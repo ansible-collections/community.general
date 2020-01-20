@@ -126,7 +126,8 @@ def query_package(module, name):
     Possible return values:
     * "present"  - installed, no upgrade needed
     * "outdated" - installed, but can be upgraded
-    * False      - not installed or not found
+    * False      - not installed
+    * None       - not found
     """
 
     # test whether '-p' (parsable) flag is supported.
@@ -172,7 +173,8 @@ def query_package(module, name):
             # Grab matched string
             pkgname_without_version = pkg_search_obj.group(1)
 
-            if name != pkgname_without_version:
+            if name != pkgname_with_version and \
+               name != pkgname_without_version:
                 continue
 
             # The package was found; now return its state
@@ -181,12 +183,15 @@ def query_package(module, name):
             elif raw_state == '=' or raw_state == '>':
                 return 'present'
             else:
+                # Package found but not installed
                 return False
             # no fall-through
 
-        # No packages were matched, so return False
-        return False
+        # No packages were matched, so return None
+        return None
 
+    # Search failed, so return None
+    return None
 
 def format_action_message(module, action, count):
     vars = {"actioned": action,
@@ -255,8 +260,11 @@ def install_packages(module, packages):
     install_c = 0
 
     for package in packages:
-        if query_package(module, package):
+        query_result = query_package(module, package)
+        if query_result:
             continue
+        elif query_result == None:
+            module.fail_json(msg="failed to find package %s for installation" % package)
 
         rc, out, err = module.run_command(
             format_pkgin_command(module, "install", package))
