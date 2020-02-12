@@ -1,0 +1,85 @@
+- name: Test that we have a UCS host, UCS username, and UCS password.
+  fail:
+    msg: 'Please define the following variables: ucs_hostname, ucs_username and ucs_password.'
+  when: ucs_hostname is not defined or ucs_username is not defined or ucs_password
+    is not defined
+  vars:
+    login_info:
+      hostname: '{{ ucs_hostname }}'
+      username: '{{ ucs_username }}'
+      password: '{{ ucs_password }}'
+- name: DNS Server absent
+  ucs_dns_server: &id003
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    dns_server: 10.10.10.10
+    state: absent
+- name: DNS Server present (check_mode)
+  ucs_dns_server: &id001
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    dns_server: 10.10.10.10
+  check_mode: true
+  register: cm_dns_server_present
+- name: DNS Server present (normal mode)
+  ucs_dns_server: *id001
+  register: nm_dns_server_present
+- name: DNS Server present again (check_mode)
+  ucs_dns_server: *id001
+  check_mode: true
+  register: cm_dns_server_present_again
+- name: DNS Server present again (normal mode)
+  ucs_dns_server: *id001
+  register: nm_dns_server_present_again
+- name: Verify DNS Server present results
+  assert:
+    that:
+    - cm_dns_server_present.changed == nm_dns_server_present.changed == true
+    - cm_dns_server_present_again.changed == nm_dns_server_present_again.changed ==
+      false
+- name: DNS DNS Server change (check_mode)
+  ucs_dns_server: &id002
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    dns_server: 10.10.10.10
+  check_mode: true
+  register: cm_dns_dns_server_change
+- name: DNS DNS Server change (normal mode)
+  ucs_dns_server: *id002
+  register: nm_dns_dns_server_change
+- name: DNS DNS Server change again (check_mode)
+  ucs_dns_server: *id002
+  check_mode: true
+  register: cm_dns_dns_server_change_again
+- name: DNS DNS Server change again (normal mode)
+  ucs_dns_server: *id002
+  register: nm_dns_dns_server_change_again
+- name: Verify DNS DNS Server change results
+  assert:
+    that:
+    - cm_dns_dns_server_change.changed == nm_dns_dns_server_change.changed == true
+    - cm_dns_dns_server_change_again.changed == nm_dns_dns_server_change_again.changed
+      == false
+- name: DNS Server absent (check_mode)
+  ucs_dns_server: *id003
+  check_mode: true
+  register: cm_dns_server_absent
+- name: DNS Server absent (normal mode)
+  ucs_dns_server: *id003
+  register: nm_dns_server_absent
+- name: DNS Server absent again (check_mode)
+  ucs_dns_server: *id003
+  check_mode: true
+  register: cm_dns_server_absent_again
+- name: DNS Server absent again (normal mode)
+  ucs_dns_server: *id003
+  register: nm_dns_server_absent_again
+- name: Verify DNS Server absent results
+  assert:
+    that:
+    - cm_dns_server_absent.changed == nm_dns_server_absent.changed == true
+    - cm_dns_server_absent_again.changed == nm_dns_server_absent_again.changed ==
+      false

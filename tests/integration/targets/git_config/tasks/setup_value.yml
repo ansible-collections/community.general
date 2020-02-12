@@ -1,0 +1,4 @@
+- name: set up with value
+  copy:
+    src: gitconfig
+    dest: ~/.gitconfig

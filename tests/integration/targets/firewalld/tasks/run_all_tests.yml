@@ -1,0 +1,11 @@
+- name: Ensure /run/firewalld exists
+  file:
+    path: /run/firewalld
+    state: directory
+- include_tasks: service_test_cases.yml
+  when: not (ansible_facts.distribution == "CentOS" and ansible_distribution_major_version
+    is version('8', '=='))
+- include_tasks: port_test_cases.yml
+  when: not (ansible_facts.distribution == "CentOS" and ansible_distribution_major_version
+    is version('8', '=='))
+- import_tasks: source_test_cases.yml

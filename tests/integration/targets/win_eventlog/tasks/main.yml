@@ -1,0 +1,9 @@
+- name: Run tests for win_eventlog in normal mode
+  import_tasks: tests.yml
+  vars:
+    in_check_mode: false
+- name: Run tests for win_eventlog in check-mode
+  import_tasks: tests.yml
+  vars:
+    in_check_mode: true
+  check_mode: true

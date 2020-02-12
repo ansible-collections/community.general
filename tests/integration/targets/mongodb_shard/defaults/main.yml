@@ -1,0 +1,11 @@
+mongodb_replicaset1: rs1
+mongodb_replicaset2: rs2
+configsrv_replicaset: cfg
+test_mongo_auth: true
+mongodb_admin_user: test_root
+mongodb_admin_password: saE_Rr9!gE6gh#e~R#nZ
+debug: true
+mongod_auth: false
+kill_signal: SIGTERM
+mongod_storage_engine_opts: --storageEngine wiredTiger --wiredTigerEngineConfigString='cache_size=200M'
+mongodb_user: mongodb

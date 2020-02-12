@@ -1,0 +1,27 @@
+- debug: msg="START cli/invalid_subset.yaml"
+- name: test invalid subset (foobar)
+  enos_facts:
+    gather_subset:
+    - foobar
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+    - result.changed == false
+    - result.failed == true
+    - result.msg == 'Bad subset'
+- name: test subset specified multiple times
+  enos_facts:
+    gather_subset:
+    - '!hardware'
+    - hardware
+    authorize: true
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+    - result.changed == false
+    - result.failed == true
+    - result.msg == 'Bad subset'
+  ignore_errors: true
+- debug: msg="END cli/invalid_subset.yaml"

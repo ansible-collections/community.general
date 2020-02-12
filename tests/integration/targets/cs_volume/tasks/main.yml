@@ -1,0 +1,2 @@
+- include_tasks: common.yml
+- include_tasks: extract_upload.yml

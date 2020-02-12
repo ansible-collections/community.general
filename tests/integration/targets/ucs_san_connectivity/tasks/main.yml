@@ -1,0 +1,94 @@
+- name: Test that we have a UCS host, UCS username, and UCS password
+  fail:
+    msg: 'Please define the following variables: ucs_hostname, ucs_username and ucs_password.'
+  when: ucs_hostname is not defined or ucs_username is not defined or ucs_password
+    is not defined
+- name: SAN Connectivity Policies absent
+  ucs_san_connectivity: &id004
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    name: Cntr-FC-Boot
+    state: absent
+- name: SAN Connectivity Policies present (check_mode)
+  ucs_san_connectivity: &id001
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    name: Cntr-FC-Boot
+    wwnn_pool: WWNN-Pool
+    vhba_list: &id002
+    - name: Fabric-A
+      vhba_template: vHBA-Template-A
+      adapter_policy: Linux
+    - name: Fabric-B
+      vhba_template: vHBA-Template-B
+      adapter_policy: Linux
+  check_mode: true
+  register: cm_san_connectivity_present
+- name: SAN Connectivity Policies present (normal mode)
+  ucs_san_connectivity: *id001
+  register: nm_san_connectivity_present
+- name: SAN Connectivity Policies present again (check_mode)
+  ucs_san_connectivity: *id001
+  check_mode: true
+  register: cm_san_connectivity_present_again
+- name: SAN Connectivity Policies present again (normal mode)
+  ucs_san_connectivity: *id001
+  register: nm_san_connectivity_present_again
+- name: Verify SAN Connectivity Policies present results
+  assert:
+    that:
+    - cm_san_connectivity_present.changed == nm_san_connectivity_present.changed ==
+      true
+    - cm_san_connectivity_present_again.changed == nm_san_connectivity_present_again.changed
+      == false
+- name: SAN Connectivity Policies description change (check_mode)
+  ucs_san_connectivity: &id003
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    name: Cntr-FC-Boot
+    wwnn_pool: WWNN-Pool
+    vhba_list: *id002
+    descr: Testing Ansible
+  check_mode: true
+  register: cm_san_connectivity_descr_change
+- name: SAN Connectivity Policies description change (normal mode)
+  ucs_san_connectivity: *id003
+  register: nm_san_connectivity_descr_change
+- name: SAN Connectivity Policies description again (check_mode)
+  ucs_san_connectivity: *id003
+  check_mode: true
+  register: cm_san_connectivity_descr_change_again
+- name: SAN Connectivity Policies description change again (normal mode)
+  ucs_san_connectivity: *id003
+  register: nm_san_connectivity_descr_change_again
+- name: Verify SAN Connectivity Policies change results
+  assert:
+    that:
+    - cm_san_connectivity_descr_change.changed == nm_san_connectivity_descr_change.changed
+      == true
+    - cm_san_connectivity_descr_change_again.changed == nm_san_connectivity_descr_change_again.changed
+      == false
+- name: SAN Connectivity Policies absent (check_mode)
+  ucs_san_connectivity: *id004
+  check_mode: true
+  register: cm_san_connectivity_absent
+- name: SAN Connectivity Policies absent (normal mode)
+  ucs_san_connectivity: *id004
+  register: nm_san_connectivity_absent
+- name: SAN Connectivity Policies absent again (check_mode)
+  ucs_san_connectivity: *id004
+  check_mode: true
+  register: cm_san_connectivity_absent_again
+- name: SAN Connectivity Policies absent again (normal mode)
+  ucs_san_connectivity: *id004
+  register: nm_san_connectivity_absent_again
+- name: Verify SAN Connectivity Policies absent results
+  assert:
+    that:
+    - cm_san_connectivity_absent.changed == nm_san_connectivity_absent.changed ==
+      true
+    - cm_san_connectivity_absent_again.changed == nm_san_connectivity_absent_again.changed
+      == false

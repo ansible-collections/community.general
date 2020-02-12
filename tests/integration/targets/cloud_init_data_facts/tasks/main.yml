@@ -1,0 +1,41 @@
+- name: test cloud-init
+  when:
+  - not (ansible_distribution == "Ubuntu" and ansible_distribution_major_version|int
+    == 14)
+  - not (ansible_os_family == "Suse" and ansible_distribution_major_version|int !=
+    42 and ansible_python.version.major != 3)
+  block:
+  - name: setup install cloud-init
+    package:
+      name:
+      - cloud-init
+      - udev
+  - name: setup run cloud-init
+    service:
+      name: cloud-init-local
+      state: restarted
+  - name: test gather cloud-init facts in check mode
+    cloud_init_data_facts: null
+    check_mode: true
+    register: result
+  - name: verify test gather cloud-init facts in check mode
+    assert:
+      that:
+      - result.cloud_init_data_facts.status.v1 is defined
+      - result.cloud_init_data_facts.status.v1.stage is defined
+      - not result.cloud_init_data_facts.status.v1.stage
+      - cloud_init_data_facts.status.v1 is defined
+      - cloud_init_data_facts.status.v1.stage is defined
+      - not cloud_init_data_facts.status.v1.stage
+  - name: test gather cloud-init facts
+    cloud_init_data_facts: null
+    register: result
+  - name: verify test gather cloud-init facts
+    assert:
+      that:
+      - result.cloud_init_data_facts.status.v1 is defined
+      - result.cloud_init_data_facts.status.v1.stage is defined
+      - not result.cloud_init_data_facts.status.v1.stage
+      - cloud_init_data_facts.status.v1 is defined
+      - cloud_init_data_facts.status.v1.stage is defined
+      - not cloud_init_data_facts.status.v1.stage

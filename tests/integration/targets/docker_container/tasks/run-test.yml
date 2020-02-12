@@ -1,0 +1,2 @@
+- name: Loading tasks from {{ item }}
+  include_tasks: '{{ item }}'

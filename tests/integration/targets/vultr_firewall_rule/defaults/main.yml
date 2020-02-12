@@ -1,0 +1,2 @@
+vultr_resource_prefix: vultr-test-prefix
+vultr_firewall_group_name: '{{ vultr_resource_prefix }}_firewall-group'

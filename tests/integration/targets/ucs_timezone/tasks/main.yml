@@ -1,0 +1,85 @@
+- name: Test that we have a UCS host, UCS username, and UCS password
+  fail:
+    msg: 'Please define the following variables: ucs_hostname, ucs_username and ucs_password.'
+  when: ucs_hostname is not defined or ucs_username is not defined or ucs_password
+    is not defined
+  vars:
+    login_info:
+      hostname: '{{ ucs_hostname }}'
+      username: '{{ ucs_username }}'
+      password: '{{ ucs_password }}'
+- name: Timezone absent
+  ucs_timezone: &id003
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    state: absent
+- name: Timezone present (check_mode)
+  ucs_timezone: &id001
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    timezone: America/Los_Angeles
+    description: Timezone for America/Los_Angeles
+  check_mode: true
+  register: cm_timezone_present
+- name: Timezone present (normal mode)
+  ucs_timezone: *id001
+  register: nm_timezone_present
+- name: Timezone present again (check_mode)
+  ucs_timezone: *id001
+  check_mode: true
+  register: cm_timezone_present_again
+- name: Timezone present again (normal mode)
+  ucs_timezone: *id001
+  register: nm_timezone_present_again
+- name: Verify Timezone present results
+  assert:
+    that:
+    - cm_timezone_present.changed == nm_timezone_present.changed == true
+    - cm_timezone_present_again.changed == nm_timezone_present_again.changed == false
+- name: Timezone description change (check_mode)
+  ucs_timezone: &id002
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    timezone: America/Los_Angeles
+    description: Timezone for America/Los_Angeles
+    descr: Testing Ansible
+  check_mode: true
+  register: cm_timezone_descr_change
+- name: Timezone description change (normal mode)
+  ucs_timezone: *id002
+  register: nm_timezone_descr_change
+- name: Timezone description again (check_mode)
+  ucs_timezone: *id002
+  check_mode: true
+  register: cm_timezone_descr_change_again
+- name: Timezone description change again (normal mode)
+  ucs_timezone: *id002
+  register: nm_timezone_descr_change_again
+- name: Verify Timezone change results
+  assert:
+    that:
+    - cm_timezone_descr_change.changed == nm_timezone_descr_change.changed == true
+    - cm_timezone_descr_change_again.changed == nm_timezone_descr_change_again.changed
+      == false
+- name: Timezone absent (check_mode)
+  ucs_timezone: *id003
+  check_mode: true
+  register: cm_timezone_absent
+- name: Timezone absent (normal mode)
+  ucs_timezone: *id003
+  register: nm_timezone_absent
+- name: Timezone absent again (check_mode)
+  ucs_timezone: *id003
+  check_mode: true
+  register: cm_timezone_absent_again
+- name: Timezone absent again (normal mode)
+  ucs_timezone: *id003
+  register: nm_timezone_absent_again
+- name: Verify Timezone absent results
+  assert:
+    that:
+    - cm_timezone_absent.changed == nm_timezone_absent.changed == true
+    - cm_timezone_absent_again.changed == nm_timezone_absent_again.changed == false

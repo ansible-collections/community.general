@@ -1,0 +1,7 @@
+- block:
+  - include: zabbix_host_setup.yml
+  - include: zabbix_host_tests.yml
+  - include: zabbix_host_doc.yml
+  - include: zabbix_host_teardown.yml
+  when:
+  - ansible_distribution == 'Ubuntu'

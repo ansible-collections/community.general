@@ -1,0 +1,17 @@
+- debug: msg="START common/not_hardware_facts.yaml on connection={{ ansible_connection
+    }}"
+- name: test not hardware
+  exos_facts:
+    gather_subset:
+    - '!hardware'
+  register: result
+- assert:
+    that:
+    - result.changed == false
+    - '''config'' in result.ansible_facts.ansible_net_gather_subset'
+    - '''default'' in result.ansible_facts.ansible_net_gather_subset'
+    - '''interfaces'' in result.ansible_facts.ansible_net_gather_subset'
+    - '''hardware'' not in result.ansible_facts.ansible_net_gather_subset'
+    - result.ansible_facts.ansible_net_interfaces | length > 1
+- debug: msg="END common/not_hardware_facts.yaml on connection={{ ansible_connection
+    }}"

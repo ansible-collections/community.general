@@ -1,0 +1,21 @@
+- name: test get vultr account infos in check mode
+  vultr_account_info: null
+  check_mode: true
+  register: result
+- name: verify test get vultr account infos in check mode
+  assert:
+    that:
+    - result.vultr_account_info.balance is defined
+    - result.vultr_account_info.last_payment_amount is defined
+    - result.vultr_account_info.last_payment_date is defined
+    - result.vultr_account_info.last_payment_amount is defined
+- name: test get vultr account fact
+  vultr_account_info: null
+  register: result
+- name: verify test get vultr account infos
+  assert:
+    that:
+    - result.vultr_account_info.balance is defined
+    - result.vultr_account_info.last_payment_amount is defined
+    - result.vultr_account_info.last_payment_date is defined
+    - result.vultr_account_info.last_payment_amount is defined

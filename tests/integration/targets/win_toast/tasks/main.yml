@@ -1,0 +1,11 @@
+- name: Set up tests
+  import_tasks: setup.yml
+- name: Test in normal mode
+  import_tasks: tests.yml
+  vars:
+    in_check_mode: false
+- name: Test in check mode
+  import_tasks: tests.yml
+  vars:
+    in_check_mode: true
+  check_mode: true

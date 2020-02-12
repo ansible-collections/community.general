@@ -1,0 +1,24 @@
+- name: Install EPEL repository (RHEL only)
+  include_role:
+    name: setup_epel
+  when: ansible_distribution == 'RedHat'
+- name: Install iptables (SuSE only)
+  package:
+    name: iptables
+  become: true
+  when: ansible_os_family == 'Suse'
+- name: Install ufw
+  become: true
+  package:
+    name: ufw
+- block:
+  - include_tasks: run-test.yml
+    with_fileglob:
+    - tests/*.yml
+  become: true
+  always:
+  - pause:
+      seconds: 1
+  - name: Reset ufw to factory defaults and disable
+    ufw:
+      state: reset

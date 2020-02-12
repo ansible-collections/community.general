@@ -1,0 +1,36 @@
+- block:
+  - command: echo {{ output_dir }}
+    register: echo
+  - set_fact:
+      remote_dir: '{{ echo.stdout }}'
+  - include_vars: '{{ item }}'
+    with_first_found:
+    - files:
+      - '{{ ansible_distribution }}.yml'
+      - '{{ ansible_os_family }}.yml'
+      - defaults.yml
+  - include_tasks: '{{ item }}'
+    with_first_found:
+    - files:
+      - install_{{ ansible_distribution }}.yml
+      - install_{{ ansible_os_family }}.yml
+      - install_{{ ansible_system }}.yml
+  - include_tasks: test.yml
+    with_items:
+    - username: ''
+      password: ''
+    - username: testétest
+      password: passéword
+    loop_control:
+      loop_var: credentials
+  when: ansible_os_family != 'RedHat' or ansible_distribution_major_version|int >
+    6
+  always:
+  - include_tasks: '{{ item }}'
+    when: ansible_os_family != 'RedHat' or ansible_distribution_major_version|int
+      > 6
+    with_first_found:
+    - files:
+      - uninstall_{{ ansible_distribution }}.yml
+      - uninstall_{{ ansible_os_family }}.yml
+      - uninstall_{{ ansible_system }}.yml

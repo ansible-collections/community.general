@@ -1,0 +1,2 @@
+- include: test.yml
+  when: ansible_os_family == 'Suse'

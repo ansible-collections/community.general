@@ -1,0 +1,10 @@
+- name: ensure netbios is set to default to start with
+  win_netbios:
+    state: default
+- block:
+  - name: run tests
+    include_tasks: tests.yml
+  always:
+  - name: set netbios back to default after tests
+    win_netbios:
+      state: default

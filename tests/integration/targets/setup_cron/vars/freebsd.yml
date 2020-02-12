@@ -1,0 +1,3 @@
+cron_pkg: null
+cron_service: cron
+list_pkg_files: pkg info --list-files

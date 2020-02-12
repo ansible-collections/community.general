@@ -1,0 +1,85 @@
+- name: Test that we have a UCS host, UCS username, and UCS password
+  fail:
+    msg: 'Please define the following variables: ucs_hostname, ucs_username and ucs_password.'
+  when: ucs_hostname is not defined or ucs_username is not defined or ucs_password
+    is not defined
+  vars:
+    login_info:
+      hostname: '{{ ucs_hostname }}'
+      username: '{{ ucs_username }}'
+      password: '{{ ucs_password }}'
+- name: NTP Server absent
+  ucs_ntp_server: &id003
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    ntp_server: pool.ntp.org
+    state: absent
+- name: NTP Server present (check_mode)
+  ucs_ntp_server: &id001
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    ntp_server: pool.ntp.org
+  check_mode: true
+  register: cm_ntp_server_present
+- name: NTP Server present (normal mode)
+  ucs_ntp_server: *id001
+  register: nm_ntp_server_present
+- name: NTP Server present again (check_mode)
+  ucs_ntp_server: *id001
+  check_mode: true
+  register: cm_ntp_server_present_again
+- name: NTP Server present again (normal mode)
+  ucs_ntp_server: *id001
+  register: nm_ntp_server_present_again
+- name: Verify NTP Server present results
+  assert:
+    that:
+    - cm_ntp_server_present.changed == nm_ntp_server_present.changed == true
+    - cm_ntp_server_present_again.changed == nm_ntp_server_present_again.changed ==
+      false
+- name: NTP NTP Server change (check_mode)
+  ucs_ntp_server: &id002
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    ntp_server: 10.10.10.10
+  check_mode: true
+  register: cm_ntp_ntp_server_change
+- name: NTP NTP Server change (normal mode)
+  ucs_ntp_server: *id002
+  register: nm_ntp_ntp_server_change
+- name: NTP NTP Server change again (check_mode)
+  ucs_ntp_server: *id002
+  check_mode: true
+  register: cm_ntp_ntp_server_change_again
+- name: NTP NTP Server change again (normal mode)
+  ucs_ntp_server: *id002
+  register: nm_ntp_ntp_server_change_again
+- name: Verify NTP NTP Server change results
+  assert:
+    that:
+    - cm_ntp_ntp_server_change.changed == nm_ntp_ntp_server_change.changed == true
+    - cm_ntp_ntp_server_change_again.changed == nm_ntp_ntp_server_change_again.changed
+      == false
+- name: NTP Server absent (check_mode)
+  ucs_ntp_server: *id003
+  check_mode: true
+  register: cm_ntp_server_absent
+- name: NTP Server absent (normal mode)
+  ucs_ntp_server: *id003
+  register: nm_ntp_server_absent
+- name: NTP Server absent again (check_mode)
+  ucs_ntp_server: *id003
+  check_mode: true
+  register: cm_ntp_server_absent_again
+- name: NTP Server absent again (normal mode)
+  ucs_ntp_server: *id003
+  register: nm_ntp_server_absent_again
+- name: Verify NTP Server absent results
+  assert:
+    that:
+    - cm_ntp_server_absent.changed == nm_ntp_server_absent.changed == true
+    - cm_ntp_server_absent_again.changed == nm_ntp_server_absent_again.changed ==
+      false

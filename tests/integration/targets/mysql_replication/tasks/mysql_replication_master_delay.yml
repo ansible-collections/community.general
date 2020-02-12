@@ -1,0 +1,32 @@
+- name: Run replication
+  mysql_replication:
+    login_host: 127.0.0.1
+    login_port: '{{ standby_port }}'
+    mode: changemaster
+    master_delay: '{{ test_master_delay }}'
+  register: result
+- assert:
+    that:
+    - result is changed
+    - result.queries == ["CHANGE MASTER TO MASTER_DELAY=60"]
+- name: Start slave
+  mysql_replication:
+    login_host: 127.0.0.1
+    login_port: '{{ standby_port }}'
+    mode: startslave
+  register: result
+- name: Get standby status
+  mysql_replication:
+    login_host: 127.0.0.1
+    login_port: '{{ standby_port }}'
+    mode: getslave
+  register: slave_status
+- assert:
+    that:
+    - slave_status.SQL_Delay == {{ test_master_delay }}
+    - slave_status is not changed
+- name: Stop slave
+  mysql_replication:
+    login_host: 127.0.0.1
+    login_port: '{{ standby_port }}'
+    mode: stopslave

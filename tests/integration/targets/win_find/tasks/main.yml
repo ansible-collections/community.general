@@ -1,0 +1,56 @@
+- name: ensure the testing directory is cleared before setting up test
+  win_file:
+    path: '{{win_find_dir}}'
+    state: absent
+- name: set test files and folders
+  win_shell: "$directories = @(\n    \"nested\",\n    \"single\",\n    \"link-dest\\\
+    sub-link\",\n    \"hard-link-dest\",\n    \"junction-link-dest\",\n    \"broken-link-dest\"\
+    ,\n    \"nested\\sub-nest\",\n    \"shared\\folder\",\n    \"hidden\",\n    \"\
+    date\",\n    \"emptynested\\nest\\dir1\",\n    \"emptynested\\nest\\dir2\"\n)\n\
+    \n$tmp_dir = '{{ win_find_dir }}'\nforeach ($directory in $directories) {\n  \
+    \  New-Item -Path \"$tmp_dir\\$directory\" -ItemType Directory\n}\n\n$normal_content\
+    \ = \"abcdefg1234567\"\n$normal_files = @(\n    \"nested\\file.ps1\",\n    \"\
+    nested\\test.ps1\",\n    \"nested\\out.log\",\n    \"nested\\archive.log\",\n\
+    \    \"nested\\sub-nest\\test.ps1\",\n    \"nested\\sub-nest\\readonly.txt\",\n\
+    \    \"link-dest\\link.ps1\",\n    \"single\\test.ps1\",\n    \"single\\hidden.ps1\"\
+    ,\n    \"single\\out_20161101-091005.log\",\n    \"hidden\\out_20161101-091005.log\"\
+    ,\n    \"hard-link-dest\\file-abc.log\"\n)\nforeach ($file in $normal_files) {\n\
+    \    New-Item -Path \"$tmp_dir\\$file\" -ItemType File\n    [System.IO.File]::WriteAllText(\"\
+    $tmp_dir\\$file\", $normal_content)\n}\n\nNew-Item -Path \"$tmp_dir\\single\\\
+    small.ps1\" -ItemType File\n[System.IO.File]::WriteAllText(\"$tmp_dir\\single\\\
+    small.ps1\", \"a\")\n\nNew-Item -Path \"$tmp_dir\\date\\new.ps1\" -ItemType File\n\
+    [System.IO.File]::WriteAllText(\"$tmp_dir\\date\\new.ps1\", \"random text for\
+    \ new date\")\n\nNew-Item -Path \"$tmp_dir\\date\\old.ps1\" -ItemType File\n[System.IO.File]::WriteAllText(\"\
+    $tmp_dir\\date\\old.ps1\", \"random text for old date\")\n\nNew-Item -Path \"\
+    $tmp_dir\\single\\large.ps1\" -ItemType File\nSet-Content -LiteralPath \"$tmp_dir\\\
+    single\\large.ps1\" -Value ('abcdefghijklmnopqrstuvwxyz' * 10000)\n\n$share_stat\
+    \ = Get-WmiObject -Class Win32_Share -Filter \"name='folder-share'\"\nif ($share_stat)\
+    \ {\n    $share_stat.Delete()\n}\n$wmi = [wmiClass] 'Win32_Share'\n$wmi.Create(\"\
+    $tmp_dir\\shared\\folder\", \"folder-share\", 0)\n\ncmd.exe /c mklink /D \"$tmp_dir\\\
+    nested\\link\" \"$tmp_dir\\link-dest\"\ncmd.exe /c mklink /D \"$tmp_dir\\broken-link\"\
+    \ \"$tmp_dir\\broken-link-dest\"\ncmd.exe /c mklink /H \"$tmp_dir\\hard-link-dest\\\
+    hard-link.log\" \"$tmp_dir\\hard-link-dest\\file-abc.log\"\ncmd.exe /c mklink\
+    \ /J \"$tmp_dir\\junction-link\" \"$tmp_dir\\junction-link-dest\"\n\n$date = Get-Date\
+    \ -Year 2016 -Month 11 -Day 1 -Hour 7 -Minute 10 -Second 5 -Millisecond 0\nSet-Location\
+    \ -LiteralPath $tmp_dir\nGet-ChildItem -Recurse | Where-Object { $_.Name -ne \"\
+    new.ps1\" } | ForEach-Object {\n    $_.CreationTime = $date\n    $_.LastAccessTime\
+    \ = $date\n    $_.LastWriteTime = $date\n}\nPop-Location\n\n$attributes = @{\n\
+    \    \"hidden\" = \"Hidden\"\n    \"date\" = \"Hidden\"\n    \"nested\\archive.log\"\
+    \ = \"Archive\"\n    \"nested\\sub-nest\\readonly.txt\" = \"ReadOnly\"\n    \"\
+    single\\hidden.ps1\" = \"Hidden\"\n}\nforeach ($attribute in $attributes.GetEnumerator())\
+    \ {\n    $item = Get-Item -LiteralPath \"$tmp_dir\\$($attribute.Name)\"\n    $file_attributes\
+    \ = $item.Attributes -split ','\n    if ($file_attributes -notcontains $attribute.Value)\
+    \ {\n        $file_attributes += $attribute.Value\n    }\n    $item.Attributes\
+    \ = $file_attributes -join ','\n}\n\nRemove-Item -LiteralPath \"$tmp_dir\\broken-link-dest\"\
+    \ -Force\n"
+- block:
+  - include_tasks: tests.yml
+  always:
+  - name: remove test user
+    win_user:
+      name: '{{test_win_find_username}}'
+      state: absent
+  - name: remove testing folder
+    win_file:
+      path: '{{win_find_dir}}'
+      state: absent

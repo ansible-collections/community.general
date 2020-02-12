@@ -1,0 +1,8 @@
+vultr_resource_prefix: vultr-test-prefix
+vultr_startup_script_name: '{{ vultr_resource_prefix }}_script'
+vultr_startup_script: '#!/bin/bash
+
+  echo Hello World > /root/hello'
+vultr_startup_script2: '#!/bin/bash
+
+  echo Hello to my World > /root/hello'

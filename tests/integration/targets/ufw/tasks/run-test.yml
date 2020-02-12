@@ -1,0 +1,13 @@
+- pause:
+    seconds: 1
+- name: Reset ufw to factory defaults
+  ufw:
+    state: reset
+- name: Disable ufw
+  ufw:
+    state: disabled
+- name: Loading tasks from {{ item }}
+  include_tasks: '{{ item }}'
+- name: Reset to factory defaults
+  ufw:
+    state: reset

@@ -1,0 +1,28 @@
+- debug: msg="START common/invalid_subset.yaml on connection={{ ansible_connection
+    }}"
+- name: test invalid subset (foobar)
+  exos_facts:
+    gather_subset:
+    - foobar
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+    - result.changed == false
+    - result.failed == true
+    - result.msg == 'Subset must be one of [config, default, hardware, interfaces],
+      got foobar'
+- name: test subset specified multiple times
+  exos_facts:
+    gather_subset:
+    - '!hardware'
+    - hardware
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+    - result.changed == false
+    - result.failed == true
+    - result.msg == 'Bad subset'
+  ignore_errors: true
+- debug: msg="END common/invalid_subset.yaml on connection={{ ansible_connection }}"

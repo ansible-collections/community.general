@@ -1,0 +1,3 @@
+- set_fact:
+    cloudscale_test_password: '{{ lookup(''password'', ''/dev/null length=15 chars=ascii_letters'')
+      }}'

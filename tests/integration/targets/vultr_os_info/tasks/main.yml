@@ -1,0 +1,17 @@
+- name: test get vultr os infos in check mode
+  vultr_os_info: null
+  check_mode: true
+  register: result
+- name: verify test get vultr os infos in check mode
+  assert:
+    that:
+    - result.vultr_os_info|selectattr('name','equalto', 'CentOS 7 x64') | list | count
+      == 1
+- name: test get vultr os fact
+  vultr_os_info: null
+  register: result
+- name: verify test get vultr os infos
+  assert:
+    that:
+    - result.vultr_os_info|selectattr('name','equalto', 'CentOS 7 x64') | list | count
+      == 1

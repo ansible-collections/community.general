@@ -1,0 +1,54 @@
+- name: setup ensure VM is absent
+  vultr_server:
+    name: '{{ vultr_server_name }}'
+    state: absent
+  register: result
+- name: wait for 5 min until VM is absent
+  wait_for: null
+  when: result is changed
+- name: test gather vultr server info - empty resources
+  vultr_server_info: null
+  register: result
+- name: verify test gather vultr server info - empty resources
+  assert:
+    that:
+    - result.vultr_server_info | selectattr('name','equalto',vultr_server_name) |
+      list | count == 0
+- name: setup firewall group
+  vultr_firewall_group:
+    name: test_vultr_server_info
+- name: setup create the server
+  vultr_server:
+    name: '{{ vultr_server_name }}'
+    os: '{{ vultr_server_os }}'
+    plan: '{{ vultr_server_plan }}'
+    region: '{{ vultr_server_region }}'
+    firewall_group: test_vultr_server_info
+- name: test gather vultr server info in check mode
+  vultr_server_info: null
+  check_mode: true
+  register: result
+- name: verify test gather vultr server info in check mode
+  assert:
+    that:
+    - result.vultr_server_info|selectattr('name','equalto',vultr_server_name) | list
+      | count == 1
+- name: test gather vultr server info
+  vultr_server_info: null
+  register: result
+- name: verify test gather vultr server info
+  assert:
+    that:
+    - result.vultr_server_info|selectattr('name','equalto',vultr_server_name) | list
+      | count == 1
+- name: Pause for 5 min before deleting the VM
+  pause:
+    minutes: 5
+- name: cleanup the server
+  vultr_server:
+    name: '{{ vultr_server_name }}'
+    state: absent
+- name: cleanup firewall group
+  vultr_firewall_group:
+    name: test_vultr_server_info
+    state: absent

@@ -1,0 +1,72 @@
+- name: Test that we have a UCS host, UCS username, and UCS password
+  fail:
+    msg: 'Please define the following variables: ucs_hostname, ucs_username and ucs_password.'
+  when: ucs_hostname is not defined or ucs_username is not defined or ucs_password
+    is not defined
+  vars:
+    login_info: {}
+- name: org absent
+  ucs_org: &id003
+    org_name: testorg
+    state: absent
+- name: org present (check_mode)
+  ucs_org: &id001
+    org_name: testorg
+  check_mode: true
+  register: cm_org_present
+- name: org present (normal mode)
+  ucs_org: *id001
+  register: nm_org_present
+- name: org present again (check_mode)
+  ucs_org: *id001
+  check_mode: true
+  register: cm_org_present_again
+- name: org present again (normal mode)
+  ucs_org: *id001
+  register: nm_org_present_again
+- name: Verify org present results
+  assert:
+    that:
+    - cm_org_present.changed == nm_org_present.changed == true
+    - cm_org_present_again.changed == nm_org_present_again.changed == false
+- name: org description change (check_mode)
+  ucs_org: &id002
+    org_name: testorg
+    description: testorg
+  check_mode: true
+  register: cm_org_description_change
+- name: org description change (normal mode)
+  ucs_org: *id002
+  register: nm_org_description_change
+- name: org description change again (check_mode)
+  ucs_org: *id002
+  check_mode: true
+  register: cm_org_description_change_again
+- name: org description change again (normal mode)
+  ucs_org: *id002
+  register: nm_org_description_change_again
+- name: Verify org change results
+  assert:
+    that:
+    - cm_org_description_change.changed == nm_org_description_change.changed == true
+    - cm_org_description_change_again.changed == nm_org_description_change_again.changed
+      == false
+- name: org absent (check_mode)
+  ucs_org: *id003
+  check_mode: true
+  register: cm_org_absent
+- name: org absent (normal mode)
+  ucs_org: *id003
+  register: nm_org_absent
+- name: org absent again (check_mode)
+  ucs_org: *id003
+  check_mode: true
+  register: cm_org_absent_again
+- name: org absent again (normal mode)
+  ucs_org: *id003
+  register: nm_org_absent_again
+- name: Verify org absent results
+  assert:
+    that:
+    - cm_org_absent.changed == nm_org_absent.changed == true
+    - cm_org_absent_again.changed == nm_org_absent_again.changed == false

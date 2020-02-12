@@ -1,0 +1,240 @@
+- set_fact: output_file={{win_output_dir}}\\foo.txt
+- name: prep with a basic win copy
+  win_copy: src=foo.txt dest={{output_file}}
+- name: verify that we are checking a file and it is present
+  win_file: path={{output_file}} state=file
+  register: file_result
+- name: verify that the file was marked as changed
+  assert:
+    that:
+    - file_result.changed == false
+- name: verify that we are checking an absent file
+  win_file: path={{win_output_dir}}/bar.txt state=absent
+  register: file2_result
+- name: verify that the file was marked as changed
+  assert:
+    that:
+    - file2_result.changed == false
+- name: verify we can touch a file (check)
+  win_file:
+    path: '{{win_output_dir}}\touch.txt'
+    state: touch
+  register: touch_file_check
+  check_mode: true
+- name: get details of touched file (check)
+  win_stat:
+    path: '{{win_output_dir}}\touch.txt'
+  register: touch_file_actual_check
+- name: assert touch a file (check)
+  assert:
+    that:
+    - touch_file_check.changed
+    - not touch_file_actual_check.stat.exists
+- name: verify we can touch a file
+  win_file: path={{win_output_dir}}/touch.txt state=touch
+  register: touch_file
+- name: get details of touched file
+  win_stat:
+    path: '{{win_output_dir}}\touch.txt'
+  register: touch_file_actual
+- name: assert touch a file
+  assert:
+    that:
+    - touch_file.changed
+    - touch_file_actual.stat.exists
+    - touch_file_actual.stat.size == 0
+- name: touch a file again
+  win_file:
+    path: '{{win_output_dir}}\touch.txt'
+    state: touch
+  register: touch_file_again
+- name: get details of touched file again
+  win_stat:
+    path: '{{win_output_dir}}\touch.txt'
+  register: touch_file_actual_again
+- name: assert touch a file again
+  assert:
+    that:
+    - touch_file_again.changed
+    - touch_file_actual_again.stat.lastwritetime > touch_file_actual.stat.lastwritetime
+- name: touch an existing file in check mode
+  win_file:
+    path: '{{win_output_dir}}\touch.txt'
+    state: touch
+  register: touch_file_again_check
+  check_mode: true
+- name: get details of touched file in check mode
+  win_stat:
+    path: '{{win_output_dir}}\touch.txt'
+  register: touch_file_again_actual_check
+- name: assert touch an existing file in check mode
+  assert:
+    that:
+    - touch_file_again_check.changed
+    - touch_file_again_actual_check.stat.lastwritetime == touch_file_actual_again.stat.lastwritetime
+- name: create a directory
+  win_file: path={{win_output_dir}}/foobar state=directory
+  register: file7_result
+- debug: var=file7_result
+- name: verify that the file was marked as changed
+  assert:
+    that:
+    - file7_result.changed == true
+- name: remote directory foobar
+  win_file: path={{win_output_dir}}/foobar state=absent
+- name: remove file foo.txt
+  win_file: path={{win_output_dir}}/foo.txt state=absent
+- name: remove file bar.txt
+  win_file: path={{win_output_dir}}/foo.txt state=absent
+- name: remove file baz.txt
+  win_file: path={{win_output_dir}}/foo.txt state=absent
+- name: win copy directory structure over
+  win_copy: src=foobar dest={{win_output_dir}}
+- name: remove directory foobar
+  win_file: path={{win_output_dir}}/foobar state=absent
+  register: file14_result
+- debug: var=file14_result
+- name: verify that the directory was removed
+  assert:
+    that:
+    - file14_result.changed == true
+- name: create a test sub-directory
+  win_file: dest={{win_output_dir}}/sub1 state=directory
+  register: file15_result
+- name: verify that the new directory was created
+  assert:
+    that:
+    - file15_result.changed == true
+- name: create test files in the sub-directory
+  win_file: dest={{win_output_dir}}/sub1/{{item}} state=touch
+  with_items:
+  - file1
+  - file2
+  - file3
+  register: file16_result
+- name: verify the files were created
+  assert:
+    that:
+    - item.changed == true
+  with_items: '{{file16_result.results}}'
+- name: create another test sub-directory
+  win_file: dest={{win_output_dir}}/sub2 state=directory
+  register: file19_result
+- name: verify that the new directory was created
+  assert:
+    that:
+    - file19_result.changed == true
+- name: create a directory
+  win_file: path={{win_output_dir}}/dirtest state=directory
+  register: file_result
+- name: stat the directory created
+  win_stat: path={{win_output_dir}}/dirtest
+  register: stat_result
+- name: assert the directory was created
+  assert:
+    that:
+    - file_result.changed
+    - stat_result.stat.exists
+    - stat_result.stat.isdir
+- name: re run create directory (bug 2147)
+  win_file: path={{win_output_dir}}/dirtest state=directory
+  register: file_result
+- name: stat the directory created again
+  win_stat: path={{win_output_dir}}/dirtest
+  register: stat_result
+- name: assert the directory exists but was not changed
+  assert:
+    that:
+    - file_result.changed == False
+    - stat_result.stat.exists
+    - stat_result.stat.isdir
+- name: remove empty dir we just created
+  win_file: path={{win_output_dir}}/dirtest state=absent
+  register: file_result
+- name: stat the removed directory
+  win_stat: path={{win_output_dir}}/dirtest
+  register: stat_result
+- name: assert the directory does not exist
+  assert:
+    that:
+    - file_result.changed
+    - stat_result.stat.exists == False
+- name: create dir with spaces and parens in the dir name
+  win_file:
+    path: '{{win_output_dir}}\dir with spaces (and parens) [block]'
+    state: directory
+  register: file_result
+- name: stat the directory with spaces and parens
+  win_stat:
+    path: '{{win_output_dir}}\dir with spaces (and parens) [block]'
+  register: stat_result
+- name: check dir with spaces and parens in the dir name has been created
+  assert:
+    that:
+    - file_result.changed
+    - stat_result.stat.exists
+    - stat_result.stat.isdir
+- name: create file in dir with special char
+  win_file:
+    path: '{{win_output_dir}}\dir with spaces (and parens) [block]\file[1].txt'
+    state: touch
+  register: file_result
+- name: stat the file with spaces and parens
+  win_stat:
+    path: '{{win_output_dir}}\dir with spaces (and parens) [block]\file[1].txt'
+  register: stat_result
+- name: check file in dir with spaces and parens exist
+  assert:
+    that:
+    - file_result.changed
+    - stat_result.stat.exists
+    - stat_result.stat.isreg
+- name: remove dir with spaces and parens in the dir name
+  win_file:
+    path: '{{win_output_dir}}/dir with spaces (and parens) [block]'
+    state: absent
+  register: file_result
+- name: stat the dir with spaces and parens in the dir name
+  win_stat:
+    path: '{{win_output_dir}}\dir with spaces (and parens) [block]'
+  register: stat_result
+- name: assert dir with spaces and parens in the dir name was removed
+  assert:
+    that:
+    - file_result.changed
+    - stat_result.stat.exists == False
+- name: create hidden file
+  win_shell: $file = New-Item -Path "{{ win_output_dir }}\hidden.txt" -ItemType File;
+    $file.Attributes = "Hidden"
+- name: delete hidden file
+  win_file:
+    path: '{{ win_output_dir }}\hidden.txt'
+    state: absent
+  register: delete_hidden
+- name: get result of delete hidden file
+  win_stat:
+    path: '{{ win_output_dir }}\hidden.txt'
+  register: delete_hidden_actual
+- name: assert delete hidden file
+  assert:
+    that:
+    - delete_hidden is changed
+    - not delete_hidden_actual.stat.exists
+- name: create folder to point set symbolic link for
+  win_file:
+    path: '{{win_output_dir}}/link-test/link-target'
+    state: directory
+- name: create symbolic link
+  win_command: cmd.exe /c mklink /d "{{win_output_dir}}\link-test\link" "{{win_output_dir}}\link-test\link-target"
+- name: remove symbolic link target
+  win_file:
+    path: '{{win_output_dir}}/link-test/link-target'
+    state: absent
+- name: remove parent folder with broken link
+  win_file:
+    path: '{{win_output_dir}}/link-test'
+    state: absent
+- name: clean up sub1
+  win_file: path={{win_output_dir}}/sub1 state=absent
+- name: clean up sub2
+  win_file: path={{win_output_dir}}/sub2 state=absent

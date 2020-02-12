@@ -1,0 +1,94 @@
+- debug: msg="START connection={{ ansible_connection }}/sanity.yaml"
+- debug: msg="Using provider={{ connection.transport }}"
+  when: ansible_connection == "local"
+- block:
+  - name: remove configuration
+    cnos_system: &id009
+      state: absent
+    register: result
+    ignore_errors: true
+  - name: configure lookup_enabled
+    cnos_system: &id007
+      lookup_enabled: true
+      state: present
+    register: result
+  - name: configure hostname and domain-name
+    cnos_system: &id001
+      hostname: switch
+      domain_name: test.example.com
+    register: result
+  - assert: &id002
+      that:
+      - result.changed == true
+  - name: Idempotence check
+    cnos_system: *id001
+    register: result
+  - assert: &id004
+      that:
+      - result.changed == true
+  - name: configure name servers
+    cnos_system: &id003
+      name_servers:
+      - 8.8.8.8
+      - 8.8.4.4
+    register: result
+  - assert: *id002
+  - name: Idempotence check
+    cnos_system: *id003
+    register: result
+  - assert: *id004
+  - name: configure name servers with VRF support
+    cnos_system: &id005
+      name_servers:
+      - server: 8.8.8.8
+        vrf: management
+      - server: 8.8.4.4
+        vrf: management
+    register: result
+  - assert: *id002
+  - name: Idempotence check
+    cnos_system: *id005
+    register: result
+  - assert:
+      that:
+      - result.changed == false
+  - name: configure lookup_enabled1
+    cnos_system: &id006
+      lookup_enabled: false
+    register: result
+  - assert: *id002
+  - name: Idempotence check
+    cnos_system: *id006
+    register: result
+  - assert:
+      that:
+      - result.changed == false
+  - name: configure lookup_enabled2
+    cnos_system: *id007
+    register: result
+  - assert: *id002
+  - name: Idempotence check
+    cnos_system: *id007
+    register: result
+  - assert:
+      that:
+      - result.changed == false
+  - name: default configuration
+    cnos_system: &id008
+      hostname: default
+      domain_name: default
+      name_servers: default
+    register: result
+  - assert: *id002
+  - name: Idempotence check
+    cnos_system: *id008
+    register: result
+  - assert:
+      that:
+      - result.changed == false
+  always:
+  - name: remove configuration
+    cnos_system: *id009
+  - name: Re-configure hostname
+    cnos_system: *id001
+- debug: msg="END connection={{ ansible_connection }}/sanity.yaml"

@@ -1,0 +1,8 @@
+- name: check whether servermanager module is available (windows 2008 r2 or later)
+  win_shell: if (Get-Command -Name Add-WindowsFeature -ErrorAction SilentlyContinue)
+    { $true } else { $false }
+  changed_when: false
+  register: win_feature_has_servermanager
+- name: run tests
+  include_tasks: tests.yml
+  when: win_feature_has_servermanager.stdout | trim | bool

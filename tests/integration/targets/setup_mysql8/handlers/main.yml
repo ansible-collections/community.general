@@ -1,0 +1,22 @@
+- name: stop mysql service
+  service:
+    name: mysqld
+    state: stopped
+  listen: cleanup mysql8
+- name: remove repo
+  command: '{{ ansible_facts.pkg_mgr}} -y erase mysql80-community-release'
+  args:
+    warn: false
+  listen: cleanup mysql8
+- name: remove mysql packages
+  yum:
+    name: '{{ mysql_support_packages | union(mysql_server_packages) | union(mysql_cleanup_packages)
+      }}'
+    state: absent
+  listen: cleanup mysql8
+- name: remove mysql data
+  file:
+    path: '{{ item }}'
+    state: absent
+  loop: '{{ mysql_data_dirs }}'
+  listen: cleanup mysql8

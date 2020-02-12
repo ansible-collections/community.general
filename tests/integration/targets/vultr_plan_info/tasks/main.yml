@@ -1,0 +1,17 @@
+- name: test gather vultr plan info in check mode
+  vultr_plan_info: null
+  check_mode: true
+  register: result
+- name: verify test gather vultr plan info in check mode
+  assert:
+    that:
+    - result.vultr_plan_info|selectattr('name','equalto','16384 MB RAM,2x110 GB SSD,20.00
+      TB BW') | list | count == 1
+- name: test gather vultr plan info
+  vultr_plan_info: null
+  register: result
+- name: verify test gather vultr plan info
+  assert:
+    that:
+    - result.vultr_plan_info|selectattr('name','equalto','16384 MB RAM,2x110 GB SSD,20.00
+      TB BW') | list | count == 1

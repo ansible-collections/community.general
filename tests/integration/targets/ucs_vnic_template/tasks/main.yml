@@ -1,0 +1,205 @@
+- name: Test that we have a UCS host, UCS username, and UCS password
+  fail:
+    msg: 'Please define the following variables: ucs_hostname, ucs_username and ucs_password.'
+  when: ucs_hostname is not defined or ucs_username is not defined or ucs_password
+    is not defined
+  vars:
+    login_info:
+      hostname: '{{ ucs_hostname }}'
+      username: '{{ ucs_username }}'
+      password: '{{ ucs_password }}'
+- name: vNIC template absent
+  ucs_vnic_template: &id005
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    name: vNIC-A-B
+    state: absent
+- name: vNIC primary template absent
+  ucs_vnic_template: &id006
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    name: vNIC-A
+    state: absent
+- name: vNIC secondary template absent
+  ucs_vnic_template: &id007
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    name: vNIC-B
+    state: absent
+- name: vNIC template present (check_mode)
+  ucs_vnic_template: &id001
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    name: vNIC-A-B
+    fabric: A-B
+    vlans_list:
+    - name: default
+      native: 'yes'
+    - name: 10
+  check_mode: true
+  register: cm_vnic_templates_present
+- name: vNIC primary template present (check_mode)
+  ucs_vnic_template: &id002
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    name: vNIC-A
+    fabric: A
+    redundancy_type: primary
+    peer_redundancy_templ: vNIC-B
+    template_type: updating-template
+    mtu: '9000'
+    mac_pool: MAC-Pool-A
+    network_control_policy: Enable-CDP-LLDP
+    vlans_list:
+    - name: default
+      native: 'yes'
+    - name: finance
+  check_mode: true
+  register: cm_vnic_primary_templates_present
+- name: vNIC secondary template present (check_mode)
+  ucs_vnic_template: &id003
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    name: vNIC-B
+    fabric: B
+    redundancy_type: secondary
+    peer_redundancy_templ: vNIC-A
+    mac_pool: MAC-Pool-B
+  check_mode: true
+  register: cm_vnic_secondary_templates_present
+- name: vNIC template present (normal mode)
+  ucs_vnic_template: *id001
+  register: nm_vnic_templates_present
+- name: vNIC primary template present (normal mode)
+  ucs_vnic_template: *id002
+  register: nm_vnic_primary_templates_present
+- name: vNIC secondary template present (normal mode)
+  ucs_vnic_template: *id003
+  register: nm_vnic_secondary_templates_present
+- name: vNIC template present again (check_mode)
+  ucs_vnic_template: *id001
+  check_mode: true
+  register: cm_vnic_templates_present_again
+- name: vNIC primary template present again (check_mode)
+  ucs_vnic_template: *id002
+  check_mode: true
+  register: cm_vnic_primary_templates_present_again
+- name: vNIC secondary template present again (check_mode)
+  ucs_vnic_template: *id003
+  check_mode: true
+  register: cm_vnic_secondary_templates_present_again
+- name: vNIC template present again (normal mode)
+  ucs_vnic_template: *id001
+  register: nm_vnic_templates_present_again
+- name: vNIC primary template present again (normal mode)
+  ucs_vnic_template: *id002
+  register: nm_vnic_primary_templates_present_again
+- name: vNIC secondary template present again (normal mode)
+  ucs_vnic_template: *id003
+  register: nm_vnic_secondary_templates_present_again
+- name: Verify vNIC template present results
+  assert:
+    that:
+    - cm_vnic_templates_present.changed == nm_vnic_templates_present.changed == true
+    - cm_vnic_templates_present_again.changed == nm_vnic_templates_present_again.changed
+      == false
+    - cm_vnic_primary_templates_present.changed == nm_vnic_primary_templates_present.changed
+      == true
+    - cm_vnic_primary_templates_present_again.changed == nm_vnic_primary_templates_present_again.changed
+      == false
+    - cm_vnic_secondary_templates_present.changed == nm_vnic_secondary_templates_present.changed
+      == true
+    - cm_vnic_secondary_templates_present_again.changed == nm_vnic_secondary_templates_present_again.changed
+      == false
+- name: vNIC template change (check_mode)
+  ucs_vnic_template: &id004
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    name: vNIC-A-B
+    fabric: A-B
+    vlans_list:
+    - name: default
+      native: 'yes'
+    - name: 10
+      state: absent
+  check_mode: true
+  register: cm_vnic_templates_change
+- name: vNIC template change (normal mode)
+  ucs_vnic_template: *id004
+  register: nm_vnic_templates_change
+- name: vNIC template change again (check_mode)
+  ucs_vnic_template: *id004
+  check_mode: true
+  register: cm_vnic_templates_change_again
+- name: vNIC template change again (normal mode)
+  ucs_vnic_template: *id004
+  register: nm_vnic_templates_change_again
+- name: Verify vNIC template change results
+  assert:
+    that:
+    - cm_vnic_templates_change.changed == nm_vnic_templates_change.changed == true
+    - cm_vnic_templates_change_again.changed == nm_vnic_templates_change_again.changed
+      == false
+- name: vNIC template absent (check_mode)
+  ucs_vnic_template: *id005
+  check_mode: true
+  register: cm_vnic_templates_absent
+- name: vNIC primary template absent (check_mode)
+  ucs_vnic_template: *id006
+  check_mode: true
+  register: cm_vnic_primary_templates_absent
+- name: vNIC secondary template absent (check_mode)
+  ucs_vnic_template: *id007
+  check_mode: true
+  register: cm_vnic_secondary_templates_absent
+- name: vNIC template absent (normal mode)
+  ucs_vnic_template: *id005
+  register: nm_vnic_templates_absent
+- name: vNIC primary template absent (normal mode)
+  ucs_vnic_template: *id006
+  register: nm_vnic_primary_templates_absent
+- name: vNIC secondary template absent (normal mode)
+  ucs_vnic_template: *id007
+  register: nm_vnic_secondary_templates_absent
+- name: vNIC template absent again (check_mode)
+  ucs_vnic_template: *id005
+  check_mode: true
+  register: cm_vnic_templates_absent_again
+- name: vNIC primary template absent again (check_mode)
+  ucs_vnic_template: *id006
+  check_mode: true
+  register: cm_vnic_primary_templates_absent_again
+- name: vNIC secondary template absent again (check_mode)
+  ucs_vnic_template: *id007
+  check_mode: true
+  register: cm_vnic_secondary_templates_absent_again
+- name: vNIC template absent again (normal mode)
+  ucs_vnic_template: *id005
+  register: nm_vnic_templates_absent_again
+- name: vNIC primary template absent again (normal mode)
+  ucs_vnic_template: *id006
+  register: nm_vnic_primary_templates_absent_again
+- name: vNIC secondary template absent again (normal mode)
+  ucs_vnic_template: *id007
+  register: nm_vnic_secondary_templates_absent_again
+- name: Verify vNIC template absent results
+  assert:
+    that:
+    - cm_vnic_templates_absent.changed == nm_vnic_templates_absent.changed == true
+    - cm_vnic_templates_absent_again.changed == nm_vnic_templates_absent_again.changed
+      == false
+    - cm_vnic_primary_templates_absent.changed == nm_vnic_primary_templates_absent.changed
+      == true
+    - cm_vnic_primary_templates_absent_again.changed == nm_vnic_primary_templates_absent_again.changed
+      == false
+    - cm_vnic_secondary_templates_absent.changed == nm_vnic_secondary_templates_absent.changed
+      == true
+    - cm_vnic_secondary_templates_absent_again.changed == nm_vnic_secondary_templates_absent_again.changed
+      == false

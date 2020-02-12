@@ -1,0 +1,31 @@
+tested_filesystems:
+  ext4:
+    fssize: 10
+    grow: true
+  ext4dev:
+    fssize: 10
+    grow: true
+  ext3:
+    fssize: 10
+    grow: true
+  ext2:
+    fssize: 10
+    grow: true
+  xfs:
+    fssize: 20
+    grow: false
+  btrfs:
+    fssize: 150
+    grow: false
+  vfat:
+    fssize: 20
+    grow: true
+  ocfs2:
+    fssize: '{{ ocfs2_fssize }}'
+    grow: false
+  f2fs:
+    fssize: '{{ f2fs_fssize|default(60) }}'
+    grow: f2fs_version is version("1.10.0", ">=")
+  lvm:
+    fssize: 20
+    grow: true

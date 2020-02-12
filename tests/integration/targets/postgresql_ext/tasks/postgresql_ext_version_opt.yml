@@ -1,0 +1,371 @@
+- vars:
+    test_ext: dummy
+    test_schema: schema1
+    task_parameters:
+      become_user: '{{ pg_user }}'
+      become: true
+      register: result
+    pg_parameters:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+  block:
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - create schema schema1
+    postgresql_schema:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_schema }}'
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - create extension of specific version, check mode
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+      schema: '{{ test_schema }}'
+      version: '1.0'
+    check_mode: true
+  - assert:
+      that:
+      - result is changed
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - check that nothing was actually changed
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: SELECT 1 FROM pg_extension WHERE extname = '{{ test_ext }}'
+  - assert:
+      that:
+      - result.rowcount == 0
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - create extension of specific version
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+      schema: '{{ test_schema }}'
+      version: '1.0'
+  - assert:
+      that:
+      - result is changed
+      - result.queries == ["CREATE EXTENSION \"{{ test_ext }}\" WITH SCHEMA \"{{ test_schema
+        }}\" VERSION '1.0'"]
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - check
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: SELECT 1 FROM pg_extension WHERE extname = '{{ test_ext }}' AND extversion
+        = '1.0'
+  - assert:
+      that:
+      - result.rowcount == 1
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - try to create extension of the same version again
+      in check_mode
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+      schema: '{{ test_schema }}'
+      version: '1.0'
+    check_mode: true
+  - assert:
+      that:
+      - result is not changed
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - check
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: SELECT 1 FROM pg_extension WHERE extname = '{{ test_ext }}' AND extversion
+        = '1.0'
+  - assert:
+      that:
+      - result.rowcount == 1
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - try to create extension of the same version again
+      in actual mode
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+      schema: '{{ test_schema }}'
+      version: '1.0'
+  - assert:
+      that:
+      - result is not changed
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - check
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: SELECT 1 FROM pg_extension WHERE extname = '{{ test_ext }}' AND extversion
+        = '1.0'
+  - assert:
+      that:
+      - result.rowcount == 1
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - update the extension to the next version in check_mode
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+      schema: '{{ test_schema }}'
+      version: '2.0'
+    check_mode: true
+  - assert:
+      that:
+      - result is changed
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - check, the version must be 1.0
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: SELECT 1 FROM pg_extension WHERE extname = '{{ test_ext }}' AND extversion
+        = '1.0'
+  - assert:
+      that:
+      - result.rowcount == 1
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - update the extension to the next version
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+      schema: '{{ test_schema }}'
+      version: '2.0'
+  - assert:
+      that:
+      - result is changed
+      - result.queries == ["ALTER EXTENSION \"{{ test_ext }}\" UPDATE TO '2.0'"]
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - check, the version must be 2.0
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: SELECT 1 FROM pg_extension WHERE extname = '{{ test_ext }}' AND extversion
+        = '2.0'
+  - assert:
+      that:
+      - result.rowcount == 1
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - check that version won't be changed if version
+      won't be passed
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+      schema: '{{ test_schema }}'
+  - assert:
+      that:
+      - result is not changed
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - check, the version must be 2.0
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: SELECT 1 FROM pg_extension WHERE extname = '{{ test_ext }}' AND extversion
+        = '2.0'
+  - assert:
+      that:
+      - result.rowcount == 1
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - update the extension to the latest version
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+      schema: '{{ test_schema }}'
+      version: latest
+  - assert:
+      that:
+      - result is changed
+      - result.queries == ["ALTER EXTENSION \"{{ test_ext }}\" UPDATE TO '3.0'"]
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - check
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: SELECT 1 FROM pg_extension WHERE extname = '{{ test_ext }}' AND extversion
+        = '3.0'
+  - assert:
+      that:
+      - result.rowcount == 1
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - try to update the extension to the latest version
+      again
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+      schema: '{{ test_schema }}'
+      version: latest
+  - assert:
+      that:
+      - result is not changed
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - try to downgrade the extension version, must fail
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+      schema: '{{ test_schema }}'
+      version: '1.0'
+    ignore_errors: true
+  - assert:
+      that:
+      - result.failed == true
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - drop the extension in check_mode
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+      state: absent
+    check_mode: true
+  - assert:
+      that:
+      - result is changed
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - check that extension exists
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: SELECT 1 FROM pg_extension WHERE extname = '{{ test_ext }}' AND extversion
+        = '3.0'
+  - assert:
+      that:
+      - result.rowcount == 1
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - drop the extension in actual mode
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+      state: absent
+  - assert:
+      that:
+      - result is changed
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - check that extension doesn't exist after the prev
+      step
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: SELECT 1 FROM pg_extension WHERE extname = '{{ test_ext }}'
+  - assert:
+      that:
+      - result.rowcount == 0
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - try to drop the non-existent extension again
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+      state: absent
+  - assert:
+      that:
+      - result is not changed
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - create the extension without passing version
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+  - assert:
+      that:
+      - result is changed
+      - result.queries == ["CREATE EXTENSION \"{{ test_ext }}\""]
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - check
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: SELECT 1 FROM pg_extension WHERE extname = '{{ test_ext }}' AND extversion
+        = '3.0'
+  - assert:
+      that:
+      - result.rowcount == 1
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - try to install non-existent version
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: non_existent
+    ignore_errors: true
+  - assert:
+      that:
+      - result.failed == true
+      - result.msg == "Extension non_existent is not installed"
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - drop the extension
+    postgresql_ext:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_ext }}'
+      state: absent
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_ext_version - drop the schema
+    postgresql_schema:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_schema }}'
+      state: absent

@@ -1,0 +1,2 @@
+- include: locale_gen.yml
+  when: ansible_distribution in ('Ubuntu', 'Debian')

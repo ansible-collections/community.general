@@ -1,0 +1,50 @@
+- name: record special path for tests
+  set_fact:
+    testing_dir: '{{ remote_tmp_dir }}\ansible win_psexec'
+- name: create special path testing dir
+  win_file:
+    path: '{{ testing_dir }}'
+    state: directory
+- name: Download PsExec
+  win_get_url:
+    url: https://ansible-ci-files.s3.amazonaws.com/test/integration/targets/win_psexec/PsExec.exe
+    dest: '{{ testing_dir }}\PsExec.exe'
+- name: Get the existing PATH env var
+  win_shell: $env:PATH
+  register: system_path
+  changed_when: false
+- name: Run whoami
+  win_psexec:
+    command: whoami.exe
+    nobanner: true
+  register: whoami
+  environment:
+    PATH: '{{ testing_dir }};{{ system_path.stdout | trim }}'
+- name: Test whoami
+  assert:
+    that:
+    - whoami.rc == 0
+    - whoami.stdout == ''
+- name: Run whoami as SYSTEM
+  win_psexec:
+    command: whoami.exe
+    system: true
+    nobanner: true
+    executable: '{{ testing_dir }}\PsExec.exe'
+  register: whoami_as_system
+  until: whoami_as_system.rc == 0 and whoami_as_system.stdout == 'nt authority\system'
+  retries: 3
+  delay: 2
+- name: Run command with multiple arguments
+  win_psexec:
+    command: powershell.exe -NonInteractive "exit 1"
+  ignore_errors: true
+  register: whoami_multiple_args
+  environment:
+    PATH: '{{ testing_dir }};{{ system_path.stdout | trim }}'
+- name: Test command with multiple argumetns
+  assert:
+    that:
+    - whoami_multiple_args.rc == 1
+    - whoami_multiple_args.psexec_command == "psexec.exe -accepteula powershell.exe
+      -NonInteractive \"exit 1\""

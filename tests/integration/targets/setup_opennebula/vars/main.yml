@@ -1,0 +1,4 @@
+opennebula_test:
+  hosts:
+  - hv1
+  - hv2

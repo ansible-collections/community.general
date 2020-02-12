@@ -1,0 +1,64 @@
+- name: make sure symlink file does not exist
+  test_symlink_file:
+    src: '{{win_stat_dir}}\file-link.txt'
+    state: absent
+- name: remove win_stat testing directories for clean slate
+  win_file:
+    path: '{{win_stat_dir}}'
+    state: absent
+- name: set test files and folders
+  win_shell: "$ErrorActionPreference = \"Stop\"\n$directories = @(\n    \"folder\"\
+    ,\n    \"folder space\",\n    \"nested\\nested\",\n    \"shared\",\n    \"hidden\"\
+    ,\n    \"link-dest\",\n    \"junction-dest\"\n)\n\nforeach ($directory in $directories)\
+    \ {\n    New-Item -Path \"{{win_stat_dir}}\\$directory\" -ItemType Directory\n\
+    }\n\n$normal_content = \"abc\"\n$normal_files = @(\n    \"nested\\file.ps1\",\n\
+    \    \"nested\\hard-target.txt\",\n    \"nested\\read-only.ps1\",\n    \"nested\\\
+    archive.ps1\",\n    \"nested\\hidden.ps1\",\n    \"nested\\nested\\file.ps1\"\
+    ,\n    \"folder space\\file.ps1\",\n    \"link-dest\\file.txt\"\n)\nforeach ($file\
+    \ in $normal_files) {\n    New-Item -Path \"{{win_stat_dir}}\\$file\" -ItemType\
+    \ File\n    [System.IO.File]::WriteAllText(\"{{win_stat_dir}}\\$file\", $normal_content)\n\
+    }\n\n$share_stat = Get-WmiObject -Class Win32_Share -Filter \"name='folder-share'\"\
+    \nif ($share_stat) {\n    $share_stat.Delete()\n}\n$wmi = [wmiClass] 'Win32_Share'\n\
+    $wmi.Create(\"{{win_stat_dir}}\\shared\", \"folder-share\", 0)\n\ncmd.exe /c mklink\
+    \ /D \"{{win_stat_dir}}\\link\" \"{{win_stat_dir}}\\link-dest\"\ncmd.exe /c mklink\
+    \ /H \"{{win_stat_dir}}\\nested\\hard-link.ps1\" \"{{win_stat_dir}}\\nested\\\
+    hard-target.txt\"\ncmd.exe /c mklink /J \"{{win_stat_dir}}\\junction-link\" \"\
+    {{win_stat_dir}}\\junction-dest\"\ncmd.exe /c mklink /D \"{{win_stat_dir}}\\nested\\\
+    nested\\link-rel\" \"..\\..\\link-dest\"\ncmd.exe /c mklink /D \"{{win_stat_dir}}\\\
+    outer-link\" \"{{win_stat_dir}}\\nested\\nested\\link-rel\"\n\n$date = Get-Date\
+    \ -Year 2016 -Month 11 -Day 1 -Hour 7 -Minute 10 -Second 5 -Millisecond 0\nGet-ChildItem\
+    \ -Path \"{{win_stat_dir}}\" -Recurse | ForEach-Object {\n    $_.CreationTime\
+    \ = $date\n    $_.LastAccessTime = $date\n    $_.LastWriteTime = $date\n}\n\n\
+    $attributes = @{\n    \"hidden\" = \"Hidden\"\n    \"nested\\read-only.ps1\" =\
+    \ \"ReadOnly\"\n    \"nested\\archive.ps1\" = \"Archive\"\n    \"nested\\hidden.ps1\"\
+    \ = \"Hidden\"\n}\n\nforeach ($attribute in $attributes.GetEnumerator()) {\n \
+    \   $item = Get-Item -Path \"{{win_stat_dir}}\\$($attribute.Name)\"\n    $file_attributes\
+    \ = $item.Attributes -split ','\n    if ($file_attributes -notcontains $attribute.Value)\
+    \ {\n        $file_attributes += $attribute.Value\n    }\n    $item.Attributes\
+    \ = $file_attributes -join ','\n}\n\n# weird issue, need to access the file in\
+    \ anyway to get the correct date stats\nTest-Path {{win_stat_dir}}\\nested\\hard-link.ps1\n"
+- name: create file symlink
+  test_symlink_file:
+    src: '{{win_stat_dir}}\file-link.txt'
+    target: '{{win_stat_dir}}\nested\file.ps1'
+    state: present
+- block:
+  - include_tasks: tests.yml
+  always:
+  - name: make sure symlink file does not exist
+    test_symlink_file:
+      src: '{{win_stat_dir}}\file-link.txt'
+      state: absent
+  - name: remove testing folder
+    win_file:
+      path: '{{win_stat_dir}}'
+      state: absent
+  - name: ensure test user is deleted
+    win_user:
+      name: '{{win_stat_user}}'
+      state: absent
+  - name: ensure test user profile is deleted
+    win_shell: rmdir /S /Q {{profile_dir_out.stdout_lines[0]}}
+    args:
+      executable: cmd.exe
+    when: win_stat_user in profile_dir_out.stdout_lines[0]

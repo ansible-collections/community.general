@@ -1,0 +1,3 @@
+hcloud_prefix: tests
+hcloud_network_name: '{{hcloud_prefix}}-server-network'
+hcloud_server_name: '{{hcloud_prefix}}-server-network'

@@ -1,0 +1,33 @@
+- name: create test directory
+  win_file:
+    path: '{{ test_win_service_dir }}'
+    state: directory
+- name: download service executable
+  win_get_url:
+    url: '{{ test_win_service_binary_url }}'
+    dest: '{{ test_win_service_path }}'
+- name: remove the dummy test services if it is left over from previous tests
+  win_service:
+    name: '{{ item }}'
+    force_dependent_services: true
+    state: absent
+  with_items:
+  - '{{ test_win_service_name }}'
+  - TestServiceParent2
+  - TestServiceDependency
+- block:
+  - include_tasks: tests.yml
+  always:
+  - name: remove test services
+    win_service:
+      name: '{{ item }}'
+      force_dependent_services: true
+      state: absent
+    with_items:
+    - '{{ test_win_service_name }}'
+    - TestServiceParent2
+    - TestServiceDependency
+  - name: remove test directory
+    win_file:
+      path: '{{ test_win_service_dir }}'
+      state: absent

@@ -1,0 +1,32 @@
+- name: Setup
+  cnos_banner:
+    banner: login
+    text: 'Junk login banner
+
+      over multiple lines
+
+      '
+    state: present
+    provider: '{{ cli }}'
+- name: remove login
+  cnos_banner:
+    banner: login
+    state: absent
+    provider: '{{ cli }}'
+  register: result
+- debug:
+    msg: '{{ result }}'
+- assert:
+    that:
+    - result.changed == true
+    - '''no banner login'' in result.commands'
+- name: remove login (idempotent)
+  cnos_banner:
+    banner: login
+    state: absent
+    provider: '{{ cli }}'
+  register: result
+- assert:
+    that:
+    - result.changed == false
+    - result.commands | length == 0

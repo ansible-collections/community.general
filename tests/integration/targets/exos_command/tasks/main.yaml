@@ -1,0 +1,6 @@
+- include: cli.yaml
+  tags:
+  - cli
+- include: httpapi.yaml
+  tags:
+  - httpapi

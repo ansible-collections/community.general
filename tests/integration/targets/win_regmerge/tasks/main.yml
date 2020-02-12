@@ -1,0 +1,74 @@
+- name: remove setting
+  win_regedit:
+    key: HKLM:\SOFTWARE\Wow6432Node\Cow Corp
+    state: absent
+- name: copy over some registry files to work with
+  win_copy: src={{item}} dest={{win_output_dir}}\\{{item}}
+  with_items:
+  - settings1.reg
+  - settings2.reg
+  - settings3.reg
+- name: test 1 merge in a setting
+  win_regmerge:
+    path: '{{win_output_dir}}\settings1.reg'
+  register: merge11_result
+- assert:
+    that:
+    - merge11_result.changed == true
+- name: test 1 merge in the setting again
+  win_regmerge:
+    path: '{{win_output_dir}}\settings1.reg'
+  register: merge12_result
+- assert:
+    that:
+    - merge12_result.changed == true
+- name: test 1 remove setting
+  win_regedit:
+    key: HKLM:\SOFTWARE\Wow6432Node\Cow Corp
+    state: absent
+- name: test 2 merge in a setting
+  win_regmerge:
+    path: '{{win_output_dir}}\settings1.reg'
+    compare_to: HKLM:\SOFTWARE\Wow6432Node\Cow Corp\Moosic\ILikeToMooveIt
+  register: merge21_result
+- assert:
+    that:
+    - merge21_result.changed == true
+- name: test 2 merge in the setting again but with compare_key
+  win_regmerge:
+    path: '{{win_output_dir}}\settings1.reg'
+    compare_to: HKLM:\SOFTWARE\Wow6432Node\Cow Corp\Moosic\ILikeToMooveIt
+  register: merge22_result
+- assert:
+    that:
+    - merge22_result.changed == false
+- name: test 2 clean up remove setting
+  win_regedit:
+    key: HKLM:\SOFTWARE\Wow6432Node\Cow Corp
+    state: absent
+- name: test 3 merge in a setting
+  win_regmerge:
+    path: '{{win_output_dir}}\settings3.reg'
+    compare_to: HKLM:\SOFTWARE\Wow6432Node\Cow Corp\Moo Monitor
+  register: merge31_result
+- assert:
+    that:
+    - merge31_result.changed == true
+- name: test 3 merge in the setting again but with compare_key check
+  win_regmerge:
+    path: '{{win_output_dir}}\settings3.reg'
+    compare_to: HKLM:\SOFTWARE\Wow6432Node\Cow Corp\Moo Monitor
+  register: merge32_result
+- assert:
+    that:
+    - merge32_result.changed == false
+- name: test 3 clean up remove setting
+  win_regedit:
+    key: HKLM:\SOFTWARE\Wow6432Node\Cow Corp
+    state: absent
+- name: clean up registry files
+  win_file: path={{win_output_dir}}\\{{item}} state=absent
+  with_items:
+  - settings1.reg
+  - settings2.reg
+  - settings3.reg

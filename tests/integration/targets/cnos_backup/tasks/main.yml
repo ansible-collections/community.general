@@ -1,0 +1,14 @@
+- name: Test Startup Config Backup
+  cnos_backup: host={{ inventory_hostname }} username={{ hostvars[inventory_hostname]['ansible_ssh_user']}}  password={{
+    hostvars[inventory_hostname]['ansible_ssh_pass']}} deviceType={{ hostvars[inventory_hostname]['deviceType']}}
+    outputfile=./results/cnos_backup_{{ inventory_hostname }}_output.txt configType='{{item.configType}}'
+    protocol='{{item.protocol}}' serverip='{{item.serverip}}' rcpath='{{item.rcpath}}'
+    serverusername='{{item.serverusername}}' serverpassword='{{item.serverpassword}}'
+  with_items: '{{test_config_data2}}'
+- name: Test Running Config Backup
+  cnos_backup: host={{ inventory_hostname }} username={{ hostvars[inventory_hostname]['ansible_ssh_user']}}  password={{
+    hostvars[inventory_hostname]['ansible_ssh_pass']}} deviceType={{ hostvars[inventory_hostname]['deviceType']}}
+    outputfile=./results/cnos_backup_{{ inventory_hostname }}_output.txt configType='{{item.configType}}'
+    protocol='{{item.protocol}}' serverip='{{item.serverip}}' rcpath='{{item.rcpath}}'
+    serverusername='{{item.serverusername}}' serverpassword='{{item.serverpassword}}'
+  with_items: '{{test_config_data1}}'

@@ -1,0 +1,30 @@
+- name: CLEANUP | Leave Docker Swarm
+  docker_swarm:
+    state: absent
+    force: true
+  ignore_errors: true
+  register: leave_swarm
+- name: CLEANUP | Kill Docker and cleanup
+  when: leave_swarm is failed
+  block:
+  - name: CLEANUP | Kill docker daemon
+    command: systemctl kill -s 9 docker
+    become: true
+  - name: CLEANUP | Clear out /var/lib/docker
+    shell: rm -rf  /var/lib/docker/*
+    args:
+      warn: false
+  - name: CLEANUP | Start docker daemon
+    service:
+      name: docker
+      state: started
+    become: true
+  - name: CLEANUP | Wait for docker daemon to be fully started
+    command: docker ps
+    register: result
+    until: result is success
+    retries: 10
+  - name: CLEANUP | Leave Docker Swarm
+    docker_swarm:
+      state: absent
+      force: true

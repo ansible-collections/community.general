@@ -1,0 +1,2 @@
+scaleway_organization: '{{ scw_org }}'
+scaleway_region: ams1

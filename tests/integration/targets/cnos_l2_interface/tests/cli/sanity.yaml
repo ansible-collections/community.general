@@ -1,0 +1,127 @@
+- debug: msg="START connection={{ ansible_connection }} cnos_l2_interface sanity test"
+- name: Setup interface
+  cnos_config: &id009
+    lines:
+    - interface {{ test_interface }}
+    provider: '{{ cli }}'
+- name: Setup vlans
+  cnos_vlan:
+    aggregate:
+    - vlan_id: 5
+    - vlan_id: 6
+    - vlan_id: 7
+    - vlan_id: 8
+    - vlan_id: 9
+    - vlan_id: 10
+    - vlan_id: 20
+    provider: '{{ cli }}'
+- block:
+  - name: Ensure interface is in its default switchport state
+    cnos_l2_interface: &id008
+      name: '{{ test_interface }}'
+      state: unconfigured
+      provider: '{{ cli }}'
+  - name: Ensure interface is configured for access vlan 20
+    cnos_l2_interface: &id001
+      name: '{{ test_interface }}'
+      mode: access
+      access_vlan: 20
+      provider: '{{ cli }}'
+    register: result
+  - assert: &id002
+      that:
+      - result.changed == true
+  - name: access vlan Idempotence
+    cnos_l2_interface: *id001
+    register: result
+  - assert: &id004
+      that:
+      - result.changed == false
+  - name: Ensure interface only has vlans 5-10 as trunk vlans
+    cnos_l2_interface: &id003
+      name: '{{ test_interface }}'
+      mode: trunk
+      native_vlan: 10
+      trunk_allowed_vlans: 5-10
+      provider: '{{ cli }}'
+    register: result
+  - assert: *id002
+  - name: trunk vlan Idempotence
+    cnos_l2_interface: *id003
+    register: result
+  - assert: *id004
+  - name: Ensure interface is a trunk port and ensure 2-50 are being tagged (doesn't
+      mean others aren't also being tagged)
+    cnos_l2_interface: &id005
+      name: '{{ test_interface }}'
+      mode: trunk
+      native_vlan: 10
+      trunk_vlans: 2-50
+      provider: '{{ cli }}'
+    register: result
+  - assert: *id002
+  - name: tag vlan Idempotence
+    cnos_l2_interface: *id005
+    register: result
+  - assert: *id002
+  - name: Remove full trunk vlan range 2-50
+    cnos_l2_interface: &id006
+      name: '{{ test_interface }}'
+      mode: trunk
+      trunk_vlans: 2-50
+      state: absent
+      provider: '{{ cli }}'
+    register: result
+  - assert: *id002
+  - name: Check Idempotence Remove full trunk vlan range 2-50
+    cnos_l2_interface: *id006
+    register: result
+  - assert: *id004
+  - name: Reconfigure interface trunk port and ensure 2-50 are being tagged
+    cnos_l2_interface: *id005
+    register: result
+  - assert: *id002
+  - name: Check Idempotence Reconfigure interface trunk port and ensure 2-50 are being
+      tagged
+    cnos_l2_interface: *id005
+    register: result
+  - assert: *id002
+  - name: Remove partial trunk vlan range 30-4094 are removed
+    cnos_l2_interface: &id007
+      name: '{{ test_interface }}'
+      mode: trunk
+      trunk_vlans: 30-4094
+      state: absent
+      provider: '{{ cli }}'
+    register: result
+  - assert: *id004
+  - name: Check Idempotence Remove partial trunk vlan range 30-4094 are removed
+    cnos_l2_interface: *id007
+    register: result
+  - assert: *id004
+  - name: put interface default state
+    cnos_l2_interface: *id008
+    register: result
+  - assert: *id002
+  - name: default state idempotence
+    cnos_l2_interface: *id008
+    register: result
+  - assert: *id002
+  always:
+  - name: remove vlans
+    cnos_vlan:
+      aggregate:
+      - vlan_id: 5
+      - vlan_id: 6
+      - vlan_id: 7
+      - vlan_id: 8
+      - vlan_id: 9
+      - vlan_id: 10
+      - vlan_id: 20
+      state: absent
+      provider: '{{ cli }}'
+    ignore_errors: true
+  - name: default interface
+    cnos_config: *id009
+    ignore_errors: true
+- debug: msg="END connection={{ ansible_connection }} cnos_l2_interface sanity test"

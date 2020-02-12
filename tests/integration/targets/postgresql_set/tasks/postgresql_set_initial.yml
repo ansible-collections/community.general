@@ -1,0 +1,263 @@
+- vars:
+    task_parameters:
+      become_user: '{{ pg_user }}'
+      become: true
+    pg_parameters:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+  block:
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql_set - preparation to the next step
+    postgresql_set:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: work_mem
+      reset: true
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql_set - get work_mem initial value
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: SHOW work_mem
+    register: before
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql_set - set work_mem (restart is not required), check_mode
+    postgresql_set:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: work_mem
+      value: 12MB
+    register: set_wm
+    check_mode: true
+  - assert:
+      that:
+      - set_wm.name == 'work_mem'
+      - set_wm.changed == true
+      - set_wm.prev_val_pretty == before.query_result[0].work_mem
+      - set_wm.value_pretty == '12MB'
+      - set_wm.restart_required == false
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql_set - get work_mem value to check, must be the same as initial
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: SHOW work_mem
+    register: after
+  - assert:
+      that:
+      - before.query_result[0].work_mem == after.query_result[0].work_mem
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql_set - set work_mem (restart is not required)
+    postgresql_set:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: work_mem
+      value: 12MB
+    register: set_wm
+  - assert:
+      that:
+      - set_wm.name == 'work_mem'
+      - set_wm.changed == true
+      - set_wm.value_pretty == '12MB'
+      - set_wm.value_pretty != set_wm.prev_val_pretty
+      - set_wm.restart_required == false
+      - set_wm.value.value == 12582912
+      - set_wm.value.unit == 'b'
+    when:
+    - ansible_distribution != "Ubuntu"
+    - ansible_distribution_major_version != '16'
+    - ansible_distribution != "FreeBSD"
+  - assert:
+      that:
+      - set_wm.name == 'work_mem'
+      - set_wm.changed == true
+      - set_wm.restart_required == false
+    when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version == '16'
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql_set - reset work_mem (restart is not required)
+    postgresql_set:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: work_mem
+      reset: true
+    register: reset_wm
+  - assert:
+      that:
+      - reset_wm.name == 'work_mem'
+      - reset_wm.changed == true
+      - reset_wm.value_pretty != reset_wm.prev_val_pretty
+      - reset_wm.restart_required == false
+      - reset_wm.value.value != '12582912'
+    when:
+    - ansible_distribution != "Ubuntu"
+    - ansible_distribution_major_version != '16'
+    - ansible_distribution != "FreeBSD"
+  - assert:
+      that:
+      - reset_wm.name == 'work_mem'
+      - reset_wm.changed == true
+      - reset_wm.restart_required == false
+    when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version == '16'
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql_set - reset work_mem again to check that nothing changed (restart
+      is not required)
+    postgresql_set:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: work_mem
+      reset: true
+    register: reset_wm2
+  - assert:
+      that:
+      - reset_wm2.name == 'work_mem'
+      - reset_wm2.changed == false
+      - reset_wm2.value_pretty == reset_wm2.prev_val_pretty
+      - reset_wm2.restart_required == false
+    when:
+    - ansible_distribution != "Ubuntu"
+    - ansible_distribution_major_version != '16'
+  - assert:
+      that:
+      - reset_wm2.name == 'work_mem'
+      - reset_wm2.changed == false
+      - reset_wm2.restart_required == false
+    when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version == '16'
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql_set - preparation to the next step
+    postgresql_set:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: work_mem
+      value: 14MB
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql_set - set work_mem to initial state (restart is not required)
+    postgresql_set:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: work_mem
+      value: default
+    register: def_wm
+  - assert:
+      that:
+      - def_wm.name == 'work_mem'
+      - def_wm.changed == true
+      - def_wm.value_pretty != def_wm.prev_val_pretty
+      - def_wm.restart_required == false
+      - def_wm.value.value != '14680064'
+    when:
+    - ansible_distribution != "Ubuntu"
+    - ansible_distribution_major_version != '16'
+    - ansible_distribution != 'FreeBSD'
+  - assert:
+      that:
+      - def_wm.name == 'work_mem'
+      - def_wm.changed == true
+      - def_wm.restart_required == false
+    when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version == '16'
+    - ansible_distribution != 'FreeBSD'
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql_set - set shared_buffers (restart is required)
+    postgresql_set:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: shared_buffers
+      value: 111MB
+    register: set_shb
+  - assert:
+      that:
+      - set_shb.name == 'shared_buffers'
+      - set_shb.changed == true
+      - set_shb.restart_required == true
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql_set - set autovacuum (enabled by default, restart is not required)
+    postgresql_set:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: autovacuum
+      value: false
+    register: set_aut
+  - assert:
+      that:
+      - set_aut.name == 'autovacuum'
+      - set_aut.changed == true
+      - set_aut.restart_required == false
+      - set_aut.value.value == 'off'
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql - try to change autovacuum again in check_mode
+    postgresql_set:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: autovacuum
+      value: true
+    register: set_aut
+    check_mode: true
+  - assert:
+      that:
+      - set_aut.name == 'autovacuum'
+      - set_aut.changed == true
+      - set_aut.restart_required == false
+      - set_aut.value.value == 'off'
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql - check that autovacuum wasn't actually changed after change
+      in check_mode
+    postgresql_set:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: autovacuum
+      value: false
+    register: set_aut
+    check_mode: true
+  - assert:
+      that:
+      - set_aut.name == 'autovacuum'
+      - set_aut.changed == false
+      - set_aut.restart_required == false
+      - set_aut.value.value == 'off'
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql_set - get autovacuum value to check, must be off
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: SHOW autovacuum
+    register: result
+  - assert:
+      that:
+      - result.query_result[0].autovacuum == 'off'
+  - become_user: '{{ pg_user }}'
+    become: true
+    name: postgresql - check that autovacuum wasn't actually changed after change
+      in check_mode
+    postgresql_set:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: autovacuum
+      value: false
+    register: set_aut
+  - assert:
+      that:
+      - set_aut.name == 'autovacuum'
+      - set_aut.changed == false
+      - set_aut.restart_required == false
+      - set_aut.value.value == 'off'

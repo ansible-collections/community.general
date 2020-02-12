@@ -1,0 +1,135 @@
+- include: create_user.yml user_name={{user_name_1}} user_password={{ user_password_1
+    }}
+- include: assert_user.yml user_name={{user_name_1}}
+- include: remove_user.yml user_name={{user_name_1}} user_password={{ user_password_1
+    }}
+- include: assert_no_user.yml user_name={{user_name_1}}
+- include: create_user.yml user_name={{user_name_1}} user_password={{ user_password_1
+    }}
+- name: create mysql user that already exist (expect changed=false)
+  mysql_user:
+    name: '{{user_name_1}}'
+    password: '{{user_password_1}}'
+    state: present
+    login_unix_socket: '{{ mysql_socket }}'
+  register: result
+- name: assert output message mysql user was not created
+  assert:
+    that: result.changed == false
+- name: remove mysql user state=absent (expect changed=true)
+  mysql_user:
+    name: '{{ user_name_1 }}'
+    password: '{{ user_password_1 }}'
+    state: absent
+    login_unix_socket: '{{ mysql_socket }}'
+  register: result
+- name: assert output message mysql user was removed
+  assert:
+    that: result.changed == true
+- include: assert_no_user.yml user_name={{user_name_1}}
+- name: remove mysql user that does not exist state=absent (expect changed=false)
+  mysql_user:
+    name: '{{ user_name_1 }}'
+    password: '{{ user_password_1 }}'
+    state: absent
+    login_unix_socket: '{{ mysql_socket }}'
+  register: result
+- name: assert output message mysql user that does not exist
+  assert:
+    that: result.changed == false
+- include: assert_no_user.yml user_name={{user_name_1}}
+- name: create user with select privilege state=present (expect changed=true)
+  mysql_user:
+    name: '{{ user_name_1 }}'
+    password: '{{ user_password_1 }}'
+    state: present
+    login_unix_socket: '{{ mysql_socket }}'
+  register: result
+- include: assert_user.yml user_name={{user_name_1}} priv=USAGE
+- include: remove_user.yml user_name={{user_name_1}} user_password={{ user_password_1
+    }}
+- include: assert_no_user.yml user_name={{user_name_1}}
+- name: create user with select privilege state=present (expect changed=true)
+  mysql_user:
+    name: '{{ user_name_2 }}'
+    password: '{{ user_password_2 }}'
+    state: present
+    priv: '*.*:SELECT'
+    login_unix_socket: '{{ mysql_socket }}'
+  register: result
+- include: assert_user.yml user_name={{user_name_2}} priv=SELECT
+- include: remove_user.yml user_name={{user_name_2}} user_password={{ user_password_2
+    }}
+- include: assert_no_user.yml user_name={{user_name_2}}
+- name: give users access to multiple databases
+  mysql_user:
+    name: '{{ item[0] }}'
+    priv: '{{ item[1] }}.*:ALL'
+    append_privs: true
+    password: '{{ user_password_1 }}'
+    login_unix_socket: '{{ mysql_socket }}'
+  with_nested:
+  - - '{{ user_name_1 }}'
+    - '{{ user_name_2 }}'
+  - '{{db_names}}'
+- name: show grants access for user1 on multiple database
+  command: mysql "-e SHOW GRANTS FOR '{{ user_name_1 }}'@'localhost';"
+  register: result
+- name: assert grant access for user1 on multiple database
+  assert:
+    that: '''{{ item }}'' in result.stdout'
+  with_items: '{{db_names}}'
+- name: show grants access for user2 on multiple database
+  command: mysql "-e SHOW GRANTS FOR '{{ user_name_2 }}'@'localhost';"
+  register: result
+- name: assert grant access for user2 on multiple database
+  assert:
+    that: '''{{ item }}'' in result.stdout'
+  with_items: '{{db_names}}'
+- include: remove_user.yml user_name={{user_name_1}} user_password={{ user_password_1
+    }}
+- include: remove_user.yml user_name={{user_name_2}} user_password={{ user_password_1
+    }}
+- name: give user access to database via wildcard
+  mysql_user:
+    name: '{{ user_name_1 }}'
+    priv: '%db.*:SELECT'
+    append_privs: true
+    password: '{{ user_password_1 }}'
+    login_unix_socket: '{{ mysql_socket }}'
+- name: show grants access for user1 on multiple database
+  command: mysql "-e SHOW GRANTS FOR '{{ user_name_1 }}'@'localhost';"
+  register: result
+- name: assert grant access for user1 on multiple database
+  assert:
+    that:
+    - '''%db'' in result.stdout'
+    - '''SELECT'' in result.stdout'
+- name: change user access to database via wildcard
+  mysql_user:
+    name: '{{ user_name_1 }}'
+    priv: '%db.*:INSERT'
+    append_privs: true
+    password: '{{ user_password_1 }}'
+    login_unix_socket: '{{ mysql_socket }}'
+- name: show grants access for user1 on multiple database
+  command: mysql "-e SHOW GRANTS FOR '{{ user_name_1 }}'@'localhost';"
+  register: result
+- name: assert grant access for user1 on multiple database
+  assert:
+    that:
+    - '''%db'' in result.stdout'
+    - '''INSERT'' in result.stdout'
+- include: remove_user.yml user_name={{user_name_1}} user_password={{ user_password_1
+    }}
+- include: test_privs.yml current_privilege=SELECT current_append_privs=no
+- include: test_privs.yml current_privilege=DROP current_append_privs=yes
+- include: test_privs.yml current_privilege='UPDATE,ALTER' current_append_privs=no
+- include: test_privs.yml current_privilege='INSERT,DELETE' current_append_privs=yes
+- include: test_priv_dict.yml
+- import_tasks: issue-29511.yaml
+  tags:
+  - issue-29511
+- import_tasks: issue-64560.yaml
+  tags:
+  - issue-64560

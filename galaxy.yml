@@ -1,0 +1,30 @@
+namespace: community
+name: general
+version: 1.0.0
+readme: README.md
+authors: null
+description: null
+license: null
+license_file: null
+tags: null
+dependencies:
+  cisco.mso: '>=1.0'
+  google.cloud: '>=1.0'
+  cisco.ucs: '>=1.0'
+  netbox_community.ansible_modules: '>=1.0'
+  fortinet.fortios: '>=1.0'
+  check_point.mgmt: '>=1.0'
+  openstack.cloud: '>=1.0'
+  community.amazon: '>=1.0'
+  community.kubernetes: '>=1.0'
+  azure.azcollection: '>=1.0'
+  ansible.netcommon: '>=1.0'
+  netapp.aws: '>=1.0'
+  cisco.nxos: '>=1.0'
+  f5networks.f5_modules: '>=1.0'
+  cisco.intersight: '>=1.0'
+  cisco.aci: '>=1.0'
+repository: git@github.com:ansible-collection-migration/community.general.git
+documentation: https://github.com/ansible-collection-migration/community.general/tree/master/docs
+homepage: https://github.com/ansible-collection-migration/community.general
+issues: https://github.com/ansible-collection-migration/community.general/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc

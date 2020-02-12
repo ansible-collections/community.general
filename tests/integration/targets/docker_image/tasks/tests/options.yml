@@ -1,0 +1,229 @@
+- name: Registering image name
+  set_fact:
+    iname: '{{ name_prefix ~ ''-options'' }}'
+    iname_1: '{{ name_prefix ~ ''-options-1'' }}'
+- name: Registering image name
+  set_fact:
+    inames: '{{ inames + [iname, iname_1] }}'
+- name: cleanup
+  docker_image:
+    name: '{{ iname }}'
+    state: absent
+    force_absent: true
+- name: buildargs
+  docker_image:
+    name: '{{ iname }}'
+    build:
+      path: '{{ role_path }}/files'
+      args:
+        TEST1: val1
+        TEST2: val2
+        TEST3: 'True'
+      pull: false
+    source: build
+  register: buildargs_1
+- name: buildargs (idempotency)
+  docker_image:
+    name: '{{ iname }}'
+    build:
+      path: '{{ role_path }}/files'
+      args:
+        TEST1: val1
+        TEST2: val2
+        TEST3: 'True'
+      pull: false
+    source: build
+  register: buildargs_2
+- name: cleanup
+  docker_image:
+    name: '{{ iname }}'
+    state: absent
+    force_absent: true
+- assert:
+    that:
+    - buildargs_1 is changed
+    - buildargs_2 is not changed
+  when: docker_py_version is version('1.6.0', '>=')
+- assert:
+    that:
+    - buildargs_1 is failed
+    - buildargs_2 is failed
+  when: docker_py_version is version('1.6.0', '<')
+- name: container_limits (Failed due to min memory limit)
+  docker_image:
+    name: '{{ iname }}'
+    build:
+      path: '{{ role_path }}/files'
+      container_limits:
+        memory: 4000
+      pull: false
+    source: build
+  ignore_errors: true
+  register: container_limits_1
+- name: container_limits
+  docker_image:
+    name: '{{ iname }}'
+    build:
+      path: '{{ role_path }}/files'
+      container_limits:
+        memory: 5000000
+        memswap: 7000000
+      pull: false
+    source: build
+  register: container_limits_2
+- name: cleanup
+  docker_image:
+    name: '{{ iname }}'
+    state: absent
+    force_absent: true
+- assert:
+    that:
+    - not container_limits_1 is failed or ('Minimum memory limit allowed is 4MB')
+      in container_limits_1.msg
+    - container_limits_1 is changed or container_limits_2 is changed and not (container_limits_1
+      is changed and container_limits_2 is changed)
+- name: dockerfile
+  docker_image:
+    name: '{{ iname }}'
+    build:
+      path: '{{ role_path }}/files'
+      dockerfile: MyDockerfile
+      pull: false
+    source: build
+  register: dockerfile_1
+- name: cleanup
+  docker_image:
+    name: '{{ iname }}'
+    state: absent
+    force_absent: true
+- assert:
+    that:
+    - dockerfile_1 is changed
+    - dockerfile_1['image']['Config']['WorkingDir'] == '/newdata'
+- name: Build an image
+  docker_image:
+    name: '{{ iname }}'
+    build:
+      path: '{{ role_path }}/files'
+      pull: false
+    source: build
+- name: force (changed)
+  docker_image:
+    name: '{{ iname }}'
+    build:
+      path: '{{ role_path }}/files'
+      dockerfile: MyDockerfile
+      pull: false
+    source: build
+    force_source: true
+  register: force_1
+- name: force (unchanged)
+  docker_image:
+    name: '{{ iname }}'
+    build:
+      path: '{{ role_path }}/files'
+      dockerfile: MyDockerfile
+      pull: false
+    source: build
+    force_source: true
+  register: force_2
+- name: cleanup
+  docker_image:
+    name: '{{ iname }}'
+    state: absent
+    force_absent: true
+- assert:
+    that:
+    - force_1 is changed
+    - force_2 is not changed
+- name: Archive image
+  docker_image:
+    name: hello-world:latest
+    archive_path: '{{ output_dir }}/image.tar'
+    source: pull
+  register: archive_image
+- name: remove image
+  docker_image:
+    name: hello-world:latest
+    state: absent
+    force_absent: true
+- name: load image (changed)
+  docker_image:
+    name: hello-world:latest
+    load_path: '{{ output_dir }}/image.tar'
+    source: load
+  register: load_image
+- name: load image (idempotency)
+  docker_image:
+    name: hello-world:latest
+    load_path: '{{ output_dir }}/image.tar'
+    source: load
+  register: load_image_1
+- assert:
+    that:
+    - load_image is changed
+    - load_image_1 is not changed
+    - archive_image['image']['Id'] == load_image['image']['Id']
+- name: Build image
+  docker_image:
+    name: '{{ iname }}'
+    build:
+      path: '{{ role_path }}/files'
+      pull: false
+    source: build
+  register: path_1
+- name: Build image (idempotency)
+  docker_image:
+    name: '{{ iname }}'
+    build:
+      path: '{{ role_path }}/files'
+      pull: false
+    source: build
+  register: path_2
+- name: cleanup
+  docker_image:
+    name: '{{ iname }}'
+    state: absent
+    force_absent: true
+- assert:
+    that:
+    - path_1 is changed
+    - path_2 is not changed
+- name: Build multi-stage image
+  docker_image:
+    name: '{{ iname }}'
+    build:
+      path: '{{ role_path }}/files'
+      dockerfile: StagedDockerfile
+      target: first
+      pull: false
+    source: build
+  register: dockerfile_2
+- name: cleanup
+  docker_image:
+    name: '{{ iname }}'
+    state: absent
+    force_absent: true
+- assert:
+    that:
+    - dockerfile_2 is changed
+    - dockerfile_2.image.Config.WorkingDir == '/first'
+- name: Build image with custom etc_hosts
+  docker_image:
+    name: '{{ iname }}'
+    build:
+      path: '{{ role_path }}/files'
+      dockerfile: EtcHostsDockerfile
+      pull: false
+      etc_hosts:
+        some-custom-host: 127.0.0.1
+    source: build
+  register: path_1
+- name: cleanup
+  docker_image:
+    name: '{{ iname }}'
+    state: absent
+    force_absent: true
+- assert:
+    that:
+    - path_1 is changed

@@ -1,0 +1,23 @@
+- import_tasks: postgresql_db_session_role.yml
+- import_tasks: postgresql_db_initial.yml
+- import_tasks: postgresql_db_general.yml
+- include_tasks: state_dump_restore.yml
+  vars:
+    test_fixture: user
+    file: '{{ loop_item }}'
+  loop:
+  - dbdata.sql
+  - dbdata.sql.gz
+  - dbdata.sql.bz2
+  - dbdata.sql.xz
+  - dbdata.tar
+  - dbdata.tar.gz
+  - dbdata.tar.bz2
+  - dbdata.tar.xz
+  - dbdata.pgc
+  loop_control:
+    loop_var: loop_item
+- import_tasks: state_dump_restore.yml
+  vars:
+    file: dbdata.tar
+    test_fixture: admin

@@ -1,0 +1,69 @@
+- debug:
+    msg: START ce_is_is_view EXPORTROUTE route policy presented integration tests
+      on connection={{ ansible_connection }}
+- include_tasks: setup.yaml
+- name: present the provided configuration with the exisiting running configuration
+  ce_is_is_view: &id001
+    instance_id: 100
+    bfd_min_rx: 100
+    bfd_min_tx: 100
+    bfd_multiplier_num: 10
+  register: result
+- name: Assert the configuration is reflected on host
+  assert:
+    that:
+    - result['changed'] == true
+- name: Get basic config by ce_netconf.
+  ce_netconf: &id003
+    rpc: get
+    cfg_xml: <filter type="subtree"> <isiscomm xmlns="http://www.huawei.com/netconf/vrp"
+      content-version="1.0" format-version="1.0"> <isSites> <isSite> <instanceId>100</instanceId>
+      <isSiteMTs> <isSiteMT> <addressFamily>afIpv4</addressFamily> <mtId>0</mtId>
+      <bfdMinRx></bfdMinRx> <bfdMinTx></bfdMinTx> <bfdMultNum></bfdMultNum> </isSiteMT>
+      </isSiteMTs> </isSite> </isSites> </isiscomm> </filter>
+  register: result_xml
+- name: present the provided configuration with the existing running configuration
+    (IDEMPOTENT)
+  ce_is_is_view: *id001
+  register: repeat
+- name: Assert that the previous task was idempotent
+  assert:
+    that:
+    - repeat.changed == false
+    - '''<bfdMinRx>100</bfdMinRx>'' in result_xml.end_state.result'
+    - '''<bfdMinTx>100</bfdMinTx>'' in result_xml.end_state.result'
+    - '''<bfdMultNum>10</bfdMultNum>'' in result_xml.end_state.result'
+- name: present the provided configuration with the exisiting running configuration
+  ce_is_is_view: &id002
+    instance_id: 100
+    defaultmode: always
+    cost: 10
+    mode_tag: 10
+    level_type: level_1
+    avoid_learning: true
+    mode_routepolicyname: routepolicy_name
+    tag: 100
+    state: absent
+  register: result
+- name: Assert the configuration is reflected on host
+  assert:
+    that:
+    - result['changed'] == true
+- name: present the provided configuration with the existing running configuration
+    (IDEMPOTENT)
+  ce_is_is_view: *id002
+  register: repeat
+- name: Get basic config by ce_netconf.
+  ce_netconf: *id003
+  register: result_xml
+- name: Assert that the previous task was idempotent
+  assert:
+    that:
+    - repeat.changed == false
+    - '''<bfdMinRx>100</bfdMinRx>'' not in result_xml.end_state.result'
+    - '''<bfdMinTx>100</bfdMinTx>'' not in result_xml.end_state.result'
+    - '''<bfdMultNum>10</bfdMultNum>'' not in result_xml.end_state.result'
+- include_tasks: cleanup.yaml
+- debug:
+    msg: END ce_is_is_view EXPORTROUTE route policy resentd integration tests on connection={{
+      ansible_connection }}

@@ -1,0 +1,16 @@
+- debug: msg="START cli/not_hardware_facts.yaml"
+- name: test not hardware
+  enos_facts:
+    gather_subset:
+    - '!hardware'
+  register: result
+- assert:
+    that:
+    - result.changed == false
+    - '''config'' in result.ansible_facts.ansible_net_gather_subset'
+    - '''default'' in result.ansible_facts.ansible_net_gather_subset'
+    - '''interfaces'' in result.ansible_facts.ansible_net_gather_subset'
+    - '''hardware'' not in result.ansible_facts.ansible_net_gather_subset'
+    - result.ansible_facts.ansible_net_interfaces | length > 1
+    - result.ansible_facts.ansible_net_filesystems is not defined
+- debug: msg="END cli/not_hardware_facts.yaml"

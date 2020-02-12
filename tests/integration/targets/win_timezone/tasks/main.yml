@@ -1,0 +1,16 @@
+- name: Determine if server has tzutil.exe installed
+  win_command: tzutil.exe /l
+  register: tzutil
+  ignore_errors: true
+- name: Only run tests if tzutil.exe is installed
+  when: tzutil.rc == 0
+  block:
+  - name: Test in normal mode
+    import_tasks: tests.yml
+    vars:
+      in_check_mode: false
+  - name: Test in check-mode
+    import_tasks: tests.yml
+    vars:
+      in_check_mode: true
+    check_mode: true

@@ -1,0 +1,7 @@
+- name: check OS version is supported
+  win_shell: if ([Environment]::OSVersion.Version -ge [Version]"6.2") { $true } else
+    { $false }
+  register: os_supported
+- name: run tests on supported hosts
+  include: tests.yml
+  when: os_supported.stdout | trim | bool

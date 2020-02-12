@@ -1,0 +1,192 @@
+- vars:
+    task_parameters:
+      become_user: '{{ pg_user }}'
+      become: true
+      register: result
+    pg_parameters:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+  block:
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Create schema
+    postgresql_schema:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+      name: '{{ test_schema1 }}'
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Create test tables
+    postgresql_table:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+      name: '{{ item }}'
+      columns:
+      - id int
+    loop:
+    - '{{ test_table1 }}'
+    - '{{ test_table2 }}'
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Create test table in another schema
+    postgresql_table:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+      name: '{{ test_schema1 }}.{{ test_table3 }}'
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Create test indexes
+    postgresql_idx:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+      name: '{{ item }}'
+      table: '{{ test_table1 }}'
+      columns:
+      - id
+    loop:
+    - '{{ test_idx1 }}'
+    - '{{ test_idx2 }}'
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Set track_function (restart is required)
+    postgresql_set:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+      name: track_functions
+      value: all
+  - name: Restart PostgreSQL
+    become: true
+    service:
+      name: '{{ postgresql_service }}'
+      state: restarted
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Create test functions
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+      query: CREATE FUNCTION {{ item }}() RETURNS boolean AS $$ BEGIN RETURN 1; END;
+        $$ LANGUAGE PLPGSQL
+    loop:
+    - '{{ test_func1 }}'
+    - '{{ test_func2 }}'
+    - '{{ test_schema1 }}.{{ test_func3 }}'
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Touch test functions
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+      query: SELECT {{ item }}()
+    loop:
+    - '{{ test_func1 }}'
+    - '{{ test_func2 }}'
+    - '{{ test_schema1 }}.{{ test_func3 }}'
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Collect all stats
+    postgresql_user_obj_stat_info:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+  - assert:
+      that:
+      - result is not changed
+      - result.tables.public.{{ test_table1 }}.size == 0
+      - result.tables.public.{{ test_table1 }}.size == 0
+      - result.tables.{{ test_schema1 }}.{{ test_table3 }}.size == 0
+      - result.functions.public.{{ test_func1 }}.calls == 1
+      - result.functions.public.{{ test_func2 }}.calls == 1
+      - result.functions.{{ test_schema1 }}.{{ test_func3 }}.calls == 1
+      - result.indexes.public.{{ test_idx1 }}.idx_scan == 0
+      - result.indexes.public.{{ test_idx2 }}.idx_scan == 0
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Collect stats with filter
+    postgresql_user_obj_stat_info:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+      filter: tables, indexes
+  - assert:
+      that:
+      - result is not changed
+      - result.tables.public.{{ test_table1 }}.size == 0
+      - result.tables.public.{{ test_table1 }}.size == 0
+      - result.tables.{{ test_schema1 }}.{{ test_table3 }}.size == 0
+      - result.functions == {}
+      - result.indexes.public.{{ test_idx1 }}.idx_scan == 0
+      - result.indexes.public.{{ test_idx2 }}.idx_scan == 0
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Collect stats for objects in certain schema
+    postgresql_user_obj_stat_info:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+      schema: public
+  - assert:
+      that:
+      - result is not changed
+      - result.tables.public.{{ test_table1 }}.size == 0
+      - result.tables.public.{{ test_table1 }}.size == 0
+      - result.indexes.public.{{ test_idx1 }}.idx_scan == 0
+      - result.indexes.public.{{ test_idx2 }}.idx_scan == 0
+      - result.functions.public.{{ test_func1 }}.calls == 1
+      - result.functions.public.{{ test_func2 }}.calls == 1
+      - result.tables.{{ test_schema1 }} is not defined
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Try to collect data in nonexistent schema
+    postgresql_user_obj_stat_info:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+      schema: nonexistent
+    ignore_errors: true
+  - assert:
+      that:
+      - result is failed
+      - result.msg == "Schema 'nonexistent' does not exist"
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Drop schema
+    postgresql_schema:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+      name: '{{ test_schema1 }}'
+      state: absent
+      cascade_drop: true
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Drop test tables
+    postgresql_table:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+      name: '{{ item }}'
+      state: absent
+    loop:
+    - '{{ test_table1 }}'
+    - '{{ test_table2 }}'
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Drop test functions
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ db_default }}'
+      query: DROP FUNCTION {{ item }}()
+    loop:
+    - '{{ test_func1 }}'
+    - '{{ test_func2 }}'
+    - '{{ test_schema1 }}.{{ test_func3 }}'
+    ignore_errors: true

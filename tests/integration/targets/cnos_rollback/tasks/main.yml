@@ -1,0 +1,14 @@
+- name: Test Rollback of config - Running config
+  cnos_rollback: host={{ inventory_hostname }} username={{ hostvars[inventory_hostname]['ansible_ssh_user']}}  password={{
+    hostvars[inventory_hostname]['ansible_ssh_pass']}} deviceType={{ hostvars[inventory_hostname]['deviceType']}}
+    outputfile=./results/cnos_rollback_{{ inventory_hostname }}_output.txt configType='{{item.configType}}'
+    protocol='{{item.protocol}}' serverip='{{item.serverip}}' rcpath='{{item.rcpath}}'
+    serverusername='{{item.serverusername}}' serverpassword='{{item.serverpassword}}'
+  with_items: '{{test_rollback_data1}}'
+- name: Test Rollback of config - Startup config
+  cnos_rollback: host={{ inventory_hostname }} username={{ hostvars[inventory_hostname]['ansible_ssh_user']}}  password={{
+    hostvars[inventory_hostname]['ansible_ssh_pass']}} deviceType={{ hostvars[inventory_hostname]['deviceType']}}
+    outputfile=./results/cnos_rollback_{{ inventory_hostname }}_output.txt configType='{{item.configType}}'
+    protocol='{{item.protocol}}' serverip='{{item.serverip}}' rcpath='{{item.rcpath}}'
+    serverusername='{{item.serverusername}}' serverpassword='{{item.serverpassword}}'
+  with_items: '{{test_rollback_data2}}'

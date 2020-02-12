@@ -1,0 +1,173 @@
+- name: Test that we have a UCS host, UCS username, and UCS password
+  fail:
+    msg: 'Please define the following variables: ucs_hostname, ucs_username and ucs_password.'
+  when: ucs_hostname is not defined or ucs_username is not defined or ucs_password
+    is not defined
+  vars:
+    login_info:
+      hostname: '{{ ucs_hostname }}'
+      username: '{{ ucs_username }}'
+      password: '{{ ucs_password }}'
+- name: LAN Connectivity Policies absent
+  ucs_lan_connectivity: &id004
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    name: Cntr-FC-Boot
+    state: absent
+- name: LAN Connectivity Policies present (check_mode)
+  ucs_lan_connectivity: &id001
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    name: Cntr-FC-Boot
+    vnic_list:
+    - name: eno1
+      vnic_template: Cntr-Template
+      adapter_policy: Linux
+    - name: eno2
+      vnic_template: Container-NFS-A
+      adapter_policy: Linux
+    - name: eno3
+      vnic_template: Container-NFS-B
+      adapter_policy: Linux
+    iscsi_vnic_list:
+    - name: iSCSIa
+      overlay_vnic: eno1
+      iscsi_adapter_policy: default
+      vlan_name: Container-MGMT-VLAN
+    - name: iSCSIb
+      overlay_vnic: eno3
+      iscsi_adapter_policy: default
+      vlan_name: Container-TNT-A-NFS
+  check_mode: true
+  register: cm_lan_connectivity_present
+- name: LAN Connectivity Policies present (normal mode)
+  ucs_lan_connectivity: *id001
+  register: nm_lan_connectivity_present
+- name: LAN Connectivity Policies present again (check_mode)
+  ucs_lan_connectivity: *id001
+  check_mode: true
+  register: cm_lan_connectivity_present_again
+- name: LAN Connectivity Policies present again (normal mode)
+  ucs_lan_connectivity: *id001
+  register: nm_lan_connectivity_present_again
+- name: Verify LAN Connectivity Policies present results
+  assert:
+    that:
+    - cm_lan_connectivity_present.changed == nm_lan_connectivity_present.changed ==
+      true
+    - cm_lan_connectivity_present_again.changed == nm_lan_connectivity_present_again.changed
+      == false
+- name: LAN Connectivity Policies change (check_mode)
+  ucs_lan_connectivity: &id002
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    name: Cntr-FC-Boot
+    vnic_list:
+    - name: eno1
+      vnic_template: Cntr-Template
+      adapter_policy: Linux
+    - name: eno2
+      vnic_template: Container-NFS-A
+      adapter_policy: Linux
+    - name: eno3
+      vnic_template: Container-NFS-B
+      adapter_policy: default
+    iscsi_vnic_list:
+    - name: iSCSIa
+      overlay_vnic: eno1
+      iscsi_adapter_policy: default
+      vlan_name: Container-MGMT-VLAN
+    - name: iSCSIb
+      overlay_vnic: eno3
+      iscsi_adapter_policy: default
+      vlan_name: Container-TNT-A-NFS
+  check_mode: true
+  register: cm_lan_connectivity_descr_change
+- name: LAN Connectivity Policies description change (normal mode)
+  ucs_lan_connectivity: *id002
+  register: nm_lan_connectivity_descr_change
+- name: LAN Connectivity Policies description again (check_mode)
+  ucs_lan_connectivity: *id002
+  check_mode: true
+  register: cm_lan_connectivity_descr_change_again
+- name: LAN Connectivity Policies description change again (normal mode)
+  ucs_lan_connectivity: *id002
+  register: nm_lan_connectivity_descr_change_again
+- name: Verify LAN Connectivity Policies change results
+  assert:
+    that:
+    - cm_lan_connectivity_descr_change.changed == nm_lan_connectivity_descr_change.changed
+      == true
+    - cm_lan_connectivity_descr_change_again.changed == nm_lan_connectivity_descr_change_again.changed
+      == false
+- name: LAN Connectivity Policies vnic removal (check_mode)
+  ucs_lan_connectivity: &id003
+    hostname: '{{ ucs_hostname }}'
+    username: '{{ ucs_username }}'
+    password: '{{ ucs_password }}'
+    name: Cntr-FC-Boot
+    vnic_list:
+    - name: eno1
+      vnic_template: Cntr-Template
+      adapter_policy: Linux
+    - name: eno2
+      vnic_template: Container-NFS-A
+      adapter_policy: Linux
+    - name: eno3
+      vnic_template: Container-NFS-B
+      adapter_policy: default
+      state: absent
+    iscsi_vnic_list:
+    - name: iSCSIa
+      overlay_vnic: eno1
+      iscsi_adapter_policy: default
+      vlan_name: Container-MGMT-VLAN
+      state: absent
+    - name: iSCSIb
+      overlay_vnic: eno3
+      iscsi_adapter_policy: default
+      vlan_name: Container-TNT-A-NFS
+      state: absent
+  check_mode: true
+  register: cm_lan_connectivity_vnic_change
+- name: LAN Connectivity Policies vnic removal (normal mode)
+  ucs_lan_connectivity: *id003
+  register: nm_lan_connectivity_vnic_change
+- name: LAN Connectivity Policies vnic removal again (check_mode)
+  ucs_lan_connectivity: *id003
+  check_mode: true
+  register: cm_lan_connectivity_vnic_change_again
+- name: LAN Connectivity Policies vnic removal again (normal mode)
+  ucs_lan_connectivity: *id003
+  register: nm_lan_connectivity_vnic_change_again
+- name: Verify LAN Connectivity Policies vnic removal results
+  assert:
+    that:
+    - cm_lan_connectivity_vnic_change.changed == nm_lan_connectivity_vnic_change.changed
+      == true
+    - cm_lan_connectivity_vnic_change_again.changed == nm_lan_connectivity_vnic_change_again.changed
+      == false
+- name: LAN Connectivity Policies absent (check_mode)
+  ucs_lan_connectivity: *id004
+  check_mode: true
+  register: cm_lan_connectivity_absent
+- name: LAN Connectivity Policies absent (normal mode)
+  ucs_lan_connectivity: *id004
+  register: nm_lan_connectivity_absent
+- name: LAN Connectivity Policies absent again (check_mode)
+  ucs_lan_connectivity: *id004
+  check_mode: true
+  register: cm_lan_connectivity_absent_again
+- name: LAN Connectivity Policies absent again (normal mode)
+  ucs_lan_connectivity: *id004
+  register: nm_lan_connectivity_absent_again
+- name: Verify LAN Connectivity Policies absent results
+  assert:
+    that:
+    - cm_lan_connectivity_absent.changed == nm_lan_connectivity_absent.changed ==
+      true
+    - cm_lan_connectivity_absent_again.changed == nm_lan_connectivity_absent_again.changed
+      == false

@@ -1,0 +1,28 @@
+- name: test gather vultr network info - empty resources
+  vultr_network_info: null
+- name: Create the network
+  vultr_network:
+    name: '{{ vultr_network_name }}'
+    cidr: '{{ vultr_network_cidr }}'
+    region: '{{ vultr_network_region }}'
+- name: test gather vultr network info in check mode
+  vultr_network_info: null
+  check_mode: true
+  register: result
+- name: verify test gather vultr network info in check mode
+  assert:
+    that:
+    - result.vultr_network_info|selectattr('name','equalto','{{ vultr_network_name
+      }}') | list | count == 1
+- name: test gather vultr network info
+  vultr_network_info: null
+  register: result
+- name: verify test gather vultr network info
+  assert:
+    that:
+    - result.vultr_network_info|selectattr('name','equalto','{{ vultr_network_name
+      }}') | list | count == 1
+- name: Delete the script
+  vultr_network:
+    name: '{{ vultr_network_name }}'
+    state: absent

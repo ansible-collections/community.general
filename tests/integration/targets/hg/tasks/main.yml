@@ -1,0 +1,23 @@
+- name: determine if mercurial is already installed
+  command: which hg
+  register: has_hg
+  ignore_errors: true
+- name: warn if the underlying system is not capable of running these tests
+  debug:
+    msg: 'The mercurial client is not able to check out Bitbucket repositories as
+      per the changes mentioned here: https://bitbucket.org/blog/deprecating-tlsv1-tlsv1-1-2018-12-01
+      . Therefore these tests are skipped.'
+  when: (ansible_distribution == "Ubuntu" and ansible_distribution_version == "14.04")
+    or ansible_python_version is version("2.7.9", "<")
+- block:
+  - name: install mercurial
+    include_tasks: install.yml
+    when: has_hg is failed
+  - name: test mercurial
+    include_tasks: run-tests.yml
+  - name: uninstall mercurial
+    include_tasks: uninstall.yml
+    when: has_hg is failed
+  when:
+  - not (ansible_distribution == "Ubuntu" and ansible_distribution_version == "14.04")
+  - ansible_python_version is version("2.7.9", ">=")

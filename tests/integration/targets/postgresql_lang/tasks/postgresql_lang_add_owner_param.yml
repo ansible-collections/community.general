@@ -1,0 +1,210 @@
+- vars:
+    test_user1: alice
+    test_user2: bob
+    test_lang: plperl
+    non_existent_role: fake_role
+    task_parameters:
+      become_user: '{{ pg_user }}'
+      become: true
+      register: result
+    pg_parameters:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+  block:
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Create roles for tests
+    postgresql_user:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ item }}'
+    loop:
+    - '{{ test_user1 }}'
+    - '{{ test_user2 }}'
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Create lang with owner in check_mode
+    postgresql_lang:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_lang }}'
+      owner: '{{ test_user1 }}'
+    check_mode: true
+  - assert:
+      that:
+      - result is changed
+      - result.queries == []
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Check that nothing was actually changed
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: 'SELECT r.rolname FROM pg_language l  JOIN pg_roles r ON l.lanowner =
+        r.oid  WHERE l.lanname = ''{{ test_lang }}'' AND r.rolname = ''{{ test_user1
+        }}''
+
+        '
+  - assert:
+      that:
+      - result.rowcount == 0
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Create lang with owner
+    postgresql_lang:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_lang }}'
+      owner: '{{ test_user1 }}'
+  - assert:
+      that:
+      - result is changed
+      - result.queries == ['CREATE LANGUAGE "{{ test_lang }}"', 'ALTER LANGUAGE "{{
+        test_lang }}" OWNER TO {{ test_user1 }}']
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Check
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: 'SELECT r.rolname FROM pg_language l  JOIN pg_roles r ON l.lanowner =
+        r.oid  WHERE l.lanname = ''{{ test_lang }}'' AND r.rolname = ''{{ test_user1
+        }}''
+
+        '
+  - assert:
+      that:
+      - result.rowcount == 1
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Change lang owner in check_mode
+    postgresql_lang:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_lang }}'
+      owner: '{{ test_user2 }}'
+    check_mode: true
+  - assert:
+      that:
+      - result is changed
+      - result.queries == ['ALTER LANGUAGE "{{ test_lang }}" OWNER TO {{ test_user2
+        }}']
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Check that nothing was actually changed
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: 'SELECT r.rolname FROM pg_language l  JOIN pg_roles r ON l.lanowner =
+        r.oid  WHERE l.lanname = ''{{ test_lang }}'' AND r.rolname = ''{{ test_user2
+        }}''
+
+        '
+  - assert:
+      that:
+      - result.rowcount == 0
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Change lang owner
+    postgresql_lang:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_lang }}'
+      owner: '{{ test_user2 }}'
+  - assert:
+      that:
+      - result is changed
+      - result.queries == ["UPDATE pg_language SET lanpltrusted = false WHERE lanname
+        = '{{ test_lang }}'", 'ALTER LANGUAGE "{{ test_lang }}" OWNER TO {{ test_user2
+        }}']
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Check
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: 'SELECT r.rolname FROM pg_language l  JOIN pg_roles r ON l.lanowner =
+        r.oid  WHERE l.lanname = ''{{ test_lang }}'' AND r.rolname = ''{{ test_user2
+        }}''
+
+        '
+  - assert:
+      that:
+      - result.rowcount == 1
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Try to change lang owner again to the same role
+    postgresql_lang:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_lang }}'
+      owner: '{{ test_user2 }}'
+  - assert:
+      that:
+      - result is not changed
+      - result.queries == []
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Check
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: 'SELECT r.rolname FROM pg_language l  JOIN pg_roles r ON l.lanowner =
+        r.oid  WHERE l.lanname = ''{{ test_lang }}'' AND r.rolname = ''{{ test_user2
+        }}''
+
+        '
+  - assert:
+      that:
+      - result.rowcount == 1
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Drop test lang with owner, must ignore
+    postgresql_lang:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ test_lang }}'
+      state: absent
+      owner: '{{ non_existent_role }}'
+  - assert:
+      that:
+      - result is changed
+      - result.queries == ["DROP LANGUAGE \"{{ test_lang }}\""]
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Check
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      query: 'SELECT r.rolname FROM pg_language l  JOIN pg_roles r ON l.lanowner =
+        r.oid  WHERE l.lanname = ''{{ test_lang }}''
+
+        '
+  - assert:
+      that:
+      - result.rowcount == 0
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Drop test roles
+    postgresql_user:
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+      name: '{{ item }}'
+      state: absent
+    loop:
+    - '{{ test_user1 }}'
+    - '{{ test_user2 }}'

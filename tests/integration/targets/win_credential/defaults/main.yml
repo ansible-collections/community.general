@@ -1,0 +1,4 @@
+test_credential_dir: '{{ win_output_dir }}\win_credential_manager'
+test_hostname: ansible.domain.com
+key_password: password1
+cert_thumbprint: 56841AAFDD19D7DF474BDA24D01D88BD8025A00A

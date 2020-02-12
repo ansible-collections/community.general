@@ -1,0 +1,92 @@
+- vars:
+    task_parameters:
+      become_user: '{{ pg_user }}'
+      become: true
+      register: result
+    pg_parameters:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ test_db }}'
+  block:
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_publication - create test db
+    postgresql_db:
+      login_user: '{{ pg_user }}'
+      login_port: '{{ master_port }}'
+      maintenance_db: '{{ db_default }}'
+      name: '{{ test_db }}'
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_publication - create test role
+    postgresql_user:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ test_db }}'
+      login_port: '{{ master_port }}'
+      name: '{{ replication_role }}'
+      password: '{{ replication_pass }}'
+      role_attr_flags: LOGIN,REPLICATION
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_publication - create test table
+    postgresql_table:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ test_db }}'
+      login_port: '{{ master_port }}'
+      name: '{{ test_table1 }}'
+      columns:
+      - id int
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Master - dump schema
+    shell: pg_dumpall -p '{{ master_port }}' -s > /tmp/schema.sql
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: Replicat restore schema
+    shell: psql -p '{{ replica_port }}' -f /tmp/schema.sql
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_publication - create publication
+    postgresql_publication:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ test_db }}'
+      login_port: '{{ master_port }}'
+      name: '{{ test_pub }}'
+  - assert:
+      that:
+      - result is changed
+      - result.exists == true
+      - result.queries == ["CREATE PUBLICATION \"{{ test_pub }}\" FOR ALL TABLES"]
+      - result.owner == '{{ pg_user }}'
+      - result.alltables == true
+      - result.tables == []
+      - result.parameters.publish != {}
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_publication - create one more publication
+    postgresql_publication:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ test_db }}'
+      login_port: '{{ master_port }}'
+      name: '{{ test_pub2 }}'
+  - become_user: '{{ pg_user }}'
+    become: true
+    register: result
+    name: postgresql_publication - check the publication was created
+    postgresql_query:
+      login_user: '{{ pg_user }}'
+      login_db: '{{ test_db }}'
+      login_port: '{{ master_port }}'
+      query: 'SELECT * FROM pg_publication WHERE pubname = ''{{ test_pub }}'' AND
+        pubowner = ''10'' AND puballtables = ''t''
+
+        '
+  - assert:
+      that:
+      - result.rowcount == 1

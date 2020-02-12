@@ -1,0 +1,181 @@
+- vars:
+    war_file_1: helloworld-1.war
+    war_file_1_path: '{{ wf_homedir }}/{{ war_file_1 }}'
+    fake_src_path: /fake/src
+    test_deployment: helloworld-1.war
+    task_parameters:
+      become_user: '{{ wf_user }}'
+      become: true
+      register: result
+  block:
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: Create test files
+    get_url:
+      url: https://ansible-ci-files.s3.amazonaws.com/test/integration/targets/jboss/{{
+        war_file_1 }}
+      dest: '{{ wf_homedir }}'
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: jboss - deploy war in check_mode, the default deploy_path
+    jboss:
+      deployment: '{{ war_file_1 }}'
+      src: '{{ war_file_1_path }}'
+    check_mode: true
+  - assert:
+      that:
+      - result is changed
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: check that nothing changed after the previous step
+    file:
+      path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
+    ignore_errors: true
+  - assert:
+      that:
+      - '''is absent'' in result.msg'
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: jboss - deploy war
+    jboss:
+      deployment: helloworld-1.war
+      deploy_path: '{{ deploy_dir }}'
+      src: '{{ war_file_1_path }}'
+  - assert:
+      that:
+      - result is changed
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: check that the file is deployed after the previous step
+    file:
+      path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
+  - assert:
+      that:
+      - result.state == 'file'
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: jboss - try again to deploy war in check_mode, war is deployed now
+    jboss:
+      deployment: '{{ war_file_1 }}'
+      src: '{{ war_file_1_path }}'
+      deploy_path: '{{ deploy_dir }}'
+    check_mode: true
+  - assert:
+      that:
+      - result is not changed
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: jboss - try again to deploy war in actual mode, war is deployed now
+    jboss:
+      deployment: '{{ war_file_1 }}'
+      src: '{{ war_file_1_path }}'
+      deploy_path: '{{ deploy_dir }}'
+  - assert:
+      that:
+      - result is not changed
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: check that nothing changed after the previous step
+    file:
+      path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
+  - assert:
+      that:
+      - result.state == 'file'
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: jboss - undeploy war in check_mode, war is deployed
+    jboss:
+      deployment: '{{ war_file_1 }}'
+      deploy_path: '{{ deploy_dir }}'
+      state: absent
+    check_mode: true
+  - assert:
+      that:
+      - result is changed
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: check that nothing actually changed after the previous step
+    file:
+      path: '{{ deploy_dir }}/{{ war_file_1 }}.deployed'
+  - assert:
+      that:
+      - result.state == 'file'
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: jboss - undeploy war in actual mode, war is deployed
+    jboss:
+      deployment: '{{ war_file_1 }}'
+      deploy_path: '{{ deploy_dir }}'
+      state: absent
+  - assert:
+      that:
+      - result is changed
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: check that file is undeployed after the previous step
+    file:
+      path: '{{ deploy_dir }}/{{ war_file_1 }}.undeployed'
+  - assert:
+      that:
+      - result.state == 'file'
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: jboss - undeploy war in check_mode, war is undeployed
+    jboss:
+      deployment: '{{ war_file_1 }}'
+      deploy_path: '{{ deploy_dir }}'
+      state: absent
+    check_mode: true
+  - assert:
+      that:
+      - result is not changed
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: jboss - undeploy war in actual_mode, war is undeployed
+    jboss:
+      deployment: '{{ war_file_1 }}'
+      deploy_path: '{{ deploy_dir }}'
+      state: absent
+  - assert:
+      that:
+      - result is not changed
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: jboss - test fake src
+    jboss:
+      deployment: '{{ war_file_1 }}'
+      deploy_path: '{{ deploy_dir }}'
+      src: '{{ fake_src_path }}'
+      state: present
+    ignore_errors: true
+  - assert:
+      that:
+      - result is failed
+      - '''Source file {{ fake_src_path }} does not exist.'' in result.msg'
+  - become_user: '{{ wf_user }}'
+    become: true
+    register: result
+    name: jboss - must fail when state=present and src is not passed
+    jboss:
+      deployment: '{{ war_file_1 }}'
+      state: present
+    ignore_errors: true
+  - assert:
+      that:
+      - result is failed
+      - '''state is present but all of the following are missing: src'' in result.msg'

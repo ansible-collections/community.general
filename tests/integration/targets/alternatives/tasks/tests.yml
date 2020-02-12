@@ -1,0 +1,10 @@
+- block:
+  - include_tasks: remove_links.yml
+  - include_tasks: setup_test.yml
+  - include_tasks: test.yml
+    with_sequence: start=1 end=2
+  vars:
+    with_link: '{{ test_conf[0] }}'
+    with_alternatives: '{{ test_conf[1] }}'
+    mode: '{{ test_conf[2] }}'
+  when: ansible_os_family != 'RedHat' or test_conf[0]

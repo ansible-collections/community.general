@@ -1,0 +1,16 @@
+- set_fact:
+    has_httptester: '{{ lookup(''env'', ''HTTPTESTER'') != '''' }}'
+- name: make sure we have the ansible_os_family and ansible_distribution_version facts
+  setup:
+    gather_subset: distribution
+  when: ansible_facts == {}
+- block:
+  - include_vars: httptester.yml
+  - include_tasks: '{{ lookup(''first_found'', files)}}'
+    vars:
+      files:
+      - '{{ ansible_os_family | lower }}.yml'
+      - default.yml
+  when:
+  - has_httptester|bool
+  - ansible_os_family != 'Windows' or (ansible_os_family == 'Windows' and not ansible_distribution_version.startswith("6.0."))

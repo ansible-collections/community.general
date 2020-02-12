@@ -1,0 +1,15 @@
+- debug: msg="START cli/default_facts.yaml"
+- name: test getting default facts
+  enos_facts: null
+  register: result
+- assert:
+    that:
+    - result.changed == false
+    - '''hardware'' in result.ansible_facts.ansible_net_gather_subset'
+    - '''default'' in result.ansible_facts.ansible_net_gather_subset'
+    - '''interfaces'' in result.ansible_facts.ansible_net_gather_subset'
+    - '''config'' not in result.ansible_facts.ansible_net_gather_subset'
+    - result.ansible_facts.ansible_net_memtotal_mb > 10
+    - result.ansible_facts.ansible_net_interfaces | length > 1
+    - result.ansible_facts.ansible_net_config is not defined
+- debug: msg="END cli/default.yaml"

@@ -1,0 +1,3 @@
+- action: setup
+- include_tasks: tasks/tests.yml
+  when: ansible_distribution_version is version('6.1', '>=')

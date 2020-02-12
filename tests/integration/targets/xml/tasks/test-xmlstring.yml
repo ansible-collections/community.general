@@ -1,0 +1,66 @@
+- name: Copy expected results to remote
+  copy:
+    src: results/{{ item }}
+    dest: /tmp/{{ item }}
+  with_items:
+  - test-pretty-print.xml
+  - test-pretty-print-only.xml
+- name: Read from xmlstring (not using pretty_print)
+  xml:
+    xmlstring: '{{ lookup(''file'', ''{{ role_path }}/fixtures/ansible-xml-beers.xml'')
+      }}'
+    xpath: .
+  register: xmlresponse
+- name: Compare to expected result
+  copy:
+    content: '{{ xmlresponse.xmlstring }}
+
+      '
+    dest: /tmp/test-pretty-print-only.xml
+  check_mode: true
+  diff: true
+  register: comparison
+- name: Test expected result
+  assert:
+    that:
+    - xmlresponse.changed == false
+    - comparison.changed == false
+- name: Read from xmlstring (using pretty_print)
+  xml:
+    xmlstring: '{{ lookup(''file'', ''{{ role_path }}/fixtures/ansible-xml-beers.xml'')
+      }}'
+    pretty_print: true
+  register: xmlresponse
+- name: Compare to expected result
+  copy:
+    content: '{{ xmlresponse.xmlstring }}'
+    dest: /tmp/test-pretty-print-only.xml
+  check_mode: true
+  diff: true
+  register: comparison
+- name: Test expected result
+  assert:
+    that:
+    - xmlresponse.changed == true
+    - comparison.changed == false
+- name: Read from xmlstring
+  xml:
+    xmlstring: '{{ lookup(''file'', ''{{ role_path }}/fixtures/ansible-xml-beers.xml'')
+      }}'
+    xpath: /business/beers
+    pretty_print: true
+    add_children:
+    - beer: Old Rasputin
+  register: xmlresponse_modification
+- name: Compare to expected result
+  copy:
+    content: '{{ xmlresponse_modification.xmlstring }}'
+    dest: /tmp/test-pretty-print.xml
+  check_mode: true
+  diff: true
+  register: comparison
+- name: Test expected result
+  assert:
+    that:
+    - xmlresponse_modification.changed == true
+    - comparison.changed == false

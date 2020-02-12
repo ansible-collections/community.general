@@ -1,0 +1,227 @@
+- name: NetApp Test Host module
+  fail:
+    msg: Please define netapp_e_api_username, netapp_e_api_password, netapp_e_api_host,
+      and netapp_e_ssid.
+  when: netapp_e_api_username is undefined or netapp_e_api_password is undefined or
+    netapp_e_api_host is undefined or netapp_e_ssid is undefined
+  vars:
+    gather_facts: true
+    credentials: &id002
+      api_url: https://{{ netapp_e_api_host }}/devmgr/v2
+      api_username: '{{ netapp_e_api_username }}'
+      api_password: '{{ netapp_e_api_password }}'
+      ssid: '{{ netapp_e_ssid }}'
+      validate_certs: false
+    hosts: &id001
+      1:
+        host_type: 27
+        update_host_type: 28
+        ports:
+        - type: iscsi
+          label: I1_1
+          port: iqn.1996-04.de.suse:01:56f86f9bd1fe-PORT1
+        - type: iscsi
+          label: I1_2
+          port: iqn.1996-04.de.suse:01:56f86f9bd1ff-port1
+        ports2:
+        - type: iscsi
+          label: I1_1
+          port: iqn.1996-04.de.suse:01:56f86f9bd1fe-port2
+        - type: iscsi
+          label: I1_2
+          port: iqn.1996-04.de.suse:01:56f86f9bd1ff-port2
+        - type: iscsi
+          label: I1_3
+          port: iqn.1996-04.redhat:01:56f86f9bd1fe-PORT1
+      2:
+        host_type: 27
+        update_host_type: 28
+        ports:
+        - type: iscsi
+          label: I2_1
+          port: iqn.1996-04.redhat:01:56f86f9bd1fe-port1
+        - type: iscsi
+          label: I2_2
+          port: iqn.1996-04.redhat:01:56f86f9bd1ff-port1
+        ports2:
+        - type: iscsi
+          label: I2_1
+          port: iqn.1996-04.redhat:01:56f86f9bd1fe-port2
+        - type: iscsi
+          label: I2_2
+          port: iqn.1996-04.redhat:01:56f86f9bd1ff-PORT2
+- name: Ensure that jmespath is installed
+  pip:
+    name: jmespath
+    state: present
+  register: jmespath
+- fail:
+    msg: Restart playbook, the jmespath package was installed and is need for the
+      playbook's execution.
+  when: jmespath.changed
+- name: Set hosts variable
+  set_fact:
+    hosts: *id001
+- name: set credentials
+  set_fact:
+    credentials: *id002
+- name: Show some debug information
+  debug:
+    msg: Using user={{ credentials.api_username }} on server={{ credentials.api_url
+      }}.
+- name: Remove any existing hosts
+  netapp_e_host:
+    api_url: https://{{ netapp_e_api_host }}/devmgr/v2
+    api_username: '{{ netapp_e_api_username }}'
+    api_password: '{{ netapp_e_api_password }}'
+    ssid: '{{ netapp_e_ssid }}'
+    validate_certs: false
+    state: absent
+    name: '{{ item.key }}'
+  with_dict: *id001
+- name: HTTP request for all host definitions from array
+  uri:
+    url: '{{ credentials.api_url }}/storage-systems/{{ credentials.ssid }}/hosts'
+    user: '{{ credentials.api_username }}'
+    password: '{{ credentials.api_password }}'
+    body_format: json
+    validate_certs: false
+  register: result
+- name: Collect host side port labels
+  set_fact:
+    host_labels: '{{ result | json_query(''json[*].label'') }}'
+- name: Assert hosts were removed
+  assert:
+    that: '''{{ item.key }}'' not in host_labels'
+    msg: Host, {{ item.key }}, failed to be removed from the hosts!
+  loop: '{{ lookup(''dict'', hosts) }}'
+- name: Define hosts
+  netapp_e_host:
+    api_url: https://{{ netapp_e_api_host }}/devmgr/v2
+    api_username: '{{ netapp_e_api_username }}'
+    api_password: '{{ netapp_e_api_password }}'
+    ssid: '{{ netapp_e_ssid }}'
+    validate_certs: false
+    state: present
+    host_type: '{{ item.value.host_type }}'
+    ports: '{{ item.value.ports }}'
+    name: '{{ item.key }}'
+  with_dict: *id001
+- name: https request to validate host definitions were created
+  uri:
+    url: '{{ credentials.api_url }}/storage-systems/{{ credentials.ssid }}/hosts'
+    user: '{{ credentials.api_username }}'
+    password: '{{ credentials.api_password }}'
+    body_format: json
+    validate_certs: false
+  register: result
+- name: Collect host label list
+  set_fact:
+    hosts_labels: '{{ result | json_query(''json[*].label'') }}'
+- name: Validate hosts were in fact created
+  assert:
+    that: '''{{ item.key }}'' in hosts_labels'
+    msg: host, {{ item.key }}, not define on array!
+  loop: '{{ lookup(''dict'', hosts) }}'
+- name: Redefine hosts, expecting no changes
+  netapp_e_host:
+    api_url: https://{{ netapp_e_api_host }}/devmgr/v2
+    api_username: '{{ netapp_e_api_username }}'
+    api_password: '{{ netapp_e_api_password }}'
+    ssid: '{{ netapp_e_ssid }}'
+    validate_certs: false
+    state: present
+    host_type: '{{ item.value.host_type }}'
+    ports: '{{ item.value.ports }}'
+    name: '{{ item.key }}'
+  with_dict: *id001
+  register: result
+- name: Ensure no change occurred
+  assert:
+    msg: A change was not detected!
+    that: not result.changed
+- name: Redefine hosts, expecting changes
+  netapp_e_host:
+    api_url: https://{{ netapp_e_api_host }}/devmgr/v2
+    api_username: '{{ netapp_e_api_username }}'
+    api_password: '{{ netapp_e_api_password }}'
+    ssid: '{{ netapp_e_ssid }}'
+    validate_certs: false
+    state: present
+    host_type: '{{ item.value.host_type }}'
+    ports: '{{ item.value.ports2 }}'
+    name: '{{ item.key }}'
+    force_port: true
+  with_dict: *id001
+  register: result
+- name: HTTP request for port information
+  uri:
+    url: '{{ credentials.api_url }}/storage-systems/{{ credentials.ssid }}/hosts'
+    user: '{{ credentials.api_username }}'
+    password: '{{ credentials.api_password }}'
+    body_format: json
+    validate_certs: false
+  register: result
+- name: Compile array host port information list
+  set_fact:
+    tmp: []
+- set_fact:
+    tmp: '{{ tmp }} + {{ [item | json_query(''hostSidePorts[*]'')] | zip_longest([],
+      fillvalue={''host_name'': item.label}) | list }}'
+  loop: '{{ result.json }}'
+- name: Create port information list
+  set_fact:
+    port_info: []
+- set_fact:
+    port_info: '{{ port_info + [item[0] |combine(item[1])] }}'
+  loop: '{{ tmp }}'
+- name: Create expected port information list
+  set_fact:
+    tmp: []
+- set_fact:
+    tmp: '{{ tmp }} + {{ [item | json_query(''value.ports2[*]'')]| zip_longest([],
+      fillvalue={''host_name'': item.key|string}) | list }}'
+  loop: '{{ lookup(''dict'', hosts) }}'
+- name: Create expected port information list
+  set_fact:
+    expected_port_info: []
+- set_fact:
+    expected_port_info: '{{ expected_port_info + [ item[0] |combine(item[1]) ] }}'
+  loop: '{{ tmp }}'
+- name: Assert hosts information was updated with new port information
+  assert:
+    that: '{{ item[0].host_name != item[1].host_name or item[0].label != item[1].label
+      or (item[0].type == item[1].type and (item[0].address|regex_replace('':'',''''))
+      == (item[1].port|regex_replace('':'',''''))) }}'
+    msg: port failed to be updated!
+  loop: '{{ query(''nested'', port_info, expected_port_info) }}'
+- name: Remove any existing hosts
+  netapp_e_host:
+    api_url: https://{{ netapp_e_api_host }}/devmgr/v2
+    api_username: '{{ netapp_e_api_username }}'
+    api_password: '{{ netapp_e_api_password }}'
+    ssid: '{{ netapp_e_ssid }}'
+    validate_certs: false
+    state: absent
+    name: '{{ item.key }}'
+  with_dict: *id001
+- name: HTTP request for all host definitions from array
+  uri:
+    url: '{{ credentials.api_url }}/storage-systems/{{ credentials.ssid }}/hosts'
+    user: '{{ credentials.api_username }}'
+    password: '{{ credentials.api_password }}'
+    body_format: json
+    validate_certs: false
+  register: results
+- name: Collect host side port labels
+  set_fact:
+    host_side_port_labels: '{{ results | json_query(''json[*].hostSidePorts[*].label'')
+      }}'
+- name: Collect removed port labels
+  set_fact:
+    removed_host_side_port_labels: '{{ hosts | json_query(''*.ports[*].label'') }}'
+- name: Assert hosts were removed
+  assert:
+    that: item not in host_side_port_labels
+    msg: Host {{ item }} failed to be removed from the hosts!
+  loop: '{{ removed_host_side_port_labels }}'

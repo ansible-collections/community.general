@@ -1,0 +1,126 @@
+- name: create test folders
+  win_shell: "$ErrorActionPreference = 'Stop'\n\n$tmp_dir = '{{ test_win_acl_inheritance_path\
+    \ }}'\nif (Test-Path -LiteralPath $tmp_dir) {\n    Remove-Item -LiteralPath $tmp_dir\
+    \ -Force -Recurse\n}\nNew-Item -Path $tmp_dir -ItemType Directory > $null\n\n\
+    Add-Type -AssemblyName System.DirectoryServices.AccountManagement\n$current_sid\
+    \ = ([System.DirectoryServices.AccountManagement.UserPrincipal]::Current).Sid\n\
+    $system_sid = New-Object -TypeName System.Security.Principal.SecurityIdentifier\
+    \ -ArgumentList @([System.Security.Principal.WellKnownSidType]::LocalSystemSid,\
+    \ $null)\n$everyone_sid = New-Object -TypeName System.Security.Principal.SecurityIdentifier\
+    \ -ArgumentList @([System.Security.Principal.WellKnownSidType]::WorldSid, $null)\n\
+    \n$sd = New-Object -TypeName System.Security.AccessControl.DirectorySecurity\n\
+    $sd.SetAccessRuleProtection($true, $false)\n$sd.AddAccessRule(\n    (New-Object\
+    \ -TypeName System.Security.AccessControl.FileSystemAccessRule -ArgumentList @(\n\
+    \        $system_sid,\n        [System.Security.AccessControl.FileSystemRights]::FullControl,\n\
+    \        [System.Security.AccessControl.InheritanceFlags]\"ContainerInherit, ObjectInherit\"\
+    ,\n        [System.Security.AccessControl.PropagationFlags]::None,\n        [System.Security.AccessControl.AccessControlType]::Allow\n\
+    \    ))\n)\n$sd.AddAccessRule(\n    (New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule\
+    \ -ArgumentList @(\n        $current_sid,\n        [System.Security.AccessControl.FileSystemRights]::FullControl,\n\
+    \        [System.Security.AccessControl.InheritanceFlags]\"ContainerInherit, ObjectInherit\"\
+    ,\n        [System.Security.AccessControl.PropagationFlags]::None,\n        [System.Security.AccessControl.AccessControlType]::Allow\n\
+    \    ))\n)\n$sd.AddAccessRule(\n    (New-Object -TypeName System.Security.AccessControl.FileSystemAccessRule\
+    \ -ArgumentList @(\n        $everyone_sid,\n        [System.Security.AccessControl.FileSystemRights]::Read,\n\
+    \        [System.Security.AccessControl.InheritanceFlags]\"ContainerInherit, ObjectInherit\"\
+    ,\n        [System.Security.AccessControl.PropagationFlags]::None,\n        [System.Security.AccessControl.AccessControlType]::Allow\n\
+    \    ))\n)\n\nSet-Acl -LiteralPath $tmp_dir -AclObject $sd\n\nNew-Item -Path \"\
+    $tmp_dir\\folder\" -ItemType Directory > $null\nSet-Content -LiteralPath \"$tmp_dir\\\
+    folder\\file.txt\" -Value 'a'\n\n$system_sid.Value\n$current_sid.Value\n$everyone_sid.Value\n"
+  register: test_sids
+- name: remove inheritance check
+  win_acl_inheritance:
+    path: '{{ test_win_acl_inheritance_path }}\folder'
+    reorganize: true
+    state: absent
+  register: remove_check
+  check_mode: true
+- name: get actual remove inheritance check
+  test_get_acl:
+    path: '{{ test_win_acl_inheritance_path }}\folder'
+  register: actual_remove_check
+- name: assert remove inheritance check
+  assert:
+    that:
+    - remove_check is changed
+    - actual_remove_check.inherited == True
+    - actual_remove_check.user_details[test_sids.stdout_lines[0]].isinherited == True
+    - actual_remove_check.user_details[test_sids.stdout_lines[1]].isinherited == True
+    - actual_remove_check.user_details[test_sids.stdout_lines[2]].isinherited == True
+- name: remove inheritance
+  win_acl_inheritance:
+    path: '{{ test_win_acl_inheritance_path }}\folder'
+    reorganize: true
+    state: absent
+  register: remove
+- name: get actual remove inheritance
+  test_get_acl:
+    path: '{{ test_win_acl_inheritance_path }}\folder'
+  register: actual_remove
+- name: assert remove inheritance
+  assert:
+    that:
+    - remove is changed
+    - actual_remove.inherited == False
+    - actual_remove.user_details[test_sids.stdout_lines[0]].isinherited == False
+    - actual_remove.user_details[test_sids.stdout_lines[1]].isinherited == False
+    - actual_remove.user_details[test_sids.stdout_lines[2]].isinherited == False
+- name: remove inheritance again
+  win_acl_inheritance:
+    path: '{{ test_win_acl_inheritance_path }}\folder'
+    reorganize: true
+    state: absent
+  register: remove_again
+- name: assert remove inheritance again
+  assert:
+    that:
+    - remove_again is not changed
+- name: add inheritance check
+  win_acl_inheritance:
+    path: '{{ test_win_acl_inheritance_path }}\folder'
+    reorganize: true
+    state: present
+  register: add_check
+  check_mode: true
+- name: get actual add inheritance check
+  test_get_acl:
+    path: '{{ test_win_acl_inheritance_path }}\folder'
+  register: actual_add_check
+- name: assert add inheritance check
+  assert:
+    that:
+    - add_check is changed
+    - actual_add_check.inherited == False
+    - actual_add_check.user_details[test_sids.stdout_lines[0]].isinherited == False
+    - actual_add_check.user_details[test_sids.stdout_lines[1]].isinherited == False
+    - actual_add_check.user_details[test_sids.stdout_lines[2]].isinherited == False
+- name: add inheritance
+  win_acl_inheritance:
+    path: '{{ test_win_acl_inheritance_path }}\folder'
+    reorganize: true
+    state: present
+  register: add
+- name: get actual add inheritance
+  test_get_acl:
+    path: '{{ test_win_acl_inheritance_path }}\folder'
+  register: actual_add
+- name: assert add inheritance
+  assert:
+    that:
+    - add is changed
+    - actual_add.inherited == True
+    - actual_add.user_details[test_sids.stdout_lines[0]].isinherited == True
+    - actual_add.user_details[test_sids.stdout_lines[1]].isinherited == True
+    - actual_add.user_details[test_sids.stdout_lines[2]].isinherited == True
+- name: add inheritance again
+  win_acl_inheritance:
+    path: '{{ test_win_acl_inheritance_path }}\folder'
+    reorganize: true
+    state: present
+  register: add_again
+- name: assert add inheritance again
+  assert:
+    that:
+    - add_again is not changed
+- name: remove test folder
+  win_file:
+    path: '{{ test_win_acl_inheritance_path }}'
+    state: absent

@@ -1,0 +1,7 @@
+docker_prereq_packages:
+- yum-utils
+- device-mapper-persistent-data
+- lvm2
+- libseccomp
+docker_packages:
+- docker-ce-3:18.09.1

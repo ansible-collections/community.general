@@ -1,0 +1,4 @@
+- name: assert message failure (expect failed=true)
+  assert:
+    that:
+    - output.failed == true

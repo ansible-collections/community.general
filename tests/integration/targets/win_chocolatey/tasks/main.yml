@@ -1,0 +1,80 @@
+- name: ensure test package is uninstalled
+  win_chocolatey:
+    name: '{{ test_choco_packages }}'
+    state: absent
+- name: ensure testing dir is cleaned
+  win_file:
+    path: '{{ test_choco_path }}'
+    state: '{{ item }}'
+  with_items:
+  - absent
+  - directory
+- name: copy template package files
+  win_copy:
+    src: files/
+    dest: '{{ test_choco_path }}'
+- name: set up packages
+  win_shell: "$ErrorActionPreference = \"Stop\"\n$root_path = '{{ test_choco_path\
+    \ }}'\n$packages_path = '{{ test_choco_source }}'\n$packages_path_override = '{{\
+    \ test_choco_source2 }}'\n$packages = @(\n    @{ name = \"ansible\"; version =\
+    \ \"0.0.1\"; override = $false },\n    @{ name = \"ansible\"; version = \"0.1.0\"\
+    ; override = $false },\n    @{ name = \"ansible\"; version = \"0.1.0\"; override\
+    \ = $true },\n    @{ name = \"ansible-test\"; version = \"1.0.0\"; override =\
+    \ $false },\n    @{ name = \"ansible-test\"; version = \"1.0.1-beta1\"; override\
+    \ = $false }\n)\n$nuspec_src = \"$root_path\\package.nuspec\"\n$install_src =\
+    \ \"$root_path\\tools\\chocolateyinstall.ps1\"\n$uninstall_src = \"$root_path\\\
+    tools\\chocolateyUninstall.ps1\"\n\nNew-Item -Path $packages_path -ItemType Directory\
+    \ > $null\nNew-Item -Path $packages_path_override -ItemType Directory > $null\n\
+    \nforeach ($package in $packages) {\n    $package_dir = \"$root_path\\$($package.name)-$($package.version)\"\
+    \n    New-Item -Path $package_dir -ItemType Directory > $null\n    New-Item -Path\
+    \ \"$package_dir\\tools\" -ItemType Directory > $null\n\n    if ($package.override)\
+    \ {\n        $out_path = $packages_path_override\n        $source_value = \"override\"\
+    \n    } else {\n        $out_path = $packages_path\n        $source_value = \"\
+    normal\"\n    }\n\n    $nuspec_text = ([System.IO.File]::ReadAllLines($nuspec_src)\
+    \ -join \"`r`n\")\n    $nuspec_text = $nuspec_text.Replace('--- NAME ---', $package.name).Replace('---\
+    \ VERSION ---', $package.version)\n\n    $install_text = ([System.IO.File]::ReadAllLines($install_src)\
+    \ -join \"`r`n\")\n    $install_text = $install_text.Replace('--- PATH ---', $root_path).Replace('---\
+    \ SOURCE ---', $source_value)\n\n    $uninstall_text = ([System.IO.File]::ReadAllLines($uninstall_src)\
+    \ -join \"`r`n\")\n    $uninstall_text = $uninstall_text.Replace('--- PATH ---',\
+    \ $root_path)\n\n    $utf8 = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList\
+    \ $false\n    $utf8_bom = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList\
+    \ $true\n    [System.IO.File]::WriteAllText(\"$package_dir\\$($package.name).nuspec\"\
+    , $nuspec_text, $utf8)\n    [System.IO.File]::WriteAllText(\"$package_dir\\tools\\\
+    chocolateyinstall.ps1\", $install_text, $utf8_bom)\n    [System.IO.File]::WriteAllText(\"\
+    $package_dir\\tools\\chocolateyUninstall.ps1\", $uninstall_text, $utf8_bom)\n\n\
+    \    &choco.exe pack --out $out_path --no-progress --limit-output \"$package_dir\\\
+    $($package.name).nuspec\"\n    Remove-Item -Path $package_dir -Force -Recurse\
+    \ > $null\n}\nRemove-Item -Path \"$root_path\\tools\" -Force -Recurse > $null\n\
+    Remove-Item -Path $nuspec_src > $null\n"
+- name: set up Chocolatey sources
+  win_chocolatey_source:
+    name: '{{ item.name }}'
+    priority: '{{ item.priority }}'
+    source: '{{ item.src }}'
+    state: present
+  with_items:
+  - name: ansible-test
+    priority: 1
+    src: '{{ test_choco_source }}'
+  - name: ansible-test-override
+    priority: 2
+    src: '{{ test_choco_source2 }}'
+- block:
+  - name: run tests
+    include_tasks: tests.yml
+  always:
+  - name: ensure test package is uninstalled after tests
+    win_chocolatey:
+      name: '{{ test_choco_packages }}'
+      state: absent
+  - name: remove test sources
+    win_chocolatey_source:
+      name: '{{ item }}'
+      state: absent
+    with_items:
+    - ansible-test
+    - ansible-test-override
+  - name: remove testing dir
+    win_file:
+      path: '{{ test_choco_path }}'
+      state: absent

@@ -1,0 +1,26 @@
+- name: Create the record
+  vultr_dns_domain:
+    name: '{{ dns_domain_name }}'
+    server_ip: '{{ dns_domain_server_ip }}'
+- name: test gather vultr dns domain info in check mode
+  vultr_dns_domain_info: null
+  check_mode: true
+  register: result
+- name: verify test gather vultr dns domain info in check mode
+  assert:
+    that:
+    - result.vultr_dns_domain_info|selectattr('domain','equalto','{{ dns_domain_name
+      }}') | list | count == 1
+- name: test gather vultr dns domain info
+  vultr_dns_domain_info: null
+  register: result
+- name: verify test gather vultr dns domain info
+  assert:
+    that:
+    - result.vultr_dns_domain_info|selectattr('domain','equalto','{{ dns_domain_name
+      }}') | list | count == 1
+- name: Delete the record
+  vultr_dns_domain:
+    name: '{{ dns_domain_name }}'
+    server_ip: '{{ dns_domain_server_ip }}'
+    state: absent

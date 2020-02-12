@@ -1,0 +1,40 @@
+- name: firewalld port test permanent enabled
+  firewalld:
+    port: 8081/tcp
+    permanent: true
+    state: enabled
+  register: result
+- name: assert firewalld port test permanent enabled worked
+  assert:
+    that:
+    - result is changed
+- name: firewalld port test permanent enabled rerun (verify not changed)
+  firewalld:
+    port: 8081/tcp
+    permanent: true
+    state: enabled
+  register: result
+- name: assert firewalld port test permanent enabled rerun worked (verify not changed)
+  assert:
+    that:
+    - result is not changed
+- name: firewalld port test permanent disabled
+  firewalld:
+    port: 8081/tcp
+    permanent: true
+    state: disabled
+  register: result
+- name: assert firewalld port test permanent disabled worked
+  assert:
+    that:
+    - result is changed
+- name: firewalld port test permanent disabled rerun (verify not changed)
+  firewalld:
+    port: 8081/tcp
+    permanent: true
+    state: disabled
+  register: result
+- name: assert firewalld port test permanent disabled rerun worked (verify not changed)
+  assert:
+    that:
+    - result is not changed

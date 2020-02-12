@@ -1,0 +1,24 @@
+- name: Registering container name
+  set_fact:
+    cname: '{{ cname_prefix ~ ''-45700'' }}'
+- name: Registering container name
+  set_fact:
+    cnames: '{{ cnames + [cname] }}'
+- name: Start container
+  docker_container:
+    image: alpine:3.8
+    command: /bin/sh -c "sleep 10m"
+    name: '{{ cname }}'
+    state: started
+- name: Stop container with a lot of invalid options
+  docker_container:
+    name: '{{ cname }}'
+    force_kill: true
+    networks:
+    - name: nonexistant-network-{{ (2**32) | random }}
+    published_ports:
+    - '1:2'
+    - '3'
+    links:
+    - nonexistant-container-{{ (2**32) | random }}:test
+    state: absent

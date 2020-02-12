@@ -1,0 +1,43 @@
+- name: 'setup: create a dummy alternative'
+  block:
+  - import_tasks: setup.yml
+  - include_tasks: tests.yml
+    with_nested:
+    - - true
+      - false
+    - - true
+      - false
+    - - auto
+      - manual
+    loop_control:
+      loop_var: test_conf
+  - block:
+    - include_tasks: remove_links.yml
+    - include_tasks: setup_test.yml
+    - include_tasks: tests_set_priority.yml
+      with_sequence: start=3 end=4
+    vars:
+      with_alternatives: true
+      mode: auto
+  - block:
+    - include_tasks: remove_links.yml
+    - include_tasks: setup_test.yml
+    - include_tasks: tests_set_priority.yml
+      with_sequence: start=3 end=4
+    vars:
+      with_alternatives: false
+      mode: auto
+  - import_tasks: path_is_checked.yml
+  always:
+  - include_tasks: remove_links.yml
+  - file:
+      path: '{{ item }}'
+      state: absent
+    with_items:
+    - '{{ alternatives_dir }}/dummy'
+  - file:
+      path: /usr/bin/dummy{{ item }}
+      state: absent
+    with_sequence: start=1 end=4
+  when: ansible_distribution != 'Fedora' or ansible_distribution_major_version|int
+    > 24

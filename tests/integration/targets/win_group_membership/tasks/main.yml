@@ -1,0 +1,38 @@
+- name: Gather facts
+  setup: null
+- name: Remove potentially leftover test group
+  win_group: &id001
+    name: WinGroupMembershipTest
+    state: absent
+- name: Remove potentially leftover test user
+  win_user: &id002
+    name: WinTestUser
+    state: absent
+- name: Add new test group
+  win_group:
+    name: WinGroupMembershipTest
+    state: present
+- name: Add new test user
+  win_user:
+    name: WinTestUser
+    password: W1nGr0upM3mb3rsh1pT3$tP@$$w0rd
+    state: present
+- name: Run tests for win_group_membership
+  block:
+  - name: Test in normal mode
+    import_tasks: tests.yml
+    vars:
+      win_local_group: WinGroupMembershipTest
+      win_local_user: WinTestUser
+      in_check_mode: false
+  - name: Test in check-mode
+    import_tasks: tests.yml
+    vars:
+      win_local_group: WinGroupMembershipTest
+      win_local_user: WinTestUser
+      in_check_mode: true
+    check_mode: true
+- name: Remove test group
+  win_group: *id001
+- name: Remove test user
+  win_group: *id002

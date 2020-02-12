@@ -1,0 +1,94 @@
+- name: postgresql_info - create role to check session_role
+  become_user: '{{ pg_user }}'
+  become: true
+  postgresql_user:
+    db: '{{ db_default }}'
+    login_user: '{{ pg_user }}'
+    name: session_superuser
+    role_attr_flags: SUPERUSER
+- name: postgresql_info - test return values and session_role param
+  become_user: '{{ pg_user }}'
+  become: true
+  postgresql_info:
+    db: '{{ db_default }}'
+    login_user: '{{ pg_user }}'
+    session_role: session_superuser
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+    - result.version != {}
+    - result.databases.{{ db_default }}.collate
+    - result.databases.{{ db_default }}.languages
+    - result.databases.{{ db_default }}.namespaces
+    - result.databases.{{ db_default }}.extensions
+    - result.settings
+    - result.tablespaces
+    - result.roles
+- name: postgresql_info - check filter param passed by list
+  become_user: '{{ pg_user }}'
+  become: true
+  postgresql_info:
+    db: '{{ db_default }}'
+    login_user: '{{ pg_user }}'
+    filter:
+    - ver*
+    - rol*
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+    - result.version != {}
+    - result.roles
+    - result.databases == {}
+    - result.repl_slots == {}
+    - result.replications == {}
+    - result.settings == {}
+    - result.tablespaces == {}
+- name: postgresql_info - check filter param passed by string
+  become_user: '{{ pg_user }}'
+  become: true
+  postgresql_info:
+    db: '{{ db_default }}'
+    filter: ver*,role*
+    login_user: '{{ pg_user }}'
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+    - result.version != {}
+    - result.roles
+    - result.databases == {}
+    - result.repl_slots == {}
+    - result.replications == {}
+    - result.settings == {}
+    - result.tablespaces == {}
+- name: postgresql_info - check filter param passed by string
+  become_user: '{{ pg_user }}'
+  become: true
+  postgresql_info:
+    db: '{{ db_default }}'
+    filter: ver*
+    login_user: '{{ pg_user }}'
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+    - result.version
+    - result.roles == {}
+- name: postgresql_info - check excluding filter param passed by list
+  become_user: '{{ pg_user }}'
+  become: true
+  postgresql_info:
+    db: '{{ db_default }}'
+    filter:
+    - '!ver*'
+    - '!rol*'
+    login_user: '{{ pg_user }}'
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+    - result.version == {}
+    - result.roles == {}
+    - result.databases

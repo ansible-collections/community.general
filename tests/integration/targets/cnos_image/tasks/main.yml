@@ -1,0 +1,7 @@
+- name: Test Image transfer
+  cnos_image: host={{ inventory_hostname }} username={{ hostvars[inventory_hostname]['ansible_ssh_user']}}  password={{
+    hostvars[inventory_hostname]['ansible_ssh_pass']}} deviceType={{ hostvars[inventory_hostname]['deviceType']}}
+    outputfile=./results/cnos_image_{{ inventory_hostname }}_output.txt protocol='{{item.protocol}}'
+    serverip='{{item.serverip}}' imgpath={{ hostvars[inventory_hostname]['imgpath']}}
+    imgtype='{{item.imgtype}}' serverusername='{{item.serverusername}}' serverpassword='{{item.serverpassword}}'
+  with_items: '{{test_image_data1}}'

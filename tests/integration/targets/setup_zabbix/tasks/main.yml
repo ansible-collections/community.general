@@ -1,0 +1,2 @@
+- include: setup.yml
+  when: ansible_os_family == 'Debian'

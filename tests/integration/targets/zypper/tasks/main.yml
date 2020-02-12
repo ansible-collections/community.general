@@ -1,0 +1,2 @@
+- include: zypper.yml
+  when: ansible_os_family == 'Suse'

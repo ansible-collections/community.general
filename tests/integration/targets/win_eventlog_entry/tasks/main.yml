@@ -1,0 +1,27 @@
+- name: Remove potentially leftover test logs and sources
+  win_shell: Remove-EventLog -LogName "{{ item.log }}" -ErrorAction SilentlyContinue
+  with_items:
+  - '{{ win_test_log_source }}'
+  - '{{ win_test_log_source_extra }}'
+  failed_when: false
+- name: Add new test logs and sources
+  win_shell: New-EventLog -LogName "{{ item.log }}" -Source "{{ item.source }}"
+  with_items:
+  - '{{ win_test_log_source }}'
+  - '{{ win_test_log_source_extra }}'
+- name: Run tests for win_eventlog_entry
+  block:
+  - name: Test in normal mode
+    import_tasks: tests.yml
+    vars:
+      in_check_mode: false
+  - name: Test in check-mode
+    import_tasks: tests.yml
+    vars:
+      in_check_mode: true
+    check_mode: true
+- name: Remove test logs and sources
+  win_shell: Remove-EventLog -LogName "{{ item.log }}"
+  with_items:
+  - '{{ win_test_log_source }}'
+  - '{{ win_test_log_source_extra }}'

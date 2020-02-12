@@ -1,0 +1,8 @@
+- include_tasks: postgresql_privs_session_role.yml
+  when: postgres_version_resp.stdout is version('9.4', '>=')
+- include_tasks: postgresql_privs_initial.yml
+  when: postgres_version_resp.stdout is version('9.4', '>=')
+- include_tasks: postgresql_privs_general.yml
+  when: postgres_version_resp.stdout is version('9.4', '>=')
+- include_tasks: test_target_role.yml
+  when: postgres_version_resp.stdout is version('9.4', '>=')

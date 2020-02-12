@@ -1,0 +1,4 @@
+- import_tasks: setup_postgresql_cluster.yml
+  when:
+  - ansible_distribution == 'Ubuntu'
+  - ansible_distribution_major_version >= '18'

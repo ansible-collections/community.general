@@ -1,0 +1,39 @@
+- name: set config file path on Debian
+  set_fact:
+    timezone_config_file: /etc/timezone
+  when: ansible_os_family == 'Debian'
+- name: set config file path on RedHat
+  set_fact:
+    timezone_config_file: /etc/sysconfig/clock
+  when: ansible_os_family == 'RedHat'
+- name: set config file path on Debian
+  set_fact:
+    hwclock_config_file: /etc/default/rcS
+  when: ansible_os_family == 'Debian'
+- name: set config file path on RedHat
+  set_fact:
+    hwclock_config_file: /etc/sysconfig/clock
+  when: ansible_os_family == 'RedHat'
+- name: make sure the dbus service is started under systemd
+  systemd:
+    name: dbus
+    state: started
+  when:
+  - ansible_service_mgr == 'systemd'
+  - ansible_distribution == 'Fedora'
+  - ansible_facts.distribution_major_version is version('31', '<')
+- name: Run tests
+  when: ansible_facts.distribution ~ ansible_facts.distribution_major_version != 'Fedora31'
+  block:
+  - name: set timezone to Etc/UTC
+    timezone:
+      name: Etc/UTC
+    register: original_timezone
+  - block:
+    - include_tasks: test.yml
+    always:
+    - name: Restore original system timezone - {{ original_timezone.diff.before.name
+        }}
+      timezone:
+        name: '{{ original_timezone.diff.before.name }}'
+      when: original_timezone is changed

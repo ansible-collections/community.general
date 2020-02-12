@@ -1,0 +1,12 @@
+- name: setup
+  import_tasks: setup.yml
+- block:
+  - import_tasks: exclusion_state_list-all.yml
+  - import_tasks: get_set_no_state.yml
+  - import_tasks: get_set_state_present.yml
+  - import_tasks: unset_no_value.yml
+  - import_tasks: unset_value.yml
+  - import_tasks: precedence_between_unset_and_value.yml
+  - import_tasks: unset_check_mode.yml
+  when: git_installed is succeeded and git_version.stdout is version(git_version_supporting_includes,
+    ">=")

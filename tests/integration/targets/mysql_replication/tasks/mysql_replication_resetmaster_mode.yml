@@ -1,0 +1,35 @@
+- name: Stop slave
+  mysql_replication:
+    login_host: 127.0.0.1
+    login_port: '{{ standby_port }}'
+    mode: stopslave
+- name: Reset slave all
+  mysql_replication:
+    login_host: 127.0.0.1
+    login_port: '{{ standby_port }}'
+    mode: resetslaveall
+- name: Get master status
+  mysql_replication:
+    login_host: 127.0.0.1
+    login_port: '{{ master_port }}'
+    mode: getmaster
+  register: master_initial_status
+- name: Reset master
+  mysql_replication:
+    login_host: 127.0.0.1
+    login_port: '{{ master_port }}'
+    mode: resetmaster
+  register: result
+- assert:
+    that:
+    - result is changed
+    - result.queries == ["RESET MASTER"]
+- name: Get master status
+  mysql_replication:
+    login_host: 127.0.0.1
+    login_port: '{{ master_port }}'
+    mode: getmaster
+  register: master_final_status
+- assert:
+    that:
+    - master_initial_status.File != master_final_status.File

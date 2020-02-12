@@ -1,0 +1,5 @@
+- win_product_facts: null
+- assert:
+    that:
+    - ansible_os_product_id is defined
+    - ansible_os_product_key is defined

@@ -1,0 +1,4 @@
+- import_tasks: setup_mysql_cluster.yml
+  when:
+  - ansible_facts.distribution == 'CentOS'
+  - ansible_facts.distribution_major_version is version('7', '==')

@@ -1,0 +1,131 @@
+- include_vars: '{{ item }}'
+  with_first_found:
+  - files:
+    - '{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+    - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
+    - '{{ ansible_os_family }}.yml'
+    - default.yml
+    paths: ../vars
+- name: Install dependencies for test
+  package:
+    name: '{{ item }}'
+    state: present
+  loop: '{{ test_packages }}'
+  when: ansible_distribution != "MacOSX"
+- name: Install a gem
+  gem:
+    name: gist
+    state: present
+  register: install_gem_result
+  ignore_errors: true
+- name: fail if failed to install gem
+  fail:
+    msg: 'failed to install gem: {{ install_gem_result.msg }}'
+  when:
+  - install_gem_result is failed
+  - not (ansible_user_uid == 0 and "User --install-dir or --user-install but not both"
+    not in install_gem_result.msg)
+- block:
+  - name: List gems
+    command: gem list
+    register: current_gems
+  - name: Ensure gem was installed
+    assert:
+      that:
+      - install_gem_result is changed
+      - current_gems.stdout is search('gist\s+\([0-9.]+\)')
+  - name: Remove a gem
+    gem:
+      name: gist
+      state: absent
+    register: remove_gem_results
+  - name: List gems
+    command: gem list
+    register: current_gems
+  - name: Verify gem is not installed
+    assert:
+      that:
+      - remove_gem_results is changed
+      - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
+  when: not install_gem_result is failed
+- block:
+  - name: Install a gem with --no-user-install
+    gem:
+      name: gist
+      state: present
+      user_install: false
+    register: install_gem_result
+  - name: List gems
+    command: gem list
+    register: current_gems
+  - name: Ensure gem was installed
+    assert:
+      that:
+      - install_gem_result is changed
+      - current_gems.stdout is search('gist\s+\([0-9.]+\)')
+  - name: Remove a gem
+    gem:
+      name: gist
+      state: absent
+    register: remove_gem_results
+  - name: List gems
+    command: gem list
+    register: current_gems
+  - name: Verify gem is not installed
+    assert:
+      that:
+      - remove_gem_results is changed
+      - current_gems.stdout is not search('gist\s+\([0-9.]+\)')
+  when: ansible_user_uid == 0
+- name: Install gem in a custom directory with incorrect options
+  gem:
+    name: gist
+    state: present
+    install_dir: '{{ output_dir }}/gems'
+  ignore_errors: true
+  register: install_gem_fail_result
+- debug:
+    var: install_gem_fail_result
+  tags: debug
+- name: Ensure previous task failed
+  assert:
+    that:
+    - install_gem_fail_result is failed
+    - install_gem_fail_result.msg == 'install_dir requires user_install=false'
+- name: Install a gem in a custom directory
+  gem:
+    name: gist
+    state: present
+    user_install: false
+    install_dir: '{{ output_dir }}/gems'
+  register: install_gem_result
+- name: Find gems in custom directory
+  find:
+    paths: '{{ output_dir }}/gems/gems'
+    file_type: directory
+    contains: gist
+  register: gem_search
+- name: Ensure gem was installed in custom directory
+  assert:
+    that:
+    - install_gem_result is changed
+    - gem_search.files[0].path is search('gist-[0-9.]+')
+  ignore_errors: true
+- name: Remove a gem in a custom directory
+  gem:
+    name: gist
+    state: absent
+    user_install: false
+    install_dir: '{{ output_dir }}/gems'
+  register: install_gem_result
+- name: Find gems in custom directory
+  find:
+    paths: '{{ output_dir }}/gems/gems'
+    file_type: directory
+    contains: gist
+  register: gem_search
+- name: Ensure gem was removed in custom directory
+  assert:
+    that:
+    - install_gem_result is changed
+    - gem_search.files | length == 0

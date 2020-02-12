@@ -1,0 +1,9 @@
+- import_tasks: postgresql_ext_session_role.yml
+- import_tasks: postgresql_ext_initial.yml
+  when:
+  - postgres_version_resp.stdout is version('9.1', '>=')
+  - ansible_distribution == 'Fedora'
+- import_tasks: postgresql_ext_version_opt.yml
+  when:
+  - ansible_distribution == 'Ubuntu'
+  - postgres_version_resp.stdout is version('9.1', '>=')

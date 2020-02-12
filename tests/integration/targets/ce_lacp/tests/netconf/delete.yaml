@@ -1,0 +1,30 @@
+- debug:
+    msg: START ce_lacp deleted integration tests on connection={{ ansible_connection
+      }}
+- name: Merge the provided configuration with the exisiting running configuration
+  ce_lacp:
+    mode: Dynamic
+    trunk_id: 10
+    preempt_enable: true
+    state_flapping: true
+    port_id_extension_enable: true
+    unexpected_mac_disable: true
+    system_id: 1111-2222-3333
+    timeout_type: Fast
+    fast_timeout: 12
+    mixed_rate_link_enable: true
+    preempt_delay: 12
+    collector_delay: 12
+    max_active_linknumber: 2
+    select: Prority
+    priority: 23
+    global_priority: 123
+    state: absent
+  register: result
+- name: Assert the configuration is reflected on host
+  assert:
+    that:
+    - result['changed'] == true
+- debug:
+    msg: END ce_lacp deleted integration tests on connection={{ ansible_connection
+      }}

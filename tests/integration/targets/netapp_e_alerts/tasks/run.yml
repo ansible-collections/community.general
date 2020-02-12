@@ -1,0 +1,48 @@
+- name: NetApp Test ASUP module
+  fail:
+    msg: Please define netapp_e_api_username, netapp_e_api_password, netapp_e_api_host,
+      and netapp_e_ssid.
+  when: netapp_e_api_username is undefined or netapp_e_api_password is undefined or
+    netapp_e_api_host is undefined or netapp_e_ssid is undefined
+  vars:
+    defaults: &id001
+      api_url: https://{{ netapp_e_api_host }}/devmgr/v2
+      api_username: '{{ netapp_e_api_username }}'
+      api_password: '{{ netapp_e_api_password }}'
+      ssid: '{{ netapp_e_ssid }}'
+      validate_certs: false
+      state: enabled
+      server: mail.example.com
+      sender: noreply@example.com
+      recipients: &id002
+      - noreply@example.com
+- name: set default vars
+  set_fact:
+    vars: *id001
+- name: Set the initial alerting settings
+  netapp_e_alerts:
+    api_url: https://{{ netapp_e_api_host }}/devmgr/v2
+    api_username: '{{ netapp_e_api_username }}'
+    api_password: '{{ netapp_e_api_password }}'
+    ssid: '{{ netapp_e_ssid }}'
+    validate_certs: false
+    state: enabled
+    server: mail.example.com
+    sender: noreply@example.com
+    recipients: *id002
+  register: result
+- name: Validate the idempotency of the module
+  netapp_e_alerts:
+    api_url: https://{{ netapp_e_api_host }}/devmgr/v2
+    api_username: '{{ netapp_e_api_username }}'
+    api_password: '{{ netapp_e_api_password }}'
+    ssid: '{{ netapp_e_ssid }}'
+    validate_certs: false
+    state: enabled
+    server: mail.example.com
+    sender: noreply@example.com
+    recipients: *id002
+  register: result
+- name: Ensure we still have the same settings, but had no change
+  assert:
+    that: not result.changed
