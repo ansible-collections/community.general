@@ -34,7 +34,6 @@ options:
     required: false
 requirements: [ say or espeak or espeak-ng ]
 author:
-    - "Ansible Core Team"
     - "Michael DeHaan (@mpdehaan)"
 '''
 
