@@ -1,0 +1,3 @@
+plugin: community.general.docker_machine
+daemon_env: skip
+running_required: false
