@@ -1,0 +1,36 @@
+- debug: msg="START cli/defaults.yaml"
+- name: setup
+  cnos_config:
+    commands:
+    - no vlan 13\n
+  ignore_errors: true
+  become: true
+  become_method: ansible.netcommon.enable
+- name: configure device with defaults included
+  cnos_config:
+    src: roles/cnos_config/templates/defaults/config.j2
+  register: result
+  become: true
+  become_method: ansible.netcommon.enable
+- debug: var=result
+- assert:
+    that:
+    - result.changed == false
+    - result.updates is not defined
+- name: check device with defaults included Hell
+  cnos_config:
+    src: roles/cnos_config/templates/defaults/config.j2
+  register: result
+- debug: var=result
+- assert:
+    that:
+    - result.changed == false
+    - result.updates is not defined
+- name: teardown
+  cnos_config:
+    commands:
+    - no vlan 13\n
+  become: true
+  become_method: ansible.netcommon.enable
+  ignore_errors: true
+- debug: msg="END cli/defaults.yaml"
