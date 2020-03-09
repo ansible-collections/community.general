@@ -1,0 +1,16 @@
+integration_tests_dependencies:
+- ansible.windows
+- ansible.posix
+- community.crypto
+- ansible.netcommon
+unit_tests_dependencies:
+- netbox.netbox
+- netapp.ontap
+- community.kubernetes
+- ansible.netcommon
+- cisco.meraki
+- fortinet.fortios
+- junipernetworks.junos
+- cisco.aci
+- google.cloud
+- f5networks.f5_modules
