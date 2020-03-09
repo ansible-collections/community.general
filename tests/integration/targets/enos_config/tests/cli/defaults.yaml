@@ -1,0 +1,40 @@
+- debug: msg="START cli/defaults.yaml"
+- name: setup
+  enos_config:
+    commands:
+    - no vlan 13\n
+    provider: '{{ cli }}'
+  ignore_errors: true
+  become: true
+  become_method: ansible.netcommon.enable
+- name: configure device with defaults included
+  enos_config:
+    src: roles/enos_config/templates/defaults/config.j2
+    provider: '{{ cli }}'
+  register: result
+  become: true
+  become_method: ansible.netcommon.enable
+- debug: var=result
+- assert:
+    that:
+    - result.changed == false
+    - result.updates is not defined
+- name: check device with defaults included Hell
+  enos_config:
+    src: roles/enos_config/templates/defaults/config.j2
+    provider: '{{ cli }}'
+  register: result
+- debug: var=result
+- assert:
+    that:
+    - result.changed == false
+    - result.updates is not defined
+- name: teardown
+  enos_config:
+    commands:
+    - no vlan 13\n
+    provider: '{{ cli }}'
+  become: true
+  become_method: ansible.netcommon.enable
+  ignore_errors: true
+- debug: msg="END cli/defaults.yaml"
