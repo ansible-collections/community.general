@@ -1,0 +1,4 @@
+plugin: community.general.docker_swarm
+docker_host: unix://var/run/docker.sock
+verbose_output: false
+include_host_uri: true

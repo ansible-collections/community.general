@@ -1,0 +1,962 @@
+plugin_routing:
+  modules:
+    ali_instance_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    cs_instance_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    cs_zone_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    digital_ocean:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    digital_ocean_account_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    digital_ocean_certificate_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    digital_ocean_domain_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    digital_ocean_firewall_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    digital_ocean_floating_ip_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    digital_ocean_image_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    digital_ocean_load_balancer_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    digital_ocean_region_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    digital_ocean_size_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    digital_ocean_snapshot_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    digital_ocean_sshkey_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    digital_ocean_tag_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    digital_ocean_volume_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    docker_image_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    docker_service:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcdns_record:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcdns_zone:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gce:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_backend_service:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_bigquery_dataset_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_bigquery_table_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_cloudbuild_trigger_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_address_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_backend_bucket_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_backend_service_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_disk_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_firewall_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_forwarding_rule_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_global_address_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_global_forwarding_rule_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_health_check_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_http_health_check_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_https_health_check_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_image_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_instance_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_instance_group_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_instance_group_manager_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_instance_template_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_interconnect_attachment_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_network_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_region_disk_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_route_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_router_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_ssl_certificate_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_ssl_policy_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_subnetwork_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_target_http_proxy_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_target_https_proxy_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_target_pool_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_target_ssl_proxy_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_target_tcp_proxy_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_target_vpn_gateway_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_url_map_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_compute_vpn_tunnel_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_container_cluster_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_container_node_pool_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_dns_managed_zone_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_dns_resource_record_set_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_forwarding_rule:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_healthcheck:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_iam_role_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_iam_service_account_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_pubsub_subscription_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_pubsub_topic_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_redis_instance_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_resourcemanager_project_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_sourcerepo_repository_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_spanner_database_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_spanner_instance_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_sql_database_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_sql_instance_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_sql_user_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_target_proxy:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_tpu_node_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcp_url_map:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcpubsub_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gcspanner:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    memset_memstore_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    memset_server_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    online_server_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    online_user_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    one_image_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    os_flavor_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    os_image_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    os_keystone_domain_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    os_networks_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    os_port_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    os_project_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    os_server_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    os_subnets_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    os_user_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_affinity_label_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_api_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_cluster_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_datacenter_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_disk_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_event_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_external_provider_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_group_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_host_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_host_storage_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_network_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_nic_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_permission_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_quota_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_scheduling_policy_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_snapshot_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_storage_domain_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_storage_template_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_storage_vm_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_tag_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_template_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_user_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_vm_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ovirt_vmpool_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    scaleway_image_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    scaleway_ip_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    scaleway_organization_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    scaleway_security_group_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    scaleway_server_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    scaleway_snapshot_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    scaleway_volume_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    smartos_image_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vr_account_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vr_dns_domain:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vr_dns_record:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vr_firewall_group:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vr_firewall_rule:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vr_server:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vr_ssh_key:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vr_startup_script:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vr_user:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vultr_account_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vultr_block_storage_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vultr_dns_domain_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vultr_firewall_group_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vultr_network_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vultr_os_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vultr_plan_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vultr_region_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vultr_server_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vultr_ssh_key_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vultr_startup_script_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vultr_user_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    xenserver_guest_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    vertica_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    onepassword_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    zabbix_group_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    zabbix_host_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    ldap_attr:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    aci_intf_policy_fc:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    aci_intf_policy_l2:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    aci_intf_policy_lldp:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    aci_intf_policy_mcp:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    aci_intf_policy_port_channel:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    aci_intf_policy_port_security:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    bigip_asm_policy:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    bigip_device_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    bigip_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    bigip_gtm_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    bigip_iapplx_package:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    bigip_security_address_list:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    bigip_security_port_list:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    bigip_traffic_group:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    bigiq_device_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    pn_cluster:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    pn_ospf:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    pn_ospfarea:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    pn_show:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    pn_trunk:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    pn_vlag:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    pn_vlan:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    pn_vrouter:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    pn_vrouterbgp:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    pn_vrouterif:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    pn_vrouterlbif:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_admin:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_admpwd:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_cert_gen_ssh:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_check:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_commit:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_dag:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_dag_tags:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_import:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_interface:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_lic:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_loadcfg:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_match_rule:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_mgtconfig:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_nat_rule:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_object:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_op:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_pg:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_query_rules:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_restart:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_sag:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_security_rule:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    panos_set:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    osx_say:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    foreman:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    katello:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    hpilo_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    oneview_datacenter_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    oneview_enclosure_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    oneview_ethernet_network_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    oneview_fc_network_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    oneview_fcoe_network_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    oneview_logical_interconnect_group_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    oneview_network_set_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    oneview_san_manager_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    idrac_redfish_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    redfish_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    github_hooks:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    github_webhook_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gitlab_hooks:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    gluster_heal_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    na_cdot_aggregate:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    na_cdot_license:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    na_cdot_lun:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    na_cdot_qtree:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    na_cdot_svm:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    na_cdot_user:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    na_cdot_user_role:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    na_cdot_volume:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    na_ontap_gather_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    sf_account_manager:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    sf_check_connections:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    sf_snapshot_schedule_manager:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    sf_volume_access_group_manager:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    sf_volume_manager:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    purefa_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    purefb_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    python_requirements_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    jenkins_job_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details
+    nginx_status_facts:
+      deprecation:
+        removal_date: TBD
+        warning_text: see plugin documentation for details

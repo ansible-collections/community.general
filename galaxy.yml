@@ -1,0 +1,28 @@
+namespace: community
+name: general
+version: 0.1.0
+readme: README.md
+authors: null
+description: null
+license: GPL-3.0-or-later
+license_file: COPYING
+tags: null
+dependencies:
+  netapp.ontap: '>=0.1.0'
+  community.kubernetes: '>=0.1.0'
+  ovirt.ovirt: '>=0.1.0'
+  ansible.netcommon: '>=0.1.0'
+  cisco.mso: '>=0.1.0'
+  ansible.posix: '>=0.1.0'
+  cisco.aci: '>=0.1.0'
+  cisco.intersight: '>=0.1.0'
+  check_point.mgmt: '>=0.1.0'
+  fortinet.fortios: '>=0.1.0'
+  openstack.cloud: '>=0.1.0'
+  google.cloud: '>=0.1.0'
+  f5networks.f5_modules: '>=0.1.0'
+repository: git@github.com:ansible-collection-migration/community.general.git
+documentation: https://github.com/ansible-collection-migration/community.general/tree/master/docs
+homepage: https://github.com/ansible-collection-migration/community.general
+issues: https://github.com/ansible-collection-migration/community.general/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc
+type: flatmap
