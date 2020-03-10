@@ -127,7 +127,7 @@ mkdir /tmp/collection_deps
 git clone https://github.com/ansible-collections/ansible.windows.git /tmp/collection_deps/ansible.windows
 cd /tmp/collection_deps/ansible.windows
 ansible-galaxy collection build
-ansible-galaxy collection install ansible.windows* -p "${COLLECTION_DIR}"
+ansible-galaxy collection install /tmp/collection_deps/ansible.windows/ansible-windows* -p "${COLLECTION_DIR}"
 )
 
 
