@@ -121,8 +121,17 @@ else
 fi
 
 # STAR: HACK install dependencies
+(
+#ansible.windows doesn't install from Galaxy
+mkdir /tmp/collection_deps
+git clone https://github.com/ansible-collections/ansible.windows.git /tmp/collection_deps/ansible.windows
+cd /tmp/collection_deps/ansible.windows
+ansible-galaxy collection build
+ansible-galaxy collection install ansible.windows* -p "${COLLECTION_DIR}"
+)
 
-ansible-galaxy collection install ansible.windows -p "${COLLECTION_DIR}"
+
+#ansible-galaxy collection install ansible.windows -p "${COLLECTION_DIR}"
 ansible-galaxy collection install ansible.posix -p "${COLLECTION_DIR}"
 ansible-galaxy collection install community.crypto -p "${COLLECTION_DIR}"
 ansible-galaxy collection install ansible.netcommon -p "${COLLECTION_DIR}"
