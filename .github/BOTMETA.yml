@@ -1,4 +1,4 @@
-utomerge: false
+automerge: false
 files:
   $module_utils/:
   $module_utils/cloudscale.py:
