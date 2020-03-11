@@ -1,0 +1,1 @@
+./monitoring/logstash_plugin.py
