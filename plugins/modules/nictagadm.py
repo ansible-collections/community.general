@@ -1,0 +1,1 @@
+./cloud/smartos/nictagadm.py
