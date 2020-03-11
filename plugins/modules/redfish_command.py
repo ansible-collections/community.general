@@ -1,0 +1,1 @@
+./remote_management/redfish/redfish_command.py

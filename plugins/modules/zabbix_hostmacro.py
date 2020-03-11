@@ -1,0 +1,1 @@
+./monitoring/zabbix/zabbix_hostmacro.py
