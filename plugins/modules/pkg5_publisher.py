@@ -1,0 +1,1 @@
+./packaging/os/pkg5_publisher.py
