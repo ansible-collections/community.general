@@ -1,0 +1,1 @@
+./cloud/google/gcp_compute_instance_group_manager_info.py
