@@ -1,12 +1,236 @@
 automerge: false
 files:
-  $module_utils/:
+  $actions/aireos.py:
+    labels: aireos cisco networking
+  $actions/aruba.py:
+    maintainers: $team_aruba
+    labels: aruba networking
+  $actions/:
+  $actions/ironware.py:
+    maintainers: paulquack
+    labels: ironware networking
+  $actions/nos_config.py:
+  $actions/onyx_config.py:
+    maintainers: $team_onyx
+    labels: networking onyx_config
+  $actions/slxos.py:
+  $actions/sros.py:
+    maintainers: $team_networking
+    labels: networking sros
+  $actions/voss.py:
+  $becomes/doas.py:
+  $becomes/dzdo.py:
+  $becomes/ksu.py:
+  $becomes/machinectl.py:
+  $becomes/pbrun.py:
+  $becomes/pfexec.py:
+  $becomes/pmrun.py:
+  $becomes/sesu.py:
+  $callbacks/actionable.py:
+  $callbacks/cgroup_memory_recap.py:
+  $callbacks/context_demo.py:
+  $callbacks/counter_enabled.py:
+  $callbacks/dense.py:
+  $callbacks/full_skip.py:
+  $callbacks/hipchat.py:
+  $callbacks/jabber.py:
+  $callbacks/log_plays.py:
+  $callbacks/logdna.py:
+  $callbacks/logentries.py:
+  $callbacks/logstash.py:
+  $callbacks/mail.py:
+  $callbacks/nrdp.py:
+  $callbacks/null.py:
+  $callbacks/osx_say.py:
+  $callbacks/say.py:
+    notify: chris-short
+    maintainers: $team_macos
+    labels: macos say
+    keywords: brew cask darwin homebrew macosx macports osx
+  $callbacks/:
+  $callbacks/stderr.py:
+    maintainers: ysn2233
+    labels: stderr
+  $callbacks/sumologic.py:
+    maintainers: ryancurrah
+    labels: sumologic
+  $callbacks/syslog_json.py:
+  $callbacks/unixy.py:
+    maintainers: akatch
+    labels: unixy
+  $callbacks/yaml.py:
+  $cliconfs/:
+    labels: networking
+  $cliconfs/aruba.py:
+    maintainers: $team_aruba
+    labels: aruba networking
+  $cliconfs/ce.py:
+    maintainers: $team_huawei
+    labels: ce cloudengine huawei networking
+  $cliconfs/edgeswitch.py:
+    maintainers: f-bor
+    labels: edgeswitch networking
+  $cliconfs/eric_eccli.py:
+    maintainers: $team_networking itercheng
+    labels: eric_eccli networking
+  $cliconfs/exos.py:
+    maintainers: $team_extreme rdvencioneck
+    labels: exos networking
+  $cliconfs/ironware.py:
+    maintainers: paulquack
+    labels: ironware networking
+  $cliconfs/nos.py:
+    maintainers: $team_extreme
+    labels: networking nos
+  $cliconfs/onyx.py:
+    maintainers: $team_onyx
+    labels: networking onyx
+  $cliconfs/routeros.py:
+    maintainers: heuels
+    labels: networking routeros
+  $cliconfs/slxos.py:
+    maintainers: $team_extreme
+    labels: networking slxos
+  $cliconfs/voss.py:
+    maintainers: $team_extreme
+    labels: networking voss
+  $connections/chroot.py:
+  $connections/docker.py:
+    maintainers: $team_docker
+    labels: cloud docker
+    ignore: cove
+    supershipit: felixfontein
+  $connections/:
+  $connections/kubectl.py:
+    maintainers: chouseknecht fabianvf flaper87 maxamillion
+    labels: k8s kubectl
+  $connections/lxd.py:
+    maintainers: mattclay
+    labels: lxd
+  $connections/oc.py:
+    maintainers: chouseknecht fabianvf flaper87 maxamillion
+    labels: oc
+  $connections/qubes.py:
+  $connections/saltstack.py:
+    labels: saltstack
+  $connections/zone.py:
+  $doc_fragments/a10.py:
+  $doc_fragments/aireos.py:
+  $doc_fragments/alicloud.py:
+  $doc_fragments/aruba.py:
+  $doc_fragments/auth_basic.py:
+  $doc_fragments/avi.py:
+  $doc_fragments/ce.py:
+  $doc_fragments/cloudscale.py:
+  $doc_fragments/cloudstack.py:
+    maintainers: $team_cloudstack
+    labels: cloudstack
+  $doc_fragments/:
+  $doc_fragments/docker.py:
+    maintainers: $team_docker
+    labels: cloud docker
+    ignore: cove
+    supershipit: felixfontein
+  $doc_fragments/gcp.py:
+    maintainers: $team_google
+    labels: gcp
+    supershipit: erjohnso rambleraptor
+  $doc_fragments/hetzner.py:
+  $doc_fragments/hpe3par.py:
+    maintainers: farhan7500 gautamphegde
+    labels: hpe3par
+  $doc_fragments/hwc.py:
+    maintainers: $team_huawei
+    labels: hwc
+  $doc_fragments/mysql.py:
+    maintainers: $team_mysql
+    labels: database mysql
+    keywords: mariadb proxysql
+  $doc_fragments/postgres.py:
+    maintainers: $team_postgresql
+    labels: postgres postgresql
+    keywords: database postgres postgresql
+  $doc_fragments/proxysql.py:
+    maintainers: $team_mysql
+    labels: database mysql proxysql
+    keywords: mariadb proxysql
+  $doc_fragments/vultr.py:
+    maintainers: $team_vultr
+    labels: cloud vultr
+  $doc_fragments/xenserver.py:
+    maintainers: bvitnik
+    labels: xenserver
+  $doc_fragments/zabbix.py:
+  $filters/gcp_kms_filters.py:
+  $filters/json_query.py:
+  $filters/random_mac.py:
+  $httpapis/exos.py:
+    maintainers: $team_networking LindsayHill bigmstone ujwalkomarla
+    labels: exos networking
+  $httpapis/:
+    maintainers: $team_networking
+    labels: networking
+  $httpapis/ftd.py:
+    maintainers: $team_networking annikulin
+    labels: cisco ftd networking
+    keywords: firepower ftd
+  $inventories/cloudscale.py:
+  $inventories/docker_machine.py:
+    maintainers: $team_docker
+    labels: cloud docker
+    ignore: cove
+    supershipit: felixfontein
+  $inventories/docker_swarm.py:
+    maintainers: $team_docker morph027
+    labels: cloud docker docker_swarm
+    ignore: cove
+    supershipit: felixfontein
+  $inventories/:
+  $inventories/linode.py:
+    maintainers: $team_linode
+    labels: cloud linode
+    keywords:
+    - linode dynamic inventory script
+  $inventories/scaleway.py:
+    maintainers: $team_scaleway
+    labels: cloud scaleway
+  $inventories/virtualbox.py:
+  $inventories/vultr.py:
+    maintainers: $team_vultr
+    labels: cloud vultr
+  $lookups/:
+    maintainers: samdoran
+    labels: onepassword
+  $lookups/conjur_variable.py:
+    notify: cyberark-bizdev
+    maintainers: $team_cyberark_conjur
+    labels: conjur_variable
+  $lookups/cyberarkpassword.py:
+    notify: cyberark-bizdev
+    labels: cyberarkpassword
+  $lookups/dig.py:
+    maintainers: jpmens
+    labels: dig
+  $lookups/hashi_vault.py:
+    labels: hashi_vault
+  $lookups/manifold.py:
+    maintainers: galanoff
+    labels: manifold
+  $lookups/passwordstore.py:
+  $lookups/rabbitmq.py:
+    maintainers: Im0
+    labels: rabbitmq
+  $lookups/redis.py:
+  $lookups/shelvefile.py:
+  $module_utils/alicloud_ecs.py:
+  $module_utils/cloud.py:
   $module_utils/cloudscale.py:
     maintainers: $team_cloudscale
     labels: cloudscale
   $module_utils/cloudstack.py:
     maintainers: $team_cloudstack
     labels: cloudstack
+  $module_utils/:
   $module_utils/docker/:
     maintainers: $team_docker
     labels: cloud
@@ -858,6 +1082,8 @@ files:
     authors: jpmens noseka1
   $modules/files/iso_extract.py:
     authors: dagwieers jhoekx ribbons
+  $modules/files/patch.py:
+    authors: jirutka luisperlaz
   $modules/files/read_csv.py:
     authors: dagwieers
   $modules/files/xattr.py:
@@ -2008,162 +2234,47 @@ files:
     authors: inetfuture mattupstate
   $modules/web_infrastructure/taiga_issue.py:
     authors: lekum
-  $plugins/:
-  $plugins/aireos.py:
+  $terminals/:
     labels: networking
-  $plugins/alicloud.py:
-  $plugins/apconos.py:
-    labels: networking
-  $plugins/aruba.py:
+  $terminals/aruba.py:
     maintainers: $team_aruba
     labels: aruba networking
-  $plugins/cloudstack.py:
-    maintainers: $team_cloudstack
-    labels: cloudstack
-  $plugins/cnos.py:
-    labels: networking
-  $plugins/conjur_variable.py:
-    notify: cyberark-bizdev
-    maintainers: $team_cyberark_conjur
-    labels: conjur_variable
-  $plugins/cyberarkpassword.py:
-    notify: cyberark-bizdev
-    labels: cyberarkpassword
-  $plugins/dense.py:
-  $plugins/dig.py:
-    maintainers: jpmens
-    labels: dig
-  $plugins/docker_swarm.py:
-    maintainers: $team_docker morph027
-    labels: cloud docker docker_swarm
-    ignore: cove
-    supershipit: felixfontein
-  $plugins/dzdo.py:
-  $plugins/edgeos.py:
+  $terminals/ce.py:
+    maintainers: $team_huawei
+    labels: ce cloudengine huawei networking
+  $terminals/edgeos.py:
     maintainers: samdoran
     labels: edgeos networking
-  $plugins/edgeos_config.py:
-  $plugins/edgeswitch.py:
+  $terminals/edgeswitch.py:
     maintainers: f-bor
     labels: edgeswitch networking
-  $plugins/emc.py:
-  $plugins/enos.py:
-    labels: networking
-  $plugins/eric_eccli.py:
+  $terminals/eric_eccli.py:
     maintainers: itercheng
     labels: eric_eccli networking
-  $plugins/etcd.py:
-  $plugins/exos.py:
+  $terminals/exos.py:
     maintainers: $team_extreme rdvencioneck
     labels: exos networking
-  $plugins/ftd.py:
-    maintainers: $team_networking annikulin
-    labels: cisco ftd networking
-    keywords: firepower ftd
-  $plugins/gcp.py:
-    maintainers: $team_google
-    labels: gcp
-    supershipit: erjohnso rambleraptor
-  $plugins/hashi_vault.py:
-    labels: hashi_vault
-  $plugins/hpe3par.py:
-    maintainers: farhan7500 gautamphegde
-    labels: hpe3par
-  $plugins/hwc.py:
-    maintainers: $team_huawei
-    labels: hwc
-  $plugins/ibm_storage.py:
-  $plugins/icx.py:
-    labels: networking
-  $plugins/ironware.py:
+  $terminals/ironware.py:
     maintainers: paulquack
     labels: ironware networking
-  $plugins/kubectl.py:
-    maintainers: chouseknecht fabianvf flaper87 maxamillion
-    labels: k8s kubectl
-  $plugins/linode.py:
-    maintainers: $team_linode
-    labels: cloud linode
-    keywords:
-    - linode dynamic inventory script
-  $plugins/lxd.py:
-    maintainers: mattclay
-    labels: lxd
-  $plugins/manifold.py:
-    maintainers: galanoff
-    labels: manifold
-  $plugins/memcached.py:
-  $plugins/mysql.py:
-    maintainers: $team_mysql
-    labels: database mysql
-    keywords: mariadb proxysql
-  $plugins/netscaler.py:
-  $plugins/netvisor.py:
-    labels: networking
-  $plugins/nmap.py:
-  $plugins/nos.py:
+  $terminals/nos.py:
     maintainers: $team_extreme
     labels: networking nos
-  $plugins/oc.py:
-    maintainers: chouseknecht fabianvf flaper87 maxamillion
-    labels: oc
-  $plugins/onyx.py:
+  $terminals/onyx.py:
     maintainers: $team_onyx
     labels: networking onyx
-  $plugins/onyx_config.py:
-    maintainers: $team_onyx
-    labels: networking onyx_config
-  $plugins/postgres.py:
-    maintainers: $team_postgresql
-    labels: postgres postgresql
-    keywords: database postgres postgresql
-  $plugins/proxysql.py:
-    maintainers: $team_mysql
-    labels: database mysql proxysql
-    keywords: mariadb proxysql
-  $plugins/rabbitmq.py:
-    maintainers: Im0
-    labels: rabbitmq
-  $plugins/routeros.py:
+  $terminals/routeros.py:
     maintainers: heuels
     labels: networking routeros
-  $plugins/saltstack.py:
-    labels: saltstack
-  $plugins/say.py:
-    notify: chris-short
-    maintainers: $team_macos
-    labels: macos say
-    keywords: brew cask darwin homebrew macosx macports osx
-  $plugins/scaleway.py:
-    maintainers: $team_scaleway
-    labels: cloud scaleway
-  $plugins/slxos.py:
+  $terminals/slxos.py:
     maintainers: $team_extreme
     labels: networking slxos
-  $plugins/splunk.py:
-  $plugins/sros.py:
+  $terminals/sros.py:
     maintainers: $team_networking
     labels: networking sros
-  $plugins/stderr.py:
-    maintainers: ysn2233
-    labels: stderr
-  $plugins/sumologic.py:
-    maintainers: ryancurrah
-    labels: sumologic
-  $plugins/syslog_json.py:
-  $plugins/unixy.py:
-    maintainers: akatch
-    labels: unixy
-  $plugins/voss.py:
+  $terminals/voss.py:
     maintainers: $team_extreme
     labels: networking voss
-  $plugins/vultr.py:
-    maintainers: $team_vultr
-    labels: cloud vultr
-  $plugins/xenserver.py:
-    maintainers: bvitnik
-    labels: xenserver
-  $plugins/yaml.py:
 macros:
   actions: plugins/action
   becomes: plugins/become
@@ -2177,7 +2288,6 @@ macros:
   lookups: plugins/lookup
   module_utils: plugins/module_utils
   modules: plugins/modules
-  plugins: plugins/plugins
   terminals: plugins/terminal
   team_aci: aciguru brunocalogero devarshishah3 fadallar jmcgill298 koladiya mtorelli rsmeyers schunduri smnmtzgr
   team_aix: MorrisA bcoca d-little flynn1973 gforster kairoaraujo marvin-sinister mator molekuul ramooncamacho wtcross
