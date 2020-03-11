@@ -1,0 +1,1 @@
+./database/proxysql/proxysql_manage_config.py
