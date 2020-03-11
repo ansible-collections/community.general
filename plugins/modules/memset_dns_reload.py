@@ -1,0 +1,1 @@
+./cloud/memset/memset_dns_reload.py
