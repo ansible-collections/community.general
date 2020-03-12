@@ -2,7 +2,8 @@ namespace: community
 name: general
 version: 0.1.1
 readme: README.md
-authors: null
+authors:
+  - Ansible (https://github.com/ansible)
 description: null
 license: GPL-3.0-or-later
 license_file: COPYING
@@ -25,4 +26,4 @@ repository: https://github.com/ansible-collections/community.general
 documentation: https://github.com/ansible-collection-migration/community.general/tree/master/docs
 homepage: https://github.com/ansible-collections/community.general
 issues: https://github.com/ansible-collections/community.general/issues
-type: flatmap
+#type: flatmap
