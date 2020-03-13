@@ -1,1 +1,0 @@
-./cloud/misc/virt.py
