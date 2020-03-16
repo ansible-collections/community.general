@@ -33,8 +33,6 @@ scripts/inventory/jail.py future-import-boilerplate
 scripts/inventory/jail.py metaclass-boilerplate
 scripts/inventory/landscape.py future-import-boilerplate
 scripts/inventory/landscape.py metaclass-boilerplate
-scripts/inventory/libvirt_lxc.py future-import-boilerplate
-scripts/inventory/libvirt_lxc.py metaclass-boilerplate
 scripts/inventory/linode.py future-import-boilerplate
 scripts/inventory/linode.py metaclass-boilerplate
 scripts/inventory/lxc_inventory.py future-import-boilerplate
@@ -543,13 +541,6 @@ plugins/modules/cloud/misc/terraform.py validate-modules:doc-missing-type
 plugins/modules/cloud/misc/terraform.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/misc/terraform.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/misc/terraform.py validate-modules:return-syntax-error
-plugins/modules/cloud/misc/virt.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/cloud/misc/virt.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/misc/virt.py validate-modules:undocumented-parameter
-plugins/modules/cloud/misc/virt_net.py validate-modules:doc-missing-type
-plugins/modules/cloud/misc/virt_net.py validate-modules:doc-required-mismatch
-plugins/modules/cloud/misc/virt_pool.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/cloud/misc/virt_pool.py validate-modules:doc-missing-type
 plugins/modules/cloud/oneandone/oneandone_firewall_policy.py validate-modules:doc-required-mismatch
 plugins/modules/cloud/oneandone/oneandone_firewall_policy.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/oneandone/oneandone_firewall_policy.py validate-modules:parameter-type-not-in-doc
@@ -3592,10 +3583,6 @@ tests/unit/modules/cloud/linode/test_linode.py metaclass-boilerplate
 tests/unit/modules/cloud/linode/test_linode_v4.py metaclass-boilerplate
 tests/unit/modules/cloud/misc/test_terraform.py future-import-boilerplate
 tests/unit/modules/cloud/misc/test_terraform.py metaclass-boilerplate
-tests/unit/modules/cloud/misc/virt_net/conftest.py future-import-boilerplate
-tests/unit/modules/cloud/misc/virt_net/conftest.py metaclass-boilerplate
-tests/unit/modules/cloud/misc/virt_net/test_virt_net.py future-import-boilerplate
-tests/unit/modules/cloud/misc/virt_net/test_virt_net.py metaclass-boilerplate
 tests/unit/modules/cloud/xenserver/FakeAnsibleModule.py future-import-boilerplate
 tests/unit/modules/cloud/xenserver/FakeAnsibleModule.py metaclass-boilerplate
 tests/unit/modules/cloud/xenserver/FakeXenAPI.py future-import-boilerplate
