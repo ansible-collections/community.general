@@ -655,33 +655,6 @@ files:
   $modules/cloud/opennebula/one_vm.py:
     authors: ilicmilan meerkampdvv
     maintainers: rsmontero xorel
-  $modules/cloud/openstack/_os_flavor_facts.py:
-    authors: Shrews
-    maintainers: cloudnull dagnello emonty gtema juliakreger mnaser odyssey4me rcarrillocruz
-  $modules/cloud/openstack/_os_image_facts.py:
-    authors: dagnello
-    maintainers: Shrews cloudnull emonty gtema juliakreger mnaser odyssey4me rcarrillocruz
-  $modules/cloud/openstack/_os_keystone_domain_facts.py:
-    authors: rcarrillocruz
-    maintainers: Shrews cloudnull dagnello emonty gtema juliakreger mnaser odyssey4me
-  $modules/cloud/openstack/_os_networks_facts.py:
-    authors: dagnello
-    maintainers: Shrews cloudnull emonty gtema juliakreger mnaser odyssey4me rcarrillocruz
-  $modules/cloud/openstack/_os_port_facts.py:
-    authors: Shrews
-    maintainers: cloudnull dagnello emonty gtema juliakreger mnaser odyssey4me rcarrillocruz
-  $modules/cloud/openstack/_os_project_facts.py:
-    authors: rcarrillocruz
-    maintainers: Shrews cloudnull dagnello emonty gtema juliakreger mnaser odyssey4me
-  $modules/cloud/openstack/_os_server_facts.py:
-    authors: emonty
-    maintainers: Shrews cloudnull dagnello gtema juliakreger mnaser odyssey4me rcarrillocruz
-  $modules/cloud/openstack/_os_subnets_facts.py:
-    authors: dagnello
-    maintainers: Shrews cloudnull emonty gtema juliakreger mnaser odyssey4me rcarrillocruz
-  $modules/cloud/openstack/_os_user_facts.py:
-    authors: rcarrillocruz
-    maintainers: Shrews cloudnull dagnello emonty gtema juliakreger mnaser odyssey4me
   $modules/cloud/oracle/oci_vcn.py:
     authors: rohitChaware
     maintainers: $team_oracle
