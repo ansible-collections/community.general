@@ -160,7 +160,6 @@ files:
   $doc_fragments/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
-  $doc_fragments/zabbix.py:
   $filters/gcp_kms_filters.py:
   $filters/json_query.py:
   $filters/random_mac.py:
@@ -1181,70 +1180,6 @@ files:
     authors: bhcopeland
   $modules/monitoring/uptimerobot.py:
     authors: nate-kingsley
-  $modules/monitoring/zabbix/:
-    authors: sky-joker
-    maintainers: D3DeFi rubentsirunyan
-    ignore: ryansb
-  $modules/monitoring/zabbix/zabbix_action.py:
-    authors: K-DOT rubentsirunyan
-    maintainers: D3DeFi sky-joker
-    ignore: ryansb
-  $modules/monitoring/zabbix/zabbix_group.py:
-    authors: cove harrisongu
-    maintainers: $team_zabbix
-    ignore: cove
-  $modules/monitoring/zabbix/zabbix_group_info.py:
-    authors: RedWhiteMiko
-    maintainers: $team_zabbix
-    ignore: ryansb
-  $modules/monitoring/zabbix/zabbix_host.py:
-    authors: cove dj-wasabi eikef harrisongu
-    maintainers: $team_zabbix
-    ignore: cove
-  $modules/monitoring/zabbix/zabbix_host_events_info.py:
-    authors: stravassac
-    maintainers: $team_zabbix
-    ignore: ryansb
-  $modules/monitoring/zabbix/zabbix_host_info.py:
-    authors: RedWhiteMiko
-    maintainers: $team_zabbix
-    ignore: ryansb
-  $modules/monitoring/zabbix/zabbix_hostmacro.py:
-    authors: cove
-    maintainers: $team_zabbix
-    ignore: cove
-  $modules/monitoring/zabbix/zabbix_maintenance.py:
-    authors: abulimov
-    maintainers: $team_zabbix
-    ignore: ryansb
-  $modules/monitoring/zabbix/zabbix_map.py:
-    authors: Akint
-    maintainers: $team_zabbix
-    ignore: ryansb
-  $modules/monitoring/zabbix/zabbix_mediatype.py:
-    authors: rubentsirunyan
-    maintainers: D3DeFi sky-joker
-    ignore: ryansb
-  $modules/monitoring/zabbix/zabbix_proxy.py:
-    authors: akomic
-    maintainers: $team_zabbix
-    ignore: ryansb
-  $modules/monitoring/zabbix/zabbix_screen.py:
-    authors: cove harrisongu
-    maintainers: $team_zabbix
-    ignore: cove
-  $modules/monitoring/zabbix/zabbix_service.py:
-    authors: emriver
-    maintainers: $team_zabbix
-    ignore: ryansb
-  $modules/monitoring/zabbix/zabbix_template.py:
-    authors: D3DeFi logan2211 sookido
-    maintainers: rubentsirunyan sky-joker
-    ignore: ryansb
-  $modules/monitoring/zabbix/zabbix_valuemap.py:
-    authors: rubentsirunyan
-    maintainers: D3DeFi sky-joker
-    ignore: ryansb
   $modules/net_tools/cloudflare_dns.py:
     authors: mgruener
     maintainers: andreaso
@@ -2302,4 +2237,3 @@ macros:
   team_suse: commel dcermak evrardjp lrupp toabctl
   team_virt: joshainglis karmab
   team_vultr: Spredzy resmo
-  team_zabbix: D3DeFi rubentsirunyan sky-joker
