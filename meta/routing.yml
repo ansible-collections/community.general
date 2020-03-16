@@ -608,14 +608,6 @@ plugin_routing:
       deprecation:
         removal_date: TBD
         warning_text: see plugin documentation for details
-    zabbix_group_facts:
-      deprecation:
-        removal_date: TBD
-        warning_text: see plugin documentation for details
-    zabbix_host_facts:
-      deprecation:
-        removal_date: TBD
-        warning_text: see plugin documentation for details
     ldap_attr:
       deprecation:
         removal_date: TBD
