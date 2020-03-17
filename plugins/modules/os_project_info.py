@@ -1,1 +1,0 @@
-./cloud/openstack/os_project_info.py
