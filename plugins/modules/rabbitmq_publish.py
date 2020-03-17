@@ -1,1 +1,0 @@
-./notification/rabbitmq_publish.py
