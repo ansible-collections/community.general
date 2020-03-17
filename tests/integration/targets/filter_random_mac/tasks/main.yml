@@ -8,7 +8,7 @@
 
 - name: Test random_mac filter bad argument type
   debug:
-    var: "0 | random_mac"
+    var: "0 | community.general.random_mac"
   register: _bad_random_mac_filter
   ignore_errors: yes
 
@@ -20,7 +20,7 @@
 
 - name: Test random_mac filter bad argument value
   debug:
-    var: "'dummy' | random_mac"
+    var: "'dummy' | community.generalrandom_mac"
   register: _bad_random_mac_filter
   ignore_errors: yes
 
@@ -32,7 +32,7 @@
 
 - name: Test random_mac filter prefix too big
   debug:
-    var: "'00:00:00:00:00:00' | random_mac"
+    var: "'00:00:00:00:00:00' | community.general.random_mac"
   register: _bad_random_mac_filter
   ignore_errors: yes
 
@@ -55,5 +55,5 @@
 - name: Verify random_mac filter with seed
   assert:
     that:
-      - "'00:00:00' | random_mac(seed='test') == '00:00:00' | random_mac(seed='test')"
-      - "'00:00:00' | random_mac(seed='test') != '00:00:00' | random_mac(seed='another_test')"
+      - "'00:00:00' | communit.general.random_mac(seed='test') == '00:00:00' | random_mac(seed='test')"
+      - "'00:00:00' | community.general.random_mac(seed='test') != '00:00:00' | random_mac(seed='another_test')"

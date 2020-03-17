@@ -2,7 +2,7 @@
 
 set -eux
 
-export ANSIBLE_CALLBACK_WHITELIST="log_plays,${ANSIBLE_CALLBACK_WHITELIST:-}"
+export ANSIBLE_CALLBACK_WHITELIST="community.general.log_plays,${ANSIBLE_CALLBACK_WHITELIST:-}"
 
 # run play, should create log and dir if needed
 export ANSIBLE_LOG_FOLDER="logit"
