@@ -1,7 +1,7 @@
-- name: postgresql_ext - install postgis
+- name: postgresql_ext - install postgis on Linux
   package: name=postgis state=present
   when: ansible_os_family != "Windows"
-- name: postgresql_ext - install postgis RedHat
+- name: postgresql_ext - install postgis on Windows
   when: ansible_os_family == "Windows"
   ansible.windows.win_package: name=postgis state=present
 - name: postgresql_ext - create schema schema1
