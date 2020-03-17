@@ -1,1 +1,0 @@
-./messaging/rabbitmq/rabbitmq_global_parameter.py
