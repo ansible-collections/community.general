@@ -37,11 +37,11 @@
 
 - name: Create a password
   set_fact:
-    newpass: "{{ lookup('passwordstore', 'test-pass length=8 create=yes') }}"
+    newpass: "{{ lookup('community.general.passwordstore', 'test-pass length=8 create=yes') }}"
 
 - name: Fetch password from an existing file
   set_fact:
-    readpass: "{{ lookup('passwordstore', 'test-pass') }}"
+    readpass: "{{ lookup('community.general.passwordstore', 'test-pass') }}"
 
 - name: Verify password
   assert:
