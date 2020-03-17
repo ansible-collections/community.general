@@ -1,1 +1,0 @@
-./monitoring/zabbix/zabbix_host_info.py
