@@ -4,6 +4,8 @@
 # (c) 2014, Steve Smith <ssmith@atlassian.com>
 # Atlassian open-source approval reference OSR-76.
 #
+# (c) 2020, Per Abildgaard Toft <per@minfejl.dk> Search function
+#
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -15,8 +17,9 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'supported_by': 'community'}
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 module: jira
+version_added: "1.6"
 short_description: create and modify issues in a JIRA instance
 description:
   - Create and modify issues in a JIRA instance.
@@ -30,7 +33,7 @@ options:
   operation:
     required: true
     aliases: [ command ]
-    choices: [ create, comment, edit, fetch, transition , link ]
+    choices: [ create, comment, edit, fetch, transition , link, search ]
     description:
       - The operation to perform.
 
@@ -86,16 +89,19 @@ options:
 
   linktype:
     required: false
+    version_added: 2.3
     description:
      - Set type of link, when action 'link' selected.
 
   inwardissue:
     required: false
+    version_added: 2.3
     description:
      - Set issue from which link will be created.
 
   outwardissue:
     required: false
+    version_added: 2.3
     description:
      - Set issue to which link will be created.
 
@@ -106,14 +112,22 @@ options:
        (possibly after merging with other required data, as when passed to create). See examples for more information,
        and the JIRA REST API for the structure required for various fields.
 
+  jql:
+    required: false
+    version_added: '2.10'
+    description:
+     - Query JIRA in JQL Syntax E.g. 'CMDB Hostname'='test.example.com'
+
   timeout:
     required: false
+    version_added: 2.3
     description:
       - Set timeout, in seconds, on requests to JIRA API.
     default: 10
 
   validate_certs:
     required: false
+    version_added: 2.5
     description:
       - Require valid SSL certificates (set to `false` if you'd like to use self-signed certificates)
     default: true
@@ -122,8 +136,10 @@ options:
 notes:
   - "Currently this only works with basic-auth."
 
-author: "Steve Smith (@tarka)"
-'''
+author:
+- "Steve Smith (@tarka)"
+- "Per Abildgaard Toft (@pertoft)"
+"""
 
 EXAMPLES = """
 # Create a new issue and add a comment to it:
@@ -137,6 +153,10 @@ EXAMPLES = """
     summary: Example Issue
     description: Created using Ansible
     issuetype: Task
+  args:
+    fields:
+        customfield_13225: "test"
+        customfield_12931: '{"value": "Test"}'
   register: issue
 
 - name: Comment on issue
@@ -196,6 +216,21 @@ EXAMPLES = """
     issue: ANS-63
   register: issue
 
+# Search for an issue
+# You can limit the search for specific fields by adding optional args. Note! It must be a dict, hence, lastViewed: null
+- name: Search for an issue
+  jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    project: ANS
+    operation: search
+    jql: project=cmdb AND cf[13225]="test"
+  args:
+    fields:
+      lastViewed: null
+  register: issue
+
 - name: Create a unix account for the reporter
   become: true
   user:
@@ -228,6 +263,7 @@ EXAMPLES = """
 import base64
 import json
 import sys
+import urllib
 from ansible.module_utils._text import to_text, to_bytes
 
 from ansible.module_utils.basic import AnsibleModule
@@ -246,13 +282,18 @@ def request(url, user, passwd, timeout, data=None, method=None):
     # inject the basic-auth header up-front to ensure that JIRA treats
     # the requests as authorized for this user.
     auth = to_text(base64.b64encode(to_bytes('{0}:{1}'.format(user, passwd), errors='surrogate_or_strict')))
-
     response, info = fetch_url(module, url, data=data, method=method, timeout=timeout,
                                headers={'Content-Type': 'application/json',
                                         'Authorization': "Basic %s" % auth})
 
     if info['status'] not in (200, 201, 204):
-        module.fail_json(msg=info['msg'])
+        module.fail_json(msg=info)
+        error = json.loads(info['body'])
+        if error:
+            module.fail_json(msg=error['errorMessages'])
+        else:
+            # Fallback print body, if it cant be decoded
+            module.fail_json(msg=info['body'])
 
     body = response.read()
 
@@ -326,6 +367,16 @@ def fetch(restbase, user, passwd, params):
     return ret
 
 
+def search(restbase, user, passwd, params):
+    url = restbase + '/search?jql=' + urllib.request.pathname2url(params['jql']) + '&maxResults=10'
+    if params['fields']:
+        fields = params['fields'].keys()
+        for f in fields:
+            url = url + '&fields=' + urllib.request.pathname2url(f)
+    ret = get(url, user, passwd, params['timeout'])
+    return ret
+
+
 def transition(restbase, user, passwd, params):
     # Find the transition id
     turl = restbase + '/issue/' + params['issue'] + "/transitions"
@@ -371,7 +422,8 @@ OP_REQUIRED = dict(create=['project', 'issuetype', 'summary'],
                    edit=[],
                    fetch=['issue'],
                    transition=['status'],
-                   link=['linktype', 'inwardissue', 'outwardissue'])
+                   link=['linktype', 'inwardissue', 'outwardissue'],
+                   search=['jql'])
 
 
 def main():
@@ -380,7 +432,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             uri=dict(required=True),
-            operation=dict(choices=['create', 'comment', 'edit', 'fetch', 'transition', 'link'],
+            operation=dict(choices=['create', 'comment', 'edit', 'fetch', 'transition', 'link', 'search'],
                            aliases=['command'], required=True),
             username=dict(required=True),
             password=dict(required=True, no_log=True),
@@ -396,6 +448,7 @@ def main():
             linktype=dict(),
             inwardissue=dict(),
             outwardissue=dict(),
+            jql=dict(),
             timeout=dict(type='float', default=10),
             validate_certs=dict(default=True, type='bool'),
         ),
