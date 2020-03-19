@@ -971,7 +971,6 @@ plugins/modules/files/archive.py use-argspec-type-path # fix needed
 plugins/modules/files/archive.py validate-modules:parameter-list-no-elements
 plugins/modules/files/iso_extract.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/files/iso_extract.py validate-modules:parameter-list-no-elements
-plugins/modules/files/patch.py pylint:blacklisted-name
 plugins/modules/files/read_csv.py validate-modules:parameter-list-no-elements
 plugins/modules/files/xml.py validate-modules:doc-required-mismatch
 plugins/modules/files/xml.py validate-modules:parameter-list-no-elements
