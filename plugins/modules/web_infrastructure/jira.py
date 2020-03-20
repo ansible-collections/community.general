@@ -212,7 +212,7 @@ EXAMPLES = """
     username: '{{ user }}'
     password: '{{ pass }}'
     issue: '{{ issue.meta.key }}'
-    operation: update    
+    operation: update
   args:
     fields:
       customfield_12931: [ {'set': {'value': 'Virtual'}} ]
@@ -376,6 +376,7 @@ def edit(restbase, user, passwd, params):
 
     return ret
 
+
 def update(restbase, user, passwd, params):
     data = {
         "update": params['fields']
@@ -385,6 +386,7 @@ def update(restbase, user, passwd, params):
     ret = put(url, user, passwd, params['timeout'], data)
 
     return ret
+
 
 def fetch(restbase, user, passwd, params):
     url = restbase + '/issue/' + params['issue']
