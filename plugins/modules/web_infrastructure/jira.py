@@ -4,7 +4,7 @@
 # (c) 2014, Steve Smith <ssmith@atlassian.com>
 # Atlassian open-source approval reference OSR-76.
 #
-# (c) 2020, Per Abildgaard Toft <per@minfejl.dk> Search function
+# (c) 2020, Per Abildgaard Toft <per@minfejl.dk> Search and update function
 #
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
