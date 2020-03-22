@@ -39,7 +39,7 @@ class OneViewBaseTest(object):
         resource_module_path_name = re.findall('[A-Z][^A-Z]*', resource_module_path_name)
         resource_module_path_name = 'oneview_' + str.join('_', resource_module_path_name).lower()
 
-        ansible = __import__('ansible')
+        ansible_collections = __import__('ansible_collections')
         oneview_module = ansible_collections.community.general.plugins.modules.remote_management.oneview
         resource_module = getattr(oneview_module, resource_module_path_name)
         self.testing_class = getattr(resource_module, resource_name)
