@@ -9,8 +9,8 @@ __metaclass__ = type
 
 import pytest
 
-from ..FakeAnsibleModule import FailJsonException
-from ..common import fake_xenapi_ref, testcase_bad_xenapi_refs
+from .FakeAnsibleModule import FailJsonException
+from .common import fake_xenapi_ref, testcase_bad_xenapi_refs
 
 
 testcase_wait_for_vm_ip_address_bad_power_states = {
