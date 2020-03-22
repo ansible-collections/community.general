@@ -9,8 +9,8 @@ __metaclass__ = type
 
 import pytest
 
-from ..FakeAnsibleModule import FailJsonException
-from ..common import fake_xenapi_ref
+from .FakeAnsibleModule import FailJsonException
+from .common import fake_xenapi_ref
 
 
 def test_xenserverobject_xenapi_lib_detection(mocker, fake_ansible_module, xenserver):
