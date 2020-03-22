@@ -11,7 +11,7 @@ import sys
 import importlib
 import pytest
 
-from ..FakeAnsibleModule import FakeAnsibleModule
+from .FakeAnsibleModule import FakeAnsibleModule
 
 
 @pytest.fixture
