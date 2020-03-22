@@ -143,7 +143,7 @@ class OneViewBaseTestCase(object):
 
     def __set_module_examples(self):
         # Load scenarios from module examples (Also checks if it is a valid yaml)
-        ansible = __import__('ansible')
+        ansible_collections = __import__('ansible_collections')
         testing_module = self.testing_class.__module__.split('.')[-1]
         self.testing_module = getattr(ansible_collections.community.general.plugins.modules.remote_management.oneview, testing_module)
 
