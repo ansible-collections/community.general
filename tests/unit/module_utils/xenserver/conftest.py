@@ -13,7 +13,7 @@ import os
 import json
 import pytest
 
-from ..FakeAnsibleModule import FakeAnsibleModule
+from .FakeAnsibleModule import FakeAnsibleModule
 from ansible.module_utils import six
 from mock import MagicMock
 
