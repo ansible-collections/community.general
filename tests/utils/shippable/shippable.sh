@@ -39,21 +39,21 @@ cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
 cd "${TEST_DIR}"
 
 # STAR: HACK install dependencies
-ansible-galaxy collection install ansible.posix -p "${COLLECTION_DIR}"
-ansible-galaxy collection install community.crypto -p "${COLLECTION_DIR}"
-ansible-galaxy collection install ansible.netcommon -p "${COLLECTION_DIR}"
+ansible-galaxy collection install ansible.posix
+ansible-galaxy collection install community.crypto
+ansible-galaxy collection install ansible.netcommon
 
 # unit tests
-ansible-galaxy collection install community.kubernetes -p "${COLLECTION_DIR}"
-ansible-galaxy collection install netbox.netbox -p "${COLLECTION_DIR}"
-ansible-galaxy collection install netapp.ontap -p "${COLLECTION_DIR}"
-ansible-galaxy collection install cisco.meraki -p "${COLLECTION_DIR}"
-ansible-galaxy collection install fortinet.fortios -p "${COLLECTION_DIR}"
-ansible-galaxy collection install junipernetworks.junos -p "${COLLECTION_DIR}"
-ansible-galaxy collection install cisco.aci -p "${COLLECTION_DIR}"
-ansible-galaxy collection install google.cloud -p "${COLLECTION_DIR}"
-ansible-galaxy collection install community.kubernetes -p "${COLLECTION_DIR}"
-ansible-galaxy collection install f5networks.f5_modules -p "${COLLECTION_DIR}"
+ansible-galaxy collection install community.kubernetes
+ansible-galaxy collection install netbox.netbox
+ansible-galaxy collection install netapp.ontap
+ansible-galaxy collection install cisco.meraki
+ansible-galaxy collection install fortinet.fortios
+ansible-galaxy collection install junipernetworks.junos
+ansible-galaxy collection install cisco.aci
+ansible-galaxy collection install google.cloud
+ansible-galaxy collection install community.kubernetes
+ansible-galaxy collection install f5networks.f5_modules
 # END: HACK
 
 export PYTHONIOENCODING='utf-8'
