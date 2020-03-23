@@ -99,7 +99,6 @@ options:
 
   outwardissue:
     required: false
-    version_added: 2.3
     description:
      - Set issue to which link will be created.
 
