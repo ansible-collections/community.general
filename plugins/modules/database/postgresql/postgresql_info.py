@@ -499,7 +499,6 @@ from ansible.module_utils._text import to_native
 #
 
 class PgDbConn(object):
-
     """Auxiliary class for working with PostgreSQL connection objects.
 
     Arguments:
@@ -534,7 +533,6 @@ class PgDbConn(object):
 
 
 class PgClusterInfo(object):
-
     """Class for collection information about a PostgreSQL instance.
 
     Arguments:
