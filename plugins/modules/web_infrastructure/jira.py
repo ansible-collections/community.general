@@ -88,7 +88,6 @@ options:
 
   linktype:
     required: false
-    version_added: 2.3
     description:
      - Set type of link, when action 'link' selected.
 
