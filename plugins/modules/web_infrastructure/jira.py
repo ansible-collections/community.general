@@ -19,7 +19,6 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = """
 module: jira
-version_added: "1.6"
 short_description: create and modify issues in a JIRA instance
 description:
   - Create and modify issues in a JIRA instance.
