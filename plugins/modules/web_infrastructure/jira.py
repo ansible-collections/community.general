@@ -124,7 +124,6 @@ options:
 
   validate_certs:
     required: false
-    version_added: 2.5
     description:
       - Require valid SSL certificates (set to `false` if you'd like to use self-signed certificates)
     default: true
