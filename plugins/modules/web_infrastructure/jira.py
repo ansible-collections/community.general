@@ -94,7 +94,6 @@ options:
 
   inwardissue:
     required: false
-    version_added: 2.3
     description:
      - Set issue from which link will be created.
 
