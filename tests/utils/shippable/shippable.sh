@@ -117,7 +117,7 @@ trap cleanup EXIT
 if [[ "${COVERAGE:-}" == "--coverage" ]]; then
     timeout=60
 else
-    timeout=45
+    timeout=4
 fi
 
 # STAR: HACK install dependencies
