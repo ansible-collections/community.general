@@ -118,7 +118,6 @@ options:
 
   timeout:
     required: false
-    version_added: 2.3
     description:
       - Set timeout, in seconds, on requests to JIRA API.
     default: 10
