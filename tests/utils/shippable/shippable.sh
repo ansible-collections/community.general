@@ -149,8 +149,6 @@ ansible-galaxy collection install community.kubernetes -p "${COLLECTION_DIR}"
 ansible-galaxy collection install f5networks.f5_modules -p "${COLLECTION_DIR}"
 
 chmod -R a+rX "${COLLECTION_DIR}"
-chmod -R a+rx /root/ansible/test/lib/ansible_test/_data/sanity/code-smell/*.py
-chmod -R a+rx /root/ansible/test/lib/ansible_test/_data/sanity/import/importer.py
 
 # END: HACK
 
