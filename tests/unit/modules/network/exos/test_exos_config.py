@@ -23,7 +23,7 @@ from ansible_collections.community.general.tests.unit.compat.mock import patch, 
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
 from ansible_collections.community.general.plugins.cliconf.exos import Cliconf
 from ansible_collections.community.general.plugins.modules.network.exos import exos_config
-from ..exos_module import TestExosModule, load_fixture
+from .exos_module import TestExosModule, load_fixture
 
 
 class TestExosConfigModule(TestExosModule):

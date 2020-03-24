@@ -148,6 +148,8 @@ ansible-galaxy collection install google.cloud -p "${COLLECTION_DIR}"
 ansible-galaxy collection install community.kubernetes -p "${COLLECTION_DIR}"
 ansible-galaxy collection install f5networks.f5_modules -p "${COLLECTION_DIR}"
 
+chmod -R a+rX "${COLLECTION_DIR}"
+
 # END: HACK
 
 ansible-test env --dump --show --timeout "${timeout}" --color -v

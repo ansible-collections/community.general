@@ -24,7 +24,7 @@ import json
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.eric_eccli import eric_eccli_command
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
-from ..eccli_module import TestEccliModule, load_fixture
+from .eccli_module import TestEccliModule, load_fixture
 
 
 class TestEccliCommandModule(TestEccliModule):
