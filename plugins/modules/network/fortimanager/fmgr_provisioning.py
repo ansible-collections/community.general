@@ -145,7 +145,7 @@ api_result:
 """
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager import AnsibleFortiManager
+from ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager import AnsibleFortiManager
 
 # check for pyFMG lib
 try:
