@@ -29,8 +29,36 @@ python -V
 command -v pip
 pip --version
 pip list --disable-pip-version-check
+pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
 
-export PATH="${PWD}/bin:${PATH}"
+export ANSIBLE_COLLECTIONS_PATHS="${HOME}/.ansible"
+SHIPPABLE_RESULT_DIR="$(pwd)/shippable"
+TEST_DIR="${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/general"
+mkdir -p "${TEST_DIR}"
+cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
+cd "${TEST_DIR}"
+
+# STAR: HACK install dependencies
+ansible-galaxy -vvv collection install ansible.posix
+ansible-galaxy -vvv collection install community.crypto
+ansible-galaxy -vvv collection install ansible.netcommon
+
+# unit tests
+ansible-galaxy -vvv collection install community.kubernetes
+ansible-galaxy -vvv collection install netbox.netbox
+ansible-galaxy -vvv collection install netapp.ontap
+ansible-galaxy -vvv collection install cisco.meraki
+ansible-galaxy -vvv collection install fortinet.fortios
+ansible-galaxy -vvv collection install junipernetworks.junos
+ansible-galaxy -vvv collection install cisco.aci
+ansible-galaxy -vvv collection install google.cloud
+ansible-galaxy -vvv collection install community.kubernetes
+ansible-galaxy -vvv collection install f5networks.f5_modules
+
+# Needed until https://github.com/ansible/ansible/issues/68415 is fixed:
+chmod -R a+rX "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections"
+# END: HACK
+
 export PYTHONIOENCODING='utf-8'
 
 if [ "${JOB_TRIGGERED_BY_NAME:-}" == "nightly-trigger" ]; then
@@ -68,47 +96,81 @@ else
     export UNSTABLE=""
 fi
 
-virtualenv --python /usr/bin/python3.7 ~/ansible-venv
-set +ux
-. ~/ansible-venv/bin/activate
-set -ux
-
-#pip install ansible==2.9.0 --disable-pip-version-check
-pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
-
-COLLECTION_DIR="${HOME}/.ansible/ansible_collections/"
-TEST_DIR="${COLLECTION_DIR}/community/general"
-mkdir -p "${TEST_DIR}"
-cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
-cd "${TEST_DIR}"
+# remove empty core/extras module directories from PRs created prior to the repo-merge
+find plugins -type d -empty -print -delete
 
 function cleanup
 {
+    # for complete on-demand coverage generate a report for all files with no coverage on the "sanity/5" job so we only have one copy
+    if [ "${COVERAGE}" == "--coverage" ] && [ "${CHANGED}" == "" ] && [ "${test}" == "sanity/5" ]; then
+        stub="--stub"
+        # trigger coverage reporting for stubs even if no other coverage data exists
+        mkdir -p tests/output/coverage/
+    else
+        stub=""
+    fi
+
     if [ -d tests/output/coverage/ ]; then
         if find tests/output/coverage/ -mindepth 1 -name '.*' -prune -o -print -quit | grep -q .; then
-            # for complete on-demand coverage generate a report for all files with no coverage on the "other" job so we only have one copy
-            if [ "${COVERAGE}" == "--coverage" ] && [ "${CHANGED}" == "" ] && [ "${test}" == "sanity/1" ]; then
-                stub="--stub"
-            else
-                stub=""
-            fi
+            process_coverage='yes'  # process existing coverage files
+        elif [ "${stub}" ]; then
+            process_coverage='yes'  # process coverage when stubs are enabled
+        else
+            process_coverage=''
+        fi
+
+        if [ "${process_coverage}" ]; then
+            # use python 3.7 for coverage to avoid running out of memory during coverage xml processing
+            # only use it for coverage to avoid the additional overhead of setting up a virtual environment for a potential no-op job
+            virtualenv --python /usr/bin/python3.7 ~/ansible-venv
+            set +ux
+            . ~/ansible-venv/bin/activate
+            set -ux
 
             # shellcheck disable=SC2086
-            ansible-test coverage xml --color -v --requirements --group-by command --group-by version ${stub:+"$stub"}
-            cp -a tests/output/reports/coverage=*.xml shippable/codecoverage/
+            ansible-test coverage xml --color --requirements --group-by command --group-by version ${stub:+"$stub"}
+            cp -a tests/output/reports/coverage=*.xml "$SHIPPABLE_RESULT_DIR/codecoverage/"
+
+            # analyze and capture code coverage aggregated by integration test target
+            ansible-test coverage analyze targets generate -v "$SHIPPABLE_RESULT_DIR/testresults/coverage-analyze-targets.json"
+
+            # upload coverage report to codecov.io only when using complete on-demand coverage
+            if [ "${COVERAGE}" == "--coverage" ] && [ "${CHANGED}" == "" ]; then
+                for file in tests/output/reports/coverage=*.xml; do
+                    flags="${file##*/coverage=}"
+                    flags="${flags%-powershell.xml}"
+                    flags="${flags%.xml}"
+                    # remove numbered component from stub files when converting to tags
+                    flags="${flags//stub-[0-9]*/stub}"
+                    flags="${flags//=/,}"
+                    flags="${flags//[^a-zA-Z0-9_,]/_}"
+
+                    bash <(curl -s https://codecov.io/bash) \
+                        -f "${file}" \
+                        -F "${flags}" \
+                        -n "${test}" \
+                        -t 20636cf5-4d6a-4b9a-8d2d-6f22ebbaa752 \
+                        -X coveragepy \
+                        -X gcov \
+                        -X fix \
+                        -X search \
+                        -X xcode \
+                    || echo "Failed to upload code coverage report to codecov.io: ${file}"
+                done
+            fi
         fi
     fi
 
     if [ -d  tests/output/junit/ ]; then
-      cp -aT tests/output/junit/ shippable/testresults/
+      cp -aT tests/output/junit/ "$SHIPPABLE_RESULT_DIR/testresults/"
     fi
 
     if [ -d tests/output/data/ ]; then
-      cp -a tests/output/data/ shippable/testresults/
+      cp -a tests/output/data/ "$SHIPPABLE_RESULT_DIR/testresults/"
     fi
 
     if [ -d  tests/output/bot/ ]; then
-      cp -aT tests/output/bot/ shippable/testresults/
+      cp -aT tests/output/bot/ "$SHIPPABLE_RESULT_DIR/testresults/"
     fi
 }
 
@@ -117,40 +179,8 @@ trap cleanup EXIT
 if [[ "${COVERAGE:-}" == "--coverage" ]]; then
     timeout=60
 else
-    timeout=45
+    timeout=50
 fi
-
-# STAR: HACK install dependencies
-(
-#ansible.windows doesn't install from Galaxy
-mkdir /tmp/collection_deps
-git clone https://github.com/ansible-collections/ansible.windows.git /tmp/collection_deps/ansible.windows
-cd /tmp/collection_deps/ansible.windows
-ansible-galaxy collection build
-ansible-galaxy collection install /tmp/collection_deps/ansible.windows/ansible-windows* -p "${COLLECTION_DIR}"
-)
-
-
-#ansible-galaxy collection install ansible.windows -p "${COLLECTION_DIR}"
-ansible-galaxy collection install ansible.posix -p "${COLLECTION_DIR}"
-ansible-galaxy collection install community.crypto -p "${COLLECTION_DIR}"
-ansible-galaxy collection install ansible.netcommon -p "${COLLECTION_DIR}"
-
-# unit tests
-ansible-galaxy collection install community.kubernetes -p "${COLLECTION_DIR}"
-ansible-galaxy collection install netbox.netbox -p "${COLLECTION_DIR}"
-ansible-galaxy collection install netapp.ontap -p "${COLLECTION_DIR}"
-ansible-galaxy collection install cisco.meraki -p "${COLLECTION_DIR}"
-ansible-galaxy collection install fortinet.fortios -p "${COLLECTION_DIR}"
-ansible-galaxy collection install junipernetworks.junos -p "${COLLECTION_DIR}"
-ansible-galaxy collection install cisco.aci -p "${COLLECTION_DIR}"
-ansible-galaxy collection install google.cloud -p "${COLLECTION_DIR}"
-ansible-galaxy collection install community.kubernetes -p "${COLLECTION_DIR}"
-ansible-galaxy collection install f5networks.f5_modules -p "${COLLECTION_DIR}"
-
-chmod -R a+rX "${COLLECTION_DIR}"
-
-# END: HACK
 
 ansible-test env --dump --show --timeout "${timeout}" --color -v
 
