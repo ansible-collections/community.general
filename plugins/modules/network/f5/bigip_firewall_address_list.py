@@ -178,16 +178,16 @@ try:
     from library.module_utils.network.f5.ipaddress import is_valid_ip
     from library.module_utils.network.f5.ipaddress import is_valid_ip_interface
 except ImportError:
-    from ansible_collections.f5networks.f5_modules.plugins.module_utils.network.f5.bigip import F5RestClient
-    from ansible_collections.f5networks.f5_modules.plugins.module_utils.network.f5.common import F5ModuleError
-    from ansible_collections.f5networks.f5_modules.plugins.module_utils.network.f5.common import AnsibleF5Parameters
-    from ansible_collections.f5networks.f5_modules.plugins.module_utils.network.f5.common import fq_name
-    from ansible_collections.f5networks.f5_modules.plugins.module_utils.network.f5.common import f5_argument_spec
-    from ansible_collections.f5networks.f5_modules.plugins.module_utils.network.f5.common import transform_name
+    from ansible_collections.f5networks.f5_modules.plugins.module_utils.bigip import F5RestClient
+    from ansible_collections.f5networks.f5_modules.plugins.module_utils.common import F5ModuleError
+    from ansible_collections.f5networks.f5_modules.plugins.module_utils.common import AnsibleF5Parameters
+    from ansible_collections.f5networks.f5_modules.plugins.module_utils.common import fq_name
+    from ansible_collections.f5networks.f5_modules.plugins.module_utils.common import f5_argument_spec
+    from ansible_collections.f5networks.f5_modules.plugins.module_utils.common import transform_name
     from ansible_collections.ansible.netcommon.plugins.module_utils.compat.ipaddress import ip_address
     from ansible_collections.ansible.netcommon.plugins.module_utils.compat.ipaddress import ip_interface
-    from ansible_collections.f5networks.f5_modules.plugins.module_utils.network.f5.ipaddress import is_valid_ip
-    from ansible_collections.f5networks.f5_modules.plugins.module_utils.network.f5.ipaddress import is_valid_ip_interface
+    from ansible_collections.f5networks.f5_modules.plugins.module_utils.ipaddress import is_valid_ip
+    from ansible_collections.f5networks.f5_modules.plugins.module_utils.ipaddress import is_valid_ip_interface
 
 
 class Parameters(AnsibleF5Parameters):

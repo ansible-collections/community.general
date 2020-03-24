@@ -70,7 +70,7 @@ seealso:
 - module: cisco.mso.mso_schema_template_externalepg
 - module: cisco.mso.mso_schema_template_contract_filter
 extends_documentation_fragment:
-- cisco.mso.mso
+- cisco.mso.modules
 
 '''
 
@@ -132,7 +132,7 @@ RETURN = r'''
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.cisco.mso.plugins.module_utils.network.aci.mso import MSOModule, mso_argument_spec, mso_contractref_spec, issubset
+from ansible_collections.cisco.mso.plugins.module_utils.mso import MSOModule, mso_argument_spec, mso_contractref_spec, issubset
 
 
 def main():

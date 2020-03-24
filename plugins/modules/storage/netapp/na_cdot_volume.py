@@ -18,7 +18,7 @@ module: na_cdot_volume
 
 short_description: Manage NetApp cDOT volumes
 extends_documentation_fragment:
-- netapp.ontap.netapp.ontap
+- netapp.ontap.netapp.na_ontap
 
 author: Sumit Kumar (@timuster) <sumit4@netapp.com>
 

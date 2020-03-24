@@ -126,12 +126,12 @@ api_result:
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible.module_utils.connection import Connection
-from ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager import FortiManagerHandler
-from ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.common import FMGBaseException
-from ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.common import FMGRCommon
-from ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.common import FMGRMethods
-from ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.common import DEFAULT_RESULT_OBJ
-from ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.common import FAIL_SOCKET_MSG
+from ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager import FortiManagerHandler
+from ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.common import FMGBaseException
+from ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.common import FMGRCommon
+from ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.common import FMGRMethods
+from ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.common import DEFAULT_RESULT_OBJ
+from ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.common import FAIL_SOCKET_MSG
 
 
 def get_groups(fmgr, paramgram):

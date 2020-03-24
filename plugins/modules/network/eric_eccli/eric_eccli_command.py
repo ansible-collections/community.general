@@ -12,7 +12,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'supported_by': 'community'}
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: eric_eccli_command
 author: Ericsson IPOS OAM team (@itercheng)
@@ -34,7 +34,7 @@ options:
         the number of retries has expired. If a command sent to the
         device requires answering a prompt, it is possible to pass
         a dict containing I(command), I(answer) and I(prompt).
-        Common answers are 'y' or "\r" (carriage return, must be
+        Common answers are 'y' or "\\r" (carriage return, must be
         double quotes). See examples.
     type: list
     required: true
@@ -80,7 +80,7 @@ notes:
   - For more information on using Ansible to manage Ericsson devices see the Ericsson documents.
   - "Starting with Ansible 2.5 we recommend using C(connection: network_cli)."
   - For more information please see the L(ERIC_ECCLI Platform Options guide,../network/user_guide/platform_eric_eccli.html).
-'''
+"""
 
 EXAMPLES = r"""
 tasks:
