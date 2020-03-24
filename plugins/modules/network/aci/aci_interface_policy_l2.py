@@ -184,7 +184,7 @@ url:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.cisco.aci.plugins.module_utils.network.aci.aci import ACIModule, aci_argument_spec
+from ansible_collections.cisco.aci.plugins.module_utils.aci import ACIModule, aci_argument_spec
 
 # Mapping dicts are used to normalize the proposed data to what the APIC expects, which will keep diffs accurate
 QINQ_MAPPING = dict(
