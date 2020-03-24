@@ -22,7 +22,7 @@ __metaclass__ = type
 import json
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ..cnos_module import TestCnosModule, load_fixture
+from .cnos_module import TestCnosModule, load_fixture
 from ansible_collections.community.general.plugins.modules.network.cnos import cnos_facts
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
 

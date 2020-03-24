@@ -39,8 +39,8 @@ class OneViewBaseTest(object):
         resource_module_path_name = re.findall('[A-Z][^A-Z]*', resource_module_path_name)
         resource_module_path_name = 'oneview_' + str.join('_', resource_module_path_name).lower()
 
-        ansible = __import__('ansible')
-        oneview_module = ansible.modules.remote_management.oneview
+        ansible_collections = __import__('ansible_collections')
+        oneview_module = ansible_collections.community.general.plugins.modules.remote_management.oneview
         resource_module = getattr(oneview_module, resource_module_path_name)
         self.testing_class = getattr(resource_module, resource_name)
         testing_module = self.testing_class.__module__.split('.')[-1]
@@ -143,9 +143,9 @@ class OneViewBaseTestCase(object):
 
     def __set_module_examples(self):
         # Load scenarios from module examples (Also checks if it is a valid yaml)
-        ansible = __import__('ansible')
+        ansible_collections = __import__('ansible_collections')
         testing_module = self.testing_class.__module__.split('.')[-1]
-        self.testing_module = getattr(ansible.modules.remote_management.oneview, testing_module)
+        self.testing_module = getattr(ansible_collections.community.general.plugins.modules.remote_management.oneview, testing_module)
 
         try:
             # Load scenarios from module examples (Also checks if it is a valid yaml)

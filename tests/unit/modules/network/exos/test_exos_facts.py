@@ -26,7 +26,7 @@ from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
 from ansible.module_utils.common._collections_compat import Mapping
 from ansible_collections.community.general.plugins.modules.network.exos import exos_facts
-from ..exos_module import TestExosModule
+from .exos_module import TestExosModule
 
 
 class TestExosFactsModule(TestExosModule):

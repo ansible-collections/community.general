@@ -20,7 +20,7 @@ __metaclass__ = type
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.routeros import routeros_facts
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
-from ..routeros_module import TestRouterosModule, load_fixture
+from .routeros_module import TestRouterosModule, load_fixture
 
 
 class TestRouterosFactsModule(TestRouterosModule):

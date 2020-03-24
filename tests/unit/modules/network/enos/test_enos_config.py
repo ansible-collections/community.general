@@ -22,7 +22,7 @@ __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.enos import enos_config
-from ..enos_module import TestEnosModule, load_fixture
+from .enos_module import TestEnosModule, load_fixture
 
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
 

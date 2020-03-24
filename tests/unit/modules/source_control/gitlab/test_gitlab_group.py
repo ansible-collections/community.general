@@ -18,10 +18,10 @@ def _dummy(x):
 
 pytestmark = []
 try:
-    from ..gitlab import (GitlabModuleTestCase,
-                         python_version_match_requirement,
-                         resp_get_group, resp_get_missing_group, resp_create_group,
-                         resp_create_subgroup, resp_delete_group, resp_find_group_project)
+    from .gitlab import (GitlabModuleTestCase,
+                        python_version_match_requirement,
+                        resp_get_group, resp_get_missing_group, resp_create_group,
+                        resp_create_subgroup, resp_delete_group, resp_find_group_project)
 
     # GitLab module requirements
     if python_version_match_requirement():
