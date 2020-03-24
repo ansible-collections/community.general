@@ -1,5 +1,4 @@
 integration_tests_dependencies:
-- ansible.windows
 - ansible.posix
 - community.crypto
 - ansible.netcommon
