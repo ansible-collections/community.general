@@ -1,3 +1,4 @@
+# (c) 2020, Brian Scholer (@briantist)
 # (c) 2015, Jonathan Davila <jonathan(at)davila.io>
 # (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -10,10 +11,6 @@ DOCUMENTATION = """
   author:
     - Jonathan Davila <jdavila(at)ansible.com>
     - Brian Scholer (@briantist)
-  version_added: "2.0"
-  extends_documentation_fragment:
-    - aws_credentials
-    - aws_region
   short_description: Retrieve secrets from HashiCorp's vault
   requirements:
     - hvac (python library)
@@ -92,7 +89,6 @@ DOCUMENTATION = """
         - aws_iam_login
       default: token
     return_format:
-      version_added: "2.10"
       description:
         - Controls how multiple key/value pairs in a path are treated on return.
         - C(dict) returns a single dict containing the key/value pairs (same behavior as before 2.10).
@@ -114,8 +110,43 @@ DOCUMENTATION = """
       type: boolean
       default: True
     namespace:
-      version_added: "2.8"
       description: Namespace where secrets reside. Requires HVAC 0.7.0+ and Vault 0.11+.
+    aws_profile:
+        description: The AWS profile
+        type: str
+        aliases: [ boto_profile ]
+        env:
+        - name: AWS_DEFAULT_PROFILE
+        - name: AWS_PROFILE
+    aws_access_key:
+        description: The AWS access key to use.
+        type: str
+        aliases: [ aws_access_key_id ]
+        env:
+        - name: EC2_ACCESS_KEY
+        - name: AWS_ACCESS_KEY
+        - name: AWS_ACCESS_KEY_ID
+    aws_secret_key:
+        description: The AWS secret key that corresponds to the access key.
+        type: str
+        aliases: [ aws_secret_access_key ]
+        env:
+        - name: EC2_SECRET_KEY
+        - name: AWS_SECRET_KEY
+        - name: AWS_SECRET_ACCESS_KEY
+    aws_security_token:
+        description: The AWS security token if using temporary access and secret keys.
+        type: str
+        env:
+        - name: EC2_SECURITY_TOKEN
+        - name: AWS_SESSION_TOKEN
+        - name: AWS_SECURITY_TOKEN
+    region:
+        description: The AWS region for which to create the connection.
+        type: str
+        env:
+        - name: EC2_REGION
+        - name: AWS_REGION
 """
 
 EXAMPLES = """
