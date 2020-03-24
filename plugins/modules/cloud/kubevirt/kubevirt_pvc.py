@@ -254,8 +254,8 @@ import traceback
 
 from collections import defaultdict
 
-from ansible_collections.community.kubernetes.plugins.module_utils.k8s.common import AUTH_ARG_SPEC
-from ansible_collections.community.kubernetes.plugins.module_utils.k8s.raw import KubernetesRawModule
+from ansible_collections.community.kubernetes.plugins.module_utils.common import AUTH_ARG_SPEC
+from ansible_collections.community.kubernetes.plugins.module_utils.raw import KubernetesRawModule
 from ansible_collections.community.general.plugins.module_utils.kubevirt import virtdict, KubeVirtRawModule
 
 

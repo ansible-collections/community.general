@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
+__metaclass__ = type
+
 from ansible_collections.ansible.posix.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.modules import interfaces_file
 from shutil import copyfile, move
@@ -156,7 +158,7 @@ class TestInterfacesFileModule(unittest.TestCase):
                 fail_json_iterations = []
                 for i, options in enumerate(options_list):
                     try:
-                        _, lines = interfaces_file.setInterfaceOption(module, lines, options['iface'], options['option'], options['value'], options['state'])
+                        dummy, lines = interfaces_file.setInterfaceOption(module, lines, options['iface'], options['option'], options['value'], options['state'])
                     except AnsibleFailJson as e:
                         fail_json_iterations.append("[%d] fail_json message: %s\noptions:\n%s" %
                                                     (i, str(e), json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))))
@@ -188,8 +190,8 @@ class TestInterfacesFileModule(unittest.TestCase):
                         fail_json_iterations = []
                         options['state'] = state
                         try:
-                            _, lines = interfaces_file.setInterfaceOption(module, lines,
-                                                                          options['iface'], options['option'], options['value'], options['state'])
+                            dummy, lines = interfaces_file.setInterfaceOption(module, lines,
+                                                                              options['iface'], options['option'], options['value'], options['state'])
                         except AnsibleFailJson as e:
                             fail_json_iterations.append("fail_json message: %s\noptions:\n%s" %
                                                         (str(e), json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))))
@@ -312,8 +314,8 @@ class TestInterfacesFileModule(unittest.TestCase):
                     options = options_list[0]
                     fail_json_iterations = []
                     try:
-                        _, lines = interfaces_file.setInterfaceOption(module, lines, options['iface'], options['option'],
-                                                                      options['value'], options['state'], options['address_family'])
+                        dummy, lines = interfaces_file.setInterfaceOption(module, lines, options['iface'], options['option'],
+                                                                          options['value'], options['state'], options['address_family'])
                     except AnsibleFailJson as e:
                         fail_json_iterations.append("fail_json message: %s\noptions:\n%s" %
                                                     (str(e), json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))))

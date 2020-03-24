@@ -93,7 +93,7 @@ checkpoint_hosts:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.connection import Connection
-from ansible_collections.check_point.mgmt.plugins.module_utils.network.checkpoint.checkpoint import checkpoint_argument_spec, publish, install_policy
+from ansible_collections.check_point.mgmt.plugins.module_utils.checkpoint import checkpoint_argument_spec, publish, install_policy
 
 
 def get_host(module, connection):

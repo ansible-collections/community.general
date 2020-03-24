@@ -20,8 +20,8 @@ try:
     from library.module_utils.network.f5.common import F5BaseClient
     from library.module_utils.network.f5.common import F5ModuleError
 except ImportError:
-    from ansible_collections.f5networks.f5_modules.plugins.module_utils.network.f5.common import F5BaseClient
-    from ansible_collections.f5networks.f5_modules.plugins.module_utils.network.f5.common import F5ModuleError
+    from ansible_collections.f5networks.f5_modules.plugins.module_utils.common import F5BaseClient
+    from ansible_collections.f5networks.f5_modules.plugins.module_utils.common import F5ModuleError
 
 
 class F5Client(F5BaseClient):
