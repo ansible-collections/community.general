@@ -55,7 +55,7 @@ options:
       description:
         - "Name of the host, which tags should be listed."
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- ovirt.ovirt_collection.ovirt_info
 
 '''
 

@@ -70,7 +70,7 @@ options:
            effect when the virtual machine is restarted. By default the value is set by engine."
       type: bool
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- ovirt.ovirt_collection.ovirt_info
 
 '''
 

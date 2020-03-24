@@ -62,7 +62,7 @@ options:
                 description:
                   - "LUN id."
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- ovirt.ovirt_collection.ovirt_info
 
 '''
 

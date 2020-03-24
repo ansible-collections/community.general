@@ -47,7 +47,7 @@ options:
       type: str
 
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- ovirt.ovirt_collection.ovirt_info
 
 '''
 

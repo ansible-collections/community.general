@@ -74,7 +74,7 @@ options:
         default: true
         type: bool
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- ovirt.ovirt_collection.ovirt_info
 
 '''
 

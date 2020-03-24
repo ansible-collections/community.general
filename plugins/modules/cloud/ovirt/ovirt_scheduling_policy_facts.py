@@ -53,7 +53,7 @@ options:
         description:
             - "Name of the scheduling policy, can be used as glob expression."
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- ovirt.ovirt_collection.ovirt_info
 
 '''
 

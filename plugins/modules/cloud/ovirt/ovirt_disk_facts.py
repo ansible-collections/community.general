@@ -51,7 +51,7 @@ options:
         - "For example to search Disk X from storage Y use following pattern:
            name=X and storage.name=Y"
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- ovirt.ovirt_collection.ovirt_info
 
 '''
 

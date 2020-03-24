@@ -50,7 +50,7 @@ options:
         - "Search term which is accepted by oVirt/RHV search backend."
         - "For example to search vmpool X: name=X"
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- ovirt.ovirt_collection.ovirt_info
 
 '''
 

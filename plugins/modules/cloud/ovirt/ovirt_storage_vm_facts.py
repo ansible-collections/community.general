@@ -58,7 +58,7 @@ options:
         description:
             - "The storage domain name where the virtual machines should be listed."
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- ovirt.ovirt_collection.ovirt_info
 
 '''
 

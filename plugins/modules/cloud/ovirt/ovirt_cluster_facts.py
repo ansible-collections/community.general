@@ -51,7 +51,7 @@ options:
         - "For example to search cluster X from datacenter Y use following pattern:
            name=X and datacenter=Y"
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- ovirt.ovirt_collection.ovirt_info
 
 '''
 

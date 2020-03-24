@@ -50,7 +50,7 @@ options:
         - "Search term which is accepted by oVirt/RHV search backend."
         - "For example to search network starting with string vlan1 use: name=vlan1*"
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- ovirt.ovirt_collection.ovirt_info
 
 '''
 
