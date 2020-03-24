@@ -94,7 +94,7 @@ options:
     - The alias for the current object. This relates to the nameAlias field in ACI.
     type: str
 extends_documentation_fragment:
-- cisco.aci.aci
+- cisco.aci.modules
 
 seealso:
 - name: APIC Management Information Model reference

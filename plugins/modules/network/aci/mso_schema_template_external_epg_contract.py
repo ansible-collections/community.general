@@ -70,7 +70,7 @@ seealso:
 - module: cisco.mso.mso_schema_template_externalepg
 - module: cisco.mso.mso_schema_template_contract_filter
 extends_documentation_fragment:
-- cisco.mso.mso
+- cisco.mso.modules
 
 '''
 

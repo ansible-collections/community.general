@@ -57,7 +57,7 @@ options:
 notes:
 - Due to restrictions of the MSO REST API concurrent modifications to EPG subnets can be dangerous and corrupt data.
 extends_documentation_fragment:
-- cisco.mso.mso
+- cisco.mso.modules
 
 '''
 
