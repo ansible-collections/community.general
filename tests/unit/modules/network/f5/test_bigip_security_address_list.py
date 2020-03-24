@@ -28,10 +28,10 @@ try:
     from test.unit.modules.utils import set_module_args
 except ImportError:
     try:
-        from ansible.modules.network.f5.bigip_security_address_list import ApiParameters
-        from ansible.modules.network.f5.bigip_security_address_list import ModuleParameters
-        from ansible.modules.network.f5.bigip_security_address_list import ModuleManager
-        from ansible.modules.network.f5.bigip_security_address_list import ArgumentSpec
+        from ansible_collections.community.general.plugins.modules.network.f5.bigip_security_address_list import ApiParameters
+        from ansible_collections.community.general.plugins.modules.network.f5.bigip_security_address_list import ModuleParameters
+        from ansible_collections.community.general.plugins.modules.network.f5.bigip_security_address_list import ModuleManager
+        from ansible_collections.community.general.plugins.modules.network.f5.bigip_security_address_list import ArgumentSpec
         from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
     except ImportError:
         pytestmark.append(pytest.mark.skip("F5 Ansible modules require the f5-sdk Python library"))
