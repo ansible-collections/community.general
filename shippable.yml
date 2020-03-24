@@ -30,14 +30,6 @@ matrix:
     - env: T=units/3.8/2
     - env: T=units/3.9/2
 
-    - env: T=units/2.6/3
-    - env: T=units/2.7/3
-    - env: T=units/3.5/3
-    - env: T=units/3.6/3
-    - env: T=units/3.7/3
-    - env: T=units/3.8/3
-    - env: T=units/3.9/3
-
     - env: T=aix/7.2/1
     - env: T=osx/10.11/1
     - env: T=rhel/7.6/1
@@ -117,9 +109,6 @@ matrix:
     - env: T=linux/opensuse15/5
     - env: T=linux/ubuntu1604/5
     - env: T=linux/ubuntu1804/5
-
-    - env: T=fallaxy/2.7/1
-    - env: T=fallaxy/3.6/1
 
     - env: T=cs/2.7/1
     - env: T=cs/3.6/1

@@ -18,7 +18,7 @@ group1=()
 group2=()
 group3=()
 
-# create three groups by putting network tests into separate groups
+# create two groups by putting network tests into another group
 # add or remove network platforms as needed to balance the groups
 
 networks2=(
@@ -69,12 +69,8 @@ networks2=(
     vyos
 )
 
-networks3=(
-    fortios
-)
-
 for network in "${networks2[@]}"; do
-    test_path="test/units/modules/network/${network}/"
+    test_path="tests/unit/modules/network/${network}/"
 
     if [ -d "${test_path}" ]; then
         group1+=(--exclude "${test_path}")
@@ -82,19 +78,9 @@ for network in "${networks2[@]}"; do
     fi
 done
 
-for network in "${networks3[@]}"; do
-    test_path="test/units/modules/network/${network}/"
-
-    if [ -d "${test_path}" ]; then
-        group1+=(--exclude "${test_path}")
-        group3+=("${test_path}")
-    fi
-done
-
 case "${group}" in
     1) options=("${group1[@]:+${group1[@]}}") ;;
     2) options=("${group2[@]:+${group2[@]}}") ;;
-    3) options=("${group3[@]:+${group3[@]}}") ;;
 esac
 
 if [ ${#options[@]} -eq 0 ] && [ "${group}" -gt 1 ]; then
