@@ -21,7 +21,7 @@ __metaclass__ = type
 from ansible_collections.community.general.plugins.modules.net_tools.nios import nios_ptr_record
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios import api
 from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock, Mock
-from ..test_nios_module import TestNiosModule, load_fixture
+from .test_nios_module import TestNiosModule, load_fixture
 
 
 class TestNiosPTRRecordModule(TestNiosModule):

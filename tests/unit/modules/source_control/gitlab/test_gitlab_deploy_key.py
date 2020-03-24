@@ -18,10 +18,10 @@ def _dummy(x):
 
 pytestmark = []
 try:
-    from ..gitlab import (GitlabModuleTestCase,
-                         python_version_match_requirement,
-                         resp_get_project, resp_find_project_deploy_key,
-                         resp_create_project_deploy_key, resp_delete_project_deploy_key)
+    from .gitlab import (GitlabModuleTestCase,
+                        python_version_match_requirement,
+                        resp_get_project, resp_find_project_deploy_key,
+                        resp_create_project_deploy_key, resp_delete_project_deploy_key)
 
     # GitLab module requirements
     if python_version_match_requirement():

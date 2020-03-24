@@ -11,7 +11,7 @@ import os
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.ingate import ig_unit_information
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
-from ..ingate_module import TestIngateModule, load_fixture
+from .ingate_module import TestIngateModule, load_fixture
 
 
 class TestUnitInformationModule(TestIngateModule):
@@ -21,11 +21,13 @@ class TestUnitInformationModule(TestIngateModule):
     def setUp(self):
         super(TestUnitInformationModule, self).setUp()
 
-        self.mock_make_request = patch('ansible.modules.network.ingate.'
+        self.mock_make_request = patch('ansible_collections.community.general.'
+                                       'plugins.modules.network.ingate.'
                                        'ig_unit_information.make_request')
         self.make_request = self.mock_make_request.start()
 
-        self.mock_is_ingatesdk_installed = patch('ansible.modules.network.ingate.'
+        self.mock_is_ingatesdk_installed = patch('ansible_collections.community.general.'
+                                                 'plugins.modules.network.ingate.'
                                                  'ig_unit_information.is_ingatesdk_installed')
         self.is_ingatesdk_installed = self.mock_is_ingatesdk_installed.start()
 

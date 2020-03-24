@@ -47,7 +47,8 @@ def module_mock(mocker):
 
 @pytest.fixture(autouse=True)
 def connection_mock(mocker):
-    connection_class_mock = mocker.patch('ansible.modules.network.fortimanager.'
+    connection_class_mock = mocker.patch('ansible_collections.community.general.'
+                                         'plugins.modules.network.fortimanager.'
                                          'fmgr_device_provision_template.Connection')
     return connection_class_mock
 
