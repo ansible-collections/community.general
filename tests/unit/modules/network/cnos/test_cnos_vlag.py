@@ -4,7 +4,7 @@ __metaclass__ = type
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.cnos import cnos_vlag
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
-from ..cnos_module import TestCnosModule, load_fixture
+from .cnos_module import TestCnosModule, load_fixture
 
 
 class TestCnosVlagModule(TestCnosModule):

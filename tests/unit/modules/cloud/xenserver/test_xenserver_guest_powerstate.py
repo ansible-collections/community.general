@@ -10,7 +10,7 @@ __metaclass__ = type
 import json
 import pytest
 
-from ..common import fake_xenapi_ref
+from .common import fake_xenapi_ref
 
 
 testcase_set_powerstate = {
