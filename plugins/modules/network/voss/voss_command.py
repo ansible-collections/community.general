@@ -25,7 +25,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'supported_by': 'community'}
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: voss_command
 author: "Lindsay Hill (@LindsayHill)"
@@ -48,7 +48,7 @@ options:
         until the condition is satisfied or the number of retries has
         expired. If a command sent to the device requires answering a
         prompt, it is possible to pass a dict containing I(command),
-        I(answer) and I(prompt). Common answers are 'y' or "\r"
+        I(answer) and I(prompt). Common answers are 'y' or "\\r"
         (carriage return, must be double quotes). See examples.
     required: true
   wait_for:
@@ -82,7 +82,7 @@ options:
         conditions, the interval indicates how long to wait before
         trying the command again.
     default: 1
-'''
+"""
 
 EXAMPLES = r"""
 tasks:

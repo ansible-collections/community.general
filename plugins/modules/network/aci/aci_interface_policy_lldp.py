@@ -50,7 +50,7 @@ options:
     - The alias for the current object. This relates to the nameAlias field in ACI.
     type: str
 extends_documentation_fragment:
-- cisco.aci.aci
+- cisco.aci.modules
 
 seealso:
 - name: APIC Management Information Model reference
@@ -179,7 +179,7 @@ url:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.cisco.aci.plugins.module_utils.network.aci.aci import ACIModule, aci_argument_spec
+from ansible_collections.cisco.aci.plugins.module_utils.aci import ACIModule, aci_argument_spec
 
 
 def main():
