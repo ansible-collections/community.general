@@ -23,7 +23,7 @@ from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.cnos import cnos_vlan
 from ansible_collections.community.general.plugins.modules.network.cnos.cnos_vlan import parse_vlan_brief
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
-from ..cnos_module import TestCnosModule, load_fixture
+from .cnos_module import TestCnosModule, load_fixture
 
 
 class TestCnosVlanModule(TestCnosModule):

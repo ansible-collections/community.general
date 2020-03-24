@@ -24,7 +24,7 @@ from ansible_collections.community.general.tests.unit.compat.mock import patch, 
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
 from ansible_collections.community.general.plugins.modules.network.voss import voss_config
 from ansible_collections.community.general.plugins.cliconf.voss import Cliconf
-from ..voss_module import TestVossModule, load_fixture
+from .voss_module import TestVossModule, load_fixture
 
 
 class TestVossConfigModule(TestVossModule):

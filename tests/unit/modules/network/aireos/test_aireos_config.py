@@ -23,7 +23,7 @@ __metaclass__ = type
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.aireos import aireos_config
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
-from ..aireos_module import TestCiscoWlcModule, load_fixture
+from .aireos_module import TestCiscoWlcModule, load_fixture
 
 
 class TestCiscoWlcConfigModule(TestCiscoWlcModule):

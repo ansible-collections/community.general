@@ -24,7 +24,7 @@ import json
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
 from ansible_collections.community.general.plugins.modules.network.ironware import ironware_facts
-from ..ironware_module import TestIronwareModule, load_fixture
+from .ironware_module import TestIronwareModule, load_fixture
 
 
 class TestIronwareFacts(TestIronwareModule):

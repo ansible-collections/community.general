@@ -18,7 +18,7 @@
 #
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch, Mock, call
-from ..netscaler_module import TestModule
+from .netscaler_module import TestModule
 import copy
 import tempfile
 import json
