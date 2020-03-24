@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
+__metaclass__ = type
+
 from ansible_collections.ansible.posix.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.modules import interfaces_file
 from shutil import copyfile, move
