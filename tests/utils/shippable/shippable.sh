@@ -39,21 +39,21 @@ cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
 cd "${TEST_DIR}"
 
 # STAR: HACK install dependencies
-ansible-galaxy collection install ansible.posix
-ansible-galaxy collection install community.crypto
-ansible-galaxy collection install ansible.netcommon
+ansible-galaxy -vvv collection install ansible.posix
+ansible-galaxy -vvv collection install community.crypto
+ansible-galaxy -vvv collection install ansible.netcommon
 
 # unit tests
-ansible-galaxy collection install community.kubernetes
-ansible-galaxy collection install netbox.netbox
-ansible-galaxy collection install netapp.ontap
-ansible-galaxy collection install cisco.meraki
-ansible-galaxy collection install fortinet.fortios
-ansible-galaxy collection install junipernetworks.junos
-ansible-galaxy collection install cisco.aci
-ansible-galaxy collection install google.cloud
-ansible-galaxy collection install community.kubernetes
-ansible-galaxy collection install f5networks.f5_modules
+ansible-galaxy -vvv collection install community.kubernetes
+ansible-galaxy -vvv collection install netbox.netbox
+ansible-galaxy -vvv collection install netapp.ontap
+ansible-galaxy -vvv collection install cisco.meraki
+ansible-galaxy -vvv collection install fortinet.fortios
+ansible-galaxy -vvv collection install junipernetworks.junos
+ansible-galaxy -vvv collection install cisco.aci
+ansible-galaxy -vvv collection install google.cloud
+ansible-galaxy -vvv collection install community.kubernetes
+ansible-galaxy -vvv collection install f5networks.f5_modules
 
 # Needed until https://github.com/ansible/ansible/issues/68415 is fixed:
 chmod -R a+rX "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections"
