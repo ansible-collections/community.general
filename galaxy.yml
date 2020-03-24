@@ -11,7 +11,7 @@ tags: null
 #dependencies:
 #  netapp.ontap: '>=0.1.0'
 #  community.kubernetes: '>=0.1.0'
-#  ovirt.ovirt: '>=0.1.0'
+#  ovirt.ovirt_collection: '>=0.1.0'
 #  ansible.netcommon: '>=0.1.0'
 #  cisco.mso: '>=0.1.0'
 #  ansible.posix: '>=0.1.0'
