@@ -55,7 +55,8 @@ ansible-galaxy collection install google.cloud
 ansible-galaxy collection install community.kubernetes
 ansible-galaxy collection install f5networks.f5_modules
 
-chmod -R a+rX "${COLLECTION_DIR}"
+# Needed until https://github.com/ansible/ansible/issues/68415 is fixed:
+chmod -R a+rX "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections"
 # END: HACK
 
 export PYTHONIOENCODING='utf-8'
