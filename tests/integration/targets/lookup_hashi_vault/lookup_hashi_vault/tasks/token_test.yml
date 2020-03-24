@@ -3,15 +3,15 @@
   block:
     - name: 'Fetch secrets using "hashi_vault" lookup'
       set_fact:
-        gen_secret1: "{{ lookup('hashi_vault', conn_params ~ 'secret=' ~ vault_gen_path ~ '/secret1 auth_method=token token=' ~ user_token) }}"
-        gen_secret2: "{{ lookup('hashi_vault', conn_params ~ 'secret=' ~ vault_gen_path ~ '/secret2 token=' ~ user_token) }}"
-        kv1_secret1: "{{ lookup('hashi_vault', conn_params ~ 'secret=' ~ vault_kv1_path ~ '/secret1 auth_method=token token=' ~ user_token) }}"
-        kv1_secret2: "{{ lookup('hashi_vault', conn_params ~ 'secret=' ~ vault_kv1_path ~ '/secret2 token=' ~ user_token) }}"
-        kv2_secret1: "{{ lookup('hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret1 auth_method=token token=' ~ user_token) }}"
-        kv2_secret2: "{{ lookup('hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret2 token=' ~ user_token) }}"
-        kv2_secret2_as_raw: "{{ lookup('hashi_vault', vault_kv2_path ~ '/secret2 ' ~  conn_params, auth_method='token', token=user_token, return_format='raw') }}"
-        kv2_secrets_as_dict: "{{ lookup('hashi_vault', vault_kv2_multi_path ~ '/secrets ' ~  conn_params, auth_method='token', token=user_token) }}"
-        kv2_secrets_as_values: "{{ query('hashi_vault', vault_kv2_multi_path ~ '/secrets ' ~  conn_params, auth_method='token', token=user_token, return_format='values') }}"
+        gen_secret1: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_gen_path ~ '/secret1 auth_method=token token=' ~ user_token) }}"
+        gen_secret2: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_gen_path ~ '/secret2 token=' ~ user_token) }}"
+        kv1_secret1: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv1_path ~ '/secret1 auth_method=token token=' ~ user_token) }}"
+        kv1_secret2: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv1_path ~ '/secret2 token=' ~ user_token) }}"
+        kv2_secret1: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret1 auth_method=token token=' ~ user_token) }}"
+        kv2_secret2: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret2 token=' ~ user_token) }}"
+        kv2_secret2_as_raw: "{{ lookup('community.general.hashi_vault', vault_kv2_path ~ '/secret2 ' ~  conn_params, auth_method='token', token=user_token, return_format='raw') }}"
+        kv2_secrets_as_dict: "{{ lookup('community.general.hashi_vault', vault_kv2_multi_path ~ '/secrets ' ~  conn_params, auth_method='token', token=user_token) }}"
+        kv2_secrets_as_values: "{{ query('community.general.hashi_vault', vault_kv2_multi_path ~ '/secrets ' ~  conn_params, auth_method='token', token=user_token, return_format='values') }}"
 
     - name: 'Check secret generic values'
       fail:
@@ -56,7 +56,7 @@
 
     - name: 'Failure expected when erroneous credentials are used'
       vars:
-        secret_wrong_cred: "{{ lookup('hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret2 auth_method=token token=wrong_token') }}"
+        secret_wrong_cred: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret2 auth_method=token token=wrong_token') }}"
       debug:
         msg: 'Failure is expected ({{ secret_wrong_cred }})'
       register: test_wrong_cred
@@ -64,7 +64,7 @@
 
     - name: 'Failure expected when unauthorized secret is read'
       vars:
-        secret_unauthorized: "{{ lookup('hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret3 token=' ~ user_token) }}"
+        secret_unauthorized: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret3 token=' ~ user_token) }}"
       debug:
         msg: 'Failure is expected ({{ secret_unauthorized }})'
       register: test_unauthorized
@@ -72,7 +72,7 @@
 
     - name: 'Failure expected when inexistent secret is read'
       vars:
-        secret_inexistent: "{{ lookup('hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret4 token=' ~ user_token) }}"
+        secret_inexistent: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret4 token=' ~ user_token) }}"
       debug:
         msg: 'Failure is expected ({{ secret_inexistent }})'
       register: test_inexistent
