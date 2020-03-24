@@ -11,7 +11,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'supported_by': 'community'}
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: icx_command
 author: "Ruckus Wireless (@Commscope)"
@@ -34,7 +34,7 @@ options:
         device requires answering a prompt, checkall and newline if
         multiple prompts, it is possible to pass
         a dict containing I(command), I(answer), I(prompt), I(check_all)
-        and I(newline).Common answers are 'y' or "\r" (carriage return,
+        and I(newline).Common answers are 'y' or "\\r" (carriage return,
         must be double quotes). See examples.
     type: list
     required: true
@@ -74,7 +74,7 @@ options:
         trying the command again.
     type: int
     default: 1
-'''
+"""
 
 EXAMPLES = """
 tasks:
