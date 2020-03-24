@@ -74,7 +74,7 @@ set +ux
 set -ux
 
 #pip install ansible==2.9.0 --disable-pip-version-check
-pip install git+https://github.com/ansible/ansible.git@temp-2.10-devel --disable-pip-version-check
+pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
 
 COLLECTION_DIR="${HOME}/.ansible/ansible_collections/"
 TEST_DIR="${COLLECTION_DIR}/community/general"
