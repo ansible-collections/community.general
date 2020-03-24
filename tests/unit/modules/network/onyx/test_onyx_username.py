@@ -9,7 +9,7 @@ __metaclass__ = type
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.onyx import onyx_username
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
-from ..onyx_module import TestOnyxModule, load_fixture
+from .onyx_module import TestOnyxModule, load_fixture
 
 
 class TestOnyxUsernameModule(TestOnyxModule):

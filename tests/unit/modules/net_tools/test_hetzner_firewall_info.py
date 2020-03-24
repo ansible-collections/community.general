@@ -9,7 +9,7 @@ import pytest
 
 from ansible_collections.community.general.plugins.module_utils.hetzner import BASE_URL
 from ansible_collections.community.general.plugins.modules.net_tools import hetzner_firewall_info
-from ..test_hetzner_firewall import FetchUrlCall, run_module_success, run_module_failed
+from .test_hetzner_firewall import FetchUrlCall, run_module_success, run_module_failed
 
 
 # Tests for state (absent and present)

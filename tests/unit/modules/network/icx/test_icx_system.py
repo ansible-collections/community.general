@@ -8,7 +8,7 @@ import json
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.icx import icx_system
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
-from ..icx_module import TestICXModule, load_fixture
+from .icx_module import TestICXModule, load_fixture
 
 
 class TestICXSystemModule(TestICXModule):
