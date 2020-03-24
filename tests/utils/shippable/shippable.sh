@@ -50,6 +50,7 @@ ansible-galaxy -vvv collection install netbox.netbox
 ansible-galaxy -vvv collection install netapp.ontap
 ansible-galaxy -vvv collection install cisco.mso
 ansible-galaxy -vvv collection install cisco.meraki
+ansible-galaxy -vvv collection install cisco.intersight
 ansible-galaxy -vvv collection install fortinet.fortios
 ansible-galaxy -vvv collection install junipernetworks.junos
 ansible-galaxy -vvv collection install cisco.aci
