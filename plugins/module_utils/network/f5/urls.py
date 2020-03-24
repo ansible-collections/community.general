@@ -12,7 +12,7 @@ import re
 try:
     from library.module_utils.network.f5.common import F5ModuleError
 except ImportError:
-    from ansible_collections.f5networks.f5_modules.plugins.module_utils.network.f5.common import F5ModuleError
+    from ansible_collections.f5networks.f5_modules.plugins.module_utils.common import F5ModuleError
 
 _CLEAN_HEADER_REGEX_BYTE = re.compile(b'^\\S[^\\r\\n]*$|^$')
 _CLEAN_HEADER_REGEX_STR = re.compile(r'^\S[^\r\n]*$|^$')

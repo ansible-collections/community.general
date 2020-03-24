@@ -56,7 +56,7 @@ cp_publish:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.check_point.mgmt.plugins.module_utils.network.checkpoint.checkpoint import checkpoint_argument_spec_for_commands, api_command
+from ansible_collections.check_point.mgmt.plugins.module_utils.checkpoint import checkpoint_argument_spec_for_commands, api_command
 
 
 def main():
