@@ -74,7 +74,7 @@ networks3=(
 )
 
 for network in "${networks2[@]}"; do
-    test_path="test/units/modules/network/${network}/"
+    test_path="tests/unit/modules/network/${network}/"
 
     if [ -d "${test_path}" ]; then
         group1+=(--exclude "${test_path}")
@@ -83,7 +83,7 @@ for network in "${networks2[@]}"; do
 done
 
 for network in "${networks3[@]}"; do
-    test_path="test/units/modules/network/${network}/"
+    test_path="tests/unit/modules/network/${network}/"
 
     if [ -d "${test_path}" ]; then
         group1+=(--exclude "${test_path}")
