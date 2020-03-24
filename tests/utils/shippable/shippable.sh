@@ -42,6 +42,7 @@ cd "${TEST_DIR}"
 ansible-galaxy -vvv collection install ansible.posix
 ansible-galaxy -vvv collection install community.crypto
 ansible-galaxy -vvv collection install ansible.netcommon
+ansible-galaxy -vvv collection install ovirt.ovirt_collection
 
 # unit tests
 ansible-galaxy -vvv collection install community.kubernetes
