@@ -34,8 +34,8 @@ description:
 options:
     name:
         description:
-            - list of names of packages to install/remove
-        aliases: ['pkg', 'package', 'formula']
+            - A list of names of packages to install/remove.
+        aliases: [ 'formula', 'package', 'pkg' ]
         type: list
         elements: str
     path:
@@ -44,27 +44,31 @@ options:
               Since a package (I(formula) in homebrew parlance) location is prefixed relative to the actual path of I(brew) command,
               providing an alternative I(brew) path enables managing different set of packages in an alternative location in the system."
         default: '/usr/local/bin'
+        type: path
     state:
         description:
-            - state of the package
-        choices: [ 'head', 'latest', 'present', 'absent', 'linked', 'unlinked' ]
+            - state of the package.
+        choices: [ 'absent', 'head', 'installed', 'latest', 'linked', 'present', 'removed', 'uninstalled', 'unlinked', 'upgraded' ]
         default: present
+        type: str
     update_homebrew:
         description:
-            - update homebrew itself first
+            - update homebrew itself first.
         type: bool
         default: 'no'
         aliases: ['update-brew']
     upgrade_all:
         description:
-            - upgrade all homebrew packages
+            - upgrade all homebrew packages.
         type: bool
         default: 'no'
         aliases: ['upgrade']
     install_options:
         description:
-            - options flags to install a package
+            - options flags to install a package.
         aliases: ['options']
+        type: list
+        elements: str
 notes:
   - When used with a `loop:` each package will be processed individually,
     it is much more efficient to pass the list directly to the `name` option.
@@ -852,6 +856,7 @@ def main():
                 default=None,
                 aliases=['options'],
                 type='list',
+                elements='str',
             )
         ),
         supports_check_mode=True,
