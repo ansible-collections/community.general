@@ -56,6 +56,7 @@ ansible-galaxy -vvv collection install cisco.aci
 ansible-galaxy -vvv collection install google.cloud
 ansible-galaxy -vvv collection install community.kubernetes
 ansible-galaxy -vvv collection install f5networks.f5_modules
+ansible-galaxy -vvv collection install check_point.mgmt
 
 # Needed until https://github.com/ansible/ansible/issues/68415 is fixed:
 chmod -R a+rX "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections"
