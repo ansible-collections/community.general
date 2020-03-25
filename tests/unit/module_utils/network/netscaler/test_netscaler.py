@@ -21,7 +21,8 @@ from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import Mock
 
 
-from ansible_collections.community.general.plugins.module_utils.network.netscaler.netscaler import ConfigProxy, get_immutables_intersection, ensure_feature_is_enabled, log, loglines
+from ansible_collections.community.general.plugins.module_utils.network.netscaler.netscaler import (ConfigProxy, get_immutables_intersection,
+                                                                                                    ensure_feature_is_enabled, log, loglines)
 
 
 class TestNetscalerConfigProxy(unittest.TestCase):

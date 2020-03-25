@@ -22,7 +22,7 @@ author:
     - Nathan Swartz (@ndswartz)
 description: Create, update or destroy host groups on a NetApp E-Series storage array.
 extends_documentation_fragment:
-- netapp.ontap.netapp.eseries
+- community.general.netapp.eseries
 
 options:
     state:

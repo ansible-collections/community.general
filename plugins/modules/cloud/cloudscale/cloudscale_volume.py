@@ -172,8 +172,8 @@ tags:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.cloudscale import (AnsibleCloudscaleBase,
-                                             cloudscale_argument_spec,
-                                             )
+                                                                                   cloudscale_argument_spec,
+                                                                                   )
 
 
 class AnsibleCloudscaleVolume(AnsibleCloudscaleBase):

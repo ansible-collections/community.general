@@ -148,8 +148,8 @@ project:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.cloudstack import (AnsibleCloudStack,
-                                             cs_argument_spec,
-                                             cs_required_together)
+                                                                                   cs_argument_spec,
+                                                                                   cs_required_together)
 
 
 class AnsibleCloudStackInstanceNic(AnsibleCloudStack):

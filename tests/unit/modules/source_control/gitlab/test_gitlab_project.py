@@ -19,9 +19,9 @@ def _dummy(x):
 pytestmark = []
 try:
     from .gitlab import (GitlabModuleTestCase,
-                        python_version_match_requirement,
-                        resp_get_group, resp_get_project_by_name, resp_create_project,
-                        resp_get_project, resp_delete_project, resp_get_user)
+                         python_version_match_requirement,
+                         resp_get_group, resp_get_project_by_name, resp_create_project,
+                         resp_get_project, resp_delete_project, resp_get_user)
 
     # GitLab module requirements
     if python_version_match_requirement():
