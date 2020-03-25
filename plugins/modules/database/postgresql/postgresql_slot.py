@@ -192,19 +192,19 @@ class PgSlot(object):
 
             self.changed = exec_sql(self, query,
                                     query_params={'name': self.name, 'i_reserve': immediately_reserve},
-                                    ddl=True)
+                                    return_bool=True)
 
         elif kind == 'logical':
             query = "SELECT pg_create_logical_replication_slot(%(name)s, %(o_plugin)s)"
             self.changed = exec_sql(self, query,
-                                    query_params={'name': self.name, 'o_plugin': output_plugin}, ddl=True)
+                                    query_params={'name': self.name, 'o_plugin': output_plugin}, return_bool=True)
 
     def drop(self):
         if not self.exists:
             return False
 
         query = "SELECT pg_drop_replication_slot(%(name)s)"
-        self.changed = exec_sql(self, query, query_params={'name': self.name}, ddl=True)
+        self.changed = exec_sql(self, query, query_params={'name': self.name}, return_bool=True)
 
     def __slot_exists(self):
         query = "SELECT slot_type FROM pg_replication_slots WHERE slot_name = %(name)s"

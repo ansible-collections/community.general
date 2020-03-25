@@ -253,7 +253,7 @@ class PgCopyData(object):
             if self.changed:
                 self.executed_queries.append(' '.join(query_fragments))
         else:
-            if exec_sql(self, ' '.join(query_fragments), ddl=True):
+            if exec_sql(self, ' '.join(query_fragments), return_bool=True):
                 self.changed = True
 
     def copy_to(self):
@@ -288,7 +288,7 @@ class PgCopyData(object):
             if self.changed:
                 self.executed_queries.append(' '.join(query_fragments))
         else:
-            if exec_sql(self, ' '.join(query_fragments), ddl=True):
+            if exec_sql(self, ' '.join(query_fragments), return_bool=True):
                 self.changed = True
 
     def __transform_options(self):

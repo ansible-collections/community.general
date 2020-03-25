@@ -287,14 +287,14 @@ class PgTablespace(object):
             location (str) -- tablespace directory path in the FS
         """
         query = ("CREATE TABLESPACE %s LOCATION '%s'" % (pg_quote_identifier(self.name, 'database'), location))
-        return exec_sql(self, query, ddl=True)
+        return exec_sql(self, query, return_bool=True)
 
     def drop(self):
         """Drop tablespace.
 
         Return True if success, otherwise, return False.
         """
-        return exec_sql(self, "DROP TABLESPACE %s" % pg_quote_identifier(self.name, 'database'), ddl=True)
+        return exec_sql(self, "DROP TABLESPACE %s" % pg_quote_identifier(self.name, 'database'), return_bool=True)
 
     def set_owner(self, new_owner):
         """Set tablespace owner.
@@ -308,7 +308,7 @@ class PgTablespace(object):
             return False
 
         query = "ALTER TABLESPACE %s OWNER TO %s" % (pg_quote_identifier(self.name, 'database'), new_owner)
-        return exec_sql(self, query, ddl=True)
+        return exec_sql(self, query, return_bool=True)
 
     def rename(self, newname):
         """Rename tablespace.
@@ -320,7 +320,7 @@ class PgTablespace(object):
         """
         query = "ALTER TABLESPACE %s RENAME TO %s" % (pg_quote_identifier(self.name, 'database'), newname)
         self.new_name = newname
-        return exec_sql(self, query, ddl=True)
+        return exec_sql(self, query, return_bool=True)
 
     def set_settings(self, new_settings):
         """Set tablespace settings (options).
@@ -358,7 +358,7 @@ class PgTablespace(object):
             setting (str) -- string in format "setting_name = 'setting_value'"
         """
         query = "ALTER TABLESPACE %s RESET (%s)" % (pg_quote_identifier(self.name, 'database'), setting)
-        return exec_sql(self, query, ddl=True)
+        return exec_sql(self, query, return_bool=True)
 
     def __set_setting(self, setting):
         """Set tablespace setting.
@@ -369,7 +369,7 @@ class PgTablespace(object):
             setting (str) -- string in format "setting_name = 'setting_value'"
         """
         query = "ALTER TABLESPACE %s SET (%s)" % (pg_quote_identifier(self.name, 'database'), setting)
-        return exec_sql(self, query, ddl=True)
+        return exec_sql(self, query, return_bool=True)
 
 
 # ===========================================
