@@ -26,10 +26,24 @@ fi
 command -v python
 python -V
 
+function retry
+{
+    for repetition in 1 2 3; do
+        "$@"
+        result=$?
+        if [ ${result} == 0 ]; then
+            return ${result}
+        fi
+        echo "$@ -> ${result}"
+    done
+    echo "Command '$@' failed 3 times!"
+    exit -1
+}
+
 command -v pip
 pip --version
 pip list --disable-pip-version-check
-pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
 
 export ANSIBLE_COLLECTIONS_PATHS="${HOME}/.ansible"
 SHIPPABLE_RESULT_DIR="$(pwd)/shippable"
@@ -39,23 +53,23 @@ cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
 cd "${TEST_DIR}"
 
 # STAR: HACK install dependencies
-ansible-galaxy -vvv collection install ansible.posix
-ansible-galaxy -vvv collection install community.crypto
-ansible-galaxy -vvv collection install ansible.netcommon
-ansible-galaxy -vvv collection install ovirt.ovirt_collection
-ansible-galaxy -vvv collection install cisco.mso
-ansible-galaxy -vvv collection install cisco.intersight
-ansible-galaxy -vvv collection install check_point.mgmt
-ansible-galaxy -vvv collection install community.kubernetes
-ansible-galaxy -vvv collection install f5networks.f5_modules
-ansible-galaxy -vvv collection install fortinet.fortios
-ansible-galaxy -vvv collection install cisco.aci
-ansible-galaxy -vvv collection install google.cloud
-ansible-galaxy -vvv collection install netapp.ontap
+retry ansible-galaxy -vvv collection install ansible.posix
+retry ansible-galaxy -vvv collection install community.crypto
+retry ansible-galaxy -vvv collection install ansible.netcommon
+retry ansible-galaxy -vvv collection install ovirt.ovirt_collection
+retry ansible-galaxy -vvv collection install cisco.mso
+retry ansible-galaxy -vvv collection install cisco.intersight
+retry ansible-galaxy -vvv collection install check_point.mgmt
+retry ansible-galaxy -vvv collection install community.kubernetes
+retry ansible-galaxy -vvv collection install f5networks.f5_modules
+retry ansible-galaxy -vvv collection install fortinet.fortios
+retry ansible-galaxy -vvv collection install cisco.aci
+retry ansible-galaxy -vvv collection install google.cloud
+retry ansible-galaxy -vvv collection install netapp.ontap
 
 # unit tests
-ansible-galaxy -vvv collection install cisco.meraki
-ansible-galaxy -vvv collection install junipernetworks.junos
+retry ansible-galaxy -vvv collection install cisco.meraki
+retry ansible-galaxy -vvv collection install junipernetworks.junos
 
 # END: HACK
 
