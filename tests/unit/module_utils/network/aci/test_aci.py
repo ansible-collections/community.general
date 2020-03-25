@@ -9,7 +9,7 @@ __metaclass__ = type
 import sys
 
 from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.cisco.aci.plugins.module_utils.network.aci.aci import ACIModule
+from ansible_collections.cisco.aci.plugins.module_utils.aci import ACIModule
 from ansible.module_utils.six import PY2
 from ansible.module_utils._text import to_native
 
