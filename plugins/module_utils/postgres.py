@@ -122,13 +122,12 @@ def connect_to_db(module, conn_params, autocommit=False, fail_on_conn=True):
     return db_connection
 
 
-def exec_sql(obj, query, query_params=None, ddl=False, add_to_executed=True, dont_exec=False):
+def exec_sql(obj, query, query_params=None, return_bool=False, add_to_executed=True, dont_exec=False):
     """Execute SQL.
 
     Auxiliary function for PostgreSQL user classes.
 
-    Returns a query result if possible or True/False if ddl=True arg was passed.
-    It necessary for statements that don't return any result (like DDL queries).
+    Returns a query result if possible or a boolean value.
 
     Args:
         obj (obj) -- must be an object of a user class.
@@ -139,8 +138,8 @@ def exec_sql(obj, query, query_params=None, ddl=False, add_to_executed=True, don
     Kwargs:
         query_params (dict or tuple) -- Query parameters to prevent SQL injections,
             could be a dict or tuple
-        ddl (bool) -- must return True or False instead of rows (typical for DDL queries)
-            (default False)
+        return_bool (bool) -- return True instead of rows if a query was successfully executed.
+            It's necessary for statements that don't return any result like DDL queries (default False).
         add_to_executed (bool) -- append the query to obj.executed_queries attribute
         dont_exec (bool) -- used with add_to_executed=True to generate a query, add it
             to obj.executed_queries list and return True (default False)
@@ -167,7 +166,7 @@ def exec_sql(obj, query, query_params=None, ddl=False, add_to_executed=True, don
             else:
                 obj.executed_queries.append(query)
 
-        if not ddl:
+        if not return_bool:
             res = obj.cursor.fetchall()
             return res
         return True
@@ -246,7 +245,7 @@ class PgMembership(object):
                     continue
 
                 query = 'GRANT "%s" TO "%s"' % (group, role)
-                self.changed = exec_sql(self, query, ddl=True)
+                self.changed = exec_sql(self, query, return_bool=True)
 
                 if self.changed:
                     self.granted[group].append(role)
@@ -263,7 +262,7 @@ class PgMembership(object):
                     continue
 
                 query = 'REVOKE "%s" FROM "%s"' % (group, role)
-                self.changed = exec_sql(self, query, ddl=True)
+                self.changed = exec_sql(self, query, return_bool=True)
 
                 if self.changed:
                     self.revoked[group].append(role)
