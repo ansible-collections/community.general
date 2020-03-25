@@ -124,8 +124,8 @@ unit-information:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 from ansible_collections.community.general.plugins.module_utils.network.ingate.common import (ingate_argument_spec,
-                                                        ingate_create_client,
-                                                        is_ingatesdk_installed)
+                                                                                              ingate_create_client,
+                                                                                              is_ingatesdk_installed)
 
 try:
     from ingate import ingatesdk

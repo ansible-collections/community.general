@@ -158,7 +158,8 @@ class TestInterfacesFileModule(unittest.TestCase):
                 fail_json_iterations = []
                 for i, options in enumerate(options_list):
                     try:
-                        dummy, lines = interfaces_file.setInterfaceOption(module, lines, options['iface'], options['option'], options['value'], options['state'])
+                        dummy, lines = interfaces_file.setInterfaceOption(module, lines, options['iface'], options['option'],
+                                                                          options['value'], options['state'])
                     except AnsibleFailJson as e:
                         fail_json_iterations.append("[%d] fail_json message: %s\noptions:\n%s" %
                                                     (i, str(e), json.dumps(options, sort_keys=True, indent=4, separators=(',', ': '))))

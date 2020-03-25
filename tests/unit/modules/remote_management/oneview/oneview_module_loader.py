@@ -11,9 +11,9 @@ sys.modules['hpOneView.oneview_client'] = Mock()
 
 ONEVIEW_MODULE_UTILS_PATH = 'ansible_collections.community.general.plugins.module_utils.oneview'
 from ansible_collections.community.general.plugins.module_utils.oneview import (OneViewModuleException,
-                                          OneViewModuleTaskError,
-                                          OneViewModuleResourceNotFound,
-                                          OneViewModuleBase)
+                                                                                OneViewModuleTaskError,
+                                                                                OneViewModuleResourceNotFound,
+                                                                                OneViewModuleBase)
 
 from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_ethernet_network import EthernetNetworkModule
 from ansible_collections.community.general.plugins.modules.remote_management.oneview.oneview_ethernet_network_info import EthernetNetworkInfoModule

@@ -19,7 +19,7 @@ description:
     - Allow the syslog settings to be configured for an individual E-Series storage-system
 author: Nathan Swartz (@ndswartz)
 extends_documentation_fragment:
-- netapp.ontap.netapp.eseries
+- community.general.netapp.eseries
 
 options:
     state:

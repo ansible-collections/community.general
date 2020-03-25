@@ -409,7 +409,7 @@ download:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.network.ingate.common import (ingate_argument_spec,
-                                                        ingate_create_client)
+                                                                                              ingate_create_client)
 
 try:
     from ingate import ingatesdk

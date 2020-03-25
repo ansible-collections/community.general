@@ -71,10 +71,10 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.rax import (rax_argument_spec,
-                                      rax_required_together,
-                                      rax_to_dict,
-                                      setup_rax_module,
-                                      )
+                                                                            rax_required_together,
+                                                                            rax_to_dict,
+                                                                            setup_rax_module,
+                                                                            )
 
 
 def rax_dns(module, comment, email, name, state, ttl):

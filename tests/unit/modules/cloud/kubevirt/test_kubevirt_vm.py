@@ -3,7 +3,7 @@ import pytest
 openshiftdynamic = pytest.importorskip("openshift.dynamic")
 
 from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
-from ansible_collections.community.general.tests.unit.utils.kubevirt_fixtures import base_fixture, RESOURCE_DEFAULT_ARGS, AnsibleExitJson
+from .kubevirt_fixtures import base_fixture, RESOURCE_DEFAULT_ARGS, AnsibleExitJson
 
 from ansible_collections.community.general.plugins.module_utils.kubevirt import KubeVirtRawModule
 from ansible_collections.community.general.plugins.modules.cloud.kubevirt import kubevirt_vm as mymodule

@@ -20,7 +20,7 @@ deprecated:
   alternative: please use M(na_elementsw_snapshot_schedule)
 short_description: Manage SolidFire snapshot schedules
 extends_documentation_fragment:
-- netapp.ontap.netapp.solidfire
+- community.general.netapp.solidfire
 
 author: Sumit Kumar (@timuster) <sumit4@netapp.com>
 description:

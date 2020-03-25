@@ -19,7 +19,7 @@ __metaclass__ = type
 
 import os
 import json
-from ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager import FortiManagerHandler
+from ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager import FortiManagerHandler
 import pytest
 
 try:
@@ -63,7 +63,7 @@ fmg_instance = FortiManagerHandler(connection_mock, module_mock)
 
 
 def test_get_devprof(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
     #  Fixture sets used:###########################
 
@@ -771,7 +771,7 @@ def test_get_devprof(fixture_data, mocker):
 
 
 def test_set_devprof(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
     #  Fixture sets used:###########################
 
@@ -849,7 +849,7 @@ def test_set_devprof(fixture_data, mocker):
 
 
 def test_set_devprof_scope(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
     #  Fixture sets used:###########################
 
@@ -927,7 +927,7 @@ def test_set_devprof_scope(fixture_data, mocker):
 
 
 def test_set_devprof_snmp(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
     #  Fixture sets used:###########################
 
@@ -1145,7 +1145,7 @@ def test_set_devprof_snmp(fixture_data, mocker):
 
 
 def test_set_devprof_snmp_v2c(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
     #  Fixture sets used:###########################
 
@@ -1223,7 +1223,7 @@ def test_set_devprof_snmp_v2c(fixture_data, mocker):
 
 
 def test_set_devprof_snmp_v3(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
     #  Fixture sets used:###########################
 
@@ -1301,7 +1301,7 @@ def test_set_devprof_snmp_v3(fixture_data, mocker):
 
 
 def test_set_devprof_syslog(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
     #  Fixture sets used:###########################
 
@@ -1379,7 +1379,7 @@ def test_set_devprof_syslog(fixture_data, mocker):
 
 
 def test_set_devprof_ntp(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
     #  Fixture sets used:###########################
 
@@ -1527,7 +1527,7 @@ def test_set_devprof_ntp(fixture_data, mocker):
 
 
 def test_set_devprof_admin(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
     #  Fixture sets used:###########################
 
@@ -1605,7 +1605,7 @@ def test_set_devprof_admin(fixture_data, mocker):
 
 
 def test_set_devprof_smtp(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
     #  Fixture sets used:###########################
 
@@ -1683,7 +1683,7 @@ def test_set_devprof_smtp(fixture_data, mocker):
 
 
 def test_set_devprof_dns(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
     #  Fixture sets used:###########################
 
