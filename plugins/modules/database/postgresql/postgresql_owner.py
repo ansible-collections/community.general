@@ -231,7 +231,7 @@ class PgOwnership(object):
         query.append('TO %s' % pg_quote_identifier(self.role, 'role'))
         query = ' '.join(query)
 
-        self.changed = exec_sql(self, query, ddl=True)
+        self.changed = exec_sql(self, query, return_bool=True)
 
     def set_owner(self, obj_type, obj_name):
         """Change owner of a database object.
@@ -325,49 +325,49 @@ class PgOwnership(object):
         """Set the database owner."""
         query = "ALTER DATABASE %s OWNER TO %s" % (pg_quote_identifier(self.obj_name, 'database'),
                                                    pg_quote_identifier(self.role, 'role'))
-        self.changed = exec_sql(self, query, ddl=True)
+        self.changed = exec_sql(self, query, return_bool=True)
 
     def __set_func_owner(self):
         """Set the function owner."""
         query = "ALTER FUNCTION %s OWNER TO %s" % (self.obj_name,
                                                    pg_quote_identifier(self.role, 'role'))
-        self.changed = exec_sql(self, query, ddl=True)
+        self.changed = exec_sql(self, query, return_bool=True)
 
     def __set_seq_owner(self):
         """Set the sequence owner."""
         query = "ALTER SEQUENCE %s OWNER TO %s" % (pg_quote_identifier(self.obj_name, 'table'),
                                                    pg_quote_identifier(self.role, 'role'))
-        self.changed = exec_sql(self, query, ddl=True)
+        self.changed = exec_sql(self, query, return_bool=True)
 
     def __set_schema_owner(self):
         """Set the schema owner."""
         query = "ALTER SCHEMA %s OWNER TO %s" % (pg_quote_identifier(self.obj_name, 'schema'),
                                                  pg_quote_identifier(self.role, 'role'))
-        self.changed = exec_sql(self, query, ddl=True)
+        self.changed = exec_sql(self, query, return_bool=True)
 
     def __set_table_owner(self):
         """Set the table owner."""
         query = "ALTER TABLE %s OWNER TO %s" % (pg_quote_identifier(self.obj_name, 'table'),
                                                 pg_quote_identifier(self.role, 'role'))
-        self.changed = exec_sql(self, query, ddl=True)
+        self.changed = exec_sql(self, query, return_bool=True)
 
     def __set_tablespace_owner(self):
         """Set the tablespace owner."""
         query = "ALTER TABLESPACE %s OWNER TO %s" % (pg_quote_identifier(self.obj_name, 'database'),
                                                      pg_quote_identifier(self.role, 'role'))
-        self.changed = exec_sql(self, query, ddl=True)
+        self.changed = exec_sql(self, query, return_bool=True)
 
     def __set_view_owner(self):
         """Set the view owner."""
         query = "ALTER VIEW %s OWNER TO %s" % (pg_quote_identifier(self.obj_name, 'table'),
                                                pg_quote_identifier(self.role, 'role'))
-        self.changed = exec_sql(self, query, ddl=True)
+        self.changed = exec_sql(self, query, return_bool=True)
 
     def __set_mat_view_owner(self):
         """Set the materialized view owner."""
         query = "ALTER MATERIALIZED VIEW %s OWNER TO %s" % (pg_quote_identifier(self.obj_name, 'table'),
                                                             pg_quote_identifier(self.role, 'role'))
-        self.changed = exec_sql(self, query, ddl=True)
+        self.changed = exec_sql(self, query, return_bool=True)
 
     def __role_exists(self, role):
         """Return True if role exists, otherwise return False."""

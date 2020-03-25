@@ -411,7 +411,7 @@ class Index(object):
 
         self.executed_query = query
 
-        if exec_sql(self, query, ddl=True, add_to_executed=False):
+        if exec_sql(self, query, return_bool=True, add_to_executed=False):
             return True
 
         return False
@@ -447,7 +447,7 @@ class Index(object):
 
         self.executed_query = query
 
-        if exec_sql(self, query, ddl=True, add_to_executed=False):
+        if exec_sql(self, query, return_bool=True, add_to_executed=False):
             return True
 
         return False
