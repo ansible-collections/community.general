@@ -19,7 +19,7 @@ description:
     - Allow the auto-support settings to be configured for an individual E-Series storage-system
 author: Michael Price (@lmprice)
 extends_documentation_fragment:
-- netapp.ontap.netapp.eseries
+- community.general.netapp.eseries
 
 options:
     state:
