@@ -49,13 +49,17 @@ class TestOmeDeviceInfo(object):
 
     @pytest.fixture
     def get_device_identifier_map_mock(self, mocker):
-        response_class_mock = mocker.patch('ansible_collections.community.general.plugins.modules.remote_management.dellemc.ome_device_info._get_device_identifier_map')
+        response_class_mock = mocker.patch(
+            'ansible_collections.community.general.plugins.modules.remote_management.dellemc.ome_device_info._get_device_identifier_map'
+        )
         response_class_mock.return_value = resource_detailed_inventory
         return response_class_mock.return_value
 
     @pytest.fixture
     def get_resource_parameters_mock(self, mocker):
-        response_class_mock = mocker.patch('ansible_collections.community.general.plugins.modules.remote_management.dellemc.ome_device_info._get_resource_parameters')
+        response_class_mock = mocker.patch(
+            'ansible_collections.community.general.plugins.modules.remote_management.dellemc.ome_device_info._get_resource_parameters'
+        )
         return response_class_mock
 
     def test_main_basic_inventory_success_case(self, module_mock, validate_inputs_mock, connection_mock, get_resource_parameters_mock, response_mock):
@@ -143,7 +147,9 @@ class TestOmeDeviceInfo(object):
 
     @pytest.mark.parametrize("module_params", params)
     def test_get_device_identifier_map(self, module_params, connection_mock, mocker):
-        get_device_id_from_service_tags_mock = mocker.patch('ansible_collections.community.general.plugins.modules.remote_management.dellemc.ome_device_info._get_device_id_from_service_tags')
+        get_device_id_from_service_tags_mock = mocker.patch(
+            'ansible_collections.community.general.plugins.modules.remote_management.dellemc.ome_device_info._get_device_id_from_service_tags'
+        )
         get_device_id_from_service_tags_mock.return_value = None
         res = self.module._get_device_identifier_map(module_params, connection_mock)
         assert isinstance(res, dict)
