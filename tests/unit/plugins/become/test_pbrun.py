@@ -31,8 +31,8 @@ def test_pbrun(mocker, parser, reset_cli_args):
 
     play_context.become = True
     play_context.become_user = 'foo'
-    play_context.set_become_plugin(become_loader.get('pbrun'))
-    play_context.become_method = 'pbrun'
+    play_context.set_become_plugin(become_loader.get('community.general.pbrun'))
+    play_context.become_method = 'community.general.pbrun'
     play_context.become_flags = pbrun_flags
     cmd = play_context.make_become_cmd(cmd=default_cmd, executable=default_exe)
     assert re.match("""%s %s -u %s 'echo %s; %s'""" % (pbrun_exe, pbrun_flags, play_context.become_user,

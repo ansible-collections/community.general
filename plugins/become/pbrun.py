@@ -93,7 +93,15 @@ class BecomeModule(BecomeBase):
         if not cmd:
             return cmd
 
-        become_exe = self.get_option('become_exe') or self.name
+        become_exe = self.get_option('become_exe')
+        if not become_exe or become_exe == self.name:
+            # HACK! Ansible's playbook/play_context.py initializes the become_exe
+            # with the become method's name if it is not explicitly specified.
+            # Since in the community.general collection that name is prefixed with
+            # `community.general.`, we have to check for that default and replace
+            # it with the "short name" of the become plugin.
+            become_exe = 'pbrun'
+
         flags = self.get_option('become_flags') or ''
         user = self.get_option('become_user') or ''
         if user:

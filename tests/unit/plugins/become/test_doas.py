@@ -31,8 +31,8 @@ def test_doas(mocker, parser, reset_cli_args):
 
     play_context.become = True
     play_context.become_user = 'foo'
-    play_context.set_become_plugin(become_loader.get('doas'))
-    play_context.become_method = 'doas'
+    play_context.set_become_plugin(become_loader.get('community.general.doas'))
+    play_context.become_method = 'community.general.doas'
     play_context.become_flags = doas_flags
     cmd = play_context.make_become_cmd(cmd=default_cmd, executable=default_exe)
     assert (re.match("""%s %s -u %s %s -c 'echo %s; %s'""" % (doas_exe, doas_flags, play_context.become_user, default_exe, success,

@@ -31,8 +31,8 @@ def test_ksu(mocker, parser, reset_cli_args):
 
     play_context.become = True
     play_context.become_user = 'foo'
-    play_context.set_become_plugin(become_loader.get('ksu'))
-    play_context.become_method = 'ksu'
+    play_context.set_become_plugin(become_loader.get('community.general.ksu'))
+    play_context.become_method = 'community.general.ksu'
     play_context.become_flags = ksu_flags
     cmd = play_context.make_become_cmd(cmd=default_cmd, executable=default_exe)
     assert (re.match("""%s %s %s -e %s -c 'echo %s; %s'""" % (ksu_exe, play_context.become_user, ksu_flags,
