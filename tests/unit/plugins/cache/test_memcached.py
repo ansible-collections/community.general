@@ -32,4 +32,4 @@ def test_memcached_cachemodule():
 
 
 def test_memcached_cachemodule_with_loader():
-    assert isinstance(cache_loader.get('memcached'), MemcachedCache)
+    assert isinstance(cache_loader.get('community.general.memcached'), MemcachedCache)

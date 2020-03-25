@@ -65,7 +65,7 @@ def super_switcher(scope="function", autouse=True):
 
 
 def test_lookup_multiple_obj(dummy_credentials):
-    avi_lookup = lookup_loader.get('avi')
+    avi_lookup = lookup_loader.get('community.general.avi')
     avi_mock = MagicMock()
     avi_mock.return_value.get.return_value.json.return_value = data["mock_multiple_obj"]
     with patch.object(avi, 'ApiSession', avi_mock):
@@ -75,7 +75,7 @@ def test_lookup_multiple_obj(dummy_credentials):
 
 
 def test_lookup_single_obj(dummy_credentials):
-    avi_lookup = lookup_loader.get('avi')
+    avi_lookup = lookup_loader.get('community.general.avi')
     avi_mock = MagicMock()
     avi_mock.return_value.get_object_by_name.return_value = data["mock_single_obj"]
     with patch.object(avi, 'ApiSession', avi_mock):
@@ -85,7 +85,7 @@ def test_lookup_single_obj(dummy_credentials):
 
 
 def test_invalid_lookup(dummy_credentials):
-    avi_lookup = lookup_loader.get('avi')
+    avi_lookup = lookup_loader.get('community.general.avi')
     avi_mock = MagicMock()
     with pytest.raises(AnsibleError):
         with patch.object(avi, 'ApiSession', avi_mock):
