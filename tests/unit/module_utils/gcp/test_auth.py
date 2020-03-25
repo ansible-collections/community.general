@@ -21,8 +21,8 @@ import pytest
 
 from ansible_collections.community.general.tests.unit.compat import mock, unittest
 from ansible_collections.community.general.plugins.module_utils.gcp import (_get_gcp_ansible_credentials, _get_gcp_credentials, _get_gcp_environ_var,
-                                      _get_gcp_environment_credentials,
-                                      _validate_credentials_file)
+                                                                            _get_gcp_environment_credentials,
+                                                                            _validate_credentials_file)
 
 # Fake data/function used for testing
 fake_env_data = {'GCE_EMAIL': 'gce-email'}

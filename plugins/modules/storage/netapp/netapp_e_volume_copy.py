@@ -20,7 +20,7 @@ description:
     - Create and delete snapshots images on volume groups for NetApp E-series storage arrays.
 author: Kevin Hulquest (@hulquest)
 extends_documentation_fragment:
-- netapp.ontap.netapp.eseries
+- community.general.netapp.eseries
 
 options:
     api_username:

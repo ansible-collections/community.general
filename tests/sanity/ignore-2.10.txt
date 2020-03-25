@@ -3502,8 +3502,6 @@ tests/unit/module_utils/hwc/test_dict_comparison.py future-import-boilerplate
 tests/unit/module_utils/hwc/test_dict_comparison.py metaclass-boilerplate
 tests/unit/module_utils/hwc/test_hwc_utils.py future-import-boilerplate
 tests/unit/module_utils/hwc/test_hwc_utils.py metaclass-boilerplate
-tests/unit/module_utils/net_tools/netbox/test_netbox_utils.py future-import-boilerplate
-tests/unit/module_utils/net_tools/netbox/test_netbox_utils.py metaclass-boilerplate
 tests/unit/module_utils/network/avi/test_avi_api_utils.py future-import-boilerplate
 tests/unit/module_utils/network/avi/test_avi_api_utils.py metaclass-boilerplate
 tests/unit/module_utils/network/ftd/test_common.py future-import-boilerplate
