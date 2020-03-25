@@ -419,7 +419,7 @@ class Sequence(object):
         if self.module.params.get('cycle'):
             query.append('CYCLE')
 
-        return exec_sql(self, ' '.join(query), ddl=True)
+        return exec_sql(self, ' '.join(query), return_bool=True)
 
     def drop(self):
         """Implements DROP SEQUENCE command behavior."""
@@ -429,7 +429,7 @@ class Sequence(object):
         if self.module.params.get('cascade'):
             query.append('CASCADE')
 
-        return exec_sql(self, ' '.join(query), ddl=True)
+        return exec_sql(self, ' '.join(query), return_bool=True)
 
     def rename(self):
         """Implements ALTER SEQUENCE RENAME TO command behavior."""
@@ -437,7 +437,7 @@ class Sequence(object):
         query.append(self.__add_schema())
         query.append('RENAME TO %s' % pg_quote_identifier(self.module.params['rename_to'], 'sequence'))
 
-        return exec_sql(self, ' '.join(query), ddl=True)
+        return exec_sql(self, ' '.join(query), return_bool=True)
 
     def set_owner(self):
         """Implements ALTER SEQUENCE OWNER TO command behavior."""
@@ -445,7 +445,7 @@ class Sequence(object):
         query.append(self.__add_schema())
         query.append('OWNER TO %s' % pg_quote_identifier(self.module.params['owner'], 'role'))
 
-        return exec_sql(self, ' '.join(query), ddl=True)
+        return exec_sql(self, ' '.join(query), return_bool=True)
 
     def set_schema(self):
         """Implements ALTER SEQUENCE SET SCHEMA command behavior."""
@@ -453,7 +453,7 @@ class Sequence(object):
         query.append(self.__add_schema())
         query.append('SET SCHEMA %s' % pg_quote_identifier(self.module.params['newschema'], 'schema'))
 
-        return exec_sql(self, ' '.join(query), ddl=True)
+        return exec_sql(self, ' '.join(query), return_bool=True)
 
     def __add_schema(self):
         return '.'.join([pg_quote_identifier(self.schema, 'schema'),
