@@ -19,7 +19,7 @@ description:
     - This module allows an e-series storage system owner to set audit-log configuration parameters.
 author: Nathan Swartz (@ndswartz)
 extends_documentation_fragment:
-- netapp.ontap.netapp.eseries
+- community.general.netapp.eseries
 
 options:
     max_records:
