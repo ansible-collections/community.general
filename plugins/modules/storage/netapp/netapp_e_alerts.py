@@ -20,7 +20,7 @@ description:
     - This module will allow the owner of the system to specify email recipients for these messages.
 author: Michael Price (@lmprice)
 extends_documentation_fragment:
-- netapp.ontap.netapp.eseries
+- community.general.netapp.eseries
 
 options:
     state:

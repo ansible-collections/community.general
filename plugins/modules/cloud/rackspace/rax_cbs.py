@@ -105,7 +105,7 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.rax import (VOLUME_STATUS, rax_argument_spec, rax_find_image, rax_find_volume,
-                                      rax_required_together, rax_to_dict, setup_rax_module)
+                                                                            rax_required_together, rax_to_dict, setup_rax_module)
 
 
 def cloud_block_storage(module, state, name, description, meta, size,

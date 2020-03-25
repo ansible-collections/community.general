@@ -20,7 +20,7 @@ __metaclass__ = type
 
 import os
 import json
-from ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager import FortiManagerHandler
+from ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager import FortiManagerHandler
 import pytest
 
 try:
@@ -62,7 +62,7 @@ fmg_instance = FortiManagerHandler(connection_mock, module_mock)
 
 
 def test_fmgr_fwpol_package(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
 
     # Test using fixture 1 #
@@ -80,7 +80,7 @@ def test_fmgr_fwpol_package(fixture_data, mocker):
 
 
 def test_fmgr_fwpol_package_folder(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
 
     # Test using fixture 1 #

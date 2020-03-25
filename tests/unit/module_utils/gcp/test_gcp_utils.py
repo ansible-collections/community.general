@@ -17,9 +17,9 @@
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.google.cloud.plugins.module_utils.gcp_utils import (GcpRequest,
-                                            navigate_hash,
-                                            remove_nones_from_dict,
-                                            replace_resource_dict)
+                                                                             navigate_hash,
+                                                                             remove_nones_from_dict,
+                                                                             replace_resource_dict)
 
 
 class ReplaceResourceDictTestCase(unittest.TestCase):

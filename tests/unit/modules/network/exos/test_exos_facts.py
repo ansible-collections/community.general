@@ -39,7 +39,8 @@ class TestExosFactsModule(TestExosModule):
         self.mock_run_commands = patch('ansible_collections.community.general.plugins.module_utils.network.exos.facts.legacy.base.run_commands')
         self.run_commands = self.mock_run_commands.start()
 
-        self.mock_get_resource_connection = patch('ansible_collections.ansible.netcommon.plugins.module_utils.network.common.facts.facts.get_resource_connection')
+        self.mock_get_resource_connection = patch('ansible_collections.ansible.netcommon.plugins.module_utils.network.'
+                                                  'common.facts.facts.get_resource_connection')
         self.get_resource_connection = self.mock_get_resource_connection.start()
 
     def tearDown(self):
