@@ -562,7 +562,7 @@ class PgPublication():
             self.executed_queries.append(query)
             return True
         else:
-            return exec_sql(self, query, ddl=True)
+            return exec_sql(self, query, return_bool=True)
 
 
 # ===========================================

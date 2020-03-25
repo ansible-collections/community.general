@@ -367,7 +367,7 @@ class Table(object):
         if tblspace:
             query += " TABLESPACE %s" % pg_quote_identifier(tblspace, 'database')
 
-        if exec_sql(self, query, ddl=True):
+        if exec_sql(self, query, return_bool=True):
             changed = True
 
         if owner:
@@ -414,7 +414,7 @@ class Table(object):
         if tblspace:
             query += " TABLESPACE %s" % pg_quote_identifier(tblspace, 'database')
 
-        if exec_sql(self, query, ddl=True):
+        if exec_sql(self, query, return_bool=True):
             changed = True
 
         if owner:
@@ -424,17 +424,17 @@ class Table(object):
 
     def truncate(self):
         query = "TRUNCATE TABLE %s" % pg_quote_identifier(self.name, 'table')
-        return exec_sql(self, query, ddl=True)
+        return exec_sql(self, query, return_bool=True)
 
     def rename(self, newname):
         query = "ALTER TABLE %s RENAME TO %s" % (pg_quote_identifier(self.name, 'table'),
                                                  pg_quote_identifier(newname, 'table'))
-        return exec_sql(self, query, ddl=True)
+        return exec_sql(self, query, return_bool=True)
 
     def set_owner(self, username):
         query = "ALTER TABLE %s OWNER TO %s" % (pg_quote_identifier(self.name, 'table'),
                                                 pg_quote_identifier(username, 'role'))
-        return exec_sql(self, query, ddl=True)
+        return exec_sql(self, query, return_bool=True)
 
     def drop(self, cascade=False):
         if not self.exists:
@@ -443,16 +443,16 @@ class Table(object):
         query = "DROP TABLE %s" % pg_quote_identifier(self.name, 'table')
         if cascade:
             query += " CASCADE"
-        return exec_sql(self, query, ddl=True)
+        return exec_sql(self, query, return_bool=True)
 
     def set_tblspace(self, tblspace):
         query = "ALTER TABLE %s SET TABLESPACE %s" % (pg_quote_identifier(self.name, 'table'),
                                                       pg_quote_identifier(tblspace, 'database'))
-        return exec_sql(self, query, ddl=True)
+        return exec_sql(self, query, return_bool=True)
 
     def set_stor_params(self, params):
         query = "ALTER TABLE %s SET (%s)" % (pg_quote_identifier(self.name, 'table'), params)
-        return exec_sql(self, query, ddl=True)
+        return exec_sql(self, query, return_bool=True)
 
 
 # ===========================================
