@@ -213,8 +213,8 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.rax import (FINAL_STATUSES, rax_argument_spec, rax_find_bootable_volume,
-                                      rax_find_image, rax_find_network, rax_find_volume,
-                                      rax_required_together, rax_to_dict, setup_rax_module)
+                                                                            rax_find_image, rax_find_network, rax_find_volume,
+                                                                            rax_required_together, rax_to_dict, setup_rax_module)
 from ansible.module_utils.six.moves import xrange
 from ansible.module_utils.six import string_types
 

@@ -133,12 +133,12 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.rax import (CLB_ALGORITHMS,
-                                      CLB_PROTOCOLS,
-                                      rax_argument_spec,
-                                      rax_required_together,
-                                      rax_to_dict,
-                                      setup_rax_module,
-                                      )
+                                                                            CLB_PROTOCOLS,
+                                                                            rax_argument_spec,
+                                                                            rax_required_together,
+                                                                            rax_to_dict,
+                                                                            setup_rax_module,
+                                                                            )
 
 
 def cloud_load_balancer(module, state, name, meta, algorithm, port, protocol,

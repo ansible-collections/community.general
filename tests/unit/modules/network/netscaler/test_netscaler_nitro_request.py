@@ -215,7 +215,8 @@ class TestNetscalerNitroRequestModule(TestModule):
             nitro_auth_token='##DDASKLFDJ',
         ))
         module_mock = Mock(params=args, from_json=json.loads)
-        with patch('ansible_collections.community.general.plugins.modules.network.netscaler.netscaler_nitro_request.AnsibleModule', Mock(return_value=module_mock)):
+        with patch('ansible_collections.community.general.plugins.modules.network.netscaler.netscaler_nitro_request.AnsibleModule',
+                   Mock(return_value=module_mock)):
             with tempfile.TemporaryFile() as r:
                 actual_body = {
                     'errorcode': 258,
@@ -252,7 +253,8 @@ class TestNetscalerNitroRequestModule(TestModule):
             nitro_auth_token='##DDASKLFDJ',
         ))
         module_mock = Mock(params=args, from_json=json.loads)
-        with patch('ansible_collections.community.general.plugins.modules.network.netscaler.netscaler_nitro_request.AnsibleModule', Mock(return_value=module_mock)):
+        with patch('ansible_collections.community.general.plugins.modules.network.netscaler.netscaler_nitro_request.AnsibleModule',
+                   Mock(return_value=module_mock)):
             with tempfile.TemporaryFile() as r:
                 actual_body = {}
                 r.write(codecs.encode(json.dumps(actual_body), 'utf-8'))
@@ -283,7 +285,8 @@ class TestNetscalerNitroRequestModule(TestModule):
             nitro_pass='nsroot',
         ))
         module_mock = Mock(params=args, from_json=json.loads)
-        with patch('ansible_collections.community.general.plugins.modules.network.netscaler.netscaler_nitro_request.AnsibleModule', Mock(return_value=module_mock)):
+        with patch('ansible_collections.community.general.plugins.modules.network.netscaler.netscaler_nitro_request.AnsibleModule',
+                   Mock(return_value=module_mock)):
             body = {
                 'errorcode': 258,
                 'message': 'Numerical error 258',
@@ -324,7 +327,8 @@ class TestNetscalerNitroRequestModule(TestModule):
             'property2': 'value2',
         }
         module_mock = Mock(params=args, from_json=json.loads)
-        with patch('ansible_collections.community.general.plugins.modules.network.netscaler.netscaler_nitro_request.AnsibleModule', Mock(return_value=module_mock)):
+        with patch('ansible_collections.community.general.plugins.modules.network.netscaler.netscaler_nitro_request.AnsibleModule',
+                   Mock(return_value=module_mock)):
             instance = netscaler_nitro_request.NitroAPICaller()
 
             data = {resource: resource_data}

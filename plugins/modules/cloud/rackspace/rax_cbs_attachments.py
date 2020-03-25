@@ -82,13 +82,13 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.rax import (NON_CALLABLES,
-                                      rax_argument_spec,
-                                      rax_find_server,
-                                      rax_find_volume,
-                                      rax_required_together,
-                                      rax_to_dict,
-                                      setup_rax_module,
-                                      )
+                                                                            rax_argument_spec,
+                                                                            rax_find_server,
+                                                                            rax_find_volume,
+                                                                            rax_required_together,
+                                                                            rax_to_dict,
+                                                                            setup_rax_module,
+                                                                            )
 
 
 def cloud_block_storage_attachments(module, state, volume, server, device,
