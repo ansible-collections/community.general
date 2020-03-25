@@ -19,7 +19,7 @@ __metaclass__ = type
 
 import os
 import json
-from ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager import FortiManagerHandler
+from ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager import FortiManagerHandler
 import pytest
 
 try:
@@ -61,7 +61,7 @@ fmg_instance = FortiManagerHandler(connection_mock, module_mock)
 
 
 def test_set_script(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
     #  Fixture sets used:###########################
 
@@ -84,7 +84,7 @@ def test_set_script(fixture_data, mocker):
 
 
 def test_delete_script(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
     #  Fixture sets used:###########################
 
@@ -107,7 +107,7 @@ def test_delete_script(fixture_data, mocker):
 
 
 def test_execute_script(fixture_data, mocker):
-    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.network.fortimanager.fortimanager.FortiManagerHandler.process_request',
+    mocker.patch('ansible_collections.fortinet.fortios.plugins.module_utils.fortimanager.fortimanager.FortiManagerHandler.process_request',
                  side_effect=fixture_data)
     #  Fixture sets used:###########################
 
