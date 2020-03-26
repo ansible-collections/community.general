@@ -69,6 +69,7 @@ import time
 
 from ansible.module_utils.basic import AnsibleModule
 
+
 def check_resource_state(module, resource, state):
     # get resources
     cmd = "bash -c 'pcs status --full | grep -w \"%s[ \t]\"'" % resource
@@ -116,7 +117,7 @@ def main():
 
     if check_mode:
         if check_resource_state(module, resource, state):
-            module.exit_json(changed=False,
+            module.exit_json(changed=changed,
                              out={'resource': resource, 'status': state})
         else:
             if wait_for_resource:
@@ -127,15 +128,15 @@ def main():
                         status = True
                         break
                 if status:
-                    module.exit_json(changed=False,
+                    module.exit_json(changed=changed,
                                      out={'resource': resource,
                                           'status': state})
             module.fail_json(msg="Failed, the resource %s is not %s\n" %
                              (resource, state))
 
     resource_state = get_resource(module, resource)
-    if resource_state = state:
-        module.exit_json(changed=False, out={'resource': resource,
+    if resource_state == state:
+        module.exit_json(changed=changed, out={'resource': resource,
                          'status': state})
     rc, out, err = set_resource_state(module, resource, state, timeout)
     if rc == 1:
@@ -144,7 +145,8 @@ def main():
                          rc=rc,
                          output=out,
                          error=err)
-    module.exit_json(changed=True, out=out, rc=rc)
+    changed = True
+    module.exit_json(changed=changed, out=out, rc=rc)
 
 
 if __name__ == '__main__':
