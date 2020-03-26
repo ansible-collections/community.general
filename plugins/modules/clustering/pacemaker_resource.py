@@ -123,7 +123,7 @@ def main():
             if wait_for_resource:
                 t = time.time()
                 status = False
-                while time.time() < t+timeout:
+                while time.time() < t + timeout:
                     if check_resource_state(module, resource, state):
                         status = True
                         break
