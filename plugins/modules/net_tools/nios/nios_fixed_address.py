@@ -161,11 +161,28 @@ EXAMPLES = '''
 
 RETURN = ''' # '''
 
+import socket
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
-from ansible_collections.ansible.netcommon.plugins.module_utils.network.common.utils import validate_ip_address, validate_ip_v6_address
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import NIOS_IPV4_FIXED_ADDRESS, NIOS_IPV6_FIXED_ADDRESS
+
+
+def validate_ip_address(address):
+    try:
+        socket.inet_aton(address)
+    except socket.error:
+        return False
+    return address.count(".") == 3
+
+
+def validate_ip_v6_address(address):
+    try:
+        socket.inet_pton(socket.AF_INET6, address)
+    except socket.error:
+        return False
+    return True
 
 
 def options(module):
