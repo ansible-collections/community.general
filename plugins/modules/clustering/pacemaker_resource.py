@@ -13,7 +13,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 
 DOCUMENTATION = '''
 ---
-module: pacemaker_manage
+module: pacemaker_resource
 short_description: Manage a pacemaker resource
 extends_documentation_fragment: openstack
 version_added: "2.9"
