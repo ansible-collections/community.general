@@ -164,8 +164,9 @@ def set_node(module, state, timeout, force, node='all'):
 
 def main():
     argument_spec = dict(
-        state=dict(type='str', choices=['online', 'offline', 'restart', 'cleanup']),
-        check_and_fail = module.params['check_and_fail'],
+        state=dict(type='str', choices=['online', 'offline', 'restart',
+                                        'cleanup']),
+        check_and_fail=dict(default=False, type='bool'),
         node=dict(type='str'),
         timeout=dict(type='int', default=300),
         force=dict(type='bool', default=True),
