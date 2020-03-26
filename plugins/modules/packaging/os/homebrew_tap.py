@@ -32,6 +32,8 @@ options:
             - The GitHub user/organization repository to tap.
         required: true
         aliases: ['tap']
+        type: list
+        elements: str
     url:
         description:
             - The optional git URL of the repository to tap. The URL is not
@@ -40,12 +42,14 @@ options:
             - I(name) option may not be a list of multiple taps (but a single
               tap instead) when this option is provided.
         required: false
+        type: str
     state:
         description:
             - state of the repository.
         choices: [ 'present', 'absent' ]
         required: false
         default: 'present'
+        type: str
 requirements: [ homebrew ]
 '''
 
@@ -205,7 +209,7 @@ def remove_taps(module, brew_path, taps):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(aliases=['tap'], type='list', required=True),
+            name=dict(aliases=['tap'], type='list', required=True, elements='str'),
             url=dict(default=None, required=False),
             state=dict(default='present', choices=['present', 'absent']),
         ),
