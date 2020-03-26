@@ -270,7 +270,7 @@ firewall:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.ansible.netcommon.plugins.module_utils.compat import ipaddress as compat_ipaddress
+from ansible_collections.community.general.plugins.module_utils.compat import ipaddress as compat_ipaddress
 from ansible_collections.community.general.plugins.module_utils.hetzner import (
     HETZNER_DEFAULT_ARGUMENT_SPEC,
     BASE_URL,
