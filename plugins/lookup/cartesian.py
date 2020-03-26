@@ -20,7 +20,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: Example of the change in the description
-  debug: msg="{{ [1,2,3]|lookup('cartesian', [a, b])}}"
+  debug: msg="{{ lookup('cartesian', [1,2,3], [a, b])}}"
 
 - name: loops over the cartesian product of the supplied lists
   debug: msg="{{item}}"
