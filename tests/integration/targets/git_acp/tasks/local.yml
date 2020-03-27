@@ -1,0 +1,48 @@
+- name: set first random file name.
+  delegate_to: 127.0.0.1
+  set_fact:
+    first_file_name: "{{ lookup('pipe','date +%s%N') }}.txt"
+
+- name: set second random file name.
+  delegate_to: 127.0.0.1
+  set_fact:
+    second_file_name: "{{ lookup('pipe','date +%s%N') }}.txt"
+
+- name: touch file1 and file2
+  file:
+    path: "{{ playbook_dir }}/test_directory/repo/{{ item }}"
+    state: touch
+  loop:
+    - "{{ first_file_name }}"
+    - "{{ second_file_name }}"
+
+- name: LOCAL +add +mode
+  register: result
+  git_acp:
+    folder_path: "{{ playbook_dir }}/test_directory/repo"
+    comment: Add file1 and file2
+    add: [ "{{ first_file_name }}", "{{ second_file_name }}" ]
+    branch: master
+    mode: local
+    url: "{{ playbook_dir }}/test_directory/repo.git"
+
+- assert: { that: "result.changed == true" }
+
+- name: rm file1 and file2
+  file:
+    path: "{{ playbook_dir }}/test_directory/repo/{{ item }}"
+    state: absent
+  loop:
+    - "{{ first_file_name }}"
+    - "{{ second_file_name }}"
+
+- name: LOCAL +add +mode
+  register: result
+  git_acp:
+    folder_path: "{{ playbook_dir }}/test_directory/repo"
+    comment: Add .
+    branch: master
+    mode: local
+    url: "{{ playbook_dir }}/test_directory/repo.git"
+
+- assert: { that: "result.changed == true" }
