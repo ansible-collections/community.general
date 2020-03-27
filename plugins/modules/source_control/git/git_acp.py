@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2016, Cumulus Networks <ce-ceng@cumulusnetworks.com>
+# Copyright: (c) 2020, Federico Olivieri (lvrfrc87@gmail.com)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -10,30 +10,30 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: git_acp
+module: community.general.git_acp
 author:
     - "Federico Olivieri (@Federico87)"
 version_added: "2.10"
-short_description: Perform git commiit and/or git push perations.
+short_description: Perform git commit and git push operations.
 description:
-    - Manage git commits and git push on local git directory
+    - Manage git commits and git push on local or remote git repository.
 options:
-    folder_path:
+    path:
         description:
-            - full folder path where .git/ is located.
+            - Folder path where .git/ is located.
         required: true
         type: str
     user:
         description:
-            - git username for https operations.
+            - Git username for https operations.
         type: str
     token:
         description:
-            - git API token for https operations.
+            - Git API token for https operations.
         type: str
     comment:
         description:
-            - git commit comment. Same as "git commit -m".
+            - Git commit comment. Same as "git commit -m".
         type: str
         required: true
     add:
@@ -45,23 +45,23 @@ options:
         elements: str
     branch:
         description:
-            - git branch where perform git push.
+            - Git branch where perform git push.
         required: True
         type: str
     push_option:
         description:
-            - git push options. Same as "git --push-option=option".
+            - Git push options. Same as "git --push-option=option".
         type: str
     mode:
         description:
-            - git operations are performend eithr over ssh channel or https.
+            - Git operations are performend eithr over ssh, https or local.
               Same as "git@git..." or "https://user:token@git..." or "git init --bare"
         choices: ['ssh', 'https', 'local']
         default: ssh
         type: str
     url:
         description:
-            - git repo URL. If not provided, the module will use the same mode used by "git clone".
+            - Git repo URL.
         type: str
 requirements:
     - git>=2.10.0 (the command line tool)
@@ -69,33 +69,32 @@ requirements:
 
 EXAMPLES = '''
 
-# Commit and push changes via https.
-- git_acp:
-    folder_path: /Users/federicoolivieri/git/git_test_module
+- name: Commit and push via HTTPs.
+  community.general.git_acp:
+    path: /Users/federicoolivieri/git/git_test_module
     user: Federico87
     token: m1Ap!T0k3n!!!
     comment: My amazing backup
     add: ['test.txt', 'txt.test']
     branch: master
-    push: true
-    commit: true
     mode: https
     url: https://gitlab.com/networkAutomation/git_test_module
 
-# Push changes via ssh using some defaults.
-- git_acp:
-    folder_path: /Users/federicoolivieri/git/git_test_module
+- name: Commit and push via SSH.
+  community.general.git_acp:
+    path: /Users/federicoolivieri/git/git_test_module
     comment: My amazing backup
+    add: ['test.txt', 'txt.test']
     branch: master
-    push: true
-    commit: false
-    url: git@gitlab.com/networkAutomation/git_test_module
+    mode: ssh
+    url: https://gitlab.com/networkAutomation/git_test_module
 
-# Commit and push changes using only defaults.
-- git_acp:
-    folder_path: /Users/federicoolivieri/git/git_test_module
+- name: Commit and push using the defaults.
+  community.general.git_acp:
+    path: /Users/federicoolivieri/git/git_test_module
     comment: My amazing backup
     branch: master
+    url: https://gitlab.com/networkAutomation/git_test_module
 '''
 
 RETURN = '''
@@ -109,10 +108,6 @@ output:
     ]
 '''
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'core'}
-
 import os
 
 from ansible.module_utils.basic import AnsibleModule
@@ -123,18 +118,18 @@ def git_commit(module):
     commands = list()
 
     add = module.params.get('add')
-    folder_path = module.params.get('folder_path')
+    path = module.params.get('path')
     comment = module.params.get('comment')
 
     if add:
         commands.append('git -C {0} add {1}'.format(
-            folder_path,
+            path,
             ' '.join(add)
         ))
 
     if comment:
         commands.append('git -C {0} commit -m "{1}"'.format(
-            folder_path,
+            path,
             comment
         ))
 
@@ -145,7 +140,7 @@ def git_push(module):
 
     commands = list()
 
-    folder_path = module.params.get('folder_path')
+    path = module.params.get('path')
     url = module.params.get('url')
     user = module.params.get('user')
     token = module.params.get('token')
@@ -153,16 +148,16 @@ def git_push(module):
     push_option = module.params.get('push_option')
     mode = module.params.get('mode')
 
-    def https(folder_path, user, token, url, branch, push_option):
+    def https(path, user, token, url, branch, push_option):
         if url.startswith('https://'):
-            remote_add = 'git -C {folder_path} remote set-url origin https://{user}:{token}@{url}'.format(
-                folder_path=folder_path,
+            remote_add = 'git -C {path} remote set-url origin https://{user}:{token}@{url}'.format(
+                path=path,
                 url=url[8:],
                 user=user,
                 token=token,
             )
-            cmd = 'git -C {folder_path} push origin {branch}'.format(
-                folder_path=folder_path,
+            cmd = 'git -C {path} push origin {branch}'.format(
+                path=path,
                 branch=branch,
             )
 
@@ -177,12 +172,12 @@ def git_push(module):
         if 'https' in url or 'ssh' in url:
             module.fail_json(msg='SSH or HTTPS mode selected but repo is LOCAL')
 
-        remote_add = 'git -C {folder_path} remote set-url origin {url}'.format(
-            folder_path=folder_path,
+        remote_add = 'git -C {path} remote set-url origin {url}'.format(
+            path=path,
             url=url
         )
-        cmd = "git -C {folder_path} push origin {branch}".format(
-            folder_path=folder_path,
+        cmd = "git -C {path} push origin {branch}".format(
+            path=path,
             branch=branch
         )
 
@@ -194,19 +189,19 @@ def git_push(module):
             return [remote_add, cmd]
 
     if mode == 'https':
-        for cmd in https(folder_path, user, token, url, branch, push_option):
+        for cmd in https(path, user, token, url, branch, push_option):
             commands.append(cmd)
 
     if mode == 'ssh':
         if 'https' in url:
             module.fail_json(msg='SSH mode selected but HTTPS URL provided')
 
-        remote_add = 'git -C {folder_path} remote set-url origin {url}'.format(
-            folder_path=folder_path,
+        remote_add = 'git -C {path} remote set-url origin {url}'.format(
+            path=path,
             url=url,
         )
-        cmd = 'git -C {folder_path} push origin {branch}'.format(
-            folder_path=folder_path,
+        cmd = 'git -C {path} push origin {branch}'.format(
+            path=path,
             branch=branch
         )
         commands.append(remote_add)
@@ -224,7 +219,7 @@ def git_push(module):
 def main():
 
     argument_spec = dict(
-        folder_path=dict(required=True),
+        path=dict(required=True, type="path"),
         user=dict(),
         token=dict(),
         comment=dict(required=True),
@@ -232,7 +227,7 @@ def main():
         branch=dict(required=True),
         push_option=dict(),
         mode=dict(choices=["ssh", "https", "local"], default='ssh'),
-        url=dict(),
+        url=dict(required=True),
     )
 
     required_if = [
