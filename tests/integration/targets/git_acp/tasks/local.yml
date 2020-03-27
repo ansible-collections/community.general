@@ -18,7 +18,7 @@
 
 - name: LOCAL +add +mode
   register: result
-  git_acp:
+  community.general.git_acp:
     folder_path: "{{ playbook_dir }}/test_directory/repo"
     comment: Add file1 and file2
     add: [ "{{ first_file_name }}", "{{ second_file_name }}" ]
@@ -38,7 +38,7 @@
 
 - name: LOCAL +add +mode
   register: result
-  git_acp:
+  community.general.git_acp:
     folder_path: "{{ playbook_dir }}/test_directory/repo"
     comment: Add .
     branch: master
