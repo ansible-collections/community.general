@@ -101,12 +101,10 @@ def main():
         argument_spec=argument_spec,
     )
 
-    git_commands = git_commit(module)
-
     result_output = list()
     result = dict(changed=False)
 
-    for cmd in git_commands:
+    for cmd in git_commit(module):
         _rc, output, error = module.run_command(cmd, check_rc=False)
 
         if output:
@@ -116,6 +114,7 @@ def main():
                 module.fail_json(msg=output)
             else:
                 result_output.append(output)
+                result.update(changed=True)
 
         if error:
             if 'error:' in error:
@@ -124,10 +123,10 @@ def main():
                 module.fail_json(msg=error)
             else:
                 result_output.append(error)
+                result.update(changed=True)
 
     if result_output:
         result.update(output=result_output)
-        result.update(changed=True)
 
     module.exit_json(**result)
 
