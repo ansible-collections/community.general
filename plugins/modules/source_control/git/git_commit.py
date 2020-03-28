@@ -1,0 +1,136 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# Copyright: (c) 2020, Federico Olivieri (lvrfrc87@gmail.com)
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
+
+DOCUMENTATION = '''
+---
+module: community.general.git_commit
+author:
+    - "Federico Olivieri (@Federico87)"
+version_added: "2.10"
+short_description: Perform git and and git commit operations.
+description:
+    - Manage git add and git commit on local git repository.
+options:
+    path:
+        description:
+            - Folder path where .git/ is located.
+        required: true
+        type: str
+    comment:
+        description:
+            - Git commit comment. Same as "git commit -m".
+        type: str
+        required: true
+    add:
+        description:
+            - list of files to be staged. Same as "git add ."
+              Asterisx values not accepted. i.e. "./*" or "*".
+        type: list
+        default: ["."]
+        elements: str
+requirements:
+    - git>=2.10.0 (the command line tool)
+'''
+
+EXAMPLES = '''
+- name: Add and commit 2 files.
+  community.general.git_commit:
+    path: /Users/federicoolivieri/git/git_test_module
+    comment: My amazing backup
+    add: ['test.txt', 'txt.test']
+
+- name: Add all files using default and commit.
+  community.general.git_commit:
+    path: /Users/federicoolivieri/git/git_test_module
+    comment: My amazing backup
+'''
+
+RETURN = '''
+output:
+    description: list of git cli command stdout
+    type: list
+    returned: always
+    sample: [
+        "[master 99830f4] Remove [ test.txt, tax.txt ]\n 4 files changed, 26 insertions(+)..."
+    ]
+'''
+
+import os
+from ansible.module_utils.basic import AnsibleModule
+
+
+def git_commit(module):
+
+    commands = list()
+
+    add = module.params.get('add')
+    path = module.params.get('path')
+    comment = module.params.get('comment')
+
+    if add:
+        commands.append('git -C {path} add {add}'.format(
+            path=path,
+            add=' '.join(add),
+        ))
+
+    if comment:
+        commands.append('git -C {path} commit -m "{comment}"'.format(
+            path=path,
+            comment=comment,
+        ))
+
+    return commands
+
+
+def main():
+
+    argument_spec = dict(
+        path=dict(required=True, type="path"),
+        comment=dict(required=True),
+        add=dict(type="list", elements='str', default=["."]),
+    )
+
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+    )
+
+    git_commands = git_commit(module)
+
+    result_output = list()
+    result = dict(changed=False)
+
+    for cmd in git_commands:
+        _rc, output, error = module.run_command(cmd, check_rc=False)
+
+        if output:
+            if 'no changes added to commit' in output:
+                module.fail_json(msg=output)
+            elif 'nothing to commit, working tree clean' in output:
+                module.fail_json(msg=output)
+            else:
+                result_output.append(output)
+
+        if error:
+            if 'error:' in error:
+                module.fail_json(msg=error)
+            elif 'fatal:' in error:
+                module.fail_json(msg=error)
+            else:
+                result_output.append(error)
+
+    if result_output:
+        result.update(output=result_output)
+        result.update(changed=True)
+
+    module.exit_json(**result)
+
+
+if __name__ == "__main__":
+    main()
