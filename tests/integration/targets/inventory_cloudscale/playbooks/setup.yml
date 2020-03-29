@@ -1,6 +1,6 @@
 ---
 - name: Create server with public network only
-  cloudscale_server:
+  community.general.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-inventory-public'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -10,7 +10,7 @@
   register: server_public
 
 - name: Create server with private network only
-  cloudscale_server:
+  community.general.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-inventory-private'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_alt_test_image }}'
@@ -20,7 +20,7 @@
   register: server_private
 
 - name: Create server with public and private network
-  cloudscale_server:
+  community.general.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-inventory-public-private'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -49,7 +49,7 @@
   with_sequence: count=2
 
 - name: Create server with different prefix
-  cloudscale_server:
+  community.general.cloudscale_server:
     name: 'other-prefix-{{ cloudscale_resource_prefix }}-inventory'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
@@ -61,14 +61,14 @@
 # it afterwards (which is possible). The resaon for this restriction is
 # that on creation a PTR entry for the server is created.
 - name: Create server to be renamed with unsafe characters
-  cloudscale_server:
+  community.general.cloudscale_server:
     name: '{{ cloudscale_resource_prefix }}-unsafe-chars'
     flavor: '{{ cloudscale_test_flavor }}'
     image: '{{ cloudscale_test_image }}'
     ssh_keys: '{{ cloudscale_test_ssh_key }}'
   register: server_unsafe_chars
 - name: Rename server to contain unsafe characters
-  cloudscale_server:
+  community.general.cloudscale_server:
     uuid: '{{ server_unsafe_chars.uuid }}'
     name: '{{ cloudscale_resource_prefix }}-snowmans-are-cool-☃!'
   register: server_unsafe_chars
