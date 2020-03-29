@@ -3,4 +3,4 @@ docker-pipelining    ansible_ssh_pipelining=true
 docker-no-pipelining ansible_ssh_pipelining=false
 [docker:vars]
 ansible_host=ubuntu-latest
-ansible_connection=docker
+ansible_connection=community.general.docker
