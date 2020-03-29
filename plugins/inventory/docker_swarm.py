@@ -244,7 +244,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         """Return the possibly of a file being consumable by this plugin."""
         return (
             super(InventoryModule, self).verify_file(path) and
-            path.endswith((self.NAME + '.yaml', self.NAME + '.yml')))
+            path.endswith(('docker_swarm.yaml', 'docker_swarm.yml')))
 
     def parse(self, inventory, loader, path, cache=True):
         if not HAS_DOCKER:
