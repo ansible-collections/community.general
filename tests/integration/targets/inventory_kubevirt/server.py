@@ -66,7 +66,7 @@ class TestServer(object):
         TestHandler.handlers[path] = _handle_request
 
     def start_server(self, host='localhost'):
-        self._httpd = HTTPServer((host, 12347), TestHandler)
+        self._httpd = HTTPServer((host, 12345), TestHandler)
         self._thread = Thread(target=self._httpd.serve_forever)
         self._thread.start()
 
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     server.start_server()
     server.set_json_response(path="/version", code=200, body={})
     server.set_json_response(path="/api", code=200, body={
-        "kind": "APIVersions", "versions": ["v1"], "serverAddressByClientCIDRs": [{"clientCIDR": "0.0.0.0/0", "serverAddress": "localhost:12347"}]
+        "kind": "APIVersions", "versions": ["v1"], "serverAddressByClientCIDRs": [{"clientCIDR": "0.0.0.0/0", "serverAddress": "localhost:12345"}]
     })
     server.set_json_response(path="/api/v1", code=200, body={'resources': {}})
     server.set_json_response(path="/apis", code=200, body={

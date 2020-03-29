@@ -24,7 +24,7 @@
             "label_kubevirt_io_nodeName_localhost",
             "label_label_x",
             "label_vm_cnv_io_name_myvm",
-            "localhost_12347",
+            "localhost_12345",
             "ungrouped"
         ]
     },
@@ -43,7 +43,7 @@
             "default-myvm-7ba1b196-57ad-11e9-9e2e-0800279ffc6b"
         ]
     },
-    "localhost_12347": {
+    "localhost_12345": {
         "children": [
             "namespace_default"
         ]
