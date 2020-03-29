@@ -29,8 +29,10 @@ python -V
 function retry
 {
     for repetition in 1 2 3; do
+        set +e
         "$@"
         result=$?
+        set -e
         if [ ${result} == 0 ]; then
             return ${result}
         fi
