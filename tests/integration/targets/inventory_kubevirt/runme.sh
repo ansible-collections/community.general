@@ -11,8 +11,6 @@ set -eux
 source virtualenv.sh
 pip install openshift -c constraints.txt
 
-lsof -i -n
-
 ./server.py &
 
 # Fake auth file
