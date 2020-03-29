@@ -14,4 +14,4 @@ lxc-no-pipelining ansible_ssh_pipelining=false
 # 6. stop container
 # $ sudo lxc-stop -n centos-7-amd64
 ansible_host=centos-7-amd64
-ansible_connection=lxc
+ansible_connection=community.general.lxc
