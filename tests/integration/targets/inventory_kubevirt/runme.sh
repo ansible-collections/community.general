@@ -47,7 +47,7 @@ EOF
 #################################################
 
 # run the plugin second
-export ANSIBLE_INVENTORY_ENABLED=kubevirt
+export ANSIBLE_INVENTORY_ENABLED=community.general.kubevirt
 export ANSIBLE_INVENTORY=test.kubevirt.yml
 
 cat << EOF > "$OUTPUT_DIR/test.kubevirt.yml"
