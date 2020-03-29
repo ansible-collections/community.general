@@ -34,7 +34,7 @@
 - name: install mercurial (pkgng)
   package:
     name: mercurial
-  when: ansible_facts.pkg_mgr == 'ansible.community.pkgng'
+  when: ansible_facts.pkg_mgr in ['pkgng', 'ansible.community.pkgng']
 
 - name: preserve the updated python
   command: cp -av "{{ which_python.stdout }}" "{{ which_python.stdout }}.updated"
