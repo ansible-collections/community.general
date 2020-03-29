@@ -20,7 +20,7 @@ apiVersion: v1
 clusters:
 - cluster:
     insecure-skip-tls-verify: true
-    server: http://localhost:12345
+    server: http://localhost:12347
   name: development
 contexts:
 - context:
