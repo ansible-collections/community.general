@@ -5,7 +5,7 @@
     - name: 'Fetch secrets using "hashi_vault" lookup'
       set_fact:
         secret1: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret1 auth_method=approle secret_id=' ~ secret_id ~ ' role_id=' ~ role_id) }}"
-        secret2: "{{ lookup('hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret2 auth_method=approle secret_id=' ~ secret_id ~ ' role_id=' ~ role_id) }}"
+        secret2: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret2 auth_method=approle secret_id=' ~ secret_id ~ ' role_id=' ~ role_id) }}"
 
     - name: 'Check secret values'
       fail:
