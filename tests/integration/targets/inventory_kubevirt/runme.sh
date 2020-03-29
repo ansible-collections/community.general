@@ -13,6 +13,12 @@ pip install openshift -c constraints.txt
 
 ./server.py &
 
+cleanup() {
+  kill -9 "$(jobs -p)"
+}
+
+trap cleanup INT TERM EXIT
+
 # Fake auth file
 mkdir -p ~/.kube/
 cat <<EOF > ~/.kube/config
@@ -52,7 +58,6 @@ connections:
 EOF
 
 ANSIBLE_JINJA2_NATIVE=1 ansible-inventory -vvvv -i "$OUTPUT_DIR/test.kubevirt.yml" --list --output="$OUTPUT_DIR/plugin.out"
-kill -9 "$(jobs -p)"
 
 #################################################
 #   DIFF THE RESULTS
