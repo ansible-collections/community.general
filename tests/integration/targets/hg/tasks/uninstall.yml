@@ -33,7 +33,7 @@
     name: mercurial
     state: absent
     autoremove: yes
-  when: ansible_facts.pkg_mgr in ['pkgng', 'ansible.community.pkgng']
+  when: ansible_facts.pkg_mgr in ['pkgng', 'community.general.pkgng']
 
 - name: restore the default python
   raw: mv "{{ which_python.stdout }}.default" "{{ which_python.stdout }}"
