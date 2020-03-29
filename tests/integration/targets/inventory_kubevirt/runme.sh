@@ -45,7 +45,7 @@ export ANSIBLE_INVENTORY_ENABLED=kubevirt
 export ANSIBLE_INVENTORY=test.kubevirt.yml
 
 cat << EOF > "$OUTPUT_DIR/test.kubevirt.yml"
-plugin: kubevirt
+plugin: community.general.kubevirt
 connections:
   - namespaces:
       - default
