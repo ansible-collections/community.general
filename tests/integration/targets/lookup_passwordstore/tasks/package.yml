@@ -14,7 +14,7 @@
   args:
     name: "{{ passwordstore_packages }}"
     state: present
-  when: ansible_facts.pkg_mgr in ['apt', 'dnf', 'yum', 'community.general.pkgng']
+  when: ansible_facts.pkg_mgr in ['apt', 'dnf', 'yum', 'pkgng', 'community.general.pkgng']
 
 - block:
   # OpenSUSE Leap>=15.0 don't include password-store in main repo
@@ -29,7 +29,7 @@
       state: present
       update_cache: yes
       disable_gpg_check: yes
-  when: ansible_facts.pkg_mgr == 'community.general.zypper'
+  when: ansible_facts.pkg_mgr in ['zypper', 'community.general.zypper']
 
 - name: Install on macOS
   when: ansible_facts.distribution == 'MacOSX'
