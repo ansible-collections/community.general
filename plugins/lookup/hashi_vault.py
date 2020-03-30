@@ -151,35 +151,35 @@ DOCUMENTATION = """
 
 EXAMPLES = """
 - debug:
-    msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello:value token=c975b780-d1be-8016-866b-01d0f9b688a5 url=http://myvault:8200')}}"
+    msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello:value token=c975b780-d1be-8016-866b-01d0f9b688a5 url=http://myvault:8200') }}"
 
 - name: Return all secrets from a path
   debug:
-    msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello token=c975b780-d1be-8016-866b-01d0f9b688a5 url=http://myvault:8200')}}"
+    msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello token=c975b780-d1be-8016-866b-01d0f9b688a5 url=http://myvault:8200') }}"
 
 - name: Vault that requires authentication via LDAP
   debug:
-      msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello:value auth_method=ldap mount_point=ldap username=myuser password=mypas url=http://myvault:8200')}}"
+    msg: "{{ lookup('community.general.hashi_vault', 'secret/hello:value auth_method=ldap mount_point=ldap username=myuser password=mypas') }}"
 
 - name: Vault that requires authentication via username and password
   debug:
-      msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello:value auth_method=userpass username=myuser password=mypas url=http://myvault:8200')}}"
+    msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello:value auth_method=userpass username=myuser password=psw url=http://myvault:8200') }}"
 
 - name: Using an ssl vault
   debug:
-      msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hola:value token=c975b780-d1be-8016-866b-01d0f9b688a5 url=https://myvault:8200 validate_certs=False')}}"
+    msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hola:value token=c975b780-d1be-8016-866b-01d0f9b688a5 validate_certs=False') }}"
 
 - name: using certificate auth
   debug:
-      msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hi:value token=xxxx-xxx-xxx url=https://myvault:8200 validate_certs=True cacert=/cacert/path/ca.pem')}}"
+    msg: "{{ lookup('community.general.hashi_vault', 'secret/hi:value token=xxxx url=https://myvault:8200 validate_certs=True cacert=/cacert/path/ca.pem') }}"
 
 - name: authenticate with a Vault app role
   debug:
-      msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello:value auth_method=approle role_id=myroleid secret_id=mysecretid url=http://myvault:8200')}}"
+    msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello:value auth_method=approle role_id=myroleid secret_id=mysecretid') }}"
 
 - name: Return all secrets from a path in a namespace
   debug:
-    msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello token=c975b780-d1be-8016-866b-01d0f9b688a5 url=http://myvault:8200 namespace=teama/admins')}}"
+    msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello token=c975b780-d1be-8016-866b-01d0f9b688a5 namespace=teama/admins') }}"
 
 # When using KV v2 the PATH should include "data" between the secret engine mount and path (e.g. "secret/data/:path")
 # see: https://www.vaultproject.io/api/secret/kv/kv-v2.html#read-secret-version
@@ -223,7 +223,7 @@ EXAMPLES = """
 
 - name: authenticate with aws_iam_login
   debug:
-    msg: "{{ lookup('community.general.hashi_vault', 'secret/hello:value', auth_method='aws_iam_login' role_id='myroleid', profile=my_boto_profile, url='http://myvault:8200') }}"
+    msg: "{{ lookup('community.general.hashi_vault', 'secret/hello:value', auth_method='aws_iam_login' role_id='myroleid', profile=my_boto_profile) }}"
 """
 
 RETURN = """
