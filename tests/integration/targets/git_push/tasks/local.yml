@@ -1,12 +1,12 @@
-- name: set first random file name.
+- name: FILE | set first random file name.
   set_fact:
     file1: "{{ lookup('pipe','date +%s%N') }}.txt"
 
-- name: set second random file name.
+- name: FILE | set second random file name.
   set_fact:
     file2: "{{ lookup('pipe','date +%s%N') }}.txt"
 
-- name: touch file1 and file2
+- name: FILE | touch file1 and file2
   file:
     path: "{{ playbook_dir }}/test_directory/repo/{{ item }}"
     state: touch
@@ -35,7 +35,7 @@
 
 - assert: { that: "result.changed == true" }
 
-- name: rm file1 and file2
+- name: FILE | rm file1 and file2
   file:
     path: "{{ playbook_dir }}/test_directory/repo/{{ item }}"
     state: absent
