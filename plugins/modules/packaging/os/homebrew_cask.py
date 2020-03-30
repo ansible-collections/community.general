@@ -26,16 +26,16 @@ author:
 - "Enric Lluelles (@enriclluelles)"
 requirements:
 - "python >= 2.6"
-short_description: Install and uninstall homebrew casks.
+short_description: Install and uninstall homebrew casks
 description:
 - Manages Homebrew casks.
 options:
   name:
     description:
     - Name of cask to install or remove.
-    required: true
-    aliases: ['pkg', 'package', 'cask']
+    aliases: [ 'cask', 'package', 'pkg' ]
     type: list
+    elements: str
   path:
     description:
     - "':' separated list of paths to search for 'brew' executable."
@@ -44,7 +44,7 @@ options:
   state:
     description:
     - State of the cask.
-    choices: [ 'present', 'absent', 'upgraded' ]
+    choices: [ 'absent', 'installed', 'latest', 'present', 'removed', 'uninstalled', 'upgraded' ]
     default: present
     type: str
   sudo_password:
@@ -57,32 +57,33 @@ options:
     - Update homebrew itself first.
     - Note that C(brew cask update) is a synonym for C(brew update).
     type: bool
-    default: 'no'
-    aliases: ['update-brew']
+    default: no
+    aliases: [ 'update-brew' ]
   install_options:
     description:
     - Options flags to install a package.
-    aliases: ['options']
+    aliases: [ 'options' ]
     type: list
+    elements: str
   accept_external_apps:
     description:
     - Allow external apps.
     type: bool
-    default: 'no'
+    default: no
   upgrade_all:
     description:
     - Upgrade all casks.
     - Mutually exclusive with C(upgraded) state.
     type: bool
-    default: 'no'
-    aliases: ['upgrade']
+    default: no
+    aliases: [ 'upgrade' ]
   greedy:
     description:
     - Upgrade casks that auto update.
     - Passes --greedy to brew cask outdated when checking
       if an installed cask has a newer version available.
     type: bool
-    default: 'no'
+    default: no
 '''
 EXAMPLES = '''
 - name: Install cask
@@ -749,6 +750,7 @@ def main():
                 aliases=["pkg", "package", "cask"],
                 required=False,
                 type='list',
+                elements='str',
             ),
             path=dict(
                 default="/usr/local/bin",
@@ -777,6 +779,7 @@ def main():
                 default=None,
                 aliases=['options'],
                 type='list',
+                elements='str',
             ),
             accept_external_apps=dict(
                 default=False,
