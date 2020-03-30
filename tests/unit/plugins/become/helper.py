@@ -13,6 +13,9 @@ from ansible.plugins.loader import become_loader, get_shell_plugin
 
 def call_become_plugin(play_context, cmd, executable=None):
     """Helper function to call become plugin simiarly on how Ansible itself handles this."""
+    if not cmd or not play_context.become:
+        return cmd
+
     plugin = become_loader.get(play_context.become_method)
     if not plugin:
         raise AnsibleError("Privilege escalation method not found: %s" % play_context.become_method)
