@@ -2974,10 +2974,7 @@ plugins/modules/packaging/os/flatpak.py validate-modules:use-run-command-not-pop
 plugins/modules/packaging/os/flatpak_remote.py validate-modules:parameter-type-not-in-doc
 plugins/modules/packaging/os/flatpak_remote.py validate-modules:use-run-command-not-popen
 plugins/modules/packaging/os/homebrew.py validate-modules:parameter-invalid
-plugins/modules/packaging/os/homebrew_cask.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/packaging/os/homebrew_cask.py validate-modules:doc-required-mismatch
 plugins/modules/packaging/os/homebrew_cask.py validate-modules:parameter-invalid
-plugins/modules/packaging/os/homebrew_cask.py validate-modules:parameter-list-no-elements
 plugins/modules/packaging/os/installp.py validate-modules:parameter-list-no-elements
 plugins/modules/packaging/os/layman.py validate-modules:doc-missing-type
 plugins/modules/packaging/os/layman.py validate-modules:undocumented-parameter
