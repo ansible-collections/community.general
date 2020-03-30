@@ -16,11 +16,11 @@ author:
 version_added: "2.10"
 short_description: Perform git push operations.
 description:
-    - Manage git push on local or remote git repository.
+    - Manage C(git push) on local or remote git repository.
 options:
     path:
         description:
-            - Folder path where .git/ is located.
+            - Folder path where C(.git/) is located.
         required: true
         type: path
     user:
@@ -38,12 +38,12 @@ options:
         type: str
     push_option:
         description:
-            - Git push options. Same as "git --push-option=option".
+            - Git push options. Same as C(git --push-option=option).
         type: str
     mode:
         description:
             - Git operations are performend eithr over ssh, https or local.
-              Same as "git@git..." or "https://user:token@git..." or "git init --bare"
+              Same as C(git@git...) or C(https://user:token@git...).
         choices: ['ssh', 'https', 'local']
         default: ssh
         type: str
@@ -110,40 +110,51 @@ def git_push(module):
 
     def https(path, user, token, url, branch, push_option):
         if url.startswith('https://'):
-            remote_add = 'git -C {path} remote set-url origin https://{user}:{token}@{url}'.format(
-                path=path,
-                url=url[8:],
-                user=user,
-                token=token,
-            )
-            cmd = 'git -C {path} push origin {branch}'.format(
-                path=path,
-                branch=branch,
-            )
+            remote_add = [
+                'git',
+                '-C',
+                path,
+                'remote',
+                'set-url',
+                'origin',
+                'https://{user}:{token}@{url}'.format(
+                    url=url[8:],
+                    user=user,
+                    token=token,
+                ),
+            ]
 
-        if push_option:
-            index = cmd.find('origin')
-            return [remote_add, cmd[:index] + '--push-option={option} '.format(option=push_option) + cmd[index:]]
+            cmd = [
+                'git',
+                '-C',
+                path,
+                'push',
+                'origin',
+                branch,
+                '--porcelain',
+            ]
 
-        if not push_option:
-            return [remote_add, cmd]
+            if push_option:
+                return [remote_add, cmd.insert(5, '--push-option={0} '.format(push_option))]
+
+            if not push_option:
+                return [remote_add, cmd]
 
     if mode == 'local':
         if 'https' in url or 'ssh' in url:
             module.fail_json(msg='SSH or HTTPS mode selected but repo is LOCAL')
 
-        remote_add = 'git -C {path} remote set-url origin {url}'.format(
-            path=path,
-            url=url
-        )
-        cmd = "git -C {path} push origin {branch}".format(
-            path=path,
-            branch=branch
-        )
+        cmd = [
+            'git', 
+            '-C',
+            path, 
+            'push',
+            'origin',
+            branch,
+        ]
 
         if push_option:
-            index = cmd.find('origin')
-            return [remote_add, cmd[:index] + '--push-option={option} '.format(option=push_option) + cmd[index:]]
+            module.fail_json(msg='"--push-option" not supported with mode "local"')
 
         if not push_option:
             return [remote_add, cmd]
@@ -156,10 +167,16 @@ def git_push(module):
         if 'https' in url:
             module.fail_json(msg='SSH mode selected but HTTPS URL provided')
 
-        remote_add = 'git -C {path} remote set-url origin {url}'.format(
-            path=path,
-            url=url,
-        )
+        remote_add = [
+            'git',
+            '-C',
+            path,
+            'remote',
+            'set-url',
+            'origin',
+            url
+        ]
+
         cmd = 'git -C {path} push origin {branch}'.format(
             path=path,
             branch=branch
@@ -167,11 +184,10 @@ def git_push(module):
         commands.append(remote_add)
 
         if push_option:
-            index = cmd.find('origin')
-            commands.append(cmd[:index] + '--push-option={option} '.format(option=push_option) + cmd[index:])
+            return [remote_add, cmd.insert(5, '--push-option={0} '.format(push_option))]
 
         if not push_option:
-            commands.append(cmd)
+            return [remote_add, cmd]
 
     return commands
 
