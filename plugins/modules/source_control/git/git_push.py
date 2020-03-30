@@ -222,7 +222,8 @@ def main():
                 result_output.append(error)
                 result.update(changed=True)
             else:
-                module.fail_json(msg=error)
+                result_output.append(error)
+                result.update(changed=True)
 
     if result_output:
         result.update(output=result_output)
