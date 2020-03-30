@@ -22,7 +22,7 @@ options:
         description:
             - Folder path where .git/ is located.
         required: true
-        type: str
+        type: path
     comment:
         description:
             - Git commit comment. Same as "git commit -m".

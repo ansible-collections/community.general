@@ -22,7 +22,7 @@ options:
         description:
             - Folder path where .git/ is located.
         required: true
-        type: str
+        type: path
     user:
         description:
             - Git username for https operations.
@@ -221,8 +221,7 @@ def main():
                 result_output.append(error)
                 result.update(changed=True)
             else:
-                result_output.append(error)
-                result.update(changed=True)
+                module.fail_json(msg=error)
 
     if result_output:
         result.update(output=result_output)

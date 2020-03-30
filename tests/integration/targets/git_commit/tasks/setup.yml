@@ -1,34 +1,34 @@
-- name: SETUP | update git to the latest
+- name: SETUP | update git to the latest.
   package:
     name: git
     state: latest
   when: ansible_distribution != "MacOSX"
 
-- name: SETUP | check git version
+- name: SETUP | check git version.
   shell: git --version | grep 'git version' | sed 's/git version //'
   register: git_version
 
-- name: SETUP | edit git version variable
+- name: SETUP | edit git version variable.
   set_fact:
     git_int: "{{  git_version | replace('.', '') }}"
 
-- name: SETUP | end play if git is not >=2.19
+- name: SETUP | end play if git is not >=2.19.
   meta: end_play
   when: git_int.stdout | int < 2100
 
-- name: SETUP | create test directory
+- name: SETUP | create test directory.
   file: 
     path: "{{ playbook_dir }}/test_directory" 
     state: directory
 
-- name: SETUP | set git local
+- name: SETUP | set git local.
   shell: "{{ item }}"
   loop:
     - "git -C {{ playbook_dir }}/test_directory init --bare repo.git"
     - "git -C {{ playbook_dir }}/test_directory clone repo.git -l"
 
-- name: SETUP | set git global user.email if not already set
+- name: SETUP | set git global user.email if not already set.
   shell: git -C {{ playbook_dir }}/test_directory/repo config --global user.email "noreply@example.com"
   
-- name: SETUP | set git global user.name if not already set
+- name: SETUP | set git global user.name if not already set.
   shell: git -C {{ playbook_dir }}/test_directory/repo config --global user.name  "Ansible Test Runner"
