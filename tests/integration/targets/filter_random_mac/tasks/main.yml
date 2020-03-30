@@ -20,7 +20,7 @@
 
 - name: Test random_mac filter bad argument value
   debug:
-    var: "'dummy' | community.generalrandom_mac"
+    var: "'dummy' | community.general.random_mac"
   register: _bad_random_mac_filter
   ignore_errors: yes
 
