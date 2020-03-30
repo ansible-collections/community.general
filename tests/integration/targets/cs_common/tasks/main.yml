@@ -1,0 +1,11 @@
+---
+- name: wait for system template available
+  cs_template:
+    name: "{{ cs_common_template }}"
+    state: absent
+    cross_zones: yes
+  register: template
+  check_mode: true
+  until: template is changed
+  retries: 40
+  delay: 5
