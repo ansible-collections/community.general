@@ -73,10 +73,24 @@ def git_commit(module):
     comment = module.params.get('comment')
 
     if add:
-        add_cmds = ['git', '-C', path, 'add', '{0}'.format(' '.join(add))]
+        add_cmds = [
+            'git',
+            '-C',
+            path,
+            'add',
+            '{0}'.format(' '.join(add))
+        ]
 
     if comment:
-        commit_cmds = ['git', '-C', path, 'commit', '-m', '"{0}"'.format(comment), '--porcelain']
+        commit_cmds = [
+            'git', 
+            '-C', 
+            path, 
+            'commit', 
+            '-m', 
+            '"{0}"'.format(comment), 
+            '--porcelain'
+        ]
     
     return [add_cmds + commit_cmds ]
 
