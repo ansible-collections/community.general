@@ -50,6 +50,7 @@ options:
     url:
         description:
             - Git repo URL.
+        required: True
         type: str
 requirements:
     - git>=2.10.0 (the command line tool)
