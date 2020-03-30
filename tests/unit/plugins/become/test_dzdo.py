@@ -40,3 +40,34 @@ def test_dzdo(mocker, parser, reset_cli_args):
     print(cmd)
     assert re.match("""%s %s -p %s -u %s %s -c 'echo %s; %s'""" % (dzdo_exe, dzdo_flags, r'\"\[dzdo via ansible, key=.+?\] password:\"',
                                                                    task['become_user'], default_exe, success, default_cmd), cmd) is not None
+
+
+def test_dzdo_varoptions(mocker, parser, reset_cli_args):
+    options = parser.parse_args([])
+    context._init_global_context(options)
+
+    default_cmd = "/bin/foo"
+    default_exe = "/bin/bash"
+    dzdo_exe = 'dzdo'
+    dzdo_flags = ''
+
+    success = 'BECOME-SUCCESS-.+?'
+
+    task = {
+        'become_user': 'foo',
+        'become_method': 'community.general.dzdo',
+        'become_flags': dzdo_flags,
+    }
+    var_options = {
+        'become_user': 'bar',
+        'become_flags': '',
+    }
+    cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
+    print(cmd)
+    assert re.match("""%s %s -u %s %s -c 'echo %s; %s'""" % (dzdo_exe, '', task['become_user'], default_exe,
+                                                             success, default_cmd), cmd) is not None
+    task['become_pass'] = 'testpass'
+    cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
+    print(cmd)
+    assert re.match("""%s %s -p %s -u %s %s -c 'echo %s; %s'""" % (dzdo_exe, '', r'\"\[dzdo via ansible, key=.+?\] password:\"',
+                                                                   task['become_user'], default_exe, success, default_cmd), cmd) is not None

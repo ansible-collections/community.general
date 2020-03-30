@@ -35,3 +35,29 @@ def test_pbrun(mocker, parser, reset_cli_args):
     print(cmd)
     assert re.match("""%s %s -u %s 'echo %s; %s'""" % (pbrun_exe, pbrun_flags, task['become_user'],
                                                        success, default_cmd), cmd) is not None
+
+
+def test_pbrun_var_varoptions(mocker, parser, reset_cli_args):
+    options = parser.parse_args([])
+    context._init_global_context(options)
+
+    default_cmd = "/bin/foo"
+    default_exe = "/bin/bash"
+    pbrun_exe = 'pbrun'
+    pbrun_flags = ''
+
+    success = 'BECOME-SUCCESS-.+?'
+
+    task = {
+        'become_user': 'foo',
+        'become_method': 'community.general.pbrun',
+        'become_flags': pbrun_flags,
+    }
+    var_options = {
+        'become_user': 'bar',
+        'become_flags': '',
+    }
+    cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
+    print(cmd)
+    assert re.match("""%s %s -u %s 'echo %s; %s'""" % (pbrun_exe, '', task['become_user'],
+                                                       success, default_cmd), cmd) is not None

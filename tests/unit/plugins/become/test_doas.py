@@ -35,3 +35,29 @@ def test_doas(mocker, parser, reset_cli_args):
     print(cmd)
     assert (re.match("""%s %s -u %s %s -c 'echo %s; %s'""" % (doas_exe, doas_flags, task['become_user'], default_exe, success,
                                                               default_cmd), cmd) is not None)
+
+
+def test_doas_varoptions(mocker, parser, reset_cli_args):
+    options = parser.parse_args([])
+    context._init_global_context(options)
+
+    default_cmd = "/bin/foo"
+    default_exe = "/bin/bash"
+    doas_exe = 'doas'
+    doas_flags = '-n'
+
+    success = 'BECOME-SUCCESS-.+?'
+
+    task = {
+        'become_user': 'foo',
+        'become_method': 'community.general.doas',
+        'become_flags': doas_flags,
+    }
+    var_options = {
+        'become_user': 'bar',
+        'become_flags': '',
+    }
+    cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
+    print(cmd)
+    assert (re.match("""%s %s -u %s %s -c 'echo %s; %s'""" % (doas_exe, doas_flags, task['become_user'], default_exe, success,
+                                                              default_cmd), cmd) is not None)
