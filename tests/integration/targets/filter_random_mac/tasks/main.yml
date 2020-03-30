@@ -55,5 +55,5 @@
 - name: Verify random_mac filter with seed
   assert:
     that:
-      - "'00:00:00' | communit.general.random_mac(seed='test') == '00:00:00' | community.general.random_mac(seed='test')"
+      - "'00:00:00' | community.general.random_mac(seed='test') == '00:00:00' | community.general.random_mac(seed='test')"
       - "'00:00:00' | community.general.random_mac(seed='test') != '00:00:00' | community.general.random_mac(seed='another_test')"
