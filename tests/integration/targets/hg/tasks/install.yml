@@ -19,22 +19,22 @@
 # using the apt module prevents autoremove from working, so call apt-get via shell instead
 - name: install mercurial (apt)
   shell: apt-get -y update && apt-get -y install mercurial
-  when: ansible_pkg_mgr == 'apt'
+  when: ansible_facts.pkg_mgr == 'apt'
 
 - name: install mercurial (dnf)
   dnf:
     name: mercurial
-  when: ansible_pkg_mgr == 'dnf'
+  when: ansible_facts.pkg_mgr == 'dnf'
 
 - name: install mercurial (yum)
   yum:
     name: mercurial
-  when: ansible_pkg_mgr == 'yum'
+  when: ansible_facts.pkg_mgr == 'yum'
 
 - name: install mercurial (pkgng)
   package:
     name: mercurial
-  when: ansible_pkg_mgr == 'pkgng'
+  when: ansible_facts.pkg_mgr in ['pkgng', 'community.general.pkgng']
 
 - name: preserve the updated python
   command: cp -av "{{ which_python.stdout }}" "{{ which_python.stdout }}.updated"
