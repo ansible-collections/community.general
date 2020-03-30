@@ -11,9 +11,8 @@ import re
 
 from ansible import context
 from ansible.playbook.play_context import PlayContext
-from ansible.plugins.loader import become_loader
 
-from .helper import make_become_cmd
+from .helper import call_become_plugin
 
 
 def test_pfexec(mocker, parser, reset_cli_args):
@@ -26,15 +25,15 @@ def test_pfexec(mocker, parser, reset_cli_args):
     pfexec_exe = 'pfexec'
     pfexec_flags = ''
 
-    cmd = make_become_cmd(play_context, cmd=default_cmd, executable=default_exe)
+    cmd = call_become_plugin(play_context, cmd=default_cmd, executable=default_exe)
     assert cmd == default_cmd
 
     success = 'BECOME-SUCCESS-.+?'
 
     play_context.become = True
     play_context.become_user = 'foo'
-    play_context.set_become_plugin(become_loader.get('community.general.pfexec'))
     play_context.become_method = 'community.general.pfexec'
     play_context.become_flags = pfexec_flags
-    cmd = make_become_cmd(play_context, cmd=default_cmd, executable=default_exe)
+    cmd = call_become_plugin(play_context, cmd=default_cmd, executable=default_exe)
+    print(cmd)
     assert re.match('''%s %s "'echo %s; %s'"''' % (pfexec_exe, pfexec_flags, success, default_cmd), cmd) is not None

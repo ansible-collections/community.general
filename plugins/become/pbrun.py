@@ -41,6 +41,7 @@ DOCUMENTATION = '''
               - name: ANSIBLE_PBRUN_EXE
         become_flags:
             description: Options to pass to pbrun
+            default: ''
             ini:
               - section: privilege_escalation
                 key: become_flags
@@ -93,10 +94,10 @@ class BecomeModule(BecomeBase):
         if not cmd:
             return cmd
 
-        become_exe = self.get_option('become_exe') or 'pbrun'
+        become_exe = self.get_option('become_exe')
 
-        flags = self.get_option('become_flags') or ''
-        user = self.get_option('become_user') or ''
+        flags = self.get_option('become_flags')
+        user = self.get_option('become_user')
         if user:
             user = '-u %s' % (user)
         noexe = not self.get_option('wrap_exe')

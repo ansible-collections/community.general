@@ -13,6 +13,7 @@ DOCUMENTATION = '''
     options:
         become_user:
             description: User you 'become' to execute the task
+            default: ''
             ini:
               - section: privilege_escalation
                 key: become_user
@@ -80,8 +81,8 @@ class BecomeModule(BecomeBase):
         if not cmd:
             return cmd
 
-        become = self.get_option('become_exe') or 'machinectl'
+        become = self.get_option('become_exe')
 
-        flags = self.get_option('become_flags') or ''
-        user = self.get_option('become_user') or ''
+        flags = self.get_option('become_flags')
+        user = self.get_option('become_user')
         return '%s -q shell %s %s@ %s' % (become, flags, user, cmd)

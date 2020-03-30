@@ -11,9 +11,8 @@ import re
 
 from ansible import context
 from ansible.playbook.play_context import PlayContext
-from ansible.plugins.loader import become_loader
 
-from .helper import make_become_cmd
+from .helper import call_become_plugin
 
 
 def test_dzdo(mocker, parser, reset_cli_args):
@@ -26,21 +25,21 @@ def test_dzdo(mocker, parser, reset_cli_args):
     dzdo_exe = 'dzdo'
     dzdo_flags = ''
 
-    cmd = make_become_cmd(play_context, cmd=default_cmd, executable=default_exe)
+    cmd = call_become_plugin(play_context, cmd=default_cmd, executable=default_exe)
     assert cmd == default_cmd
 
     success = 'BECOME-SUCCESS-.+?'
 
     play_context.become = True
     play_context.become_user = 'foo'
-    play_context.set_become_plugin(become_loader.get('community.general.dzdo'))
     play_context.become_method = 'community.general.dzdo'
     play_context.become_flags = dzdo_flags
-    cmd = make_become_cmd(play_context, cmd=default_cmd, executable=default_exe)
+    cmd = call_become_plugin(play_context, cmd=default_cmd, executable=default_exe)
+    print(cmd)
     assert re.match("""%s %s -u %s %s -c 'echo %s; %s'""" % (dzdo_exe, dzdo_flags, play_context.become_user, default_exe,
                                                              success, default_cmd), cmd) is not None
     play_context.become_pass = 'testpass'
-    play_context.set_become_plugin(become_loader.get('community.general.dzdo'))
-    cmd = make_become_cmd(play_context, cmd=default_cmd, executable=default_exe)
+    cmd = call_become_plugin(play_context, cmd=default_cmd, executable=default_exe)
+    print(cmd)
     assert re.match("""%s %s -p %s -u %s %s -c 'echo %s; %s'""" % (dzdo_exe, dzdo_flags, r'\"\[dzdo via ansible, key=.+?\] password:\"',
                                                                    play_context.become_user, default_exe, success, default_cmd), cmd) is not None

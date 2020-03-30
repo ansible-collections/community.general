@@ -8,37 +8,31 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible.errors import AnsibleError
-from ansible.plugins.loader import get_shell_plugin
+from ansible.plugins.loader import become_loader, get_shell_plugin
 
 
-def make_become_cmd(play_context, cmd, executable=None):
-    """ helper function to create privilege escalation commands """
-    if not cmd or not play_context.become:
-        return cmd
+def call_become_plugin(play_context, cmd, executable=None):
+    """Helper function to call become plugin simiarly on how Ansible itself handles this."""
+    plugin = become_loader.get(play_context.become_method)
+    if not plugin:
+        raise AnsibleError("Privilege escalation method not found: %s" % play_context.become_method)
 
-    become_method = play_context.become_method
+    play_context.set_become_plugin(plugin)
 
-    # load/call become plugins here
-    plugin = play_context._become_plugin
+    options = {
+        'become_exe': play_context.become_exe,
+        'become_flags': play_context.become_flags,
+        'become_user': play_context.become_user,
+        'become_pass': play_context.become_pass,
+    }
+    task_keys = {}
+    for k, v in options.items():
+        if v is not None:
+            task_keys[k] = v
+    plugin.set_options(task_keys=options, var_options={})
 
-    if plugin:
-        options = {
-            'become_exe': play_context.become_exe or '',
-            'become_flags': play_context.become_flags or '',
-            'become_user': play_context.become_user,
-            'become_pass': play_context.become_pass
-        }
-        plugin.set_options(direct=options)
+    if not executable:
+        executable = play_context.executable
 
-        if not executable:
-            executable = play_context.executable
-
-        shell = get_shell_plugin(executable=executable)
-        cmd = plugin.build_become_command(cmd, shell)
-        # for backwards compat:
-        if play_context.become_pass:
-            play_context.prompt = plugin.prompt
-    else:
-        raise AnsibleError("Privilege escalation method not found: %s" % become_method)
-
-    return cmd
+    shell = get_shell_plugin(executable=executable)
+    return plugin.build_become_command(cmd, shell)

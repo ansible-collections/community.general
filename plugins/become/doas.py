@@ -111,13 +111,13 @@ class BecomeModule(BecomeBase):
 
         self.prompt = True
 
-        become_exe = self.get_option('become_exe') or 'doas'
+        become_exe = self.get_option('become_exe')
 
-        flags = self.get_option('become_flags') or ''
+        flags = self.get_option('become_flags')
         if not self.get_option('become_pass') and '-n' not in flags:
             flags += ' -n'
 
-        user = self.get_option('become_user') or ''
+        user = self.get_option('become_user')
         if user:
             user = '-u %s' % (user)
 

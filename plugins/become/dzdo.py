@@ -82,14 +82,14 @@ class BecomeModule(BecomeBase):
         if not cmd:
             return cmd
 
-        becomecmd = self.get_option('become_exe') or 'dzdo'
+        becomecmd = self.get_option('become_exe')
 
-        flags = self.get_option('become_flags') or ''
+        flags = self.get_option('become_flags')
         if self.get_option('become_pass'):
             self.prompt = '[dzdo via ansible, key=%s] password:' % self._id
             flags = '%s -p "%s"' % (flags.replace('-n', ''), self.prompt)
 
-        user = self.get_option('become_user') or ''
+        user = self.get_option('become_user')
         if user:
             user = '-u %s' % (user)
 
