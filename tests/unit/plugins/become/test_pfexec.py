@@ -50,12 +50,12 @@ def test_pfexec_varoptions(mocker, parser, reset_cli_args):
     task = {
         'become_user': 'foo',
         'become_method': 'community.general.pfexec',
-        'become_flags': pfexec_flags,
+        'become_flags': 'xxx',
     }
     var_options = {
-        'become_user': 'bar',
-        'become_flags': '',
+        'ansible_become_user': 'bar',
+        'ansible_become_flags': pfexec_flags,
     }
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert re.match('''%s %s "'echo %s; %s'"''' % (pfexec_exe, '', success, default_cmd), cmd) is not None
+    assert re.match('''%s %s "'echo %s; %s'"''' % (pfexec_exe, pfexec_flags, success, default_cmd), cmd) is not None

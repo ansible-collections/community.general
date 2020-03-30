@@ -51,13 +51,13 @@ def test_ksu_varoptions(mocker, parser, reset_cli_args):
     task = {
         'become_user': 'foo',
         'become_method': 'community.general.ksu',
-        'become_flags': ksu_flags,
+        'become_flags': 'xxx',
     }
     var_options = {
-        'become_user': 'bar',
-        'become_flags': '',
+        'ansible_become_user': 'bar',
+        'ansible_become_flags': ksu_flags,
     }
     cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s %s %s -e %s -c 'echo %s; %s'""" % (ksu_exe, task['become_user'], '',
+    assert (re.match("""%s %s %s -e %s -c 'echo %s; %s'""" % (ksu_exe, var_options['ansible_become_user'], ksu_flags,
                                                               default_exe, success, default_cmd), cmd) is not None)
