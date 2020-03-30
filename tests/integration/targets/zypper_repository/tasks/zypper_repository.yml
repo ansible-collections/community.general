@@ -1,11 +1,11 @@
 - name: Delete test repo
-  zypper_repository:
+  community.general.zypper_repository:
     name: test
     state: absent
   register: zypper_result
 
 - name: Add test repo
-  zypper_repository:
+  community.general.zypper_repository:
     name: test
     state: present
     repo: http://dl.google.com/linux/chrome/rpm/stable/x86_64
@@ -17,7 +17,7 @@
       - "zypper_result.changed"
 
 - name: Add same repo again
-  zypper_repository:
+  community.general.zypper_repository:
     name: test
     state: present
     repo: http://dl.google.com/linux/chrome/rpm/stable/x86_64
@@ -29,7 +29,7 @@
       - "not zypper_result.changed"
 
 - name: Change repo URL
-  zypper_repository:
+  community.general.zypper_repository:
     name: test
     state: present
     repo: http://download.videolan.org/pub/vlc/SuSE/Leap_{{ ansible_distribution_version }}/
@@ -41,7 +41,7 @@
       - "zypper_result.changed"
 
 - name: use refresh option
-  zypper_repository:
+  community.general.zypper_repository:
     name: testrefresh
     refresh: no
     state: present
@@ -56,7 +56,7 @@
       - '"autorefresh=\"0\"" in zypper_result.stdout'
 
 - name: set repo priority
-  zypper_repository:
+  community.general.zypper_repository:
     name: testprio
     priority: 55
     state: present
@@ -71,7 +71,7 @@
       - '"priority=\"55\"" in zypper_result.stdout'
 
 - name: add two repos with same url
-  zypper_repository:
+  community.general.zypper_repository:
     name: "{{item}}"
     state: present
     repo: http://dl.google.com/linux/chrome/rpm/stable/x86_64
@@ -96,7 +96,7 @@
       - "'http://dl.google.com/linux/chrome/rpm/stable/x86_64' in zypper_result2.stdout"
 
 - name: add two repos with same name
-  zypper_repository:
+  community.general.zypper_repository:
     name: samename
     state: present
     repo: "{{ item }}"
@@ -114,12 +114,12 @@
       - "'/devel:/languages:/ruby/' in zypper_result.stdout"
 
 - name: remove last added repos (by URL to test that)
-  zypper_repository:
+  community.general.zypper_repository:
     repo: http://download.opensuse.org/repositories/devel:/languages:/ruby/openSUSE_Leap_{{ ansible_distribution_version }}/
     state: absent
 
 - name: "Test adding a repo with custom GPG key"
-  zypper_repository:
+  community.general.zypper_repository:
     name: "Apache_Modules"
     repo: "http://download.opensuse.org/repositories/Apache:/Modules/openSUSE_Tumbleweed/"
     priority: 100
