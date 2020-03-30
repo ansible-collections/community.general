@@ -123,6 +123,7 @@ branches:
   except:
     - "*-patch-*"
     - "revert-*-*"
+    - "master"
 
 build:
   ci:
