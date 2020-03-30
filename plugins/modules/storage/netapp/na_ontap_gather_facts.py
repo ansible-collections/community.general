@@ -19,7 +19,7 @@ deprecated:
   alternative: Use M(na_ontap_info) instead.
 author: Piotr Olczak (@dprts) <polczak@redhat.com>
 extends_documentation_fragment:
-- netapp.ontap.netapp.na_ontap
+- community.general.netapp.na_ontap
 
 short_description: NetApp information gatherer
 description:
