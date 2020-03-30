@@ -20,17 +20,6 @@
     folder_path: "{{ playbook_dir }}/test_directory/repo"
     comment: Add file1 and file2
     add: [ "{{ file1 }}", "{{ file2 }}" ]
-    mode: local
-    url: "{{ playbook_dir }}/test_directory/repo.git"
-
-- assert: { that: "result.changed == true" }
-
-- name: LOCAL push on master
-  register: result
-  git_push:
-    folder_path: "{{ playbook_dir }}/test_directory/repo"
-    branch: master
-    mode: local
     url: "{{ playbook_dir }}/test_directory/repo.git"
 
 - assert: { that: "result.changed == true" }
@@ -48,17 +37,6 @@
   git_commit:
     folder_path: "{{ playbook_dir }}/test_directory/repo"
     comment: Add .
-    mode: local
-    url: "{{ playbook_dir }}/test_directory/repo.git"
-
-- assert: { that: "result.changed == true" }
-
-- name: LOCAL push on master
-  register: result
-  git_push:
-    folder_path: "{{ playbook_dir }}/test_directory/repo"
-    branch: master
-    mode: local
     url: "{{ playbook_dir }}/test_directory/repo.git"
 
 - assert: { that: "result.changed == true" }
