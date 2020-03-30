@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: community.general.git_push
+module: git_push
 author:
     - "Federico Olivieri (@Federico87)"
 version_added: "2.10"
