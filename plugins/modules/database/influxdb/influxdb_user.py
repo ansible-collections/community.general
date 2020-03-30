@@ -235,10 +235,12 @@ def main():
 
             try:
                 if admin and not user['admin']:
-                    client.grant_admin_privileges(user_name)
+                    if not module.check_mode:
+                        client.grant_admin_privileges(user_name)
                     changed = True
                 elif not admin and user['admin']:
-                    client.revoke_admin_privileges(user_name)
+                    if not module.check_mode:
+                        client.revoke_admin_privileges(user_name)
                     changed = True
             except influx.exceptions.InfluxDBClientError as e:
                 module.fail_json(msg=to_native(e))
