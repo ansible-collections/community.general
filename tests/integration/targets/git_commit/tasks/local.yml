@@ -17,10 +17,9 @@
 - name: LOCAL +add +mode
   register: result
   git_commit:
-    folder_path: "{{ playbook_dir }}/test_directory/repo"
+    path: "{{ playbook_dir }}/test_directory/repo"
     comment: Add file1 and file2
     add: [ "{{ file1 }}", "{{ file2 }}" ]
-    url: "{{ playbook_dir }}/test_directory/repo.git"
 
 - assert: { that: "result.changed == true" }
 
@@ -35,8 +34,7 @@
 - name: LOCAL -add +mode
   register: result
   git_commit:
-    folder_path: "{{ playbook_dir }}/test_directory/repo"
+    path: "{{ playbook_dir }}/test_directory/repo"
     comment: Add .
-    url: "{{ playbook_dir }}/test_directory/repo.git"
 
 - assert: { that: "result.changed == true" }
