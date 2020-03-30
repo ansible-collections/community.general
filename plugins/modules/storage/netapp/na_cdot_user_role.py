@@ -18,7 +18,7 @@ module: na_cdot_user_role
 
 short_description: useradmin configuration and management
 extends_documentation_fragment:
-- community.general.netapp.ontap
+- community.general._netapp.ontap
 
 author: Sumit Kumar (@timuster) <sumit4@netapp.com>
 

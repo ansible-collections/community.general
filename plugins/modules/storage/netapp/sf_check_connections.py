@@ -21,7 +21,7 @@ deprecated:
   alternative: please use M(na_elementsw_check_connections)
 short_description: Check connectivity to MVIP and SVIP.
 extends_documentation_fragment:
-- community.general.netapp.solidfire
+- community.general._netapp.solidfire
 
 author: Sumit Kumar (@timuster) <sumit4@netapp.com>
 description:

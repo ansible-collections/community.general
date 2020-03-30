@@ -18,7 +18,7 @@ module: na_cdot_svm
 
 short_description: Manage NetApp cDOT svm
 extends_documentation_fragment:
-- community.general.netapp.ontap
+- community.general._netapp.ontap
 
 author: Sumit Kumar (@timuster) <sumit4@netapp.com>
 

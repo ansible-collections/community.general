@@ -19,7 +19,7 @@ description:
     - Allow the user to configure several of the global settings associated with an E-Series storage-system
 author: Michael Price (@lmprice)
 extends_documentation_fragment:
-- community.general.netapp.eseries
+- community.general._netapp.eseries
 
 options:
     name:

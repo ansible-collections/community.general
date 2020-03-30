@@ -21,7 +21,7 @@ deprecated:
   alternative: please use M(na_elementsw_volume)
 short_description: Manage SolidFire volumes
 extends_documentation_fragment:
-- community.general.netapp.solidfire
+- community.general._netapp.solidfire
 
 author: Sumit Kumar (@timuster) <sumit4@netapp.com>
 description:

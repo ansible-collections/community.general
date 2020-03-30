@@ -18,7 +18,7 @@ module: na_cdot_lun
 
 short_description: Manage  NetApp cDOT luns
 extends_documentation_fragment:
-- community.general.netapp.ontap
+- community.general._netapp.ontap
 
 author: Sumit Kumar (@timuster) <sumit4@netapp.com>
 

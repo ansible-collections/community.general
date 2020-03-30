@@ -19,7 +19,7 @@ description:
     - Allows for the creation, removal and updating of Asynchronous Mirror Groups for NetApp E-series storage arrays
 author: Kevin Hulquest (@hulquest)
 extends_documentation_fragment:
-- community.general.netapp.eseries
+- community.general._netapp.eseries
 
 options:
     name:

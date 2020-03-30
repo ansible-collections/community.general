@@ -21,7 +21,7 @@ short_description: NetApp E-Series create, delete, or modify lun mappings
 description:
      - Create, delete, or modify mappings between a volume and a targeted host/host+ group.
 extends_documentation_fragment:
-- community.general.netapp.eseries
+- community.general._netapp.eseries
 
 options:
   state:

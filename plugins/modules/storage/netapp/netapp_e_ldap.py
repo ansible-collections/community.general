@@ -19,7 +19,7 @@ description:
     - Configure an E-Series system to allow authentication via an LDAP server
 author: Michael Price (@lmprice)
 extends_documentation_fragment:
-- community.general.netapp.eseries
+- community.general._netapp.eseries
 
 options:
     state:

@@ -21,7 +21,7 @@ author:
     - Michael Price (@lmprice)
     - Nathan Swartz (@ndswartz)
 extends_documentation_fragment:
-- community.general.netapp.eseries
+- community.general._netapp.eseries
 
 options:
     state:

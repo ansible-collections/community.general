@@ -19,7 +19,7 @@ description:
     - Configure the settings of an E-Series iSCSI target
 author: Michael Price (@lmprice)
 extends_documentation_fragment:
-- community.general.netapp.eseries
+- community.general._netapp.eseries
 
 options:
     name:
