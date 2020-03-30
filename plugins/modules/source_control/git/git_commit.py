@@ -14,24 +14,24 @@ module: git_commit
 author:
     - "Federico Olivieri (@Federico87)"
 version_added: "2.10"
-short_description: Perform git and and git commit operations.
+short_description: Perform git add and git commit operations.
 description:
-    - Manage git add and git commit on local git repository.
+    - Manage C(git add) and C(git commit) on a local git.
 options:
     path:
         description:
-            - Folder path where .git/ is located.
+            - Folder path where C(.git/) is located.
         required: true
         type: path
     comment:
         description:
-            - Git commit comment. Same as "git commit -m".
+            - Git commit comment. Same as C(git commit -m).
         type: str
         required: true
     add:
         description:
-            - list of files to be staged. Same as "git add ."
-              Asterisx values not accepted. i.e. "./*" or "*".
+            - List of files to be staged. Same as C(git add .).
+              File globs not accepted, such as C(./*) or C(*).
         type: list
         default: ["."]
         elements: str
@@ -40,7 +40,7 @@ requirements:
 '''
 
 EXAMPLES = '''
-- name: Add and commit 2 files.
+- name: Add and commit two files.
   community.general.git_commit:
     path: /Users/federicoolivieri/git/git_test_module
     comment: My amazing backup
@@ -68,25 +68,17 @@ from ansible.module_utils.basic import AnsibleModule
 
 def git_commit(module):
 
-    commands = list()
-
     add = module.params.get('add')
     path = module.params.get('path')
     comment = module.params.get('comment')
 
     if add:
-        commands.append('git -C {path} add {add}'.format(
-            path=path,
-            add=' '.join(add),
-        ))
+        add_cmds = ['git', '-C', path, 'add', '{0}'.format(' '.join(add))]
 
     if comment:
-        commands.append('git -C {path} commit -m "{comment}"'.format(
-            path=path,
-            comment=comment,
-        ))
-
-    return commands
+        commit_cmds = ['git', '-C', path, 'commit', '-m', '"{0}"'.format(comment), '--porcelain']
+    
+    return [add_cmds + commit_cmds ]
 
 
 def main():
