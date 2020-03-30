@@ -28,12 +28,12 @@
 
 - set_fact:
     # If netaddr would be installed on the controller, one could do:
-    nname_3_ipv4_2: "{{ subnet_ipv4 | next_nth_usable(2) }}"
-    nname_3_ipv4_3: "{{ subnet_ipv4 | next_nth_usable(3) }}"
-    nname_3_ipv4_4: "{{ subnet_ipv4 | next_nth_usable(4) }}"
-    nname_3_ipv6_2: "{{ subnet_ipv6 | next_nth_usable(2) }}"
-    nname_3_ipv6_3: "{{ subnet_ipv6 | next_nth_usable(3) }}"
-    nname_3_ipv6_4: "{{ subnet_ipv6 | next_nth_usable(4) }}"
+    nname_3_ipv4_2: "{{ subnet_ipv4 | ansible.netcommon.next_nth_usable(2) }}"
+    nname_3_ipv4_3: "{{ subnet_ipv4 | ansible.netcommon.next_nth_usable(3) }}"
+    nname_3_ipv4_4: "{{ subnet_ipv4 | ansible.netcommon.next_nth_usable(4) }}"
+    nname_3_ipv6_2: "{{ subnet_ipv6 | ansible.netcommon.next_nth_usable(2) }}"
+    nname_3_ipv6_3: "{{ subnet_ipv6 | ansible.netcommon.next_nth_usable(3) }}"
+    nname_3_ipv6_4: "{{ subnet_ipv6 | ansible.netcommon.next_nth_usable(4) }}"
 
 - debug:
     msg: "Chose random IPv4 subnet {{ subnet_ipv4 }} and random IPv6 subnet {{ subnet_ipv6 }}"
@@ -677,44 +677,44 @@
       that:
       - networks_1 is changed
       - networks_1.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv4Address == nname_3_ipv4_2
-      - networks_1.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ipaddr == nname_3_ipv6_2 | ipaddr
+      - networks_1.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ansible.netcommon.ipaddr == nname_3_ipv6_2 | ansible.netcommon.ipaddr
       - networks_1.container.NetworkSettings.Networks[nname_3].IPAddress == ""
       - networks_1.container.NetworkSettings.Networks[nname_3].GlobalIPv6Address == ""
       - networks_2 is not changed
       - networks_2.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv4Address == nname_3_ipv4_2
-      - networks_2.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ipaddr == nname_3_ipv6_2 | ipaddr
+      - networks_2.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ansible.netcommon.ipaddr == nname_3_ipv6_2 | ansible.netcommon.ipaddr
       - networks_2.container.NetworkSettings.Networks[nname_3].IPAddress == ""
       - networks_2.container.NetworkSettings.Networks[nname_3].GlobalIPv6Address == ""
       - networks_3 is changed
       - networks_3.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv4Address == nname_3_ipv4_3
-      - networks_3.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ipaddr == nname_3_ipv6_2 | ipaddr
+      - networks_3.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ansible.netcommon.ipaddr == nname_3_ipv6_2 | ansible.netcommon.ipaddr
       - networks_3.container.NetworkSettings.Networks[nname_3].IPAddress == ""
       - networks_3.container.NetworkSettings.Networks[nname_3].GlobalIPv6Address == ""
       - networks_4 is changed
       - networks_4.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv4Address == nname_3_ipv4_3
-      - networks_4.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ipaddr == nname_3_ipv6_3 | ipaddr
+      - networks_4.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ansible.netcommon.ipaddr == nname_3_ipv6_3 | ansible.netcommon.ipaddr
       - networks_4.container.NetworkSettings.Networks[nname_3].IPAddress == ""
       - networks_4.container.NetworkSettings.Networks[nname_3].GlobalIPv6Address == ""
       - networks_5 is changed
       - networks_5.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv4Address == nname_3_ipv4_3
-      - networks_5.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ipaddr == nname_3_ipv6_3 | ipaddr
+      - networks_5.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ansible.netcommon.ipaddr == nname_3_ipv6_3 | ansible.netcommon.ipaddr
       - networks_5.container.NetworkSettings.Networks[nname_3].IPAddress == nname_3_ipv4_3
-      - networks_5.container.NetworkSettings.Networks[nname_3].GlobalIPv6Address | ipaddr == nname_3_ipv6_3 | ipaddr
+      - networks_5.container.NetworkSettings.Networks[nname_3].GlobalIPv6Address | ansible.netcommon.ipaddr == nname_3_ipv6_3 | ansible.netcommon.ipaddr
       - networks_6 is changed
       - networks_6.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv4Address == nname_3_ipv4_4
-      - networks_6.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ipaddr == nname_3_ipv6_3 | ipaddr
+      - networks_6.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ansible.netcommon.ipaddr == nname_3_ipv6_3 | ansible.netcommon.ipaddr
       - networks_6.container.NetworkSettings.Networks[nname_3].IPAddress == nname_3_ipv4_4
-      - networks_6.container.NetworkSettings.Networks[nname_3].GlobalIPv6Address | ipaddr == nname_3_ipv6_3 | ipaddr
+      - networks_6.container.NetworkSettings.Networks[nname_3].GlobalIPv6Address | ansible.netcommon.ipaddr == nname_3_ipv6_3 | ansible.netcommon.ipaddr
       - networks_7 is changed
       - networks_7.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv4Address == nname_3_ipv4_4
-      - networks_7.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ipaddr == nname_3_ipv6_4 | ipaddr
+      - networks_7.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ansible.netcommon.ipaddr == nname_3_ipv6_4 | ansible.netcommon.ipaddr
       - networks_7.container.NetworkSettings.Networks[nname_3].IPAddress == nname_3_ipv4_4
-      - networks_7.container.NetworkSettings.Networks[nname_3].GlobalIPv6Address | ipaddr == nname_3_ipv6_4 | ipaddr
+      - networks_7.container.NetworkSettings.Networks[nname_3].GlobalIPv6Address | ansible.netcommon.ipaddr == nname_3_ipv6_4 | ansible.netcommon.ipaddr
       - networks_8 is not changed
       - networks_8.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv4Address == nname_3_ipv4_4
-      - networks_8.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ipaddr == nname_3_ipv6_4 | ipaddr
+      - networks_8.container.NetworkSettings.Networks[nname_3].IPAMConfig.IPv6Address | ansible.netcommon.ipaddr == nname_3_ipv6_4 | ansible.netcommon.ipaddr
       - networks_8.container.NetworkSettings.Networks[nname_3].IPAddress == nname_3_ipv4_4
-      - networks_8.container.NetworkSettings.Networks[nname_3].GlobalIPv6Address | ipaddr == nname_3_ipv6_4 | ipaddr
+      - networks_8.container.NetworkSettings.Networks[nname_3].GlobalIPv6Address | ansible.netcommon.ipaddr == nname_3_ipv6_4 | ansible.netcommon.ipaddr
 
   when: docker_py_version is version('1.10.0', '>=')
 
