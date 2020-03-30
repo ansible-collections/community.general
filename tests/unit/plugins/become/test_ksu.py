@@ -10,7 +10,6 @@ __metaclass__ = type
 import re
 
 from ansible import context
-from ansible.playbook.play_context import PlayContext
 
 from .helper import call_become_plugin
 
@@ -18,23 +17,20 @@ from .helper import call_become_plugin
 def test_ksu(mocker, parser, reset_cli_args):
     options = parser.parse_args([])
     context._init_global_context(options)
-    play_context = PlayContext()
 
     default_cmd = "/bin/foo"
     default_exe = "/bin/bash"
     ksu_exe = 'ksu'
     ksu_flags = ''
 
-    cmd = call_become_plugin(play_context, cmd=default_cmd, executable=default_exe)
-    assert cmd == default_cmd
-
     success = 'BECOME-SUCCESS-.+?'
 
-    play_context.become = True
-    play_context.become_user = 'foo'
-    play_context.become_method = 'community.general.ksu'
-    play_context.become_flags = ksu_flags
+    play_context = {
+        'become_user': 'foo',
+        'become_method': 'community.general.ksu',
+        'become_flags': ksu_flags,
+    }
     cmd = call_become_plugin(play_context, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s %s %s -e %s -c 'echo %s; %s'""" % (ksu_exe, play_context.become_user, ksu_flags,
+    assert (re.match("""%s %s %s -e %s -c 'echo %s; %s'""" % (ksu_exe, play_context['become_user'], ksu_flags,
                                                               default_exe, success, default_cmd), cmd) is not None)
