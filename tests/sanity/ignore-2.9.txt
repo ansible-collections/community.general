@@ -98,6 +98,9 @@ plugins/module_utils/alicloud_ecs.py metaclass-boilerplate
 plugins/module_utils/cloud.py future-import-boilerplate
 plugins/module_utils/cloud.py metaclass-boilerplate
 plugins/module_utils/compat/ipaddress.py future-import-boilerplate
+plugins/module_utils/compat/ipaddress.py metaclass-boilerplate
+plugins/module_utils/compat/ipaddress.py no-assert
+plugins/module_utils/compat/ipaddress.py no-unicode-literals
 plugins/module_utils/database.py future-import-boilerplate
 plugins/module_utils/database.py metaclass-boilerplate
 plugins/module_utils/digital_ocean.py future-import-boilerplate

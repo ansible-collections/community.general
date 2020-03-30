@@ -19,11 +19,11 @@
 
 - name: Ensure zip is present to create test archive (yum)
   yum: name=zip state=latest
-  when: ansible_pkg_mgr == 'yum'
+  when: ansible_facts.pkg_mgr == 'yum'
 
 - name: Ensure zip is present to create test archive (apt)
   apt: name=zip state=latest
-  when: ansible_pkg_mgr == 'apt'
+  when: ansible_facts.pkg_mgr == 'apt'
 
 - name: Install prerequisites for backports.lzma when using python2 (non OSX)
   block:

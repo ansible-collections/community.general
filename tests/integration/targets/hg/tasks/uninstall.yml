@@ -14,26 +14,26 @@
 # using the apt module prevents autoremove from working, so call apt-get via shell instead
 - name: uninstall packages which were not originally installed (apt)
   shell: apt-get -y remove mercurial && apt-get -y autoremove
-  when: ansible_pkg_mgr == 'apt'
+  when: ansible_facts.pkg_mgr == 'apt'
 
 - name: uninstall packages which were not originally installed (dnf)
   dnf:
     name: mercurial
     state: absent
     autoremove: yes
-  when: ansible_pkg_mgr == 'dnf'
+  when: ansible_facts.pkg_mgr == 'dnf'
 
 # the yum module does not have an autoremove parameter
 - name: uninstall packages which were not originally installed (yum)
   shell: yum -y autoremove mercurial
-  when: ansible_pkg_mgr == 'yum'
+  when: ansible_facts.pkg_mgr == 'yum'
 
 - name: uninstall packages which were not originally installed (pkgng)
   package:
     name: mercurial
     state: absent
     autoremove: yes
-  when: ansible_pkg_mgr == 'pkgng'
+  when: ansible_facts.pkg_mgr in ['pkgng', 'community.general.pkgng']
 
 - name: restore the default python
   raw: mv "{{ which_python.stdout }}.default" "{{ which_python.stdout }}"
