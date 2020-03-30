@@ -64,7 +64,7 @@ import json
 import logging
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.netapp.ontap.plugins.module_utils.netapp import request, eseries_host_argument_spec
+from ansible_collections.community.general.plugins.module_utils._netapp import request, eseries_host_argument_spec
 from ansible.module_utils._text import to_native
 
 HEADERS = {

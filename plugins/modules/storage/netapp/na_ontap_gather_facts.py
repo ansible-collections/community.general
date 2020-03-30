@@ -119,7 +119,7 @@ ontap_facts:
 import traceback
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
-import ansible_collections.netapp.ontap.plugins.module_utils.netapp as netapp_utils
+import ansible_collections.community.general.plugins.module_utils._netapp as netapp_utils
 
 try:
     import xmltodict

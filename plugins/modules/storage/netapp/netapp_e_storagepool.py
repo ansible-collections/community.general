@@ -145,7 +145,7 @@ import functools
 from itertools import groupby
 from time import sleep
 from pprint import pformat
-from ansible_collections.netapp.ontap.plugins.module_utils.netapp import NetAppESeriesModule
+from ansible_collections.community.general.plugins.module_utils._netapp import NetAppESeriesModule
 from ansible.module_utils._text import to_native
 
 

@@ -231,7 +231,7 @@ RETURN = """
 
 from re import match
 from pprint import pformat
-from ansible_collections.netapp.ontap.plugins.module_utils.netapp import NetAppESeriesModule
+from ansible_collections.community.general.plugins.module_utils._netapp import NetAppESeriesModule
 
 
 class Facts(NetAppESeriesModule):

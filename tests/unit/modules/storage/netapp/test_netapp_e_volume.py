@@ -9,7 +9,7 @@ try:
 except ImportError:
     import mock
 
-from ansible_collections.netapp.ontap.plugins.module_utils.netapp import NetAppESeriesModule
+from ansible_collections.community.general.plugins.module_utils._netapp import NetAppESeriesModule
 from ansible_collections.community.general.plugins.modules.storage.netapp.netapp_e_volume import NetAppESeriesVolume
 from ansible_collections.community.general.tests.unit.modules.utils import AnsibleFailJson, ModuleTestCase, set_module_args
 

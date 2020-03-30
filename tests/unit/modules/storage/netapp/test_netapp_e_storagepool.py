@@ -372,7 +372,7 @@ class StoragePoolTest(ModuleTestCase):
          "usableCapacity": "2994631290880", "driveBlockFormat": "allNative"}]}
 
     REQUEST_FUNC = 'ansible_collections.community.general.plugins.modules.storage.netapp.netapp_e_storagepool.request'
-    NETAPP_REQUEST_FUNC = 'ansible_collections.netapp.ontap.plugins.module_utils.netapp.NetAppESeriesModule.request'
+    NETAPP_REQUEST_FUNC = 'ansible_collections.community.general.plugins.module_utils._netapp.NetAppESeriesModule.request'
     VALIDATE_FUNC = 'ansible_collections.community.general.plugins.modules.storage.netapp.netapp_e_storagepool.NetAppESeriesModule.validate_instance'
 
     DRIVES_PROPERTY = 'ansible_collections.community.general.plugins.modules.storage.netapp.netapp_e_storagepool.NetAppESeriesStoragePool.drives'

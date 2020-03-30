@@ -77,7 +77,7 @@ import os
 
 from time import sleep
 from ansible.module_utils import six
-from ansible_collections.netapp.ontap.plugins.module_utils.netapp import NetAppESeriesModule, create_multipart_formdata, request
+from ansible_collections.community.general.plugins.module_utils._netapp import NetAppESeriesModule, create_multipart_formdata, request
 from ansible.module_utils._text import to_native, to_text, to_bytes
 
 

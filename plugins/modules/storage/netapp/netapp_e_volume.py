@@ -255,7 +255,7 @@ msg:
     sample: "Standard volume [workload_vol_1] has been created."
 """
 from time import sleep
-from ansible_collections.netapp.ontap.plugins.module_utils.netapp import NetAppESeriesModule
+from ansible_collections.community.general.plugins.module_utils._netapp import NetAppESeriesModule
 from ansible.module_utils._text import to_native
 
 
