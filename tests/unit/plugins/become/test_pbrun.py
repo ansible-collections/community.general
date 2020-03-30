@@ -10,30 +10,54 @@ __metaclass__ = type
 import re
 
 from ansible import context
-from ansible.playbook.play_context import PlayContext
-from ansible.plugins.loader import become_loader
+
+from .helper import call_become_plugin
 
 
 def test_pbrun(mocker, parser, reset_cli_args):
     options = parser.parse_args([])
     context._init_global_context(options)
-    play_context = PlayContext()
 
     default_cmd = "/bin/foo"
     default_exe = "/bin/bash"
     pbrun_exe = 'pbrun'
     pbrun_flags = ''
 
-    cmd = play_context.make_become_cmd(cmd=default_cmd, executable=default_exe)
-    assert cmd == default_cmd
+    success = 'BECOME-SUCCESS-.+?'
+
+    task = {
+        'become_user': 'foo',
+        'become_method': 'community.general.pbrun',
+        'become_flags': pbrun_flags,
+    }
+    var_options = {}
+    cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
+    print(cmd)
+    assert re.match("""%s %s -u %s 'echo %s; %s'""" % (pbrun_exe, pbrun_flags, task['become_user'],
+                                                       success, default_cmd), cmd) is not None
+
+
+def test_pbrun_var_varoptions(mocker, parser, reset_cli_args):
+    options = parser.parse_args([])
+    context._init_global_context(options)
+
+    default_cmd = "/bin/foo"
+    default_exe = "/bin/bash"
+    pbrun_exe = 'pbrun'
+    pbrun_flags = ''
 
     success = 'BECOME-SUCCESS-.+?'
 
-    play_context.become = True
-    play_context.become_user = 'foo'
-    play_context.set_become_plugin(become_loader.get('pbrun'))
-    play_context.become_method = 'pbrun'
-    play_context.become_flags = pbrun_flags
-    cmd = play_context.make_become_cmd(cmd=default_cmd, executable=default_exe)
-    assert re.match("""%s %s -u %s 'echo %s; %s'""" % (pbrun_exe, pbrun_flags, play_context.become_user,
+    task = {
+        'become_user': 'foo',
+        'become_method': 'community.general.pbrun',
+        'become_flags': 'xxx',
+    }
+    var_options = {
+        'ansible_become_user': 'bar',
+        'ansible_become_flags': pbrun_flags,
+    }
+    cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
+    print(cmd)
+    assert re.match("""%s %s -u %s 'echo %s; %s'""" % (pbrun_exe, pbrun_flags, var_options['ansible_become_user'],
                                                        success, default_cmd), cmd) is not None

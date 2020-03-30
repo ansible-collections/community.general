@@ -27,6 +27,7 @@ DOCUMENTATION = '''
               - name: ANSIBLE_PMRUN_EXE
         become_flags:
             description: Options to pass to pmrun
+            default: ''
             ini:
               - section: privilege_escalation
                 key: become_flags
@@ -70,6 +71,7 @@ class BecomeModule(BecomeBase):
         if not cmd:
             return cmd
 
-        become = self.get_option('become_exe') or self.name
-        flags = self.get_option('become_flags') or ''
+        become = self.get_option('become_exe')
+
+        flags = self.get_option('become_flags')
         return '%s %s %s' % (become, flags, shlex_quote(self._build_success_command(cmd, shell)))
