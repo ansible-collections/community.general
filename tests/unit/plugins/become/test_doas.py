@@ -25,12 +25,13 @@ def test_doas(mocker, parser, reset_cli_args):
 
     success = 'BECOME-SUCCESS-.+?'
 
-    play_context = {
+    task = {
         'become_user': 'foo',
         'become_method': 'community.general.doas',
         'become_flags': doas_flags,
     }
-    cmd = call_become_plugin(play_context, cmd=default_cmd, executable=default_exe)
+    var_options = {}
+    cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s %s -u %s %s -c 'echo %s; %s'""" % (doas_exe, doas_flags, play_context['become_user'], default_exe, success,
+    assert (re.match("""%s %s -u %s %s -c 'echo %s; %s'""" % (doas_exe, doas_flags, task['become_user'], default_exe, success,
                                                               default_cmd), cmd) is not None)

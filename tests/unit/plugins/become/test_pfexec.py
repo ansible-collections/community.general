@@ -25,11 +25,12 @@ def test_pfexec(mocker, parser, reset_cli_args):
 
     success = 'BECOME-SUCCESS-.+?'
 
-    play_context = {
+    task = {
         'become_user': 'foo',
         'become_method': 'community.general.pfexec',
         'become_flags': pfexec_flags,
     }
-    cmd = call_become_plugin(play_context, cmd=default_cmd, executable=default_exe)
+    var_options = {}
+    cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
     assert re.match('''%s %s "'echo %s; %s'"''' % (pfexec_exe, pfexec_flags, success, default_cmd), cmd) is not None

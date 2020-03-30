@@ -25,12 +25,13 @@ def test_ksu(mocker, parser, reset_cli_args):
 
     success = 'BECOME-SUCCESS-.+?'
 
-    play_context = {
+    task = {
         'become_user': 'foo',
         'become_method': 'community.general.ksu',
         'become_flags': ksu_flags,
     }
-    cmd = call_become_plugin(play_context, cmd=default_cmd, executable=default_exe)
+    var_options = {}
+    cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
     print(cmd)
-    assert (re.match("""%s %s %s -e %s -c 'echo %s; %s'""" % (ksu_exe, play_context['become_user'], ksu_flags,
+    assert (re.match("""%s %s %s -e %s -c 'echo %s; %s'""" % (ksu_exe, task['become_user'], ksu_flags,
                                                               default_exe, success, default_cmd), cmd) is not None)

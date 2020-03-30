@@ -11,9 +11,9 @@ from ansible.errors import AnsibleError
 from ansible.plugins.loader import become_loader, get_shell_plugin
 
 
-def call_become_plugin(play_context, cmd, executable=None):
+def call_become_plugin(task, var_options, cmd, executable=None):
     """Helper function to call become plugin simiarly on how Ansible itself handles this."""
-    plugin = become_loader.get(play_context['become_method'])
-    plugin.set_options(task_keys=play_context, var_options={})
+    plugin = become_loader.get(task['become_method'])
+    plugin.set_options(task_keys=task, var_options=var_options)
     shell = get_shell_plugin(executable=executable)
     return plugin.build_become_command(cmd, shell)
