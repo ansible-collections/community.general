@@ -1,5 +1,5 @@
 - name: Install docker 17
-  zypper:
+  community.general.zypper:
     name: "{{ docker_packages }}"
     force: yes
     disable_gpg_check: yes

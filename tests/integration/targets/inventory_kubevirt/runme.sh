@@ -13,6 +13,12 @@ pip install openshift -c constraints.txt
 
 ./server.py &
 
+cleanup() {
+  kill -9 "$(jobs -p)"
+}
+
+trap cleanup INT TERM EXIT
+
 # Fake auth file
 mkdir -p ~/.kube/
 cat <<EOF > ~/.kube/config
@@ -41,18 +47,17 @@ EOF
 #################################################
 
 # run the plugin second
-export ANSIBLE_INVENTORY_ENABLED=kubevirt
+export ANSIBLE_INVENTORY_ENABLED=community.general.kubevirt
 export ANSIBLE_INVENTORY=test.kubevirt.yml
 
 cat << EOF > "$OUTPUT_DIR/test.kubevirt.yml"
-plugin: kubevirt
+plugin: community.general.kubevirt
 connections:
   - namespaces:
       - default
 EOF
 
 ANSIBLE_JINJA2_NATIVE=1 ansible-inventory -vvvv -i "$OUTPUT_DIR/test.kubevirt.yml" --list --output="$OUTPUT_DIR/plugin.out"
-kill -9 "$(jobs -p)"
 
 #################################################
 #   DIFF THE RESULTS

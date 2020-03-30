@@ -5,7 +5,7 @@
   listen: cleanup mysql
 
 - name: remove mysql packages
-  action: '{{ ansible_pkg_mgr }}'
+  action: '{{ ansible_facts.pkg_mgr }}'
   args:
     name: "{{ item }}"
     state: absent
