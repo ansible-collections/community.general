@@ -9,7 +9,7 @@
     - include: 'zypper_repository.yml'
   always:
     - name: remove repositories added during test
-      zypper_repository:
+      community.general.zypper_repository:
         name: "{{item}}"
         state: absent
       with_items:
