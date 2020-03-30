@@ -9,7 +9,7 @@
 
 - name: Remove all floating IPs created by this test run
   cloudscale_floating_ip:
-    ip: '{{ item.network | ipaddr("address") }}'
+    ip: '{{ item.network | ansible.netcommon.ipaddr("address") }}'
     state: 'absent'
   when: cloudscale_resource_prefix in (item.reverse_ptr | string )
   with_items: '{{ floating_ip_list.json }}'

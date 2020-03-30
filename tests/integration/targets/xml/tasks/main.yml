@@ -1,6 +1,4 @@
-- name: Gather facts
-  setup:
-
+---
 - name: Install lxml (FreeBSD)
   package:
     name: '{{ "py27-lxml" if ansible_python.version.major == 2 else "py36-lxml" }}'
