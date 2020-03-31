@@ -46,6 +46,14 @@ options:
         description:
             - RHN/Satellite password.
         required: true
+    validate_certs:
+        description:
+            - If C(False), SSL certificates will not be validated.
+            - This should only set to C(False) when used on self controlled sites
+              using self-signed certificates, and you are absolutely sure that nobody
+              can modify traffic between the module and the site.
+        type: bool
+        default: true
 '''
 
 EXAMPLES = '''
@@ -58,6 +66,7 @@ EXAMPLES = '''
   delegate_to: localhost
 '''
 
+import ssl
 from ansible.module_utils._text import to_text
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import xmlrpc_client
@@ -103,6 +112,7 @@ def main():
             url=dict(type='str', required=True),
             user=dict(type='str', required=True),
             password=dict(type='str', required=True, aliases=['pwd'], no_log=True),
+            validate_certs=dict(type='bool', default=True),
         )
     )
 
@@ -112,9 +122,23 @@ def main():
     saturl = module.params['url']
     user = module.params['user']
     password = module.params['password']
+    validate_certs = module.params['validate_certs']
+
+    ssl_context = None
+    if not validate_certs:
+        try:  # Python 2.7.9 and newer
+            ssl_context = ssl.create_unverified_context()
+        except AttributeError:  # Legacy Python that doesn't verify HTTPS certificates by default
+            ssl._create_default_context = ssl._create_unverified_context
+        else:  # Python 2.7.8 and older
+            ssl._create_default_https_context = ssl._create_unverified_https_context
 
     # initialize connection
-    client = xmlrpc_client.ServerProxy(saturl)
+    if ssl_context:
+        client = xmlrpc_client.ServerProxy(saturl, context=ssl_context)
+    else:
+        client = xmlrpc_client.Server(saturl)
+
     try:
         session = client.auth.login(user, password)
     except Exception as e:
