@@ -10,7 +10,6 @@ license_file: COPYING
 tags: null
 # NOTE: No more dependencies can be added to this list
 #dependencies:
-#  netapp.ontap: '>=0.1.0'
 #  community.kubernetes: '>=0.1.0'
 #  ovirt.ovirt_collection: '>=0.1.0'
 #  ansible.netcommon: '>=0.1.0'

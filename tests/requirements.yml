@@ -4,7 +4,6 @@ integration_tests_dependencies:
 - ansible.netcommon
 unit_tests_dependencies:
 - netbox.netbox
-- netapp.ontap
 - community.kubernetes
 - ansible.netcommon
 - cisco.meraki
