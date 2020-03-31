@@ -1,4 +1,9 @@
 - block:
+  - tempfile:
+      state: directory
+      suffix: supervisorctl-tests
+    register: supervisord_sock_path
+
   - command: 'echo {{ output_dir }}'
     register: echo
   - set_fact:
@@ -36,3 +41,7 @@
         - 'uninstall_{{ ansible_distribution }}.yml' # CentOS
         - 'uninstall_{{ ansible_os_family }}.yml'    # RedHat
         - 'uninstall_{{ ansible_system }}.yml'       # Linux
+
+  - file:
+      path: '{{ supervisord_sock_path.path }}'
+      state: absent
