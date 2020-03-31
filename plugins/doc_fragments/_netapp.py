@@ -74,45 +74,6 @@ notes:
 
 '''
 
-    # Documentation fragment for E-Series
-    ESERIES = r'''
-options:
-  api_username:
-    required: true
-    type: str
-    description:
-    - The username to authenticate with the SANtricity Web Services Proxy or Embedded Web Services API.
-  api_password:
-    required: true
-    type: str
-    description:
-    - The password to authenticate with the SANtricity Web Services Proxy or Embedded Web Services API.
-  api_url:
-    required: true
-    type: str
-    description:
-    - The url to the SANtricity Web Services Proxy or Embedded Web Services API.
-      Example https://prod-1.wahoo.acme.com/devmgr/v2
-  validate_certs:
-    required: false
-    default: true
-    description:
-        - Should https certificates be validated?
-    type: bool
-  ssid:
-    required: false
-    type: str
-    default: 1
-    description:
-    - The ID of the array to manage. This value must be unique for each array.
-
-notes:
-  - The E-Series Ansible modules require either an instance of the Web Services Proxy (WSP), to be available to manage
-    the storage-system, or an E-Series storage-system that supports the Embedded Web Services API.
-  - Embedded Web Services is currently available on the E2800, E5700, EF570, and newer hardware models.
-  - M(netapp_e_storage_system) may be utilized for configuring the systems managed by a WSP instance.
-'''
-
     # Documentation fragment for ONTAP (na_ontap)
     NA_ONTAP = r'''
 options:
