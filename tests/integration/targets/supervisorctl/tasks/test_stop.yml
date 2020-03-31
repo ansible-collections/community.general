@@ -3,7 +3,7 @@
     name: 'pys:py1'
     state: stopped
     # test with 'server_url' parameter
-    server_url: 'unix://{{ remote_dir }}/supervisord.sock'
+    server_url: 'unix://{{ supervisord_sock_path.path }}/supervisord.sock'
   register: result
   when: credentials.username == ''
 
@@ -12,7 +12,7 @@
     name: 'pys:py1'
     state: stopped
     # test with unix socket
-    server_url: 'unix://{{ remote_dir }}/supervisord.sock'
+    server_url: 'unix://{{ supervisord_sock_path.path }}/supervisord.sock'
     username: '{{ credentials.username }}'
     password: '{{ credentials.password }}'
   register: result_with_auth
@@ -37,7 +37,7 @@
     name: pys:py1
     state: stopped
     # test with 'server_url' parameter
-    server_url: 'unix://{{ remote_dir }}/supervisord.sock'
+    server_url: 'unix://{{ supervisord_sock_path.path }}/supervisord.sock'
   register: result
   when: credentials.username == ''
 
@@ -46,7 +46,7 @@
     name: pys:py1
     state: stopped
     # test with unix socket
-    server_url: 'unix://{{ remote_dir }}/supervisord.sock'
+    server_url: 'unix://{{ supervisord_sock_path.path }}/supervisord.sock'
     username: '{{ credentials.username }}'
     password: '{{ credentials.password }}'
   register: result_with_auth
