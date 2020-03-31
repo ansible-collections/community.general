@@ -22,7 +22,7 @@ __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.aruba import aruba_config
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from .aruba_module import TestArubaModule, load_fixture
 
 

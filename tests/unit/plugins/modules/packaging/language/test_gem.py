@@ -5,7 +5,7 @@ import copy
 import pytest
 
 from ansible_collections.community.general.plugins.modules.packaging.language import gem
-from ansible_collections.community.general.tests.unit.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 
 def get_command(run_command):

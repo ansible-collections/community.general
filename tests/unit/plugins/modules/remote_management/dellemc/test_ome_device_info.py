@@ -13,7 +13,7 @@
 from __future__ import absolute_import
 
 import pytest
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args, exit_json, \
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args, exit_json, \
     fail_json, AnsibleFailJson, AnsibleExitJson
 from ansible.module_utils import basic
 from ansible_collections.community.general.plugins.modules.remote_management.dellemc import ome_device_info

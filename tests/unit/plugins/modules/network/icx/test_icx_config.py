@@ -6,7 +6,7 @@ __metaclass__ = type
 from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock
 from ansible_collections.community.general.plugins.modules.network.icx import icx_config
 from ansible_collections.community.general.plugins.cliconf.icx import Cliconf
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from .icx_module import TestICXModule, load_fixture
 
 

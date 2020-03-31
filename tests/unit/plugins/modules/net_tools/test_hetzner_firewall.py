@@ -17,7 +17,7 @@ from ansible_collections.community.general.plugins.modules.net_tools import hetz
 import json
 
 from mock import MagicMock
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from ansible.module_utils.six.moves.urllib.parse import parse_qs
 
 

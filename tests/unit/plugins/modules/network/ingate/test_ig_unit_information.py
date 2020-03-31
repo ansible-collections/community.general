@@ -10,7 +10,7 @@ import os
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.ingate import ig_unit_information
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from .ingate_module import TestIngateModule, load_fixture
 
 

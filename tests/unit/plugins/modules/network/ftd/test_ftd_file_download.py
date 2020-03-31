@@ -24,7 +24,7 @@ from ansible.module_utils import basic
 from ansible_collections.community.general.plugins.module_utils.network.ftd.common import HTTPMethod
 from ansible_collections.community.general.plugins.module_utils.network.ftd.fdm_swagger_client import FILE_MODEL_NAME, OperationField
 from ansible_collections.community.general.plugins.modules.network.ftd import ftd_file_download
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args, exit_json, fail_json, AnsibleFailJson, AnsibleExitJson
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args, exit_json, fail_json, AnsibleFailJson, AnsibleExitJson
 
 
 class TestFtdFileDownload(object):

@@ -1,7 +1,7 @@
 import sys
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch, Mock
-from ansible_collections.community.general.tests.unit.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase
 
 base_modules_mock = Mock()
 nitro_service_mock = Mock()

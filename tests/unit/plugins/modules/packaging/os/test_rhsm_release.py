@@ -6,7 +6,7 @@ __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat.mock import call, patch
 from ansible_collections.community.general.plugins.modules.packaging.os import rhsm_release
-from ansible_collections.community.general.tests.unit.modules.utils import (
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
     AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args)
 
 

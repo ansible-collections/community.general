@@ -22,7 +22,7 @@ pytest.importorskip("kick")
 
 from ansible_collections.community.general.plugins.module_utils.network.ftd.device import FtdPlatformFactory, FtdModel, FtdAsa5500xPlatform, \
     Ftd2100Platform, AbstractFtdPlatform
-from ansible_collections.community.general.tests.unit.modules.network.ftd.test_ftd_install import DEFAULT_MODULE_PARAMS
+from ansible_collections.community.general.tests.unit.plugins.modules.network.ftd.test_ftd_install import DEFAULT_MODULE_PARAMS
 
 
 class TestFtdModel(object):

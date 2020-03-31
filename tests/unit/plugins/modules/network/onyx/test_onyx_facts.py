@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from .onyx_module import TestOnyxModule, load_fixture
 from ansible_collections.community.general.plugins.modules.network.onyx import onyx_facts
 

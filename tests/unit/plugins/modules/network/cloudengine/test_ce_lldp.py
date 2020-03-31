@@ -22,8 +22,8 @@ __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.cloudengine import ce_lldp
-from ansible_collections.community.general.tests.unit.modules.network.cloudengine.ce_module import TestCloudEngineModule, load_fixture
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.network.cloudengine.ce_module import TestCloudEngineModule, load_fixture
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 
 
 class TestCloudEngineLacpModule(TestCloudEngineModule):

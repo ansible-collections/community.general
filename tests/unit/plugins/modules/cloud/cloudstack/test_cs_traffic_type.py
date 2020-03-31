@@ -8,7 +8,7 @@ import pytest
 import ansible_collections.community.general.tests.unit.compat.unittest as unittest
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock
 from ansible_collections.community.general.tests.unit.compat.unittest import TestCase
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 
 
 # Exoscale's cs doesn't support Python 2.6

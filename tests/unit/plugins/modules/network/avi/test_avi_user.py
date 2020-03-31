@@ -2,7 +2,7 @@ import os
 import json
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import Mock
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from ansible_collections.community.general.plugins.modules.network.avi import avi_user
 
 fixture_path = os.path.join(os.path.dirname(__file__), 'fixtures')

@@ -24,7 +24,7 @@ import json
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from .enos_module import TestEnosModule, load_fixture
 from ansible_collections.community.general.plugins.modules.network.enos import enos_facts
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 
 
 class TestEnosFacts(TestEnosModule):

@@ -2,7 +2,7 @@ import pytest
 
 openshiftdynamic = pytest.importorskip("openshift.dynamic")
 
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from .kubevirt_fixtures import base_fixture, RESOURCE_DEFAULT_ARGS, AnsibleExitJson
 
 from ansible_collections.community.kubernetes.plugins.module_utils.raw import KubernetesRawModule

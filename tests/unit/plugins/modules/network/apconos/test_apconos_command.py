@@ -23,7 +23,7 @@ import json
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.apconos import apconos_command
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from .apconos_module import TestApconosModule, load_fixture
 
 

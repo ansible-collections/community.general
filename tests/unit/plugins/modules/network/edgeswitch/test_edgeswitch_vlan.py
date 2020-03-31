@@ -21,7 +21,7 @@ __metaclass__ = type
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.edgeswitch import edgeswitch_vlan
 from ansible_collections.community.general.plugins.modules.network.edgeswitch.edgeswitch_vlan import parse_vlan_brief, parse_interfaces_switchport
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from .edgeswitch_module import TestEdgeswitchModule, load_fixture
 
 

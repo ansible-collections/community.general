@@ -32,7 +32,7 @@ from ansible.module_utils import basic
 from ansible_collections.community.general.plugins.modules.network.netact import netact_cm_command
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args, AnsibleExitJson, AnsibleFailJson
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args, AnsibleExitJson, AnsibleFailJson
 
 
 class AnsibleExitJson(Exception):

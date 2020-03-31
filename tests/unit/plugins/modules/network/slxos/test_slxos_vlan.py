@@ -22,7 +22,7 @@ __metaclass__ = type
 import re
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from ansible_collections.community.general.plugins.modules.network.slxos import slxos_vlan
 from .slxos_module import TestSlxosModule, load_fixture
 

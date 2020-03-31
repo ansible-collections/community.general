@@ -25,7 +25,7 @@ if sys.version_info[:2] != (2, 6):
     import requests
 
 
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from .netscaler_module import TestModule, nitro_base_patcher
 
 

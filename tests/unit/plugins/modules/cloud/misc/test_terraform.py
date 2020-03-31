@@ -6,7 +6,7 @@ import json
 import pytest
 
 from ansible_collections.community.general.plugins.modules.cloud.misc import terraform
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 
 
 def test_terraform_without_argument(capfd):

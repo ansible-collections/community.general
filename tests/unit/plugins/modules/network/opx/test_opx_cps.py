@@ -44,7 +44,7 @@ sys.modules['cps_utils'] = Mock()
 
 from ansible_collections.community.general.plugins.modules.network.opx import opx_cps
 
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from .opx_module import TestOpxModule, load_fixture
 
 

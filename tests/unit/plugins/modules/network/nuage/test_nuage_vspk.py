@@ -33,7 +33,7 @@ except ImportError:
     pytestmark.append(pytest.mark.skip('Nuage Ansible modules requires the vspk and bambou python libraries'))
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args, AnsibleExitJson, AnsibleFailJson
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args, AnsibleExitJson, AnsibleFailJson
 from .nuage_module import MockNuageConnection, TestNuageModule
 
 _LOOP_COUNTER = 0

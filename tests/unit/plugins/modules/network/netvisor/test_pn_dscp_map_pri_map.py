@@ -1,4 +1,4 @@
-# Copyright: (c) 2018, Pluribus Networks
+s# Copyright: (c) 2018, Pluribus Networks
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
@@ -6,7 +6,7 @@ __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.netvisor import pn_dscp_map_pri_map
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from .nvos_module import TestNvosModule
 
 

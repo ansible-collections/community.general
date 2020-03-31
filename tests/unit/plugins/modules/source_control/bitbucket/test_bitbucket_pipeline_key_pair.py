@@ -2,7 +2,7 @@ from ansible_collections.community.general.plugins.module_utils.source_control.b
 from ansible_collections.community.general.plugins.modules.source_control.bitbucket import bitbucket_pipeline_key_pair
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.modules.utils import AnsibleFailJson, AnsibleExitJson, ModuleTestCase, set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleFailJson, AnsibleExitJson, ModuleTestCase, set_module_args
 
 
 class TestBucketPipelineKeyPairModule(ModuleTestCase):

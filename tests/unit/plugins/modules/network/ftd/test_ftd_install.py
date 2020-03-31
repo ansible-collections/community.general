@@ -21,7 +21,7 @@ from __future__ import absolute_import
 import pytest
 from ansible_collections.community.general.tests.unit.compat.mock import PropertyMock
 from ansible.module_utils import basic
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args, exit_json, fail_json, AnsibleFailJson, AnsibleExitJson
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args, exit_json, fail_json, AnsibleFailJson, AnsibleExitJson
 
 from ansible_collections.community.general.plugins.modules.network.ftd import ftd_install
 from ansible_collections.community.general.plugins.module_utils.network.ftd.device import FtdModel

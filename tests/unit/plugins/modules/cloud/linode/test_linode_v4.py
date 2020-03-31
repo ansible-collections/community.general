@@ -17,7 +17,7 @@ from linode_api4 import LinodeClient
 
 from ansible_collections.community.general.plugins.modules.cloud.linode import linode_v4
 from ansible_collections.community.general.plugins.module_utils.linode import get_user_agent
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from ansible_collections.community.general.tests.unit.compat import mock
 
 

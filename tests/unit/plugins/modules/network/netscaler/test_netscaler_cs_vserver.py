@@ -18,7 +18,7 @@
 #
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch, Mock, MagicMock, call
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from .netscaler_module import TestModule, nitro_base_patcher
 
 import sys

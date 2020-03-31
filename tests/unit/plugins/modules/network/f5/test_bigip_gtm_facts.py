@@ -40,7 +40,7 @@ except ImportError:
         from ansible_collections.f5networks.f5_modules.plugins.modules.network.f5.bigip_gtm_pool import ArgumentSpec
         from f5.bigip.tm.gtm.pool import A
         from f5.utils.responses.handlers import Stats
-        from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+        from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
     except ImportError:
         pytestmark.append(pytest.mark.skip("F5 Ansible modules require the f5-sdk Python library"))
         # pytestmark will cause this test to skip but we have to define A so that classes can be

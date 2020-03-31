@@ -17,7 +17,7 @@
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args as _set_module_args, ModuleTestCase
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args as _set_module_args, ModuleTestCase
 
 import pytest
 

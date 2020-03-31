@@ -7,7 +7,7 @@
 
 import os
 
-from ansible_collections.community.general.tests.unit.modules.utils import ModuleTestCase, set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import ModuleTestCase, set_module_args
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.tests.unit.compat.mock import Mock
 from ansible.module_utils.basic import AnsibleModule

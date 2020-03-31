@@ -9,7 +9,7 @@ from urllib3.response import HTTPResponse
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible.module_utils._text import to_bytes
 from ansible_collections.community.general.plugins.modules.monitoring import circonus_annotation
-from ansible_collections.community.general.tests.unit.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 
 class TestCirconusAnnotation(ModuleTestCase):

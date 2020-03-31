@@ -25,7 +25,7 @@ pytestmark = []
 try:
     from ansible_collections.community.general.plugins.modules.network.fortimanager import fmgr_provisioning
     from .fortimanager_module import TestFortimanagerModule
-    from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+    from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 except ImportError:
     pytestmark.append(pytest.mark.skip("Could not load required modules for testing"))
 

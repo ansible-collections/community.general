@@ -19,7 +19,7 @@ __metaclass__ = type
 from ansible_collections.community.general.tests.unit.compat.mock import patch, call
 from ansible_collections.community.general.plugins.modules.system import parted as parted_module
 from ansible_collections.community.general.plugins.modules.system.parted import parse_partition_info
-from ansible_collections.community.general.tests.unit.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 # Example of output : parted -s -m /dev/sdb -- unit 'MB' print
 parted_output1 = """

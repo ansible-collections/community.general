@@ -8,7 +8,7 @@ import json
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.network.netvisor import pn_log_audit_exception
-from ansible_collections.community.general.tests.unit.modules.utils import set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 from .nvos_module import TestNvosModule, load_fixture
 
 
