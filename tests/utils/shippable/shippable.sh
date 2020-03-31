@@ -67,7 +67,6 @@ retry ansible-galaxy -vvv collection install f5networks.f5_modules
 retry ansible-galaxy -vvv collection install fortinet.fortios
 retry ansible-galaxy -vvv collection install cisco.aci
 retry ansible-galaxy -vvv collection install google.cloud
-retry ansible-galaxy -vvv collection install netapp.ontap
 
 # unit tests
 retry ansible-galaxy -vvv collection install cisco.meraki

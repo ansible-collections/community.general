@@ -20,7 +20,7 @@ deprecated:
   alternative: please use M(na_elementsw_snapshot_schedule)
 short_description: Manage SolidFire snapshot schedules
 extends_documentation_fragment:
-- community.general.netapp.solidfire
+- community.general._netapp.solidfire
 
 author: Sumit Kumar (@timuster) <sumit4@netapp.com>
 description:
@@ -138,7 +138,7 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
-import ansible_collections.netapp.ontap.plugins.module_utils.netapp as netapp_utils
+import ansible_collections.community.general.plugins.module_utils._netapp as netapp_utils
 
 
 HAS_SF_SDK = netapp_utils.has_sf_sdk()

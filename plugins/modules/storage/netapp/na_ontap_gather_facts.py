@@ -19,7 +19,7 @@ deprecated:
   alternative: Use M(na_ontap_info) instead.
 author: Piotr Olczak (@dprts) <polczak@redhat.com>
 extends_documentation_fragment:
-- netapp.ontap.netapp.na_ontap
+- community.general._netapp.na_ontap
 
 short_description: NetApp information gatherer
 description:
@@ -119,7 +119,7 @@ ontap_facts:
 import traceback
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
-import ansible_collections.netapp.ontap.plugins.module_utils.netapp as netapp_utils
+import ansible_collections.community.general.plugins.module_utils._netapp as netapp_utils
 
 try:
     import xmltodict

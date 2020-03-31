@@ -18,7 +18,7 @@ module: na_cdot_volume
 
 short_description: Manage NetApp cDOT volumes
 extends_documentation_fragment:
-- community.general.netapp.ontap
+- community.general._netapp.ontap
 
 author: Sumit Kumar (@timuster) <sumit4@netapp.com>
 
@@ -132,7 +132,7 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
-import ansible_collections.netapp.ontap.plugins.module_utils.netapp as netapp_utils
+import ansible_collections.community.general.plugins.module_utils._netapp as netapp_utils
 
 
 HAS_NETAPP_LIB = netapp_utils.has_netapp_lib()
