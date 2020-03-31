@@ -334,7 +334,7 @@ class Connection(ConnectionBase):
 
         if getattr(self._shell, "_IS_WINDOWS", False):
             import ntpath
-            actual_out_path = os.path.join(out_dir, ntpath.basename(in_path))
+            actual_out_path = ntpath.join(out_dir, ntpath.basename(in_path))
         else:
             actual_out_path = os.path.join(out_dir, os.path.basename(in_path))
 
