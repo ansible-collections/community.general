@@ -1,0 +1,65 @@
+- name: Install PyGithub python library
+  pip:
+    name: PyGithub
+    state: present
+
+- name: Create deploy key
+  github_deploy_key:
+    owner: "{{ user }}"
+    repo: "{{ repo }}"
+    name: "{{ deploy_key_name }}"
+    key: "{{ deploy_key_content }}"
+    token: "{{ repo_token }}"
+    state: present
+  register: deploy_key_create
+
+- name: Create deploy key again (Idempotency test)
+  github_deploy_key:
+    owner: "{{ user }}"
+    repo: "{{ repo }}"
+    name: "{{ deploy_key_name }}"
+    key: "{{ deploy_key_content }}"
+    token: "{{ repo_token }}"
+    state: present
+  register: deploy_key_create_idempotent
+
+- name: Force create deploy key
+  github_deploy_key:
+    owner: "{{ user }}"
+    repo: "{{ repo }}"
+    name: "{{ deploy_key_name }}"
+    key: "{{ deploy_key_content }}"
+    token: "{{ repo_token }}"
+    state: present
+    force: true
+  register: deploy_key_create_force
+
+- name: Delete deploy key
+  github_deploy_key:
+    owner: "{{ user }}"
+    repo: "{{ repo }}"
+    name: "{{ deploy_key_name }}"
+    token: "{{ repo_token }}"
+    key: "{{ deploy_key_content }}"
+    state: absent
+  register: deploy_key_delete
+
+- name: Delete deploy key again (Idempotency test)
+  github_deploy_key:
+    owner: "{{ user }}"
+    repo: "{{ repo }}"
+    name: "{{ deploy_key_name }}"
+    token: "{{ repo_token }}"
+    key: "{{ deploy_key_content }}"
+    state: absent
+  register: deploy_key_delete_idempotent
+
+
+- name: Assert create/delete run correctly
+  assert:
+    that:
+      - deploy_key_create is changed
+      - deploy_key_create_idempotent is not changed
+      - deploy_key_create_force is changed
+      - deploy_key_delete is changed
+      - deploy_key_create_idempotent is not changed

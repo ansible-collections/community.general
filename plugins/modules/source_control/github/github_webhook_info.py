@@ -1,18 +1,21 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 #
 # Copyright: (c) 2018, Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
+    "metadata_version": "1.1",
+    "status": ["preview"],
+    "supported_by": "community",
 }
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: github_webhook_info
 short_description: Query information about GitHub webhooks
@@ -28,29 +31,14 @@ options:
     required: true
     aliases:
       - repo
-  user:
-    description:
-      - User to authenticate to GitHub as
-    required: true
-  password:
-    description:
-      - Password to authenticate to GitHub with
-    required: false
-  token:
-    description:
-      - Token to authenticate to GitHub with
-    required: false
-  github_url:
-    description:
-      - Base URL of the github api
-    required: false
-    default: https://api.github.com
+    type: str
 
+extends_documentation_fragment: community.general.github
 author:
   - "Chris St. Pierre (@stpierre)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 - name: list hooks for a repository (password auth)
   github_webhook_info:
     repository: ansible/ansible
@@ -65,9 +53,9 @@ EXAMPLES = '''
     token: "{{ github_user_api_token }}"
     github_url: https://github.example.com/api/v3/
   register: myrepo_webhooks
-'''
+"""
 
-RETURN = '''
+RETURN = """
 ---
 hooks:
   description: A list of hooks that exist for the repo
@@ -82,13 +70,14 @@ hooks:
       "active": true,
       "id": 6206,
       "last_response": {"status": "active", "message": "OK", "code": 200}}]
-'''
+"""
 
 import traceback
 
 GITHUB_IMP_ERR = None
 try:
     import github
+
     HAS_GITHUB = True
 except ImportError:
     GITHUB_IMP_ERR = traceback.format_exc()
@@ -96,6 +85,9 @@ except ImportError:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
+from ansible_collections.community.general.plugins.module_utils import (
+    github as github_utils,
+)
 
 
 def _munge_hook(hook_obj):
@@ -115,60 +107,73 @@ def _munge_hook(hook_obj):
 
 
 def main():
+    argument_spec = github_utils.github_common_argument_spec()
+    argument_spec.update(
+        dict(
+            repository=dict(type="str", required=True, aliases=["repo"])
+        )
+    )
     module = AnsibleModule(
-        argument_spec=dict(
-            repository=dict(type='str', required=True, aliases=["repo"]),
-            user=dict(type='str', required=True),
-            password=dict(type='str', required=False, no_log=True),
-            token=dict(type='str', required=False, no_log=True),
-            github_url=dict(
-                type='str', required=False, default="https://api.github.com")),
-        mutually_exclusive=(('password', 'token'), ),
-        required_one_of=(("password", "token"), ),
-        supports_check_mode=True)
-    if module._name == 'github_webhook_facts':
-        module.deprecate("The 'github_webhook_facts' module has been renamed to 'github_webhook_info'", version='2.13')
+        argument_spec=argument_spec,
+        mutually_exclusive=(("password", "token"),),
+        required_one_of=(("password", "token"),),
+        supports_check_mode=True,
+    )
+    if module._name == "github_webhook_facts":
+        module.deprecate(
+            "The 'github_webhook_facts' module has been renamed to 'github_webhook_info'",
+            version="2.13",
+        )
 
     if not HAS_GITHUB:
-        module.fail_json(msg=missing_required_lib('PyGithub'),
-                         exception=GITHUB_IMP_ERR)
+        module.fail_json(msg=missing_required_lib("PyGithub"), exception=GITHUB_IMP_ERR)
 
     try:
         github_conn = github.Github(
             module.params["user"],
             module.params.get("password") or module.params.get("token"),
-            base_url=module.params["github_url"])
+            base_url=module.params["github_url"],
+        )
     except github.GithubException as err:
-        module.fail_json(msg="Could not connect to GitHub at %s: %s" % (
-            module.params["github_url"], to_native(err)))
+        module.fail_json(
+            msg="Could not connect to GitHub at %s: %s"
+            % (module.params["github_url"], to_native(err))
+        )
 
     try:
         repo = github_conn.get_repo(module.params["repository"])
     except github.BadCredentialsException as err:
-        module.fail_json(msg="Could not authenticate to GitHub at %s: %s" % (
-            module.params["github_url"], to_native(err)))
+        module.fail_json(
+            msg="Could not authenticate to GitHub at %s: %s"
+            % (module.params["github_url"], to_native(err))
+        )
     except github.UnknownObjectException as err:
         module.fail_json(
-            msg="Could not find repository %s in GitHub at %s: %s" % (
-                module.params["repository"], module.params["github_url"],
-                to_native(err)))
+            msg="Could not find repository %s in GitHub at %s: %s"
+            % (module.params["repository"], module.params["github_url"], to_native(err))
+        )
     except Exception as err:
         module.fail_json(
-            msg="Could not fetch repository %s from GitHub at %s: %s" %
-            (module.params["repository"], module.params["github_url"],
-             to_native(err)),
-            exception=traceback.format_exc())
+            msg="Could not fetch repository %s from GitHub at %s: %s"
+            % (
+                module.params["repository"],
+                module.params["github_url"],
+                to_native(err),
+            ),
+            exception=traceback.format_exc(),
+        )
 
     try:
         hooks = [_munge_hook(h) for h in repo.get_hooks()]
     except github.GithubException as err:
         module.fail_json(
-            msg="Unable to get hooks from repository %s: %s" %
-            (module.params["repository"], to_native(err)),
-            exception=traceback.format_exc())
+            msg="Unable to get hooks from repository %s: %s"
+            % (module.params["repository"], to_native(err)),
+            exception=traceback.format_exc(),
+        )
 
     module.exit_json(changed=False, hooks=hooks)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

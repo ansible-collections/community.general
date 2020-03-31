@@ -1,74 +1,86 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 #
 # Copyright: Ansible Team
+# Copyright: (c) 2020, Andrea Tartaglia <andrea@braingap.uk>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
+ANSIBLE_METADATA = {
+    "metadata_version": "1.1",
+    "status": ["preview"],
+    "supported_by": "community",
+}
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: github_release
 short_description: Interact with GitHub Releases
 description:
     - Fetch metadata about GitHub Releases
+version_added: 2.2
 options:
-    token:
-        description:
-            - GitHub Personal Access Token for authenticating. Mutually exclusive with C(password).
     user:
         description:
             - The GitHub account that owns the repository
         required: true
-    password:
-        description:
-            - The GitHub account password for the user. Mutually exclusive with C(token).
+        type: str
     repo:
         description:
             - Repository name
         required: true
+        type: str
     action:
         description:
             - Action to perform
         required: true
         choices: [ 'latest_release', 'create_release' ]
+        type: str
     tag:
         description:
             - Tag name when creating a release. Required when using action is set to C(create_release).
+        version_added: 2.4
+        type: str
     target:
         description:
             - Target of release when creating a release
+        version_added: 2.4
+        type: str
     name:
         description:
             - Name of release when creating a release
+        version_added: 2.4
+        type: str
     body:
         description:
             - Description of the release when creating a release
+        version_added: 2.4
+        type: str
     draft:
         description:
             - Sets if the release is a draft or not. (boolean)
         type: 'bool'
         default: 'no'
+        version_added: 2.4
     prerelease:
         description:
             - Sets if the release is a prerelease or not. (boolean)
         type: bool
         default: 'no'
+        version_added: 2.4
 
+extends_documentation_fragment: community.general.github
 author:
     - "Adrian Moisey (@adrianmoisey)"
-requirements:
-    - "github3.py >= 1.0.0a3"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 - name: Get latest release of a public repository
   github_release:
     user: ansible
@@ -100,9 +112,9 @@ EXAMPLES = '''
     name: My Release
     body: Some description
 
-'''
+"""
 
-RETURN = '''
+RETURN = """
 create_release:
     description:
     - Version of the created release
@@ -117,102 +129,140 @@ latest_release:
     type: str
     returned: success
     sample: 1.1.0
-'''
-
-import traceback
-
-GITHUB_IMP_ERR = None
-try:
-    import github3
-
-    HAS_GITHUB_API = True
-except ImportError:
-    GITHUB_IMP_ERR = traceback.format_exc()
-    HAS_GITHUB_API = False
+"""
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible_collections.community.general.plugins.module_utils import (
+    github as github_utils,
+)
 from ansible.module_utils._text import to_native
 
 
+class GithubRelease(github_utils.GitHubBase):
+    def __init__(self, module):
+        self.tag = module.params["tag"]
+        self.target = module.params["target"]
+        self.name = module.params["name"]
+        self.body = module.params["body"]
+        self.draft = module.params["draft"]
+        self.prerelease = module.params["prerelease"]
+        self.repo_full_name = "/".join([module.params["user"], module.params["repo"]])
+        self.module = module
+
+        if not self.name:
+            self.name = self.tag
+
+        super(GithubRelease, self).__init__(
+            username=module.params["user"]
+            if module.params["password"] is not None
+            else None,
+            password=module.params["password"],
+            token=module.params["token"],
+            server=module.params["server"],
+            repo=self.repo_full_name,
+        )
+
+        self.auth()
+
+        self.target_ref = self.repository.get_git_ref("heads/{0}".format(self.target))
+
+    def create_release(self):
+        try:
+            self.repository.get_release(self.tag)
+            return dict(
+                changed=False,
+                msg="Release for tag {0} already exists.".format(self.tag),
+            )
+        except github_utils.UnknownObjectException:
+            pass
+
+        try:
+            tag_exists = self.repository.get_git_ref("tags/{0}".format(self.tag))
+        except github_utils.UnknownObjectException:
+            tag_exists = False
+
+        if tag_exists:
+            ret_state = dict(
+                changed=True,
+                msg="Release {0} created".format(self.name),
+                tag=self.repository.create_git_release(
+                    self.tag,
+                    self.name,
+                    self.body,
+                    self.draft,
+                    self.prerelease,
+                    self.target,
+                ).tag_name,
+            )
+        else:
+            ret_state = dict(
+                changed=True,
+                msg="Release {0} and tag {1} created".format(self.name, self.tag),
+                tag=self.repository.create_git_tag_and_release(
+                    self.tag,
+                    self.tag,
+                    self.name,
+                    self.body,
+                    self.target_ref.object.sha,
+                    "commit",
+                    draft=self.draft,
+                    prerelease=self.prerelease,
+                ).tag_name,
+            )
+
+        return ret_state
+
+
 def main():
-    module = AnsibleModule(
-        argument_spec=dict(
+    argument_spec = github_utils.github_common_argument_spec()
+    argument_spec.update(
+        dict(
             repo=dict(required=True),
-            user=dict(required=True),
-            password=dict(no_log=True),
-            token=dict(no_log=True),
-            action=dict(
-                required=True, choices=['latest_release', 'create_release']),
-            tag=dict(type='str'),
-            target=dict(type='str'),
-            name=dict(type='str'),
-            body=dict(type='str'),
-            draft=dict(type='bool', default=False),
-            prerelease=dict(type='bool', default=False),
-        ),
+            user=dict(required=True, aliases=["username"]),
+            action=dict(required=True, choices=["latest_release", "create_release"]),
+            tag=dict(type="str"),
+            target=dict(type="str"),
+            name=dict(type="str"),
+            body=dict(type="str"),
+            draft=dict(type="bool", default=False),
+            prerelease=dict(type="bool", default=False),
+        )
+    )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
         supports_check_mode=True,
-        mutually_exclusive=(('password', 'token'),),
-        required_if=[('action', 'create_release', ['tag']),
-                     ('action', 'create_release', ['password', 'token'], True)],
+        mutually_exclusive=(("password", "token"),),
+        required_if=[
+            ("action", "create_release", ["tag"]),
+            ("action", "create_release", ["password", "token"], True),
+        ],
     )
 
-    if not HAS_GITHUB_API:
-        module.fail_json(msg=missing_required_lib('github3.py >= 1.0.0a3'),
-                         exception=GITHUB_IMP_ERR)
+    if not github_utils.HAS_GITHUB:
+        module.fail_json(
+            msg=missing_required_lib("PyGithub >= 1.3.5"),
+            exception=github_utils.GITHUB_IMP_ERR,
+        )
 
-    repo = module.params['repo']
-    user = module.params['user']
-    password = module.params['password']
-    login_token = module.params['token']
-    action = module.params['action']
-    tag = module.params.get('tag')
-    target = module.params.get('target')
-    name = module.params.get('name')
-    body = module.params.get('body')
-    draft = module.params.get('draft')
-    prerelease = module.params.get('prerelease')
+    action = module.params["action"]
 
-    # login to github
-    try:
-        if password:
-            gh_obj = github3.login(user, password=password)
-        elif login_token:
-            gh_obj = github3.login(token=login_token)
-        else:
-            gh_obj = github3.GitHub()
+    repo_release = GithubRelease(module)
 
-        # test if we're actually logged in
-        if password or login_token:
-            gh_obj.me()
-    except github3.exceptions.AuthenticationFailed as e:
-        module.fail_json(msg='Failed to connect to GitHub: %s' % to_native(e),
-                         details="Please check username and password or token "
-                                 "for repository %s" % repo)
+    if action == "latest_release":
+        try:
+            release = repo_release.repository.get_latest_release()
+        except github_utils.UnknownObjectException:
+            release = None
 
-    repository = gh_obj.repository(user, repo)
-
-    if not repository:
-        module.fail_json(msg="Repository %s/%s doesn't exist" % (user, repo))
-
-    if action == 'latest_release':
-        release = repository.latest_release()
         if release:
             module.exit_json(tag=release.tag_name)
         else:
             module.exit_json(tag=None)
 
-    if action == 'create_release':
-        release_exists = repository.release_from_tag(tag)
-        if release_exists:
-            module.exit_json(changed=False, msg="Release for tag %s already exists." % tag)
-
-        release = repository.create_release(
-            tag, target, name, body, draft, prerelease)
-        if release:
-            module.exit_json(changed=True, tag=release.tag_name)
-        else:
-            module.exit_json(changed=False, tag=None)
+    if action == "create_release":
+        release = repo_release.create_release()
+        module.exit_json(**release)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
