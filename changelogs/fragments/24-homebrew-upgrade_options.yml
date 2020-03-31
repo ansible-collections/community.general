@@ -1,0 +1,2 @@
+minor_changes:
+- "homebrew - New option ``upgrade_options`` allows to pass flags to upgrade"
