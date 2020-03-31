@@ -1,1 +1,0 @@
-./storage/netapp/netapp_e_snapshot_images.py
