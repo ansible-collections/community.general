@@ -30,11 +30,20 @@ options:
         required: true
     add:
         description:
-            - List of files to be staged. Same as C(git add .).
+            - List of files under C(path) to be staged. Same as C(git add .).
               File globs not accepted, such as C(./*) or C(*).
         type: list
-        default: ["."]
         elements: str
+        required: true
+        default: ["."]
+    empty_commit:
+        descripion:
+            - Drive module behaviour in case nothing to commit.
+              If C(allow) empty commit is allowed, same as C(--allow-empty).
+              Do not commit if C(skip). Fail job if C(fail). In order to C(allow)
+              to work, C(add) argument must not provided in module.
+        type: str
+        default: 'fail'
 requirements:
     - git>=2.10.0 (the command line tool)
 '''
@@ -45,11 +54,21 @@ EXAMPLES = '''
     path: /Users/federicoolivieri/git/git_test_module
     comment: My amazing backup
     add: ['test.txt', 'txt.test']
+    empty_commit: fail
 
-- name: Add all files using default and commit.
+- name: Empty commit. 
   community.general.git_commit:
     path: /Users/federicoolivieri/git/git_test_module
-    comment: My amazing backup
+    comment: My amazing empty commit
+    empty_commit: allow
+    add: ['.']
+
+- name: Skip if nothing to commit. 
+  community.general.git_commit:
+    path: /Users/federicoolivieri/git/git_test_module
+    comment: Skip my amazing empty commit
+    empty_commit: skyp
+    add: ['.']
 '''
 
 RETURN = '''
@@ -66,33 +85,47 @@ import os
 from ansible.module_utils.basic import AnsibleModule
 
 
-def git_commit(module):
+def git_add(module):
 
     add = module.params.get('add')
-    path = module.params.get('path')
-    comment = module.params.get('comment')
 
     if add:
         add_cmds = [
             'git',
-            '-C',
-            path,
             'add',
-            '{0}'.format(' '.join(add))
         ]
+        for item in add:
+            add_cmds.insert(len(add_cmds), item)
 
-    if comment:
+        return add_cmds
+
+
+def git_commit(module):
+
+    empty_commit = module.params.get('empty_commit')
+    comment = module.params.get('comment')
+
+    if comment and empty_commit == 'allow':
         commit_cmds = [
             'git', 
-            '-C', 
-            path, 
-            'commit', 
+            'commit',
+            '--allow-empty',
             '-m', 
             '"{0}"'.format(comment), 
             '--porcelain'
         ]
     
-    return [add_cmds + commit_cmds ]
+    if comment and empty_commit != 'allow':
+        commit_cmds = [
+            'git', 
+            'commit',
+            '-m', 
+            '"{0}"'.format(comment), 
+            '--porcelain'
+        ]
+    
+    if commit_cmds:
+        return commit_cmds
 
 
 def main():
@@ -100,39 +133,59 @@ def main():
     argument_spec = dict(
         path=dict(required=True, type="path"),
         comment=dict(required=True),
-        add=dict(type="list", elements='str', default=["."]),
+        add=dict(type='list', elements='str', default=["."]),
+        empty_commit=dict(choices=[ "allow", "fail", "skip" ], default='fail')
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
     )
 
-    result_output = list()
+    path = module.params.get('path')
+    empty_commit = module.params.get('empty_commit')
+
     result = dict(changed=False)
 
-    for cmd in git_commit(module):
-        _rc, output, error = module.run_command(cmd, check_rc=False)
+    rc, output, error = module.run_command(
+        git_add(module),
+        cwd=path, 
+        check_rc=False,
+    )
+    
+    # "git add do_not_exist" -> rc: 128
+    # "git add i_exist"      -> rc: 0
+    # "git add ."            -> rc: 0
+    if rc != 0 and empty_commit != 'skip':
+        module.fail_json(
+            msg=error,
+        )
+    elif rc != 0 and empty_commit == 'skip':
+        rc = 0
+        result.update(changed=False, output=output, rc=rc)
+    else:
+        porcelain_list = ('M', 'A', 'D', 'R', 'C', 'U')
+        # A  test.txt            -> rc: 1
+        # "" (nothing to commit) -> rc: 1
+        rc, output, error = module.run_command(
+            git_commit(module),
+            cwd=path, 
+            check_rc=False,
+        )
 
-        if output:
-            if 'no changes added to commit' in output:
-                module.fail_json(msg=output)
-            elif 'nothing to commit, working tree clean' in output:
-                module.fail_json(msg=output)
-            else:
-                result_output.append(output)
-                result.update(changed=True)
+        if rc == 1:
 
-        if error:
-            if 'error:' in error:
-                module.fail_json(msg=error)
-            elif 'fatal:' in error:
-                module.fail_json(msg=error)
-            else:
-                result_output.append(error)
-                result.update(changed=True)
+            if empty_commit == 'allow' and not output:
+                rc = 0
+                result.update(changed=True, output=output, rc=rc)
+                
+            if empty_commit == 'fail' and output:
+                for porc in output.splitlines():
+                    if porc.startswith(porcelain_list):
+                        rc = 0
+                        result.update(changed=True, output=output, rc=rc)
+            elif empty_commit == 'fail' and not output:
+                module.fail_json(msg='Empty commit not allowed with empty_commit=fail',rc=rc)
 
-    if result_output:
-        result.update(output=result_output)
 
     module.exit_json(**result)
 

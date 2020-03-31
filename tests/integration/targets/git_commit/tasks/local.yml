@@ -1,12 +1,43 @@
-- name: set first random file name.
+- name: FILE | set first random file name.
   set_fact:
     file1: "{{ lookup('pipe','date +%s%N') }}.txt"
 
-- name: set second random file name.
+- name: FILE | set second random file name.
   set_fact:
     file2: "{{ lookup('pipe','date +%s%N') }}.txt"
 
-- name: touch file1 and file2
+- name: LOCAL | Empty commit -> empty_commi=allow
+  register: result
+  git_commit:
+    path: "{{ playbook_dir }}/test_directory/repo"
+    comment: I am an empty commit.
+    add: ['.']
+    empty_commit: allow
+- debug: var=result
+- assert: { that: "result.changed == true" }
+
+- name: LOCAL | Empty commit -> empty_commi=fail
+  register: result
+  git_commit:
+    path: "{{ playbook_dir }}/test_directory/repo"
+    comment: I am failing because I got nothing to add and commit.
+    add: ['.']
+    empty_commit: fail
+  ignore_errors: yes
+- debug: var=result
+- assert: { that: "result.changed == false" }
+
+- name: LOCAL | Empty commit -> empty_commi=skip
+  register: result
+  git_commit:
+    path: "{{ playbook_dir }}/test_directory/repo"
+    comment: I do not care.
+    add: ['.']
+    empty_commit: skip
+- debug: var=result
+- assert: { that: "result.changed == false" }
+
+- name: FILE | touch file1 and file2
   file:
     path: "{{ playbook_dir }}/test_directory/repo/{{ item }}"
     state: touch
@@ -14,16 +45,17 @@
     - "{{ file1 }}"
     - "{{ file2 }}"
 
-- name: LOCAL +add +mode
+- name: LOCAL | "git add {{ file1 }} {{ file2 }}" rc == 0 
   register: result
   git_commit:
     path: "{{ playbook_dir }}/test_directory/repo"
     comment: Add file1 and file2
     add: [ "{{ file1 }}", "{{ file2 }}" ]
-
+    empty_commit: fail
+- debug: var=result
 - assert: { that: "result.changed == true" }
 
-- name: rm file1 and file2
+- name: FILE | rm file1 and file2
   file:
     path: "{{ playbook_dir }}/test_directory/repo/{{ item }}"
     state: absent
@@ -31,10 +63,21 @@
     - "{{ file1 }}"
     - "{{ file2 }}"
 
-- name: LOCAL -add +mode
+- name: LOCAL | "git add . " -> rc == 0
+  git_commit:
+    path: "{{ playbook_dir }}/test_directory/repo"
+    comment: Add file1 and file2
+    empty_commit: skip  
+- debug: var=result
+- assert: { that: "result.changed == true" }
+
+- name: LOCAL | git add not existing file -> rc == 128
   register: result
   git_commit:
     path: "{{ playbook_dir }}/test_directory/repo"
-    comment: Add .
-
-- assert: { that: "result.changed == true" }
+    comment: Add file1 and file2
+    add: [ 'i_do_not_exist.txt' ]
+    empty_commit: fail
+  ignore_errors: yes
+- debug: var=result
+- assert: { that: "result.changed == false" }
