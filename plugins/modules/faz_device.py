@@ -1,1 +1,0 @@
-./network/fortianalyzer/faz_device.py

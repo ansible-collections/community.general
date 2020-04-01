@@ -1,1 +1,0 @@
-./network/fortimanager/fmgr_fwpol_package.py
