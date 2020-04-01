@@ -1,1 +1,0 @@
-./network/illumos/dladm_linkprop.py

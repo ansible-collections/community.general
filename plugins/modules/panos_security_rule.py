@@ -1,1 +1,0 @@
-./network/panos/panos_security_rule.py

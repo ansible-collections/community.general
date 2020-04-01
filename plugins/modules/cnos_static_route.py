@@ -1,1 +1,0 @@
-./network/cnos/cnos_static_route.py

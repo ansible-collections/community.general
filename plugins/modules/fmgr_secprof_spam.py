@@ -1,1 +1,0 @@
-./network/fortimanager/fmgr_secprof_spam.py
