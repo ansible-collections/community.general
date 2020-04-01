@@ -1,1 +1,0 @@
-./network/cloudengine/ce_evpn_bgp_rr.py
