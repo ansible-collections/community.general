@@ -1,4 +1,3 @@
-plugins/action/ce_template.py action-plugin-docs # undocumented action plugin to fix, existed before sanity test was added
 plugins/callback/hipchat.py pylint:blacklisted-name
 plugins/connection/lxc.py pylint:blacklisted-name
 plugins/doc_fragments/alicloud.py future-import-boilerplate
@@ -2016,6 +2015,4 @@ tests/unit/plugins/modules/web_infrastructure/test_apache2_module.py future-impo
 tests/unit/plugins/modules/web_infrastructure/test_apache2_module.py metaclass-boilerplate
 tests/unit/plugins/modules/web_infrastructure/test_jenkins_plugin.py future-import-boilerplate
 tests/unit/plugins/modules/web_infrastructure/test_jenkins_plugin.py metaclass-boilerplate
-tests/unit/plugins/httpapi/test_ftd.py future-import-boilerplate
-tests/unit/plugins/httpapi/test_ftd.py metaclass-boilerplate
 tests/utils/shippable/timing.py shebang
