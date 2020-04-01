@@ -1,1 +1,0 @@
-./network/fortimanager/fmgr_device_config.py

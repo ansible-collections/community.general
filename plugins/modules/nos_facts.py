@@ -1,1 +1,0 @@
-./network/nos/nos_facts.py

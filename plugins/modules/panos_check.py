@@ -1,1 +1,0 @@
-./network/panos/panos_check.py
