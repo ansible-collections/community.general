@@ -152,7 +152,6 @@ def saslprep(string):
     Returns:
         Prepared unicode string.
     """
-
     # RFC4013: "The algorithm assumes all strings are
     # comprised of characters from the Unicode [Unicode] character set."
     # Validate the string is a Unicode string
