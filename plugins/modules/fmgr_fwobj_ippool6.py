@@ -1,1 +1,0 @@
-./network/fortimanager/fmgr_fwobj_ippool6.py
