@@ -1,1 +1,0 @@
-./network/cloudengine/ce_snmp_location.py

@@ -1,1 +1,0 @@
-./network/nso/nso_query.py

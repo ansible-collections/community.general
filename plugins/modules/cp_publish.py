@@ -1,1 +1,0 @@
-./network/check_point/cp_publish.py

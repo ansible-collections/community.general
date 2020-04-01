@@ -1,1 +1,0 @@
-./network/panos/panos_nat_rule.py

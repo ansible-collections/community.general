@@ -1,1 +1,0 @@
-./network/cnos/cnos_reload.py

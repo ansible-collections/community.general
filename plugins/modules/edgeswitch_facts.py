@@ -1,1 +1,0 @@
-./network/edgeswitch/edgeswitch_facts.py

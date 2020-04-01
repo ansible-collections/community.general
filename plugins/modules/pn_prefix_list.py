@@ -1,1 +1,0 @@
-./network/netvisor/pn_prefix_list.py

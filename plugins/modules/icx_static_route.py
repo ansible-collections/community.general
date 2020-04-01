@@ -1,1 +1,0 @@
-./network/icx/icx_static_route.py
