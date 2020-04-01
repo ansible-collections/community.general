@@ -22,14 +22,6 @@ matrix:
     - env: T=units/3.8/1
     - env: T=units/3.9/1
 
-    - env: T=units/2.6/2
-    - env: T=units/2.7/2
-    - env: T=units/3.5/2
-    - env: T=units/3.6/2
-    - env: T=units/3.7/2
-    - env: T=units/3.8/2
-    - env: T=units/3.9/2
-
     - env: T=aix/7.2/1
     - env: T=osx/10.11/1
     - env: T=rhel/7.6/1
