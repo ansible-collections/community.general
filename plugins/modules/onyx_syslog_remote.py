@@ -1,1 +1,0 @@
-./network/onyx/onyx_syslog_remote.py

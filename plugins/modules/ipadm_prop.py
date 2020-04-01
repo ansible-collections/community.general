@@ -1,1 +1,0 @@
-./network/illumos/ipadm_prop.py
