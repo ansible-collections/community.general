@@ -22,7 +22,6 @@ description:
 notes:
     - This module works on ALT based distros.
     - Does NOT support checkmode, due to a limitation in apt-repo tool.
-version_added: "2.8"
 options:
   repo:
     description:
