@@ -16,8 +16,8 @@ fi
 case "${group}" in
     1) options=(--skip-test pylint --skip-test ansible-doc --skip-test validate-modules) ;;
     2) options=(                   --test      ansible-doc      --test validate-modules) ;;
-    3) options=(--test pylint           plugins/modules) ;;
-    4) options=(--test pylint --exclude plugins/modules) ;;
+    3) options=(--test pylint           plugins/modules/) ;;
+    4) options=(--test pylint --exclude plugins/modules/) ;;
 esac
 
 # allow collection migration sanity tests for groups 3 and 4 to pass without updating this script during migration
