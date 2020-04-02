@@ -1,0 +1,2 @@
+minor_changes:
+- "pacemaker_cluster - add check_and_fail option to avoid manipulation of the cluster is the state is not what expected"
