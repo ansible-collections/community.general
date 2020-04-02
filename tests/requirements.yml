@@ -1,14 +1,12 @@
 integration_tests_dependencies:
+- ansible.netcommon
 - ansible.posix
 - community.crypto
-- ansible.netcommon
-unit_tests_dependencies:
-- netbox.netbox
 - community.kubernetes
+unit_tests_dependencies:
 - ansible.netcommon
-- cisco.meraki
-- fortinet.fortios
-- junipernetworks.junos
-- cisco.aci
+- ansible.posix
+- cisco.intersight
+- community.kubernetes
 - google.cloud
-- f5networks.f5_modules
+- ovirt.ovirt_collection
