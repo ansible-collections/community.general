@@ -55,22 +55,13 @@ cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
 cd "${TEST_DIR}"
 
 # STAR: HACK install dependencies
-retry ansible-galaxy -vvv collection install ansible.posix
-retry ansible-galaxy -vvv collection install community.crypto
 retry ansible-galaxy -vvv collection install ansible.netcommon
-retry ansible-galaxy -vvv collection install ovirt.ovirt_collection
-retry ansible-galaxy -vvv collection install cisco.mso
+retry ansible-galaxy -vvv collection install ansible.posix
 retry ansible-galaxy -vvv collection install cisco.intersight
-retry ansible-galaxy -vvv collection install check_point.mgmt
+retry ansible-galaxy -vvv collection install community.crypto
 retry ansible-galaxy -vvv collection install community.kubernetes
-retry ansible-galaxy -vvv collection install f5networks.f5_modules
-retry ansible-galaxy -vvv collection install fortinet.fortios
-retry ansible-galaxy -vvv collection install cisco.aci
 retry ansible-galaxy -vvv collection install google.cloud
-
-# unit tests
-retry ansible-galaxy -vvv collection install cisco.meraki
-retry ansible-galaxy -vvv collection install junipernetworks.junos
+retry ansible-galaxy -vvv collection install ovirt.ovirt_collection
 
 # END: HACK
 
