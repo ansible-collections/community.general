@@ -1,4 +1,0 @@
-dependencies:
-  - setup_pkg_mgr
-  - prepare_tests
-  - setup_epel
