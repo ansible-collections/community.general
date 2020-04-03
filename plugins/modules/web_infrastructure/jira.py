@@ -268,6 +268,11 @@ EXAMPLES = """
     issue: '{{ issue.meta.key }}'
     operation: transition
     status: Done
+  args: 
+  fields:
+    customfield_14321: [ {'set': {'value': 'Value of Select' }} ]   
+    comment:  [ { 'add': { 'body' : 'Test' } }]
+
 """
 
 import base64
