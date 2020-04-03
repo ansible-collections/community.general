@@ -396,8 +396,7 @@ def search(restbase, user, passwd, params):
     url = restbase + '/search?jql=' + urllib.request.pathname2url(params['jql'])
     if params['fields']:
         fields = params['fields'].keys()
-        url = url +  '&fields=' + '&fields='.join([urllib.request.pathname2url(f) for f in fields])
-
+        url = url + '&fields=' + '&fields='.join([urllib.request.pathname2url(f) for f in fields])
     ret = get(url, user, passwd, params['timeout'])
     return ret
 
