@@ -289,7 +289,7 @@ def main():
         if p['execute']:
             cmd += " --execute '%s'" % p['execute']
         else:
-            cmd += shlex_quote(p['manifest'])
+            cmd += " %s" % shlex_quote(p['manifest'])
         if p['summarize']:
             cmd += " --summarize"
         if p['debug']:
