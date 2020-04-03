@@ -4,5 +4,5 @@ minor_changes:
 - Added update function which can update Jira Selects etc.
 
 bugfixes:
-- Priting full error message from jira server
-- jira - transition issue not working (https://link/to/the/issue).
+- Priting full error message from jira server (https://github.com/ansible-collections/community.general/pull/22)
+- jira - transition issue not working (https://github.com/ansible-collections/community.general/issues/109).
