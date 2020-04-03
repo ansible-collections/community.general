@@ -268,9 +268,9 @@ EXAMPLES = """
     issue: '{{ issue.meta.key }}'
     operation: transition
     status: Done
-  args: 
+  args:
   fields:
-    customfield_14321: [ {'set': {'value': 'Value of Select' }} ]   
+    customfield_14321: [ {'set': {'value': 'Value of Select' }} ]
     comment:  [ { 'add': { 'body' : 'Test' } }]
 
 """
@@ -302,7 +302,6 @@ def request(url, user, passwd, timeout, data=None, method=None):
                                         'Authorization': "Basic %s" % auth})
 
     if info['status'] not in (200, 201, 204):
-        
         error = json.loads(info['body'])
         if error:
             module.fail_json(msg=error['errorMessages'])
@@ -398,6 +397,7 @@ def search(restbase, user, passwd, params):
     if params['fields']:
         fields = params['fields'].keys()
         url = url +  '&fields=' + '&fields='.join([urllib.request.pathname2url(f) for f in fields])
+
     ret = get(url, user, passwd, params['timeout'])
     return ret
 
