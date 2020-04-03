@@ -1,6 +1,7 @@
 import pytest
 
 from ansible_collections.community.general.plugins.module_utils.database import (
+    is_input_dangerous,
     pg_quote_identifier,
     SQLParseError,
 )
@@ -76,6 +77,18 @@ HOW_MANY_DOTS = (
 VALID_QUOTES = ((test, VALID[test]) for test in sorted(VALID))
 INVALID_QUOTES = ((test[0], test[1], INVALID[test]) for test in sorted(INVALID))
 
+IS_STRINGS_DANGEROUS = (
+    (u'', False),
+    (u'alternative database', False),
+    (u'backup of TRUNCATED table', False),
+    (u'bob.dropper', False),
+    (u'd\'artagnan', False),
+    (u';DROP DATABASE fluffy_pets_photos', True),
+    (u'; TRUNCATE TABLE his_valuable_table', True),
+    (u'\'--', True),
+    (u'\' union select username, password from admin_credentials', True),
+)
+
 
 @pytest.mark.parametrize("identifier, quoted_identifier", VALID_QUOTES)
 def test_valid_quotes(identifier, quoted_identifier):
@@ -98,3 +111,8 @@ def test_how_many_dots(identifier, id_type, quoted_identifier, msg):
         pg_quote_identifier('%s.more' % identifier, id_type)
 
     ex.match(msg)
+
+
+@pytest.mark.parametrize("string, result", IS_STRINGS_DANGEROUS)
+def test_is_input_dangerous(string, result):
+    assert is_input_dangerous(string) == result

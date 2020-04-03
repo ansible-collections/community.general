@@ -26,6 +26,8 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 # USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import re
+
 
 class SQLParseError(Exception):
     pass
@@ -140,3 +142,38 @@ def mysql_quote_identifier(identifier, id_type):
             special_cased_fragments.append(fragment)
 
     return '.'.join(special_cased_fragments)
+
+
+def is_input_dangerous(string):
+    """Check if the passed string is potentially dangerous.
+    Can be used to prevent SQL injections.
+
+    Note: use this function only when you can't use
+      psycopg2's cursor.execute method parametrized
+      (typically with DDL queries).
+    """
+    if not string:
+        return False
+
+    # 1. '"' in string and '--' in string or
+    # "'" in string and '--' in string
+    pattern1 = re.compile(r'(\'|\").*--')
+
+    if re.search(pattern1, string):
+        return True
+
+    # 2. union \ intersect \ except + select
+    pattern2 = re.compile(r'(union|UNION|intersect|INTERSECT|'
+                          r'except|EXCEPT).*(select|SELECT)')
+
+    if re.search(pattern2, string):
+        return True
+
+    # 3. ';' and any KEY_WORDS
+    pattern3 = re.compile(r';.*(select|SELECT|update|UPDATE|insert|INSERT|'
+                          r'delete|DELETE|drop|DROP|truncate|TRUNCATE|alter|ALTER)')
+
+    if re.search(pattern3, string):
+        return True
+
+    return False
