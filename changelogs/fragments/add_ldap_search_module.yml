@@ -1,0 +1,2 @@
+feature:
+  - "ldap_search - Added module for searching in LDAP servers for entries"
