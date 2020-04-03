@@ -1,131 +1,37 @@
 automerge: false
 files:
-  $actions/aireos.py:
-    labels: aireos cisco networking
-  $actions/aruba.py:
-    maintainers: $team_aruba
-    labels: aruba networking
-  $actions/:
-  $actions/ironware.py:
-    maintainers: paulquack
-    labels: ironware networking
-  $actions/nos_config.py:
-  $actions/onyx_config.py:
-    maintainers: $team_onyx
-    labels: networking onyx_config
-  $actions/slxos.py:
-  $actions/sros.py:
-    maintainers: $team_networking
-    labels: networking sros
-  $actions/voss.py:
-  $becomes/doas.py:
-  $becomes/dzdo.py:
-  $becomes/ksu.py:
-  $becomes/machinectl.py:
-  $becomes/pbrun.py:
-  $becomes/pfexec.py:
-  $becomes/pmrun.py:
-  $becomes/sesu.py:
-  $callbacks/actionable.py:
-  $callbacks/cgroup_memory_recap.py:
-  $callbacks/context_demo.py:
-  $callbacks/counter_enabled.py:
-  $callbacks/dense.py:
-  $callbacks/full_skip.py:
-  $callbacks/hipchat.py:
-  $callbacks/jabber.py:
-  $callbacks/log_plays.py:
-  $callbacks/logdna.py:
-  $callbacks/logentries.py:
-  $callbacks/logstash.py:
-  $callbacks/mail.py:
-  $callbacks/nrdp.py:
-  $callbacks/null.py:
-  $callbacks/osx_say.py:
   $callbacks/say.py:
     notify: chris-short
     maintainers: $team_macos
     labels: macos say
     keywords: brew cask darwin homebrew macosx macports osx
-  $callbacks/:
   $callbacks/stderr.py:
     maintainers: ysn2233
     labels: stderr
   $callbacks/sumologic.py:
     maintainers: ryancurrah
     labels: sumologic
-  $callbacks/syslog_json.py:
   $callbacks/unixy.py:
     maintainers: akatch
     labels: unixy
-  $callbacks/yaml.py:
-  $cliconfs/:
-    labels: networking
-  $cliconfs/aruba.py:
-    maintainers: $team_aruba
-    labels: aruba networking
-  $cliconfs/ce.py:
-    maintainers: $team_huawei
-    labels: ce cloudengine huawei networking
-  $cliconfs/edgeswitch.py:
-    maintainers: f-bor
-    labels: edgeswitch networking
-  $cliconfs/eric_eccli.py:
-    maintainers: $team_networking itercheng
-    labels: eric_eccli networking
-  $cliconfs/exos.py:
-    maintainers: $team_extreme rdvencioneck
-    labels: exos networking
-  $cliconfs/ironware.py:
-    maintainers: paulquack
-    labels: ironware networking
-  $cliconfs/nos.py:
-    maintainers: $team_extreme
-    labels: networking nos
-  $cliconfs/onyx.py:
-    maintainers: $team_onyx
-    labels: networking onyx
-  $cliconfs/routeros.py:
-    maintainers: heuels
-    labels: networking routeros
-  $cliconfs/slxos.py:
-    maintainers: $team_extreme
-    labels: networking slxos
-  $cliconfs/voss.py:
-    maintainers: $team_extreme
-    labels: networking voss
-  $connections/chroot.py:
   $connections/docker.py:
     maintainers: $team_docker
     labels: cloud docker
     ignore: cove
     supershipit: felixfontein
-  $connections/:
-  $connections/kubectl.py:
-    maintainers: chouseknecht fabianvf flaper87 maxamillion
-    labels: k8s kubectl
   $connections/lxd.py:
     maintainers: mattclay
     labels: lxd
   $connections/oc.py:
     maintainers: chouseknecht fabianvf flaper87 maxamillion
     labels: oc
-  $connections/qubes.py:
   $connections/saltstack.py:
     labels: saltstack
-  $connections/zone.py:
-  $doc_fragments/a10.py:
-  $doc_fragments/aireos.py:
-  $doc_fragments/alicloud.py:
-  $doc_fragments/aruba.py:
-  $doc_fragments/auth_basic.py:
-  $doc_fragments/avi.py:
-  $doc_fragments/ce.py:
   $doc_fragments/cloudscale.py:
+    labels: cloudscale
   $doc_fragments/cloudstack.py:
     maintainers: $team_cloudstack
     labels: cloudstack
-  $doc_fragments/:
   $doc_fragments/docker.py:
     maintainers: $team_docker
     labels: cloud docker
@@ -136,6 +42,7 @@ files:
     labels: gcp
     supershipit: erjohnso rambleraptor
   $doc_fragments/hetzner.py:
+    labels: hetzner
   $doc_fragments/hpe3par.py:
     maintainers: farhan7500 gautamphegde
     labels: hpe3par
@@ -160,20 +67,8 @@ files:
   $doc_fragments/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
-  $filters/gcp_kms_filters.py:
-  $filters/json_query.py:
-  $filters/random_mac.py:
-  $httpapis/exos.py:
-    maintainers: $team_networking LindsayHill bigmstone ujwalkomarla
-    labels: exos networking
-  $httpapis/:
-    maintainers: $team_networking
-    labels: networking
-  $httpapis/ftd.py:
-    maintainers: $team_networking annikulin
-    labels: cisco ftd networking
-    keywords: firepower ftd
   $inventories/cloudscale.py:
+    labels: cloudscale
   $inventories/docker_machine.py:
     maintainers: $team_docker
     labels: cloud docker
@@ -184,7 +79,6 @@ files:
     labels: cloud docker docker_swarm
     ignore: cove
     supershipit: felixfontein
-  $inventories/:
   $inventories/linode.py:
     maintainers: $team_linode
     labels: cloud linode
@@ -193,11 +87,10 @@ files:
   $inventories/scaleway.py:
     maintainers: $team_scaleway
     labels: cloud scaleway
-  $inventories/virtualbox.py:
   $inventories/vultr.py:
     maintainers: $team_vultr
     labels: cloud vultr
-  $lookups/:
+  $lookups/onepass:
     maintainers: samdoran
     labels: onepassword
   $lookups/conjur_variable.py:
@@ -215,30 +108,17 @@ files:
   $lookups/manifold.py:
     maintainers: galanoff
     labels: manifold
-  $lookups/passwordstore.py:
-  $lookups/rabbitmq.py:
-    maintainers: Im0
-    labels: rabbitmq
-  $lookups/redis.py:
-  $lookups/shelvefile.py:
-  $module_utils/alicloud_ecs.py:
-  $module_utils/cloud.py:
   $module_utils/cloudscale.py:
     maintainers: $team_cloudscale
     labels: cloudscale
   $module_utils/cloudstack.py:
     maintainers: $team_cloudstack
     labels: cloudstack
-  $module_utils/:
   $module_utils/docker/:
     maintainers: $team_docker
     labels: cloud
     ignore: cove
     supershipit: felixfontein
-  $module_utils/exoscale.py:
-  $module_utils/f5_utils.py:
-    maintainers: caphrim007 wojtek0806
-    labels: f5 f5_utils
   $module_utils/gitlab.py:
     notify: jlozadad
     maintainers: $team_gitlab
@@ -248,12 +128,10 @@ files:
     maintainers: $team_huawei
     labels: huawei hwc_utils networking
     keywords: cloud huawei hwc
-  $module_utils/ibm_sa_utils.py:
   $module_utils/identity/keycloak/keycloak.py: eikef ndclt
   $module_utils/ipa.py:
     maintainers: $team_ipa
     labels: ipa
-  $module_utils/known_hosts.py:
   $module_utils/kubevirt.py:
     maintainers: $team_kubevirt
     labels: cloud kubevirt
@@ -271,90 +149,6 @@ files:
   $module_utils/net_tools/nios/api.py:
     maintainers: $team_networking sganesh-infoblox
     labels: infoblox networking
-  $module_utils/network/a10/a10.py:
-    maintainers: ericchou1 mischapeters
-    labels: networking
-  $module_utils/network/aireos/aireos.py:
-    labels: cisco networking
-  $module_utils/network/aos/aos.py:
-    maintainers: dgarros jeremyschulman
-    labels: networking
-  $module_utils/network/apconos/apconos.py:
-    labels: networking
-  $module_utils/network/aruba/aruba.py:
-    maintainers: $team_aruba
-    labels: networking
-  $module_utils/network/avi/:
-    maintainers: $team_avi
-    labels: networking
-  $module_utils/network/bigswitch/bigswitch.py:
-    maintainers: jayakody tedelhourani vuile
-    labels: networking
-  $module_utils/network/cloudengine/ce.py:
-    maintainers: $team_huawei
-    labels: huawei networking
-  $module_utils/network/cnos/:
-    maintainers: amuraleedhar dkasberg
-    labels: networking
-  $module_utils/network/edgeos/edgeos.py:
-    labels: networking
-  $module_utils/network/edgeswitch/:
-    maintainers: f-bor
-    labels: networking
-  $module_utils/network/enos/enos.py:
-    maintainers: amuraleedhar
-    labels: networking
-  $module_utils/network/eric_eccli/eric_eccli.py:
-    maintainers: $team_networking itercheng
-    labels: networking
-  $module_utils/network/exos/:
-    maintainers: $team_extreme rdvencioneck
-    labels: networking
-  $module_utils/network/f5/:
-    maintainers: caphrim007 wojtek0806
-    labels: networking
-  $module_utils/network/fortianalyzer/:
-    labels: networking
-  $module_utils/network/ftd/:
-    maintainers: $team_ftd
-    labels: cisco networking
-    keywords: firepower ftd
-  $module_utils/network/:
-    labels: networking
-  $module_utils/network/ironware/ironware.py:
-    maintainers: paulquack
-    labels: networking
-  $module_utils/network/netscaler/netscaler.py:
-    maintainers: $team_netscaler
-    labels: networking
-  $module_utils/network/netvisor/:
-    labels: networking
-  $module_utils/network/nos/nos.py:
-    maintainers: $team_extreme
-    labels: networking
-  $module_utils/network/nso/nso.py:
-    maintainers: $team_nso
-    labels: cisco networking
-  $module_utils/network/onyx/onyx.py:
-    maintainers: $team_onyx
-    labels: networking
-  $module_utils/network/ordnance/ordnance.py:
-    maintainers: alexanderturner djh00t
-    labels: networking
-  $module_utils/network/panos/panos.py:
-    maintainers: ivanbojer jtschichold shinmog
-    labels: networking
-  $module_utils/network/routeros/routeros.py:
-    maintainers: heuels
-    labels: networking
-  $module_utils/network/slxos/slxos.py:
-    maintainers: $team_extreme
-    labels: networking
-  $module_utils/network/sros/sros.py:
-    labels: networking
-  $module_utils/network/voss/voss.py:
-    maintainers: $team_extreme
-    labels: networking
   $module_utils/oracle/oci_utils.py:
     maintainers: $team_oracle
     labels: cloud
@@ -368,18 +162,15 @@ files:
   $module_utils/redfish_utils.py:
     maintainers: $team_redfish
     labels: redfish_utils
-  $module_utils/redhat.py:
   $module_utils/remote_management/dellemc/: rajeevarakkal
   $module_utils/remote_management/lxca/common.py: navalkp prabhosa
   $module_utils/scaleway.py:
     maintainers: $team_scaleway
     labels: cloud scaleway
   $module_utils/storage/hpe3par/hpe3par.py: farhan7500 gautamphegde
-  $module_utils/univention_umc.py:
   $module_utils/utm_utils.py:
     maintainers: $team_e_spirit
     labels: utm_utils
-  $module_utils/vexata.py:
   $module_utils/vultr.py:
     maintainers: $team_vultr
     labels: cloud vultr
@@ -439,7 +230,7 @@ files:
   $modules/cloud/cloudstack/cs_vpc_offering.py:
     authors: dpassante
     maintainers: rhtyd
-  $modules/cloud/digital_ocean/_digital_ocean.py:
+  $modules/cloud/digital_ocean/digital_ocean.py:
     authors: zbal
   $modules/cloud/digital_ocean/:
     authors: Akasurde
@@ -447,12 +238,12 @@ files:
     keywords:
     - digital ocean
     - droplet
-  $modules/cloud/digital_ocean/_digital_ocean_firewall_facts.py:
+  $modules/cloud/digital_ocean/digital_ocean_firewall_facts.py:
     authors: BondAnthony
     maintainers: mgregson
-  $modules/cloud/digital_ocean/_digital_ocean_floating_ip_facts.py:
+  $modules/cloud/digital_ocean/digital_ocean_floating_ip_facts.py:
     authors: pmarques
-  $modules/cloud/digital_ocean/_digital_ocean_sshkey_facts.py:
+  $modules/cloud/digital_ocean/digital_ocean_sshkey_facts.py:
     authors: pmarques
   $modules/cloud/digital_ocean/digital_ocean_block_storage.py:
     authors: harneksidhu
@@ -537,28 +328,6 @@ files:
     maintainers: $team_google
     ignore: supertom
     supershipit: erjohnso rambleraptor
-  $modules/cloud/google/_gce.py:
-    authors: erjohnso supertom
-    maintainers: rambleraptor
-  $modules/cloud/google/_gcp_tpu_node_facts.py:
-    authors: googlecloudplatform
-  $modules/cloud/google/gc_storage.py:
-    authors: Nitaco bennojoy
-    labels: gc_storage
-  $modules/cloud/google/gce_instance_template.py:
-    authors: GwenaelPellenArkeup
-  $modules/cloud/google/gce_net.py:
-    authors: erjohnso supertom
-    maintainers: rambleraptor
-  $modules/cloud/google/gce_pd.py:
-    authors: erjohnso
-    maintainers: rambleraptor
-  $modules/cloud/google/gce_snapshot.py:
-    authors: robwagner33
-  $modules/cloud/google/gce_tag.py:
-    authors: dohoangkhiem supertom
-  $modules/cloud/heroku/heroku_collaborator.py:
-    authors: marns93
   $modules/cloud/huawei/:
     authors: huaweicloud
     maintainers: $team_huawei
@@ -610,24 +379,6 @@ files:
   $modules/cloud/misc/:
     authors: ryansb
     ignore: ryansb
-  $modules/cloud/misc/virt.py:
-    authors: ansible skvidal
-    maintainers: $team_virt
-    labels: virt
-    ignore: skvidal
-    keywords: kvm libvirt proxmox qemu
-  $modules/cloud/misc/virt_net.py:
-    authors: drybjed
-    maintainers: $team_virt
-    labels: virt virt_net
-    ignore: skvidal
-    keywords: kvm libvirt proxmox qemu
-  $modules/cloud/misc/virt_pool.py:
-    authors: drybjed
-    maintainers: $team_virt
-    labels: virt virt_pool
-    ignore: skvidal
-    keywords: kvm libvirt proxmox qemu
   $modules/cloud/misc/xenserver_facts.py:
     authors: andyhky caphrim007 cheese
     labels: xenserver_facts
@@ -636,7 +387,7 @@ files:
     authors: aajdinov edevenport
   $modules/cloud/online/:
     authors: sieben
-  $modules/cloud/opennebula/_one_image_facts.py:
+  $modules/cloud/opennebula/one_image_facts.py:
     authors: ilicmilan meerkampdvv
     maintainers: rsmontero xorel
   $modules/cloud/opennebula/one_host.py:
@@ -661,174 +412,6 @@ files:
     authors: pascalheraud
   $modules/cloud/ovh/ovh_monthly_billing.py:
     authors: fraff
-  $modules/cloud/ovirt/_ovirt_affinity_label_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_affinity_label_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_api_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_api_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_cluster_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_cluster_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_datacenter_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_datacenter_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_disk_facts.py:
-    authors: KKoukiou
-    maintainers: $team_ovirt
-    labels: _ovirt_disk_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_event_facts.py:
-    authors: nasx
-    maintainers: $team_ovirt
-    labels: _ovirt_event_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_external_provider_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_external_provider_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_group_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_group_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_host_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_host_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_host_storage_facts.py:
-    authors: derez
-    maintainers: $team_ovirt
-    labels: _ovirt_host_storage_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_network_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_network_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_nic_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_nic_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_permission_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_permission_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_quota_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_quota_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_scheduling_policy_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_scheduling_policy_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_snapshot_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_snapshot_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_storage_domain_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_storage_domain_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_storage_template_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_storage_template_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_storage_vm_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_storage_vm_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_tag_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_tag_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_template_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_template_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_user_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_user_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_vm_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_vm_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
-  $modules/cloud/ovirt/_ovirt_vmpool_facts.py:
-    authors: machacekondra
-    maintainers: mnecas mwperina
-    labels: _ovirt_vmpool_facts
-    ignore: vincentvdk
-    deprecated: true
-    keywords: RHEV RHV ovirt
   $modules/cloud/packet/packet_device.py:
     authors: baldwinSPC t0mk teebes
   $modules/cloud/packet/:
@@ -882,7 +465,7 @@ files:
     ignore: hekonsek
   $modules/cloud/scaleway/scaleway_volume_info.py:
     authors: Spredzy sieben
-  $modules/cloud/smartos/_smartos_image_facts.py:
+  $modules/cloud/smartos/smartos_image_facts.py:
     authors: xen0l
     maintainers: bcoca danowar2k fishman jasperla jpdasma mator scathatheworm troy2914
     labels: solaris
@@ -1054,8 +637,6 @@ files:
     authors: jpmens noseka1
   $modules/files/iso_extract.py:
     authors: dagwieers jhoekx ribbons
-  $modules/files/patch.py:
-    authors: jirutka luisperlaz
   $modules/files/read_csv.py:
     authors: dagwieers
   $modules/files/xattr.py:
@@ -1066,7 +647,7 @@ files:
     maintainers: cmprescott sm4rk0
     labels: m:xml xml
     ignore: magnus919
-  $modules/identity/_onepassword_facts.py:
+  $modules/identity/onepassword_facts.py:
     authors: Rylon
   $modules/identity/ipa/ipa_config.py:
     authors: fxfitz
@@ -1099,21 +680,6 @@ files:
     authors: Rylon
   $modules/identity/opendj/opendj_backendprop.py:
     authors: dj-wasabi
-  $modules/messaging/rabbitmq/:
-    authors: chrishoffman
-    maintainers: manuel-sousa
-  $modules/messaging/rabbitmq/rabbitmq_global_parameter.py:
-    authors: jgkirschbaum
-    maintainers: $team_rabbitmq
-  $modules/messaging/rabbitmq/rabbitmq_policy.py:
-    authors: retr0h
-    maintainers: $team_rabbitmq
-  $modules/messaging/rabbitmq/rabbitmq_queue.py:
-    authors: manuel-sousa
-    maintainers: chrishoffman
-  $modules/messaging/rabbitmq/rabbitmq_vhost_limits.py:
-    authors: h-matsuo
-    maintainers: $team_rabbitmq
   $modules/monitoring/airbrake_deployment.py:
     authors: bpennypacker
     labels: airbrake_deployment
@@ -1155,13 +721,13 @@ files:
   $modules/monitoring/newrelic_deployment.py:
     authors: mcodd
   $modules/monitoring/pagerduty.py:
-    authors: '!UNKNOWN bpennypacker suprememoocow thaumos'
+    authors: 'bpennypacker suprememoocow thaumos'
     labels: pagerduty
     ignore: bpennypacker
   $modules/monitoring/pagerduty_alert.py:
     authors: ApsOps
   $modules/monitoring/pingdom.py:
-    authors: '!UNKNOWN thaumos'
+    authors: 'thaumos'
   $modules/monitoring/rollbar_deployment.py:
     authors: kavu
   $modules/monitoring/sensu/sensu_check.py:
@@ -1204,7 +770,7 @@ files:
     authors: akostyuk
   $modules/net_tools/ipwcli_dns.py:
     authors: cwollinger
-  $modules/net_tools/ldap/_ldap_attr.py:
+  $modules/net_tools/ldap/ldap_attr.py:
     authors: jtyr
   $modules/net_tools/ldap/ldap_attrs.py:
     authors: drybjed jtyr noles
@@ -1263,288 +829,8 @@ files:
     authors: alcamie101
   $modules/net_tools/snmp_facts.py:
     authors: ogenstad
-  $modules/network/a10/a10_server_axapi3.py:
-    authors: ericchou1
-    maintainers: mischapeters
-  $modules/network/a10/:
-    authors: ericchou1 mischapeters
-  $modules/network/aci/:
-    authors: devarshishah3
-    maintainers: aciguru brunocalogero fadallar jmcgill298 koladiya mtorelli rsmeyers schunduri smnmtzgr
-    labels: cisco networking
-    keywords:
-    - aci
-    - cisco msc
-    - cisco mso
-    - multi-site
-    - multisite
-  $modules/network/aireos/:
-    authors: jmighion
-    labels: cisco networking
-    ignore: jmighion
-  $modules/network/apconos/apconos_command.py:
-    authors: davidlee-ap
-  $modules/network/aruba/:
-    authors: jmighion
-    maintainers: $team_aruba
-    ignore: jmighion
-  $modules/network/avi/:
-    authors: grastogi23
-    maintainers: ericsysmin khaltore
-  $modules/network/avi/avi_api_version.py:
-    authors: vivobg
-    maintainers: $team_avi
-  $modules/network/avi/avi_autoscalelaunchconfig.py:
-    authors: chaitanyaavi
-    maintainers: $team_avi
-  $modules/network/avi/avi_l4policyset.py:
-    authors: chaitanyaavi
-    maintainers: $team_avi
-  $modules/network/avi/avi_user.py:
-    authors: gitshrikant
-    maintainers: $team_avi
-  $modules/network/avi/avi_useraccount.py:
-    authors: chaitanyaavi
-    maintainers: $team_avi
-  $modules/network/bigswitch/:
-    authors: tedelhourani
-    maintainers: jayakody vuile
-  $modules/network/check_point/checkpoint_access_layer_facts.py:
-    authors: rcarrillocruz
-    labels: checkpoint_access_layer_facts
-  $modules/network/check_point/checkpoint_access_rule.py:
-    authors: rcarrillocruz
-    labels: checkpoint_access_rule
-  $modules/network/check_point/checkpoint_access_rule_facts.py:
-    authors: rcarrillocruz
-    labels: checkpoint_access_rule_facts
-  $modules/network/check_point/checkpoint_host.py:
-    authors: rcarrillocruz
-    labels: checkpoint_host
-  $modules/network/check_point/checkpoint_host_facts.py:
-    authors: rcarrillocruz
-    labels: checkpoint_host_facts
-  $modules/network/check_point/checkpoint_object_facts.py:
-    authors: rcarrillocruz
-    labels: checkpoint_object_facts
-  $modules/network/check_point/checkpoint_run_script.py:
-    authors: rcarrillocruz
-    labels: checkpoint_run_script
-  $modules/network/check_point/checkpoint_session.py:
-    authors: rcarrillocruz
-    labels: checkpoint_session
-  $modules/network/check_point/checkpoint_task_facts.py:
-    authors: rcarrillocruz
-    labels: checkpoint_task_facts
-  $modules/network/check_point/cp_publish.py:
-    authors: chkp-orso
-    labels: cp_publish
-  $modules/network/cloudengine/:
-    authors: QijunPan
-    maintainers: TommyLike edisonxiang freesky-edward hwDCN niuzhenguo xuxiaowei0512 yanzhangi zengchen1024 zhongjun2
-    labels: huawei networking
-  $modules/network/cloudengine/ce_command.py:
-    authors: CloudEngine-Ansible
-    maintainers: $team_huawei
-  $modules/network/cloudengine/ce_multicast_global.py:
-    authors: xuxiaowei0512
-    maintainers: QijunPan TommyLike edisonxiang freesky-edward hwDCN niuzhenguo yanzhangi zengchen1024 zhongjun2
-  $modules/network/cloudengine/ce_multicast_igmp_enable.py:
-    authors: CloudEngine-Ansible
-    maintainers: $team_huawei
-  $modules/network/cloudengine/ce_static_route_bfd.py:
-    authors: CloudEngine-Ansible
-    maintainers: $team_huawei
-  $modules/network/cloudengine/ce_vrrp.py:
-    authors: numone213
-    maintainers: $team_huawei
-  $modules/network/cloudvision/cv_server_provision.py:
-    authors: mharista
-  $modules/network/cnos/:
-    authors: amuraleedhar
-    maintainers: dkasberg
-  $modules/network/cnos/cnos_linkagg.py:
-    authors: auraleedhar
-    maintainers: amuraleedhar dkasberg
-  $modules/network/cumulus/nclu.py:
-    authors: isharacomix
-    maintainers: jrrivers
-  $modules/network/edgeos/edgeos_command.py:
-    authors: beardymcbeards samdoran
-  $modules/network/edgeos/:
-    authors: Qalthos samdoran
-  $modules/network/edgeswitch/:
-    authors: f-bor
-  $modules/network/enos/:
-    authors: amuraleedhar
-  $modules/network/eric_eccli/eric_eccli_command.py:
-    authors: itercheng
-  $modules/network/exos/exos_command.py:
-    authors: rdvencioneck
-    maintainers: $team_extreme
-  $modules/network/exos/exos_config.py:
-    authors: hlrichardson
-    maintainers: $team_extreme rdvencioneck
-  $modules/network/exos/exos_facts.py:
-    authors: hlrichardson ujwalkomarla
-    maintainers: LindsayHill bigmstone rdvencioneck
-  $modules/network/exos/exos_l2_interfaces.py:
-    authors: jayalakshmiV
-    maintainers: $team_extreme rdvencioneck
-  $modules/network/exos/exos_lldp_global.py:
-    authors: ujwalkomarla
-    maintainers: LindsayHill bigmstone rdvencioneck
-  $modules/network/exos/exos_lldp_interfaces.py:
-    authors: JayalakshmiV
-    maintainers: $team_extreme rdvencioneck
-  $modules/network/exos/exos_vlans.py:
-    authors: jayalakshmiV
-    maintainers: $team_extreme rdvencioneck
-  $modules/network/f5/:
-    authors: caphrim007 wojtek0806
-    ignore: JoeReifel Qalthos ganeshrn mhite perzizzle srvg
-  $modules/network/f5/_bigip_facts.py:
-    authors: caphrim007 mhite
-    maintainers: wojtek0806
-  $modules/network/f5/_bigip_gtm_facts.py:
-    authors: caphrim007
-    maintainers: wojtek0806
-  $modules/network/f5/_bigiq_device_facts.py:
-    authors: caphrim007
-    maintainers: wojtek0806
-  $modules/network/fortianalyzer/faz_device.py:
-    authors: lweighall
-  $modules/network/fortimanager/:
-    authors: Ghilli3 lweighall p4r4n0y1ng
-    maintainers: Ftntcorecse
-  $modules/network/fortimanager/fmgr_provisioning.py:
-    authors: Ghilli3
-    maintainers: Ftntcorecse lweighall p4r4n0y1ng
-  $modules/network/fortimanager/fmgr_query.py:
-    authors: lweighall
-    maintainers: Ftntcorecse Ghilli3 p4r4n0y1ng
-  $modules/network/fortimanager/fmgr_script.py:
-    authors: Ghilli3
-    maintainers: Ftntcorecse lweighall p4r4n0y1ng
-  $modules/network/ftd/:
-    authors: annikulin
-    labels: cisco networking
-    keywords: firepower ftd
-  $modules/network/icx/:
-    authors: Commscope
-    maintainers: sushma-alethea
-  $modules/network/illumos/:
-    authors: xen0l
-    maintainers: bcoca danowar2k fishman jasperla jpdasma mator scathatheworm troy2914
-    labels: solaris
-    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
-  $modules/network/ingate/:
-    authors: ingatesystems
-  $modules/network/ironware/:
-    authors: paulquack
-  $modules/network/itential/:
-    authors: cma0
-  $modules/network/netact/netact_cm_command.py:
-    authors: hatuomin
-  $modules/network/netscaler/:
-    authors: giorgos-nikolopoulos
-    maintainers: chiradeep
-  $modules/network/netvisor/:
-    authors: rajaspachipulusu17
-    maintainers: $team_netvisor
-  $modules/network/nos/:
-    authors: LindsayHill
     maintainers: bigmstone ujwalkomarla
-  $modules/network/nso/:
-    authors: cnasten
-    maintainers: cmoberg tbjurman
-    labels: cisco networking
-  $modules/network/nuage/nuage_vspk.py:
-    authors: pdellaert
-  $modules/network/onyx/:
-    authors: anass
-    maintainers: $team_onyx
-  $modules/network/onyx/onyx_bgp.py:
-    authors: anasb samerd
-    maintainers: anasbadaha
-  $modules/network/onyx/onyx_buffer_pool.py:
-    authors: anasb
-  $modules/network/onyx/onyx_command.py:
-    authors: samerd
-    maintainers: anasbadaha
-  $modules/network/onyx/onyx_config.py:
-    authors: atabachnik samerd
-    maintainers: anasbadaha
-  $modules/network/onyx/onyx_facts.py:
-    authors: samerd waleedym
-    maintainers: anasbadaha
-  $modules/network/onyx/onyx_igmp.py:
-    authors: samerd
-    maintainers: anasbadaha
-  $modules/network/onyx/onyx_igmp_interface.py:
-    authors: anasb
-  $modules/network/onyx/onyx_igmp_vlan.py:
-    authors: anasbadaha
-    maintainers: samerd
-  $modules/network/onyx/onyx_traffic_class.py:
-    authors: anasb
-  $modules/network/onyx/onyx_vlan.py:
-    authors: atabachnik samerd
-    maintainers: anasbadaha
-  $modules/network/onyx/onyx_vxlan.py:
-    authors: anasb
-  $modules/network/opx/opx_cps.py:
-    authors: skg-net
-  $modules/network/ordnance/:
-    authors: alexanderturner
-    maintainers: djh00t
-  $modules/network/panos/:
-    authors: ivanbojer jtschichold
-    maintainers: shinmog
-  $modules/network/panos/_panos_commit.py:
-    authors: ivanbojer jtschichold traittinen
-  $modules/network/panos/_panos_dag_tags.py:
-    authors: vinayvenkat
-    maintainers: ivanbojer jtschichold shinmog
-  $modules/network/panos/_panos_match_rule.py:
-    authors: rnh556
-    maintainers: ivanbojer jtschichold shinmog
-  $modules/network/panos/_panos_nat_rule.py:
-    authors: ivanbojer jtschichold rnh556
-  $modules/network/panos/_panos_object.py:
-    authors: rnh556
-    maintainers: ivanbojer jtschichold shinmog
-  $modules/network/panos/_panos_op.py:
-    authors: ivanbojer
-    maintainers: jtschichold shinmog
-  $modules/network/panos/_panos_query_rules.py:
-    authors: rnh556
-    maintainers: ivanbojer jtschichold shinmog
-  $modules/network/panos/_panos_sag.py:
-    authors: vinayvenkat
-    maintainers: ivanbojer jtschichold shinmog
-  $modules/network/panos/_panos_security_rule.py:
-    authors: ivanbojer rnh556
-    maintainers: jtschichold shinmog
-  $modules/network/panos/_panos_set.py:
-    authors: spmp
-    maintainers: ivanbojer jtschichold shinmog
-  $modules/network/radware/:
-    authors: evgenyfedoruk
-  $modules/network/routeros/:
-    authors: heuels
-  $modules/network/slxos/:
-    authors: bigmstone
-    maintainers: LindsayHill ujwalkomarla
-  $modules/network/slxos/slxos_vlan.py:
-    authors: lindsayhill
-    maintainers: $team_extreme
-  $modules/network/sros/:
-    authors: privateip
-  $modules/network/voss/:
-    authors: LindsayHill
-    maintainers: bigmstone ujwalkomarla
-  $modules/notification/_osx_say.py:
+  $modules/notification/osx_say.py:
     authors: ansible mpdehaan
     labels: _osx_say
     deprecated: true
@@ -1584,8 +870,6 @@ files:
     authors: willybarro
   $modules/notification/pushover.py:
     authors: weaselkeeper
-  $modules/notification/rabbitmq_publish.py:
-    authors: Im0
   $modules/notification/rocketchat.py:
     authors: ramondelafuente
     maintainers: Deepakkothandan
@@ -1804,7 +1088,7 @@ files:
     authors: evertmulder
   $modules/remote_management/manageiq/manageiq_tenant.py:
     authors: evertmulder
-  $modules/remote_management/oneview/_oneview_datacenter_facts.py:
+  $modules/remote_management/oneview/oneview_datacenter_facts.py:
     authors: aalexmonteiro madhav-bharadwaj ricardogpsf soodpr
   $modules/remote_management/oneview/:
     authors: adriane-cardozo fgbulsoni tmiotto
@@ -1829,7 +1113,7 @@ files:
     authors: andreparames
   $modules/source_control/git_config.py:
     authors: djmattyg007 mgedmin
-  $modules/source_control/github/_github_hooks.py:
+  $modules/source_control/github/github_hooks.py:
     authors: pcgentry
   $modules/source_control/github/github_deploy_key.py:
     authors: bincyber
@@ -1886,45 +1170,6 @@ files:
   $modules/storage/netapp/:
     authors: hulquest
     maintainers: amit0701 carchi8py lmprice lonico ndswartz schmots1
-  $modules/storage/netapp/_na_ontap_gather_facts.py:
-    authors: dprts
-    maintainers: $team_netapp
-  $modules/storage/netapp/netapp_e_alerts.py:
-    authors: lmprice
-    maintainers: amit0701 carchi8py hulquest lonico ndswartz schmots1
-  $modules/storage/netapp/netapp_e_asup.py:
-    authors: lmprice
-    maintainers: amit0701 carchi8py hulquest lonico ndswartz schmots1
-  $modules/storage/netapp/netapp_e_auditlog.py:
-    authors: ndswartz
-    maintainers: amit0701 carchi8py hulquest lmprice lonico schmots1
-  $modules/storage/netapp/netapp_e_drive_firmware.py:
-    authors: ndswartz
-    maintainers: amit0701 carchi8py hulquest lmprice lonico schmots1
-  $modules/storage/netapp/netapp_e_facts.py:
-    authors: hulquest ndswartz
-    maintainers: amit0701 carchi8py lmprice lonico schmots1
-  $modules/storage/netapp/netapp_e_firmware.py:
-    authors: ndswartz
-    maintainers: amit0701 carchi8py hulquest lmprice lonico schmots1
-  $modules/storage/netapp/netapp_e_global.py:
-    authors: lmprice
-    maintainers: amit0701 carchi8py hulquest lonico ndswartz schmots1
-  $modules/storage/netapp/netapp_e_lun_mapping.py:
-    authors: hulquest ndswartz
-    maintainers: amit0701 carchi8py lmprice lonico schmots1
-  $modules/storage/netapp/netapp_e_mgmt_interface.py:
-    authors: lmprice ndswartz
-    maintainers: amit0701 carchi8py hulquest lonico schmots1
-  $modules/storage/netapp/netapp_e_storagepool.py:
-    authors: hulquest ndswartz
-    maintainers: amit0701 carchi8py lmprice lonico schmots1
-  $modules/storage/netapp/netapp_e_syslog.py:
-    authors: ndswartz
-    maintainers: amit0701 carchi8py hulquest lmprice lonico schmots1
-  $modules/storage/netapp/netapp_e_volume.py:
-    authors: hulquest ndswartz
-    maintainers: amit0701 carchi8py lmprice lonico schmots1
   $modules/storage/purestorage/:
     authors: sdodsley
     maintainers: bannaych dnix101 genegr lionmax opslounge raekins sile16
@@ -1942,7 +1187,7 @@ files:
     maintainers: bcoca danowar2k fishman jasperla jpdasma mator scathatheworm troy2914
     labels: solaris
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
-  $modules/system/_python_requirements_facts.py:
+  $modules/system/python_requirements_facts.py:
     authors: ryansb willthames
     ignore: ryansb
   $modules/system/:
@@ -2081,9 +1326,9 @@ files:
     authors: jbenden
   $modules/system/xfs_quota.py:
     authors: bushvin
-  $modules/web_infrastructure/_jenkins_job_facts.py:
+  $modules/web_infrastructure/jenkins_job_facts.py:
     authors: stpierre
-  $modules/web_infrastructure/_nginx_status_facts.py:
+  $modules/web_infrastructure/nginx_status_facts.py:
     authors: resmo
   $modules/web_infrastructure/apache2_mod_proxy.py:
     authors: oboukili
@@ -2142,47 +1387,6 @@ files:
     authors: inetfuture mattupstate
   $modules/web_infrastructure/taiga_issue.py:
     authors: lekum
-  $terminals/:
-    labels: networking
-  $terminals/aruba.py:
-    maintainers: $team_aruba
-    labels: aruba networking
-  $terminals/ce.py:
-    maintainers: $team_huawei
-    labels: ce cloudengine huawei networking
-  $terminals/edgeos.py:
-    maintainers: samdoran
-    labels: edgeos networking
-  $terminals/edgeswitch.py:
-    maintainers: f-bor
-    labels: edgeswitch networking
-  $terminals/eric_eccli.py:
-    maintainers: itercheng
-    labels: eric_eccli networking
-  $terminals/exos.py:
-    maintainers: $team_extreme rdvencioneck
-    labels: exos networking
-  $terminals/ironware.py:
-    maintainers: paulquack
-    labels: ironware networking
-  $terminals/nos.py:
-    maintainers: $team_extreme
-    labels: networking nos
-  $terminals/onyx.py:
-    maintainers: $team_onyx
-    labels: networking onyx
-  $terminals/routeros.py:
-    maintainers: heuels
-    labels: networking routeros
-  $terminals/slxos.py:
-    maintainers: $team_extreme
-    labels: networking slxos
-  $terminals/sros.py:
-    maintainers: $team_networking
-    labels: networking sros
-  $terminals/voss.py:
-    maintainers: $team_extreme
-    labels: networking voss
 macros:
   actions: plugins/action
   becomes: plugins/become
@@ -2197,9 +1401,7 @@ macros:
   module_utils: plugins/module_utils
   modules: plugins/modules
   terminals: plugins/terminal
-  team_aci: aciguru brunocalogero devarshishah3 fadallar jmcgill298 koladiya mtorelli rsmeyers schunduri smnmtzgr
   team_aix: MorrisA bcoca d-little flynn1973 gforster kairoaraujo marvin-sinister mator molekuul ramooncamacho wtcross
-  team_avi: ericsysmin grastogi23 khaltore
   team_bsd: JoergFiedler MacLemon bcoca dch jasperla mekanix opoplawski overhacked tuxillo
   team_cloudscale: gaudenz resmo
   team_cloudstack: dpassante rhtyd
@@ -2222,11 +1424,7 @@ macros:
   team_netapp: amit0701 carchi8py hulquest lmprice lonico ndswartz schmots1
   team_netscaler: chiradeep giorgos-nikolopoulos
   team_netvisor: Qalthos amitsi csharpe-pn pdam preetiparasar
-  team_networking: NilashishC Qalthos danielmellado ganeshrn justjais trishnaguha
-  team_nso: cmoberg cnasten tbjurman
-  team_onyx: anasbadaha samerd
   team_oracle: manojmeda mross22 nalsaber
-  team_ovirt: machacekondra mnecas mwperina
   team_postgresql: Andersson007 Dorn- amenonsen andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
   team_purestorage: bannaych dnix101 genegr lionmax opslounge raekins sdodsley sile16
   team_rabbitmq: chrishoffman manuel-sousa
