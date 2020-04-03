@@ -255,16 +255,16 @@ def main():
             cmd += " --certname='%s'" % p['certname']
         if module.check_mode:
             cmd += " --noop"
-        if p['use_srv_records'] is not None:
-            if not p['use_srv_records']:
-                cmd += " --no-use_srv_records"
-            else:
-                cmd += " --use_srv_records"
         elif 'noop' in p:
             if p['noop']:
                 cmd += " --noop"
             else:
                 cmd += " --no-noop"
+        if p['use_srv_records'] is not None:
+            if not p['use_srv_records']:
+                cmd += " --no-use_srv_records"
+            else:
+                cmd += " --use_srv_records"
     else:
         cmd = "%s apply --detailed-exitcodes " % base_cmd
         if p['logdest'] == 'syslog':
