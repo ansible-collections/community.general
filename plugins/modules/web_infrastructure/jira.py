@@ -32,7 +32,7 @@ options:
   operation:
     required: true
     aliases: [ command ]
-    choices: [ create, comment, edit, update, fetch, transition , link, search ]
+    choices: [ comment, create, edit, fetch, link, search, transition, update ]
     description:
       - The operation to perform.
 
@@ -373,7 +373,7 @@ def edit(restbase, user, passwd, params):
 
 def update(restbase, user, passwd, params):
     data = {
-        "update": params['fields']
+        "update": params['fields'],
     }
     url = restbase + '/issue/' + params['issue']
 
