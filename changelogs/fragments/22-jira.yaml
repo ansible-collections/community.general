@@ -5,4 +5,4 @@ minor_changes:
 
 bugfixes:
 - Priting full error message from jira server
-- Issue 109: Transsistion issue not working 
+- jira - transition issue not working (https://link/to/the/issue).
