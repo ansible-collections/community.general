@@ -112,7 +112,7 @@ options:
     required: false
     version_added: '2.10'
     description:
-     - Query JIRA in JQL Syntax E.g. 'CMDB Hostname'='test.example.com'.
+     - Query JIRA in JQL Syntax, e.g. 'CMDB Hostname'='test.example.com'.
     type: str
 
   timeout:
