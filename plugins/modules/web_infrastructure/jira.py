@@ -297,7 +297,7 @@ def request(url, user, passwd, timeout, data=None, method=None):
                                         'Authorization': "Basic %s" % auth})
 
     if info['status'] not in (200, 201, 204):
-        module.fail_json(msg=info)
+        
         error = json.loads(info['body'])
         if error:
             module.fail_json(msg=error['errorMessages'])
@@ -389,11 +389,10 @@ def fetch(restbase, user, passwd, params):
 
 
 def search(restbase, user, passwd, params):
-    url = restbase + '/search?jql=' + urllib.request.pathname2url(params['jql']) + '&maxResults=10'
+    url = restbase + '/search?jql=' + urllib.request.pathname2url(params['jql'])
     if params['fields']:
         fields = params['fields'].keys()
-        for f in fields:
-            url = url + '&fields=' + urllib.request.pathname2url(f)
+        url = url +  '&fields=' + '&fields='.join([urllib.request.pathname2url(f) for f in fields])
     ret = get(url, user, passwd, params['timeout'])
     return ret
 
