@@ -415,7 +415,7 @@ def transition(restbase, user, passwd, params):
     # Perform it
     url = restbase + '/issue/' + params['issue'] + "/transitions"
     data = {'transition': {"id": tid},
-            'fields': params['fields']}
+            'update': params['fields']}
 
     ret = post(url, user, passwd, params['timeout'], data)
 
