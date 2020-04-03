@@ -373,7 +373,7 @@ def edit(restbase, user, passwd, params):
 
 def update(restbase, user, passwd, params):
     data = {
-        "update": params['fields']
+        "update": params['fields'],
     }
     url = restbase + '/issue/' + params['issue']
 
