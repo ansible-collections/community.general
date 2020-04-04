@@ -79,14 +79,32 @@ INVALID_QUOTES = ((test[0], test[1], INVALID[test]) for test in sorted(INVALID))
 
 IS_STRINGS_DANGEROUS = (
     (u'', False),
+    (u' ', False),
     (u'alternative database', False),
     (u'backup of TRUNCATED table', False),
     (u'bob.dropper', False),
     (u'd\'artagnan', False),
+    (u'user_with_select_update_truncate_right', False),
     (u';DROP DATABASE fluffy_pets_photos', True),
+    (u';drop DATABASE fluffy_pets_photos', True),
     (u'; TRUNCATE TABLE his_valuable_table', True),
+    (u'; truncate TABLE his_valuable_table', True),
     (u'\'--', True),
+    (u'"--', True),
     (u'\' union select username, password from admin_credentials', True),
+    (u'\' UNION SELECT username, password from admin_credentials', True),
+    (u'\' intersect select', True),
+    (u'\' INTERSECT select', True),
+    (u'\' except select', True),
+    (u'\' EXCEPT select', True),
+    (u';ALTER TABLE prices', True),
+    (u';alter table prices', True),
+    (u"; UPDATE products SET price = '0'", True),
+    (u";update products SET price = '0'", True),
+    (u"; DELETE FROM products", True),
+    (u"; delete FROM products", True),
+    (u"; SELECT * FROM products", True),
+    (u" ; select * from products", True),
 )
 
 

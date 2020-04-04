@@ -177,3 +177,29 @@ def is_input_dangerous(string):
         return True
 
     return False
+
+
+def check_input(module, **args):
+    """Wrapper for is_input_dangerous function."""
+    needs_to_check = args
+
+    dangerous_elements = []
+
+    for elem in needs_to_check:
+        if isinstance(elem, str):
+            if is_input_dangerous(elem):
+                dangerous_elements.append(elem)
+
+        elif isinstance(elem, list):
+            for e in elem:
+                if is_input_dangerous(e):
+                    dangerous_elements.append(e)
+
+        else:
+            elem = str(elem)
+            if is_input_dangerous(elem):
+                dangerous_elements.append(elem)
+
+    if dangerous_elements:
+        module.fail_json(msg="Passed input '%s' is "
+                             "potentially dangerous" % ', '.join(dangerous_elements))
