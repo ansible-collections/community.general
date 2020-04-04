@@ -179,7 +179,7 @@ def is_input_dangerous(string):
     return False
 
 
-def check_input(module, **args):
+def check_input(module, *args):
     """Wrapper for is_input_dangerous function."""
     needs_to_check = args
 
