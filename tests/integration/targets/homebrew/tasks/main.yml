@@ -35,8 +35,6 @@
   become: yes
   become_user: "{{ brew_stat.stat.pw_name }}"
   register: xz_result
-  environment:
-    HOMEBREW_NO_AUTO_UPDATE: True
 
 - assert:
     that:
@@ -50,8 +48,6 @@
   become: yes
   become_user: "{{ brew_stat.stat.pw_name }}"
   register: xz_result
-  environment:
-    HOMEBREW_NO_AUTO_UPDATE: True
 
 - assert:
     that:
@@ -65,8 +61,6 @@
   become: yes
   become_user: "{{ brew_stat.stat.pw_name }}"
   register: xz_result
-  environment:
-    HOMEBREW_NO_AUTO_UPDATE: True
 
 - assert:
     that:
@@ -80,8 +74,6 @@
   become: yes
   become_user: "{{ brew_stat.stat.pw_name }}"
   register: xz_result
-  environment:
-    HOMEBREW_NO_AUTO_UPDATE: True
 
 - assert:
     that:
