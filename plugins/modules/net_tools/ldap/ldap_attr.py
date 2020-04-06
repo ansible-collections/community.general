@@ -35,7 +35,7 @@ notes:
     rules. This should work out in most cases, but it is theoretically
     possible to see spurious changes when target and actual values are
     semantically identical but lexically distinct.
-  - "The C(params) parameter was removed in Ansible-2.10 due to circumventing Ansible's parameter
+  - "The C(params) parameter was removed due to circumventing Ansible's parameter
      handling.  The C(params) parameter started disallowing setting the bind_pw parameter in
      Ansible-2.7 as it was insecure to set the parameter that way."
 deprecated:
@@ -157,7 +157,6 @@ modlist:
 '''
 
 import traceback
-from distutils.version import LooseVersion
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native, to_bytes
@@ -257,28 +256,8 @@ def main():
         module.fail_json(msg=missing_required_lib('python-ldap'),
                          exception=LDAP_IMP_ERR)
 
-    # For Ansible-2.9.x and below, allow the params module parameter with a warning
-    if LooseVersion(module.ansible_version) < LooseVersion('2.10'):
-        if module.params['params']:
-            module.deprecate("The `params` option to ldap_attr will be removed in Ansible 2.10"
-                             " since it circumvents Ansible's option handling", version='2.10')
-
-        # However, the bind_pw parameter contains a password so it **must** go through the normal
-        # argument parsing even though removing it breaks backwards compat.
-        if 'bind_pw' in module.params['params']:
-            module.fail_json("Using `bind_pw` with the `params` option has been disallowed since"
-                             " it is insecure.  Use the `bind_pw` option directly.  The `params`"
-                             " option will be removed in Ansible-2.10")
-
-        # Update module parameters with user's parameters if defined
-        module.params.update(module.params['params'])
-        # Remove params itself
-        module.params.pop('params', None)
-    else:
-        # For Ansible 2.10 and above
-        if module.params['params']:
-            module.fail_json("The `params` option to ldap_attr was removed in Ansible-2.10 since"
-                             " it circumvents Ansible's option handling")
+    if module.params['params']:
+        module.fail_json(msg="The `params` option to ldap_attr was removed in since it circumvents Ansible's option handling")
 
     # Instantiate the LdapAttr object
     ldap = LdapAttr(module)
