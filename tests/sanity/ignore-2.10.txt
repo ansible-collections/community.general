@@ -998,8 +998,6 @@ plugins/modules/identity/onepassword_info.py pylint:collection-invalid-deprecate
 plugins/modules/identity/onepassword_info.py validate-modules:parameter-list-no-elements
 plugins/modules/identity/opendj/opendj_backendprop.py validate-modules:doc-missing-type
 plugins/modules/identity/opendj/opendj_backendprop.py validate-modules:parameter-type-not-in-doc
-plugins/modules/monitoring/airbrake_deployment.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/monitoring/airbrake_deployment.py validate-modules:doc-missing-type
 plugins/modules/monitoring/bigpanda.py validate-modules:collection-invalid-version
 plugins/modules/monitoring/bigpanda.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/monitoring/bigpanda.py validate-modules:doc-missing-type
