@@ -32,8 +32,8 @@ notes:
     rule allowing root to modify the server configuration. If you need to use
     a simple bind to access your server, pass the credentials in I(bind_dn)
     and I(bind_pw).
-  - "The C(params) parameter was removed due to circumventing Ansible's parameter
-     handling.  The C(params) parameter started disallowing setting the bind_pw parameter in
+  - "The I(params) parameter was removed due to circumventing Ansible's parameter
+     handling.  The I(params) parameter started disallowing setting the I(bind_pw) parameter in
      Ansible-2.7 as it was insecure to set the parameter that way."
 author:
   - Jiri Tyr (@jtyr)
