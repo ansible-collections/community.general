@@ -35,6 +35,9 @@ notes:
     rules. This should work out in most cases, but it is theoretically
     possible to see spurious changes when target and actual values are
     semantically identical but lexically distinct.
+  - "The I(params) parameter was removed due to circumventing Ansible's parameter
+     handling.  The I(params) parameter started disallowing setting the I(bind_pw) parameter in
+     Ansible-2.7 as it was insecure to set the parameter that way."
 deprecated:
   removed_in: '2.14'
   why: 'The current "ldap_attr" module does not support LDAP attribute insertions or deletions with objectClass dependencies.'
@@ -66,10 +69,6 @@ options:
         a list of strings (see examples).
     type: raw
     required: true
-  params:
-    description:
-    - Additional module parameters.
-    type: dict
 extends_documentation_fragment:
 - community.general.ldap.documentation
 
@@ -138,13 +137,15 @@ EXAMPLES = r'''
 #   server_uri: ldap://localhost/
 #   bind_dn: cn=admin,dc=example,dc=com
 #   bind_pw: password
+#
+# In the example below, 'args' is a task keyword, passed at the same level as the module
 - name: Get rid of an unneeded attribute
   ldap_attr:
     dn: uid=jdoe,ou=people,dc=example,dc=com
     name: shadowExpire
     values: []
     state: exact
-    params: "{{ ldap_auth }}"
+  args: "{{ ldap_auth }}"
 '''
 
 RETURN = r'''
@@ -255,11 +256,8 @@ def main():
         module.fail_json(msg=missing_required_lib('python-ldap'),
                          exception=LDAP_IMP_ERR)
 
-    # Update module parameters with user's parameters if defined
-    if 'params' in module.params and isinstance(module.params['params'], dict):
-        module.params.update(module.params['params'])
-        # Remove the params
-        module.params.pop('params', None)
+    if module.params['params']:
+        module.fail_json(msg="The `params` option to ldap_attr was removed in since it circumvents Ansible's option handling")
 
     # Instantiate the LdapAttr object
     ldap = LdapAttr(module)
