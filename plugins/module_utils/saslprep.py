@@ -134,7 +134,7 @@ def prohibited_output_profile(string):
 
         # RFC4013, 2.5. Unassigned Code Points:
         if in_table_a1(c):
-            raise ValueError('%s: prohibited unassigned code points (A.1).')
+            raise ValueError('%s: prohibited unassigned code points (A.1).' % RFC)
 
 
 def saslprep(string):
