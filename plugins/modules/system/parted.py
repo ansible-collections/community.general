@@ -68,15 +68,17 @@ options:
   part_start:
     description:
     - Where the partition will start as offset from the beginning of the disk,
-      that is, the "distance" from the start of the disk.
+      that is, the "distance" from the start of the disk. Negative numbers
+      specify distance from the end of the disk.
     - The distance can be specified with all the units supported by parted
       (except compat) and it is case sensitive, e.g. C(10GiB), C(15%).
     type: str
     default: 0%
-  part_end :
+  part_end:
     description:
     - Where the partition will end as offset from the beginning of the disk,
-      that is, the "distance" from the start of the disk.
+      that is, the "distance" from the start of the disk. Negative numbers
+      specify distance from the end of the disk.
     - The distance can be specified with all the units supported by parted
       (except compat) and it is case sensitive, e.g. C(10GiB), C(15%).
     type: str
@@ -178,6 +180,13 @@ EXAMPLES = r'''
     state: present
     part_start: 1GiB
 
+- name: Create a new primary partition with a size of 1GiB at disk's end
+  parted:
+    device: /dev/sdb
+    number: 3
+    state: present
+    part_start: -1GiB
+
 # Example on how to read info and reuse it in subsequent task
 - name: Read device information (always use unit when probing)
   parted: device=/dev/sdb unit=MiB
@@ -206,9 +215,9 @@ parted_units = units_si + units_iec + ['s', '%', 'cyl', 'chs', 'compact']
 
 def parse_unit(size_str, unit=''):
     """
-    Parses a string containing a size of information
+    Parses a string containing a size or boundary information
     """
-    matches = re.search(r'^([\d.]+)([\w%]+)?$', size_str)
+    matches = re.search(r'^(-?[\d.]+)([\w%]+)?$', size_str)
     if matches is None:
         # "<cylinder>,<head>,<sector>" format
         matches = re.search(r'^(\d+),(\d+),(\d+)$', size_str)
