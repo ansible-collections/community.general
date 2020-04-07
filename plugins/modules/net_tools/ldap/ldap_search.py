@@ -64,7 +64,7 @@ options:
       - Set to True to return the full attribute schema of entries, not
         their attribute values. Overrides C(attrs) when provided.
 extends_documentation_fragment:
-  - ldap.documentation
+    - community.general.ldap.documentation
 """
 
 EXAMPLES = r"""
