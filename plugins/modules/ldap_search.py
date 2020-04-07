@@ -40,7 +40,7 @@ options:
     description:
       - The LDAP DN to search in.
   scope:
-    choices: [ base, onelevel, subordinate, children ]
+    choices: [base, onelevel, subordinate, children]
     default: base
     type: str
     description:
@@ -51,7 +51,6 @@ options:
     description:
       - Used for filtering the LDAP search result.
   attrs:
-    default: None
     type: raw
     description:
       - A list of attributes for limiting the result. Use an
@@ -59,7 +58,7 @@ options:
   schema:
     default: False
     type: bool
-    choices: [ False, True ]
+    choices: [True, False]
     description:
       - Set to True to return the full attribute schema of entries, not
         their attribute values. Overrides C(attrs) when provided.
@@ -103,8 +102,8 @@ def main():
             dn=dict(type='str', required=True),
             scope=dict(type='str', default='base', choices=['base', 'onelevel', 'subordinate', 'children']),
             filter=dict(type='str', default='(objectClass=*)'),
-            attrs=dict(type='raw', default=None),
-            schema=dict(type='bool', default=False, choices=(list(BOOLEANS))),
+            attrs=dict(type='raw'),
+            schema=dict(type='bool', default=False, choices=[True, False]),
         ),
         supports_check_mode=True,
     )
@@ -164,7 +163,7 @@ class LdapSearch(LdapGeneric):
             self.module.fail_json(msg="scope must be one of: base, onelevel, subordinate, children")
 
     def _load_attrs(self):
-        if self.module.params['attrs'] is None:
+        if not self.module.params['attrs'] or self.module.params['attrs'] is None:
             self.attrlist = None
         else:
             attrs = self._load_attr_values(self.module.params['attrs'])
