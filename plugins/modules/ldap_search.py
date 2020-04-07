@@ -30,8 +30,7 @@ notes:
     and I(bind_pw).
 version_added: "2.9"
 author:
-  - Peter Sagerson
-  - Sebastian Pfahl
+  - Sebastian Pfahl (@eryx12o45)
 requirements:
   - python-ldap
 options:
@@ -52,7 +51,7 @@ options:
     description:
       - Used for filtering the LDAP search result.
   attrs:
-    default: none
+    default: None
     type: raw
     description:
       - A list of attributes for limiting the result. Use an
@@ -60,6 +59,7 @@ options:
   schema:
     default: False
     type: bool
+    choices: [ False, True ]
     description:
       - Set to True to return the full attribute schema of entries, not
         their attribute values. Overrides C(attrs) when provided.
