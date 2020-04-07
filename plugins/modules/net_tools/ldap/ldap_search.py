@@ -21,7 +21,6 @@ short_description: Search for entries in a LDAP server
 description:
   - Return the results of an LDAP search. Use Ansible's 'register' statement.
 notes:
-  - Only supports Python 3.
   - The default authentication settings will attempt to use a SASL EXTERNAL
     bind over a UNIX domain socket. This works well with the default Ubuntu
     install for example, which includes a C(cn=peercred,cn=external,cn=auth) ACL
@@ -102,7 +101,7 @@ def main():
             dn=dict(type='str', required=True),
             scope=dict(type='str', default='base', choices=['base', 'onelevel', 'subordinate', 'children']),
             filter=dict(type='str', default='(objectClass=*)'),
-            attrs=dict(type='list'),
+            attrs=dict(type='list', elements='str'),
             schema=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
@@ -163,13 +162,7 @@ class LdapSearch(LdapGeneric):
             self.module.fail_json(msg="scope must be one of: base, onelevel, subordinate, children")
 
     def _load_attrs(self):
-        if not self.module.params['attrs'] or self.module.params['attrs'] is None:
-            self.attrlist = None
-        else:
-            if len(self.module.params['attrs']) > 0:
-                self.attrlist = self.module.params['attrs']
-            else:
-                self.attrlist = None
+        self.attrlist = self.module.params['attrs'] or None
 
     def main(self):
         results = self.perform_search()
