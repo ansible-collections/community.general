@@ -36,33 +36,29 @@ requirements:
   - python-ldap
 options:
   dn:
-    required: true
+    required: True
     type: str
     description:
       - The LDAP DN to search in.
   scope:
-    required: false
     choices: [ base, onelevel, subordinate, children ]
     default: base
     type: str
     description:
       - The LDAP scope to use.
   filter:
-    required: false
     default: '(objectClass=*)'
     type: str
     description:
       - Used for filtering the LDAP search result.
   attrs:
-    required: false
     default: none
     type: raw
     description:
       - A list of attributes for limiting the result. Use an
         actual list or a comma-separated string.
   schema:
-    required: false
-    default: false
+    default: False
     type: bool
     description:
       - Set to True to return the full attribute schema of entries, not
@@ -108,7 +104,7 @@ def main():
             scope=dict(type='str', default='base', choices=['base', 'onelevel', 'subordinate', 'children']),
             filter=dict(type='str', default='(objectClass=*)'),
             attrs=dict(type='raw', default=None),
-            schema=dict(type='bool', default='false', choices=(list(BOOLEANS) + ['True', True, 'False', False])),
+            schema=dict(type='bool', default=False, choices=(list(BOOLEANS))),
         ),
         supports_check_mode=True,
     )
@@ -206,7 +202,7 @@ class LdapSearch(LdapGeneric):
             else:
                 return [_extract_entry(result[0], result[1]) for result in results]
         except ldap.NO_SUCH_OBJECT:
-            self.module.fail_json(msg="Base not found: {}".format(self.dn))
+            self.module.fail_json(msg="Base not found: {0}".format(self.dn))
 
 
 if __name__ == '__main__':

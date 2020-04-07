@@ -1104,8 +1104,6 @@ plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:doc-missing-type
 plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/ldap/ldap_passwd.py validate-modules:doc-missing-type
 plugins/modules/net_tools/ldap/ldap_passwd.py validate-modules:doc-required-mismatch
-plugins/modules/net_tools/ldap/ldap_search.py validate-modules:doc-missing-type
-plugins/modules/net_tools/ldap/ldap_search.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/netcup_dns.py validate-modules:doc-missing-type
 plugins/modules/net_tools/netcup_dns.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nios/nios_a_record.py validate-modules:doc-default-does-not-match-spec
