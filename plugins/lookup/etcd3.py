@@ -83,7 +83,8 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
     - name: "a value from a locally running etcd"
-      debug: msg={{ lookup('etcd3', 'foo/bar') }}
+      debug:
+        msg: "{{ lookup('etcd3', 'foo/bar') }}"
 
     - name: "values from multiple folders on a locally running etcd"
       debug: msg={{ lookup('etcd3', 'foo', 'bar', 'baz') }}
