@@ -72,7 +72,8 @@ EXAMPLES = r"""
   vars:
       secret: "{{ lookup('community.general.dsv', '/test/secret') }}"
   tasks:
-      - debug: msg="the password is {{ secret["data"]["password"] }}"
+      - debug:
+          msg: 'the password is {{ secret["data"]["password"] }}'
 """
 
 from ansible.errors import AnsibleError, AnsibleOptionsError
