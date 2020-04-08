@@ -99,7 +99,7 @@ EXAMPLES = '''
 RETURN = '''
     _raw:
         description:
-        - list of keys and associated values
+        - List of keys and associated values.
         type: list
         elements: complex
 '''
