@@ -66,7 +66,7 @@ _list:
 EXAMPLES = r"""
 - hosts: localhost
   vars:
-      secret: "{{ lookup('tss', 1) }}"
+      secret: "{{ lookup('community.general.tss', 1) }}"
   tasks:
       - debug: msg="the password is {{ (secret['items'] | items2dict(key_name='slug', value_name='itemValue'))['password'] }}"
 """
