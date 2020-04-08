@@ -114,6 +114,13 @@ options:
     description:
      - Query JIRA in JQL Syntax, e.g. 'CMDB Hostname'='test.example.com'.
     type: str
+  
+  maxresults:
+    required: false
+    version_added: '2.10'
+    description:
+     - Limit the max number of returned resuts from a jira search. If not value is specified, the default jira limit will be used.
+    type: int
 
   timeout:
     required: false
@@ -236,6 +243,7 @@ EXAMPLES = """
     password: '{{ pass }}'
     project: ANS
     operation: search
+    maxresults: 10
     jql: project=cmdb AND cf[13225]="test"
   args:
     fields:
@@ -398,6 +406,8 @@ def search(restbase, user, passwd, params):
     if params['fields']:
         fields = params['fields'].keys()
         url = url + '&fields=' + '&fields='.join([urllib.request.pathname2url(f) for f in fields])
+    if params['maxresults']:
+        url = url + '&maxResults=' + str(params['maxresults'])
     ret = get(url, user, passwd, params['timeout'])
     return ret
 
@@ -475,6 +485,7 @@ def main():
             inwardissue=dict(),
             outwardissue=dict(),
             jql=dict(),
+            maxresults=dict(type='int'),
             timeout=dict(type='float', default=10),
             validate_certs=dict(default=True, type='bool'),
         ),
