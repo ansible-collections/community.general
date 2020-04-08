@@ -1,8 +1,8 @@
 ---
 minor_changes:
-- Added serarch function with support for Jira JQL
-- Added update function which can update Jira Selects etc.
+- jira - added search function with support for Jira JQL (http..).
+- jira - added update function which can update Jira Selects etc (http..).
 
 bugfixes:
-- Priting full error message from jira server (https://github.com/ansible-collections/community.general/pull/22)
+- jira - printing full error message from jira server (https://github.com/ansible-collections/community.general/pull/22)
 - jira - transition issue not working (https://github.com/ansible-collections/community.general/issues/109).
