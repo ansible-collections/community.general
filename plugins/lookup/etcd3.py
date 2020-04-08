@@ -22,7 +22,7 @@ DOCUMENTATION = '''
     options:
         _terms:
             description:
-            - the list of keys to lookup on the etcd3 server
+            - The list of keys to look up on the etcd3 server.
             type: list
             elements: string
             required: True
