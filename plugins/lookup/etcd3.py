@@ -16,7 +16,7 @@ DOCUMENTATION = '''
     short_description: get info from an etcd3 server
 
     description:
-    - Retrieves data from an etcd3 server
+    - Retrieves data from an etcd3 server.
 
     options:
         _terms:
