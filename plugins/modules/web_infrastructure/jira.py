@@ -110,14 +110,12 @@ options:
 
   jql:
     required: false
-    version_added: '2.10'
     description:
      - Query JIRA in JQL Syntax, e.g. 'CMDB Hostname'='test.example.com'.
     type: str
 
   maxresults:
     required: false
-    version_added: '2.10'
     description:
      - Limit the max number of returned resuts from a jira search. If not value is specified, the default jira limit will be used.
     type: int
