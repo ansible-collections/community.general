@@ -1,7 +1,7 @@
 ---
 minor_changes:
-- jira - added search function with support for Jira JQL (http..).
-- jira - added update function which can update Jira Selects etc (http..).
+- jira - added search function with support for Jira JQL (https://github.com/ansible-collections/community.general/pull/22).
+- jira - added update function which can update Jira Selects etc (https://github.com/ansible-collections/community.general/pull/22).
 
 bugfixes:
 - jira - printing full error message from jira server (https://github.com/ansible-collections/community.general/pull/22)
