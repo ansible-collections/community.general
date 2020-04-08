@@ -73,6 +73,8 @@ EXAMPLES = r"""
 
 from ansible.errors import AnsibleError, AnsibleOptionsError
 
+sdk_is_missing = False
+
 try:
     from thycotic.secrets.server import (
         SecretServer,
@@ -80,7 +82,7 @@ try:
         SecretServerError,
     )
 except ImportError:
-    raise AnsibleError("python-tss-sdk must be installed to use this plugin")
+    sdk_is_missing = True
 
 from ansible.utils.display import Display
 from ansible.plugins.lookup import LookupBase
@@ -91,6 +93,9 @@ display = Display()
 
 class LookupModule(LookupBase):
     def run(self, terms, variables, **kwargs):
+        if sdk_is_missing:
+            raise AnsibleError("python-tss-sdk must be installed to use this plugin")
+
         self.set_options(var_options=variables, direct=kwargs)
 
         server_parameters = {
