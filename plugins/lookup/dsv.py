@@ -70,7 +70,7 @@ _list:
 EXAMPLES = r"""
 - hosts: localhost
   vars:
-      secret: "{{ lookup('dsv', '/test/secret') }}"
+      secret: "{{ lookup('community.general.dsv', '/test/secret') }}"
   tasks:
       - debug: msg="the password is {{ secret["data"]["password"] }}"
 """
