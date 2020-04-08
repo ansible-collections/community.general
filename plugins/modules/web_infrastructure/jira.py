@@ -117,7 +117,8 @@ options:
   maxresults:
     required: false
     description:
-     - Limit the max number of returned resuts from a jira search. If not value is specified, the default jira limit will be used.
+     - Limit the result of I(operation=search). If no value is specified, the default jira limit will be used.
+     - Used when I(operation=search) only, ignored otherwise.
     type: int
 
   timeout:
