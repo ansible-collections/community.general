@@ -1,0 +1,5 @@
+changes:
+  - Add params unique_suffix, tags, purge_tags, ram_role_name, spot_price_limit, spot_strategy, period_unit, dry_run, include_data_disks for module ali_instance.py
+  - Add parmas name_prefix, filters for module ali_instance_info.py
+  - improve module_utils alicloud_ecs.py to support more products and more ways of authentication
+  - Add parmas for doc alicloud.py about authentication
