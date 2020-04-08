@@ -17,25 +17,24 @@ ANSIBLE_METADATA = {
 DOCUMENTATION = r"""
 ---
 module: ldap_search
-short_description: Search for entries in a LDAP server.
+short_description: Search for entries in a LDAP server
 description:
   - Return the results of an LDAP search. Use Ansible's 'register' statement.
 notes:
-  - Only supports Python3
+  - Only supports Python 3.
   - The default authentication settings will attempt to use a SASL EXTERNAL
     bind over a UNIX domain socket. This works well with the default Ubuntu
-    install for example, which includes a cn=peercred,cn=external,cn=auth ACL
+    install for example, which includes a C(cn=peercred,cn=external,cn=auth) ACL
     rule allowing root to modify the server configuration. If you need to use
     a simple bind to access your server, pass the credentials in I(bind_dn)
     and I(bind_pw).
-version_added: "2.9"
 author:
   - Sebastian Pfahl (@eryx12o45)
 requirements:
   - python-ldap
 options:
   dn:
-    required: True
+    required: true
     type: str
     description:
       - The LDAP DN to search in.
@@ -51,32 +50,33 @@ options:
     description:
       - Used for filtering the LDAP search result.
   attrs:
-    type: raw
+    type: list
+    elements: str
     description:
       - A list of attributes for limiting the result. Use an
         actual list or a comma-separated string.
   schema:
-    default: False
+    default: false
     type: bool
-    choices: [True, False]
     description:
-      - Set to True to return the full attribute schema of entries, not
-        their attribute values. Overrides C(attrs) when provided.
+      - Set to C(true) to return the full attribute schema of entries, not
+        their attribute values. Overrides I(attrs) when provided.
 extends_documentation_fragment:
     - community.general.ldap.documentation
 """
 
 EXAMPLES = r"""
 # Return all entries within the 'groups' organizational unit.
-- ldap_search:
+- community.general.ldap_search:
     dn: "ou=groups,dc=example,dc=com"
   register: ldap_groups
 
 # Return GIDs for all groups
-- ldap_search:
+- community.general.ldap_search:
     dn: "ou=groups,dc=example,dc=com"
     scope: "onelevel"
-    attrs: "gidNumber"
+    attrs:
+      - "gidNumber"
   register: ldap_group_gids
 """
 
@@ -102,8 +102,8 @@ def main():
             dn=dict(type='str', required=True),
             scope=dict(type='str', default='base', choices=['base', 'onelevel', 'subordinate', 'children']),
             filter=dict(type='str', default='(objectClass=*)'),
-            attrs=dict(type='raw'),
-            schema=dict(type='bool', default=False, choices=[True, False]),
+            attrs=dict(type='list'),
+            schema=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )
@@ -166,22 +166,10 @@ class LdapSearch(LdapGeneric):
         if not self.module.params['attrs'] or self.module.params['attrs'] is None:
             self.attrlist = None
         else:
-            attrs = self._load_attr_values(self.module.params['attrs'])
-            if len(attrs) > 0:
-                self.attrlist = attrs
+            if len(self.module.params['attrs']) > 0:
+                self.attrlist = self.module.params['attrs']
             else:
                 self.attrlist = None
-
-    def _load_attr_values(self, raw):
-        if isinstance(raw, str):
-            values = raw.split(',')
-        else:
-            values = raw
-
-        if not (isinstance(values, list) and all(isinstance(value, str) for value in values)):
-            self.module.fail_json(msg="attrs must be a string or list of strings.")
-
-        return list(map(to_bytes, values))
 
     def main(self):
         results = self.perform_search()
