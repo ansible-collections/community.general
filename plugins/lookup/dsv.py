@@ -120,5 +120,4 @@ class LookupModule(LookupBase):
                 raise AnsibleError(
                     "DevOps Secrets Vault lookup failure: %s" % error.message
                 )
-        display.debug(u"dsv_lookup result: %s" % result)
         return result
