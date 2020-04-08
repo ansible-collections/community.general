@@ -104,8 +104,10 @@ RETURN = '''
 '''
 
 import os
+import re
 import traceback
 
+from ansible.utils.display import Display
 from ansible.plugins.lookup import LookupBase
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils._text import to_native
@@ -117,6 +119,8 @@ except ImportError:
     ETCD_IMP_ERR = traceback.format_exc()
     HAS_ETCD = False
 
+display = Display()
+
 
 class LookupModule(LookupBase):
 
@@ -125,7 +129,7 @@ class LookupModule(LookupBase):
         self.set_options(var_options=variables, direct=kwargs)
 
         if not HAS_ETCD:
-            self._display.error(missing_required_lib('etcd3'))
+            display.error(missing_required_lib('etcd3'))
             return None
 
         # get etcd3 optional args
@@ -145,11 +149,32 @@ class LookupModule(LookupBase):
             'ca_cert': 'ETCDCTL_CACERT',
             'cert_cert': 'ETCDCTL_CERT',
             'cert_key': 'ETCDCTL_KEY',
+            'user': 'ETCDCTL_USER',
+            'password': 'ETCDCTL_PASSWORD',
+            'timeout': 'ETCDCTL_DIAL_TIMEOUT',
         }
+        
+        def env_override(key, value):
+            client_params[key] = value
+            display.vvvvv("Overriding etcd3 '{}' param with ENV variable '{}'".format(
+                key,
+                value
+            ))
         for key in etcd3_envs.keys():
-            value = os.getenv(etcd3_envs[key])
-            if value:
-                client_params[key] = value
+            if etcd3_envs[key] in os.environ:
+                env_override(key, os.environ[etcd3_envs[key]])
+
+        # ETCDCTL_ENDPOINTS expects something in the form <http(s)://server:port> of <server:port>
+        # so here we use a regex to extract server and port
+        if 'ETCDCTL_ENDPOINTS' in os.environ:
+            match = re.compile(
+                r'^(https?://)?(?P<host>(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|([\w\.]+))(:(?P<port>\d{1,5}))?/?$'
+            ).match(os.environ['ETCDCTL_ENDPOINTS'])
+            if match:
+                if match.group('host'):
+                    env_override('host', match.group('host'))
+                if match.group('port'):
+                    env_override('port', match.group('port'))
 
         # override env with optional lookup parameters
         for key in client_params.keys():
@@ -163,7 +188,7 @@ class LookupModule(LookupBase):
         try:
             etcd = etcd3.client(**client_params)
         except Exception as exp:
-            self._display.warning('Cannot connect to etcd cluster: %s' % (to_native(exp)))
+            display.error('Cannot connect to etcd cluster: %s' % (to_native(exp)))
             return None
 
         ret = []
