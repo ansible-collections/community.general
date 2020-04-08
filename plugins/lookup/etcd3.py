@@ -13,7 +13,6 @@ DOCUMENTATION = '''
 
     lookup: etcd3
 
-    version_added: "2.9.6"
 
     short_description: get info from an etcd3 server
 
