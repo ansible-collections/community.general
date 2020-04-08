@@ -23,58 +23,68 @@ DOCUMENTATION = '''
             description:
             - The list of keys to look up on the etcd3 server.
             type: list
-            elements: string
+            elements: str
             required: True
         prefix:
             description:
-            - look for a key or for a prefix key
-            type: boolean
+            - look for key or prefix key
+            type: bool
         host:
             description:
             - etcd3 listening client host
+            env:
+            - name: ETCDCTL_ENDPOINTS
             default: '127.0.0.1'
-            type: string
+            type: str
         port:
             description:
             - etcd3 listening client port
+            env:
+            - name: ETCDCTL_ENDPOINTS
             default: 2379
-            type: integer
+            type: int
         ca_cert:
             description:
             - etcd3 CA authority
             default: None
             env:
             - name: ETCDCTL_CACERT
-            type: string
+            type: str
         cert_cert:
             description:
             - etcd3 client certificate
             default: None
             env:
             - name: ETCDCTL_CERT
-            type: string
+            type: str
         cert_key:
             description:
             - etcd3 client private key
             default: None
             env:
             - name: ETCDCTL_KEY
-            type: string
+            type: str
         timeout:
             description:
             - client timeout
             default: 60
-            type: integer
+            env:
+            - name: ETCDCTL_DIAL_TIMEOUT
+            type: int
         user:
             description:
             - auth user name
             default: None
-            type: string
+            env:
+            - name: ETCDCTL_USER
+            type: str
         password:
             description:
             - auth user password
             default: None
-            type: string
+            env:
+            - name: ETCDCTL_PASSWORD
+            type: str
 
     requirements:
     - "etcd3 >= 0.12"
@@ -153,7 +163,7 @@ class LookupModule(LookupBase):
             'password': 'ETCDCTL_PASSWORD',
             'timeout': 'ETCDCTL_DIAL_TIMEOUT',
         }
-        
+
         def env_override(key, value):
             client_params[key] = value
             display.vvvvv("Overriding etcd3 '{}' param with ENV variable '{}'".format(
@@ -199,11 +209,11 @@ class LookupModule(LookupBase):
                     for val, meta in etcd.get_prefix(key):
                         ret.append({'key': to_native(meta.key), 'value': to_native(val)})
                 except Exception as exp:
-                    pass
+                    display.warning('Caught except during etcd3.get_prefix: %s' % (to_native(exp)))
             else:
                 try:
                     val, meta = etcd.get(key)
                     ret.append({'key': to_native(meta.key), 'value': to_native(val)})
                 except Exception as exp:
-                    pass
+                    display.warning('Caught except during etcd3.get: %s' % (to_native(exp)))
         return ret
