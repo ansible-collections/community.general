@@ -9,4 +9,4 @@ unit_tests_dependencies:
 - cisco.intersight
 - community.kubernetes
 - google.cloud
-- ovirt.ovirt_collection
+- ovirt.ovirt

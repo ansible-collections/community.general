@@ -61,7 +61,7 @@ retry ansible-galaxy -vvv collection install cisco.intersight
 retry ansible-galaxy -vvv collection install community.crypto
 retry ansible-galaxy -vvv collection install community.kubernetes
 retry ansible-galaxy -vvv collection install google.cloud
-retry ansible-galaxy -vvv collection install ovirt.ovirt_collection
+retry ansible-galaxy -vvv collection install ovirt.ovirt
 
 # END: HACK
 
