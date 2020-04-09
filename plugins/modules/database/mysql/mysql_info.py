@@ -312,6 +312,7 @@ class MySQL_Info(object):
 
         if 'users' in wanted:
             self.__get_users()
+
         if 'master_status' in wanted:
             self.__get_master_status()
 
