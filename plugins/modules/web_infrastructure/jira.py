@@ -4,6 +4,8 @@
 # (c) 2014, Steve Smith <ssmith@atlassian.com>
 # Atlassian open-source approval reference OSR-76.
 #
+# (c) 2020, Per Abildgaard Toft <per@minfejl.dk> Search and update function
+#
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -15,7 +17,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'supported_by': 'community'}
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 module: jira
 short_description: create and modify issues in a JIRA instance
 description:
@@ -30,7 +32,7 @@ options:
   operation:
     required: true
     aliases: [ command ]
-    choices: [ create, comment, edit, fetch, transition , link ]
+    choices: [ comment, create, edit, fetch, link, search, transition, update ]
     description:
       - The operation to perform.
 
@@ -106,6 +108,19 @@ options:
        (possibly after merging with other required data, as when passed to create). See examples for more information,
        and the JIRA REST API for the structure required for various fields.
 
+  jql:
+    required: false
+    description:
+     - Query JIRA in JQL Syntax, e.g. 'CMDB Hostname'='test.example.com'.
+    type: str
+
+  maxresults:
+    required: false
+    description:
+     - Limit the result of I(operation=search). If no value is specified, the default jira limit will be used.
+     - Used when I(operation=search) only, ignored otherwise.
+    type: int
+
   timeout:
     required: false
     description:
@@ -122,8 +137,10 @@ options:
 notes:
   - "Currently this only works with basic-auth."
 
-author: "Steve Smith (@tarka)"
-'''
+author:
+- "Steve Smith (@tarka)"
+- "Per Abildgaard Toft (@pertoft)"
+"""
 
 EXAMPLES = """
 # Create a new issue and add a comment to it:
@@ -137,6 +154,10 @@ EXAMPLES = """
     summary: Example Issue
     description: Created using Ansible
     issuetype: Task
+  args:
+    fields:
+        customfield_13225: "test"
+        customfield_12931: '{"value": "Test"}'
   register: issue
 
 - name: Comment on issue
@@ -185,6 +206,22 @@ EXAMPLES = """
           - autocreated
           - ansible
 
+# Updating a field using operations: add, set & remove
+- name: Change the value of a Select dropdown
+  jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: update
+  args:
+    fields:
+      customfield_12931: [ {'set': {'value': 'Virtual'}} ]
+      customfield_13820: [ {'set': {'value':'Manually'}} ]
+  register: cmdb_issue
+  delegate_to: localhost
+
+
 # Retrieve metadata for an issue and use it to create an account
 - name: Get an issue
   jira:
@@ -194,6 +231,22 @@ EXAMPLES = """
     project: ANS
     operation: fetch
     issue: ANS-63
+  register: issue
+
+# Search for an issue
+# You can limit the search for specific fields by adding optional args. Note! It must be a dict, hence, lastViewed: null
+- name: Search for an issue
+  jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    project: ANS
+    operation: search
+    maxresults: 10
+    jql: project=cmdb AND cf[13225]="test"
+  args:
+    fields:
+      lastViewed: null
   register: issue
 
 - name: Create a unix account for the reporter
@@ -223,11 +276,17 @@ EXAMPLES = """
     issue: '{{ issue.meta.key }}'
     operation: transition
     status: Done
+  args:
+  fields:
+    customfield_14321: [ {'set': {'value': 'Value of Select' }} ]
+    comment:  [ { 'add': { 'body' : 'Test' } }]
+
 """
 
 import base64
 import json
 import sys
+import urllib
 from ansible.module_utils._text import to_text, to_bytes
 
 from ansible.module_utils.basic import AnsibleModule
@@ -246,13 +305,17 @@ def request(url, user, passwd, timeout, data=None, method=None):
     # inject the basic-auth header up-front to ensure that JIRA treats
     # the requests as authorized for this user.
     auth = to_text(base64.b64encode(to_bytes('{0}:{1}'.format(user, passwd), errors='surrogate_or_strict')))
-
     response, info = fetch_url(module, url, data=data, method=method, timeout=timeout,
                                headers={'Content-Type': 'application/json',
                                         'Authorization': "Basic %s" % auth})
 
     if info['status'] not in (200, 201, 204):
-        module.fail_json(msg=info['msg'])
+        error = json.loads(info['body'])
+        if error:
+            module.fail_json(msg=error['errorMessages'])
+        else:
+            # Fallback print body, if it cant be decoded
+            module.fail_json(msg=info['body'])
 
     body = response.read()
 
@@ -320,8 +383,30 @@ def edit(restbase, user, passwd, params):
     return ret
 
 
+def update(restbase, user, passwd, params):
+    data = {
+        "update": params['fields'],
+    }
+    url = restbase + '/issue/' + params['issue']
+
+    ret = put(url, user, passwd, params['timeout'], data)
+
+    return ret
+
+
 def fetch(restbase, user, passwd, params):
     url = restbase + '/issue/' + params['issue']
+    ret = get(url, user, passwd, params['timeout'])
+    return ret
+
+
+def search(restbase, user, passwd, params):
+    url = restbase + '/search?jql=' + urllib.request.pathname2url(params['jql'])
+    if params['fields']:
+        fields = params['fields'].keys()
+        url = url + '&fields=' + '&fields='.join([urllib.request.pathname2url(f) for f in fields])
+    if params['maxresults']:
+        url = url + '&maxResults=' + str(params['maxresults'])
     ret = get(url, user, passwd, params['timeout'])
     return ret
 
@@ -344,7 +429,7 @@ def transition(restbase, user, passwd, params):
     # Perform it
     url = restbase + '/issue/' + params['issue'] + "/transitions"
     data = {'transition': {"id": tid},
-            'fields': params['fields']}
+            'update': params['fields']}
 
     ret = post(url, user, passwd, params['timeout'], data)
 
@@ -369,9 +454,11 @@ def link(restbase, user, passwd, params):
 OP_REQUIRED = dict(create=['project', 'issuetype', 'summary'],
                    comment=['issue', 'comment'],
                    edit=[],
+                   update=[],
                    fetch=['issue'],
                    transition=['status'],
-                   link=['linktype', 'inwardissue', 'outwardissue'])
+                   link=['linktype', 'inwardissue', 'outwardissue'],
+                   search=['jql'])
 
 
 def main():
@@ -380,7 +467,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             uri=dict(required=True),
-            operation=dict(choices=['create', 'comment', 'edit', 'fetch', 'transition', 'link'],
+            operation=dict(choices=['create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search'],
                            aliases=['command'], required=True),
             username=dict(required=True),
             password=dict(required=True, no_log=True),
@@ -396,6 +483,8 @@ def main():
             linktype=dict(),
             inwardissue=dict(),
             outwardissue=dict(),
+            jql=dict(),
+            maxresults=dict(type='int'),
             timeout=dict(type='float', default=10),
             validate_certs=dict(default=True, type='bool'),
         ),
