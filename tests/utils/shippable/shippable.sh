@@ -45,7 +45,7 @@ function retry
 command -v pip
 pip --version
 pip list --disable-pip-version-check
-retry pip install https://github.com/felixfontein/ansible/archive/changelogs-docs-collections.tar.gz --disable-pip-version-check
+retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
 
 export ANSIBLE_COLLECTIONS_PATHS="${HOME}/.ansible"
 SHIPPABLE_RESULT_DIR="$(pwd)/shippable"
