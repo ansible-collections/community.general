@@ -257,7 +257,6 @@ class MySQL_Info(object):
             filter_ (list): List of collected subsets (e.g., databases, users, etc.),
                 when it is empty, return all available information.
         """
-        self.__collect(exclude_fields, return_empty_dbs)
 
         inc_list = []
         exc_list = []
@@ -277,11 +276,16 @@ class MySQL_Info(object):
                     inc_list.append(fi)
 
             if inc_list:
+                self.__collect(exclude_fields, return_empty_dbs, set(inc_list))
+
                 for i in self.info:
                     if i in inc_list:
                         partial_info[i] = self.info[i]
 
             else:
+                not_in_exc_list = list(set(self.info) - set(exc_list))
+                self.__collect(exclude_fields, return_empty_dbs, set(not_in_exc_list))
+
                 for i in self.info:
                     if i not in exc_list:
                         partial_info[i] = self.info[i]
@@ -289,18 +293,33 @@ class MySQL_Info(object):
             return partial_info
 
         else:
+            self.__collect(exclude_fields, return_empty_dbs, set(self.info))
             return self.info
 
-    def __collect(self, exclude_fields, return_empty_dbs):
+    def __collect(self, exclude_fields, return_empty_dbs, wanted):
         """Collect all possible subsets."""
-        self.__get_databases(exclude_fields, return_empty_dbs)
-        self.__get_global_variables()
-        self.__get_global_status()
-        self.__get_engines()
-        self.__get_users()
-        self.__get_master_status()
-        self.__get_slave_status()
-        self.__get_slaves()
+        if 'version' in wanted or 'settings' in wanted:
+            self.__get_global_variables()
+
+        if 'databases' in wanted:
+            self.__get_databases(exclude_fields, return_empty_dbs)
+
+        if 'global_status' in wanted:
+            self.__get_global_status()
+
+        if 'engines' in wanted:
+            self.__get_engines()
+
+        if 'users' in wanted:
+            self.__get_users()
+        if 'master_status' in wanted:
+            self.__get_master_status()
+
+        if 'slave_status' in wanted:
+            self.__get_slave_status()
+
+        if 'slave_hosts' in wanted:
+            self.__get_slaves()
 
     def __get_engines(self):
         """Get storage engines info."""
