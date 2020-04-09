@@ -101,6 +101,13 @@ options:
     description:
       - User's plugin auth_string (``CREATE USER user IDENTIFIED WITH plugin BY plugin_auth_string``).
     type: str
+  resource_limits:
+    description:
+      - Limit the user for certain server resources. Provided since MySQL 5.6.
+      - "Available options are C(MAX_QUERIES_PER_HOUR: num), C(MAX_UPDATES_PER_HOUR: num),
+        C(MAX_CONNECTIONS_PER_HOUR: num), C(MAX_USER_CONNECTIONS: num)."
+      - Used when I(state=present), ignored otherwise.
+    type: dict
 
 notes:
    - "MySQL server installs with default login_user of 'root' and no password. To secure this user
@@ -231,6 +238,13 @@ EXAMPLES = r'''
     plugin_hash_string: RDS
     priv: '*.*:ALL'
     state: present
+
+- name: Limit bob's resources to 10 queries per hour and 5 connections per hour
+  mysql_user:
+    name: bob
+    resource_limits:
+      MAX_QUERIES_PER_HOUR: 10
+      MAX_CONNECTIONS_PER_HOUR: 5
 
 # Example .my.cnf file for setting the root password
 # [client]
@@ -672,6 +686,96 @@ def convert_priv_dict_to_str(priv):
 
     return '/'.join(priv_list)
 
+
+def get_resource_limits(cursor, user, host):
+    """Get user resource limits.
+
+    Args:
+        cursor (cursor): DB driver cursor object.
+        user (str): User name.
+        host (str): User host name.
+
+    Returns: Dictionary containing current resource limits.
+    """
+
+    query = ('SELECT max_questions AS MAX_QUERIES_PER_HOUR, '
+             'max_updates AS MAX_UPDATES_PER_HOUR, '
+             'max_connections AS MAX_CONNECTION_PER_HOUR, '
+             'max_user_connections AS MAX_USER_CONNECTIONS '
+             'FROM user WHERE User = %s AND Host = %s')
+    cursor.execute(query, (user, host))
+    return cursor.fetchone()
+
+
+def match_resource_limits(module, current, desired):
+    """Check and match limits.
+
+    Args:
+        module (AnsibleModule): Ansible module object.
+        current (dict): Dictionary with current limits.
+        desired (dict): Dictionary with desired limits.
+
+    Returns: Dictionary containing parameters that need to change.
+    """
+
+    if not current:
+        # It means the user does not exists, so we need
+        # to set all limits after its creation
+        return desired
+
+    needs_to_change = {}
+
+    for key, val in iteritems(desired):
+        if not current.get(key):
+            # Supported keys are listed in the documentation
+            # and must be determined in the get_resource_limits function
+            # (follow 'AS' keyword)
+            module.fail_json(msg="resource_limits: key '%s' is unsupported." % key)
+
+        try:
+            val = int(val)
+        except Exception:
+            module.fail_json(msg="Can't convert value '%s' to integer." % val)
+
+        if val != current.get(key):
+            needs_to_change[key] = val
+
+    return needs_to_change
+
+
+def limit_resources(module, cursor, user, host, resource_limits, check_mode):
+    """Limit user resources.
+
+    Args:
+        module (AnsibleModule): Ansible module object.
+        cursor (cursor): DB driver cursor object.
+        user (str): User name.
+        host (str): User host name.
+        resource_limit (dict): Dictionary with desired limits.
+        check_mode (bool): Run the function in check mode or not.
+
+    Returns: True, if changed, False otherwise.
+    """
+
+    current_limits = get_resource_limits(cursor, user, host)
+
+    needs_to_change = match_resource_limits(module, current_limits, resource_limits)
+
+    if not needs_to_change:
+        return False
+
+    if needs_to_change and check_mode:
+        return True
+
+    # If not check_mode
+    tmp = []
+    for key, val in iteritems(needs_to_change):
+        tmp.append('%s %s' % (key, val))
+
+    query = "ALTER USER %s@%s"
+    cursor.execute(query + ' WITH %s' % ' '.join(tmp), (user, host))
+    return True
+
 # ===========================================
 # Module execution.
 #
@@ -704,6 +808,7 @@ def main():
             plugin=dict(default=None, type='str'),
             plugin_hash_string=dict(default=None, type='str'),
             plugin_auth_string=dict(default=None, type='str'),
+            resource_limits=dict(type='dict'),
         ),
         supports_check_mode=True,
     )
@@ -729,6 +834,7 @@ def main():
     plugin = module.params["plugin"]
     plugin_hash_string = module.params["plugin_hash_string"]
     plugin_auth_string = module.params["plugin_auth_string"]
+    resource_limits = module.params["resource_limits"]
     if priv and not (isinstance(priv, str) or isinstance(priv, dict)):
         module.fail_json(msg="priv parameter must be str or dict but %s was passed" % type(priv))
 
@@ -793,6 +899,10 @@ def main():
 
             except (SQLParseError, InvalidPrivsError, mysql_driver.Error) as e:
                 module.fail_json(msg=to_native(e))
+
+        if resource_limits:
+            changed = limit_resources(module, cursor, user, host, resource_limits, module.check_mode) or changed
+
     elif state == "absent":
         if user_exists(cursor, user, host, host_all):
             changed = user_delete(cursor, user, host, host_all, module.check_mode)
