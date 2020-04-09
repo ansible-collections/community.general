@@ -67,7 +67,7 @@
   zypper:
     name: "{{ mysql_packages }}"
     state: latest
-  when: ansible_facts.pkg_mgr == 'zypper'
+  when: ansible_facts.pkg_mgr in ['zypper', 'community.general.zypper']
   notify: cleanup mysql
 
 - name: install mysqldb_test FreeBSD dependencies
