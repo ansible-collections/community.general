@@ -160,7 +160,6 @@ files:
   $doc_fragments/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
-  $filters/gcp_kms_filters.py:
   $filters/json_query.py:
   $filters/random_mac.py:
   $httpapis/exos.py:
