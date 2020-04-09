@@ -2199,6 +2199,7 @@ macros:
   terminals: plugins/terminal
   team_aci: aciguru brunocalogero devarshishah3 fadallar jmcgill298 koladiya mtorelli rsmeyers schunduri smnmtzgr
   team_aix: MorrisA bcoca d-little flynn1973 gforster kairoaraujo marvin-sinister mator molekuul ramooncamacho wtcross
+  team_aruba: karthikeyan-dhandapani
   team_avi: ericsysmin grastogi23 khaltore
   team_bsd: JoergFiedler MacLemon bcoca dch jasperla mekanix opoplawski overhacked tuxillo
   team_cloudscale: gaudenz resmo
