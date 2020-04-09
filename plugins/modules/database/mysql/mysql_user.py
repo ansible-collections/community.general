@@ -103,7 +103,7 @@ options:
     type: str
   resource_limits:
     description:
-      - Limit the user for certain server resources. Provided since MySQL 5.6.
+      - Limit the user for certain server resources. Provided since MySQL 5.6 / MariaDB 10.2.
       - "Available options are C(MAX_QUERIES_PER_HOUR: num), C(MAX_UPDATES_PER_HOUR: num),
         C(MAX_CONNECTIONS_PER_HOUR: num), C(MAX_USER_CONNECTIONS: num)."
       - Used when I(state=present), ignored otherwise.
@@ -687,6 +687,33 @@ def convert_priv_dict_to_str(priv):
     return '/'.join(priv_list)
 
 
+# Alter user is supported since MySQL 5.6 and MariaDB 10.2.0
+def server_supports_alter_user(cursor):
+    """Check if the server supports ALTER USER statement or doesn't.
+
+    Args:
+        cursor (cursor): DB driver cursor object.
+
+    Returns: True if supports, False otherwise.
+    """
+    cursor.execute("SELECT VERSION()")
+    version_str = cursor.fetchone()[0]
+    version = version_str.split('.')
+
+    if 'mariadb' in version_str.lower():
+        # MariaDB 10.2 and later
+        if int(version[0]) * 1000 + int(version[1]) >= 10002:
+            return True
+        else:
+            return False
+    else:
+        # MySQL 5.6 and later
+        if int(version[0]) * 1000 + int(version[1]) >= 5006:
+            return True
+        else:
+            return False
+
+
 def get_resource_limits(cursor, user, host):
     """Get user resource limits.
 
@@ -700,11 +727,22 @@ def get_resource_limits(cursor, user, host):
 
     query = ('SELECT max_questions AS MAX_QUERIES_PER_HOUR, '
              'max_updates AS MAX_UPDATES_PER_HOUR, '
-             'max_connections AS MAX_CONNECTION_PER_HOUR, '
+             'max_connections AS MAX_CONNECTIONS_PER_HOUR, '
              'max_user_connections AS MAX_USER_CONNECTIONS '
-             'FROM user WHERE User = %s AND Host = %s')
+             'FROM mysql.user WHERE User = %s AND Host = %s')
     cursor.execute(query, (user, host))
-    return cursor.fetchone()
+    res = cursor.fetchone()
+
+    if not res:
+        return None
+
+    current_limits = {
+        'MAX_QUERIES_PER_HOUR': res[0],
+        'MAX_UPDATES_PER_HOUR': res[1],
+        'MAX_CONNECTIONS_PER_HOUR': res[2],
+        'MAX_USER_CONNECTIONS': res[3],
+    }
+    return current_limits
 
 
 def match_resource_limits(module, current, desired):
@@ -726,7 +764,7 @@ def match_resource_limits(module, current, desired):
     needs_to_change = {}
 
     for key, val in iteritems(desired):
-        if not current.get(key):
+        if key not in current:
             # Supported keys are listed in the documentation
             # and must be determined in the get_resource_limits function
             # (follow 'AS' keyword)
@@ -756,6 +794,9 @@ def limit_resources(module, cursor, user, host, resource_limits, check_mode):
 
     Returns: True, if changed, False otherwise.
     """
+    if not server_supports_alter_user(cursor):
+        module.fail_json(msg="The server version does not match the requirements "
+                             "for resource_limits parameter. See module's documentation.")
 
     current_limits = get_resource_limits(cursor, user, host)
 
@@ -773,7 +814,8 @@ def limit_resources(module, cursor, user, host, resource_limits, check_mode):
         tmp.append('%s %s' % (key, val))
 
     query = "ALTER USER %s@%s"
-    cursor.execute(query + ' WITH %s' % ' '.join(tmp), (user, host))
+    query += ' WITH %s' % ' '.join(tmp)
+    cursor.execute(query, (user, host))
     return True
 
 # ===========================================
