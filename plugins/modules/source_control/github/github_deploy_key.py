@@ -19,7 +19,6 @@ ANSIBLE_METADATA = {
 DOCUMENTATION = """
 ---
 module: github_deploy_key
-version_added: "2.4"
 author: "Ali (@bincyber)"
 short_description: Manages deploy keys for GitHub repositories.
 description:
@@ -77,7 +76,7 @@ notes:
 
 EXAMPLES = """
 # add a new read-only deploy key to a GitHub repository using basic authentication
-- github_deploy_key:
+- community.general.github_deploy_key:
     owner: "johndoe"
     repo: "example"
     name: "new-deploy-key"
@@ -87,7 +86,7 @@ EXAMPLES = """
     password: "supersecretpassword"
 
 # remove an existing deploy key from a GitHub repository
-- github_deploy_key:
+- community.general.github_deploy_key:
     owner: "johndoe"
     repository: "example"
     name: "new-deploy-key"
@@ -98,7 +97,7 @@ EXAMPLES = """
     state: absent
 
 # add a new deploy key to a GitHub repository, replace an existing key, use an OAuth2 token to authenticate
-- github_deploy_key:
+- community.general.github_deploy_key:
     owner: "johndoe"
     repository: "example"
     name: "new-deploy-key"
@@ -112,11 +111,11 @@ EXAMPLES = """
     repository: "example"
     name: "replace-deploy-key"
     key: "{{ lookup('file', '~/.ssh/github.pub') }}"
-    username: "johndoe"
+    username: "janedoe"
     password: "supersecretpassword"
 
 # add a new deploy key to a GitHub repository using 2FA
-- github_deploy_key:
+- community.general.github_deploy_key:
     owner: "johndoe"
     repo: "example"
     name: "new-deploy-key-2"
@@ -126,13 +125,13 @@ EXAMPLES = """
     otp: 123456
 
 # Create a deploy key in a GitHub enterprise repository
-- github_deploy_key:
-    owner: "johndoe"
+- community.general.github_deploy_key:
+    owner: "janedoe"
     repository: "example"
     name: "new-deploy-key"
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAwXxn7kIMNWzcDfou..."
     force: yes
-    username: "johndoe"
+    username: "janedoe"
     password: "supersecretpassword"
     state: present
     server: https://my-internal-github-server.example.com
@@ -150,10 +149,21 @@ id:
     returned: changed
     type: int
     sample: 24381901
+http_status_code:
+    description: the HTTP error status code returned by the GitHub API
+    returned: failed
+    type:int
+    sample: 400
+error:
+    description: the error message returned by the GitHub API
+    returned: failed
+    type: int
+    sample: "Key is already in use"
 """
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
+from ansible.module_utils._text import to_native
 from ansible_collections.community.general.plugins.module_utils import (
     github as github_utils,
 )
@@ -200,15 +210,29 @@ class GithubDeployKey(github_utils.GitHubBase):
         return None
 
     def add_new_key(self):
-        new_key = self.repository.create_key(self.name, self.key, self.read_only)
+        try:
+            new_key = self.repository.create_key(self.name, self.key, self.read_only)
+        except github_utils.GithubError as err:
+            self.module.fail_json(
+                msg="Failed to add key {0}: {1}".format(self.name, to_native(err)),
+                http_status_code=err.status,
+                error=err.data,
+            )
 
         self.module.exit_json(
             changed=True, msg="Deploy key successfully added", id=new_key.id
         )
 
     def remove_existing_key(self, key_id):
-        key = self.repository.get_key(key_id)
-        key.delete()
+        try:
+            key = self.repository.get_key(key_id)
+            key.delete()
+        except github_utils.GithubError as err:
+            self.module.fail_json(
+                msg="Failed to remove key {0}: {1}".format(self.name, to_native(err)),
+                http_status_code=err.status,
+                error=err.data,
+            )
         if self.state == "absent":
             self.module.exit_json(
                 changed=True, msg="Deploy key successfully deleted", id=key_id
