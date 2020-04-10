@@ -40,8 +40,7 @@ PATTERN_2 = re.compile(r'(union|UNION|intersect|INTERSECT|'
                        r'except|EXCEPT).*(select|SELECT)')
 
 # 3. ';' and any KEY_WORDS
-PATTERN_3 = re.compile(r';.*(select|SELECT|update|UPDATE|insert|INSERT|'
-                       r'delete|DELETE|drop|DROP|truncate|TRUNCATE|alter|ALTER)')
+PATTERN_3 = re.compile(r';.*(SELECT|UPDATE|INSERT|DELETE|DROP|TRUNCATE|ALTER)', re.IGNORECASE)
 
 
 class SQLParseError(Exception):
