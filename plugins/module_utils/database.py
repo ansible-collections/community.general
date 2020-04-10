@@ -29,6 +29,21 @@
 import re
 
 
+# Input patterns for is_input_dangerous function:
+#
+# 1. '"' in string and '--' in string or
+# "'" in string and '--' in string
+PATTERN_1 = re.compile(r'(\'|\").*--')
+
+# 2. union \ intersect \ except + select
+PATTERN_2 = re.compile(r'(union|UNION|intersect|INTERSECT|'
+                       r'except|EXCEPT).*(select|SELECT)')
+
+# 3. ';' and any KEY_WORDS
+PATTERN_3 = re.compile(r';.*(select|SELECT|update|UPDATE|insert|INSERT|'
+                       r'delete|DELETE|drop|DROP|truncate|TRUNCATE|alter|ALTER)')
+
+
 class SQLParseError(Exception):
     pass
 
@@ -155,25 +170,13 @@ def is_input_dangerous(string):
     if not string:
         return False
 
-    # 1. '"' in string and '--' in string or
-    # "'" in string and '--' in string
-    pattern1 = re.compile(r'(\'|\").*--')
-
-    if re.search(pattern1, string):
+    if re.search(PATTERN_1, string):
         return True
 
-    # 2. union \ intersect \ except + select
-    pattern2 = re.compile(r'(union|UNION|intersect|INTERSECT|'
-                          r'except|EXCEPT).*(select|SELECT)')
-
-    if re.search(pattern2, string):
+    if re.search(PATTERN_2, string):
         return True
 
-    # 3. ';' and any KEY_WORDS
-    pattern3 = re.compile(r';.*(select|SELECT|update|UPDATE|insert|INSERT|'
-                          r'delete|DELETE|drop|DROP|truncate|TRUNCATE|alter|ALTER)')
-
-    if re.search(pattern3, string):
+    if re.search(PATTERN_3, string):
         return True
 
     return False
