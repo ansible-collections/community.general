@@ -1,3 +1,4 @@
+---
 - name: Install docker 17
   community.general.zypper:
     name: "{{ docker_packages }}"

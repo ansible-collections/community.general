@@ -1,3 +1,4 @@
+---
 - name: Get OS version
   shell: uname -r
   register: os_version

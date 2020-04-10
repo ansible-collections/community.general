@@ -1,3 +1,4 @@
+---
 - name: Setup Docker
   when: ansible_facts.distribution ~ ansible_facts.distribution_major_version not in  ['CentOS6', 'RedHat6']
   block:
