@@ -17,7 +17,7 @@ ANSIBLE_METADATA = {
 }
 
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 module: github_key
 short_description: Manage GitHub access keys.
 description:
@@ -50,7 +50,7 @@ extends_documentation_fragment: community.general.github
 author: Robert Estelle (@erydo)
 """
 
-RETURN = """
+RETURN = r"""
 deleted_keys:
     description: An array of key objects that were deleted. Only present on state=absent
     type: list
@@ -70,14 +70,14 @@ key:
 
 EXAMPLES = """
 - name: Authorize key with GitHub
-  github_key:
+  community.general.github_key:
     name: Access Key for Some Machine
     token: '{{ github_access_token }}'
     pubkey: '{{ lookup("file", "/home/foo/.ssh/id_rsa.pub") }}'
   delegate_to: localhost
 
-- name: Remoe key from GitHub
-  github_key:
+- name: Remove key from GitHub
+  community.general.github_key:
     name: Access Key for Some Machine
     token: '{{ github_access_token }}'
     state: absent
@@ -91,7 +91,6 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.general.plugins.module_utils import (
     github as github_utils,
 )
-from ansible.module_utils.urls import fetch_url
 
 
 class GithubKey(github_utils.GitHubBase):
@@ -113,7 +112,7 @@ class GithubKey(github_utils.GitHubBase):
 
         self.auth()
 
-        self.user = self.github_connection.get_user()
+        self.user = self.github_conn.get_user()
 
     def _key_exists(self):
         for user_key in self.get_all_keys():
