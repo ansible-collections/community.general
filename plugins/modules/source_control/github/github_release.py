@@ -18,13 +18,12 @@ ANSIBLE_METADATA = {
 }
 
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 ---
 module: github_release
 short_description: Interact with GitHub Releases
 description:
     - Fetch metadata about GitHub Releases
-version_added: 2.2
 options:
     user:
         description:
@@ -45,42 +44,36 @@ options:
     tag:
         description:
             - Tag name when creating a release. Required when using action is set to C(create_release).
-        version_added: 2.4
         type: str
     target:
         description:
             - Target of release when creating a release
-        version_added: 2.4
         type: str
     name:
         description:
             - Name of release when creating a release
-        version_added: 2.4
         type: str
     body:
         description:
             - Description of the release when creating a release
-        version_added: 2.4
         type: str
     draft:
         description:
             - Sets if the release is a draft or not. (boolean)
         type: 'bool'
         default: 'no'
-        version_added: 2.4
-    prerelease:
+        elease:
         description:
             - Sets if the release is a prerelease or not. (boolean)
         type: bool
         default: 'no'
-        version_added: 2.4
 
 extends_documentation_fragment: community.general.github
 author:
     - "Adrian Moisey (@adrianmoisey)"
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Get latest release of a public repository
   github_release:
     user: ansible
@@ -114,7 +107,7 @@ EXAMPLES = """
 
 """
 
-RETURN = """
+RETURN = r"""
 create_release:
     description:
     - Version of the created release
