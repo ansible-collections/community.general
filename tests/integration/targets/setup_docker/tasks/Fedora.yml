@@ -1,3 +1,4 @@
+---
 - name: Add repository
   yum_repository:
     file: docker-ce
