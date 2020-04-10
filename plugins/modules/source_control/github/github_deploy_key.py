@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {
     "supported_by": "community",
 }
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 ---
 module: github_deploy_key
 author: "Ali (@bincyber)"
@@ -138,7 +138,7 @@ EXAMPLES = """
 
 """
 
-RETURN = """
+RETURN = r"""
 msg:
     description: the status message describing what occurred
     returned: always
@@ -152,7 +152,7 @@ id:
 http_status_code:
     description: the HTTP error status code returned by the GitHub API
     returned: failed
-    type:int
+    type: int
     sample: 400
 error:
     description: the error message returned by the GitHub API

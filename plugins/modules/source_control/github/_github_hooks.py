@@ -5,22 +5,22 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
+ANSIBLE_METADATA = {
+    "metadata_version": "1.1",
+    "status": ["deprecated"],
+    "supported_by": "community",
+}
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: github_hooks
 short_description: Manages GitHub service hooks.
-deprecated:
-  removed_in: "2.12"
-  why: Replaced by more granular modules
-  alternative: Use M(github_webhook) and M(github_webhook_info) instead.
+deprecated
 description:
      - Adds service hooks and removes service hooks that have an error status.
 options:
@@ -62,9 +62,9 @@ options:
     choices: ['json', 'form']
 
 author: "Phillip Gentry, CX Inc (@pcgentry)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
 # Example creating a new service hook. It ignores duplicates.
 - github_hooks:
     action: create
@@ -81,7 +81,7 @@ EXAMPLES = '''
     oauthkey: '{{ oauthkey }}'
     repo: '{{ repo }}'
   delegate_to: localhost
-'''
+"""
 
 import json
 import base64
@@ -91,10 +91,10 @@ from ansible.module_utils.urls import fetch_url
 from ansible.module_utils._text import to_bytes
 
 
-def request(module, url, user, oauthkey, data='', method='GET'):
-    auth = base64.b64encode(to_bytes('%s:%s' % (user, oauthkey)).replace('\n', ''))
+def request(module, url, user, oauthkey, data="", method="GET"):
+    auth = base64.b64encode(to_bytes("%s:%s" % (user, oauthkey)).replace("\n", ""))
     headers = {
-        'Authorization': 'Basic %s' % auth,
+        "Authorization": "Basic %s" % auth,
     }
     response, info = fetch_url(module, url, headers=headers, data=data, method=method)
     return response, info
@@ -103,8 +103,8 @@ def request(module, url, user, oauthkey, data='', method='GET'):
 def _list(module, oauthkey, repo, user):
     url = "%s/hooks" % repo
     response, info = request(module, url, user, oauthkey)
-    if info['status'] != 200:
-        return False, ''
+    if info["status"] != 200:
+        return False, ""
     else:
         return False, response.read()
 
@@ -114,8 +114,8 @@ def _clean504(module, oauthkey, repo, user):
     decoded = json.loads(current_hooks)
 
     for hook in decoded:
-        if hook['last_response']['code'] == 504:
-            _delete(module, oauthkey, repo, user, hook['id'])
+        if hook["last_response"]["code"] == 504:
+            _delete(module, oauthkey, repo, user, hook["id"])
 
     return 0, current_hooks
 
@@ -125,8 +125,8 @@ def _cleanall(module, oauthkey, repo, user):
     decoded = json.loads(current_hooks)
 
     for hook in decoded:
-        if hook['last_response']['code'] != 200:
-            _delete(module, oauthkey, repo, user, hook['id'])
+        if hook["last_response"]["code"] != 200:
+            _delete(module, oauthkey, repo, user, hook["id"])
 
     return 0, current_hooks
 
@@ -136,44 +136,43 @@ def _create(module, hookurl, oauthkey, repo, user, content_type):
     values = {
         "active": True,
         "name": "web",
-        "config": {
-            "url": "%s" % hookurl,
-            "content_type": "%s" % content_type
-        }
+        "config": {"url": "%s" % hookurl, "content_type": "%s" % content_type},
     }
     data = json.dumps(values)
-    response, info = request(module, url, user, oauthkey, data=data, method='POST')
-    if info['status'] != 200:
-        return 0, '[]'
+    response, info = request(module, url, user, oauthkey, data=data, method="POST")
+    if info["status"] != 200:
+        return 0, "[]"
     else:
         return 0, response.read()
 
 
 def _delete(module, oauthkey, repo, user, hookid):
     url = "%s/hooks/%s" % (repo, hookid)
-    response, info = request(module, url, user, oauthkey, method='DELETE')
+    response, info = request(module, url, user, oauthkey, method="DELETE")
     return response.read()
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            action=dict(required=True, choices=['list', 'clean504', 'cleanall', 'create']),
+            action=dict(
+                required=True, choices=["list", "clean504", "cleanall", "create"]
+            ),
             hookurl=dict(required=False),
             oauthkey=dict(required=True, no_log=True),
             repo=dict(required=True),
             user=dict(required=True),
-            validate_certs=dict(default='yes', type='bool'),
-            content_type=dict(default='json', choices=['json', 'form']),
+            validate_certs=dict(default="yes", type="bool"),
+            content_type=dict(default="json", choices=["json", "form"]),
         )
     )
 
-    action = module.params['action']
-    hookurl = module.params['hookurl']
-    oauthkey = module.params['oauthkey']
-    repo = module.params['repo']
-    user = module.params['user']
-    content_type = module.params['content_type']
+    action = module.params["action"]
+    hookurl = module.params["hookurl"]
+    oauthkey = module.params["oauthkey"]
+    repo = module.params["repo"]
+    user = module.params["user"]
+    content_type = module.params["content_type"]
 
     if action == "list":
         (rc, out) = _list(module, oauthkey, repo, user)
@@ -193,5 +192,5 @@ def main():
     module.exit_json(msg="success", result=out)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

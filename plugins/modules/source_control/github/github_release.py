@@ -18,7 +18,7 @@ ANSIBLE_METADATA = {
 }
 
 
-DOCUMENTATION = r"""
+DOCUMENTATION = """
 ---
 module: github_release
 short_description: Interact with GitHub Releases
@@ -62,7 +62,7 @@ options:
             - Sets if the release is a draft or not. (boolean)
         type: 'bool'
         default: 'no'
-        elease:
+    prerelease:
         description:
             - Sets if the release is a prerelease or not. (boolean)
         type: bool
