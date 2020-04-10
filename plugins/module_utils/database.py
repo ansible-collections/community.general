@@ -36,8 +36,7 @@ import re
 PATTERN_1 = re.compile(r'(\'|\").*--')
 
 # 2. union \ intersect \ except + select
-PATTERN_2 = re.compile(r'(union|UNION|intersect|INTERSECT|'
-                       r'except|EXCEPT).*(select|SELECT)')
+PATTERN_2 = re.compile(r'(UNION|INTERSECT|EXCEPT).*SELECT', re.IGNORECASE)
 
 # 3. ';' and any KEY_WORDS
 PATTERN_3 = re.compile(r';.*(SELECT|UPDATE|INSERT|DELETE|DROP|TRUNCATE|ALTER)', re.IGNORECASE)
@@ -169,11 +168,11 @@ def is_input_dangerous(string):
     if not string:
         return False
 
-    return (
-        re.search(PATTERN_1, string)
-        or re.search(PATTERN_2, string)
-        or re.search(PATTERN_3, string)
-    )
+    for pattern in (PATTERN_1, PATTERN_2, PATTERN_3):
+        if re.search(pattern, string):
+            return True
+
+    return False
 
 
 def check_input(module, *args):
