@@ -5,20 +5,24 @@
     state: present
     priv: '*.*:ALL'
     login_unix_socket: '{{ mysql_socket }}'
+
 - name: mysql_info - create default config file
   template:
     src: my.cnf.j2
     dest: /root/.my.cnf
     mode: '0400'
+
 - name: mysql_info - create non-default config file
   template:
     src: my.cnf.j2
     dest: /root/non-default_my.cnf
     mode: '0400'
+
 - name: mysql_info - collect default cred file
   mysql_info:
     login_user: '{{ user_name }}'
   register: result
+
 - assert:
     that:
     - result.changed == false
@@ -28,15 +32,18 @@
     - result.databases != {}
     - result.engines != {}
     - result.users != {}
+
 - name: mysql_info - check non-default cred file
   mysql_info:
     login_user: '{{ user_name }}'
     config_file: /root/non-default_my.cnf
   register: result
+
 - assert:
     that:
     - result.changed == false
     - result.version != {}
+
 - name: mysql_info - remove cred files
   file:
     path: '{{ item }}'
@@ -44,21 +51,25 @@
   with_items:
   - /root/.my.cnf
   - /root/non-default_my.cnf
+
 - name: mysql_info - check access with password
   mysql_info:
     login_user: '{{ user_name }}'
     login_password: '{{ user_pass }}'
   register: result
+
 - assert:
     that:
     - result.changed == false
     - result.version != {}
+
 - name: Collect all info except settings and users
   mysql_info:
     login_user: '{{ user_name }}'
     login_password: '{{ user_pass }}'
     filter: '!settings,!users'
   register: result
+
 - assert:
     that:
     - result.changed == false
@@ -68,6 +79,7 @@
     - result.engines != {}
     - result.settings is not defined
     - result.users is not defined
+
 - name: Collect info only about version and databases
   mysql_info:
     login_user: '{{ user_name }}'
@@ -76,6 +88,7 @@
     - version
     - databases
   register: result
+
 - assert:
     that:
     - result.changed == false
@@ -85,6 +98,7 @@
     - result.settings is not defined
     - result.global_status is not defined
     - result.users is not defined
+
 - name: Collect info about databases excluding their sizes
   mysql_info:
     login_user: '{{ user_name }}'
@@ -95,16 +109,19 @@
     - db_size
     - unsupported
   register: result
+
 - assert:
     that:
     - result.changed == false
     - result.databases != {}
     - result.databases.mysql == {}
+
 - name: Create empty database acme
   mysql_db:
     login_user: '{{ user_name }}'
     login_password: '{{ user_pass }}'
     name: acme
+
 - name: Collect info about databases
   mysql_info:
     login_user: '{{ user_name }}'
@@ -113,11 +130,13 @@
     - databases
     return_empty_dbs: true
   register: result
+
 - assert:
     that:
     - result.changed == false
     - result.databases.acme.size == 0
     - result.databases.mysql != {}
+
 - name: Collect info about databases excluding their sizes
   mysql_info:
     login_user: '{{ user_name }}'
@@ -128,11 +147,13 @@
     - db_size
     return_empty_dbs: true
   register: result
+
 - assert:
     that:
     - result.changed == false
     - result.databases.acme == {}
     - result.databases.mysql == {}
+
 - name: Remove acme database
   mysql_db:
     login_user: '{{ user_name }}'
