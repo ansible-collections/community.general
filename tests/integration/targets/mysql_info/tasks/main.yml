@@ -119,7 +119,9 @@
     - result.global_status is not defined
     - result.users is not defined
 
-# Test exclude_fields
+# Test exclude_fields: db_size
+# 'unsupported' element is passed to check that an unsupported value
+# won't break anything (will be ignored regarding to the module's documentation).
 - name: Collect info about databases excluding their sizes
   mysql_info:
     login_user: '{{ user_name }}'
@@ -137,6 +139,9 @@
     - result.databases != {}
     - result.databases.mysql == {}
 
+########################################################
+# Issue #65727, empty databases must be in returned dict
+#
 - name: Create empty database acme
   mysql_db:
     login_user: '{{ user_name }}'
@@ -152,6 +157,7 @@
     return_empty_dbs: true
   register: result
 
+# Check acme is in returned dict
 - assert:
     that:
     - result.changed == false
@@ -169,6 +175,7 @@
     return_empty_dbs: true
   register: result
 
+# Check acme is in returned dict
 - assert:
     that:
     - result.changed == false
