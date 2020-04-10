@@ -22,7 +22,6 @@ module: github_issue
 short_description: View GitHub issue.
 description:
     - View GitHub issue for a given repository and organization.
-version_added: "2.4"
 options:
   repo:
     description:
@@ -52,7 +51,7 @@ author:
 '''
 
 RETURN = '''
-issue_state:
+get_status:
     description: State of the GitHub issue
     type: str
     returned: success
@@ -61,7 +60,7 @@ issue_state:
 
 EXAMPLES = '''
 - name: Check if GitHub issue is closed or not
-  github_issue:
+  community.general.github_issue:
     organization: ansible
     repo: ansible
     issue: 23642
@@ -71,7 +70,7 @@ EXAMPLES = '''
 - name: Take action depending upon issue status
   debug:
     msg: Do something when issue 23642 is open
-  when: r.issue_status == 'open'
+  when: r.get_status == 'open'
 '''
 
 import json
@@ -127,7 +126,7 @@ def main():
             github_issue_state = github_issue.get_issue()
             if github_issue_state is None:
                 module.fail_json(msg="Failed to find issue {0}".format(github_issue.issue))
-            module.exit_json(changed=True, issue_status=github_issue_state.state)
+            module.exit_json(changed=True, get_status=github_issue_state.state)
 
 
 if __name__ == '__main__':
