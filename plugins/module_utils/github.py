@@ -85,4 +85,4 @@ class GitHubBase(object):
         except UnknownObjectException as err:
             raise GithubUnknownObjectError("Unable to find repository {0} in GitHub at {1}: {2}".format(self.repo_full_name, self.server, to_native(err)))
         except GithubException as err:
-            raise GithubError("Failed to run operation on repository {0}: {1}".format(self.repo_name, to_native(err)))
+            raise GithubError(err)
