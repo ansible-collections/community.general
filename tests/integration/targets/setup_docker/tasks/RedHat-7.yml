@@ -1,3 +1,4 @@
+---
 # The RHEL extras repository must be enabled to provide the container-selinux package.
 # See: https://docs.docker.com/engine/installation/linux/docker-ee/rhel/#install-using-the-repository
 
@@ -12,7 +13,8 @@
     name: setup_epel
 
 - name: Enable extras repository for RHEL on AWS
-  command: yum-config-manager --enable rhui-REGION-rhel-server-extras
+  # RHEL 7.6 uses rhui-REGION-rhel-server-extras and RHEL 7.7+ use rhui-rhel-7-server-rhui-extras-rpms
+  command: yum-config-manager --enable rhui-REGION-rhel-server-extras rhui-rhel-7-server-rhui-extras-rpms
   args:
     warn: no
 

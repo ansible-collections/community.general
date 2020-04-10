@@ -1,3 +1,4 @@
+---
 # The RHEL extras repository must be enabled to provide the container-selinux package.
 # See: https://docs.docker.com/engine/installation/linux/docker-ee/rhel/#install-using-the-repository
 
