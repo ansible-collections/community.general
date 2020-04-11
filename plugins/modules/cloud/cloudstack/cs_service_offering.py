@@ -382,7 +382,6 @@ is_customized:
   returned: success
   type: bool
   sample: false
-  version_added: '2.8'
 '''
 
 from ansible.module_utils.basic import AnsibleModule

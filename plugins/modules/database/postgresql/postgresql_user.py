@@ -235,7 +235,6 @@ queries:
   returned: always
   type: list
   sample: ['CREATE USER "alice"', 'GRANT CONNECT ON DATABASE "acme" TO "alice"']
-  version_added: '2.8'
 '''
 
 import itertools
