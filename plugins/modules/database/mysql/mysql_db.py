@@ -402,10 +402,11 @@ def db_import(module, host, user, password, db_name, target, all_databases, port
     elif os.path.splitext(target)[-1] == '.xz':
         comp_prog_path = module.get_bin_path('xz', required=True)
     if comp_prog_path:
-        # The line above is for returned data only:
-        executed_commands.append('%s -dc %s | %s' % (comp_prog_path, target, ' '.join(cmd)))
+        cmd = " ".join(cmd)
+        # The line below is for returned data only:
+        executed_commands.append('%s -dc %s | %s' % (comp_prog_path, target, cmd))
         p1 = subprocess.Popen([comp_prog_path, '-dc', target], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        p2 = subprocess.Popen(cmd, stdin=p1.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p2 = subprocess.Popen(cmd, stdin=p1.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         (stdout2, stderr2) = p2.communicate()
         p1.stdout.close()
         p1.wait()
