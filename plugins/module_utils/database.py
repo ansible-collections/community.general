@@ -26,6 +26,21 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 # USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import re
+
+
+# Input patterns for is_input_dangerous function:
+#
+# 1. '"' in string and '--' in string or
+# "'" in string and '--' in string
+PATTERN_1 = re.compile(r'(\'|\").*--')
+
+# 2. union \ intersect \ except + select
+PATTERN_2 = re.compile(r'(UNION|INTERSECT|EXCEPT).*SELECT', re.IGNORECASE)
+
+# 3. ';' and any KEY_WORDS
+PATTERN_3 = re.compile(r';.*(SELECT|UPDATE|INSERT|DELETE|DROP|TRUNCATE|ALTER)', re.IGNORECASE)
+
 
 class SQLParseError(Exception):
     pass
@@ -140,3 +155,47 @@ def mysql_quote_identifier(identifier, id_type):
             special_cased_fragments.append(fragment)
 
     return '.'.join(special_cased_fragments)
+
+
+def is_input_dangerous(string):
+    """Check if the passed string is potentially dangerous.
+    Can be used to prevent SQL injections.
+
+    Note: use this function only when you can't use
+      psycopg2's cursor.execute method parametrized
+      (typically with DDL queries).
+    """
+    if not string:
+        return False
+
+    for pattern in (PATTERN_1, PATTERN_2, PATTERN_3):
+        if re.search(pattern, string):
+            return True
+
+    return False
+
+
+def check_input(module, *args):
+    """Wrapper for is_input_dangerous function."""
+    needs_to_check = args
+
+    dangerous_elements = []
+
+    for elem in needs_to_check:
+        if isinstance(elem, str):
+            if is_input_dangerous(elem):
+                dangerous_elements.append(elem)
+
+        elif isinstance(elem, list):
+            for e in elem:
+                if is_input_dangerous(e):
+                    dangerous_elements.append(e)
+
+        else:
+            elem = str(elem)
+            if is_input_dangerous(elem):
+                dangerous_elements.append(elem)
+
+    if dangerous_elements:
+        module.fail_json(msg="Passed input '%s' is "
+                             "potentially dangerous" % ', '.join(dangerous_elements))

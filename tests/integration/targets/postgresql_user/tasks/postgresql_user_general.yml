@@ -717,6 +717,32 @@
       that:
       - result.rowcount == 2
 
+  ########################
+  # Test trust_input param
+
+  - name: Create role with potentially dangerous name, don't trust
+    <<: *task_parameters
+    postgresql_user:
+      <<: *pg_parameters
+      name: '{{ dangerous_name }}'
+      trust_input: no
+    ignore_errors: yes
+
+  - assert:
+      that:
+      - result is failed
+      - result.msg == 'Passed input \'{{ dangerous_name }}\' is potentially dangerous'
+
+  - name: Create role with potentially dangerous name, trust
+    <<: *task_parameters
+    postgresql_user:
+      <<: *pg_parameters
+      name: '{{ dangerous_name }}'
+
+  - assert:
+      that:
+      - result is changed
+
   always:
   #
   # Clean up
@@ -739,3 +765,4 @@
     - '{{ test_user2 }}'
     - '{{ test_group1 }}'
     - '{{ test_group2 }}'
+    - '{{ dangerous_name }}'
