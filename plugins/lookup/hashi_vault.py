@@ -247,6 +247,22 @@ class HashiVault:
 
         self.client.auth.ldap.login(username, password, mount_point=mount_point)
 
+    def auth_jwt(self, **kwargs):
+        role_id = kwargs.get('role_id', os.environ.get('VAULT_ROLE_ID', None))
+        if role_id is None:
+            raise AnsibleError("Authentication method jwt requires a role_id")
+
+        jwt = kwargs.get('jwt', os.environ.get('VAULT_JWT', None))
+        if jwt is None:
+            raise AnsibleError("Authentication method jwt requires parameter jwt to be set")
+
+        mount_point = kwargs.get('mount_point')
+        if mount_point is None:
+            mount_point = 'jwt'
+
+        # The GCP (and Azure, Kubernetes) auth methods just implement JWT
+        self.client.auth.gcp.login(role=role_id, jwt=jwt, mount_point=mount_point)
+
     def boolean_or_cacert(self, validate_certs, cacert):
         validate_certs = boolean(validate_certs, strict=False)
         '''' return a bool or cacert '''
