@@ -8,24 +8,24 @@ __metaclass__ = type
 DOCUMENTATION = '''
   lookup: hashi_vault
   author: Jonathan Davila <jdavila(at)ansible.com>
-  short_description: retrieve secrets from HashiCorp's vault
+  short_description: retrieve secrets from HashiCorp's Vault
   requirements:
     - hvac (python library)
   description:
-    - retrieve secrets from HashiCorp's vault
+    - retrieve secrets from HashiCorp's Vault
   notes:
     - Due to a current limitation in the HVAC library there won't necessarily be an error if a bad endpoint is specified.
     - As of Ansible 2.10, only the latest secret is returned when specifying a KV v2 path.
   options:
     secret:
-      description: query you are making.
+      description: Vault path to the secret being requested in the format C(path[:field]).
       required: True
     token:
-      description: vault token.
+      description: Vault token.
       env:
         - name: VAULT_TOKEN
     url:
-      description: URL to vault service.
+      description: URL to the Vault service.
       env:
         - name: VAULT_ADDR
       default: 'http://127.0.0.1:8200'
@@ -34,11 +34,11 @@ DOCUMENTATION = '''
     password:
       description: Authentication password.
     role_id:
-      description: Role id for a vault AppRole auth.
+      description: Role ID to be used for Vault authentication.
       env:
         - name: VAULT_ROLE_ID
     secret_id:
-      description: Secret id for a vault AppRole auth.
+      description: Secret ID to be used for Vault AppRole authentication.
       env:
         - name: VAULT_SECRET_ID
     auth_method:
@@ -53,21 +53,25 @@ DOCUMENTATION = '''
         - approle
         - jwt
     mount_point:
-      description: vault mount point, only required if you have a custom mount point. Does not apply to token authentication.
+      description: Vault mount point, only required if you have a custom mount point. Does not apply to token authentication.
       default: auth_method
     jwt:
       description: The JSON Web Token (JWT) to use for authentication to Vault.
       env:
         - name: VAULT_JWT
     ca_cert:
-      description: path to certificate to use for authentication.
+      description: Path to certificate to use for authentication.
       aliases: [ cacert ]
     validate_certs:
-      description: controls verification and validation of SSL certificates, mostly you only want to turn off with self signed ones.
+      description:
+        - If set to C(no), the TLS certificate of the Vault service will not be validated.
+        - Use extreme caution when disabling certificate validation. This should not be used in production.
       type: boolean
       default: True
     namespace:
-      description: namespace where secrets reside. requires HVAC 0.7.0+ and Vault 0.11+.
+      description:
+        - Vault namespace where secrets reside. This option requires HVAC 0.7.0+ and Vault 0.11+.
+        - Optionally, this may be achieved by prefixing the authentication mount point and/or secret path with the namespace (e.g C(mynamespace/secret/mysecret)).
 '''
 
 EXAMPLES = """
@@ -86,7 +90,7 @@ EXAMPLES = """
   debug:
       msg: "{{ lookup('hashi_vault', 'secret=secret/hello:value auth_method=userpass username=myuser password=mypas url=http://myvault:8200')}}"
 
-- name: Using an ssl vault
+- name: Connect to Vault using TLS
   debug:
       msg: "{{ lookup('hashi_vault', 'secret=secret/hola:value token=c975b780-d1be-8016-866b-01d0f9b688a5 url=https://myvault:8200 validate_certs=False')}}"
 
@@ -94,9 +98,13 @@ EXAMPLES = """
   debug:
       msg: "{{ lookup('hashi_vault', 'secret=secret/hi:value token=xxxx-xxx-xxx url=https://myvault:8200 validate_certs=True cacert=/cacert/path/ca.pem')}}"
 
-- name: authenticate with a Vault app role
+- name: Authenticate with a Vault app role
   debug:
       msg: "{{ lookup('hashi_vault', 'secret=secret/hello:value auth_method=approle role_id=myroleid secret_id=mysecretid url=http://myvault:8200')}}"
+
+- name: Authenticate with a JWT
+  debug:
+      msg: "{{ lookup('hashi_vault', 'secret=secret/hello:value auth_method=jwt role_id=myroleid jwt=myjwt url=https://myvault:8200')}}"
 
 - name: Return all secrets from a path in a namespace
   debug:
