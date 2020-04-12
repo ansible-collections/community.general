@@ -21,6 +21,8 @@
 #
 - include: create_user.yml user_name={{user_name_1}} user_password={{ user_password_1 }}
 
+- include: resource_limits.yml
+
 - include: assert_user.yml user_name={{user_name_1}}
 
 - include: remove_user.yml user_name={{user_name_1}} user_password={{ user_password_1 }}
