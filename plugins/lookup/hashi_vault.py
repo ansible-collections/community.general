@@ -51,9 +51,14 @@ DOCUMENTATION = '''
         - userpass
         - ldap
         - approle
+        - jwt
     mount_point:
-      description: vault mount point, only required if you have a custom mount point.
-      default: ldap
+      description: vault mount point, only required if you have a custom mount point. Does not apply to token authentication.
+      default: auth_method
+    jwt:
+      description: The JSON Web Token (JWT) to use for authentication to Vault.
+      env:
+        - name: VAULT_JWT
     ca_cert:
       description: path to certificate to use for authentication.
       aliases: [ cacert ]
