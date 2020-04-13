@@ -1,1 +1,0 @@
-./cloud/vultr/vultr_plan_facts.py
