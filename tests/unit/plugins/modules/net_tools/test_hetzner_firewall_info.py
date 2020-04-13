@@ -212,7 +212,6 @@ class TestHetznerFirewallInfo(BaseTestModule):
         ])
         assert result['msg'] == 'Timeout while waiting for firewall to be configured.'
 
-
     def test_nowait_get(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall_info, {
             'hetzner_user': '',
