@@ -287,13 +287,11 @@ acl:
   returned: success
   type: str
   sample: My ACL
-  version_added: '2.5'
 acl_id:
   description: ID of the access control list for the VPC network tier.
   returned: success
   type: str
   sample: dfafcd55-0510-4b8c-b6c5-b8cedb4cfd88
-  version_added: '2.5'
 broadcast_domain_type:
   description: Broadcast domain type of the network.
   returned: success
@@ -334,25 +332,21 @@ network_offering_display_text:
   returned: success
   type: str
   sample: Offering for Isolated Vpc networks with Source Nat service enabled
-  version_added: '2.5'
 network_offering_conserve_mode:
   description: Whether the network offering has IP conserve mode enabled or not.
   returned: success
   type: bool
   sample: false
-  version_added: '2.5'
 network_offering_availability:
   description: The availability of the network offering the network is created from
   returned: success
   type: str
   sample: Optional
-  version_added: '2.5'
 is_system:
   description: Whether the network is system related or not.
   returned: success
   type: bool
   sample: false
-  version_added: '2.5'
 vpc:
   description: Name of the VPC.
   returned: if available

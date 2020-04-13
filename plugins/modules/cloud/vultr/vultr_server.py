@@ -189,7 +189,6 @@ vultr_api:
       returned: success
       type: int
       sample: 12
-      version_added: '2.9'
     api_endpoint:
       description: Endpoint used for the API requests
       returned: success

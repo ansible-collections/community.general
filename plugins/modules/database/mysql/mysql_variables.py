@@ -76,7 +76,6 @@ queries:
   returned: if executed
   type: list
   sample: ["SET GLOBAL `read_only` = 1"]
-  version_added: '2.10'
 '''
 
 import os

@@ -231,7 +231,6 @@ queries:
   returned: always
   type: list
   sample: ["CHANGE MASTER TO MASTER_HOST='master2.example.com',MASTER_PORT=3306"]
-  version_added: '2.10'
 '''
 
 import os

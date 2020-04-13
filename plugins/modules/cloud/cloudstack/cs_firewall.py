@@ -181,7 +181,6 @@ cidrs:
   returned: success
   type: list
   sample: [ '0.0.0.0/0' ]
-  version_added: '2.5'
 protocol:
   description: Protocol of the rule.
   returned: success
