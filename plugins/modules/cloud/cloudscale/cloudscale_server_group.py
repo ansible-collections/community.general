@@ -106,7 +106,6 @@ zone:
   returned: success
   type: dict
   sample: { 'slug': 'rma1' }
-  version_added: '2.10'
 servers:
   description: A list of servers that are part of the server group.
   returned: if available
@@ -122,7 +121,6 @@ tags:
   returned: success
   type: dict
   sample: { 'project': 'my project' }
-  version_added: '2.9'
 '''
 
 from ansible.module_utils.basic import AnsibleModule

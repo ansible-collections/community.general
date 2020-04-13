@@ -264,7 +264,6 @@ url:
   returned: success when I(state=extracted)
   type: str
   sample: http://1.12.3.4/userdata/387e2c7c-7c42-4ecc-b4ed-84e8367a1965.vhd
-  version_added: '2.8'
 '''
 
 from ansible.module_utils.basic import AnsibleModule

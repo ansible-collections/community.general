@@ -173,7 +173,6 @@ queries:
   returned: always
   type: list
   sample: ['CREATE LANGUAGE "acme"']
-  version_added: '2.8'
 '''
 
 from ansible.module_utils.basic import AnsibleModule
