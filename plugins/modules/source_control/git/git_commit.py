@@ -13,7 +13,6 @@ DOCUMENTATION = '''
 module: git_commit
 author:
     - "Federico Olivieri (@Federico87)"
-version_added: "2.10"
 short_description: Perform git add and git commit operations.
 description:
     - Manage C(git add) and C(git commit) on a local git.
@@ -65,7 +64,7 @@ EXAMPLES = '''
   community.general.git_commit:
     path: /Users/federicoolivieri/git/git_test_module
     comment: Skip my amazing empty commit
-    empty_commit: skyp
+    empty_commit: skip
     add: ['.']
 '''
 
@@ -99,13 +98,14 @@ def git_add(module):
     add_cmds = [
         'git',
         'add',
+        '--',
     ]
-    for item in add:
-        add_cmds.insert(len(add_cmds), item)
+
+    add_cmds.extend(add)
 
     rc, _output, error = module.run_command(add_cmds, cwd=path)
 
-    if rc == 128:
+    if rc != 0:
         module.fail_json(msg=error)
 
     if rc == 0:
@@ -119,7 +119,7 @@ def git_commit(module):
 
         rc, output, error = module.run_command(cmd, cwd=path)
 
-        if rc == 1:
+        if rc != 0:
             module.fail_json(msg=error)
         if rc == 0:
             return output
@@ -149,7 +149,7 @@ def git_commit(module):
             'git',
             'commit',
             '-m',
-            '"{0}"'.format(comment),
+            comment,
         ]
 
         output = git_commit_run(commit_cmds, path)
