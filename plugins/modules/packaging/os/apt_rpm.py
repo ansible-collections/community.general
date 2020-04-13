@@ -158,7 +158,7 @@ def main():
     if p['update_cache']:
         update_package_db(module)
 
-    packages = p['package'].split(',')
+    packages = p['package']
 
     if p['state'] in ['installed', 'present']:
         install_packages(module, packages)
