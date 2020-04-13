@@ -1,11 +1,12 @@
 automerge: false
 files:
+  $actions:
+    labels: action
   $actions/aireos.py:
     labels: aireos cisco networking
   $actions/aruba.py:
     maintainers: $team_aruba
     labels: aruba networking
-  $actions/:
   $actions/ironware.py:
     maintainers: paulquack
     labels: ironware networking
@@ -18,6 +19,8 @@ files:
     maintainers: $team_networking
     labels: networking sros
   $actions/voss.py:
+  $becomes/:
+    labels: become
   $becomes/doas.py:
   $becomes/dzdo.py:
   $becomes/ksu.py:
@@ -26,6 +29,8 @@ files:
   $becomes/pfexec.py:
   $becomes/pmrun.py:
   $becomes/sesu.py:
+  $callbacks/:
+    labels: callbacks
   $callbacks/actionable.py:
   $callbacks/cgroup_memory_recap.py:
   $callbacks/context_demo.py:
@@ -47,7 +52,6 @@ files:
     maintainers: $team_macos
     labels: macos say
     keywords: brew cask darwin homebrew macosx macports osx
-  $callbacks/:
   $callbacks/stderr.py:
     maintainers: ysn2233
     labels: stderr
@@ -101,6 +105,7 @@ files:
     ignore: cove
     supershipit: felixfontein
   $connections/:
+    labels: connections
   $connections/kubectl.py:
     maintainers: chouseknecht fabianvf flaper87 maxamillion
     labels: k8s kubectl
@@ -114,6 +119,8 @@ files:
   $connections/saltstack.py:
     labels: saltstack
   $connections/zone.py:
+  $doc_fragments/:
+    labels: docs_fragments
   $doc_fragments/a10.py:
   $doc_fragments/aireos.py:
   $doc_fragments/alicloud.py:
@@ -125,7 +132,6 @@ files:
   $doc_fragments/cloudstack.py:
     maintainers: $team_cloudstack
     labels: cloudstack
-  $doc_fragments/:
   $doc_fragments/docker.py:
     maintainers: $team_docker
     labels: cloud docker
@@ -160,7 +166,6 @@ files:
   $doc_fragments/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
-  $filters/gcp_kms_filters.py:
   $filters/json_query.py:
   $filters/random_mac.py:
   $httpapis/exos.py:
@@ -173,6 +178,8 @@ files:
     maintainers: $team_networking annikulin
     labels: cisco ftd networking
     keywords: firepower ftd
+  $inventories/:
+    labels: inventories
   $inventories/cloudscale.py:
   $inventories/docker_machine.py:
     maintainers: $team_docker
@@ -184,7 +191,6 @@ files:
     labels: cloud docker docker_swarm
     ignore: cove
     supershipit: felixfontein
-  $inventories/:
   $inventories/linode.py:
     maintainers: $team_linode
     labels: cloud linode
@@ -198,8 +204,7 @@ files:
     maintainers: $team_vultr
     labels: cloud vultr
   $lookups/:
-    maintainers: samdoran
-    labels: onepassword
+    labels: lookups
   $lookups/conjur_variable.py:
     notify: cyberark-bizdev
     maintainers: $team_cyberark_conjur
@@ -221,6 +226,8 @@ files:
     labels: rabbitmq
   $lookups/redis.py:
   $lookups/shelvefile.py:
+  $module_utils/:
+    labels: module_utils
   $module_utils/alicloud_ecs.py:
   $module_utils/cloud.py:
   $module_utils/cloudscale.py:
@@ -229,7 +236,6 @@ files:
   $module_utils/cloudstack.py:
     maintainers: $team_cloudstack
     labels: cloudstack
-  $module_utils/:
   $module_utils/docker/:
     maintainers: $team_docker
     labels: cloud
@@ -2183,6 +2189,16 @@ files:
   $terminals/voss.py:
     maintainers: $team_extreme
     labels: networking voss
+#########################
+  tests/:
+    labels: tests
+  tests/unit/:
+    labels: unit
+  tests/integration:
+    labels: integration
+  tests/utils/:
+    maintainers: gundalow
+    labels: unit
 macros:
   actions: plugins/action
   becomes: plugins/become

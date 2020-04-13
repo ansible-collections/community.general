@@ -1,0 +1,112 @@
+# test code for resource_limits parameter
+
+- block:
+
+  - name: Drop mysql user {{ user_name_1 }} if exists
+    mysql_user:
+      name: '{{ user_name_1 }}'
+      state: absent
+      login_unix_socket: '{{ mysql_socket }}'
+
+  - name: Create mysql user {{ user_name_1 }} with resource limits in check_mode
+    mysql_user:
+      name: '{{ user_name_1 }}'
+      password: '{{ user_password_1 }}'
+      state: present
+      login_unix_socket: '{{ mysql_socket }}'
+      resource_limits:
+        MAX_QUERIES_PER_HOUR: 10
+        MAX_CONNECTIONS_PER_HOUR: 5
+    check_mode: yes
+    register: result
+
+  - assert:
+      that:
+      - result is changed
+
+  - name: Create mysql user {{ user_name_1 }} with resource limits in actual mode
+    mysql_user:
+      name: '{{ user_name_1 }}'
+      password: '{{ user_password_1 }}'
+      state: present
+      login_unix_socket: '{{ mysql_socket }}'
+      resource_limits:
+        MAX_QUERIES_PER_HOUR: 10
+        MAX_CONNECTIONS_PER_HOUR: 5
+    register: result
+
+  - assert:
+      that:
+      - result is changed
+
+  - name: Check
+    mysql_query:
+      query: >
+        SELECT User FROM mysql.user WHERE User = '{{ user_name_1 }}' AND Host = 'localhost'
+        AND max_questions = 10 AND max_connections = 5
+      login_unix_socket: '{{ mysql_socket }}'
+    register: result
+
+  - assert:
+      that:
+      - result.rowcount[0] == 1
+
+  - name: Try to set the same limits again in check mode
+    mysql_user:
+      name: '{{ user_name_1 }}'
+      password: '{{ user_password_1 }}'
+      state: present
+      login_unix_socket: '{{ mysql_socket }}'
+      resource_limits:
+        MAX_QUERIES_PER_HOUR: 10
+        MAX_CONNECTIONS_PER_HOUR: 5
+    check_mode: yes
+    register: result
+
+  - assert:
+      that:
+      - result is not changed
+
+  - name: Try to set the same limits again in actual mode
+    mysql_user:
+      name: '{{ user_name_1 }}'
+      password: '{{ user_password_1 }}'
+      state: present
+      login_unix_socket: '{{ mysql_socket }}'
+      resource_limits:
+        MAX_QUERIES_PER_HOUR: 10
+        MAX_CONNECTIONS_PER_HOUR: 5
+    register: result
+
+  - assert:
+      that:
+      - result is not changed
+
+  - name: Change limits
+    mysql_user:
+      name: '{{ user_name_1 }}'
+      password: '{{ user_password_1 }}'
+      state: present
+      login_unix_socket: '{{ mysql_socket }}'
+      resource_limits:
+        MAX_QUERIES_PER_HOUR: 5
+        MAX_CONNECTIONS_PER_HOUR: 5
+    register: result
+
+  - assert:
+      that:
+      - result is changed
+
+  - name: Check
+    mysql_query:
+      query: >
+        SELECT User FROM mysql.user WHERE User = '{{ user_name_1 }}' AND Host = 'localhost'
+        AND max_questions = 5 AND max_connections = 5
+      login_unix_socket: '{{ mysql_socket }}'
+    register: result
+
+  - assert:
+      that:
+      - result.rowcount[0] == 1
+
+  when: (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version >= '18') or (ansible_distribution == 'CentOS' and ansible_distribution_major_version >= '8')

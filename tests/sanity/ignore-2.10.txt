@@ -152,12 +152,6 @@ plugins/module_utils/univention_umc.py future-import-boilerplate
 plugins/module_utils/univention_umc.py metaclass-boilerplate
 plugins/module_utils/vexata.py future-import-boilerplate
 plugins/module_utils/vexata.py metaclass-boilerplate
-plugins/modules/cloud/alicloud/ali_instance.py validate-modules:doc-required-mismatch
-plugins/modules/cloud/alicloud/ali_instance.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/alicloud/ali_instance_info.py validate-modules:doc-missing-type
-plugins/modules/cloud/alicloud/ali_instance_info.py validate-modules:doc-required-mismatch
-plugins/modules/cloud/alicloud/ali_instance_info.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/alicloud/ali_instance_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/atomic/atomic_container.py validate-modules:doc-missing-type
 plugins/modules/cloud/atomic/atomic_container.py validate-modules:doc-required-mismatch
 plugins/modules/cloud/atomic/atomic_container.py validate-modules:no-default-for-required-parameter
@@ -1813,8 +1807,6 @@ scripts/inventory/nsot.py future-import-boilerplate
 scripts/inventory/nsot.py metaclass-boilerplate
 scripts/inventory/openshift.py future-import-boilerplate
 scripts/inventory/openshift.py metaclass-boilerplate
-scripts/inventory/openstack_inventory.py future-import-boilerplate
-scripts/inventory/openstack_inventory.py metaclass-boilerplate
 scripts/inventory/openvz.py future-import-boilerplate
 scripts/inventory/openvz.py metaclass-boilerplate
 scripts/inventory/ovirt.py future-import-boilerplate

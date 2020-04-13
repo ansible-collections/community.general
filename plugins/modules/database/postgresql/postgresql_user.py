@@ -147,6 +147,11 @@ options:
     description:
     - Add a comment on the user (equal to the COMMENT ON ROLE statement result).
     type: str
+  trust_input:
+    description:
+    - If C(no), check whether values of some parameters are potentially dangerous.
+    type: bool
+    default: yes
 notes:
 - The module creates a user (role) with login privilege by default.
   Use NOLOGIN role_attr_flags to change this behaviour.
@@ -235,7 +240,6 @@ queries:
   returned: always
   type: list
   sample: ['CREATE USER "alice"', 'GRANT CONNECT ON DATABASE "acme" TO "alice"']
-  version_added: '2.8'
 '''
 
 import itertools
@@ -252,7 +256,11 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.database import pg_quote_identifier, SQLParseError
+from ansible_collections.community.general.plugins.module_utils.database import (
+    pg_quote_identifier,
+    SQLParseError,
+    check_input,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     get_conn_params,
@@ -812,6 +820,7 @@ def main():
         session_role=dict(type='str'),
         groups=dict(type='list', elements='str'),
         comment=dict(type='str', default=None),
+        trust_input=dict(type='bool', default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -837,6 +846,12 @@ def main():
     if groups:
         groups = [e.strip() for e in groups]
     comment = module.params["comment"]
+
+    trust_input = module.params['trust_input']
+    if not trust_input:
+        # Check input for potentially dangerous elements:
+        check_input(module, user, password, privs, expires,
+                    role_attr_flags, groups, comment)
 
     conn_params = get_conn_params(module, module.params, warn_db_default=False)
     db_connection = connect_to_db(module, conn_params)
