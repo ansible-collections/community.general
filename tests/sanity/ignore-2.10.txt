@@ -76,8 +76,6 @@ plugins/doc_fragments/utm.py future-import-boilerplate
 plugins/doc_fragments/utm.py metaclass-boilerplate
 plugins/doc_fragments/vexata.py future-import-boilerplate
 plugins/doc_fragments/vexata.py metaclass-boilerplate
-plugins/doc_fragments/vultr.py future-import-boilerplate
-plugins/doc_fragments/vultr.py metaclass-boilerplate
 plugins/doc_fragments/xenserver.py future-import-boilerplate
 plugins/doc_fragments/xenserver.py metaclass-boilerplate
 plugins/module_utils/alicloud_ecs.py future-import-boilerplate
@@ -861,34 +859,6 @@ plugins/modules/cloud/univention/udm_user.py validate-modules:doc-choices-do-not
 plugins/modules/cloud/univention/udm_user.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/vultr/vultr_block_storage.py validate-modules:doc-missing-type
-plugins/modules/cloud/vultr/vultr_block_storage.py validate-modules:doc-required-mismatch
-plugins/modules/cloud/vultr/vultr_block_storage.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/vultr/vultr_block_storage_facts.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_dns_domain.py validate-modules:doc-missing-type
-plugins/modules/cloud/vultr/vultr_dns_domain_facts.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_dns_domain_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_dns_record.py validate-modules:doc-missing-type
-plugins/modules/cloud/vultr/vultr_dns_record.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/vultr/vultr_firewall_group.py validate-modules:doc-missing-type
-plugins/modules/cloud/vultr/vultr_firewall_group_facts.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_firewall_group_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_firewall_rule.py validate-modules:doc-missing-type
-plugins/modules/cloud/vultr/vultr_firewall_rule.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/vultr/vultr_network.py validate-modules:doc-missing-type
-plugins/modules/cloud/vultr/vultr_network_facts.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_network_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_os_facts.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_region_facts.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_region_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_server.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/vultr/vultr_server_facts.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_server_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_ssh_key_facts.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_startup_script_facts.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_startup_script_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/vultr/vultr_user.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/vultr/vultr_user_facts.py validate-modules:return-syntax-error
 plugins/modules/cloud/webfaction/webfaction_app.py validate-modules:doc-missing-type
 plugins/modules/cloud/webfaction/webfaction_db.py validate-modules:doc-missing-type
 plugins/modules/cloud/webfaction/webfaction_domain.py validate-modules:doc-missing-type
@@ -2096,31 +2066,6 @@ plugins/modules/cloud/scaleway/scaleway_snapshot_facts.py validate-modules:depre
 plugins/modules/cloud/scaleway/scaleway_snapshot_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
 plugins/modules/cloud/scaleway/scaleway_volume_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
 plugins/modules/cloud/scaleway/scaleway_volume_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/_vultr_account_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_account_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_account_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_block_storage_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_block_storage_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_dns_domain_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_dns_domain_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_firewall_group_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_firewall_group_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_network_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_network_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_os_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_os_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_plan_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_plan_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_region_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_region_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_server_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_server_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_ssh_key_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_ssh_key_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_startup_script_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_startup_script_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_user_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/vultr/vultr_user_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
 plugins/modules/net_tools/ldap/ldap_attr.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
 plugins/modules/net_tools/ldap/ldap_attr.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
 plugins/modules/remote_management/foreman/foreman.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
