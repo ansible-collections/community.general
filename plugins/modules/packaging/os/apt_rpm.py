@@ -163,8 +163,6 @@ def main():
         update_package_db(module)
 
     packages = p['package']
-    if len(packages) == 1:
-        packages = packages[0].split(',')
 
     if p['state'] in ['installed', 'present']:
         install_packages(module, packages)
