@@ -1,1 +1,0 @@
-./cloud/vultr/vultr_region_info.py

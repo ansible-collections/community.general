@@ -1,1 +1,0 @@
-./cloud/vultr/vultr_firewall_group_facts.py

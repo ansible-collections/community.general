@@ -312,9 +312,6 @@ files:
     maintainers: $team_mysql
     labels: database mysql proxysql
     keywords: mariadb proxysql
-  $doc_fragments/vultr.py:
-    maintainers: $team_vultr
-    labels: cloud vultr
   $doc_fragments/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
@@ -352,9 +349,6 @@ files:
     maintainers: $team_scaleway
     labels: cloud scaleway
   $inventories/virtualbox.py:
-  $inventories/vultr.py:
-    maintainers: $team_vultr
-    labels: cloud vultr
   $lookups/:
     labels: lookups
   $lookups/conjur_variable.py:
@@ -538,9 +532,6 @@ files:
     maintainers: $team_e_spirit
     labels: utm_utils
   $module_utils/vexata.py:
-  $module_utils/vultr.py:
-    maintainers: $team_vultr
-    labels: cloud vultr
   $module_utils/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
@@ -1071,38 +1062,6 @@ files:
     authors: talzur
   $modules/cloud/univention/:
     authors: keachi
-  $modules/cloud/vultr/:
-    authors: Spredzy
-    maintainers: resmo
-  $modules/cloud/vultr/vultr_account_info.py:
-    authors: resmo
-    maintainers: Spredzy
-  $modules/cloud/vultr/vultr_block_storage_info.py:
-    authors: Spredzy resmo
-  $modules/cloud/vultr/vultr_dns_domain.py:
-    authors: resmo
-    maintainers: Spredzy
-  $modules/cloud/vultr/vultr_firewall_rule.py:
-    authors: resmo
-    maintainers: Spredzy
-  $modules/cloud/vultr/vultr_os_info.py:
-    authors: Spredzy resmo
-  $modules/cloud/vultr/vultr_server.py:
-    authors: resmo
-    maintainers: Spredzy
-  $modules/cloud/vultr/vultr_ssh_key.py:
-    authors: resmo
-    maintainers: Spredzy
-  $modules/cloud/vultr/vultr_ssh_key_info.py:
-    authors: Spredzy resmo
-  $modules/cloud/vultr/vultr_startup_script.py:
-    authors: resmo
-    maintainers: Spredzy
-  $modules/cloud/vultr/vultr_user.py:
-    authors: resmo
-    maintainers: Spredzy
-  $modules/cloud/vultr/vultr_user_info.py:
-    authors: Spredzy resmo
   $modules/cloud/webfaction/:
     authors: quentinsf
   $modules/cloud/xenserver/:
@@ -2406,9 +2365,12 @@ macros:
   team_solaris: bcoca danowar2k fishman jasperla jpdasma mator scathatheworm troy2914 xen0l
   team_suse: commel dcermak evrardjp lrupp toabctl
   team_virt: joshainglis karmab
+<<<<<<< HEAD
   team_vultr: Spredzy resmo
 <<<<<<< HEAD
   team_zabbix: D3DeFi rubentsirunyan sky-joker
 >>>>>>> 60853a87de (Initial BOTMETA (#7))
 =======
 >>>>>>> 24405289fe (removing zabbix modules and their references due to migration to a dedicated collection (#11))
+=======
+>>>>>>> 6ccf3682ac (vultr migrated to dedicated collection ngine_io.vultr (#172))
