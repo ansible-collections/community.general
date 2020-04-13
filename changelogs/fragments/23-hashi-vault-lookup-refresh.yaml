@@ -1,6 +1,6 @@
 bugfixes:
   - hashi_vault - when a non-token authentication method like ldap or userpass failed, but a valid token was loaded anyway (via env or token file), the token was used to attempt authentication, hiding the failure of the requested auth method.
-  - hashi_vault - if used via ``with_hashi_vault`` and a list of (say) 4 secrets to retrieve, only the first one would be retrieved and returned 4 times.
+  - hashi_vault - if used via ``with_hashi_vault`` and a list of n secrets to retrieve, only the first one would be retrieved and returned n times.
   - hashi_vault - error messages are now user friendly and don't contain the secret name ( https://github.com/ansible-collections/community.general/issues/54 )
 minor_changes:
   - hashi_vault - ``secret`` can now be an unnamed argument if it's specified first in the term string (see examples).
