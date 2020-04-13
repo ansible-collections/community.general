@@ -23,16 +23,17 @@ options:
     description:
       - DCID integer Location in which to create the load balancer.
     required: true
-  label:
+  name:
     description:
       - Text label that will be associated with the subscription.
+    aliases: [ label ]
+    required: true
   config_ssl_redirect:
     description:
       - Forces redirect from HTTP to HTTPS.
   sticky_sessions:
     description:
       - Enables stick sessions for your load balancer.
-    choices: [ on, off ]
   cookie_name:
     description:
       - Name for your stick session.
@@ -82,6 +83,81 @@ EXAMPLES = r'''
 
 RETURN = r'''
 ---
+vultr_api:
+  description: Response from Vultr API with a few additions/modification
+  returned: success
+  type: complex
+  contains:
+    api_account:
+      description: Account used in the ini file to select the key
+      returned: success
+      type: str
+      sample: default
+    api_timeout:
+      description: Timeout used for the API requests
+      returned: success
+      type: int
+      sample: 60
+    api_retries:
+      description: Amount of max retries for the API requests
+      returned: success
+      type: int
+      sample: 5
+    api_retry_max_delay:
+      description: Exponential backoff delay in seconds between retries up to this max delay value.
+      returned: success
+      type: int
+      sample: 12
+    api_endpoint:
+      description: Endpoint used for the API requests
+      returned: success
+      type: str
+      sample: "https://api.vultr.com"
+vultr_dns_domain:
+  description: Response from Vultr API
+  returned: success
+  type: complex
+  contains:
+    SUBID:
+      description: Unique identifier of a load balancer subscription.
+      returned: success
+      type: int
+      sample: 1314217
+    date_created:
+      description: Date the Load Balancer was created.
+      returned: success
+      type: str
+      sample: "2017-08-26 12:47:48"
+    DCID:
+      description: Location in which the Load Balancer was created.
+      returned: success
+      type: int
+      sample: 1
+    location:
+      description: The physical localtion where the Load Balancer was created.
+      returned: success
+      type: str
+      sample: "New Jersey"
+    label:
+      description: The name of the Load Balancer.
+      returned: success
+      type: str
+      sample: "lb01"
+    status:
+      description: Status of the subscription and will be one of: pending | active | suspended | closed.
+      returned: success
+      type: str
+      sample: "active"
+    ipv4:
+      description: IPv4 of the Load Balancer.
+      returned: success
+      type: str
+      sample: "203.0.113.20"
+    ipv4:
+      description: IPv6 of the Load Balancer.
+      returned: success
+      type: str
+      sample: "fd06:30bd:6374:dc29:ffff:ffff:ffff:ffff"
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -100,25 +176,120 @@ class AnsibleVultrLoadBalancer(Vultr):
         }
 
     def get_lb(self):
-        return {}
+        lb_list = self.api_query(path="/v1/loadbalancer/list")
+        lb_name = self.module.params.get('name').lower()
+        found_lbs = []
+
+        if lb_list:
+            found_lbs = [lb for lb in lb_list if lb['name'] is lb_name]
+
+        if len(found_lbs) in (0, 1):
+            self.module.warn("Found more than 1 or no Vultr Load Balancer matching {}".format(lb_name))
+            return {}
+
+        return found_lbs[0]
 
     def present_lb(self):
-        return None
+        lb = self.get_lb()
+        if not lb:
+            lb = self._create_lb(lb)
+        return lb
 
     def _create_lb(self, lb):
-        return None
+        self.result['changed'] = True
+        data = {
+            'DCID': self.module.params.get('dcid'),
+            'label': self.module.params.get('name'),
+        }
+
+        def add_param_if_exists(d, param):
+            value = self.module.params.get(param)
+            if value:
+                d[param] = value
+
+        optional_params = [
+            'config_ssl_redirect',
+            'sticky_sessions',
+            'cookie_name',
+            'balancing_algorithm',
+            'health_check',
+            'forwarding_rules',
+            'ssl_private_key',
+            'ssl_certificate',
+            'ssl_chain'
+        ]
+
+        for param in optional_params:
+            add_param_if_exists(data, param)
+
+        # StickSessions should be either 'on' or 'off'
+        if 'sticky_sessions' in data:
+            ss_values = { True: 'on', False: 'off'}
+            data['sticky_sessions'] = ss_values[data['sticky_sessions']]
+
+        self.result['diff']['before'] = {}
+        self.result['diff']['after'] = data
+
+        if not self.module.check_mode:
+            self.api_query(
+                path="/v1/loadbalancer/create",
+                method="POST",
+                data=data
+            )
+            lb = self.get_lb()
+        return lb
 
     def absent_lb(self):
-        return None
+        lb = self.get_lb()
+        if lb:
+            self.result['changed'] = True
+
+        data = {
+            'label': lb['name'],
+        }
+
+        self.result['diff']['before'] = lb
+        self.result['diff']['after'] = {}
+
+        if not self.module.check_mode:
+            self.api_query(
+                path="/v1/loadbalancer/create",
+                method="POST",
+                data=data
+            )
+        return lb
 
 
 def main():
     argument_spec = vultr_argument_spec()
-    argument_spec.update()
+    argument_spec.update({
+        'name': {
+            'required': True,
+            'aliases': ['domain'],
+        },
+        'dcid': {
+            'required': True,
+        },
+        'config_ssl_redirect': {},
+        'sticky_sessions': {},
+        'cookie_name': {},
+        'balancing_algorithm': {},
+        'health_check': {},
+        'forwarding_rules': {},
+        'ssl_private_key': {},
+        'ssl_certificate': {},
+        'ssl_chain': {},
+        'state': {
+            'choices': ['present', 'absent'],
+            'default': 'present',
+        },
+    })
 
     module = AnsibleModule(
         argument_spec=argument_spec,
-        required_if=[],
+        required_if=[
+            ('state', 'present', ['name', 'dcid']),
+        ],
         supports_check_mode=True,
     )
 

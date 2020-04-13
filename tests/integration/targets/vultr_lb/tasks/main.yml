@@ -1,0 +1,101 @@
+# Copyright (c) 2020, Julien BORDELLIER <git@julienbordellier.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+---
+- name: setup
+  vultr_lb:
+    name: "{{ vultr_lb_name }}"
+    dcid: 1
+    state: absent
+  register: result
+- name: verify setup
+  assert:
+    that:
+      - result is success
+
+- name: test fail if missing name
+  vultr_lb:
+    dcid: 1
+  register: result
+  ignore_errors: true
+- name: verify test fail if missing name
+  assert:
+    that:
+      - result is failed
+      - 'result.msg == "missing required arguments: name"'
+
+- name: test fail if missing dcid
+  vultr_lb:
+    name: "{{ vultr_lb_name }}"
+  register: result
+  ignore_errors: true
+- name: verify test fail if missing dcid
+  assert:
+    that:
+      - result is failed
+      - 'result.msg == "missing required arguments: dcid"'
+
+- name: test create loadbalancer in check mode
+  vultr_lb:
+    name: "{{ vultr_lb_name }}"
+    dcid: 1
+  register: result
+  check_mode: true
+- name: verify test create loadbalancer in check mode
+  assert:
+    that:
+      - result is changed
+
+- name: test create loadbalancer
+  vultr_lb:
+    name: "{{ vultr_lb_name }}"
+    dcid: 1
+  register: result
+- name: verify test create loadbalancer
+  assert:
+    that:
+      - result is changed
+      - result.vultr_lb.name == '{{ vultr_lb_name }}'
+
+- name: test create loadbalancer idempotence
+  vultr_lb:
+    name: "{{ vultr_lb_name }}"
+    dcid: 1
+  register: result
+- name: verify test create loadbalancer idempotence
+  assert:
+    that:
+      - result is not changed
+      - result.vultr_lb.name == '{{ vultr_lb_name }}'
+
+- name: test absent loadbalancer in check mode
+  vultr_lb:
+    name: "{{ vultr_lb_name }}"
+    state: absent
+  register: result
+  check_mode: true
+- name: verify test absent loadbalancer in check mode
+  assert:
+    that:
+      - result is changed
+      - result.vultr_lb.name == '{{ vultr_lb_name }}'
+
+- name: test absent loadbalancer
+  vultr_lb:
+    name: "{{ vultr_lb_name }}"
+    state: absent
+  register: result
+- name: verify test absent loadbalancer
+  assert:
+    that:
+      - result is changed
+      - result.vultr_lb.name == '{{ vultr_lb_name }}'
+
+- name: test absent loadbalancer idempotence
+  vultr_lb:
+    name: "{{ vultr_lb_name }}"
+    state: absent
+  register: result
+- name: verify test absent loadbalancer idempotence
+  assert:
+    that:
+      - result is not changed
