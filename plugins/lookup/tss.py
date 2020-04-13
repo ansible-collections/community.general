@@ -9,17 +9,17 @@ author: Adam Migus (adam@migus.org)
 short_description: Get secrets from Thycotic Secret Server
 description:
     - Uses the Thycotic Secret Server Python SDK to get Secrets from Secret
-      Server using token authentication with `username` and `password` on
-      the REST API at `base_url`.
+      Server using token authentication with I(username) and I(password) on
+      the REST API at I(base_url).
 requirements:
     - python-tss-sdk - https://pypi.org/project/python-tss-sdk/
 options:
     _terms:
-        description: the integer ID of the secret
+        description: The integer ID of the secret.
         required: True
         type: integer
     base_url:
-        description: the base URL of the server e.g. https://localhost/SecretServer
+        description: The base URL of the server, e.g. C(https://localhost/SecretServer).
         env:
             - name: TSS_BASE_URL
         ini:
@@ -27,7 +27,7 @@ options:
               key: base_url
         required: True
     username:
-        description: the username with which to request the OAuth2 Access Grant
+        description: The username with which to request the OAuth2 Access Grant.
         env:
             - name: TSS_USERNAME
         ini:
@@ -35,7 +35,7 @@ options:
               key: username
         required: True
     password:
-        description: the password associated with the supplied username
+        description: The password associated with the supplied username.
         env:
             - name: TSS_PASSWORD
         ini:
@@ -44,23 +44,24 @@ options:
         required: True
     api_path_uri:
         default: /api/v1
-        description: the path to append to the base URL to form a valid REST
-            API request
+        description: The path to append to the base URL to form a valid REST
+            API request.
         env:
             - name: TSS_API_PATH_URI
         required: False
     token_path_uri:
         default: /oauth2/token
-        description: the path to append to the base URL to form a valid OAuth2
-            Access Grant request
+        description: The path to append to the base URL to form a valid OAuth2
+            Access Grant request.
         env:
             - name: TSS_TOKEN_PATH_URI
-        required: False"""
+        required: False
+"""
 
 RETURN = r"""
 _list:
     description:
-        - The JSON responses to `GET /secrets/{id}`
+        - The JSON responses to C(GET /secrets/{id}).
         - See https://updates.thycotic.net/secretserver/restapiguide/TokenAuth/#operation--secrets--id--get>"""
 
 EXAMPLES = r"""
