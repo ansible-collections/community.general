@@ -16,13 +16,26 @@ from ansible_collections.community.general.plugins.module_utils.hetzner import B
 from ansible_collections.community.general.plugins.modules.net_tools import hetzner_firewall
 
 
+def create_params(parameter, *values):
+    assert len(values) > 1
+    result = []
+    for i in range(1, len(values)):
+        result.append((parameter, values[i - 1], values[i]))
+    return result
+
+
+def flatten(list_of_lists):
+    result = []
+    for l in list_of_lists:
+        result.extend(l)
+    return result
+
+
 class TestHetznerFirewall(BaseTestModule):
     MOCK_ANSIBLE_MODULEUTILS_BASIC_ANSIBLEMODULE = 'ansible_collections.community.general.plugins.modules.net_tools.hetzner_firewall.AnsibleModule'
     MOCK_ANSIBLE_MODULEUTILS_URLS_FETCH_URL = 'ansible_collections.community.general.plugins.module_utils.hetzner.fetch_url'
 
-
     # Tests for state (absent and present)
-
 
     def test_absent_idempotency(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
@@ -52,7 +65,6 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['status'] == 'disabled'
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
-
 
     def test_absent_changed(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
@@ -98,7 +110,6 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
 
-
     def test_present_idempotency(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
             'hetzner_user': '',
@@ -127,7 +138,6 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['status'] == 'active'
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
-
 
     def test_present_changed(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
@@ -173,9 +183,7 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
 
-
     # Tests for state (absent and present) with check mode
-
 
     def test_absent_idempotency_check(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
@@ -207,7 +215,6 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
 
-
     def test_absent_changed_check(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
             'hetzner_user': '',
@@ -237,7 +244,6 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['status'] == 'disabled'
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
-
 
     def test_present_idempotency_check(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
@@ -269,7 +275,6 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
 
-
     def test_present_changed_check(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
             'hetzner_user': '',
@@ -300,9 +305,7 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
 
-
     # Tests for port
-
 
     def test_port_idempotency(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
@@ -334,7 +337,6 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
         assert result['firewall']['port'] == 'main'
-
 
     def test_port_changed(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
@@ -382,9 +384,7 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['server_number'] == 1
         assert result['firewall']['port'] == 'main'
 
-
     # Tests for whitelist_hos
-
 
     def test_whitelist_hos_idempotency(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
@@ -416,7 +416,6 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
         assert result['firewall']['whitelist_hos'] is True
-
 
     def test_whitelist_hos_changed(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
@@ -464,9 +463,7 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['server_number'] == 1
         assert result['firewall']['whitelist_hos'] is True
 
-
     # Tests for wait_for_configured in getting status
-
 
     def test_wait_get(self, mocker):
         mocker.patch('time.sleep', lambda duration: None)
@@ -513,7 +510,6 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
 
-
     def test_wait_get_timeout(self, mocker):
         mocker.patch('time.sleep', lambda duration: None)
         result = self.run_module_failed(mocker, hetzner_firewall, {
@@ -555,7 +551,6 @@ class TestHetznerFirewall(BaseTestModule):
         ])
         assert result['msg'] == 'Timeout while waiting for firewall to be configured.'
 
-
     def test_nowait_get(self, mocker):
         result = self.run_module_failed(mocker, hetzner_firewall, {
             'hetzner_user': '',
@@ -581,9 +576,7 @@ class TestHetznerFirewall(BaseTestModule):
         ])
         assert result['msg'] == 'Firewall configuration cannot be read as it is not configured.'
 
-
     # Tests for wait_for_configured in setting status
-
 
     def test_wait_update(self, mocker):
         mocker.patch('time.sleep', lambda duration: None)
@@ -643,7 +636,6 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['status'] == 'active'
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
-
 
     def test_wait_update_timeout(self, mocker):
         mocker.patch('time.sleep', lambda duration: None)
@@ -706,7 +698,6 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['server_number'] == 1
         assert 'Timeout while waiting for firewall to be configured.' in result['warnings']
 
-
     def test_nowait_update(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
             'hetzner_user': '',
@@ -750,7 +741,6 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['status'] == 'in process'
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
-
 
     # Idempotency checks: different amount of input rules
 
@@ -829,7 +819,6 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['status'] == 'active'
         assert len(result['firewall']['rules']['input']) == 1
 
-
     def test_input_rule_len_change_1_0(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
             'hetzner_user': '',
@@ -889,7 +878,6 @@ class TestHetznerFirewall(BaseTestModule):
         assert len(result['diff']['after']['rules']['input']) == 0
         assert result['firewall']['status'] == 'active'
         assert len(result['firewall']['rules']['input']) == 0
-
 
     def test_input_rule_len_change_1_2(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall, {
@@ -988,24 +976,7 @@ class TestHetznerFirewall(BaseTestModule):
         assert result['firewall']['status'] == 'active'
         assert len(result['firewall']['rules']['input']) == 2
 
-
     # Idempotency checks: change one value
-
-
-    def create_params(parameter, *values):
-        assert len(values) > 1
-        result = []
-        for i in range(1, len(values)):
-            result.append((parameter, values[i - 1], values[i]))
-        return result
-
-
-    def flatten(list_of_lists):
-        result = []
-        for l in list_of_lists:
-            result.extend(l)
-        return result
-
 
     @pytest.mark.parametrize("parameter, before, after", flatten([
         create_params('name', None, '', 'Test', 'Test', 'foo', '', None),
@@ -1117,9 +1088,7 @@ class TestHetznerFirewall(BaseTestModule):
         assert len(result['firewall']['rules']['input']) == 1
         assert result['firewall']['rules']['input'][0][parameter] == after
 
-
     # Idempotency checks: IP address normalization
-
 
     @pytest.mark.parametrize("ip_version, parameter, before_normalized, after_normalized, after", [
         ('ipv4', 'src_ip', '1.2.3.4/32', '1.2.3.4/32', '1.2.3.4'),

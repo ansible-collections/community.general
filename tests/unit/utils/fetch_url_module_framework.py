@@ -305,7 +305,6 @@ class BaseTestModule(object):
     # Users of this class need to overwrite this depending on how fetch_url was imported in the module
     MOCK_ANSIBLE_MODULEUTILS_URLS_FETCH_URL = 'ansible.module_utils.urls.fetch_url'
 
-
     def run_module(self, mocker, module, arguments, fetch_url):
         def exit_json(module, **kwargs):
             module._return_formatted(kwargs)
@@ -321,7 +320,6 @@ class BaseTestModule(object):
         set_module_args(arguments)
         module.main()
 
-
     def run_module_success(self, mocker, module, arguments, fetch_url_calls):
         '''
         Run module given by Python module ``module`` with the arguments ``arguments``
@@ -333,7 +331,6 @@ class BaseTestModule(object):
             self.run_module(mocker, module, arguments, fetch_url)
         fetch_url.assert_is_done()
         return e.value.kwargs
-
 
     def run_module_failed(self, mocker, module, arguments, fetch_url_calls):
         '''

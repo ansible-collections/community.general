@@ -5,8 +5,6 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-import pytest
-
 from ansible_collections.community.general.tests.unit.utils.fetch_url_module_framework import (
     FetchUrlCall,
     BaseTestModule,
@@ -20,9 +18,7 @@ class TestHetznerFirewallInfo(BaseTestModule):
     MOCK_ANSIBLE_MODULEUTILS_BASIC_ANSIBLEMODULE = 'ansible_collections.community.general.plugins.modules.net_tools.hetzner_firewall_info.AnsibleModule'
     MOCK_ANSIBLE_MODULEUTILS_URLS_FETCH_URL = 'ansible_collections.community.general.plugins.module_utils.hetzner.fetch_url'
 
-
     # Tests for state (absent and present)
-
 
     def test_absent(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall_info, {
@@ -50,7 +46,6 @@ class TestHetznerFirewallInfo(BaseTestModule):
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
 
-
     def test_present(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall_info, {
             'hetzner_user': '',
@@ -77,7 +72,6 @@ class TestHetznerFirewallInfo(BaseTestModule):
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
         assert len(result['firewall']['rules']['input']) == 0
-
 
     def test_present_w_rules(self, mocker):
         result = self.run_module_success(mocker, hetzner_firewall_info, {
@@ -134,9 +128,7 @@ class TestHetznerFirewallInfo(BaseTestModule):
         assert result['firewall']['rules']['input'][1]['dst_port'] is None
         assert result['firewall']['rules']['input'][1]['action'] == 'discard'
 
-
     # Tests for wait_for_configured in getting status
-
 
     def test_wait_get(self, mocker):
         mocker.patch('time.sleep', lambda duration: None)
@@ -179,7 +171,6 @@ class TestHetznerFirewallInfo(BaseTestModule):
         assert result['firewall']['status'] == 'active'
         assert result['firewall']['server_ip'] == '1.2.3.4'
         assert result['firewall']['server_number'] == 1
-
 
     def test_wait_get_timeout(self, mocker):
         mocker.patch('time.sleep', lambda duration: None)
