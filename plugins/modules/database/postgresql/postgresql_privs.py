@@ -403,7 +403,6 @@ queries:
   returned: always
   type: list
   sample: ['REVOKE GRANT OPTION FOR INSERT ON TABLE "books" FROM "reader";']
-  version_added: '2.8'
 '''
 
 import traceback

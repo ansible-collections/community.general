@@ -225,7 +225,6 @@ zone:
   returned: success when not state == absent
   type: dict
   sample: { 'slug': 'lpg1' }
-  version_added: '2.10'
 volumes:
   description: List of volumes attached to the server
   returned: success when not state == absent
@@ -258,13 +257,11 @@ server_groups:
   returned: success when not state == absent
   type: list
   sample: [ {"href": "https://api.cloudscale.ch/v1/server-groups/...", "uuid": "...", "name": "db-group"} ]
-  version_added: '2.8'
 tags:
   description: Tags assosiated with the volume.
   returned: success
   type: dict
   sample: { 'project': 'my project' }
-  version_added: '2.9'
 '''
 
 from datetime import datetime, timedelta

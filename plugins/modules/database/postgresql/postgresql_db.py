@@ -190,7 +190,6 @@ executed_commands:
   returned: always
   type: list
   sample: ["CREATE DATABASE acme"]
-  version_added: '2.10'
 '''
 
 

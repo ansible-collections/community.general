@@ -179,7 +179,6 @@ cidrs:
   returned: success
   type: list
   sample: [ 0.0.0.0/0 ]
-  version_added: '2.9'
 rule_position:
   description: Position of the network ACL rule.
   returned: success

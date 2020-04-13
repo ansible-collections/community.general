@@ -182,31 +182,26 @@ is_public:
   returned: success
   type: bool
   sample: true
-  version_added: '2.4'
 bootable:
   description: True if the ISO is bootable.
   returned: success
   type: bool
   sample: true
-  version_added: '2.4'
 is_featured:
   description: True if the ISO is featured.
   returned: success
   type: bool
   sample: true
-  version_added: '2.4'
 format:
   description: Format of the ISO.
   returned: success
   type: str
   sample: ISO
-  version_added: '2.4'
 os_type:
   description: Typo of the OS.
   returned: success
   type: str
   sample: CentOS 6.5 (64-bit)
-  version_added: '2.4'
 checksum:
   description: MD5 checksum of the ISO.
   returned: success
@@ -222,7 +217,6 @@ cross_zones:
   returned: success
   type: bool
   sample: false
-  version_added: '2.4'
 domain:
   description: Domain the ISO is related to.
   returned: success
@@ -243,7 +237,6 @@ tags:
   returned: success
   type: dict
   sample: '[ { "key": "foo", "value": "bar" } ]'
-  version_added: '2.4'
 '''
 
 from ansible.module_utils.basic import AnsibleModule

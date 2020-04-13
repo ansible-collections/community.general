@@ -93,12 +93,10 @@ changed:
   description: Return changed for mksysb actions as true or false.
   returned: always
   type: bool
-  version_added: 2.5
 msg:
   description: Return message regarding the action.
   returned: always
   type: str
-  version_added: 2.5
 '''
 
 
