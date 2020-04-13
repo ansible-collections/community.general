@@ -72,6 +72,11 @@ options:
     - Permissions checking for SQL commands is carried out as though
       the session_role were the one that had logged in originally.
     type: str
+  trust_input:
+    description:
+    - If C(no), check whether values of some parameters are potentially dangerous.
+    type: bool
+    default: yes
 seealso:
 - module: postgresql_user
 - module: postgresql_privs
@@ -141,6 +146,7 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import check_input
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     exec_sql,
@@ -163,6 +169,7 @@ def main():
         state=dict(type='str', default='present', choices=['absent', 'present']),
         db=dict(type='str', aliases=['login_db']),
         session_role=dict(type='str'),
+        trust_input=dict(type='bool', default=True),
     )
 
     module = AnsibleModule(
@@ -174,6 +181,10 @@ def main():
     target_roles = module.params['target_roles']
     fail_on_role = module.params['fail_on_role']
     state = module.params['state']
+    trust_input = module.params['trust_input']
+    if not trust_input:
+        # Check input for potentially dangerous elements:
+        check_input(module, groups, target_roles)
 
     conn_params = get_conn_params(module, module.params, warn_db_default=False)
     db_connection = connect_to_db(module, conn_params, autocommit=False)
