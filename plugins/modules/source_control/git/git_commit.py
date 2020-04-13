@@ -99,6 +99,7 @@ def git_add(module):
         'git',
         'add',
         '--',
+        '--',
     ]
 
     add_cmds.extend(add)
