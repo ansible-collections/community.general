@@ -150,7 +150,7 @@ def main():
         argument_spec=dict(
             state=dict(type='str', default='installed', choices=['absent', 'installed', 'present', 'removed']),
             update_cache=dict(type='bool', default=False, aliases=['update-cache']),
-            package=dict(type='str', required=True, aliases=['name', 'pkg']),
+            package=dict(type='list', required=True, aliases=['name', 'pkg']),
         ),
     )
 
@@ -162,7 +162,9 @@ def main():
     if p['update_cache']:
         update_package_db(module)
 
-    packages = p['package'].strip('[]').split(',')
+    packages = p['package']
+    if len(packages) == 1:
+        packages = packages[0].split(',')
 
     if p['state'] in ['installed', 'present']:
         install_packages(module, packages)
