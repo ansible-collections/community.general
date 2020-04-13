@@ -1,1 +1,0 @@
-./cloud/vultr/vultr_user_facts.py
