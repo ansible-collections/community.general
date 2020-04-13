@@ -51,8 +51,6 @@ scripts/inventory/nsot.py future-import-boilerplate
 scripts/inventory/nsot.py metaclass-boilerplate
 scripts/inventory/openshift.py future-import-boilerplate
 scripts/inventory/openshift.py metaclass-boilerplate
-scripts/inventory/openstack_inventory.py future-import-boilerplate
-scripts/inventory/openstack_inventory.py metaclass-boilerplate
 scripts/inventory/openvz.py future-import-boilerplate
 scripts/inventory/openvz.py metaclass-boilerplate
 scripts/inventory/ovirt.py future-import-boilerplate
