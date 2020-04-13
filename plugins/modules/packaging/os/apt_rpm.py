@@ -19,7 +19,7 @@ description:
 options:
   pkg:
     description:
-      - name of package to install, upgrade or remove.
+      - list of packages to install, upgrade or remove.
     required: true
   state:
     description:
