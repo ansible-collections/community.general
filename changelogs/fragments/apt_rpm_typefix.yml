@@ -1,2 +1,2 @@
 bugfixes:
-    - Fix package type from str to list to fix package->apt_rpm invoking with list of packages
+  - apt_rpm - Fix ``package`` type from ``str`` to ``list`` to fix invoking with list of packages
