@@ -1,5 +1,7 @@
 #!/usr/bin/python
-# Copyright (c) 2017 Alibaba Group Holding Limited. He Guimin <heguimin36@163.com>
+# -*- coding: utf-8 -*-
+
+# Copyright (c) 2017-present Alibaba Group Holding Limited. He Guimin <heguimin36@163.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 #
 #  This file is part of Ansible
@@ -17,7 +19,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible. If not, see http://www.gnu.org/licenses/.
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (absolute_import, division, print_function)
+
 __metaclass__ = type
 
 ANSIBLE_METADATA = {'metadata_version': '1.1',
@@ -36,68 +39,70 @@ description:
 options:
     availability_zone:
       description:
-        - Aliyun availability zone ID in which to launch the instance
+        - (Deprecated) Aliyun availability zone ID in which to launch the instance. Please use filter item 'zone_id' instead.
       aliases: ['alicloud_zone']
+      type: str
     instance_names:
       description:
-        - A list of ECS instance names.
-      aliases: [ "names"]
+        - (Deprecated) A list of ECS instance names. Please use filter item 'instance_name' instead.
+      aliases: ["names"]
+      type: list
+      elements: str
     instance_ids:
       description:
         - A list of ECS instance ids.
       aliases: ["ids"]
-    instance_tags:
+      type: list
+      elements: str
+    name_prefix:
+      description:
+        - Use a instance name prefix to filter ecs instances.
+      type: str
+    tags:
       description:
         - A hash/dictionaries of instance tags. C({"key":"value"})
-      aliases: ["tags"]
+      aliases: ["instance_tags"]
+      type: dict
+    filters:
+      description:
+        - A dict of filters to apply. Each dict item consists of a filter key and a filter value. The filter keys can be
+          all of request parameters. See U(https://www.alibabacloud.com/help/doc-detail/25506.htm) for parameter details.
+          Filter keys can be same as request parameter name or be lower case and use underscore ("_") or dash ("-") to
+          connect different words in one parameter. 'InstanceIds' should be a list and it will be appended to
+          I(instance_ids) automatically. 'Tag.n.Key' and 'Tag.n.Value' should be a dict and using I(tags) instead.
+      type: dict
 author:
     - "He Guimin (@xiaozhu36)"
 requirements:
-    - "python >= 2.6"
-    - "footmark >= 1.1.16"
+    - "python >= 3.6"
+    - "footmark >= 1.13.0"
 extends_documentation_fragment:
-- community.general.alicloud
-
+    - community.general.alicloud
 '''
 
 EXAMPLES = '''
 # Fetch instances details according to setting different filters
-- name: fetch instances details example
-  hosts: localhost
-  vars:
-    alicloud_access_key: <your-alicloud-access-key>
-    alicloud_secret_key: <your-alicloud-secret-key>
-    alicloud_region: cn-beijing
-    availability_zone: cn-beijing-a
 
-  tasks:
-    - name: Find all instances in the specified region
-      ali_instance_info:
-        alicloud_access_key: '{{ alicloud_access_key }}'
-        alicloud_secret_key: '{{ alicloud_secret_key }}'
-        alicloud_region: '{{ alicloud_region }}'
-      register: all_instances
+- name: Find all instances in the specified region
+  ali_instance_info:
+  register: all_instances
 
-    - name: Find all instances based on the specified ids
-      ali_instance_info:
-        alicloud_access_key: '{{ alicloud_access_key }}'
-        alicloud_secret_key: '{{ alicloud_secret_key }}'
-        alicloud_region: '{{ alicloud_region }}'
-        instance_ids:
-          - "i-35b333d9"
-          - "i-ddav43kd"
-      register: instances_by_ids
+- name: Find all instances based on the specified ids
+  ali_instance_info:
+    instance_ids:
+      - "i-35b333d9"
+      - "i-ddav43kd"
+  register: instances_by_ids
 
-    - name: Find all instances based on the specified names/name-prefixes
-      ali_instance_info:
-        alicloud_access_key: '{{ alicloud_access_key }}'
-        alicloud_secret_key: '{{ alicloud_secret_key }}'
-        alicloud_region: '{{ alicloud_region }}'
-        instance_names:
-          - "ecs_instance-1"
-          - "ecs_instance_2"
-      register: instances_by_ids
+- name: Find all instances based on the specified name_prefix
+  ali_instance_info:
+    name_prefix: "ecs_instance_"
+  register: instances_by_name_prefix
 
+- name: Find instances based on tags
+  ali_instance_info:
+    tags:
+      Test: "add"
 '''
 
 RETURN = '''
@@ -231,6 +236,11 @@ instances:
             returned: always
             type: str
             sample: my-ecs
+        instance_type_family:
+            description: The instance type family of the instance belongs.
+            returned: always
+            type: str
+            sample: ecs.sn1ne
         instance_type:
             description: The instance type of the running instance.
             returned: always
@@ -297,7 +307,7 @@ instances:
             type: str
             sample: 10.0.0.1
         public_ip_address:
-            description: The public IPv4 address assigned to the instance
+            description: The public IPv4 address assigned to the instance or eip address
             returned: always
             type: str
             sample: 43.0.0.1
@@ -313,15 +323,15 @@ instances:
             elements: dict
             contains:
                 group_id:
-                    description: The ID of the security group.
-                    returned: always
-                    type: str
-                    sample: sg-0123456
+                  description: The ID of the security group.
+                  returned: always
+                  type: str
+                  sample: sg-0123456
                 group_name:
-                    description: The name of the security group.
-                    returned: always
-                    type: str
-                    sample: my-security-group
+                  description: The name of the security group.
+                  returned: always
+                  type: str
+                  sample: my-security-group
         status:
             description: The current status of the instance.
             returned: always
@@ -340,7 +350,7 @@ instances:
         vpc_id:
             description: The ID of the VPC the instance is in.
             returned: always
-            type: dict
+            type: str
             sample: vpc-0011223344
 ids:
     description: List of ECS instance IDs
@@ -349,11 +359,9 @@ ids:
     sample: [i-12345er, i-3245fs]
 '''
 
-# import time
-# import sys
 import traceback
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import get_acs_connection_info, ecs_argument_spec, ecs_connect
+from ansible_collections.community.general.plugins.module_utils.alicloud_ecs import ecs_argument_spec, ecs_connect
 
 HAS_FOOTMARK = False
 FOOTMARK_IMP_ERR = None
@@ -369,9 +377,11 @@ def main():
     argument_spec = ecs_argument_spec()
     argument_spec.update(dict(
         availability_zone=dict(aliases=['alicloud_zone']),
-        instance_ids=dict(type='list', aliases=['ids']),
-        instance_names=dict(type='list', aliases=['names']),
-        instance_tags=dict(type='list', aliases=['tags']),
+        instance_ids=dict(type='list', elements='str', aliases=['ids']),
+        instance_names=dict(type='list', elements='str', aliases=['names']),
+        name_prefix=dict(type='str'),
+        tags=dict(type='dict', aliases=['instance_tags']),
+        filters=dict(type='dict')
     )
     )
     module = AnsibleModule(argument_spec=argument_spec)
@@ -386,23 +396,43 @@ def main():
     instances = []
     instance_ids = []
     ids = module.params['instance_ids']
+    name_prefix = module.params['name_prefix']
     names = module.params['instance_names']
     zone_id = module.params['availability_zone']
     if ids and (not isinstance(ids, list) or len(ids) < 1):
         module.fail_json(msg='instance_ids should be a list of instances, aborting')
 
     if names and (not isinstance(names, list) or len(names) < 1):
-        module.fail_json(msg='instance_ids should be a list of instances, aborting')
+        module.fail_json(msg='instance_names should be a list of instances, aborting')
 
+    filters = module.params['filters']
+    if not filters:
+        filters = {}
+    if not ids:
+        ids = []
+    for key, value in list(filters.items()):
+        if key in ["InstanceIds", "instance_ids", "instance-ids"] and isinstance(ids, list):
+            for id in value:
+                if id not in ids:
+                    ids.append(value)
+    if ids:
+        filters['instance_ids'] = ids
+    if module.params['tags']:
+        filters['tags'] = module.params['tags']
+    if zone_id:
+        filters['zone_id'] = zone_id
     if names:
-        for name in names:
-            for inst in ecs.get_all_instances(zone_id=zone_id, instance_ids=ids, instance_name=name):
-                instances.append(inst.read())
-                instance_ids.append(inst.id)
-    else:
-        for inst in ecs.get_all_instances(zone_id=zone_id, instance_ids=ids):
-            instances.append(inst.read())
-            instance_ids.append(inst.id)
+        filters['instance_name'] = names[0]
+
+    for inst in ecs.describe_instances(**filters):
+        if name_prefix:
+            if not str(inst.instance_name).startswith(name_prefix):
+                continue
+        volumes = ecs.describe_disks(instance_id=inst.id)
+        setattr(inst, 'block_device_mappings', volumes)
+        setattr(inst, 'user_data', inst.describe_user_data())
+        instances.append(inst.read())
+        instance_ids.append(inst.id)
 
     module.exit_json(changed=False, ids=instance_ids, instances=instances)
 
