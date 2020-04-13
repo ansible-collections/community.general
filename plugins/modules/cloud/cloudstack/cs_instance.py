@@ -341,7 +341,6 @@ default_ip6:
   returned: if available
   type: str
   sample: 2a04:c43:c00:a07:4b4:beff:fe00:74
-  version_added: '2.6'
 public_ip:
   description: Public IP address with instance via static NAT rule.
   returned: if available
@@ -362,7 +361,6 @@ template_display_text:
   returned: success
   type: str
   sample: Linux Debian 9 64-bit 200G Disk (2017-10-08-622866)
-  version_added: '2.6'
 service_offering:
   description: Name of the service offering the instance has.
   returned: success
@@ -403,7 +401,6 @@ host:
   returned: success and instance is running
   type: str
   sample: host-01.example.com
-  version_added: '2.6'
 instance_name:
   description: Internal name of the instance (ROOT admin only).
   returned: success

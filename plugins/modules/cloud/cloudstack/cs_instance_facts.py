@@ -178,7 +178,6 @@ host:
   returned: success and instance is running
   type: str
   sample: host01.example.com
-  version_added: '2.6'
 instance_name:
   description: Internal name of the instance (ROOT admin only).
   returned: success
@@ -193,7 +192,6 @@ nic:
   description: List of dictionaries of the instance nics.
   returned: success
   type: complex
-  version_added: '2.8'
   contains:
     broadcasturi:
       description: The broadcast uri of the nic.

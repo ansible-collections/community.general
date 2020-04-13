@@ -63,7 +63,6 @@ options:
     description:
       - The URI of the authentication service.
     default: https://identity.api.rackspacecloud.com/v2.0/
-    version_added: '1.5'
   credentials:
     description:
       - File to find the Rackspace credentials in. Ignored if I(api_key) and
@@ -73,12 +72,10 @@ options:
     description:
       - Environment as configured in I(~/.pyrax.cfg),
         see U(https://github.com/rackspace/pyrax/blob/master/docs/getting_started.md#pyrax-configuration).
-    version_added: '1.5'
   identity_type:
     description:
       - Authentication mechanism to use, such as rackspace or keystone.
     default: rackspace
-    version_added: '1.5'
   region:
     description:
       - Region to create an instance in.
@@ -86,18 +83,15 @@ options:
   tenant_id:
     description:
       - The tenant ID used for authentication.
-    version_added: '1.5'
   tenant_name:
     description:
       - The tenant name used for authentication.
-    version_added: '1.5'
   username:
     description:
       - Rackspace username, overrides I(credentials).
   validate_certs:
     description:
       - Whether or not to require SSL validation of API endpoints.
-    version_added: '1.5'
     type: bool
     aliases: [ verify_ssl ]
 requirements:

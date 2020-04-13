@@ -243,7 +243,6 @@ databases:
           - Content depends on PostgreSQL server version.
           returned: if configured
           type: dict
-          version_added: "2.10"
           sample: { "pub1": { "ownername": "postgres", "puballtables": true, "pubinsert": true, "pubupdate": true } }
         subscriptions:
           description:
@@ -252,7 +251,6 @@ databases:
           - Content depends on PostgreSQL server version.
           returned: if configured
           type: dict
-          version_added: "2.10"
           sample:
           - { "my_subscription": {"ownername": "postgres", "subenabled": true, "subpublications": ["first_publication"] } }
 repl_slots:

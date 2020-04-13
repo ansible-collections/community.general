@@ -251,13 +251,11 @@ db_list:
   returned: always
   type: list
   sample: ["foo", "bar"]
-  version_added: '2.9'
 executed_commands:
   description: List of commands which tried to run.
   returned: if executed
   type: list
   sample: ["CREATE DATABASE acme"]
-  version_added: '2.10'
 '''
 
 import os

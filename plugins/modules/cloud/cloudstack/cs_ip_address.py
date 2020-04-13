@@ -150,7 +150,6 @@ tags:
   returned: success
   type: dict
   sample: '[ { "key": "myCustomID", "value": "5510c31a-416e-11e8-9013-02000a6b00bf" } ]'
-  version_added: '2.6'
 '''
 
 from ansible.module_utils.basic import AnsibleModule
