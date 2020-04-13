@@ -146,7 +146,7 @@ def main():
         argument_spec=dict(
             state=dict(type='str', default='installed', choices=['absent', 'installed', 'present', 'removed']),
             update_cache=dict(type='bool', default=False, aliases=['update-cache']),
-            package=dict(type='str', required=True, aliases=['name', 'pkg']),
+            package=dict(type='list', required=True, aliases=['name', 'pkg']),
         ),
     )
 
