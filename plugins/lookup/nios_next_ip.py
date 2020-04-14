@@ -89,7 +89,7 @@ class LookupModule(LookupBase):
             raise AnsibleError('missing argument in the form of A.B.C.D/E')
 
         provider = kwargs.pop('provider', {})
-        wapi = WapiLookup(provider) 
+        wapi = WapiLookup(provider)
         if type(ipaddress.ip_network(network)) == ipaddress.IPv6Network:
             network_obj = wapi.get_object('ipv6network', {'network': network})
         else:
