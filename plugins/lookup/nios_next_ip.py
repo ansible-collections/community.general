@@ -50,6 +50,11 @@ EXAMPLES = """
   set_fact:
     ipaddr: "{{ lookup('nios_next_ip', '192.168.10.0/24', provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
 
+- name: return next available IP address for network 2230:52:2:1211::/64
+  set_fact:
+    ipaddr: "{{ lookup('nios_next_ip', '2230:52:2:1211::/64', provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
+
+
 - name: return the next 3 available IP addresses for network 192.168.10.0/24
   set_fact:
     ipaddr: "{{ lookup('nios_next_ip', '192.168.10.0/24', num=3, provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
@@ -72,7 +77,7 @@ from ansible.plugins.lookup import LookupBase
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiLookup
 from ansible.module_utils._text import to_text
 from ansible.errors import AnsibleError
-
+import ipaddress
 
 class LookupModule(LookupBase):
 
@@ -84,8 +89,12 @@ class LookupModule(LookupBase):
 
         provider = kwargs.pop('provider', {})
         wapi = WapiLookup(provider)
+        
+        if type(ipaddress.ip_network(network)) == ipaddress.IPv6Network:
+            network_obj = wapi.get_object('ipv6network', {'network': network})
+        else:
+            network_obj = wapi.get_object('network', {'network': network})
 
-        network_obj = wapi.get_object('network', {'network': network})
         if network_obj is None:
             raise AnsibleError('unable to find network object %s' % network)
 
