@@ -9,12 +9,8 @@ __metaclass__ = type
 DOCUMENTATION = '''
     author:
     - Eric Belhomme <ebelhomme@fr.scc.com>
-
     lookup: etcd3
-
-
     short_description: get info from an etcd3 server
-
     description:
     - Retrieves data from an etcd3 server.
 
@@ -93,16 +89,19 @@ DOCUMENTATION = '''
 EXAMPLES = '''
     - name: "a value from a locally running etcd"
       debug:
-        msg: "{{ lookup('etcd3', 'foo/bar') }}"
+        msg: "{{ lookup('community.general.etcd3', 'foo/bar') }}"
 
     - name: "values from multiple folders on a locally running etcd"
-      debug: msg={{ lookup('etcd3', 'foo', 'bar', 'baz') }}
+      debug:
+        msg: "{{ lookup('community.general.etcd3', 'foo', 'bar', 'baz') }}"
 
     - name: "look for a key prefix"
-      debug: msg="{{ lookup('etcd3', '/foo/bar', prefix=True) }}"
+      debug:
+        msg: "{{ lookup('community.general.etcd3', '/foo/bar', prefix=True) }}"
 
     - name: "connect to etcd3 with a client certificate"
-      debug msg: "{{ lookup('etcd3', 'foo/bar', cert_cert='/etc/ssl/etcd/client.pem', cert_key='/etc/ssl/etcd/client.key') }}"
+      debug:
+        msg: "{{ lookup('community.general.etcd3', 'foo/bar', cert_cert='/etc/ssl/etcd/client.pem', cert_key='/etc/ssl/etcd/client.key') }}"
 '''
 
 RETURN = '''
@@ -166,10 +165,12 @@ class LookupModule(LookupBase):
 
         def env_override(key, value):
             client_params[key] = value
-            display.vvvvv("Overriding etcd3 '{}' param with ENV variable '{}'".format(
-                key,
-                value
-            ))
+            display.vvvvv(
+                "Overriding etcd3 '{1}' param with ENV variable '{2}'".format(
+                    key,
+                    value
+                )
+            )
         for key in etcd3_envs.keys():
             if etcd3_envs[key] in os.environ:
                 env_override(key, os.environ[etcd3_envs[key]])
