@@ -1,1 +1,0 @@
-./cloud/cloudstack/cs_network_offering.py
