@@ -7,7 +7,7 @@
   pip:
     name: PyGithub
     state: latest
-  
+
 - name: Check if GitHub issue is closed or not
   github_issue:
     organization: "{{ organization }}"
@@ -19,7 +19,7 @@
 - assert:
     that:
       - "{{ get_status_0002.changed == True }}"
-      - "{{ get_status_0002.issue_status == 'closed' }}"
+      - "{{ get_status_0002.get_status == 'closed' }}"
 
 - name: Check if GitHub issue is closed or not
   github_issue:
