@@ -101,12 +101,6 @@ matrix:
     - env: T=linux/ubuntu1604/5
     - env: T=linux/ubuntu1804/5
 
-    - env: T=cs/2.7/1
-    - env: T=cs/3.6/1
-
-    - env: T=cs/2.7/2
-    - env: T=cs/3.6/2
-
     - env: T=cloud/2.7/1
     - env: T=cloud/3.6/1
 

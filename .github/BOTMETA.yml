@@ -129,9 +129,6 @@ files:
   $doc_fragments/avi.py:
   $doc_fragments/ce.py:
   $doc_fragments/cloudscale.py:
-  $doc_fragments/cloudstack.py:
-    maintainers: $team_cloudstack
-    labels: cloudstack
   $doc_fragments/docker.py:
     maintainers: $team_docker
     labels: cloud docker
@@ -227,9 +224,6 @@ files:
   $module_utils/cloudscale.py:
     maintainers: $team_cloudscale
     labels: cloudscale
-  $module_utils/cloudstack.py:
-    maintainers: $team_cloudstack
-    labels: cloudstack
   $module_utils/docker/:
     maintainers: $team_docker
     labels: cloud
@@ -402,40 +396,6 @@ files:
     maintainers: gaudenz
   $modules/cloud/cloudscale/cloudscale_volume.py:
     authors: gaudenz href resmo
-  $modules/cloud/cloudstack/:
-    authors: resmo
-    maintainers: $team_cloudstack
-  $modules/cloud/cloudstack/cs_disk_offering.py:
-    authors: dpassante resmo
-    maintainers: rhtyd
-  $modules/cloud/cloudstack/cs_image_store.py:
-    authors: PatTheSilent
-  $modules/cloud/cloudstack/cs_instance_nic.py:
-    authors: marcaurele resmo
-  $modules/cloud/cloudstack/cs_instance_password_reset.py:
-    authors: onitake
-  $modules/cloud/cloudstack/cs_ip_address.py:
-    authors: dazworrall resmo
-  $modules/cloud/cloudstack/cs_network_offering.py:
-    authors: dpassante
-    maintainers: rhtyd
-  $modules/cloud/cloudstack/cs_physical_network.py:
-    authors: PatTheSilent netservers
-  $modules/cloud/cloudstack/cs_role_permission.py:
-    authors: dpassante
-    maintainers: rhtyd
-  $modules/cloud/cloudstack/cs_storage_pool.py:
-    authors: netservers resmo
-  $modules/cloud/cloudstack/cs_traffic_type.py:
-    authors: PatTheSilent
-  $modules/cloud/cloudstack/cs_vlan_ip_range.py:
-    authors: dpassante
-    maintainers: rhtyd
-  $modules/cloud/cloudstack/cs_volume.py:
-    authors: jeffersongirao resmo
-  $modules/cloud/cloudstack/cs_vpc_offering.py:
-    authors: dpassante
-    maintainers: rhtyd
   $modules/cloud/digital_ocean/_digital_ocean.py:
     authors: zbal
   $modules/cloud/digital_ocean/:
@@ -2178,7 +2138,6 @@ macros:
   team_avi: ericsysmin grastogi23 khaltore
   team_bsd: JoergFiedler MacLemon bcoca dch jasperla mekanix opoplawski overhacked tuxillo
   team_cloudscale: gaudenz resmo
-  team_cloudstack: dpassante rhtyd
   team_cyberark_conjur: jvanderhoof ryanprior
   team_digital_ocean: BondAnthony mgregson
   team_docker: DBendit WojciechowskiPiotr akshay196 danihodovic dariko felixfontein jwitko kassiansun tbouvet
