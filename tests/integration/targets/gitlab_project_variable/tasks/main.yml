@@ -142,6 +142,7 @@
         value: checkmode
         masked: True
         protected: True
+        variable_type: env_var
   register: gitlab_project_variable_state
 
 - name: state must be changed
@@ -159,6 +160,7 @@
         value: checkmode
         masked: True
         protected: True
+        variable_type: env_var
   register: gitlab_project_variable_state
 
 - name: state must not be changed
