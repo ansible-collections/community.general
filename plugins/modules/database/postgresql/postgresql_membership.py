@@ -181,10 +181,11 @@ def main():
     target_roles = module.params['target_roles']
     fail_on_role = module.params['fail_on_role']
     state = module.params['state']
+    session_role = module.params['session_role']
     trust_input = module.params['trust_input']
     if not trust_input:
         # Check input for potentially dangerous elements:
-        check_input(module, groups, target_roles)
+        check_input(module, groups, target_roles, session_role)
 
     conn_params = get_conn_params(module, module.params, warn_db_default=False)
     db_connection = connect_to_db(module, conn_params, autocommit=False)
