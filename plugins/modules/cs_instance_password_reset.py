@@ -1,1 +1,0 @@
-./cloud/cloudstack/cs_instance_password_reset.py

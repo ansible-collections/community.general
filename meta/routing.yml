@@ -4,14 +4,6 @@ plugin_routing:
       deprecation:
         removal_date: TBD
         warning_text: see plugin documentation for details
-    cs_instance_facts:
-      deprecation:
-        removal_date: TBD
-        warning_text: see plugin documentation for details
-    cs_zone_facts:
-      deprecation:
-        removal_date: TBD
-        warning_text: see plugin documentation for details
     digital_ocean:
       deprecation:
         removal_date: TBD
