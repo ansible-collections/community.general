@@ -3,12 +3,16 @@
 # Copyright: (c) 2020, Andrea Tartaglia <andrea@braingap.uk>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+from __future__ import absolute_import, division, print_function
+
+__metaclass__ = type
+
 
 class ModuleDocFragment(object):
 
     # Shared GitHub documentation fragment
 
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 requirements:
   - "PyGithub >= 1.3.5"
 options:
@@ -31,4 +35,4 @@ options:
     default: https://api.github.com
     aliases: [github_url]
     type: str
-    '''
+    """
