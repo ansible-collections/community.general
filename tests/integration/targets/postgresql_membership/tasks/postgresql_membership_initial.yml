@@ -345,3 +345,46 @@
     that:
     - result is changed
     - result.queries == ["GRANT \"{{ test_group3 }}\" TO \"{{ test_user1 }}\""]
+
+#############################
+# Check trust_input parameter
+
+- name: postgresql_membership - try to use dangerous input, don't trust
+  become_user: "{{ pg_user }}"
+  become: yes
+  postgresql_membership:
+    login_user: "{{ pg_user }}"
+    db: postgres
+    group:
+    - "{{ test_group3}}"
+    - "{{ dangerous_name }}"
+    user: "{{ test_user1 }}"
+    state: present
+    trust_input: no
+  register: result
+  ignore_errors: yes
+
+- assert:
+    that:
+    - result is failed
+    - result.msg == 'Passed input \'{{ dangerous_name }}\' is potentially dangerous'
+
+- name: postgresql_membership - try to use dangerous input, trust explicitly
+  become_user: "{{ pg_user }}"
+  become: yes
+  postgresql_membership:
+    login_user: "{{ pg_user }}"
+    db: postgres
+    group:
+    - "{{ test_group3}}"
+    - "{{ dangerous_name }}"
+    user: "{{ test_user1 }}"
+    state: present
+    trust_input: yes
+  register: result
+  ignore_errors: yes
+
+- assert:
+    that:
+    - result is failed
+    - result.msg == 'Role {{ dangerous_name }} does not exist'
