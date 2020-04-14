@@ -157,6 +157,11 @@ options:
     type: str
     aliases:
     - ssl_rootcert
+  trust_input:
+    description:
+    - If C(no), check whether values of some parameters are potentially dangerous.
+    type: bool
+    default: yes
 
 notes:
 - Parameters that accept comma separated lists (I(privs), I(objs), I(roles))
@@ -417,7 +422,10 @@ except ImportError:
 
 # import module snippets
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.community.general.plugins.module_utils.database import pg_quote_identifier
+from ansible_collections.community.general.plugins.module_utils.database import (
+    pg_quote_identifier,
+    check_input,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import postgres_common_argument_spec
 from ansible.module_utils._text import to_native
 
@@ -943,6 +951,7 @@ def main():
         login=dict(default='postgres', aliases=['login_user']),
         password=dict(default='', aliases=['login_password'], no_log=True),
         fail_on_role=dict(type='bool', default=True),
+        trust_input=dict(type='bool', default=True),
     )
 
     module = AnsibleModule(
@@ -976,6 +985,11 @@ def main():
     elif not p.privs:
         module.fail_json(msg='Argument "privs" is required '
                              'for type "%s".' % p.type)
+
+    # Check input
+    if not p.trust_input:
+        # Check input for potentially dangerous elements:
+        check_input(module, p.roles, p.target_roles, p.session_role, p.schema)
 
     # Connect to Database
     if not psycopg2:
