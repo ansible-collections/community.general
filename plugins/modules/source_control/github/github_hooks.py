@@ -16,11 +16,12 @@ ANSIBLE_METADATA = {
 }
 
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 ---
 module: github_hooks
 short_description: Manages GitHub service hooks.
-deprecated
+deprecated:
+    removed_in: "2.12"
 description:
      - Adds service hooks and removes service hooks that have an error status.
 options:
@@ -64,7 +65,7 @@ options:
 author: "Phillip Gentry, CX Inc (@pcgentry)"
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 # Example creating a new service hook. It ignores duplicates.
 - github_hooks:
     action: create
