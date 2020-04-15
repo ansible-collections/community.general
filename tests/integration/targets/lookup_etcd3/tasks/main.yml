@@ -1,84 +1,19 @@
 ---
 
-- name: install etcd3 on controlled node an test
-  vars:
-    etcd3_version: 'v3.4.7'
-    etcd3_download_url: "https://storage.googleapis.com/etcd"
-    etcd3_cmd: etcd
-  block:
-  - name: 'Install etcd3 Python package'
-    pip:
-      name: etcd3
-  - name: Create a local temporary directory
-    tempfile:
-      state: directory
-    register: tempfile_result
-  - set_fact:
-      local_temp_dir: '{{ tempfile_result.path }}'
-  - assert:
-      that: ansible_architecture in ['x86_64', 'amd64']
-  - set_fact:
-      etcd3_arch: amd64
-    when: ansible_architecture in ['x86_64', 'amd64']
-  - set_fact:
-      etcd3_bindir: "{{ local_temp_dir }}/etcd-{{ etcd3_version }}-linux-{{ etcd3_arch }}"
-      etcd3_libdir: "{{ local_temp_dir }}/lib"
-  - file:
-      path: "{{ etcd3_libdir }}"
-      state: directory
-      mode: 0775
-  - name: Download etcd3 binary
-    unarchive:
-      src: "{{ etcd3_download_url}}/{{ etcd3_version }}/etcd-{{ etcd3_version }}-linux-{{ etcd3_arch }}.tar.gz"
-      dest: "{{ local_temp_dir }}"
-      remote_src: true
+- name: put key/values with an etcd prefix
+  etcd3:
+    key: "{{ etcd3_prefix }}foo{{ item }}"
+    value: "bar{{ item }}"
+    state: present
+  loop:
+  - 1
+  - 2
+  - 3
 
-  - environment:
-      ETCD_DATA_DIR: "{{ etcd3_libdir }}"
-      ETCD_ADVERTISE_CLIENT_URLS: http://127.0.0.1:2379
-      ETCD_INITIAL_ADVERTISE_PEER_URLS: http://127.0.0.1:2380
-      ETCD_INITIAL_CLUSTER_STATE: new
-      ETCD_LISTEN_CLIENT_URLS: http://127.0.0.1:2379
-      ETCD_ELECTION_TIMEOUT: 5000
-      ETCD_HEARTBEAT_INTERVAL: 250
-      ETCD_LISTEN_PEER_URLS: http://127.0.0.1:2380
-      ETCD_NAME: etcd1
-      ETCD_INITIAL_CLUSTER: etcd1=http://127.0.0.1:2380
+- name: put a single key/values in etcd
+  etcd3:
+    key: "{{ etcd3_singlekey }}"
+    value: "foobar"
+    state: present
 
-    block:
-    - name: start etcd3 daemon
-      shell: |
-        nohup {{ etcd3_bindir }}/etcd </dev/null >/dev/null 2>&1 &
-        echo $!
-      register: run_etcd3
-    - name: put key/values with an etcd prefix
-      etcd3:
-        key: "{{ etcd3_prefix }}foo{{ item }}"
-        value: "bar{{ item }}"
-        state: present
-      loop:
-      - 1
-      - 2
-      - 3
-    - name: put a single key/values in etcd
-      etcd3:
-        key: "{{ etcd3_singlekey }}"
-        value: "foobar"
-        state: present
-    - import_tasks: tests.yml
-      vars:
-        auth_type: token
-
-    always:
-    - name: Kill etcd3 process
-      shell: kill {{ run_etcd3.stdout }}
-      ignore_errors: true
-
-  always:
-  - name: Delete temp dir
-    file:
-      path: '{{ local_temp_dir }}'
-      state: absent
-
-
-
+- import_tasks: tests.yml
