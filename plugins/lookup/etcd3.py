@@ -83,7 +83,7 @@ DOCUMENTATION = '''
             type: str
 
     requirements:
-    - "etcd3 >= 0.12"
+    - "etcd3 >= 0.10"
 '''
 
 EXAMPLES = '''

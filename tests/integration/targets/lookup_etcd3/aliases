@@ -1,6 +1,7 @@
 shippable/posix/group1
 destructive
 needs/file/tests/utils/constraints.txt
+needs/target/setup_etcd3
 skip/aix
 skip/osx
 skip/freebsd
