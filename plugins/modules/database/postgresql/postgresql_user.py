@@ -846,12 +846,13 @@ def main():
     if groups:
         groups = [e.strip() for e in groups]
     comment = module.params["comment"]
+    session_role = module.params['session_role']
 
     trust_input = module.params['trust_input']
     if not trust_input:
         # Check input for potentially dangerous elements:
         check_input(module, user, password, privs, expires,
-                    role_attr_flags, groups, comment)
+                    role_attr_flags, groups, comment, session_role)
 
     conn_params = get_conn_params(module, module.params, warn_db_default=False)
     db_connection = connect_to_db(module, conn_params)
