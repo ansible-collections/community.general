@@ -854,7 +854,7 @@ def main():
         check_input(module, user, password, privs, expires,
                     role_attr_flags, groups, comment, session_role)
 
-    conn_params = get_conn_params(module, module.params, warn_db_default=False)
+    conn_params = get_conn_params(module, module.params, False)
     db_connection = connect_to_db(module, conn_params)
     cursor = db_connection.cursor(cursor_factory=DictCursor)
 
