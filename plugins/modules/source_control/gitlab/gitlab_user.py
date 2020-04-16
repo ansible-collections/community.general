@@ -18,8 +18,8 @@ module: gitlab_user
 short_description: Creates/updates/deletes/blocks/unblocks GitLab Users
 description:
   - When the user does not exist in GitLab, it will be created.
-  - When the user does exists and state=absent, the user will be deleted.
-  - When the user does exists and state=blocked, the user will be blocked.
+  - When the user exists and state=absent, the user will be deleted.
+  - When the user exists and state=blocked, the user will be blocked.
   - When changes are made to user, the user will be updated.
 notes:
   - From Ansible 2.10 and onwards, name, email and password are optional while deleting the user.
@@ -86,8 +86,7 @@ options:
     choices: ["guest", "reporter", "developer", "master", "maintainer", "owner"]
   state:
     description:
-      - create, delete or block a user.
-      - Possible values are present, absent, blocked, and unblocked.
+      - Create, delete or block a user.
     default: present
     type: str
     choices: ["present", "absent", "blocked", "unblocked"]
@@ -116,7 +115,6 @@ EXAMPLES = '''
     validate_certs: False
     username: myusername
     state: absent
-  delegate_to: localhost
 
 - name: "Create GitLab User"
   gitlab_user:
@@ -133,7 +131,6 @@ EXAMPLES = '''
     state: present
     group: super_group/mon_group
     access_level: owner
-  delegate_to: localhost
 
 - name: "Block GitLab User"
   gitlab_user:
@@ -142,7 +139,6 @@ EXAMPLES = '''
     validate_certs: False
     username: myusername
     state: blocked
-  delegate_to: localhost
 
 - name: "Unblock GitLab User"
   gitlab_user:
@@ -151,7 +147,6 @@ EXAMPLES = '''
     validate_certs: False
     username: myusername
     state: unblocked
-  delegate_to: localhost
 '''
 
 RETURN = '''
@@ -490,7 +485,10 @@ def main():
 
     gitlab_user = GitLabUser(module, gitlab_instance)
     user_exists = gitlab_user.existsUser(user_username)
-    user_is_active = gitlab_user.isActive(user_username)
+    if user_exists:
+        user_is_active = gitlab_user.isActive(user_username)
+    else:
+        user_is_active = False
 
     if state == 'absent':
         if user_exists:
