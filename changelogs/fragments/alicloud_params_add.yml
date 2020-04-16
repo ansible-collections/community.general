@@ -1,4 +1,4 @@
-changes:
+minor_changes:
   - "alicloud modules - now only support Python 3.6, not support Python 2.x"
   - "ali_instance and ali_instance_info - the required package footmark needs a version higher than 1.19.0"
   - "ali_instance - Add params ``unique_suffix``, ``tags``, ``purge_tags``, ``ram_role_name``, ``spot_price_limit``, ``spot_strategy``, ``period_unit``, ``dry_run``, ``include_data_disks``"
