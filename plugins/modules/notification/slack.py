@@ -34,7 +34,7 @@ options:
     description:
       - Slack integration token. This authenticates you to the slack service.
         Make sure to use the correct type of token, depending on what method you use.
-      - Webhook token:
+      - "Webhook token:
         Prior to 1.8, a token looked like C(3Ffe373sfhRE6y42Fg3rvf4GlK).  In
         1.8 and above, ansible adapts to the new slack API where tokens look
         like C(G922VJP24/D921DW937/3Ffe373sfhRE6y42Fg3rvf4GlK).  If tokens
@@ -47,12 +47,12 @@ options:
         The incoming webhooks can be added in that area.  In some cases this may
         be locked by your Slack admin and you must request access.  It is there
         that the incoming webhooks can be added.  The key is on the end of the
-        URL given to you in that section.
-      - WebAPI token:
+        URL given to you in that section."
+      - "WebAPI token:
         Slack WebAPI requires a personal, bot or work application token. These tokens start with C(xoxp-), C(xoxb-)
         or C(xoxa-), eg. C(xoxb-1234-56789abcdefghijklmnop). WebAPI token is required if you inted to receive and use
         thread_id.
-        See Slack's documentation (U(https://api.slack.com/docs/token-types)) for more information.
+        See Slack's documentation (U(https://api.slack.com/docs/token-types)) for more information."
     required: true
   msg:
     description:
