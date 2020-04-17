@@ -1,5 +1,7 @@
 automerge: true
 files:
+  changelogs/fragments/:
+    support: community
   $actions:
     labels: action
   $actions/aireos.py:
@@ -2113,8 +2115,10 @@ files:
     labels: tests
   tests/unit/:
     labels: unit
+    support: community
   tests/integration:
     labels: integration
+    support: community
   tests/utils/:
     maintainers: gundalow
     labels: unit
