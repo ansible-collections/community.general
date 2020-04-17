@@ -217,7 +217,7 @@
 - assert:
     that:
     - result is failed
-    - resutl.msg == 'Passed input \'{{ dangerous_name }}\' is potentially dangerous'
+    - result.msg == 'Passed input \'{{ dangerous_name }}\' is potentially dangerous'
 
 - name: postgresql_owner - reassign_owned_by, trust_input yes by default
   become_user: '{{ pg_user }}'
