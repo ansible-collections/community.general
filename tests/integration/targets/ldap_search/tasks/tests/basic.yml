@@ -1,0 +1,20 @@
+- debug:
+    msg: Running tests/basic.yml
+
+####################################################################
+## Search ##########################################################
+####################################################################
+- name: Test simple search for a user
+  ldap_search:
+    dn: "ou=users,dc=example,dc=com"
+    scope: "onelevel"
+    filter: "(uid=ldaptest)"
+  ignore_errors: yes
+  register: output
+
+- name: assert that test LDAP user can be found
+  assert:
+    that:
+       - output is not failed
+       - output.results | length == 1
+       - output.results.0.displayName == "LDAP Test"
