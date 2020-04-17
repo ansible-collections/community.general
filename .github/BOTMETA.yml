@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 automerge: false
 <<<<<<< HEAD
 collection_redirect: true
@@ -151,6 +152,9 @@ macros:
   team_networking: Qalthos ganeshrn trishnaguha justjais NilashishC danielmellado rohitthakur2590 GomathiselviS
   team_windows_core: nitzmahone jborean93
 =======
+=======
+automerge: true
+>>>>>>> afcf87d21f (Enable bot automerge)
 files:
   $actions:
     labels: action
