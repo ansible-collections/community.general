@@ -1,0 +1,2 @@
+bugfixes:
+- Convert MD5SUM to lowercase before comparison in maven_artifact module (https://github.com/ansible-collections/community.general/issues/186).
