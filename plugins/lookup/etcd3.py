@@ -35,8 +35,6 @@ DOCUMENTATION = '''
         port:
             description:
             - etcd3 listening client port
-            env:
-            - name: ETCDCTL_ENDPOINTS
             default: 2379
             type: int
         ca_cert:
@@ -116,6 +114,7 @@ import os
 import re
 import traceback
 
+from ansible.errors import AnsibleLookupError
 from ansible.utils.display import Display
 from ansible.plugins.lookup import LookupBase
 from ansible.module_utils.basic import missing_required_lib
@@ -125,13 +124,30 @@ try:
     import etcd3
     HAS_ETCD = True
 except ImportError:
-    ETCD_IMP_ERR = traceback.format_exc()
     HAS_ETCD = False
 
 display = Display()
 
 
+def etcd3_client(client_params):
+    etcd = None
+    try:
+        etcd = etcd3.client(**client_params)
+        etcd.status()
+    except Exception as exp:
+        raise AnsibleLookupError('Cannot connect to etcd cluster: %s' % (to_native(exp)))
+    return etcd
+
+
 class LookupModule(LookupBase):
+
+    def log_env_override(self, params, key):
+        display.verbose(
+            "Overriding etcd3 '{0}' param with ENV variable '{1}'".format(
+                to_native(key),
+                to_native(params[key])
+            )
+        )
 
     def run(self, terms, variables, **kwargs):
 
@@ -163,29 +179,24 @@ class LookupModule(LookupBase):
             'timeout': 'ETCDCTL_DIAL_TIMEOUT',
         }
 
-        def env_override(key, value):
-            client_params[key] = value
-            display.vvvvv(
-                "Overriding etcd3 '{1}' param with ENV variable '{2}'".format(
-                    key,
-                    value
-                )
-            )
         for key in etcd3_envs.keys():
             if etcd3_envs[key] in os.environ:
-                env_override(key, os.environ[etcd3_envs[key]])
+                client_params[key] = os.environ[etcd3_envs[key]]
+                self.log_env_override(client_params, key)
 
         # ETCDCTL_ENDPOINTS expects something in the form <http(s)://server:port> of <server:port>
         # so here we use a regex to extract server and port
         if 'ETCDCTL_ENDPOINTS' in os.environ:
             match = re.compile(
-                r'^(https?://)?(?P<host>(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|([\w\.]+))(:(?P<port>\d{1,5}))?/?$'
+                r'^(https?://)?(?P<host>(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|([-_\d\w\.]+))(:(?P<port>\d{1,5}))?/?$'
             ).match(os.environ['ETCDCTL_ENDPOINTS'])
             if match:
                 if match.group('host'):
-                    env_override('host', match.group('host'))
+                    client_params['host'] = match.group('host')
+                    self.log_env_override(client_params, 'host')
                 if match.group('port'):
-                    env_override('port', match.group('port'))
+                    client_params['port'] = match.group('port')
+                    self.log_env_override(client_params, 'port')
 
         # override env with optional lookup parameters
         for key in client_params.keys():
@@ -196,25 +207,24 @@ class LookupModule(LookupBase):
         # look for a key or for a key prefix ?
         prefix = kwargs.get('prefix')
 
-        try:
-            etcd = etcd3.client(**client_params)
-        except Exception as exp:
-            display.error('Cannot connect to etcd cluster: %s' % (to_native(exp)))
-            return None
+        # connect to etcd3 server
+        etcd = etcd3_client(client_params)
 
         ret = []
+        # can pass many keys to lookup
         for term in terms:
-            key = term.split()[0]
             if prefix:
                 try:
-                    for val, meta in etcd.get_prefix(key):
-                        ret.append({'key': to_native(meta.key), 'value': to_native(val)})
+                    for val, meta in etcd.get_prefix(term):
+                        if val and meta:
+                            ret.append({'key': to_native(meta.key), 'value': to_native(val)})
                 except Exception as exp:
                     display.warning('Caught except during etcd3.get_prefix: %s' % (to_native(exp)))
             else:
                 try:
-                    val, meta = etcd.get(key)
-                    ret.append({'key': to_native(meta.key), 'value': to_native(val)})
+                    val, meta = etcd.get(term)
+                    if val and meta:
+                        ret.append({'key': to_native(meta.key), 'value': to_native(val)})
                 except Exception as exp:
                     display.warning('Caught except during etcd3.get: %s' % (to_native(exp)))
         return ret
