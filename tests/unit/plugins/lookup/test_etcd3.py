@@ -28,11 +28,11 @@ class FakeKVMetadata:
 class FakeEtcd3Client(MagicMock):
 
     def get_prefix(self, key):
-        for i in range(1,4):
+        for i in range(1, 4):
             yield self.get('{0}_{1}'.format(key, i))
 
     def get(self, key):
-        return ("{} value".format(key), FakeKVMetadata(key, None))
+        return ("{0} value".format(key), FakeKVMetadata(key, None))
 
 
 class TestLookupModule(unittest.TestCase):
