@@ -9,7 +9,6 @@
   with_items:
   - alice
   - bob
-  - '{{ dangerous_name }}'
 
 - name: postgresql_owner - create test database
   become_user: '{{ pg_user }}'
@@ -232,7 +231,8 @@
 
 - assert:
     that:
-    - result is changed
+    - result is not changed
+    - result.msg is search('does not exist')
 # End of testing trust_input
 
 - name: postgresql_owner - set db owner in check_mode
