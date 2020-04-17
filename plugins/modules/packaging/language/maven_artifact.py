@@ -519,12 +519,12 @@ class MavenDownloader:
                 remote_md5 = _remote_md5
                 # remote_md5 is empty so we continue and keep original md5 string
                 # This should not happen since we check for remote_md5 before
-            except IndexError as e:
+            except IndexError:
                 pass
-            if local_md5 == remote_md5:
+            if local_md5.lower() == remote_md5.lower():
                 return None
             else:
-                return "Checksum does not match: we computed " + local_md5 + "but the repository states " + remote_md5
+                return "Checksum does not match: we computed " + local_md5 + " but the repository states " + remote_md5
 
         return "Path does not exist: " + file
 
