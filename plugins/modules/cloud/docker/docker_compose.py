@@ -16,7 +16,7 @@ DOCUMENTATION = '''
 
 module: docker_compose
 
-short_description: Manage multi-container Docker applications with Docker Compose.
+short_description: Manage multi-container Docker applications with Docker Compose
 
 
 author: "Chris Houseknecht (@chouseknecht)"
