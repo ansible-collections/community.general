@@ -1,4 +1,4 @@
-automerge: false
+automerge: true
 files:
   $actions:
     labels: action
