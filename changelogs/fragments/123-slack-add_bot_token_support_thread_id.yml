@@ -1,0 +1,6 @@
+bugfixes:
+- "slack - Fix ``thread_id`` data type"
+
+minor_changes:
+- "slack - Add support for user/bot/application tokens (using Slack WebAPI)"
+- "slack - Return ``thread_id`` with thread timestamp when user/bot/application tokens are used"

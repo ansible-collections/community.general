@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# (c) 2020, Michal Middleton <mm.404@icloud.com>
 # (c) 2017, Steve Pletcher <steve@steve-pletcher.com>
 # (c) 2016, René Moser <mail@renemoser.net>
 # (c) 2015, Stefan Berggren <nsg@nsg.cc>
@@ -17,7 +18,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
                     'supported_by': 'community'}
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 module: slack
 short_description: Send Slack notifications
 description:
@@ -31,7 +32,9 @@ options:
         be ignored.  See token documentation for information.
   token:
     description:
-      - Slack integration token.  This authenticates you to the slack service.
+      - Slack integration token. This authenticates you to the slack service.
+        Make sure to use the correct type of token, depending on what method you use.
+      - "Webhook token:
         Prior to 1.8, a token looked like C(3Ffe373sfhRE6y42Fg3rvf4GlK).  In
         1.8 and above, ansible adapts to the new slack API where tokens look
         like C(G922VJP24/D921DW937/3Ffe373sfhRE6y42Fg3rvf4GlK).  If tokens
@@ -44,7 +47,12 @@ options:
         The incoming webhooks can be added in that area.  In some cases this may
         be locked by your Slack admin and you must request access.  It is there
         that the incoming webhooks can be added.  The key is on the end of the
-        URL given to you in that section.
+        URL given to you in that section."
+      - "WebAPI token:
+        Slack WebAPI requires a personal, bot or work application token. These tokens start with C(xoxp-), C(xoxb-)
+        or C(xoxa-), eg. C(xoxb-1234-56789abcdefghijklmnop). WebAPI token is required if you inted to receive and use
+        thread_id.
+        See Slack's documentation (U(https://api.slack.com/docs/token-types)) for more information."
     required: true
   msg:
     description:
@@ -56,7 +64,8 @@ options:
       - Channel to send the message to. If absent, the message goes to the channel selected for the I(token).
   thread_id:
     description:
-      - Optional. Timestamp of message to thread this message to as a float. https://api.slack.com/docs/message-threading
+      - Optional. Timestamp of parent message to thread this message. https://api.slack.com/docs/message-threading
+    type: str
   username:
     description:
       - This is the sender of the message.
@@ -97,7 +106,7 @@ options:
     description:
       - Define a list of attachments. This list mirrors the Slack JSON API.
       - For more information, see also in the (U(https://api.slack.com/docs/attachments)).
-'''
+"""
 
 EXAMPLES = """
 - name: Send notification message via Slack
@@ -111,7 +120,7 @@ EXAMPLES = """
     token: thetoken/generatedby/slack
     msg: '{{ inventory_hostname }} completed'
     channel: '#ansible'
-    thread_id: 1539917263.000100
+    thread_id: '1539917263.000100'
     username: 'Ansible on {{ inventory_hostname }}'
     icon_url: http://www.example.com/some-image-file.png
     link_names: 0
@@ -158,6 +167,20 @@ EXAMPLES = """
   slack:
     token: thetoken/generatedby/slack
     msg: This message has &lt;brackets&gt; &amp; ampersands in plain text.
+
+- name: Initial Threaded Slack message
+  slack:
+    channel: '#ansible'
+    token: xoxb-1234-56789abcdefghijklmnop
+    msg: 'Starting a thread with my initial post.'
+  register: slack_response
+- name: Add more info to thread
+  slack:
+    channel: '#ansible'
+    token: xoxb-1234-56789abcdefghijklmnop
+    thread_id: "{{ slack_response['ts'] }}"
+    color: good
+    msg: 'And this is my threaded response!'
 """
 
 import re
@@ -167,6 +190,7 @@ from ansible.module_utils.urls import fetch_url
 
 OLD_SLACK_INCOMING_WEBHOOK = 'https://%s/services/hooks/incoming-webhook?token=%s'
 SLACK_INCOMING_WEBHOOK = 'https://hooks.slack.com/services/%s'
+SLACK_POSTMESSAGE_WEBAPI = 'https://slack.com/api/chat.postMessage'
 
 # Escaping quotes and apostrophes to avoid ending string prematurely in ansible call.
 # We do not escape other characters used as Slack metacharacters (e.g. &, <, >).
@@ -240,24 +264,40 @@ def build_payload_for_slack(module, text, channel, thread_id, username, icon_url
 
 
 def do_notify_slack(module, domain, token, payload):
+    use_webapi = False
     if token.count('/') >= 2:
-        # New style token
-        slack_incoming_webhook = SLACK_INCOMING_WEBHOOK % (token)
+        # New style webhook token
+        slack_uri = SLACK_INCOMING_WEBHOOK % (token)
+    elif re.match(r'^xox[abp]-\w+-\w+$', token):
+        slack_uri = SLACK_POSTMESSAGE_WEBAPI
+        use_webapi = True
     else:
         if not domain:
             module.fail_json(msg="Slack has updated its webhook API.  You need to specify a token of the form "
                                  "XXXX/YYYY/ZZZZ in your playbook")
-        slack_incoming_webhook = OLD_SLACK_INCOMING_WEBHOOK % (domain, token)
+        slack_uri = OLD_SLACK_INCOMING_WEBHOOK % (domain, token)
 
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
     }
-    response, info = fetch_url(module=module, url=slack_incoming_webhook, headers=headers, method='POST', data=payload)
+    if use_webapi:
+        headers['Authorization'] = 'Bearer ' + token
+
+    response, info = fetch_url(module=module, url=slack_uri, headers=headers, method='POST', data=payload)
 
     if info['status'] != 200:
-        obscured_incoming_webhook = SLACK_INCOMING_WEBHOOK % ('[obscured]')
+        if use_webapi:
+            obscured_incoming_webhook = slack_uri
+        else:
+            obscured_incoming_webhook = SLACK_INCOMING_WEBHOOK % ('[obscured]')
         module.fail_json(msg=" failed to send %s to %s: %s" % (payload, obscured_incoming_webhook, info['msg']))
+
+    # each API requires different handling
+    if use_webapi:
+        return module.from_json(response.read())
+    else:
+        return {'webhook': 'ok'}
 
 
 def main():
@@ -267,7 +307,7 @@ def main():
             token=dict(type='str', required=True, no_log=True),
             msg=dict(type='str', required=False, default=None),
             channel=dict(type='str', default=None),
-            thread_id=dict(type='float', default=None),
+            thread_id=dict(type='str', default=None),
             username=dict(type='str', default='Ansible'),
             icon_url=dict(type='str', default='https://www.ansible.com/favicon.ico'),
             icon_emoji=dict(type='str', default=None),
@@ -299,9 +339,19 @@ def main():
 
     payload = build_payload_for_slack(module, text, channel, thread_id, username, icon_url, icon_emoji, link_names,
                                       parse, color, attachments)
-    do_notify_slack(module, domain, token, payload)
+    slack_response = do_notify_slack(module, domain, token, payload)
 
-    module.exit_json(msg="OK")
+    if 'ok' in slack_response:
+        # Evaluate WebAPI response
+        if slack_response['ok']:
+            module.exit_json(changed=True, ts=slack_response['ts'], channel=slack_response['channel'],
+                             api=slack_response, payload=payload)
+        else:
+            module.fail_json(msg="Slack API error", error=slack_response['error'])
+    else:
+        # Exit with plain OK from WebHook, since we don't have more information
+        # If we get 200 from webhook, the only answer is OK
+        module.exit_json(msg="OK")
 
 
 if __name__ == '__main__':
