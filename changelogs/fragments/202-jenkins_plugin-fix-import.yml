@@ -1,0 +1,2 @@
+bugfixes:
+- jenkins_plugin - make compatible to Ansible 2.10 by fixing import.
