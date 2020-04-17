@@ -15,5 +15,6 @@
 - name: assert that test LDAP user can be found
   assert:
     that:
-       - 'not output.failed'
-       - 'output.results.0.displayName == "LDAP Test"'
+       - output is not failed
+       - output.results | length == 1
+       - output.results.0.displayName == "LDAP Test"

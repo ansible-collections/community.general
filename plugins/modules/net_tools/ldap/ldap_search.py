@@ -19,7 +19,7 @@ DOCUMENTATION = r"""
 module: ldap_search
 short_description: Search for entries in a LDAP server
 description:
-  - Return the results of an LDAP search. Use Ansible's 'register' statement.
+  - Return the results of an LDAP search.
 notes:
   - The default authentication settings will attempt to use a SASL EXTERNAL
     bind over a UNIX domain socket. This works well with the default Ubuntu
@@ -65,13 +65,13 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = r"""
-# Return all entries within the 'groups' organizational unit.
-- community.general.ldap_search:
+- name: Return all entries within the 'groups' organizational unit.
+  community.general.ldap_search:
     dn: "ou=groups,dc=example,dc=com"
   register: ldap_groups
 
-# Return GIDs for all groups
-- community.general.ldap_search:
+- name: Return GIDs for all groups
+  community.general.ldap_search:
     dn: "ou=groups,dc=example,dc=com"
     scope: "onelevel"
     attrs:
@@ -81,8 +81,8 @@ EXAMPLES = r"""
 
 import traceback
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib, BOOLEANS
-from ansible.module_utils._text import to_native, to_bytes
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils._text import to_native
 from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs
 
 LDAP_IMP_ERR = None
@@ -159,7 +159,7 @@ class LdapSearch(LdapGeneric):
         elif scope == 'children':
             self.scope = ldap.SCOPE_SUBTREE
         else:
-            self.module.fail_json(msg="scope must be one of: base, onelevel, subordinate, children")
+            raise AssertionError('Implementation error')
 
     def _load_attrs(self):
         self.attrlist = self.module.params['attrs'] or None
