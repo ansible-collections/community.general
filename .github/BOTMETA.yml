@@ -156,6 +156,8 @@ macros:
 automerge: true
 >>>>>>> afcf87d21f (Enable bot automerge)
 files:
+  changelogs/fragments/:
+    support: community
   $actions:
     labels: action
   $actions/aireos.py:
@@ -2269,8 +2271,10 @@ files:
     labels: tests
   tests/unit/:
     labels: unit
+    support: community
   tests/integration:
     labels: integration
+    support: community
   tests/utils/:
     maintainers: gundalow
     labels: unit
