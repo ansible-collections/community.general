@@ -213,6 +213,9 @@ files:
   $lookups/manifold.py:
     maintainers: galanoff
     labels: manifold
+  $lookups/nios:
+    maintainers: $team_networking sganesh-infoblox
+    labels: infoblox networking
   $lookups/passwordstore.py:
   $lookups/rabbitmq.py:
     maintainers: Im0
