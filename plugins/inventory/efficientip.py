@@ -1,6 +1,6 @@
 # -*- Mode: Python; python-indent-offset: 4 -*-
 #
-# Time-stamp: <2020-04-13 21:46:58 alex>
+# Time-stamp: <2020-04-18 16:19:07 alex>
 #
 
 """
@@ -77,7 +77,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 # example with only credentials to get the whole content of Device Manager
-plugin: efficientip
+plugin: community.general.efficientip
 api:
  - host: 192.168.16.117
  - user: admin
@@ -355,6 +355,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self._populate(adevs)
 
 #
-# ansible-test sanity --test pylint lib/ansible/plugins/inventory/efficientip.py
-# ansible-test sanity --test future-import-boilerplate lib/ansible/plugins/inventory/efficientip.py
-# ansible-test sanity --test metaclass-boilerplate lib/ansible/plugins/inventory/efficientip.py
+# ansible-test sanity --test pylint plugins/inventory/efficientip.py
+# ansible-test sanity --test future-import-boilerplate plugins/inventory/efficientip.py
+# ansible-test sanity --test metaclass-boilerplate plugins/inventory/efficientip.py
