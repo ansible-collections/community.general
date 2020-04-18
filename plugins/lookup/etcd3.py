@@ -10,9 +10,9 @@ DOCUMENTATION = '''
     author:
     - Eric Belhomme <ebelhomme@fr.scc.com>
     lookup: etcd3
-    short_description: get info from an etcd3 server
+    short_description: Get key values from etcd3 server
     description:
-    - Retrieves data from an etcd3 server.
+    - Retrieves key values and/or key prefixes from etcd3 using gRPC API.
 
     options:
         _terms:
@@ -23,61 +23,61 @@ DOCUMENTATION = '''
             required: True
         prefix:
             description:
-            - look for key or prefix key
+            - Look for key or prefix key.
             type: bool
         host:
             description:
-            - etcd3 listening client host
-            env:
-            - name: ETCDCTL_ENDPOINTS
+            - etcd3 listening client host.
             default: '127.0.0.1'
             type: str
         port:
             description:
-            - etcd3 listening client port
+            - etcd3 listening client port.
             default: 2379
             type: int
         ca_cert:
             description:
-            - etcd3 CA authority
-            default: None
+            - etcd3 CA authority.
             env:
             - name: ETCDCTL_CACERT
             type: str
         cert_cert:
             description:
-            - etcd3 client certificate
-            default: None
+            - etcd3 client certificate.
             env:
             - name: ETCDCTL_CERT
             type: str
         cert_key:
             description:
-            - etcd3 client private key
-            default: None
+            - etcd3 client private key.
             env:
             - name: ETCDCTL_KEY
             type: str
         timeout:
             description:
-            - client timeout
+            - Client timeout.
             default: 60
             env:
             - name: ETCDCTL_DIAL_TIMEOUT
             type: int
         user:
             description:
-            - auth user name
-            default: None
+            - Authentified user name.
             env:
             - name: ETCDCTL_USER
             type: str
         password:
             description:
-            - auth user password
-            default: None
+            - Authentified user password.
             env:
             - name: ETCDCTL_PASSWORD
+            type: str
+        endpoints:
+            description:
+            - Counterpart of ETCDCTL_ENDPOINTS enviroment variable.
+              Specify the etcd3 connection with and URL form or <host>:<port> form
+            env:
+            - name: ETCDCTL_ENDPOINTS
             type: str
 
     requirements:
@@ -110,15 +110,15 @@ RETURN = '''
         elements: complex
 '''
 
-import os
 import re
+import yaml
 import traceback
 
-from ansible.errors import AnsibleLookupError
-from ansible.utils.display import Display
 from ansible.plugins.lookup import LookupBase
+from ansible.utils.display import Display
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils._text import to_native
+from ansible.plugins.lookup import LookupBase
 
 try:
     import etcd3
@@ -130,7 +130,6 @@ display = Display()
 
 
 def etcd3_client(client_params):
-    etcd = None
     try:
         etcd = etcd3.client(**client_params)
         etcd.status()
@@ -141,79 +140,45 @@ def etcd3_client(client_params):
 
 class LookupModule(LookupBase):
 
-    def log_env_override(self, params, key):
-        display.verbose(
-            "Overriding etcd3 '{0}' param with ENV variable '{1}'".format(
-                to_native(key),
-                to_native(params[key])
-            )
-        )
-
     def run(self, terms, variables, **kwargs):
 
         self.set_options(var_options=variables, direct=kwargs)
+        ymldoc = yaml.safe_load(DOCUMENTATION)
 
         if not HAS_ETCD:
             display.error(missing_required_lib('etcd3'))
             return None
 
-        # get etcd3 optional args
-        client_params = {
-            'host': '127.0.0.1',
-            'port': 2379,
-            'ca_cert': None,
-            'cert_cert': None,
-            'cert_key': None,
-            'timeout': 60,
-            'user': None,
-            'password': None
-        }
+        # create the etcd3 connection parameters objet to pass to etcd3 class
+        # by copying options object and removing unneeded keys
+        client_params = dict(self._options)
+        for i in ('_terms', 'prefix', 'endpoints'):
+            if i in client_params:
+                client_params.pop(i)
 
-        # use ETCD environment variables if they are set
-        etcd3_envs = {
-            'ca_cert': 'ETCDCTL_CACERT',
-            'cert_cert': 'ETCDCTL_CERT',
-            'cert_key': 'ETCDCTL_KEY',
-            'user': 'ETCDCTL_USER',
-            'password': 'ETCDCTL_PASSWORD',
-            'timeout': 'ETCDCTL_DIAL_TIMEOUT',
-        }
-
-        for key in etcd3_envs.keys():
-            if etcd3_envs[key] in os.environ:
-                client_params[key] = os.environ[etcd3_envs[key]]
-                self.log_env_override(client_params, key)
-
-        # ETCDCTL_ENDPOINTS expects something in the form <http(s)://server:port> of <server:port>
+        # etcd3 class expects host and port as connection parameters, so endpoints
+        # must be mangled a bit to fit in this scheme.
         # so here we use a regex to extract server and port
-        if 'ETCDCTL_ENDPOINTS' in os.environ:
+        if self.get_option('endpoints'):
             match = re.compile(
                 r'^(https?://)?(?P<host>(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|([-_\d\w\.]+))(:(?P<port>\d{1,5}))?/?$'
-            ).match(os.environ['ETCDCTL_ENDPOINTS'])
+            ).match(self.get_option('endpoints'))
             if match:
-                if match.group('host'):
+                if match.group('host') and match.group('host') != ymldoc['options']['host']['default']:
                     client_params['host'] = match.group('host')
-                    self.log_env_override(client_params, 'host')
-                if match.group('port'):
+                    display.verbose("etcd3 option 'host' overriden by 'endpoint' host value: %s" % client_params['host'])
+                if match.group('port') and match.group('port') != ymldoc['options']['port']['default']:
                     client_params['port'] = match.group('port')
-                    self.log_env_override(client_params, 'port')
-
-        # override env with optional lookup parameters
-        for key in client_params.keys():
-            value = kwargs.get(key)
-            if value:
-                client_params[key] = value
-
-        # look for a key or for a key prefix ?
-        prefix = kwargs.get('prefix')
+                    display.verbose("etcd3 option 'port' overriden by 'endpoint' port value: %s" % client_params['port'])
 
         # connect to etcd3 server
+        display.verbose("etcd3 connection parameters: %s" % client_params)
         etcd = etcd3_client(client_params)
 
         ret = []
-        # can pass many keys to lookup
+        # we can pass many keys to lookup
         for term in terms:
-            if prefix:
+            if self.get_option('prefix'):
                 try:
                     for val, meta in etcd.get_prefix(term):
                         if val and meta:
