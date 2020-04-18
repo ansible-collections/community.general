@@ -71,9 +71,13 @@ author: "Franck Cuny (@fcuny)"
 '''
 
 EXAMPLES = '''
-# install Dancer perl package
+# install latest version of Dancer perl package
 - cpanm:
     name: Dancer
+
+# install Dancer 1.3513 or later Perl package
+- cpanm:
+    name: Dancer~1.3513
 
 # install version 0.99_05 of the Plack perl package
 - cpanm:
@@ -129,13 +133,16 @@ def _is_package_installed(module, name, locallib, cpanm, version):
     return res == 0
 
 
-def _build_cmd_line(name, from_path, notest, locallib, mirror, mirror_only, installdeps, cpanm, use_sudo):
+def _build_cmd_line(name, from_path, notest, locallib, mirror, mirror_only, installdeps, cpanm, version, use_sudo):
     # this code should use "%s" like everything else and just return early but not fixing all of it now.
     # don't copy stuff like this
     if from_path:
         cmd = cpanm + " " + from_path
     else:
         cmd = cpanm + " " + name
+
+        if version:
+            cmd = cmd + version
 
     if notest is True:
         cmd = cmd + " -n"
