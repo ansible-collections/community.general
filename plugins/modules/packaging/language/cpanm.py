@@ -77,7 +77,8 @@ EXAMPLES = '''
 
 # install Dancer 1.3513 or later Perl package
 - cpanm:
-    name: Dancer~1.3513
+    name: Dancer
+    version: ~1.3513
 
 # install version 0.99_05 of the Plack perl package
 - cpanm:
