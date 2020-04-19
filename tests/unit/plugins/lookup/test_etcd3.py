@@ -12,7 +12,7 @@ from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock
 from ansible.errors import AnsibleError
 from ansible_collections.community.general.plugins.lookup import etcd3
-
+from ansible.plugins.loader import lookup_loader
 
 class FakeKVMetadata:
 
@@ -39,8 +39,7 @@ class TestLookupModule(unittest.TestCase):
 
     def setUp(self):
         etcd3.HAS_ETCD = True
-        self.lookup = etcd3.LookupModule()
-        self.lookup._load_name = 'community.general.etcd3'
+        self.lookup = lookup_loader.get('community.general.etcd3')
 
     @patch('ansible_collections.community.general.plugins.lookup.etcd3.etcd3_client', FakeEtcd3Client())
     def test_key(self):
