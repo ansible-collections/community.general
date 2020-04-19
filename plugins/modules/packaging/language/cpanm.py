@@ -209,7 +209,7 @@ def main():
     installed = _is_package_installed(module, name, locallib, cpanm, version)
 
     if not installed:
-        cmd = _build_cmd_line(name, from_path, notest, locallib, mirror, mirror_only, installdeps, cpanm, use_sudo)
+        cmd = _build_cmd_line(name, from_path, notest, locallib, mirror, mirror_only, installdeps, cpanm, version, use_sudo)
 
         rc_cpanm, out_cpanm, err_cpanm = module.run_command(cmd, check_rc=False)
 
