@@ -6,18 +6,24 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+ANSIBLE_METADATA = {'metadata_version': '1.1',
+                    'status': ['preview'],
+                    'supported_by': 'community'}
+
 DOCUMENTATION = '''
     author:
     - Eric Belhomme <ebelhomme@fr.scc.com>
     lookup: etcd3
     short_description: Get key values from etcd3 server
     description:
-    - Retrieves key values and/or key prefixes from etcd3 using gRPC API.
+    - Retrieves key values and/or key prefixes from etcd3 server using its native gRPC API.
+    - Try to reuse M(etcd3) options for connection parameters, but add support for some C(ETCDCTL_*) environment variables.
+    - See U(https://github.com/etcd-io/etcd/tree/master/Documentation/op-guide) for etcd overview.
 
     options:
         _terms:
             description:
-            - The list of keys to look up on the etcd3 server.
+            - The list of keys (or key prefixes) to look up on the etcd3 server.
             type: list
             elements: str
             required: True
@@ -29,22 +35,21 @@ DOCUMENTATION = '''
         endpoints:
             description:
             - Counterpart of C(ETCDCTL_ENDPOINTS) enviroment variable.
-              Specify the etcd3 connection with and URL form eg. U(https://hostname:2379)  or C(<host>:<port>) form
-            - mutually exclusive with C(host) and C(port)
+              Specify the etcd3 connection with and URL form eg. C(https://hostname:2379)  or C(<host>:<port>) form
+            - mutually exclusive with I(host) and I(port)
             env:
             - name: ETCDCTL_ENDPOINTS
+            default: '127.0.0.1:2379'
             type: str
         host:
             description:
             - etcd3 listening client host.
-            - mutually exclusive with C(endpoints)
-            default: '127.0.0.1'
+            - mutually exclusive with I(endpoints)
             type: str
         port:
             description:
             - etcd3 listening client port.
-            - mutually exclusive with C(endpoints)
-            default: 2379
+            - mutually exclusive with I(endpoints)
             type: int
         ca_cert:
             description:
@@ -85,7 +90,10 @@ DOCUMENTATION = '''
             type: str
 
     notes:
-    - C(host, port) and C(endpoints) are mutually exclusive. Using these options together will raise an error.
+    - I(endpoints) and I(host), I(port) are mutually exclusive. Using these options together will raise an error.
+    seealso:
+    - module: etcd3
+    - lookup: etcd
 
     requirements:
     - "etcd3 >= 0.10"
@@ -168,29 +176,28 @@ class LookupModule(LookupBase):
 
         # create the etcd3 connection parameters dict to pass to etcd3 class
         client_params = {}
-        for opt in etcd3_cnx_opts:
-            if self.get_option(opt):
-                client_params[opt] = self.get_option(opt)
+
+        # 'endpoints' option is mutually exclusive with 'host' and 'port'
+        if 'endpoints' in kwargs.keys() and 'host' in kwargs.keys() or 'port' in kwargs.keys():
+            raise AnsibleError("etcd3 lookup option 'endpoints' is mutually exclusive with 'host' and 'port' options !")
 
         # etcd3 class expects host and port as connection parameters, so endpoints
         # must be mangled a bit to fit in this scheme.
         # so here we use a regex to extract server and port
-        if self.get_option('endpoints'):
+        match = re.compile(
+            r'^(https?://)?(?P<host>(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|([-_\d\w\.]+))(:(?P<port>\d{1,5}))?/?$'
+        ).match(self.get_option('endpoints'))
+        if match:
+            if match.group('host'):
+                client_params['host'] = match.group('host')
+                display.verbose("etcd3 option 'host' overriden by 'endpoint' host value: %s" % client_params['host'])
+            if match.group('port'):
+                client_params['port'] = match.group('port')
+                display.verbose("etcd3 option 'port' overriden by 'endpoint' port value: %s" % client_params['port'])
 
-            # 'endpoints' option is mutually exclusive with 'host' and 'port'
-            if 'host' in kwargs.keys() or 'port' in kwargs.keys():
-                raise AnsibleError("etcd3 lookup option 'endpoints' is mutually exclusive with 'host' and 'port' options !")
-
-            match = re.compile(
-                r'^(https?://)?(?P<host>(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|([-_\d\w\.]+))(:(?P<port>\d{1,5}))?/?$'
-            ).match(self.get_option('endpoints'))
-            if match:
-                if match.group('host'):
-                    client_params['host'] = match.group('host')
-                    display.verbose("etcd3 option 'host' overriden by 'endpoint' host value: %s" % client_params['host'])
-                if match.group('port'):
-                    client_params['port'] = match.group('port')
-                    display.verbose("etcd3 option 'port' overriden by 'endpoint' port value: %s" % client_params['port'])
+        for opt in etcd3_cnx_opts:
+            if self.get_option(opt):
+                client_params[opt] = self.get_option(opt)
 
         # connect to etcd3 server
         display.verbose("etcd3 connection parameters: %s" % client_params)
