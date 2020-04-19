@@ -204,7 +204,7 @@ class LookupModule(LookupBase):
                 client_params[opt] = self.get_option(opt)
 
         cnx_log = dict(client_params)
-        if 'password' in cnx_log.keys():
+        if 'password' in cnx_log:
             cnx_log['password'] = '<password obfuscated by Ansible>'
         display.verbose("etcd3 connection parameters: %s" % cnx_log)
 
