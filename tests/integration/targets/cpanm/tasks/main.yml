@@ -19,7 +19,7 @@
   package:
     name:
       - make
-      - {{ cpanminus_package }}
+      - "{{ cpanminus_package }}"
     state: present
   become: yes
 
