@@ -1,2 +1,2 @@
-bugfix:
+bugfixes:
   - cpanm - honor and install specified version
