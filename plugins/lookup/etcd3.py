@@ -35,8 +35,9 @@ DOCUMENTATION = '''
         endpoints:
             description:
             - Counterpart of C(ETCDCTL_ENDPOINTS) enviroment variable.
-              Specify the etcd3 connection with and URL form eg. C(https://hostname:2379)  or C(<host>:<port>) form
-            - mutually exclusive with I(host) and I(port)
+              Specify the etcd3 connection with and URL form eg. C(https://hostname:2379)  or C(<host>:<port>) form.
+            - The C(host) part is overwritten by I(host) option, if defined.
+            - The C(port) part is overwritten by I(port) option, if defined.
             env:
             - name: ETCDCTL_ENDPOINTS
             default: '127.0.0.1:2379'
@@ -44,12 +45,12 @@ DOCUMENTATION = '''
         host:
             description:
             - etcd3 listening client host.
-            - mutually exclusive with I(endpoints)
+            - Takes precedence over I(endpoints).
             type: str
         port:
             description:
             - etcd3 listening client port.
-            - mutually exclusive with I(endpoints)
+            - Takes precedence over I(endpoints).
             type: int
         ca_cert:
             description:
@@ -90,10 +91,12 @@ DOCUMENTATION = '''
             type: str
 
     notes:
-    - I(endpoints) and I(host), I(port) are mutually exclusive. Using these options together will raise an error.
+    - I(host) and I(port) options take precedence over (endpoints) option.
+    - The recommanded way to connect to etcd3 server is using C(ETCDCTL_ENDPOINT)
+      environment variable and keep I(endpoints), I(host), and I(port) unused.
     seealso:
     - module: etcd3
-    - lookup: etcd
+    - ref: etcd_lookup
 
     requirements:
     - "etcd3 >= 0.10"
@@ -122,7 +125,14 @@ RETURN = '''
         description:
         - List of keys and associated values.
         type: list
-        elements: complex
+        elements: dict
+        contains:
+            key:
+                description: The element's key.
+                type: str
+            value:
+                description: The element's value.
+                type: str
 '''
 
 import re
@@ -177,10 +187,6 @@ class LookupModule(LookupBase):
         # create the etcd3 connection parameters dict to pass to etcd3 class
         client_params = {}
 
-        # 'endpoints' option is mutually exclusive with 'host' and 'port'
-        if 'endpoints' in kwargs.keys() and 'host' in kwargs.keys() or 'port' in kwargs.keys():
-            raise AnsibleError("etcd3 lookup option 'endpoints' is mutually exclusive with 'host' and 'port' options !")
-
         # etcd3 class expects host and port as connection parameters, so endpoints
         # must be mangled a bit to fit in this scheme.
         # so here we use a regex to extract server and port
@@ -190,17 +196,19 @@ class LookupModule(LookupBase):
         if match:
             if match.group('host'):
                 client_params['host'] = match.group('host')
-                display.verbose("etcd3 option 'host' overriden by 'endpoint' host value: %s" % client_params['host'])
             if match.group('port'):
                 client_params['port'] = match.group('port')
-                display.verbose("etcd3 option 'port' overriden by 'endpoint' port value: %s" % client_params['port'])
 
         for opt in etcd3_cnx_opts:
             if self.get_option(opt):
                 client_params[opt] = self.get_option(opt)
 
+        cnx_log = dict(client_params)
+        if 'password' in cnx_log.keys():
+            cnx_log['password'] = '<password obfuscated by Ansible>'
+        display.verbose("etcd3 connection parameters: %s" % cnx_log)
+
         # connect to etcd3 server
-        display.verbose("etcd3 connection parameters: %s" % client_params)
         etcd = etcd3_client(client_params)
 
         ret = []
