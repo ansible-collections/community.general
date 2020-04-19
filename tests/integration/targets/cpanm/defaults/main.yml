@@ -1,0 +1,1 @@
+cpanminus_package: "{{ 'perl-App-cpanminus' if ansible_os_family == 'RedHat' else 'cpanminus' }}"
