@@ -205,7 +205,7 @@ class LookupModule(LookupBase):
 
         cnx_log = dict(client_params)
         if 'password' in cnx_log:
-            cnx_log['password'] = '<password obfuscated by Ansible>'
+            cnx_log['password'] = '<redacted>'
         display.verbose("etcd3 connection parameters: %s" % cnx_log)
 
         # connect to etcd3 server
