@@ -25,14 +25,25 @@ DOCUMENTATION = '''
             description:
             - Look for key or prefix key.
             type: bool
+            default: False
+        endpoints:
+            description:
+            - Counterpart of C(ETCDCTL_ENDPOINTS) enviroment variable.
+              Specify the etcd3 connection with and URL form eg. U(https://hostname:2379)  or C(<host>:<port>) form
+            - mutually exclusive with C(host) and C(port)
+            env:
+            - name: ETCDCTL_ENDPOINTS
+            type: str
         host:
             description:
             - etcd3 listening client host.
+            - mutually exclusive with C(endpoints)
             default: '127.0.0.1'
             type: str
         port:
             description:
             - etcd3 listening client port.
+            - mutually exclusive with C(endpoints)
             default: 2379
             type: int
         ca_cert:
@@ -72,13 +83,9 @@ DOCUMENTATION = '''
             env:
             - name: ETCDCTL_PASSWORD
             type: str
-        endpoints:
-            description:
-            - Counterpart of ETCDCTL_ENDPOINTS enviroment variable.
-              Specify the etcd3 connection with and URL form or <host>:<port> form
-            env:
-            - name: ETCDCTL_ENDPOINTS
-            type: str
+
+    notes:
+    - C(host, port) and C(endpoints) are mutually exclusive. Using these options together will raise an error.
 
     requirements:
     - "etcd3 >= 0.10"
@@ -111,14 +118,13 @@ RETURN = '''
 '''
 
 import re
-import yaml
 
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
 from ansible.module_utils.basic import missing_required_lib
 from ansible.module_utils._text import to_native
 from ansible.plugins.lookup import LookupBase
-from ansible.errors import AnsibleLookupError
+from ansible.errors import AnsibleError, AnsibleLookupError
 
 try:
     import etcd3
@@ -127,6 +133,18 @@ except ImportError:
     HAS_ETCD = False
 
 display = Display()
+
+etcd3_cnx_opts = (
+    'host',
+    'port',
+    'ca_cert',
+    'cert_key',
+    'cert_cert',
+    'timeout',
+    'user',
+    'password',
+    # 'grpc_options' Etcd3Client() option currently not supported by lookup module (maybe in future ?)
+)
 
 
 def etcd3_client(client_params):
@@ -143,31 +161,34 @@ class LookupModule(LookupBase):
     def run(self, terms, variables, **kwargs):
 
         self.set_options(var_options=variables, direct=kwargs)
-        ymldoc = yaml.safe_load(DOCUMENTATION)
 
         if not HAS_ETCD:
             display.error(missing_required_lib('etcd3'))
             return None
 
-        # create the etcd3 connection parameters objet to pass to etcd3 class
-        # by copying options object and removing unneeded keys
-        client_params = dict(self._options)
-        for i in ('_terms', 'prefix', 'endpoints'):
-            if i in client_params:
-                client_params.pop(i)
+        # create the etcd3 connection parameters dict to pass to etcd3 class
+        client_params = {}
+        for opt in etcd3_cnx_opts:
+            if self.get_option(opt):
+                client_params[opt] = self.get_option(opt)
 
         # etcd3 class expects host and port as connection parameters, so endpoints
         # must be mangled a bit to fit in this scheme.
         # so here we use a regex to extract server and port
         if self.get_option('endpoints'):
+
+            # 'endpoints' option is mutually exclusive with 'host' and 'port'
+            if 'host' in kwargs.keys() or 'port' in kwargs.keys():
+                raise AnsibleError("etcd3 lookup option 'endpoints' is mutually exclusive with 'host' and 'port' options !")
+
             match = re.compile(
                 r'^(https?://)?(?P<host>(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|([-_\d\w\.]+))(:(?P<port>\d{1,5}))?/?$'
             ).match(self.get_option('endpoints'))
             if match:
-                if match.group('host') and match.group('host') != ymldoc['options']['host']['default']:
+                if match.group('host'):
                     client_params['host'] = match.group('host')
                     display.verbose("etcd3 option 'host' overriden by 'endpoint' host value: %s" % client_params['host'])
-                if match.group('port') and match.group('port') != ymldoc['options']['port']['default']:
+                if match.group('port'):
                     client_params['port'] = match.group('port')
                     display.verbose("etcd3 option 'port' overriden by 'endpoint' port value: %s" % client_params['port'])
 
