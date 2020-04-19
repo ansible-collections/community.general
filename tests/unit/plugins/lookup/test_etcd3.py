@@ -14,6 +14,7 @@ from ansible.errors import AnsibleError
 from ansible_collections.community.general.plugins.lookup import etcd3
 from ansible.plugins.loader import lookup_loader
 
+
 class FakeKVMetadata:
 
     def __init__(self, keyvalue, header):
