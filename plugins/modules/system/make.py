@@ -117,9 +117,9 @@ def main():
         ),
         supports_check_mode=True,
     )
-    
+
     make_path = module.params['make']
-    if make_path is None: 
+    if make_path is None:
         # Build up the invocation of `make` we are going to use
         # For non-Linux OSes, prefer gmake (GNU make) over make
         make_path = module.get_bin_path('gmake', required=False)
