@@ -77,3 +77,26 @@
 - assert:
     that:
       - result is failed
+
+########################
+# Test trust_input param
+
+- name: Verify trust_input parameter
+  become_user: "{{ pg_user }}"
+  become: yes
+  postgresql_privs:
+    db: "{{ db_session_role1 }}"
+    type: table
+    objs: test2
+    roles: "{{ db_session_role1 }}"
+    login_user: "{{ pg_user }}"
+    privs: update
+    session_role: "{{ dangerous_name }}"
+    trust_input: no
+  ignore_errors: yes
+  register: result
+
+- assert:
+    that:
+      - result is failed
+      - result.msg == 'Passed input \'{{ dangerous_name }}\' is potentially dangerous'

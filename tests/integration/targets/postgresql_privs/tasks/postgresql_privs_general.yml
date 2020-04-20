@@ -62,6 +62,7 @@
     type: table
     objs: test_view
     roles: "{{ db_user2 }}"
+    trust_input: no
   check_mode: yes
   register: result
 
