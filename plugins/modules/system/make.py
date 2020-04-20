@@ -41,7 +41,7 @@ options:
     type: path
   make:
     description:
-      - Use a specific make binary
+      - Use a specific make binary.
     type: path
 '''
 
