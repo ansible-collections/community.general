@@ -286,7 +286,9 @@ EXAMPLES = """
 import base64
 import json
 import sys
-import urllib
+
+from ansible.module_utils.six.moves.urllib.request import pathname2url
+
 from ansible.module_utils._text import to_text, to_bytes
 
 from ansible.module_utils.basic import AnsibleModule
@@ -401,10 +403,10 @@ def fetch(restbase, user, passwd, params):
 
 
 def search(restbase, user, passwd, params):
-    url = restbase + '/search?jql=' + urllib.request.pathname2url(params['jql'])
+    url = restbase + '/search?jql=' + pathname2url(params['jql'])
     if params['fields']:
         fields = params['fields'].keys()
-        url = url + '&fields=' + '&fields='.join([urllib.request.pathname2url(f) for f in fields])
+        url = url + '&fields=' + '&fields='.join([pathname2url(f) for f in fields])
     if params['maxresults']:
         url = url + '&maxResults=' + str(params['maxresults'])
     ret = get(url, user, passwd, params['timeout'])
