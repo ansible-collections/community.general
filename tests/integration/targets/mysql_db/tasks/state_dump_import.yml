@@ -157,6 +157,7 @@
     state: import
     target: '{{ db_file_name }}'
     login_unix_socket: '{{ mysql_socket }}'
+    use_shell: yes
   register: result
 
 - name: show the tables
@@ -174,6 +175,7 @@
     state: import
     target: '{{ dump_file1 }}'
     login_unix_socket: '{{ mysql_socket }}'
+    use_shell: no
   register: import_result
 
 - name: assert output message restored a database from dump file1
