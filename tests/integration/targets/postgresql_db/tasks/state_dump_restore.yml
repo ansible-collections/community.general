@@ -140,6 +140,77 @@
        - "'47' in result.stdout"
        - "'Joe Smith' in result.stdout"
 
+############################
+# 1. Test trust_input parameter
+# 2. Test db name containing dots
+
+- name: state dump/restore - create database, trust_input no
+  become: yes
+  become_user: "{{ pg_user }}"
+  postgresql_db:
+    state: present
+    name: "{{ suspicious_db_name }}"
+    owner: "{{ db_user1 }}"
+    login_user: "{{ pg_user }}"
+    trust_input: no
+  register: result
+  ignore_errors: yes
+
+- assert:
+    that:
+    - result is failed
+    - result.msg == 'Passed input \'{{ suspicious_db_name }}\' is potentially dangerous'
+
+- name: state dump/restore - create database, trust_input yes explicitly
+  become: yes
+  become_user: "{{ pg_user }}"
+  postgresql_db:
+    state: present
+    name: "{{ suspicious_db_name }}"
+    owner: "{{ db_user1 }}"
+    login_user: "{{ pg_user }}"
+    trust_input: yes
+  register: result
+
+- assert:
+    that:
+    - result is changed
+
+- name: test state=restore to restore the database (expect changed=true)
+  become: yes
+  become_user: "{{ pg_user }}"
+  postgresql_db:
+    name: "{{ db_name_with_dot }}"
+    target: "{{ db_file_name }}"
+    owner: "{{ db_user1 }}"
+    login_user: '{{(test_fixture == "user")|ternary(db_user1, pg_user)}}'
+    target_opts: '{{(test_fixture == "user")|ternary("-n public", omit)}}'
+    login_host:  '{{(test_fixture == "user")|ternary("localhost", omit)}}'
+    login_password: '{{(test_fixture == "user")|ternary("password", omit)}}'
+    state: restore
+  register: result
+
+- name: assert output message restore the database
+  assert:
+    that:
+    - result is changed
+
+- name: state dump/restore - remove databases
+  become: yes
+  become_user: "{{ pg_user }}"
+  postgresql_db:
+    state: absent
+    name: "{{ db_name_with_dot }}"
+    owner: "{{ db_user1 }}"
+    login_user: "{{ pg_user }}"
+    trust_input: yes
+  register: result
+
+- assert:
+    that:
+    - result is changed
+
+# Clean up
 - name: state dump/restore - remove database name
   postgresql_db:
     name: "{{ db_name }}"
