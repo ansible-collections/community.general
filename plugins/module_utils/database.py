@@ -191,6 +191,9 @@ def check_input(module, *args):
                 if is_input_dangerous(e):
                     dangerous_elements.append(e)
 
+        elif elem is None or isinstance(elem, bool):
+            pass
+
         else:
             elem = str(elem)
             if is_input_dangerous(elem):
