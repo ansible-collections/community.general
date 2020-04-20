@@ -1,0 +1,2 @@
+minor_changes:
+- postgresql_privs - add the ``trust_input`` parameter (https://github.com/ansible-collections/community.general/pull/177).
