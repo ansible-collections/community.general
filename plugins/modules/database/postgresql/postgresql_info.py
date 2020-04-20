@@ -46,6 +46,7 @@ options:
     - It makes sense to use C(yes) only when SQL injections via I(session_role) are possible.
     type: bool
     default: yes
+    version_added: '1.0.0'
 seealso:
 - module: postgresql_ping
 author:

@@ -136,6 +136,7 @@ options:
     - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
     type: bool
     default: yes
+    version_added: '1.0.0'
 notes:
 - If you do not pass db parameter, sequence will be created in the database
   named postgres.

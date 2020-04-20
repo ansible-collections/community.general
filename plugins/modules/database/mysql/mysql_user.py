@@ -107,6 +107,7 @@ options:
         C(MAX_CONNECTIONS_PER_HOUR: num), C(MAX_USER_CONNECTIONS: num)."
       - Used when I(state=present), ignored otherwise.
     type: dict
+    version_added: '1.0.0'
 
 notes:
    - "MySQL server installs with default login_user of 'root' and no password. To secure this user

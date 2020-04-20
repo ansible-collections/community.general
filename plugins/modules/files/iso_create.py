@@ -15,8 +15,9 @@ short_description: Generate ISO file with specified files or folders
 description:
     - This module is used to generate ISO file with specified path of files.
 author:
-    - Diane Wang(@Tomorrow9) <dianew@vmware.com>
+    - Diane Wang (@Tomorrow9) <dianew@vmware.com>
 requirements: ["pycdlib", "python >= 2.7"]
+version_added: '1.0.0'
 
 options:
    src_files:

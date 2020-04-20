@@ -118,6 +118,7 @@ options:
     required: no
     type: bool
     default: no
+    version_added: '1.0.0'
   unsafe_login_password:
     description:
       - If C(no), the module will safely use a shell-escaped version of the I(login_password) value.
@@ -125,6 +126,7 @@ options:
       - Used only when I(state) is C(import) or C(dump) and I(login_password) is passed, ignored otherwise.
     type: bool
     default: no
+    version_added: '1.0.0'
   restrict_config_file:
     description:
       - Read only passed I(config_file).
@@ -134,12 +136,14 @@ options:
       - If this behavior is undesirable, use C(yes) to read only named option file.
     type: bool
     default: no
+    version_added: '1.0.0'
   check_implicit_admin:
     description:
       - Check if mysql allows login as root/nopassword before trying supplied credentials.
       - If success, passed I(login_user)/I(login_password) will be ignored.
     type: bool
     default: no
+    version_added: '1.0.0'
 
 seealso:
 - module: mysql_info

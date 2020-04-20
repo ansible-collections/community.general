@@ -12,6 +12,7 @@ DOCUMENTATION = r'''
 ---
 module: dpkg_divert
 short_description: Override a debian package's version of a file
+version_added: '1.0.0'
 author:
   - quidame (@quidame)
 description:

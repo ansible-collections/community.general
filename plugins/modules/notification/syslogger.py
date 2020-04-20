@@ -38,6 +38,7 @@ options:
             - Specify the name of application name which is sending the log to syslog.
         type: str
         default: 'ansible_syslogger'
+        version_added: '1.0.0'
 author:
     - Tim Rightnour (@garbled1)
 '''
@@ -67,6 +68,7 @@ ident:
   returned: always
   type: str
   sample: "ansible_syslogger"
+  version_added: '1.0.0'
 priority:
   description: Priority level
   returned: always

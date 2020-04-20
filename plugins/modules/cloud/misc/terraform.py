@@ -55,6 +55,7 @@ options:
     description:
       - The path to a variables file for Terraform to fill into the TF
         configurations. This can accept a list of paths to multiple variables files.
+      - Up until Ansible 2.9, this option was usable as I(variables_file).
     type: list
     elements: path
     aliases: [ 'variables_file' ]
@@ -91,6 +92,7 @@ options:
         This can accept a list of paths to multiple configuration files.
     type: list
     elements: path
+    version_added: '1.0.0'
 notes:
    - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]

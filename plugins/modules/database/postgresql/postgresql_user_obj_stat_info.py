@@ -46,6 +46,7 @@ options:
     - It only makes sense to use C(no) only when SQL injections via I(session_role) are possible.
     type: bool
     default: yes
+    version_added: '1.0.0'
 
 notes:
 - C(size) and C(total_size) returned values are presented in bytes.

@@ -94,7 +94,7 @@ options:
     description:
      - If specified and the partition does not exist, will set filesystem type to given partition.
     type: str
-    version_added: '2.10'
+    version_added: '1.0.0'
 notes:
   - When fetching information about a new disk and when the version of parted
     installed on the system is before version 3.1, the module queries the kernel

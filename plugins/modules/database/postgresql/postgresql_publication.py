@@ -64,6 +64,7 @@ options:
     - Permissions checking for SQL commands is carried out as though
       the session_role were the one that had logged in originally.
     type: str
+    version_added: '1.0.0'
   trust_input:
     description:
     - If C(no), check whether values of parameters I(name), I(tables), I(owner),
@@ -71,6 +72,7 @@ options:
     - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
     type: bool
     default: yes
+    version_added: '1.0.0'
 notes:
 - PostgreSQL version must be 10 or greater.
 seealso:

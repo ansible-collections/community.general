@@ -11,6 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: ldap_search
+version_added: '1.0.0'
 short_description: Search for entries in a LDAP server
 description:
   - Return the results of an LDAP search.

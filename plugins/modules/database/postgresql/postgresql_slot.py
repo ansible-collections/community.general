@@ -72,6 +72,7 @@ options:
     - It sense to use C(no) only when SQL injections via I(session_role) are possible.
     type: bool
     default: yes
+    version_added: '1.0.0'
 
 notes:
 - Physical replication slots were introduced to PostgreSQL with version 9.4,

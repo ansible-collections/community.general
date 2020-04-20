@@ -9,6 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
     author:
     - Eric Belhomme <ebelhomme@fr.scc.com>
+    version_added: '1.0.0'
     lookup: etcd3
     short_description: Get key values from etcd3 server
     description:
