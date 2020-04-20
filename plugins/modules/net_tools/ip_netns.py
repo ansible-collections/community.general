@@ -48,6 +48,7 @@ EXAMPLES = '''
   ip_netns:
     name: mario
     state: present
+
 - name: Delete a namespace named luigi
   ip_netns:
     name: luigi
