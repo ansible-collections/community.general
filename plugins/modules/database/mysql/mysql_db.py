@@ -109,6 +109,14 @@ options:
         Used when I(state=dump) only, ignored otherwise.
     required: no
     type: str
+  use_shell:
+    description:
+      - Used to prevent C(Broken pipe) errors when the imported I(target) file is compressed.
+      - If C(yes), the module will internally execute commands via a shell.
+      - Used when I(state=import), ignored otherwise.
+    required: no
+    type: bool
+    default: no
 seealso:
 - module: mysql_info
 - module: mysql_variables
@@ -361,7 +369,8 @@ def db_dump(module, host, user, password, db_name, target, all_databases, port,
 
 
 def db_import(module, host, user, password, db_name, target, all_databases, port, config_file,
-              socket=None, ssl_cert=None, ssl_key=None, ssl_ca=None, encoding=None, force=False):
+              socket=None, ssl_cert=None, ssl_key=None, ssl_ca=None, encoding=None, force=False,
+              use_shell=False):
     if not os.path.exists(target):
         return module.fail_json(msg="target %s does not exist on the host" % target)
 
@@ -400,18 +409,31 @@ def db_import(module, host, user, password, db_name, target, all_databases, port
     elif os.path.splitext(target)[-1] == '.xz':
         comp_prog_path = module.get_bin_path('xz', required=True)
     if comp_prog_path:
-        # The line above is for returned data only:
-        executed_commands.append('%s -dc %s | %s' % (comp_prog_path, target, ' '.join(cmd)))
-        p1 = subprocess.Popen([comp_prog_path, '-dc', target], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        p2 = subprocess.Popen(cmd, stdin=p1.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (stdout2, stderr2) = p2.communicate()
-        p1.stdout.close()
-        p1.wait()
-        if p1.returncode != 0:
-            stderr1 = p1.stderr.read()
-            return p1.returncode, '', stderr1
+        # The line below is for returned data only:
+        executed_commands.append('%s -dc %s | %s' % (comp_prog_path, target, cmd))
+
+        if not use_shell:
+            p1 = subprocess.Popen([comp_prog_path, '-dc', target], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p2 = subprocess.Popen(cmd, stdin=p1.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            (stdout2, stderr2) = p2.communicate()
+            p1.stdout.close()
+            p1.wait()
+
+            if p1.returncode != 0:
+                stderr1 = p1.stderr.read()
+                return p1.returncode, '', stderr1
+            else:
+                return p2.returncode, stdout2, stderr2
         else:
-            return p2.returncode, stdout2, stderr2
+            # Used to prevent 'Broken pipe' errors that
+            # occasionaly occur when target files are compressed.
+            # FYI: passing the `shell=True` argument to p2 = subprocess.Popen()
+            # doesn't solve the problem.
+            cmd = " ".join(cmd)
+            cmd = "%s -dc %s | %s" % (comp_prog_path, shlex_quote(target), cmd)
+            rc, stdout, stderr = module.run_command(cmd, use_unsafe_shell=True)
+            return rc, stdout, stderr
+
     else:
         cmd = ' '.join(cmd)
         cmd += " < %s" % shlex_quote(target)
@@ -473,6 +495,7 @@ def main():
             master_data=dict(type='int', default=0, choices=[0, 1, 2]),
             skip_lock_tables=dict(type='bool', default=False),
             dump_extra_args=dict(type='str'),
+            use_shell=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )
@@ -512,6 +535,7 @@ def main():
     master_data = module.params["master_data"]
     skip_lock_tables = module.params["skip_lock_tables"]
     dump_extra_args = module.params["dump_extra_args"]
+    use_shell = module.params["use_shell"]
 
     if len(db) > 1 and state == 'import':
         module.fail_json(msg="Multiple databases are not supported with state=import")
@@ -597,7 +621,8 @@ def main():
                                        login_password, db, target,
                                        all_databases,
                                        login_port, config_file,
-                                       socket, ssl_cert, ssl_key, ssl_ca, encoding, force)
+                                       socket, ssl_cert, ssl_key, ssl_ca,
+                                       encoding, force, use_shell)
         if rc != 0:
             module.fail_json(msg="%s" % stderr)
         module.exit_json(changed=True, db=db_name, db_list=db, msg=stdout,
