@@ -44,7 +44,6 @@ options:
 '''
 
 EXAMPLES = '''
-# Create a namespace named mario
 - name: Create a namespace named mario
   ip_netns:
     name: mario
