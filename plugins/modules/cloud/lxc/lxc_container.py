@@ -706,14 +706,7 @@ class LxcContainerManagement(object):
         with open(container_config_file, 'rb') as f:
             container_config = to_text(f.read(), errors='surrogate_or_strict').splitlines(True)
 
-        # Note used ast literal_eval because AnsibleModule does not provide for
-        # adequate dictionary parsing.
-        # Issue: https://github.com/ansible/ansible/issues/7679
-        # TODO(cloudnull) adjust import when issue has been resolved.
-        import ast
-        options_dict = ast.literal_eval(_container_config)
-        parsed_options = [i.split('=', 1) for i in options_dict]
-
+        parsed_options = [i.split('=', 1) for i in _container_config]
         config_change = False
         for key, value in parsed_options:
             key = key.strip()
@@ -1700,7 +1693,7 @@ def main():
                 type='str'
             ),
             container_config=dict(
-                type='str'
+                type='list'
             ),
             container_log=dict(
                 type='bool',
