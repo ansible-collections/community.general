@@ -1693,7 +1693,8 @@ def main():
                 type='str'
             ),
             container_config=dict(
-                type='list'
+                type='list',
+                elements='str'
             ),
             container_log=dict(
                 type='bool',
