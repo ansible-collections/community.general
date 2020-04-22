@@ -48,7 +48,7 @@ options:
     - Unhashed password will automatically be hashed when saved into the
       database if C(encrypted) parameter is set, otherwise it will be save in
       plain text format.
-    - When passing a hashed password it must be generated with the format
+    - When passing an MD5-hashed password it must be generated with the format
       C('str["md5"] + md5[ password + username ]'), resulting in a total of
       35 characters. An easy way to do this is C(echo "md5$(echo -n
       'verysecretpasswordJOE' | md5sum | awk '{print $1}')").
@@ -157,6 +157,8 @@ notes:
   Use NOLOGIN role_attr_flags to change this behaviour.
 - If you specify PUBLIC as the user (role), then the privilege changes will apply to all users (roles).
   You may not specify password or role_attr_flags when the PUBLIC user is specified.
+- SCRAM-SHA-256-hashed passwords (SASL Authentication) require PostgreSQL version 10 or newer.
+  On the previous versions the whole hashed string will be used as a password.
 seealso:
 - module: postgresql_privs
 - module: postgresql_membership
@@ -164,6 +166,9 @@ seealso:
 - name: PostgreSQL database roles
   description: Complete reference of the PostgreSQL database roles documentation.
   link: https://www.postgresql.org/docs/current/user-manag.html
+- name: PostgreSQL SASL Authentication
+  description: Complete reference of the PostgreSQL SASL Authentication.
+  link: https://www.postgresql.org/docs/current/sasl-authentication.html
 author:
 - Ansible Core Team
 extends_documentation_fragment:
@@ -232,6 +237,15 @@ EXAMPLES = r'''
     groups:
     - user_ro
     - user_rw
+
+# Create user with a cleartext password if it does not exist or update its password.
+# The password will be encrypted with SCRAM algorithm (available since PostgreSQL 10)
+- name: Create appclient user with SCRAM-hashed password
+  postgresql_user:
+    name: appclient
+    password: "secret123"
+  environment:
+    PGOPTIONS: "-c password_encryption=scram-sha-256"
 '''
 
 RETURN = r'''
@@ -245,7 +259,9 @@ queries:
 import itertools
 import re
 import traceback
-from hashlib import md5
+from hashlib import md5, sha256
+import hmac
+from base64 import b64decode
 
 try:
     import psycopg2
@@ -267,12 +283,23 @@ from ansible_collections.community.general.plugins.module_utils.postgres import 
     PgMembership,
     postgres_common_argument_spec,
 )
-from ansible.module_utils._text import to_bytes, to_native
+from ansible.module_utils._text import to_bytes, to_native, to_text
 from ansible.module_utils.six import iteritems
+import ansible_collections.community.general.plugins.module_utils.saslprep as saslprep
+
+try:
+    # pbkdf2_hmac is missing on python 2.6, we can safely assume,
+    # that postresql 10 capable instance have at least python 2.7 installed
+    from hashlib import pbkdf2_hmac
+    pbkdf2_found = True
+except ImportError:
+    pbkdf2_found = False
 
 
 FLAGS = ('SUPERUSER', 'CREATEROLE', 'CREATEDB', 'INHERIT', 'LOGIN', 'REPLICATION')
 FLAGS_BY_VERSION = {'BYPASSRLS': 90500}
+
+SCRAM_SHA256_REGEX = r'^SCRAM-SHA-256\$(\d+):([A-Za-z0-9+\/=]+)\$([A-Za-z0-9+\/=]+):([A-Za-z0-9+\/=]+)$'
 
 VALID_PRIVS = dict(table=frozenset(('SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER', 'ALL')),
                    database=frozenset(
@@ -350,6 +377,39 @@ def user_should_we_change_password(current_role_attrs, user, password, encrypted
         if password == '':
             if current_role_attrs['rolpassword'] is not None:
                 pwchanging = True
+
+        # SCRAM hashes are represented as a special object, containing hash data:
+        # `SCRAM-SHA-256$<iteration count>:<salt>$<StoredKey>:<ServerKey>`
+        # for reference, see https://www.postgresql.org/docs/current/catalog-pg-authid.html
+        elif current_role_attrs['rolpassword'] is not None \
+                and pbkdf2_found \
+                and re.match(SCRAM_SHA256_REGEX, current_role_attrs['rolpassword']):
+
+            r = re.match(SCRAM_SHA256_REGEX, current_role_attrs['rolpassword'])
+            try:
+                # extract SCRAM params from rolpassword
+                it = int(r.group(1))
+                salt = b64decode(r.group(2))
+                server_key = b64decode(r.group(4))
+                # we'll never need `storedKey` as it is only used for server auth in SCRAM
+                # storedKey = b64decode(r.group(3))
+
+                # from RFC5802 https://tools.ietf.org/html/rfc5802#section-3
+                # SaltedPassword  := Hi(Normalize(password), salt, i)
+                # ServerKey       := HMAC(SaltedPassword, "Server Key")
+                normalized_password = saslprep.saslprep(to_text(password))
+                salted_password = pbkdf2_hmac('sha256', to_bytes(normalized_password), salt, it)
+
+                server_key_verifier = hmac.new(salted_password, digestmod=sha256)
+                server_key_verifier.update(b'Server Key')
+
+                if server_key_verifier.digest() != server_key:
+                    pwchanging = True
+            except Exception:
+                # We assume the password is not scram encrypted
+                # or we cannot check it properly, e.g. due to missing dependencies
+                pwchanging = True
+
         # 32: MD5 hashes are represented as a sequence of 32 hexadecimal digits
         #  3: The size of the 'md5' prefix
         # When the provided password looks like a MD5-hash, value of
