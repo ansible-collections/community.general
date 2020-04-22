@@ -24,6 +24,12 @@
     state: present
   become: yes
 
+- name: Install perl development package for Red Hat family
+  package:
+    name: perl-devel
+    state: present
+  when: ansible_os_family == "RedHat"
+
 - name: Install cpanminus
   raw: "curl -L http://cpanmin.us | sudo perl - --sudo App::cpanminus"
 
