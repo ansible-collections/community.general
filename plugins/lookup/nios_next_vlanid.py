@@ -79,43 +79,43 @@ from ansible.errors import AnsibleError
 class LookupModule(LookupBase):
 
     def run(self, terms, variables=None, **kwargs):
-      vlanview_name = kwargs.get('view', 'default')
-      num = kwargs.get('num', 1)
-      exclude_vlan = kwargs.get('exclude', [])
-      provider = kwargs.pop('provider', {})
+        vlanview_name = kwargs.get('view', 'default')
+        num = kwargs.get('num', 1)
+        exclude_vlan = kwargs.get('exclude', [])
+        provider = kwargs.pop('provider', {})
 
-      if terms:
-        vlanrange_name = terms[0]
-      else:
-        vlanrange_name = None
-
-      # VLAN functionality requires API version >=2.10
-      # provider.update({'wapi_version' : '2.10' })
-
-      wapi = WapiLookup(provider)
-      
-      vlanview_obj = wapi.get_object('vlanview', {'name': vlanview_name})
-      vlanview_ref = vlanview_obj[0].get('_ref')      
-      vlanrange_ref = None
-
-      if vlanrange_name:
-        vlanrange_obj = wapi.get_object('vlanrange', {'name': vlanrange_name})
-        if vlanrange_obj is None:
-          raise AnsibleError('Unable to find vlanrange object %s' % vlanrange_name)
-        if len(vlanrange_obj) > 1:
-          for obj in vlanrange_obj:
-            if obj['vlan_view']['_ref'] == vlanview_ref:
-              vlanrange_ref = obj.get('_ref')
+        if terms:
+            vlanrange_name = terms[0]
         else:
-          vlanrange_ref = vlanrange_obj[0].get('_ref')            
+            vlanrange_name = None
 
-      if vlanrange_ref:
-        ref = vlanrange_ref
-      else: 
-        ref = vlanview_ref
+        # VLAN functionality requires API version >=2.10
+        # provider.update({'wapi_version' : '2.10' })
 
-      try:
-          avail_vlans = wapi.call_func('next_available_vlan_id', ref, {'num': num, 'exclude': exclude_vlan})
-          return [avail_vlans['vlan_ids']]
-      except Exception as exc:
-          raise AnsibleError(to_text(exc))
+        wapi = WapiLookup(provider)
+
+        vlanview_obj = wapi.get_object('vlanview', {'name': vlanview_name})
+        vlanview_ref = vlanview_obj[0].get('_ref')
+        vlanrange_ref = None
+
+        if vlanrange_name:
+            vlanrange_obj = wapi.get_object('vlanrange', {'name': vlanrange_name})
+            if vlanrange_obj is None:
+                raise AnsibleError('Unable to find vlanrange object %s' % vlanrange_name)
+            if len(vlanrange_obj) > 1:
+                for obj in vlanrange_obj:
+                    if obj['vlan_view']['_ref'] == vlanview_ref:
+                        vlanrange_ref = obj.get('_ref')
+            else:
+                vlanrange_ref = vlanrange_obj[0].get('_ref')
+
+        if vlanrange_ref:
+            ref = vlanrange_ref
+        else:
+            ref = vlanview_ref
+
+        try:
+            avail_vlans = wapi.call_func('next_available_vlan_id', ref, {'num': num, 'exclude': exclude_vlan})
+            return [avail_vlans['vlan_ids']]
+        except Exception as exc:
+            raise AnsibleError(to_text(exc))
