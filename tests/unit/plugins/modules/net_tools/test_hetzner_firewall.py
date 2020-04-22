@@ -7,7 +7,7 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.tests.unit.utils.fetch_url_module_framework import (
+from ansible_collections.community.internal_test_tools.tests.unit.utils.fetch_url_module_framework import (
     FetchUrlCall,
     BaseTestModule,
 )
