@@ -58,7 +58,7 @@ cd "${TEST_DIR}"
 retry ansible-galaxy -vvv collection install ansible.netcommon
 retry ansible-galaxy -vvv collection install ansible.posix
 # https://github.com/CiscoDevNet/ansible-intersight/issues/9
-retry ansible-galaxy -vvv collection install cisco.intersight:1.04
+retry ansible-galaxy -vvv collection install cisco.intersight:1.0.4
 retry ansible-galaxy -vvv collection install community.crypto
 retry ansible-galaxy -vvv collection install community.kubernetes
 retry ansible-galaxy -vvv collection install google.cloud
