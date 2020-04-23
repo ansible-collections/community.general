@@ -278,16 +278,16 @@ class DconfPreference(object):
 
         return value
 
-    def list(self, key):
+    def list_sub_dirs(self, key):
         """
-        List the sub-keys and sub-dirs of a dir.
+        List the sub-dirs of a dir.
 
         If an error occurs, a call will be made to AnsibleModule.fail_json.
 
         :param key: A directory path which the sub-dirs should be return. Should be a full path, starting and ending with '/'.
         :type key: str
 
-        :returns: list -- List the sub-keys and sub-dirs of a dir. If the value does not have sub-dirs, returns None.
+        :returns: list -- List the sub-dirs of a dir. If the value does not have sub-dirs, returns None.
         """
 
         command = ["dconf", "list", key]
@@ -300,9 +300,8 @@ class DconfPreference(object):
         if out == '':
             values = None
         else:
-            values = out.split('\n')
+            values = out.rstrip('\n').split('\n')
         return values
-
 
     def write(self, key, value):
         """
@@ -381,7 +380,7 @@ def main():
     # Setup the Ansible module
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'absent', 'read', 'list']),
+            state=dict(default='present', choices=['present', 'absent', 'read', 'list_sub_dirs']),
             key=dict(required=True, type='str'),
             value=dict(required=False, default=None, type='str'),
         ),
@@ -402,8 +401,8 @@ def main():
     if module.params['state'] == 'read':
         value = dconf.read(module.params['key'])
         module.exit_json(changed=False, value=value)
-    elif module.params['state'] == 'list':
-        values = dconf.list(module.params['key'])
+    elif module.params['state'] == 'list_sub_dirs':
+        values = dconf.list_sub_dirs(module.params['key'])
         module.exit_json(changed=False, values=values)
     elif module.params['state'] == 'present':
         changed = dconf.write(module.params['key'], module.params['value'])
