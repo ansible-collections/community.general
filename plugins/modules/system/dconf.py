@@ -64,7 +64,7 @@ options:
     default: present
     choices:
       - read
-      - list
+      - list_sub_dirs
       - present
       - absent
     description:
@@ -123,7 +123,7 @@ EXAMPLES = """
 - name: List GNOME Terminal profiles
   dconf:
     key: "/org/gnome/terminal/legacy/profiles:/"
-    state: list
+    state: list_sub_dirs
   register: terminal_profiles
 """
 
