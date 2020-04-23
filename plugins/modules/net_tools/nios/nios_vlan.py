@@ -25,7 +25,9 @@ description:
     using the Infoblox WAPI interface over REST.
 requirements:
   - infoblox-client
-extends_documentation_fragment: nios
+extends_documentation_fragment:
+- community.general.nios
+
 options:
   id:
     description:
@@ -41,7 +43,7 @@ options:
       - Specifies the name of the vlan view to associate with this
         configured instance.
     default: default
-   extattrs:
+  extattrs:
     description:
       - Allows for the configuration of Extensible Attributes on the
         instance of the object.  This argument accepts a set of key / value
@@ -99,8 +101,8 @@ ref:
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six import iteritems
-from ansible.module_utils.net_tools.nios.api import WapiModule
-from ansible.module_utils.net_tools.nios.api import flatten_extattrs
+from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
+from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import flatten_extattrs
 
 
 def main():
