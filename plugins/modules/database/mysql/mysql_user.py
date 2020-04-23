@@ -80,6 +80,7 @@ options:
   check_implicit_admin:
     description:
       - Check if mysql allows login as root/nopassword before trying supplied credentials.
+      - If success, passed I(login_user)/I(login_password) will be ignored.
     type: bool
     default: no
   update_password:
@@ -189,6 +190,18 @@ EXAMPLES = r'''
 
 - name: Ensure no user named 'sally'@'localhost' exists, also passing in the auth credentials.
   mysql_user:
+    login_user: root
+    login_password: 123456
+    name: sally
+    state: absent
+
+# check_implicit_admin example
+- name: >
+    Ensure no user named 'sally'@'localhost' exists, also passing in the auth credentials.
+    If mysql allows root/nopassword login, try it without the credentials first.
+    If it's not allowed, pass the credentials.
+  mysql_user:
+    check_implicit_admin: yes
     login_user: root
     login_password: 123456
     name: sally
