@@ -7,6 +7,7 @@ unit_tests_dependencies:
 - ansible.netcommon
 - ansible.posix
 - cisco.intersight
+- community.internal_test_tools
 - community.kubernetes
 - google.cloud
 - ovirt.ovirt
