@@ -97,7 +97,7 @@ options:
     default: info
   fs_type:
     description:
-     - If specified, will set filesystem type to given partition
+     - If specified and the partition does not exist, will set filesystem type to given partition.
     type: str
     version_added: '2.10'
 notes:
