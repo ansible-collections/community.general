@@ -105,7 +105,7 @@ def main():
         argument_spec,
         supports_check_mode=True,
     )
-    if module._name == 'intersight_facts':
+    if module._name in ('intersight_facts', 'community.general.intersight_facts'):
         module.deprecate("The 'intersight_facts' module has been renamed to 'intersight_info'", version='2.13')
 
     intersight = IntersightModule(module)

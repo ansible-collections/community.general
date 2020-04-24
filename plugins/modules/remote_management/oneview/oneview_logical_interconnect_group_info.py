@@ -100,7 +100,7 @@ class LogicalInterconnectGroupInfoModule(OneViewModuleBase):
         )
 
         super(LogicalInterconnectGroupInfoModule, self).__init__(additional_arg_spec=argument_spec)
-        self.is_old_facts = self.module._name == 'oneview_logical_interconnect_group_facts'
+        self.is_old_facts = self.module._name in ('oneview_logical_interconnect_group_facts', 'community.general.oneview_logical_interconnect_group_facts')
         if self.is_old_facts:
             self.module.deprecate("The 'oneview_logical_interconnect_group_facts' module has been renamed to 'oneview_logical_interconnect_group_info', "
                                   "and the renamed one no longer returns ansible_facts", version='2.13')

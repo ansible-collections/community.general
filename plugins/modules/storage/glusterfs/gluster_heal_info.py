@@ -165,7 +165,7 @@ def main():
             status_filter=dict(type='str', default='self-heal', choices=['self-heal', 'rebalance']),
         ),
     )
-    is_old_facts = module._name == 'gluster_heal_facts'
+    is_old_facts = module._name in ('gluster_heal_facts', 'community.general.gluster_heal_facts')
     if is_old_facts:
         module.deprecate("The 'gluster_heal_facts' module has been renamed to 'gluster_heal_info', "
                          "and the renamed one no longer returns ansible_facts", version='2.13')

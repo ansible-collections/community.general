@@ -155,7 +155,7 @@ def main():
         ),
         supports_check_mode=False
     )
-    if module._name == 'memset_memstore_facts':
+    if module._name in ('memset_memstore_facts', 'community.general.memset_memstore_facts'):
         module.deprecate("The 'memset_memstore_facts' module has been renamed to 'memset_memstore_info'", version='2.13')
 
     # populate the dict with the user-provided vars.
