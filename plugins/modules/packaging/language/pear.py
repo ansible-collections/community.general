@@ -44,7 +44,7 @@ options:
       version_added: "2.10"
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 # Install pear package
 - pear:
     name: Net_URL2
@@ -60,14 +60,14 @@ EXAMPLES = '''
     name: pecl/apcu
     state: present
     prompt: 
-        - (.*)Enable internal debugging in APCu \\[no\\]
+        - (.*)Enable internal debugging in APCu \[no\]
 
 # Install pecl package with expected prompt and an answer
 - pear:
     name: pecl/apcu
     state: present
     prompt:
-        - (.*)Enable internal debugging in APCu \\[no\\]: "yes"
+        - (.*)Enable internal debugging in APCu \[no\]: "yes"
 
 # Install multiple pear/pecl packages at once with prompts. Prompts will be processed on the same order as the packages order, if there is more prompts than packages, packages without prompts will be installed without any prompt expected. If there is more prompts than packages, additionnal prompts will be ignored
 - pear:
@@ -75,7 +75,7 @@ EXAMPLES = '''
     state: present
     prompt:
       - I am a test prompt cause gnupg doesnt asks anything
-      - (.*)Enable internal debugging in APCu \\[no\\]: "yes"
+      - (.*)Enable internal debugging in APCu \[no\]: "yes"
 
 # Upgrade package
 - pear:
