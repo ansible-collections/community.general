@@ -153,7 +153,7 @@ def main():
             ['snapshot_type', 'by_id', ['snapshot_id']],
         ],
     )
-    if module._name == 'digital_ocean_snapshot_facts':
+    if module._name in ('digital_ocean_snapshot_facts', 'community.general.digital_ocean_snapshot_facts'):
         module.deprecate("The 'digital_ocean_snapshot_facts' module has been renamed to 'digital_ocean_snapshot_info'", version='2.13')
 
     try:

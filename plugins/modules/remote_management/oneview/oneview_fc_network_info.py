@@ -87,7 +87,7 @@ class FcNetworkInfoModule(OneViewModuleBase):
         )
 
         super(FcNetworkInfoModule, self).__init__(additional_arg_spec=argument_spec)
-        self.is_old_facts = self.module._name == 'oneview_fc_network_facts'
+        self.is_old_facts = self.module._name in ('oneview_fc_network_facts', 'community.general.oneview_fc_network_facts')
         if self.is_old_facts:
             self.module.deprecate("The 'oneview_fc_network_facts' module has been renamed to 'oneview_fc_network_info', "
                                   "and the renamed one no longer returns ansible_facts", version='2.13')

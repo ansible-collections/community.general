@@ -309,7 +309,7 @@ def main():
         ),
         supports_check_mode=False
     )
-    is_old_facts = module._name == 'redfish_facts'
+    is_old_facts = module._name in ('redfish_facts', 'community.general.redfish_facts')
     if is_old_facts:
         module.deprecate("The 'redfish_facts' module has been renamed to 'redfish_info', "
                          "and the renamed one no longer returns ansible_facts", version='2.13')

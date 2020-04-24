@@ -91,7 +91,7 @@ def main():
         pattern=dict(default='', required=False),
     )
     module = AnsibleModule(argument_spec)
-    is_old_facts = module._name == 'ovirt_user_facts'
+    is_old_facts = module._name in ('ovirt_user_facts', 'community.general.ovirt_user_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_user_facts' module has been renamed to 'ovirt_user_info', "
                          "and the renamed one no longer returns ansible_facts", version='2.13')

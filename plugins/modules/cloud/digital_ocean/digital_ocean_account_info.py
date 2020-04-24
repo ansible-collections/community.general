@@ -75,7 +75,7 @@ def core(module):
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name == 'digital_ocean_account_facts':
+    if module._name in ('digital_ocean_account_facts', 'community.general.digital_ocean_account_facts'):
         module.deprecate("The 'digital_ocean_account_facts' module has been renamed to 'digital_ocean_account_info'", version='2.13')
     try:
         core(module)

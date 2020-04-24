@@ -124,7 +124,7 @@ def main():
         ),
     )
     module = AnsibleModule(argument_spec)
-    is_old_facts = module._name == 'ovirt_external_provider_facts'
+    is_old_facts = module._name in ('ovirt_external_provider_facts', 'community.general.ovirt_external_provider_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_external_provider_facts' module has been renamed to 'ovirt_external_provider_info', "
                          "and the renamed one no longer returns ansible_facts", version='2.13')
