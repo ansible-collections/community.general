@@ -108,7 +108,7 @@ def main():
         load_balancer_id=dict(type='str', required=False),
     )
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name == 'digital_ocean_load_balancer_facts':
+    if module._name in ('digital_ocean_load_balancer_facts', 'community.general.digital_ocean_load_balancer_facts'):
         module.deprecate("The 'digital_ocean_load_balancer_facts' module has been renamed to 'digital_ocean_load_balancer_info'", version='2.13')
 
     try:

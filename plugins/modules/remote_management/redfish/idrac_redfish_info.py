@@ -183,7 +183,7 @@ def main():
         ),
         supports_check_mode=False
     )
-    is_old_facts = module._name == 'idrac_redfish_facts'
+    is_old_facts = module._name in ('idrac_redfish_facts', 'community.general.idrac_redfish_facts')
     if is_old_facts:
         module.deprecate("The 'idrac_redfish_facts' module has been renamed to 'idrac_redfish_info', "
                          "and the renamed one no longer returns ansible_facts", version='2.13')
