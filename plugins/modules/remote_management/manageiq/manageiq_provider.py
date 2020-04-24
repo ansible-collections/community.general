@@ -571,7 +571,7 @@ def delete_nulls(h):
         a hash without nulls
     """
     if isinstance(h, list):
-        return map(delete_nulls, h)
+        return [delete_nulls(i) for i in h]
     if isinstance(h, dict):
         return dict((k, delete_nulls(v)) for k, v in h.items() if v is not None)
 
