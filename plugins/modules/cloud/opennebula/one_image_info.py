@@ -259,7 +259,7 @@ def main():
     module = AnsibleModule(argument_spec=fields,
                            mutually_exclusive=[['ids', 'name']],
                            supports_check_mode=True)
-    if module._name == 'one_image_facts':
+    if module._name in ('one_image_facts', 'community.general.one_image_facts'):
         module.deprecate("The 'one_image_facts' module has been renamed to 'one_image_info'", version='2.13')
 
     if not HAS_PYONE:

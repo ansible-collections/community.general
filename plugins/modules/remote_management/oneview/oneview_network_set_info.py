@@ -137,7 +137,7 @@ class NetworkSetInfoModule(OneViewModuleBase):
 
     def __init__(self):
         super(NetworkSetInfoModule, self).__init__(additional_arg_spec=self.argument_spec)
-        self.is_old_facts = self.module._name == 'oneview_network_set_facts'
+        self.is_old_facts = self.module._name in ('oneview_network_set_facts', 'community.general.oneview_network_set_facts')
         if self.is_old_facts:
             self.module.deprecate("The 'oneview_network_set_facts' module has been renamed to 'oneview_network_set_info', "
                                   "and the renamed one no longer returns ansible_facts", version='2.13')

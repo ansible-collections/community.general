@@ -135,7 +135,7 @@ def main():
         namespace=dict(default=None),
     )
     module = AnsibleModule(argument_spec)
-    is_old_facts = module._name == 'ovirt_permission_facts'
+    is_old_facts = module._name in ('ovirt_permission_facts', 'community.general.ovirt_permission_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_permission_facts' module has been renamed to 'ovirt_permission_info', "
                          "and the renamed one no longer returns ansible_facts", version='2.13')

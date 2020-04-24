@@ -126,7 +126,7 @@ def main():
         mutually_exclusive=(('password', 'token'), ),
         required_one_of=(("password", "token"), ),
         supports_check_mode=True)
-    if module._name == 'github_webhook_facts':
+    if module._name in ('github_webhook_facts', 'community.general.github_webhook_facts'):
         module.deprecate("The 'github_webhook_facts' module has been renamed to 'github_webhook_info'", version='2.13')
 
     if not HAS_GITHUB:

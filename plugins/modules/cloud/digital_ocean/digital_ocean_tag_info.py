@@ -108,7 +108,7 @@ def main():
         tag_name=dict(type='str', required=False),
     )
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name == 'digital_ocean_tag_facts':
+    if module._name in ('digital_ocean_tag_facts', 'community.general.digital_ocean_tag_facts'):
         module.deprecate("The 'digital_ocean_tag_facts' module has been renamed to 'digital_ocean_tag_info'", version='2.13')
 
     try:

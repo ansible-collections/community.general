@@ -385,7 +385,7 @@ def main():
     )
     )
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name == 'ali_instance_facts':
+    if module._name in ('ali_instance_facts', 'community.general.ali_instance_facts'):
         module.deprecate("The 'ali_instance_facts' module has been renamed to 'ali_instance_info'", version='2.13')
 
     if HAS_FOOTMARK is False:
