@@ -38,6 +38,10 @@ options:
     executable:
       description:
         - Path to the pear executable
+    prompts: 
+        description:
+            - List of regex strings which can be used to detect prompts during pear package installation: Optionnal string to answer the expected regex
+      version_added: "2.10"
 '''
 
 EXAMPLES = '''
@@ -50,6 +54,28 @@ EXAMPLES = '''
 - pear:
     name: pecl/json_post
     state: present
+
+# Install pecl package with expected prompt
+- pear:
+    name: pecl/apcu
+    state: present
+    prompt: 
+        - (.*)Enable internal debugging in APCu \[no\]
+
+# Install pecl package with expected prompt and an answer
+- pear:
+    name: pecl/apcu
+    state: present
+    prompt:
+        - (.*)Enable internal debugging in APCu \[no\]: "yes"
+
+# Install multiple pear/pecl packages at once with prompts. Prompts will be processed on the same order as the packages order, if there is more prompts than packages, packages without prompts will be installed without any prompt expected. If there is more prompts than packages, additionnal prompts will be ignored
+- pear:
+    name: pecl/gnupg, pecl/apcu
+    state: present
+    prompt:
+      - I am a test prompt cause gnupg doesnt asks anything
+      - (.*)Enable internal debugging in APCu \[no\]: "yes"
 
 # Upgrade package
 - pear:
@@ -150,9 +176,41 @@ def remove_packages(module, packages):
     module.exit_json(changed=False, msg="package(s) already absent")
 
 
-def install_packages(module, state, packages):
+def install_packages(module, state, packages, prompts):
     install_c = 0
+    has_prompt = True if prompts else False
 
+    if has_prompt:
+        nb_prompts = len(prompts)
+        nb_packages = len(packages)
+
+        if nb_prompts > 0 and ( nb_prompts != nb_packages ):
+            if nb_prompts > nb_packages:
+                diff = nb_prompts - nb_packages
+                msg = "%s packages to install but %s prompts to expect. %s prompts will be ignored" % (to_text(nb_packages), to_text(nb_prompts), to_text(diff))
+            else:
+                diff = nb_packages - nb_prompts
+                msg = "%s packages to install but only %s prompts to expect. %s packages won't be expected to have a prompt" % (to_text(nb_packages), to_text(nb_prompts), to_text(diff))
+            
+            module.warn(msg)
+
+        # Preparing prompts answer according to item type
+        tmp_prompts = []
+        default_prompt_answer = "\n"
+        for _item in prompts:
+            # If the current item is a dict then we expect it's key to be the prompt regex and it's value to be the answer
+            # We also expect here that the dict only has ONE key and the first key will be taken
+            if isinstance(_item, dict):
+                key = list(_item.keys())[0]
+                answer = _item[key] if _item[key] else default_prompt_answer
+                answer += "\n"
+
+                tmp_prompts.append((key, answer))
+            else:
+                tmp_prompts.append((_item, default_prompt_answer))
+
+        prompts = tmp_prompts                     
+            
     for i, package in enumerate(packages):
         # if the package is installed and state == present
         # or state == latest and is up-to-date then skip
@@ -166,9 +224,14 @@ def install_packages(module, state, packages):
         if state == 'latest':
             command = 'upgrade'
 
-        cmd = "%s %s %s" % (_get_pear_path(module), command, package)
-        rc, stdout, stderr = module.run_command(cmd, check_rc=False)
+        current_prompt_regex = (None, None)
+        if has_prompt and (len(prompts) > 0 and i < len(prompts)):
+            current_prompt_regex = prompts[i]
 
+            print(current_prompt_regex)
+
+        cmd = "%s %s %s" % (_get_pear_path(module), command, package)
+        rc, stdout, stderr = module.run_command(cmd, check_rc=False, prompt_regex=current_prompt_regex[0], data=current_prompt_regex[1])
         if rc != 0:
             module.fail_json(msg="failed to install %s: %s" % (package, to_text(stdout + stderr)))
 
@@ -202,7 +265,8 @@ def main():
         argument_spec=dict(
             name=dict(aliases=['pkg'], required=True),
             state=dict(default='present', choices=['present', 'installed', "latest", 'absent', 'removed']),
-            executable=dict(default=None, required=False, type='path')),
+            executable=dict(default=None, required=False, type='path'),
+            prompts=dict(default=None, required=False, type='list')),
         supports_check_mode=True)
 
     p = module.params
@@ -224,7 +288,7 @@ def main():
             check_packages(module, pkgs, p['state'])
 
         if p['state'] in ['present', 'latest']:
-            install_packages(module, p['state'], pkgs)
+            install_packages(module, p['state'], pkgs, p["prompts"])
         elif p['state'] == 'absent':
             remove_packages(module, pkgs)
 
