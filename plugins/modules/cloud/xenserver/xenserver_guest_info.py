@@ -209,7 +209,7 @@ def main():
                            ],
                            )
 
-    if module._name == 'xenserver_guest_facts':
+    if module._name in ('xenserver_guest_facts', 'community.general.xenserver_guest_facts'):
         module.deprecate("The 'xenserver_guest_facts' module has been renamed to 'xenserver_guest_info'", version='2.13')
 
     result = {'failed': False, 'changed': False}
