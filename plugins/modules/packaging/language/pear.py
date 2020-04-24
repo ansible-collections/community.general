@@ -41,6 +41,8 @@ options:
     prompts:
         description:
             - List of regex strings which can be used to detect prompts during pear package installation with an ptionnal string to answer the expected regex
+        type: list
+        elements: raw
         version_added: "2.10"
 '''
 
