@@ -33,7 +33,7 @@ options:
     executable:
         description:
             - Path to the pear executable
-    prompts: 
+    prompts:
         description:
             - List of regex strings which can be used to detect prompts during pear package installation: Optionnal string to answer the expected regex
         version_added: "2.10"
@@ -54,7 +54,7 @@ EXAMPLES = r'''
   pear:
     name: pecl/apcu
     state: present
-    prompts: 
+    prompts:
         - (.*)Enable internal debugging in APCu \[no\]
 
 - name: Install pecl package with expected prompt and an answer
@@ -65,8 +65,9 @@ EXAMPLES = r'''
         - (.*)Enable internal debugging in APCu \[no\]: "yes"
 
 - name: Install multiple pear/pecl packages at once with prompts.
-    Prompts will be processed on the same order as the packages order, if there is more prompts than packages, packages without prompts will be installed without any prompt expected.
-    If there is more prompts than packages, additionnal prompts will be ignored
+    Prompts will be processed on the same order as the packages order.
+    If there is more prompts than packages, packages without prompts will be installed without any prompt expected.
+    If there is more packages than prompts, additionnal prompts will be ignored
   pear:
     name: pecl/gnupg, pecl/apcu
     state: present
@@ -187,7 +188,8 @@ def install_packages(module, state, packages, prompts):
                 msg = "%s packages to install but %s prompts to expect. %s prompts will be ignored" % (to_text(nb_packages), to_text(nb_prompts), to_text(diff))
             else:
                 diff = nb_packages - nb_prompts
-                msg = "%s packages to install but only %s prompts to expect. %s packages won't be expected to have a prompt" % (to_text(nb_packages), to_text(nb_prompts), to_text(diff))
+                msg = "%s packages to install but only %s prompts to expect. %s packages won't be expected to have a prompt" \
+                    % (to_text(nb_packages), to_text(nb_prompts), to_text(diff))
             module.warn(msg)
 
         # Preparing prompts answer according to item type
@@ -204,7 +206,7 @@ def install_packages(module, state, packages, prompts):
                 tmp_prompts.append((key, answer))
             else:
                 tmp_prompts.append((_item, default_prompt_answer))
-        prompts = tmp_prompts 
+        prompts = tmp_prompts
     for i, package in enumerate(packages):
         # if the package is installed and state == present
         # or state == latest and is up-to-date then skip
