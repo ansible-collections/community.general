@@ -31,12 +31,12 @@ options:
         default: "present"
         choices: ["present", "absent", "latest"]
     executable:
-      description:
-        - Path to the pear executable
+        description:
+            - Path to the pear executable
     prompts: 
         description:
             - List of regex strings which can be used to detect prompts during pear package installation: Optionnal string to answer the expected regex
-      version_added: "2.10"
+        version_added: "2.10"
 '''
 
 EXAMPLES = r'''
@@ -54,14 +54,14 @@ EXAMPLES = r'''
   pear:
     name: pecl/apcu
     state: present
-    prompt: 
+    prompts: 
         - (.*)Enable internal debugging in APCu \[no\]
 
 - name: Install pecl package with expected prompt and an answer
   pear:
     name: pecl/apcu
     state: present
-    prompt:
+    prompts:
         - (.*)Enable internal debugging in APCu \[no\]: "yes"
 
 - name: Install multiple pear/pecl packages at once with prompts.
@@ -70,7 +70,7 @@ EXAMPLES = r'''
   pear:
     name: pecl/gnupg, pecl/apcu
     state: present
-    prompt:
+    prompts:
       - I am a test prompt cause gnupg doesnt asks anything
       - (.*)Enable internal debugging in APCu \[no\]: "yes"
 
