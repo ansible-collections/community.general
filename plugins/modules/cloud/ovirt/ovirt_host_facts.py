@@ -109,7 +109,7 @@ def main():
         cluster_version=dict(default=None, type='str'),
     )
     module = AnsibleModule(argument_spec)
-    is_old_facts = module._name == 'ovirt_host_facts'
+    is_old_facts = module._name in ('ovirt_host_facts', 'community.general.ovirt_host_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_host_facts' module has been renamed to 'ovirt_host_info', "
                          "and the renamed one no longer returns ansible_facts", version='2.13')

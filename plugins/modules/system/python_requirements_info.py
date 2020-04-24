@@ -116,7 +116,7 @@ def main():
         ),
         supports_check_mode=True,
     )
-    if module._name == 'python_requirements_facts':
+    if module._name in ('python_requirements_facts', 'community.general.python_requirements_facts'):
         module.deprecate("The 'python_requirements_facts' module has been renamed to 'python_requirements_info'", version='2.13')
     if not HAS_DISTUTILS:
         module.fail_json(

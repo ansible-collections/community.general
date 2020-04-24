@@ -383,7 +383,7 @@ def main():
 
     results = {'onepassword': OnePasswordInfo().run()}
 
-    if module._name == 'onepassword_facts':
+    if module._name in ('onepassword_facts', 'community.general.onepassword_facts'):
         module.deprecate("The 'onepassword_facts' module has been renamed to 'onepassword_info'. "
                          "When called with the new name it no longer returns 'ansible_facts'", version='2.13')
         module.exit_json(changed=False, ansible_facts=results)

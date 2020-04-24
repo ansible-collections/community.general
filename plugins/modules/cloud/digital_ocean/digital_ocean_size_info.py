@@ -106,7 +106,7 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
     )
-    if module._name == 'digital_ocean_size_facts':
+    if module._name in ('digital_ocean_size_facts', 'community.general.digital_ocean_size_facts'):
         module.deprecate("The 'digital_ocean_size_facts' module has been renamed to 'digital_ocean_size_info'", version='2.13')
 
     try:

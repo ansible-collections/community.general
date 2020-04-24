@@ -132,7 +132,7 @@ def main():
         fcp=dict(default=None, type='dict'),
     )
     module = AnsibleModule(argument_spec)
-    is_old_facts = module._name == 'ovirt_host_storage_facts'
+    is_old_facts = module._name in ('ovirt_host_storage_facts', 'community.general.ovirt_host_storage_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_host_storage_facts' module has been renamed to 'ovirt_host_storage_info', "
                          "and the renamed one no longer returns ansible_facts", version='2.13')

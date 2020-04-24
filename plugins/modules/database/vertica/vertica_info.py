@@ -233,7 +233,7 @@ def main():
             login_user=dict(default='dbadmin'),
             login_password=dict(default=None, no_log=True),
         ), supports_check_mode=True)
-    is_old_facts = module._name == 'vertica_facts'
+    is_old_facts = module._name in ('vertica_facts', 'community.general.vertica_facts')
     if is_old_facts:
         module.deprecate("The 'vertica_facts' module has been renamed to 'vertica_info', "
                          "and the renamed one no longer returns ansible_facts", version='2.13')
