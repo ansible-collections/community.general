@@ -1,0 +1,2 @@
+bugfixes:
+- manageiq_provider - fix serialization error when running on python3 environment.
