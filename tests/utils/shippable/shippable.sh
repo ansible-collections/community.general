@@ -64,7 +64,7 @@ mkdir -p "${TEST_DIR}"
 cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
 cd "${TEST_DIR}"
 
-# STAR: HACK install dependencies
+# START: HACK install dependencies
 retry ansible-galaxy -vvv collection install ansible.netcommon
 retry ansible-galaxy -vvv collection install ansible.posix
 # https://github.com/CiscoDevNet/ansible-intersight/issues/9
