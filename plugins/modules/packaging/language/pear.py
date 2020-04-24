@@ -55,14 +55,14 @@ EXAMPLES = '''
     name: pecl/apcu
     state: present
     prompt: 
-        - (.*)Enable internal debugging in APCu \[no\]
+        - (.*)Enable internal debugging in APCu \\[no\\]
 
 - name: Install pecl package with expected prompt and an answer
   pear:
     name: pecl/apcu
     state: present
     prompt:
-        - (.*)Enable internal debugging in APCu \[no\]: "yes"
+        - (.*)Enable internal debugging in APCu \\[no\\]: "yes"
 
 - name: Install multiple pear/pecl packages at once with prompts.
     Prompts will be processed on the same order as the packages order, if there is more prompts than packages, packages without prompts will be installed without any prompt expected.
@@ -72,7 +72,7 @@ EXAMPLES = '''
     state: present
     prompt:
       - I am a test prompt cause gnupg doesnt asks anything
-      - (.*)Enable internal debugging in APCu \[no\]: "yes"
+      - (.*)Enable internal debugging in APCu \\[no\\]: "yes"
 
 - name: Upgrade package
   pear:
@@ -181,14 +181,13 @@ def install_packages(module, state, packages, prompts):
         nb_prompts = len(prompts)
         nb_packages = len(packages)
 
-        if nb_prompts > 0 and ( nb_prompts != nb_packages ):
+        if nb_prompts > 0 and (nb_prompts != nb_packages):
             if nb_prompts > nb_packages:
                 diff = nb_prompts - nb_packages
                 msg = "%s packages to install but %s prompts to expect. %s prompts will be ignored" % (to_text(nb_packages), to_text(nb_prompts), to_text(diff))
             else:
                 diff = nb_packages - nb_prompts
                 msg = "%s packages to install but only %s prompts to expect. %s packages won't be expected to have a prompt" % (to_text(nb_packages), to_text(nb_prompts), to_text(diff))
-            
             module.warn(msg)
 
         # Preparing prompts answer according to item type
@@ -205,9 +204,7 @@ def install_packages(module, state, packages, prompts):
                 tmp_prompts.append((key, answer))
             else:
                 tmp_prompts.append((_item, default_prompt_answer))
-
-        prompts = tmp_prompts                     
-            
+        prompts = tmp_prompts 
     for i, package in enumerate(packages):
         # if the package is installed and state == present
         # or state == latest and is up-to-date then skip
@@ -224,8 +221,6 @@ def install_packages(module, state, packages, prompts):
         current_prompt_regex = (None, None)
         if has_prompt and (len(prompts) > 0 and i < len(prompts)):
             current_prompt_regex = prompts[i]
-
-            print(current_prompt_regex)
 
         cmd = "%s %s %s" % (_get_pear_path(module), command, package)
         rc, stdout, stderr = module.run_command(cmd, check_rc=False, prompt_regex=current_prompt_regex[0], data=current_prompt_regex[1])
