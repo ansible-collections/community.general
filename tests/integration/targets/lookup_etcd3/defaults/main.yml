@@ -1,0 +1,4 @@
+---
+
+  etcd3_prefix: '/keyprefix/'
+  etcd3_singlekey: '/singlekeypath'
