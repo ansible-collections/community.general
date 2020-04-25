@@ -1,0 +1,3 @@
+# SuSE's python 3.6.10 comes with six 1.11.0 as distutil
+# we restrict to etcd3 < 0.11 to avoid pip to try to upgrade six
+etcd3_pip_module: 'etcd3<0.11'
