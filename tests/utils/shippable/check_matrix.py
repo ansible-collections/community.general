@@ -26,7 +26,7 @@ except ImportError:
 def main():  # type: () -> None
     """Main entry point."""
     repo_full_name = os.environ['REPO_FULL_NAME']
-    required_repo_full_name = 'ansible-collections/general'
+    required_repo_full_name = 'ansible-collections/community.general'
 
     if repo_full_name != required_repo_full_name:
         sys.stderr.write('Skipping matrix check on repo "%s" which is not "%s".\n' % (repo_full_name, required_repo_full_name))
