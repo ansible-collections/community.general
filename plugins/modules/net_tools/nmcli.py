@@ -981,7 +981,7 @@ class Nmcli(object):
 
         return cmd
 
-    def modify_connection_ethernet(self, conn_type='ethernet'):
+    def modify_connection_ethernet(self, connection_fields={}, conn_type='ethernet'):
         cmd = [self.nmcli_bin, 'con', 'mod', self.conn_name]
         # format for modifying ethernet interface
         # To modify an Ethernet connection with static IP configuration, issue a command as follows
@@ -994,20 +994,34 @@ class Nmcli(object):
             'ipv6.address': self.ip6,
             'ipv6.gateway': self.gw6,
             'ipv6.dns': self.dns6,
-            'autoconnect': self.bool_to_string(self.autoconnect),
+            'connection.autoconnect': self.bool_to_string(self.autoconnect),
             'ipv4.dns-search': self.dns4_search,
             'ipv6.dns-search': self.dns6_search,
             '802-3-ethernet.mtu': self.mtu,
             'ipv4.dhcp-client-id': self.dhcp_client_id,
         }
 
+        # Check if fields is already set
+        changed = False
         for key, value in options.items():
-            if value is not None:
+            try:
+                current_value = connection_fields[key].replace(',',' ')
+            except:
+                current_value = None
+            if value == None:
+                value = current_value
+            if value != current_value:
+                changed = True
                 if key == '802-3-ethernet.mtu' and conn_type != 'ethernet':
                     continue
-                cmd.extend([key, value])
-
-        return cmd
+                if value is not None:
+                    cmd.extend([key, value])
+                else:
+                    cmd.extend([key, ''])
+        if changed:
+            return cmd
+        else:
+            return 'unchanged'
 
     def create_connection_bridge(self):
         # format for creating bridge interface
@@ -1388,7 +1402,7 @@ class Nmcli(object):
         cmd = [self.nmcli_bin, 'con', 'del', self.conn_name]
         return self.execute_command(cmd)
 
-    def modify_connection(self):
+    def modify_connection(self, connection_fields):
         cmd = []
         if self.type == 'team':
             cmd = self.modify_connection_team()
@@ -1399,7 +1413,7 @@ class Nmcli(object):
         elif self.type == 'bond-slave':
             cmd = self.modify_connection_bond_slave()
         elif self.type == 'ethernet':
-            cmd = self.modify_connection_ethernet()
+            cmd = self.modify_connection_ethernet(connection_fields)
         elif self.type == 'bridge':
             cmd = self.modify_connection_bridge()
         elif self.type == 'bridge-slave':
@@ -1413,13 +1427,14 @@ class Nmcli(object):
         elif self.type == 'sit':
             cmd = self.modify_connection_sit()
         elif self.type == 'generic':
-            cmd = self.modify_connection_ethernet(conn_type='generic')
-        if cmd:
+            cmd = self.modify_connection_ethernet(connection_fields, conn_type='generic')
+        if cmd and cmd != 'unchanged':
             return self.execute_command(cmd)
-        else:
+        elif cmd != 'unchanged':
             self.module.fail_json(msg="Type of device or network connection is required "
                                       "while performing 'modify' operation. Please specify 'type' as an argument.")
-
+        else:
+            return [None,'','']
 
 def main():
     # Parsing argument file
@@ -1515,10 +1530,36 @@ def main():
         if nmcli.connection_exists():
             # modify connection (note: this function is check mode aware)
             # result['Connection']=('Connection %s of Type %s is not being added' % (nmcli.conn_name, nmcli.type))
-            result['Exists'] = 'Connections do exist so we are modifying them'
+            # result['Exists'] = 'Connections do exist so we are modifying them'
             if module.check_mode:
                 module.exit_json(changed=True)
-            (rc, out, err) = nmcli.modify_connection()
+            # Extract the fields for the desired connection
+            rc_code, out, err = module.run_command("%s -t con show '%s'" % (nmcli.nmcli_bin, nmcli.conn_name))
+            # Format it as an list
+            connection_fields = dict()
+            for extracts in out.rstrip("\n\r").splitlines():
+                key = extracts.split(':')[0]
+                try:
+                    value = extracts.split(':')[1]
+                    connection_fields
+                except:
+                    value = ''
+                connection_fields[key] = value
+            (rc, out, err) = nmcli.modify_connection(connection_fields)
+            # Extract the fields for the desired connection
+            diff_code, diff_out, diff_err = module.run_command("%s -t con show '%s'" % (nmcli.nmcli_bin, nmcli.conn_name))
+            # Format it as an list
+            after_connection_fields = dict()
+            result['diff'] = dict()
+            for extracts in diff_out.rstrip("\n\r").splitlines():
+                key = extracts.split(':')[0]
+                try:
+                    value = extracts.split(':')[1]
+                except:
+                    value = ''
+                after_connection_fields[key] = value
+            result['diff']['before'] = str(connection_fields).replace('\',','\',\n')
+            result['diff']['after'] = str(after_connection_fields).replace('\',','\',\n')
         if not nmcli.connection_exists():
             result['Connection'] = ('Connection %s of Type %s is being added' % (nmcli.conn_name, nmcli.type))
             if module.check_mode:
