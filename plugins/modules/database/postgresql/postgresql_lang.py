@@ -101,6 +101,7 @@ options:
       - Set an owner for the language.
       - Ignored when I(state=absent).
     type: str
+    version_added: '1.0.0'
   trust_input:
     description:
     - If C(no), check whether values of parameters I(lang), I(session_role),
@@ -108,6 +109,7 @@ options:
     - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
     type: bool
     default: yes
+    version_added: '1.0.0'
 seealso:
 - name: PostgreSQL languages
   description: General information about PostgreSQL languages.

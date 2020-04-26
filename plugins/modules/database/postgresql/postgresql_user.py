@@ -141,6 +141,7 @@ options:
     description:
     - Add a comment on the user (equal to the COMMENT ON ROLE statement result).
     type: str
+    version_added: '1.0.0'
   trust_input:
     description:
     - If C(no), check whether values of parameters I(name), I(password), I(privs), I(expires),

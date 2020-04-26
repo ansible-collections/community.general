@@ -89,14 +89,17 @@ options:
     description:
       - User's plugin to authenticate (``CREATE USER user IDENTIFIED WITH plugin``).
     type: str
+    version_added: '1.0.0'
   plugin_hash_string:
     description:
       - User's plugin hash string (``CREATE USER user IDENTIFIED WITH plugin AS plugin_hash_string``).
     type: str
+    version_added: '1.0.0'
   plugin_auth_string:
     description:
       - User's plugin auth_string (``CREATE USER user IDENTIFIED WITH plugin BY plugin_auth_string``).
     type: str
+    version_added: '1.0.0'
   resource_limits:
     description:
       - Limit the user for certain server resources. Provided since MySQL 5.6 / MariaDB 10.2.

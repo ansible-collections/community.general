@@ -19,6 +19,7 @@ description:
     - Create/delete a project in Packet host.
     - API is documented at U(https://www.packet.com/developers/api/#projects).
 
+version_added: '1.0.0'
 
 author:
     - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>

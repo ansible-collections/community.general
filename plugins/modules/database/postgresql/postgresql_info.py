@@ -244,6 +244,7 @@ databases:
           returned: if configured
           type: dict
           sample: { "pub1": { "ownername": "postgres", "puballtables": true, "pubinsert": true, "pubupdate": true } }
+          version_added: '1.0.0'
         subscriptions:
           description:
           - Information about replication subscriptions (available for PostgreSQL 10 and higher)
@@ -253,6 +254,7 @@ databases:
           type: dict
           sample:
           - { "my_subscription": {"ownername": "postgres", "subenabled": true, "subpublications": ["first_publication"] } }
+          version_added: '1.0.0'
 repl_slots:
   description:
   - Replication slots (available in 9.4 and later)

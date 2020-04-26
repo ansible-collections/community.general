@@ -8,6 +8,7 @@ DOCUMENTATION = '''
     lookup: lmdb_kv
     author:
       - Jan-Piet Mens (@jpmens)
+    version_added: '1.0.0'
     short_description: fetch data from LMDB
     description:
       - This lookup returns a list of results from an LMDB DB corresponding to a list of items given to it

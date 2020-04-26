@@ -88,6 +88,7 @@ options:
     - Only btree currently supports unique indexes.
     type: bool
     default: no
+    version_added: '1.0.0'
   tablespace:
     description:
     - Set a tablespace for the index.

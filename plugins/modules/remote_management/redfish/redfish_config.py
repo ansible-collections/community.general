@@ -60,6 +60,7 @@ options:
       - dictionary of BIOS attributes to update
     default: {}
     type: dict
+    version_added: '1.0.0'
   timeout:
     description:
       - Timeout in seconds for URL requests to OOB controller
@@ -71,27 +72,32 @@ options:
       - list of BootOptionReference strings specifying the BootOrder
     default: []
     type: list
+    version_added: '1.0.0'
   network_protocols:
     required: false
     description:
       -  setting dict of manager services to update
     type: dict
+    version_added: '1.0.0'
   resource_id:
     required: false
     description:
       - The ID of the System, Manager or Chassis to modify
     type: str
+    version_added: '1.0.0'
   nic_addr:
     required: false
     description:
       - EthernetInterface Address string on OOB controller
     default: 'null'
     type: str
+    version_added: '1.0.0'
   nic_config:
     required: false
     description:
       - setting dict of EthernetInterface on OOB controller
     type: dict
+    version_added: '1.0.0'
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''

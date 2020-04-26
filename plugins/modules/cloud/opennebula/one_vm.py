@@ -172,12 +172,15 @@ options:
       - Create a private persistent copy of the template plus any image defined in DISK, and instantiate that copy.
     default: NO
     type: bool
+    version_added: '1.0.0'
   datastore_id:
     description:
       - Name of Datastore to use to create a new instace
+    version_added: '1.0.0'
   datastore_name:
     description:
       - Name of Datastore to use to create a new instace
+    version_added: '1.0.0'
 author:
     - "Milan Ilic (@ilicmilan)"
     - "Jan Meerkamp (@meerkampdvv)"

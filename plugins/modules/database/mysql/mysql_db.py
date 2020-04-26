@@ -73,6 +73,7 @@ options:
     required: no
     default: no
     type: bool
+    version_added: '1.0.0'
   force:
     description:
     - Continue dump or import even if we get an SQL error.
@@ -80,6 +81,7 @@ options:
     required: no
     type: bool
     default: no
+    version_added: '1.0.0'
   master_data:
     description:
       - Option to dump a master replication server to produce a dump file
@@ -93,18 +95,21 @@ options:
     type: int
     choices: [0, 1, 2]
     default: 0
+    version_added: '1.0.0'
   skip_lock_tables:
     description:
       - Skip locking tables for read. Used when I(state=dump), ignored otherwise.
     required: no
     type: bool
     default: no
+    version_added: '1.0.0'
   dump_extra_args:
     description:
       - Provide additional arguments for mysqldump.
         Used when I(state=dump) only, ignored otherwise.
     required: no
     type: str
+    version_added: '1.0.0'
   use_shell:
     description:
       - Used to prevent C(Broken pipe) errors when the imported I(target) file is compressed.
@@ -291,6 +296,7 @@ executed_commands:
   returned: if executed
   type: list
   sample: ["CREATE DATABASE acme"]
+  version_added: '1.0.0'
 '''
 
 import os

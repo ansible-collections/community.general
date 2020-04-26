@@ -37,6 +37,7 @@ options:
     description:
       - Zone slug of the server group (e.g. C(lgp1) or C(rma1)).
     type: str
+    version_added: '1.0.0'
   state:
     description:
       - State of the server group.
@@ -101,6 +102,7 @@ zone:
   returned: success
   type: dict
   sample: { 'slug': 'rma1' }
+  version_added: '1.0.0'
 servers:
   description: A list of servers that are part of the server group.
   returned: if available

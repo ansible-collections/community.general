@@ -14,6 +14,7 @@ module: postgresql_subscription
 short_description: Add, update, or remove PostgreSQL subscription
 description:
 - Add, update, or remove PostgreSQL subscription.
+version_added: '1.0.0'
 
 options:
   name:

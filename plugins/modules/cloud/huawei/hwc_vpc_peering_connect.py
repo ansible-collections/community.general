@@ -19,6 +19,7 @@ module: hwc_vpc_peering_connect
 description:
     - vpc peering management.
 short_description: Creates a resource of Vpc/PeeringConnect in Huawei Cloud
+version_added: '1.0.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
     - keystoneauth1 >= 3.6.0

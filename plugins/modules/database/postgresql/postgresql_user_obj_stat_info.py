@@ -13,6 +13,7 @@ module: postgresql_user_obj_stat_info
 short_description: Gather statistics about PostgreSQL user objects
 description:
 - Gathers statistics about PostgreSQL user objects.
+version_added: '1.0.0'
 options:
   filter:
     description:

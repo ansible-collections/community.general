@@ -18,6 +18,7 @@ module: hwc_evs_disk
 description:
     - block storage management.
 short_description: Creates a resource of Evs/Disk in Huawei Cloud
+version_added: '1.0.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
     - keystoneauth1 >= 3.6.0

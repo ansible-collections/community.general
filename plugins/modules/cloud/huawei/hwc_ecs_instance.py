@@ -18,6 +18,7 @@ module: hwc_ecs_instance
 description:
     - instance management.
 short_description: Creates a resource of Ecs/Instance in Huawei Cloud
+version_added: '1.0.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
     - keystoneauth1 >= 3.6.0

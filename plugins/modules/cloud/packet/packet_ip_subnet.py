@@ -21,6 +21,7 @@ description:
     - IPv6 subnets must come from publicly routable /56 block from your project.
     - See U(https://support.packet.com/kb/articles/elastic-ips) for more info on IP block reservation.
 
+version_added: '1.0.0'
 
 author:
     - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>

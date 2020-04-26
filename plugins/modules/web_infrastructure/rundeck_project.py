@@ -43,6 +43,24 @@ options:
         description:
             - Sets the token to authenticate against Rundeck API.
         required: True
+    client_cert:
+        version_added: '1.0.0'
+    client_key:
+        version_added: '1.0.0'
+    force:
+        version_added: '1.0.0'
+    force_basic_auth:
+        version_added: '1.0.0'
+    http_agent:
+        version_added: '1.0.0'
+    url_password:
+        version_added: '1.0.0'
+    url_username:
+        version_added: '1.0.0'
+    use_proxy:
+        version_added: '1.0.0'
+    validate_certs:
+        version_added: '1.0.0'
 extends_documentation_fragment: url
 '''
 

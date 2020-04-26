@@ -101,6 +101,7 @@ options:
       - Provides additional arguments when I(state) is C(dump).
       - Cannot be used with dump-file-format-related arguments like ``--format=d``.
     type: str
+    version_added: '1.0.0'
   trust_input:
     description:
     - If C(no), check whether values of parameters I(owner), I(conn_limit), I(encoding),
@@ -200,6 +201,7 @@ executed_commands:
   returned: always
   type: list
   sample: ["CREATE DATABASE acme"]
+  version_added: '1.0.0'
 '''
 
 

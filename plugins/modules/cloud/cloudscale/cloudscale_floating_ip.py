@@ -58,6 +58,7 @@ options:
         If omitted, the region of the project default zone is used.
         This parameter must be omitted if I(type) is set to C(global).
     type: str
+    version_added: '1.0.0'
   prefix_length:
     description:
       - Only valid if I(ip_version) is 6.
@@ -153,6 +154,7 @@ region:
   returned: success when state == present
   type: dict
   sample: {'slug': 'lpg'}
+  version_added: '1.0.0'
 state:
   description: The current status of the floating IP.
   returned: success

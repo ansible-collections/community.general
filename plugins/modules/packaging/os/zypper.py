@@ -87,6 +87,7 @@ options:
         required: false
         default: "no"
         type: bool
+        version_added: '1.0.0'
     update_cache:
         description:
           - Run the equivalent of C(zypper refresh) before the operation. Disabled in check mode.

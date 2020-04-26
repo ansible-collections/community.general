@@ -11,6 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: hetzner_firewall
+version_added: '1.0.0'
 short_description: Manage Hetzner's dedicated server firewall
 author:
   - Felix Fontein (@felixfontein)
