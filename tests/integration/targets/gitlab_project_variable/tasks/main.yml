@@ -415,6 +415,80 @@
       - gitlab_project_variable_state.project_variable.updated|length == 0
       - gitlab_project_variable_state.project_variable.removed[0] == "some"
 
+- name: add one variable with variable_type file
+  gitlab_project_variable:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    project: "{{ gitlab_project_name }}"
+    vars:
+      my_file:
+        value: my_file_value
+        variable_type: file
+    purge: False
+  register: gitlab_project_variable_state
+
+- name: append one variable state must be changed
+  assert:
+    that:
+      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state.project_variable.added|length == 1
+      - gitlab_project_variable_state.project_variable.untouched|length == 0
+      - gitlab_project_variable_state.project_variable.removed|length == 0
+      - gitlab_project_variable_state.project_variable.updated|length == 0
+      - gitlab_project_variable_state.project_variable.added[0] == "my_file"
+
+- name: change variable_type attribute
+  gitlab_project_variable:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    project: "{{ gitlab_project_name }}"
+    vars:
+      my_file:
+        value: my_file_value
+        variable_type: env_var
+  register: gitlab_project_variable_state
+
+- name: state must be changed
+  assert:
+    that:
+      - gitlab_project_variable_state is changed
+
+- name: revert variable_type attribute
+  gitlab_project_variable:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    project: "{{ gitlab_project_name }}"
+    vars:
+      my_file:
+        value: my_file_value
+        variable_type: file
+  register: gitlab_project_variable_state
+
+- name: state must be changed
+  assert:
+    that:
+      - gitlab_project_variable_state is changed
+
+- name: delete the variable_type file variable
+  gitlab_project_variable:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    project: "{{ gitlab_project_name }}"
+    state: absent
+    vars:
+      my_file: my_file_value
+  register: gitlab_project_variable_state
+
+- name: no variable is left state must be changed
+  assert:
+    that:
+      - gitlab_project_variable_state.changed
+      - gitlab_project_variable_state.project_variable.added|length == 0
+      - gitlab_project_variable_state.project_variable.untouched|length == 0
+      - gitlab_project_variable_state.project_variable.removed|length == 1
+      - gitlab_project_variable_state.project_variable.updated|length == 0
+      - gitlab_project_variable_state.project_variable.removed[0] == "my_file"
+
 - name: check that no variables are left
   gitlab_project_variable:
     api_url: "{{ gitlab_host }}"
