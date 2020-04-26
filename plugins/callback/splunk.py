@@ -49,6 +49,11 @@ DOCUMENTATION = '''
         description: Whether to validate certificates for connections to HEC.  Do not set to
                      C(false) except when you are sure that nobody can intercept the connection
                      between this plugin and HEC, as setting it to C(false) enables man-in-the-middle attacks!
+        env:
+          - name: SPLUNK_VALIDATE_CERTS
+        ini:
+          - section: callback_splunk
+            key: validate_certs
         type: bool
         default: true
         version_added: '2.10'
