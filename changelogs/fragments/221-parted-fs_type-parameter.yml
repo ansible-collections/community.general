@@ -1,0 +1,2 @@
+minor_changes:
+- parted - add the ``fs_type`` parameter (https://github.com/ansible-collections/community.general/issues/135).
