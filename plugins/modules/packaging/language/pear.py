@@ -222,7 +222,7 @@ def install_packages(module, state, packages, prompts):
             command = 'upgrade'
 
         current_prompt_regex = (None, None)
-        if has_prompt and (len(prompts) > 0 and i < len(prompts)):
+        if has_prompt and i < len(prompts):
             current_prompt_regex = prompts[i]
 
         cmd = "%s %s %s" % (_get_pear_path(module), command, package)
