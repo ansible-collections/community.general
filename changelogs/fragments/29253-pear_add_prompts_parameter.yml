@@ -1,2 +1,2 @@
 minor_changes:
-- added prompts parameter to allow users to specify expected prompt that could hang Ansible execution while using pear
+- pear - added ``prompts`` parameter to allow users to specify expected prompt that could hang Ansible execution
