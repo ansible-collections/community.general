@@ -625,6 +625,10 @@ def main():
         if current_device['generic'].get('table', None) != label:
             script += "mklabel %s " % label
 
+        # parted <= 3.2.153 bug: optional filesystem parameter is mandatory for negative part_start
+        if fs_type is None and part_start.startswith('-'):
+            fs_type = 'ext2'
+
         # Create partition if required
         if part_type and not part_exists(current_parts, 'num', number):
             script += "mkpart %s %s%s %s " % (
