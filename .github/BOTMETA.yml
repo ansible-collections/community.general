@@ -925,6 +925,7 @@ files:
     authors: Andersson007
     maintainers: Alexander198961 Xyon bmalynovytch bmildren kurtdavis michaelcoburn oneiroi tolland
     keywords: mariadb proxysql
+    ignore: tomaszkiewicz
   $modules/database/mysql/mysql_replication.py:
     authors: Andersson007 banyek
   $modules/database/mysql/mysql_user.py:
