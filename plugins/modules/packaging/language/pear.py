@@ -178,7 +178,7 @@ def remove_packages(module, packages):
 
 def install_packages(module, state, packages, prompts):
     install_c = 0
-    has_prompt = True if prompts else False
+    has_prompt = bool(prompts)
 
     if has_prompt:
         nb_prompts = len(prompts)
