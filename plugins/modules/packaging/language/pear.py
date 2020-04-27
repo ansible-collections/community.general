@@ -57,7 +57,7 @@ EXAMPLES = r'''
     name: pecl/json_post
     state: present
 
-# Install pecl package with expected prompt
+- name: Install pecl package with expected prompt
 - pear:
     name: pecl/apcu
     state: present
