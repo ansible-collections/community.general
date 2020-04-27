@@ -202,8 +202,7 @@ def install_packages(module, state, packages, prompts):
             # We also expect here that the dict only has ONE key and the first key will be taken
             if isinstance(_item, dict):
                 key = list(_item.keys())[0]
-                answer = _item[key] if _item[key] else default_prompt_answer
-                answer += "\n"
+                answer = _item[key] + "\n"
 
                 tmp_prompts.append((key, answer))
             else:
