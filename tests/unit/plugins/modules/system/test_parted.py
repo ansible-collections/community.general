@@ -218,10 +218,11 @@ class TestParted(ModuleTestCase):
             'flags': ["boot"],
             'state': 'present',
             'part_start': '257GiB',
+            'fs_type': 'ext3',
             '_ansible_check_mode': True,
         })
         with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
-            self.execute_module(changed=True, script='unit KiB mkpart primary 257GiB 100% unit KiB set 4 boot on')
+            self.execute_module(changed=True, script='unit KiB mkpart primary ext3 257GiB 100% unit KiB set 4 boot on')
 
     def test_create_label_gpt(self):
         # Like previous test, current implementation use parted to create the partition and
