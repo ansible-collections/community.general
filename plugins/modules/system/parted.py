@@ -620,7 +620,7 @@ def main():
         if part_type and not part_exists(current_parts, 'num', number):
             script += "mkpart %s %s%s %s " % (
                 part_type,
-                f"{fs_type} " if fs_type is not None else '',
+                '%s ' % fs_type if fs_type is not None else '',
                 part_start,
                 part_end
             )
