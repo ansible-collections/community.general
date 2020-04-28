@@ -244,7 +244,7 @@ EXAMPLES = r'''
 - name: >
     Start container with mount. You should enter a 90-second timeout because servers
     with additional disks take longer to boot
- proxmox:
+  proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
