@@ -1,6 +1,5 @@
 shippable/posix/group1
 destructive
-needs/target/setup_etcd3
 skip/aix
 skip/osx
 skip/freebsd
