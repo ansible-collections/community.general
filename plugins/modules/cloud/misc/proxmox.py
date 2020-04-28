@@ -141,9 +141,9 @@ requirements: [ "proxmoxer", "python >= 2.7", "requests" ]
 author: Sergei Antipov (@UnderGreen)
 '''
 
-EXAMPLES = '''
-# Create new container with minimal options
-- proxmox:
+EXAMPLES = r'''
+- name: Create new container with minimal options
+  proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -153,8 +153,8 @@ EXAMPLES = '''
     hostname: example.org
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
-# Create new container automatically selecting the next available vmid.
-- proxmox:
+- name: Create new container automatically selecting the next available vmid.
+  proxmox:
     node: 'uk-mc02'
     api_user: 'root@pam'
     api_password: '1q2w3e'
@@ -163,8 +163,8 @@ EXAMPLES = '''
     hostname: 'example.org'
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
-# Create new container with minimal options with force(it will rewrite existing container)
-- proxmox:
+- name: Create new container with minimal options with force(it will rewrite existing container)
+  proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -175,8 +175,8 @@ EXAMPLES = '''
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     force: yes
 
-# Create new container with minimal options use environment PROXMOX_PASSWORD variable(you should export it before)
-- proxmox:
+- name: Create new container with minimal options use environment PROXMOX_PASSWORD variable(you should export it before)
+  proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -185,8 +185,8 @@ EXAMPLES = '''
     hostname: example.org
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
-# Create new container with minimal options defining network interface with dhcp
-- proxmox:
+- name: Create new container with minimal options defining network interface with dhcp
+  proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -197,8 +197,8 @@ EXAMPLES = '''
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     netif: '{"net0":"name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr0"}'
 
-# Create new container with minimal options defining network interface with static ip
-- proxmox:
+- name: Create new container with minimal options defining network interface with static ip
+  proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -209,8 +209,8 @@ EXAMPLES = '''
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     netif: '{"net0":"name=eth0,gw=192.168.0.1,ip=192.168.0.2/24,bridge=vmbr0"}'
 
-# Create new container with minimal options defining a mount with 8GB
-- proxmox:
+- name: Create new container with minimal options defining a mount with 8GB
+  proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -221,8 +221,8 @@ EXAMPLES = '''
     ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     mounts: '{"mp0":"local:8,mp=/mnt/test/"}'
 
-# Create new container with minimal options defining a cpu core limit
-- proxmox:
+- name: Create new container with minimal options defining a cpu core limit
+  proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -233,16 +233,18 @@ EXAMPLES = '''
     ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     cores: 2
 
-# Start container
-- proxmox:
+- name: Start container
+  proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
     api_host: node1
     state: started
 
-# Start container with mount. You should enter a 90-second timeout because servers with additional disks take longer to boot.
-- proxmox:
+- name: >
+    Start container with mount. You should enter a 90-second timeout because servers
+    with additional disks take longer to boot
+  proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -250,16 +252,16 @@ EXAMPLES = '''
     state: started
     timeout: 90
 
-# Stop container
-- proxmox:
+- name: Stop container
+  proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
     api_host: node1
     state: stopped
 
-# Stop container with force
-- proxmox:
+- name: Stop container with force
+  proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -267,16 +269,16 @@ EXAMPLES = '''
     force: yes
     state: stopped
 
-# Restart container(stopped or mounted container you can't restart)
-- proxmox:
+- name: Restart container(stopped or mounted container you can't restart)
+  proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
     api_host: node1
     state: restarted
 
-# Remove container
-- proxmox:
+- name: Remove container
+  proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
