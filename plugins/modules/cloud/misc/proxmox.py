@@ -137,7 +137,8 @@ options:
   description:
     description:
       - Specify the description for the container. Only used on the configuration web interface.
-      - This is saved as comment inside the configuration file.
+      - This is saved as a comment inside the configuration file.
+    type: str
   hookscript:
     description:
       - Script that will be executed during various steps in the containers lifetime.
