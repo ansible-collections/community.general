@@ -162,6 +162,19 @@ EXAMPLES = r'''
     hostname: example.org
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
+- name: Create new container with hookscript and description
+  proxmox:
+    vmid: 100
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    password: 123456
+    hostname: example.org
+    ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
+    hookscript: 'local:snippets/vm_hook.sh'
+    description: created with ansible
+
 - name: Create new container automatically selecting the next available vmid.
   proxmox:
     node: 'uk-mc02'
