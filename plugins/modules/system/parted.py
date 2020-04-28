@@ -637,11 +637,13 @@ def main():
             changed = True
             script = ""
 
-            current_parts = get_device_info(device, unit)['partitions']
+            if not module.check_mode:
+                current_parts = get_device_info(device, unit)['partitions']
 
         if part_exists(current_parts, 'num', number) or module.check_mode:
-            partition = {'flags': []}      # Empty structure for the check-mode
-            if not module.check_mode:
+            if changed and module.check_mode:
+                partition = {'flags': []}   # Empty structure for the check-mode
+            else:
                 partition = [p for p in current_parts if p['num'] == number][0]
 
             # Assign name to the partition

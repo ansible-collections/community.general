@@ -1,0 +1,2 @@
+bugfixes:
+  - 'parted: consider current partition state even in check mode'
