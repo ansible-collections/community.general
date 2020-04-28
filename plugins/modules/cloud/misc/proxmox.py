@@ -142,7 +142,7 @@ options:
   hookscript:
     description:
       - Script that will be executed during various steps in the containers lifetime.
-    type: ?
+    type: str
 
 notes:
   - Requires proxmoxer and requests modules on host. This modules can be installed with pip.
