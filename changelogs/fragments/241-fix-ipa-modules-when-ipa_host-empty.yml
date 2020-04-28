@@ -1,0 +1,2 @@
+bugfixes:
+  - ipa modules - fix error when IPA_HOST is empty and fallback on DNS
