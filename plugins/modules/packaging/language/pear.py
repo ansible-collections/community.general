@@ -75,7 +75,7 @@ EXAMPLES = r'''
   # Prompts will be processed on the same order as the packages order
 # If there is more prompts than packages, packages without prompts will be installed without any prompt expected.
 # If there is more packages than prompts, additionnal prompts will be ignored
-- pear:
+  pear:
     name: pecl/gnupg, pecl/apcu
     state: present
     prompts:
