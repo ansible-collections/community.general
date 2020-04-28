@@ -140,7 +140,8 @@ options:
       - This is saved as comment inside the configuration file.
   hookscript:
     description:
-      - Script that will be exectued during various steps in the containers lifetime.
+      - Script that will be executed during various steps in the containers lifetime.
+    type: ?
 
 notes:
   - Requires proxmoxer and requests modules on host. This modules can be installed with pip.
