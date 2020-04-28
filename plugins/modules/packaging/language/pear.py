@@ -58,7 +58,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Install pecl package with expected prompt
-- pear:
+  pear:
     name: pecl/apcu
     state: present
     prompts:
