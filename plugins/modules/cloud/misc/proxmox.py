@@ -538,9 +538,9 @@ def main():
                             searchdomain=module.params['searchdomain'],
                             force=int(module.params['force']),
                             pubkey=module.params['pubkey'],
-                            unprivileged=int(module.params['unprivileged'],
+                            unprivileged=int(module.params['unprivileged']),
                             description=module.params['description'],
-                            hookscript=module.params['hookscript']))
+                            hookscript=module.params['hookscript'])
 
             module.exit_json(changed=True, msg="deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
         except Exception as e:
