@@ -1,3 +1,10 @@
+# Copyright: (c) 2019, Andrew Klychkov (@Andersson007) <aaklychkov@mail.ru>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+####################
+# Prepare for tests:
+
+# Create test roles:
 - name: postgresql_owner - create test roles
   become_user: '{{ pg_user }}'
   become: true
@@ -49,7 +56,9 @@
   postgresql_query:
     login_user: '{{ pg_user }}'
     db: acme
-    query: CREATE FUNCTION increment(integer) RETURNS integer AS 'select $1 + 1;' LANGUAGE SQL IMMUTABLE RETURNS NULL ON NULL INPUT;
+    query: >
+      CREATE FUNCTION increment(integer) RETURNS integer AS 'select $1 + 1;'
+      LANGUAGE SQL IMMUTABLE RETURNS NULL ON NULL INPUT;
 
 - name: postgresql_owner - create test schema
   become_user: '{{ pg_user }}'
@@ -98,7 +107,9 @@
     mode: '0700'
   ignore_errors: true
 
-- name: postgresql_owner - create a new tablespace called acme and set bob as an its owner
+- name: >
+    postgresql_owner - create a new tablespace called acme and
+    set bob as an its owner
   become_user: '{{ pg_user }}'
   become: true
   postgresql_tablespace:
@@ -108,6 +119,13 @@
     owner: alice
     location: '{{ test_tablespace_path }}'
 
+################
+# Do main tests:
+
+#
+# check reassign_owned_by param
+#
+# try to reassign ownership to non existent user:
 - name: postgresql_owner - reassign_owned_by to non existent user
   become_user: '{{ pg_user }}'
   become: true
@@ -160,7 +178,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_tables WHERE tablename = 'my_table' AND tableowner = 'alice'
+    query: >
+      SELECT 1 FROM pg_tables WHERE tablename = 'my_table'
+      AND tableowner = 'alice'
   ignore_errors: true
   register: result
 
@@ -235,6 +255,12 @@
     - result.msg is search('does not exist')
 # End of testing trust_input
 
+#
+# Check obj_type for each type
+#
+
+# #############################
+# check_mode obj_type: database
 - name: postgresql_owner - set db owner in check_mode
   become_user: '{{ pg_user }}'
   become: true
@@ -258,7 +284,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_database AS d JOIN pg_roles AS r ON d.datdba = r.oid WHERE d.datname = 'acme' AND r.rolname = 'bob'
+    query: >
+      SELECT 1 FROM pg_database AS d JOIN pg_roles AS r
+      ON d.datdba = r.oid WHERE d.datname = 'acme' AND r.rolname = 'bob'
   ignore_errors: true
   register: result
 
@@ -288,7 +316,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_database AS d JOIN pg_roles AS r ON d.datdba = r.oid WHERE d.datname = 'acme' AND r.rolname = 'bob'
+    query: >
+      SELECT 1 FROM pg_database AS d JOIN pg_roles AS r
+      ON d.datdba = r.oid WHERE d.datname = 'acme' AND r.rolname = 'bob'
   ignore_errors: true
   register: result
 
@@ -318,7 +348,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_database AS d JOIN pg_roles AS r ON d.datdba = r.oid WHERE d.datname = 'acme' AND r.rolname = 'bob'
+    query: >
+      SELECT 1 FROM pg_database AS d JOIN pg_roles AS r
+      ON d.datdba = r.oid WHERE d.datname = 'acme' AND r.rolname = 'bob'
   ignore_errors: true
   register: result
 
@@ -349,7 +381,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_tables WHERE tablename = 'my_table' AND tableowner = 'bob'
+    query: >
+      SELECT 1 FROM pg_tables WHERE tablename = 'my_table'
+      AND tableowner = 'bob'
   ignore_errors: true
   register: result
 
@@ -379,7 +413,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_tables WHERE tablename = 'my_table' AND tableowner = 'bob'
+    query: >
+      SELECT 1 FROM pg_tables WHERE tablename = 'my_table'
+      AND tableowner = 'bob'
   ignore_errors: true
   register: result
 
@@ -409,7 +445,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_tables WHERE tablename = 'my_table' AND tableowner = 'bob'
+    query: >
+      SELECT 1 FROM pg_tables WHERE tablename = 'my_table'
+      AND tableowner = 'bob'
   ignore_errors: true
   register: result
 
@@ -440,7 +478,10 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_class AS c JOIN pg_roles AS r ON c.relowner = r.oid WHERE c.relkind = 'S' AND c.relname = 'test_seq' AND r.rolname = 'bob'
+    query: >
+      SELECT 1 FROM pg_class AS c JOIN pg_roles AS r
+      ON c.relowner = r.oid WHERE c.relkind = 'S'
+      AND c.relname = 'test_seq' AND r.rolname = 'bob'
   ignore_errors: true
   register: result
 
@@ -470,7 +511,10 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_class AS c JOIN pg_roles AS r ON c.relowner = r.oid WHERE c.relkind = 'S' AND c.relname = 'test_seq' AND r.rolname = 'bob'
+    query: >
+      SELECT 1 FROM pg_class AS c JOIN pg_roles AS r
+      ON c.relowner = r.oid WHERE c.relkind = 'S'
+      AND c.relname = 'test_seq' AND r.rolname = 'bob'
   ignore_errors: true
   register: result
 
@@ -500,7 +544,10 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_class AS c JOIN pg_roles AS r ON c.relowner = r.oid WHERE c.relkind = 'S' AND c.relname = 'test_seq' AND r.rolname = 'bob'
+    query: >
+      SELECT 1 FROM pg_class AS c JOIN pg_roles AS r
+      ON c.relowner = r.oid WHERE c.relkind = 'S'
+      AND c.relname = 'test_seq' AND r.rolname = 'bob'
   ignore_errors: true
   register: result
 
@@ -533,7 +580,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_proc AS f JOIN pg_roles AS r ON f.proowner = r.oid WHERE f.proname = 'increment' AND r.rolname = 'bob'
+    query: >
+      SELECT 1 FROM pg_proc AS f JOIN pg_roles AS r
+      ON f.proowner = r.oid WHERE f.proname = 'increment' AND r.rolname = 'bob'
   ignore_errors: true
   register: result
   when: postgres_version_resp.stdout is version('10', '>=')
@@ -567,7 +616,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_proc AS f JOIN pg_roles AS r ON f.proowner = r.oid WHERE f.proname = 'increment' AND r.rolname = 'bob'
+    query: >
+      SELECT 1 FROM pg_proc AS f JOIN pg_roles AS r
+      ON f.proowner = r.oid WHERE f.proname = 'increment' AND r.rolname = 'bob'
   ignore_errors: true
   register: result
   when: postgres_version_resp.stdout is version('10', '>=')
@@ -601,7 +652,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_proc AS f JOIN pg_roles AS r ON f.proowner = r.oid WHERE f.proname = 'increment' AND r.rolname = 'bob'
+    query: >
+      SELECT 1 FROM pg_proc AS f JOIN pg_roles AS r
+      ON f.proowner = r.oid WHERE f.proname = 'increment' AND r.rolname = 'bob'
   ignore_errors: true
   register: result
   when: postgres_version_resp.stdout is version('10', '>=')
@@ -634,7 +687,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM information_schema.schemata WHERE schema_name = 'test_schema' AND schema_owner = 'bob'
+    query: >
+      SELECT 1 FROM information_schema.schemata
+      WHERE schema_name = 'test_schema' AND schema_owner = 'bob'
   ignore_errors: true
   register: result
 
@@ -664,7 +719,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM information_schema.schemata WHERE schema_name = 'test_schema' AND schema_owner = 'bob'
+    query: >
+      SELECT 1 FROM information_schema.schemata
+      WHERE schema_name = 'test_schema' AND schema_owner = 'bob'
   ignore_errors: true
   register: result
 
@@ -694,7 +751,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM information_schema.schemata WHERE schema_name = 'test_schema' AND schema_owner = 'bob'
+    query: >
+      SELECT 1 FROM information_schema.schemata
+      WHERE schema_name = 'test_schema' AND schema_owner = 'bob'
   ignore_errors: true
   register: result
 
@@ -919,7 +978,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_tablespace AS t JOIN pg_roles AS r ON t.spcowner = r.oid WHERE t.spcname = 'acme' AND r.rolname = 'bob'
+    query: >
+      SELECT 1 FROM pg_tablespace AS t JOIN pg_roles AS r
+      ON t.spcowner = r.oid WHERE t.spcname = 'acme' AND r.rolname = 'bob'
   ignore_errors: true
   register: result
 
@@ -949,7 +1010,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_tablespace AS t JOIN pg_roles AS r ON t.spcowner = r.oid WHERE t.spcname = 'acme' AND r.rolname = 'bob'
+    query: >
+      SELECT 1 FROM pg_tablespace AS t JOIN pg_roles AS r
+      ON t.spcowner = r.oid WHERE t.spcname = 'acme' AND r.rolname = 'bob'
   ignore_errors: true
   register: result
 
@@ -979,7 +1042,9 @@
   postgresql_query:
     db: acme
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_tablespace AS t JOIN pg_roles AS r ON t.spcowner = r.oid WHERE t.spcname = 'acme' AND r.rolname = 'bob'
+    query: >
+      SELECT 1 FROM pg_tablespace AS t JOIN pg_roles AS r
+      ON t.spcowner = r.oid WHERE t.spcname = 'acme' AND r.rolname = 'bob'
   ignore_errors: true
   register: result
 
@@ -987,7 +1052,10 @@
     that:
     - result.rowcount == 1
 
-- name: postgresql_owner - create test database
+#
+# Crean up
+#
+- name: postgresql_owner - drop test database
   become_user: '{{ pg_user }}'
   become: true
   postgresql_db:
