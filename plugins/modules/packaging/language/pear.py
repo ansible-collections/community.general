@@ -35,7 +35,14 @@ options:
             - Path to the pear executable
     prompts:
         description:
-            - List of regular expressions which can be used to detect prompts during pear package installation with an optional string to answer the expected regex.
+            - List of regular expressions that can be used to detect prompts during pear package installation to answer the expected question.
+            - Prompts will be processed in the same order as the packages list
+            - You can optionnally specify an answer to any question in the list
+            - If no answer is provided, the list item will only contain the regular expression.
+            - "To specify an answer, the item will be a dict with the regular expression as key and the answer as value eg: C(my_regular_expression: 'an_answer')"
+            - You can provide a list containing items with or without answer
+            - A prompt list can be shorter or longer than the packages list but will issue a warning
+            - If you want to specify that a package will not need prompts in the middle of a list,  C(null)
         type: list
         elements: raw
         version_added: "2.10"
@@ -74,7 +81,18 @@ EXAMPLES = r'''
     name: pecl/gnupg, pecl/apcu
     state: present
     prompts:
-      - I am a test prompt cause gnupg doesnt asks anything
+      - I am a test prompt because gnupg doesnt asks anything
+      - (.*)Enable internal debugging in APCu \[no\]: "yes"
+
+- name: Install multiple pear/pecl packages at once skipping the first prompt
+  # Prompts will be processed on the same order as the packages order
+  # If there is more prompts than packages, packages without prompts will be installed without any prompt expected.
+  # If there is more packages than prompts, additionnal prompts will be ignored
+  pear:
+    name: pecl/gnupg, pecl/apcu
+    state: present
+    prompts:
+      - null
       - (.*)Enable internal debugging in APCu \[no\]: "yes"
 
 - name: Upgrade package
@@ -205,6 +223,8 @@ def install_packages(module, state, packages, prompts):
                 answer = _item[key] + "\n"
 
                 tmp_prompts.append((key, answer))
+            elif not _item:
+                tmp_prompts.append((None, None))
             else:
                 tmp_prompts.append((_item, default_prompt_answer))
         prompts = tmp_prompts
@@ -226,7 +246,7 @@ def install_packages(module, state, packages, prompts):
             current_prompt_regex = prompts[i]
 
         cmd = "%s %s %s" % (_get_pear_path(module), command, package)
-        rc, stdout, stderr = module.run_command(cmd, check_rc=False, prompt_regex=current_prompt_regex[0], data=current_prompt_regex[1])
+        rc, stdout, stderr = module.run_command(cmd, check_rc=False, prompt_regex=current_prompt_regex[0], data=current_prompt_regex[1], binary_data=True)
         if rc != 0:
             module.fail_json(msg="failed to install %s: %s" % (package, to_text(stdout + stderr)))
 
