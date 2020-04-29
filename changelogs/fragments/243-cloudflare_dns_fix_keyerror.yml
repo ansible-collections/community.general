@@ -1,0 +1,2 @@
+bugfixes:
+  - cloudflare_dns - fix KeyError 'success' (https://github.com/ansible-collections/community.general/issues/236).
