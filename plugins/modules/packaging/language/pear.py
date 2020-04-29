@@ -71,8 +71,8 @@ EXAMPLES = r'''
     prompts:
         - (.*)Enable internal debugging in APCu \[no\]
 
-# Install pecl package with expected prompt and an answer
-- pear:
+- name: Install pecl package with expected prompt and an answer
+  pear:
     name: pecl/apcu
     state: present
     prompts:
