@@ -496,6 +496,10 @@ class CloudflareAPI(object):
         if result is None:
             self.module.fail_json(msg=error_msg)
 
+        if 'success' not in result:
+            error_msg += "; Unexpected error details: {0}".format(result.get('error'))
+            self.module.fail_json(msg=error_msg)
+
         if not result['success']:
             error_msg += "; Error details: "
             for error in result['errors']:
