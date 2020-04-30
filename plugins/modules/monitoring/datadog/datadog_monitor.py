@@ -48,7 +48,7 @@ options:
     type:
         description:
           - The type of the monitor.
-        choices: ['metric alert', 'service check', 'event alert', 'process alert', 'log alert']
+        choices: ['metric alert', 'service check', 'event alert', 'process alert', 'query alert', 'log alert']
         type: str
     query:
         description:
@@ -106,9 +106,16 @@ options:
     thresholds:
         description:
           - A dictionary of thresholds by status.
-          - Only available for service checks and metric alerts.
+          - Only available for service checks, metric alerts, and query alerts.
           - Because each of them can have multiple thresholds, we do not define them directly in the query.
         default: {'ok': 1, 'critical': 1, 'warning': 1}
+    threshold_windows:
+        description:
+          - A dictionary of threshold windows by status
+          - These options only apply to anomaly monitors which are of the "query alert" type; Use elsewhere will be ignored.
+          - "recovery_window: Describes how long an anomalous metric must be normal before the alert recovers"
+          - "trigger_window: Describes how long a metric must be anomalous before an alert triggers"
+        type: dict
     locked:
         description:
           - Whether changes to this monitor should be restricted to the creator or admins.
@@ -199,7 +206,7 @@ def main():
             api_host=dict(required=False),
             app_key=dict(required=True, no_log=True),
             state=dict(required=True, choices=['present', 'absent', 'mute', 'unmute']),
-            type=dict(required=False, choices=['metric alert', 'service check', 'event alert', 'process alert', 'log alert']),
+            type=dict(required=False, choices=['metric alert', 'service check', 'event alert', 'process alert', 'query alert', 'log alert']),
             name=dict(required=True),
             query=dict(required=False),
             notification_message=dict(required=False, default=None, aliases=['message'], deprecated_aliases=[dict(name='message', version='2.14')]),
@@ -211,6 +218,7 @@ def main():
             escalation_message=dict(required=False, default=None),
             notify_audit=dict(required=False, default=False, type='bool'),
             thresholds=dict(required=False, type='dict', default=None),
+            threshold_windows=dict(required=False, type='dict', default=None),
             tags=dict(required=False, type='list', default=None),
             locked=dict(required=False, default=False, type='bool'),
             require_full_window=dict(required=False, default=None, type='bool'),
@@ -337,6 +345,8 @@ def install_monitor(module):
         options["thresholds"] = module.params['thresholds'] or {'ok': 1, 'critical': 1, 'warning': 1}
     if module.params['type'] in ["metric alert", "log alert"] and module.params['thresholds'] is not None:
         options["thresholds"] = module.params['thresholds']
+    if module.params['type'] == "query alert" and module.params['threshold_windows'] is not None:
+        options['threshold_windows'] = module.params['threshold_windows']
 
     monitor = _get_monitor(module)
     if not monitor:
