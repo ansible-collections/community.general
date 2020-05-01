@@ -75,6 +75,11 @@ options:
     type: str
     aliases:
     - login_db
+  trust_input:
+    description:
+    - If C(no), check whether values of some parameters are potentially dangerous.
+    type: bool
+    default: yes
 
 notes:
 - I(state=absent) and I(state=present) (the second one if the tablespace doesn't exist) do not
@@ -185,7 +190,12 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.database import pg_quote_identifier
+from ansible.module_utils.six import iteritems
+
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+    pg_quote_identifier,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     exec_sql,
@@ -286,7 +296,7 @@ class PgTablespace(object):
         args:
             location (str) -- tablespace directory path in the FS
         """
-        query = ("CREATE TABLESPACE %s LOCATION '%s'" % (pg_quote_identifier(self.name, 'database'), location))
+        query = ('CREATE TABLESPACE "%s" LOCATION \'%s\'' % (self.name, location))
         return exec_sql(self, query, return_bool=True)
 
     def drop(self):
@@ -294,7 +304,7 @@ class PgTablespace(object):
 
         Return True if success, otherwise, return False.
         """
-        return exec_sql(self, "DROP TABLESPACE %s" % pg_quote_identifier(self.name, 'database'), return_bool=True)
+        return exec_sql(self, 'DROP TABLESPACE "%s"' % self.name, return_bool=True)
 
     def set_owner(self, new_owner):
         """Set tablespace owner.
@@ -307,7 +317,7 @@ class PgTablespace(object):
         if new_owner == self.owner:
             return False
 
-        query = "ALTER TABLESPACE %s OWNER TO %s" % (pg_quote_identifier(self.name, 'database'), new_owner)
+        query = 'ALTER TABLESPACE "%s" OWNER TO "%s"' % (self.name, new_owner)
         return exec_sql(self, query, return_bool=True)
 
     def rename(self, newname):
@@ -318,7 +328,7 @@ class PgTablespace(object):
         args:
             newname (str) -- new name for the tablespace"
         """
-        query = "ALTER TABLESPACE %s RENAME TO %s" % (pg_quote_identifier(self.name, 'database'), newname)
+        query = 'ALTER TABLESPACE "%s" RENAME TO "%s"' % (self.name, newname)
         self.new_name = newname
         return exec_sql(self, query, return_bool=True)
 
@@ -357,7 +367,7 @@ class PgTablespace(object):
         args:
             setting (str) -- string in format "setting_name = 'setting_value'"
         """
-        query = "ALTER TABLESPACE %s RESET (%s)" % (pg_quote_identifier(self.name, 'database'), setting)
+        query = 'ALTER TABLESPACE "%s" RESET (%s)' % (self.name, setting)
         return exec_sql(self, query, return_bool=True)
 
     def __set_setting(self, setting):
@@ -368,7 +378,7 @@ class PgTablespace(object):
         args:
             setting (str) -- string in format "setting_name = 'setting_value'"
         """
-        query = "ALTER TABLESPACE %s SET (%s)" % (pg_quote_identifier(self.name, 'database'), setting)
+        query = 'ALTER TABLESPACE "%s" SET (%s)' % (self.name, setting)
         return exec_sql(self, query, return_bool=True)
 
 
@@ -388,6 +398,7 @@ def main():
         rename_to=dict(type='str'),
         db=dict(type='str', aliases=['login_db']),
         session_role=dict(type='str'),
+        trust_input=dict(type='bool', default=True),
     )
 
     module = AnsibleModule(
@@ -402,10 +413,22 @@ def main():
     owner = module.params["owner"]
     rename_to = module.params["rename_to"]
     settings = module.params["set"]
+    session_role = module.params["session_role"]
+    trust_input = module.params["trust_input"]
 
     if state == 'absent' and (location or owner or rename_to or settings):
         module.fail_json(msg="state=absent is mutually exclusive location, "
                              "owner, rename_to, and set")
+
+    if not trust_input:
+        # Check input for potentially dangerous elements:
+        if not settings:
+            settings_list = None
+        else:
+            settings_list = ['%s = %s' % (k, v) for k, v in iteritems(settings)]
+
+        check_input(module, tablespace, location, owner,
+                    rename_to, session_role, settings_list)
 
     conn_params = get_conn_params(module, module.params, warn_db_default=False)
     db_connection = connect_to_db(module, conn_params, autocommit=True)
@@ -428,7 +451,8 @@ def main():
 
     # If tablespace exists with different location, exit:
     if tblspace.exists and location and location != tblspace.location:
-        module.fail_json(msg="Tablespace '%s' exists with different location '%s'" % (tblspace.name, tblspace.location))
+        module.fail_json(msg="Tablespace '%s' exists with "
+                             "different location '%s'" % (tblspace.name, tblspace.location))
 
     # Create new tablespace:
     if not tblspace.exists and state == 'present':
