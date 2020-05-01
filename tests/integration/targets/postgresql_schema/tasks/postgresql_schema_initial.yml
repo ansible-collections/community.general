@@ -61,6 +61,7 @@
     database: "{{ db_name }}"
     name: acme
     login_user: "{{ pg_user }}"
+    trust_input: yes
   register: result
 
 # Checks
@@ -143,6 +144,25 @@
 - assert:
     that:
       - result.rowcount == 0
+
+# Test: trust_input parameter
+- name: Create a new schema with potentially dangerous owner name
+  become_user: "{{ pg_user }}"
+  become: yes
+  postgresql_schema:
+    database: "{{ db_name }}"
+    name: acme
+    login_user: "{{ pg_user }}"
+    owner: "{{ dangerous_name }}"
+    trust_input: no
+  register: result
+  ignore_errors: yes
+
+# Checks
+- assert:
+    that:
+      - result is failed
+      - result.msg == 'Passed input \'{{ dangerous_name }}\' is potentially dangerous'
 
 # Test: CREATE SCHEMA; WITH TABLE for DROP CASCADE test
 - name: Create a new schema "acme"
