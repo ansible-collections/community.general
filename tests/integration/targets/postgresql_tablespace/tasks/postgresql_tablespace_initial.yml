@@ -4,10 +4,12 @@
     path: '{{ test_tablespace_path }}'
     state: absent
   ignore_errors: true
+
 - name: postgresql_tablespace - disable selinux
   become: true
   shell: setenforce 0
   ignore_errors: true
+
 - name: postgresql_tablespace - create dir for test tablespace
   become: true
   file:
@@ -17,6 +19,7 @@
     group: '{{ pg_user }}'
     mode: '0700'
   ignore_errors: true
+
 - name: postgresql_tablespace - create test role to test change ownership
   become_user: '{{ pg_user }}'
   become: true
@@ -26,6 +29,7 @@
     name: bob
     state: present
   ignore_errors: true
+
 - name: postgresql_tablespace - create test role to test change ownership
   become_user: '{{ pg_user }}'
   become: true
@@ -35,6 +39,7 @@
     name: alice
     state: present
   ignore_errors: true
+
 - name: postgresql_tablespace - create a new tablespace called acme and set bob as an its owner
   become_user: '{{ pg_user }}'
   become: true
@@ -46,15 +51,17 @@
     location: /ssd
   register: result
   ignore_errors: true
+
 - assert:
     that:
     - result is changed
     - result.owner == 'bob'
-    - result.queries == ["CREATE TABLESPACE \"acme\" LOCATION '/ssd'", "ALTER TABLESPACE \"acme\" OWNER TO bob"]
+    - result.queries == ["CREATE TABLESPACE \"acme\" LOCATION '/ssd'", "ALTER TABLESPACE \"acme\" OWNER TO \"bob\""]
     - result.state == 'present'
     - result.tablespace == 'acme'
     - result.options == {}
     - result.location == '/ssd'
+
 - name: postgresql_tablespace - try to create the same tablespace with different location
   become_user: '{{ pg_user }}'
   become: true
@@ -65,10 +72,12 @@
     location: /another-ssd
   register: result
   ignore_errors: true
+
 - assert:
     that:
     - result is not changed
     - result.msg == "Tablespace 'acme' exists with different location '/ssd'"
+
 - name: postgresql_tablespace - change tablespace owner to alice
   become_user: '{{ pg_user }}'
   become: true
@@ -79,14 +88,16 @@
     owner: alice
   register: result
   ignore_errors: true
+
 - assert:
     that:
     - result is changed
     - result.owner == 'alice'
-    - result.queries == ["ALTER TABLESPACE \"acme\" OWNER TO alice"]
+    - result.queries == ["ALTER TABLESPACE \"acme\" OWNER TO \"alice\""]
     - result.state == 'present'
     - result.tablespace == 'acme'
     - result.options == {}
+
 - name: postgresql_tablespace - try to change tablespace owner to alice again to be sure that nothing changes
   become_user: '{{ pg_user }}'
   become: true
@@ -97,6 +108,7 @@
     owner: alice
   register: result
   ignore_errors: true
+
 - assert:
     that:
     - result is not changed
@@ -105,6 +117,7 @@
     - result.state == 'present'
     - result.tablespace == 'acme'
     - result.options == {}
+
 - name: postgresql_tablespace - change tablespace options
   become_user: '{{ pg_user }}'
   become: true
@@ -116,6 +129,7 @@
       seq_page_cost: 4
   register: result
   ignore_errors: true
+
 - assert:
     that:
     - result is changed
@@ -125,6 +139,7 @@
     - result.tablespace == 'acme'
     - result.options.seq_page_cost == '4'
   when: postgres_version_resp.stdout is version('9.0', '>=')
+
 - name: postgresql_tablespace - reset seq_page_cost option
   become_user: '{{ pg_user }}'
   become: true
@@ -136,11 +151,13 @@
       seq_page_cost: reset
   register: result
   ignore_errors: true
+
 - assert:
     that:
     - result is changed
     - result.queries == ["ALTER TABLESPACE \"acme\" RESET (seq_page_cost)"]
   when: postgres_version_resp.stdout is version('9.0', '>=')
+
 - name: postgresql_tablespace - reset seq_page_cost option again
   become_user: '{{ pg_user }}'
   become: true
@@ -152,11 +169,13 @@
       seq_page_cost: reset
   register: result
   ignore_errors: true
+
 - assert:
     that:
     - result is not changed
     - result.queries == []
   when: postgres_version_resp.stdout is version('9.0', '>=')
+
 - name: postgresql_tablespace - rename tablespace
   become_user: '{{ pg_user }}'
   become: true
@@ -167,11 +186,30 @@
     rename_to: foo
   register: result
   ignore_errors: true
+
 - assert:
     that:
     - result is changed
     - result.newname == 'foo'
-    - result.queries == ["ALTER TABLESPACE \"acme\" RENAME TO foo"]
+    - result.queries == ["ALTER TABLESPACE \"acme\" RENAME TO \"foo\""]
+
+- name: postgresql_tablespace - rename tablespace to potentially dangerous name
+  become_user: '{{ pg_user }}'
+  become: true
+  postgresql_tablespace:
+    db: postgres
+    login_user: '{{ pg_user }}'
+    name: foo
+    rename_to: '{{ dangerous_name }}'
+    trust_input: no
+  register: result
+  ignore_errors: true
+
+- assert:
+    that:
+    - result is failed
+    - result.msg == 'Passed input \'{{ dangerous_name }}\' is potentially dangerous'
+
 - name: postgresql_tablespace - drop tablespace
   become_user: '{{ pg_user }}'
   become: true
@@ -180,13 +218,16 @@
     login_user: '{{ pg_user }}'
     name: foo
     state: absent
+    trust_input: yes
   register: result
   ignore_errors: true
+
 - assert:
     that:
     - result is changed
     - result.state == 'absent'
     - result.queries == ["DROP TABLESPACE \"foo\""]
+
 - name: postgresql_tablespace - try to drop nonexistent tablespace
   become_user: '{{ pg_user }}'
   become: true
@@ -197,6 +238,7 @@
     state: absent
   register: result
   ignore_errors: true
+
 - assert:
     that:
     - result is not changed
