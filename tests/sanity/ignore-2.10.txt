@@ -1957,6 +1957,7 @@ tests/unit/plugins/modules/web_infrastructure/test_apache2_module.py future-impo
 tests/unit/plugins/modules/web_infrastructure/test_apache2_module.py metaclass-boilerplate
 tests/unit/plugins/modules/web_infrastructure/test_jenkins_plugin.py future-import-boilerplate
 tests/unit/plugins/modules/web_infrastructure/test_jenkins_plugin.py metaclass-boilerplate
+tests/utils/shippable/check_matrix.py replace-urlopen
 tests/utils/shippable/timing.py shebang
 plugins/modules/cloud/digital_ocean/digital_ocean.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
 plugins/modules/cloud/digital_ocean/digital_ocean.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
