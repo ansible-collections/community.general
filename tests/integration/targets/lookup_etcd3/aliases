@@ -5,4 +5,4 @@ needs/target/setup_etcd3
 skip/aix
 skip/osx
 skip/freebsd
-skip/python2.6  # lookups are controller only, and we no longer support Python 2.6 on the controller
+skip/python2.6   # lookups are controller only, and we no longer support Python 2.6 on the controller

@@ -3,4 +3,4 @@ destructive
 skip/aix
 skip/osx
 skip/freebsd
-skip/python2.6 # installing etcd3 python module will fail on python < 2.7
+skip/python2.6  # installing etcd3 python module will fail on python < 2.7
