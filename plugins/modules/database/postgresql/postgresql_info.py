@@ -291,7 +291,7 @@ replications:
   returned: if pg_stat_replication view existent
   type: dict
   sample:
-  - { 76580: { "app_name": "standby1", "backend_start": "2019-02-03 00:14:33.908593+03",
+  - { "76580": { "app_name": "standby1", "backend_start": "2019-02-03 00:14:33.908593+03",
     "client_addr": "10.10.10.2", "client_hostname": "", "state": "streaming", "usename": "postgres" } }
   contains:
     usename:
