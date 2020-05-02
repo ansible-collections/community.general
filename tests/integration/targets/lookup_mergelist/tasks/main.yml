@@ -1,0 +1,35 @@
+---
+# lookup_mergelist integration tests
+# 2020, Jose Angel Munoz <josea.munoz@gmail.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: Merges list1 and list2 with 'name' as key
+  set_fact:
+    mergedlists: "{{ lookup('community.general.mergelist', list1, list2) | sort(attribute='name') }}"
+  vars:
+    list1:
+      - name: myname01
+        param01: myparam01
+      - name: myname02
+        param01: myparam02
+    list2:
+      - name: myname01
+        param01: myparam03
+      - name: myname02
+        param02: myparam04
+      - name: myname03
+        param03: myparam03
+
+- name: Checks mergelist values
+  assert:
+    msg: unexpected mergelist values
+    that:
+      - mergedlists is iterable
+      - mergedlists | length() == 3
+      - mergedlists[0].name == "myname01"
+      - mergedlists[1].name == "myname02"
+      - mergedlists[2].name == "myname03"
+      - mergedlists[0].param01 == "myparam03"
+      - mergedlists[1].param01 == "myparam02"
+      - mergedlists[1].param02 == "myparam04"
+      - mergedlists[2].param03 == "myparam03"
