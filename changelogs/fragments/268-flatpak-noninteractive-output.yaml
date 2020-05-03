@@ -1,0 +1,2 @@
+bugfixes:
+- flatpak - fix output by running with the --noninteractive argument.
