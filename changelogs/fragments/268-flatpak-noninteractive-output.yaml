@@ -1,2 +1,2 @@
 bugfixes:
-- flatpak - fix output by running with the --noninteractive argument.
+- flatpak - fix output by running with the --noninteractive argument (https://github.com/ansible-collections/community.general/pull/268).
