@@ -5,7 +5,7 @@
 
 - name: Merges list1 and list2 with 'name' as key
   set_fact:
-    mergedlists: "{{ lookup('community.general.mergelist', list1, list2) | sort(attribute='name') }}"
+    mergedlistbasic: "{{ lookup('community.general.mergelist', list1, list2) | sort(attribute='name') }}"
   vars:
     list1:
       - name: myname01
@@ -24,12 +24,85 @@
   assert:
     msg: unexpected mergelist values
     that:
-      - mergedlists is iterable
-      - mergedlists | length() == 3
-      - mergedlists[0].name == "myname01"
-      - mergedlists[1].name == "myname02"
-      - mergedlists[2].name == "myname03"
-      - mergedlists[0].param01 == "myparam03"
-      - mergedlists[1].param01 == "myparam02"
-      - mergedlists[1].param02 == "myparam04"
-      - mergedlists[2].param03 == "myparam03"
+      - mergedlistbasic is iterable
+      - mergedlistbasic | length() == 3
+      - mergedlistbasic[0].name == "myname01"
+      - mergedlistbasic[1].name == "myname02"
+      - mergedlistbasic[2].name == "myname03"
+      - mergedlistbasic[0].param01 == "myparam03"
+      - mergedlistbasic[1].param01 == "myparam02"
+      - mergedlistbasic[1].param02 == "myparam04"
+      - mergedlistbasic[2].param03 == "myparam03"
+
+- name: Merges list1 and list2 with 'id' as key
+  set_fact:
+    mergedlistkey: "{{ lookup('community.general.mergelist', list1, list2, key='id') | sort(attribute='id') }}"
+  vars:
+    list1:
+      - id: myname01
+        param01: myparam01
+      - id: myname02
+        param01: myparam02
+    list2:
+      - id: myname01
+        param01: myparam03
+      - id: myname02
+        param02: myparam04
+      - id: myname03
+        param03: myparam03
+
+- name: Checks mergelist values
+  assert:
+    msg: unexpected mergelist values
+    that:
+      - mergedlistkey is iterable
+      - mergedlistkey | length() == 3
+      - mergedlistkey[0].id == "myname01"
+      - mergedlistkey[1].id == "myname02"
+      - mergedlistkey[2].id == "myname03"
+      - mergedlistkey[0].param01 == "myparam03"
+      - mergedlistkey[1].param01 == "myparam02"
+      - mergedlistkey[1].param02 == "myparam04"
+      - mergedlistkey[2].param03 == "myparam03"
+
+- name: Merges list1, list2 and list3 with 'id' as key
+  set_fact:
+    mergedlistmulti: "{{ lookup('community.general.mergelist', list1, list2, list3, key='id') | sort(attribute='id') }}"
+  vars:
+    list1:
+      - id: myname01
+        param01: myparam01
+      - id: myname02
+        param01: myparam02
+    list2:
+      - id: myname01
+        param01: myparam03
+      - id: myname02
+        param02: myparam04
+      - id: myname03
+        param03: myparam03
+    list3:
+      - id: myname01
+        param01: myparam03
+        param03: myparam08
+      - id: myname02
+        param02: myparam04
+      - id: myname04
+        param03: myparam03
+
+- name: Checks mergelist values
+  assert:
+    msg: unexpected mergelist values
+    that:
+      - mergedlistmulti is iterable
+      - mergedlistmulti | length() == 4
+      - mergedlistmulti[0].id == "myname01"
+      - mergedlistmulti[1].id == "myname02"
+      - mergedlistmulti[2].id == "myname03"
+      - mergedlistmulti[3].id == "myname04"
+      - mergedlistmulti[0].param01 == "myparam03"
+      - mergedlistmulti[0].param03 == "myparam08"
+      - mergedlistmulti[1].param01 == "myparam02"
+      - mergedlistmulti[1].param02 == "myparam04"
+      - mergedlistmulti[2].param03 == "myparam03"
+      - mergedlistmulti[3].param03 == "myparam03"
