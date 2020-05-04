@@ -1264,9 +1264,7 @@ plugins/modules/packaging/os/apt_rpm.py validate-modules:doc-default-does-not-ma
 plugins/modules/packaging/os/apt_rpm.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/apt_rpm.py validate-modules:parameter-type-not-in-doc
 plugins/modules/packaging/os/apt_rpm.py validate-modules:undocumented-parameter
-plugins/modules/packaging/os/flatpak.py validate-modules:parameter-type-not-in-doc
 plugins/modules/packaging/os/flatpak.py validate-modules:use-run-command-not-popen
-plugins/modules/packaging/os/flatpak_remote.py validate-modules:parameter-type-not-in-doc
 plugins/modules/packaging/os/flatpak_remote.py validate-modules:use-run-command-not-popen
 plugins/modules/packaging/os/homebrew.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/homebrew_cask.py validate-modules:parameter-invalid

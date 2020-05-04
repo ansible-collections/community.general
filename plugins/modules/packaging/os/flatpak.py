@@ -51,12 +51,14 @@ options:
     description:
     - The path to the C(flatpak) executable to use.
     - By default, this module looks for the C(flatpak) executable on the path.
+    type: path
     default: flatpak
   method:
     description:
     - The installation method to use.
     - Defines if the I(flatpak) is supposed to be installed globally for the whole C(system)
       or only for the current C(user).
+    type: str
     choices: [ system, user ]
     default: system
   name:
@@ -72,6 +74,7 @@ options:
       installed flatpak based on the name of the flatpakref to remove it. However, there is no
       guarantee that the names of the flatpakref file and the reverse DNS name of the installed
       flatpak do match.
+    type: str
     required: true
   remote:
     description:
@@ -79,11 +82,13 @@ options:
     - By default, C(flathub) is assumed, but you do need to add the flathub flatpak_remote before
       you can use this.
     - See the M(flatpak_remote) module for managing flatpak remotes.
+    type: str
     default: flathub
   state:
     description:
     - Indicates the desired package state.
     choices: [ absent, present ]
+    type: str
     default: present
 '''
 
