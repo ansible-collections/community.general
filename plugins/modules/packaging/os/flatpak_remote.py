@@ -55,6 +55,7 @@ options:
     description:
     - The path to the C(flatpak) executable to use.
     - By default, this module looks for the C(flatpak) executable on the path.
+    type: str
     default: flatpak
   flatpakrepo_url:
     description:
@@ -63,11 +64,13 @@ options:
       is added using the specified installation C(method).
     - When used with I(state=absent), this is not required.
     - Required when I(state=present).
+    type: str
   method:
     description:
     - The installation method to use.
     - Defines if the I(flatpak) is supposed to be installed globally for the whole C(system)
       or only for the current C(user).
+    type: str
     choices: [ system, user ]
     default: system
   name:
@@ -76,10 +79,12 @@ options:
     - When used with I(state=present), the remote will be added to the managed host under
       the specified I(name).
     - When used with I(state=absent) the remote with that name will be removed.
+    type: str
     required: true
   state:
     description:
     - Indicates the desired package state.
+    type: str
     choices: [ absent, present ]
     default: present
 '''
