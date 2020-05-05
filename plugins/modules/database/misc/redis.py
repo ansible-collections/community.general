@@ -24,9 +24,8 @@ options:
             - C(config) (new in 1.6), ensures a configuration setting on an instance.
             - C(flush) flushes all the instance or a specified db.
             - C(slave) sets a redis instance in slave or master mode.
-            - C(info) returns information and statistics about the server.
         required: true
-        choices: [ config, flush, slave, info ]
+        choices: [ config, flush, slave ]
     login_password:
         description:
             - The password used to authenticate with (usually not used)
@@ -66,7 +65,6 @@ options:
             - A redis config value. When memory size is needed, it is possible
               to specify it in the usal form of 1KB, 2M, 400MB where the base is 1024.
               Units are case insensitive i.e. 1m = 1mb = 1M = 1MB.
-
 notes:
    - Requires the redis-py Python package on the remote host. You can
      install it with pip (pip install redis) or with a package manager.
@@ -74,6 +72,8 @@ notes:
    - If the redis master instance we are making slave of is password protected
      this needs to be in the redis.conf in the masterauth variable
 
+seealso:
+    - module: redis_info
 requirements: [ redis ]
 author: "Xabier Larrakoetxea (@slok)"
 '''
@@ -101,15 +101,6 @@ EXAMPLES = '''
     db: 1
     flush_mode: db
 
-- name: Get server information
-  redis:
-    command: info
-  register: result
-
-- name: Print server information
-  debug:
-    var: result.info
-
 - name: Configure local redis to have 10000 max clients
   redis:
     command: config
@@ -127,18 +118,6 @@ EXAMPLES = '''
     command: config
     name: lua-time-limit
     value: 100
-'''
-
-RETURN = '''
-info:
-  description: The default set of server information sections U(https://redis.io/commands/info).
-  returned: success
-  type: dict
-  sample: {"arch_bits": 64, "atomicvar_api": "atomic-builtin", "config_file": "", "configured_hz": 10,
-    "executable": "/data/redis-server", "gcc_version": "8.3.0", "lru_clock": 11603906, "multiplexing_api": "epoll",
-    "os": "Linux 3.10.0-1062.12.1.el7.x86_64", "process_id": 1, "redis_build_id": "4d072dc1c62d5672",
-    "redis_git_dirty": 0, "redis_git_sha1": 0, "redis_mode": "standalone", "redis_version": "999.999.999",
-    "run_id": "8d252f66c3ef89bd60a060cf8dc5cfe3d511c5e4", "tcp_port": 6379, "uptime_in_days": 53, "uptime_in_seconds": 4631778}
 '''
 
 import traceback
@@ -187,7 +166,7 @@ def flush(client, db=None):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            command=dict(type='str', choices=['config', 'flush', 'slave', 'info']),
+            command=dict(type='str', choices=['config', 'flush', 'slave']),
             login_password=dict(type='str', no_log=True),
             login_host=dict(type='str', default='localhost'),
             login_port=dict(type='int', default=6379),
@@ -297,8 +276,6 @@ def main():
                 module.exit_json(changed=True, flushed=True, db=db)
             else:  # Flush never fails :)
                 module.fail_json(msg="Unable to flush '%d' database" % db)
-
-    # Config Command section -----------
     elif command == 'config':
         name = module.params['name']
 
@@ -328,18 +305,6 @@ def main():
             except Exception as e:
                 module.fail_json(msg="unable to write config: %s" % to_native(e), exception=traceback.format_exc())
             module.exit_json(changed=changed, name=name, value=value)
-
-    # Info Command section -----------
-    elif command == "info":
-        # Connect and check
-        r = redis.StrictRedis(host=login_host, port=login_port, password=login_password)
-        try:
-            r.ping()
-        except Exception as e:
-            module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
-
-        info = r.info()
-        module.exit_json(changed=False, info=info)
     else:
         module.fail_json(msg='A valid command must be provided')
 
