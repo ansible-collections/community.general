@@ -23,14 +23,17 @@ options:
   login_host:
     description:
     - The host running the database
+    type: str
     default: localhost
   login_port:
     description:
     - The port to connect to
+    type: int
     default: 6379
   login_password:
     description:
     - The password used to authenticate with (usually not used)
+    type: str
 notes:
 - Requires the redis-py Python package on the remote host. You can
   install it with pip (pip install redis) or with a package manager.
@@ -199,6 +202,7 @@ else:
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
+
 
 # Module execution.
 def main():
