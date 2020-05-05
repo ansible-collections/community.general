@@ -94,7 +94,7 @@ EXAMPLES = r'''
     local: yes
 
 - name: Revoke all permissions from everyone (permissions specifically assigned to users and groups remain)
-- zfs_delegate_admin:
+  zfs_delegate_admin:
     name: rpool/myfs
     everyone: yes
     state: absent
