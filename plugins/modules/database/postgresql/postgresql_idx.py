@@ -114,6 +114,11 @@ options:
     - Mutually exclusive with I(concurrent=yes)
     type: bool
     default: no
+  trust_input:
+    description:
+    - If C(no), check whether values of some parameters are potentially dangerous.
+    type: bool
+    default: yes
 
 seealso:
 - module: postgresql_table
@@ -258,6 +263,7 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import check_input
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     exec_sql,
@@ -360,7 +366,8 @@ class Index(object):
             self.exists = False
             return False
 
-    def create(self, tblname, idxtype, columns, cond, tblspace, storage_params, concurrent=True, unique=False):
+    def create(self, tblname, idxtype, columns, cond, tblspace,
+               storage_params, concurrent=True, unique=False):
         """Create PostgreSQL index.
 
         Return True if success, otherwise, return False.
@@ -391,12 +398,9 @@ class Index(object):
         if concurrent:
             query += ' CONCURRENTLY'
 
-        query += ' %s' % self.name
+        query += ' "%s"' % self.name
 
-        if self.schema:
-            query += ' ON %s.%s ' % (self.schema, tblname)
-        else:
-            query += 'public.%s ' % tblname
+        query += ' ON "%s"."%s" ' % (self.schema, tblname)
 
         query += 'USING %s (%s)' % (idxtype, columns)
 
@@ -404,7 +408,7 @@ class Index(object):
             query += ' WITH (%s)' % storage_params
 
         if tblspace:
-            query += ' TABLESPACE %s' % tblspace
+            query += ' TABLESPACE "%s"' % tblspace
 
         if cond:
             query += ' WHERE %s' % cond
@@ -438,9 +442,9 @@ class Index(object):
             query += ' CONCURRENTLY'
 
         if not schema:
-            query += ' public.%s' % self.name
+            query += ' "public"."%s"' % self.name
         else:
-            query += ' %s.%s' % (schema, self.name)
+            query += ' "%s"."%s"' % (schema, self.name)
 
         if cascade:
             query += ' CASCADE'
@@ -475,6 +479,7 @@ def main():
         storage_params=dict(type='list', elements='str'),
         cascade=dict(type='bool', default=False),
         schema=dict(type='str'),
+        trust_input=dict(type='bool', default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -493,6 +498,13 @@ def main():
     storage_params = module.params["storage_params"]
     cascade = module.params["cascade"]
     schema = module.params["schema"]
+    session_role = module.params["session_role"]
+    trust_input = module.params["trust_input"]
+
+    if not trust_input:
+        # Check input for potentially dangerous elements:
+        check_input(module, idxname, session_role, schema, table, columns,
+                    tablespace, storage_params, cond)
 
     if concurrent and cascade:
         module.fail_json(msg="Concurrent mode and cascade parameters are mutually exclusive")
