@@ -129,7 +129,7 @@ EXAMPLES = '''
     value: 100
 '''
 
-RETURN='''
+RETURN = '''
 info:
   description: The default set of server information sections U(https://redis.io/commands/info).
   returned: success
