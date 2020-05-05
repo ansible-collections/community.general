@@ -1,0 +1,2 @@
+bugfixes:
+- mysql_user - add ``INVOKE LAMBDA`` privilege support (https://github.com/ansible-collections/community.general/issues/283).
