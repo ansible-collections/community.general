@@ -295,7 +295,8 @@ VALID_PRIVS = frozenset(('CREATE', 'DROP', 'GRANT', 'GRANT OPTION',
                          'ROLE_ADMIN', 'SESSION_VARIABLES_ADMIN', 'SET_USER_ID',
                          'SYSTEM_USER', 'SYSTEM_VARIABLES_ADMIN', 'SYSTEM_USER',
                          'TABLE_ENCRYPTION_ADMIN', 'VERSION_TOKEN_ADMIN',
-                         'XA_RECOVER_ADMIN', 'LOAD FROM S3', 'SELECT INTO S3'))
+                         'XA_RECOVER_ADMIN', 'LOAD FROM S3', 'SELECT INTO S3',
+                         'INVOKE LAMBDA'))
 
 
 class InvalidPrivsError(Exception):
