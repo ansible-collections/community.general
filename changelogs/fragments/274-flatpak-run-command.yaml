@@ -1,2 +1,2 @@
 minor_changes:
-- flatpak and flatpak_remote - use module.run_command() instead of subprocess.Popen.
+- flatpak and flatpak_remote - use ``module.run_command()`` instead of ``subprocess.Popen()``.
