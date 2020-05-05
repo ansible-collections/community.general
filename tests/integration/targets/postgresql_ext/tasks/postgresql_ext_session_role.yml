@@ -63,6 +63,7 @@
     db: "{{ db_session_role1 }}"
     login_user: "{{ pg_user }}"
     session_role: "{{ db_session_role1 }}"
+    trust_input: no
   when:
      "pg_extension.stdout_lines[-1] == '1'"
 
@@ -88,6 +89,7 @@
     db: "{{ db_session_role1 }}"
     login_user: "{{ pg_user }}"
     state: absent
+    trust_input: no
   when:
      "pg_extension.stdout_lines[-1] == '1'"
 
