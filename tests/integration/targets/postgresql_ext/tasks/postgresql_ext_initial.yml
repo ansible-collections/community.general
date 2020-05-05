@@ -198,6 +198,7 @@
     db: postgres
     name: postgis
     session_role: 'curious.anonymous"; SELECT * FROM information_schema.tables; --'
+    trust_input: no
   ignore_errors: true
   register: result
 
