@@ -2,6 +2,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 - vars:
+    dangerous_name: 'curious.anonymous"; SELECT * FROM information_schema.tables; --'
     task_parameters: &task_parameters
       become_user: '{{ pg_user }}'
       become: yes
@@ -242,6 +243,34 @@
   - assert:
       that:
       - result.rowcount == 1
+
+  ##########################
+  # Test trust_input param #
+  ##########################
+
+  - name: Test trust_input parameter
+    <<: *task_parameters
+    postgresql_subscription:
+      <<: *pg_parameters
+      login_port: '{{ replica_port }}'
+      name: '{{ test_subscription }}'
+      state: present
+      publications: '{{ test_pub }}'
+      session_role: '{{ dangerous_name }}'
+      owner: '{{ test_role1 }}'
+      trust_input: no
+      connparams:
+        host: 127.0.0.1
+        port: '{{ master_port }}'
+        user: '{{ replication_role }}'
+        password: '{{ replication_pass }}'
+        dbname: '{{ test_db }}'
+    ignore_errors: yes
+
+  - assert:
+      that:
+      - result is failed
+      - result.msg is search('is potentially dangerous')
 
   ##############
   # Test cascade
