@@ -14,7 +14,8 @@ DOCUMENTATION = '''
     options:
       _uri:
         description:
-          - A colon separated string of connection information for Redis. The format is 'host:port:db:password',
+          - A colon separated string of connection information for Redis.
+          - The format is C(host:port:db:password), for example C(localhost:6379:0:changeme).
             for example 'localhost:6379:0:changeme'
         required: True
         env:
