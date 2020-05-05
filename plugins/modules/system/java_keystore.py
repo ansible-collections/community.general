@@ -63,8 +63,8 @@ author: Guillaume Grossetie (@Mogztter)
 '''
 
 EXAMPLES = '''
-# Create a key store for the given certificate (inline)
-- java_keystore:
+- name: Create a key store for the given certificate (inline)
+  java_keystore:
     name: example
     certificate: |
       -----BEGIN CERTIFICATE-----
@@ -79,8 +79,8 @@ EXAMPLES = '''
     password: changeit
     dest: /etc/security/keystore.jks
 
-# Create a key store for the given certificate (lookup)
-- java_keystore:
+- name: Create a key store for the given certificate (lookup)
+  java_keystore:
     name: example
     certificate: "{{lookup('file', '/path/to/certificate.crt') }}"
     private_key: "{{lookup('file', '/path/to/private.key') }}"
