@@ -197,6 +197,7 @@ def remove_packages(module, packages):
 def install_packages(module, state, packages, prompts):
     install_c = 0
     has_prompt = bool(prompts)
+    default_stdin = "\n"
 
     if has_prompt:
         nb_prompts = len(prompts)
@@ -214,7 +215,6 @@ def install_packages(module, state, packages, prompts):
 
         # Preparing prompts answer according to item type
         tmp_prompts = []
-        default_prompt_answer = "\n"
         for _item in prompts:
             # If the current item is a dict then we expect it's key to be the prompt regex and it's value to be the answer
             # We also expect here that the dict only has ONE key and the first key will be taken
@@ -224,9 +224,9 @@ def install_packages(module, state, packages, prompts):
 
                 tmp_prompts.append((key, answer))
             elif not _item:
-                tmp_prompts.append((None, None))
+                tmp_prompts.append((None, default_stdin))
             else:
-                tmp_prompts.append((_item, default_prompt_answer))
+                tmp_prompts.append((_item, default_stdin))
         prompts = tmp_prompts
     for i, package in enumerate(packages):
         # if the package is installed and state == present
@@ -241,12 +241,15 @@ def install_packages(module, state, packages, prompts):
         if state == 'latest':
             command = 'upgrade'
 
-        current_prompt_regex = (None, None)
         if has_prompt and i < len(prompts):
-            current_prompt_regex = prompts[i]
+            prompt_regex = prompts[i][0]
+            data = prompts[i][1]
+        else:
+            prompt_regex = None
+            data = default_stdin
 
         cmd = "%s %s %s" % (_get_pear_path(module), command, package)
-        rc, stdout, stderr = module.run_command(cmd, check_rc=False, prompt_regex=current_prompt_regex[0], data=current_prompt_regex[1], binary_data=True)
+        rc, stdout, stderr = module.run_command(cmd, check_rc=False, prompt_regex=prompt_regex, data=data, binary_data=True)
         if rc != 0:
             module.fail_json(msg="failed to install %s: %s" % (package, to_text(stdout + stderr)))
 
