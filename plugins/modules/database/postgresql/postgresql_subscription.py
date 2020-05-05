@@ -80,6 +80,18 @@ options:
       on U(https://www.postgresql.org/docs/current/sql-createsubscription.html).
     - Ignored when I(state) is not C(present).
     type: dict
+  session_role:
+    description:
+    - Switch to session_role after connecting. The specified session_role must
+      be a role that the current login_user is a member of.
+    - Permissions checking for SQL commands is carried out as though
+      the session_role were the one that had logged in originally.
+    type: str
+  trust_input:
+    description:
+    - If C(no), check whether values of some parameters are potentially dangerous.
+    type: bool
+    default: yes
 
 notes:
 - PostgreSQL version must be 10 or greater.
@@ -196,6 +208,7 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import check_input
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     exec_sql,
@@ -581,6 +594,8 @@ def main():
         cascade=dict(type='bool', default=False),
         owner=dict(type='str'),
         subsparams=dict(type='dict'),
+        session_role=dict(type='str'),
+        trust_input=dict(type='bool', default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -596,6 +611,23 @@ def main():
     owner = module.params['owner']
     subsparams = module.params['subsparams']
     connparams = module.params['connparams']
+    session_role = module.params['session_role']
+    trust_input = module.params['trust_input']
+
+    if not trust_input:
+        # Check input for potentially dangerous elements:
+        if not subsparams:
+            subsparams_str = None
+        else:
+            subsparams_str = convert_subscr_params(subsparams)
+
+        if not connparams:
+            connparams_str = None
+        else:
+            connparams_str = convert_conn_params(connparams)
+
+        check_input(module, name, publications, owner, session_role,
+                    connparams_str, subsparams_str)
 
     if state == 'present' and cascade:
         module.warn('parameter "cascade" is ignored when state is not absent')
