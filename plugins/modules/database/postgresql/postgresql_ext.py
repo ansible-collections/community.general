@@ -80,6 +80,11 @@ options:
         When version downgrade is needed, remove the extension and create new one with appropriate version.
       - Set I(version=latest) to update the extension to the latest available version.
     type: str
+  trust_input:
+    description:
+    - If C(no), check whether values of some parameters are potentially dangerous.
+    type: bool
+    default: yes
 seealso:
 - name: PostgreSQL extensions
   description: General information about PostgreSQL extensions.
@@ -175,6 +180,9 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     get_conn_params,
@@ -309,6 +317,7 @@ def main():
         cascade=dict(type="bool", default=False),
         session_role=dict(type="str"),
         version=dict(type="str"),
+        trust_input=dict(type="bool", default=True),
     )
 
     module = AnsibleModule(
@@ -321,7 +330,12 @@ def main():
     state = module.params["state"]
     cascade = module.params["cascade"]
     version = module.params["version"]
+    session_role = module.params["session_role"]
+    trust_input = module.params["trust_input"]
     changed = False
+
+    if not trust_input:
+        check_input(module, ext, schema, version, session_role)
 
     if version and state == 'absent':
         module.warn("Parameter version is ignored when state=absent")

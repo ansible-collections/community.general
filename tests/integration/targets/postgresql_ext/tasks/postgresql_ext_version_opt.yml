@@ -29,6 +29,7 @@
       name: "{{ test_ext }}"
       schema: "{{ test_schema }}"
       version: '1.0'
+      trust_input: no
     check_mode: yes
 
   - assert:
@@ -52,6 +53,7 @@
       name: "{{ test_ext }}"
       schema: "{{ test_schema }}"
       version: '1.0'
+      trust_input: no
 
   - assert:
       that:
@@ -75,6 +77,7 @@
       name: "{{ test_ext }}"
       schema: "{{ test_schema }}"
       version: '1.0'
+      trust_input: no
     check_mode: yes
 
   - assert:
@@ -98,6 +101,7 @@
       name: "{{ test_ext }}"
       schema: "{{ test_schema }}"
       version: '1.0'
+      trust_input: no
 
   - assert:
       that:
@@ -120,6 +124,7 @@
       name: "{{ test_ext }}"
       schema: "{{ test_schema }}"
       version: '2.0'
+      trust_input: no
     check_mode: yes
 
   - assert:
@@ -143,6 +148,7 @@
       name: "{{ test_ext }}"
       schema: "{{ test_schema }}"
       version: '2.0'
+      trust_input: no
 
   - assert:
       that:
@@ -165,6 +171,7 @@
       <<: *pg_parameters
       name: "{{ test_ext }}"
       schema: "{{ test_schema }}"
+      trust_input: no
 
   - assert:
       that:
@@ -187,6 +194,7 @@
       name: "{{ test_ext }}"
       schema: "{{ test_schema }}"
       version: latest
+      trust_input: no
 
   - assert:
       that:
@@ -210,6 +218,7 @@
       name: "{{ test_ext }}"
       schema: "{{ test_schema }}"
       version: latest
+      trust_input: no
 
   - assert:
       that:
@@ -222,6 +231,7 @@
       name: "{{ test_ext }}"
       schema: "{{ test_schema }}"
       version: '1.0'
+      trust_input: no
     ignore_errors: yes
 
   - assert:
@@ -234,6 +244,7 @@
       <<: *pg_parameters
       name: "{{ test_ext }}"
       state: absent
+      trust_input: no
     check_mode: yes
 
   - assert:
@@ -256,6 +267,7 @@
       <<: *pg_parameters
       name: "{{ test_ext }}"
       state: absent
+      trust_input: no
 
   - assert:
       that:
@@ -277,6 +289,7 @@
       <<: *pg_parameters
       name: "{{ test_ext }}"
       state: absent
+      trust_input: no
 
   - assert:
       that:
@@ -287,6 +300,7 @@
     postgresql_ext:
       <<: *pg_parameters
       name: "{{ test_ext }}"
+      trust_input: no
 
   - assert:
       that:
@@ -308,6 +322,7 @@
     postgresql_ext:
       <<: *pg_parameters
       name: non_existent
+      trust_input: no
     ignore_errors: yes
 
   - assert:
@@ -322,6 +337,7 @@
       <<: *pg_parameters
       name: "{{ test_ext }}"
       state: absent
+      trust_input: no
 
   - name: postgresql_ext_version - drop the schema
     <<: *task_parameters
