@@ -1,0 +1,2 @@
+bugfixes:
+    - datadog_monitor - added missing ``log alert`` type to ``type`` choices (https://github.com/ansible-collections/community.general/issues/251).
