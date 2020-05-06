@@ -53,7 +53,7 @@ options:
     type:
         description:
           - The type of the monitor.
-        choices: ['metric alert', 'service check', 'event alert', 'process alert']
+        choices: ['metric alert', 'service check', 'event alert', 'process alert', 'log alert']
         type: str
     query:
         description:
@@ -204,7 +204,7 @@ def main():
             api_host=dict(required=False),
             app_key=dict(required=True, no_log=True),
             state=dict(required=True, choices=['present', 'absent', 'mute', 'unmute']),
-            type=dict(required=False, choices=['metric alert', 'service check', 'event alert', 'process alert']),
+            type=dict(required=False, choices=['metric alert', 'service check', 'event alert', 'process alert', 'log alert']),
             name=dict(required=True),
             query=dict(required=False),
             notification_message=dict(required=False, default=None, aliases=['message'], deprecated_aliases=[dict(name='message', version='2.14')]),
