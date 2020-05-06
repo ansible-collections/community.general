@@ -335,28 +335,27 @@ class HashiVault:
         if return_as == 'raw':
             return [data]
 
-        # Check response for KV v2 fields and flatten nested secret data.
         # https://vaultproject.io/api/secret/kv/kv-v2.html#sample-response-1
-        try:
-            # sentinel field checks
-            check_dd = data['data']['data']
-            check_md = data['data']['metadata']
-            # unwrap nested data
-            data = data['data']
-        except KeyError:
-            pass
+        is_kv_v2 = '/data/' in secret and set(data['data'].keys()) == set(('data', 'metadata'))
 
         if return_as == 'values':
+            if is_kv_v2:
+                data = data['data']
             return list(data['data'].values())
 
-        # everything after here implements return_as == 'dict'
+        # return_as == 'dict'
         if not field:
             return [data['data']]
 
-        if field not in data['data']:
-            raise AnsibleError("The secret %s does not contain the field '%s'. for hashi_vault lookup" % (secret, field))
+        # a single field was requested
+        if field in data['data']:
+            return [data['data'][field]]
 
-        return [data['data'][field]]
+        # handle nested data for KV v2
+        if is_kv_v2 and field in data['data']['data']:
+            return [data['data']['data'][field]]
+
+        raise AnsibleError("The secret %s does not contain the field '%s'" % (secret, field))
 
     # begin auth implementation methods
     #
