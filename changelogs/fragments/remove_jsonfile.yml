@@ -1,2 +1,0 @@
-minor_changes:
-- moved jsonfile cache plugin back to ansible-base
