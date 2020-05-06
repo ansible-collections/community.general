@@ -15,6 +15,7 @@ DOCUMENTATION = '''
       _uri:
         description:
           - A colon separated string of connection information for Redis.
+          - The format is C(host:port:db:password), for example C(localhost:6379:0:changeme).
         required: True
         env:
           - name: ANSIBLE_CACHE_PLUGIN_CONNECTION
