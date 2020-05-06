@@ -195,10 +195,6 @@ from ansible.module_utils._text import to_native
 executed_queries = []
 
 
-class NotSupportedError(Exception):
-    pass
-
-
 # ===========================================
 # PostgreSQL module specific support methods.
 #
@@ -231,32 +227,33 @@ def ext_update_version(cursor, ext, version):
       ext (str) -- extension name
       version (str) -- extension version
     """
+    query = "ALTER EXTENSION \"%s\" UPDATE" % ext
+    params = {}
+
     if version != 'latest':
-        query = ("ALTER EXTENSION \"%s\"" % ext)
-        cursor.execute(query + " UPDATE TO %(ver)s", {'ver': version})
-        executed_queries.append(cursor.mogrify(query + " UPDATE TO %(ver)s", {'ver': version}))
-    else:
-        query = ("ALTER EXTENSION \"%s\" UPDATE" % ext)
-        cursor.execute(query)
-        executed_queries.append(query)
+        query += " TO %(ver)s"
+        params['ver'] = version
+
+    cursor.execute(query, params)
+    executed_queries.append(cursor.mogrify(query, params))
+
     return True
 
 
 def ext_create(cursor, ext, schema, cascade, version):
     query = "CREATE EXTENSION \"%s\"" % ext
+    params = {}
+
     if schema:
         query += " WITH SCHEMA \"%s\"" % schema
     if version:
         query += " VERSION %(ver)s"
+        params['ver'] = version
     if cascade:
         query += " CASCADE"
 
-    if version:
-        cursor.execute(query, {'ver': version})
-        executed_queries.append(cursor.mogrify(query, {'ver': version}))
-    else:
-        cursor.execute(query)
-        executed_queries.append(query)
+    cursor.execute(query, params)
+    executed_queries.append(cursor.mogrify(query, params))
     return True
 
 
@@ -292,12 +289,11 @@ def ext_get_versions(cursor, ext):
     cursor.execute(query, {'ext': ext})
     res = cursor.fetchall()
 
-    available_versions = []
-    if res:
-        # Make the list of available versions:
-        for line in res:
-            if LooseVersion(line[0]) > LooseVersion(current_version):
-                available_versions.append(line['version'])
+    available_versions = [
+        line['version']
+        for line in res
+        if LooseVersion(line['version']) > LooseVersion(current_version)
+    ]
 
     if current_version == '0':
         current_version = False
@@ -372,7 +368,7 @@ def main():
                                              "the passed version is not available" % (version, curr_version))
 
                 # If the specific version is passed and it is higher that the current version:
-                if curr_version and version:
+                if curr_version:
                     if LooseVersion(curr_version) < LooseVersion(version):
                         if module.check_mode:
                             changed = True
