@@ -1,3 +1,4 @@
+---
 # Copyright: (c) 2019, Tobias Birkefeld (@tcraxs) <t@craxs.de>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -685,6 +686,27 @@
   assert:
     that:
       - result.rowcount == 1
+
+####################
+# Test: create sequence with trust_input
+- name: postgresql_sequence - check that trust_input works as expected
+  become_user: "{{ pg_user }}"
+  become: yes
+  postgresql_sequence:
+    db: "{{ db_name }}"
+    login_user: "{{ pg_user }}"
+    name: 'just_a_name"; SELECT * FROM information_schema.tables; --'
+    trust_input: no
+    owner: "{{ db_user2 }}"
+  ignore_errors: yes
+  register: result
+
+# Checks
+- name: postgresql_sequence - check with assert the output
+  assert:
+    that:
+      - result is failed
+      - result.msg is search('is potentially dangerous')
 
 # Cleanup
 - name: postgresql_sequence - destroy DB
