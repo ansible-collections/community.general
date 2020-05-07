@@ -520,9 +520,6 @@ plugin_routing:
       deprecation:
         removal_date: TBD
         warning_text: see plugin documentation for details
-      deprecation:
-        removal_date: TBD
-        warning_text: see plugin documentation for details
     osx_say:
       deprecation:
         removal_date: TBD
