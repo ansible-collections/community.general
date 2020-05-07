@@ -143,9 +143,6 @@ files:
   $module_utils/cloudscale.py:
     maintainers: $team_cloudscale
     labels: cloudscale
-  $module_utils/cloudstack.py:
-    maintainers: $team_cloudstack
-    labels: cloudstack
   $module_utils/docker/:
     maintainers: $team_docker
     labels: cloud
@@ -203,9 +200,6 @@ files:
   $module_utils/utm_utils.py:
     maintainers: $team_e_spirit
     labels: utm_utils
-  $module_utils/vultr.py:
-    maintainers: $team_vultr
-    labels: cloud vultr
   $module_utils/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
@@ -1402,7 +1396,6 @@ macros:
   team_aix: MorrisA bcoca d-little flynn1973 gforster kairoaraujo marvin-sinister mator molekuul ramooncamacho wtcross
   team_bsd: JoergFiedler MacLemon bcoca dch jasperla mekanix opoplawski overhacked tuxillo
   team_cloudscale: gaudenz resmo
-  team_cloudstack: dpassante rhtyd
   team_cyberark_conjur: jvanderhoof ryanprior
   team_digital_ocean: BondAnthony mgregson
   team_docker: DBendit WojciechowskiPiotr akshay196 danihodovic dariko felixfontein jwitko kassiansun tbouvet
