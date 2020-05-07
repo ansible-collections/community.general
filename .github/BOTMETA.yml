@@ -6,9 +6,6 @@ files:
     labels: action
   $actions/aireos.py:
     labels: aireos cisco networking
-  $actions/aruba.py:
-    maintainers: $team_aruba
-    labels: aruba networking
   $actions/ironware.py:
     maintainers: paulquack
     labels: ironware networking
