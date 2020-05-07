@@ -70,6 +70,11 @@ options:
     - Permissions checking for SQL commands is carried out as though
       the session_role were the one that had logged in originally.
     type: str
+  trust_input:
+    description:
+    - If C(no), check whether values of some parameters are potentially dangerous.
+    type: bool
+    default: yes
 
 notes:
 - Physical replication slots were introduced to PostgreSQL with version 9.4,
@@ -89,6 +94,7 @@ seealso:
 author:
 - John Scalia (@jscalia)
 - Andrew Klychkov (@Andersson007)
+- Thomas O'Donnell (@andytom)
 extends_documentation_fragment:
 - community.general.postgres
 
@@ -147,6 +153,9 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     exec_sql,
@@ -229,6 +238,7 @@ def main():
         session_role=dict(type="str"),
         output_plugin=dict(type="str", default="test_decoding"),
         state=dict(type="str", default="present", choices=["absent", "present"]),
+        trust_input=dict(type="bool", default=True),
     )
 
     module = AnsibleModule(
@@ -241,6 +251,9 @@ def main():
     immediately_reserve = module.params["immediately_reserve"]
     state = module.params["state"]
     output_plugin = module.params["output_plugin"]
+
+    if not module.params["trust_input"]:
+        check_input(module, module.params['session_role'])
 
     if immediately_reserve and slot_type == 'logical':
         module.fail_json(msg="Module parameters immediately_reserve and slot_type=logical are mutually exclusive")
