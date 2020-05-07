@@ -135,6 +135,11 @@ options:
     aliases:
     - database
     - login_db
+  trust_input:
+    description:
+    - If C(no), check whether values of some parameters are potentially dangerous.
+    type: bool
+    default: yes
 notes:
 - If you do not pass db parameter, sequence will be created in the database
   named postgres.
@@ -154,6 +159,7 @@ seealso:
   link: https://www.postgresql.org/docs/current/sql-dropsequence.html
 author:
 - Tobias Birkefeld (@tcraxs)
+- Thomas O'Donnell (@andytom)
 extends_documentation_fragment:
 - community.general.postgres
 
@@ -299,7 +305,9 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.database import pg_quote_identifier
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     exec_sql,
@@ -435,7 +443,7 @@ class Sequence(object):
         """Implements ALTER SEQUENCE RENAME TO command behavior."""
         query = ['ALTER SEQUENCE']
         query.append(self.__add_schema())
-        query.append('RENAME TO %s' % pg_quote_identifier(self.module.params['rename_to'], 'sequence'))
+        query.append('RENAME TO "%s"' % self.module.params['rename_to'])
 
         return exec_sql(self, ' '.join(query), return_bool=True)
 
@@ -443,7 +451,7 @@ class Sequence(object):
         """Implements ALTER SEQUENCE OWNER TO command behavior."""
         query = ['ALTER SEQUENCE']
         query.append(self.__add_schema())
-        query.append('OWNER TO %s' % pg_quote_identifier(self.module.params['owner'], 'role'))
+        query.append('OWNER TO "%s"' % self.module.params['owner'])
 
         return exec_sql(self, ' '.join(query), return_bool=True)
 
@@ -451,13 +459,12 @@ class Sequence(object):
         """Implements ALTER SEQUENCE SET SCHEMA command behavior."""
         query = ['ALTER SEQUENCE']
         query.append(self.__add_schema())
-        query.append('SET SCHEMA %s' % pg_quote_identifier(self.module.params['newschema'], 'schema'))
+        query.append('SET SCHEMA "%s"' % self.module.params['newschema'])
 
         return exec_sql(self, ' '.join(query), return_bool=True)
 
     def __add_schema(self):
-        return '.'.join([pg_quote_identifier(self.schema, 'schema'),
-                        pg_quote_identifier(self.name, 'sequence')])
+        return '"%s"."%s"' % (self.schema, self.name)
 
 
 # ===========================================
@@ -483,6 +490,7 @@ def main():
         newschema=dict(type='str'),
         db=dict(type='str', default='', aliases=['login_db', 'database']),
         session_role=dict(type='str'),
+        trust_input=dict(type="bool", default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -509,6 +517,17 @@ def main():
             ['cascade', 'newschema'],
         ]
     )
+
+    if not module.params["trust_input"]:
+        check_input(
+            module,
+            module.params['sequence'],
+            module.params['schema'],
+            module.params['rename_to'],
+            module.params['owner'],
+            module.params['newschema'],
+            module.params['session_role'],
+        )
 
     # Note: we don't need to check mutually exclusive params here, because they are
     # checked automatically by AnsibleModule (mutually_exclusive=[] list above).
