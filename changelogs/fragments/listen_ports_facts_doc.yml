@@ -1,0 +1,2 @@
+minor_changes:
+- Updated documentation about netstat command requirement for listen_ports_facts module (https://github.com/ansible/ansible/issues/68077).
