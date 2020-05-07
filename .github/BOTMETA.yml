@@ -9,12 +9,6 @@ files:
   $actions/ironware.py:
     maintainers: paulquack
     labels: ironware networking
-  $actions/onyx_config.py:
-    maintainers: $team_onyx
-    labels: networking onyx_config
-  $actions/sros.py:
-    maintainers: $team_networking
-    labels: networking sros
   $becomes/:
     labels: become
   $callbacks/:
