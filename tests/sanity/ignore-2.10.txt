@@ -390,22 +390,18 @@ plugins/modules/cloud/google/gcp_container_node_pool_info.py validate-modules:pa
 plugins/modules/cloud/google/gcp_dns_managed_zone_info.py validate-modules:doc-elements-mismatch
 plugins/modules/cloud/google/gcp_dns_managed_zone_info.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gcp_dns_resource_record_set_info.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gcp_forwarding_rule.py validate-modules:deprecation-mismatch
 plugins/modules/cloud/google/gcp_forwarding_rule.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/cloud/google/gcp_forwarding_rule.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/google/gcp_forwarding_rule.py validate-modules:doc-missing-type
 plugins/modules/cloud/google/gcp_forwarding_rule.py validate-modules:doc-required-mismatch
-plugins/modules/cloud/google/gcp_forwarding_rule.py validate-modules:invalid-documentation
 plugins/modules/cloud/google/gcp_forwarding_rule.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gcp_forwarding_rule.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/google/gcp_forwarding_rule.py validate-modules:undocumented-parameter
 plugins/modules/cloud/google/gcp_healthcheck.py pylint:blacklisted-name
-plugins/modules/cloud/google/gcp_healthcheck.py validate-modules:deprecation-mismatch
 plugins/modules/cloud/google/gcp_healthcheck.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/cloud/google/gcp_healthcheck.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/google/gcp_healthcheck.py validate-modules:doc-missing-type
 plugins/modules/cloud/google/gcp_healthcheck.py validate-modules:doc-required-mismatch
-plugins/modules/cloud/google/gcp_healthcheck.py validate-modules:invalid-documentation
 plugins/modules/cloud/google/gcp_healthcheck.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gcp_healthcheck.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/google/gcp_iam_role_info.py validate-modules:parameter-list-no-elements
@@ -420,20 +416,16 @@ plugins/modules/cloud/google/gcp_spanner_instance_info.py validate-modules:param
 plugins/modules/cloud/google/gcp_sql_database_info.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gcp_sql_instance_info.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gcp_sql_user_info.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gcp_target_proxy.py validate-modules:deprecation-mismatch
 plugins/modules/cloud/google/gcp_target_proxy.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/cloud/google/gcp_target_proxy.py validate-modules:doc-missing-type
 plugins/modules/cloud/google/gcp_target_proxy.py validate-modules:doc-required-mismatch
-plugins/modules/cloud/google/gcp_target_proxy.py validate-modules:invalid-documentation
 plugins/modules/cloud/google/gcp_target_proxy.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gcp_target_proxy.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/google/gcp_target_proxy.py validate-modules:undocumented-parameter
 plugins/modules/cloud/google/gcp_tpu_node_info.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gcp_url_map.py validate-modules:deprecation-mismatch
 plugins/modules/cloud/google/gcp_url_map.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/cloud/google/gcp_url_map.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/google/gcp_url_map.py validate-modules:doc-missing-type
-plugins/modules/cloud/google/gcp_url_map.py validate-modules:invalid-documentation
 plugins/modules/cloud/google/gcp_url_map.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gcp_url_map.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/google/gcp_url_map.py validate-modules:undocumented-parameter
@@ -447,8 +439,6 @@ plugins/modules/cloud/google/gcpubsub_info.py validate-modules:doc-missing-type
 plugins/modules/cloud/google/gcpubsub_info.py validate-modules:doc-required-mismatch
 plugins/modules/cloud/google/gcpubsub_info.py validate-modules:parameter-state-invalid-choice
 plugins/modules/cloud/google/gcpubsub_info.py validate-modules:undocumented-parameter
-plugins/modules/cloud/google/gcspanner.py validate-modules:deprecation-mismatch
-plugins/modules/cloud/google/gcspanner.py validate-modules:invalid-documentation
 plugins/modules/cloud/google/gcspanner.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/google/gcspanner.py validate-modules:undocumented-parameter
 plugins/modules/cloud/heroku/heroku_collaborator.py validate-modules:parameter-list-no-elements
@@ -1957,125 +1947,3 @@ tests/unit/plugins/modules/web_infrastructure/test_jenkins_plugin.py future-impo
 tests/unit/plugins/modules/web_infrastructure/test_jenkins_plugin.py metaclass-boilerplate
 tests/utils/shippable/check_matrix.py replace-urlopen
 tests/utils/shippable/timing.py shebang
-plugins/modules/cloud/digital_ocean/digital_ocean.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/digital_ocean/digital_ocean.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/digital_ocean/digital_ocean_sshkey_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/digital_ocean/digital_ocean_sshkey_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/google/gcdns_record.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/google/gcdns_record.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/google/gcdns_zone.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/google/gcdns_zone.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/google/gce.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/google/gce.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/google/gcp_backend_service.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/google/gcp_backend_service.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/misc/ovirt.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/misc/ovirt.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/online/online_server_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/online/online_server_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/online/online_user_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/online/online_user_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_affinity_label_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_affinity_label_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_api_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_api_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_cluster_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_cluster_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_datacenter_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_datacenter_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_disk_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_disk_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_event_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_event_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_external_provider_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_external_provider_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_group_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_group_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_host_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_host_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_host_storage_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_host_storage_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_network_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_network_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_nic_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_nic_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_permission_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_permission_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_quota_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_quota_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_scheduling_policy_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_scheduling_policy_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_snapshot_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_snapshot_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_storage_domain_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_storage_domain_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_storage_template_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_storage_template_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_storage_vm_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_storage_vm_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_tag_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_tag_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_template_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_template_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_user_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_user_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_vm_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_vm_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/scaleway/scaleway_image_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/scaleway/scaleway_image_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/scaleway/scaleway_ip_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/scaleway/scaleway_ip_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/scaleway/scaleway_organization_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/scaleway/scaleway_organization_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/scaleway/scaleway_security_group_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/scaleway/scaleway_security_group_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/scaleway/scaleway_server_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/scaleway/scaleway_server_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/scaleway/scaleway_snapshot_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/scaleway/scaleway_snapshot_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/scaleway/scaleway_volume_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/cloud/scaleway/scaleway_volume_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/net_tools/ldap/ldap_attr.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/net_tools/ldap/ldap_attr.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/remote_management/foreman/foreman.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/remote_management/foreman/foreman.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/remote_management/foreman/katello.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/remote_management/foreman/katello.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/source_control/github/github_hooks.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/source_control/github/github_hooks.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_aggregate.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_aggregate.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_license.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_license.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_lun.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_lun.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_qtree.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_qtree.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_svm.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_svm.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_user.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_user.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_user_role.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_user_role.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_volume.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_cdot_volume.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_ontap_gather_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/na_ontap_gather_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/sf_account_manager.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/sf_account_manager.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/sf_check_connections.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/sf_check_connections.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/sf_snapshot_schedule_manager.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/sf_snapshot_schedule_manager.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/sf_volume_access_group_manager.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/sf_volume_access_group_manager.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/sf_volume_manager.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/netapp/sf_volume_manager.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/purestorage/purefa_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/purestorage/purefa_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/purestorage/purefb_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/storage/purestorage/purefb_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/web_infrastructure/nginx_status_facts.py validate-modules:deprecation-mismatch  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
-plugins/modules/web_infrastructure/nginx_status_facts.py validate-modules:invalid-documentation  # needs to be removed and adjusted once https://github.com/ansible/ansible/pull/67684 has been merged
