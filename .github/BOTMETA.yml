@@ -1,5 +1,27 @@
 automerge: true
 files:
+  changelogs/fragments/:
+    support: community
+  $actions:
+    labels: action
+  $actions/aireos.py:
+    labels: aireos cisco networking
+  $actions/aruba.py:
+    maintainers: $team_aruba
+    labels: aruba networking
+  $actions/ironware.py:
+    maintainers: paulquack
+    labels: ironware networking
+  $actions/onyx_config.py:
+    maintainers: $team_onyx
+    labels: networking onyx_config
+  $actions/sros.py:
+    maintainers: $team_networking
+    labels: networking sros
+  $becomes/:
+    labels: become
+  $callbacks/:
+    labels: callbacks
   $callbacks/say.py:
     notify: chris-short
     maintainers: $team_macos
@@ -19,6 +41,11 @@ files:
     labels: cloud docker
     ignore: cove
     supershipit: felixfontein
+  $connections/:
+    labels: connections
+  $connections/kubectl.py:
+    maintainers: chouseknecht fabianvf flaper87 maxamillion
+    labels: k8s kubectl
   $connections/lxd.py:
     maintainers: mattclay
     labels: lxd
@@ -27,7 +54,8 @@ files:
     labels: oc
   $connections/saltstack.py:
     labels: saltstack
-  $doc_fragments/cloudscale.py:
+  $doc_fragments/:
+    labels: docs_fragments
   $doc_fragments/docker.py:
     maintainers: $team_docker
     labels: cloud docker
@@ -60,7 +88,15 @@ files:
   $doc_fragments/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
-  $inventories/cloudscale.py:
+  $httpapis/:
+    maintainers: $team_networking
+    labels: networking
+  $httpapis/ftd.py:
+    maintainers: $team_networking annikulin
+    labels: cisco ftd networking
+    keywords: firepower ftd
+  $inventories/:
+    labels: inventories
   $inventories/docker_machine.py:
     maintainers: $team_docker
     labels: cloud docker
@@ -75,10 +111,12 @@ files:
     maintainers: $team_linode
     labels: cloud linode
     keywords:
-    - linode dynamic inventory script
+      - linode dynamic inventory script
   $inventories/scaleway.py:
     maintainers: $team_scaleway
     labels: cloud scaleway
+  $lookups/:
+    labels: lookups
   $lookups/onepass:
     maintainers: samdoran
     labels: onepassword
@@ -97,6 +135,11 @@ files:
   $lookups/manifold.py:
     maintainers: galanoff
     labels: manifold
+  $lookups/nios:
+    maintainers: $team_networking sganesh-infoblox
+    labels: infoblox networking
+  $module_utils/:
+    labels: module_utils
   $module_utils/cloudscale.py:
     maintainers: $team_cloudscale
     labels: cloudscale
@@ -160,7 +203,6 @@ files:
   $module_utils/utm_utils.py:
     maintainers: $team_e_spirit
     labels: utm_utils
-  $module_utils/vexata.py:
   $module_utils/vultr.py:
     maintainers: $team_vultr
     labels: cloud vultr
@@ -186,48 +228,14 @@ files:
     maintainers: gaudenz
   $modules/cloud/cloudscale/cloudscale_volume.py:
     authors: gaudenz href resmo
-  $modules/cloud/cloudstack/:
-    authors: resmo
-    maintainers: $team_cloudstack
-  $modules/cloud/cloudstack/cs_disk_offering.py:
-    authors: dpassante resmo
-    maintainers: rhtyd
-  $modules/cloud/cloudstack/cs_image_store.py:
-    authors: PatTheSilent
-  $modules/cloud/cloudstack/cs_instance_nic.py:
-    authors: marcaurele resmo
-  $modules/cloud/cloudstack/cs_instance_password_reset.py:
-    authors: onitake
-  $modules/cloud/cloudstack/cs_ip_address.py:
-    authors: dazworrall resmo
-  $modules/cloud/cloudstack/cs_network_offering.py:
-    authors: dpassante
-    maintainers: rhtyd
-  $modules/cloud/cloudstack/cs_physical_network.py:
-    authors: PatTheSilent netservers
-  $modules/cloud/cloudstack/cs_role_permission.py:
-    authors: dpassante
-    maintainers: rhtyd
-  $modules/cloud/cloudstack/cs_storage_pool.py:
-    authors: netservers resmo
-  $modules/cloud/cloudstack/cs_traffic_type.py:
-    authors: PatTheSilent
-  $modules/cloud/cloudstack/cs_vlan_ip_range.py:
-    authors: dpassante
-    maintainers: rhtyd
-  $modules/cloud/cloudstack/cs_volume.py:
-    authors: jeffersongirao resmo
-  $modules/cloud/cloudstack/cs_vpc_offering.py:
-    authors: dpassante
-    maintainers: rhtyd
   $modules/cloud/digital_ocean/digital_ocean.py:
     authors: zbal
   $modules/cloud/digital_ocean/:
     authors: Akasurde
     maintainers: $team_digital_ocean
     keywords:
-    - digital ocean
-    - droplet
+      - digital ocean
+      - droplet
   $modules/cloud/digital_ocean/digital_ocean_firewall_facts.py:
     authors: BondAnthony
     maintainers: mgregson
@@ -1365,6 +1373,18 @@ files:
     authors: inetfuture mattupstate
   $modules/web_infrastructure/taiga_issue.py:
     authors: lekum
+#########################
+  tests/:
+    labels: tests
+  tests/unit/:
+    labels: unit
+    support: community
+  tests/integration:
+    labels: integration
+    support: community
+  tests/utils/:
+    maintainers: gundalow
+    labels: unit
 macros:
   actions: plugins/action
   becomes: plugins/become
