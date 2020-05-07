@@ -1945,4 +1945,5 @@ tests/unit/plugins/modules/web_infrastructure/test_apache2_module.py future-impo
 tests/unit/plugins/modules/web_infrastructure/test_apache2_module.py metaclass-boilerplate
 tests/unit/plugins/modules/web_infrastructure/test_jenkins_plugin.py future-import-boilerplate
 tests/unit/plugins/modules/web_infrastructure/test_jenkins_plugin.py metaclass-boilerplate
+tests/utils/shippable/check_matrix.py replace-urlopen
 tests/utils/shippable/timing.py shebang
