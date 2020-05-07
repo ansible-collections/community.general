@@ -15,10 +15,6 @@ DOCUMENTATION = '''
     requirements:
       - 'python-consul python library U(https://python-consul.readthedocs.io/en/latest/#installation)'
     options:
-      _raw:
-        description: List of key(s) to retrieve.
-        type: list
-        required: True
       recurse:
         type: boolean
         description: If true, will retrieve all the values that have the given key as prefix.
@@ -67,6 +63,14 @@ DOCUMENTATION = '''
         ini:
           - section: lookup_consul
             key: client_cert
+      url:
+        description:
+          - The target to connect to, should look like this: C(https://my.consul.server:8500).
+        env:
+          - name: ANSIBLE_CONSUL_URL
+        ini:
+          - section: lookup_consul
+            key: url
 '''
 
 EXAMPLES = """
@@ -114,25 +118,27 @@ class LookupModule(LookupBase):
             raise AnsibleError(
                 'python-consul is required for consul_kv lookup. see http://python-consul.readthedocs.org/en/latest/#installation')
 
+        # get options
+        self.set_options(direct=kwargs)
+
+        scheme = self.get_option('scheme')
+        host = self.get_option('host')
+        port = self.get_option('port')
+        url = self.get_option('url')
+        if url is not None:
+            u = urlparse(url)
+            scheme = u.scheme
+            host = u.hostname
+            port = u.port
+
+        validate_certs = self.get_option('validate_certs')
+        client_cert = self.get_option('client_cert')
+
         values = []
         try:
             for term in terms:
                 params = self.parse_params(term)
-                try:
-                    url = os.environ['ANSIBLE_CONSUL_URL']
-                    validate_certs = os.environ.get('ANSIBLE_CONSUL_VALIDATE_CERTS') or True
-                    client_cert = os.environ.get('ANSIBLE_CONSUL_CLIENT_CERT') or None
-                    u = urlparse(url)
-                    consul_api = consul.Consul(host=u.hostname, port=u.port, scheme=u.scheme, verify=validate_certs,
-                                               cert=client_cert)
-                except KeyError:
-                    port = kwargs.get('port', '8500')
-                    host = kwargs.get('host', 'localhost')
-                    scheme = kwargs.get('scheme', 'http')
-                    validate_certs = kwargs.get('validate_certs', True)
-                    client_cert = kwargs.get('client_cert', None)
-                    consul_api = consul.Consul(host=host, port=port, scheme=scheme, verify=validate_certs,
-                                               cert=client_cert)
+                consul_api = consul.Consul(host=host, port=port, scheme=scheme, verify=validate_certs, cert=client_cert)
 
                 results = consul_api.kv.get(params['key'],
                                             token=params['token'],
