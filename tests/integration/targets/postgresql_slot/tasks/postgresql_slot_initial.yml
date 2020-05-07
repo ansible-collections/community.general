@@ -1,3 +1,4 @@
+---
 # Copyright: (c) 2019, Andrew Klychkov (@Andersson007) <aaklychkov@mail.ru>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -55,7 +56,7 @@
     query: "SELECT 1 FROM pg_replication_slots WHERE slot_name = 'slot0'"
   ignore_errors: yes
   register: result
- 
+
 - assert:
     that:
     - result.rowcount == 0
@@ -92,7 +93,7 @@
     query: "SELECT 1 FROM pg_replication_slots WHERE slot_name = 'slot0' and slot_type = 'physical'"
   ignore_errors: yes
   register: result
- 
+
 - assert:
     that:
     - result.rowcount == 1
@@ -123,7 +124,7 @@
     query: "SELECT 1 FROM pg_replication_slots WHERE slot_name = 'slot0' and slot_type = 'physical'"
   ignore_errors: yes
   register: result
- 
+
 - assert:
     that:
     - result.rowcount == 1
@@ -154,7 +155,7 @@
     query: "SELECT 1 FROM pg_replication_slots WHERE slot_name = 'slot0' and slot_type = 'physical'"
   ignore_errors: yes
   register: result
- 
+
 - assert:
     that:
     - result.rowcount == 1
@@ -191,7 +192,7 @@
   ignore_errors: yes
   register: result
   when: postgres_version_resp.stdout is version('9.6', '>=')
- 
+
 - assert:
     that:
     - result.rowcount == 1
@@ -238,7 +239,7 @@
   ignore_errors: yes
   register: result
   when: postgres_version_resp.stdout is version('10', '>=') and ansible_distribution == 'Ubuntu'
- 
+
 - assert:
     that:
     - result.rowcount == 0
@@ -273,7 +274,7 @@
   ignore_errors: yes
   register: result
   when: postgres_version_resp.stdout is version('10', '>=') and ansible_distribution == 'Ubuntu'
- 
+
 - assert:
     that:
     - result.rowcount == 1
@@ -309,7 +310,7 @@
   ignore_errors: yes
   register: result
   when: postgres_version_resp.stdout is version('10', '>=')
- 
+
 - assert:
     that:
     - result.rowcount == 1
@@ -344,7 +345,7 @@
   ignore_errors: yes
   register: result
   when: postgres_version_resp.stdout is version('10', '>=') and ansible_distribution == 'Ubuntu'
- 
+
 - assert:
     that:
     - result.rowcount == 1
@@ -383,7 +384,7 @@
   ignore_errors: yes
   register: result
   when: postgres_version_resp.stdout is version('10', '>=') and ansible_distribution == 'Ubuntu'
- 
+
 - assert:
     that:
     - result.rowcount == 1
@@ -423,7 +424,7 @@
   ignore_errors: yes
   register: result
   when: postgres_version_resp.stdout is version('10', '>=') and ansible_distribution == 'Ubuntu'
- 
+
 - assert:
     that:
     - result.rowcount == 1
@@ -458,7 +459,7 @@
   ignore_errors: yes
   register: result
   when: postgres_version_resp.stdout is version('10', '>=') and ansible_distribution == 'Ubuntu'
- 
+
 - assert:
     that:
     - result.rowcount == 0
@@ -494,7 +495,7 @@
   ignore_errors: yes
   register: result
   when: postgres_version_resp.stdout is version('10', '>=')
- 
+
 - assert:
     that:
     - result.rowcount == 0
@@ -529,7 +530,7 @@
   ignore_errors: yes
   register: result
   when: postgres_version_resp.stdout is version('10', '>=') and ansible_distribution == 'Ubuntu'
- 
+
 - assert:
     that:
     - result.rowcount == 0
@@ -568,7 +569,7 @@
   ignore_errors: yes
   register: result
   when: postgres_version_resp.stdout is version('9.6', '>=')
- 
+
 - assert:
     that:
     - result.rowcount == 1
@@ -603,7 +604,7 @@
   ignore_errors: yes
   register: result
   when: postgres_version_resp.stdout is version('9.6', '>=')
- 
+
 - assert:
     that:
     - result.rowcount == 0
@@ -639,7 +640,7 @@
   ignore_errors: yes
   register: result
   when: postgres_version_resp.stdout is version('9.6', '>=')
- 
+
 - assert:
     that:
     - result.rowcount == 0
@@ -674,10 +675,28 @@
   ignore_errors: yes
   register: result
   when: postgres_version_resp.stdout is version('9.6', '>=')
- 
+
 - assert:
     that:
     - result.rowcount == 0
+  when: postgres_version_resp.stdout is version('9.6', '>=')
+
+# Check trust input
+- name: postgresql_slot - try using a bad name
+  postgresql_slot:
+    session_role: 'curious.anonymous"; SELECT * FROM information_schema.tables; --'
+    db: postgres
+    name: slot1
+    trust_input: no
+  register: result
+  ignore_errors: true
+  when: postgres_version_resp.stdout is version('9.6', '>=')
+
+- name: postgresql_slot - check that using a dangerous name fails
+  assert:
+    that:
+      - result is failed
+      - result.msg is search('is potentially dangerous')
   when: postgres_version_resp.stdout is version('9.6', '>=')
 
 #
