@@ -233,7 +233,13 @@ def create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password):
 
 
 def update_jks_perm(module, keystore_path):
-    file_args = module.load_file_common_arguments(module.params, path=keystore_path)
+    try:
+        file_args = module.load_file_common_arguments(module.params, path=keystore_path)
+    except TypeError:
+        # The path argument is only supported in Ansible 2.10+. Fall back to
+        # pre-2.10 behavior for older Ansible versions.
+        module.params['path'] = keystore_path
+        file_args = module.load_file_common_arguments(module.params)
     module.set_fs_attributes_if_different(file_args, False)
 
 
