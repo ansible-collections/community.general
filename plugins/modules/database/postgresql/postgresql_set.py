@@ -306,7 +306,7 @@ def main():
     name = module.params['name']
     value = module.params['value']
     reset = module.params['reset']
-    session_role =  module.params['session_role']
+    session_role = module.params['session_role']
     trust_input = module.params['trust_input']
 
     if not trust_input:
