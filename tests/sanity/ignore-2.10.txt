@@ -200,30 +200,6 @@ plugins/modules/cloud/cloudscale/cloudscale_server.py validate-modules:parameter
 plugins/modules/cloud/cloudscale/cloudscale_server_group.py validate-modules:doc-required-mismatch
 plugins/modules/cloud/cloudscale/cloudscale_volume.py validate-modules:doc-required-mismatch
 plugins/modules/cloud/cloudscale/cloudscale_volume.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_disk_offering.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_firewall.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_host.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_instance.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_ip_address.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_iso.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_loadbalancer_rule.py validate-modules:doc-required-mismatch
-plugins/modules/cloud/cloudstack/cs_loadbalancer_rule.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_loadbalancer_rule_member.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_network.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_network_acl_rule.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_network_offering.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_physical_network.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_portforward.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_project.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_resourcelimit.py validate-modules:invalid-ansiblemodule-schema
-plugins/modules/cloud/cloudstack/cs_service_offering.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_storage_pool.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_template.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_vmsnapshot.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_volume.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_vpc.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_vpc_offering.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/cloudstack/cs_vpn_customer_gateway.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/digital_ocean/digital_ocean.py validate-modules:doc-missing-type
 plugins/modules/cloud/digital_ocean/digital_ocean.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/digital_ocean/digital_ocean.py validate-modules:parameter-type-not-in-doc
@@ -463,7 +439,6 @@ plugins/modules/cloud/google/gcpubsub_info.py validate-modules:doc-missing-type
 plugins/modules/cloud/google/gcpubsub_info.py validate-modules:doc-required-mismatch
 plugins/modules/cloud/google/gcpubsub_info.py validate-modules:parameter-state-invalid-choice
 plugins/modules/cloud/google/gcpubsub_info.py validate-modules:undocumented-parameter
-plugins/modules/cloud/google/gcspanner.py validate-modules:invalid-documentation
 plugins/modules/cloud/google/gcspanner.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/google/gcspanner.py validate-modules:undocumented-parameter
 plugins/modules/cloud/heroku/heroku_collaborator.py validate-modules:parameter-list-no-elements
@@ -1055,8 +1030,11 @@ plugins/modules/net_tools/dnsmadeeasy.py validate-modules:parameter-type-not-in-
 plugins/modules/net_tools/ip_netns.py validate-modules:doc-missing-type
 plugins/modules/net_tools/ipinfoio_facts.py validate-modules:doc-missing-type
 plugins/modules/net_tools/ipinfoio_facts.py validate-modules:parameter-type-not-in-doc
+plugins/modules/net_tools/ldap/ldap_attr.py validate-modules:parameter-type-not-in-doc  # This triggers when a parameter is undocumented
+plugins/modules/net_tools/ldap/ldap_attr.py validate-modules:undocumented-parameter # Parameter removed but reason for removal is shown by custom code
 plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:doc-missing-type
 plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:parameter-type-not-in-doc
+plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:undocumented-parameter # Parameter removed but reason for removal is shown by custom code
 plugins/modules/net_tools/ldap/ldap_passwd.py validate-modules:doc-missing-type
 plugins/modules/net_tools/ldap/ldap_passwd.py validate-modules:doc-required-mismatch
 plugins/modules/net_tools/netcup_dns.py validate-modules:doc-missing-type
@@ -1276,9 +1254,7 @@ plugins/modules/packaging/os/apt_rpm.py validate-modules:doc-default-does-not-ma
 plugins/modules/packaging/os/apt_rpm.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/apt_rpm.py validate-modules:parameter-type-not-in-doc
 plugins/modules/packaging/os/apt_rpm.py validate-modules:undocumented-parameter
-plugins/modules/packaging/os/flatpak.py validate-modules:parameter-type-not-in-doc
 plugins/modules/packaging/os/flatpak.py validate-modules:use-run-command-not-popen
-plugins/modules/packaging/os/flatpak_remote.py validate-modules:parameter-type-not-in-doc
 plugins/modules/packaging/os/flatpak_remote.py validate-modules:use-run-command-not-popen
 plugins/modules/packaging/os/homebrew.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/homebrew_cask.py validate-modules:parameter-invalid
@@ -1765,8 +1741,6 @@ scripts/inventory/nsot.py future-import-boilerplate
 scripts/inventory/nsot.py metaclass-boilerplate
 scripts/inventory/openshift.py future-import-boilerplate
 scripts/inventory/openshift.py metaclass-boilerplate
-scripts/inventory/openstack_inventory.py future-import-boilerplate
-scripts/inventory/openstack_inventory.py metaclass-boilerplate
 scripts/inventory/openvz.py future-import-boilerplate
 scripts/inventory/openvz.py metaclass-boilerplate
 scripts/inventory/ovirt.py future-import-boilerplate
