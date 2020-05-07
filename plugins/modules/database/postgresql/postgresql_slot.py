@@ -72,7 +72,8 @@ options:
     type: str
   trust_input:
     description:
-    - If C(no), check whether values of some parameters are potentially dangerous.
+    - If C(no), check the value of I(session_role) is potentially dangerous.
+    - It sense to use C(no) only when SQL injections via I(session_role) are possible.
     type: bool
     default: yes
 
