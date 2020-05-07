@@ -59,6 +59,12 @@ options:
     type: str
     aliases:
     - login_db
+  trust_input:
+    description:
+    - If C(no), check whether values of parameters are potentially dangerous.
+    - It does make sense to use C(yes) only when SQL injections are possible.
+    type: bool
+    default: yes
 notes:
 - Supported version of PostgreSQL is 9.4 and later.
 - Pay attention, change setting with 'postmaster' context can return changed is true
@@ -166,6 +172,9 @@ except Exception:
 from copy import deepcopy
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     get_conn_params,
@@ -287,15 +296,22 @@ def main():
         value=dict(type='str'),
         reset=dict(type='bool'),
         session_role=dict(type='str'),
+        trust_input=dict(type='bool', default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
 
-    name = module.params["name"]
-    value = module.params["value"]
-    reset = module.params["reset"]
+    name = module.params['name']
+    value = module.params['value']
+    reset = module.params['reset']
+    session_role =  module.params['session_role']
+    trust_input = module.params['trust_input']
+
+    if not trust_input:
+        # Check input for potentially dangerous elements:
+        check_input(module, name, value, session_role)
 
     # Allow to pass values like 1mb instead of 1MB, etc:
     if value:

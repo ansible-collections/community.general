@@ -288,6 +288,7 @@
     <<: *task_parameters
     postgresql_set:
       <<: *pg_parameters
+      trust_input: yes
       name: archive_command
       value: 'test ! -f /mnt/postgres/mb/%f && cp %p /mnt/postgres/mb/%f'
 
@@ -302,3 +303,21 @@
   - assert:
       that:
       - result.query_result.0.reset_val == "test ! -f /mnt/postgres/mb/%f && cp %p /mnt/postgres/mb/%f"
+
+  #############################
+  # Check trust_input parameter
+  - name: postgresql_set - check trust_input
+    <<: *task_parameters
+    postgresql_set:
+      <<: *pg_parameters
+      name: shared_buffers
+      value: 111MB
+      trust_input: no
+      session_role: 'curious.anonymous"; SELECT * FROM information_schema.tables; --'
+    register: result
+    ignore_errors: yes
+
+  - assert:
+      that:
+      - result is failed
+      - result.msg is search('is potentially dangerous')
