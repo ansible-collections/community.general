@@ -15,6 +15,9 @@ DOCUMENTATION = '''
     requirements:
       - 'python-consul python library U(https://python-consul.readthedocs.io/en/latest/#installation)'
     options:
+      _raw:
+        description: List of key(s) to retrieve.
+        type: list
       recurse:
         type: boolean
         description: If true, will retrieve all the values that have the given key as prefix.
