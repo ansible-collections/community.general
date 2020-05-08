@@ -555,7 +555,13 @@ def main():
                     msg='Unable to remove source file: %s' % to_native(e), exception=format_exc()
                 )
 
-    file_args = module.load_file_common_arguments(params, path=b_dest)
+    try:
+        file_args = module.load_file_common_arguments(params, path=b_dest)
+    except TypeError:
+        # The path argument is only supported in Ansible 2.10+. Fall back to
+        # pre-2.10 behavior for older Ansible versions.
+        params['path'] = b_dest
+        file_args = module.load_file_common_arguments(params)
 
     if not check_mode:
         changed = module.set_fs_attributes_if_different(file_args, changed)

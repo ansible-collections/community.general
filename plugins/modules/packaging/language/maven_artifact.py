@@ -654,7 +654,13 @@ def main():
         except ValueError as e:
             module.fail_json(msg=e.args[0])
 
-    file_args = module.load_file_common_arguments(module.params, path=dest)
+    try:
+        file_args = module.load_file_common_arguments(module.params, path=dest)
+    except TypeError:
+        # The path argument is only supported in Ansible 2.10+. Fall back to
+        # pre-2.10 behavior for older Ansible versions.
+        module.params['path'] = dest
+        file_args = module.load_file_common_arguments(module.params)
     changed = module.set_fs_attributes_if_different(file_args, changed)
     if changed:
         module.exit_json(state=state, dest=dest, group_id=group_id, artifact_id=artifact_id, version=version, classifier=classifier,
