@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: Ansible Project
+# Copyright: (c) 2020, Pavlo Bashynskyi
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
+
 
 ANSIBLE_METADATA = {
     'metadata_version': '1.1',
@@ -22,7 +23,7 @@ description:
 options:
   login_host:
     description:
-    - The host running the database
+    - The host running the database.
     type: str
     default: localhost
   login_port:
@@ -36,7 +37,7 @@ options:
     type: str
 notes:
 - Requires the redis-py Python package on the remote host. You can
-  install it with pip (pip install redis) or with a package manager.
+  install it with pip (C(pip install redis)) or with a package manager.
   U(https://github.com/andymccurdy/redis-py)
 seealso:
 - module: redis
@@ -46,7 +47,7 @@ author: "Pavlo Bashynskyi (@levonet)"
 
 EXAMPLES = r'''
 - name: Get server information
-  redis_info:
+  community.general.redis_info:
   register: result
 
 - name: Print server information
@@ -193,15 +194,18 @@ import traceback
 
 REDIS_IMP_ERR = None
 try:
-    import redis
+    from redis import StrictRedis
+    HAS_REDIS_PACKAGE = True
 except ImportError:
     REDIS_IMP_ERR = traceback.format_exc()
-    redis_found = False
-else:
-    redis_found = True
+    HAS_REDIS_PACKAGE = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
+
+
+def redis_client(**client_params):
+    return StrictRedis(**client_params)
 
 
 # Module execution.
@@ -210,12 +214,12 @@ def main():
         argument_spec=dict(
             login_host=dict(type='str', default='localhost'),
             login_port=dict(type='int', default=6379),
-            login_password=dict(type='str', no_log=True)
+            login_password=dict(type='str', no_log=True),
         ),
         supports_check_mode=True,
     )
 
-    if not redis_found:
+    if not HAS_REDIS_PACKAGE:
         module.fail_json(msg=missing_required_lib('redis'), exception=REDIS_IMP_ERR)
 
     login_host = module.params['login_host']
@@ -223,13 +227,13 @@ def main():
     login_password = module.params['login_password']
 
     # Connect and check
-    r = redis.StrictRedis(host=login_host, port=login_port, password=login_password)
+    client = redis_client(host=login_host, port=login_port, password=login_password)
     try:
-        r.ping()
+        client.ping()
     except Exception as e:
         module.fail_json(msg="unable to connect to database: %s" % to_native(e), exception=traceback.format_exc())
 
-    info = r.info()
+    info = client.info()
     module.exit_json(changed=False, info=info)
 
 
