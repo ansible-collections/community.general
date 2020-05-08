@@ -182,7 +182,6 @@
       tables:
       - '{{ test_table1 }}'
       - '{{ test_schema }}.{{ test_table2 }}'
-      trust_input: yes
       parameters:
         publish: 'insert'
       trust_input: no
