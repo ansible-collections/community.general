@@ -39,9 +39,12 @@ class TestRedisInfoModule(ModuleTestCase):
     def tearDown(self):
         super(TestRedisInfoModule, self).tearDown()
 
+    def patch_redis_client(self, **kwds):
+        return patch('ansible_collections.community.general.plugins.modules.database.misc.redis_info.redis_client', autospec=True, **kwds)
+
     def test_without_parameters(self):
         """Test without parameters"""
-        with patch('ansible_collections.community.general.plugins.modules.database.misc.redis_info.redis_client', autospec=True, side_effect=FakeRedisClient) as redis_client:
+        with self.patch_redis_client(side_effect=FakeRedisClient) as redis_client:
             with self.assertRaises(AnsibleExitJson) as result:
                 set_module_args({})
                 self.module.main()
@@ -51,7 +54,7 @@ class TestRedisInfoModule(ModuleTestCase):
 
     def test_with_parameters(self):
         """Test with all parameters"""
-        with patch('ansible_collections.community.general.plugins.modules.database.misc.redis_info.redis_client', autospec=True, side_effect=FakeRedisClient) as redis_client:
+        with self.patch_redis_client(side_effect=FakeRedisClient) as redis_client:
             with self.assertRaises(AnsibleExitJson) as result:
                 set_module_args({
                     'login_host': 'test',
@@ -65,7 +68,7 @@ class TestRedisInfoModule(ModuleTestCase):
 
     def test_with_fail_client(self):
         """Test failure message"""
-        with patch('ansible_collections.community.general.plugins.modules.database.misc.redis_info.redis_client', autospec=True, side_effect=FakeRedisClientFail) as redis_client:
+        with self.patch_redis_client(side_effect=FakeRedisClientFail) as redis_client:
             with self.assertRaises(AnsibleFailJson) as result:
                 set_module_args({})
                 self.module.main()
