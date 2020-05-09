@@ -116,6 +116,7 @@
     objs: "test_table2"
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
 
 - name: Check that ansible reports it changed the user
@@ -144,6 +145,7 @@
     objs: "test_table2,test_table1"
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
 
 - name: Check that ansible reports it changed the user
@@ -179,6 +181,7 @@
     objs: "{{ db_name }}"
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
 
 - name: Check that the user has the requested permissions (database)
   become_user: "{{ pg_user }}"
@@ -202,6 +205,7 @@
     objs: "{{ db_name }}"
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
 
 - name: Check that ansible reports it changed the user
@@ -230,6 +234,7 @@
     objs: "test_table1"
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
 
 - name: Check that permissions were added (table1)
   become_user: "{{ pg_user }}"
@@ -252,6 +257,7 @@
     objs: "test_table2,test_table1"
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
 
 - name: Check that permissions were added (table1)
   become_user: "{{ pg_user }}"
@@ -307,6 +313,7 @@
     objs: "test_table1"
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
 
 - name: Check that permissions were added (table1)
   become_user: "{{ pg_user }}"
@@ -334,6 +341,7 @@
     objs: TABLES
     type: default_privs
     target_roles: "{{ db_user_with_dots2 }}"
+    trust_input: no
 
 #
 # Cleanup
