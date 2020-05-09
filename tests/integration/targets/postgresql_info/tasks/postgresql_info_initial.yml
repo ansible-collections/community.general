@@ -139,6 +139,7 @@
       <<: *pg_parameters
       login_db: '{{ test_db }}'
       login_port: '{{ master_port }}'
+      trust_input: yes
 
   - assert:
       that:
@@ -152,3 +153,19 @@
       - result.settings
       - result.tablespaces
       - result.roles
+
+  - name: postgresql_info - test trust_input parameter
+    <<: *task_parameters
+    postgresql_info:
+      <<: *pg_parameters
+      login_db: '{{ test_db }}'
+      login_port: '{{ master_port }}'
+      trust_input: no
+      session_role: 'curious.anonymous"; SELECT * FROM information_schema.tables; --'
+    register: result
+    ignore_errors: yes
+
+  - assert:
+      that:
+      - result is failed
+      - result.msg is search('is potentially dangerous')
