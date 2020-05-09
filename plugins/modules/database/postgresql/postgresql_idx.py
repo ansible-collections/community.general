@@ -116,7 +116,10 @@ options:
     default: no
   trust_input:
     description:
-    - If C(no), check whether values of some parameters are potentially dangerous.
+    - If C(no), check whether values of parameters I(idxname), I(session_role),
+      I(schema), I(table), I(columns), I(tablespace), I(storage_params),
+      I(cond) are potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
     type: bool
     default: yes
 
