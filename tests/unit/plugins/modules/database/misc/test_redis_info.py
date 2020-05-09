@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2020, Pavlo Bashynskyi
+# Copyright: (c) 2020, Pavlo Bashynskyi (@levonet)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -33,7 +33,7 @@ class TestRedisInfoModule(ModuleTestCase):
 
     def setUp(self):
         super(TestRedisInfoModule, self).setUp()
-        redis_info.REDIS_FOUND = True
+        redis_info.HAS_REDIS_PACKAGE = True
         self.module = redis_info
 
     def tearDown(self):

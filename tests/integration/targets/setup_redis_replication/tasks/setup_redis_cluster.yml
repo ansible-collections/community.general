@@ -1,0 +1,70 @@
+# We run two servers listening different ports
+# to be able to check replication (one server for master, another for slave).
+
+- name: Install redis server
+  apt:
+    name: redis-server
+    state: present
+    policy_rc_d: 101
+
+- name: Install redis module
+  pip:
+    state: present
+    name: redis
+
+- name: Create redis directories
+  file:                                                                                                                                                                                                 
+    path: "{{ item }}"
+    state: directory                                                                                                                                                                                    
+    owner: redis
+    group: redis
+  loop:
+  - "{{ master_datadir }}"
+  - "{{ master_logdir }}"
+  - "{{ slave_datadir }}"
+  - "{{ slave_logdir }}"
+
+- name: Create redis configs
+  copy:
+    dest: "{{ item.file }}"
+    content: |
+      daemonize yes
+      port {{ item.port }}
+      pidfile /var/run/redis_{{ item.port }}.pid
+      logfile {{ item.logdir }}/redis.log
+      dir {{ item.datadir }}
+      requirepass {{ redis_password }}
+      masterauth {{ redis_password }}
+  loop:
+  - file: "{{ master_conf }}"
+    port: "{{ master_port }}"
+    logdir: "{{ master_logdir }}"
+    datadir: "{{ master_datadir }}"
+  - file: "{{ slave_conf }}"
+    port: "{{ slave_port }}"
+    logdir: "{{ slave_logdir }}"
+    datadir: "{{ slave_datadir }}"
+
+- name: Start redis master
+  shell: /usr/bin/redis-server {{ master_conf }}
+
+- name: Start redis slave
+  shell: /usr/bin/redis-server {{ slave_conf }} --slaveof 127.0.0.1 {{ master_port }}
+
+- name: Wait for redis master to be started
+  wait_for:
+    host: 127.0.0.1
+    port: "{{ master_port }}"
+    state: started
+    delay: 1
+    connect_timeout: 5
+    timeout: 30
+
+- name: Wait for redis slave to be started
+  wait_for:
+    host: 127.0.0.1
+    port: "{{ slave_port }}"
+    state: started
+    delay: 1
+    connect_timeout: 5
+    timeout: 30

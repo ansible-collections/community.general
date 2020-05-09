@@ -65,6 +65,7 @@ options:
             - A redis config value. When memory size is needed, it is possible
               to specify it in the usal form of 1KB, 2M, 400MB where the base is 1024.
               Units are case insensitive i.e. 1m = 1mb = 1M = 1MB.
+
 notes:
    - Requires the redis-py Python package on the remote host. You can
      install it with pip (pip install redis) or with a package manager.

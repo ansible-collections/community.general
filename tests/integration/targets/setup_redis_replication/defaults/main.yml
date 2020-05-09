@@ -1,0 +1,14 @@
+# General
+redis_password: PASS
+
+# Master
+master_port: 6379
+master_conf: /etc/redis-master.conf
+master_datadir: /var/lib/redis-master
+master_logdir: /var/log/redis-master
+
+# Slave
+slave_port: 6380
+slave_conf: /etc/redis-slave.conf
+slave_datadir: /var/lib/redis-slave
+slave_logdir: /var/log/redis-slave
