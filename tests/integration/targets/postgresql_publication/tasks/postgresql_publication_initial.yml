@@ -64,6 +64,7 @@
     postgresql_publication: 
       <<: *pg_parameters
       name: '{{ test_pub }}'
+      trust_input: no
     check_mode: yes
 
   - assert:
@@ -89,6 +90,7 @@
     postgresql_publication: 
       <<: *pg_parameters
       name: '{{ test_pub }}'
+      trust_input: no
 
   - assert:
       that:
@@ -120,6 +122,7 @@
       <<: *pg_parameters
       name: '{{ test_pub }}'
       state: absent
+      trust_input: no
     check_mode: yes
 
   - assert:
@@ -179,9 +182,9 @@
       tables:
       - '{{ test_table1 }}'
       - '{{ test_schema }}.{{ test_table2 }}'
-      trust_input: yes
       parameters:
         publish: 'insert'
+      trust_input: no
 
   - assert:
       that:
@@ -254,6 +257,7 @@
       - '{{ test_table1 }}'
       - '{{ test_schema }}.{{ test_table2 }}'
       - '{{ test_table3 }}'
+      trust_input: no
     check_mode: yes
 
   - assert:
@@ -297,6 +301,7 @@
       - '{{ test_table1 }}'
       - '{{ test_schema }}.{{ test_table2 }}'
       - '{{ test_table3 }}'
+      trust_input: no
 
   - assert:
       that:
@@ -338,6 +343,7 @@
       - '{{ test_schema }}.{{ test_table2 }}'
       parameters:
         publish: 'insert'
+      trust_input: no
     check_mode: yes
 
   - assert:
@@ -379,6 +385,7 @@
       - '{{ test_schema }}.{{ test_table2 }}'
       parameters:
         publish: 'delete'
+      trust_input: no
 
   - assert:
       that:
