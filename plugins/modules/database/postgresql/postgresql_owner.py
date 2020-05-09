@@ -72,7 +72,9 @@ options:
     type: str
   trust_input:
     description:
-    - If C(no), check whether values of some parameters are potentially dangerous.
+    - If C(no), check whether values of parameters I(new_owner), I(obj_name),
+      I(reassign_owned_by), I(session_role) are potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
     type: bool
     default: yes
 seealso:

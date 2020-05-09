@@ -73,7 +73,8 @@ options:
     description:
     - Switch to session_role after connecting.
     - The specified I(session_role) must be a role that the current I(login_user) is a member of.
-    - Permissions checking for SQL commands is carried out as though the I(session_role) were the one that had logged in originally.
+    - Permissions checking for SQL commands is carried out as though the
+      I(session_role) were the one that had logged in originally.
     type: str
   state:
     description:
@@ -106,7 +107,9 @@ options:
     type: str
   trust_input:
     description:
-    - If C(no), check whether values of some parameters are potentially dangerous.
+    - If C(no), check whether values of parameters I(lang), I(session_role),
+      I(owner) are potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
     type: bool
     default: yes
 seealso:
