@@ -143,7 +143,6 @@ stdout:
   sample: "flathub\tFlathub\thttps://dl.flathub.org/repo/\t1\t\n"
 '''
 
-import subprocess
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_native
 
@@ -187,16 +186,11 @@ def _flatpak_command(module, noop, command):
         result['command'] = command
         return ""
 
-    process = subprocess.Popen(
-        command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout_data, stderr_data = process.communicate()
-    result['rc'] = process.returncode
+    result['rc'], result['stdout'], result['stderr'] = module.run_command(
+        command.split(), check_rc=True
+    )
     result['command'] = command
-    result['stdout'] = stdout_data
-    result['stderr'] = stderr_data
-    if result['rc'] != 0:
-        module.fail_json(msg="Failed to execute flatpak command", **result)
-    return to_native(stdout_data)
+    return result['stdout']
 
 
 def main():
