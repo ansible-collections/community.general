@@ -46,6 +46,12 @@ options:
     - Permissions checking for SQL commands is carried out as though
       the session_role were the one that had logged in originally.
     type: str
+  trust_input:
+    description:
+    - If C(no), check whether a value of I(session_role) is potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections via I(session_role) are possible.
+    type: bool
+    default: yes
 seealso:
 - module: postgresql_ping
 author:
@@ -483,6 +489,9 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     get_conn_params,
@@ -988,13 +997,18 @@ def main():
         db=dict(type='str', aliases=['login_db']),
         filter=dict(type='list', elements='str'),
         session_role=dict(type='str'),
+        trust_input=dict(type='bool', default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
 
-    filter_ = module.params["filter"]
+    filter_ = module.params['filter']
+
+    if not module.params['trust_input']:
+        # Check input for potentially dangerous elements:
+        check_input(module, module.params['session_role'])
 
     db_conn_obj = PgDbConn(module)
 
