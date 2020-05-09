@@ -28,6 +28,7 @@
     postgresql_user:
       <<: *pg_parameters
       name: '{{ test_user }}'
+      trust_input: no
 
   - assert:
       that:
@@ -96,6 +97,7 @@
       <<: *pg_parameters
       name: '{{ test_user }}'
       comment: '{{ test_comment1 }}'
+      trust_input: no
 
   - assert:
       that:
@@ -346,6 +348,7 @@
       <<: *pg_parameters
       name: '{{ test_user }}'
       expires: 'Jan 31 2020'
+      trust_input: no
 
   - assert:
       that:
@@ -397,6 +400,7 @@
       <<: *pg_parameters
       name: '{{ test_user }}'
       role_attr_flags: CREATEROLE,CREATEDB
+      trust_input: no
 
   - assert:
       that:
@@ -516,6 +520,7 @@
       <<: *pg_parameters
       name: '{{ test_user }}'
       priv: '{{ test_table }}:SELECT'
+      trust_input: no
 
   - assert:
       that:
@@ -643,6 +648,7 @@
       name: '{{ test_group1 }}'
       groups: '{{ test_group2 }}'
       role_attr_flags: NOLOGIN
+      trust_input: no
 
   - assert:
       that:
@@ -700,6 +706,7 @@
       groups:
       - '{{ test_group1 }}'
       - '{{ test_group2 }}'
+      trust_input: no
 
   - assert:
       that:

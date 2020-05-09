@@ -77,7 +77,9 @@ options:
     - login_db
   trust_input:
     description:
-    - If C(no), check whether values of some parameters are potentially dangerous.
+    - If C(no), check whether values of parameters I(tablespace), I(location), I(owner),
+      I(rename_to), I(session_role), I(settings_list) are potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
     type: bool
     default: yes
 

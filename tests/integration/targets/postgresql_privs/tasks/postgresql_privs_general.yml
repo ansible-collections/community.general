@@ -96,6 +96,7 @@
     type: table
     objs: test_view
     roles: "{{ db_user2 }}"
+    trust_input: no
   register: result
 
 - assert:
@@ -128,6 +129,7 @@
     type: table
     objs: test_view
     roles: "{{ db_user2 }}"
+    trust_input: no
   register: result
 
 - assert:
@@ -182,6 +184,7 @@
     objs: dummy
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
   ignore_errors: yes
 
@@ -215,6 +218,7 @@
     objs: dummy
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
   ignore_errors: yes
 
@@ -233,6 +237,7 @@
     objs: dummy
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
   ignore_errors: yes
 
@@ -266,6 +271,7 @@
     objs: dummy
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
   ignore_errors: yes
 
@@ -284,6 +290,7 @@
     objs: dummy_server
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
   ignore_errors: yes
 
@@ -317,6 +324,7 @@
     objs: dummy_server
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
   ignore_errors: yes
 
@@ -335,6 +343,7 @@
     objs: dummy_server
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
   ignore_errors: yes
 
@@ -368,6 +377,7 @@
     objs: dummy_server
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
   ignore_errors: yes
 
@@ -416,6 +426,7 @@
     db: "{{ db_name }}"
     login_user: "{{ db_user3 }}"
     login_password: password
+    trust_input: no
   register: result
   ignore_errors: yes
 
@@ -444,6 +455,7 @@
     db: "{{ db_name }}"
     login_user: "{{ db_user3 }}"
     login_password: password
+    trust_input: no
   register: result
   ignore_errors: yes
 
@@ -463,6 +475,7 @@
     db: "{{ db_name }}"
     login_user: "{{ db_user3 }}"
     login_password: password
+    trust_input: no
   register: result
   ignore_errors: yes
 
@@ -482,6 +495,7 @@
     db: "{{ db_name }}"
     login_user: "{{ db_user3 }}"
     login_password: password
+    trust_input: no
   register: result
   ignore_errors: yes
 
@@ -525,6 +539,7 @@
     db: "{{ db_name }}"
     login_user: "{{ db_user3 }}"
     login_password: password
+    trust_input: no
   register: result
   ignore_errors: yes
   when: postgres_version_resp.stdout is version('10', '>=')
@@ -562,6 +577,7 @@
     db: "{{ db_name }}"
     login_user: "{{ db_user3 }}"
     login_password: password
+    trust_input: no
   register: result
   ignore_errors: yes
   when: postgres_version_resp.stdout is version('10', '>=')
@@ -601,6 +617,7 @@
     db: "{{ db_name }}"
     login_user: "{{ db_user3 }}"
     login_password: password
+    trust_input: no
   register: result
   ignore_errors: yes
   when: postgres_version_resp.stdout is version('10', '>=')
@@ -622,6 +639,7 @@
     db: "{{ db_name }}"
     login_user: "{{ db_user3 }}"
     login_password: password
+    trust_input: no
   register: result
   ignore_errors: yes
   when: postgres_version_resp.stdout is version('10', '>=')
@@ -661,6 +679,7 @@
     db: "{{ db_name }}"
     login_user: "{{ db_user3 }}"
     login_password: password
+    trust_input: no
   register: result
   ignore_errors: yes
   when: postgres_version_resp.stdout is version('10', '>=')
@@ -676,6 +695,7 @@
     db: "{{ db_name }}"
     login_user: "{{ db_user3 }}"
     login_password: password
+    trust_input: no
   ignore_errors: yes
   when: postgres_version_resp.stdout is version('10', '>=')
 
@@ -696,6 +716,7 @@
     schema: pg_catalog
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
   when: postgres_version_resp.stdout is version('10', '>=')
 
@@ -732,6 +753,7 @@
     schema: pg_catalog
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
   check_mode: yes
   when: postgres_version_resp.stdout is version('10', '>=')
@@ -769,6 +791,7 @@
     schema: pg_catalog
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
   when: postgres_version_resp.stdout is version('10', '>=')
 
@@ -805,6 +828,7 @@
     schema: pg_catalog
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
   check_mode: yes
   when: postgres_version_resp.stdout is version('10', '>=')
@@ -842,6 +866,7 @@
     schema: pg_catalog
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
   when: postgres_version_resp.stdout is version('10', '>=')
 
@@ -888,6 +913,7 @@
     objs: compfoo
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   register: result
   when: postgres_version_resp.stdout is version('10', '>=')
 
@@ -926,6 +952,7 @@
     objs: compfoo
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+    trust_input: no
   when: postgres_version_resp.stdout is version('10', '>=')
 
 - name: Reassign ownership
