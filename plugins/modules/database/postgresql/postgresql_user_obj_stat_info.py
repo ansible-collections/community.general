@@ -45,6 +45,13 @@ options:
     - Permissions checking for SQL commands is carried out as though
       the session_role were the one that had logged in originally.
     type: str
+  trust_input:
+    description:
+    - If C(no), check the value of I(session_role) is potentially dangerous.
+    - It only makes sense to use C(no) only when SQL injections via I(session_role) are possible.
+    type: bool
+    default: yes
+
 notes:
 - C(size) and C(total_size) returned values are presented in bytes.
 - For tracking function statistics the PostgreSQL C(track_functions) parameter must be enabled.
@@ -57,6 +64,7 @@ seealso:
   link: https://www.postgresql.org/docs/current/monitoring-stats.html
 author:
 - Andrew Klychkov (@Andersson007)
+- Thomas O'Donnell (@andytom)
 extends_documentation_fragment:
 - community.general.postgres
 
@@ -104,6 +112,9 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     exec_sql,
@@ -302,6 +313,7 @@ def main():
         filter=dict(type='list', elements='str'),
         session_role=dict(type='str'),
         schema=dict(type='str'),
+        trust_input=dict(type="bool", default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -310,6 +322,9 @@ def main():
 
     filter_ = module.params["filter"]
     schema = module.params["schema"]
+
+    if not module.params["trust_input"]:
+        check_input(module, module.params['session_role'])
 
     # Connect to DB and make cursor object:
     pg_conn_params = get_conn_params(module, module.params)
