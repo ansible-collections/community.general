@@ -1,5 +1,4 @@
 ---
 minor_changes:
   - iptables_state - add new module and its action plugin to save iptables
-    state in a file or restore iptables state from a file (with a rollback
-    feature in case of connection loss).
+    state in a file or restore iptables state from a file.
