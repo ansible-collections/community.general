@@ -73,7 +73,7 @@ EXAMPLES = r'''
 - name: Ensure group is present
   ipa_group:
     name: oinstall
-    gidnumber: 54321
+    gidnumber: '54321'
     state: present
     ipa_host: ipa.example.com
     ipa_user: admin

@@ -117,8 +117,8 @@ EXAMPLES = r'''
     sshpubkey:
     - ssh-rsa ....
     - ssh-dsa ....
-    uidnumber: 1001
-    gidnumber: 100
+    uidnumber: '1001'
+    gidnumber: '100'
     homedirectory: /home/pinky
     ipa_host: ipa.example.com
     ipa_user: admin
