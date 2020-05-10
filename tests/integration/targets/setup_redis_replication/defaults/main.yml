@@ -1,4 +1,23 @@
 # General
+redis_packages:
+  Ubuntu:
+  - redis-server
+  openSUSE Leap:
+  - redis
+  Fedora:
+  - redis
+  CentOS:
+  - redis
+  FreeBSD:
+  - redis
+
+redis_bin:
+  Ubuntu: /usr/bin/redis-server
+  openSUSE Leap: /usr/sbin/redis-server
+  Fedora: /usr/bin/redis-server
+  CentOS: /usr/bin/redis-server
+  FreeBSD: /usr/local/bin/redis-server
+
 redis_password: PASS
 
 # Master

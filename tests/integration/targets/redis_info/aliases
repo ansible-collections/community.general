@@ -2,5 +2,5 @@ destructive
 shippable/posix/group1
 skip/aix
 skip/osx
-skip/freebsd
 skip/rhel
+skip/python2.6 # installing redis python module will fail on python < 2.7

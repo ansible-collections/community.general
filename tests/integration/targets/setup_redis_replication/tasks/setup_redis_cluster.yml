@@ -1,16 +1,51 @@
 # We run two servers listening different ports
 # to be able to check replication (one server for master, another for slave).
 
-- name: Install redis server
+- name: Install redis server apt dependencies
   apt:
-    name: redis-server
-    state: present
+    name: "{{ redis_packages[ansible_distribution] }}"
+    state: latest
     policy_rc_d: 101
+  when:
+  - ansible_facts.pkg_mgr == 'apt'
+  notify: cleanup redis
+
+- name: Install redis server rpm dependencies
+  yum:
+    name: "{{ redis_packages[ansible_distribution] }}"
+    state: latest
+  when:
+  - ansible_facts.pkg_mgr == 'yum'
+  notify: cleanup redis
+
+- name: Install redis rpm dependencies
+  dnf:
+    name: "{{ redis_packages[ansible_distribution] }}"
+    state: latest
+  when: ansible_facts.pkg_mgr == 'dnf'
+  notify: cleanup redis
+
+- name: Install redis server zypper dependencies
+  zypper:
+    name: "{{ redis_packages[ansible_distribution] }}"
+    state: latest
+  when:
+  - ansible_facts.pkg_mgr == 'community.general.zypper'
+  notify: cleanup redis
+
+- name: Install redis FreeBSD dependencies
+  community.general.pkgng:
+    name: "{{ redis_packages[ansible_distribution] }}"
+    state: latest
+  when:
+  - ansible_facts.pkg_mgr == 'community.general.pkgng'
+  notify: cleanup redis
 
 - name: Install redis module
   pip:
     state: present
     name: redis
+  notify: cleanup redis
 
 - name: Create redis directories
   file:                                                                                                                                                                                                 
@@ -46,10 +81,10 @@
     datadir: "{{ slave_datadir }}"
 
 - name: Start redis master
-  shell: /usr/bin/redis-server {{ master_conf }}
+  shell: "{{ redis_bin[ansible_distribution] }} {{ master_conf }}"
 
 - name: Start redis slave
-  shell: /usr/bin/redis-server {{ slave_conf }} --slaveof 127.0.0.1 {{ master_port }}
+  shell: "{{ redis_bin[ansible_distribution] }} {{ slave_conf }} --slaveof 127.0.0.1 {{ master_port }}"
 
 - name: Wait for redis master to be started
   wait_for:
