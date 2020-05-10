@@ -65,7 +65,9 @@ EXAMPLES = '''
     zone: example.com
     type: host_record
     data:
-      - a: 192.0.2.1
+      a:
+         - 192.0.2.1
+         - 2001:0db8::42
 '''
 
 
