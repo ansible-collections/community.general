@@ -159,9 +159,9 @@ def install_flat(module, binary, remote, name, method):
     """Add a new flatpak."""
     global result
     if name.startswith('http://') or name.startswith('https://'):
-        command = "{0} install --{1} -y {2}".format(binary, method, name)
+        command = [binary, "install", "--{0}".format(method), "-y", name]
     else:
-        command = "{0} install --{1} -y {2} {3}".format(binary, method, remote, name)
+        command = [binary, "install", "--{0}".format(method), "-y", remote, name]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
@@ -170,14 +170,14 @@ def uninstall_flat(module, binary, name, method):
     """Remove an existing flatpak."""
     global result
     installed_flat_name = _match_installed_flat_name(module, binary, name, method)
-    command = "{0} uninstall -y --{1} {2}".format(binary, method, installed_flat_name)
+    command = [binary, "uninstall", "--{0}".format(method), "-y", name]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
 
 def flatpak_exists(module, binary, name, method):
     """Check if the flatpak is installed."""
-    command = "{0} list --{1} --app".format(binary, method)
+    command = [binary, "list", "--{0}".format(method), "--app"]
     output = _flatpak_command(module, False, command)
     name = _parse_flatpak_name(name).lower()
     if name in output.lower():
@@ -192,7 +192,7 @@ def _match_installed_flat_name(module, binary, name, method):
     global result
     parsed_name = _parse_flatpak_name(name)
     # Try running flatpak list with columns feature
-    command = "{0} list --{1} --app --columns=application".format(binary, method)
+    command = [binary, "list", "--{0}".format(method), "--app", "--columns=application"]
     _flatpak_command(module, False, command, ignore_failure=True)
     if result['rc'] != 0 and OUTDATED_FLATPAK_VERSION_ERROR_MESSAGE in result['stderr']:
         # Probably flatpak before 1.2
@@ -214,7 +214,7 @@ def _match_installed_flat_name(module, binary, name, method):
 
 def _match_flat_using_outdated_flatpak_format(module, binary, parsed_name, method):
     global result
-    command = "{0} list --{1} --app --columns=application".format(binary, method)
+    command = [binary, "list", "--{0}".format(method), "--app", "--columns=application"]
     output = _flatpak_command(module, False, command)
     for row in output.split('\n'):
         if parsed_name.lower() == row.lower():
@@ -223,7 +223,7 @@ def _match_flat_using_outdated_flatpak_format(module, binary, parsed_name, metho
 
 def _match_flat_using_flatpak_column_feature(module, binary, parsed_name, method):
     global result
-    command = "{0} list --{1} --app".format(binary, method)
+    command = [binary, "list", "--{0}".format(method), "--app"]
     output = _flatpak_command(module, False, command)
     for row in output.split('\n'):
         if parsed_name.lower() in row.lower():
@@ -242,15 +242,14 @@ def _parse_flatpak_name(name):
 
 def _flatpak_command(module, noop, command, ignore_failure=False):
     global result
+    result['command'] = ' '.join(command)
     if noop:
         result['rc'] = 0
-        result['command'] = command
         return ""
 
     result['rc'], result['stdout'], result['stderr'] = module.run_command(
-        command.split(), check_rc=not ignore_failure
+        command, check_rc=not ignore_failure
     )
-    result['command'] = command
     return result['stdout']
 
 
