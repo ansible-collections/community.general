@@ -150,8 +150,7 @@ from ansible.module_utils._text import to_bytes, to_native
 def add_remote(module, binary, name, flatpakrepo_url, method):
     """Add a new remote."""
     global result
-    command = "{0} remote-add --{1} {2} {3}".format(
-        binary, method, name, flatpakrepo_url)
+    command = [binary, "remote-add", "--{0}".format(method), name, flatpakrepo_url]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
@@ -159,15 +158,14 @@ def add_remote(module, binary, name, flatpakrepo_url, method):
 def remove_remote(module, binary, name, method):
     """Remove an existing remote."""
     global result
-    command = "{0} remote-delete --{1} --force {2} ".format(
-        binary, method, name)
+    command = [binary, "remote-delete", "--{0}".format(method), "--force", name]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
 
 def remote_exists(module, binary, name, method):
     """Check if the remote exists."""
-    command = "{0} remote-list -d --{1}".format(binary, method)
+    command = [binary, "remote-list", "-d", "--{0}".format(method)]
     # The query operation for the remote needs to be run even in check mode
     output = _flatpak_command(module, False, command)
     for line in output.splitlines():
@@ -181,15 +179,14 @@ def remote_exists(module, binary, name, method):
 
 def _flatpak_command(module, noop, command):
     global result
+    result['command'] = ' '.join(command)
     if noop:
         result['rc'] = 0
-        result['command'] = command
         return ""
 
     result['rc'], result['stdout'], result['stderr'] = module.run_command(
-        command.split(), check_rc=True
+        command, check_rc=True
     )
-    result['command'] = command
     return result['stdout']
 
 
