@@ -1,3 +1,4 @@
+---
 # Copyright: (c) 2019, Andrew Klychkov (@Andersson007) <aaklychkov@mail.ru>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -156,6 +157,20 @@
       - result is failed
       - result.msg == "Schema 'nonexistent' does not exist"
 
+  # 4. Test Trust Input
+  - name: Try running with SQL injection
+    <<: *task_parameters
+    postgresql_user_obj_stat_info:
+      <<: *pg_parameters
+      session_role: 'curious.anonymous"; SELECT * FROM information_schema.tables; --'
+      trust_input: no
+    ignore_errors: yes
+
+  - assert:
+      that:
+        - result is failed
+        - result.msg is search('is potentially dangerous')
+    
   ##########
   # Clean up
   ##########
