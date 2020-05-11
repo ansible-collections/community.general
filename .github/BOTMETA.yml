@@ -259,7 +259,7 @@ files:
   $modules/cloud/docker/docker_container.py:
     authors: ThomasSteinbach chouseknecht cove dusdanig felixfontein joshuaconner kassiansun softzilla zfil
     maintainers: DBendit WojciechowskiPiotr akshay196 danihodovic dariko jwitko tbouvet
-    ignore: ThomasSteinbach cove
+    ignore: ThomasSteinbach cove joshuaconner
   $modules/cloud/docker/docker_container_info.py:
     authors: felixfontein
     maintainers: DBendit WojciechowskiPiotr akshay196 danihodovic dariko jwitko kassiansun tbouvet
