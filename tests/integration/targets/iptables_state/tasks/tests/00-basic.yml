@@ -1,17 +1,4 @@
 ---
-# Start with no param at all, i.e. only get current state without doing anything
-- name: "get state (no param, must NOT report a change)"
-  iptables_state:
-  register: iptables_state
-
-- name: "assert that results are as expected"
-  assert:
-    that:
-      - iptables_state is not changed
-      - iptables_state.tables.filter is defined
-
-
-
 - name: "ensure our next backup is not there (file)"
   file:
     path: "{{ iptables_saved }}"

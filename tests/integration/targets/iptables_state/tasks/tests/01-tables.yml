@@ -9,7 +9,11 @@
 - name: "get state (table filter)"
   iptables_state:
     table: filter
+    state: saved
+    path: "{{ iptables_saved }}"
   register: iptables_state
+  changed_when: false
+  check_mode: yes
 
 - name: "assert that results are as expected"
   assert:
@@ -24,7 +28,11 @@
 - name: "get state (table nat)"
   iptables_state:
     table: nat
+    state: saved
+    path: "{{ iptables_saved }}"
   register: iptables_state
+  changed_when: false
+  check_mode: yes
 
 - name: "assert that results are as expected"
   assert:
@@ -157,11 +165,15 @@
 
 - name: "get security, raw and mangle tables states"
   iptables_state:
+    path: "{{ iptables_saved }}"
+    state: saved
     table: "{{ item }}"
   loop:
     - security
     - raw
     - mangle
+  changed_when: false
+  check_mode: yes
 
 
 
