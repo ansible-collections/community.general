@@ -43,8 +43,8 @@
 
 - name: Install redis module
   pip:
+    name: "{{ redis_module }}"
     state: present
-    name: redis
   notify: cleanup redis
 
 - name: Create redis directories
