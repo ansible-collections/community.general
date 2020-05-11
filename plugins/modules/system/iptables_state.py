@@ -77,7 +77,6 @@ options:
     description:
       - Whether the firewall state should be saved (into a file) or restored
         (from a file).
-      - When this option is not set, the current iptables state is returned.
     type: str
     choices: [ saved, restored ]
     required: yes
