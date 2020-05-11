@@ -71,8 +71,8 @@ options:
     description:
       - The file the iptables state should be saved to.
       - The file the iptables state should be restored from.
-      - Required when I(state=saved) or I(state=restored).
     type: path
+    required: yes
   state:
     description:
       - Whether the firewall state should be saved (into a file) or restored
@@ -80,12 +80,14 @@ options:
       - When this option is not set, the current iptables state is returned.
     type: str
     choices: [ saved, restored ]
+    required: yes
   table:
     description:
       - When I(state=restored), restore only the named table even if the input
-        file contains other tables.
-      - When I(state=saved) (or left unset), restrict output to the specified
-        table. If not specified, output includes all active tables.
+        file contains other tables. Fail if the named table is not declared in
+        the file.
+      - When I(state=saved), restrict output to the specified table. If not
+        specified, output includes all active tables.
     type: str
     choices: [ filter, nat, mangle, raw, security ]
   wait:
@@ -111,15 +113,6 @@ requirements: [iptables, ip6tables]
 '''
 
 EXAMPLES = r'''
-# This will only retrieve information
-- name: get current state of the firewall
-  iptables_state:
-  register: iptables_state
-
-- name: show current state of the firewall
-  debug:
-    var: iptables_state.initial_state
-
 # This will apply to all loaded/active IPv4 tables.
 - name: Save current state of the firewall in system file
   iptables_state:
@@ -150,6 +143,19 @@ EXAMPLES = r'''
     noflush: true
   async: "{{ ansible_timeout }}"
   poll: 0
+
+# This will only retrieve information
+- name: get current state of the firewall
+  iptables_state:
+    state: saved
+    path: /tmp/iptables
+  check_mode: yes
+  changed_when: false
+  register: iptables_state
+
+- name: show current state of the firewall
+  debug:
+    var: iptables_state.initial_state
 '''
 
 RETURN = r'''
@@ -374,8 +380,8 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            path=dict(type='path'),
-            state=dict(type='str', choices=['saved', 'restored']),
+            path=dict(type='path', required=True),
+            state=dict(type='str', choices=['saved', 'restored'], required=True),
             table=dict(type='str', choices=['filter', 'nat', 'mangle', 'raw', 'security']),
             noflush=dict(type='bool', default=False),
             counters=dict(type='bool', default=False),
@@ -386,7 +392,6 @@ def main():
             _back=dict(type='path'),
         ),
         required_together=[
-            ['state', 'path'],
             ['_timeout', '_back'],
         ],
         supports_check_mode=True,
@@ -444,8 +449,7 @@ def main():
     SAVECOMMAND = list(COMMANDARGS)
     SAVECOMMAND.insert(0, bin_iptables_save)
 
-    if path is not None:
-        b_path = to_bytes(path, errors='surrogate_or_strict')
+    b_path = to_bytes(path, errors='surrogate_or_strict')
 
     if state == 'restored':
         if not os.path.exists(b_path):
@@ -494,14 +498,7 @@ def main():
     tables_before = per_table_state(SAVECOMMAND, stdout)
     initref_state = filter_and_format_state(stdout)
 
-    if state is None:
-        module.exit_json(
-            changed=changed,
-            cmd=cmd,
-            tables=tables_before,
-            initial_state=initial_state)
-
-    elif state == 'saved':
+    if state == 'saved':
         changed = write_state(b_path, initref_state, changed)
         module.exit_json(
             changed=changed,
