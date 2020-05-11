@@ -42,7 +42,7 @@ options:
   counters:
     description:
       - Save or restore the values of all packet and byte counters.
-      - When I(True), the module is not idempotent.
+      - When C(True), the module is not idempotent.
     type: bool
     default: false
   ip_version:
@@ -53,16 +53,16 @@ options:
     default: ipv4
   modprobe:
     description:
-      - Specify the path to the modprobe program internally used by iptables
+      - Specify the path to the C(modprobe) program internally used by iptables
         related commands to load kernel modules.
-      - By default, /proc/sys/kernel/modprobe is inspected to determine the
+      - By default, C(/proc/sys/kernel/modprobe) is inspected to determine the
         executable's path.
     type: path
   noflush:
     description:
       - For I(state=restored), ignored otherwise.
-      - If I(False), restoring iptables rules from a file flushes (deletes)
-        all previous contents of the respective table(s). If I(True), the
+      - If C(False), restoring iptables rules from a file flushes (deletes)
+        all previous contents of the respective table(s). If C(True), the
         previous rules are left untouched (but policies are updated anyway,
         for all built-in chains).
     type: bool
@@ -82,9 +82,9 @@ options:
     choices: [ saved, restored ]
   table:
     description:
-      - When C(state=restored), restore only the named table even if the input
+      - When I(state=restored), restore only the named table even if the input
         file contains other tables.
-      - When C(state=saved) (or left unset), restrict output to the specified
+      - When I(state=saved) (or left unset), restrict output to the specified
         table. If not specified, output includes all active tables.
     type: str
     choices: [ filter, nat, mangle, raw, security ]
