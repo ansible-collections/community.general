@@ -12,6 +12,69 @@
 
 
 #
+# Basic checks about invalid param/value handling.
+#
+- name: "trigger error about invalid param"
+  iptables_state:
+    name: foobar
+  register: iptables_state
+  ignore_errors: yes
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - iptables_state is failed
+      - iptables_state.msg is match("Invalid options")
+    quiet: yes
+
+
+
+- name: "trigger error about missing param 'state'"
+  iptables_state:
+    path: foobar
+  register: iptables_state
+  ignore_errors: yes
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - iptables_state is failed
+      - iptables_state.msg is match("missing required arguments")
+    quiet: yes
+
+
+
+- name: "trigger error about missing param 'path'"
+  iptables_state:
+    state: saved
+  register: iptables_state
+  ignore_errors: yes
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - iptables_state is failed
+      - iptables_state.msg is match("missing required arguments")
+    quiet: yes
+
+
+
+- name: "trigger error about invalid value for param 'state'"
+  iptables_state:
+    path: foobar
+    state: present
+  register: iptables_state
+  ignore_errors: yes
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - iptables_state is failed
+      - iptables_state.msg is match("value of state must be one of")
+    quiet: yes
+
+
+#
 # Play with the current state first. We will create a file to store it in, but
 # no more. These tests are for:
 # - idempotency
