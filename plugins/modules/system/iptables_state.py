@@ -115,13 +115,13 @@ requirements: [iptables, ip6tables]
 EXAMPLES = r'''
 # This will apply to all loaded/active IPv4 tables.
 - name: Save current state of the firewall in system file
-  iptables_state:
+  community.general.iptables_state:
     state: saved
     path: /etc/sysconfig/iptables
 
 # This will apply only to IPv6 filter table.
 - name: save current state of the firewall in system file
-  iptables_state:
+  community.general.iptables_state:
     ip_version: ipv6
     table: filter
     state: saved
@@ -129,7 +129,7 @@ EXAMPLES = r'''
 
 # This will load a state from a file, with a rollback in case of access loss
 - name: restore firewall state from a file
-  iptables_state:
+  community.general.iptables_state:
     state: restored
     path: /run/iptables.apply
   async: "{{ ansible_timeout }}"
@@ -137,7 +137,7 @@ EXAMPLES = r'''
 
 # This will load new rules by appending them to the current ones
 - name: restore firewall state from a file
-  iptables_state:
+  community.general.iptables_state:
     state: restored
     path: /run/iptables.apply
     noflush: true
@@ -146,7 +146,7 @@ EXAMPLES = r'''
 
 # This will only retrieve information
 - name: get current state of the firewall
-  iptables_state:
+  community.general.iptables_state:
     state: saved
     path: /tmp/iptables
   check_mode: yes
