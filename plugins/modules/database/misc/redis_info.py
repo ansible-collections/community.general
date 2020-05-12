@@ -28,12 +28,12 @@ options:
     default: localhost
   login_port:
     description:
-    - The port to connect to
+    - The port to connect to.
     type: int
     default: 6379
   login_password:
     description:
-    - The password used to authenticate with (usually not used)
+    - The password used to authenticate with, when authentication is enabled for the Redis server.
     type: str
 notes:
 - Requires the redis-py Python package on the remote host. You can
