@@ -45,6 +45,7 @@
     login_port: 5432
     ssl_mode: require
     ca_cert: '{{ ssl_rootcert }}'
+    trust_input: yes
   register: result
   when:
   - ansible_os_family == 'Debian'
@@ -56,3 +57,19 @@
   when:
   - ansible_os_family == 'Debian'
   - postgres_version_resp.stdout is version('9.4', '>=')
+
+- name: postgresql_ping - check trust_input
+  become_user: "{{ pg_user }}"
+  become: yes
+  postgresql_ping:
+    db: "{{ db_default }}"
+    login_user: "{{ pg_user }}"
+    trust_input: no
+    session_role: 'curious.anonymous"; SELECT * FROM information_schema.tables; --'
+  register: result
+  ignore_errors: yes
+
+- assert:
+    that:
+    - result is failed
+    - result.msg is search('is potentially dangerous')
