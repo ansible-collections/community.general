@@ -257,9 +257,9 @@ files:
   $modules/cloud/docker/docker_config.py:
     authors: chouseknecht ushuz
   $modules/cloud/docker/docker_container.py:
-    authors: ThomasSteinbach chouseknecht cove dusdanig felixfontein joshuaconner kassiansun softzilla zfil
+    authors: ThomasSteinbach chouseknecht cove dusdanig felixfontein kassiansun softzilla zfil
     maintainers: DBendit WojciechowskiPiotr akshay196 danihodovic dariko jwitko tbouvet
-    ignore: ThomasSteinbach cove
+    ignore: ThomasSteinbach cove joshuaconner
   $modules/cloud/docker/docker_container_info.py:
     authors: felixfontein
     maintainers: DBendit WojciechowskiPiotr akshay196 danihodovic dariko jwitko kassiansun tbouvet
