@@ -191,13 +191,12 @@ class PgUserObjStatInfo():
 
     def get_func_stat(self):
         """Get function statistics and fill out self.info dictionary."""
-        if not self.schema:
-            query = "SELECT * FROM pg_stat_user_functions"
-            result = exec_sql(self, query, add_to_executed=False)
-        else:
+        query = "SELECT * FROM pg_stat_user_functions"
+        if self.schema:
             query = "SELECT * FROM pg_stat_user_functions WHERE schemaname = %s"
-            result = exec_sql(self, query, query_params=(self.schema,),
-                              add_to_executed=False)
+
+        result = exec_sql(self, query, query_params=(self.schema,),
+                          add_to_executed=False)
 
         if not result:
             return
@@ -209,13 +208,12 @@ class PgUserObjStatInfo():
 
     def get_idx_stat(self):
         """Get index statistics and fill out self.info dictionary."""
-        if not self.schema:
-            query = "SELECT * FROM pg_stat_user_indexes"
-            result = exec_sql(self, query, add_to_executed=False)
-        else:
+        query = "SELECT * FROM pg_stat_user_indexes"
+        if self.schema:
             query = "SELECT * FROM pg_stat_user_indexes WHERE schemaname = %s"
-            result = exec_sql(self, query, query_params=(self.schema,),
-                              add_to_executed=False)
+
+        result = exec_sql(self, query, query_params=(self.schema,),
+                          add_to_executed=False)
 
         if not result:
             return
@@ -227,13 +225,12 @@ class PgUserObjStatInfo():
 
     def get_tbl_stat(self):
         """Get table statistics and fill out self.info dictionary."""
-        if not self.schema:
-            query = "SELECT * FROM pg_stat_user_tables"
-            result = exec_sql(self, query, add_to_executed=False)
-        else:
+        query = "SELECT * FROM pg_stat_user_tables"
+        if self.schema:
             query = "SELECT * FROM pg_stat_user_tables WHERE schemaname = %s"
-            result = exec_sql(self, query, query_params=(self.schema,),
-                              add_to_executed=False)
+
+        result = exec_sql(self, query, query_params=(self.schema,),
+                          add_to_executed=False)
 
         if not result:
             return
@@ -262,30 +259,22 @@ class PgUserObjStatInfo():
                     self.info[info_key][elem[schema_key]][elem[name_key]][key] = val
 
             if info_key in ('tables', 'indexes'):
-                relname = elem[name_key]
                 schemaname = elem[schema_key]
-                if not self.schema:
-                    result = exec_sql(self, "SELECT pg_relation_size ('%s.%s')" % (schemaname, relname),
-                                      add_to_executed=False)
-                else:
-                    relname = '%s.%s' % (self.schema, relname)
-                    result = exec_sql(self, "SELECT pg_relation_size (%s)",
-                                      query_params=(relname,),
-                                      add_to_executed=False)
+                if self.schema:
+                    schemaname = self.schema
+
+                relname = '%s.%s' % (schemaname, elem[name_key])
+
+                result = exec_sql(self, "SELECT pg_relation_size (%s)",
+                                  query_params=(relname,),
+                                  add_to_executed=False)
 
                 self.info[info_key][elem[schema_key]][elem[name_key]]['size'] = result[0][0]
 
                 if info_key == 'tables':
-                    relname = elem[name_key]
-                    schemaname = elem[schema_key]
-                    if not self.schema:
-                        result = exec_sql(self, "SELECT pg_total_relation_size ('%s.%s')" % (schemaname, relname),
-                                          add_to_executed=False)
-                    else:
-                        relname = '%s.%s' % (self.schema, relname)
-                        result = exec_sql(self, "SELECT pg_total_relation_size (%s)",
-                                          query_params=(relname,),
-                                          add_to_executed=False)
+                    result = exec_sql(self, "SELECT pg_total_relation_size (%s)",
+                                      query_params=(relname,),
+                                      add_to_executed=False)
 
                     self.info[info_key][elem[schema_key]][elem[name_key]]['total_size'] = result[0][0]
 
