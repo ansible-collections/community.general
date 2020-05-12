@@ -75,7 +75,12 @@ options:
     - Permissions checking for SQL commands is carried out as though
       the session_role were the one that had logged in originally.
     type: str
-
+  trust_input:
+    description:
+    - If C(no), check whether values of parameters are potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections are possible.
+    type: bool
+    default: yes
 notes:
 - Supports PostgreSQL version 9.4+.
 - COPY command is only allowed to database superusers.
@@ -182,7 +187,10 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.database import pg_quote_identifier
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+    pg_quote_identifier,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     exec_sql,
@@ -340,6 +348,7 @@ def main():
         program=dict(type='bool', default=False),
         db=dict(type='str', aliases=['login_db']),
         session_role=dict(type='str'),
+        trust_input=dict(type='bool', default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -350,6 +359,21 @@ def main():
             ['copy_to', 'dst'],
         ]
     )
+
+    if not module.params['trust_input']:
+        # Check input for potentially dangerous elements:
+        opt_list = None
+        if module.params['options']:
+            opt_list = ['%s %s' % (key, val) for (key, val) in iteritems(module.params['options'])]
+
+        check_input(module,
+                    module.params['copy_to'],
+                    module.params['copy_from'],
+                    module.params['src'],
+                    module.params['dst'],
+                    opt_list,
+                    module.params['columns'],
+                    module.params['session_role'])
 
     # Note: we don't need to check mutually exclusive params here, because they are
     # checked automatically by AnsibleModule (mutually_exclusive=[] list above).
