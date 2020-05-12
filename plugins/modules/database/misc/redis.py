@@ -73,6 +73,8 @@ notes:
    - If the redis master instance we are making slave of is password protected
      this needs to be in the redis.conf in the masterauth variable
 
+seealso:
+    - module: redis_info
 requirements: [ redis ]
 author: "Xabier Larrakoetxea (@slok)"
 '''
