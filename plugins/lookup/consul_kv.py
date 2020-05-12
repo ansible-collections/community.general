@@ -70,9 +70,6 @@ DOCUMENTATION = '''
         description: The target to connect to, should look like this: C(https://my.consul.server:8500).
         env:
           - name: ANSIBLE_CONSUL_URL
-        ini:
-          - section: lookup_consul
-            key: url
 '''
 
 EXAMPLES = """
