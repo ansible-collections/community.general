@@ -52,6 +52,7 @@
       <<: *pg_parameters
       copy_to: '{{ data_file_txt }}'
       src: '{{ test_table }}'
+      trust_input: no
 
   - assert:
       that:
@@ -76,6 +77,7 @@
       <<: *pg_parameters
       copy_from: '{{ data_file_txt }}'
       dst: '{{ test_table }}'
+      trust_input: no
 
   - assert:
       that:
@@ -101,11 +103,27 @@
       <<: *pg_parameters
       copy_to: '{{ data_file_txt }}'
       src: non_existent_table
+      trust_input: no
 
   - assert:
       that:
       - result.failed == true
       - result.queries is not defined
+
+  - name: postgresql_copy - check trust_input
+    <<: *task_parameters
+    postgresql_copy:
+      <<: *pg_parameters
+      copy_to: '{{ data_file_txt }}'
+      src: '{{ test_table }}'
+      session_role: 'curious.anonymous"; SELECT * FROM information_schema.tables; --'
+      trust_input: no
+    ignore_errors: yes
+
+  - assert:
+      that:
+      - result is failed
+      - result.msg is search('is potentially dangerous')
 
   - name: postgresql_copy - copy test table data to data_file_txt
     <<: *task_parameters
@@ -113,6 +131,7 @@
       <<: *pg_parameters
       copy_to: '{{ data_file_txt }}'
       src: '{{ test_table }}'
+      trust_input: no
 
   - assert:
       that:
@@ -142,6 +161,7 @@
       - name
       options:
         format: csv
+      trust_input: no
 
   - assert:
       that:
@@ -170,6 +190,7 @@
       - name
       options:
         format: csv
+      trust_input: no
 
   - assert:
       that:
@@ -198,6 +219,7 @@
       columns: id, name
       options:
         delimiter: '|'
+      trust_input: no
     when: ansible_distribution != 'FreeBSD'
 
   - assert:
@@ -218,6 +240,7 @@
       columns: id, name
       options:
         delimiter: ','
+      trust_input: no
 
   - assert:
       that:
