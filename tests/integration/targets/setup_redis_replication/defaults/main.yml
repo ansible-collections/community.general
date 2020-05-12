@@ -1,0 +1,35 @@
+# General
+redis_packages:
+  Ubuntu:
+  - redis-server
+  openSUSE Leap:
+  - redis
+  Fedora:
+  - redis
+  CentOS:
+  - redis
+  FreeBSD:
+  - redis
+
+redis_bin:
+  Ubuntu: /usr/bin/redis-server
+  openSUSE Leap: /usr/sbin/redis-server
+  Fedora: /usr/bin/redis-server
+  CentOS: /usr/bin/redis-server
+  FreeBSD: /usr/local/bin/redis-server
+
+redis_module: "{{ (ansible_python_version is version('2.7', '>=')) | ternary('redis', 'redis==2.10.6') }}"
+
+redis_password: PASS
+
+# Master
+master_port: 6379
+master_conf: /etc/redis-master.conf
+master_datadir: /var/lib/redis-master
+master_logdir: /var/log/redis-master
+
+# Slave
+slave_port: 6380
+slave_conf: /etc/redis-slave.conf
+slave_datadir: /var/lib/redis-slave
+slave_logdir: /var/log/redis-slave
