@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - postgresql_ext - refactor to simplify and remove dead code (https://github.com/ansible-collections/community.general/pull/291)
+  - postgresql_idx - refactor to simplify code (https://github.com/ansible-collections/community.general/pull/291)
+  - postgresql_user_obj_stat_info - refactor to simplify code (https://github.com/ansible-collections/community.general/pull/291)
