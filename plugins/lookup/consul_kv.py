@@ -67,7 +67,7 @@ DOCUMENTATION = '''
           - section: lookup_consul
             key: client_cert
       url:
-        description: "The target to connect to, should look like this: C(https://my.consul.server:8500)."
+        description: "The target to connect to, should look like this: C(https://my.consul.server:8500)"
         env:
           - name: ANSIBLE_CONSUL_URL
         ini:
