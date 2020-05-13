@@ -158,7 +158,8 @@ class ActionModule(ActionBase):
                     task_vars=task_vars,
                     wrap_async=False)
 
-        # remove a temporary path we created
-        self._remove_tmp_path(self._connection._shell.tmpdir)
+        if not wrap_async:
+            # remove a temporary path we created
+            self._remove_tmp_path(self._connection._shell.tmpdir)
 
         return result
