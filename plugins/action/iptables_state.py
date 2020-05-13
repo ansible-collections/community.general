@@ -48,9 +48,6 @@ class ActionModule(ActionBase):
                 break
             time.sleep(1)
 
-        del async_result['ansible_job_id']
-        del async_result['finished']
-
         return async_result
 
     def run(self, tmp=None, task_vars=None):
@@ -142,7 +139,17 @@ class ActionModule(ActionBase):
                     raise AnsibleActionFail("Unable to get 'ansible_job_id'.")
 
                 async_status_args['_async_dir'] = async_dir
-                result = self._async_result(async_status_args, task_vars, remaining_time)
+                result = merge_hash(result, self._async_result(async_status_args, task_vars, remaining_time))
+
+                # Cleanup async related stuff and internal params
+                for key in ('ansible_job_id', 'results_file', 'started', 'finished'):
+                    if result.get(key):
+                        del result[key]
+
+                if result.get('invocation', {}).get('module_args'):
+                    if '_timeout' in result['invocation']['module_args']:
+                        del result['invocation']['module_args']['_back']
+                        del result['invocation']['module_args']['_timeout']
 
                 async_status_args['mode'] = 'cleanup'
                 garbage = self._execute_module(
@@ -153,11 +160,5 @@ class ActionModule(ActionBase):
 
         # remove a temporary path we created
         self._remove_tmp_path(self._connection._shell.tmpdir)
-
-        # Remove internal params from results
-        if result.get('invocation', {}).get('module_args'):
-            if '_timeout' in result['invocation']['module_args']:
-                del result['invocation']['module_args']['_timeout']
-                del result['invocation']['module_args']['_back']
 
         return result
