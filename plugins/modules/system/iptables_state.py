@@ -620,9 +620,14 @@ def main():
     (rc, stdout, stderr) = module.run_command(SAVECOMMAND, check_rc=True)
     tables_rollback = per_table_state(SAVECOMMAND, stdout)
 
+    msg = (
+        "Failed to confirm state restored from %s after %ss. "
+        "Firewall has been rolled back to its initial state." % (path, _timeout)
+    )
+
     module.fail_json(
         changed=(tables_before != tables_rollback),
-        msg="Failed to confirm state restored from %s. Firewall has been rolled back to initial state." % path,
+        msg=msg,
         cmd=cmd,
         tables=tables_before,
         initial_state=initial_state,
