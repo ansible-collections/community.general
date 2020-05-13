@@ -109,7 +109,7 @@ EXAMPLES = '''
   apk:
     upgrade: yes
 
-- name: Upgrade all installed packages to the latest versions available
+- name: Upgrade / replace / downgrade / uninstall all installed packages to the latest versions available
   apk:
     available: yes
     upgrade: yes
