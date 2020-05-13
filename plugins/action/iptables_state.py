@@ -98,8 +98,9 @@ class ActionModule(ActionBase):
                         async_dir = self.get_shell_option('async_dir', default="~/.ansible_async")
                     # END snippet from async_status action plugin
 
-                    # Bind the loop max duration to the same value on both
-                    # remote and local sides, and set a backup file path.
+                    # Bind the loop max duration to consistent values on both
+                    # remote and local sides (if not the same, make the loop
+                    # longer on the controller); and set a backup file path.
                     module_args['_timeout'] = task_async
                     module_args['_back'] = '%s/iptables.state' % async_dir
 
@@ -118,8 +119,8 @@ class ActionModule(ActionBase):
                     display.warning("Connection plugin does not allow to reset the connection.")
 
                 confirm_cmd = 'rm -f %s' % module_args['_back']
-                remaining_time = int(module_args['_timeout'])
-                for x in range(int(module_args['_timeout'])):
+                remaining_time = max(task_async, max_timeout)
+                for x in range(max_timeout):
                     time.sleep(1)
                     remaining_time -= 1
                     # - AnsibleConnectionFailure covers rejected requests (i.e.
