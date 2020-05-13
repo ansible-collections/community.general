@@ -79,36 +79,36 @@ options:
 
 
 EXAMPLES = '''
-# Make sure spell 'foo' is installed
-- sorcery:
+- name: Make sure spell foo is installed
+  sorcery:
     spell: foo
     state: present
 
-# Make sure spells 'foo', 'bar' and 'baz' are removed
-- sorcery:
+- name: Make sure spells foo, bar and baz are removed
+  sorcery:
     spell: foo,bar,baz
     state: absent
 
-# Make sure spell 'foo' with dependencies 'bar' and 'baz' is installed
-- sorcery:
+- name: Make sure spell foo with dependencies bar and baz is installed
+  sorcery:
     spell: foo
     depends: bar,baz
     state: present
 
-# Make sure spell 'foo' with 'bar' and without 'baz' dependencies is installed
-- sorcery:
+- name: Make sure spell foo with bar and without baz dependencies is installed
+  sorcery:
     spell: foo
     depends: +bar,-baz
     state: present
 
-# Make sure spell 'foo' with libressl (providing SSL) dependency is installed
-- sorcery:
+- name: Make sure spell foo with libressl (providing SSL) dependency is installed
+  sorcery:
     spell: foo
     depends: libressl(SSL)
     state: present
 
-# Playbook: make sure spells with/without required dependencies (if any) are installed
-- sorcery:
+- name: Make sure spells with/without required dependencies (if any) are installed
+  sorcery:
     name: "{{ item.spell }}"
     depends: "{{ item.depends | default(None) }}"
     state: present
@@ -117,30 +117,30 @@ EXAMPLES = '''
     - { spell: 'fwknop', depends: 'gpgme' }
     - { spell: 'pv,tnftp,tor' }
 
-# Install the latest version of spell 'foo' using regular glossary
-- sorcery:
+- name: Install the latest version of spell foo using regular glossary
+  sorcery:
     name: foo
     state: latest
 
-# Rebuild spell 'foo'
-- sorcery:
+- name: Rebuild spell foo
+  sorcery:
     spell: foo
     state: rebuild
 
-# Rebuild the whole system, but update Sorcery and Codex first
-- sorcery:
+- name: Rebuild the whole system, but update Sorcery and Codex first
+  sorcery:
     spell: '*'
     state: rebuild
     update: yes
     update_cache: yes
 
-# Refresh the grimoire collection if it's 1 day old using native sorcerous alias
-- sorcery:
+- name: Refresh the grimoire collection if it is 1 day old using native sorcerous alias
+  sorcery:
     update_codex: yes
     cache_valid_time: 86400
 
-# Update only Sorcery itself
-- sorcery:
+- name: Update only Sorcery itself
+  sorcery:
     update: yes
 '''
 

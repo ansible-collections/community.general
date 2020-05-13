@@ -76,47 +76,54 @@ notes:
 '''
 
 EXAMPLES = r'''
-- osx_defaults:
+- name: Manage macOS user defaults
+  osx_defaults:
     domain: com.apple.Safari
     key: IncludeInternalDebugMenu
     type: bool
     value: true
     state: present
 
-- osx_defaults:
+- name: Manage macOS user defaults
+  osx_defaults:
     domain: NSGlobalDomain
     key: AppleMeasurementUnits
     type: string
     value: Centimeters
     state: present
 
-- osx_defaults:
+- name: Manage macOS user defaults
+  osx_defaults:
     domain: /Library/Preferences/com.apple.SoftwareUpdate
     key: AutomaticCheckEnabled
     type: int
     value: 1
   become: yes
 
-- osx_defaults:
+- name: Manage macOS user defaults
+  osx_defaults:
     domain: com.apple.screensaver
     host: currentHost
     key: showClock
     type: int
     value: 1
 
-- osx_defaults:
+- name: Manage macOS user defaults
+  osx_defaults:
     key: AppleMeasurementUnits
     type: string
     value: Centimeters
 
-- osx_defaults:
+- name: Manage macOS user defaults
+  osx_defaults:
     key: AppleLanguages
     type: array
     value:
       - en
       - nl
 
-- osx_defaults:
+- name: Manage macOS user defaults
+  osx_defaults:
     domain: com.geekchimp.macable
     key: ExampleKeyToRemove
     state: absent

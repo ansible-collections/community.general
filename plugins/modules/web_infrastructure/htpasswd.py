@@ -68,8 +68,8 @@ extends_documentation_fragment: files
 '''
 
 EXAMPLES = """
-# Add a user to a password file and ensure permissions are set
-- htpasswd:
+- name: Add a user to a password file and ensure permissions are set
+  htpasswd:
     path: /etc/nginx/passwdfile
     name: janedoe
     password: '9s36?;fyNp'
@@ -77,14 +77,14 @@ EXAMPLES = """
     group: www-data
     mode: 0640
 
-# Remove a user from a password file
-- htpasswd:
+- name: Remove a user from a password file
+  htpasswd:
     path: /etc/apache2/passwdfile
     name: foobar
     state: absent
 
-# Add a user to a password file suitable for use by libpam-pwdfile
-- htpasswd:
+- name: Add a user to a password file suitable for use by libpam-pwdfile
+  htpasswd:
     path: /etc/mail/passwords
     name: alex
     password: oedu2eGh

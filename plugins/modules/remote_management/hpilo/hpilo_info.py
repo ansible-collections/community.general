@@ -51,8 +51,8 @@ notes:
 '''
 
 EXAMPLES = r'''
-# Task to gather facts from a HP iLO interface only if the system is an HP server
-- hpilo_info:
+- name: Gather facts from a HP iLO interface only if the system is an HP server
+  hpilo_info:
     host: YOUR_ILO_ADDRESS
     login: YOUR_ILO_LOGIN
     password: YOUR_ILO_PASSWORD

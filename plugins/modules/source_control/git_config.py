@@ -64,70 +64,73 @@ options:
 '''
 
 EXAMPLES = '''
-# Set some settings in ~/.gitconfig
-- git_config:
+- name: Add a setting to ~/.gitconfig
+  git_config:
     name: alias.ci
     scope: global
     value: commit
 
-- git_config:
+- name: Add a setting to ~/.gitconfig
+  git_config:
     name: alias.st
     scope: global
     value: status
 
-# Unset some settings in ~/.gitconfig
-- git_config:
+- name: Remove a setting from ~/.gitconfig
+  git_config:
     name: alias.ci
     scope: global
     state: absent
 
-# Or system-wide:
-- git_config:
-    name: alias.remotev
-    scope: system
-    value: remote -v
-
-- git_config:
+- name: Add a setting to ~/.gitconfig
+  git_config:
     name: core.editor
     scope: global
     value: vim
 
-# scope=system is the default
-- git_config:
+- name: Add a setting system-wide
+  git_config:
+    name: alias.remotev
+    scope: system
+    value: remote -v
+
+- name: Add a setting to a system scope (default)
+  git_config:
     name: alias.diffc
     value: diff --cached
 
-- git_config:
+- name: Add a setting to a system scope (default)
+  git_config:
     name: color.ui
     value: auto
 
-# Make etckeeper not complain when invoked by cron
-- git_config:
+- name: Make etckeeper not complaining when it is invoked by cron
+  git_config:
     name: user.email
     repo: /etc
     scope: local
     value: 'root@{{ ansible_fqdn }}'
 
-# Read individual values from git config
-- git_config:
+- name: Read individual values from git config
+  git_config:
     name: alias.ci
     scope: global
 
-# scope: system is also assumed when reading values, unless list_all=yes
-- git_config:
+- name: Scope system is also assumed when reading values, unless list_all=yes
+  git_config:
     name: alias.diffc
 
-# Read all values from git config
-- git_config:
+- name: Read all values from git config
+  git_config:
     list_all: yes
     scope: global
 
-# When list_all=yes and no scope is specified, you get configuration from all scopes
-- git_config:
+- name: When list_all is yes and no scope is specified, you get configuration from all scopes
+  git_config:
     list_all: yes
 
-# Specify a repository to include local settings
-- git_config:
+- name: Specify a repository to include local settings
+  git_config:
     list_all: yes
     repo: /path/to/repo.git
 '''
