@@ -282,7 +282,7 @@ def main():
                     if ret['code'] == 200:
                         changed = True
                     else:
-                        module.fail_json(msg="bad return code deleting host: %s" % (ret['data']))
+                        module.fail_json(msg="bad return code deleting host: %s" % (ret['code']))
                 except Exception as e:
                     module.fail_json(msg="exception deleting host: " + str(e))
 
@@ -298,7 +298,7 @@ def main():
             if ret['code'] == 200:
                 changed = True
             else:
-                module.fail_json(msg="bad return code modifying host: %s" % (ret['data']))
+                module.fail_json(msg="bad return code modifying host: %s" % (ret['code']))
 
     else:
         if state == "present":
@@ -310,7 +310,7 @@ def main():
                     if ret['code'] == 200:
                         changed = True
                     else:
-                        module.fail_json(msg="bad return code creating host: %s" % (ret['data']))
+                        module.fail_json(msg="bad return code creating host: %s" % (ret['code']))
                 except Exception as e:
                     module.fail_json(msg="exception creating host: " + str(e))
 
