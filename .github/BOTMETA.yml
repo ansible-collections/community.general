@@ -925,12 +925,12 @@ files:
     authors: Andersson007
     maintainers: Alexander198961 Xyon bmalynovytch bmildren kurtdavis michaelcoburn oneiroi tolland
     keywords: mariadb proxysql
-    ignore: tomaszkiewicz
   $modules/database/mysql/mysql_replication.py:
     authors: Andersson007 banyek
   $modules/database/mysql/mysql_user.py:
-    authors: Jmainguy bmalynovytch tomaszkiewicz
+    authors: Jmainguy bmalynovytch
     maintainers: Alexander198961 Andersson007 Xyon bmildren kurtdavis michaelcoburn oneiroi tolland
+    ignore: tomaszkiewicz
   $modules/database/mysql/mysql_variables.py:
     authors: banyek
     maintainers: $team_mysql
