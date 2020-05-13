@@ -61,12 +61,14 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about all NICs which names start with C(eth) for VM named C(centos7):
-- ovirt_nic_info:
+- name: Gather information about all NICs which names start with eth for VM named centos7
+  ovirt_nic_info:
     vm: centos7
     name: eth*
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_nics }}"
 '''
 

@@ -52,21 +52,23 @@ options:
 '''
 
 EXAMPLES = '''
-# Create an MCP 1.0 network
-- dimensiondata_network:
+- name: Create an MCP 1.0 network
+  dimensiondata_network:
     region: na
     location: NA5
     name: mynet
-# Create an MCP 2.0 network
-- dimensiondata_network:
+
+- name: Create an MCP 2.0 network
+  dimensiondata_network:
     region: na
     mcp_user: my_user
     mcp_password: my_password
     location: NA9
     name: mynet
     service_plan: ADVANCED
-# Delete a network
-- dimensiondata_network:
+
+- name: Delete a network
+  dimensiondata_network:
     region: na
     location: NA1
     name: mynet

@@ -127,8 +127,8 @@ ifaces:
 '''
 
 EXAMPLES = '''
-# Set eth1 mtu configuration value to 8000
-- interfaces_file:
+- name: Set eth1 mtu configuration value to 8000
+  interfaces_file:
     dest: /etc/network/interfaces.d/eth1.cfg
     iface: eth1
     option: mtu

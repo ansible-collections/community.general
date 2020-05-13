@@ -58,11 +58,13 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about all groups which names start with C(admin):
-- ovirt_group_info:
+- name: Gather information about all groups which names start with admin
+  ovirt_group_info:
     pattern: name=admin*
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_groups }}"
 '''
 

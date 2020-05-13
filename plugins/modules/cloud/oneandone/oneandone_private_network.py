@@ -95,10 +95,8 @@ author:
 '''
 
 EXAMPLES = '''
-
-# Provisioning example. Create and destroy private networks.
-
-- oneandone_private_network:
+- name: Create a private network
+  oneandone_private_network:
     auth_token: oneandone_private_api_key
     name: backup_network
     description: Testing creation of a private network with ansible
@@ -106,38 +104,35 @@ EXAMPLES = '''
     subnet_mask: 255.0.0.0
     datacenter: US
 
-- oneandone_private_network:
+- name: Destroy a private network
+  oneandone_private_network:
     auth_token: oneandone_private_api_key
     state: absent
     name: backup_network
 
-# Modify the private network.
-
-- oneandone_private_network:
+- name: Modify the private network
+  oneandone_private_network:
     auth_token: oneandone_private_api_key
     state: update
     private_network: backup_network
     network_address: 192.168.2.0
     subnet_mask: 255.255.255.0
 
-# Add members to the private network.
-
-- oneandone_private_network:
+- name: Add members to the private network
+  oneandone_private_network:
     auth_token: oneandone_private_api_key
     state: update
     private_network: backup_network
     add_members:
      - server identifier (id or name)
 
-# Remove members from the private network.
-
-- oneandone_private_network:
+- name: Remove members from the private network
+  oneandone_private_network:
     auth_token: oneandone_private_api_key
     state: update
     private_network: backup_network
     remove_members:
      - server identifier (id or name)
-
 '''
 
 RETURN = '''

@@ -89,34 +89,34 @@ requirements:
 '''
 
 EXAMPLES = '''
-# Add NVIDIA repository for graphics drivers
-- zypper_repository:
+- name: Add NVIDIA repository for graphics drivers
+  zypper_repository:
     name: nvidia-repo
     repo: 'ftp://download.nvidia.com/opensuse/12.2'
     state: present
 
-# Remove NVIDIA repository
-- zypper_repository:
+- name: Remove NVIDIA repository
+  zypper_repository:
     name: nvidia-repo
     repo: 'ftp://download.nvidia.com/opensuse/12.2'
     state: absent
 
-# Add python development repository
-- zypper_repository:
+- name: Add python development repository
+  zypper_repository:
     repo: 'http://download.opensuse.org/repositories/devel:/languages:/python/SLE_11_SP3/devel:languages:python.repo'
 
-# Refresh all repos
-- zypper_repository:
+- name: Refresh all repos
+  zypper_repository:
     repo: '*'
     runrefresh: yes
 
-# Add a repo and add it's gpg key
-- zypper_repository:
+- name: Add a repo and add its gpg key
+  zypper_repository:
     repo: 'http://download.opensuse.org/repositories/systemsmanagement/openSUSE_Leap_42.1/'
     auto_import_keys: yes
 
-# Force refresh of a repository
-- zypper_repository:
+- name: Force refresh of a repository
+  zypper_repository:
     repo: 'http://my_internal_ci_repo/repo'
     name: my_ci_repo
     state: present

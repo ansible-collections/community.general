@@ -87,31 +87,25 @@ author:
 '''
 
 EXAMPLES = '''
-
-# Create a public IP.
-
-- oneandone_public_ip:
+- name: Create a public IP
+  oneandone_public_ip:
     auth_token: oneandone_private_api_key
     reverse_dns: example.com
     datacenter: US
     type: IPV4
 
-# Update a public IP.
-
-- oneandone_public_ip:
+- name: Update a public IP
+  oneandone_public_ip:
     auth_token: oneandone_private_api_key
     public_ip_id: public ip id
     reverse_dns: secondexample.com
     state: update
 
-
-# Delete a public IP
-
-- oneandone_public_ip:
+- name: Delete a public IP
+  oneandone_public_ip:
     auth_token: oneandone_private_api_key
     public_ip_id: public ip id
     state: absent
-
 '''
 
 RETURN = '''

@@ -188,16 +188,16 @@ author: "Brice Burgess (@briceburg)"
 '''
 
 EXAMPLES = '''
-# fetch my.com domain records
-- dnsmadeeasy:
+- name: Fetch my.com domain records
+  dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
     state: present
   register: response
 
-# create / ensure the presence of a record
-- dnsmadeeasy:
+- name: Create a record
+  dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -206,8 +206,8 @@ EXAMPLES = '''
     record_type: A
     record_value: 127.0.0.1
 
-# update the previously created record
-- dnsmadeeasy:
+- name: Update the previously created record
+  dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -215,8 +215,8 @@ EXAMPLES = '''
     record_name: test
     record_value: 192.0.2.23
 
-# fetch a specific record
-- dnsmadeeasy:
+- name: Fetch a specific record
+  dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -224,8 +224,8 @@ EXAMPLES = '''
     record_name: test
   register: response
 
-# delete a record / ensure it is absent
-- dnsmadeeasy:
+- name: Delete a record
+  dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -233,8 +233,8 @@ EXAMPLES = '''
     state: absent
     record_name: test
 
-# Add a failover
-- dnsmadeeasy:
+- name: Add a failover
+  dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -246,7 +246,8 @@ EXAMPLES = '''
     ip1: 127.0.0.2
     ip2: 127.0.0.3
 
-- dnsmadeeasy:
+- name: Add a failover
+  dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -261,8 +262,8 @@ EXAMPLES = '''
     ip4: 127.0.0.5
     ip5: 127.0.0.6
 
-# Add a monitor
-- dnsmadeeasy:
+- name: Add a monitor
+  dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -278,8 +279,8 @@ EXAMPLES = '''
     systemDescription: Monitor Test A record
     contactList: my contact list
 
-# Add a monitor with http options
-- dnsmadeeasy:
+- name: Add a monitor with http options
+  dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -298,8 +299,8 @@ EXAMPLES = '''
     httpFile: example
     httpQueryString: some string
 
-# Add a monitor and a failover
-- dnsmadeeasy:
+- name: Add a monitor and a failover
+  dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -317,8 +318,8 @@ EXAMPLES = '''
     systemDescription: monitoring my.com status
     contactList: emergencycontacts
 
-# Remove a failover
-- dnsmadeeasy:
+- name: Remove a failover
+  dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -328,8 +329,8 @@ EXAMPLES = '''
     record_value: 127.0.0.1
     failover: no
 
-# Remove a monitor
-- dnsmadeeasy:
+- name: Remove a monitor
+  dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com

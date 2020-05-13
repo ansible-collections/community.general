@@ -49,12 +49,14 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about all snapshots which description start with C(update) for VM named C(centos7):
-- ovirt_snapshot_info:
+- name: Gather information about all snapshots which description start with update for VM named centos7
+  ovirt_snapshot_info:
     vm: centos7
     description: update*
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_snapshots }}"
 '''
 

@@ -52,27 +52,26 @@ options:
 '''
 
 EXAMPLES = '''
-# basic usage, using auth from /etc/ovh.conf
-  - ovh_monthly_billing:
-       project_id: 0c727a20aa144485b70c44dee9123b46
-       instance_id: 8fa89ad2-8f08-4220-9fa4-9695ea23e948
+- name: Basic usage, using auth from /etc/ovh.conf
+  ovh_monthly_billing:
+    project_id: 0c727a20aa144485b70c44dee9123b46
+    instance_id: 8fa89ad2-8f08-4220-9fa4-9695ea23e948
 
-# a bit more more complex
-  # get openstack cloud ID and instance ID, OVH use them in its API
-  - os_server_info:
-      cloud: myProjectName
-      region_name: myRegionName
-      server: myServerName
-    # force run even in check_mode
-    check_mode: no
+# Get openstack cloud ID and instance ID, OVH use them in its API
+- name: Get openstack cloud ID and instance ID
+  os_server_info:
+    cloud: myProjectName
+    region_name: myRegionName
+    server: myServerName
+  register: openstack_servers
 
-  # use theses IDs
-  - ovh_monthly_billing:
-      project_id: "{{ openstack_servers.0.tenant_id }}"
-      instance_id: "{{ openstack_servers.0.id }}"
-      application_key: yourkey
-      application_secret: yoursecret
-      consumer_key: yourconsumerkey
+- name: Use IDs
+  ovh_monthly_billing:
+    project_id: "{{ openstack_servers.0.tenant_id }}"
+    instance_id: "{{ openstack_servers.0.id }}"
+    application_key: yourkey
+    application_secret: yoursecret
+    consumer_key: yourconsumerkey
 '''
 
 RETURN = '''

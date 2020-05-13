@@ -61,12 +61,14 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about quota named C<myquota> in Default datacenter:
-- ovirt_quota_info:
+- name: Gather information about quota named C<myquota> in Default datacenter
+  ovirt_quota_info:
     data_center: Default
     name: myquota
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_quotas }}"
 '''
 

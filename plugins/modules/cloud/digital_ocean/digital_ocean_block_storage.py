@@ -63,31 +63,34 @@ author:
 '''
 
 EXAMPLES = '''
-# Create new Block Storage
-- digital_ocean_block_storage:
+- name: Create new Block Storage
+  digital_ocean_block_storage:
     state: present
     command: create
     api_token: <TOKEN>
     region: nyc1
     block_size: 10
     volume_name: nyc1-block-storage
-# Delete Block Storage
-- digital_ocean_block_storage:
+
+- name: Delete Block Storage
+  digital_ocean_block_storage:
     state: absent
     command: create
     api_token: <TOKEN>
     region: nyc1
     volume_name: nyc1-block-storage
-# Attach Block Storage to a Droplet
-- digital_ocean_block_storage:
+
+- name: Attach Block Storage to a Droplet
+  digital_ocean_block_storage:
     state: present
     command: attach
     api_token: <TOKEN>
     volume_name: nyc1-block-storage
     region: nyc1
     droplet_id: <ID>
-# Detach Block Storage from a Droplet
-- digital_ocean_block_storage:
+
+- name: Detach Block Storage from a Droplet
+  digital_ocean_block_storage:
     state: absent
     command: attach
     api_token: <TOKEN>

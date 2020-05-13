@@ -33,17 +33,20 @@ requirements:
 
 
 EXAMPLES = '''
-- digital_ocean_sshkey_info:
+- name: Gather information about DigitalOcean SSH keys
+  digital_ocean_sshkey_info:
     oauth_token: "{{ my_do_key }}"
   register: ssh_keys
 
-- set_fact:
+- name: Set facts based on the gathered information
+  set_fact:
     pubkey: "{{ item.public_key }}"
   loop: "{{ ssh_keys.data|json_query(ssh_pubkey) }}"
   vars:
     ssh_pubkey: "[?name=='ansible_ctrl']"
 
-- debug:
+- name: Print SSH public key
+  debug:
     msg: "{{ pubkey }}"
 '''
 

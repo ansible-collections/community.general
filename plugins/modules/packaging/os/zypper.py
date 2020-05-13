@@ -122,68 +122,68 @@ requirements:
 '''
 
 EXAMPLES = '''
-# Install "nmap"
-- zypper:
+- name: Install nmap
+  zypper:
     name: nmap
     state: present
 
-# Install apache2 with recommended packages
-- zypper:
+- name: Install apache2 with recommended packages
+  zypper:
     name: apache2
     state: present
     disable_recommends: no
 
-# Apply a given patch
-- zypper:
+- name: Apply a given patch
+  zypper:
     name: openSUSE-2016-128
     state: present
     type: patch
 
-# Remove the "nmap" package
-- zypper:
+- name: Remove the nmap package
+  zypper:
     name: nmap
     state: absent
 
-# Install the nginx rpm from a remote repo
-- zypper:
+- name: Install the nginx rpm from a remote repo
+  zypper:
     name: 'http://nginx.org/packages/sles/12/x86_64/RPMS/nginx-1.8.0-1.sles12.ngx.x86_64.rpm'
     state: present
 
-# Install local rpm file
-- zypper:
+- name: Install local rpm file
+  zypper:
     name: /tmp/fancy-software.rpm
     state: present
 
-# Update all packages
-- zypper:
+- name: Update all packages
+  zypper:
     name: '*'
     state: latest
 
-# Apply all available patches
-- zypper:
+- name: Apply all available patches
+  zypper:
     name: '*'
     state: latest
     type: patch
 
-# Perform a dist-upgrade with additional arguments
-- zypper:
+- name: Perform a dist-upgrade with additional arguments
+  zypper:
     name: '*'
     state: dist-upgrade
     extra_args: '--no-allow-vendor-change --allow-arch-change'
 
-# Refresh repositories and update package "openssl"
-- zypper:
+- name: Refresh repositories and update package openssl
+  zypper:
     name: openssl
     state: present
     update_cache: yes
 
-# Install specific version (possible comparisons: <, >, <=, >=, =)
-- zypper:
+- name: "Install specific version (possible comparisons: <, >, <=, >=, =)"
+  zypper:
     name: 'docker>=1.10'
     state: present
 
-# Wait 20 seconds to acquire the lock before failing
-- zypper:
+- name: Wait 20 seconds to acquire the lock before failing
+  zypper:
     name: mosh
     state: present
   environment:

@@ -78,20 +78,23 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about all VMs which names start with C(centos) and
-# belong to cluster C(west):
-- ovirt_vm_info:
+- name: Gather information about all VMs which names start with centos and belong to cluster west
+  ovirt_vm_info:
     pattern: name=centos* and cluster=west
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_vms }}"
 
-# Gather info about next run configuration of virtual machine named myvm
-- ovirt_vm_info:
+- name: Gather info about next run configuration of virtual machine named myvm
+  ovirt_vm_info:
     pattern: name=myvm
     next_run: true
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_vms[0] }}"
 '''
 

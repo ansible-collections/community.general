@@ -99,7 +99,8 @@ EXAMPLES = '''
 # runtime in a single batch using the M(proxysql_manage_config) module).  It
 # uses supplied credentials to connect to the proxysql admin interface.
 
-- proxysql_backend_servers:
+- name: Add a server
+  proxysql_backend_servers:
     login_user: 'admin'
     login_password: 'admin'
     hostname: 'mysql01'
@@ -110,7 +111,8 @@ EXAMPLES = '''
 # dynamically loads the mysql server config to runtime.  It uses credentials
 # in a supplied config file to connect to the proxysql admin interface.
 
-- proxysql_backend_servers:
+- name: Remove a server
+  proxysql_backend_servers:
     config_file: '~/proxysql.cnf'
     hostname: 'mysql02'
     state: absent

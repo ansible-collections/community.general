@@ -189,44 +189,44 @@ author:
 
 
 EXAMPLES = '''
-# Create a new instance
-- one_vm:
+- name: Create a new instance
+  one_vm:
     template_id: 90
   register: result
 
-# Print VM properties
-- debug:
+- name: Print VM properties
+  debug:
     msg: result
 
-# Deploy a new VM on hold
-- one_vm:
+- name: Deploy a new VM on hold
+  one_vm:
     template_name: 'app1_template'
     vm_start_on_hold: 'True'
 
-# Deploy a new VM and set its name to 'foo'
-- one_vm:
+- name: Deploy a new VM and set its name to 'foo'
+  one_vm:
     template_name: 'app1_template'
     attributes:
       name: foo
 
-# Deploy a new VM and set its group_id and mode
-- one_vm:
+- name: Deploy a new VM and set its group_id and mode
+  one_vm:
     template_id: 90
     group_id: 16
     mode: 660
 
-# Deploy a new VM  as persistent
-- one_vm:
+- name: Deploy a new VM  as persistent
+  one_vm:
     template_id: 90
     persistent: yes
 
-# Change VM's permissions to 640
-- one_vm:
+- name: Change VM's permissions to 640
+  one_vm:
     instance_ids: 5
     mode: 640
 
-# Deploy 2 new instances and set memory, vcpu, disk_size and 3 networks
-- one_vm:
+- name: Deploy 2 new instances and set memory, vcpu, disk_size and 3 networks
+  one_vm:
     template_id: 15
     disk_size: 35.2 GB
     memory: 4 GB
@@ -240,8 +240,8 @@ EXAMPLES = '''
       - NETWORK_ID: 27
         SECURITY_GROUPS: "10"
 
-# Deploy a new instance which uses a Template with two Disks
-- one_vm:
+- name: Deploy a new instance which uses a Template with two Disks
+  one_vm:
     template_id: 42
     disk_size:
       - 35.2 GB
@@ -252,15 +252,15 @@ EXAMPLES = '''
     networks:
       - NETWORK_ID: 27
 
-# Deploy an new instance with attribute 'bar: bar1' and set its name to 'foo'
-- one_vm:
+- name: "Deploy an new instance with attribute 'bar: bar1' and set its name to 'foo'"
+  one_vm:
     template_id: 53
     attributes:
       name: foo
       bar: bar1
 
-# Enforce that 2 instances with attributes 'foo1: app1' and 'foo2: app2' are deployed
-- one_vm:
+- name: "Enforce that 2 instances with attributes 'foo1: app1' and 'foo2: app2' are deployed"
+  one_vm:
     template_id: 53
     attributes:
       foo1: app1
@@ -270,8 +270,8 @@ EXAMPLES = '''
       foo1: app1
       foo2: app2
 
-# Enforce that 4 instances with an attribute 'bar' are deployed
-- one_vm:
+- name: Enforce that 4 instances with an attribute 'bar' are deployed
+  one_vm:
     template_id: 53
     attributes:
       name: app
@@ -282,7 +282,8 @@ EXAMPLES = '''
 
 # Deploy 2 new instances with attribute 'foo: bar' and labels 'app1' and 'app2' and names in format 'fooapp-##'
 # Names will be: fooapp-00 and fooapp-01
-- one_vm:
+- name: Deploy 2 new instances
+  one_vm:
     template_id: 53
     attributes:
       name: fooapp-##
@@ -294,7 +295,8 @@ EXAMPLES = '''
 
 # Deploy 2 new instances with attribute 'app: app1' and names in format 'fooapp-###'
 # Names will be: fooapp-002 and fooapp-003
-- one_vm:
+- name: Deploy 2 new instances
+  one_vm:
     template_id: 53
     attributes:
       name: fooapp-###
@@ -303,61 +305,63 @@ EXAMPLES = '''
 
 # Reboot all instances with name in format 'fooapp-#'
 # Instances 'fooapp-00', 'fooapp-01', 'fooapp-002' and 'fooapp-003' will be rebooted
-- one_vm:
+- name: Reboot all instances with names in a certain format
+  one_vm:
     attributes:
       name: fooapp-#
     state: rebooted
 
 # Enforce that only 1 instance with name in format 'fooapp-#' is deployed
 # The task will delete oldest instances, so only the 'fooapp-003' will remain
-- one_vm:
+- name: Enforce that only 1 instance with name in a certain format is deployed
+  one_vm:
     template_id: 53
     exact_count: 1
     count_attributes:
       name: fooapp-#
 
-# Deploy an new instance with a network
-- one_vm:
+- name: Deploy an new instance with a network
+  one_vm:
     template_id: 53
     networks:
       - NETWORK_ID: 27
   register: vm
 
-# Wait for SSH to come up
-- wait_for_connection:
+- name: Wait for SSH to come up
+  wait_for_connection:
   delegate_to: '{{ vm.instances[0].networks[0].ip }}'
 
-# Terminate VMs by ids
-- one_vm:
+- name: Terminate VMs by ids
+  one_vm:
     instance_ids:
       - 153
       - 160
     state: absent
 
-# Reboot all VMs that have labels 'foo' and 'app1'
-- one_vm:
+- name: Reboot all VMs that have labels 'foo' and 'app1'
+  one_vm:
     labels:
       - foo
       - app1
     state: rebooted
 
-# Fetch all VMs that have name 'foo' and attribute 'app: bar'
-- one_vm:
+- name: "Fetch all VMs that have name 'foo' and attribute 'app: bar'"
+  one_vm:
     attributes:
       name: foo
       app: bar
   register: results
 
-# Deploy 2 new instances with labels 'foo1' and 'foo2'
-- one_vm:
+- name: Deploy 2 new instances with labels 'foo1' and 'foo2'
+  one_vm:
     template_name: app_template
     labels:
       - foo1
       - foo2
     count: 2
 
-# Enforce that only 1 instance with label 'foo1' will be running
-- one_vm:
+- name: Enforce that only 1 instance with label 'foo1' will be running
+  one_vm:
     template_name: app_template
     labels:
       - foo1
@@ -365,22 +369,22 @@ EXAMPLES = '''
     count_labels:
       - foo1
 
-# Terminate all instances that have attribute foo
-- one_vm:
+- name: Terminate all instances that have attribute foo
+  one_vm:
     template_id: 53
     exact_count: 0
     count_attributes:
       foo:
 
-# Power-off the VM and save VM's disk with id=0 to the image with name 'foo-image'
-- one_vm:
+- name: "Power-off the VM and save VM's disk with id=0 to the image with name 'foo-image'"
+  one_vm:
     instance_ids: 351
     state: poweredoff
     disk_saveas:
       name: foo-image
 
-# Save VM's disk with id=1 to the image with name 'bar-image'
-- one_vm:
+- name: "Save VM's disk with id=1 to the image with name 'bar-image'"
+  one_vm:
     instance_ids: 351
     disk_saveas:
       name: bar-image
