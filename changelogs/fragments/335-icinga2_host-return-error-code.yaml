@@ -1,0 +1,2 @@
+bugfixes:
+  - icinga2_host - fix returning error codes
