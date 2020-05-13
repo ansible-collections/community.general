@@ -55,7 +55,6 @@ class ActionModule(ActionBase):
 
     def run(self, tmp=None, task_vars=None):
 
-        # individual modules might disagree but as the generic the action plugin, pass at this point.
         self._supports_check_mode = True
         self._supports_async = True
 
