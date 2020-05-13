@@ -123,9 +123,8 @@ EXAMPLES = '''
     ssh_pub_key: 'ssh-rsa AAAA...'
     api_token: XXX
 
-- name: >
-    Create a new Droplet.
-    Will return the droplet details including the droplet id (used for idempotence)
+# Will return the droplet details including the droplet id (used for idempotence)
+- name: Create a new Droplet
   digital_ocean:
     state: present
     command: droplet

@@ -50,7 +50,8 @@ EXAMPLES = '''
   zpool_facts: properties='free,size'
 
 - name: Print gathered information
-  debug: msg='ZFS pool {{ item.name }} has {{ item.free }} free space out of {{ item.size }}.'
+  debug:
+    msg: 'ZFS pool {{ item.name }} has {{ item.free }} free space out of {{ item.size }}.'
   with_items: '{{ ansible_zfs_pools }}'
 '''
 
