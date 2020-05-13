@@ -1,0 +1,2 @@
+minor_changes:
+- "pacman - Improve package state detection speed: Don't query for full details of a package."
