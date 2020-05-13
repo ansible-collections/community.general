@@ -82,7 +82,7 @@ EXAMPLES = '''
     project_id: 52000fb2-ee46-4673-93a8-de2c2bdba33b
 
   tasks:
-    - name: test create volume
+    - name: Create volume
       packet_volume:
         description: "{{ volname }}"
         project_id: "{{ project_id }}"
@@ -94,7 +94,8 @@ EXAMPLES = '''
           snapshot_count: 10
           snapshot_frequency: 1day
 
-    - packet_device:
+    - name: Create a device
+      packet_device:
         project_id: "{{ project_id }}"
         hostnames: "{{ devname }}"
         operating_system: ubuntu_16_04
@@ -114,7 +115,6 @@ EXAMPLES = '''
         volume: "{{ volname }}"
         device: "{{ devname }}"
         state: absent
-
 '''
 
 RETURN = '''

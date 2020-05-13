@@ -78,7 +78,7 @@ options:
 '''
 
 EXAMPLES = '''
-  - name: create website
+  - name: Create website
     webfaction_site:
       name: testsite1
       state: present

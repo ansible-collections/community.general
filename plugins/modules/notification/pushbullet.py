@@ -55,28 +55,28 @@ notes:
 '''
 
 EXAMPLES = '''
-# Sends a push notification to a device
-- pushbullet:
+- name: Sends a push notification to a device
+  pushbullet:
     api_key: "ABC123abc123ABC123abc123ABC123ab"
     device: "Chrome"
     title: "You may see this on Google Chrome"
 
-# Sends a link to a device
-- pushbullet:
+- name: Sends a link to a device
+  pushbullet:
     api_key: ABC123abc123ABC123abc123ABC123ab
     device: Chrome
     push_type: link
     title: Ansible Documentation
     body: https://docs.ansible.com/
 
-# Sends a push notification to a channel
-- pushbullet:
+- name: Sends a push notification to a channel
+  pushbullet:
     api_key: ABC123abc123ABC123abc123ABC123ab
     channel: my-awesome-channel
     title: Broadcasting a message to the #my-awesome-channel folks
 
-# Sends a push notification with title and body to a channel
-- pushbullet:
+- name: Sends a push notification with title and body to a channel
+  pushbullet:
     api_key: ABC123abc123ABC123abc123ABC123ab
     channel: my-awesome-channel
     title: ALERT! Signup service is down

@@ -41,7 +41,8 @@ author: "Takashi Someda (@tksmd)"
 '''
 
 EXAMPLES = '''
-- typetalk:
+- name: Send a message to typetalk
+  typetalk:
     client_id: 12345
     client_secret: 12345
     topic: 1

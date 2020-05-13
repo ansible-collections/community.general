@@ -131,7 +131,7 @@ EXAMPLES = '''
     project_id: 53000fb2-ee46-4673-93a8-de2c2bdba33b
 
   tasks:
-    - name: test create volume
+    - name: Create volume
       packet_volume:
         description: "{{ volname }}"
         project_id: "{{ project_id }}"
@@ -144,7 +144,7 @@ EXAMPLES = '''
           snapshot_frequency: 1day
       register: result_create
 
-    - name: test delete volume
+    - name: Delete volume
       packet_volume:
         id: "{{ result_create.id }}"
         project_id: "{{ project_id }}"

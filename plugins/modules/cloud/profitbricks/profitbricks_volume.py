@@ -105,10 +105,8 @@ author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
 '''
 
 EXAMPLES = '''
-
-# Create Multiple Volumes
-
-- profitbricks_volume:
+- name: Create multiple volumes
+  profitbricks_volume:
     datacenter: Tardis One
     name: vol%02d
     count: 5
@@ -116,16 +114,14 @@ EXAMPLES = '''
     wait_timeout: 500
     state: present
 
-# Remove Volumes
-
-- profitbricks_volume:
+- name: Remove Volumes
+  profitbricks_volume:
     datacenter: Tardis One
     instance_ids:
       - 'vol01'
       - 'vol02'
     wait_timeout: 500
     state: absent
-
 '''
 
 import re

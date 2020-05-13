@@ -70,7 +70,7 @@ options:
 '''
 
 EXAMPLES = '''
-  - name: "Add or update OpenDJ backend properties"
+  - name: Add or update OpenDJ backend properties
     action: opendj_backendprop
             hostname=localhost
             port=4444

@@ -88,12 +88,14 @@ author:
 '''
 
 EXAMPLES = '''
-- irc:
+- name: Send a message to an IRC channel from nick ansible
+  irc:
     server: irc.example.net
     channel: #t1
     msg: Hello world
 
-- local_action:
+- name: Send a message to an IRC channel
+  local_action:
     module: irc
     port: 6669
     server: irc.example.net
@@ -102,7 +104,8 @@ EXAMPLES = '''
     color: red
     nick: ansibleIRC
 
-- local_action:
+- name: Send a message to an IRC channel
+  local_action:
     module: irc
     port: 6669
     server: irc.example.net

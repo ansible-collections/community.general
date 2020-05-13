@@ -51,7 +51,8 @@ options:
 '''
 
 EXAMPLES = '''
-- honeybadger_deployment:
+- name: Notify Honeybadger.io about an app deployment
+  honeybadger_deployment:
     token: AAAAAA
     environment: staging
     user: ansible

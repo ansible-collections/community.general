@@ -89,18 +89,18 @@ options:
 '''
 
 EXAMPLES = '''
-  - name: Create a Security Group
-    scaleway_security_group:
-      state: present
-      region: par1
-      name: security_group
-      description: "my security group description"
-      organization: "43a3b6c8-916f-477b-b7ec-ff1898f5fdd9"
-      stateful: false
-      inbound_default_policy: accept
-      outbound_default_policy: accept
-      organization_default: false
-    register: security_group_creation_task
+- name: Create a Security Group
+  scaleway_security_group:
+    state: present
+    region: par1
+    name: security_group
+    description: "my security group description"
+    organization: "43a3b6c8-916f-477b-b7ec-ff1898f5fdd9"
+    stateful: false
+    inbound_default_policy: accept
+    outbound_default_policy: accept
+    organization_default: false
+  register: security_group_creation_task
 '''
 
 RETURN = '''

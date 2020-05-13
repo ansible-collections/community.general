@@ -64,23 +64,21 @@ author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
 '''
 
 EXAMPLES = '''
-
-# Create a NIC
-- profitbricks_nic:
+- name: Create a NIC
+  profitbricks_nic:
     datacenter: Tardis One
     server: node002
     lan: 2
     wait_timeout: 500
     state: present
 
-# Remove a NIC
-- profitbricks_nic:
+- name: Remove a NIC
+  profitbricks_nic:
     datacenter: Tardis One
     server: node002
     name: 7341c2454f
     wait_timeout: 500
     state: absent
-
 '''
 
 import re

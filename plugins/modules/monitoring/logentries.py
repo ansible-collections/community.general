@@ -44,14 +44,14 @@ notes:
     - Requires the LogEntries agent which can be installed following the instructions at logentries.com
 '''
 EXAMPLES = '''
-# Track nginx logs
-- logentries:
+- name: Track nginx logs
+  logentries:
     path: /var/log/nginx/access.log
     state: present
     name: nginx-access-log
 
-# Stop tracking nginx logs
-- logentries:
+- name: Stop tracking nginx logs
+  logentries:
     path: /var/log/nginx/error.log
     state: absent
 '''

@@ -39,8 +39,8 @@ author: "Darryl Stoflet (@dstoflet)"
 '''
 
 EXAMPLES = '''
-# Manage the state of program "httpd" to be in "started" state.
-- monit:
+- name: Manage the state of program httpd to be in started state
+  monit:
     name: httpd
     state: started
 '''

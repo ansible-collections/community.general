@@ -63,18 +63,16 @@ author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
 '''
 
 EXAMPLES = '''
-
-# Create a Datacenter
-- profitbricks_datacenter:
+- name: Create a datacenter
+  profitbricks_datacenter:
     datacenter: Tardis One
     wait_timeout: 500
 
-# Destroy a Datacenter. This will remove all servers, volumes, and other objects in the datacenter.
-- profitbricks_datacenter:
+- name: Destroy a datacenter (remove all servers, volumes, and other objects in the datacenter)
+  profitbricks_datacenter:
     datacenter: Tardis One
     wait_timeout: 500
     state: absent
-
 '''
 
 import re

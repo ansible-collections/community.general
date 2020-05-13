@@ -469,7 +469,7 @@ EXAMPLES = '''
 
 - hosts: localhost
   tasks:
-    - name: create elastigroup
+    - name: Create elastigroup
       spotinst_aws_elastigroup:
           state: present
           risk: 100
@@ -503,7 +503,7 @@ EXAMPLES = '''
 
 - hosts: localhost
   tasks:
-    - name: create elastigroup
+    - name: Create elastigroup
       spotinst_aws_elastigroup:
           state: present
           account_id: act-1a9dd2b
@@ -550,7 +550,7 @@ EXAMPLES = '''
 
 - hosts: localhost
   tasks:
-    - name: create elastigroup
+    - name: Create elastigroup
       spotinst_aws_elastigroup:
           state: present
           account_id: act-1a9dd2b
@@ -600,7 +600,7 @@ EXAMPLES = '''
 
 - hosts: localhost
   tasks:
-    - name: create elastigroup
+    - name: Create elastigroup
       spotinst_aws_elastigroup:
           state: present
           risk: 100
@@ -640,7 +640,7 @@ EXAMPLES = '''
 
 - hosts: localhost
   tasks:
-    - name: create elastigroup
+    - name: Create elastigroup
       spotinst_aws_elastigroup:
           state: present
           risk: 100
@@ -678,7 +678,7 @@ EXAMPLES = '''
 
 - hosts: localhost
   tasks:
-    - name: create elastigroup
+    - name: Create elastigroup
       spotinst_aws_elastigroup:
           account_id: act-92d45673
           state: present
@@ -717,8 +717,8 @@ EXAMPLES = '''
             - image_id
       register: result
     - debug: var=result
-
 '''
+
 RETURN = '''
 ---
 instances:

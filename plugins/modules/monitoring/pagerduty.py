@@ -73,22 +73,22 @@ options:
 '''
 
 EXAMPLES = '''
-# List ongoing maintenance windows using a token
-- pagerduty:
+- name: List ongoing maintenance windows using a token
+  pagerduty:
     name: companyabc
     token: xxxxxxxxxxxxxx
     state: ongoing
 
-# Create a 1 hour maintenance window for service FOO123
-- pagerduty:
+- name: Create a 1 hour maintenance window for service FOO123
+  pagerduty:
     name: companyabc
     user: example@example.com
     token: yourtoken
     state: running
     service: FOO123
 
-# Create a 5 minute maintenance window for service FOO123
-- pagerduty:
+- name: Create a 5 minute maintenance window for service FOO123
+  pagerduty:
     name: companyabc
     token: xxxxxxxxxxxxxx
     hours: 0
@@ -97,8 +97,8 @@ EXAMPLES = '''
     service: FOO123
 
 
-# Create a 4 hour maintenance window for service FOO123 with the description "deployment".
-- pagerduty:
+- name: Create a 4 hour maintenance window for service FOO123 with the description "deployment"
+  pagerduty:
     name: companyabc
     user: example@example.com
     state: running
@@ -107,26 +107,28 @@ EXAMPLES = '''
     desc: deployment
   register: pd_window
 
-# Delete the previous maintenance window
-- pagerduty:
+- name: Delete the previous maintenance window
+  pagerduty:
     name: companyabc
     user: example@example.com
     state: absent
     window_id: '{{ pd_window.result.maintenance_window.id }}'
 
-# Delete a maintenance window from a separate playbook than its creation, and if it is the only existing maintenance window.
-- pagerduty:
+# Delete a maintenance window from a separate playbook than its creation,
+# and if it is the only existing maintenance window
+- name: Check
+  pagerduty:
     requester_id: XXXXXXX
     token: yourtoken
     state: ongoing
   register: pd_window
 
-- pagerduty:
+- name: Delete
+  pagerduty:
     requester_id: XXXXXXX
     token: yourtoken
     state: absent
     window_id: "{{ pd_window.result.maintenance_windows[0].id }}"
-
 '''
 
 import datetime
