@@ -59,15 +59,18 @@ class ActionModule(ActionBase):
         result = super(ActionModule, self).run(tmp, task_vars)
         del tmp  # tmp no longer has any effect
 
-        task_async = self._task.async_val
-        task_poll = self._task.poll
-        module_name = self._task.action
-        module_args = self._task.args
-
         if not result.get('skipped'):
 
             # FUTURE: better to let _execute_module calculate this internally?
             wrap_async = self._task.async_val and not self._connection.has_native_async
+
+            # Set short names for values we'll have to compare or reuse
+            task_poll = self._task.poll
+            task_async = self._task.async_val
+            check_mode = self._play_context.check_mode
+            max_timeout = self._connection._play_context.timeout
+            module_name = self._task.action
+            module_args = self._task.args
 
             if module_args.get('state', None) == 'restored':
                 if not task_async:
