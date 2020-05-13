@@ -38,7 +38,8 @@ class ActionModule(ActionBase):
         Retrieve results of the asynchonous task, and display them in place of
         the async wrapper results (those with the ansible_job_id key).
         '''
-        for i in range(timeout):
+        # At least one iteration is required, even if timeout is 0.
+        for i in range(max(1, timeout)):
             async_result = self._execute_module(
                 module_name='async_status',
                 module_args=module_args,
