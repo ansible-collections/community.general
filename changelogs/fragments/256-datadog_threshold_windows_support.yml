@@ -1,2 +1,2 @@
 minor_changes:
-  - datadog_monitor module - Add support for threshold_windows, utilized by Anomaly Detection monitors.
+  - datadog_monitor - add support for threshold_windows, utilized by Anomaly Detection monitors (https://github.com/ansible-collections/community.general/pull/256).
