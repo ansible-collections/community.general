@@ -8,11 +8,6 @@ __metaclass__ = type
 
 """An Ansible module to utilize GCE image resources."""
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: gce_img

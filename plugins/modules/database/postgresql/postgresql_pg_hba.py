@@ -11,10 +11,6 @@ This module is used to manage postgres pg_hba files with Ansible.
 
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: postgresql_pg_hba

@@ -57,10 +57,6 @@
 #
 # ansible-playbook --vault-password-file=/path/to/vault-keyring.py site.yml
 
-ANSIBLE_METADATA = {'status': ['preview'],
-                    'supported_by': 'community',
-                    'version': '1.0'}
-
 import sys
 import getpass
 import keyring
