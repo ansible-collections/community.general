@@ -25,8 +25,6 @@ __metaclass__ = type
 # Documentation
 ################################################################################
 
-ANSIBLE_METADATA = {'metadata_version': '1.1', 'status': ["preview"], 'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: gcp_container_node_pool_info
