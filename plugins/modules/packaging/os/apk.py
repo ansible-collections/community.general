@@ -58,63 +58,63 @@ notes:
 '''
 
 EXAMPLES = '''
-# Update repositories and install "foo" package
-- apk:
+- name: Update repositories and install foo package
+  apk:
     name: foo
     update_cache: yes
 
-# Update repositories and install "foo" and "bar" packages
-- apk:
+- name: Update repositories and install foo and bar packages
+  apk:
     name: foo,bar
     update_cache: yes
 
-# Remove "foo" package
-- apk:
+- name: Remove foo package
+  apk:
     name: foo
     state: absent
 
-# Remove "foo" and "bar" packages
-- apk:
+- name: Remove foo and bar packages
+  apk:
     name: foo,bar
     state: absent
 
-# Install the package "foo"
-- apk:
+- name: Install the package foo
+  apk:
     name: foo
     state: present
 
-# Install the packages "foo" and "bar"
-- apk:
+- name: Install the packages foo and bar
+  apk:
     name: foo,bar
     state: present
 
-# Update repositories and update package "foo" to latest version
-- apk:
+- name: Update repositories and update package foo to latest version
+  apk:
     name: foo
     state: latest
     update_cache: yes
 
-# Update repositories and update packages "foo" and "bar" to latest versions
-- apk:
+- name: Update repositories and update packages foo and bar to latest versions
+  apk:
     name: foo,bar
     state: latest
     update_cache: yes
 
-# Update all installed packages to the latest versions
-- apk:
+- name: Update all installed packages to the latest versions
+  apk:
     upgrade: yes
 
-# Upgrade / replace / downgrade / uninstall all installed packages to the latest versions available
-- apk:
+- name: Upgrade / replace / downgrade / uninstall all installed packages to the latest versions available
+  apk:
     available: yes
     upgrade: yes
 
-# Update repositories as a separate step
-- apk:
+- name: Update repositories as a separate step
+  apk:
     update_cache: yes
 
-# Install package from a specific repository
-- apk:
+- name: Install package from a specific repository
+  apk:
     name: foo
     state: latest
     update_cache: yes

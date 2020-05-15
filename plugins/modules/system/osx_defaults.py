@@ -70,6 +70,8 @@ notes:
 '''
 
 EXAMPLES = r'''
+# TODO: Describe what happens in each example
+
 - osx_defaults:
     domain: com.apple.Safari
     key: IncludeInternalDebugMenu
