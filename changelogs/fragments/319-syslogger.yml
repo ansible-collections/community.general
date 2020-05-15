@@ -1,0 +1,2 @@
+minor_changes:
+- syslogger - added new parameter ident to specify the name of application which is sending the message to syslog (https://github.com/ansible-collections/community.general/issues/319).
