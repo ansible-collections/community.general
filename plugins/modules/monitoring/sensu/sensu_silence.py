@@ -194,7 +194,7 @@ def create(
                     (check is None or check == i['check']) and
                     (
                         creator == '' or
-                        creator == i['creator'])and
+                        creator == i['creator']) and
                     (
                         reason == '' or
                         reason == i['reason']) and
