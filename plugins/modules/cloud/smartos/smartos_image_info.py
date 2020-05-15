@@ -27,27 +27,32 @@ options:
 '''
 
 EXAMPLES = '''
-# Return information about all installed images.
-- smartos_image_info:
+- name: Return information about all installed images
+  smartos_image_info:
   register: result
 
-# Return all private active Linux images.
-- smartos_image_info: filters="os=linux state=active public=false"
+- name: Return all private active Linux images
+  smartos_image_info:
+    filters: "os=linux state=active public=false"
   register: result
 
-# Show, how many clones does every image have.
-- smartos_image_info:
+- name: Show, how many clones does every image have
+  smartos_image_info:
   register: result
 
-- debug: msg="{{ result.smartos_images[item]['name'] }}-{{ result.smartos_images[item]['version'] }}
-            has {{ result.smartos_images[item]['clones'] }} VM(s)"
+- name: Print information
+  debug:
+    msg: "{{ result.smartos_images[item]['name'] }}-{{ result.smartos_images[item]['version'] }}
+         has {{ result.smartos_images[item]['clones'] }} VM(s)"
   with_items: "{{ result.smartos_images.keys() | list }}"
 
 # When the module is called as smartos_image_facts, return values are published
 # in ansible_facts['smartos_images'] and can be used as follows.
 # Note that this is deprecated and will stop working in Ansible 2.13.
-- debug: msg="{{ smartos_images[item]['name'] }}-{{ smartos_images[item]['version'] }}
-            has {{ smartos_images[item]['clones'] }} VM(s)"
+- name: Print information
+  debug:
+    msg: "{{ smartos_images[item]['name'] }}-{{ smartos_images[item]['version'] }}
+         has {{ smartos_images[item]['clones'] }} VM(s)"
   with_items: "{{ smartos_images.keys() | list }}"
 '''
 

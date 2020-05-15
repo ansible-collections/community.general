@@ -81,8 +81,8 @@ options:
 
 
 EXAMPLES = '''
-# Create a DNS zone on a UCS
-- udm_dns_zone:
+- name: Create a DNS zone on a UCS
+  udm_dns_zone:
     zone: example.com
     type: forward_zone
     nameserver:

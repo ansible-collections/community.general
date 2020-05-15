@@ -49,22 +49,22 @@ author: "Brian Coca (@bcoca)"
 '''
 
 EXAMPLES = '''
-# send a message to a user
-- jabber:
+- name: Send a message to a user
+  jabber:
     user: mybot@example.net
     password: secret
     to: friend@example.net
     msg: Ansible task finished
 
-# send a message to a room
-- jabber:
+- name: Send a message to a room
+  jabber:
     user: mybot@example.net
     password: secret
     to: mychaps@conference.example.net/ansiblebot
     msg: Ansible task finished
 
-# send a message, specifying the host and port
-- jabber:
+- name: Send a message, specifying the host and port
+  jabber:
     user: mybot@example.net
     host: talk.example.net
     port: 5223

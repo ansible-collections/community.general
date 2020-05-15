@@ -115,9 +115,9 @@ EXAMPLES = '''
 
 # Note: These examples do not set authentication details, see the AWS Guide for details.
 
-# Provisioning example. This will create three servers and enumerate their names.
-
-- profitbricks:
+# Provisioning example
+- name: Create three servers and enumerate their names
+  profitbricks:
     datacenter: Tardis One
     name: web%02d.stackpointcloud.com
     cores: 4
@@ -129,9 +129,8 @@ EXAMPLES = '''
     count: 3
     assign_public_ip: true
 
-# Removing Virtual machines
-
-- profitbricks:
+- name: Remove virtual machines
+  profitbricks:
     datacenter: Tardis One
     instance_ids:
       - 'web001.stackpointcloud.com'
@@ -140,9 +139,8 @@ EXAMPLES = '''
     wait_timeout: 500
     state: absent
 
-# Starting Virtual Machines.
-
-- profitbricks:
+- name: Start virtual machines
+  profitbricks:
     datacenter: Tardis One
     instance_ids:
       - 'web001.stackpointcloud.com'
@@ -151,9 +149,8 @@ EXAMPLES = '''
     wait_timeout: 500
     state: running
 
-# Stopping Virtual Machines
-
-- profitbricks:
+- name: Stop virtual machines
+  profitbricks:
     datacenter: Tardis One
     instance_ids:
       - 'web001.stackpointcloud.com'
@@ -161,7 +158,6 @@ EXAMPLES = '''
       - 'web003.stackpointcloud.com'
     wait_timeout: 500
     state: stopped
-
 '''
 
 import re
