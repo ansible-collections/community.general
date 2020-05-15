@@ -1,2 +1,2 @@
 bugfixes:
-- filesystem: resizefs of xfs filesystems is fixed. Filesystem needs to be mounted.
+- "filesystem - resizefs of xfs filesystems is fixed. Filesystem needs to be mounted."
