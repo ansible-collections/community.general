@@ -37,7 +37,8 @@ EXAMPLES = '''
 # runtime. It uses supplied credentials to connect to the proxysql admin
 # interface.
 
-- proxysql_global_variables:
+- name: Set the value of a variable
+  proxysql_global_variables:
     login_user: 'admin'
     login_password: 'admin'
     variable: 'mysql-max_connections'
@@ -46,7 +47,8 @@ EXAMPLES = '''
 # This example gets the value of a variable.  It uses credentials in a
 # supplied config file to connect to the proxysql admin interface.
 
-- proxysql_global_variables:
+- name: Get the value of a variable
+  proxysql_global_variables:
     config_file: '~/proxysql.cnf'
     variable: 'mysql-default_query_delay'
 '''

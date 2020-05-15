@@ -76,23 +76,25 @@ author: Sergei Antipov (@UnderGreen)
 '''
 
 EXAMPLES = '''
-# Upload new openvz template with minimal options
-- proxmox_template:
+- name: Upload new openvz template with minimal options
+  proxmox_template:
     node: uk-mc02
     api_user: root@pam
     api_password: 1q2w3e
     api_host: node1
     src: ~/ubuntu-14.04-x86_64.tar.gz
 
-# Upload new openvz template with minimal options use environment PROXMOX_PASSWORD variable(you should export it before)
-- proxmox_template:
+- name: >
+    Upload new openvz template with minimal options use environment
+    PROXMOX_PASSWORD variable(you should export it before)
+  proxmox_template:
     node: uk-mc02
     api_user: root@pam
     api_host: node1
     src: ~/ubuntu-14.04-x86_64.tar.gz
 
-# Upload new openvz template with all options and force overwrite
-- proxmox_template:
+- name: Upload new openvz template with all options and force overwrite
+  proxmox_template:
     node: uk-mc02
     api_user: root@pam
     api_password: 1q2w3e
@@ -102,8 +104,8 @@ EXAMPLES = '''
     src: ~/ubuntu-14.04-x86_64.tar.gz
     force: yes
 
-# Delete template with minimal options
-- proxmox_template:
+- name: Delete template with minimal options
+  proxmox_template:
     node: uk-mc02
     api_user: root@pam
     api_password: 1q2w3e

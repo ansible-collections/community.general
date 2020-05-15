@@ -153,7 +153,8 @@ EXAMPLES = '''
 # single batch using the M(proxysql_manage_config) module). It uses supplied
 # credentials to connect to the proxysql admin interface.
 
-- proxysql_query_rules:
+- name: Add a rule
+  proxysql_query_rules:
     login_user: admin
     login_password: admin
     username: 'guest_ro'
@@ -169,7 +170,8 @@ EXAMPLES = '''
 # config to runtime.  It uses credentials in a supplied config file to connect
 # to the proxysql admin interface.
 
-- proxysql_query_rules:
+- name: Remove rules
+  proxysql_query_rules:
     config_file: '~/proxysql.cnf'
     username: 'guest_ro'
     state: absent

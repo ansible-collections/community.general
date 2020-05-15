@@ -183,10 +183,8 @@ author:
 '''
 
 EXAMPLES = '''
-
-# Provisioning example. Create and destroy a monitoring policy.
-
-- oneandone_moitoring_policy:
+- name: Create a monitoring policy
+  oneandone_moitoring_policy:
     auth_token: oneandone_private_api_key
     name: ansible monitoring policy
     description: Testing creation of a monitoring policy with ansible
@@ -246,14 +244,14 @@ EXAMPLES = '''
        email_notification: false
     wait: true
 
-- oneandone_moitoring_policy:
+- name: Destroy a monitoring policy
+  oneandone_moitoring_policy:
     auth_token: oneandone_private_api_key
     state: absent
     name: ansible monitoring policy
 
-# Update a monitoring policy.
-
-- oneandone_moitoring_policy:
+- name: Update a monitoring policy
+  oneandone_moitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy
     name: ansible monitoring policy updated
@@ -303,9 +301,8 @@ EXAMPLES = '''
     wait: true
     state: update
 
-# Add a port to a monitoring policy.
-
-- oneandone_moitoring_policy:
+- name: Add a port to a monitoring policy
+  oneandone_moitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     add_ports:
@@ -317,9 +314,8 @@ EXAMPLES = '''
     wait: true
     state: update
 
-# Update existing ports of a monitoring policy.
-
-- oneandone_moitoring_policy:
+- name: Update existing ports of a monitoring policy
+  oneandone_moitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     update_ports:
@@ -338,18 +334,16 @@ EXAMPLES = '''
     wait: true
     state: update
 
-# Remove a port from a monitoring policy.
-
-- oneandone_moitoring_policy:
+- name: Remove a port from a monitoring policy
+  oneandone_moitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     remove_ports:
      - port_id
     state: update
 
-# Add a process to a monitoring policy.
-
-- oneandone_moitoring_policy:
+- name: Add a process to a monitoring policy
+  oneandone_moitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     add_processes:
@@ -360,9 +354,8 @@ EXAMPLES = '''
     wait: true
     state: update
 
-# Update existing processes of a monitoring policy.
-
-- oneandone_moitoring_policy:
+- name: Update existing processes of a monitoring policy
+  oneandone_moitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     update_processes:
@@ -379,9 +372,8 @@ EXAMPLES = '''
     wait: true
     state: update
 
-# Remove a process from a monitoring policy.
-
-- oneandone_moitoring_policy:
+- name: Remove a process from a monitoring policy
+  oneandone_moitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     remove_processes:
@@ -389,9 +381,8 @@ EXAMPLES = '''
     wait: true
     state: update
 
-# Add server to a monitoring policy.
-
-- oneandone_moitoring_policy:
+- name: Add server to a monitoring policy
+  oneandone_moitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     add_servers:
@@ -399,9 +390,8 @@ EXAMPLES = '''
     wait: true
     state: update
 
-# Remove server from a monitoring policy.
-
-- oneandone_moitoring_policy:
+- name: Remove server from a monitoring policy
+  oneandone_moitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     remove_servers:

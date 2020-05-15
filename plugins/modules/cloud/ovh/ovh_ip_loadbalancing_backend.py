@@ -69,9 +69,8 @@ options:
 '''
 
 EXAMPLES = '''
-# Adds or modify the backend '212.1.1.1' to a
-# loadbalancing 'ip-1.1.1.1'
-- ovh_ip_loadbalancing:
+- name: Adds or modify the backend '212.1.1.1' to a loadbalancing 'ip-1.1.1.1'
+  ovh_ip_loadbalancing:
     name: ip-1.1.1.1
     backend: 212.1.1.1
     state: present
@@ -82,8 +81,8 @@ EXAMPLES = '''
     application_secret: yoursecret
     consumer_key: yourconsumerkey
 
-# Removes a backend '212.1.1.1' from a loadbalancing 'ip-1.1.1.1'
-- ovh_ip_loadbalancing:
+- name: Removes a backend '212.1.1.1' from a loadbalancing 'ip-1.1.1.1'
+  ovh_ip_loadbalancing:
     name: ip-1.1.1.1
     backend: 212.1.1.1
     state: absent

@@ -69,8 +69,8 @@ options:
 '''
 
 EXAMPLES = '''
-# Add or update VLAN
-- dimensiondata_vlan:
+- name: Add or update VLAN
+  dimensiondata_vlan:
     region: na
     location: NA5
     network_domain: test_network
@@ -80,16 +80,18 @@ EXAMPLES = '''
     private_ipv4_prefix_size: 24
     state: present
     wait: yes
-# Read / get VLAN details
-- dimensiondata_vlan:
+
+- name: Read / get VLAN details
+  dimensiondata_vlan:
     region: na
     location: NA5
     network_domain: test_network
     name: my_vlan1
     state: readonly
     wait: yes
-# Delete a VLAN
-- dimensiondata_vlan:
+
+- name: Delete a VLAN
+  dimensiondata_vlan:
     region: na
     location: NA5
     network_domain: test_network
