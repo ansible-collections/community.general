@@ -55,32 +55,32 @@ author:
 '''
 
 EXAMPLES = '''
-# Manage the state of program to be in 'started' state.
-- supervisorctl:
+- name: Manage the state of program to be in started state
+  supervisorctl:
     name: my_app
     state: started
 
-# Manage the state of program group to be in 'started' state.
-- supervisorctl:
+- name: Manage the state of program group to be in started state
+  supervisorctl:
     name: 'my_apps:'
     state: started
 
-# Restart my_app, reading supervisorctl configuration from a specified file.
-- supervisorctl:
+- name: Restart my_app, reading supervisorctl configuration from a specified file
+  supervisorctl:
     name: my_app
     state: restarted
     config: /var/opt/my_project/supervisord.conf
 
-# Restart my_app, connecting to supervisord with credentials and server URL.
-- supervisorctl:
+- name: Restart my_app, connecting to supervisord with credentials and server URL
+  supervisorctl:
     name: my_app
     state: restarted
     username: test
     password: testpass
     server_url: http://localhost:9001
 
-# Send a signal to my_app via supervisorctl
-- supervisorctl:
+- name: Send a signal to my_app via supervisorctl
+  supervisorctl:
     name: my_app
     state: signalled
     signal: USR1
