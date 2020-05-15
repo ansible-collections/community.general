@@ -37,13 +37,17 @@ t0 = tn = time.time()*1000
 
 
 def timestamp(self):
+    '''
+    Evaluate execution time for individual task
+    '''
     if self.current is not None:
         self.stats[self.current]['time'] = int((time.time()*1000) - self.stats[self.current]['time'])
 
 def tasktime():
+    '''
+    Evaluate execution time for playbook
+    '''
     global tn
-    time_current = time.time()*1000
-    time_elapsed = time.time() - tn
     time_total_elapsed = (time.time()*1000) - t0
     tn = time.time()*1000
     return int(time_total_elapsed)
