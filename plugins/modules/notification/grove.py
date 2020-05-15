@@ -47,10 +47,11 @@ author: "Jonas Pfenniger (@zimbatm)"
 '''
 
 EXAMPLES = '''
-- grove: >
-    channel_token=6Ph62VBBJOccmtTPZbubiPzdrhipZXtg
-    service=my-app
-    message=deployed {{ target }}
+- name: Sends a notification to a grove.io channel
+  grove:
+    channel_token: 6Ph62VBBJOccmtTPZbubiPzdrhipZXtg
+    service: my-app
+    message: 'deployed {{ target }}'
 '''
 
 from ansible.module_utils.basic import AnsibleModule

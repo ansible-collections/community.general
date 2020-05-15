@@ -55,25 +55,21 @@ author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
 '''
 
 EXAMPLES = '''
-
-# Attach a Volume
-
-- profitbricks_volume_attachments:
+- name: Attach a volume
+  profitbricks_volume_attachments:
     datacenter: Tardis One
     server: node002
     volume: vol01
     wait_timeout: 500
     state: present
 
-# Detach a Volume
-
-- profitbricks_volume_attachments:
+- name: Detach a volume
+  profitbricks_volume_attachments:
     datacenter: Tardis One
     server: node002
     volume: vol01
     wait_timeout: 500
     state: absent
-
 '''
 
 import re
