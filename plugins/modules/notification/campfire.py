@@ -52,13 +52,15 @@ author: "Adam Garside (@fabulops)"
 '''
 
 EXAMPLES = '''
-- campfire:
+- name: Send a message to Campfire
+  campfire:
     subscription: foo
     token: 12345
     room: 123
     msg: Task completed.
 
-- campfire:
+- name: Send a message to Campfire
+  campfire:
     subscription: foo
     token: 12345
     room: 123

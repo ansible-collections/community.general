@@ -111,25 +111,26 @@ notes:
 '''
 
 EXAMPLES = '''
-# Downloads and installs all the libs and dependencies outlined in the /path/to/project/composer.lock
-- composer:
+- name: Download and installs all libs and dependencies outlined in the /path/to/project/composer.lock
+  composer:
     command: install
     working_dir: /path/to/project
 
-- composer:
+- name: install a new package
+  composer:
     command: require
     arguments: my/package
     working_dir: /path/to/project
 
-# Clone project and install with all dependencies
-- composer:
+- name: Clone and install a project with all dependencies
+  composer:
     command: create-project
     arguments: package/package /path/to/project ~1.0
     working_dir: /path/to/project
     prefer_dist: yes
 
-# Installs package globally
-- composer:
+- name: Install a package globally
+  composer:
     command: require
     global_command: yes
     arguments: my/package
