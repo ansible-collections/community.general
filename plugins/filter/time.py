@@ -49,14 +49,14 @@ UNIT_TO_SHORT_FORM = {
 def multiply(factors):
     result = 1
     for factor in factors:
-         result = result * factor
+        result = result * factor
     return result
 
 
 def divide(divisors):
     result = 1
     for divisor in divisors:
-         result = result / divisor
+        result = result / divisor
     return result
 
 
