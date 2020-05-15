@@ -54,8 +54,8 @@ options:
 
 
 EXAMPLES = '''
-# Create a DNS record on a UCS
-- udm_dns_record:
+- name: Create a DNS record on a UCS
+  udm_dns_record:
     name: www
     zone: example.com
     type: host_record
@@ -66,7 +66,7 @@ EXAMPLES = '''
 '''
 
 
-RETURN = '''# '''
+RETURN = '''#'''
 
 HAVE_UNIVENTION = False
 try:
