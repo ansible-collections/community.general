@@ -94,7 +94,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a backend bucket
+- name: Get info on a backend bucket
   gcp_compute_backend_bucket_info:
     filters:
     - name = test_object

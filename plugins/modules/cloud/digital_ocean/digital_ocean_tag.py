@@ -51,12 +51,12 @@ requirements:
 
 
 EXAMPLES = '''
-- name: create a tag
+- name: Create a tag
   digital_ocean_tag:
     name: production
     state: present
 
-- name: tag a resource; creating the tag if it does not exist
+- name: Tag a resource; creating the tag if it does not exist
   digital_ocean_tag:
     name: "{{ item }}"
     resource_id: "73333005"
@@ -65,7 +65,7 @@ EXAMPLES = '''
     - staging
     - dbserver
 
-- name: untag a resource
+- name: Untag a resource
   digital_ocean_tag:
     name: staging
     resource_id: "73333005"
@@ -73,7 +73,7 @@ EXAMPLES = '''
 
 # Deleting a tag also untags all the resources that have previously been
 # tagged with it
-- name: remove a tag
+- name: Remove a tag
   digital_ocean_tag:
     name: dbserver
     state: absent

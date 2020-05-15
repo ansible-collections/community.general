@@ -94,7 +94,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a HTTP health check
+- name: Get info on a HTTP health check
   gcp_compute_http_health_check_info:
     filters:
     - name = test_object

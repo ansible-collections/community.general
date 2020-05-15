@@ -88,7 +88,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a subscription
+- name: Get info on a subscription
   gcp_pubsub_subscription_info:
     project: test_project
     auth_kind: serviceaccount
