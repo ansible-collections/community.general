@@ -9,12 +9,12 @@
 - name: test to_seconds filter
   assert:
     that:
-      - "('1000ms' | community.general.to_seconds) == 1"
+      - "('1000msecs' | community.general.to_seconds) == 1"
       - "('1ms' | community.general.to_seconds) == 0.001"
       - "('12m' | community.general.to_seconds) == 720"
-      - "('300m' | community.general.to_seconds) == 18000"
+      - "('300minutes' | community.general.to_seconds) == 18000"
       - "('3h 12m' | community.general.to_seconds) == 11520"
-      - "('2d 3h 12m 15s' | community.general.to_seconds) == 184335"
+      - "('2days 3hours 12mins 15secs' | community.general.to_seconds) == 184335"
       - "('2d -2d -12s' | community.general.to_seconds) == -12"
 
 - name: test to_minutes filter
@@ -34,8 +34,9 @@
 - name: test to_days filter
   assert:
     that:
-      - "('1y' | community.general.to_days) == 365"
-      - "('1w' | community.general.to_days) == 7"
+      - "('1year' | community.general.to_days) == 365"
+      - "('1week' | community.general.to_days) == 7"
+      - "('2weeks' | community.general.to_days) == 14"
 
 - name: test to_weeks filter
   assert:
