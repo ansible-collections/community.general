@@ -35,14 +35,14 @@ notes:
 '''
 
 EXAMPLES = '''
-# Pause the monitor with an ID of 12345.
-- uptimerobot:
+- name: Pause the monitor with an ID of 12345
+  uptimerobot:
     monitorid: 12345
     apikey: 12345-1234512345
     state: paused
 
-# Start the monitor with an ID of 12345.
-- uptimerobot:
+- name: Start the monitor with an ID of 12345
+  uptimerobot:
     monitorid: 12345
     apikey: 12345-1234512345
     state: started
