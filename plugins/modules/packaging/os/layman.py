@@ -46,28 +46,28 @@ options:
 '''
 
 EXAMPLES = '''
-# Install the overlay 'mozilla' which is on the central overlays list.
-- layman:
+- name: Install the overlay mozilla which is on the central overlays list
+  layman:
     name: mozilla
 
-# Install the overlay 'cvut' from the specified alternative list.
-- layman:
+- name: Install the overlay cvut from the specified alternative list
+  layman:
     name: cvut
     list_url: 'http://raw.github.com/cvut/gentoo-overlay/master/overlay.xml'
 
-# Update (sync) the overlay 'cvut', or install if not installed yet.
-- layman:
+- name: Update (sync) the overlay cvut or install if not installed yet
+  layman:
     name: cvut
     list_url: 'http://raw.github.com/cvut/gentoo-overlay/master/overlay.xml'
     state: updated
 
-# Update (sync) all of the installed overlays.
-- layman:
+- name: Update (sync) all of the installed overlays
+  layman:
     name: ALL
     state: updated
 
-# Uninstall the overlay 'cvut'.
-- layman:
+- name: Uninstall the overlay cvut
+  layman:
     name: cvut
     state: absent
 '''

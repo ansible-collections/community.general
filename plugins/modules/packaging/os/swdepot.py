@@ -35,17 +35,20 @@ options:
 '''
 
 EXAMPLES = '''
-- swdepot:
+- name: Install a package
+  swdepot:
     name: unzip-6.0
     state: present
     depot: 'repository:/path'
 
-- swdepot:
+- name: Install the latest version of a package
+  swdepot:
     name: unzip
     state: latest
     depot: 'repository:/path'
 
-- swdepot:
+- name: Remove a package
+  swdepot:
     name: unzip
     state: absent
 '''

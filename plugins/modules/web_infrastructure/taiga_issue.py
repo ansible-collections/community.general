@@ -72,8 +72,8 @@ notes:
 '''
 
 EXAMPLES = '''
-# Create an issue in the my hosted Taiga environment and attach an error log
-- taiga_issue:
+- name: Create an issue in the my hosted Taiga environment and attach an error log
+  taiga_issue:
     taiga_host: https://mytaigahost.example.com
     project: myproject
     subject: An error has been found
@@ -89,8 +89,8 @@ EXAMPLES = '''
       - Needs manual check
     state: present
 
-# Deletes the previously created issue
-- taiga_issue:
+- name: Deletes the previously created issue
+  taiga_issue:
     taiga_host: https://mytaigahost.example.com
     project: myproject
     subject: An error has been found
