@@ -74,28 +74,28 @@ options:
 '''
 
 EXAMPLES = '''
-# Install Elasticsearch Head plugin in Elasticsearch 2.x
-- elasticsearch_plugin:
+- name: Install Elasticsearch Head plugin in Elasticsearch 2.x
+  elasticsearch_plugin:
     name: mobz/elasticsearch-head
     state: present
 
-# Install a specific version of Elasticsearch Head in Elasticsearch 2.x
-- elasticsearch_plugin:
+- name: Install a specific version of Elasticsearch Head in Elasticsearch 2.x
+  elasticsearch_plugin:
     name: mobz/elasticsearch-head
     version: 2.0.0
 
-# Uninstall Elasticsearch head plugin in Elasticsearch 2.x
-- elasticsearch_plugin:
+- name: Uninstall Elasticsearch head plugin in Elasticsearch 2.x
+  elasticsearch_plugin:
     name: mobz/elasticsearch-head
     state: absent
 
-# Install a specific plugin in Elasticsearch >= 5.0
-- elasticsearch_plugin:
+- name: Install a specific plugin in Elasticsearch >= 5.0
+  elasticsearch_plugin:
     name: analysis-icu
     state: present
 
-# Install the ingest-geoip plugin with a forced installation
-- elasticsearch_plugin:
+- name: Install the ingest-geoip plugin with a forced installation
+  elasticsearch_plugin:
     name: ingest-geoip
     state: present
     force: yes
