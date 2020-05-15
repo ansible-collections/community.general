@@ -49,15 +49,19 @@
 
 
 - name: Run tests
-  # Skip tests on Fedora 31 because dbus fails to start unless the container is run in priveleged mode.
-  # Even then, it starts unreliably. This may be due to the move to cgroup v2 in Fedora 31.
+  # Skip tests on Fedora 31 and 32 because dbus fails to start unless the container is run in priveleged mode.
+  # Even then, it starts unreliably. This may be due to the move to cgroup v2 in Fedora 31 and 32.
   # https://www.redhat.com/sysadmin/fedora-31-control-group-v2
-  when: ansible_facts.distribution ~ ansible_facts.distribution_major_version != 'Fedora31'
+  when: ansible_facts.distribution ~ ansible_facts.distribution_major_version not in ['Fedora31', 'Fedora32']
   block:
     - name: set timezone to Etc/UTC
       timezone:
         name: Etc/UTC
       register: original_timezone
+
+    - name: Value of original_timezone
+      debug:
+        msg: "{{ original_timezone }}"
 
     - block:
         - include_tasks: test.yml
