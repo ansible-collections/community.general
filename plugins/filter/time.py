@@ -16,7 +16,8 @@ UNIT_FACTORS = {
     'h': [1000, 60, 60],
     'd': [1000, 60, 60, 24],
     'w': [1000, 60, 60, 24, 7],
-    'y': [1000, 60, 60, 24, 365],
+    'mo': [1000, 60, 60, 24, 30],
+    'y': [1000, 60, 60, 24, 360],
 }
 
 
@@ -41,6 +42,8 @@ UNIT_TO_SHORT_FORM = {
     'days': 'd',
     'week': 'w',
     'weeks': 'w',
+    'month': 'mo',
+    'months': 'mo',
     'year': 'y',
     'years': 'y',
 }
@@ -117,6 +120,11 @@ def to_weeks(human_time):
     return to_time_unit(human_time, 'w')
 
 
+def to_months(human_time):
+    ''' Return months from a human readable string '''
+    return to_time_unit(human_time, 'mo')
+
+
 def to_years(human_time):
     ''' Return years from a human readable string '''
     return to_time_unit(human_time, 'y')
@@ -134,6 +142,7 @@ class FilterModule(object):
             'to_hours': to_hours,
             'to_days': to_days,
             'to_weeks': to_weeks,
+            'to_months': to_months,
             'to_years': to_years,
         }
 

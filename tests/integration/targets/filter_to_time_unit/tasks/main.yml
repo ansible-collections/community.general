@@ -34,20 +34,26 @@
 - name: test to_days filter
   assert:
     that:
-      - "('1year' | community.general.to_days) == 365"
+      - "('1year' | community.general.to_days) == 360"
       - "('1week' | community.general.to_days) == 7"
       - "('2weeks' | community.general.to_days) == 14"
 
 - name: test to_weeks filter
   assert:
     that:
-      - "('1y' | community.general.to_weeks | int) == 52"
+      - "('1y' | community.general.to_weeks | round(0, 'ceil')) == 52"
       - "('7d' | community.general.to_weeks) == 1"
+
+- name: test to_weeks filter
+  assert:
+    that:
+      - "('1mo' | community.general.to_days) == 30"
+      - "('12mo' | community.general.to_years) == 1"
 
 - name: test to_years filter
   assert:
     that:
-      - "('365d' | community.general.to_years) == 1"
+      - "('360d' | community.general.to_years) == 1"
 
 - name: test fail unknown unit
   debug:
