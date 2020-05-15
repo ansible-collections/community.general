@@ -101,10 +101,8 @@ author:
 '''
 
 EXAMPLES = '''
-
-# Provisioning example. Create and destroy a firewall policy.
-
-- oneandone_firewall_policy:
+- name: Create a firewall policy
+  oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     name: ansible-firewall-policy
     description: Testing creation of firewall policies with ansible
@@ -117,23 +115,22 @@ EXAMPLES = '''
     wait: true
     wait_timeout: 500
 
-- oneandone_firewall_policy:
+- name: Destroy a firewall policy
+  oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     state: absent
     name: ansible-firewall-policy
 
-# Update a firewall policy.
-
-- oneandone_firewall_policy:
+- name: Update a firewall policy
+  oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     state: update
     firewall_policy: ansible-firewall-policy
     name: ansible-firewall-policy-updated
     description: Testing creation of firewall policies with ansible - updated
 
-# Add server to a firewall policy.
-
-- oneandone_firewall_policy:
+- name: Add server to a firewall policy
+  oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     firewall_policy: ansible-firewall-policy-updated
     add_server_ips:
@@ -143,9 +140,8 @@ EXAMPLES = '''
     wait_timeout: 500
     state: update
 
-# Remove server from a firewall policy.
-
-- oneandone_firewall_policy:
+- name: Remove server from a firewall policy
+  oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     firewall_policy: ansible-firewall-policy-updated
     remove_server_ips:
@@ -154,9 +150,8 @@ EXAMPLES = '''
     wait_timeout: 500
     state: update
 
-# Add rules to a firewall policy.
-
-- oneandone_firewall_policy:
+- name: Add rules to a firewall policy
+  oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     firewall_policy: ansible-firewall-policy-updated
     description: Adding rules to an existing firewall policy
@@ -175,9 +170,8 @@ EXAMPLES = '''
     wait_timeout: 500
     state: update
 
-# Remove rules from a firewall policy.
-
-- oneandone_firewall_policy:
+- name: Remove rules from a firewall policy
+  oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     firewall_policy: ansible-firewall-policy-updated
     remove_rules:
@@ -187,7 +181,6 @@ EXAMPLES = '''
     wait: true
     wait_timeout: 500
     state: update
-
 '''
 
 RETURN = '''

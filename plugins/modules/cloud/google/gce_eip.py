@@ -36,8 +36,8 @@ options:
 '''
 
 EXAMPLES = '''
-# Create a Global external IP address
-- gce_eip:
+- name: Create a Global external IP address
+  gce_eip:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"
@@ -45,8 +45,8 @@ EXAMPLES = '''
     region: global
     state: present
 
-# Create a Regional external IP address
-- gce_eip:
+- name: Create a Regional external IP address
+  gce_eip:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"

@@ -128,46 +128,46 @@ notes:
 '''
 
 EXAMPLES = '''
-# Create an A record.
-- gcdns_record:
+- name: Create an A record
+  gcdns_record:
     record: 'www1.example.com'
     zone: 'example.com'
     type: A
     value: '1.2.3.4'
 
-# Update an existing record.
-- gcdns_record:
+- name: Update an existing record
+  gcdns_record:
     record: 'www1.example.com'
     zone: 'example.com'
     type: A
     overwrite: true
     value: '5.6.7.8'
 
-# Remove an A record.
-- gcdns_record:
+- name: Remove an A record
+  gcdns_record:
     record: 'www1.example.com'
     zone_id: 'example-com'
     state: absent
     type: A
     value: '5.6.7.8'
 
-# Create a CNAME record.
-- gcdns_record:
+- name: Create a CNAME record. Note the trailing dot of value
+  gcdns_record:
     record: 'www.example.com'
     zone_id: 'example-com'
     type: CNAME
-    value: 'www.example.com.'    # Note the trailing dot
+    value: 'www.example.com.'
 
-# Create an MX record with a custom TTL.
-- gcdns_record:
+- name: Create an MX record with a custom TTL. Note the trailing dot of value
+  gcdns_record:
     record: 'example.com'
     zone: 'example.com'
     type: MX
     ttl: 3600
-    value: '10 mail.example.com.'    # Note the trailing dot
+    value: '10 mail.example.com.'
 
-# Create multiple A records with the same name.
-- gcdns_record:
+- name: Create multiple A records with the same name
+  gcdns_record:
     record: 'api.example.com'
     zone_id: 'example-com'
     type: A
@@ -177,54 +177,54 @@ EXAMPLES = '''
       - '198.51.100.5'
       - '203.0.113.10'
 
-# Change the value of an existing record with multiple record_data.
-- gcdns_record:
+- name: Change the value of an existing record with multiple record_data
+  gcdns_record:
     record: 'api.example.com'
     zone: 'example.com'
     type: A
     overwrite: true
-    record_data:           # WARNING: All values in a record will be replaced
+    record_data:        # WARNING: All values in a record will be replaced
       - '192.0.2.23'
       - '192.0.2.42'    # The changed record
       - '198.51.100.5'
       - '203.0.113.10'
 
-# Safely remove a multi-line record.
-- gcdns_record:
+- name: Safely remove a multi-line record
+  gcdns_record:
     record: 'api.example.com'
     zone_id: 'example-com'
     state: absent
     type: A
-    record_data:           # NOTE: All of the values must match exactly
+    record_data:        # NOTE: All of the values must match exactly
       - '192.0.2.23'
       - '192.0.2.42'
       - '198.51.100.5'
       - '203.0.113.10'
 
-# Unconditionally remove a record.
-- gcdns_record:
+- name: Unconditionally remove a record
+  gcdns_record:
     record: 'api.example.com'
     zone_id: 'example-com'
     state: absent
     overwrite: true   # overwrite is true, so no values are needed
     type: A
 
-# Create an AAAA record
-- gcdns_record:
+- name: Create an AAAA record
+  gcdns_record:
     record: 'www1.example.com'
     zone: 'example.com'
     type: AAAA
     value: 'fd00:db8::1'
 
-# Create a PTR record
-- gcdns_record:
+- name: Create a PTR record
+  gcdns_record:
     record: '10.5.168.192.in-addr.arpa'
     zone: '5.168.192.in-addr.arpa'
     type: PTR
     value: 'api.example.com.'    # Note the trailing dot.
 
-# Create an NS record
-- gcdns_record:
+- name: Create an NS record
+  gcdns_record:
     record: 'subdomain.example.com'
     zone: 'example.com'
     type: NS
@@ -235,8 +235,8 @@ EXAMPLES = '''
       - 'ns-cloud-d3.googledomains.com.'
       - 'ns-cloud-d4.googledomains.com.'
 
-# Create a TXT record
-- gcdns_record:
+- name: Create a TXT record
+  gcdns_record:
     record: 'example.com'
     zone_id: 'example-com'
     type: TXT

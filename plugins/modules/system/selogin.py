@@ -65,21 +65,21 @@ author:
 '''
 
 EXAMPLES = '''
-# Modify the default user on the system to the guest_u user
-- selogin:
+- name: Modify the default user on the system to the guest_u user
+  selogin:
     login: __default__
     seuser: guest_u
     state: present
 
-# Assign gijoe user on an MLS machine a range and to the staff_u user
-- selogin:
+- name: Assign gijoe user on an MLS machine a range and to the staff_u user
+  selogin:
     login: gijoe
     seuser: staff_u
     serange: SystemLow-Secret
     state: present
 
-# Assign all users in the engineering group to the staff_u user
-- selogin:
+- name: Assign all users in the engineering group to the staff_u user
+  selogin:
     login: '%engineering'
     seuser: staff_u
     state: present

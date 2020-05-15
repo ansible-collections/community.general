@@ -58,25 +58,31 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about all tags, which names start with C(tag):
-- ovirt_tag_info:
+- name: Gather information about all tags, which names start with tag
+  ovirt_tag_info:
     name: tag*
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_tags }}"
 
-# Gather information about all tags, which are assigned to VM C(postgres):
-- ovirt_tag_info:
+- name: Gather information about all tags, which are assigned to VM postgres
+  ovirt_tag_info:
     vm: postgres
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_tags }}"
 
-# Gather information about all tags, which are assigned to host C(west):
-- ovirt_tag_info:
+- name: Gather information about all tags, which are assigned to host west
+  ovirt_tag_info:
     host: west
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_tags }}"
 '''
 
