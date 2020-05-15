@@ -65,12 +65,13 @@ author:
 '''
 
 EXAMPLES = '''
-- hipchat:
+- name: Send a message to a Hipchat room
+  hipchat:
     room: notif
     msg: Ansible task finished
 
-# Use Hipchat API version 2
-- hipchat:
+- name: Send a message to a Hipchat room using Hipchat API version 2
+  hipchat:
     api: https://api.hipchat.com/v2/
     token: OAUTH2_TOKEN
     room: notify

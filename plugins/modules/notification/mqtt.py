@@ -95,7 +95,8 @@ author: "Jan-Piet Mens (@jpmens)"
 '''
 
 EXAMPLES = '''
-- mqtt:
+- name: Publish a message on an MQTT topic
+  mqtt:
     topic: 'service/ansible/{{ ansible_hostname }}'
     payload: 'Hello at {{ ansible_date_time.iso8601 }}'
     qos: 0

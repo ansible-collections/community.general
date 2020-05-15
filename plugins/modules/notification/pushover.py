@@ -43,13 +43,15 @@ author: "Jim Richardson (@weaselkeeper)"
 '''
 
 EXAMPLES = '''
-- pushover:
+- name: Send notifications via pushover.net
+  pushover:
     msg: '{{ inventory_hostname }} is acting strange ...'
     app_token: wxfdksl
     user_key: baa5fe97f2c5ab3ca8f0bb59
   delegate_to: localhost
 
-- pushover:
+- name: Send notifications via pushover.net
+  pushover:
     title: 'Alert!'
     msg: '{{ inventory_hostname }} has exploded in flames, It is now time to panic'
     pri: 1

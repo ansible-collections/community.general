@@ -53,7 +53,8 @@ requirements: []
 '''
 
 EXAMPLES = '''
-- airbrake_deployment:
+- name: Notify airbrake about an app deployment
+  airbrake_deployment:
     token: AAAAAA
     environment: staging
     user: ansible

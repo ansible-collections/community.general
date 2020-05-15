@@ -119,21 +119,21 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = '''
-# Download the latest version of the JUnit framework artifact from Maven Central
-- maven_artifact:
+- name: Download the latest version of the JUnit framework artifact from Maven Central
+  maven_artifact:
     group_id: junit
     artifact_id: junit
     dest: /tmp/junit-latest.jar
 
-# Download JUnit 4.11 from Maven Central
-- maven_artifact:
+- name: Download JUnit 4.11 from Maven Central
+  maven_artifact:
     group_id: junit
     artifact_id: junit
     version: 4.11
     dest: /tmp/junit-4.11.jar
 
-# Download an artifact from a private repository requiring authentication
-- maven_artifact:
+- name: Download an artifact from a private repository requiring authentication
+  maven_artifact:
     group_id: com.company
     artifact_id: library-name
     repository_url: 'https://repo.company.com/maven'
@@ -141,31 +141,31 @@ EXAMPLES = '''
     password: pass
     dest: /tmp/library-name-latest.jar
 
-# Download a WAR File to the Tomcat webapps directory to be deployed
-- maven_artifact:
+- name: Download a WAR File to the Tomcat webapps directory to be deployed
+  maven_artifact:
     group_id: com.company
     artifact_id: web-app
     extension: war
     repository_url: 'https://repo.company.com/maven'
     dest: /var/lib/tomcat7/webapps/web-app.war
 
-# Keep a downloaded artifact's name, i.e. retain the version
-- maven_artifact:
+- name: Keep a downloaded artifact's name, i.e. retain the version
+  maven_artifact:
     version: latest
     artifact_id: spring-core
     group_id: org.springframework
     dest: /tmp/
     keep_name: yes
 
-# Download the latest version of the JUnit framework artifact from Maven local
-- maven_artifact:
+- name: Download the latest version of the JUnit framework artifact from Maven local
+  maven_artifact:
     group_id: junit
     artifact_id: junit
     dest: /tmp/junit-latest.jar
     repository_url: "file://{{ lookup('env','HOME') }}/.m2/repository"
 
-# Download the latest version between 3.8 and 4.0 (exclusive) of the JUnit framework artifact from Maven Central
-- maven_artifact:
+- name: Download the latest version between 3.8 and 4.0 (exclusive) of the JUnit framework artifact from Maven Central
+  maven_artifact:
     group_id: junit
     artifact_id: junit
     version_by_spec: "[3.8,4.0)"
