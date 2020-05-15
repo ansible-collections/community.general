@@ -38,13 +38,15 @@ options:
 '''
 
 EXAMPLES = '''
-# Gather facts about ZFS pool rpool
-- zpool_facts: pool=rpool
+- name: Gather facts about ZFS pool rpool
+  zpool_facts: pool=rpool
 
-# Gather space usage about all imported ZFS pools
-- zpool_facts: properties='free,size'
+- name: Gather space usage about all imported ZFS pools
+  zpool_facts: properties='free,size'
 
-- debug: msg='ZFS pool {{ item.name }} has {{ item.free }} free space out of {{ item.size }}.'
+- name: Print gathered information
+  debug:
+    msg: 'ZFS pool {{ item.name }} has {{ item.free }} free space out of {{ item.size }}.'
   with_items: '{{ ansible_zfs_pools }}'
 '''
 
