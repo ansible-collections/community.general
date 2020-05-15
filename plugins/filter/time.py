@@ -77,11 +77,10 @@ def to_time_unit(human_time, unit='ms'):
         h_time_int = int(res.group(1))
         h_time_unit = res.group(2)
 
+        h_time_unit = UNIT_TO_SHORT_FORM.get(h_time_unit, h_time_unit)
         if h_time_unit not in UNIT_FACTORS:
-            h_time_unit = UNIT_TO_SHORT_FORM.get(h_time_unit)
-            if not h_time_unit:
-                raise AnsibleFilterError(
-                    "to_time_unit() can not interpret following string: %s" % human_time)
+            raise AnsibleFilterError(
+                "to_time_unit() can not interpret following string: %s" % human_time)
 
         time_in_milliseconds = h_time_int * multiply(UNIT_FACTORS[h_time_unit])
         result += time_in_milliseconds
