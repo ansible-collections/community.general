@@ -1,0 +1,35 @@
+---
+- name: test community.general.to_seconds filter
+  assert:
+    that:
+      - "('12m' | community.general.to_seconds) == 720"
+      - "('300m' | community.general.to_seconds) == 18000"
+      - "('3h 12m' | community.general.to_seconds) == 11520"
+      - "('2d 3h 12m 15s' | community.general.to_seconds) == 184335"
+      - "('2d -2d -12s' | community.general.to_seconds) == -12"
+
+- name: test community.general.to_seconds filter
+  assert:
+    that:
+      - "('30s' | community.general.to_minutes) == 0.5"
+      - "('12m' | community.general.to_minutes) == 12"
+      - "('3h 72m' | community.general.to_minutes) == 252"
+      - "('300s' | community.general.to_minutes) == 5"
+
+- name: test community.general.to_hours filter
+  assert:
+    that:
+      - "('30m' | community.general.to_hours) == 0.5"
+      - "('3h 119m 61s' | community.general.to_hours) > 5"
+
+- name: test fail unknown unit
+  debug:
+    msg: "{{ '1s' | community.general.to_time_unit('lightyears') }}"
+  ignore_errors: yes
+  register: res
+
+- name: verify test fail unknown unit
+  assert:
+    that:
+      - res is failed
+      - "'to_time_unit() can not convert to the following unit: lightyears' in res.msg"
