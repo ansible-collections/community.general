@@ -20,6 +20,26 @@ UNIT_FACTORS = {
 }
 
 
+UNIT_TO_SHORT_FORM = {
+    'millisecond': 'ms',
+    'milliseconds': 'ms',
+    'msecond': 'ms',
+    'mseconds': 'ms',
+    'second': 's',
+    'seconds': 's',
+    'hour': 'h',
+    'hours': 'h',
+    'minute': 'm',
+    'minutes': 'm',
+    'day': 'd',
+    'days': 'd',
+    'week': 'w',
+    'weeks': 'w',
+    'year': 'y',
+    'years': 'y',
+}
+
+
 def multiply(factors):
     result = 1
     for factor in factors:
@@ -36,9 +56,11 @@ def divide(divisors):
 
 def to_time_unit(human_time, unit='ms'):
     ''' Return a time unit from a human readable string '''
+    unit = UNIT_TO_SHORT_FORM.get(unit, unit)
     if unit not in UNIT_FACTORS:
-        raise AnsibleFilterError("to_time_unit() can not convert to the following unit: %s, "
-                                 "available units: %s" % (unit, ', '.join(UNIT_FACTORS.keys())))
+        available_units = sorted(UNIT_FACTORS.keys() + UNIT_TO_SHORT_FORM.keys())
+        raise AnsibleFilterError("to_time_unit() can not convert to the following unit: %s. "
+                                 "Available units: %s" % (unit, ', '.join(available_units)))
     result = 0
     for h_time_string in human_time.split():
         res = re.match(r'(-?\d+)(\w+)', h_time_string)
