@@ -88,15 +88,15 @@ uefimode:
 '''
 
 EXAMPLES = '''
-# Ensure bootdevice is HD.
-- ipmi_boot:
+- name: Ensure bootdevice is HD
+  ipmi_boot:
     name: test.testdomain.com
     user: admin
     password: password
     bootdev: hd
 
-# Ensure bootdevice is not Network
-- ipmi_boot:
+- name: Ensure bootdevice is not Network
+  ipmi_boot:
     name: test.testdomain.com
     user: admin
     password: password
