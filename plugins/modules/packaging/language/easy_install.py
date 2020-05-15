@@ -61,13 +61,13 @@ author: "Matt Wright (@mattupstate)"
 '''
 
 EXAMPLES = '''
-# Examples from Ansible Playbooks
-- easy_install:
+- name: Install or update pip
+  easy_install:
     name: pip
     state: latest
 
-# Install Bottle into the specified virtualenv.
-- easy_install:
+- name: Install Bottle into the specified virtualenv
+  easy_install:
     name: bottle
     virtualenv: /webapps/myapp/venv
 '''
