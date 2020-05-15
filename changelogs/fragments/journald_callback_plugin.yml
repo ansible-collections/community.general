@@ -1,0 +1,2 @@
+minor_changes:
+- journald - Add callback plugin based upon systemd-python.
