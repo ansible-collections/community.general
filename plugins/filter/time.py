@@ -76,8 +76,8 @@ def to_time_unit(human_time, unit='ms'):
                 "to_time_unit() can not interpret following string: %s" % human_time)
 
         time_in_milliseconds = h_time_int * multiply(UNIT_FACTORS[h_time_unit])
-        result += time_in_milliseconds * divide(UNIT_FACTORS[unit])
-    return round(result, 12)
+        result += time_in_milliseconds
+    return round(result * divide(UNIT_FACTORS[unit]), 12)
 
 
 def to_milliseconds(human_time):
