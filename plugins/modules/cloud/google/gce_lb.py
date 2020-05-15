@@ -99,8 +99,8 @@ author: "Eric Johnson (@erjohnso) <erjohnso@google.com>"
 '''
 
 EXAMPLES = '''
-# Simple example of creating a new LB, adding members, and a health check
-- local_action:
+- name: Simple example of creating a new LB, adding members, and a health check
+  local_action:
     module: gce_lb
     name: testlb
     region: us-central1

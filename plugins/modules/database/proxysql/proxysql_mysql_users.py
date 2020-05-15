@@ -94,7 +94,8 @@ EXAMPLES = '''
 # runtime in a single batch using the M(proxysql_manage_config) module).  It
 # uses supplied credentials to connect to the proxysql admin interface.
 
-- proxysql_mysql_users:
+- name: Add a user
+  proxysql_mysql_users:
     login_user: 'admin'
     login_password: 'admin'
     username: 'productiondba'
@@ -105,7 +106,8 @@ EXAMPLES = '''
 # dynamically loads the mysql user config to runtime.  It uses credentials
 # in a supplied config file to connect to the proxysql admin interface.
 
-- proxysql_mysql_users:
+- name: Remove a user
+  proxysql_mysql_users:
     config_file: '~/proxysql.cnf'
     username: 'mysqlboy'
     state: absent

@@ -64,12 +64,14 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about all permissions of user with username C(john):
-- ovirt_permission_info:
+- name: Gather information about all permissions of user with username john
+  ovirt_permission_info:
     user_name: john
     authz_name: example.com-authz
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_permissions }}"
 '''
 

@@ -61,12 +61,13 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about all VMs which relate to a storage domain and
-# are unregistered:
-- ovirt_vms_info:
-    unregistered=True
+- name: Gather information about all VMs which relate to a storage domain and are unregistered
+  ovirt_vms_info:
+    unregistered: yes
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_storage_vms }}"
 '''
 

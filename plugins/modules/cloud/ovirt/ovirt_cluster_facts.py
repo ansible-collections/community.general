@@ -54,12 +54,14 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about all clusters which names start with C<production>:
-- ovirt_cluster_info:
+- name: Gather information about all clusters which names start with production
+  ovirt_cluster_info:
     pattern:
       name: 'production*'
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_clusters }}"
 '''
 

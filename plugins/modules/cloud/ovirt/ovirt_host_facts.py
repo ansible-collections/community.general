@@ -50,19 +50,23 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about all hosts which names start with C(host) and
-# belong to data center C(west):
-- ovirt_host_info:
+- name: Gather information about all hosts which names start with host and belong to data center west
+  ovirt_host_info:
     pattern: name=host* and datacenter=west
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_hosts }}"
-# All hosts with cluster version 4.2:
-- ovirt_host_info:
+
+- name: Gather information about all hosts with cluster version 4.2
+  ovirt_host_info:
     pattern: name=host*
     cluster_version: "4.2"
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_hosts }}"
 '''
 

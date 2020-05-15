@@ -33,10 +33,12 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information oVirt API:
-- ovirt_api_info:
+- name: Gather information oVirt API
+  ovirt_api_info:
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_api }}"
 '''
 
