@@ -65,31 +65,31 @@ author:
 '''
 
 EXAMPLES = '''
-# Gather facts about all images
-- one_image_info:
+- name: Gather facts about all images
+  one_image_info:
   register: result
 
-# Print all images facts
-- debug:
+- name: Print all images facts
+  debug:
     msg: result
 
-# Gather facts about an image using ID
-- one_image_info:
+- name: Gather facts about an image using ID
+  one_image_info:
     ids:
       - 123
 
-# Gather facts about an image using the name
-- one_image_info:
+- name: Gather facts about an image using the name
+  one_image_info:
     name: 'foo-image'
   register: foo_image
 
-# Gather facts about all IMAGEs whose name matches regex 'app-image-.*'
-- one_image_info:
+- name: Gather facts about all IMAGEs whose name matches regex 'app-image-.*'
+  one_image_info:
     name: '~app-image-.*'
   register: app_images
 
-# Gather facts about all IMAGEs whose name matches regex 'foo-image-.*' ignoring cases
-- one_image_info:
+- name: Gather facts about all IMAGEs whose name matches regex 'foo-image-.*' ignoring cases
+  one_image_info:
     name: '~*foo-image-.*'
   register: foo_images
 '''

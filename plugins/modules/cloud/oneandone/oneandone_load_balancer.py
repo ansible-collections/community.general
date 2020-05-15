@@ -138,10 +138,8 @@ author:
 '''
 
 EXAMPLES = '''
-
-# Provisioning example. Create and destroy a load balancer.
-
-- oneandone_load_balancer:
+- name: Create a load balancer
+  oneandone_load_balancer:
     auth_token: oneandone_private_api_key
     name: ansible load balancer
     description: Testing creation of load balancer with ansible
@@ -160,16 +158,16 @@ EXAMPLES = '''
     wait: true
     wait_timeout: 500
 
-- oneandone_load_balancer:
+- name: Destroy a load balancer
+  oneandone_load_balancer:
     auth_token: oneandone_private_api_key
     name: ansible load balancer
     wait: true
     wait_timeout: 500
     state: absent
 
-# Update a load balancer.
-
-- oneandone_load_balancer:
+- name: Update a load balancer
+  oneandone_load_balancer:
     auth_token: oneandone_private_api_key
     load_balancer: ansible load balancer
     name: ansible load balancer updated
@@ -178,9 +176,8 @@ EXAMPLES = '''
     wait_timeout: 500
     state: update
 
-# Add server to a load balancer.
-
-- oneandone_load_balancer:
+- name: Add server to a load balancer
+  oneandone_load_balancer:
     auth_token: oneandone_private_api_key
     load_balancer: ansible load balancer updated
     description: Adding server to a load balancer with ansible
@@ -190,9 +187,8 @@ EXAMPLES = '''
     wait_timeout: 500
     state: update
 
-# Remove server from a load balancer.
-
-- oneandone_load_balancer:
+- name: Remove server from a load balancer
+  oneandone_load_balancer:
     auth_token: oneandone_private_api_key
     load_balancer: ansible load balancer updated
     description: Removing server from a load balancer with ansible
@@ -202,9 +198,8 @@ EXAMPLES = '''
     wait_timeout: 500
     state: update
 
-# Add rules to a load balancer.
-
-- oneandone_load_balancer:
+- name: Add rules to a load balancer
+  oneandone_load_balancer:
     auth_token: oneandone_private_api_key
     load_balancer: ansible load balancer updated
     description: Adding rules to a load balancer with ansible
@@ -223,9 +218,8 @@ EXAMPLES = '''
     wait_timeout: 500
     state: update
 
-# Remove rules from a load balancer.
-
-- oneandone_load_balancer:
+- name: Remove rules from a load balancer
+  oneandone_load_balancer:
     auth_token: oneandone_private_api_key
     load_balancer: ansible load balancer updated
     description: Adding rules to a load balancer with ansible

@@ -75,7 +75,8 @@ EXAMPLES = '''
 # runtime in a single batch using the M(proxysql_manage_config) module).  It
 # uses supplied credentials to connect to the proxysql admin interface.
 
-- proxysql_scheduler:
+- name: Add a schedule
+  proxysql_scheduler:
     login_user: 'admin'
     login_password: 'admin'
     interval_ms: 1000
@@ -87,7 +88,8 @@ EXAMPLES = '''
 # dynamically loads the scheduler config to runtime.  It uses credentials
 # in a supplied config file to connect to the proxysql admin interface.
 
-- proxysql_scheduler:
+- name: Remove a schedule
+  proxysql_scheduler:
     config_file: '~/proxysql.cnf'
     filename: "/opt/old_script.py"
     state: absent

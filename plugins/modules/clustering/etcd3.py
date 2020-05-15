@@ -66,16 +66,16 @@ author:
 '''
 
 EXAMPLES = """
-# Store a value "bar" under the key "foo" for a cluster located "http://localhost:2379"
-- etcd3:
+- name: Store a value "bar" under the key "foo" for a cluster located "http://localhost:2379"
+  etcd3:
     key: "foo"
     value: "baz3"
     host: "localhost"
     port: 2379
     state: "present"
 
-# Authenticate using user/password combination with a timeout of 10 seconds
-- etcd3:
+- name: Authenticate using user/password combination with a timeout of 10 seconds
+  etcd3:
     key: "foo"
     value: "baz3"
     state: "present"
@@ -83,8 +83,8 @@ EXAMPLES = """
     password: "password123"
     timeout: 10
 
-# Authenticate using TLS certificates
-- etcd3:
+- name: Authenticate using TLS certificates
+  etcd3:
     key: "foo"
     value: "baz3"
     state: "present"

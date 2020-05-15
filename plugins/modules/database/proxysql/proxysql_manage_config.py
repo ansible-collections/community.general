@@ -61,7 +61,8 @@ EXAMPLES = '''
 # This example saves the mysql users config from memory to disk. It uses
 # supplied credentials to connect to the proxysql admin interface.
 
-- proxysql_manage_config:
+- name: Save the mysql users config from memory to disk
+  proxysql_manage_config:
     login_user: 'admin'
     login_password: 'admin'
     action: "SAVE"
@@ -69,10 +70,11 @@ EXAMPLES = '''
     direction: "FROM"
     config_layer: "MEMORY"
 
-# This example loads the mysql query rules config from memory to to runtime. It
+# This example loads the mysql query rules config from memory to runtime. It
 # uses supplied credentials to connect to the proxysql admin interface.
 
-- proxysql_manage_config:
+- name: Load the mysql query rules config from memory to runtime
+  proxysql_manage_config:
     config_file: '~/proxysql.cnf'
     action: "LOAD"
     config_settings: "MYSQL QUERY RULES"

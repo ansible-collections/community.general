@@ -59,25 +59,25 @@ author: "Tom Melendez (@supertom)"
 '''
 
 EXAMPLES = '''
-# Create an image named test-image from the disk 'test-disk' in zone us-central1-a.
-- gce_img:
+- name: Create an image named test-image from the disk 'test-disk' in zone us-central1-a
+  gce_img:
     name: test-image
     source: test-disk
     zone: us-central1-a
     state: present
 
-# Create an image named test-image from a tarball in Google Cloud Storage.
-- gce_img:
+- name: Create an image named test-image from a tarball in Google Cloud Storage
+  gce_img:
     name: test-image
     source: https://storage.googleapis.com/bucket/path/to/image.tgz
 
-# Alternatively use the gs scheme
-- gce_img:
+- name: Alternatively use the gs scheme
+  gce_img:
     name: test-image
     source: gs://bucket/path/to/image.tgz
 
-# Delete an image named test-image.
-- gce_img:
+- name: Delete an image named test-image
+  gce_img:
     name: test-image
     state: absent
 '''
