@@ -66,14 +66,16 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about HostStorages with specified target and address:
-- ovirt_host_storage_info:
+- name: Gather information about HostStorages with specified target and address
+  ovirt_host_storage_info:
     host: myhost
     iscsi:
       target: iqn.2016-08-09.domain-01:nickname
       address: 10.34.63.204
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_host_storages }}"
 '''
 
