@@ -64,7 +64,7 @@ def to_time_unit(human_time, unit='ms'):
     ''' Return a time unit from a human readable string '''
     unit = UNIT_TO_SHORT_FORM.get(unit, unit)
     if unit not in UNIT_FACTORS:
-        available_units = sorted(UNIT_FACTORS.keys() + UNIT_TO_SHORT_FORM.keys())
+        available_units = sorted(list(UNIT_FACTORS.keys()) + list(UNIT_TO_SHORT_FORM.keys()))
         raise AnsibleFilterError("to_time_unit() can not convert to the following unit: %s. "
                                  "Available units: %s" % (unit, ', '.join(available_units)))
     result = 0
