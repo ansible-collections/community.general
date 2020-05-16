@@ -99,7 +99,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a disk
+- name: Get info on a disk
   gcp_compute_disk_info:
     zone: us-central1-a
     filters:

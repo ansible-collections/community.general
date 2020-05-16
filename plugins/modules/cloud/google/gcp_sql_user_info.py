@@ -98,7 +98,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a user
+- name: Get info on a user
   gcp_sql_user_info:
     instance: "{{ instance }}"
     project: test_project

@@ -97,7 +97,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: configure a NAPTR record
+- name: Configure a NAPTR record
   nios_naptr_record:
     name: '*.subscriber-100.ansiblezone.com'
     order: 1000
@@ -110,7 +110,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: add a comment to an existing NAPTR record
+- name: Add a comment to an existing NAPTR record
   nios_naptr_record:
     name: '*.subscriber-100.ansiblezone.com'
     order: 1000
@@ -124,7 +124,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: remove a NAPTR record from the system
+- name: Remove a NAPTR record from the system
   nios_naptr_record:
     name: '*.subscriber-100.ansiblezone.com'
     order: 1000

@@ -94,7 +94,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a target TCP proxy
+- name: Get info on a target TCP proxy
   gcp_compute_target_tcp_proxy_info:
     filters:
     - name = test_object

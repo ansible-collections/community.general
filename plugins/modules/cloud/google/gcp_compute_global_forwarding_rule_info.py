@@ -94,7 +94,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a global forwarding rule
+- name: Get info on a global forwarding rule
   gcp_compute_global_forwarding_rule_info:
     filters:
     - name = test_object

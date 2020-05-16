@@ -30,7 +30,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: get details for testyaa1
+- name: Get details for testyaa1
   memset_server_info:
     name: testyaa1
     api_key: 5eb86c9896ab03919abcf03857163741

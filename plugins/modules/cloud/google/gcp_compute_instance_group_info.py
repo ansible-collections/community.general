@@ -99,7 +99,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on an instance group
+- name: Get info on an instance group
   gcp_compute_instance_group_info:
     zone: us-central1-a
     filters:

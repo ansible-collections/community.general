@@ -94,7 +94,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a global address
+- name: Get info on a global address
   gcp_compute_global_address_info:
     filters:
     - name = test_object

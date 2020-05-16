@@ -49,7 +49,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 # Example influxdb_retention_policy command from Ansible Playbooks
-- name: create 1 hour retention policy
+- name: Create 1 hour retention policy
   influxdb_retention_policy:
       hostname: "{{influxdb_ip_address}}"
       database_name: "{{influxdb_database_name}}"
@@ -59,7 +59,7 @@ EXAMPLES = r'''
       ssl: yes
       validate_certs: yes
 
-- name: create 1 day retention policy
+- name: Create 1 day retention policy
   influxdb_retention_policy:
       hostname: "{{influxdb_ip_address}}"
       database_name: "{{influxdb_database_name}}"
@@ -67,7 +67,7 @@ EXAMPLES = r'''
       duration: 1d
       replication: 1
 
-- name: create 1 week retention policy
+- name: Create 1 week retention policy
   influxdb_retention_policy:
       hostname: "{{influxdb_ip_address}}"
       database_name: "{{influxdb_database_name}}"
@@ -75,7 +75,7 @@ EXAMPLES = r'''
       duration: 1w
       replication: 1
 
-- name: create infinite retention policy
+- name: Create infinite retention policy
   influxdb_retention_policy:
       hostname: "{{influxdb_ip_address}}"
       database_name: "{{influxdb_database_name}}"

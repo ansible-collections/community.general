@@ -220,7 +220,7 @@ EXAMPLES = '''
     credentials_file: "/path/to/your-key.json"
     project_id: "your-project-name"
   tasks:
-    - name: create multiple instances
+    - name: Create multiple instances
       # Basic provisioning example.  Create multiple Debian 8 instances in the
       # us-central1-a Zone of n1-standard-1 machine type.
       gce:
@@ -260,7 +260,7 @@ EXAMPLES = '''
       tags:
         - config
 
-    - name: delete test-instances
+    - name: Delete test-instances
       # Basic termination of instance.
       gce:
         service_account_email: "{{ service_account_email }}"

@@ -62,7 +62,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: configure a new dns view instance
+- name: Configure a new dns view instance
   nios_dns_view:
     name: ansible-dns
     state: present
@@ -71,7 +71,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: update the comment for dns view
+- name: Update the comment for dns view
   nios_dns_view:
     name: ansible-dns
     comment: this is an example comment
@@ -81,7 +81,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: remove the dns view instance
+- name: Remove the dns view instance
   nios_dns_view:
     name: ansible-dns
     state: absent
@@ -90,7 +90,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: update the dns view instance
+- name: Update the dns view instance
   nios_dns_view:
     name: {new_name: ansible-dns-new, old_name: ansible-dns}
     state: present

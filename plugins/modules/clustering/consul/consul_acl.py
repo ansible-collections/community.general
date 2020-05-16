@@ -76,7 +76,7 @@ requirements:
 '''
 
 EXAMPLES = """
-- name: create an ACL with rules
+- name: Create an ACL with rules
   consul_acl:
     host: consul1.example.com
     mgmt_token: some_management_acl
@@ -87,7 +87,7 @@ EXAMPLES = """
       - key: "private/foo"
         policy: deny
 
-- name: create an ACL with a specific token
+- name: Create an ACL with a specific token
   consul_acl:
     host: consul1.example.com
     mgmt_token: some_management_acl
@@ -97,7 +97,7 @@ EXAMPLES = """
       - key: "foo"
         policy: read
 
-- name: update the rules associated to an ACL token
+- name: Update the rules associated to an ACL token
   consul_acl:
     host: consul1.example.com
     mgmt_token: some_management_acl
@@ -121,7 +121,7 @@ EXAMPLES = """
       - session: "standup"
         policy: write
 
-- name: remove a token
+- name: Remove a token
   consul_acl:
     host: consul1.example.com
     mgmt_token: some_management_acl

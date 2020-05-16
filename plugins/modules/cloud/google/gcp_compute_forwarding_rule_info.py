@@ -100,7 +100,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a forwarding rule
+- name: Get info on a forwarding rule
   gcp_compute_forwarding_rule_info:
     region: us-west1
     filters:
