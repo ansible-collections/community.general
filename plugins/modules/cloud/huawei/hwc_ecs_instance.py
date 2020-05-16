@@ -226,12 +226,12 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 # create an ecs instance
-- name: create a vpc
+- name: Create a vpc
   hwc_network_vpc:
     cidr: "192.168.100.0/24"
     name: "ansible_network_vpc_test"
   register: vpc
-- name: create a subnet
+- name: Create a subnet
   hwc_vpc_subnet:
     gateway_ip: "192.168.100.32"
     name: "ansible_network_subnet_test"
@@ -239,7 +239,7 @@ EXAMPLES = '''
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
   register: subnet
-- name: create a eip
+- name: Create a eip
   hwc_vpc_eip:
     dedicated_bandwidth:
       charge_mode: "traffic"
@@ -247,14 +247,14 @@ EXAMPLES = '''
       size: 1
     type: "5_bgp"
   register: eip
-- name: create a disk
+- name: Create a disk
   hwc_evs_disk:
     availability_zone: "cn-north-1a"
     name: "ansible_evs_disk_test"
     volume_type: "SATA"
     size: 10
   register: disk
-- name: create an instance
+- name: Create an instance
   hwc_ecs_instance:
     data_volumes:
       - volume_id: "{{ disk.id }}"

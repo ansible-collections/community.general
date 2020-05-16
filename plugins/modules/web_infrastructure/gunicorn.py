@@ -55,24 +55,24 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: simple gunicorn run example
+- name: Simple gunicorn run example
   gunicorn:
     app: 'wsgi'
     chdir: '/workspace/example'
 
-- name: run gunicorn on a virtualenv
+- name: Run gunicorn on a virtualenv
   gunicorn:
     app: 'wsgi'
     chdir: '/workspace/example'
     venv: '/workspace/example/venv'
 
-- name: run gunicorn with a config file
+- name: Run gunicorn with a config file
   gunicorn:
     app: 'wsgi'
     chdir: '/workspace/example'
     conf: '/workspace/example/gunicorn.cfg'
 
-- name: run gunicorn as ansible user with specified pid and config file
+- name: Run gunicorn as ansible user with specified pid and config file
   gunicorn:
     app: 'wsgi'
     chdir: '/workspace/example'

@@ -99,7 +99,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a subnetwork
+- name: Get info on a subnetwork
   gcp_compute_subnetwork_info:
     region: us-west1
     filters:

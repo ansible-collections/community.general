@@ -114,7 +114,7 @@ EXAMPLES = '''
 - hosts: localhost
   connection: local
   tasks:
-  - name: create macvlan profile
+  - name: Create macvlan profile
     lxd_profile:
       url: https://127.0.0.1:8443
       # These client_cert and client_key values are equal to the default values.

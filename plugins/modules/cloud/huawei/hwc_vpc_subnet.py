@@ -97,12 +97,12 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 # create subnet
-- name: create vpc
+- name: Create vpc
   hwc_network_vpc:
     cidr: "192.168.100.0/24"
     name: "ansible_network_vpc_test"
   register: vpc
-- name: create subnet
+- name: Create subnet
   hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"

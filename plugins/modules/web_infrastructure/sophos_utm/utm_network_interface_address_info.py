@@ -31,7 +31,7 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = """
-- name: utm network interface address
+- name: Get network interface address info
   utm_proxy_interface_address_info:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234

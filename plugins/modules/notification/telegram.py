@@ -44,7 +44,7 @@ options:
 
 EXAMPLES = """
 
-- name: send a message to chat in playbook
+- name: Send a message to chat in playbook
   telegram:
     token: '9999999:XXXXXXXXXXXXXXXXXXXXXXX'
     chat_id: 000000
