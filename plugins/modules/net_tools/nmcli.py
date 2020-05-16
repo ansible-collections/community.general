@@ -354,7 +354,7 @@ EXAMPLES = r'''
   remote_user: root
   tasks:
 
-  - name: install needed network manager libs
+  - name: Install needed network manager libs
     package:
       name:
         - NetworkManager-libnm

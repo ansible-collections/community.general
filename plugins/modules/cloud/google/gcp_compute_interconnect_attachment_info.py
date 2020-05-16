@@ -99,7 +99,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on an interconnect attachment
+- name: Get info on an interconnect attachment
   gcp_compute_interconnect_attachment_info:
     region: us-central1
     filters:

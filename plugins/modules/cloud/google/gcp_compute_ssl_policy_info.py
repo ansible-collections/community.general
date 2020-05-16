@@ -94,7 +94,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a SSL policy
+- name: Get info on a SSL policy
   gcp_compute_ssl_policy_info:
     filters:
     - name = test_object
