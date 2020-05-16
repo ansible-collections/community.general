@@ -24,9 +24,10 @@ author:
 '''
 
 EXAMPLES = '''
-- name: show python lib/site paths
+- name: Show python lib/site paths
   python_requirements_info:
-- name: check for modern boto3 and botocore versions
+
+- name: Check for modern boto3 and botocore versions
   python_requirements_info:
     dependencies:
     - boto3>1.6

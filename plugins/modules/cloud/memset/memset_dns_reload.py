@@ -37,7 +37,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: submit DNS reload and poll.
+- name: Submit DNS reload and poll
   memset_dns_reload:
     api_key: 5eb86c9196ab03919abcf03857163741
     poll: True

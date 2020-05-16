@@ -93,7 +93,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a node
+- name: Get info on a node
   gcp_tpu_node_info:
     zone: us-central1-b
     project: test_project

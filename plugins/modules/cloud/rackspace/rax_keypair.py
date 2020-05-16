@@ -42,7 +42,7 @@ EXAMPLES = '''
   hosts: localhost
   gather_facts: False
   tasks:
-    - name: keypair request
+    - name: Keypair request
       local_action:
         module: rax_keypair
         credentials: ~/.raxpub
@@ -64,7 +64,7 @@ EXAMPLES = '''
   hosts: localhost
   gather_facts: False
   tasks:
-    - name: keypair request
+    - name: Keypair request
       local_action:
         module: rax_keypair
         credentials: ~/.raxpub

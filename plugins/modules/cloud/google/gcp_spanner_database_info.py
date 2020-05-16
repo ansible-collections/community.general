@@ -98,7 +98,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a database
+- name: Get info on a database
   gcp_spanner_database_info:
     instance: "{{ instance }}"
     project: test_project

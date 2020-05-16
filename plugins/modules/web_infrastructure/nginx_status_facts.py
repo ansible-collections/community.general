@@ -36,12 +36,12 @@ notes:
 
 EXAMPLES = '''
 # Gather status facts from nginx on localhost
-- name: get current http stats
+- name: Get current http stats
   nginx_status_facts:
     url: http://localhost/nginx_status
 
 # Gather status facts from nginx on localhost with a custom timeout of 20 seconds
-- name: get current http stats
+- name: Get current http stats
   nginx_status_facts:
     url: http://localhost/nginx_status
     timeout: 20

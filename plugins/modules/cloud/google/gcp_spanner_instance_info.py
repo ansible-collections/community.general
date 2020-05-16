@@ -88,7 +88,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on an instance
+- name: Get info on an instance
   gcp_spanner_instance_info:
     project: test_project
     auth_kind: serviceaccount

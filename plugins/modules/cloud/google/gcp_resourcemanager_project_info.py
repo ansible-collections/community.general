@@ -88,7 +88,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a project
+- name: Get info on a project
   gcp_resourcemanager_project_info:
     project: test_project
     auth_kind: serviceaccount

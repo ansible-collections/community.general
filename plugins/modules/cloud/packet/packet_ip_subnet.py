@@ -82,7 +82,7 @@ EXAMPLES = '''
 # All the examples assume that you have your Packet api token in env var PACKET_API_TOKEN.
 # You can also pass it to the auth_token parameter of the module instead.
 
-- name: create 1 device and assign an arbitrary public IPv4 subnet to it
+- name: Create 1 device and assign an arbitrary public IPv4 subnet to it
   hosts: localhost
   tasks:
 
@@ -103,7 +103,7 @@ EXAMPLES = '''
 
 # Release IP address 147.75.201.78
 
-- name: unassign IP address from any device in your project
+- name: Unassign IP address from any device in your project
   hosts: localhost
   tasks:
   - packet_ip_subnet:

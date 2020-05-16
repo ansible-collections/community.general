@@ -122,7 +122,7 @@ EXAMPLES = """
     parse: 'none'
   delegate_to: localhost
 
-- name: insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured in Slack
+- name: Insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured in Slack
   slack:
     token: thetoken/generatedby/slack
     msg: '{{ inventory_hostname }} is alive!'
@@ -130,7 +130,7 @@ EXAMPLES = """
     username: ''
     icon_url: ''
 
-- name: insert a color bar in front of the message with valid hex color value
+- name: Insert a color bar in front of the message with valid hex color value
   slack:
     token: thetoken/generatedby/slack
     msg: 'This message uses color in hex value'

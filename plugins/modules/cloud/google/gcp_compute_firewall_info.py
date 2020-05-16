@@ -94,7 +94,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a firewall
+- name: Get info on a firewall
   gcp_compute_firewall_info:
     filters:
     - name = test_object

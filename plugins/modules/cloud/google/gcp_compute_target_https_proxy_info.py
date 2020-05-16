@@ -94,7 +94,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a target HTTPS proxy
+- name: Get info on a target HTTPS proxy
   gcp_compute_target_https_proxy_info:
     filters:
     - name = test_object

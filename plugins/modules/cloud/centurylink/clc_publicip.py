@@ -72,7 +72,7 @@ EXAMPLES = '''
         state: present
       register: clc
 
-    - name: debug
+    - name: Debug
       debug:
         var: clc
 
@@ -89,7 +89,7 @@ EXAMPLES = '''
         state: absent
       register: clc
 
-    - name: debug
+    - name: Debug
       debug:
         var: clc
 '''

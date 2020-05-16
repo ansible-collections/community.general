@@ -88,7 +88,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a trigger
+- name: Get info on a trigger
   gcp_cloudbuild_trigger_info:
     project: test_project
     auth_kind: serviceaccount

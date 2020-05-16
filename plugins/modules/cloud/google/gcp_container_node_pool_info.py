@@ -106,7 +106,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a node pool
+- name: Get info on a node pool
   gcp_container_node_pool_info:
     cluster: "{{ cluster }}"
     location: us-central1-a

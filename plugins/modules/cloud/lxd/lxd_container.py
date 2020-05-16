@@ -162,14 +162,14 @@ EXAMPLES = '''
         wait_for_ipv4_addresses: true
         timeout: 600
 
-    - name: check python is installed in container
+    - name: Check python is installed in container
       delegate_to: mycontainer
       raw: dpkg -s python
       register: python_install_check
       failed_when: python_install_check.rc not in [0, 1]
       changed_when: false
 
-    - name: install python in container
+    - name: Install python in container
       delegate_to: mycontainer
       raw: apt-get install -y python
       when: python_install_check.rc == 1
@@ -238,7 +238,7 @@ EXAMPLES = '''
 - hosts:
     - mycontainer
   tasks:
-    - name: copy /etc/hosts in the created container to localhost with name "mycontainer-hosts"
+    - name: Copy /etc/hosts in the created container to localhost with name "mycontainer-hosts"
       fetch:
         src: /etc/hosts
         dest: /tmp/mycontainer-hosts

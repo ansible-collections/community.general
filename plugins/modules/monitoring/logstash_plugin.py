@@ -57,7 +57,7 @@ EXAMPLES = '''
     state: absent
     name: logstash-filter-multiline
 
-- name: install Logstash plugin with alternate heap size
+- name: Install Logstash plugin with alternate heap size
   logstash_plugin:
     state: present
     name: logstash-input-beats

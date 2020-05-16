@@ -109,7 +109,7 @@ options:
 EXAMPLES = '''
 # If the key does not exist, the value associated to the "data" property in `retrieved_key` will be `None`
 # If the key value is empty string, `retrieved_key["data"]["Value"]` will be `None`
-- name: retrieve a value from the key/value store
+- name: Retrieve a value from the key/value store
   consul_kv:
     key: somekey
   register: retrieved_key

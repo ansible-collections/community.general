@@ -94,7 +94,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on an instance template
+- name: Get info on an instance template
   gcp_compute_instance_template_info:
     filters:
     - name = test_object

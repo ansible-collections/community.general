@@ -74,27 +74,27 @@ EXAMPLES = '''
 # All the examples assume that you have your Packet API token in env var PACKET_API_TOKEN.
 # You can also pass the api token in module param auth_token.
 
-- name: create new project
+- name: Create new project
   hosts: localhost
   tasks:
     packet_project:
       name: "new project"
 
-- name: create new project within non-default organization
+- name: Create new project within non-default organization
   hosts: localhost
   tasks:
     packet_project:
       name: "my org project"
       org_id: a4cc87f9-e00f-48c2-9460-74aa60beb6b0
 
-- name: remove project by id
+- name: Remove project by id
   hosts: localhost
   tasks:
     packet_project:
       state: absent
       id: eef49903-7a09-4ca1-af67-4087c29ab5b6
 
-- name: create new project with non-default billing method
+- name: Create new project with non-default billing method
   hosts: localhost
   tasks:
     packet_project:

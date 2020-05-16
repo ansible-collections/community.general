@@ -93,7 +93,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a database
+- name: Get info on a database
   gcp_sql_database_info:
     instance: "{{ instance.name }}"
     project: test_project
