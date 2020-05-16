@@ -44,7 +44,7 @@ options:
 
 EXAMPLES = '''
 # Create the zone domain 'test.com'
-- name: create zone domain
+- name: Create zone domain
   memset_zone_domain:
     domain: test.com
     zone: testzone

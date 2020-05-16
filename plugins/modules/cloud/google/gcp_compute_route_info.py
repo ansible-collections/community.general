@@ -94,7 +94,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a route
+- name: Get info on a route
   gcp_compute_route_info:
     filters:
     - name = test_object

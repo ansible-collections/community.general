@@ -312,7 +312,7 @@ author:
 
 EXAMPLES = '''
 
-- name: pull an image
+- name: Pull an image
   docker_image:
     name: pacur/centos-7
     source: pull

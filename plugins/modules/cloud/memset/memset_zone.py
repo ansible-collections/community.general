@@ -50,7 +50,7 @@ options:
 
 EXAMPLES = '''
 # Create the zone 'test'
-- name: create zone
+- name: Create zone
   memset_zone:
     name: test
     state: present
@@ -59,7 +59,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 # Force zone deletion
-- name: force delete zone
+- name: Force delete zone
   memset_zone:
     name: test
     state: absent

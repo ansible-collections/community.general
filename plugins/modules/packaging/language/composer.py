@@ -116,7 +116,7 @@ EXAMPLES = '''
     command: install
     working_dir: /path/to/project
 
-- name: install a new package
+- name: Install a new package
   composer:
     command: require
     arguments: my/package

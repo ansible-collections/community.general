@@ -60,17 +60,17 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 # create a peering connect
-- name: create a local vpc
+- name: Create a local vpc
   hwc_network_vpc:
     cidr: "192.168.0.0/16"
     name: "ansible_network_vpc_test_local"
   register: vpc1
-- name: create a peering vpc
+- name: Create a peering vpc
   hwc_network_vpc:
     cidr: "192.168.0.0/16"
     name: "ansible_network_vpc_test_peering"
   register: vpc2
-- name: create a peering connect
+- name: Create a peering connect
   hwc_vpc_peering_connect:
     local_vpc_id: "{{ vpc1.id }}"
     name: "ansible_network_peering_test"
@@ -79,7 +79,7 @@ EXAMPLES = '''
     peering_vpc:
       vpc_id: "{{ vpc2.id }}"
   register: connect
-- name: create a route
+- name: Create a route
   hwc_vpc_route:
     vpc_id: "{{ vpc1.id }}"
     destination: "192.168.0.0/16"

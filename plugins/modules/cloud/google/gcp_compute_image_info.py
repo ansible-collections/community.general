@@ -94,7 +94,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on an image
+- name: Get info on an image
   gcp_compute_image_info:
     filters:
     - name = test_object

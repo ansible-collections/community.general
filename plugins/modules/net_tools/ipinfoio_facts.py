@@ -32,7 +32,7 @@ notes:
 
 EXAMPLES = '''
 # Retrieve geolocation data of a host's IP address
-- name: get IP geolocation data
+- name: Get IP geolocation data
   ipinfoio_facts:
 '''
 

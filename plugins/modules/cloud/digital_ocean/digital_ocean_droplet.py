@@ -105,7 +105,7 @@ requirements:
 
 
 EXAMPLES = '''
-- name: create a new droplet
+- name: Create a new droplet
   digital_ocean_droplet:
     state: present
     name: mydroplet
@@ -120,7 +120,7 @@ EXAMPLES = '''
 - debug:
     msg: "ID is {{ my_droplet.data.droplet.id }}, IP is {{ my_droplet.data.ip_address }}"
 
-- name: ensure a droplet is present
+- name: Ensure a droplet is present
   digital_ocean_droplet:
     state: present
     id: 123
@@ -131,7 +131,7 @@ EXAMPLES = '''
     image: ubuntu-16-04-x64
     wait_timeout: 500
 
-- name: ensure a droplet is present with SSH keys installed
+- name: Ensure a droplet is present with SSH keys installed
   digital_ocean_droplet:
     state: present
     id: 123

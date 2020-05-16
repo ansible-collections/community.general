@@ -69,7 +69,7 @@ notes:
 EXAMPLES = '''
 # Note - You must set the CLC_V2_API_USERNAME And CLC_V2_API_PASSWD Environment variables before running these examples
 
-- name: set the cpu count to 4 on a server
+- name: Set the cpu count to 4 on a server
   clc_modify_server:
     server_ids:
         - UC1TESTSVR01
@@ -77,7 +77,7 @@ EXAMPLES = '''
     cpu: 4
     state: present
 
-- name: set the memory to 8GB on a server
+- name: Set the memory to 8GB on a server
   clc_modify_server:
     server_ids:
         - UC1TESTSVR01
@@ -85,7 +85,7 @@ EXAMPLES = '''
     memory: 8
     state: present
 
-- name: set the anti affinity policy on a server
+- name: Set the anti affinity policy on a server
   clc_modify_server:
     server_ids:
         - UC1TESTSVR01
@@ -93,7 +93,7 @@ EXAMPLES = '''
     anti_affinity_policy_name: 'aa_policy'
     state: present
 
-- name: remove the anti affinity policy on a server
+- name: Remove the anti affinity policy on a server
   clc_modify_server:
     server_ids:
         - UC1TESTSVR01
@@ -101,7 +101,7 @@ EXAMPLES = '''
     anti_affinity_policy_name: 'aa_policy'
     state: absent
 
-- name: add the alert policy on a server
+- name: Add the alert policy on a server
   clc_modify_server:
     server_ids:
         - UC1TESTSVR01
@@ -109,7 +109,7 @@ EXAMPLES = '''
     alert_policy_name: 'alert_policy'
     state: present
 
-- name: remove the alert policy on a server
+- name: Remove the alert policy on a server
   clc_modify_server:
     server_ids:
         - UC1TESTSVR01
@@ -117,7 +117,7 @@ EXAMPLES = '''
     alert_policy_name: 'alert_policy'
     state: absent
 
-- name: set the memory to 16GB and cpu to 8 core on a lust if servers
+- name: Ret the memory to 16GB and cpu to 8 core on a lust if servers
   clc_modify_server:
     server_ids:
         - UC1TESTSVR01

@@ -56,8 +56,7 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = """
-# Create a ca_host_key_cert entry
-- name: utm ca_host_key_cert
+- name: Create a ca_host_key_cert entry
   utm_ca_host_key_cert:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
@@ -72,16 +71,14 @@ EXAMPLES = """
       --- END CERTIFICATE ---
     state: present
 
-# Remove a ca_host_key_cert entry
-- name: utm ca_host_key_cert
+- name: Remove a ca_host_key_cert entry
   utm_ca_host_key_cert:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestHostKeyCertEntry
     state: absent
 
-# Read a ca_host_key_cert entry
-- name: utm ca_host_key_cert
+- name: Read a ca_host_key_cert entry
   utm_ca_host_key_cert:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234

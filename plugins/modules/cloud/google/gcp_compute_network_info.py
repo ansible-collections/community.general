@@ -94,7 +94,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a network
+- name: Get info on a network
   gcp_compute_network_info:
     filters:
     - name = test_object

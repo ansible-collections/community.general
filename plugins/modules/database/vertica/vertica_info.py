@@ -49,7 +49,7 @@ author: "Dariusz Owczarek (@dareko)"
 '''
 
 EXAMPLES = """
-- name: gathering vertica facts
+- name: Gathering vertica facts
   vertica_info: db=db_name
   register: result
 

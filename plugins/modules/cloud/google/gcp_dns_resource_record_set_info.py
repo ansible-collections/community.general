@@ -95,7 +95,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a resource record set
+- name: Get info on a resource record set
   gcp_dns_resource_record_set_info:
     managed_zone: "{{ managed_zone }}"
     project: test_project

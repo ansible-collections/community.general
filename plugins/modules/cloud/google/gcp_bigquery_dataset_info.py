@@ -88,7 +88,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a dataset
+- name: Get info on a dataset
   gcp_bigquery_dataset_info:
     project: test_project
     auth_kind: serviceaccount

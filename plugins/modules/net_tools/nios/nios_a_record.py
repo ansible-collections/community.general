@@ -67,7 +67,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: configure an A record
+- name: Configure an A record
   nios_a_record:
     name: a.ansible.com
     ipv4: 192.168.10.1
@@ -78,7 +78,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: add a comment to an existing A record
+- name: Add a comment to an existing A record
   nios_a_record:
     name: a.ansible.com
     ipv4: 192.168.10.1
@@ -90,7 +90,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: remove an A record from the system
+- name: Remove an A record from the system
   nios_a_record:
     name: a.ansible.com
     ipv4: 192.168.10.1
@@ -101,7 +101,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: update an A record name
+- name: Update an A record name
   nios_a_record:
     name: {new_name: a_new.ansible.com, old_name: a.ansible.com}
     ipv4: 192.168.10.1
@@ -112,7 +112,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: dynamically add a record to next available ip
+- name: Dynamically add a record to next available ip
   nios_a_record:
     name: a.ansible.com
     ipv4: {nios_next_ip: 192.168.10.0/24}

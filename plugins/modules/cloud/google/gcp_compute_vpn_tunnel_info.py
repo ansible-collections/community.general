@@ -99,7 +99,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a vpn tunnel
+- name: Get info on a vpn tunnel
   gcp_compute_vpn_tunnel_info:
     region: us-west1
     filters:

@@ -163,7 +163,7 @@ EXAMPLES = '''
     realm: master
     name: this_is_a_test
 
-- name: delete Keycloak client template
+- name: Delete Keycloak client template
   local_action:
     module: keycloak_clienttemplate
     auth_client_id: admin-cli

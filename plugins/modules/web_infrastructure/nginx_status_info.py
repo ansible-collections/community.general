@@ -34,13 +34,13 @@ notes:
 
 EXAMPLES = r'''
 # Gather status info from nginx on localhost
-- name: get current http stats
+- name: Get current http stats
   nginx_status_info:
     url: http://localhost/nginx_status
   register: result
 
 # Gather status info from nginx on localhost with a custom timeout of 20 seconds
-- name: get current http stats
+- name: Get current http stats
   nginx_status_info:
     url: http://localhost/nginx_status
     timeout: 20

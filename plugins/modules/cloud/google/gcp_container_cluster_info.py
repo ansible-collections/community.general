@@ -96,7 +96,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a cluster
+- name: Get info on a cluster
   gcp_container_cluster_info:
     location: us-central1-a
     project: test_project

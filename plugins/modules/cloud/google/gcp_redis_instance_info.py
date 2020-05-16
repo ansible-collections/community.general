@@ -93,7 +93,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on an instance
+- name: Get info on an instance
   gcp_redis_instance_info:
     region: us-central1
     project: test_project

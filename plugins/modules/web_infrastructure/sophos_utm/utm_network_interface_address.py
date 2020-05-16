@@ -49,8 +49,7 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = """
-# Create a network interface address
-- name: utm network interface address
+- name: Create a network interface address
   utm_proxy_backend:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
@@ -58,8 +57,7 @@ EXAMPLES = """
     address: 0.0.0.0
     state: present
 
-# Remove a network interface address
-- name: utm network interface address
+- name: Remove a network interface address
   network_interface_address:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
