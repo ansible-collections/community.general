@@ -43,7 +43,7 @@ notes:
 
 
 EXAMPLES = '''
-- name: create a certificate
+- name: Create a certificate
   digital_ocean_certificate:
     name: production
     state: present
@@ -51,7 +51,7 @@ EXAMPLES = '''
     leaf_certificate: "-----BEGIN CERTIFICATE-----\nMIIFDmg2Iaw==\n-----END CERTIFICATE-----"
     oauth_token: b7d03a6947b217efb6f3ec3bd365652
 
-- name: create a certificate using file lookup plugin
+- name: Create a certificate using file lookup plugin
   digital_ocean_certificate:
     name: production
     state: present
@@ -59,7 +59,7 @@ EXAMPLES = '''
     leaf_certificate: "{{ lookup('file', 'test.cert') }}"
     oauth_token: "{{ oauth_token }}"
 
-- name: create a certificate with trust chain
+- name: Create a certificate with trust chain
   digital_ocean_certificate:
     name: production
     state: present
@@ -68,7 +68,7 @@ EXAMPLES = '''
     certificate_chain: "{{ lookup('file', 'chain.cert') }}"
     oauth_token: "{{ oauth_token }}"
 
-- name: remove a certificate
+- name: Remove a certificate
   digital_ocean_certificate:
     name: production
     state: absent

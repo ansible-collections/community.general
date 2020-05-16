@@ -49,20 +49,20 @@ EXAMPLES = '''
 # All the examples assume that you have your Packet API token in env var PACKET_API_TOKEN.
 # You can also pass the api token in module param auth_token.
 
-- name: create sshkey from string
+- name: Create sshkey from string
   hosts: localhost
   tasks:
     packet_sshkey:
       key: "{{ lookup('file', 'my_packet_sshkey.pub') }}"
 
-- name: create sshkey from file
+- name: Create sshkey from file
   hosts: localhost
   tasks:
     packet_sshkey:
       label: key from file
       key_file: ~/ff.pub
 
-- name: remove sshkey by id
+- name: Remove sshkey by id
   hosts: localhost
   tasks:
     packet_sshkey:

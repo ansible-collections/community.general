@@ -147,7 +147,7 @@ author: "Gwenael Pellen (@GwenaelPellenArkeup) <gwenael.pellen@arkeup.com>"
 
 EXAMPLES = '''
 # Usage
-- name: create instance template named foo
+- name: Create instance template named foo
   gce_instance_template:
     name: foo
     size: n1-standard-1
@@ -165,7 +165,7 @@ EXAMPLES = '''
     credentials_file: "/path/to/your-key.json"
     project_id: "your-project-name"
   tasks:
-    - name: create instance template
+    - name: Create instance template
       gce_instance_template:
         name: my-test-instance-template
         size: n1-standard-1
@@ -174,7 +174,7 @@ EXAMPLES = '''
         project_id: "{{ project_id }}"
         credentials_file: "{{ credentials_file }}"
         service_account_email: "{{ service_account_email }}"
-    - name: delete instance template
+    - name: Delete instance template
       gce_instance_template:
         name: my-test-instance-template
         size: n1-standard-1
@@ -192,7 +192,7 @@ EXAMPLES = '''
     credentials_file: "/path/to/your-key.json"
     project_id: "your-project-name"
   tasks:
-    - name: create instance template
+    - name: Create instance template
       gce_instance_template:
         name: foo
         size: n1-standard-1

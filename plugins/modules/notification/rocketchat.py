@@ -101,7 +101,7 @@ EXAMPLES = """
     link_names: 0
   delegate_to: localhost
 
-- name: insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured in rocketchat
+- name: Insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured in rocketchat
   rocketchat:
     token: thetoken/generatedby/rocketchat
     domain: chat.example.com
