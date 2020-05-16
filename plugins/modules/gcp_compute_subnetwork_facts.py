@@ -1,0 +1,1 @@
+cloud/google/gcp_compute_subnetwork_facts.py

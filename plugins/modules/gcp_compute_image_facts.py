@@ -1,0 +1,1 @@
+cloud/google/gcp_compute_image_facts.py

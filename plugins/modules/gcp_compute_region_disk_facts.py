@@ -1,0 +1,1 @@
+cloud/google/gcp_compute_region_disk_facts.py
