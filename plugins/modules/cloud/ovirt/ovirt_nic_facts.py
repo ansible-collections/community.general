@@ -28,9 +28,9 @@ module: ovirt_nic_facts
 short_description: Retrieve information about one or more oVirt/RHV virtual machine network interfaces
 author: "Ondra Machacek (@machacekondra)"
 deprecated:
-    removed_in: "2.10"
+    removed_in: "2.14"
     why: When migrating to collection we decided to use only _info modules.
-    alternative: Use M(ovirt_nic_info) instead
+    alternative: Use C(ovirt_nic_info) from the C(ovirt.ovirt) collection instead
 description:
     - "Retrieve information about one or more oVirt/RHV virtual machine network interfaces."
     - This module was called C(ovirt_nic_facts) before Ansible 2.9, returning C(ansible_facts).
@@ -141,4 +141,4 @@ def main():
 
 
 if __name__ == '__main__':
-    removed_module("2.10")
+    main()

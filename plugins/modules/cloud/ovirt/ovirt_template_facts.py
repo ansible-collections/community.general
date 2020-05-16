@@ -28,9 +28,9 @@ module: ovirt_template_facts
 short_description: Retrieve information about one or more oVirt/RHV templates
 author: "Ondra Machacek (@machacekondra)"
 deprecated:
-    removed_in: "2.10"
+    removed_in: "2.14"
     why: When migrating to collection we decided to use only _info modules.
-    alternative: Use M(ovirt_template_info) instead
+    alternative: Use C(ovirt_template_info) from the C(ovirt.ovirt) collection instead
 description:
     - "Retrieve information about one or more oVirt/RHV templates."
     - This module was called C(ovirt_template_facts) before Ansible 2.9, returning C(ansible_facts).
@@ -122,4 +122,4 @@ def main():
 
 
 if __name__ == '__main__':
-    removed_module("2.10")
+    main()

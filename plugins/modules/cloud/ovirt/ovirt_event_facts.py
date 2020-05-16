@@ -12,9 +12,9 @@ module: ovirt_event_facts
 short_description: This module can be used to retrieve information about one or more oVirt/RHV events
 author: "Chris Keller (@nasx)"
 deprecated:
-    removed_in: "2.10"
+    removed_in: "2.14"
     why: When migrating to collection we decided to use only _info modules.
-    alternative: Use M(ovirt_event_info) instead
+    alternative: Use C(ovirt_event_info) from the C(ovirt.ovirt) collection instead
 description:
     - "Retrieve information about one or more oVirt/RHV events."
     - This module was called C(ovirt_event_facts) before Ansible 2.9, returning C(ansible_facts).
@@ -168,4 +168,4 @@ def main():
 
 
 if __name__ == '__main__':
-    removed_module("2.10")
+    main()
