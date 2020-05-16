@@ -304,7 +304,7 @@ EXAMPLES = """
     archive_compression: gzip
   register: clone_container_info
 
-- name: debug info on container "test-container"
+- name: Debug info on container "test-container"
   debug:
     var: clone_container_info
 

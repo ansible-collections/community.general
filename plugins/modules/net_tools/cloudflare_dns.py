@@ -196,7 +196,7 @@ EXAMPLES = r'''
     account_api_key: dummyapitoken
     state: absent
 
-- name: create a example.net CNAME record to example.com and proxy through Cloudflare's network
+- name: Create a example.net CNAME record to example.com and proxy through Cloudflare's network
   cloudflare_dns:
     zone: example.net
     type: CNAME

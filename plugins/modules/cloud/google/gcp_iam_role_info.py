@@ -88,7 +88,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a role
+- name: Get info on a role
   gcp_iam_role_info:
     project: test_project
     auth_kind: serviceaccount

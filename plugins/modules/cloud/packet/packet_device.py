@@ -131,7 +131,7 @@ EXAMPLES = '''
 
 # Creating devices
 
-- name: create 1 device
+- name: Create 1 device
   hosts: localhost
   tasks:
   - packet_device:
@@ -145,7 +145,7 @@ EXAMPLES = '''
 # ready for other API operations). Fail if the devices in not "active" in
 # 10 minutes.
 
-- name: create device and wait up to 10 minutes for active state
+- name: Create device and wait up to 10 minutes for active state
   hosts: localhost
   tasks:
   - packet_device:
@@ -157,7 +157,7 @@ EXAMPLES = '''
       state: active
       wait_timeout: 600
 
-- name: create 3 ubuntu devices called server-01, server-02 and server-03
+- name: Create 3 ubuntu devices called server-01, server-02 and server-03
   hosts: localhost
   tasks:
   - packet_device:
@@ -171,7 +171,7 @@ EXAMPLES = '''
 - name: Create 3 coreos devices with userdata, wait until they get IPs and then wait for SSH
   hosts: localhost
   tasks:
-  - name: create 3 devices and register their facts
+  - name: Create 3 devices and register their facts
     packet_device:
       hostnames: [coreos-one, coreos-two, coreos-three]
       operating_system: coreos_stable
@@ -198,7 +198,7 @@ EXAMPLES = '''
               command: start
     register: newhosts
 
-  - name: wait for ssh
+  - name: Wait for ssh
     wait_for:
       delay: 1
       host: "{{ item.public_ipv4 }}"
@@ -210,7 +210,7 @@ EXAMPLES = '''
 
 # Other states of devices
 
-- name: remove 3 devices by uuid
+- name: Remove 3 devices by uuid
   hosts: localhost
   tasks:
   - packet_device:

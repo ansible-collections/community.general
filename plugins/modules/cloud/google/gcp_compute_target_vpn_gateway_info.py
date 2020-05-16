@@ -99,7 +99,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a target vpn gateway
+- name: Get info on a target vpn gateway
   gcp_compute_target_vpn_gateway_info:
     region: us-west1
     filters:

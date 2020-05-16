@@ -66,7 +66,7 @@ options:
 
 EXAMPLES = '''
 # Create DNS record for www.domain.com
-- name: create DNS record
+- name: Create DNS record
   memset_zone_record:
     api_key: dcf089a2896940da9ffefb307ef49ccd
     state: present
@@ -79,7 +79,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 # create an SPF record for domain.com
-- name: create SPF record for domain.com
+- name: Create SPF record for domain.com
   memset_zone_record:
     api_key: dcf089a2896940da9ffefb307ef49ccd
     state: present
@@ -89,7 +89,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 # create multiple DNS records
-- name: create multiple DNS records
+- name: Create multiple DNS records
   memset_zone_record:
     api_key: dcf089a2896940da9ffefb307ef49ccd
     zone: "{{ item.zone }}"

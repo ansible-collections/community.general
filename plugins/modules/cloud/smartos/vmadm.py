@@ -288,7 +288,7 @@ requirements:
 '''
 
 EXAMPLES = '''
-- name: create SmartOS zone
+- name: Create SmartOS zone
   vmadm:
     brand: joyent
     state: present

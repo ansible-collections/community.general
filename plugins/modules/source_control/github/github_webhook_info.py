@@ -45,14 +45,14 @@ author:
 '''
 
 EXAMPLES = '''
-- name: list hooks for a repository (password auth)
+- name: List hooks for a repository (password auth)
   github_webhook_info:
     repository: ansible/ansible
     user: "{{ github_user }}"
     password: "{{ github_password }}"
   register: ansible_webhooks
 
-- name: list hooks for a repository on GitHub Enterprise (token auth)
+- name: List hooks for a repository on GitHub Enterprise (token auth)
   github_webhook_info:
     repository: myorg/myrepo
     user: "{{ github_user }}"

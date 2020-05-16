@@ -88,7 +88,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a topic
+- name: Get info on a topic
   gcp_pubsub_topic_info:
     project: test_project
     auth_kind: serviceaccount

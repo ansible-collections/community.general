@@ -60,42 +60,42 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: start dnscache if not running
+- name: Start dnscache if not running
   nosh: name=dnscache state=started
 
-- name: stop mpd, if running
+- name: Stop mpd, if running
   nosh: name=mpd state=stopped
 
-- name: restart unbound or start it if not already running
+- name: Restart unbound or start it if not already running
   nosh:
     name: unbound
     state: restarted
 
-- name: reload fail2ban or start it if not already running
+- name: Reload fail2ban or start it if not already running
   nosh:
     name: fail2ban
     state: reloaded
 
-- name: disable nsd
+- name: Disable nsd
   nosh: name=nsd enabled=no
 
-- name: for package installers, set nginx running state according to local enable settings, preset and reset
+- name: For package installers, set nginx running state according to local enable settings, preset and reset
   nosh: name=nginx preset=True state=reset
 
-- name: reboot the host if nosh is the system manager, would need a "wait_for*" task at least, not recommended as-is
+- name: Reboot the host if nosh is the system manager, would need a "wait_for*" task at least, not recommended as-is
   nosh: name=reboot state=started
 
-- name: using conditionals with the module facts
+- name: Using conditionals with the module facts
   tasks:
-    - name: obtain information on tinydns service
+    - name: Obtain information on tinydns service
       nosh: name=tinydns
       register: result
 
-    - name: fail if service not loaded
+    - name: Fail if service not loaded
       fail: msg="The {{ result.name }} service is not loaded"
       when: not result.status
 
-    - name: fail if service is running
+    - name: Fail if service is running
       fail: msg="The {{ result.name }} service is running"
       when: result.status and result.status['DaemontoolsEncoreState'] == "running"
 '''

@@ -51,11 +51,11 @@ reasons:
 
 EXAMPLES = '''
 # Subscribe to the nginx channel
-- name: subscribe to nginx checks
+- name: Subscribe to nginx checks
   sensu_subscription: name=nginx
 
 # Unsubscribe from the common checks channel
-- name: unsubscribe from common checks
+- name: Unsubscribe from common checks
   sensu_subscription: name=common state=absent
 '''
 

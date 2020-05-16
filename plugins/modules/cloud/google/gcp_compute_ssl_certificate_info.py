@@ -94,7 +94,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a SSL certificate
+- name: Get info on a SSL certificate
   gcp_compute_ssl_certificate_info:
     filters:
     - name = test_object

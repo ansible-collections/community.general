@@ -94,7 +94,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a target SSL proxy
+- name: Get info on a target SSL proxy
   gcp_compute_target_ssl_proxy_info:
     filters:
     - name = test_object

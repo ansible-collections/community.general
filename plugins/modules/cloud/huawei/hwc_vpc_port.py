@@ -106,12 +106,12 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 # create a port
-- name: create vpc
+- name: Create vpc
   hwc_network_vpc:
     cidr: "192.168.100.0/24"
     name: "ansible_network_vpc_test"
   register: vpc
-- name: create subnet
+- name: Create subnet
   hwc_vpc_subnet:
     gateway_ip: "192.168.100.32"
     name: "ansible_network_subnet_test"
@@ -119,7 +119,7 @@ EXAMPLES = '''
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
   register: subnet
-- name: create a port
+- name: Create a port
   hwc_vpc_port:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
