@@ -16,18 +16,18 @@ DOCUMENTATION = '''
         description: Number of tasks to display in the summary
         default: 20
         env:
-          - name: PROFILE_TASKS_TASK_OUTPUT_LIMIT
+          - name: LOGGER_RUNTIME_TASK_OUTPUT_LIMIT
         ini:
-          - section: callback_profile_tasks
+          - section: callback_logger_runtime
             key: task_output_limit
       sort_order:
         description: Adjust the sorting output of summary tasks
         choices: ['descending', 'ascending', 'none']
         default: 'descending'
         env:
-          - name: PROFILE_TASKS_SORT_ORDER
+          - name: LOGGER_RUNTIME_SORT_ORDER
         ini:
-          - section: callback_profile_tasks
+          - section: callback_logger_runtime
             key: sort_order
 '''
 
