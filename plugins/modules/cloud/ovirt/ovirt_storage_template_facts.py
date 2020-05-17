@@ -53,7 +53,7 @@ options:
         description:
             - "The storage domain name where the templates should be listed."
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- community.general._ovirt_info
 
 '''
 
@@ -83,7 +83,7 @@ import traceback
 
 from ansible.module_utils.common.removed import removed_module
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.ovirt.ovirt.plugins.module_utils.ovirt import (
+from ansible_collections.community.general.plugins.module_utils._ovirt import (
     check_sdk,
     create_connection,
     get_dict_of_struct,
