@@ -37,7 +37,7 @@ logging.basicConfig(format='[%(asctime)s] %(process)d %(pathname)s::%(lineno)d -
 
 
 # define start time
-T0 = TN = time.time()*1000
+T0 = TN = time.time() * 1000
 
 
 def timestamp(self):
@@ -45,7 +45,7 @@ def timestamp(self):
     Evalute execution time for individual task
     '''
     if self.current is not None:
-        task_eval = int((time.time()*1000) - self.stats[self.current]['time'])
+        task_eval = int((time.time() * 1000) - self.stats[self.current]['time'])
         self.stats[self.current]['time'] = task_eval
 
 
@@ -54,8 +54,8 @@ def tasktime():
     Evalute execution time for playbook
     '''
     global TN
-    time_total_elapsed = (time.time()*1000) - T0
-    TN = time.time()*1000
+    time_total_elapsed = (time.time() * 1000) - T0
+    TN = time.time() * 1000
     return int(time_total_elapsed)
 
 
@@ -106,7 +106,7 @@ class CallbackModule(CallbackBase):
         timestamp(self)
         # Record the start time of the current task
         self.current = task._uuid
-        self.stats[self.current] = {'time': (time.time()*1000), 'name': task.get_name()}
+        self.stats[self.current] = {'time': (time.time() * 1000), 'name': task.get_name()}
         if self._display.verbosity >= 2:
             self.stats[self.current]['path'] = task.get_path()
 
