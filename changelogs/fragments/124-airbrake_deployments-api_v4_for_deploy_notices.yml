@@ -1,0 +1,8 @@
+bugfixes:
+- "airbrake_deployment - Allow deploy notifications for Airbrake compatible v2 api (e.g. Errbit)"
+
+minor_changes:
+- "airbrake_deployment - Allow passing ``project_id`` and ``project_key`` for v4 api deploy compatibility"
+
+deprecated_features:
+- "airbrake_deployment - Add deprecation notice for ``token`` parameter and v2 api deploys. This feature will be removed in Ansible 2.14"
