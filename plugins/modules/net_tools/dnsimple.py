@@ -121,7 +121,7 @@ EXAMPLES = '''
     state: present
   delegate_to: localhost
 
-- name: change TTL value for a record
+- name: Change TTL value for a record
   dnsimple:
     domain: my.com
     record: ''

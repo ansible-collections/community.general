@@ -99,7 +99,7 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: get info on a target pool
+- name: Get info on a target pool
   gcp_compute_target_pool_info:
     region: us-west1
     filters:

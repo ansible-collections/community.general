@@ -81,7 +81,7 @@ EXAMPLES = '''
         state: absent
       register: policy
 
-    - name: debug
+    - name: Debug
       debug:
         var: policy
 '''
