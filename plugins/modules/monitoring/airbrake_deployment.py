@@ -129,7 +129,7 @@ def main():
         if module.params["revision"]:
             params["deploy[scm_revision]"] = module.params["revision"]
 
-        module.deprecate("Parameter 'token' is deprecated in 2.10. Please remove it and use 'project_id' and 'project_key' instead", version='2.12')
+        module.deprecate("Parameter 'token' is deprecated in 2.10. Please remove it and use 'project_id' and 'project_key' instead", version='2.14')
 
         params["api_key"] = module.params["token"]
 
