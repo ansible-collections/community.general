@@ -1,1 +1,0 @@
-cloud/google/gcp_sql_user_facts.py

@@ -1,1 +1,0 @@
-cloud/google/gcp_sql_instance_facts.py

@@ -1,1 +1,0 @@
-cloud/google/gcp_spanner_database_facts.py

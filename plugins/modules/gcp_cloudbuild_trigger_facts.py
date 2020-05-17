@@ -1,1 +1,0 @@
-cloud/google/gcp_cloudbuild_trigger_facts.py

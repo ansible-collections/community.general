@@ -1,1 +1,0 @@
-cloud/google/gcp_bigquery_table_facts.py

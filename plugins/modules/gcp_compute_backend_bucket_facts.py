@@ -1,1 +1,0 @@
-cloud/google/gcp_compute_backend_bucket_facts.py
