@@ -11,23 +11,31 @@ from ansible.plugins.callback import CallbackBase
 
 
 DOCUMENTATION = '''
+    callback: logger_runtime
+    type: aggregate
+    short_description: adds time information to tasks
+    version_added: "2.0"
+    description:
+      - Ansible callback plugin for timing individual tasks and overall execution time.
+    requirements:
+      - whitelisting in configuration.
     options:
       output_limit:
         description: Number of tasks to display in the summary
         default: 20
         env:
-          - name: PROFILE_TASKS_TASK_OUTPUT_LIMIT
+          - name: LOGGER_RUNTIME_TASK_OUTPUT_LIMIT
         ini:
-          - section: callback_profile_tasks
+          - section: callback_logger_runtime
             key: task_output_limit
       sort_order:
         description: Adjust the sorting output of summary tasks
         choices: ['descending', 'ascending', 'none']
         default: 'descending'
         env:
-          - name: PROFILE_TASKS_SORT_ORDER
+          - name: LOGGER_RUNTIME_SORT_ORDER
         ini:
-          - section: callback_profile_tasks
+          - section: callback_logger_runtime
             key: sort_order
 '''
 
