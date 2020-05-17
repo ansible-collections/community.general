@@ -50,7 +50,7 @@ options:
       description:
         - "Name of the host, which affinity labels should be listed."
 extends_documentation_fragment:
-- community.general._ovirt_info
+- community.general.ovirt_facts
 
 '''
 

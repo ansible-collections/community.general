@@ -48,7 +48,7 @@ options:
         description:
             - "Name of the quota, can be used as glob expression."
 extends_documentation_fragment:
-- community.general._ovirt_info
+- community.general.ovirt_facts
 
 '''
 

@@ -45,7 +45,7 @@ options:
         - "Search term which is accepted by oVirt/RHV search backend."
         - "For example to search group X use following pattern: name=X"
 extends_documentation_fragment:
-- community.general._ovirt_info
+- community.general.ovirt_facts
 
 '''
 

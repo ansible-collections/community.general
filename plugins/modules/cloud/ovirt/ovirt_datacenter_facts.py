@@ -30,7 +30,7 @@ options:
         - "Search term which is accepted by oVirt/RHV search backend."
         - "For example to search datacenter I(X) use following pattern: I(name=X)"
 extends_documentation_fragment:
-- community.general._ovirt_info
+- community.general.ovirt_facts
 
 '''
 

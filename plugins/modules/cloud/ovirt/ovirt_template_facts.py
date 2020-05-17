@@ -46,7 +46,7 @@ options:
         - "For example to search template X from datacenter Y use following pattern:
            name=X and datacenter=Y"
 extends_documentation_fragment:
-- community.general._ovirt_info
+- community.general.ovirt_facts
 
 '''
 

@@ -58,7 +58,7 @@ options:
                 description:
                   - "LUN id."
 extends_documentation_fragment:
-- community.general._ovirt_info
+- community.general.ovirt_facts
 
 '''
 

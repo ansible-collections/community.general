@@ -53,7 +53,7 @@ options:
         description:
             - "The storage domain name where the virtual machines should be listed."
 extends_documentation_fragment:
-- community.general._ovirt_info
+- community.general.ovirt_facts
 
 '''
 

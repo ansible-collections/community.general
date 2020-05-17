@@ -25,7 +25,7 @@ notes:
        which contains a information about oVirt/RHV API. You need to register the result with
        the I(register) keyword to use it."
 extends_documentation_fragment:
-- community.general._ovirt_info
+- community.general.ovirt_facts
 
 '''
 

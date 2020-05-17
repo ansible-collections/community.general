@@ -49,7 +49,7 @@ options:
         description:
             - "Name of the external provider, can be used as glob expression."
 extends_documentation_fragment:
-- community.general._ovirt_info
+- community.general.ovirt_facts
 
 '''
 
