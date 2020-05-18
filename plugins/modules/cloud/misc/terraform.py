@@ -252,23 +252,10 @@ def _workspace_cmd(bin_path, project_path, action, workspace):
 def create_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'new', workspace)
 
-#ERROR HANDLER FOR CREATE WORKSPACE
-# try:
-#   create_workspace()
-# except AssertionError as error:
-#   print(error)
-#   print('Error on create workspace')    
-
 
 def select_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'select', workspace)
 
-#ERROR HANDLER FOR SELECT WORKSPACE
-# try:
-#   select_workspace()
-# except AssertionError as error:
-#   print(error)
-#   print('Error on select workspace') 
 
 def remove_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'delete', workspace)
@@ -430,8 +417,6 @@ def main():
 
     module.exit_json(changed=changed, state=state, workspace=workspace, outputs=outputs, stdout=out, stderr=err, command=' '.join(command))
 
-
-#ERROR HANDLER FOR CREATE WORKSPACE
 try:
   main()
 except Exception as e:
