@@ -93,6 +93,12 @@ options:
     type: list
     elements: path
     version_added: '0.2.0'
+  check_deletes:
+    description:
+      - Check and apply only when there are no deletes to resources
+    type: bool
+    default: false
+    version_added: '0.2.0'
 notes:
    - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]
@@ -287,6 +293,7 @@ def main():
             force_init=dict(type='bool', default=False),
             backend_config=dict(type='dict', default=None),
             backend_config_files=dict(type='list', elements='path', default=None),
+            check_deletes=dict(type='bool', default=False)
         ),
         required_if=[('state', 'planned', ['plan_file'])],
         supports_check_mode=True,
@@ -304,6 +311,7 @@ def main():
     force_init = module.params.get('force_init')
     backend_config = module.params.get('backend_config')
     backend_config_files = module.params.get('backend_config_files')
+    check_deletes = module.params.get('check_deletes')
 
     if bin_path is not None:
         command = [bin_path]
@@ -334,6 +342,13 @@ def main():
     if variables_files:
         for f in variables_files:
             variables_args.extend(['-var-file', f])
+
+    if state == 'present' and check_deletes is True:
+        plan_file, needs_application, out, err, command = build_plan(command, project_path, variables_args, state_file,
+                                                                     module.params.get('targets'), state, plan_file)
+        if '- destroy' in out:
+            module.fail_json(msg="Aborting command because it would result in the deletion of resource."
+                             "Consider switching the 'check_deletes' to false to suppress this error")
 
     preflight_validation(command[0], project_path, variables_args)
 
