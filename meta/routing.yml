@@ -316,6 +316,10 @@ plugin_routing:
       deprecation:
         removal_date: TBD
         warning_text: see plugin documentation for details
+    helm:
+      deprecation:
+        removal_date: TBD
+        warning_text: The helm module in community.general has been deprecated. Use community.kubernetes.helm instead.
     memset_memstore_facts:
       deprecation:
         removal_date: TBD
