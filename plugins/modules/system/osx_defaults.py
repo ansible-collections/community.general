@@ -229,8 +229,8 @@ class OSXDefaults(object):
         value.pop(0)
         value.pop(-1)
 
-        # Remove extra spaces and comma (,) at the end of values
-        value = [re.sub(',$', '', x.strip(' ')) for x in value]
+        # Remove spaces at beginning and comma (,) at the end, unquote and unescape double quotes
+        value = [re.sub('^ *"?|"?,?$', '', x.replace('\\"', '"')) for x in value]
 
         return value
 

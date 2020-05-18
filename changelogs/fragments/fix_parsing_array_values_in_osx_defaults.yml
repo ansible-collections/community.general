@@ -1,0 +1,2 @@
+bugfixes:
+  - Unquote values and unescape double quotes when reading array values from osx defaults.
