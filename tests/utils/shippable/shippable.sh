@@ -75,7 +75,6 @@ retry ansible-galaxy -vvv collection install community.crypto
 retry git clone https://github.com/ansible-collections/community.internal_test_tools.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/internal_test_tools"
 retry ansible-galaxy -vvv collection install community.kubernetes
 retry ansible-galaxy -vvv collection install google.cloud
-retry ansible-galaxy -vvv collection install ovirt.ovirt
 
 # END: HACK
 

@@ -28,9 +28,9 @@ module: ovirt_permission_facts
 short_description: Retrieve information about one or more oVirt/RHV permissions
 author: "Ondra Machacek (@machacekondra)"
 deprecated:
-    removed_in: "2.10"
+    removed_in: "2.14"
     why: When migrating to collection we decided to use only _info modules.
-    alternative: Use M(ovirt_permission_info) instead
+    alternative: Use C(ovirt_permission_info) from the C(ovirt.ovirt) collection instead
 description:
     - "Retrieve information about one or more oVirt/RHV permissions."
     - This module was called C(ovirt_permission_facts) before Ansible 2.9, returning C(ansible_facts).
@@ -56,7 +56,7 @@ options:
             - "Namespace of the authorization provider, where user/group resides."
         required: false
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- community.general.ovirt_facts
 
 '''
 
@@ -92,7 +92,7 @@ except ImportError:
 
 from ansible.module_utils.common.removed import removed_module
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.ovirt.ovirt.plugins.module_utils.ovirt import (
+from ansible_collections.community.general.plugins.module_utils._ovirt import (
     check_sdk,
     create_connection,
     get_link_name,
@@ -164,4 +164,4 @@ def main():
 
 
 if __name__ == '__main__':
-    removed_module("2.10")
+    main()
