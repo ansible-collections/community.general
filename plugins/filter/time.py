@@ -56,13 +56,6 @@ def multiply(factors):
     return result
 
 
-def divide(divisors):
-    result = 1
-    for divisor in divisors:
-        result = result / divisor
-    return result
-
-
 def to_time_unit(human_time, unit='ms'):
     ''' Return a time unit from a human readable string '''
     unit = UNIT_TO_SHORT_FORM.get(unit, unit)
@@ -87,7 +80,7 @@ def to_time_unit(human_time, unit='ms'):
 
         time_in_milliseconds = h_time_int * multiply(UNIT_FACTORS[h_time_unit])
         result += time_in_milliseconds
-    return round(result * divide(UNIT_FACTORS[unit]), 12)
+    return round(result / multiply(UNIT_FACTORS[unit]), 12)
 
 
 def to_milliseconds(human_time):
