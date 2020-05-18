@@ -13,6 +13,11 @@ else
     base_branch=""
 fi
 
+if [ "${group}" == "extra" ]; then
+    ../internal_test_tools/tools/run.py --color
+    exit
+fi
+
 case "${group}" in
     1) options=(--skip-test pylint --skip-test ansible-doc --skip-test validate-modules) ;;
     2) options=(                   --test      ansible-doc      --test validate-modules) ;;
