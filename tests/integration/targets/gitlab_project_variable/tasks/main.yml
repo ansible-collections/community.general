@@ -421,8 +421,8 @@
     api_token: "{{ gitlab_login_token }}"
     project: "{{ gitlab_project_name }}"
     vars:
-      my_file:
-        value: my_file_value
+      my_test_var:
+        value: my_test_value
         variable_type: file
     purge: False
   register: gitlab_project_variable_state
@@ -435,7 +435,7 @@
       - gitlab_project_variable_state.project_variable.untouched|length == 0
       - gitlab_project_variable_state.project_variable.removed|length == 0
       - gitlab_project_variable_state.project_variable.updated|length == 0
-      - gitlab_project_variable_state.project_variable.added[0] == "my_file"
+      - gitlab_project_variable_state.project_variable.added[0] == "my_test_var"
 
 - name: change variable_type attribute
   gitlab_project_variable:
@@ -443,8 +443,8 @@
     api_token: "{{ gitlab_login_token }}"
     project: "{{ gitlab_project_name }}"
     vars:
-      my_file:
-        value: my_file_value
+      my_test_var:
+        value: my_test_value
         variable_type: env_var
   register: gitlab_project_variable_state
 
@@ -459,8 +459,8 @@
     api_token: "{{ gitlab_login_token }}"
     project: "{{ gitlab_project_name }}"
     vars:
-      my_file:
-        value: my_file_value
+      my_test_var:
+        value: my_test_value
         variable_type: file
   register: gitlab_project_variable_state
 
@@ -476,7 +476,7 @@
     project: "{{ gitlab_project_name }}"
     state: absent
     vars:
-      my_file: my_file_value
+      my_test_var: my_test_value
   register: gitlab_project_variable_state
 
 - name: no variable is left state must be changed
@@ -487,7 +487,7 @@
       - gitlab_project_variable_state.project_variable.untouched|length == 0
       - gitlab_project_variable_state.project_variable.removed|length == 1
       - gitlab_project_variable_state.project_variable.updated|length == 0
-      - gitlab_project_variable_state.project_variable.removed[0] == "my_file"
+      - gitlab_project_variable_state.project_variable.removed[0] == "my_test_var"
 
 - name: check that no variables are left
   gitlab_project_variable:
