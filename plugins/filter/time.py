@@ -66,9 +66,12 @@ def to_time_unit(human_time, unit='ms', **kwargs):
 
     unit_factors = UNIT_FACTORS
     if 'year' in kwargs:
-        unit_factors['y'] = unit_factors['y'][:-1] + [kwargs['year']]
+        unit_factors['y'] = unit_factors['y'][:-1] + [kwargs.pop('year')]
     if 'month' in kwargs:
-        unit_factors['mo'] = unit_factors['mo'][:-1] + [kwargs['month']]
+        unit_factors['mo'] = unit_factors['mo'][:-1] + [kwargs.pop('month')]
+
+    if kwargs:
+        raise AnsibleFilterError('to_time_unit() got unknown keyword arguments: %s'.format(', '.join(kwargs.keys())))
 
     result = 0
     for h_time_string in human_time.split():

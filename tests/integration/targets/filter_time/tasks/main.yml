@@ -85,3 +85,15 @@
     that:
       - res is failed
       - "'to_time_unit() can not interpret following string' in res.msg"
+
+- name: test fail unknown kwarg
+  debug:
+    msg: "{{ '1s' | community.general.to_time_unit('s', second=23) }}"
+  ignore_errors: yes
+  register: res
+
+- name: test fail unknown kwarg
+  assert:
+    that:
+      - res is failed
+      - "'to_time_unit() got unknown keyword arguments' in res.msg"
