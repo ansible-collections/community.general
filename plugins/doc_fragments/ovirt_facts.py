@@ -11,10 +11,6 @@ class ModuleDocFragment(object):
 
     # info standard oVirt documentation fragment
     DOCUMENTATION = r'''
-deprecated:
-    removed_in: "2.10"
-    why: When migrating to collection we decided to use only _info modules.
-    alternative: Use M(ovirt_info) instead
 options:
     fetch_nested:
         description:
