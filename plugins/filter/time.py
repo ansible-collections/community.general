@@ -71,7 +71,7 @@ def to_time_unit(human_time, unit='ms', **kwargs):
         unit_factors['mo'] = unit_factors['mo'][:-1] + [kwargs.pop('month')]
 
     if kwargs:
-        raise AnsibleFilterError('to_time_unit() got unknown keyword arguments: %s'.format(', '.join(kwargs.keys())))
+        raise AnsibleFilterError('to_time_unit() got unknown keyword arguments: %s' % ', '.join(kwargs.keys()))
 
     result = 0
     for h_time_string in human_time.split():
