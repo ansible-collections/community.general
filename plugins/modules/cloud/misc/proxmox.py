@@ -129,6 +129,15 @@ options:
       - Indicate if the container should be unprivileged
     type: bool
     default: 'no'
+  description:
+    description:
+      - Specify the description for the container. Only used on the configuration web interface.
+      - This is saved as a comment inside the configuration file.
+    type: str
+  hookscript:
+    description:
+      - Script that will be executed during various steps in the containers lifetime.
+    type: str
 
 notes:
   - Requires proxmoxer and requests modules on host. This modules can be installed with pip.
@@ -147,6 +156,19 @@ EXAMPLES = r'''
     password: 123456
     hostname: example.org
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
+
+- name: Create new container with hookscript and description
+  proxmox:
+    vmid: 100
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    password: 123456
+    hostname: example.org
+    ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
+    hookscript: 'local:snippets/vm_hook.sh'
+    description: created with ansible
 
 - name: Create new container automatically selecting the next available vmid.
   proxmox:
@@ -443,7 +465,9 @@ def main():
             force=dict(type='bool', default='no'),
             state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted']),
             pubkey=dict(type='str', default=None),
-            unprivileged=dict(type='bool', default='no')
+            unprivileged=dict(type='bool', default='no'),
+            description=dict(type='str'),
+            hookscript=dict(type='str'),
         )
     )
 
@@ -524,7 +548,9 @@ def main():
                             searchdomain=module.params['searchdomain'],
                             force=int(module.params['force']),
                             pubkey=module.params['pubkey'],
-                            unprivileged=int(module.params['unprivileged']))
+                            unprivileged=int(module.params['unprivileged']),
+                            description=module.params['description'],
+                            hookscript=module.params['hookscript'])
 
             module.exit_json(changed=True, msg="deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
         except Exception as e:
