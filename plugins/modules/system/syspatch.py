@@ -6,26 +6,25 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: syspatch
 
-short_description: Manage OpenBSD system patches
+short_description: Manage OpenBSD system patches.
 
 
 description:
-    - "Manage OpenBSD system patches using syspatch"
+    - "Manage OpenBSD system patches using syspatch."
 
 options:
     apply:
         description:
-            - Apply all available system patches
-        default: False
-        required: false
+            - Apply all available system patches.
+            - By default, apply all patches.
+        default: yes
     revert:
         description:
-            - Revert system patches
-        required: false
+            - Revert system patches.
         type: str
         choices: [ all, one ]
 
@@ -63,17 +62,17 @@ rc:
   returned: always
   type: int
 stdout:
-  description: syspatch standard output
+  description: syspatch standard output.
   returned: always
   type: str
   sample: "001_rip6cksum"
 stderr:
-  description: syspatch standard error
+  description: syspatch standard error.
   returned: always
   type: str
   sample: "syspatch: need root privileges"
 reboot_needed:
-  description: Whether or not a reboot is required after an update
+  description: Whether or not a reboot is required after an update.
   returned: always
   type: bool
   sample: True
@@ -85,7 +84,7 @@ from ansible.module_utils.basic import AnsibleModule
 def run_module():
     # define available arguments/parameters a user can pass to the module
     module_args = dict(
-        apply=dict(type='bool'),
+        apply=dict(type='bool', default=True),
         revert=dict(type='str', choices=['all', 'one'])
     )
 
@@ -142,10 +141,10 @@ def syspatch_run(module):
         # http://openbsd-archive.7691.n7.nabble.com/Warning-applying-latest-syspatch-td354250.html
         if rc != 0 and err != 'ln: /usr/X11R6/bin/X: No such file or directory\n':
             module.fail_json(msg="Command %s failed rc=%d, out=%s, err=%s" % (cmd, rc, out, err))
-        elif out.lower().find('create unique kernel') > 0:
+        elif out.lower().find('create unique kernel') >= 0:
             # Kernel update applied
             reboot_needed = True
-        elif out.lower().find('syspatch updated itself') > 0:
+        elif out.lower().find('syspatch updated itself') >= 0:
             warnings.append('Syspatch was updated. Please run syspatch again.')
 
         # If no stdout, then warn user
