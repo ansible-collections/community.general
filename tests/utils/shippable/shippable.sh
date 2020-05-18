@@ -71,7 +71,8 @@ retry ansible-galaxy -vvv collection install ansible.posix
 # https://github.com/CiscoDevNet/ansible-intersight/issues/9
 retry ansible-galaxy -vvv collection install cisco.intersight:1.0.4
 retry ansible-galaxy -vvv collection install community.crypto
-retry ansible-galaxy -vvv collection install community.internal_test_tools
+# retry ansible-galaxy -vvv collection install community.internal_test_tools - we need git checkout until 0.2.0 has been released
+retry git clone https://github.com/ansible-collections/community.internal_test_tools.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/internal_test_tools"
 retry ansible-galaxy -vvv collection install community.kubernetes
 retry ansible-galaxy -vvv collection install google.cloud
 retry ansible-galaxy -vvv collection install ovirt.ovirt
