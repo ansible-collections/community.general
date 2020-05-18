@@ -1,0 +1,6 @@
+dictdiffer
+jinja2
+kubernetes ~= 11.0
+python-string-utils
+ruamel.yaml >= 0.15
+six

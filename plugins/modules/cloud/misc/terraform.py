@@ -147,11 +147,17 @@ command:
   returned: always
   sample: terraform apply ...
 """
-
+ 
 import os
 import json
 import tempfile
 import traceback
+import time
+import csv
+import logging
+
+from datetime import datetime
+from io import StringIO
 from ansible.module_utils.six.moves import shlex_quote
 
 from ansible.module_utils.basic import AnsibleModule
@@ -160,8 +166,15 @@ DESTROY_ARGS = ('destroy', '-no-color', '-force')
 APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve=true')
 module = None
 
+logging.basicConfig(filename='error.log',level=logging.INFO)
 
-def preflight_validation(bin_path, project_path, variables_args=None, plan_file=None):
+
+current_DateTime = datetime.now().strftime("%d/%m/%Y %H:%M:$S")
+
+def preflight_validation(bin_path, project_path, variables_args=None, plan_file=None):   
+    dir_name = "errors"
+    file_name = "errors.csv"
+    full_path = dir_name+"/"+file_name
     if project_path in [None, ''] or '/' not in project_path:
         module.fail_json(msg="Path for Terraform project can not be None or ''.")
     if not os.path.exists(bin_path):
@@ -170,17 +183,28 @@ def preflight_validation(bin_path, project_path, variables_args=None, plan_file=
         module.fail_json(msg="Path for Terraform project '{0}' doesn't exist on this host - check the path and try again please.".format(project_path))
 
     rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, cwd=project_path, use_unsafe_shell=True)
-    if rc != 0:
-        module.fail_json(msg="Failed to validate Terraform configuration files:\r\n{0}".format(err))
-
-
+    if rc != 0:      
+      if not os.path.exists(dir_name):
+        os.mkdir(dir_name)
+        if not os.path.exists(file_name):
+          with open(full_path, 'w+') as file_m:
+            writer = csv.writer(file_m, delimiter=',')          
+            writer.writerow(StringIO("ERROR RECORDED on "+ current_DateTime +'\r\n'  + err))
+      elif os.path.exists(full_path):
+        with open(full_path, 'a+', newline='') as file_op:
+          writer = csv.writer(file_op, delimiter=',')
+          writer.writerow(StringIO("ERROR RECORDED on "+ current_DateTime + '\r\n' + err))
+      module.fail_json(msg="Failed to validate Terraform configuration files:\r\n{0}".format(err))    
+      
 def _state_args(state_file):
-    if state_file and os.path.exists(state_file):
-        return ['-state', state_file]
-    if state_file and not os.path.exists(state_file):
-        module.fail_json(msg='Could not find state_file "{0}", check the path and try again.'.format(state_file))
-    return []
-
+  try:
+      if state_file and os.path.exists(state_file):
+          return ['-state', state_file]
+      if state_file and not os.path.exists(state_file):
+          module.fail_json(msg='Could not find state_file "{0}", check the path and try again.'.format(state_file))
+      return []
+  except Exception as e:
+    print(e)
 
 def init_plugins(bin_path, project_path, backend_config):
     command = [bin_path, 'init', '-input=false']
@@ -196,6 +220,7 @@ def init_plugins(bin_path, project_path, backend_config):
 
 
 def get_workspace_context(bin_path, project_path):
+  try:
     workspace_ctx = {"current": "default", "all": []}
     command = [bin_path, 'workspace', 'list', '-no-color']
     rc, out, err = module.run_command(command, cwd=project_path)
@@ -210,29 +235,47 @@ def get_workspace_context(bin_path, project_path):
         else:
             workspace_ctx["all"].append(stripped_item)
     return workspace_ctx
+  except Exception as e:
+    print (e)  
 
 
 def _workspace_cmd(bin_path, project_path, action, workspace):
+  try:
     command = [bin_path, 'workspace', action, workspace, '-no-color']
     rc, out, err = module.run_command(command, cwd=project_path)
     if rc != 0:
         module.fail_json(msg="Failed to {0} workspace:\r\n{1}".format(action, err))
     return rc, out, err
-
+  except Exception as e:
+    print(e)
 
 def create_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'new', workspace)
+
+#ERROR HANDLER FOR CREATE WORKSPACE
+# try:
+#   create_workspace()
+# except AssertionError as error:
+#   print(error)
+#   print('Error on create workspace')    
 
 
 def select_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'select', workspace)
 
+#ERROR HANDLER FOR SELECT WORKSPACE
+# try:
+#   select_workspace()
+# except AssertionError as error:
+#   print(error)
+#   print('Error on select workspace') 
 
 def remove_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'delete', workspace)
 
 
 def build_plan(command, project_path, variables_args, state_file, targets, state, plan_path=None):
+  try:
     if plan_path is None:
         f, plan_path = tempfile.mkstemp(suffix='.tfplan')
 
@@ -256,7 +299,8 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
         return plan_path, True, out, err, plan_command if state == 'planned' else command
 
     module.fail_json(msg='Terraform plan failed with unexpected exit code {0}. \r\nSTDOUT: {1}\r\n\r\nSTDERR: {2}'.format(rc, out, err))
-
+  except Exception as e:
+    print(e)
 
 def main():
     global module
@@ -308,6 +352,7 @@ def main():
         else:
             select_workspace(command[0], project_path, workspace)
 
+    #APPLYING PRESENT AND ABSENT
     if state == 'present':
         command.extend(APPLY_ARGS)
     elif state == 'absent':
@@ -324,6 +369,7 @@ def main():
 
     preflight_validation(command[0], project_path, variables_args)
 
+    #LOCK MODULE
     if module.params.get('lock') is not None:
         if module.params.get('lock'):
             command.append('-lock=true')
@@ -383,6 +429,14 @@ def main():
         remove_workspace(command[0], project_path, workspace)
 
     module.exit_json(changed=changed, state=state, workspace=workspace, outputs=outputs, stdout=out, stderr=err, command=' '.join(command))
+
+
+#ERROR HANDLER FOR CREATE WORKSPACE
+try:
+  main()
+except Exception as e:
+  logging.error('Error occurred '+ str(e))
+  print('Error on occurred ', str(e))  
 
 
 if __name__ == '__main__':
