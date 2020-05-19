@@ -88,6 +88,28 @@ parted_dict2 = {
     "partitions": []
 }
 
+# fake some_flag exists
+parted_dict3 = {
+    "generic": {
+        "dev": "/dev/sdb",
+        "size": 286061.0,
+        "unit": "mb",
+        "table": "msdos",
+        "model": "ATA TOSHIBA THNSFJ25",
+        "logical_block": 512,
+        "physical_block": 512
+    },
+    "partitions": [{
+        "num": 1,
+        "begin": 1.05,
+        "end": 106.0,
+        "size": 105.0,
+        "fstype": "fat32",
+        "name": '',
+        "flags": ["some_flag"],
+        "unit": "mb"
+    }]
+}
 
 class TestParted(ModuleTestCase):
     def setUp(self):
@@ -239,3 +261,29 @@ class TestParted(ModuleTestCase):
         })
         with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict2):
             self.execute_module(changed=True, script='unit KiB mklabel gpt mkpart primary 0% 100% unit KiB name 1 \'"lvmpartition"\' set 1 lvm on')
+
+    def test_check_mode_unchanged(self):
+        # Test that get_device_info result is checked in check mode too
+        # No change on partition 1
+        set_module_args({
+            'device': '/dev/sdb',
+            'number': 1,
+            'state': 'present',
+            'flags': ['some_flag'],
+            '_ansible_check_mode': True,
+        })
+        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict3):
+            self.execute_module(changed=False)
+
+    def test_check_mode_changed(self):
+        # Test that get_device_info result is checked in check mode too
+        # Flag change on partition 1
+        set_module_args({
+            'device': '/dev/sdb',
+            'number': 1,
+            'state': 'present',
+            'flags': ['other_flag'],
+            '_ansible_check_mode': True,
+        })
+        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict3):
+            self.execute_module(changed=True)
