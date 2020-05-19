@@ -59,7 +59,7 @@
     when: docker_inspect is not failed
   - assert:
       that:
-         - "'is too new. Maximum supported API version is' in docker_inspect.stderr"
+        - "'is too new. Maximum supported API version is' in docker_inspect.stderr"
     when: docker_inspect is failed
 
   always:
