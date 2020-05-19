@@ -48,7 +48,12 @@ import requests
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
-from ansible_collections.google.cloud.plugins.module_utils.gcp_utils import navigate_hash, GcpSession
+
+try:
+    from ansible_collections.google.cloud.plugins.module_utils.gcp_utils import navigate_hash, GcpSession
+    HAS_GOOGLE_CLOUD_COLLECTION = True
+except ImportError:
+    HAS_GOOGLE_CLOUD_COLLECTION = False
 
 
 display = Display()
@@ -135,4 +140,6 @@ class GcpFileLookup():
 
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
+        if not HAS_GOOGLE_CLOUD_COLLECTION:
+            raise AnsibleError("community.general.gcp_storage_files needs a supported version of the google.cloud collection installed")
         return GcpFileLookup().run(terms, variables=variables, **kwargs)
