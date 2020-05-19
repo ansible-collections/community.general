@@ -1,0 +1,2 @@
+bugfixes:
+- "gcp_storage_file lookup - die gracefully when the ``google.cloud`` collection is not installed, or changed in an incompatible way."
