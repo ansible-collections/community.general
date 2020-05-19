@@ -53,6 +53,7 @@
     - nginx.conf
     - nginx.htpasswd
     register: can_copy_files
+    ignore_errors: yes
   - block:
     - name: Create private key for frontend certificate
       community.crypto.openssl_privatekey:
