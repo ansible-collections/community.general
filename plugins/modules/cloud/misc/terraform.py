@@ -172,9 +172,7 @@ logging.basicConfig(filename='error.log',level=logging.INFO)
 current_DateTime = datetime.now().strftime("%d/%m/%Y %H:%M:$S")
 
 def preflight_validation(bin_path, project_path, log_error_path, variables_args=None, plan_file=None):   
-    dir_name = log_error_path
-    # file_name = "errors.csv"
-    # full_path = dir_name+"/"+file_name
+    dir_name = log_error_path    
     if project_path in [None, ''] or '/' not in project_path:
         module.fail_json(msg="Path for Terraform project can not be None or ''.")
     if not os.path.exists(bin_path):
@@ -183,15 +181,7 @@ def preflight_validation(bin_path, project_path, log_error_path, variables_args=
         module.fail_json(msg="Path for Terraform project '{0}' doesn't exist on this host - check the path and try again please.".format(project_path))
 
     rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, cwd=project_path, use_unsafe_shell=True)
-    if rc != 0: 
-      #condition     
-      # if not os.path.exists(dir_name):
-      #   os.mkdir(dir_name)
-      #   if not os.path.exists(file_name):
-      #     with open(full_path, 'w+') as file_m:
-      #       writer = csv.writer(file_m, delimiter=',')          
-      #       writer.writerow(StringIO("ERROR RECORDED on "+ current_DateTime +'\r\n'  + err))
-      # elif os.path.exists(full_path):
+    if rc != 0:      
       with open(dir_name, 'a+', newline='') as file_op:
         writer = csv.writer(file_op)
         writer.writerow(StringIO("ERROR RECORDED on "+ current_DateTime + '\r\n' + err))
