@@ -1939,8 +1939,6 @@ tests/unit/plugins/module_utils/conftest.py future-import-boilerplate
 tests/unit/plugins/module_utils/conftest.py metaclass-boilerplate
 tests/unit/plugins/module_utils/gcp/test_auth.py future-import-boilerplate
 tests/unit/plugins/module_utils/gcp/test_auth.py metaclass-boilerplate
-tests/unit/plugins/module_utils/gcp/test_gcp_utils.py future-import-boilerplate
-tests/unit/plugins/module_utils/gcp/test_gcp_utils.py metaclass-boilerplate
 tests/unit/plugins/module_utils/gcp/test_utils.py future-import-boilerplate
 tests/unit/plugins/module_utils/gcp/test_utils.py metaclass-boilerplate
 tests/unit/plugins/module_utils/hwc/test_dict_comparison.py future-import-boilerplate
