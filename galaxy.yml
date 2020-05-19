@@ -5,7 +5,6 @@ readme: README.md
 authors:
   - Ansible (https://github.com/ansible)
 description: null
-license: GPL-3.0-or-later
 license_file: COPYING
 tags: null
 # NOTE: No more dependencies can be added to this list
