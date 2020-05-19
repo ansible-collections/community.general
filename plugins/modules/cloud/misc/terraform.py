@@ -171,10 +171,10 @@ logging.basicConfig(filename='error.log',level=logging.INFO)
 
 current_DateTime = datetime.now().strftime("%d/%m/%Y %H:%M:$S")
 
-def preflight_validation(bin_path, project_path, variables_args=None, plan_file=None):   
-    dir_name = "errors"
-    file_name = "errors.csv"
-    full_path = dir_name+"/"+file_name
+def preflight_validation(bin_path, project_path, log_error_path, variables_args=None, plan_file=None):   
+    dir_name = log_error_path
+    # file_name = "errors.csv"
+    # full_path = dir_name+"/"+file_name
     if project_path in [None, ''] or '/' not in project_path:
         module.fail_json(msg="Path for Terraform project can not be None or ''.")
     if not os.path.exists(bin_path):
@@ -183,18 +183,33 @@ def preflight_validation(bin_path, project_path, variables_args=None, plan_file=
         module.fail_json(msg="Path for Terraform project '{0}' doesn't exist on this host - check the path and try again please.".format(project_path))
 
     rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, cwd=project_path, use_unsafe_shell=True)
-    if rc != 0:      
-      if not os.path.exists(dir_name):
-        os.mkdir(dir_name)
-        if not os.path.exists(file_name):
-          with open(full_path, 'w+') as file_m:
-            writer = csv.writer(file_m, delimiter=',')          
-            writer.writerow(StringIO("ERROR RECORDED on "+ current_DateTime +'\r\n'  + err))
-      elif os.path.exists(full_path):
-        with open(full_path, 'a+', newline='') as file_op:
-          writer = csv.writer(file_op, delimiter=',')
-          writer.writerow(StringIO("ERROR RECORDED on "+ current_DateTime + '\r\n' + err))
+    if rc != 0: 
+      #condition     
+      # if not os.path.exists(dir_name):
+      #   os.mkdir(dir_name)
+      #   if not os.path.exists(file_name):
+      #     with open(full_path, 'w+') as file_m:
+      #       writer = csv.writer(file_m, delimiter=',')          
+      #       writer.writerow(StringIO("ERROR RECORDED on "+ current_DateTime +'\r\n'  + err))
+      # elif os.path.exists(full_path):
+      with open(dir_name, 'a+', newline='') as file_op:
+        writer = csv.writer(file_op)
+        writer.writerow(StringIO("ERROR RECORDED on "+ current_DateTime + '\r\n' + err))
       module.fail_json(msg="Failed to validate Terraform configuration files:\r\n{0}".format(err))    
+
+
+def create_error_file_and_directory(log_error_path):
+  error_directory_name, error_file_name = os.path.split(log_error_path)
+  if not os.path.exists(error_directory_name):
+    os.makedirs(error_directory_name)
+  
+  if not os.path.exists(log_error_path):
+    with open(log_error_path, 'w') as file:
+      writer = csv.writer(file, delimiter=',')
+      writer.writerow(StringIO(file))
+
+
+
       
 def _state_args(state_file):
   try:
@@ -294,6 +309,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             project_path=dict(required=True, type='path'),
+            log_error_path=dict(type='path'),
             binary_path=dict(type='path'),
             workspace=dict(required=False, type='str', default='default'),
             purge_workspace=dict(type='bool', default=False),
@@ -312,6 +328,7 @@ def main():
         supports_check_mode=True,
     )
 
+    log_error_path = module.params.get('log_error_path')
     project_path = module.params.get('project_path')
     bin_path = module.params.get('binary_path')
     workspace = module.params.get('workspace')
@@ -323,6 +340,8 @@ def main():
     state_file = module.params.get('state_file')
     force_init = module.params.get('force_init')
     backend_config = module.params.get('backend_config')
+
+    create_error_file_and_directory(log_error_path)
 
     if bin_path is not None:
         command = [bin_path]
@@ -354,7 +373,7 @@ def main():
     if variables_file:
         variables_args.extend(['-var-file', variables_file])
 
-    preflight_validation(command[0], project_path, variables_args)
+    preflight_validation(command[0], project_path,log_error_path, variables_args)
 
     #LOCK MODULE
     if module.params.get('lock') is not None:
@@ -372,6 +391,8 @@ def main():
     needs_application, changed = True, False
 
     out, err = '', ''
+
+    
 
     if state == 'absent':
         command.extend(variables_args)
