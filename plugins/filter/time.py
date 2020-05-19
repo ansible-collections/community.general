@@ -56,20 +56,23 @@ def multiply(factors):
     return result
 
 
-def divide(divisors):
-    result = 1
-    for divisor in divisors:
-        result = result / divisor
-    return result
-
-
-def to_time_unit(human_time, unit='ms'):
+def to_time_unit(human_time, unit='ms', **kwargs):
     ''' Return a time unit from a human readable string '''
     unit = UNIT_TO_SHORT_FORM.get(unit, unit)
     if unit not in UNIT_FACTORS:
         available_units = sorted(list(UNIT_FACTORS.keys()) + list(UNIT_TO_SHORT_FORM.keys()))
         raise AnsibleFilterError("to_time_unit() can not convert to the following unit: %s. "
                                  "Available units: %s" % (unit, ', '.join(available_units)))
+
+    unit_factors = UNIT_FACTORS
+    if 'year' in kwargs:
+        unit_factors['y'] = unit_factors['y'][:-1] + [kwargs.pop('year')]
+    if 'month' in kwargs:
+        unit_factors['mo'] = unit_factors['mo'][:-1] + [kwargs.pop('month')]
+
+    if kwargs:
+        raise AnsibleFilterError('to_time_unit() got unknown keyword arguments: %s' % ', '.join(kwargs.keys()))
+
     result = 0
     for h_time_string in human_time.split():
         res = re.match(r'(-?\d+)(\w+)', h_time_string)
@@ -81,53 +84,53 @@ def to_time_unit(human_time, unit='ms'):
         h_time_unit = res.group(2)
 
         h_time_unit = UNIT_TO_SHORT_FORM.get(h_time_unit, h_time_unit)
-        if h_time_unit not in UNIT_FACTORS:
+        if h_time_unit not in unit_factors:
             raise AnsibleFilterError(
                 "to_time_unit() can not interpret following string: %s" % human_time)
 
-        time_in_milliseconds = h_time_int * multiply(UNIT_FACTORS[h_time_unit])
+        time_in_milliseconds = h_time_int * multiply(unit_factors[h_time_unit])
         result += time_in_milliseconds
-    return round(result * divide(UNIT_FACTORS[unit]), 12)
+    return round(result / multiply(unit_factors[unit]), 12)
 
 
-def to_milliseconds(human_time):
+def to_milliseconds(human_time, **kwargs):
     ''' Return milli seconds from a human readable string '''
-    return to_time_unit(human_time, 'ms')
+    return to_time_unit(human_time, 'ms', **kwargs)
 
 
-def to_seconds(human_time):
+def to_seconds(human_time, **kwargs):
     ''' Return seconds from a human readable string '''
-    return to_time_unit(human_time, 's')
+    return to_time_unit(human_time, 's', **kwargs)
 
 
-def to_minutes(human_time):
+def to_minutes(human_time, **kwargs):
     ''' Return minutes from a human readable string '''
-    return to_time_unit(human_time, 'm')
+    return to_time_unit(human_time, 'm', **kwargs)
 
 
-def to_hours(human_time):
+def to_hours(human_time, **kwargs):
     ''' Return hours from a human readable string '''
-    return to_time_unit(human_time, 'h')
+    return to_time_unit(human_time, 'h', **kwargs)
 
 
-def to_days(human_time):
+def to_days(human_time, **kwargs):
     ''' Return days from a human readable string '''
-    return to_time_unit(human_time, 'd')
+    return to_time_unit(human_time, 'd', **kwargs)
 
 
-def to_weeks(human_time):
+def to_weeks(human_time, **kwargs):
     ''' Return weeks from a human readable string '''
-    return to_time_unit(human_time, 'w')
+    return to_time_unit(human_time, 'w', **kwargs)
 
 
-def to_months(human_time):
+def to_months(human_time, **kwargs):
     ''' Return months from a human readable string '''
-    return to_time_unit(human_time, 'mo')
+    return to_time_unit(human_time, 'mo', **kwargs)
 
 
-def to_years(human_time):
+def to_years(human_time, **kwargs):
     ''' Return years from a human readable string '''
-    return to_time_unit(human_time, 'y')
+    return to_time_unit(human_time, 'y', **kwargs)
 
 
 class FilterModule(object):
