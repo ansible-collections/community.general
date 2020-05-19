@@ -278,7 +278,7 @@ VALID_PRIVS = frozenset(('CREATE', 'DROP', 'GRANT', 'GRANT OPTION',
                          'EXECUTE', 'FILE', 'CREATE TABLESPACE', 'CREATE USER',
                          'PROCESS', 'PROXY', 'RELOAD', 'REPLICATION CLIENT',
                          'REPLICATION SLAVE', 'SHOW DATABASES', 'SHUTDOWN',
-                         'SUPER', 'ALL', 'ALL PRIVILEGES', 'USAGE', 'REQUIRESSL',
+                         'SUPER', 'ALL', 'ALL PRIVILEGES', 'USAGE', 'REQUIRESSL', 'REQUIREX509',
                          'CREATE ROLE', 'DROP ROLE', 'APPLICATION_PASSWORD_ADMIN',
                          'AUDIT_ADMIN', 'BACKUP_ADMIN', 'BINLOG_ADMIN',
                          'BINLOG_ENCRYPTION_ADMIN', 'CLONE_ADMIN', 'CONNECTION_ADMIN',
@@ -590,6 +590,12 @@ def privileges_get(cursor, user, host):
             privileges.append('GRANT')
         if "REQUIRE SSL" in res.group(7):
             privileges.append('REQUIRESSL')
+        if "REQUIRE X509" in res.group(7):
+            privileges.append('REQUIREX509')
+        # REQUIRESSL and REQUIREX509 are mutually exclusive, if both are
+        # present, honor the most restrictive one.
+        if "REQUIRESSL" in privileges and "REQUIREX509" in privileges:
+            privileges.remove("REQUIRESSL")
         db = res.group(2)
         output.setdefault(db, []).extend(privileges)
     return output
@@ -648,6 +654,8 @@ def privileges_unpack(priv, mode):
     # we still need to add USAGE as a privilege to avoid syntax errors
     if 'REQUIRESSL' in priv and not set(output['*.*']).difference(set(['GRANT', 'REQUIRESSL'])):
         output['*.*'].append('USAGE')
+    if 'REQUIREX509' in priv and not set(outuput['*.*']).difference(set(['GRANT', 'REQUIREX509'])):
+        output['*.*'].append('USAGE')
 
     return output
 
@@ -660,7 +668,7 @@ def privileges_revoke(cursor, user, host, db_table, priv, grant_option):
         query.append("FROM %s@%s")
         query = ' '.join(query)
         cursor.execute(query, (user, host))
-    priv_string = ",".join([p for p in priv if p not in ('GRANT', 'REQUIRESSL')])
+    priv_string = ",".join([p for p in priv if p not in ('GRANT', 'REQUIRESSL', 'REQUIREX509')])
     query = ["REVOKE %s ON %s" % (priv_string, db_table)]
     query.append("FROM %s@%s")
     query = ' '.join(query)
@@ -671,11 +679,13 @@ def privileges_grant(cursor, user, host, db_table, priv):
     # Escape '%' since mysql db.execute uses a format string and the
     # specification of db and table often use a % (SQL wildcard)
     db_table = db_table.replace('%', '%%')
-    priv_string = ",".join([p for p in priv if p not in ('GRANT', 'REQUIRESSL')])
+    priv_string = ",".join([p for p in priv if p not in ('GRANT', 'REQUIRESSL', 'REQUIREX509')])
     query = ["GRANT %s ON %s" % (priv_string, db_table)]
     query.append("TO %s@%s")
     if 'REQUIRESSL' in priv:
         query.append("REQUIRE SSL")
+    if 'REQUIREX509' in priv:
+        query.append("REQUIRE X509")
     if 'GRANT' in priv:
         query.append("WITH GRANT OPTION")
     query = ' '.join(query)
