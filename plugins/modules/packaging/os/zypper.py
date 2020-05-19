@@ -106,6 +106,12 @@ options:
         description:
           - Add additional options to C(zypper) command.
           - Options should be supplied in a single line as if given in the command line.
+    extra_install_args:
+        version_added: "2.9"
+        required: false
+        description:
+          - Add additional options to C(zypper) install/update command.
+          - Options should be supplied in a single line as if given in the command line.
 notes:
   - When used with a `loop:` each package will be processed individually,
     it is much more efficient to pass the list directly to the `name` option.
@@ -188,7 +194,7 @@ EXAMPLES = '''
 import xml
 import re
 from xml.dom.minidom import parseString as parseXML
-from ansible.module_utils.six import iteritems
+#from ansible.module_utils.six import iteritems  # Remove as it is not used
 from ansible.module_utils._text import to_native
 
 # import module snippets
@@ -335,6 +341,9 @@ def get_cmd(m, subcommand):
             cmd.append('--force-resolution')
         if m.params['oldpackage']:
             cmd.append('--oldpackage')
+        if m.params['extra_install_args']:
+            args_list = m.params['extra_install_args'].split(' ')
+            cmd.extend(args_list)
     if m.params['extra_args']:
         args_list = m.params['extra_args'].split(' ')
         cmd.extend(args_list)
@@ -478,6 +487,7 @@ def main():
             update_cache=dict(required=False, aliases=['refresh'], default='no', type='bool'),
             oldpackage=dict(required=False, default='no', type='bool'),
             extra_args=dict(required=False, default=None),
+            extra_install_args=dict(required=False, default=None),
         ),
         supports_check_mode=True
     )
