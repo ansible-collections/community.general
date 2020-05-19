@@ -1,0 +1,2 @@
+minor_changes:
+  - mysql_user - add the REQUIRE X509 privilege (https://github.com/ansible-collections/community.general/pull/367)
