@@ -57,6 +57,10 @@
       that:
       - "result.volume == docker_volume_inspect_result[0]"
     when: docker_volume_inspect is not failed
+  - assert:
+      that:
+         - "'is too new. Maximum supported API version is' in docker_volume_inspect.stderr"
+    when: docker_volume_inspect is failed
 
   # Requirements for docker_volume
   when: docker_py_version is version('1.10.0', '>=') and docker_api_version is version('1.24', '>=')
