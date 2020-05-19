@@ -1,1 +1,0 @@
-./cloud/google/gcp_compute_ssl_policy_info.py
