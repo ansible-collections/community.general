@@ -23,29 +23,17 @@ UNIT_FACTORS = {
 
 UNIT_TO_SHORT_FORM = {
     'millisecond': 'ms',
-    'milliseconds': 'ms',
     'msec': 'ms',
-    'msecs': 'ms',
     'msecond': 'ms',
-    'mseconds': 'ms',
     'sec': 's',
-    'secs': 's',
     'second': 's',
-    'seconds': 's',
     'hour': 'h',
-    'hours': 'h',
     'min': 'm',
-    'mins': 'm',
     'minute': 'm',
-    'minutes': 'm',
     'day': 'd',
-    'days': 'd',
     'week': 'w',
-    'weeks': 'w',
     'month': 'mo',
-    'months': 'mo',
     'year': 'y',
-    'years': 'y',
 }
 
 
@@ -58,13 +46,16 @@ def multiply(factors):
 
 def to_time_unit(human_time, unit='ms', **kwargs):
     ''' Return a time unit from a human readable string '''
-    unit = UNIT_TO_SHORT_FORM.get(unit, unit)
-    if unit not in UNIT_FACTORS:
-        available_units = sorted(list(UNIT_FACTORS.keys()) + list(UNIT_TO_SHORT_FORM.keys()))
-        raise AnsibleFilterError("to_time_unit() can not convert to the following unit: %s. "
-                                 "Available units: %s" % (unit, ', '.join(available_units)))
-
+    unit_to_short_form = UNIT_TO_SHORT_FORM
     unit_factors = UNIT_FACTORS
+
+    unit = unit_to_short_form.get(unit.rstrip('s'), unit)
+    if unit not in unit_factors:
+        raise AnsibleFilterError("to_time_unit() can not convert to the following unit: %s. "
+                                 "Available units (singular or plural): %s. "
+                                 "Available short units: %s"
+                                 % (unit, ', '.join(unit_to_short_form.keys()), ', '.join(unit_factors.keys())))
+
     if 'year' in kwargs:
         unit_factors['y'] = unit_factors['y'][:-1] + [kwargs.pop('year')]
     if 'month' in kwargs:
@@ -83,7 +74,7 @@ def to_time_unit(human_time, unit='ms', **kwargs):
         h_time_int = int(res.group(1))
         h_time_unit = res.group(2)
 
-        h_time_unit = UNIT_TO_SHORT_FORM.get(h_time_unit, h_time_unit)
+        h_time_unit = unit_to_short_form.get(h_time_unit.rstrip('s'), h_time_unit)
         if h_time_unit not in unit_factors:
             raise AnsibleFilterError(
                 "to_time_unit() can not interpret following string: %s" % human_time)
