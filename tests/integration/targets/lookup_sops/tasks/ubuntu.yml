@@ -31,4 +31,3 @@
 - assert:
     that:
       - "sops_lookup_simple is success"
-
