@@ -24,7 +24,7 @@
 
     - name: Make sure OpenLDAP service is stopped
       become: True
-      shell: 'cat /var/run/slapd/slapd.pid | xargs kill -9 '
+      shell: 'cat /var/run/slapd/slapd.pid | xargs -r kill -9 '
 
     - name: Debconf
       shell: 'echo "slapd {{ item.question }} {{ item.vtype }} {{ item.value }}" >> /root/debconf-slapd.conf'
