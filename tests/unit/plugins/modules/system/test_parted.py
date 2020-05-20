@@ -111,6 +111,7 @@ parted_dict3 = {
     }]
 }
 
+
 class TestParted(ModuleTestCase):
     def setUp(self):
         super(TestParted, self).setUp()
