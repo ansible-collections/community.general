@@ -497,7 +497,7 @@ def main():
             update_cache=dict(required=False, aliases=['refresh'], default='no', type='bool'),
             oldpackage=dict(required=False, default='no', type='bool'),
             extra_args=dict(required=False, default=None),
-            extra_install_args=dict(type='list', required=False, default=None),
+            extra_install_args=dict(type='list', elements='str', required=False, default=None),
         ),
         supports_check_mode=True
     )
