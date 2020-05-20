@@ -3,7 +3,6 @@
 
 from __future__ import absolute_import, division, print_function
 
-from ansible.errors import AnsibleError
 
 from subprocess import Popen, PIPE
 
