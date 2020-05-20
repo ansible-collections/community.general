@@ -22,12 +22,12 @@
       - "sops_lookup_wrong_file is failed"
       - "'sops metadata not found' in sops_lookup_wrong_file.msg"
 
-- name: Test simple lookup 
+- name: Test simple lookup
   set_fact:
     sops_success: "{{ lookup('sops', 'simple.sops.yaml') }}"
   ignore_errors: yes
   register: sops_lookup_simple
-    
+
 - assert:
     that:
       - "sops_lookup_simple is success"
