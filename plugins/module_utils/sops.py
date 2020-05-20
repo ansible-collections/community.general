@@ -44,7 +44,7 @@ class SopsError(Exception):
     def __init__(self, filename, exit_code, message,):
         exception_name = sops_error_codes[exit_code]
         message = "error with file %s: %s exited with code %d: %s" % (filename, exception_name, exit_code, message)
-        super(SopsError, self).__init__(message=message)
+        super(SopsError, self).__init__(message)
 
 
 class Sops():
