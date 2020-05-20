@@ -66,49 +66,56 @@
         retries: 3
         delay: 3
         until: docker_containers is success
+        ignore_errors: yes
 
       - name: "Remove all ansible-test-* docker volumes"
         shell: 'docker volume ls --format {% raw %}"{{.Name}}"{% endraw %} | grep "^ansible-test-" | xargs -r docker volume rm -f'
         register: docker_volumes
+        ignore_errors: yes
 
       - name: "Remove all ansible-test-* docker networks"
         shell: 'docker network ls --no-trunc --format {% raw %}"{{.Name}}"{% endraw %} | grep "^ansible-test-" | xargs -r docker network rm'
         register: docker_networks
+        ignore_errors: yes
 
       - name: Cleaned docker resources
         debug:
           var: docker_resources
         vars:
           docker_resources:
-            containers: "{{ docker_containers.stdout_lines }}"
-            volumes: "{{ docker_volumes.stdout_lines }}"
-            networks: "{{ docker_networks.stdout_lines }}"
+            containers: "{{ docker_containers.stdout_lines | default([]) }}"
+            volumes: "{{ docker_volumes.stdout_lines | default([]) }}"
+            networks: "{{ docker_networks.stdout_lines | default([]) }}"
 
       # List all existing docker resources
       - name: List all docker containers
         command: docker ps --no-trunc -a
         register: docker_containers
+        ignore_errors: yes
 
       - name: List all docker volumes
         command: docker volume ls
         register: docker_volumes
+        ignore_errors: yes
 
       - name: List all docker networks
         command: docker network ls --no-trunc
         register: docker_networks
+        ignore_errors: yes
 
       - name: List all docker images
         command: docker images --no-trunc -a
         register: docker_images
+        ignore_errors: yes
 
       - name: Still existing docker resources
         debug:
           var: docker_resources
         vars:
           docker_resources:
-            containers: "{{ docker_containers.stdout_lines }}"
-            volumes: "{{ docker_volumes.stdout_lines }}"
-            networks: "{{ docker_networks.stdout_lines }}"
-            images: "{{ docker_images.stdout_lines }}"
+            containers: "{{ docker_containers.stdout_lines | default([]) }}"
+            volumes: "{{ docker_volumes.stdout_lines | default([]) }}"
+            networks: "{{ docker_networks.stdout_lines | default([]) }}"
+            images: "{{ docker_images.stdout_lines | default([]) }}"
 
       when: docker_cli_version is version('0.0', '>')
