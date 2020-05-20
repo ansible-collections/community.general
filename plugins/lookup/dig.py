@@ -70,29 +70,73 @@ RETURN = """
     description:
       - list of composed strings or dictonaries with key and value
         If a dictionary, fields shows the keys returned depending on query type
-    fields:
-       ALL: owner, ttl, type
-       A: address
-       AAAA: address
-       CNAME: target
-       DNAME: target
-       DLV: algorithm, digest_type, key_tag, digest
-       DNSKEY: flags, algorithm, protocol, key
-       DS: algorithm, digest_type, key_tag, digest
-       HINFO:  cpu, os
-       LOC: latitude, longitude, altitude, size, horizontal_precision, vertical_precision
-       MX: preference, exchange
-       NAPTR: order, preference, flags, service, regexp, replacement
-       NS: target
-       NSEC3PARAM: algorithm, flags, iterations, salt
-       PTR: target
-       RP: mbox, txt
-       SOA: mname, rname, serial, refresh, retry, expire, minimum
-       SPF: strings
-       SRV: priority, weight, port, target
-       SSHFP: algorithm, fp_type, fingerprint
-       TLSA: usage, selector, mtype, cert
-       TXT: strings
+    contains:
+       ALL:
+           description:
+               - owner, ttl, type
+       A:
+           description:
+               - address
+       AAAA:
+           description:
+               - address
+       CNAME:
+           description:
+               - target
+       DNAME:
+           description:
+               - target
+       DLV:
+            description:
+                - algorithm, digest_type, key_tag, digest
+       DNSKEY:
+            description:
+                - flags, algorithm, protocol, key
+       DS:
+            description:
+                - algorithm, digest_type, key_tag, digest
+       HINFO:
+            description:
+                -  cpu, os
+       LOC:
+            description:
+                - latitude, longitude, altitude, size, horizontal_precision, vertical_precision
+       MX:
+            description:
+                - preference, exchange
+       NAPTR:
+            description:
+                - order, preference, flags, service, regexp, replacement
+       NS:
+            description:
+                - target
+       NSEC3PARAM:
+            description:
+                - algorithm, flags, iterations, salt
+       PTR:
+            description:
+                - target
+       RP:
+            description:
+                - mbox, txt
+       SOA:
+            description:
+                - mname, rname, serial, refresh, retry, expire, minimum
+       SPF:
+            description:
+                - strings
+       SRV:
+            description:
+                - priority, weight, port, target
+       SSHFP:
+            description:
+                - algorithm, fp_type, fingerprint
+       TLSA:
+            description:
+                - usage, selector, mtype, cert
+       TXT:
+            description:
+                - strings
 """
 
 from ansible.errors import AnsibleError
