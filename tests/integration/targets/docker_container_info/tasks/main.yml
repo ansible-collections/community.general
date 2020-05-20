@@ -39,17 +39,28 @@
   - name: "Comparison: use 'docker inspect'"
     command: docker inspect "{{ cname }}"
     register: docker_inspect
-  - set_fact:
-      docker_inspect_result: "{{ docker_inspect.stdout | from_json }}"
-  - name: Dump docker inspect result
-    debug: var=docker_inspect_result
+    ignore_errors: yes
+  - block:
+    - set_fact:
+        docker_inspect_result: "{{ docker_inspect.stdout | from_json }}"
+    - name: Dump docker inspect result
+      debug: var=docker_inspect_result
+    when: docker_inspect is not failed
 
   - assert:
       that:
       - result.exists
       - "'container' in result"
       - "result.container"
+
+  - assert:
+      that:
       - "result.container == docker_inspect_result[0]"
+    when: docker_inspect is not failed
+  - assert:
+      that:
+        - "'is too new. Maximum supported API version is' in docker_inspect.stderr"
+    when: docker_inspect is failed
 
   always:
   - name: Cleanup
