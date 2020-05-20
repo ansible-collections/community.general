@@ -107,7 +107,9 @@ options:
           - Add additional options to C(zypper) command.
           - Options should be supplied in a single line as if given in the command line.
     extra_install_args:
-        version_added: "2.9"
+        version_added: "2.10"
+        type: list
+        elements: str
         required: false
         description:
           - Add additional options to C(zypper) install/update command.
