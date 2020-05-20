@@ -85,7 +85,7 @@ DOCUMENTATION = '''
         vars:
           - name: ansible_oc_context
         env:
-          - name: k8S_AUTH_CONTEXT
+          - name: K8S_AUTH_CONTEXT
       oc_host:
         description:
           - URL for accessing the API.
