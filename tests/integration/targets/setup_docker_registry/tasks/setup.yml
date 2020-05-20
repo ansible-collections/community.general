@@ -52,47 +52,54 @@
     loop:
     - nginx.conf
     - nginx.htpasswd
-  - name: Create private key for frontend certificate
-    community.crypto.openssl_privatekey:
-      path: '{{ output_dir }}/cert.key'
-      type: ECC
-      curve: secp256r1
-  - name: Create CSR for frontend certificate
-    community.crypto.openssl_csr:
-      path: '{{ output_dir }}/cert.csr'
-      privatekey_path: '{{ output_dir }}/cert.key'
-      subject_alt_name:
-      - DNS:test-registry.ansible.com
-  - name: Create frontend certificate
-    community.crypto.openssl_certificate:
-      path: '{{ output_dir }}/cert.pem'
-      csr_path: '{{ output_dir }}/cert.csr'
-      privatekey_path: '{{ output_dir }}/cert.key'
-      provider: selfsigned
-  - name: Copy dynamic files into volume
-    command: docker cp {{ output_dir }}/{{ item }} {{ nginx_name }}:/etc/nginx/{{ item }}
-    loop:
-    - cert.pem
-    - cert.key
-  - name: Start nginx frontend for registry
-    docker_container:
-      name: '{{ nginx_name }}'
-      state: started
-    register: nginx_container
-  - debug: var=nginx_container.container.NetworkSettings
-  - name: Wait for registry frontend
-    uri:
-      url: https://{{ nginx_container.container.NetworkSettings.IPAddress }}:5000/v2/
-      url_username: testuser
-      url_password: hunter2
-      validate_certs: false
-    register: result
-    until: result is success
-    retries: 5
-    delay: 1
-  - name: Get registry URL
-    set_fact:
-      registry_frontend_address: localhost:{{ nginx_container.container.NetworkSettings.Ports['5000/tcp'].0.HostPort }}
+    register: can_copy_files
+    ignore_errors: yes
+  - block:
+    - name: Create private key for frontend certificate
+      community.crypto.openssl_privatekey:
+        path: '{{ output_dir }}/cert.key'
+        type: ECC
+        curve: secp256r1
+    - name: Create CSR for frontend certificate
+      community.crypto.openssl_csr:
+        path: '{{ output_dir }}/cert.csr'
+        privatekey_path: '{{ output_dir }}/cert.key'
+        subject_alt_name:
+        - DNS:test-registry.ansible.com
+    - name: Create frontend certificate
+      community.crypto.openssl_certificate:
+        path: '{{ output_dir }}/cert.pem'
+        csr_path: '{{ output_dir }}/cert.csr'
+        privatekey_path: '{{ output_dir }}/cert.key'
+        provider: selfsigned
+    - name: Copy dynamic files into volume
+      command: docker cp {{ output_dir }}/{{ item }} {{ nginx_name }}:/etc/nginx/{{ item }}
+      loop:
+      - cert.pem
+      - cert.key
+    - name: Start nginx frontend for registry
+      docker_container:
+        name: '{{ nginx_name }}'
+        state: started
+      register: nginx_container
+    - debug: var=nginx_container.container.NetworkSettings
+    - name: Wait for registry frontend
+      uri:
+        url: https://{{ nginx_container.container.NetworkSettings.IPAddress }}:5000/v2/
+        url_username: testuser
+        url_password: hunter2
+        validate_certs: false
+      register: result
+      until: result is success
+      retries: 5
+      delay: 1
+    - name: Get registry URL
+      set_fact:
+        registry_frontend_address: localhost:{{ nginx_container.container.NetworkSettings.Ports['5000/tcp'].0.HostPort }}
+    when: can_copy_files is not failed
+  - set_fact:
+      registry_frontend_address: 'n/a'
+    when: can_copy_files is failed
   - debug: msg="Registry available under {{ registry_address }}, NGINX frontend available under {{ registry_frontend_address }}"
   when: docker_py_version is version('1.8.0', '>=') and docker_api_version is version('1.20', '>=')
 - fail: msg="Too old docker / docker-py version to run docker_image tests!"
