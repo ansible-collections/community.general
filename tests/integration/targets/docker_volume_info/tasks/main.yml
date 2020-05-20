@@ -34,10 +34,13 @@
   - name: "Comparison: use 'docker volume inspect'"
     command: docker volume inspect "{{ cname }}"
     register: docker_volume_inspect
-  - set_fact:
-      docker_volume_inspect_result: "{{ docker_volume_inspect.stdout | from_json }}"
-  - name: Dump docker volume inspect result
-    debug: var=docker_volume_inspect_result
+    ignore_errors: yes
+  - block:
+    - set_fact:
+        docker_volume_inspect_result: "{{ docker_volume_inspect.stdout | from_json }}"
+    - name: Dump docker volume inspect result
+      debug: var=docker_volume_inspect_result
+    when: docker_volume_inspect is not failed
 
   - name: Cleanup
     docker_volume:
@@ -49,7 +52,15 @@
       - result.exists
       - "'volume' in result"
       - "result.volume"
+
+  - assert:
+      that:
       - "result.volume == docker_volume_inspect_result[0]"
+    when: docker_volume_inspect is not failed
+  - assert:
+      that:
+         - "'is too new. Maximum supported API version is' in docker_volume_inspect.stderr"
+    when: docker_volume_inspect is failed
 
   # Requirements for docker_volume
   when: docker_py_version is version('1.10.0', '>=') and docker_api_version is version('1.24', '>=')

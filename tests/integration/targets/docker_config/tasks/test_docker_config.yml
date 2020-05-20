@@ -53,6 +53,7 @@
   - name: Inspect config
     command: "docker config inspect {{ config_id }}"
     register: inspect
+    ignore_errors: yes
 
   - debug: var=inspect
 
@@ -61,6 +62,11 @@
       that:
          - "'db_password' in inspect.stdout"
          - "'ansible_key' in inspect.stdout"
+    when: inspect is not failed
+  - assert:
+      that:
+         - "'is too new. Maximum supported API version is' in inspect.stderr"
+    when: inspect is failed
 
   - name: Create config again
     docker_config:
