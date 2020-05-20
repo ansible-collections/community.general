@@ -106,14 +106,20 @@ options:
         description:
           - Add additional options to C(zypper) command.
           - Options should be supplied in a single line as if given in the command line.
-    extra_install_args:
+    allow_vendor_change:
         version_added: "2.10"
-        type: list
-        elements: str
+        type: bool
         required: false
+        default: false
         description:
-          - Add additional options to C(zypper) install/update command.
-          - Options should be supplied as a list
+          - Adds C(--allow_vendor_change) option to I(zypper) install/update command.
+    replacefiles:
+        version_added: "2.10"
+        type: bool
+        required: false
+        default: false
+        description:
+          - Adds C(--replacefiles) option to I(zypper) install/update command.
 notes:
   - When used with a `loop:` each package will be processed individually,
     it is much more efficient to pass the list directly to the `name` option.
@@ -174,13 +180,12 @@ EXAMPLES = '''
     state: dist-upgrade
     extra_args: '--no-allow-vendor-change --allow-arch-change'
 
-- name: Perform a installaion of nmap with the install option --replacefiles and --force-resolution
+- name: Perform a installaion of nmap with the install option replacefiles and allow_vendor_change 
   zypper:
     name: 'nmap'
     state: latest
-    extra_install_args:
-      - '--replacefiles'
-      - '--force-resolution'
+    allow_vendor_change: true
+    replacefiles: true
 
 - name: Refresh repositories and update package openssl
   zypper:
@@ -351,9 +356,10 @@ def get_cmd(m, subcommand):
             cmd.append('--force-resolution')
         if m.params['oldpackage']:
             cmd.append('--oldpackage')
-        if m.params['extra_install_args']:
-            args_list = m.params['extra_install_args']
-            cmd.extend(args_list)
+        if m.params['allow_vendor_change']:
+            cmd.append('--allow-vendor-change')
+        if m.params['replacefiles']:
+            cmd.append('--replacefiles')
     if m.params['extra_args']:
         args_list = m.params['extra_args'].split(' ')
         cmd.extend(args_list)
@@ -497,7 +503,8 @@ def main():
             update_cache=dict(required=False, aliases=['refresh'], default='no', type='bool'),
             oldpackage=dict(required=False, default='no', type='bool'),
             extra_args=dict(required=False, default=None),
-            extra_install_args=dict(type='list', elements='str', required=False, default=None),
+            allow_vendor_change=dict(False, default=false, type='bool'),
+            replacefiles=dict(False, default=false, type='bool')
         ),
         supports_check_mode=True
     )
