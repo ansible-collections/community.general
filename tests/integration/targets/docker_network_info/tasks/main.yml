@@ -36,10 +36,13 @@
   - name: "Comparison: use 'docker network inspect'"
     command: docker network inspect "{{ nname }}"
     register: docker_inspect
-  - set_fact:
-      docker_inspect_result: "{{ docker_inspect.stdout | from_json }}"
-  - name: Dump docker inspect result
-    debug: var=docker_inspect_result
+    ignore_errors: yes
+  - block:
+    - set_fact:
+        docker_inspect_result: "{{ docker_inspect.stdout | from_json }}"
+    - name: Dump docker inspect result
+      debug: var=docker_inspect_result
+    when: docker_inspect is not failed
 
   - name: Cleanup
     docker_network:
@@ -52,7 +55,15 @@
       - result.exists
       - "'network' in result"
       - "result.network"
+
+  - assert:
+      that:
       - "result.network == docker_inspect_result[0]"
+    when: docker_inspect is not failed
+  - assert:
+      that:
+        - "'is too new. Maximum supported API version is' in docker_inspect.stderr"
+    when: docker_inspect is failed
 
   when: docker_py_version is version('1.8.0', '>=') and docker_api_version is version('1.21', '>=')
 
