@@ -37,7 +37,7 @@ sops_error_codes = {
 }
 
 
-class SopsError(AnsibleError):
+class SopsError(Exception):
     ''' Extend AnsibleError class with sops specific informations '''
 
     def __init__(self, filename, exit_code, message,):
