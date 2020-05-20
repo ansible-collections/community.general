@@ -1,0 +1,28 @@
+- set_fact:
+    virtualenv: "{{ remote_tmp_dir }}/virtualenv"
+    virtualenv_command: "{{ ansible_python_interpreter }} -m virtualenv"
+
+- set_fact:
+    virtualenv_interpreter: "{{ virtualenv }}/bin/python"
+
+- pip:
+    name: virtualenv
+
+# need this for integration tests... only way to test JSON before this module existed
+- pip:
+    name:
+      - jmespath
+      - coverage
+    virtualenv: "{{ virtualenv }}"
+    virtualenv_command: "{{ virtualenv_command }}"
+    virtualenv_site_packages: no
+
+- include_tasks: tests.yml
+  vars:
+    ansible_python_interpreter: "{{ virtualenv_interpreter }}"
+    output_dir: "{{ remote_tmp_dir }}"
+
+# cleanup
+- file:
+    path: "{{ virtualenv }}"
+    state: absent

@@ -596,6 +596,9 @@ files:
     authors: jpmens noseka1
   $modules/files/iso_extract.py:
     authors: dagwieers jhoekx ribbons
+  $modules/files/json_patch.py:
+    authors: particledecay
+    labels: json
   $modules/files/read_csv.py:
     authors: dagwieers
   $modules/files/xattr.py:
