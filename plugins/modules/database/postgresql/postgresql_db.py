@@ -178,6 +178,13 @@ EXAMPLES = r'''
     target: /tmp/acme.sql
     target_opts: "-n public"
 
+- name: Dump only table1 and table2 from the acme database
+  postgresql_db:
+    name: acme
+    state: dump
+    target: /tmp/table1_table2.sql
+    target_opts: "-t table1 -t table2"
+
 # Note: In the example below, if database foo exists and has another tablespace
 # the tablespace will be changed to foo. Access to the database will be locked
 # until the copying of database files is finished.
