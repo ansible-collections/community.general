@@ -1,0 +1,4 @@
+breaking_changes:
+- The environment variable for the auth context for the oc.py connection plugin
+  has been corrected (K8S_CONTEXT).  It was using an initial lowercase k by mistake.
+  https://github.com/ansible-collections/community.general/pull/377
