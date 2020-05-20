@@ -18,6 +18,7 @@
     become: yes
   - name: Wait for docker daemon to be fully restarted
     command: docker ps
+    ignore_errors: yes
 
   - name: Cleanup
     docker_swarm:
