@@ -111,7 +111,7 @@ options:
         required: false
         description:
           - Add additional options to C(zypper) install/update command.
-          - Options should be supplied in a single line as if given in the command line.
+          - Options should be supplied as a list
 notes:
   - When used with a `loop:` each package will be processed individually,
     it is much more efficient to pass the list directly to the `name` option.
@@ -171,6 +171,14 @@ EXAMPLES = '''
     name: '*'
     state: dist-upgrade
     extra_args: '--no-allow-vendor-change --allow-arch-change'
+
+- name: Perform a installaion of nmap with the install option --replacefiles and --force-resolution
+  zypper:
+    name: 'nmap'
+    state: latest
+    extra_install_args:
+      - '--replacefiles'
+      - '--force-resolution'
 
 - name: Refresh repositories and update package openssl
   zypper:
@@ -342,7 +350,7 @@ def get_cmd(m, subcommand):
         if m.params['oldpackage']:
             cmd.append('--oldpackage')
         if m.params['extra_install_args']:
-            args_list = m.params['extra_install_args'].split(' ')
+            args_list = m.params['extra_install_args']
             cmd.extend(args_list)
     if m.params['extra_args']:
         args_list = m.params['extra_args'].split(' ')
@@ -487,7 +495,7 @@ def main():
             update_cache=dict(required=False, aliases=['refresh'], default='no', type='bool'),
             oldpackage=dict(required=False, default='no', type='bool'),
             extra_args=dict(required=False, default=None),
-            extra_install_args=dict(required=False, default=None),
+            extra_install_args=dict(type='list', required=False, default=None),
         ),
         supports_check_mode=True
     )
