@@ -654,7 +654,7 @@ def privileges_unpack(priv, mode):
     # we still need to add USAGE as a privilege to avoid syntax errors
     if 'REQUIRESSL' in priv and not set(output['*.*']).difference(set(['GRANT', 'REQUIRESSL'])):
         output['*.*'].append('USAGE')
-    if 'REQUIREX509' in priv and not set(outuput['*.*']).difference(set(['GRANT', 'REQUIREX509'])):
+    if 'REQUIREX509' in priv and not set(output['*.*']).difference(set(['GRANT', 'REQUIREX509'])):
         output['*.*'].append('USAGE')
 
     return output
