@@ -60,7 +60,7 @@ options:
   variables_file:
     description:
       - The path to a variables file for Terraform to fill into the TF
-        configurations.
+        configurations. This can accept a list of pathes to multiple variables files.
     required: false
   variables:
     description:
@@ -95,6 +95,10 @@ options:
     description:
       - A group of key-values to provide at init stage to the -backend-config parameter.
     required: false
+  backend_config_file:
+    description:
+      - The path to a configuration file to provide at init state to the -backend-config parameter. This can accept a list of pathes to multiple configuration files.
+    required: false
 notes:
    - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]
@@ -116,6 +120,15 @@ EXAMPLES = """
       region: "eu-west-1"
       bucket: "some-bucket"
       key: "random.tfstate"
+
+- name: Define the backend configuration with one or more files at init
+  terraform:
+    project_path: 'project/'
+    state: "{{ state }}"
+    force_init: true
+    backend_config_file:
+      - /path/to/backend_config_file_1
+      - /path/to/backend_config_file_2
 """
 
 RETURN = """
@@ -182,7 +195,7 @@ def _state_args(state_file):
     return []
 
 
-def init_plugins(bin_path, project_path, backend_config):
+def init_plugins(bin_path, project_path, backend_config, backend_config_file):
     command = [bin_path, 'init', '-input=false']
     if backend_config:
         for key, val in backend_config.items():
@@ -190,6 +203,9 @@ def init_plugins(bin_path, project_path, backend_config):
                 '-backend-config',
                 shlex_quote('{0}={1}'.format(key, val))
             ])
+    if backend_config_file:
+        for f in backend_config_file:
+            command.extend(['-backend-config', f])
     rc, out, err = module.run_command(command, cwd=project_path)
     if rc != 0:
         module.fail_json(msg="Failed to initialize Terraform modules:\r\n{0}".format(err))
@@ -268,7 +284,7 @@ def main():
             purge_workspace=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent', 'planned']),
             variables=dict(type='dict'),
-            variables_file=dict(type='path'),
+            variables_file=dict(type='list',default=None),
             plan_file=dict(type='path'),
             state_file=dict(type='path'),
             targets=dict(type='list', default=[]),
@@ -276,6 +292,7 @@ def main():
             lock_timeout=dict(type='int',),
             force_init=dict(type='bool', default=False),
             backend_config=dict(type='dict', default=None),
+            backend_config_file=dict(type='list', default=None),
         ),
         required_if=[('state', 'planned', ['plan_file'])],
         supports_check_mode=True,
@@ -292,6 +309,7 @@ def main():
     state_file = module.params.get('state_file')
     force_init = module.params.get('force_init')
     backend_config = module.params.get('backend_config')
+    backend_config_file = module.params.get('backend_config_file')
 
     if bin_path is not None:
         command = [bin_path]
@@ -299,7 +317,7 @@ def main():
         command = [module.get_bin_path('terraform', required=True)]
 
     if force_init:
-        init_plugins(command[0], project_path, backend_config)
+        init_plugins(command[0], project_path, backend_config,backend_config_file)
 
     workspace_ctx = get_workspace_context(command[0], project_path)
     if workspace_ctx["current"] != workspace:
@@ -320,7 +338,8 @@ def main():
             '{0}={1}'.format(k, v)
         ])
     if variables_file:
-        variables_args.extend(['-var-file', variables_file])
+        for f in variables_file:
+          variables_args.extend(['-var-file', f])
 
     preflight_validation(command[0], project_path, variables_args)
 
