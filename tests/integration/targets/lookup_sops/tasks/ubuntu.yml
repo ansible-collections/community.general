@@ -2,7 +2,7 @@
 
 - name: Test lookup with missing file
   set_fact:
-    sops_file_does_not_exists: "{{ lookup('sops', 'file-does-not-exists.sops.yml') }}"
+    sops_file_does_not_exists: "{{ lookup('community.general.sops', 'file-does-not-exists.sops.yml') }}"
   ignore_errors: yes
   register: sops_lookup_missing_file
 
