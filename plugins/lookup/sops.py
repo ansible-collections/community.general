@@ -24,7 +24,7 @@ __metaclass__ = type
 from ansible.errors import AnsibleError, AnsibleParserError, AnsibleLookupError
 from ansible.plugins.lookup import LookupBase
 from ansible.module_utils._text import to_text, to_native
-from ansible.module_utils.sops import Sops, SopsError, sops_error_codes
+from ansible_collections.community.general.plugins.module_utils.sops import Sops, SopsError, sops_error_codes
 
 from ansible.utils.display import Display
 display = Display()
