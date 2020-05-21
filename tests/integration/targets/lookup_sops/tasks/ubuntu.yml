@@ -24,7 +24,7 @@
 
 - name: Test simple lookup
   set_fact:
-    sops_success: "{{ lookup('sops', 'simple.sops.yaml') }}"
+    sops_success: "{{ lookup('community.general.sops', 'simple.sops.yaml') }}"
   ignore_errors: yes
   register: sops_lookup_simple
 
