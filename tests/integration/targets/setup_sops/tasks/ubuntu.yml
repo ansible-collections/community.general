@@ -4,9 +4,9 @@
   apt:
     deb: https://github.com/mozilla/sops/releases/download/v3.5.0/sops_3.5.0_amd64.deb
 
-- name: install gpg2
+- name: install gnupg2
   apt:
-    package: gpg
+    package: gnupg2
 
 - name: download sops test GPG key
   get_url:
