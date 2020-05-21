@@ -100,9 +100,7 @@ class LookupModule(LookupBase):
 
                     ret.append(output.rstrip())
                 else:
-                    raise AnsibleParserError()
-            except AnsibleParserError:
-                raise AnsibleError("could not locate file in lookup: %s" % to_native(term))
+                    raise AnsibleLookupError("could not locate file in lookup: %s" % to_native(term))
             except SopsError as e:
                 raise AnsibleError(to_native(e))
 
