@@ -21,7 +21,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from ansible.errors import AnsibleError, AnsibleParserError, AnsibleLookupError
+from ansible.errors import AnsibleLookupError
 from ansible.plugins.lookup import LookupBase
 from ansible.module_utils._text import to_text, to_native
 from ansible_collections.community.general.plugins.module_utils.sops import Sops, SopsError, sops_error_codes
