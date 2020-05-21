@@ -102,6 +102,6 @@ class LookupModule(LookupBase):
                 else:
                     raise AnsibleLookupError("could not locate file in lookup: %s" % to_native(term))
             except SopsError as e:
-                raise AnsibleError(to_native(e))
+                raise AnsibleLookupError(to_native(e))
 
         return ret
