@@ -97,7 +97,8 @@ options:
     required: false
   backend_config_file:
     description:
-      - The path to a configuration file to provide at init state to the -backend-config parameter. This can accept a list of pathes to multiple configuration files.
+      - The path to a configuration file to provide at init state to the -backend-config parameter.
+        This can accept a list of pathes to multiple configuration files.
     required: false
 notes:
    - To just run a `terraform plan`, use check mode.
@@ -284,7 +285,7 @@ def main():
             purge_workspace=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent', 'planned']),
             variables=dict(type='dict'),
-            variables_file=dict(type='list',default=None),
+            variables_file=dict(type='list', default=None),
             plan_file=dict(type='path'),
             state_file=dict(type='path'),
             targets=dict(type='list', default=[]),
@@ -317,7 +318,7 @@ def main():
         command = [module.get_bin_path('terraform', required=True)]
 
     if force_init:
-        init_plugins(command[0], project_path, backend_config,backend_config_file)
+        init_plugins(command[0], project_path, backend_config, backend_config_file)
 
     workspace_ctx = get_workspace_context(command[0], project_path)
     if workspace_ctx["current"] != workspace:
@@ -339,7 +340,7 @@ def main():
         ])
     if variables_file:
         for f in variables_file:
-          variables_args.extend(['-var-file', f])
+            variables_args.extend(['-var-file', f])
 
     preflight_validation(command[0], project_path, variables_args)
 
