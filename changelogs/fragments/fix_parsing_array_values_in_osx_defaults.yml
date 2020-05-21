@@ -1,2 +1,2 @@
 bugfixes:
-  - Unquote values and unescape double quotes when reading array values from osx defaults.
+  - osx_defaults - unquote values and unescape double quotes when reading array values (https://github.com/ansible-collections/community.general/pull/358).
