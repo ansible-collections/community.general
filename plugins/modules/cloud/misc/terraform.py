@@ -60,7 +60,7 @@ options:
   variables_file:
     description:
       - The path to a variables file for Terraform to fill into the TF
-        configurations. This can accept a list of pathes to multiple variables files.
+        configurations. This can accept a list of paths to multiple variables files.
     required: false
   variables:
     description:
