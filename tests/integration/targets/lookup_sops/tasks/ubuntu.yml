@@ -13,7 +13,7 @@
 
 - name: Test lookup of non-sops file
   set_fact:
-    sops_wrong_file: "{{ lookup('sops', 'wrong.yaml') }}"
+    sops_wrong_file: "{{ lookup('community.general.sops', 'wrong.yaml') }}"
   ignore_errors: yes
   register: sops_lookup_wrong_file
 
