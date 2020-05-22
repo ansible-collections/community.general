@@ -1,3 +1,3 @@
 minor_changes:
-- terraform - Adds support for multiple ``variables_file`` (https://github.com/ansible-collections/community.general/issues/224).
-- terraform - Adds support for ``backend_config_file``. This can accept a list of paths to multiple configuration files.
+- terraform - Adds option ``variables_files`` for multiple var-files (https://github.com/ansible-collections/community.general/issues/224).
+- terraform - Adds option ``backend_config_files``. This can accept a list of paths to multiple configuration files.
