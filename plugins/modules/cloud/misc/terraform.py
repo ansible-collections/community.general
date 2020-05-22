@@ -99,7 +99,8 @@ options:
     description:
       - The path to a configuration file to provide at init state to the -backend-config parameter.
         This can accept a list of pathes to multiple configuration files.
-    required: false
+    type: list
+    elements: path
 notes:
    - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]
