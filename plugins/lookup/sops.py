@@ -48,19 +48,20 @@ DOCUMENTATION = """
 
 EXAMPLES = """
 tasks:
-  - name : output secrets to screen (BAD IDEA)
+  - name: Output secrets to screen (BAD IDEA!)
     debug:
-        msg: "Content: {{lookup('sops', item)}}"
+        msg: "Content: {{ lookup('sops', item) }}"
     loop:
         - sops-encrypted-file.enc.yaml
 
-  - name: add ssh private key
+  - name: Add SSH private key
     copy:
-        content: "{{lookup('sops', user + '-id_rsa')}}"
-        dest: /home/{{user}}/.ssh/id_rsa
-        owner: "{{user}}"
-        group: "{{user}}"
+        content: "{{ lookup('sops', user + '-id_rsa') }}"
+        dest: /home/{{ user }}/.ssh/id_rsa
+        owner: "{{ user }}"
+        group: "{{ user }}"
         mode: 0600
+    no_log: true  # avoid content to be written to log
 """
 
 RETURN = """
