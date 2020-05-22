@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - teraform module - an optional parameter is added to check for deletion of resources before it is applied.
