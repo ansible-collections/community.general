@@ -5,7 +5,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-from ansible.module_utils._text import to_text
+from ansible.module_utils._text import to_text, to_native
 
 from subprocess import Popen, PIPE
 
@@ -42,14 +42,14 @@ SOPS_ERROR_CODES = {
 
 
 class SopsError(Exception):
-    ''' Extend AnsibleError class with sops specific informations '''
+    ''' Extend Exception class with sops specific informations '''
 
-    def __init__(self, filename, exit_code, message,):
+    def __init__(self, filename, exit_code, message):
         if exit_code in SOPS_ERROR_CODES:
             exception_name = SOPS_ERROR_CODES[exit_code]
-            message = "error with file %s: %s exited with code %d: %s" % (filename, exception_name, exit_code, message)
+            message = "error with file %s: %s exited with code %d: %s" % (filename, exception_name, exit_code, to_native(message))
         else:
-            message = "could not decrypt file %s; Unknown sops error code: %s" % (filename, exit_code)
+            message = "could not decrypt file %s; Unknown sops error code: %s" % (filename, to_native(exit_code))
         super(SopsError, self).__init__(message)
 
 
