@@ -8,18 +8,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['stableinterface'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: cisco_webex
-short_description: Send a webexmsg to a Cisco Webex Teams Room or Individual.
+short_description: Send a webexmsg to a Cisco Webex Teams Room or Individual
 description:
     - Send a webexmsg to a Cisco Webex Teams Room or Individual with options to control the formatting.
-version_added: "2.3"
+version_added: "2.10"
 author: Drew Rusell (@drew-russell)
 notes:
   - The C(recipient_id) type must be valid for the supplied C(recipient_id).
@@ -31,31 +26,29 @@ options:
     description:
        - The request parameter you would like to send the webexmsg to.
        - Messages can be sent to either a room or individual (by ID or E-Mail).
-    required: True
+    required: yes
     choices: ['roomId', 'toPersonEmail', 'toPersonId']
 
   recipient_id:
     description:
       - The unique identifier associated with the supplied C(recipient_type).
-    required: true
+    required: yes
 
   webexmsg_type:
     description:
        - Specifies how you would like the webexmsg formatted.
-    required: False
     default: text
     choices: ['text', 'markdown']
 
   personal_token:
     description:
       - Your personal access token required to validate the Webex Teams API.
-    required: true
-    aliases: ['token']
+    required: yes
 
   webexmsg:
     description:
       - The webexmsg you would like to send.
-    required: True
+    required: yes
 '''
 
 EXAMPLES = """
@@ -118,7 +111,7 @@ from ansible.module_utils.urls import fetch_url
 
 
 def spark_webexmsg(module):
-    """ When check mode is specified, establish a read only connection, that does not return any user specific
+    """When check mode is specified, establish a read only connection, that does not return any user specific
     data, to validate connectivity. In regular mode, send a webexmsg to a Cisco Webex Teams Room or Individual"""
 
     # Ansible Specific Variables
@@ -170,14 +163,11 @@ def main():
     '''Ansible main. '''
     module = AnsibleModule(
         argument_spec=dict(
-            recipient_type=dict(required=True, choices=[
-                'roomId', 'toPersonEmail', 'toPersonId']),
+            recipient_type=dict(required=True, choices=['roomId', 'toPersonEmail', 'toPersonId']),
             recipient_id=dict(required=True, no_log=True),
-            webexmsg_type=dict(required=False, default=['text'], aliases=[
-                              'type'], choices=['text', 'markdown']),
-            personal_token=dict(required=True, no_log=True, aliases=['token']),
+            webexmsg_type=dict(required=False, default=['text'], choices=['text', 'markdown']),
+            personal_token=dict(required=True, no_log=True),
             webexmsg=dict(required=True)
-
         ),
 
         supports_check_mode=True
