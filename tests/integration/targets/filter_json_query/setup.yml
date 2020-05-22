@@ -1,0 +1,4 @@
+- hosts: localhost
+  tasks:
+    - pip:
+        name: jmespath
