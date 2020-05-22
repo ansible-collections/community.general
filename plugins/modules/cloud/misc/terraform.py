@@ -88,7 +88,7 @@ options:
   backend_config_files:
     description:
       - The path to a configuration file to provide at init state to the -backend-config parameter.
-        This can accept a list of pathes to multiple configuration files.
+        This can accept a list of paths to multiple configuration files.
     type: list
     elements: path
 notes:
