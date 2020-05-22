@@ -20,13 +20,11 @@ options:
     choices: ['planned', 'present', 'absent']
     description:
       - Goal state of given stage/project
-    required: false
     default: present
   binary_path:
     description:
       - The path of a terraform binary to use, relative to the 'service_path'
         unless you supply an absolute path.
-    required: false
   project_path:
     description:
       - The path to the root of the Terraform directory with the
@@ -35,14 +33,12 @@ options:
   workspace:
     description:
       - The terraform workspace to work with.
-    required: false
     default: default
   purge_workspace:
     description:
       - Only works with state = absent
       - If true, the workspace will be deleted after the "terraform destroy" action.
       - The 'default' workspace will not be deleted.
-    required: false
     default: false
     type: bool
   plan_file:
@@ -50,51 +46,44 @@ options:
       - The path to an existing Terraform plan file to apply. If this is not
         specified, Ansible will build a new TF plan and execute it.
         Note that this option is required if 'state' has the 'planned' value.
-    required: false
   state_file:
     description:
       - The path to an existing Terraform state file to use when building plan.
         If this is not specified, the default `terraform.tfstate` will be used.
       - This option is ignored when plan is specified.
-    required: false
   variables_file:
     description:
       - The path to a variables file for Terraform to fill into the TF
         configurations. This can accept a list of paths to multiple variables files.
-    required: false
+    type: list
+    elements: path
   variables:
     description:
       - A group of key-values to override template variables or those in
         variables files.
-    required: false
   targets:
     description:
       - A list of specific resources to target in this plan/application. The
         resources selected here will also auto-include any dependencies.
-    required: false
   lock:
     description:
       - Enable statefile locking, if you use a service that accepts locks (such
         as S3+DynamoDB) to store your statefile.
-    required: false
     type: bool
   lock_timeout:
     description:
       - How long to maintain the lock on the statefile, if you use a service
         that accepts locks (such as S3+DynamoDB).
-    required: false
   force_init:
     description:
       - To avoid duplicating infra, if a state file can't be found this will
         force a `terraform init`. Generally, this should be turned off unless
         you intend to provision an entirely new Terraform deployment.
     default: false
-    required: false
     type: bool
   backend_config:
     description:
       - A group of key-values to provide at init stage to the -backend-config parameter.
-    required: false
   backend_config_file:
     description:
       - The path to a configuration file to provide at init state to the -backend-config parameter.
