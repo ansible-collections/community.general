@@ -23,7 +23,7 @@ __metaclass__ = type
 
 from ansible.errors import AnsibleLookupError
 from ansible.plugins.lookup import LookupBase
-from ansible.module_utils._text import to_text, to_native
+from ansible.module_utils._text import to_native
 from ansible_collections.community.general.plugins.module_utils.sops import Sops, SopsError
 
 from ansible.utils.display import Display
@@ -79,26 +79,14 @@ class LookupModule(LookupBase):
             lookupfile = self.find_file_in_search_path(variables, 'files', term)
             display.vvvv(u"Sops lookup using %s as file" % lookupfile)
 
+            if not lookupfile:
+                raise AnsibleLookupError("could not locate file in lookup: %s" % to_native(term))
+
             try:
-                if lookupfile:
-                    (output, err, exit_code) = Sops.decrypt(lookupfile)
-
-                    # output is binary, we want UTF-8 string
-                    output = to_text(output, errors='surrogate_or_strict')
-                    # the process output is the decrypted secret; be cautious
-
-                    # sops logs always to stderr, as stdout is used for
-                    # file content
-                    if err:
-                        display.vvvv(err)
-
-                    if exit_code > 0:
-                        raise SopsError(lookupfile, exit_code, err)
-
-                    ret.append(output.rstrip())
-                else:
-                    raise AnsibleLookupError("could not locate file in lookup: %s" % to_native(term))
+                output = Sops.decrypt(lookupfile, display=display)
             except SopsError as e:
                 raise AnsibleLookupError(to_native(e))
+
+            ret.append(output.rstrip())
 
         return ret

@@ -5,7 +5,10 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
+from ansible.module_utils._text import to_text
+
 from subprocess import Popen, PIPE
+
 
 # From https://github.com/mozilla/sops/blob/master/cmd/sops/codes/codes.go
 # Should be manually updated
@@ -54,10 +57,23 @@ class Sops():
     ''' Utility class to perform sops CLI actions '''
 
     @staticmethod
-    def decrypt(encrypted_file):
+    def decrypt(encrypted_file, display=None):
         # Run sops directly, python module is deprecated
         command = ["sops", "--decrypt", encrypted_file]
         process = Popen(command, stdout=PIPE, stderr=PIPE)
         (output, err) = process.communicate()
-        exit_code = process.wait()
-        return output, err, exit_code
+        exit_code = process.returncode
+
+        # output is binary, we want UTF-8 string
+        output = to_text(output, errors='surrogate_or_strict')
+        # the process output is the decrypted secret; be cautious
+
+        # sops logs always to stderr, as stdout is used for
+        # file content
+        if err and display:
+            display.vvvv(err)
+
+        if exit_code > 0:
+            raise SopsError(encrypted_file, exit_code, err)
+
+        return output.rstrip()
