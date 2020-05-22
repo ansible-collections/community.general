@@ -276,7 +276,7 @@ def main():
             purge_workspace=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent', 'planned']),
             variables=dict(type='dict'),
-            variables_files=dict(aliases=['variabels_file'], type='list', elements='path', default=None),
+            variables_files=dict(aliases=['variables_file'], type='list', elements='path', default=None),
             plan_file=dict(type='path'),
             state_file=dict(type='path'),
             targets=dict(type='list', default=[]),
