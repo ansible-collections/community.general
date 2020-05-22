@@ -1044,10 +1044,6 @@ files:
   $modules/remote_management/imc/imc_rest.py:
     authors: dagwieers
     labels: cisco
-  $modules/remote_management/intersight/intersight_info.py:
-    authors: CiscoUcs dsoper2
-    maintainers: movinalot
-    labels: cisco
   $modules/remote_management/ipmi/:
     authors: bgaifullin
     maintainers: cloudnull
