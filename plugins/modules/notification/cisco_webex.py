@@ -28,27 +28,32 @@ options:
        - Messages can be sent to either a room or individual (by ID or E-Mail).
     required: yes
     choices: ['roomId', 'toPersonEmail', 'toPersonId']
+    type: str
 
   recipient_id:
     description:
       - The unique identifier associated with the supplied C(recipient_type).
     required: yes
+    type: str
 
   webexmsg_type:
     description:
        - Specifies how you would like the webexmsg formatted.
     default: text
     choices: ['text', 'markdown']
+    type: str
 
   personal_token:
     description:
       - Your personal access token required to validate the Webex Teams API.
     required: yes
+    type: str
 
   webexmsg:
     description:
       - The webexmsg you would like to send.
     required: yes
+    type: str
 '''
 
 EXAMPLES = """
