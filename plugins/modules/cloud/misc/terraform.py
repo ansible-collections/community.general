@@ -293,7 +293,7 @@ def main():
             lock_timeout=dict(type='int',),
             force_init=dict(type='bool', default=False),
             backend_config=dict(type='dict', default=None),
-            backend_config_file=dict(type='list', default=None),
+            backend_config_file=dict(type='list', elements='path', default=None),
         ),
         required_if=[('state', 'planned', ['plan_file'])],
         supports_check_mode=True,
