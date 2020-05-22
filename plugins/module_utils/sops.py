@@ -9,7 +9,7 @@ from subprocess import Popen, PIPE
 
 # From https://github.com/mozilla/sops/blob/master/cmd/sops/codes/codes.go
 # Should be manually updated
-sops_error_codes = {
+SOPS_ERROR_CODES = {
     1: "ErrorGeneric",
     2: "CouldNotReadInputFile",
     3: "CouldNotWriteOutputFile",
@@ -42,8 +42,11 @@ class SopsError(Exception):
     ''' Extend AnsibleError class with sops specific informations '''
 
     def __init__(self, filename, exit_code, message,):
-        exception_name = sops_error_codes[exit_code]
-        message = "error with file %s: %s exited with code %d: %s" % (filename, exception_name, exit_code, message)
+        if exit_code in SOPS_ERROR_CODES:
+            exception_name = SOPS_ERROR_CODES[exit_code]
+            message = "error with file %s: %s exited with code %d: %s" % (filename, exception_name, exit_code, message)
+        else:
+            message = "could not decrypt file %s; Unknown sops error code: %s" % (filename, exit_code)
         super(SopsError, self).__init__(message)
 
 
