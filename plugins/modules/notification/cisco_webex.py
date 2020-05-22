@@ -91,7 +91,6 @@ EXAMPLES = """
     webexmsg_type: text
     personal_token: "{{ token }}"
     webexmsg: "Cisco Webex Teams Ansible Module - Text Message to Individual by E-Mail"
-
 """
 
 RETURN = """
