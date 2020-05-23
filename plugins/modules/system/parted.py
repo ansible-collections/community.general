@@ -541,7 +541,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             device=dict(type='str', required=True),
-            align=dict(type='str', default='optimal', choices=['cylinder', 'minimal', 'none', 'optimal']),
+            align=dict(type='str', default='optimal', choices=['cylinder', 'minimal', 'none', 'optimal', 'undefined']),
             number=dict(type='int'),
 
             # unit <unit> command
