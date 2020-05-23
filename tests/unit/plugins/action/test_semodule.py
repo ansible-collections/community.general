@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division, print_function)
 from ansible_collections.community.general.plugins.action.semodule import ActionModule
 from ansible.playbook.task import Task
-from tests.unit.compat.mock import MagicMock, Mock
+from ansible_collections.community.general.tests.unit.compat.mock import MagicMock, Mock
 from ansible.plugins.loader import connection_loader
 import os
 import pytest
