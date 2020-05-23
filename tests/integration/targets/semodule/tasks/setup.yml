@@ -1,0 +1,19 @@
+- name: TEST SETUP | install module requirements redhat/centos
+  yum:
+    name: 
+      - policycoreutils
+      - selinux-policy-targeted
+      - policycoreutils-python{{'-utils' if ansible_facts.distribution_major_version | int > 7 else ''}}
+      - checkpolicy
+    state: present
+  when: (ansible_facts.distribution | lower == 'redhat') or (ansible_facts.distribution | lower == 'centos')
+
+- name: TEST SETUP | install module requirements fedora
+  dnf:
+    name: 
+      - policycoreutils
+      - selinux-policy-targeted
+      - policycoreutils-python{{'-utils' if ansible_facts.distribution_major_version | int > 28 else ''}}
+      - checkpolicy
+    state: present
+  when: "ansible_facts.distribution | lower == 'fedora'"

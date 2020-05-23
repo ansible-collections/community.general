@@ -1,0 +1,7 @@
+- name: semodule integration tests
+  block:
+    - include_tasks: setup.yml
+    - include_tasks: semodule.yml
+  when: 
+    - not 'opensuse' in ansible_facts.distribution | lower
+    - not ansible_facts.distribution | lower == 'ubuntu'
