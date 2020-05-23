@@ -19,7 +19,8 @@ description:
     command line tool. For a full description of the fields and the options
     check the GNU parted manual.
 requirements:
-  - This module requires parted version 1.8.3 and above.
+  - This module requires parted version 1.8.3 and above
+  - align option (except 'undefined') requires parted 2.1 and above
   - If the version of parted is below 3.1, it requires a Linux version running
     the sysfs file system C(/sys/).
 options:
@@ -28,9 +29,9 @@ options:
     type: str
     required: True
   align:
-    description: Set alignment for newly created partitions.
+    description: Set alignment for newly created partitions. Use 'undefined' for parted default aligment.
     type: str
-    choices: [ cylinder, minimal, none, optimal ]
+    choices: [ cylinder, minimal, none, optimal, undefined ]
     default: optimal
   number:
     description:
@@ -483,8 +484,12 @@ def parted(script, device, align):
     """
     global module, parted_exec
 
+    align_option = '-a %s' % align
+    if align == 'undefined':
+        align_option = ''
+
     if script and not module.check_mode:
-        command = "%s -s -m -a %s %s -- %s" % (parted_exec, align, device, script)
+        command = "%s -s -m %s %s -- %s" % (parted_exec, align_option, device, script)
         rc, out, err = module.run_command(command)
 
         if rc != 0:
