@@ -1,0 +1,2 @@
+bugfixes:
+  - "parted - fix return value documentation (#362)"
