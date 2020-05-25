@@ -87,10 +87,10 @@ class ActionModule(ActionBase):
                 else:
                     result['changed'] = False
         except AnsibleError as error:
-                result['failed'] = True
-                result['msg'] = to_text(error)
-                result['exception'] = traceback.format_exc()
+            result['failed'] = True
+            result['msg'] = to_text(error)
+            result['exception'] = traceback.format_exc()
         finally:
             # clean up temp path
             self._remove_tmp_path(self._connection._shell.tmpdir)
-            return result
+        return result
