@@ -219,6 +219,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 self.inventory.add_host(machine_name)
 
                 # check for valid ip address from inspect output, else explicitly use ip command to find host ip address
+                # this works around an issue seen with Google Compute Platform where the IP address was not available
+                # via the 'inspect' subcommand but was via the 'ip' subcomannd.
                 if self.node_attrs['Driver']['IPAddress']:
                     ip_addr = self.node_attrs['Driver']['IPAddress']
                 else:
