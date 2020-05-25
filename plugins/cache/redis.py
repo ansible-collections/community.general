@@ -69,7 +69,7 @@ class CacheModule(BaseCacheModule):
     performance.
     """
     def __init__(self, *args, **kwargs):
-        connection = []
+        uri = ''
 
         try:
             super(CacheModule, self).__init__(*args, **kwargs)
@@ -89,8 +89,8 @@ class CacheModule(BaseCacheModule):
         kw = {}
         tlsprefix = 'tls://'
         if uri.startswith(tlsprefix):
-          kw['ssl'] = True
-          uri = uri[len(tlsprefix):]
+            kw['ssl'] = True
+            uri = uri[len(tlsprefix):]
 
         connection = uri.split(':')
         self._db = StrictRedis(*connection, **kw)
