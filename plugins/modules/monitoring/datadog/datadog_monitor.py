@@ -134,6 +134,11 @@ options:
           - The ID of the alert.
           - If set, will be used instead of the name to locate the alert.
         type: str
+    include_tags:
+        description:
+          - Whether notifications from this monitor automatically inserts its triggering tags into the title.
+        type: bool
+        default: 'yes'
 '''
 
 EXAMPLES = '''
@@ -216,7 +221,8 @@ def main():
             require_full_window=dict(required=False, default=None, type='bool'),
             new_host_delay=dict(required=False, default=None),
             evaluation_delay=dict(required=False, default=None),
-            id=dict(required=False)
+            id=dict(required=False),
+            include_tags=dict(required=False, default=True, type='bool')
         )
     )
 
@@ -330,7 +336,8 @@ def install_monitor(module):
         "locked": module.boolean(module.params['locked']),
         "require_full_window": module.params['require_full_window'],
         "new_host_delay": module.params['new_host_delay'],
-        "evaluation_delay": module.params['evaluation_delay']
+        "evaluation_delay": module.params['evaluation_delay'],
+        "include_tags": module.boolean(module.params['include_tags'])
     }
 
     if module.params['type'] == "service check":
