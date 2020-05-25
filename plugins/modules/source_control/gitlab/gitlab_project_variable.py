@@ -53,6 +53,7 @@ options:
       - Support for protected values requires GitLab >= 9.3.
       - Support for masked values requires GitLab >= 11.10.
       - A I(value) must be a string or a number.
+      - Field I(variable_type) must be a string with either C(env_var), which is the default, or C(file).
       - When a value is masked, it must be in Base64 and have a length of at least 8 characters.
         See GitLab documentation on acceptable values for a masked variable (https://docs.gitlab.com/ce/ci/variables/#masked-variables).
     default: {}
@@ -83,6 +84,7 @@ EXAMPLES = '''
         value: 3214cbad
         masked: true
         protected: true
+        variable_type: env_var
 
 - name: Delete one variable
   gitlab_project_variable:
@@ -155,26 +157,27 @@ class GitlabProjectVariables(object):
     def list_all_project_variables(self):
         return self.project.variables.list()
 
-    def create_variable(self, key, value, masked, protected):
+    def create_variable(self, key, value, masked, protected, variable_type):
         if self._module.check_mode:
             return
         return self.project.variables.create({"key": key, "value": value,
-                                              "masked": masked, "protected": protected})
+                                              "masked": masked, "protected": protected,
+                                              "variable_type": variable_type})
 
-    def update_variable(self, key, var, value, masked, protected):
-        if var.value == value and var.protected == protected and var.masked == masked:
+    def update_variable(self, key, var, value, masked, protected, variable_type):
+        if var.value == value and var.protected == protected and var.masked == masked and var.variable_type == variable_type:
             return False
 
         if self._module.check_mode:
             return True
 
-        if var.protected == protected and var.masked == masked:
+        if var.protected == protected and var.masked == masked and var.variable_type == variable_type:
             var.value = value
             var.save()
             return True
 
         self.delete_variable(key)
-        self.create_variable(key, value, masked, protected)
+        self.create_variable(key, value, masked, protected, variable_type)
         return True
 
     def delete_variable(self, key):
@@ -197,10 +200,12 @@ def native_python_main(this_gitlab, purge, var_list, state, module):
             value = var_list[key]
             masked = False
             protected = False
+            variable_type = 'env_var'
         elif isinstance(var_list[key], dict):
             value = var_list[key].get('value')
             masked = var_list[key].get('masked', False)
             protected = var_list[key].get('protected', False)
+            variable_type = var_list[key].get('variable_type', 'env_var')
         else:
             module.fail_json(msg="value must be of type string, integer or dict")
 
@@ -212,7 +217,8 @@ def native_python_main(this_gitlab, purge, var_list, state, module):
                 single_change = this_gitlab.update_variable(key,
                                                             gitlab_keys[index],
                                                             value, masked,
-                                                            protected)
+                                                            protected,
+                                                            variable_type)
                 change = single_change or change
                 if single_change:
                     return_value['updated'].append(key)
@@ -225,7 +231,7 @@ def native_python_main(this_gitlab, purge, var_list, state, module):
                 return_value['removed'].append(key)
 
         elif key not in existing_variables and state == 'present':
-            this_gitlab.create_variable(key, value, masked, protected)
+            this_gitlab.create_variable(key, value, masked, protected, variable_type)
             change = True
             return_value['added'].append(key)
 
