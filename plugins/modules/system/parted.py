@@ -108,12 +108,15 @@ partition_info:
   returned: success
   type: complex
   contains:
-    device:
+    disk:
       description: Generic device information.
       type: dict
     partitions:
       description: List of device partitions.
       type: list
+    script:
+      description: parted script executed by module
+      type: str
   sample: {
       "disk": {
         "dev": "/dev/sdb",
@@ -140,7 +143,8 @@ partition_info:
         "name": "",
         "num": 2,
         "size": 4.0
-      }]
+      }],
+      "script": "unit KiB print "
     }
 '''
 
