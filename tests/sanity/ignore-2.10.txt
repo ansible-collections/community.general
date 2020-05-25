@@ -1,3 +1,5 @@
+plugins/modules/system/semodule.py validate-modules:doc-choices-do-not-match-spec
+plugins/modules/system/semodule.py validate-modules:no-default-for-system
 plugins/cache/memcached.py pylint:collection-invalid-deprecated-version
 plugins/cache/redis.py pylint:collection-invalid-deprecated-version
 plugins/callback/hipchat.py pylint:blacklisted-name
