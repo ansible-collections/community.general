@@ -442,3 +442,23 @@
     name: gnu-netcat
     state: present
     force_resolution: True
+
+- name: remove gnu-netcat and re-install netcat-openbsd
+  zypper:
+    name:
+      - -gnu-netcat
+      - +netcat-openbsd
+    state: present
+
+- name: Install gnu-netcat with force_resolution and replacefiles
+  zypper:
+    name: gnu-netcat
+    state: present
+    force_resolution: true
+    replacefiles: true
+
+- name: Dist upgrade with allow_vendor_change
+  zypper:
+    name: '*'
+    state: dist-upgrade
+    allow_vendor_change: true
