@@ -87,22 +87,22 @@ requirements:
 
 EXAMPLES = r'''
 - name: divert /usr/bin/busybox to /usr/bin/busybox.distrib and keep file in place
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: /usr/bin/busybox
 
 - name: divert /usr/bin/busybox by package 'branding'
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: /usr/bin/busybox
     holder: branding
 
 - name: divert and rename busybox to busybox.dpkg-divert
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: /usr/bin/busybox
     divert: /usr/bin/busybox.dpkg-divert
     rename: yes
 
 - name: remove the busybox diversion and move the diverted file back
-  dpkg_divert:
+  community.general.dpkg_divert:
     path: /usr/bin/busybox
     state: absent
     rename: yes
