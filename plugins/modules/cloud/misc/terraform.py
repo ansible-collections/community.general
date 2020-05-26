@@ -32,6 +32,11 @@ options:
       - The path to the root of the Terraform directory with the
         vars.tf/main.tf/etc to use.
     required: true
+  log_error_path:
+    description:
+      - The path to the root of the Terraform directory with the
+        vars.tf/main.tf/etc to use.
+    required: false  
   workspace:
     description:
       - The terraform workspace to work with.
@@ -105,11 +110,13 @@ EXAMPLES = """
 - name: Basic deploy of a service
   terraform:
     project_path: '{{ project_dir }}'
+    log_error_path: '{{ error_dir }}'
     state: present
 
 - name: Define the backend configuration at init
   terraform:
     project_path: 'project/'
+    log_error_path: 'error/'
     state: "{{ state }}"
     force_init: true
     backend_config:
@@ -154,20 +161,15 @@ import tempfile
 import traceback
 import time
 import csv
-import logging
 
 from datetime import datetime
 from io import StringIO
 from ansible.module_utils.six.moves import shlex_quote
-
 from ansible.module_utils.basic import AnsibleModule
 
 DESTROY_ARGS = ('destroy', '-no-color', '-force')
 APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve=true')
 module = None
-
-logging.basicConfig(filename='error.log',level=logging.INFO)
-
 
 current_DateTime = datetime.now().strftime("%d/%m/%Y %H:%M:$S")
 
@@ -202,14 +204,12 @@ def create_error_file_and_directory(log_error_path):
 
       
 def _state_args(state_file):
-  try:
       if state_file and os.path.exists(state_file):
           return ['-state', state_file]
       if state_file and not os.path.exists(state_file):
           module.fail_json(msg='Could not find state_file "{0}", check the path and try again.'.format(state_file))
       return []
-  except Exception as e:
-    print(e)
+ 
 
 def init_plugins(bin_path, project_path, backend_config):
     command = [bin_path, 'init', '-input=false']
@@ -224,8 +224,7 @@ def init_plugins(bin_path, project_path, backend_config):
         module.fail_json(msg="Failed to initialize Terraform modules:\r\n{0}".format(err))
 
 
-def get_workspace_context(bin_path, project_path):
-  try:
+def get_workspace_context(bin_path, project_path): 
     workspace_ctx = {"current": "default", "all": []}
     command = [bin_path, 'workspace', 'list', '-no-color']
     rc, out, err = module.run_command(command, cwd=project_path)
@@ -240,19 +239,16 @@ def get_workspace_context(bin_path, project_path):
         else:
             workspace_ctx["all"].append(stripped_item)
     return workspace_ctx
-  except Exception as e:
-    print (e)  
+ 
 
 
 def _workspace_cmd(bin_path, project_path, action, workspace):
-  try:
     command = [bin_path, 'workspace', action, workspace, '-no-color']
     rc, out, err = module.run_command(command, cwd=project_path)
     if rc != 0:
         module.fail_json(msg="Failed to {0} workspace:\r\n{1}".format(action, err))
     return rc, out, err
-  except Exception as e:
-    print(e)
+
 
 def create_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'new', workspace)
@@ -266,8 +262,7 @@ def remove_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'delete', workspace)
 
 
-def build_plan(command, project_path, variables_args, state_file, targets, state, plan_path=None):
-  try:
+def build_plan(command, project_path, variables_args, state_file, targets, state, plan_path=None):  
     if plan_path is None:
         f, plan_path = tempfile.mkstemp(suffix='.tfplan')
 
@@ -291,8 +286,7 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
         return plan_path, True, out, err, plan_command if state == 'planned' else command
 
     module.fail_json(msg='Terraform plan failed with unexpected exit code {0}. \r\nSTDOUT: {1}\r\n\r\nSTDERR: {2}'.format(rc, out, err))
-  except Exception as e:
-    print(e)
+  
 
 def main():
     global module
@@ -427,12 +421,6 @@ def main():
         remove_workspace(command[0], project_path, workspace)
 
     module.exit_json(changed=changed, state=state, workspace=workspace, outputs=outputs, stdout=out, stderr=err, command=' '.join(command))
-
-try:
-  main()
-except Exception as e:
-  logging.error('Error occurred '+ str(e))
-  print('Error on occurred ', str(e))  
 
 
 if __name__ == '__main__':
