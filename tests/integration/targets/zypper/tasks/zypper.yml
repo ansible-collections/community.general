@@ -470,7 +470,7 @@
     - name: install duplicate rpms
       zypper:
         name: >-
-          {{ output_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}1-0.noarch.rpm
+          {{ output_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}-1-0.noarch.rpm
         disable_gpg_check: true
       ignore_errors: true
       register: zypper_duplicate_result
@@ -487,7 +487,7 @@
     - name: install duplicate rpms
       zypper:
         name: >-
-          {{ output_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}1-0.noarch.rpm
+          {{ output_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}-1-0.noarch.rpm
         disable_gpg_check: true
         replacefiles: true
       ignore_errors: true
