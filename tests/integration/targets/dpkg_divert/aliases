@@ -1,0 +1,7 @@
+shippable/posix/group4
+skip/aix
+skip/centos
+skip/freebsd
+skip/opensuse
+skip/osx
+skip/rhel
