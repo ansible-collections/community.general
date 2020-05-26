@@ -472,7 +472,7 @@
         name: >-
           {{ output_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}1-0.noarch.rpm
         disable_gpg_check: true
-        ignore_errors: true
+      ignore_errors: true
       register: zypper_duplicate_result
       loop: "{{ looplist }}"
 
@@ -490,7 +490,7 @@
           {{ output_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}1-0.noarch.rpm
         disable_gpg_check: true
         replacefiles: true
-        ignore_errors: true
+      ignore_errors: true
       register: zypper_duplicate_result
       loop: "{{ looplist }}"
 
