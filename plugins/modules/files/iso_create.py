@@ -108,7 +108,7 @@ source_file:
 created_iso:
     description: Created iso file path.
     returned: on success
-    type: path
+    type: str
     sample: "/path/to/test.iso"
 interchange_level:
     description: Configured interchange level.
@@ -191,7 +191,7 @@ def add_directory(module, iso_file=None, dir_path=None, rock_ridge=None, use_jol
 
 def main():
     argument_spec = dict(
-        src_files=dict(type='list', required=True),
+        src_files=dict(type='list', required=True, elements='path'),
         dest_iso=dict(type='path', required=True),
         interchange_level=dict(type='int', choices=[1, 2, 3, 4], default=1),
         vol_ident=dict(type='str'),
