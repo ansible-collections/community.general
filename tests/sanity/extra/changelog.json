@@ -8,6 +8,6 @@
         "changelogs/fragments/."
     ],
     "requirements": [
-        "git+git://github.com/ansible-community/antsibull.git@pip-installable#egg=antsibull"
+        "antsibull"
     ]
 }
