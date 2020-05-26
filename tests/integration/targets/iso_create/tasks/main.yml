@@ -6,12 +6,12 @@
 - set_fact:
     output_dir_test: '{{ output_dir }}/test_iso_create'
 
-- include_tasks: prepare_dest_dir.yml
+# - include_tasks: prepare_dest_dir.yml
 
 - name: Test check mode
   iso_create:
     src_files:
-      - ./files/test1.cfg
+      - "{{ role_path }}/files/test1.cfg"
     dest_iso: "{{ output_dir_test }}/test.iso"
     interchange_level: 3
   register: iso_result
@@ -31,7 +31,7 @@
 - name: Create iso file with a specified file
   iso_create:
     src_files:
-      - ./files/test1.cfg
+      - "{{ role_path }}/files/test1.cfg"
     dest_iso: "{{ output_dir_test }}/test.iso"
     interchange_level: 3
   register: iso_result
@@ -50,8 +50,8 @@
 - name: Create iso file with a specified file and folder
   iso_create:
     src_files:
-      - ./files/test1.cfg
-      - ./files/test_dir
+      - "{{ role_path }}/files/test1.cfg"
+      - "{{ role_path }}/files/test_dir"
     dest_iso: "{{ output_dir_test }}/test1.iso"
     interchange_level: 3
   register: iso_result
@@ -70,7 +70,7 @@
 - name: Create iso file with volume identification string 
   iso_create:
     src_files:
-      - ./files/test1.cfg
+      - "{{ role_path }}/files/test1.cfg"
     dest_iso: "{{ output_dir_test }}/test2.iso"
     vol_ident: "OEMDRV"
   register: iso_result
@@ -89,7 +89,7 @@
 - name: Create iso file with Rock Ridge extention
   iso_create:
     src_files:
-      - ./files/test1.cfg
+      - "{{ role_path }}/files/test1.cfg"
     dest_iso: "{{ output_dir_test }}/test3.iso"
     rock_ridge: "1.09"
   register: iso_result
@@ -108,7 +108,7 @@
 - name: Create iso file with Joliet extention
   iso_create:
     src_files:
-      - ./files/test1.cfg
+      - "{{ role_path }}/files/test1.cfg"
     dest_iso: "{{ output_dir_test }}/test4.iso"
     joliet: 3
   register: iso_result
@@ -127,7 +127,7 @@
 - name: Create iso file with UDF enabled
   iso_create:
     src_files:
-      - ./files/test1.cfg
+      - "{{ role_path }}/files/test1.cfg"
     dest_iso: "{{ output_dir_test }}/test5.iso"
     udf: True
   register: iso_result
