@@ -456,9 +456,3 @@
     state: present
     force_resolution: true
     replacefiles: true
-
-- name: Dist upgrade with allow_vendor_change
-  zypper:
-    name: '*'
-    state: dist-upgrade
-    allow_vendor_change: true
