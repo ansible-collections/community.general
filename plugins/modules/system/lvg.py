@@ -145,7 +145,7 @@ def main():
             pvs=dict(type='list'),
             pesize=dict(type='str', default='4'),
             pv_options=dict(type='str', default=''),
-            pvresize=dict(type='bool', default=True),
+            pvresize=dict(type='bool', default=False),
             vg_options=dict(type='str', default=''),
             state=dict(type='str', default='present', choices=['absent', 'present']),
             force=dict(type='bool', default=False),
