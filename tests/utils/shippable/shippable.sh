@@ -46,7 +46,7 @@ function retry
 command -v pip
 pip --version
 pip list --disable-pip-version-check
-retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+retry pip install https://github.com/nitzmahone/ansible/archive/delegated_import_fix.tar.gz --disable-pip-version-check
 
 # START: HACK
 if [ "${script}" == "osx" ]; then
