@@ -3,6 +3,3 @@ skip/aix
 skip/osx
 skip/rhel
 skip/freebsd
-skip/linux/centos
-skip/linux/fedora
-skip/linux/opensuse
