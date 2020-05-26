@@ -443,16 +443,62 @@
     state: present
     force_resolution: True
 
-- name: remove gnu-netcat and re-install netcat-openbsd
-  zypper:
-    name:
-      - -gnu-netcat
-      - +netcat-openbsd
-    state: present
+- name: duplicate rpms block
+  vars:
+    looplist:
+      - 1
+      - 2
+  block:
+    - name: Deploy spec files to build 2 packages with duplicate files.
+      template:
+        src: duplicate.spec.j2
+        dest: "{{ output_dir | expanduser }}/zypper2/duplicate{{ item }}.spec"
+      loop: "{{ looplist }}"
 
-- name: Install gnu-netcat with force_resolution and replacefiles
-  zypper:
-    name: gnu-netcat
-    state: present
-    force_resolution: true
-    replacefiles: true
+    - name: build rpms with duplicate files
+      command: |
+        rpmbuild -bb \
+        --define "_topdir {{output_dir | expanduser }}/zypper2/rpm-build"
+        --define "_builddir %{_topdir}" \
+        --define "_rpmdir %{_topdir}" \
+        --define "_srcrpmdir %{_topdir}" \
+        --define "_specdir {{output_dir | expanduser}}/zypper2" \
+        --define "_sourcedir %{_topdir}" \
+        {{ output_dir | expanduser }}/zypper2/duplicate{{ item }}.spec
+      loop: "{{ looplist }}"
+
+    - name: install duplicate rpms
+      zypper:
+        name: >-
+          {{ output_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}1-0.noarch.rpm
+        disable_gpg_check: true
+        ignore_errors: true
+      register: zypper_duplicate_result
+      loop: "{{ looplist }}"
+
+    - name: Debug zypper_duplicate_result
+      debug:
+        var: zypper_duplicate_result
+    - name: Check failure when installing rpms with duplicate files without replacefiles option
+      assert:
+        that:
+          - zypper_duplicate_result is failed
+
+    - name: install duplicate rpms
+      zypper:
+        name: >-
+          {{ output_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}1-0.noarch.rpm
+        disable_gpg_check: true
+        replacefiles: true
+        ignore_errors: true
+      register: zypper_duplicate_result
+      loop: "{{ looplist }}"
+
+    - name: Debug zypper_duplicate_result
+      debug:
+        var: zypper_duplicate_result
+    - name: Check success installing rpms with duplicate files using replacefiles option
+      assert:
+        that:
+          - zypper_duplicate_result is successful
+          - zypper_duplicate_result is changed
