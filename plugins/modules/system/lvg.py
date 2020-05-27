@@ -42,7 +42,11 @@ options:
     type: str
   pvresize:
     description:
+<<<<<<< HEAD
+    - If C(yes) resize the physical volume to the maximum available size.
+=======
     - If C(yes), resize the physical volume to the maximum available size.
+>>>>>>> ac63e2c7506f1aef918dd4a070d5f717f4ce7d55
     type: bool
     default: false
   vg_options:
@@ -94,6 +98,12 @@ EXAMPLES = r'''
   lvg:
     vg: vg.services
     state: absent
+
+- name: Create a volume group on top of /dev/sda3 that suports increases in /dev/sda3 size
+  lvg:
+    vg: resizableVG
+    pvs: /dev/sda3
+    pvresize: yes
 '''
 
 import itertools
