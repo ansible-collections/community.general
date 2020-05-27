@@ -347,8 +347,8 @@ def main():
         plan_file, needs_application, out, err, command = build_plan(command, project_path, variables_args, state_file,
                                                                      module.params.get('targets'), state, plan_file)
         if '- destroy' in out:
-            module.fail_json(msg="Aborting command because it would result in the deletion of resource."
-                             "Consider switching the 'check_deletes' to false to suppress this error")
+            module.fail_json(msg="Aborting command because it would result in the deletion of resource. Consider switching the 'check_deletes' to false to "
+                             "suppress this error")
 
     preflight_validation(command[0], project_path, variables_args)
 
