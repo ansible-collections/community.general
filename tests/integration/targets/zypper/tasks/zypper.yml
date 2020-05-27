@@ -419,6 +419,12 @@
       - zypper_result_update_cache_check is successful
       - zypper_result_update_cache_check is not changed
 
+- name: ensure no previous netcat package still exists
+  zypper:
+    name:
+      - netcat-openbsd
+      - gnu-netcat
+    state: absent
 
 - name: install netcat-openbsd which conflicts with gnu-netcat
   zypper:
