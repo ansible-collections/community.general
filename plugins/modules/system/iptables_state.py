@@ -7,9 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
 
 DOCUMENTATION = r'''
 ---
@@ -33,7 +30,7 @@ description:
 notes:
   - The rollback feature is not a module option and depends on task's
     attributes. To enable it, the module must be played asynchronously, i.e.
-    by setting task attributes I(poll) to I(0), and I(async) to a value less
+    by setting task attributes I(poll) to C(0), and I(async) to a value less
     or equal to C(ANSIBLE_TIMEOUT). If I(async) is greater, the rollback will
     still happen if it shall happen, but you will experience a connection
     timeout instead of more relevant info returned by the module after its
