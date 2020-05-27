@@ -487,9 +487,6 @@
         src: /usr/lib/duplicate/duplicate.txt
       register: duplicate_out
 
-    - name: Debug zypper_duplicate_result
-      debug:
-        var: zypper_duplicate_result
     - name: Check failure when installing rpms with duplicate files without replacefiles option
       assert:
         that:
@@ -514,9 +511,6 @@
         src: /usr/lib/duplicate/duplicate.txt
       register: duplicate_out
 
-    - name: Debug zypper_duplicate_result
-      debug:
-        var: zypper_duplicate_result
     - name: Check success installing rpms with duplicate files using replacefiles option
       assert:
         that:
