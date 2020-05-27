@@ -259,22 +259,22 @@ def main():
         if current_devs:
             if state == 'present' and pvresize:
                 for device in current_devs:
+                    pvresize_cmd = module.get_bin_path('pvresize', True)
                     pvdisplay_cmd = module.get_bin_path('pvdisplay', True)
                     pvdisplay_ops = ["--units", "b", "--columns", "--noheadings", "--nosuffix"]
-                    pvdiplay_cmd_device_options = [pvdisplay_cmd, device] + pvdisplay_ops
-                    rc, dev_size, err = module.run_command(pvdiplay_cmd_device_options + ["-o", "dev_size"])
+                    pvdisplay_cmd_device_options = [pvdisplay_cmd, device] + pvdisplay_ops
+                    rc, dev_size, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "dev_size"])
                     dev_size = int(dev_size.replace(" ", ""))
-                    rc, pv_size, err = module.run_command(pvdiplay_cmd_device_options + ["-o", "pv_size"])
+                    rc, pv_size, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "pv_size"])
                     pv_size = int(pv_size.replace(" ", ""))
-                    rc, pe_start, err = module.run_command(pvdiplay_cmd_device_options + ["-o", "pe_start"])
+                    rc, pe_start, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "pe_start"])
                     pe_start = int(pe_start.replace(" ", ""))
-                    rc, vg_extent_size, err = module.run_command(pvdiplay_cmd_device_options + ["-o", "vg_extent_size"])
+                    rc, vg_extent_size, err = module.run_command(pvdisplay_cmd_device_options + ["-o", "vg_extent_size"])
                     vg_extent_size = int(vg_extent_size.replace(" ", ""))
                     if (dev_size - (pe_start + pv_size)) > vg_extent_size:
                         if module.check_mode:
                             changed = True
                         else:
-                            pvresize_cmd = module.get_bin_path('pvresize', True)
                             rc, _, err = module.run_command([pvresize_cmd, device])
                             if rc != 0:
                                 module.fail_json(msg="Failed executing pvresize command.", rc=rc, err=err)
