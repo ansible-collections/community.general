@@ -523,3 +523,9 @@
           - zypper_duplicate_result is successful
           - zypper_duplicate_result is changed
           - '"duplicate2" in duplicate_out.content | b64decode'
+
+    - name: Remove installed duplicate rpms
+      zypper:
+        name: "duplicate{{ item }}-1-0"
+        state: absent
+      loop: "{{ looplist }}"
