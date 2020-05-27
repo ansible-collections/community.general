@@ -42,11 +42,7 @@ options:
     type: str
   pvresize:
     description:
-<<<<<<< HEAD
-    - If C(yes) resize the physical volume to the maximum available size.
-=======
     - If C(yes), resize the physical volume to the maximum available size.
->>>>>>> ac63e2c7506f1aef918dd4a070d5f717f4ce7d55
     type: bool
     default: false
   vg_options:
