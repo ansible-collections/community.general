@@ -157,8 +157,6 @@ command:
 import os
 import json
 import tempfile
-import traceback
-import time
 import csv
 
 from datetime import datetime
@@ -171,8 +169,10 @@ APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve=true')
 module = None
 current_DateTime = datetime.now().strftime("%d/%m/%Y %H:%M:$S")
 
+
 def preflight_validation(bin_path, project_path, log_error_path, variables_args=None, plan_file=None):
     dir_name = log_error_path
+
     if project_path in [None, ''] or '/' not in project_path:
         module.fail_json(msg="Path for Terraform project can not be None or ''.")
     if not os.path.exists(bin_path):
@@ -182,29 +182,29 @@ def preflight_validation(bin_path, project_path, log_error_path, variables_args=
 
     rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, cwd=project_path, use_unsafe_shell=True)
     if rc != 0:
-      with open(dir_name, 'a+', newline='') as file_op:
-        writer = csv.writer(file_op)
-        writer.writerow(StringIO("ERROR RECORDED on "+ current_DateTime + '\r\n' + err))
-      module.fail_json(msg="Failed to validate Terraform configuration files:\r\n{0}".format(err))
+        with open(dir_name, 'a+', newline='') as file_op:
+            writer = csv.writer(file_op)
+            writer.writerow(StringIO("ERROR RECORDED on " + current_DateTime + '\r\n' + err))
+        module.fail_json(msg="Failed to validate Terraform configuration files:\r\n{0}".format(err))
 
 
 def create_error_file_and_directory(log_error_path):
-  error_directory_name, error_file_name = os.path.split(log_error_path)
-  if not os.path.exists(error_directory_name):
-    os.makedirs(error_directory_name)
+    error_directory_name, error_file_name = os.path.split(log_error_path)
+    if not os.path.exists(error_directory_name):
+        os.makedirs(error_directory_name)
 
-  if not os.path.exists(log_error_path):
-    with open(log_error_path, 'w') as file:
-      writer = csv.writer(file, delimiter=',')
-      writer.writerow(StringIO(file))
+    if not os.path.exists(log_error_path):
+        with open(log_error_path, 'w') as file:
+            writer = csv.writer(file, delimiter=',')
+            writer.writerow(StringIO(file))
 
 
 def _state_args(state_file):
-      if state_file and os.path.exists(state_file):
-          return ['-state', state_file]
-      if state_file and not os.path.exists(state_file):
-          module.fail_json(msg='Could not find state_file "{0}", check the path and try again.'.format(state_file))
-      return []
+    if state_file and os.path.exists(state_file):
+        return ['-state', state_file]
+    if state_file and not os.path.exists(state_file):
+        module.fail_json(msg='Could not find state_file "{0}", check the path and try again.'.format(state_file))
+    return []
 
 
 def init_plugins(bin_path, project_path, backend_config):
@@ -236,6 +236,7 @@ def get_workspace_context(bin_path, project_path):
             workspace_ctx["all"].append(stripped_item)
     return workspace_ctx
 
+
 def _workspace_cmd(bin_path, project_path, action, workspace):
     command = [bin_path, 'workspace', action, workspace, '-no-color']
     rc, out, err = module.run_command(command, cwd=project_path)
@@ -243,14 +244,18 @@ def _workspace_cmd(bin_path, project_path, action, workspace):
         module.fail_json(msg="Failed to {0} workspace:\r\n{1}".format(action, err))
     return rc, out, err
 
+
 def create_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'new', workspace)
+
 
 def select_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'select', workspace)
 
+
 def remove_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'delete', workspace)
+
 
 def build_plan(command, project_path, variables_args, state_file, targets, state, plan_path=None):
     if plan_path is None:
@@ -276,6 +281,7 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
         return plan_path, True, out, err, plan_command if state == 'planned' else command
 
     module.fail_json(msg='Terraform plan failed with unexpected exit code {0}. \r\nSTDOUT: {1}\r\n\r\nSTDERR: {2}'.format(rc, out, err))
+
 
 def main():
     global module
@@ -331,7 +337,6 @@ def main():
         else:
             select_workspace(command[0], project_path, workspace)
 
-    #APPLYING PRESENT AND ABSENT
     if state == 'present':
         command.extend(APPLY_ARGS)
     elif state == 'absent':
@@ -348,7 +353,6 @@ def main():
 
     preflight_validation(command[0], project_path, log_error_path, variables_args)
 
-    #LOCK MODULE
     if module.params.get('lock') is not None:
         if module.params.get('lock'):
             command.append('-lock=true')
