@@ -485,7 +485,7 @@
     - name: Read in duplicate file contents
       slurp:
         src: /usr/lib/duplicate/duplicate.txt
-      register: duplicate_content
+      register: duplicate_out
 
     - name: Debug zypper_duplicate_result
       debug:
@@ -497,7 +497,7 @@
           - zypper_duplicate_result.results[1] is failed
           - '"fileconflict" in zypper_duplicate_result.results[1].stdout'
           - '"/usr/lib/duplicate/duplicate.txt" in zypper_duplicate_result.results[1].stdout'
-          - '"duplicate1" in duplicate_content | b64decode'
+          - '"duplicate1" in duplicate_out.content | b64decode'
 
     - name: install duplicate rpms
       zypper:
@@ -512,7 +512,7 @@
     - name: Read in duplicate file contents
       slurp:
         src: /usr/lib/duplicate/duplicate.txt
-      register: duplicate_content
+      register: duplicate_out
 
     - name: Debug zypper_duplicate_result
       debug:
@@ -522,4 +522,4 @@
         that:
           - zypper_duplicate_result is successful
           - zypper_duplicate_result is changed
-          - '"duplicate2" in duplicate_content | b64decode'
+          - '"duplicate2" in duplicate_out.content | b64decode'
