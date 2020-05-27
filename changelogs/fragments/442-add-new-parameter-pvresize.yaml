@@ -1,2 +1,2 @@
 minor_changes:
-    - lvg - add ``pvresize`` new parameter (https://link to the issue).
+    - lvg - add ``pvresize`` new parameter (https://github.com/ansible/ansible/issues/29139).
