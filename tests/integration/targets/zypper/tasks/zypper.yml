@@ -495,8 +495,8 @@
         that:
           - zypper_duplicate_result.results[0] is successful
           - zypper_duplicate_result.results[1] is failed
-          - '"fileconflict" in zypper_duplicate_results.results[1].stdout'
-          - '"/usr/lib/duplicate/duplicate.txt" in zypper_duplicate_results.results[1].stdout'
+          - '"fileconflict" in zypper_duplicate_result.results[1].stdout'
+          - '"/usr/lib/duplicate/duplicate.txt" in zypper_duplicate_result.results[1].stdout'
           - '"duplicate1" in duplicate_content | b64decode'
 
     - name: install duplicate rpms
