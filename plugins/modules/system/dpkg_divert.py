@@ -7,9 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
 
 DOCUMENTATION = r'''
 ---
@@ -40,8 +37,8 @@ options:
   state:
     description:
       - When I(state=absent), remove the diversion of the specified
-        C(path); when I(state=present), create the diversion if it does
-        not exist, or update its package C(holder) or C(divert) location,
+        I(path); when I(state=present), create the diversion if it does
+        not exist, or update its package I(holder) or I(divert) location,
         when specified.
     type: str
     default: present
@@ -59,7 +56,7 @@ options:
   divert:
     description:
       - The location where the versions of file will be diverted.
-      - Default is to add suffix I(.distrib) to the file path.
+      - Default is to add suffix C(.distrib) to the file path.
       - This parameter is ignored when I(state=absent).
     type: path
   rename:
@@ -72,7 +69,7 @@ options:
         exists (this lock being a dpkg-divert feature, and bypassing it being
         a module feature).
     type: bool
-    default: false
+    default: no
   force:
     description:
       - When I(rename=true) and I(force=true), renaming is performed even if
@@ -80,28 +77,28 @@ options:
         file at this location will be lost.
       - This parameter is ignored when I(rename=false).
     type: bool
-    default: false
+    default: no
 requirements:
   - dpkg-divert >= 1.15.0 (Debian family)
 '''
 
 EXAMPLES = r'''
-- name: divert /usr/bin/busybox to /usr/bin/busybox.distrib and keep file in place
+- name: Divert /usr/bin/busybox to /usr/bin/busybox.distrib and keep file in place
   community.general.dpkg_divert:
     path: /usr/bin/busybox
 
-- name: divert /usr/bin/busybox by package 'branding'
+- name: Divert /usr/bin/busybox by package 'branding'
   community.general.dpkg_divert:
     path: /usr/bin/busybox
     holder: branding
 
-- name: divert and rename busybox to busybox.dpkg-divert
+- name: Divert and rename busybox to busybox.dpkg-divert
   community.general.dpkg_divert:
     path: /usr/bin/busybox
     divert: /usr/bin/busybox.dpkg-divert
     rename: yes
 
-- name: remove the busybox diversion and move the diverted file back
+- name: Remove the busybox diversion and move the diverted file back
   community.general.dpkg_divert:
     path: /usr/bin/busybox
     state: absent
@@ -111,7 +108,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 commands:
-  description: the dpkg-divert commands ran internally by the module
+  description: The dpkg-divert commands ran internally by the module.
   type: list
   returned: on_success
   elements: str
@@ -121,7 +118,7 @@ commands:
       "/usr/bin/dpkg-divert --package ansible --no-rename --add /etc/foobarrc"
     ]
 messages:
-  description: the dpkg-divert relevant messages (stdout or stderr)
+  description: The dpkg-divert relevant messages (stdout or stderr).
   type: list
   returned: on_success
   elements: str
@@ -131,38 +128,38 @@ messages:
       "Adding 'diversion of /etc/foobarrc to /etc/foobarrc.distrib by ansible'"
     ]
 diversion:
-  description: the status of the diversion before and after task
+  description: The status of the diversion before and after task.
   type: dict
   returned: on_success
   contains:
     after:
-      description: the state of the diversion after module execution
+      description: The state of the diversion after module execution.
       type: dict
       contains:
         divert:
-          description: the location of the diverted file
+          description: The location of the diverted file.
           type: str
         holder:
-          description: the package holding the diversion
+          description: The package holding the diversion.
           type: str
         state:
-          description: the state of the diversion
+          description: The state of the diversion.
           type: str
     before:
       description: the state of the diversion before module execution
       type: dict
       contains:
         divert:
-          description: the location of the diverted file
+          description: The location of the diverted file.
           type: str
         holder:
-          description: the package holding the diversion
+          description: The package holding the diversion.
           type: str
         state:
-          description: the state of the diversion
+          description: The state of the diversion.
           type: str
     path:
-      description: the path of the file to divert/undivert
+      description: The path of the file to divert/undivert.
       type: str
   sample: |-
     {
