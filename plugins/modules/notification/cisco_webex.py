@@ -11,9 +11,9 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: cisco_webex
-short_description: Send a webexmsg to a Cisco Webex Teams Room or Individual
+short_description: Send a msg to a Cisco Webex Teams Room or Individual
 description:
-    - Send a webexmsg to a Cisco Webex Teams Room or Individual with options to control the formatting.
+    - Send a msg to a Cisco Webex Teams Room or Individual with options to control the formatting.
 version_added: "2.10"
 author: Drew Rusell (@drew-russell)
 notes:
@@ -24,7 +24,7 @@ options:
 
   recipient_type:
     description:
-       - The request parameter you would like to send the webexmsg to.
+       - The request parameter you would like to send the msg to.
        - Messages can be sent to either a room or individual (by ID or E-Mail).
     required: yes
     choices: ['roomId', 'toPersonEmail', 'toPersonId']
@@ -36,9 +36,9 @@ options:
     required: yes
     type: str
 
-  webexmsg_type:
+  msg_type:
     description:
-       - Specifies how you would like the webexmsg formatted.
+       - Specifies how you would like the msg formatted.
     default: text
     choices: ['text', 'markdown']
     type: str
@@ -49,9 +49,9 @@ options:
     required: yes
     type: str
 
-  webexmsg:
+  xmsg:
     description:
-      - The webexmsg you would like to send.
+      - The msg you would like to send.
     required: yes
     type: str
 '''
@@ -64,33 +64,33 @@ EXAMPLES = """
   cisco_webex:
     recipient_type: roomId
     recipient_id: "{{ room_id }}"
-    webexmsg_type: markdown
+    msg_type: markdown
     personal_token: "{{ token }}"
-    webexmsg: "**Cisco Webex Teams Ansible Module - Room Message in Markdown**"
+    msg: "**Cisco Webex Teams Ansible Module - Room Message in Markdown**"
 
 - name: Cisco Webex Teams - Text Message to a Room
   cisco_webex:
     recipient_type: roomId
     recipient_id: "{{ room_id }}"
-    webexmsg_type: text
+    msg_type: text
     personal_token: "{{ token }}"
-    webexmsg: "Cisco Webex Teams Ansible Module - Room Message in Text"
+    msg: "Cisco Webex Teams Ansible Module - Room Message in Text"
 
 - name: Cisco Webex Teams - Text Message by an Individuals ID
   cisco_webex:
     recipient_type: toPersonId
     recipient_id: "{{ person_id}}"
-    webexmsg_type: text
+    msg_type: text
     personal_token: "{{ token }}"
-    webexmsg: "Cisco Webex Teams Ansible Module - Text Message to Individual by ID"
+    msg: "Cisco Webex Teams Ansible Module - Text Message to Individual by ID"
 
 - name: Cisco Webex Teams - Text Message by an Individuals E-Mail Address
   cisco_webex:
     recipient_type: toPersonEmail
     recipient_id: "{{ person_email }}"
-    webexmsg_type: text
+    msg_type: text
     personal_token: "{{ token }}"
-    webexmsg: "Cisco Webex Teams Ansible Module - Text Message to Individual by E-Mail"
+    msg: "Cisco Webex Teams Ansible Module - Text Message to Individual by E-Mail"
 
 """
 
@@ -103,7 +103,7 @@ status_code:
   type: int
   sample: 200
 
-webexmsg:
+msg:
     description:
       - The Response Message returned by the Webex Teams API.
       - Full Response Code explanations can be found at U(https://developer.webex.com/docs/api/basics).
@@ -115,9 +115,9 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
 
-def spark_webexmsg(module):
+def spark_msg(module):
     """When check mode is specified, establish a read only connection, that does not return any user specific
-    data, to validate connectivity. In regular mode, send a webexmsg to a Cisco Webex Teams Room or Individual"""
+    data, to validate connectivity. In regular mode, send a msg to a Cisco Webex Teams Room or Individual"""
 
     # Ansible Specific Variables
     results = {}
@@ -137,7 +137,7 @@ def spark_webexmsg(module):
 
         payload = {
             ansible['recipient_type']: ansible['recipient_id'],
-            ansible['webexmsg_type']: ansible['webexmsg']
+            ansible['msg_type']: ansible['msg']
         }
 
         payload = module.jsonify(payload)
@@ -145,21 +145,21 @@ def spark_webexmsg(module):
     response, info = fetch_url(module, url, data=payload, headers=headers)
 
     status_code = info['status']
-    webexmsg = info['msg']
+    msg = info['msg']
 
     # Module will fail if the response is not 200
     if status_code != 200:
         results['failed'] = True
         results['status_code'] = status_code
-        results['webexmsg'] = webexmsg
+        results['msg'] = msg
     else:
         results['failed'] = False
         results['status_code'] = status_code
 
         if module.check_mode:
-            results['webexmsg'] = 'Authentication Successful.'
+            results['msg'] = 'Authentication Successful.'
         else:
-            results['webexmsg'] = webexmsg
+            results['msg'] = msg
 
     return results
 
@@ -170,15 +170,15 @@ def main():
         argument_spec=dict(
             recipient_type=dict(required=True, choices=['roomId', 'toPersonEmail', 'toPersonId']),
             recipient_id=dict(required=True, no_log=True),
-            webexmsg_type=dict(required=False, default='text', choices=['text', 'markdown']),
+            msg_type=dict(required=False, default='text', choices=['text', 'markdown']),
             personal_token=dict(required=True, no_log=True),
-            webexmsg=dict(required=True)
+            msg=dict(required=True)
         ),
 
         supports_check_mode=True
     )
 
-    results = spark_webexmsg(module)
+    results = spark_msg(module)
 
     module.exit_json(**results)
 
