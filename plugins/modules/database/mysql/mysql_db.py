@@ -116,11 +116,11 @@ options:
   unsafe_login_password:
     description:
       - If C(no), the module will safely use a shell-escaped version of the I(login_password) value.
-      - It makes sense to use C(yes) only if there are special symbols in the value,
-        for example, C(pass!word), and errors C(Access denied) occur.
+      - It makes sense to use C(yes) only if there are special symbols in the value and errors C(Access denied) occur.
       - Used only when I(state) is C(import) or C(dump) and I(login_password) is passed, ignored otherwise.
     type: bool
     default: no
+    version_added: '2.10'
 
 seealso:
 - module: mysql_info
