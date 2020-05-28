@@ -49,7 +49,7 @@ options:
     required: yes
     type: str
 
-  xmsg:
+  msg:
     description:
       - The msg you would like to send.
     required: yes
