@@ -95,7 +95,7 @@ EXAMPLES = r'''
     vg: vg.services
     state: absent
 
-- name: Create a volume group on top of /dev/sda3 that suports increases in /dev/sda3 size
+- name: Create a volume group on top of /dev/sda3 and resize the volume group /dev/sda3 to the maximum possible
   lvg:
     vg: resizableVG
     pvs: /dev/sda3
