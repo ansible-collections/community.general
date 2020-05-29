@@ -1,0 +1,76 @@
+- name: "Create volume group on first disk"
+  lvg:
+    vg: testvg
+    pvs: "{{ loop_device1.stdout }}"
+
+- name: Gets current vg size
+  shell: vgs -v testvg -o pv_size --noheading --units b | xargs
+  register: cmd_result
+
+- name: Assert the testvg size is 8388608B
+  assert:
+   that:
+    - "'8388608B' == cmd_result.stdout"
+
+- name: Increases size in file
+  command: "dd if=/dev/zero bs=8MiB count=1 of={{ remote_tmp_dir }}/img1 conv=notrunc oflag=append"
+
+- name: "Reread size of file associated with loop_device1"
+  command: "losetup -c {{ loop_device1.stdout }}"
+
+- name: "Reruns lvg with pvresize:no"
+  lvg:
+   vg: testvg
+   pvs: "{{ loop_device1.stdout }}"
+   pvresize: no
+  register: cmd_result
+ 
+- assert:
+    that:
+    - cmd_result is not changed
+
+- name: Gets current vg size
+  shell: vgs -v testvg -o pv_size --noheading --units b | xargs
+  register: cmd_result
+
+- name: Assert the testvg size is still 8388608B
+  assert:
+   that:
+    - "'8388608B' == cmd_result.stdout"
+
+- name: "Reruns lvg with pvresize:yes and check_mode:yes"
+  lvg:
+   vg: testvg
+   pvs: "{{ loop_device1.stdout }}"
+   pvresize: yes
+  check_mode: yes
+  register: cmd_result
+  
+- name: Assert that the module returned the state was changed
+  assert:
+    that:
+    - cmd_result is changed
+
+- name: Gets current vg size
+  shell: vgs -v testvg -o pv_size --noheading --units b | xargs
+  register: cmd_result
+ 
+- name: Assert the testvg size is still 8388608B
+  assert:
+   that:
+    - "'8388608B' == cmd_result.stdout"
+
+- name: "Reruns lvg with pvresize:yes"
+  lvg:
+   vg: testvg
+   pvs: "{{ loop_device1.stdout }}"
+   pvresize: yes
+
+- name: Gets current vg size
+  shell: vgs -v testvg -o pv_size --noheading --units b | xargs
+  register: cmd_result
+
+- name: Assert the testvg size is now 16777216B
+  assert:
+   that:
+    - "'16777216B' == cmd_result.stdout"
