@@ -671,7 +671,7 @@ playbook.yml: >
         debug:
           msg: default plugin output
 
-  - name: override from play vars
+  - name: Override from play vars
     hosts: localhost
     gather_facts: no
     vars:
