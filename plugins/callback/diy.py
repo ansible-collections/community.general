@@ -742,7 +742,7 @@ playbook.yml: >
           ansible_callback_diy_runner_on_ok_msg: "diy output(via task vars): result example: \n{{ ansible_callback_diy.result.output.msg }}\n"
           ansible_callback_diy_runner_on_ok_msg_color: "{{ 'yellow' if ansible_callback_diy.result.is_changed else 'bright green' }}"
 
-      - name: suppress output
+      - name: Suppress output
         debug:
           msg: i should not be displayed
         vars:
