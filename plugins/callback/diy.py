@@ -65,8 +65,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_ON_ANY_MSG_COLOR
       vars:
         - name: ansible_callback_diy_on_any_msg_color
-      required: False
-      type: string
+      type: str
 
     runner_on_failed_msg:
       description: Output to be used for callback runner_on_failed
