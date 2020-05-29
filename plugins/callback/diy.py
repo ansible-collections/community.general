@@ -44,7 +44,7 @@ DOCUMENTATION = r'''
     - set as stdout_callback in configuration
   options:
     on_any_msg:
-      description: Output to be used for callback on_any
+      description: Output to be used for callback on_any.
       ini:
         - section: callback_diy
           key: on_any_msg
