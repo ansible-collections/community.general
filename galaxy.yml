@@ -9,10 +9,10 @@ license_file: COPYING
 tags: null
 # NOTE: No more dependencies can be added to this list
 dependencies:
-  ansible.netcommon: '>=0.1.0'
+  ansible.netcommon: '>=0.0.2'
   ansible.posix: '>=0.1.0'
   community.kubernetes: '>=0.1.0'
-  google.cloud: '>=0.1.0'
+  google.cloud: '>=0.0.9'
 repository: https://github.com/ansible-collections/community.general
 documentation: https://github.com/ansible-collection-migration/community.general/tree/master/docs
 homepage: https://github.com/ansible-collections/community.general
