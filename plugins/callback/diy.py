@@ -52,8 +52,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_ON_ANY_MSG
       vars:
         - name: ansible_callback_diy_on_any_msg
-      required: False
-      type: string
+      type: str
 
     on_any_msg_color:
       description:
