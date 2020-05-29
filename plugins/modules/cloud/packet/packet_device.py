@@ -46,6 +46,13 @@ options:
     description:
       - List of device IDs on which to operate.
 
+  tags:
+    description:
+      - List of device tags.
+      - Currently implemented only for device creation.
+    type: list
+    elements: str
+
   facility:
     description:
       - Facility slug for device creation. See Packet API for current list - U(https://www.packet.net/developers/api/facilities/).
@@ -137,6 +144,7 @@ EXAMPLES = '''
   - packet_device:
       project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
       hostnames: myserver
+      tags: ci-xyz
       operating_system: ubuntu_16_04
       plan: baremetal_0
       facility: sjc1
@@ -432,6 +440,7 @@ def create_single_device(module, packet_conn, hostname):
                             % param)
     project_id = module.params.get('project_id')
     plan = module.params.get('plan')
+    tags = module.params.get('tags')
     user_data = module.params.get('user_data')
     facility = module.params.get('facility')
     operating_system = module.params.get('operating_system')
@@ -446,6 +455,7 @@ def create_single_device(module, packet_conn, hostname):
     device = packet_conn.create_device(
         project_id=project_id,
         hostname=hostname,
+        tags=tags,
         plan=plan,
         facility=facility,
         operating_system=operating_system,
@@ -594,6 +604,7 @@ def main():
             facility=dict(),
             features=dict(type='dict'),
             hostnames=dict(type='list', aliases=['name']),
+            tags=dict(type='list', elements='str'),
             locked=dict(type='bool', default=False, aliases=['lock']),
             operating_system=dict(),
             plan=dict(),
