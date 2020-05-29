@@ -23,7 +23,7 @@
    vg: testvg
    pvs: "{{ loop_device1.stdout }}"
    pvresize: no
- register: cmd_result
+  register: cmd_result
  
 - assert:
     that:
