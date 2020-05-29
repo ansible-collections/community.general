@@ -777,7 +777,7 @@ playbook.yml: >
 
           ansible_callback_diy_playbook_on_task_start_msg_color: bright blue
 
-      - name: indentation
+      - name: Indentation
         debug:
           msg: "{{ item.msg }}"
         with_items:
