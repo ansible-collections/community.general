@@ -667,7 +667,7 @@ playbook.yml: >
     hosts: localhost
     gather_facts: no
     tasks:
-      - name:  default plugin output
+      - name:  Default plugin output
         debug:
           msg: default plugin output
 
