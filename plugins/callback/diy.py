@@ -1323,7 +1323,8 @@ class CallbackModule(Default):
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super(CallbackModule, self).v2_playbook_on_handler_task_start(task)
 
-    def v2_playbook_on_vars_prompt(self, varname, private=True, prompt=None, encrypt=None, confirm=False, salt_size=None, salt=None, default=None, unsafe=None):
+    def v2_playbook_on_vars_prompt(self, varname, private=True, prompt=None, encrypt=None,
+                                   confirm=False, salt_size=None, salt=None, default=None, unsafe=None):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
             variables=self._diy_spec['vars']
