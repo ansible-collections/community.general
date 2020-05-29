@@ -663,7 +663,7 @@ ansible.cfg: >
 
 playbook.yml: >
   ---
-  - name: "default plugin output: play example"
+  - name: "Default plugin output: play example"
     hosts: localhost
     gather_facts: no
     tasks:
