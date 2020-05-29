@@ -728,7 +728,7 @@ playbook.yml: >
         debug:
           msg: "default plugin output: result example"
 
-      - name: override from task vars
+      - name: Override from task vars
         debug:
           msg: "example {{ two }}"
         changed_when: true
