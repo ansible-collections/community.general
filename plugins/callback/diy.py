@@ -647,7 +647,7 @@ EXAMPLES = r'''
 ansible.cfg: >
   # Enable plugin
   [defaults]
-  stdout_callback=diy
+  stdout_callback=community.general.diy
 
   [callback_diy]
   # Output when playbook starts
