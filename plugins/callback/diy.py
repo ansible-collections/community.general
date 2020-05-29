@@ -724,7 +724,7 @@ playbook.yml: >
         {% endfor %}
 
     tasks:
-      - name: custom banner with default plugin result output
+      - name: Custom banner with default plugin result output
         debug:
           msg: "default plugin output: result example"
 
