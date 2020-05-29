@@ -761,7 +761,7 @@ playbook.yml: >
           ansible_callback_diy_playbook_on_task_start_msg: "\n"
           ansible_callback_diy_runner_on_ok_msg: "{{ ansible_callback_diy.result.output.stdout }}\n"
 
-      - name: multline output
+      - name: Multiline output
         debug:
           msg: "{{ multiline }}"
         vars:
