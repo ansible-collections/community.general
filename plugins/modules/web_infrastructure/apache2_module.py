@@ -160,6 +160,7 @@ def create_apache_identifier(name):
     text_workarounds = [
         ('shib2', 'mod_shib'),
         ('evasive', 'evasive20_module'),
+        ('rewrite', 'rewrite_module'),
     ]
 
     # re expressions to extract subparts of names
