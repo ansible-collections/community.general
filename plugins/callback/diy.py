@@ -27,10 +27,13 @@ DOCUMENTATION = r'''
       the top level variable names available to the callback.
     - Each option value is rendered as a template before being evaluated. This allows for the dynamic usage of an option. For example,
       C("{{ 'yellow' if ansible_callback_diy.result.is_changed else 'bright green' }}")
-    - For each respective callbacks C(msg) option, the following conditions result in the following the effects. If the option value C(is None or omit)
-      then the option is not being used, and therefore use the L(default,./default.html) callback plugin. If the option value C(is not None and not omit and
-      length is not greater than 0) then the option is being used without output, and therefore suppress output. If the option value C(is not None and not omit
-      and length is greater than 0) then the option is being used with output, and therefore output.
+    - For each respective callbacks C(msg) option, the following conditions result in the following the effects.
+      If the option value C(is None or omit), then the option is not being used, and,
+      therefore, use the L(default,./default.html) callback plugin.
+      If the option value C(is not None and not omit and length is not greater than 0),
+      then the option is being used without output, and therefore suppress output.
+      If the option value C(is not None and not omit and length is greater than 0),
+      then the option is being used with output, and therefore output.
     - "Valid color values: C(black), C(bright gray), C(blue), C(white), C(green), C(bright blue), C(cyan), C(bright green), C(red), C(bright cyan),
       C(purple), C(bright red), C(yellow), C(bright purple), C(dark gray), C(bright yellow), C(magenta), C(bright magenta), C(normal)"
   seealso:
