@@ -21,7 +21,7 @@ DOCUMENTATION = r'''
   extends_documentation_fragment:
     - default_callback
   notes:
-    - Uses the L(default,./default.html) callback plugin output when a custom callback message(C(msg)) is not provided.
+    - Uses the C(default) callback plugin output when a custom callback message(C(msg)) is not provided.
     - Makes the callback event data available via the C(ansible_callback_diy) dictionary, which can be used in the templating context for the options.
       The dictionary is only available in the templating context for the options. It is not a variable that is available via the other
       various execution contexts, such as playbook, play, task etc.
