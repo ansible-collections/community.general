@@ -41,13 +41,13 @@
   check_mode: yes
 
 - name: Gets current vg size
-   shell: vgs -v testvg -o pv_size --noheading --units b | xargs
-   register: cmd_result
+  shell: vgs -v testvg -o pv_size --noheading --units b | xargs
+  register: cmd_result
  
 - name: Assert the testvg size is still 8388608B
-   assert:
-    that:
-     - "'8388608B' == cmd_result.stdout"
+  assert:
+   that:
+    - "'8388608B' == cmd_result.stdout"
 
 - name: "Reruns lvg with pvresize:yes"
   lvg:
