@@ -57,8 +57,8 @@ DOCUMENTATION = r'''
 
     on_any_msg_color:
       description:
-        - Output color to be used for on_any_msg
-        - Template should render a L(valid color value,#notes)
+        - Output color to be used for on_any_msg.
+        - Template should render a L(valid color value,#notes).
       ini:
         - section: callback_diy
           key: on_any_msg_color
