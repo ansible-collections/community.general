@@ -749,7 +749,7 @@ playbook.yml: >
           ansible_callback_diy_playbook_on_task_start_msg: ""
           ansible_callback_diy_runner_on_ok_msg: ""
 
-      - name: using alias vars (see ansible.cfg)
+      - name: Using alias vars (see ansible.cfg)
         debug:
           msg:
         when: False
