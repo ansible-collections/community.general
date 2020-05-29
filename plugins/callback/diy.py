@@ -758,7 +758,7 @@ playbook.yml: >
           on_skipped_msg: "diy output(via task vars): skipped example:\n\e[0m\e[38;5;4m\u25b6\u25b6 {{ ansible_callback_diy.result.task.name }}\n"
           on_skipped_msg_color: white
 
-      - name: just stdout
+      - name: Just stdout
         command: echo some stdout
         vars:
           ansible_callback_diy_playbook_on_task_start_msg: "\n"
