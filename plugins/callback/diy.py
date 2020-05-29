@@ -22,7 +22,7 @@ DOCUMENTATION = r'''
     - default_callback
   notes:
     - Uses the C(default) callback plugin output when a custom callback message(C(msg)) is not provided.
-    - Makes the callback event data available via the C(ansible_callback_diy) dictionary, which can be used in the templating context for the options.
+    - Makes the callback event data available via the I(ansible_callback_diy) dictionary, which can be used in the templating context for the options.
       The dictionary is only available in the templating context for the options. It is not a variable that is available via the other
       various execution contexts, such as playbook, play, task etc.
     - Options being set by their respective variable input can only be set using the variable if the variable was set in a context that is available to the
