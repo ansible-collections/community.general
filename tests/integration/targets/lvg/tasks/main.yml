@@ -11,5 +11,7 @@
     - import_tasks: test_indempotency.yml
 
     - import_tasks: test_grow_reduce.yml
+
+    - import_tasks: test_pvresize.yml
   always:
     - import_tasks: teardown.yml
