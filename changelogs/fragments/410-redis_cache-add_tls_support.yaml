@@ -1,0 +1,2 @@
+minor_changes:
+  - redis - add TLS support to redis cache plugin (https://github.com/ansible-collections/community.general/pull/410).
