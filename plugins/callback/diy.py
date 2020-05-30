@@ -29,7 +29,7 @@ DOCUMENTATION = r'''
       C("{{ 'yellow' if ansible_callback_diy.result.is_changed else 'bright green' }}")
     - For each respective callbacks C(msg) option, the following conditions result in the following the effects.
       If the option value C(is None or omit), then the option is not being used, and,
-      therefore, use the L(default,./default.html) callback plugin.
+      therefore, use the C(default) callback plugin.
       If the option value C(is not None and not omit and length is not greater than 0),
       then the option is being used without output, and therefore suppress output.
       If the option value C(is not None and not omit and length is greater than 0),
