@@ -81,7 +81,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_FAILED_MSG
       vars:
         - name: ansible_callback_diy_runner_on_failed_msg
-      type: string
+      type: str
 
     runner_on_failed_msg_color:
       description:
@@ -94,7 +94,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_FAILED_MSG_COLOR
       vars:
         - name: ansible_callback_diy_runner_on_failed_msg_color
-      type: string
+      type: str
 
     runner_on_ok_msg:
       description: Output to be used for callback runner_on_ok
@@ -105,7 +105,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_OK_MSG
       vars:
         - name: ansible_callback_diy_runner_on_ok_msg
-      type: string
+      type: str
 
     runner_on_ok_msg_color:
       description:
@@ -118,7 +118,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_OK_MSG_COLOR
       vars:
         - name: ansible_callback_diy_runner_on_ok_msg_color
-      type: string
+      type: str
 
     runner_on_skipped_msg:
       description: Output to be used for callback runner_on_skipped
@@ -129,7 +129,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_SKIPPED_MSG
       vars:
         - name: ansible_callback_diy_runner_on_skipped_msg
-      type: string
+      type: str
 
     runner_on_skipped_msg_color:
       description:
@@ -142,7 +142,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_SKIPPED_MSG_COLOR
       vars:
         - name: ansible_callback_diy_runner_on_skipped_msg_color
-      type: string
+      type: str
 
     runner_on_unreachable_msg:
       description: Output to be used for callback runner_on_unreachable
@@ -153,7 +153,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_UNREACHABLE_MSG
       vars:
         - name: ansible_callback_diy_runner_on_unreachable_msg
-      type: string
+      type: str
 
     runner_on_unreachable_msg_color:
       description:
@@ -166,7 +166,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_UNREACHABLE_MSG_COLOR
       vars:
         - name: ansible_callback_diy_runner_on_unreachable_msg_color
-      type: string
+      type: str
 
     playbook_on_start_msg:
       description: Output to be used for callback playbook_on_start
@@ -177,7 +177,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_START_MSG
       vars:
         - name: ansible_callback_diy_playbook_on_start_msg
-      type: string
+      type: str
 
     playbook_on_start_msg_color:
       description:
@@ -190,7 +190,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_START_MSG_COLOR
       vars:
         - name: ansible_callback_diy_playbook_on_start_msg_color
-      type: string
+      type: str
 
     playbook_on_notify_msg:
       description: Output to be used for callback playbook_on_notify
@@ -201,7 +201,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NOTIFY_MSG
       vars:
         - name: ansible_callback_diy_playbook_on_notify_msg
-      type: string
+      type: str
 
     playbook_on_notify_msg_color:
       description:
@@ -214,7 +214,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NOTIFY_MSG_COLOR
       vars:
         - name: ansible_callback_diy_playbook_on_notify_msg_color
-      type: string
+      type: str
 
     playbook_on_no_hosts_matched_msg:
       description: Output to be used for callback playbook_on_no_hosts_matched
@@ -225,7 +225,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NO_HOSTS_MATCHED_MSG
       vars:
         - name: ansible_callback_diy_playbook_on_no_hosts_matched_msg
-      type: string
+      type: str
 
     playbook_on_no_hosts_matched_msg_color:
       description:
@@ -238,7 +238,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NO_HOSTS_MATCHED_MSG_COLOR
       vars:
         - name: ansible_callback_diy_playbook_on_no_hosts_matched_msg_color
-      type: string
+      type: str
 
     playbook_on_no_hosts_remaining_msg:
       description: Output to be used for callback playbook_on_no_hosts_remaining
@@ -249,7 +249,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NO_HOSTS_REMAINING_MSG
       vars:
         - name: ansible_callback_diy_playbook_on_no_hosts_remaining_msg
-      type: string
+      type: str
 
     playbook_on_no_hosts_remaining_msg_color:
       description:
@@ -262,7 +262,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_NO_HOSTS_REMAINING_MSG_COLOR
       vars:
         - name: ansible_callback_diy_playbook_on_no_hosts_remaining_msg_color
-      type: string
+      type: str
 
     playbook_on_task_start_msg:
       description: Output to be used for callback playbook_on_task_start
@@ -273,7 +273,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_TASK_START_MSG
       vars:
         - name: ansible_callback_diy_playbook_on_task_start_msg
-      type: string
+      type: str
 
     playbook_on_task_start_msg_color:
       description:
@@ -286,7 +286,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_TASK_START_MSG_COLOR
       vars:
         - name: ansible_callback_diy_playbook_on_task_start_msg_color
-      type: string
+      type: str
 
     playbook_on_handler_task_start_msg:
       description: Output to be used for callback playbook_on_handler_task_start
@@ -297,7 +297,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_HANDLER_TASK_START_MSG
       vars:
         - name: ansible_callback_diy_playbook_on_handler_task_start_msg
-      type: string
+      type: str
 
     playbook_on_handler_task_start_msg_color:
       description:
@@ -310,7 +310,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_HANDLER_TASK_START_MSG_COLOR
       vars:
         - name: ansible_callback_diy_playbook_on_handler_task_start_msg_color
-      type: string
+      type: str
 
     playbook_on_vars_prompt_msg:
       description: Output to be used for callback playbook_on_vars_prompt
@@ -321,7 +321,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_VARS_PROMPT_MSG
       vars:
         - name: ansible_callback_diy_playbook_on_vars_prompt_msg
-      type: string
+      type: str
 
     playbook_on_vars_prompt_msg_color:
       description:
@@ -334,7 +334,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_VARS_PROMPT_MSG_COLOR
       vars:
         - name: ansible_callback_diy_playbook_on_vars_prompt_msg_color
-      type: string
+      type: str
 
     playbook_on_play_start_msg:
       description: Output to be used for callback playbook_on_play_start
@@ -345,7 +345,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_PLAY_START_MSG
       vars:
         - name: ansible_callback_diy_playbook_on_play_start_msg
-      type: string
+      type: str
 
     playbook_on_play_start_msg_color:
       description:
@@ -358,7 +358,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_PLAY_START_MSG_COLOR
       vars:
         - name: ansible_callback_diy_playbook_on_play_start_msg_color
-      type: string
+      type: str
 
     playbook_on_stats_msg:
       description: Output to be used for callback playbook_on_stats
@@ -369,7 +369,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_STATS_MSG
       vars:
         - name: ansible_callback_diy_playbook_on_stats_msg
-      type: string
+      type: str
 
     playbook_on_stats_msg_color:
       description:
@@ -382,7 +382,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_STATS_MSG_COLOR
       vars:
         - name: ansible_callback_diy_playbook_on_stats_msg_color
-      type: string
+      type: str
 
     on_file_diff_msg:
       description: Output to be used for callback on_file_diff
@@ -393,7 +393,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_ON_FILE_DIFF_MSG
       vars:
         - name: ansible_callback_diy_on_file_diff_msg
-      type: string
+      type: str
 
     on_file_diff_msg_color:
       description:
@@ -406,7 +406,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_ON_FILE_DIFF_MSG_COLOR
       vars:
         - name: ansible_callback_diy_on_file_diff_msg_color
-      type: string
+      type: str
 
     playbook_on_include_msg:
       description: Output to be used for callback playbook_on_include
@@ -417,7 +417,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_INCLUDE_MSG
       vars:
         - name: ansible_callback_diy_playbook_on_include_msg
-      type: string
+      type: str
 
     playbook_on_include_msg_color:
       description:
@@ -430,7 +430,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_INCLUDE_MSG_COLOR
       vars:
         - name: ansible_callback_diy_playbook_on_include_msg_color
-      type: string
+      type: str
 
     runner_item_on_ok_msg:
       description: Output to be used for callback runner_item_on_ok
@@ -441,7 +441,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_OK_MSG
       vars:
         - name: ansible_callback_diy_runner_item_on_ok_msg
-      type: string
+      type: str
 
     runner_item_on_ok_msg_color:
       description:
@@ -454,7 +454,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_OK_MSG_COLOR
       vars:
         - name: ansible_callback_diy_runner_item_on_ok_msg_color
-      type: string
+      type: str
 
     runner_item_on_failed_msg:
       description: Output to be used for callback runner_item_on_failed
@@ -465,7 +465,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_FAILED_MSG
       vars:
         - name: ansible_callback_diy_runner_item_on_failed_msg
-      type: string
+      type: str
 
     runner_item_on_failed_msg_color:
       description:
@@ -478,7 +478,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_FAILED_MSG_COLOR
       vars:
         - name: ansible_callback_diy_runner_item_on_failed_msg_color
-      type: string
+      type: str
 
     runner_item_on_skipped_msg:
       description: Output to be used for callback runner_item_on_skipped
@@ -489,7 +489,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_SKIPPED_MSG
       vars:
         - name: ansible_callback_diy_runner_item_on_skipped_msg
-      type: string
+      type: str
 
     runner_item_on_skipped_msg_color:
       description:
@@ -502,7 +502,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ITEM_ON_SKIPPED_MSG_COLOR
       vars:
         - name: ansible_callback_diy_runner_item_on_skipped_msg_color
-      type: string
+      type: str
 
     runner_retry_msg:
       description: Output to be used for callback runner_retry
@@ -513,7 +513,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_RETRY_MSG
       vars:
         - name: ansible_callback_diy_runner_retry_msg
-      type: string
+      type: str
 
     runner_retry_msg_color:
       description:
@@ -526,7 +526,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_RETRY_MSG_COLOR
       vars:
         - name: ansible_callback_diy_runner_retry_msg_color
-      type: string
+      type: str
 
     runner_on_start_msg:
       description: Output to be used for callback runner_on_start
@@ -537,7 +537,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_START_MSG
       vars:
         - name: ansible_callback_diy_runner_on_start_msg
-      type: string
+      type: str
 
     runner_on_start_msg_color:
       description:
@@ -550,7 +550,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_START_MSG_COLOR
       vars:
         - name: ansible_callback_diy_runner_on_start_msg_color
-      type: string
+      type: str
 
     runner_on_no_hosts_msg:
       description: Output to be used for callback runner_on_no_hosts
@@ -561,7 +561,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_NO_HOSTS_MSG
       vars:
         - name: ansible_callback_diy_runner_on_no_hosts_msg
-      type: string
+      type: str
 
     runner_on_no_hosts_msg_color:
       description:
@@ -574,7 +574,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_RUNNER_ON_NO_HOSTS_MSG_COLOR
       vars:
         - name: ansible_callback_diy_runner_on_no_hosts_msg_color
-      type: string
+      type: str
 
     playbook_on_setup_msg:
       description: Output to be used for callback playbook_on_setup
@@ -585,7 +585,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_SETUP_MSG
       vars:
         - name: ansible_callback_diy_playbook_on_setup_msg
-      type: string
+      type: str
 
     playbook_on_setup_msg_color:
       description:
@@ -598,7 +598,7 @@ DOCUMENTATION = r'''
         - name: ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_SETUP_MSG_COLOR
       vars:
         - name: ansible_callback_diy_playbook_on_setup_msg_color
-      type: string
+      type: str
 '''
 
 EXAMPLES = r'''
