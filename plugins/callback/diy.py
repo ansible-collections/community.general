@@ -44,7 +44,7 @@ DOCUMENTATION = r'''
   seealso:
     - name: default – default Ansible screen output
       description: The official documentation on the B(default) callback plugin.
-      link: ./default.html
+      link: https://docs.ansible.com/ansible/latest/plugins/callback/default.html
   requirements:
     - set as stdout_callback in configuration
   options:
