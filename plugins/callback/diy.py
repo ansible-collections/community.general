@@ -796,7 +796,7 @@ from ansible.module_utils._text import to_text
 
 class CallbackModule(Default):
     """
-    Callback plugin for the DIYer, because it allows you to supply your own custom callback templates to be output
+    Callback plugin that allows you to supply your own custom callback templates to be output.
     """
     CALLBACK_VERSION = 2.0
     CALLBACK_TYPE = 'stdout'
