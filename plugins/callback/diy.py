@@ -749,14 +749,14 @@ playbook.yml: >
           ansible_callback_diy_runner_on_ok_msg: "GO!!!"
           ansible_callback_diy_runner_on_ok_msg_color: bright green
 
-      - name: using lookup and template as file
+      - name: Using lookup and template as file
         shell: "echo {% raw %}'output from {{ file_name }}'{% endraw %} > {{ file_name }}"
         vars:
           ansible_callback_diy_playbook_on_task_start_msg: "\ndiy output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
           file_name: diy_file_template_example
           ansible_callback_diy_runner_on_ok_msg: "{{ lookup('template', file_name) }}"
 
-      - name: 'look at top level vars available to the "runner_on_ok" callback'
+      - name: 'Look at top level vars available to the "runner_on_ok" callback'
         debug:
           msg: ''
         vars:
@@ -769,7 +769,7 @@ playbook.yml: >
             {% endfor %}
           ansible_callback_diy_runner_on_ok_msg_color: white
 
-      - name: 'look at event data available to the "runner_on_ok" callback'
+      - name: 'Look at event data available to the "runner_on_ok" callback'
         debug:
           msg: ''
         vars:
