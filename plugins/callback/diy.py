@@ -609,7 +609,7 @@ stdout_callback=community.general.diy
 
 [callback_diy]
 # Output when playbook starts
-playbook_on_start_msg="diy output(via ansible.cfg): playbook example: {{ ansible_callback_diy.playbook.file_name }}"
+playbook_on_start_msg="DIY output(via ansible.cfg): playbook example: {{ ansible_callback_diy.playbook.file_name }}"
 playbook_on_start_msg_color=yellow
 
 # Comment out to allow default plugin output
@@ -647,8 +647,8 @@ playbook.yml: >
     cyan_bg_black_fg: "\e[0m\e[48;5;87m\e[38;5;232m"
     magenta: "\e[38;5;198m"
     white: "\e[0m\e[38;5;255m"
-    ansible_callback_diy_playbook_on_play_start_msg: "\n{{green}}diy output(via play vars): play example: {{magenta}}{{ansible_callback_diy.play.name}}\n\n"
-    ansible_callback_diy_playbook_on_task_start_msg: "diy output(via play vars): task example: {{ ansible_callback_diy.task.name }}"
+    ansible_callback_diy_playbook_on_play_start_msg: "\n{{green}}DIY output(via play vars): play example: {{magenta}}{{ansible_callback_diy.play.name}}\n\n"
+    ansible_callback_diy_playbook_on_task_start_msg: "DIY output(via play vars): task example: {{ ansible_callback_diy.task.name }}"
     ansible_callback_diy_playbook_on_task_start_msg_color: cyan
     ansible_callback_diy_playbook_on_stats_msg: |+2
               CUSTOM STATS
@@ -697,9 +697,9 @@ playbook.yml: >
       vars:
         white_fg_red_bg: "\e[0m\e[48;5;1m"
         two: "{{ white_fg_red_bg }}    2    "
-        ansible_callback_diy_playbook_on_task_start_msg: "\ndiy output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
+        ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
         ansible_callback_diy_playbook_on_task_start_msg_color: bright magenta
-        ansible_callback_diy_runner_on_ok_msg: "diy output(via task vars): result example: \n{{ ansible_callback_diy.result.output.msg }}\n"
+        ansible_callback_diy_runner_on_ok_msg: "DIY output(via task vars): result example: \n{{ ansible_callback_diy.result.output.msg }}\n"
         ansible_callback_diy_runner_on_ok_msg_color: "{{ 'yellow' if ansible_callback_diy.result.is_changed else 'bright green' }}"
 
     - name: Suppress output
@@ -715,7 +715,7 @@ playbook.yml: >
       when: False
       vars:
         ansible_callback_diy_playbook_on_task_start_msg: ""
-        on_skipped_msg: "diy output(via task vars): skipped example:\n\e[0m\e[38;5;4m\u25b6\u25b6 {{ ansible_callback_diy.result.task.name }}\n"
+        on_skipped_msg: "DIY output(via task vars): skipped example:\n\e[0m\e[38;5;4m\u25b6\u25b6 {{ ansible_callback_diy.result.task.name }}\n"
         on_skipped_msg_color: white
 
     - name: Just stdout
@@ -728,7 +728,7 @@ playbook.yml: >
       debug:
         msg: "{{ multiline }}"
       vars:
-        ansible_callback_diy_playbook_on_task_start_msg: "\ndiy output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
+        ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
         multiline: "line\nline\nline"
         ansible_callback_diy_runner_on_ok_msg: |+2
           some
@@ -753,7 +753,7 @@ playbook.yml: >
     - name: Using lookup and template as file
       shell: "echo {% raw %}'output from {{ file_name }}'{% endraw %} > {{ file_name }}"
       vars:
-        ansible_callback_diy_playbook_on_task_start_msg: "\ndiy output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
+        ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
         file_name: diy_file_template_example
         ansible_callback_diy_runner_on_ok_msg: "{{ lookup('template', file_name) }}"
 
@@ -761,7 +761,7 @@ playbook.yml: >
       debug:
         msg: ''
       vars:
-        ansible_callback_diy_playbook_on_task_start_msg: "\ndiy output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
+        ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
         ansible_callback_diy_runner_on_ok_msg: |+2
           {% for var in (ansible_callback_diy.top_level_var_names|reject('match','vars|ansible_callback_diy.*')) | sort %}
           {{ green }}{{ var }}:
@@ -774,7 +774,7 @@ playbook.yml: >
       debug:
         msg: ''
       vars:
-        ansible_callback_diy_playbook_on_task_start_msg: "\ndiy output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
+        ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
         ansible_callback_diy_runner_on_ok_msg: |+2
           {% for key in ansible_callback_diy | sort %}
           {{ green }}{{ key }}:
