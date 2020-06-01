@@ -25,13 +25,13 @@ description:
   - This module manages diversions of debian packages files using the
     C(dpkg-divert) commandline tool. It can either create or remove a
     diversion for a given file, but also update an existing diversion
-    to modify its C(holder) and/or its C(divert) location.
+    to modify its I(holder) and/or its I(divert) location.
 options:
   path:
     description:
       - The original and absolute path of the file to be diverted or
         undiverted. This path is unique, i.e. it is not possible to get
-        two diversions for the same C(path).
+        two diversions for the same I(path).
     required: true
     type: path
   state:
@@ -39,7 +39,7 @@ options:
       - When I(state=absent), remove the diversion of the specified
         I(path); when I(state=present), create the diversion if it does
         not exist, or update its package I(holder) or I(divert) location,
-        when specified.
+        if it already exists.
     type: str
     default: present
     choices: [absent, present]
