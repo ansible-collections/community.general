@@ -831,8 +831,15 @@ class CallbackModule(Default):
 
         for option in _callback_options:
             _option_name = '%s_%s' % (_callback_type, option)
-            _option_template = variables.get(self.DIY_NS + "_" + _option_name, self.get_option(_option_name))
-            _ret.update({option: self._template(loader=loader, template=_option_template, variables=variables)})
+            _option_template = variables.get(
+                                   self.DIY_NS + "_" + _option_name, 
+                                   self.get_option(_option_name)
+                               )
+            _ret.update({option: self._template(
+                                     loader=loader,
+                                     template=_option_template,
+                                     variables=variables
+                                 )})
 
         _ret.update({'vars': variables})
 
@@ -846,14 +853,20 @@ class CallbackModule(Default):
 
     def _template(self, loader, template, variables):
         _templar = Templar(loader=loader, variables=variables)
-        return _templar.template(template, preserve_trailing_newlines=True, convert_data=False, escape_backslashes=True)
+        return _templar.template(
+                   template,
+                   preserve_trailing_newlines=True,
+                   convert_data=False,
+                   escape_backslashes=True
+               )
 
     def _output(self, spec, stderr=False):
         _msg = to_text(spec['msg'])
         if len(_msg) > 0:
             self._display.display(msg=_msg, color=spec['msg_color'], stderr=stderr)
 
-    def _get_vars(self, playbook, play=None, host=None, task=None, included_file=None, handler=None, result=None, stats=None, remove_attr_ref_loop=True):
+    def _get_vars(self, playbook, play=None, host=None, task=None, included_file=None,
+                  handler=None, result=None, stats=None, remove_attr_ref_loop=True):
         def _get_value(obj, attr=None, method=None):
             if attr:
                 return getattr(obj, attr, getattr(obj, "_" + attr, None))
@@ -899,12 +912,17 @@ class CallbackModule(Default):
 
         if play:
             _ret[self.DIY_NS].update({'play': {}})
-            _play_attributes = ['any_errors_fatal', 'become', 'become_flags', 'become_method', 'become_user', 'check_mode', 'collections',
-                                'connection', 'debugger', 'diff', 'environment', 'fact_path', 'finalized', 'force_handlers', 'gather_facts',
-                                'gather_subset', 'gather_timeout', 'handlers', 'hosts', 'ignore_errors', 'ignore_unreachable',
-                                'included_conditional', 'included_path', 'max_fail_percentage', 'module_defaults', 'name', 'no_log',
-                                'only_tags', 'order', 'port', 'post_tasks', 'pre_tasks', 'remote_user', 'removed_hosts', 'roles', 'run_once',
-                                'serial', 'skip_tags', 'squashed', 'strategy', 'tags', 'tasks', 'uuid', 'validated', 'vars_files', 'vars_prompt']
+            _play_attributes = ['any_errors_fatal', 'become', 'become_flags', 'become_method',
+                                'become_user', 'check_mode', 'collections', 'connection',
+                                'debugger', 'diff', 'environment', 'fact_path', 'finalized',
+                                'force_handlers', 'gather_facts', 'gather_subset',
+                                'gather_timeout', 'handlers', 'hosts', 'ignore_errors',
+                                'ignore_unreachable', 'included_conditional', 'included_path',
+                                'max_fail_percentage', 'module_defaults', 'name', 'no_log',
+                                'only_tags', 'order', 'port', 'post_tasks', 'pre_tasks',
+                                'remote_user', 'removed_hosts', 'roles', 'run_once', 'serial',
+                                'skip_tags', 'squashed', 'strategy', 'tags', 'tasks', 'uuid',
+                                'validated', 'vars_files', 'vars_prompt']
 
             for attr in _play_attributes:
                 _ret[self.DIY_NS]['play'].update({attr: _get_value(obj=play, attr=attr)})
@@ -918,14 +936,19 @@ class CallbackModule(Default):
 
         if task:
             _ret[self.DIY_NS].update({'task': {}})
-            _task_attributes = ['action', 'any_errors_fatal', 'args', 'async', 'async_val', 'become', 'become_flags', 'become_method',
-                                'become_user', 'changed_when', 'check_mode', 'collections', 'connection', 'debugger', 'delay', 'delegate_facts',
-                                'delegate_to', 'diff', 'environment', 'failed_when', 'finalized', 'ignore_errors', 'ignore_unreachable', 'loop',
-                                'loop_control', 'loop_with', 'module_defaults', 'name', 'no_log', 'notify', 'parent', 'poll', 'port', 'register',
-                                'remote_user', 'retries', 'role', 'run_once', 'squashed', 'tags', 'untagged', 'until', 'uuid', 'validated', 'when']
+            _task_attributes = ['action', 'any_errors_fatal', 'args', 'async', 'async_val',
+                                'become', 'become_flags', 'become_method', 'become_user',
+                                'changed_when', 'check_mode', 'collections', 'connection',
+                                'debugger', 'delay', 'delegate_facts', 'delegate_to', 'diff',
+                                'environment', 'failed_when', 'finalized', 'ignore_errors',
+                                'ignore_unreachable', 'loop', 'loop_control', 'loop_with',
+                                'module_defaults', 'name', 'no_log', 'notify', 'parent', 'poll',
+                                'port', 'register', 'remote_user', 'retries', 'role', 'run_once',
+                                'squashed', 'tags', 'untagged', 'until', 'uuid', 'validated',
+                                'when']
 
-            # remove arguments that reference a loop var because they cause templating issues in callbacks that do not have the
-            # loop context(e.g. playbook_on_task_start)
+            # remove arguments that reference a loop var because they cause templating issues in
+            # callbacks that do not have the loop context(e.g. playbook_on_task_start)
             if task.loop and remove_attr_ref_loop:
                 _task_attributes = _remove_attr_ref_loop(obj=task, attributes=_task_attributes)
 
@@ -937,19 +960,28 @@ class CallbackModule(Default):
             _included_file_attributes = ['args', 'filename', 'hosts', 'is_role', 'task']
 
             for attr in _included_file_attributes:
-                _ret[self.DIY_NS]['included_file'].update({attr: _get_value(obj=included_file, attr=attr)})
+                _ret[self.DIY_NS]['included_file'].update({attr: _get_value(
+                                                                     obj=included_file,
+                                                                     attr=attr
+                                                                 )})
 
         if handler:
             _ret[self.DIY_NS].update({'handler': {}})
-            _handler_attributes = ['action', 'any_errors_fatal', 'args', 'async', 'async_val', 'become', 'become_flags', 'become_method',
-                                   'become_user', 'changed_when', 'check_mode', 'collections', 'connection', 'debugger', 'delay', 'delegate_facts',
-                                   'delegate_to', 'diff', 'environment', 'failed_when', 'finalized', 'ignore_errors', 'ignore_unreachable',
-                                   'listen', 'loop', 'loop_control', 'loop_with', 'module_defaults', 'name', 'no_log', 'notified_hosts', 'notify',
-                                   'parent', 'poll', 'port', 'register', 'remote_user', 'retries', 'role', 'run_once', 'squashed', 'tags', 'untagged',
-                                   'until', 'uuid', 'validated', 'when']
+            _handler_attributes = ['action', 'any_errors_fatal', 'args', 'async', 'async_val',
+                                   'become', 'become_flags', 'become_method', 'become_user',
+                                   'changed_when', 'check_mode', 'collections', 'connection',
+                                   'debugger', 'delay', 'delegate_facts', 'delegate_to', 'diff',
+                                   'environment', 'failed_when', 'finalized', 'ignore_errors',
+                                   'ignore_unreachable', 'listen', 'loop', 'loop_control',
+                                   'loop_with', 'module_defaults', 'name', 'no_log',
+                                   'notified_hosts', 'notify', 'parent', 'poll', 'port',
+                                   'register', 'remote_user', 'retries', 'role', 'run_once',
+                                   'squashed', 'tags', 'untagged', 'until', 'uuid', 'validated',
+                                   'when']
 
             if handler.loop and remove_attr_ref_loop:
-                _handler_attributes = _remove_attr_ref_loop(obj=handler, attributes=_handler_attributes)
+                _handler_attributes = _remove_attr_ref_loop(obj=handler,
+                                                            attributes=_handler_attributes)
 
             for attr in _handler_attributes:
                 _ret[self.DIY_NS]['handler'].update({attr: _get_value(obj=handler, attr=attr)})
@@ -974,7 +1006,8 @@ class CallbackModule(Default):
 
         if stats:
             _ret[self.DIY_NS].update({'stats': {}})
-            _stats_attributes = ['changed', 'custom', 'dark', 'failures', 'ignored', 'ok', 'processed', 'rescued', 'skipped']
+            _stats_attributes = ['changed', 'custom', 'dark', 'failures', 'ignored',
+                                 'ok', 'processed', 'rescued', 'skipped']
 
             for attr in _stats_attributes:
                 _ret[self.DIY_NS]['stats'].update({attr: _get_value(obj=stats, attr=attr)})
@@ -1284,7 +1317,8 @@ class CallbackModule(Default):
                 super(CallbackModule, self).v2_playbook_on_handler_task_start(task)
 
     def v2_playbook_on_vars_prompt(self, varname, private=True, prompt=None, encrypt=None,
-                                   confirm=False, salt_size=None, salt=None, default=None, unsafe=None):
+                                   confirm=False, salt_size=None, salt=None, default=None,
+                                   unsafe=None):
         self._diy_spec = self._get_output_specification(
             loader=self._diy_loader,
             variables=self._diy_spec['vars']
@@ -1295,7 +1329,11 @@ class CallbackModule(Default):
 
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
-                super(CallbackModule, self).v2_playbook_on_vars_prompt(varname, private, prompt, encrypt, confirm, salt_size, salt, default, unsafe)
+                super(CallbackModule, self).v2_playbook_on_vars_prompt(
+                                                varname, private, prompt, encrypt,
+                                                confirm, salt_size, salt, default,
+                                                unsafe
+                                            )
 
     # not implemented as the call to this is not implemented yet
     def v2_playbook_on_import_for_host(self, result, imported_file):
