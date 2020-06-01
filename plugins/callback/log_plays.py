@@ -53,7 +53,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_NEEDS_WHITELIST = True
 
     TIME_FORMAT = "%b %d %Y %H:%M:%S"
-    MSG_FORMAT = "%(now)s - %(category)s - %(data)s\n\n"
+    MSG_FORMAT = "%(now)s - %(playbook)s - %(task_name)s - %(task_action)s - %(category)s - %(data)s\n\n"
 
     def __init__(self):
 
@@ -80,10 +80,20 @@ class CallbackModule(CallbackBase):
                 if invocation is not None:
                     data = json.dumps(invocation) + " => %s " % data
 
-        path = os.path.join(self.log_folder, result._host.name)
+        path = os.path.join(self.log_folder, result._host.get_name())
         now = time.strftime(self.TIME_FORMAT, time.localtime())
 
-        msg = to_bytes(self.MSG_FORMAT % dict(now=now, category=category, data=data))
+        msg = to_bytes(
+            self.MSG_FORMAT
+            % dict(
+                now=now,
+                playbook=self.playbook,
+                task_name=result._task.name,
+                task_action=result._task.action,
+                category=category,
+                data=data,
+            )
+        )
         with open(path, "ab") as fd:
             fd.write(msg)
 
@@ -101,6 +111,9 @@ class CallbackModule(CallbackBase):
 
     def v2_runner_on_async_failed(self, result):
         self.log(result, 'ASYNC_FAILED')
+
+    def v2_playbook_on_start(self, playbook):
+        self.playbook = playbook._file_name
 
     def v2_playbook_on_import_for_host(self, result, imported_file):
         self.log(result, 'IMPORTED', imported_file)
