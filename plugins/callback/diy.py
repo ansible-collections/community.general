@@ -27,17 +27,17 @@ DOCUMENTATION = r'''
       the top level variable names available to the callback.
     - Each option value is rendered as a template before being evaluated. This allows for the dynamic usage of an option. For example,
       C("{{ 'yellow' if ansible_callback_diy.result.is_changed else 'bright green' }}")
-    - "**Condition** for all C(msg) options: 
-                    if value C(is None or omit), 
-                    then the option is not being used. 
+    - "**Condition** for all C(msg) options:
+                    if value C(is None or omit),
+                    then the option is not being used.
        **Effect**: use of the C(default) callback plugin for output"
-    - "**Condition** for all C(msg) options: 
-                    if value C(is not None and not omit and length is not greater than 0), 
-                    then the option is being used without output. 
+    - "**Condition** for all C(msg) options:
+                    if value C(is not None and not omit and length is not greater than 0),
+                    then the option is being used without output.
        **Effect**: suppress output"
-    - "**Condition** for all C(msg) options: 
-                    if value C(is not None and not omit and length is greater than 0), 
-                    then the option is being used with output. 
+    - "**Condition** for all C(msg) options:
+                    if value C(is not None and not omit and length is greater than 0),
+                    then the option is being used with output.
        **Effect**: render value as template and output"
     - "Valid color values: C(black), C(bright gray), C(blue), C(white), C(green), C(bright blue), C(cyan), C(bright green), C(red), C(bright cyan),
       C(purple), C(bright red), C(yellow), C(bright purple), C(dark gray), C(bright yellow), C(magenta), C(bright magenta), C(normal)"
@@ -832,14 +832,14 @@ class CallbackModule(Default):
         for option in _callback_options:
             _option_name = '%s_%s' % (_callback_type, option)
             _option_template = variables.get(
-                                   self.DIY_NS + "_" + _option_name, 
-                                   self.get_option(_option_name)
-                               )
+                self.DIY_NS + "_" + _option_name,
+                self.get_option(_option_name)
+            )
             _ret.update({option: self._template(
-                                     loader=loader,
-                                     template=_option_template,
-                                     variables=variables
-                                 )})
+                loader=loader,
+                template=_option_template,
+                variables=variables
+            )})
 
         _ret.update({'vars': variables})
 
@@ -854,11 +854,11 @@ class CallbackModule(Default):
     def _template(self, loader, template, variables):
         _templar = Templar(loader=loader, variables=variables)
         return _templar.template(
-                   template,
-                   preserve_trailing_newlines=True,
-                   convert_data=False,
-                   escape_backslashes=True
-               )
+            template,
+            preserve_trailing_newlines=True,
+            convert_data=False,
+            escape_backslashes=True
+        )
 
     def _output(self, spec, stderr=False):
         _msg = to_text(spec['msg'])
@@ -961,9 +961,9 @@ class CallbackModule(Default):
 
             for attr in _included_file_attributes:
                 _ret[self.DIY_NS]['included_file'].update({attr: _get_value(
-                                                                     obj=included_file,
-                                                                     attr=attr
-                                                                 )})
+                    obj=included_file,
+                    attr=attr
+                )})
 
         if handler:
             _ret[self.DIY_NS].update({'handler': {}})
@@ -1330,10 +1330,10 @@ class CallbackModule(Default):
         if self._parent_has_callback():
             with self._suppress_stdout(enabled=self._using_diy(spec=self._diy_spec)):
                 super(CallbackModule, self).v2_playbook_on_vars_prompt(
-                                                varname, private, prompt, encrypt,
-                                                confirm, salt_size, salt, default,
-                                                unsafe
-                                            )
+                    varname, private, prompt, encrypt,
+                    confirm, salt_size, salt, default,
+                    unsafe
+                )
 
     # not implemented as the call to this is not implemented yet
     def v2_playbook_on_import_for_host(self, result, imported_file):
