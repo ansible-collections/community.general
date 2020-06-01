@@ -12,7 +12,6 @@ DOCUMENTATION = r'''
 ---
 module: dpkg_divert
 short_description: Override a debian package's version of a file
-version_added: "2.10"
 author:
   - quidame (@quidame)
 description:
@@ -78,6 +77,8 @@ options:
       - This parameter is ignored when I(rename=false).
     type: bool
     default: no
+notes:
+  - This module supports I(check_mode).
 requirements:
   - dpkg-divert >= 1.15.0 (Debian family)
 '''
