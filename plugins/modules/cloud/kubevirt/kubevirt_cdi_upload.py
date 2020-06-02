@@ -53,7 +53,7 @@ options:
     choices: [ json, merge, strategic-merge ]
 
 extends_documentation_fragment:
-- community.kubernetes.k8s_auth_options
+- community.general.k8s_auth_options
 
 
 requirements:

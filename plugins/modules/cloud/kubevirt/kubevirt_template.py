@@ -133,7 +133,7 @@ options:
         type: str
 
 extends_documentation_fragment:
-- community.kubernetes.k8s_auth_options
+- community.general.k8s_auth_options
 - community.kubernetes.k8s_state_options
 
 
