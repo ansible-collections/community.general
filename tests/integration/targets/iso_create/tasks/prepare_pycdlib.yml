@@ -8,12 +8,12 @@
 #   ignore_errors: yes
 # - debug: var=check_pip
 
-- name: install pip if not found
-  package:
-    name: python-pip
-  register: install_pip
+# - name: install pip if not found
+#   package:
+#     name: python-pip
+#   register: install_pip
   # when: check_pip.failed
-- debug: var=install_pip
+# - debug: var=install_pip
 
 - name: install pycdlib
   pip:
