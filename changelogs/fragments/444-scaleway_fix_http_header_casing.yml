@@ -1,0 +1,2 @@
+bugfixes:
+ - scaleway - Fix bug causing KeyError exception on JSON http requests. (https://github.com/ansible-collections/community.general/pull/444)
