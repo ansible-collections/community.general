@@ -113,6 +113,15 @@ options:
     required: no
     type: bool
     default: no
+  unsafe_login_password:
+    description:
+      - If C(no), the module will safely use a shell-escaped version of the I(login_password) value.
+      - It makes sense to use C(yes) only if there are special symbols in the value and errors C(Access denied) occur.
+      - Used only when I(state) is C(import) or C(dump) and I(login_password) is passed, ignored otherwise.
+    type: bool
+    default: no
+    version_added: '2.10'
+
 seealso:
 - module: mysql_info
 - module: mysql_variables
@@ -299,7 +308,8 @@ def db_delete(cursor, db):
 def db_dump(module, host, user, password, db_name, target, all_databases, port,
             config_file, socket=None, ssl_cert=None, ssl_key=None, ssl_ca=None,
             single_transaction=None, quick=None, ignore_tables=None, hex_blob=None,
-            encoding=None, force=False, master_data=0, skip_lock_tables=False, dump_extra_args=None):
+            encoding=None, force=False, master_data=0, skip_lock_tables=False,
+            dump_extra_args=None, unsafe_password=False):
     cmd = module.get_bin_path('mysqldump', True)
     # If defined, mysqldump demands --defaults-extra-file be the first option
     if config_file:
@@ -307,7 +317,10 @@ def db_dump(module, host, user, password, db_name, target, all_databases, port,
     if user is not None:
         cmd += " --user=%s" % shlex_quote(user)
     if password is not None:
-        cmd += " --password=%s" % shlex_quote(password)
+        if not unsafe_password:
+            cmd += " --password=%s" % shlex_quote(password)
+        else:
+            cmd += " --password=%s" % password
     if ssl_cert is not None:
         cmd += " --ssl-cert=%s" % shlex_quote(ssl_cert)
     if ssl_key is not None:
@@ -366,7 +379,7 @@ def db_dump(module, host, user, password, db_name, target, all_databases, port,
 
 def db_import(module, host, user, password, db_name, target, all_databases, port, config_file,
               socket=None, ssl_cert=None, ssl_key=None, ssl_ca=None, encoding=None, force=False,
-              use_shell=False):
+              use_shell=False, unsafe_password=False):
     if not os.path.exists(target):
         return module.fail_json(msg="target %s does not exist on the host" % target)
 
@@ -377,7 +390,10 @@ def db_import(module, host, user, password, db_name, target, all_databases, port
     if user:
         cmd.append("--user=%s" % shlex_quote(user))
     if password:
-        cmd.append("--password=%s" % shlex_quote(password))
+        if not unsafe_password:
+            cmd.append("--password=%s" % shlex_quote(password))
+        else:
+            cmd.append("--password=%s" % password)
     if ssl_cert is not None:
         cmd.append("--ssl-cert=%s" % shlex_quote(ssl_cert))
     if ssl_key is not None:
@@ -492,6 +508,7 @@ def main():
             skip_lock_tables=dict(type='bool', default=False),
             dump_extra_args=dict(type='str'),
             use_shell=dict(type='bool', default=False),
+            unsafe_login_password=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )
@@ -518,6 +535,7 @@ def main():
     connect_timeout = module.params['connect_timeout']
     config_file = module.params['config_file']
     login_password = module.params["login_password"]
+    unsafe_login_password = module.params["unsafe_login_password"]
     login_user = module.params["login_user"]
     login_host = module.params["login_host"]
     ignore_tables = module.params["ignore_tables"]
@@ -599,7 +617,7 @@ def main():
                                      login_port, config_file, socket, ssl_cert, ssl_key,
                                      ssl_ca, single_transaction, quick, ignore_tables,
                                      hex_blob, encoding, force, master_data, skip_lock_tables,
-                                     dump_extra_args)
+                                     dump_extra_args, unsafe_login_password)
         if rc != 0:
             module.fail_json(msg="%s" % stderr)
         module.exit_json(changed=True, db=db_name, db_list=db, msg=stdout,
@@ -618,7 +636,7 @@ def main():
                                        all_databases,
                                        login_port, config_file,
                                        socket, ssl_cert, ssl_key, ssl_ca,
-                                       encoding, force, use_shell)
+                                       encoding, force, use_shell, unsafe_login_password)
         if rc != 0:
             module.fail_json(msg="%s" % stderr)
         module.exit_json(changed=True, db=db_name, db_list=db, msg=stdout,
