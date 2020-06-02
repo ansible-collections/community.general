@@ -22,6 +22,16 @@
     wrong_sql_file="{{tmp_dir}}/wrong.sql"
     dump_file1="{{tmp_dir}}/{{file2}}"
     dump_file2="{{tmp_dir}}/{{file3}}"
+    db_user="test"
+    db_user_unsafe_password="pass!word"
+
+- name: create user for test unsafe_login_password parameter
+  mysql_user:
+    name: '{{ db_user }}'
+    password: '{{ db_user_unsafe_password }}'
+    priv: '*.*:ALL'
+    state: present
+    login_unix_socket: '{{ mysql_socket }}'
 
 - name: state dump/import - create database
   mysql_db:
@@ -58,6 +68,9 @@
 
 - name: state dump without department table.
   mysql_db:
+    login_user: '{{ db_user }}'
+    login_password: '{{ db_user_unsafe_password }}'
+    unsafe_login_password: yes
     name: "{{ db_name }}"
     state: dump
     target: "{{ db_file_name }}"
@@ -74,7 +87,7 @@
   assert:
     that:
     - result is changed
-    - result.executed_commands[0] is search("mysqldump --force --socket={{ mysql_socket }} {{ db_name }} --skip-lock-tables --quick --ignore-table={{ db_name }}.department --master-data=1 --skip-triggers")
+    - result.executed_commands[0] is search("mysqldump --user={{ db_user }} --password=\*\*\*\*\*\*\*\* --force --socket={{ mysql_socket }} {{ db_name }} --skip-lock-tables --quick --ignore-table={{ db_name }}.department --master-data=1 --skip-triggers")
 
 - name: state dump/import - file name should exist
   file: name={{ db_file_name }} state=file
@@ -153,6 +166,9 @@
 
 - name: test state=import to restore the database of type {{ format_type }} (expect changed=true)
   mysql_db:
+    login_user: '{{ db_user }}'
+    login_password: '{{ db_user_unsafe_password }}'
+    unsafe_login_password: yes
     name: '{{ db_name }}'
     state: import
     target: '{{ db_file_name }}'
