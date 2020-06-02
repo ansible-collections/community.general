@@ -1,7 +1,3 @@
-plugins/cache/memcached.py pylint:invalid-tagged-version
-plugins/cache/redis.py pylint:invalid-tagged-version
-plugins/callback/hipchat.py pylint:blacklisted-name
-plugins/connection/lxc.py pylint:blacklisted-name
 plugins/doc_fragments/alicloud.py future-import-boilerplate
 plugins/doc_fragments/alicloud.py metaclass-boilerplate
 plugins/doc_fragments/auth_basic.py future-import-boilerplate
