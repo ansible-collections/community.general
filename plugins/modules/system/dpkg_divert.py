@@ -78,7 +78,7 @@ options:
     type: bool
     default: no
 notes:
-  - This module supports I(check_mode).
+  - This module supports I(check_mode) and I(diff).
 requirements:
   - dpkg-divert >= 1.15.0 (Debian family)
 '''
@@ -129,52 +129,28 @@ messages:
       "Adding 'diversion of /etc/foobarrc to /etc/foobarrc.distrib by ansible'"
     ]
 diversion:
-  description: The status of the diversion before and after task.
+  description: The status of the diversion after task execution.
   type: dict
-  returned: on_success
+  returned: always
   contains:
-    after:
-      description: The state of the diversion after module execution.
-      type: dict
-      contains:
-        divert:
-          description: The location of the diverted file.
-          type: str
-        holder:
-          description: The package holding the diversion.
-          type: str
-        state:
-          description: The state of the diversion.
-          type: str
-    before:
-      description: the state of the diversion before module execution
-      type: dict
-      contains:
-        divert:
-          description: The location of the diverted file.
-          type: str
-        holder:
-          description: The package holding the diversion.
-          type: str
-        state:
-          description: The state of the diversion.
-          type: str
+    divert:
+      description: The location of the diverted file.
+      type: str
+    holder:
+      description: The package holding the diversion.
+      type: str
     path:
       description: The path of the file to divert/undivert.
       type: str
+    state:
+      description: The state of the diversion.
+      type: str
   sample: |-
     {
-      "after": {
-        "divert": null,
-        "holder": null,
-        "state": "absent"
-      },
-      "before": {
-        "divert": "/etc/foobarrc.distrib",
-        "holder": "LOCAL",
-        "state": "present"
-      },
+      "divert": "/etc/foobarrc.distrib",
+      "holder": "LOCAL",
       "path": "/etc/foobarrc"
+      "state": "present"
     }
 '''
 
@@ -188,7 +164,7 @@ from ansible.module_utils._text import to_bytes, to_native
 
 
 def diversion_state(module, command, path):
-    diversion = dict(state='absent', divert=None, holder=None)
+    diversion = dict(path=path, state='absent', divert=None, holder=None)
     rc, out, err = module.run_command([command, '--listpackage', path], check_rc=True)
     if out:
         diversion['state'] = 'present'
@@ -218,7 +194,7 @@ def main():
     rename = module.params['rename']
     force = module.params['force']
 
-    diversion_wanted = dict(state=state)
+    diversion_wanted = dict(path=path, state=state)
     changed = False
 
     DPKG_DIVERT = module.get_bin_path('dpkg-divert', required=True)
@@ -275,13 +251,13 @@ def main():
         diversion_wanted['holder'] = None
 
     # Start to populate the returned objects.
-    diversion = dict(path=path, before=diversion_before)
+    diversion = diversion_before.copy()
     maincommand = ' '.join(MAINCOMMAND)
     commands = [maincommand]
 
     if module.check_mode or diversion_wanted == diversion_before:
         MAINCOMMAND.insert(1, '--test')
-        diversion['after'] = diversion_wanted
+        diversion_after = diversion_wanted
 
     # Just try and see
     rc, stdout, stderr = module.run_command(MAINCOMMAND)
@@ -304,12 +280,12 @@ def main():
                 (state == 'present' and target_exists)):
             if not force:
                 msg = "Set 'force' param to True to force renaming of files."
-                module.fail_json(changed=changed, cmd=maincommand, rc=rc,
-                                 stderr=stderr, stdout=stdout, msg=msg)
+                module.fail_json(changed=changed, cmd=maincommand, rc=rc, msg=msg,
+                                 stderr=stderr, stdout=stdout, diversion=diversion)
         else:
             msg = "Unexpected error while changing state of the diversion."
-            module.fail_json(changed=changed, cmd=maincommand, rc=rc,
-                             stderr=stderr, stdout=stdout, msg=msg)
+            module.fail_json(changed=changed, cmd=maincommand, rc=rc, msg=msg,
+                             stderr=stderr, stdout=stdout, diversion=diversion)
 
         to_remove = path
         if state == 'present':
@@ -321,8 +297,8 @@ def main():
                 os.unlink(b_remove)
             except OSError as e:
                 msg = 'Failed to remove %s: %s' % (to_remove, to_native(e))
-                module.fail_json(changed=changed, cmd=maincommand, rc=rc,
-                                 stderr=stderr, stdout=stdout, msg=msg)
+                module.fail_json(changed=changed, cmd=maincommand, rc=rc, msg=msg,
+                                 stderr=stderr, stdout=stdout, diversion=diversion)
             rc, stdout, stderr = module.run_command(MAINCOMMAND, check_rc=True)
 
         messages = [stdout.rstrip()]
@@ -369,18 +345,24 @@ def main():
                         pass
 
     if not module.check_mode:
-        diversion['after'] = diversion_state(module, DPKG_DIVERT, path)
+        diversion_after = diversion_state(module, DPKG_DIVERT, path)
 
-    if diversion['after'] != diversion['before']:
+    diversion = diversion_after.copy()
+    diff = dict()
+    if module._diff:
+        diff['before'] = diversion_before
+        diff['after'] = diversion_after
+
+    if diversion_after != diversion_before:
         changed = True
 
-    if diversion['after'] == diversion_wanted:
+    if diversion_after == diversion_wanted:
         module.exit_json(changed=changed, diversion=diversion,
-                         commands=commands, messages=messages)
+                         commands=commands, messages=messages, diff=diff)
     else:
         msg = "Unexpected error: see stdout and stderr for details."
-        module.fail_json(changed=changed, cmd=maincommand, rc=rc,
-                         stderr=stderr, stdout=stdout, msg=msg)
+        module.fail_json(changed=changed, cmd=maincommand, rc=rc, msg=msg,
+                         stderr=stderr, stdout=stdout, diversion=diversion)
 
 
 if __name__ == '__main__':
