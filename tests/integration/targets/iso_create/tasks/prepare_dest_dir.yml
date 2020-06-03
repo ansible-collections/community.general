@@ -1,0 +1,12 @@
+# Test code for iso_create module
+# Copyright: (c) 2020, Diane Wang (Tomorrow9) <dianew@vmware.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+- name: Make sure our testing sub-directory does not exist
+  file:
+    path: '{{ output_dir_test }}'
+    state: absent
+
+- name: Create our testing sub-directory
+  file:
+    path: '{{ output_dir_test }}'
+    state: directory
