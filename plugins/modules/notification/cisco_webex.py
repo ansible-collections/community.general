@@ -50,7 +50,7 @@ options:
 
   msg:
     description:
-      - The msg you would like to send.
+      - The message you would like to send.
     required: yes
     type: str
 '''
