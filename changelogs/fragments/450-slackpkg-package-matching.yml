@@ -1,0 +1,2 @@
+bugfixes:
+ - slackpkg - Fix name matching in package installation (https://github.com/ansible-collections/community.general/issues/450).
