@@ -31,7 +31,7 @@ options:
     default: no
   containers_filters:
     description:
-      - A dictionary of filter values used for selecting containers to delete.
+      - A dictionary of filter values used for selecting containers to list.
       - "For example, C(until: 24h)."
       - See L(the docker documentation,https://docs.docker.com/engine/reference/commandline/container_prune/#filtering)
         for more information on possible filters.
@@ -43,7 +43,7 @@ options:
     default: no
   images_filters:
     description:
-      - A dictionary of filter values used for selecting images to delete.
+      - A dictionary of filter values used for selecting images to list.
       - "For example, C(dangling: true)."
       - See L(the docker documentation,https://docs.docker.com/engine/reference/commandline/image_prune/#filtering)
         for more information on possible filters.
@@ -55,7 +55,7 @@ options:
     default: no
   networks_filters:
     description:
-      - A dictionary of filter values used for selecting networks to delete.
+      - A dictionary of filter values used for selecting networks to list.
       - See L(the docker documentation,https://docs.docker.com/engine/reference/commandline/network_prune/#filtering)
         for more information on possible filters.
     type: dict
@@ -66,7 +66,7 @@ options:
     default: no
   volumes_filters:
     description:
-      - A dictionary of filter values used for selecting volumes to delete.
+      - A dictionary of filter values used for selecting volumes to list.
       - See L(the docker documentation,https://docs.docker.com/engine/reference/commandline/volume_prune/#filtering)
         for more information on possible filters.
     type: dict

@@ -27,6 +27,12 @@ options:
         description:
           - Private key that should be used to create the key store.
         required: true
+    private_key_passphrase:
+        description:
+          - Pass phrase for reading the private key, if required.
+        type: str
+        required: false
+        version_added: "2.10"
     password:
         description:
           - Password that should be used to secure the key store.
@@ -110,7 +116,7 @@ import re
 
 
 def read_certificate_fingerprint(module, openssl_bin, certificate_path):
-    current_certificate_fingerprint_cmd = "%s x509 -noout -in %s -fingerprint -sha256" % (openssl_bin, certificate_path)
+    current_certificate_fingerprint_cmd = [openssl_bin, "x509", "-noout", "-in", certificate_path, "-fingerprint", "-sha256"]
     (rc, current_certificate_fingerprint_out, current_certificate_fingerprint_err) = run_commands(module, current_certificate_fingerprint_cmd)
     if rc != 0:
         return module.fail_json(msg=current_certificate_fingerprint_out,
@@ -130,7 +136,7 @@ def read_certificate_fingerprint(module, openssl_bin, certificate_path):
 
 
 def read_stored_certificate_fingerprint(module, keytool_bin, alias, keystore_path, keystore_password):
-    stored_certificate_fingerprint_cmd = "%s -list -alias '%s' -keystore '%s' -storepass '%s' -v" % (keytool_bin, alias, keystore_path, keystore_password)
+    stored_certificate_fingerprint_cmd = [keytool_bin, "-list", "-alias", alias, "-keystore", keystore_path, "-storepass", keystore_password, "-v"]
     (rc, stored_certificate_fingerprint_out, stored_certificate_fingerprint_err) = run_commands(module, stored_certificate_fingerprint_cmd)
     if rc != 0:
         if "keytool error: java.lang.Exception: Alias <%s> does not exist" % alias not in stored_certificate_fingerprint_out:
@@ -152,8 +158,8 @@ def read_stored_certificate_fingerprint(module, keytool_bin, alias, keystore_pat
         return stored_certificate_match.group(1)
 
 
-def run_commands(module, cmd, check_rc=True):
-    return module.run_command(cmd, check_rc)
+def run_commands(module, cmd, data=None, check_rc=True):
+    return module.run_command(cmd, check_rc=check_rc, data=data)
 
 
 def create_file(path, content):
@@ -180,7 +186,7 @@ def cert_changed(module, openssl_bin, keytool_bin, keystore_path, keystore_pass,
         os.remove(certificate_path)
 
 
-def create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password):
+def create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password, keypass):
     if module.check_mode:
         module.exit_json(changed=True)
     else:
@@ -194,23 +200,33 @@ def create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password):
             if os.path.exists(keystore_p12_path):
                 os.remove(keystore_p12_path)
 
-            export_p12_cmd = "%s pkcs12 -export -name '%s' -in '%s' -inkey '%s' -out '%s' -passout 'pass:%s'" % (
-                openssl_bin, name, certificate_path, private_key_path, keystore_p12_path, password)
-            (rc, export_p12_out, export_p12_err) = run_commands(module, export_p12_cmd)
+            export_p12_cmd = [openssl_bin, "pkcs12", "-export", "-name", name, "-in", certificate_path,
+                              "-inkey", private_key_path, "-out",
+                              keystore_p12_path, "-passout", "stdin"]
+
+            # when keypass is provided, add -passin
+            cmd_stdin = ""
+            if keypass:
+                export_p12_cmd.append("-passin")
+                export_p12_cmd.append("stdin")
+                cmd_stdin = "%s\n" % keypass
+
+            cmd_stdin += "%s\n%s" % (password, password)
+            (rc, export_p12_out, export_p12_err) = run_commands(module, export_p12_cmd, data=cmd_stdin)
             if rc != 0:
                 return module.fail_json(msg=export_p12_out,
                                         rc=rc,
                                         cmd=export_p12_cmd)
 
-            import_keystore_cmd = "%s -importkeystore " \
-                                  "-destkeystore '%s' " \
-                                  "-srckeystore '%s' " \
-                                  "-srcstoretype pkcs12 " \
-                                  "-alias '%s' " \
-                                  "-deststorepass '%s' " \
-                                  "-srcstorepass '%s' " \
-                                  "-noprompt" % (keytool_bin, keystore_path, keystore_p12_path, name, password, password)
-            (rc, import_keystore_out, import_keystore_err) = run_commands(module, import_keystore_cmd)
+            import_keystore_cmd = [keytool_bin, "-importkeystore",
+                                   "-destkeystore", keystore_path,
+                                   "-srckeystore", keystore_p12_path,
+                                   "-srcstoretype", "pkcs12",
+                                   "-alias", name,
+                                   "-deststorepass", password,
+                                   "-srcstorepass", password,
+                                   "-noprompt"]
+            (rc, import_keystore_out, import_keystore_err) = run_commands(module, import_keystore_cmd, data=None)
             if rc == 0:
                 update_jks_perm(module, keystore_path)
                 return module.exit_json(changed=True,
@@ -241,6 +257,7 @@ def update_jks_perm(module, keystore_path):
 def process_jks(module):
     name = module.params['name']
     password = module.params['password']
+    keypass = module.params['private_key_passphrase']
     keystore_path = module.params['dest']
     force = module.params['force']
     openssl_bin = module.get_bin_path('openssl', True)
@@ -248,16 +265,16 @@ def process_jks(module):
 
     if os.path.exists(keystore_path):
         if force:
-            create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password)
+            create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password, keypass)
         else:
             if cert_changed(module, openssl_bin, keytool_bin, keystore_path, password, name):
-                create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password)
+                create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password, keypass)
             else:
                 if not module.check_mode:
                     update_jks_perm(module, keystore_path)
                 return module.exit_json(changed=False)
     else:
-        create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password)
+        create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password, keypass)
 
 
 class ArgumentSpec(object):
@@ -270,7 +287,8 @@ class ArgumentSpec(object):
             private_key=dict(required=True, no_log=True),
             password=dict(required=True, no_log=True),
             dest=dict(required=True),
-            force=dict(required=False, default=False, type='bool')
+            force=dict(required=False, default=False, type='bool'),
+            private_key_passphrase=dict(required=False, no_log=True, type='str')
         )
         self.argument_spec = argument_spec
 
