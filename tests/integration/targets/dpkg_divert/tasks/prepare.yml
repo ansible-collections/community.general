@@ -15,6 +15,7 @@
   dpkg_divert:
     path: "{{ foobarrc }}"
     state: absent
+  become: yes
 
 - name: "remove test files"
   file:
@@ -25,6 +26,7 @@
     - "{{ foobarrc_distrib }}"
   loop_control:
     loop_var: dpkg_divert_item
+  become: yes
 
 
 - block:
@@ -34,3 +36,4 @@
     - name: "include tasks to perform other tests (rename)"
       include_tasks: tests/02-rename.yml
   become: yes
+  diff: yes
