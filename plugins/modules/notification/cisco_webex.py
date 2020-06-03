@@ -23,7 +23,7 @@ options:
 
   recipient_type:
     description:
-       - The request parameter you would like to send the msg to.
+       - The request parameter you would like to send the I(msg) to.
        - Messages can be sent to either a room or individual (by ID or E-Mail).
     required: yes
     choices: ['roomId', 'toPersonEmail', 'toPersonId']
