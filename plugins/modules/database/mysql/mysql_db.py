@@ -120,7 +120,6 @@ options:
       - Used only when I(state) is C(import) or C(dump) and I(login_password) is passed, ignored otherwise.
     type: bool
     default: no
-    version_added: '2.10'
 
 seealso:
 - module: mysql_info
