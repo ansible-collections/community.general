@@ -14,7 +14,6 @@ module: cisco_webex
 short_description: Send a msg to a Cisco Webex Teams Room or Individual
 description:
     - Send a msg to a Cisco Webex Teams Room or Individual with options to control the formatting.
-version_added: "2.10"
 author: Drew Rusell (@drew-russell)
 notes:
   - The C(recipient_id) type must be valid for the supplied C(recipient_id).
