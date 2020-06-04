@@ -72,8 +72,8 @@ def query_package(module, slackpkg_path, name):
     import re
 
     machine = platform.machine()
-    pattern = re.compile('^%s-[^-]+-(%s|noarch)-[^-]+$' % (name, machine))
-    packages = [f for f in os.listdir('/var/log/packages') if re.match(pattern, f)]
+    pattern = re.compile('^%s-[^-]+-(%s|noarch)-[^-]+$' % (re.escape(name), re.escape(machine)))
+    packages = [f for f in os.listdir('/var/log/packages') if pattern.match(f)]
 
     if len(packages) > 0:
         return True
