@@ -41,6 +41,7 @@ options:
     default: text
     choices: ['text', 'markdown']
     type: str
+    aliases: ['type']
 
   personal_token:
     description:
