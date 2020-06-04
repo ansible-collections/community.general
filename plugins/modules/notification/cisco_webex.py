@@ -11,9 +11,9 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: cisco_webex
-short_description: Send a msg to a Cisco Webex Teams Room or Individual
+short_description: Send a message to a Cisco Webex Teams Room or Individual
 description:
-    - Send a msg to a Cisco Webex Teams Room or Individual with options to control the formatting.
+    - Send a message to a Cisco Webex Teams Room or Individual with options to control the formatting.
 author: Drew Rusell (@drew-russell)
 notes:
   - The C(recipient_id) type must be valid for the supplied C(recipient_id).
@@ -23,7 +23,7 @@ options:
 
   recipient_type:
     description:
-       - The request parameter you would like to send the I(msg) to.
+       - The request parameter you would like to send the message to.
        - Messages can be sent to either a room or individual (by ID or E-Mail).
     required: yes
     choices: ['roomId', 'toPersonEmail', 'toPersonId']
@@ -37,7 +37,7 @@ options:
 
   msg_type:
     description:
-       - Specifies how you would like the msg formatted.
+       - Specifies how you would like the message formatted.
     default: text
     choices: ['text', 'markdown']
     type: str
@@ -46,6 +46,7 @@ options:
     description:
       - Your personal access token required to validate the Webex Teams API.
     required: yes
+    aliases: ['token']
     type: str
 
   msg:
@@ -116,7 +117,7 @@ from ansible.module_utils.urls import fetch_url
 
 def spark_msg(module):
     """When check mode is specified, establish a read only connection, that does not return any user specific
-    data, to validate connectivity. In regular mode, send a msg to a Cisco Webex Teams Room or Individual"""
+    data, to validate connectivity. In regular mode, send a message to a Cisco Webex Teams Room or Individual"""
 
     # Ansible Specific Variables
     results = {}
