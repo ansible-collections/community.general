@@ -419,6 +419,12 @@
       - zypper_result_update_cache_check is successful
       - zypper_result_update_cache_check is not changed
 
+- name: ensure no previous netcat package still exists
+  zypper:
+    name:
+      - netcat-openbsd
+      - gnu-netcat
+    state: absent
 
 - name: install netcat-openbsd which conflicts with gnu-netcat
   zypper:
@@ -442,3 +448,78 @@
     name: gnu-netcat
     state: present
     force_resolution: True
+
+- name: duplicate rpms block
+  vars:
+    looplist:
+      - 1
+      - 2
+  block:
+    - name: Deploy spec files to build 2 packages with duplicate files.
+      template:
+        src: duplicate.spec.j2
+        dest: "{{ output_dir | expanduser }}/zypper2/duplicate{{ item }}.spec"
+      loop: "{{ looplist }}"
+
+    - name: build rpms with duplicate files
+      command: |
+        rpmbuild -bb \
+        --define "_topdir {{output_dir | expanduser }}/zypper2/rpm-build"
+        --define "_builddir %{_topdir}" \
+        --define "_rpmdir %{_topdir}" \
+        --define "_srcrpmdir %{_topdir}" \
+        --define "_specdir {{output_dir | expanduser}}/zypper2" \
+        --define "_sourcedir %{_topdir}" \
+        {{ output_dir | expanduser }}/zypper2/duplicate{{ item }}.spec
+      loop: "{{ looplist }}"
+
+    - name: install duplicate rpms
+      zypper:
+        name: >-
+          {{ output_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}-1-0.noarch.rpm
+        disable_gpg_check: true
+      ignore_errors: true
+      register: zypper_duplicate_result
+      loop: "{{ looplist }}"
+
+    - name: Read in duplicate file contents
+      slurp:
+        src: /usr/lib/duplicate/duplicate.txt
+      register: duplicate_out
+
+    - name: Check failure when installing rpms with duplicate files without replacefiles option
+      assert:
+        that:
+          - zypper_duplicate_result.results[0] is successful
+          - zypper_duplicate_result.results[1] is failed
+          - '"fileconflict" in zypper_duplicate_result.results[1].stdout'
+          - '"/usr/lib/duplicate/duplicate.txt" in zypper_duplicate_result.results[1].stdout'
+          - '"duplicate1" in duplicate_out.content | b64decode'
+
+    - name: install duplicate rpms
+      zypper:
+        name: >-
+          {{ output_dir | expanduser }}/zypper2/rpm-build/noarch/duplicate{{ item }}-1-0.noarch.rpm
+        disable_gpg_check: true
+        replacefiles: true
+      ignore_errors: true
+      register: zypper_duplicate_result
+      loop: "{{ looplist }}"
+
+    - name: Read in duplicate file contents
+      slurp:
+        src: /usr/lib/duplicate/duplicate.txt
+      register: duplicate_out
+
+    - name: Check success installing rpms with duplicate files using replacefiles option
+      assert:
+        that:
+          - zypper_duplicate_result is successful
+          - zypper_duplicate_result is changed
+          - '"duplicate2" in duplicate_out.content | b64decode'
+
+    - name: Remove installed duplicate rpms
+      zypper:
+        name: "duplicate{{ item }}-1-0"
+        state: absent
+      loop: "{{ looplist }}"
