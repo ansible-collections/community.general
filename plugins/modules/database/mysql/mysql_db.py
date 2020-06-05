@@ -122,8 +122,8 @@ options:
     default: no
   restrict_config_file:
     description:
-      - Read only I(config_file).
-      - When I(state) is C(dump) or C(import), the module passes I(config_file) parameter
+      - Read only passed I(config_file).
+      - When I(state) is C(dump) or C(import), by default the module passes I(config_file) parameter
         using C(--defaults-extra-file) command-line argument to C(mysql/mysqldump) utilities
         under the hood that read named option file in addition to usual option files.
       - If this behavior is undesirable, use C(yes) to read only named option file.
@@ -322,7 +322,7 @@ def db_dump(module, host, user, password, db_name, target, all_databases, port,
     # If defined, mysqldump demands --defaults-extra-file be the first option
     if config_file:
         if restrict_config_file:
-            cmd += " --defaults-file=%s" % shlex_qoute(config_file)
+            cmd += " --defaults-file=%s" % shlex_quote(config_file)
         else:
             cmd += " --defaults-extra-file=%s" % shlex_quote(config_file)
     if user is not None:
@@ -390,7 +390,7 @@ def db_dump(module, host, user, password, db_name, target, all_databases, port,
 
 def db_import(module, host, user, password, db_name, target, all_databases, port, config_file,
               socket=None, ssl_cert=None, ssl_key=None, ssl_ca=None, encoding=None, force=False,
-              use_shell=False, unsafe_password=False):
+              use_shell=False, unsafe_password=False, restrict_config_file=False):
     if not os.path.exists(target):
         return module.fail_json(msg="target %s does not exist on the host" % target)
 
