@@ -107,14 +107,12 @@ options:
           - Add additional options to C(zypper) command.
           - Options should be supplied in a single line as if given in the command line.
     allow_vendor_change:
-        version_added: "2.10"
         type: bool
         required: false
         default: false
         description:
           - Adds C(--allow_vendor_change) option to I(zypper) dist-upgrade command.
     replacefiles:
-        version_added: "2.10"
         type: bool
         required: false
         default: false
