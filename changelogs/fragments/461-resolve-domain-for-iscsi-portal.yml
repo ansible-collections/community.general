@@ -1,0 +1,2 @@
+minor_changes:
+- allow open_iscsi module's portal field to be a domain name by resolving the portal ip address beforehand
