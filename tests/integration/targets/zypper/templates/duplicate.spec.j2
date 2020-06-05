@@ -1,0 +1,18 @@
+Summary:   Duplicate{{ item }} RPM. Installs one file that is a duplicate of other Duplicate# RPMs
+Name:      duplicate{{ item }}
+Version:   1
+Release:   0
+License:   GPLv3
+Group:     Applications/System
+BuildArch: noarch
+
+%description
+Duplicate {{ item }} RPM. Package one file that will be a duplicate of other Duplicate RPM contents.
+This is only for testing of the replacefiles zypper option.
+
+%install
+mkdir -p "%{buildroot}/usr/lib/duplicate"
+echo "%{name}" > "%{buildroot}/usr/lib/duplicate/duplicate.txt"
+
+%files
+/usr/lib/duplicate/duplicate.txt

@@ -106,6 +106,18 @@ options:
         description:
           - Add additional options to C(zypper) command.
           - Options should be supplied in a single line as if given in the command line.
+    allow_vendor_change:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Adds C(--allow_vendor_change) option to I(zypper) dist-upgrade command.
+    replacefiles:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Adds C(--replacefiles) option to I(zypper) install/update command.
 notes:
   - When used with a `loop:` each package will be processed individually,
     it is much more efficient to pass the list directly to the `name` option.
@@ -164,7 +176,14 @@ EXAMPLES = '''
   zypper:
     name: '*'
     state: dist-upgrade
-    extra_args: '--no-allow-vendor-change --allow-arch-change'
+    allow_vendor_change: true
+    extra_args: '--allow-arch-change'
+
+- name: Perform a installaion of nmap with the install option replacefiles
+  zypper:
+    name: 'nmap'
+    state: latest
+    replacefiles: true
 
 - name: Refresh repositories and update package openssl
   zypper:
@@ -188,7 +207,6 @@ EXAMPLES = '''
 import xml
 import re
 from xml.dom.minidom import parseString as parseXML
-from ansible.module_utils.six import iteritems
 from ansible.module_utils._text import to_native
 
 # import module snippets
@@ -335,6 +353,10 @@ def get_cmd(m, subcommand):
             cmd.append('--force-resolution')
         if m.params['oldpackage']:
             cmd.append('--oldpackage')
+        if m.params['replacefiles']:
+            cmd.append('--replacefiles')
+    if subcommand == 'dist-upgrade' and m.params['allow_vendor_change']:
+        cmd.append('--allow-vendor-change')
     if m.params['extra_args']:
         args_list = m.params['extra_args'].split(' ')
         cmd.extend(args_list)
@@ -478,6 +500,8 @@ def main():
             update_cache=dict(required=False, aliases=['refresh'], default='no', type='bool'),
             oldpackage=dict(required=False, default='no', type='bool'),
             extra_args=dict(required=False, default=None),
+            allow_vendor_change=dict(required=False, default=False, type='bool'),
+            replacefiles=dict(required=False, default=False, type='bool')
         ),
         supports_check_mode=True
     )
