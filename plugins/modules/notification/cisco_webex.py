@@ -41,7 +41,7 @@ options:
     default: text
     choices: ['text', 'markdown']
     type: str
-    aliases: ['type']
+    aliases: ['message_type']
 
   personal_token:
     description:
@@ -55,6 +55,7 @@ options:
       - The message you would like to send.
     required: yes
     type: str
+    aliases: ['message']
 '''
 
 EXAMPLES = """
@@ -62,7 +63,7 @@ EXAMPLES = """
 # that contains the appropriate information.
 
 - name: Cisco Webex Teams - Markdown Message to a Room
-  cisco_webex:
+  community.general.cisco_webex:
     recipient_type: roomId
     recipient_id: "{{ room_id }}"
     msg_type: markdown
@@ -70,7 +71,7 @@ EXAMPLES = """
     msg: "**Cisco Webex Teams Ansible Module - Room Message in Markdown**"
 
 - name: Cisco Webex Teams - Text Message to a Room
-  cisco_webex:
+  community.general.cisco_webex:
     recipient_type: roomId
     recipient_id: "{{ room_id }}"
     msg_type: text
@@ -78,7 +79,7 @@ EXAMPLES = """
     msg: "Cisco Webex Teams Ansible Module - Room Message in Text"
 
 - name: Cisco Webex Teams - Text Message by an Individuals ID
-  cisco_webex:
+  community.general.cisco_webex:
     recipient_type: toPersonId
     recipient_id: "{{ person_id}}"
     msg_type: text
@@ -86,7 +87,7 @@ EXAMPLES = """
     msg: "Cisco Webex Teams Ansible Module - Text Message to Individual by ID"
 
 - name: Cisco Webex Teams - Text Message by an Individuals E-Mail Address
-  cisco_webex:
+  community.general.cisco_webex:
     recipient_type: toPersonEmail
     recipient_id: "{{ person_email }}"
     msg_type: text
@@ -116,7 +117,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
 
-def spark_msg(module):
+def webex_msg(module):
     """When check mode is specified, establish a read only connection, that does not return any user specific
     data, to validate connectivity. In regular mode, send a message to a Cisco Webex Teams Room or Individual"""
 
@@ -152,15 +153,15 @@ def spark_msg(module):
     if status_code != 200:
         results['failed'] = True
         results['status_code'] = status_code
-        results['msg'] = msg
+        results['message'] = msg
     else:
         results['failed'] = False
         results['status_code'] = status_code
 
         if module.check_mode:
-            results['msg'] = 'Authentication Successful.'
+            results['message'] = 'Authentication Successful.'
         else:
-            results['msg'] = msg
+            results['message'] = msg
 
     return results
 
@@ -171,15 +172,15 @@ def main():
         argument_spec=dict(
             recipient_type=dict(required=True, choices=['roomId', 'toPersonEmail', 'toPersonId']),
             recipient_id=dict(required=True, no_log=True),
-            msg_type=dict(required=False, default='text', aliases=['type'], choices=['text', 'markdown']),
+            msg_type=dict(required=False, default='text', aliases=['message_type'], choices=['text', 'markdown']),
             personal_token=dict(required=True, no_log=True, aliases=['token']),
-            msg=dict(required=True)
+            msg=dict(required=True, aliases=['message']),
         ),
 
         supports_check_mode=True
     )
 
-    results = spark_msg(module)
+    results = webex_msg(module)
 
     module.exit_json(**results)
 
