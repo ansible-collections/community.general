@@ -33,7 +33,6 @@ display = Display()
 DOCUMENTATION = """
     lookup: sops
     author: Edoardo Tenani (@endorama) <e.tenani@arduino.cc>
-    version_added: "2.10"
     short_description: Read sops encrypted file contents
     description:
         - This lookup returns the contents from a file on the Ansible controller's file system.
