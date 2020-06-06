@@ -54,7 +54,7 @@ class ActionModule(ActionBase):
                 wrap_async=False)
             if async_result['finished'] == 1:
                 break
-            time.sleep(1)
+            time.sleep(min(1, timeout))
 
         return async_result
 
@@ -122,6 +122,9 @@ class ActionModule(ActionBase):
                     # longer on the controller); and set a backup file path.
                     module_args['_timeout'] = task_async
                     module_args['_back'] = '%s/iptables.state' % async_dir
+                    async_status_args = dict(_async_dir= async_dir)
+                    confirm_cmd = 'rm -f %s' % module_args['_back']
+                    remaining_time = max(task_async, max_timeout)
 
             # do work!
             result = merge_hash(result, self._execute_module(module_args=module_args, task_vars=task_vars, wrap_async=wrap_async))
@@ -131,34 +134,35 @@ class ActionModule(ActionBase):
             # - confirm the restored state by removing the backup on the remote
             # - retrieve the results of the asynchronous task to return them
             if '_back' in module_args:
-                try:
-                    self._connection.reset()
-                    display.v("%s: reset connection" % (module_name))
-                except AttributeError:
-                    display.warning("Connection plugin does not allow to reset the connection.")
-
-                confirm_cmd = 'rm -f %s' % module_args['_back']
-                remaining_time = max(task_async, max_timeout)
-                for x in range(max_timeout):
-                    time.sleep(1)
-                    remaining_time -= 1
-                    # - AnsibleConnectionFailure covers rejected requests (i.e.
-                    #   by rules with '--jump REJECT')
-                    # - ansible_timeout is able to cover dropped requests (due
-                    #   to a rule or policy DROP) if not lower than async_val.
-                    try:
-                        garbage = self._low_level_execute_command(confirm_cmd, sudoable=self.DEFAULT_SUDOABLE)
-                        break
-                    except AnsibleConnectionFailure:
-                        continue
-
-                async_status_args = {}
                 async_status_args['jid'] = result.get('ansible_job_id', None)
                 if async_status_args['jid'] is None:
                     raise AnsibleActionFail("Unable to get 'ansible_job_id'.")
 
-                async_status_args['_async_dir'] = async_dir
-                result = merge_hash(result, self._async_result(async_status_args, task_vars, remaining_time))
+                # Catch early errors due to missing mandatory option, bad
+                # option type/value, missing required system command, etc.
+                result = merge_hash(result, self._async_result(async_status_args, task_vars, 0))
+
+                if not result['finished']:
+                    try:
+                        self._connection.reset()
+                        display.v("%s: reset connection" % (module_name))
+                    except AttributeError:
+                        display.warning("Connection plugin does not allow to reset the connection.")
+
+                    for x in range(max_timeout):
+                        time.sleep(1)
+                        remaining_time -= 1
+                        # - AnsibleConnectionFailure covers rejected requests (i.e.
+                        #   by rules with '--jump REJECT')
+                        # - ansible_timeout is able to cover dropped requests (due
+                        #   to a rule or policy DROP) if not lower than async_val.
+                        try:
+                            garbage = self._low_level_execute_command(confirm_cmd, sudoable=self.DEFAULT_SUDOABLE)
+                            break
+                        except AnsibleConnectionFailure:
+                            continue
+
+                    result = merge_hash(result, self._async_result(async_status_args, task_vars, remaining_time))
 
                 # Cleanup async related stuff and internal params
                 for key in ('ansible_job_id', 'results_file', 'started', 'finished'):
