@@ -122,7 +122,7 @@ class ActionModule(ActionBase):
                     # longer on the controller); and set a backup file path.
                     module_args['_timeout'] = task_async
                     module_args['_back'] = '%s/iptables.state' % async_dir
-                    async_status_args = dict(_async_dir= async_dir)
+                    async_status_args = dict(_async_dir=async_dir)
                     confirm_cmd = 'rm -f %s' % module_args['_back']
                     remaining_time = max(task_async, max_timeout)
 
