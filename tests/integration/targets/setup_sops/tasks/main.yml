@@ -1,0 +1,7 @@
+---
+
+- set_fact:
+    sops_installed: no
+
+- include: ubuntu.yml
+  when: ansible_distribution == 'Ubuntu'
