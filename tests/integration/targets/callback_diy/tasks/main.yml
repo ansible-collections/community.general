@@ -29,7 +29,7 @@
         environment: >-
           ANSIBLE_FORCE_COLOR=True
           ANSIBLE_STDOUT_CALLBACK=community.general.diy
-          ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_START_MSG="Sample output \{\{ ansible_callback_diy.playbook.file_name \}\}"
+          ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_START_MSG="Sample output Sample playbook \{\{ ansible_callback_diy.playbook.file_name \}\}"
         playbook: |
           - hosts: testhost
             gather_facts: false
@@ -38,7 +38,7 @@
                 debug:
                   msg: sample debug msg
         expected_output: [
-          "Sample output /dev/stdin",
+          "Sample output Sample playbook /dev/fd/0",
           "",
           "PLAY [testhost] ****************************************************************",
           "",
@@ -432,8 +432,6 @@
 
 - name: Collect outputs
   shell: "{{ env }} ansible-playbook -i {{ inventory }} {{ playbook }}"
-  args:
-    executable: /bin/bash
   loop: "{{ tests }}"
   loop_control:
     loop_var: test
@@ -445,7 +443,7 @@
     inventory: "{{ role_path }}/inventory.yml"
     playbook: "{{
       [
-        '/dev/stdin <<EOF',
+        '/dev/fd/0 <<EOF',
         (
           test.playbook
           | regex_replace('(\\\\{){2}(.*?)(\\\\}){2}', '{{\\2}}')
