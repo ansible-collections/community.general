@@ -899,7 +899,7 @@ files:
     ignore: kbrebanov
   $modules/packaging/os/apt_rpm.py:
     authors: evgkrsk
-  $modules/packaging/os/:
+  $modules/packaging/os/pkg5:
     authors: mavit
     maintainers: $team_solaris
     labels: pkg5 solaris
