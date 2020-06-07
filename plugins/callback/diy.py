@@ -603,184 +603,184 @@ DOCUMENTATION = r'''
 
 EXAMPLES = r'''
 ansible.cfg: >
-# Enable plugin
-[defaults]
-stdout_callback=community.general.diy
+  # Enable plugin
+  [defaults]
+  stdout_callback=community.general.diy
 
-[callback_diy]
-# Output when playbook starts
-playbook_on_start_msg="DIY output(via ansible.cfg): playbook example: {{ ansible_callback_diy.playbook.file_name }}"
-playbook_on_start_msg_color=yellow
+  [callback_diy]
+  # Output when playbook starts
+  playbook_on_start_msg="DIY output(via ansible.cfg): playbook example: {{ ansible_callback_diy.playbook.file_name }}"
+  playbook_on_start_msg_color=yellow
 
-# Comment out to allow default plugin output
-# playbook_on_play_start_msg="PLAY: starting play {{ ansible_callback_diy.play.name }}"
+  # Comment out to allow default plugin output
+  # playbook_on_play_start_msg="PLAY: starting play {{ ansible_callback_diy.play.name }}"
 
-# Accept on_skipped_msg or ansible_callback_diy_runner_on_skipped_msg as input vars
-# If neither are supplied, omit the option
-runner_on_skipped_msg="{{ on_skipped_msg | default(ansible_callback_diy_runner_on_skipped_msg) | default(omit) }}"
+  # Accept on_skipped_msg or ansible_callback_diy_runner_on_skipped_msg as input vars
+  # If neither are supplied, omit the option
+  runner_on_skipped_msg="{{ on_skipped_msg | default(ansible_callback_diy_runner_on_skipped_msg) | default(omit) }}"
 
-# Newline after every callback
-# on_any_msg='{{ " " | join("\n") }}'
+  # Newline after every callback
+  # on_any_msg='{{ " " | join("\n") }}'
 
 playbook.yml: >
----
-- name: "Default plugin output: play example"
-  hosts: localhost
-  gather_facts: no
-  tasks:
-    - name:  Default plugin output
-      debug:
-        msg: default plugin output
+  ---
+  - name: "Default plugin output: play example"
+    hosts: localhost
+    gather_facts: no
+    tasks:
+      - name:  Default plugin output
+        debug:
+          msg: default plugin output
 
-- name: Override from play vars
-  hosts: localhost
-  gather_facts: no
-  vars:
-    ansible_connection: local
-    green: "\e[0m\e[38;5;82m"
-    yellow: "\e[0m\e[38;5;11m"
-    bright_purple: "\e[0m\e[38;5;105m"
-    cyan: "\e[0m\e[38;5;51m"
-    green_bg_black_fg: "\e[0m\e[48;5;40m\e[38;5;232m"
-    yellow_bg_black_fg: "\e[0m\e[48;5;226m\e[38;5;232m"
-    purple_bg_white_fg: "\e[0m\e[48;5;57m\e[38;5;255m"
-    cyan_bg_black_fg: "\e[0m\e[48;5;87m\e[38;5;232m"
-    magenta: "\e[38;5;198m"
-    white: "\e[0m\e[38;5;255m"
-    ansible_callback_diy_playbook_on_play_start_msg: "\n{{green}}DIY output(via play vars): play example: {{magenta}}{{ansible_callback_diy.play.name}}\n\n"
-    ansible_callback_diy_playbook_on_task_start_msg: "DIY output(via play vars): task example: {{ ansible_callback_diy.task.name }}"
-    ansible_callback_diy_playbook_on_task_start_msg_color: cyan
-    ansible_callback_diy_playbook_on_stats_msg: |+2
-              CUSTOM STATS
-      ==============================
-      {% for key in ansible_callback_diy.stats | sort %}
-      {% if ansible_callback_diy.stats[key] %}
-      {% if key == 'ok' %}
-      {% set color_one = lookup('vars','green_bg_black_fg') %}
-      {% set prefix = '      ' %}
-      {% set suffix = '     ' %}
-      {% set color_two = lookup('vars','green') %}
-      {% elif key == 'changed' %}
-      {% set color_one = lookup('vars','yellow_bg_black_fg') %}
-      {% set prefix = '   ' %}
-      {% set suffix = '   ' %}
-      {% set color_two = lookup('vars','yellow') %}
-      {% elif key == 'processed' %}
-      {% set color_one = lookup('vars','purple_bg_white_fg') %}
-      {% set prefix = '  ' %}
-      {% set suffix = '  ' %}
-      {% set color_two = lookup('vars','bright_purple') %}
-      {% elif key == 'skipped' %}
-      {% set color_one = lookup('vars','cyan_bg_black_fg') %}
-      {% set prefix = '   ' %}
-      {% set suffix = '   ' %}
-      {% set color_two = lookup('vars','cyan') %}
-      {% else %}
-      {% set color_one = "" %}
-      {% set prefix = "" %}
-      {% set suffix = "" %}
-      {% set color_two = "" %}
-      {% endif %}
-      {{ color_one }}{{ "%s%s%s" | format(prefix,key,suffix) }}{{ color_two }}: {{ ansible_callback_diy.stats[key] | to_nice_yaml }}
-      {% endif %}
-      {% endfor %}
+  - name: Override from play vars
+    hosts: localhost
+    gather_facts: no
+    vars:
+      ansible_connection: local
+      green: "\e[0m\e[38;5;82m"
+      yellow: "\e[0m\e[38;5;11m"
+      bright_purple: "\e[0m\e[38;5;105m"
+      cyan: "\e[0m\e[38;5;51m"
+      green_bg_black_fg: "\e[0m\e[48;5;40m\e[38;5;232m"
+      yellow_bg_black_fg: "\e[0m\e[48;5;226m\e[38;5;232m"
+      purple_bg_white_fg: "\e[0m\e[48;5;57m\e[38;5;255m"
+      cyan_bg_black_fg: "\e[0m\e[48;5;87m\e[38;5;232m"
+      magenta: "\e[38;5;198m"
+      white: "\e[0m\e[38;5;255m"
+      ansible_callback_diy_playbook_on_play_start_msg: "\n{{green}}DIY output(via play vars): play example: {{magenta}}{{ansible_callback_diy.play.name}}\n\n"
+      ansible_callback_diy_playbook_on_task_start_msg: "DIY output(via play vars): task example: {{ ansible_callback_diy.task.name }}"
+      ansible_callback_diy_playbook_on_task_start_msg_color: cyan
+      ansible_callback_diy_playbook_on_stats_msg: |+2
+                CUSTOM STATS
+        ==============================
+        {% for key in ansible_callback_diy.stats | sort %}
+        {% if ansible_callback_diy.stats[key] %}
+        {% if key == 'ok' %}
+        {% set color_one = lookup('vars','green_bg_black_fg') %}
+        {% set prefix = '      ' %}
+        {% set suffix = '     ' %}
+        {% set color_two = lookup('vars','green') %}
+        {% elif key == 'changed' %}
+        {% set color_one = lookup('vars','yellow_bg_black_fg') %}
+        {% set prefix = '   ' %}
+        {% set suffix = '   ' %}
+        {% set color_two = lookup('vars','yellow') %}
+        {% elif key == 'processed' %}
+        {% set color_one = lookup('vars','purple_bg_white_fg') %}
+        {% set prefix = '  ' %}
+        {% set suffix = '  ' %}
+        {% set color_two = lookup('vars','bright_purple') %}
+        {% elif key == 'skipped' %}
+        {% set color_one = lookup('vars','cyan_bg_black_fg') %}
+        {% set prefix = '   ' %}
+        {% set suffix = '   ' %}
+        {% set color_two = lookup('vars','cyan') %}
+        {% else %}
+        {% set color_one = "" %}
+        {% set prefix = "" %}
+        {% set suffix = "" %}
+        {% set color_two = "" %}
+        {% endif %}
+        {{ color_one }}{{ "%s%s%s" | format(prefix,key,suffix) }}{{ color_two }}: {{ ansible_callback_diy.stats[key] | to_nice_yaml }}
+        {% endif %}
+        {% endfor %}
 
-  tasks:
-    - name: Custom banner with default plugin result output
-      debug:
-        msg: "default plugin output: result example"
+    tasks:
+      - name: Custom banner with default plugin result output
+        debug:
+          msg: "default plugin output: result example"
 
-    - name: Override from task vars
-      debug:
-        msg: "example {{ two }}"
-      changed_when: true
-      vars:
-        white_fg_red_bg: "\e[0m\e[48;5;1m"
-        two: "{{ white_fg_red_bg }}    2    "
-        ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
-        ansible_callback_diy_playbook_on_task_start_msg_color: bright magenta
-        ansible_callback_diy_runner_on_ok_msg: "DIY output(via task vars): result example: \n{{ ansible_callback_diy.result.output.msg }}\n"
-        ansible_callback_diy_runner_on_ok_msg_color: "{{ 'yellow' if ansible_callback_diy.result.is_changed else 'bright green' }}"
+      - name: Override from task vars
+        debug:
+          msg: "example {{ two }}"
+        changed_when: true
+        vars:
+          white_fg_red_bg: "\e[0m\e[48;5;1m"
+          two: "{{ white_fg_red_bg }}    2    "
+          ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
+          ansible_callback_diy_playbook_on_task_start_msg_color: bright magenta
+          ansible_callback_diy_runner_on_ok_msg: "DIY output(via task vars): result example: \n{{ ansible_callback_diy.result.output.msg }}\n"
+          ansible_callback_diy_runner_on_ok_msg_color: "{{ 'yellow' if ansible_callback_diy.result.is_changed else 'bright green' }}"
 
-    - name: Suppress output
-      debug:
-        msg: i should not be displayed
-      vars:
-        ansible_callback_diy_playbook_on_task_start_msg: ""
-        ansible_callback_diy_runner_on_ok_msg: ""
+      - name: Suppress output
+        debug:
+          msg: i should not be displayed
+        vars:
+          ansible_callback_diy_playbook_on_task_start_msg: ""
+          ansible_callback_diy_runner_on_ok_msg: ""
 
-    - name: Using alias vars (see ansible.cfg)
-      debug:
-        msg:
-      when: False
-      vars:
-        ansible_callback_diy_playbook_on_task_start_msg: ""
-        on_skipped_msg: "DIY output(via task vars): skipped example:\n\e[0m\e[38;5;4m\u25b6\u25b6 {{ ansible_callback_diy.result.task.name }}\n"
-        on_skipped_msg_color: white
+      - name: Using alias vars (see ansible.cfg)
+        debug:
+          msg:
+        when: False
+        vars:
+          ansible_callback_diy_playbook_on_task_start_msg: ""
+          on_skipped_msg: "DIY output(via task vars): skipped example:\n\e[0m\e[38;5;4m\u25b6\u25b6 {{ ansible_callback_diy.result.task.name }}\n"
+          on_skipped_msg_color: white
 
-    - name: Just stdout
-      command: echo some stdout
-      vars:
-        ansible_callback_diy_playbook_on_task_start_msg: "\n"
-        ansible_callback_diy_runner_on_ok_msg: "{{ ansible_callback_diy.result.output.stdout }}\n"
+      - name: Just stdout
+        command: echo some stdout
+        vars:
+          ansible_callback_diy_playbook_on_task_start_msg: "\n"
+          ansible_callback_diy_runner_on_ok_msg: "{{ ansible_callback_diy.result.output.stdout }}\n"
 
-    - name: Multiline output
-      debug:
-        msg: "{{ multiline }}"
-      vars:
-        ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
-        multiline: "line\nline\nline"
-        ansible_callback_diy_runner_on_ok_msg: |+2
-          some
-          {{ ansible_callback_diy.result.output.msg }}
-          output
+      - name: Multiline output
+        debug:
+          msg: "{{ multiline }}"
+        vars:
+          ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
+          multiline: "line\nline\nline"
+          ansible_callback_diy_runner_on_ok_msg: |+2
+            some
+            {{ ansible_callback_diy.result.output.msg }}
+            output
 
-        ansible_callback_diy_playbook_on_task_start_msg_color: bright blue
+          ansible_callback_diy_playbook_on_task_start_msg_color: bright blue
 
-    - name: Indentation
-      debug:
-        msg: "{{ item.msg }}"
-      with_items:
-        - { indent: 1, msg: one., color: red }
-        - { indent: 2, msg: two.., color: yellow }
-        - { indent: 3, msg: three..., color: bright yellow }
-      vars:
-        ansible_callback_diy_runner_item_on_ok_msg: "{{ ansible_callback_diy.result.output.msg | indent(item.indent, True) }}"
-        ansible_callback_diy_runner_item_on_ok_msg_color: "{{ item.color }}"
-        ansible_callback_diy_runner_on_ok_msg: "GO!!!"
-        ansible_callback_diy_runner_on_ok_msg_color: bright green
+      - name: Indentation
+        debug:
+          msg: "{{ item.msg }}"
+        with_items:
+          - { indent: 1, msg: one., color: red }
+          - { indent: 2, msg: two.., color: yellow }
+          - { indent: 3, msg: three..., color: bright yellow }
+        vars:
+          ansible_callback_diy_runner_item_on_ok_msg: "{{ ansible_callback_diy.result.output.msg | indent(item.indent, True) }}"
+          ansible_callback_diy_runner_item_on_ok_msg_color: "{{ item.color }}"
+          ansible_callback_diy_runner_on_ok_msg: "GO!!!"
+          ansible_callback_diy_runner_on_ok_msg_color: bright green
 
-    - name: Using lookup and template as file
-      shell: "echo {% raw %}'output from {{ file_name }}'{% endraw %} > {{ file_name }}"
-      vars:
-        ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
-        file_name: diy_file_template_example
-        ansible_callback_diy_runner_on_ok_msg: "{{ lookup('template', file_name) }}"
+      - name: Using lookup and template as file
+        shell: "echo {% raw %}'output from {{ file_name }}'{% endraw %} > {{ file_name }}"
+        vars:
+          ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
+          file_name: diy_file_template_example
+          ansible_callback_diy_runner_on_ok_msg: "{{ lookup('template', file_name) }}"
 
-    - name: 'Look at top level vars available to the "runner_on_ok" callback'
-      debug:
-        msg: ''
-      vars:
-        ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
-        ansible_callback_diy_runner_on_ok_msg: |+2
-          {% for var in (ansible_callback_diy.top_level_var_names|reject('match','vars|ansible_callback_diy.*')) | sort %}
-          {{ green }}{{ var }}:
-            {{ white }}{{ lookup('vars', var) }}
+      - name: 'Look at top level vars available to the "runner_on_ok" callback'
+        debug:
+          msg: ''
+        vars:
+          ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
+          ansible_callback_diy_runner_on_ok_msg: |+2
+            {% for var in (ansible_callback_diy.top_level_var_names|reject('match','vars|ansible_callback_diy.*')) | sort %}
+            {{ green }}{{ var }}:
+              {{ white }}{{ lookup('vars', var) }}
 
-          {% endfor %}
-        ansible_callback_diy_runner_on_ok_msg_color: white
+            {% endfor %}
+          ansible_callback_diy_runner_on_ok_msg_color: white
 
-    - name: 'Look at event data available to the "runner_on_ok" callback'
-      debug:
-        msg: ''
-      vars:
-        ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
-        ansible_callback_diy_runner_on_ok_msg: |+2
-          {% for key in ansible_callback_diy | sort %}
-          {{ green }}{{ key }}:
-            {{ white }}{{ ansible_callback_diy[key] }}
+      - name: 'Look at event data available to the "runner_on_ok" callback'
+        debug:
+          msg: ''
+        vars:
+          ansible_callback_diy_playbook_on_task_start_msg: "\nDIY output(via task vars): task example: {{ ansible_callback_diy.task.name }}"
+          ansible_callback_diy_runner_on_ok_msg: |+2
+            {% for key in ansible_callback_diy | sort %}
+            {{ green }}{{ key }}:
+              {{ white }}{{ ansible_callback_diy[key] }}
 
-          {% endfor %}
+            {% endfor %}
 '''
 
 import sys
