@@ -432,6 +432,8 @@
 
 - name: Collect outputs
   shell: "{{ env }} ansible-playbook -i {{ inventory }} {{ playbook }}"
+  args:
+    executable: /bin/bash
   loop: "{{ tests }}"
   loop_control:
     loop_var: test
