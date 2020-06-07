@@ -121,8 +121,10 @@ EXAMPLES = '''
     wait_timeout: 500
     ssh_keys: [ .... ]
   register: my_droplet
+
 - debug:
     msg: "ID is {{ my_droplet.data.droplet.id }}, IP is {{ my_droplet.data.ip_address }}"
+
 - name: Ensure a droplet is present
   digital_ocean_droplet:
     state: present
@@ -133,6 +135,7 @@ EXAMPLES = '''
     region: sfo1
     image: ubuntu-16-04-x64
     wait_timeout: 500
+
 - name: Ensure a droplet is present with SSH keys installed
   digital_ocean_droplet:
     state: present
