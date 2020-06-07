@@ -274,6 +274,9 @@ class Yarn(object):
         if err:
             self.module.fail_json(msg=err)
 
+        if not cmd_result:
+            return outdated
+
         outdated_packages_data = cmd_result.splitlines()[1]
 
         data = json.loads(outdated_packages_data)
