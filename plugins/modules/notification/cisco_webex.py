@@ -105,7 +105,7 @@ status_code:
   type: int
   sample: 200
 
-msg:
+message:
     description:
       - The Response Message returned by the Webex Teams API.
       - Full Response Code explanations can be found at U(https://developer.webex.com/docs/api/basics).
