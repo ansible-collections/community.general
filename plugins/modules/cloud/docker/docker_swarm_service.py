@@ -193,7 +193,6 @@ options:
       - Corresponds to the C(--init) option of C(docker service create).
       - Requires API version >= 1.37.
     type: bool
-    version_added: "2.10"
   labels:
     description:
       - Dictionary of key value pairs.
@@ -2449,7 +2448,7 @@ class DockerServiceManager(object):
         ds.service_version = raw_data['Version']['Index']
         ds.service_id = raw_data['ID']
 
-        ds.init = task_template_data['ContainerSpec'].get('Init')
+        ds.init = task_template_data['ContainerSpec'].get('Init', False)
         return ds
 
     def update_service(self, name, old_service, new_service):
