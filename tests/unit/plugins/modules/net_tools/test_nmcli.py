@@ -261,7 +261,7 @@ def test_bond_connection_create(mocked_generic_connection_create):
     assert args[0][7] == 'ifname'
     assert args[0][8] == 'bond_non_existant'
 
-    for param in ['gw4', 'primary', 'autoconnect', 'mode', 'active-backup', 'ip4']:
+    for param in ['gw4', 'primary', 'connection.autoconnect', 'mode', 'active-backup', 'ip4']:
         assert param in args[0]
 
 
@@ -285,7 +285,7 @@ def test_generic_connection_create(mocked_generic_connection_create):
     assert args[0][5] == 'con-name'
     assert args[0][6] == 'non_existent_nw_device'
 
-    for param in ['autoconnect', 'gw4', 'ip4']:
+    for param in ['connection.autoconnect', 'gw4', 'ip4']:
         assert param in args[0]
 
 

@@ -1,0 +1,2 @@
+bugfixes:
+- nmcli - use 'connection.autoconnect' instead of 'autoconnect' (https://github.com/ansible-collections/community.general/issues/459).

@@ -801,7 +801,7 @@ class Nmcli(object):
             'gw4': self.gw4,
             'ip6': self.ip6,
             'gw6': self.gw6,
-            'autoconnect': self.bool_to_string(self.autoconnect),
+            'connection.autoconnect': self.bool_to_string(self.autoconnect),
             'ipv4.dns-search': self.dns4_search,
             'ipv6.dns-search': self.dns6_search,
             'ipv4.dhcp-client-id': self.dhcp_client_id,
@@ -822,7 +822,7 @@ class Nmcli(object):
             'ipv6.address': self.ip6,
             'ipv6.gateway': self.gw6,
             'ipv6.dns': self.dns6,
-            'autoconnect': self.bool_to_string(self.autoconnect),
+            'connection.autoconnect': self.bool_to_string(self.autoconnect),
             'ipv4.dns-search': self.dns4_search,
             'ipv6.dns-search': self.dns6_search,
             'ipv4.dhcp-client-id': self.dhcp_client_id,
@@ -876,7 +876,7 @@ class Nmcli(object):
             'gw4': self.gw4,
             'ip6': self.ip6,
             'gw6': self.gw6,
-            'autoconnect': self.bool_to_string(self.autoconnect),
+            'connection.autoconnect': self.bool_to_string(self.autoconnect),
             'ipv4.dns-search': self.dns4_search,
             'ipv6.dns-search': self.dns6_search,
             'miimon': self.miimon,
@@ -904,7 +904,7 @@ class Nmcli(object):
             'ipv6.address': self.ip6,
             'ipv6.gateway': self.gw6,
             'ipv6.dns': self.dns6,
-            'autoconnect': self.bool_to_string(self.autoconnect),
+            'connection.autoconnect': self.bool_to_string(self.autoconnect),
             'ipv4.dns-search': self.dns4_search,
             'ipv6.dns-search': self.dns6_search,
             'miimon': self.miimon,
@@ -969,7 +969,7 @@ class Nmcli(object):
             'gw4': self.gw4,
             'ip6': self.ip6,
             'gw6': self.gw6,
-            'autoconnect': self.bool_to_string(self.autoconnect),
+            'connection.autoconnect': self.bool_to_string(self.autoconnect),
             'ipv4.dns-search': self.dns4_search,
             'ipv6.dns-search': self.dns6_search,
             'ipv4.dhcp-client-id': self.dhcp_client_id,
@@ -994,7 +994,7 @@ class Nmcli(object):
             'ipv6.address': self.ip6,
             'ipv6.gateway': self.gw6,
             'ipv6.dns': self.dns6,
-            'autoconnect': self.bool_to_string(self.autoconnect),
+            'connection.autoconnect': self.bool_to_string(self.autoconnect),
             'ipv4.dns-search': self.dns4_search,
             'ipv6.dns-search': self.dns6_search,
             '802-3-ethernet.mtu': self.mtu,
@@ -1030,7 +1030,7 @@ class Nmcli(object):
             'gw4': self.gw4,
             'ip6': self.ip6,
             'gw6': self.gw6,
-            'autoconnect': self.bool_to_string(self.autoconnect),
+            'connection.autoconnect': self.bool_to_string(self.autoconnect),
             'bridge.ageing-time': self.ageingtime,
             'bridge.forward-delay': self.forwarddelay,
             'bridge.hello-time': self.hellotime,
@@ -1058,7 +1058,7 @@ class Nmcli(object):
             'ipv4.gateway': self.gw4,
             'ipv6.address': self.ip6,
             'ipv6.gateway': self.gw6,
-            'autoconnect': self.bool_to_string(self.autoconnect),
+            'connection.autoconnect': self.bool_to_string(self.autoconnect),
             'bridge.ageing-time': self.ageingtime,
             'bridge.forward-delay': self.forwarddelay,
             'bridge.hello-time': self.hellotime,
@@ -1145,7 +1145,7 @@ class Nmcli(object):
                   'gw4': self.gw4 or '',
                   'ip6': self.ip6 or '',
                   'gw6': self.gw6 or '',
-                  'autoconnect': self.bool_to_string(self.autoconnect)
+                  'connection.autoconnect': self.bool_to_string(self.autoconnect)
                   }
         for k, v in params.items():
             cmd.extend([k, v])
@@ -1172,7 +1172,7 @@ class Nmcli(object):
                   'ipv6.address': self.ip6 or '',
                   'ipv6.gateway': self.gw6 or '',
                   'ipv6.dns': self.dns6 or '',
-                  'autoconnect': self.bool_to_string(self.autoconnect)
+                  'connection.autoconnect': self.bool_to_string(self.autoconnect)
                   }
 
         for k, v in params.items():
@@ -1201,7 +1201,7 @@ class Nmcli(object):
         params = {'vxlan.id': self.vxlan_id,
                   'vxlan.local': self.vxlan_local,
                   'vxlan.remote': self.vxlan_remote,
-                  'autoconnect': self.bool_to_string(self.autoconnect)
+                  'connection.autoconnect': self.bool_to_string(self.autoconnect)
                   }
         for k, v in params.items():
             cmd.extend([k, v])
@@ -1221,7 +1221,7 @@ class Nmcli(object):
         params = {'vxlan.id': self.vxlan_id,
                   'vxlan.local': self.vxlan_local,
                   'vxlan.remote': self.vxlan_remote,
-                  'autoconnect': self.bool_to_string(self.autoconnect)
+                  'connection.autoconnect': self.bool_to_string(self.autoconnect)
                   }
         for k, v in params.items():
             cmd.extend([k, v])
@@ -1250,7 +1250,7 @@ class Nmcli(object):
 
         params = {'ip-tunnel.local': self.ip_tunnel_local,
                   'ip-tunnel.remote': self.ip_tunnel_remote,
-                  'autoconnect': self.bool_to_string(self.autoconnect)
+                  'connection.autoconnect': self.bool_to_string(self.autoconnect)
                   }
         for k, v in params.items():
             cmd.extend([k, v])
@@ -1269,7 +1269,7 @@ class Nmcli(object):
 
         params = {'ip-tunnel.local': self.ip_tunnel_local,
                   'ip-tunnel.remote': self.ip_tunnel_remote,
-                  'autoconnect': self.bool_to_string(self.autoconnect)
+                  'connection.autoconnect': self.bool_to_string(self.autoconnect)
                   }
         for k, v in params.items():
             cmd.extend([k, v])
@@ -1298,7 +1298,7 @@ class Nmcli(object):
 
         params = {'ip-tunnel.local': self.ip_tunnel_local,
                   'ip-tunnel.remote': self.ip_tunnel_remote,
-                  'autoconnect': self.bool_to_string(self.autoconnect)
+                  'connection.autoconnect': self.bool_to_string(self.autoconnect)
                   }
         for k, v in params.items():
             cmd.extend([k, v])
@@ -1317,7 +1317,7 @@ class Nmcli(object):
 
         params = {'ip-tunnel.local': self.ip_tunnel_local,
                   'ip-tunnel.remote': self.ip_tunnel_remote,
-                  'autoconnect': self.bool_to_string(self.autoconnect)
+                  'connection.autoconnect': self.bool_to_string(self.autoconnect)
                   }
         for k, v in params.items():
             cmd.extend([k, v])
