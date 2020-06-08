@@ -29,7 +29,7 @@
         environment: >-
           ANSIBLE_FORCE_COLOR=True
           ANSIBLE_STDOUT_CALLBACK=community.general.diy
-          ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_START_MSG="Sample output Sample playbook \{\{ ansible_callback_diy.playbook.file_name \}\}"
+          ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_START_MSG="Sample output Sample playbook message"
         playbook: |
           - hosts: testhost
             gather_facts: false
@@ -38,7 +38,7 @@
                 debug:
                   msg: sample debug msg
         expected_output: [
-          "Sample output Sample playbook /dev/fd/0",
+          "Sample output Sample playbook message",
           "",
           "PLAY [testhost] ****************************************************************",
           "",
@@ -430,6 +430,36 @@
           "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
+- when: ansible_distribution == 'FreeBSD' and ansible_distribution_version in ['11.1', '12.1']
+  name: Create temporary playbooks
+  block:
+    - name: Create temporary playbook files
+      tempfile:
+        state: file
+        suffix: temp
+      loop: "{{ tests }}"
+      loop_control:
+        loop_var: test
+        label: "{{ test.name }}"
+      register: temporary_playbook_files
+      notify: Remove temporary playbooks
+
+    - name: Set temporary playbook file content
+      copy:
+        content: "{{ playbook }}"
+        dest: "{{ playbook_file }}"
+      loop: "{{ tests }}"
+      loop_control:
+        loop_var: test
+        label: "{{ test.name }}"
+      vars:
+        playbook_file: "{{ (temporary_playbook_files.results | selectattr('test.name', 'equalto', test.name) | list())[0].path }}"
+        playbook: "{{
+          test.playbook
+          | regex_replace('(\\\\{){2}(.*?)(\\\\}){2}', '{{\\2}}')
+          | regex_replace('({\\\\%)(.*?)(%\\\\})', '{%\\2%}')
+        }}"
+
 - name: Collect outputs
   shell: "{{ env }} ansible-playbook -i {{ inventory }} {{ playbook }}"
   loop: "{{ tests }}"
@@ -441,16 +471,23 @@
   vars:
     env: "{{ test.environment | regex_replace('(\\\\{){2}(.*?)(\\\\}){2}', '{{\\2}}') }}"
     inventory: "{{ role_path }}/inventory.yml"
-    playbook: "{{
-      [
-        '/dev/fd/0 <<EOF',
-        (
-          test.playbook
-          | regex_replace('(\\\\{){2}(.*?)(\\\\}){2}', '{{\\2}}')
-          | regex_replace('({\\\\%)(.*?)(%\\\\})', '{%\\2%}')
-        )
-      ] | join('\n')
-    }}"
+    playbook: "
+      {%- if temporary_playbook_files is changed                                                                  -%}
+      {%-   for result in temporary_playbook_files.results                                                        -%}
+      {%-     if result.test.name == test.name                                                                    -%}
+      {{-       result.path                                                                                       -}}
+      {%-     endif                                                                                               -%}
+      {%-   endfor                                                                                                -%}
+      {%- else                                                                                                    -%}
+      {{-   [
+              '/dev/fd/0 <<EOF',
+              (
+                test.playbook
+                | regex_replace('(\\\\{){2}(.*?)(\\\\}){2}', '{{\\2}}')
+                | regex_replace('({\\\\%)(.*?)(%\\\\})', '{%\\2%}')
+              )
+            ] | join('\n')                                                                                        -}}
+      {%- endif                                                                                                   -%}"
 
 - name: Assert test output equals expected output
   assert:
