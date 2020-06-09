@@ -24,6 +24,10 @@
     dump_file2="{{tmp_dir}}/{{file3}}"
     db_user="test"
     db_user_unsafe_password="pass!word"
+    config_file="/root/.my.cnf"
+
+- name: create custom config file
+  shell: 'echo "[client]" > {{ config_file }}'
 
 - name: create user for test unsafe_login_password parameter
   mysql_user:
@@ -81,13 +85,15 @@
     master_data: 1
     skip_lock_tables: yes
     dump_extra_args: --skip-triggers
+    config_file: '{{ config_file }}'
+    restrict_config_file: yes
   register: result
 
 - name: assert successful completion of dump operation
   assert:
     that:
     - result is changed
-    - result.executed_commands[0] is search("mysqldump --user={{ db_user }} --password=\*\*\*\*\*\*\*\* --force --socket={{ mysql_socket }} {{ db_name }} --skip-lock-tables --quick --ignore-table={{ db_name }}.department --master-data=1 --skip-triggers")
+    - result.executed_commands[0] is search("mysqldump --defaults-file={{ config_file }} --user={{ db_user }} --password=\*\*\*\*\*\*\*\* --force --socket={{ mysql_socket }} {{ db_name }} --skip-lock-tables --quick --ignore-table={{ db_name }}.department --master-data=1 --skip-triggers")
 
 - name: state dump/import - file name should exist
   file: name={{ db_file_name }} state=file
