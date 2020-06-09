@@ -113,6 +113,7 @@ options:
         description:
           - A dictionary of threshold windows by status
           - These options only apply to anomaly monitors which are of the "query alert" type; Use elsewhere will be ignored.
+          - Acceptable values per the DataDog API are: last_#m (1, 5, 10, 15, or 30), last_#h (1, 2, or 4), or last_#d (1 or 2)
           - "recovery_window: Describes how long an anomalous metric must be normal before the alert recovers"
           - "trigger_window: Describes how long a metric must be anomalous before an alert triggers"
         type: dict
@@ -154,7 +155,20 @@ EXAMPLES = '''
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
-- name: Deletes a monitor
+- name: Create an anomaly monitor
+  datadog_monitor:
+    type: "query alert"
+    name: "Test anomaly monitor"
+    state: "present"
+    query: "avg(last_1h):anomalies(avg:system.cpu.system{host:host1}, 'basic', 3, direction='above', alert_window='last_5m', interval=20, count_default_zero='true') >= 1"
+    notification_message: "Host [[host.name]] with IP [[host.ip]] has had unusually high CPU usage for the past 5 minutes."
+    api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
+    app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
+    threshold_windows:
+        trigger_window: "last_5m"
+        recovery_window: "last_5m"
+
+- name: Delete a monitor
   datadog_monitor:
     name: "Test monitor"
     state: "absent"
