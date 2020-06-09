@@ -794,6 +794,7 @@ from ansible.vars.manager import VariableManager
 from ansible.plugins.callback.default import CallbackModule as Default
 from ansible.module_utils._text import to_text
 
+
 class DummyStdout(object):
     def flush(self):
         pass
@@ -803,6 +804,7 @@ class DummyStdout(object):
 
     def writelines(self, l):
         pass
+
 
 class CallbackModule(Default):
     """
