@@ -104,12 +104,14 @@
     state: dump
     target: "{{ dump_file1 }}"
     login_unix_socket: '{{ mysql_socket }}'
+    check_implicit_admin: yes
   register: dump_result1
 
 - name: assert successful completion of dump operation (with multiple databases in comma separated form)
   assert:
     that:
-       - "dump_result1.changed == true"
+       - dump_result1 is changed
+       - dump_result1.executed_commands[0] is search(" --user=root --password=''")
 
 - name: state dump - dump file1 should exist
   file: name={{ dump_file1 }} state=file

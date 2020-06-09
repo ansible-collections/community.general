@@ -611,6 +611,7 @@ def main():
         if db == ['all']:
             module.fail_json(msg="name is not allowed to equal 'all' unless state equals import, or dump.")
     try:
+        cursor = None
         if check_implicit_admin:
             try:
                 cursor, db_conn = mysql_connect(module, 'root', '', config_file, ssl_cert, ssl_key, ssl_ca, db,
