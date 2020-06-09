@@ -129,6 +129,12 @@ options:
       - If this behavior is undesirable, use C(yes) to read only named option file.
     type: bool
     default: no
+  check_implicit_admin:
+    description:
+      - Check if mysql allows login as root/nopassword before trying supplied credentials.
+      - If success, passed I(login_user)/I(login_password) will be ignored.
+    type: bool
+    default: no
 
 seealso:
 - module: mysql_info
@@ -259,6 +265,14 @@ EXAMPLES = r'''
     name: foo
     target: /tmp/dump.sql
     dump_extra_args: --skip-triggers
+
+- name: Try to create database as root/nopassword first. If not allowed, pass the credentials
+  mysql_db:
+    check_implicit_admin: yes
+    login_user: bob
+    login_password: 123456
+    name: bobdata
+    state: present
 '''
 
 RETURN = r'''
@@ -317,7 +331,8 @@ def db_dump(module, host, user, password, db_name, target, all_databases, port,
             config_file, socket=None, ssl_cert=None, ssl_key=None, ssl_ca=None,
             single_transaction=None, quick=None, ignore_tables=None, hex_blob=None,
             encoding=None, force=False, master_data=0, skip_lock_tables=False,
-            dump_extra_args=None, unsafe_password=False, restrict_config_file=False):
+            dump_extra_args=None, unsafe_password=False, restrict_config_file=False,
+            check_implicit_admin=False):
     cmd = module.get_bin_path('mysqldump', True)
     # If defined, mysqldump demands --defaults-extra-file be the first option
     if config_file:
@@ -325,13 +340,19 @@ def db_dump(module, host, user, password, db_name, target, all_databases, port,
             cmd += " --defaults-file=%s" % shlex_quote(config_file)
         else:
             cmd += " --defaults-extra-file=%s" % shlex_quote(config_file)
-    if user is not None:
-        cmd += " --user=%s" % shlex_quote(user)
-    if password is not None:
-        if not unsafe_password:
-            cmd += " --password=%s" % shlex_quote(password)
-        else:
-            cmd += " --password=%s" % password
+
+    if check_implicit_admin:
+        cmd += " --user=root --password=''"
+    else:
+        if user is not None:
+            cmd += " --user=%s" % shlex_quote(user)
+
+        if password is not None:
+            if not unsafe_password:
+                cmd += " --password=%s" % shlex_quote(password)
+            else:
+                cmd += " --password=%s" % password
+
     if ssl_cert is not None:
         cmd += " --ssl-cert=%s" % shlex_quote(ssl_cert)
     if ssl_key is not None:
@@ -390,7 +411,8 @@ def db_dump(module, host, user, password, db_name, target, all_databases, port,
 
 def db_import(module, host, user, password, db_name, target, all_databases, port, config_file,
               socket=None, ssl_cert=None, ssl_key=None, ssl_ca=None, encoding=None, force=False,
-              use_shell=False, unsafe_password=False, restrict_config_file=False):
+              use_shell=False, unsafe_password=False, restrict_config_file=False,
+              check_implicit_admin=False):
     if not os.path.exists(target):
         return module.fail_json(msg="target %s does not exist on the host" % target)
 
@@ -401,13 +423,19 @@ def db_import(module, host, user, password, db_name, target, all_databases, port
             cmd.append("--defaults-file=%s" % shlex_quote(config_file))
         else:
             cmd.append("--defaults-extra-file=%s" % shlex_quote(config_file))
-    if user:
-        cmd.append("--user=%s" % shlex_quote(user))
-    if password:
-        if not unsafe_password:
-            cmd.append("--password=%s" % shlex_quote(password))
-        else:
-            cmd.append("--password=%s" % password)
+
+    if check_implicit_admin:
+        cmd += " --user=root --password=''"
+    else:
+        if user:
+            cmd.append("--user=%s" % shlex_quote(user))
+
+        if password:
+            if not unsafe_password:
+                cmd.append("--password=%s" % shlex_quote(password))
+            else:
+                cmd.append("--password=%s" % password)
+
     if ssl_cert is not None:
         cmd.append("--ssl-cert=%s" % shlex_quote(ssl_cert))
     if ssl_key is not None:
@@ -524,6 +552,7 @@ def main():
             use_shell=dict(type='bool', default=False),
             unsafe_login_password=dict(type='bool', default=False),
             restrict_config_file=dict(type='bool', default=False),
+            check_implicit_admin=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )
@@ -566,6 +595,7 @@ def main():
     dump_extra_args = module.params["dump_extra_args"]
     use_shell = module.params["use_shell"]
     restrict_config_file = module.params["restrict_config_file"]
+    check_implicit_admin = module.params['check_implicit_admin']
 
     if len(db) > 1 and state == 'import':
         module.fail_json(msg="Multiple databases are not supported with state=import")
@@ -581,8 +611,16 @@ def main():
         if db == ['all']:
             module.fail_json(msg="name is not allowed to equal 'all' unless state equals import, or dump.")
     try:
-        cursor, db_conn = mysql_connect(module, login_user, login_password, config_file, ssl_cert, ssl_key, ssl_ca,
-                                        connect_timeout=connect_timeout)
+        if check_implicit_admin:
+            try:
+                cursor, db_conn = mysql_connect(module, 'root', '', config_file, ssl_cert, ssl_key, ssl_ca, db,
+                                                connect_timeout=connect_timeout)
+            except Exception:
+                pass
+
+        if not cursor:
+            cursor, db_conn = mysql_connect(module, login_user, login_password, config_file, ssl_cert, ssl_key, ssl_ca,
+                                            connect_timeout=connect_timeout)
     except Exception as e:
         if os.path.exists(config_file):
             module.fail_json(msg="unable to connect to database, check login_user and login_password are correct or %s has the credentials. "
@@ -633,7 +671,8 @@ def main():
                                      login_port, config_file, socket, ssl_cert, ssl_key,
                                      ssl_ca, single_transaction, quick, ignore_tables,
                                      hex_blob, encoding, force, master_data, skip_lock_tables,
-                                     dump_extra_args, unsafe_login_password, restrict_config_file)
+                                     dump_extra_args, unsafe_login_password, restrict_config_file,
+                                     check_implicit_admin)
         if rc != 0:
             module.fail_json(msg="%s" % stderr)
         module.exit_json(changed=True, db=db_name, db_list=db, msg=stdout,
@@ -653,7 +692,7 @@ def main():
                                        login_port, config_file,
                                        socket, ssl_cert, ssl_key, ssl_ca,
                                        encoding, force, use_shell, unsafe_login_password,
-                                       restrict_config_file)
+                                       restrict_config_file, check_implicit_admin)
         if rc != 0:
             module.fail_json(msg="%s" % stderr)
         module.exit_json(changed=True, db=db_name, db_list=db, msg=stdout,
