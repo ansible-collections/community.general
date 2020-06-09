@@ -1,0 +1,4 @@
+---
+minor_changes:
+    - terraform module - The current change it useful for user to get all the logs of errors to able to make future decisions with these error messages.
+    - terraform - add the `` log_error_path`` parameter (https://github.com/ansible-collections/community.general/pull/423).
