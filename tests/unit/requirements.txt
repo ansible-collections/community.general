@@ -24,7 +24,7 @@ linode-python # APIv3
 linode_api4 ; python_version > '2.6' # APIv4
 
 # requirement for the gitlab module
-python-gitlab
+python-gitlab < 2.3.0  # version 2.3.0 makes gitlab_runner tests fail
 httmock
 
 # requirement for kubevirt modules
