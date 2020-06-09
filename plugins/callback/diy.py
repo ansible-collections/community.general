@@ -794,6 +794,15 @@ from ansible.vars.manager import VariableManager
 from ansible.plugins.callback.default import CallbackModule as Default
 from ansible.module_utils._text import to_text
 
+class DummyStdout(object):
+    def flush(self):
+        pass
+
+    def write(self, b):
+        pass
+
+    def writelines(self, l):
+        pass
 
 class CallbackModule(Default):
     """
@@ -805,21 +814,11 @@ class CallbackModule(Default):
 
     DIY_NS = 'ansible_callback_diy'
 
-    class DummyStdout(object):
-        def flush(self):
-            pass
-
-        def write(self, b):
-            pass
-
-        def writelines(self, l):
-            pass
-
     @contextmanager
     def _suppress_stdout(self, enabled):
         saved_stdout = sys.stdout
         if enabled:
-            sys.stdout = self.DummyStdout()
+            sys.stdout = DummyStdout()
         yield
         sys.stdout = saved_stdout
 
