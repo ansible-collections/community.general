@@ -1289,11 +1289,7 @@ plugins/modules/notification/campfire.py validate-modules:doc-missing-type
 plugins/modules/notification/catapult.py validate-modules:doc-missing-type
 plugins/modules/notification/catapult.py validate-modules:parameter-list-no-elements
 plugins/modules/notification/catapult.py validate-modules:parameter-type-not-in-doc
-plugins/modules/notification/cisco_spark.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/notification/cisco_spark.py validate-modules:doc-missing-type
-plugins/modules/notification/cisco_spark.py validate-modules:invalid-argument-name
-plugins/modules/notification/cisco_spark.py validate-modules:nonexistent-parameter-documented
-plugins/modules/notification/cisco_spark.py validate-modules:undocumented-parameter
+plugins/modules/notification/cisco_webex.py validate-modules:invalid-argument-name
 plugins/modules/notification/flowdock.py validate-modules:doc-missing-type
 plugins/modules/notification/grove.py validate-modules:invalid-argument-name
 plugins/modules/notification/grove.py validate-modules:nonexistent-parameter-documented
