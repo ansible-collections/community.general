@@ -1,1 +1,1 @@
-./notification/cisco_spark.py
+notification/cisco_spark.py
