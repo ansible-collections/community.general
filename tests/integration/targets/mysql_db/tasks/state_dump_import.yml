@@ -41,6 +41,7 @@
   mysql_db:
     name: '{{ db_name }}'
     state: present
+    check_implicit_admin: yes
     login_unix_socket: '{{ mysql_socket }}'
 
 - name: create database
