@@ -51,3 +51,4 @@ service_expected_output:
   update_parallelism: null
   user: null
   working_dir: null
+  init: null
