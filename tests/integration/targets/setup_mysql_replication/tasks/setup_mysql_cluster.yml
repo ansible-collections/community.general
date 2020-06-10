@@ -1,6 +1,11 @@
 # We run two servers listening different ports
 # to be able to check replication (one server for master, another for standby).
 
+- name: Install mysql-python package via pip
+  pip:
+    name: mysql-python
+    state: present
+
 - name: Install Repo
   yum:
     name: '{{ repo_link }}'
