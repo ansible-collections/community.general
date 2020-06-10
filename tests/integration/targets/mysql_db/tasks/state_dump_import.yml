@@ -41,12 +41,14 @@
   mysql_db:
     name: '{{ db_name }}'
     state: present
+    check_implicit_admin: yes
     login_unix_socket: '{{ mysql_socket }}'
 
 - name: create database
   mysql_db:
     name: '{{ db_name2 }}'
     state: present
+    check_implicit_admin: no
     login_unix_socket: '{{ mysql_socket }}'
 
 - name: state dump/import - create table department
@@ -87,6 +89,7 @@
     dump_extra_args: --skip-triggers
     config_file: '{{ config_file }}'
     restrict_config_file: yes
+    check_implicit_admin: no
   register: result
 
 - name: assert successful completion of dump operation
@@ -104,12 +107,14 @@
     state: dump
     target: "{{ dump_file1 }}"
     login_unix_socket: '{{ mysql_socket }}'
+    check_implicit_admin: yes
   register: dump_result1
 
 - name: assert successful completion of dump operation (with multiple databases in comma separated form)
   assert:
     that:
-       - "dump_result1.changed == true"
+       - dump_result1 is changed
+       - dump_result1.executed_commands[0] is search(" --user=root --password=''")
 
 - name: state dump - dump file1 should exist
   file: name={{ dump_file1 }} state=file
