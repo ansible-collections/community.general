@@ -48,6 +48,7 @@
   mysql_db:
     name: '{{ db_name2 }}'
     state: present
+    check_implicit_admin: no
     login_unix_socket: '{{ mysql_socket }}'
 
 - name: state dump/import - create table department
@@ -88,6 +89,7 @@
     dump_extra_args: --skip-triggers
     config_file: '{{ config_file }}'
     restrict_config_file: yes
+    check_implicit_admin: no
   register: result
 
 - name: assert successful completion of dump operation

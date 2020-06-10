@@ -614,9 +614,9 @@ def main():
         cursor = None
         if check_implicit_admin:
             try:
-                cursor, db_conn = mysql_connect(module, 'root', '', config_file, ssl_cert, ssl_key, ssl_ca, db,
+                cursor, db_conn = mysql_connect(module, 'root', '', config_file, ssl_cert, ssl_key, ssl_ca,
                                                 connect_timeout=connect_timeout)
-            except Exception:
+            except Exception as e:
                 check_implicit_admin = False
                 pass
 
