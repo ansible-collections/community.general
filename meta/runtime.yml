@@ -56,14 +56,6 @@ action_groups:
   - ovirt_vm_facts
   - ovirt_vmpool_facts
 
-action_groups_redirection:
-  docker:
-    redirect: docker
-  k8s:
-    redirect: k8s
-  ovirt:
-    redirect: ovirt
-
 plugin_routing:
   modules:
     ali_instance_facts:
