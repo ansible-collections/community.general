@@ -1,9 +1,9 @@
 # Copyright: (c) 2019, Andrew Klychkov (@Andersson007) <aaklychkov@mail.ru>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-- name: Install mysql-python package via pip
+- name: Install PyMySQL package via pip
   pip:
-    name: mysql-python
+    name: PyMySQL
     state: present
 
 - name: Install MySQL repo
