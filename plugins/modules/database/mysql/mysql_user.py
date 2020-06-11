@@ -369,18 +369,20 @@ def parse_requires(tls_requires):
         if value:
             return '%s' % value.strip('"').strip("'")
 
-    for key in tls_requires.keys():
-        if not key.isupper():
-            tls_requires[key.upper] = tls_requires[key]
-            tls_requires.pop(key)
-    if any([key in ['CIPHER', 'ISSUER', 'SUBJECT'] for key in tls_requires.keys()]):
-        tls_requires.pop('SSL', None)
-        tls_requires.pop('X509', None)
+    if tls_requires:
+        for key in tls_requires.keys():
+            if not key.isupper():
+                tls_requires[key.upper] = tls_requires[key]
+                tls_requires.pop(key)
+        if any([key in ['CIPHER', 'ISSUER', 'SUBJECT'] for key in tls_requires.keys()]):
+            tls_requires.pop('SSL', None)
+            tls_requires.pop('X509', None)
 
-    if 'X509' in tls_requires.keys():
-        tls_requires.pop('SSL', None)
+        if 'X509' in tls_requires.keys():
+            tls_requires.pop('SSL', None)
 
-    return "REQUIRE %s" % ' AND '.join([' '.join(filter(None, (key, fix_quotes(value)))) for key, value in tls_requires.items()])
+        return "REQUIRE %s" % ' AND '.join([' '.join(filter(None, (key, fix_quotes(value)))) for key, value in tls_requires.items()])
+    return None
 
 
 def user_add(cursor, user, host, host_all, password, encrypted, plugin, plugin_hash_string,
