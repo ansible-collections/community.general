@@ -289,9 +289,6 @@ from ansible_collections.community.general.plugins.module_utils.database import 
 from ansible_collections.community.general.plugins.module_utils.mysql import mysql_connect, mysql_driver, mysql_driver_fail_msg
 from ansible.module_utils.six import iteritems
 from ansible.module_utils._text import to_native
-from ansible.utils.display import Display
-
-display = Display()
 
 VALID_PRIVS = frozenset(('CREATE', 'DROP', 'GRANT', 'GRANT OPTION',
                          'LOCK TABLES', 'REFERENCES', 'EVENT', 'ALTER',
@@ -635,7 +632,6 @@ def privileges_get(cursor, user, host):
         if "WITH GRANT OPTION" in res.group(7):
             privileges.append('GRANT')
         if "REQUIRE SSL" in res.group(7):
-            display.deprecated('Rather than using the REQUIRE SSL privilege, use the require_ssl parameter.')
             privileges.append('REQUIRESSL')
         db = res.group(2)
         output.setdefault(db, []).extend(privileges)
