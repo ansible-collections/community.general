@@ -113,6 +113,65 @@
 - include: assert_no_user.yml user_name={{user_name_2}}
 
 # ============================================================
+# Create users with TLS requirements and verify requirements are assigned
+#
+- name: create user with TLS requirements state=present (expect changed=true)
+  mysql_user:
+    name: '{{ item[0] }}'
+    password: '{{ user_password_1 }}'
+    tls_requires: '{{ item[1] }}'
+    login_unix_socket: '{{ mysql_socket }}'
+  with_together:
+    - [ '{{ user_name_1 }}', '{{ user_name_2 }}', '{{ user_name_3 }}']
+    -
+      - SSL:
+      - X509:
+      - subject: '/CN=alice/O=MyDom, Inc./C=US/ST=Oregon/L=Portland'
+        cipher: 'ECDHE-ECDSA-AES256-SHA384'
+        issuer: '/CN=org/O=MyDom, Inc./C=US/ST=Oregon/L=Portland'
+
+- name: retrieve TLS requiremets for users
+  command: mysql -L -N -s -e "SELECT JSON_OBJECT('type', ssl_type, 'cipher', ssl_cipher, 'issuer', x509_issuer, 'subject', x509_subject) FROM mysql.user where User='{{ item }}';"
+  register: result
+  with_items: ['{{ user_name_1 }}', '{{ user_name_2 }}', '{{ user_name_3 }}']
+
+- name: assert user1 TLS requirements
+  assert:
+    that:
+      - reqs.type == 'ANY'
+      - reqs.cipher == 'base64:type252:'
+      - reqs.issuer == 'base64:type252:'
+      - reqs.subject == 'base64:type252:'
+  vars:
+    - reqs: (result.results | selectattr('item', 'eq', user_name_1) | first).stdout | from_json
+
+- name: assert user2 TLS requirements
+  assert:
+    that:
+      - reqs.type == 'X509'
+      - reqs.cipher == 'base64:type252:'
+      - reqs.issuer == 'base64:type252:'
+      - reqs.subject == 'base64:type252:'
+  vars:
+    - reqs: (result.results | selectattr('item', 'eq', user_name_2) | first).stdout | from_json
+
+- name: assert user3 TLS requirements
+  assert:
+    that:
+      - reqs.type == 'SPECIFIED'
+      - reqs.cipher == 'base64:type252:RUNESEUtRUNEU0EtQUVTMjU2LVNIQTM4NA=='
+      - reqs.issuer == 'base64:type252:L0NOPW9yZy9PPU15RG9tLCBJbmMuL0M9VVMvU1Q9T3JlZ29uL0w9UG9ydGxhbmQ='
+      - reqs.subject == 'base64:type252:L0NOPWFsaWNlL089TXlEb20sIEluYy4vQz1VUy9TVD1PcmVnb24vTD1Qb3J0bGFuZA=='
+  vars:
+    - reqs: (result.results | selectattr('item', 'eq', user_name_3) | first).stdout | from_json
+
+- include: remove_user.yml user_name={{user_name_1}} user_password={{ user_password_1 }}
+
+- include: remove_user.yml user_name={{user_name_2}} user_password={{ user_password_1 }}
+
+- include: remove_user.yml user_name={{user_name_2}} user_password={{ user_password_1 }}
+
+# ============================================================
 # Assert user has access to multiple databases
 #
 - name: give users access to multiple databases
