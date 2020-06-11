@@ -1,4 +1,4 @@
-[![GitHub Actions CI/CD build status — Collection test suite](https://github.com/ansible-collection-migration/community.general/workflows/Collection%20test%20suite/badge.svg?branch=master)](https://github.com/ansible-collection-migration/community.general/actions?query=workflow%3A%22Collection%20test%20suite%22)
+[![Run Status](https://api.shippable.com/projects/5e664a167c32620006c9fa50/badge?branch=master)](https://app.shippable.com/github/ansible-collections/community.general/dashboard) [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
 
 # Ansible Collection: community.general
 
