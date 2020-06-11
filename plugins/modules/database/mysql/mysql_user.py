@@ -396,15 +396,15 @@ def user_add(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
 
     requires = parse_requires(tls_requires)
     if password and encrypted:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED BY PASSWORD %s %s", (user, host, password, requires))
+        cursor.execute("CREATE USER %s@%s IDENTIFIED BY PASSWORD %s", (user, host,  ' '.join(filter(None,(password, requires)))))
     elif password and not encrypted:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED BY %s %s", (user, host, password, requires))
+        cursor.execute("CREATE USER %s@%s IDENTIFIED BY %s", (user, host,  ' '.join(filter(None,(password, requires)))))
     elif plugin and plugin_hash_string:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s AS %s %s", (user, host, plugin, plugin_hash_string, requires))
+        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin,  ' '.join(filter(None,(plugin_hash_string, requires)))))
     elif plugin and plugin_auth_string:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s BY %s %s", (user, host, plugin, plugin_auth_string, requires))
+        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin,  ' '.join(filter(None,(plugin_auth_string, requires)))))
     elif plugin:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s %s", (user, host, plugin, requires))
+        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s", (user, host, ' '.join(filter(None,(plugin, requires)))))
     else:
         cursor.execute("CREATE USER %s@%s", (user, host))
     if new_priv is not None:
