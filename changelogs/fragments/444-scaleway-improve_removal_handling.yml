@@ -1,0 +1,2 @@
+bugfixes:
+ - scaleway_compute - fix transition handling that could cause errors when removing a node (https://github.com/ansible-collections/community.general/pull/444).
