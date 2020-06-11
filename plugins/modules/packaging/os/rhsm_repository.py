@@ -217,7 +217,7 @@ def repository_modify(module, state, name, purge=False):
             'before_header': "RHSM repositories",
             'after_header': "RHSM repositories"}
 
-    if not module.check_mode:
+    if not module.check_mode and changed:
         rc, out, err = run_subscription_manager(module, rhsm_arguments)
         results = out.splitlines()
     module.exit_json(results=results, changed=changed, repositories=updated_repo_list, diff=diff)
