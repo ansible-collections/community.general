@@ -63,9 +63,9 @@ options:
   tls_requires:
     description:
       - Set requirement for secure transport as a dictionary of requirements (see the examples).
-      - Valid requirements are SSL, X509, SUBJECT, ISSUER, CIPHER
-      - SUBJECT, ISSUER and CIPHER are complementary, and mutually exclusive with SSL and X509
-      - https://mariadb.com/kb/en/securing-connections-for-client-and-server/#requiring-tls
+      - Valid requirements are SSL, X509, SUBJECT, ISSUER, CIPHER.
+      - SUBJECT, ISSUER and CIPHER are complementary, and mutually exclusive with SSL and X509.
+      - U(https://mariadb.com/kb/en/securing-connections-for-client-and-server/#requiring-tls).
     type: dict
   sql_log_bin:
     description:
@@ -289,7 +289,9 @@ from ansible_collections.community.general.plugins.module_utils.database import 
 from ansible_collections.community.general.plugins.module_utils.mysql import mysql_connect, mysql_driver, mysql_driver_fail_msg
 from ansible.module_utils.six import iteritems
 from ansible.module_utils._text import to_native
+from ansible.utils.display import Display
 
+display = Display()
 
 VALID_PRIVS = frozenset(('CREATE', 'DROP', 'GRANT', 'GRANT OPTION',
                          'LOCK TABLES', 'REFERENCES', 'EVENT', 'ALTER',
@@ -381,7 +383,7 @@ def parse_requires(tls_requires):
     if 'X509' in tls_requires.keys():
         tls_requires.pop('SSL', None)
 
-    return "REQUIRE %s" % ' AND '.join([' '.join(filter(None, (key, fix_quotes(value)))) for key,value in tls_requires.items()])
+    return "REQUIRE %s" % ' AND '.join([' '.join(filter(None, (key, fix_quotes(value)))) for key, value in tls_requires.items()])
 
 
 def user_add(cursor, user, host, host_all, password, encrypted, plugin, plugin_hash_string,
@@ -633,6 +635,7 @@ def privileges_get(cursor, user, host):
         if "WITH GRANT OPTION" in res.group(7):
             privileges.append('GRANT')
         if "REQUIRE SSL" in res.group(7):
+            display.deprecated('Rather than using the REQUIRE SSL privilege, use the require_ssl parameter.')
             privileges.append('REQUIRESSL')
         db = res.group(2)
         output.setdefault(db, []).extend(privileges)
