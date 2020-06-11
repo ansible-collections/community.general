@@ -67,12 +67,13 @@ from ansible.module_utils.basic import AnsibleModule
 
 def query_package(module, slackpkg_path, name):
 
-    import glob
     import platform
+    import os
+    import re
 
     machine = platform.machine()
-    packages = glob.glob("/var/log/packages/%s-*-[%s|noarch]*" % (name,
-                                                                  machine))
+    pattern = re.compile('^%s-[^-]+-(%s|noarch)-[^-]+$' % (re.escape(name), re.escape(machine)))
+    packages = [f for f in os.listdir('/var/log/packages') if pattern.match(f)]
 
     if len(packages) > 0:
         return True
