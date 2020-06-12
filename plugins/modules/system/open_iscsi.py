@@ -21,7 +21,7 @@ requirements:
 options:
     portal:
         description:
-        - The IP address of the iSCSI target.
+        - The domain name or IP address of the iSCSI target.
         type: str
         aliases: [ ip ]
     port:
@@ -72,11 +72,17 @@ options:
 '''
 
 EXAMPLES = r'''
+- name: Perform a discovery on sun.com and show available target nodes
+  open_iscsi:
+    show_nodes: yes
+    discover: yes
+    portal: sun.com
+
 - name: Perform a discovery on 10.1.2.3 and show available target nodes
   open_iscsi:
     show_nodes: yes
     discover: yes
-    portal: 10.1.2.3
+    ip: 10.1.2.3
 
 # NOTE: Only works if exactly one target is exported to the initiator
 - name: Discover targets on portal and login to the one available
@@ -98,6 +104,7 @@ EXAMPLES = r'''
 
 import glob
 import os
+import socket
 import time
 
 from ansible.module_utils.basic import AnsibleModule
@@ -270,6 +277,12 @@ def main():
 
     # parameters
     portal = module.params['portal']
+    if portal:
+        try:
+            portal = socket.getaddrinfo(portal, None)[0][4][0]
+        except socket.gaierror:
+            module.fail_json(msg="Portal address is incorrect")
+
     target = module.params['target']
     port = module.params['port']
     login = module.params['login']
