@@ -131,7 +131,8 @@
         issuer: '/CN=org/O=MyDom, Inc./C=US/ST=Oregon/L=Portland'
 
 - name: retrieve TLS requiremets for users
-  command: mysql -L -N -s -e "SELECT ssl_type, ssl_cipher, x509_issuer, x509_subject FROM mysql.user where User='{{ item }}';"
+  command: mysql -e "SELECT * FROM mysql.user where User='{{ item }}'\G"
+  #command: mysql -L -N -s -e "SELECT ssl_type, ssl_cipher, x509_issuer, x509_subject FROM mysql.user where User='{{ item }}';"
   register: result
   with_items: ['{{ user_name_1 }}', '{{ user_name_2 }}', '{{ user_name_3 }}']
 
@@ -153,7 +154,7 @@
       - reqs[2] == '0x'
       - reqs[3] == '0x'
   vars:
-    - reqs: (result.results | selectattr('item', 'eq', user_name_2) | first).stdout | from_json
+    - reqs: (result.results | selectattr('item', 'eq', user_name_2) | first).stdout.split()
 
 - name: assert user3 TLS requirements
   assert:
@@ -163,13 +164,19 @@
       - reqs[2] == '0x2F434E3D6F72672F4F3D4D79446F6D2C20496E632E2F433D55532F53543D4F7265676F6E2F4C3D506F72746C616E64'
       - reqs[3] == '0x2F434E3D616C6963652F4F3D4D79446F6D2C20496E632E2F433D55532F53543D4F7265676F6E2F4C3D506F72746C616E64'
   vars:
-    - reqs: (result.results | selectattr('item', 'eq', user_name_3) | first).stdout | from_json
+    - reqs: (result.results | selectattr('item', 'eq', user_name_3) | first).stdout.split()
 
 - include: remove_user.yml user_name={{user_name_1}} user_password={{ user_password_1 }}
 
 - include: remove_user.yml user_name={{user_name_2}} user_password={{ user_password_1 }}
 
-- include: remove_user.yml user_name={{user_name_2}} user_password={{ user_password_1 }}
+- include: remove_user.yml user_name={{user_name_3}} user_password={{ user_password_1 }}
+
+- include: assert_no_user.yml user_name={{user_name_1}}
+
+- include: assert_no_user.yml user_name={{user_name_2}}
+
+- include: assert_no_user.yml user_name={{user_name_3}}
 
 # ============================================================
 # Assert user has access to multiple databases
