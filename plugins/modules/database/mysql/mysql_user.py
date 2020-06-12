@@ -499,7 +499,10 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
                                 "UPDATE mysql.user SET plugin = %s, authentication_string = %s, Password = '' WHERE User = %s AND Host = %s",
                                 ('mysql_native_password', encrypted_password, user, host)
                             )
-                            cursor.execute("GRANT USAGE on *.* to '%s'@'%s' %s" % (user, ' '.join(filter(None, (host, requires)))))
+                            if requires:
+                                cursor.execute("GRANT USAGE on *.* to '%s'@'%s' %s" % (user, host, requires))
+                            else:
+                                cursor.execute("GRANT USAGE on *.* to '%s'@'%s'" % (user, host))
                             cursor.execute("FLUSH PRIVILEGES")
                             msg = "Password forced update"
                         else:
