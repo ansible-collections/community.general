@@ -397,17 +397,17 @@ def user_add(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
 
     requires = parse_requires(tls_requires)
     if password and encrypted:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED BY PASSWORD %s", (user, host,  ' '.join(filter(None, (password, requires)))))
+        cursor.execute("CREATE USER %s@%s IDENTIFIED BY PASSWORD %s", (user, host, ' '.join(filter(None, (password, requires)))))
     elif password and not encrypted:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED BY %s", (user, host,  ' '.join(filter(None, (password, requires)))))
+        cursor.execute("CREATE USER %s@%s IDENTIFIED BY %s", (user, host, ' '.join(filter(None, (password, requires)))))
     elif plugin and plugin_hash_string:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin,  ' '.join(filter(None, (plugin_hash_string, requires)))))
+        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin, ' '.join(filter(None, (plugin_hash_string, requires)))))
     elif plugin and plugin_auth_string:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin,  ' '.join(filter(None, (plugin_auth_string, requires)))))
+        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin, ' '.join(filter(None, (plugin_auth_string, requires)))))
     elif plugin:
         cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s", (user, host, ' '.join(filter(None, (plugin, requires)))))
     else:
-        cursor.execute("CREATE USER %s@%s", (user,  ' '.join(filter(None, (host, requires)))))
+        cursor.execute("CREATE USER %s@%s", (user, ' '.join(filter(None, (host, requires)))))
     if new_priv is not None:
         for db_table, priv in iteritems(new_priv):
             privileges_grant(cursor, user, host, db_table, priv)
@@ -488,7 +488,8 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
                     msg = "Password updated (old style)"
                 else:
                     try:
-                        cursor.execute("ALTER USER %s@%s IDENTIFIED WITH mysql_native_password AS %s", (user, host, ' '.join(filter(None, (encrypted_password, requires)))))
+                        cursor.execute("ALTER USER %s@%s IDENTIFIED WITH mysql_native_password AS %s",
+                                       (user, host, ' '.join(filter(None, (encrypted_password, requires)))))
                         msg = "Password updated (new style)"
                     except (mysql_driver.Error) as e:
                         # https://stackoverflow.com/questions/51600000/authentication-string-of-root-user-on-mysql
