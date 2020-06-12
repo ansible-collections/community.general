@@ -183,6 +183,7 @@ EXAMPLES = r'''
       'db2.*': 'ALL,GRANT'
 
 # Note that REQUIRESSL is a special privilege that should only apply to *.* by itself.
+# Setting this privilege in this manner is deprecated. Use 'tls_requires' instead.
 - name: Modify user to require SSL connections.
   mysql_user:
     name: bob
@@ -372,7 +373,7 @@ def parse_requires(tls_requires):
     if tls_requires:
         for key in tls_requires.keys():
             if not key.isupper():
-                tls_requires[key.upper] = tls_requires[key]
+                tls_requires[key.upper()] = tls_requires[key]
                 tls_requires.pop(key)
         if any([key in ['CIPHER', 'ISSUER', 'SUBJECT'] for key in tls_requires.keys()]):
             tls_requires.pop('SSL', None)
@@ -396,17 +397,17 @@ def user_add(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
 
     requires = parse_requires(tls_requires)
     if password and encrypted:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED BY PASSWORD %s", (user, host,  ' '.join(filter(None,(password, requires)))))
+        cursor.execute("CREATE USER %s@%s IDENTIFIED BY PASSWORD %s", (user, host,  ' '.join(filter(None, (password, requires)))))
     elif password and not encrypted:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED BY %s", (user, host,  ' '.join(filter(None,(password, requires)))))
+        cursor.execute("CREATE USER %s@%s IDENTIFIED BY %s", (user, host,  ' '.join(filter(None, (password, requires)))))
     elif plugin and plugin_hash_string:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin,  ' '.join(filter(None,(plugin_hash_string, requires)))))
+        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin,  ' '.join(filter(None, (plugin_hash_string, requires)))))
     elif plugin and plugin_auth_string:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin,  ' '.join(filter(None,(plugin_auth_string, requires)))))
+        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin,  ' '.join(filter(None, (plugin_auth_string, requires)))))
     elif plugin:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s", (user, host, ' '.join(filter(None,(plugin, requires)))))
+        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s", (user, host, ' '.join(filter(None, (plugin, requires)))))
     else:
-        cursor.execute("CREATE USER %s@%s", (user, host))
+        cursor.execute("CREATE USER %s@%s", (user,  ' '.join(filter(None, (host, requires)))))
     if new_priv is not None:
         for db_table, priv in iteritems(new_priv):
             privileges_grant(cursor, user, host, db_table, priv)
@@ -487,7 +488,7 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
                     msg = "Password updated (old style)"
                 else:
                     try:
-                        cursor.execute("ALTER USER %s@%s IDENTIFIED WITH mysql_native_password AS %s %s", (user, host, encrypted_password, requires))
+                        cursor.execute("ALTER USER %s@%s IDENTIFIED WITH mysql_native_password AS %s", (user, host, ' '.join(filter(None, (encrypted_password, requires)))))
                         msg = "Password updated (new style)"
                     except (mysql_driver.Error) as e:
                         # https://stackoverflow.com/questions/51600000/authentication-string-of-root-user-on-mysql
@@ -497,7 +498,7 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
                                 "UPDATE mysql.user SET plugin = %s, authentication_string = %s, Password = '' WHERE User = %s AND Host = %s",
                                 ('mysql_native_password', encrypted_password, user, host)
                             )
-                            cursor.execute("GRANT USAGE on *.* to '%s'@'%s' %s" % (user, host, requires))
+                            cursor.execute("GRANT USAGE on *.* to '%s'@'%s' %s" % (user, ' '.join(filter(None, (host, requires)))))
                             cursor.execute("FLUSH PRIVILEGES")
                             msg = "Password forced update"
                         else:
@@ -527,11 +528,11 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
 
             if update:
                 if plugin_hash_string:
-                    cursor.execute("ALTER USER %s@%s IDENTIFIED WITH %s AS %s %s", (user, host, plugin, plugin_hash_string, requires))
+                    cursor.execute("ALTER USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin, ' '.join(filter(None, (plugin_hash_string, requires)))))
                 elif plugin_auth_string:
-                    cursor.execute("ALTER USER %s@%s IDENTIFIED WITH %s BY %s %s", (user, host, plugin, plugin_auth_string, requires))
+                    cursor.execute("ALTER USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin, ' '.join(filter(None, (plugin_auth_string, requires)))))
                 else:
-                    cursor.execute("ALTER USER %s@%s IDENTIFIED WITH %s %s", (user, host, plugin, requires))
+                    cursor.execute("ALTER USER %s@%s IDENTIFIED WITH %s", (user, host, ' '.join(filter(None, (plugin, requires)))))
                 changed = True
 
         # Handle privileges
