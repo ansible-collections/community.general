@@ -2138,3 +2138,4 @@ tests/unit/plugins/modules/web_infrastructure/test_jenkins_plugin.py future-impo
 tests/unit/plugins/modules/web_infrastructure/test_jenkins_plugin.py metaclass-boilerplate
 tests/utils/shippable/check_matrix.py replace-urlopen
 tests/utils/shippable/timing.py shebang
+meta/runtime.yml runtime-metadata  # TODO needs to be cleaned up before a first proper release!
