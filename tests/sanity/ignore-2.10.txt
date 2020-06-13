@@ -1775,7 +1775,6 @@ plugins/modules/system/gconftool2.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/interfaces_file.py pylint:blacklisted-name
 plugins/modules/system/interfaces_file.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/java_cert.py pylint:blacklisted-name
-plugins/modules/system/java_keystore.py validate-modules:deprecation-either-date-or-version
 plugins/modules/system/java_keystore.py validate-modules:doc-missing-type
 plugins/modules/system/java_keystore.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/java_keystore.py validate-modules:undocumented-parameter
@@ -1800,7 +1799,6 @@ plugins/modules/system/osx_defaults.py validate-modules:parameter-state-invalid-
 plugins/modules/system/pam_limits.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/pamd.py validate-modules:parameter-list-no-elements
 plugins/modules/system/parted.py pylint:blacklisted-name
-plugins/modules/system/parted.py validate-modules:deprecation-either-date-or-version
 plugins/modules/system/parted.py validate-modules:parameter-list-no-elements
 plugins/modules/system/parted.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/puppet.py use-argspec-type-path
