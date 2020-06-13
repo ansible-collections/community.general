@@ -132,138 +132,172 @@ status:
     type: complex
     contains:
         After:
+            description: []  # FIXME
             returned: success
             type: list
             sample: ["/etc/service-bundles/targets/basic","../sshdgenkeys", "log"]
         Before:
+            description: []  # FIXME
             returned: success
             type: list
             sample: ["/etc/service-bundles/targets/shutdown"]
         Conflicts:
+            description: []  # FIXME
             returned: success
             type: list
             sample: '[]'
         DaemontoolsEncoreState:
+            description: []  # FIXME
             returned: success
             type: str
             sample: "running"
         DaemontoolsState:
+            description: []  # FIXME
             returned: success
             type: str
             sample: "up"
         Enabled:
+            description: []  # FIXME
             returned: success
             type: bool
             sample: True
         LogService:
+            description: []  # FIXME
             returned: success
             type: str
             sample: "../cyclog@sshd"
         MainPID:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 661
         Paused:
+            description: []  # FIXME
             returned: success
             type: bool
             sample: 'False'
         ReadyAfterRun:
+            description: []  # FIXME
             returned: success
             type: bool
             sample: 'False'
         RemainAfterExit:
+            description: []  # FIXME
             returned: success
             type: bool
             sample: 'False'
         Required-By:
+            description: []  # FIXME
             returned: success
             type: list
             sample: '[]'
         RestartExitStatusCode:
+            description: []  # FIXME
             returned: success
             type: int
             sample: '0'
         RestartExitStatusNumber:
+            description: []  # FIXME
             returned: success
             type: int
             sample: '0'
         RestartTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 4611686019935648081
         RestartUTCTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 1508260140
         RunExitStatusCode:
+            description: []  # FIXME
             returned: success
             type: int
             sample: '0'
         RunExitStatusNumber:
+            description: []  # FIXME
             returned: success
             type: int
             sample: '0'
         RunTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 4611686019935648081
         RunUTCTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 1508260140
         StartExitStatusCode:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 1
         StartExitStatusNumber:
+            description: []  # FIXME
             returned: success
             type: int
             sample: '0'
         StartTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 4611686019935648081
         StartUTCTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 1508260140
         StopExitStatusCode:
+            description: []  # FIXME
             returned: success
             type: int
             sample: '0'
         StopExitStatusNumber:
+            description: []  # FIXME
             returned: success
             type: int
             sample: '0'
         StopTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 4611686019935648081
         StopUTCTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 1508260140
         Stopped-By:
+            description: []  # FIXME
             returned: success
             type: list
             sample: ["/etc/service-bundles/targets/shutdown"]
         Timestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 4611686019935648081
         UTCTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 1508260140
         Want:
+            description: []  # FIXME
             returned: success
             type: str
             sample: "nothing"
         Wanted-By:
+            description: []  # FIXME
             returned: success
             type: list
             sample: ["/etc/service-bundles/targets/server","/etc/service-bundles/targets/sockets"]
         Wants:
+            description: []  # FIXME
             returned: success
             type: list
             sample: ["/etc/service-bundles/targets/basic","../sshdgenkeys"]
