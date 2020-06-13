@@ -54,6 +54,7 @@ options:
               upgrades and installations will fail when xbps is not up to date.
         type: bool
         default: 'yes'
+        version_added: '0.2.0'
 '''
 
 EXAMPLES = '''

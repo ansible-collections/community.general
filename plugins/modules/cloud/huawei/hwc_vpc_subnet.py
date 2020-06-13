@@ -18,6 +18,7 @@ module: hwc_vpc_subnet
 description:
     - subnet management.
 short_description: Creates a resource of Vpc/Subnet in Huawei Cloud
+version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
     - keystoneauth1 >= 3.6.0

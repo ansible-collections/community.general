@@ -89,6 +89,7 @@ options:
     description:
     - Default home directory of the user.
     type: str
+    version_added: '0.2.0'
 extends_documentation_fragment:
 - community.general.ipa.documentation
 

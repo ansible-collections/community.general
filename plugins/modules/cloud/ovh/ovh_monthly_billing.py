@@ -12,6 +12,7 @@ DOCUMENTATION = '''
 ---
 module: ovh_monthly_billing
 author: Francois Lallart (@fraff)
+version_added: '0.2.0'
 short_description: Manage OVH monthly billing
 description:
     - Enable monthly billing on OVH cloud intances (be aware OVH does not allow to disable it).
