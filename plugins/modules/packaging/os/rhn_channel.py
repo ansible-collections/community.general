@@ -50,6 +50,7 @@ options:
               can modify traffic between the module and the site.
         type: bool
         default: true
+        version_added: '0.2.0'
 '''
 
 EXAMPLES = '''

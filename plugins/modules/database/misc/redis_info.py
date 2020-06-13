@@ -12,6 +12,7 @@ DOCUMENTATION = r'''
 ---
 module: redis_info
 short_description: Gather information about Redis servers
+version_added: '0.2.0'
 description:
 - Gathers information and statistics about Redis servers.
 options:

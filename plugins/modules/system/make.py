@@ -39,6 +39,7 @@ options:
     description:
       - Use a specific make binary.
     type: path
+    version_added: '0.2.0'
 '''
 
 EXAMPLES = r'''

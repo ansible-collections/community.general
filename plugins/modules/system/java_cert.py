@@ -41,6 +41,7 @@ options:
       - Trust imported cert as CAcert.
     type: bool
     default: False
+    version_added: '0.2.0'
   pkcs12_path:
     description:
       - Local path to load PKCS12 keystore from.

@@ -29,6 +29,7 @@ options:
           - This value can also be set with the C(DATADOG_HOST) environment variable.
         required: false
         type: str
+        version_added: '0.2.0'
     app_key:
         description:
           - Your Datadog app key.

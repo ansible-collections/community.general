@@ -89,14 +89,17 @@ options:
     description:
       - User's plugin to authenticate (``CREATE USER user IDENTIFIED WITH plugin``).
     type: str
+    version_added: '0.2.0'
   plugin_hash_string:
     description:
       - User's plugin hash string (``CREATE USER user IDENTIFIED WITH plugin AS plugin_hash_string``).
     type: str
+    version_added: '0.2.0'
   plugin_auth_string:
     description:
       - User's plugin auth_string (``CREATE USER user IDENTIFIED WITH plugin BY plugin_auth_string``).
     type: str
+    version_added: '0.2.0'
   resource_limits:
     description:
       - Limit the user for certain server resources. Provided since MySQL 5.6 / MariaDB 10.2.
@@ -104,6 +107,7 @@ options:
         C(MAX_CONNECTIONS_PER_HOUR: num), C(MAX_USER_CONNECTIONS: num)."
       - Used when I(state=present), ignored otherwise.
     type: dict
+    version_added: '0.2.0'
 
 notes:
    - "MySQL server installs with default login_user of 'root' and no password. To secure this user
