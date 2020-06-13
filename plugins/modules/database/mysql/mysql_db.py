@@ -73,6 +73,7 @@ options:
     required: no
     default: no
     type: bool
+    version_added: '0.2.0'
   force:
     description:
     - Continue dump or import even if we get an SQL error.
@@ -80,6 +81,7 @@ options:
     required: no
     type: bool
     default: no
+    version_added: '0.2.0'
   master_data:
     description:
       - Option to dump a master replication server to produce a dump file
@@ -93,18 +95,21 @@ options:
     type: int
     choices: [0, 1, 2]
     default: 0
+    version_added: '0.2.0'
   skip_lock_tables:
     description:
       - Skip locking tables for read. Used when I(state=dump), ignored otherwise.
     required: no
     type: bool
     default: no
+    version_added: '0.2.0'
   dump_extra_args:
     description:
       - Provide additional arguments for mysqldump.
         Used when I(state=dump) only, ignored otherwise.
     required: no
     type: str
+    version_added: '0.2.0'
   use_shell:
     description:
       - Used to prevent C(Broken pipe) errors when the imported I(target) file is compressed.
@@ -113,6 +118,7 @@ options:
     required: no
     type: bool
     default: no
+    version_added: '0.2.0'
   unsafe_login_password:
     description:
       - If C(no), the module will safely use a shell-escaped version of the I(login_password) value.
@@ -120,6 +126,7 @@ options:
       - Used only when I(state) is C(import) or C(dump) and I(login_password) is passed, ignored otherwise.
     type: bool
     default: no
+    version_added: '0.2.0'
   restrict_config_file:
     description:
       - Read only passed I(config_file).
@@ -129,12 +136,14 @@ options:
       - If this behavior is undesirable, use C(yes) to read only named option file.
     type: bool
     default: no
+    version_added: '0.2.0'
   check_implicit_admin:
     description:
       - Check if mysql allows login as root/nopassword before trying supplied credentials.
       - If success, passed I(login_user)/I(login_password) will be ignored.
     type: bool
     default: no
+    version_added: '0.2.0'
 
 seealso:
 - module: mysql_info
@@ -291,6 +300,7 @@ executed_commands:
   returned: if executed
   type: list
   sample: ["CREATE DATABASE acme"]
+  version_added: '0.2.0'
 '''
 
 import os
