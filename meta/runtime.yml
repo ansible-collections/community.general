@@ -582,10 +582,6 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
-    osx_say:
-      deprecation:
-        removal_date: 3.0.0
-        warning_text: see plugin documentation for details
     foreman:
       deprecation:
         removal_version: 2.0.0
@@ -641,18 +637,6 @@ plugin_routing:
     github_hooks:
       deprecation:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
-    github_webhook_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    gitlab_hooks:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    gluster_heal_facts:
-      deprecation:
-        removal_version: 3.0.0
         warning_text: see plugin documentation for details
     na_cdot_aggregate:
       deprecation:
