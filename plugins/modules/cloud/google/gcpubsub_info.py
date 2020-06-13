@@ -104,7 +104,8 @@ def main():
         credentials_file=dict(),
         project_id=dict(), ),)
     if module._name in ('gcpubsub_facts', 'community.general.gcpubsub_facts'):
-        module.deprecate("The 'gcpubsub_facts' module has been renamed to 'gcpubsub_info'", version='2.13')
+        module.deprecate("The 'gcpubsub_facts' module has been renamed to 'gcpubsub_info'",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     if not HAS_PYTHON26:
         module.fail_json(

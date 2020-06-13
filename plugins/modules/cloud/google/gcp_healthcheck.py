@@ -32,7 +32,7 @@ requirements:
 notes:
   - Only supports HTTP and HTTPS Healthchecks currently.
 deprecated:
-    removed_in: "2.12"
+    removed_in: 2.0.0  # was Ansible 2.12
     why: Updated modules released with increased functionality
     alternative: >
       Use M(gcp_compute_health_check), M(gcp_compute_http_health_check) or

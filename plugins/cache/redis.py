@@ -79,7 +79,8 @@ class CacheModule(BaseCacheModule):
             self._prefix = self.get_option('_prefix')
         except KeyError:
             display.deprecated('Rather than importing CacheModules directly, '
-                               'use ansible.plugins.loader.cache_loader', version='2.12')
+                               'use ansible.plugins.loader.cache_loader',
+                               version='2.0.0', collection_name='community.general')  # was Ansible 2.12
             if C.CACHE_PLUGIN_CONNECTION:
                 uri = C.CACHE_PLUGIN_CONNECTION
             self._timeout = float(C.CACHE_PLUGIN_TIMEOUT)

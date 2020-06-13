@@ -384,7 +384,8 @@ def main():
     )
     module = AnsibleModule(argument_spec=argument_spec)
     if module._name in ('ali_instance_facts', 'community.general.ali_instance_facts'):
-        module.deprecate("The 'ali_instance_facts' module has been renamed to 'ali_instance_info'", version='2.13')
+        module.deprecate("The 'ali_instance_facts' module has been renamed to 'ali_instance_info'",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     if HAS_FOOTMARK is False:
         module.fail_json(msg=missing_required_lib('footmark'), exception=FOOTMARK_IMP_ERR)

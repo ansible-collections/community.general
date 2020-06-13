@@ -330,7 +330,7 @@ EXAMPLES = r'''
     type: foreign_data_wrapper
     role: reader
 
-# Available since version 2.10
+# Available since Ansible 2.10
 - name: GRANT ALL PRIVILEGES ON TYPE customtype TO reader
   postgresql_privs:
     db: test
@@ -359,7 +359,7 @@ EXAMPLES = r'''
     objs: ALL_IN_SCHEMA
     schema: common
 
-# Available since version 2.8
+# Available since Ansible 2.8
 # ALTER DEFAULT PRIVILEGES FOR ROLE librarian IN SCHEMA library GRANT SELECT ON TABLES TO reader
 # GRANT SELECT privileges for new TABLES objects created by librarian as
 # default to the role reader.
@@ -390,7 +390,7 @@ EXAMPLES = r'''
     role: reader
     target_roles: librarian
 
-# Available since version 2.10
+# Available since Ansible 2.10
 - name: Grant type privileges for pg_catalog.numeric type to alice
   postgresql_privs:
     type: type

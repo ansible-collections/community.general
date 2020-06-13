@@ -16,7 +16,7 @@ description:
        Full install/configuration instructions for the gce* modules can
        be found in the comments of ansible/test/gce_tests.py.
 deprecated:
-    removed_in: "2.12"
+    removed_in: 2.0.0  # was Ansible 2.12
     why: Updated modules released with increased functionality
     alternative: Use M(gcp_compute_instance) instead.
 options:
