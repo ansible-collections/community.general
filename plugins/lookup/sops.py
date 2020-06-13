@@ -34,7 +34,7 @@ DOCUMENTATION = """
     lookup: sops
     author: Edoardo Tenani (@endorama) <e.tenani@arduino.cc>
     short_description: Read sops encrypted file contents
-    version_added: '1.0.0'
+    version_added: '0.2.0'
     description:
         - This lookup returns the contents from a file on the Ansible controller's file system.
         - This lookup requires the C(sops) executable to be available in the controller PATH.
