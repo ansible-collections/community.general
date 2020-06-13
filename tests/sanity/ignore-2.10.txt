@@ -1791,7 +1791,6 @@ plugins/modules/system/mksysb.py validate-modules:doc-missing-type
 plugins/modules/system/modprobe.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/nosh.py validate-modules:doc-missing-type
 plugins/modules/system/nosh.py validate-modules:parameter-type-not-in-doc
-plugins/modules/system/nosh.py validate-modules:return-syntax-error
 plugins/modules/system/open_iscsi.py validate-modules:required_together-unknown
 plugins/modules/system/openwrt_init.py validate-modules:doc-missing-type
 plugins/modules/system/openwrt_init.py validate-modules:parameter-type-not-in-doc
@@ -2139,3 +2138,4 @@ tests/unit/plugins/modules/web_infrastructure/test_jenkins_plugin.py future-impo
 tests/unit/plugins/modules/web_infrastructure/test_jenkins_plugin.py metaclass-boilerplate
 tests/utils/shippable/check_matrix.py replace-urlopen
 tests/utils/shippable/timing.py shebang
+meta/runtime.yml runtime-metadata  # TODO needs to be cleaned up before a first proper release!
