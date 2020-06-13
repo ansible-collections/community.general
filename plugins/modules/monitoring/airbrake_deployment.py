@@ -24,11 +24,13 @@ options:
       - Airbrake PROJECT_ID
     required: false
     type: str
+    version_added: '0.2.0'
   project_key:
     description:
       - Airbrake PROJECT_KEY.
     required: false
     type: str
+    version_added: '0.2.0'
   environment:
     description:
       - The airbrake environment name, typically 'production', 'staging', etc.

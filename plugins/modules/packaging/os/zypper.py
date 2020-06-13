@@ -87,6 +87,7 @@ options:
         required: false
         default: "no"
         type: bool
+        version_added: '0.2.0'
     update_cache:
         description:
           - Run the equivalent of C(zypper refresh) before the operation. Disabled in check mode.
@@ -112,12 +113,14 @@ options:
         default: false
         description:
           - Adds C(--allow_vendor_change) option to I(zypper) dist-upgrade command.
+        version_added: '0.2.0'
     replacefiles:
         type: bool
         required: false
         default: false
         description:
           - Adds C(--replacefiles) option to I(zypper) install/update command.
+        version_added: '0.2.0'
 notes:
   - When used with a `loop:` each package will be processed individually,
     it is much more efficient to pass the list directly to the `name` option.

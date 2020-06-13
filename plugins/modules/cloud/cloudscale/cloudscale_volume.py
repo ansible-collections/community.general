@@ -56,6 +56,7 @@ options:
       - Zone in which the volume resides (e.g. C(lgp1) or C(rma1)). Cannot be
         changed after creating the volume. Defaults to the project default zone.
     type: str
+    version_added: '0.2.0'
   server_uuids:
     description:
       - UUIDs of the servers this volume is attached to. Set this to C([]) to
@@ -146,6 +147,7 @@ zone:
   returned: state == present
   type: dict
   sample: {'slug': 'lpg1'}
+  version_added: '0.2.0'
 server_uuids:
   description: The UUIDs of the servers this volume is attached to.
   returned: state == present

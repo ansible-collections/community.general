@@ -13,6 +13,7 @@ module: postgresql_user_obj_stat_info
 short_description: Gather statistics about PostgreSQL user objects
 description:
 - Gathers statistics about PostgreSQL user objects.
+version_added: '0.2.0'
 options:
   filter:
     description:
@@ -45,6 +46,7 @@ options:
     - It only makes sense to use C(no) only when SQL injections via I(session_role) are possible.
     type: bool
     default: yes
+    version_added: '0.2.0'
 
 notes:
 - C(size) and C(total_size) returned values are presented in bytes.

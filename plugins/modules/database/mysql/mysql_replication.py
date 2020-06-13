@@ -115,12 +115,14 @@ options:
     - Available since MariaDB 10.0.2.
     choices: [current_pos, slave_pos, disabled]
     type: str
+    version_added: '0.2.0'
   master_delay:
     description:
     - Time lag behind the master's state (in seconds).
     - Available from MySQL 5.6.
     - For more information see U(https://dev.mysql.com/doc/refman/8.0/en/replication-delayed.html).
     type: int
+    version_added: '0.2.0'
   connection_name:
     description:
     - Name of the master connection.
@@ -128,6 +130,7 @@ options:
     - Mutually exclusive with I(channel).
     - For more information see U(https://mariadb.com/kb/en/library/multi-source-replication/).
     type: str
+    version_added: '0.2.0'
   channel:
     description:
     - Name of replication channel.
@@ -135,11 +138,13 @@ options:
     - Mutually exclusive with I(connection_name).
     - For more information see U(https://dev.mysql.com/doc/refman/8.0/en/replication-multi-source.html).
     type: str
+    version_added: '0.2.0'
   fail_on_error:
     description:
     - Fails on error when calling mysql.
     type: bool
     default: False
+    version_added: '0.2.0'
 
 notes:
 - If an empty value for the parameter of string type is needed, use an empty string.
@@ -226,6 +231,7 @@ queries:
   returned: always
   type: list
   sample: ["CHANGE MASTER TO MASTER_HOST='master2.example.com',MASTER_PORT=3306"]
+  version_added: '0.2.0'
 '''
 
 import os
