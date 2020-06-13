@@ -45,7 +45,7 @@ options:
     - If C(yes), resize the physical volume to the maximum available size.
     type: bool
     default: false
-    version_added: '1.0.0'
+    version_added: '0.2.0'
   vg_options:
     description:
     - Additional options to pass to C(vgcreate) when creating the volume group.

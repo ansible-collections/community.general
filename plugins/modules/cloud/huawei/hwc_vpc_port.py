@@ -18,7 +18,7 @@ module: hwc_vpc_port
 description:
     - vpc port management.
 short_description: Creates a resource of Vpc/Port in Huawei Cloud
-version_added: '1.0.0'
+version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
     - keystoneauth1 >= 3.6.0

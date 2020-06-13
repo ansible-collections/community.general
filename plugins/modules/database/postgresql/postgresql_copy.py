@@ -75,7 +75,7 @@ options:
     - It makes sense to use C(yes) only when SQL injections are possible.
     type: bool
     default: yes
-    version_added: '1.0.0'
+    version_added: '0.2.0'
 notes:
 - Supports PostgreSQL version 9.4+.
 - COPY command is only allowed to database superusers.

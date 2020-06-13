@@ -22,7 +22,7 @@ description:
        the block devices on the server, you have to run the Attach Scripts,
        as documented at U(https://help.packet.net/technical/storage/packet-block-storage-linux)."
 
-version_added: '1.0.0'
+version_added: '0.2.0'
 
 author:
     - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>

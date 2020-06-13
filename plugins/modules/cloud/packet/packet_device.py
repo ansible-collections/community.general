@@ -52,7 +52,7 @@ options:
       - Currently implemented only for device creation.
     type: list
     elements: str
-    version_added: '1.0.0'
+    version_added: '0.2.0'
 
   facility:
     description:

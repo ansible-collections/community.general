@@ -102,7 +102,7 @@ options:
           The sequential suffix ranges from 001 to 999.
       default: False
       type: bool
-      version_added: '1.0.0'
+      version_added: '0.2.0'
     password:
       description:
         - The password to login instance. After rebooting instances, modified password will take effect.
@@ -183,14 +183,14 @@ options:
         - A hash/dictionaries of instance tags, to add to the new instance or for starting/stopping instance by tag. C({"key":"value"})
       aliases: ["instance_tags"]
       type: dict
-      version_added: '1.0.0'
+      version_added: '0.2.0'
     purge_tags:
       description:
         - Delete any tags not specified in the task that are on the instance.
           If True, it means you have to specify all the desired tags on each task affecting an instance.
       default: False
       type: bool
-      version_added: '1.0.0'
+      version_added: '0.2.0'
     key_name:
       description:
         - The name of key pair which is used to access ECS instance in SSH.
@@ -207,27 +207,27 @@ options:
       description:
         - The name of the instance RAM role.
       type: str
-      version_added: '1.0.0'
+      version_added: '0.2.0'
     spot_price_limit:
       description:
         - The maximum hourly price for the preemptible instance. This parameter supports a maximum of three decimal
           places and takes effect when the SpotStrategy parameter is set to SpotWithPriceLimit.
       type: float
-      version_added: '1.0.0'
+      version_added: '0.2.0'
     spot_strategy:
       description:
          - The bidding mode of the pay-as-you-go instance. This parameter is valid when InstanceChargeType is set to PostPaid.
       choices: ['NoSpot', 'SpotWithPriceLimit', 'SpotAsPriceGo']
       default: 'NoSpot'
       type: str
-      version_added: '1.0.0'
+      version_added: '0.2.0'
     period_unit:
       description:
          - The duration unit that you will buy the resource. It is valid when C(instance_charge_type=PrePaid)
       choices: ['Month', 'Week']
       default: 'Month'
       type: str
-      version_added: '1.0.0'
+      version_added: '0.2.0'
     dry_run:
       description:
          - Specifies whether to send a dry-run request.
@@ -237,13 +237,13 @@ options:
          - If I(dry_run=False), A request is sent. If the validation succeeds, the instance is created.
       default: False
       type: bool
-      version_added: '1.0.0'
+      version_added: '0.2.0'
     include_data_disks:
       description:
          - Whether to change instance disks charge type when changing instance charge type.
       default: True
       type: bool
-      version_added: '1.0.0'
+      version_added: '0.2.0'
 author:
     - "He Guimin (@xiaozhu36)"
 requirements:

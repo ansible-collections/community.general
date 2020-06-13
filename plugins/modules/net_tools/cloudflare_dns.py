@@ -25,7 +25,7 @@ options:
     - "You can obtain your API token from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)"
     type: str
     required: false
-    version_added: '1.0.0'
+    version_added: '0.2.0'
   account_api_key:
     description:
     - Account API key.

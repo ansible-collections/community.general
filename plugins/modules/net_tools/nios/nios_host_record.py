@@ -84,7 +84,7 @@ options:
         required: false
         aliases:
           - add
-        version_added: '1.0.0'
+        version_added: '0.2.0'
       remove:
         description:
           - If user wants to remove the ipv4 address from an existing host record.
@@ -94,7 +94,7 @@ options:
         required: false
         aliases:
           - remove
-        version_added: '1.0.0'
+        version_added: '0.2.0'
   ipv6addrs:
     description:
       - Configures the IPv6 addresses for the host record.  This argument

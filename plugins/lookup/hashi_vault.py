@@ -42,14 +42,14 @@ DOCUMENTATION = """
       ini:
         - section: lookup_hashi_vault
           key: token_path
-      version_added: '1.0.0'
+      version_added: '0.2.0'
     token_file:
       description: If no token is specified, will try to read the token from this file in C(token_path).
       ini:
         - section: lookup_hashi_vault
           key: token_file
       default: '.vault-token'
-      version_added: '1.0.0'
+      version_added: '0.2.0'
     url:
       description: URL to vault service.
       env:
@@ -57,7 +57,7 @@ DOCUMENTATION = """
       ini:
         - section: lookup_hashi_vault
           key: url
-          version_added: '1.0.0'
+          version_added: '0.2.0'
       default: 'http://127.0.0.1:8200'
     username:
       description: Authentication user name.
@@ -70,7 +70,7 @@ DOCUMENTATION = """
       ini:
         - section: lookup_hashi_vault
           key: role_id
-          version_added: '1.0.0'
+          version_added: '0.2.0'
     secret_id:
       description: Secret id for a vault AppRole auth.
       env:
@@ -85,7 +85,7 @@ DOCUMENTATION = """
       ini:
         - section: lookup_hashi_vault
           key: auth_method
-          version_added: '1.0.0'
+          version_added: '0.2.0'
       choices:
         - token
         - userpass
@@ -105,7 +105,7 @@ DOCUMENTATION = """
         - raw
       default: dict
       aliases: [ as ]
-      version_added: '1.0.0'
+      version_added: '0.2.0'
     mount_point:
       description: Vault mount point, only required if you have a custom mount point.
     ca_cert:
@@ -124,7 +124,7 @@ DOCUMENTATION = """
         env:
         - name: AWS_DEFAULT_PROFILE
         - name: AWS_PROFILE
-        version_added: '1.0.0'
+        version_added: '0.2.0'
     aws_access_key:
         description: The AWS access key to use.
         type: str
@@ -133,7 +133,7 @@ DOCUMENTATION = """
         - name: EC2_ACCESS_KEY
         - name: AWS_ACCESS_KEY
         - name: AWS_ACCESS_KEY_ID
-        version_added: '1.0.0'
+        version_added: '0.2.0'
     aws_secret_key:
         description: The AWS secret key that corresponds to the access key.
         type: str
@@ -142,7 +142,7 @@ DOCUMENTATION = """
         - name: EC2_SECRET_KEY
         - name: AWS_SECRET_KEY
         - name: AWS_SECRET_ACCESS_KEY
-        version_added: '1.0.0'
+        version_added: '0.2.0'
     aws_security_token:
         description: The AWS security token if using temporary access and secret keys.
         type: str
@@ -150,14 +150,14 @@ DOCUMENTATION = """
         - name: EC2_SECURITY_TOKEN
         - name: AWS_SESSION_TOKEN
         - name: AWS_SECURITY_TOKEN
-        version_added: '1.0.0'
+        version_added: '0.2.0'
     region:
         description: The AWS region for which to create the connection.
         type: str
         env:
         - name: EC2_REGION
         - name: AWS_REGION
-        version_added: '1.0.0'
+        version_added: '0.2.0'
 """
 
 EXAMPLES = """

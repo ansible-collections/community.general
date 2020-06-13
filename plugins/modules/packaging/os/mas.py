@@ -14,7 +14,7 @@ module: mas
 short_description: Manage Mac App Store applications with mas-cli
 description:
     - Installs, uninstalls and updates macOS applications from the Mac App Store using the C(mas-cli).
-version_added: '1.0.0'
+version_added: '0.2.0'
 author:
     - Michael Heap (@mheap)
     - Lukas Bestle (@lukasbestle)

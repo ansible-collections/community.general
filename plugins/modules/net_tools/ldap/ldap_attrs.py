@@ -32,7 +32,7 @@ notes:
     rules. This should work out in most cases, but it is theoretically
     possible to see spurious changes when target and actual values are
     semantically identical but lexically distinct.
-version_added: '1.0.0'
+version_added: '0.2.0'
 author:
   - Jiri Tyr (@jtyr)
   - Alexander Korinek (@noles)

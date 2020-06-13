@@ -73,7 +73,7 @@ options:
     - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
     type: bool
     default: yes
-    version_added: '1.0.0'
+    version_added: '0.2.0'
 seealso:
 - module: postgresql_user
 - module: postgresql_privs

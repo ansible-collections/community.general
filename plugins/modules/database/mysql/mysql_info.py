@@ -37,7 +37,7 @@ options:
     - "Supports elements: C(db_size). Unsupported elements will be ignored"
     type: list
     elements: str
-    version_added: '1.0.0'
+    version_added: '0.2.0'
   return_empty_dbs:
     description:
     - Includes names of empty databases to returned dictionary.

@@ -59,7 +59,7 @@ options:
     - It does make sense to use C(yes) only when SQL injections are possible.
     type: bool
     default: yes
-    version_added: '1.0.0'
+    version_added: '0.2.0'
 notes:
 - Supported version of PostgreSQL is 9.4 and later.
 - Pay attention, change setting with 'postmaster' context can return changed is true

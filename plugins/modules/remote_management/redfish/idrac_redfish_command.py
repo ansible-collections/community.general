@@ -51,7 +51,7 @@ options:
     description:
       - The ID of the System, Manager or Chassis to modify
     type: str
-    version_added: '1.0.0'
+    version_added: '0.2.0'
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''

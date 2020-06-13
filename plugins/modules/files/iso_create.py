@@ -17,7 +17,7 @@ description:
 author:
     - Diane Wang (@Tomorrow9) <dianew@vmware.com>
 requirements: ["pycdlib", "python >= 2.7"]
-version_added: '1.0.0'
+version_added: '0.2.0'
 
 options:
    src_files:

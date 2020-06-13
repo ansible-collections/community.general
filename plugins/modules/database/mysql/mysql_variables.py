@@ -42,7 +42,7 @@ options:
     type: str
     choices: ['global', 'persist', 'persist_only']
     default: global
-    version_added: '1.0.0'
+    version_added: '0.2.0'
 
 seealso:
 - module: mysql_info
@@ -73,7 +73,7 @@ queries:
   returned: if executed
   type: list
   sample: ["SET GLOBAL `read_only` = 1"]
-  version_added: '1.0.0'
+  version_added: '0.2.0'
 '''
 
 import os

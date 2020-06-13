@@ -108,7 +108,7 @@ options:
     description:
      - Query JIRA in JQL Syntax, e.g. 'CMDB Hostname'='test.example.com'.
     type: str
-    version_added: '1.0.0'
+    version_added: '0.2.0'
 
   maxresults:
     required: false
@@ -116,7 +116,7 @@ options:
      - Limit the result of I(operation=search). If no value is specified, the default jira limit will be used.
      - Used when I(operation=search) only, ignored otherwise.
     type: int
-    version_added: '1.0.0'
+    version_added: '0.2.0'
 
   timeout:
     required: false

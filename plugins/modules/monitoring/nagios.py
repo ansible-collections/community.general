@@ -57,7 +57,7 @@ options:
   start:
     description:
       - When downtime should start, in time_t format (epoch seconds).
-    version_added: '1.0.0'
+    version_added: '0.2.0'
   minutes:
     description:
       - Minutes to schedule downtime for.

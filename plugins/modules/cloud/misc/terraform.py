@@ -92,7 +92,7 @@ options:
         This can accept a list of paths to multiple configuration files.
     type: list
     elements: path
-    version_added: '1.0.0'
+    version_added: '0.2.0'
 notes:
    - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]

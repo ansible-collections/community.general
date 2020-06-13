@@ -101,7 +101,7 @@ options:
       - Provides additional arguments when I(state) is C(dump).
       - Cannot be used with dump-file-format-related arguments like ``--format=d``.
     type: str
-    version_added: '1.0.0'
+    version_added: '0.2.0'
   trust_input:
     description:
     - If C(no), check whether values of parameters I(owner), I(conn_limit), I(encoding),
@@ -109,7 +109,7 @@ options:
     - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
     type: bool
     default: yes
-    version_added: '1.0.0'
+    version_added: '0.2.0'
 seealso:
 - name: CREATE DATABASE reference
   description: Complete reference of the CREATE DATABASE command documentation.
@@ -202,7 +202,7 @@ executed_commands:
   returned: always
   type: list
   sample: ["CREATE DATABASE acme"]
-  version_added: '1.0.0'
+  version_added: '0.2.0'
 '''
 
 

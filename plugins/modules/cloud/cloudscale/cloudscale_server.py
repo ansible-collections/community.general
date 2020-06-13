@@ -54,7 +54,7 @@ options:
     description:
       - Zone in which the server resides (e.g. C(lgp1) or C(rma1)).
     type: str
-    version_added: '1.0.0'
+    version_added: '0.2.0'
   volume_size_gb:
     description:
       - Size of the root volume in GB.
@@ -221,7 +221,7 @@ zone:
   returned: success when not state == absent
   type: dict
   sample: { 'slug': 'lpg1' }
-  version_added: '1.0.0'
+  version_added: '0.2.0'
 volumes:
   description: List of volumes attached to the server
   returned: success when not state == absent

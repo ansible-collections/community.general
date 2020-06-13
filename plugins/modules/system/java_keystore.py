@@ -32,7 +32,7 @@ options:
           - Pass phrase for reading the private key, if required.
         type: str
         required: false
-        version_added: '1.0.0'
+        version_added: '0.2.0'
     password:
         description:
           - Password that should be used to secure the key store.

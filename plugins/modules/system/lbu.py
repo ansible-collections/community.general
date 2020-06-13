@@ -12,7 +12,7 @@ module: lbu
 
 short_description: Local Backup Utility for Alpine Linux
 
-version_added: '1.0.0'
+version_added: '0.2.0'
 
 description:
 - Manage Local Backup Utility of Alpine Linux in run-from-RAM mode
