@@ -134,10 +134,12 @@ options:
       - Specify the description for the container. Only used on the configuration web interface.
       - This is saved as a comment inside the configuration file.
     type: str
+    version_added: '0.2.0'
   hookscript:
     description:
       - Script that will be executed during various steps in the containers lifetime.
     type: str
+    version_added: '0.2.0'
 
 notes:
   - Requires proxmoxer and requests modules on host. This modules can be installed with pip.

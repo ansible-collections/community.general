@@ -190,6 +190,7 @@ options:
       - Corresponds to the C(--init) option of C(docker service create).
       - Requires API version >= 1.37.
     type: bool
+    version_added: '0.2.0'
   labels:
     description:
       - Dictionary of key value pairs.

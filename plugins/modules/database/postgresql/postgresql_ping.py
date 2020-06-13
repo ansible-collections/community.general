@@ -27,12 +27,14 @@ options:
     - Permissions checking for SQL commands is carried out as though
       the session_role were the one that had logged in originally.
     type: str
+    version_added: '0.2.0'
   trust_input:
     description:
     - If C(no), check whether a value of I(session_role) is potentially dangerous.
     - It does make sense to use C(yes) only when SQL injections via I(session_role) are possible.
     type: bool
     default: yes
+    version_added: '0.2.0'
 seealso:
 - module: postgresql_info
 author:

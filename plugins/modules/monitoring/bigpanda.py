@@ -68,6 +68,7 @@ options:
     - Message about the deployment.
     - C(message) alias is deprecated in Ansible 2.10, since it is used internally by Ansible Core Engine.
     aliases: ['message']
+    version_added: '0.2.0'
 
 # informational: requirements for nodes
 requirements: [ ]
