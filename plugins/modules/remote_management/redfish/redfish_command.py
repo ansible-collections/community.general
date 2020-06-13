@@ -93,37 +93,44 @@ options:
     description:
       - new update user name for account_username
     type: str
+    version_added: '0.2.0'
   account_properties:
     required: false
     description:
       - properties of account service to update
     type: dict
+    version_added: '0.2.0'
   resource_id:
     required: false
     description:
       - The ID of the System, Manager or Chassis to modify
     type: str
+    version_added: '0.2.0'
   update_image_uri:
     required: false
     description:
       - The URI of the image for the update
     type: str
+    version_added: '0.2.0'
   update_protocol:
     required: false
     description:
       - The protocol for the update
     type: str
+    version_added: '0.2.0'
   update_targets:
     required: false
     description:
       - The list of target resource URIs to apply the update to
     type: list
     elements: str
+    version_added: '0.2.0'
   update_creds:
     required: false
     description:
       - The credentials for retrieving the update image
     type: dict
+    version_added: '0.2.0'
     suboptions:
       username:
         required: false
@@ -140,6 +147,7 @@ options:
     description:
       - The options for VirtualMedia commands
     type: dict
+    version_added: '0.2.0'
     suboptions:
       media_types:
         required: false

@@ -41,6 +41,7 @@ options:
             - See supported version ranges on U(https://cwiki.apache.org/confluence/display/MAVENOLD/Dependency+Mediation+and+Conflict+Resolution)
             - The range type "(,1.0],[1.2,)" and "(,1.1),(1.1,)" is not supported.
             - Mutually exclusive with I(version).
+        version_added: '0.2.0'
     classifier:
         description:
             - The maven classifier coordinate
@@ -74,6 +75,7 @@ options:
             upon initial request.
         default: 'no'
         type: bool
+        version_added: '0.2.0'
     dest:
         description:
             - The path where the artifact should be written to

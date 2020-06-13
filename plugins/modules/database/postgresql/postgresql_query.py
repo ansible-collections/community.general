@@ -67,12 +67,14 @@ options:
     - Set the client encoding for the current session (e.g. C(UTF-8)).
     - The default is the encoding defined by the database.
     type: str
+    version_added: '0.2.0'
   trust_input:
     description:
     - If C(no), check whether a value of I(session_role) is potentially dangerous.
     - It does make sense to use C(yes) only when SQL injections via I(session_role) are possible.
     type: bool
     default: yes
+    version_added: '0.2.0'
 seealso:
 - module: postgresql_db
 author:
