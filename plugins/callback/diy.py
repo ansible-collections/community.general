@@ -10,6 +10,7 @@ DOCUMENTATION = r'''
   callback: diy
   callback_type: stdout
   short_description: Customize the output
+  version_added: 0.2.0
   description:
     - Callback plugin that allows you to supply your own custom callback templates to be output.
   author: Trevor Highfill (@theque5t)
