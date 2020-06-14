@@ -36,9 +36,6 @@
     state: absent
     force_absent: yes
 
-- debug:
-    var: build
-
 - set_fact:
     build_deprecations: "{{ build.deprecations | map(attribute='msg') | list }}"
 
