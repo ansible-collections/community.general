@@ -1,0 +1,2 @@
+bugfixes:
+- mysql_user - fix ``host_all`` arguments conversion string formatting error (https://github.com/ansible/ansible/issues/29644).
