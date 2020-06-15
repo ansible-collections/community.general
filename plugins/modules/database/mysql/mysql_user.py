@@ -340,7 +340,7 @@ def get_mode(cursor):
 
 def user_exists(cursor, user, host, host_all):
     if host_all:
-        cursor.execute("SELECT count(*) FROM mysql.user WHERE user = %s", ([user]))
+        cursor.execute("SELECT count(*) FROM mysql.user WHERE user = %s", (user,))
     else:
         cursor.execute("SELECT count(*) FROM mysql.user WHERE user = %s AND host = %s", (user, host))
 
@@ -543,7 +543,7 @@ def user_delete(cursor, user, host, host_all, check_mode):
         return True
 
     if host_all:
-        hostnames = user_get_hostnames(cursor, [user])
+        hostnames = user_get_hostnames(cursor, user)
 
         for hostname in hostnames:
             cursor.execute("DROP USER %s@%s", (user, hostname))
@@ -554,7 +554,7 @@ def user_delete(cursor, user, host, host_all, check_mode):
 
 
 def user_get_hostnames(cursor, user):
-    cursor.execute("SELECT Host FROM mysql.user WHERE user = %s", user)
+    cursor.execute("SELECT Host FROM mysql.user WHERE user = %s", (user,))
     hostnames_raw = cursor.fetchall()
     hostnames = []
 
