@@ -1,6 +1,6 @@
 namespace: community
 name: general
-version: 0.2.0
+version: 0.1.4
 readme: README.md
 authors:
   - Ansible (https://github.com/ansible)
