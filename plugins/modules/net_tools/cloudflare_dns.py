@@ -452,7 +452,7 @@ class CloudflareAPI(object):
                                timeout=self.timeout)
 
         if info['status'] not in [200, 304, 400, 401, 403, 429, 405, 415]:
-            self.module.fail_json(msg="Failed API call {0}; got unexpected HTTP code {1}".format(api_call, info['status']))
+            self.module.fail_json(msg="Failed API call {0}; got unexpected HTTP code {1}: {2}".format(api_call, info['status'], info.get('msg')))
 
         error_msg = ''
         if info['status'] == 401:
