@@ -365,11 +365,7 @@ def user_exists(cursor, user, host, host_all):
     return count[0] > 0
 
 
-def parse_requires(tls_requires):
-    def fix_quotes(value):
-        if value:
-            return '%s' % value.strip('"').strip("'")
-
+def sanitize_requires(tls_requires):
     if tls_requires:
         for key in tls_requires.keys():
             if not key.isupper():
@@ -380,10 +376,25 @@ def parse_requires(tls_requires):
             tls_requires.pop('X509', None)
 
         if 'X509' in tls_requires.keys():
-            tls_requires.pop('SSL', None)
+            tls_requires = 'X509'
+        else:
+            tls_requires = 'SSL'
 
-        return "REQUIRE %s" % ' AND '.join([' '.join(filter(None, (key, fix_quotes(value)))) for key, value in tls_requires.items()])
+        return tls_requires
+#        return " REQUIRE %s" % ' AND '.join([' '.join(filter(None, (key, fix_quotes(value)))) for key, value in tls_requires.items()])
     return None
+
+
+def mogrify_requires(query, params, tls_requires):
+    if tls_requires:
+        if isinstance(tls_requires, dict):
+            k, v = zip(*tls_requires.items())
+            requires_query = ' AND '.join(('{} %s'.format(key) for key in k))
+            params += v
+        else:
+            requires_query = tls_requires
+        query = ' REQUIRE '.join((query, requires_query))
+    return query, params
 
 
 def user_add(cursor, user, host, host_all, password, encrypted, plugin, plugin_hash_string,
@@ -395,19 +406,18 @@ def user_add(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
     if check_mode:
         return True
 
-    requires = parse_requires(tls_requires)
     if password and encrypted:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED BY PASSWORD %s", (user, host, ' '.join(filter(None, (password, requires)))))
+        cursor.execute(*mogrify_requires("CREATE USER %s@%s IDENTIFIED BY PASSWORD %s", (user, host, password), tls_requires))
     elif password and not encrypted:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED BY %s", (user, host, ' '.join(filter(None, (password, requires)))))
+        cursor.execute(*mogrify_requires("CREATE USER %s@%s IDENTIFIED BY %s", (user, host, password), tls_requires))
     elif plugin and plugin_hash_string:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin, ' '.join(filter(None, (plugin_hash_string, requires)))))
+        cursor.execute(*mogrify_requires("CREATE USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin, plugin_hash_string), tls_requires))
     elif plugin and plugin_auth_string:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin, ' '.join(filter(None, (plugin_auth_string, requires)))))
+        cursor.execute(*mogrify_requires("CREATE USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin, plugin_auth_string), tls_requires))
     elif plugin:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s", (user, host, ' '.join(filter(None, (plugin, requires)))))
+        cursor.execute(*mogrify_requires("CREATE USER %s@%s IDENTIFIED WITH %s", (user, host, plugin), tls_requires))
     else:
-        cursor.execute("CREATE USER %s@%s", (user, ' '.join(filter(None, (host, requires)))))
+        cursor.execute(*mogrify_requires("CREATE USER %s@%s", (user, host), tls_requires))
     if new_priv is not None:
         for db_table, priv in iteritems(new_priv):
             privileges_grant(cursor, user, host, db_table, priv)
@@ -432,8 +442,6 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
         hostnames = user_get_hostnames(cursor, [user])
     else:
         hostnames = [host]
-
-    requires = parse_requires(tls_requires)
 
     for host in hostnames:
         # Handle clear text and hashed passwords.
@@ -488,8 +496,7 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
                     msg = "Password updated (old style)"
                 else:
                     try:
-                        cursor.execute("ALTER USER %s@%s IDENTIFIED WITH mysql_native_password AS %s",
-                                       (user, host, ' '.join(filter(None, (encrypted_password, requires)))))
+                        cursor.execute("ALTER USER %s@%s IDENTIFIED WITH mysql_native_password AS %s", (user, host, encrypted_password))
                         msg = "Password updated (new style)"
                     except (mysql_driver.Error) as e:
                         # https://stackoverflow.com/questions/51600000/authentication-string-of-root-user-on-mysql
@@ -499,10 +506,7 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
                                 "UPDATE mysql.user SET plugin = %s, authentication_string = %s, Password = '' WHERE User = %s AND Host = %s",
                                 ('mysql_native_password', encrypted_password, user, host)
                             )
-                            if requires:
-                                cursor.execute("GRANT USAGE on *.* to '%s'@'%s' %s" % (user, host, requires))
-                            else:
-                                cursor.execute("GRANT USAGE on *.* to '%s'@'%s'" % (user, host))
+                            cursor.execute("GRANT USAGE on *.* to '%s'@'%s'", (user, host))
                             cursor.execute("FLUSH PRIVILEGES")
                             msg = "Password forced update"
                         else:
@@ -511,8 +515,7 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
 
         # Handle plugin authentication
         if plugin:
-            cursor.execute("SELECT plugin, authentication_string FROM mysql.user "
-                           "WHERE user = %s AND host = %s", (user, host))
+            cursor.execute("SELECT plugin, authentication_string FROM mysql.user WHERE user = %s AND host = %s", (user, host))
             current_plugin = cursor.fetchone()
 
             update = False
@@ -532,12 +535,17 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
 
             if update:
                 if plugin_hash_string:
-                    cursor.execute("ALTER USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin, ' '.join(filter(None, (plugin_hash_string, requires)))))
+                    cursor.execute("ALTER USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin, plugin_hash_string))
                 elif plugin_auth_string:
-                    cursor.execute("ALTER USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin, ' '.join(filter(None, (plugin_auth_string, requires)))))
+                    cursor.execute("ALTER USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin, plugin_auth_string))
                 else:
-                    cursor.execute("ALTER USER %s@%s IDENTIFIED WITH %s", (user, host, ' '.join(filter(None, (plugin, requires)))))
+                    cursor.execute("ALTER USER %s@%s IDENTIFIED WITH %s", (user, host, plugin))
                 changed = True
+
+        # Handle TLS requirements
+        if tls_requires is not None:
+            cursor.execute(*mogrify_requires("ALTER USER %s@%s", (user, host), tls_requires))
+            changed = True
 
         # Handle privileges
         if new_priv is not None:
@@ -923,7 +931,7 @@ def main():
     host_all = module.params["host_all"]
     state = module.params["state"]
     priv = module.params["priv"]
-    tls_requires = module.params["tls_requires"]
+    tls_requires = sanitize_requires(module.params["tls_requires"])
     check_implicit_admin = module.params['check_implicit_admin']
     connect_timeout = module.params['connect_timeout']
     config_file = module.params['config_file']
