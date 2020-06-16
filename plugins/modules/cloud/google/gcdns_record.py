@@ -23,7 +23,7 @@ requirements:
     - "python >= 2.6"
     - "apache-libcloud >= 0.19.0"
 deprecated:
-    removed_in: "2.12"
+    removed_in: 2.0.0  # was Ansible 2.12
     why: Updated modules released with increased functionality
     alternative: Use M(gcp_dns_resource_record_set) instead.
 options:

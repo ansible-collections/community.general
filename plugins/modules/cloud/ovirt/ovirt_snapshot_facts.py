@@ -13,7 +13,7 @@ module: ovirt_snapshot_facts
 short_description: Retrieve information about one or more oVirt/RHV virtual machine snapshots
 author: "Ondra Machacek (@machacekondra)"
 deprecated:
-    removed_in: "2.14"
+    removed_in: 3.0.0  # was Ansible 2.13
     why: When migrating to collection we decided to use only _info modules.
     alternative: Use C(ovirt_snapshot_info) from the C(ovirt.ovirt) collection instead
 description:
@@ -88,7 +88,8 @@ def main():
     is_old_facts = module._name in ('ovirt_snapshot_facts', 'community.general.ovirt_snapshot_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_snapshot_facts' module has been renamed to 'ovirt_snapshot_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     check_sdk(module)
 
