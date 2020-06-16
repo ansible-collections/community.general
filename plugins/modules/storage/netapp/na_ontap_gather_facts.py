@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: na_ontap_gather_facts
 deprecated:
-  removed_in: '2.13'
+  removed_in: 3.0.0  # was Ansible 2.13
   why: Deprecated in favour of C(_info) module.
   alternative: Use M(na_ontap_info) instead.
 author: Piotr Olczak (@dprts) <polczak@redhat.com>

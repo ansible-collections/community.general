@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 module: github_hooks
 short_description: Manages GitHub service hooks.
 deprecated:
-  removed_in: "2.12"
+  removed_in: 2.0.0  # was Ansible 2.12
   why: Replaced by more granular modules
   alternative: Use M(github_webhook) and M(github_webhook_info) instead.
 description:
