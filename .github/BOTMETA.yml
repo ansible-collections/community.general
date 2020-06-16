@@ -131,9 +131,6 @@ files:
     labels: infoblox networking
   $module_utils/:
     labels: module_utils
-  $module_utils/cloudscale.py:
-    maintainers: $team_cloudscale
-    labels: cloudscale
   $module_utils/docker/:
     maintainers: $team_docker
     labels: cloud
@@ -203,16 +200,6 @@ files:
     authors: krsacme
   $modules/cloud/centurylink/:
     authors: clc-runner
-  $modules/cloud/cloudscale/cloudscale_floating_ip.py:
-    authors: gaudenz href
-    maintainers: resmo
-  $modules/cloud/cloudscale/cloudscale_server.py:
-    authors: gaudenz href resmo
-  $modules/cloud/cloudscale/cloudscale_server_group.py:
-    authors: href resmo
-    maintainers: gaudenz
-  $modules/cloud/cloudscale/cloudscale_volume.py:
-    authors: gaudenz href resmo
   $modules/cloud/digital_ocean/digital_ocean.py:
     authors: zbal
   $modules/cloud/digital_ocean/:
@@ -1383,7 +1370,6 @@ macros:
   terminals: plugins/terminal
   team_aix: MorrisA bcoca d-little flynn1973 gforster kairoaraujo marvin-sinister mator molekuul ramooncamacho wtcross
   team_bsd: JoergFiedler MacLemon bcoca dch jasperla mekanix opoplawski overhacked tuxillo
-  team_cloudscale: gaudenz resmo
   team_cyberark_conjur: jvanderhoof ryanprior
   team_digital_ocean: BondAnthony mgregson
   team_docker: DBendit WojciechowskiPiotr akshay196 danihodovic dariko felixfontein jwitko kassiansun tbouvet
