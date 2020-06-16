@@ -1,0 +1,2 @@
+bugfixes:
+  - nmcli - ensures modify_ethernet_connection is idempotent (https://github.com/ansible-collections/community.general/issues/481)
