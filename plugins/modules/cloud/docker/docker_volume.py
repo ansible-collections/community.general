@@ -45,7 +45,7 @@ options:
       - With state C(present) causes the volume to be deleted and recreated if the volume already
         exist and the driver, driver options or labels differ. This will cause any data in the existing
         volume to be lost.
-      - Deprecated. Will be removed in Ansible 2.12. Set I(recreate) to C(options-changed) instead
+      - Deprecated. Will be removed in community.general 2.0.0. Set I(recreate) to C(options-changed) instead
         for the same behavior of setting I(force) to C(yes).
     type: bool
     default: no
@@ -113,7 +113,7 @@ volume:
     description:
     - Volume inspection results for the affected volume.
     - Note that facts are part of the registered vars since Ansible 2.8. For compatibility reasons, the facts
-      are also accessible directly as C(docker_volume). Note that the returned fact will be removed in Ansible 2.12.
+      are also accessible directly as C(docker_volume). Note that the returned fact will be removed in community.general 2.0.0.
     returned: success
     type: dict
     sample: {}
@@ -302,7 +302,7 @@ def main():
         driver=dict(type='str', default='local'),
         driver_options=dict(type='dict', default={}),
         labels=dict(type='dict'),
-        force=dict(type='bool', removed_in_version='2.12'),
+        force=dict(type='bool', removed_in_version='2.0.0', removed_from_collection='community.general'),  # was Ansible 2.12
         recreate=dict(type='str', default='never', choices=['always', 'never', 'options-changed']),
         debug=dict(type='bool', default=False)
     )

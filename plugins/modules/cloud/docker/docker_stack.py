@@ -78,7 +78,7 @@ requirements:
   - pyyaml
 
 notes:
-  - Return values I(out) and I(err) have been deprecated and will be removed in Ansible 2.14. Use I(stdout) and I(stderr) instead.
+  - Return values I(out) and I(err) have been deprecated and will be removed in community.general 3.0.0. Use I(stdout) and I(stderr) instead.
 '''
 
 RETURN = '''

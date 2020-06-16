@@ -13,7 +13,7 @@ module: ovirt_host_storage_facts
 short_description: Retrieve information about one or more oVirt/RHV HostStorages (applicable only for block storage)
 author: "Daniel Erez (@derez)"
 deprecated:
-    removed_in: "2.14"
+    removed_in: 3.0.0  # was Ansible 2.13
     why: When migrating to collection we decided to use only _info modules.
     alternative: Use C(ovirt_host_storage_info) from the C(ovirt.ovirt) collection instead
 description:
@@ -133,7 +133,8 @@ def main():
     is_old_facts = module._name in ('ovirt_host_storage_facts', 'community.general.ovirt_host_storage_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_host_storage_facts' module has been renamed to 'ovirt_host_storage_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
     check_sdk(module)
 
     try:

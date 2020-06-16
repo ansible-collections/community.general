@@ -29,7 +29,7 @@ notes:
     these options, it will be recreated instead. The options with default values which can cause this are I(auto_remove),
     I(detach), I(init), I(interactive), I(memory), I(paused), I(privileged), I(read_only) and I(tty). This behavior
     can be changed by setting I(container_default_behavior) to C(no_defaults), which will be the default value from
-    Ansible 2.14 on.
+    community.general 3.0.0 on.
 
 options:
   auto_remove:
@@ -89,7 +89,7 @@ options:
         containers which use different values for these options.
       - The default value is C(compatibility), which will ensure that the default values
         are used when the values are not explicitly specified by the user.
-      - From Ansible 2.14 on, the default value will switch to C(no_defaults). To avoid
+      - From community.general 3.0.0 on, the default value will switch to C(no_defaults). To avoid
         deprecation warnings, please set I(container_default_behavior) to an explicit
         value.
       - This affects the I(auto_remove), I(detach), I(init), I(interactive), I(memory),
@@ -508,7 +508,7 @@ options:
   network_mode:
     description:
       - Connect the container to a network. Choices are C(bridge), C(host), C(none), C(container:<name|id>), C(<network_name>) or C(default).
-      - "*Note* that from Ansible 2.14 on, if I(networks_cli_compatible) is C(true) and I(networks) contains at least one network,
+      - "*Note* that from community.general 3.0.0 on, if I(networks_cli_compatible) is C(true) and I(networks) contains at least one network,
          the default value for I(network_mode) will be the name of the first network in the I(networks) list. You can prevent this
          by explicitly specifying a value for I(network_mode), like the default value C(default) which will be used by Docker if
          I(network_mode) is not specified."
@@ -525,7 +525,7 @@ options:
       - Note that as opposed to C(docker run ...), M(docker_container) does not remove the default
         network if I(networks) is specified. You need to explicitly use I(purge_networks) to enforce
         the removal of the default network (and all other networks not explicitly mentioned in I(networks)).
-        Alternatively, use the I(networks_cli_compatible) option, which will be enabled by default from Ansible 2.12 on.
+        Alternatively, use the I(networks_cli_compatible) option, which will be enabled by default from community.general 2.0.0 on.
     type: list
     elements: dict
     suboptions:
@@ -567,11 +567,11 @@ options:
       - "*Note* that docker CLI also sets I(network_mode) to the name of the first network
          added if C(--network) is specified. For more compatibility with docker CLI, you
          explicitly have to set I(network_mode) to the name of the first network you're
-         adding. This behavior will change for Ansible 2.14: then I(network_mode) will
+         adding. This behavior will change for community.general 3.0.0: then I(network_mode) will
          automatically be set to the first network name in I(networks) if I(network_mode)
          is not specified, I(networks) has at least one entry and I(networks_cli_compatible)
          is C(true)."
-      - Current value is C(no). A new default of C(yes) will be set in Ansible 2.12.
+      - Current value is C(no). A new default of C(yes) will be set in community.general 2.0.0.
     type: bool
   oom_killer:
     description:
@@ -618,7 +618,7 @@ options:
         container port, 9000 is a host port, and 0.0.0.0 is a host interface."
       - Port ranges can be used for source and destination ports. If two ranges with
         different lengths are specified, the shorter range will be used.
-        Since Ansible 2.10, if the source port range has length 1, the port will not be assigned
+        Since community.general 0.2.0, if the source port range has length 1, the port will not be assigned
         to the first port of the destination range, but to a free port in that range. This is the
         same behavior as for C(docker) command line utility.
       - "Bind addresses must be either IPv4 or IPv6 addresses. Hostnames are *not* allowed. This
@@ -750,7 +750,7 @@ options:
   trust_image_content:
     description:
       - If C(yes), skip image verification.
-      - The option has never been used by the module. It will be removed in Ansible 2.14.
+      - The option has never been used by the module. It will be removed in community.general 3.0.0.
     type: bool
     default: no
   tmpfs:
@@ -1054,7 +1054,8 @@ container:
     description:
       - Facts representing the current state of the container. Matches the docker inspection output.
       - Note that facts are part of the registered vars since Ansible 2.8. For compatibility reasons, the facts
-        are also accessible directly as C(docker_container). Note that the returned fact will be removed in Ansible 2.12.
+        are also accessible directly as C(docker_container). Note that the returned fact will be removed in
+        community.general 2.0.0.
       - Before 2.3 this was C(ansible_docker_container) but was renamed in 2.3 to C(docker_container) due to
         conflicts with the connection plugin.
       - Empty if I(state) is C(absent)
@@ -3262,8 +3263,8 @@ class AnsibleDockerClientContainer(AnsibleDockerClient):
             self.module.params['container_default_behavior'] = 'compatibility'
             self.module.deprecate(
                 'The container_default_behavior option will change its default value from "compatibility" to '
-                '"no_defaults" in Ansible 2.14. To remove this warning, please specify an explicit value for it now',
-                version='2.14'
+                '"no_defaults" in community.general 3.0.0. To remove this warning, please specify an explicit value for it now',
+                version='3.0.0', collection_name='community.general'  # was Ansible 2.14
             )
         if self.module.params['container_default_behavior'] == 'compatibility':
             old_default_values = dict(
@@ -3400,7 +3401,8 @@ def main():
         stop_timeout=dict(type='int'),
         sysctls=dict(type='dict'),
         tmpfs=dict(type='list', elements='str'),
-        trust_image_content=dict(type='bool', default=False, removed_in_version='2.14'),
+        trust_image_content=dict(type='bool', default=False, removed_in_version='2.0.0',
+                                 removed_from_collection='community.general'),  # was Ansible 2.12
         tty=dict(type='bool'),
         ulimits=dict(type='list', elements='str'),
         user=dict(type='str'),
@@ -3427,10 +3429,10 @@ def main():
             'Please note that docker_container handles networks slightly different than docker CLI. '
             'If you specify networks, the default network will still be attached as the first network. '
             '(You can specify purge_networks to remove all networks not explicitly listed.) '
-            'This behavior will change in Ansible 2.12. You can change the behavior now by setting '
+            'This behavior will change in community.general 2.0.0. You can change the behavior now by setting '
             'the new `networks_cli_compatible` option to `yes`, and remove this warning by setting '
             'it to `no`',
-            version='2.12'
+            version='2.0.0', collection_name='community.general',  # was Ansible 2.12
         )
     if client.module.params['networks_cli_compatible'] is True and client.module.params['networks'] and client.module.params['network_mode'] is None:
         client.module.deprecate(
@@ -3442,7 +3444,7 @@ def main():
             'Please make sure that the value you set to `network_mode` equals the inspection result '
             'for existing containers, otherwise the module will recreate them. You can find out the '
             'correct value by running "docker inspect --format \'{{.HostConfig.NetworkMode}}\' <container_name>"',
-            version='2.14'
+            version='3.0.0', collection_name='community.general',  # was Ansible 2.14
         )
 
     try:

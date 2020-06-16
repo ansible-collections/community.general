@@ -36,13 +36,16 @@
     state: absent
     force_absent: yes
 
+- set_fact:
+    build_deprecations: "{{ build.deprecations | map(attribute='msg') | list }}"
+
 - assert:
     that:
-    - '"Please specify build.container_limits instead of container_limits. The container_limits option has been renamed and will be removed in Ansible 2.12." in build.warnings'
-    - '"Please specify build.dockerfile instead of dockerfile. The dockerfile option has been renamed and will be removed in Ansible 2.12." in build.warnings'
-    - '"Please specify build.http_timeout instead of http_timeout. The http_timeout option has been renamed and will be removed in Ansible 2.12." in build.warnings'
-    - '"Please specify build.nocache instead of nocache. The nocache option has been renamed and will be removed in Ansible 2.12." in build.warnings'
-    - '"Please specify build.path instead of path. The path option has been renamed and will be removed in Ansible 2.12." in build.warnings'
-    - '"Please specify build.pull instead of pull. The pull option has been renamed and will be removed in Ansible 2.12." in build.warnings'
-    - '"Please specify build.rm instead of rm. The rm option has been renamed and will be removed in Ansible 2.12." in build.warnings'
-    - '"Please specify build.args instead of buildargs. The buildargs option has been renamed and will be removed in Ansible 2.12." in build.warnings'
+    - '"Please specify build.container_limits instead of container_limits. The container_limits option has been renamed" in build_deprecations'
+    - '"Please specify build.dockerfile instead of dockerfile. The dockerfile option has been renamed" in build_deprecations'
+    - '"Please specify build.http_timeout instead of http_timeout. The http_timeout option has been renamed" in build_deprecations'
+    - '"Please specify build.nocache instead of nocache. The nocache option has been renamed" in build_deprecations'
+    - '"Please specify build.path instead of path. The path option has been renamed" in build_deprecations'
+    - '"Please specify build.pull instead of pull. The pull option has been renamed" in build_deprecations'
+    - '"Please specify build.rm instead of rm. The rm option has been renamed" in build_deprecations'
+    - '"Please specify build.args instead of buildargs. The buildargs option has been renamed" in build_deprecations'
