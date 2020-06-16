@@ -66,7 +66,7 @@ options:
           - A message to include with notifications for this monitor.
           - Email notifications can be sent to specific users by using the same '@username' notation as events.
           - Monitor message template variables can be accessed by using double square brackets, i.e '[[' and ']]'.
-          - C(message) alias is deprecated in Ansible 2.10, since it is used internally by Ansible Core Engine.
+          - C(message) alias is deprecated in community.general 0.2.0, since it is used internally by Ansible Core Engine.
         type: str
         aliases: [ 'message' ]
     silenced:
