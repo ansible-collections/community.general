@@ -314,7 +314,7 @@ def main():
                              '`manager_attribute_value` are deprecated. '
                              'Use `manager_attributes` instead for passing in '
                              'the manager attribute name and value pairs',
-                             version='2.13')
+                             version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     # Return data back or fail with proper message
     if result['ret'] is True:

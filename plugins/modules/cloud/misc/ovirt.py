@@ -13,7 +13,7 @@ author:
 - Vincent Van der Kussen (@vincentvdk)
 short_description: oVirt/RHEV platform management
 deprecated:
-    removed_in: "2.14"
+    removed_in: 3.0.0  # was Ansible 2.14
     why: This module is for deprecated version of ovirt.
     alternative: Use C(ovirt_vm) from the C(ovirt.ovirt) collection instead
 description:

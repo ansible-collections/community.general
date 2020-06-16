@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 deprecated:
-  removed_in: '2.14'
+  removed_in: 3.0.0  # was Ansible 2.14
   why: For more details https://github.com/ansible/ansible/issues/61546.
-  alternative: Use M(helm) in kubernetes collection instead.
+  alternative: Use M(helm) in the community.kubernetes collection instead.
 module: helm
 short_description: Manages Kubernetes packages with the Helm package manager
 author: "Flavio Percoco (@flaper87)"

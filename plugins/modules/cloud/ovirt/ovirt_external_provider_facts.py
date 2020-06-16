@@ -28,7 +28,7 @@ module: ovirt_external_provider_facts
 short_description: Retrieve information about one or more oVirt/RHV external providers
 author: "Ondra Machacek (@machacekondra)"
 deprecated:
-    removed_in: "2.14"
+    removed_in: 3.0.0  # was Ansible 2.13
     why: When migrating to collection we decided to use only _info modules.
     alternative: Use C(ovirt_external_provider_info) from the C(ovirt.ovirt) collection instead
 description:
@@ -124,7 +124,8 @@ def main():
     is_old_facts = module._name in ('ovirt_external_provider_facts', 'community.general.ovirt_external_provider_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_external_provider_facts' module has been renamed to 'ovirt_external_provider_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     check_sdk(module)
 

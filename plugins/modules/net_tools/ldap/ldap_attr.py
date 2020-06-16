@@ -33,9 +33,9 @@ notes:
      handling.  The I(params) parameter started disallowing setting the I(bind_pw) parameter in
      Ansible-2.7 as it was insecure to set the parameter that way."
 deprecated:
-  removed_in: '2.14'
+  removed_in: 3.0.0  # was Ansible 2.14
   why: 'The current "ldap_attr" module does not support LDAP attribute insertions or deletions with objectClass dependencies.'
-  alternative: 'Use M(ldap_attrs) instead. Deprecated in 2.10.'
+  alternative: 'Use M(ldap_attrs) instead. Deprecated in Ansible 2.10.'
 author:
   - Jiri Tyr (@jtyr)
 requirements:

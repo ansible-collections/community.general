@@ -231,7 +231,8 @@ def main():
         supports_check_mode=True,
     )
     if module._name in ('jenkins_job_facts', 'community.general.jenkins_job_facts'):
-        module.deprecate("The 'jenkins_job_facts' module has been renamed to 'jenkins_job_info'", version='2.13')
+        module.deprecate("The 'jenkins_job_facts' module has been renamed to 'jenkins_job_info'",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     test_dependencies(module)
     jobs = list()

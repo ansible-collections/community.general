@@ -15,7 +15,7 @@ DOCUMENTATION = '''
       - This callback suppresses any non Failed or Changed status.
     deprecated:
         why: The 'default' callback plugin now supports this functionality
-        removed_in: '2.11'
+        removed_in: '2.0.0'  # was Ansible 2.11
         alternative: "'default' callback plugin with 'display_skipped_hosts = no' and 'display_ok_hosts = no' options"
     extends_documentation_fragment:
       - default_callback
@@ -32,7 +32,7 @@ DOCUMENTATION = '''
           - name: DISPLAY_SKIPPED_HOSTS
             deprecated:
               why: environment variables without "ANSIBLE_" prefix are deprecated
-              version: "2.12"
+              version: "2.0.0"  # was Ansible 2.12
               alternatives: the "ANSIBLE_DISPLAY_SKIPPED_HOSTS" environment variable
           - name: ANSIBLE_DISPLAY_SKIPPED_HOSTS
         ini:
