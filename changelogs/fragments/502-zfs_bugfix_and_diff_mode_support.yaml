@@ -1,4 +1,4 @@
 bugfixes:
-  - zfs.py - treated received properties as local
+  - zfs - treated received properties as local
 minor_changes:
-  - zfs.py - added diff mode support
+  - zfs - added diff mode support
