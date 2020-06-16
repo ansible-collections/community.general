@@ -247,7 +247,7 @@ def update_jks_perm(module, keystore_path):
     try:
         file_args = module.load_file_common_arguments(module.params, path=keystore_path)
     except TypeError:
-        # The path argument is only supported in Ansible-baes 2.10+. Fall back to
+        # The path argument is only supported in Ansible-base 2.10+. Fall back to
         # pre-2.10 behavior for older Ansible versions.
         module.params['path'] = keystore_path
         file_args = module.load_file_common_arguments(module.params)

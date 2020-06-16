@@ -330,7 +330,7 @@ EXAMPLES = r'''
     type: foreign_data_wrapper
     role: reader
 
-# Available since Ansible 2.10
+# Available since community.general 0.2.0
 - name: GRANT ALL PRIVILEGES ON TYPE customtype TO reader
   postgresql_privs:
     db: test
@@ -390,7 +390,7 @@ EXAMPLES = r'''
     role: reader
     target_roles: librarian
 
-# Available since Ansible 2.10
+# Available since community.general 0.2.0
 - name: Grant type privileges for pg_catalog.numeric type to alice
   postgresql_privs:
     type: type

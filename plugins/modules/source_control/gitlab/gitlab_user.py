@@ -18,7 +18,7 @@ description:
   - When the user exists and state=blocked, the user will be blocked.
   - When changes are made to user, the user will be updated.
 notes:
-  - From Ansible 2.10 and onwards, name, email and password are optional while deleting the user.
+  - From community.general 0.2.0 and onwards, name, email and password are optional while deleting the user.
 author:
   - Werner Dijkerman (@dj-wasabi)
   - Guillaume Martinez (@Lunik)

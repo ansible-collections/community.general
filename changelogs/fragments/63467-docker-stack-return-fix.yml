@@ -2,4 +2,4 @@ minor_changes:
   - docker_stack - Added ``stdout``, ``stderr``, and ``rc`` to return values.
 
 deprecated_features:
-  - docker_stack - Return values ``out`` and ``err`` have been deprecated and will be removed in Ansible 2.14. Use ``stdout`` and ``stderr`` instead.
+  - "docker_stack - Return values ``out`` and ``err`` have been deprecated and will be removed in community.general 3.0.0. Use ``stdout`` and ``stderr`` instead."  # was Ansible 2.14

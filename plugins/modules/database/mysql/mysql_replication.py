@@ -28,7 +28,7 @@ options:
       C(getslave) (SHOW SLAVE STATUS),
       C(startslave) (START SLAVE),
       C(stopslave) (STOP SLAVE),
-      C(resetmaster) (RESET MASTER) - supported from Ansible 2.10,
+      C(resetmaster) (RESET MASTER) - supported since community.general 0.2.0,
       C(resetslave) (RESET SLAVE),
       C(resetslaveall) (RESET SLAVE ALL).
     type: str

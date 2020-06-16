@@ -17,7 +17,7 @@ author:
 short_description: Notify airbrake about app deployments
 description:
    - Notify airbrake about app deployments (see U(https://airbrake.io/docs/api/#deploys-v4)).
-   - Parameter I(token) has been deprecated for Ansible 2.10. Please remove entry.
+   - Parameter I(token) has been deprecated for community.general 0.2.0. Please remove entry.
 options:
   project_id:
     description:
@@ -66,7 +66,7 @@ options:
     type: bool
   token:
      description:
-      - This parameter (API token) has been deprecated in Ansible 2.10. Please remove it from your tasks.
+      - This parameter (API token) has been deprecated in community.general 0.2.0. Please remove it from your tasks.
      required: false
      type: str
 
@@ -131,7 +131,8 @@ def main():
         if module.params["revision"]:
             params["deploy[scm_revision]"] = module.params["revision"]
 
-        module.deprecate("Parameter 'token' is deprecated in 2.10. Please remove it and use 'project_id' and 'project_key' instead",
+        module.deprecate("Parameter 'token' is deprecated since community.general 0.2.0. Please remove "
+                         "it and use 'project_id' and 'project_key' instead",
                          version='3.0.0', collection_name='community.general')  # was Ansible 2.14
 
         params["api_key"] = module.params["token"]
