@@ -24,7 +24,7 @@
   assert:
     that:
     - result is failed
-    - result.msg is search("unable to connect to database")
+    - result.msg is search("Connection refused")
 
 - name: Create database using default port
   mysql_db:
@@ -60,7 +60,7 @@
   assert:
     that:
     - result is failed
-    - result.msg is search("unable to connect to database")
+    - result.msg is search("Can't connect to MySQL server on '{{ fake_host }}'")
 
 # Clean up
 - name: Remove test db
