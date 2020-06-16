@@ -988,10 +988,10 @@ class Nmcli(object):
         # - nmcli: conn_name=my-eth1 ifname=eth1 type=ethernet ip4=192.0.2.100/24 gw4=192.0.2.1 state=present
         # nmcli con mod con-name my-eth1 ifname eth1 type ethernet ipv4.address 192.0.2.100/24 ipv4.gateway 192.0.2.1
         options = {
-            'ipv4.address': self.ip4,
+            'ipv4.addresses': self.ip4,
             'ipv4.gateway': self.gw4,
             'ipv4.dns': self.dns4,
-            'ipv6.address': self.ip6,
+            'ipv6.addresses': self.ip6,
             'ipv6.gateway': self.gw6,
             'ipv6.dns': self.dns6,
             'connection.autoconnect': self.bool_to_string(self.autoconnect),
