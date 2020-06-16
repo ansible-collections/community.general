@@ -1,2 +1,2 @@
 bugfixes:
- - slackpkg - fix matching some special cases in package names.
+ - slackpkg - fix matching some special cases in package names (https://github.com/ansible-collections/community.general/pull/505).
