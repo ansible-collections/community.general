@@ -115,6 +115,14 @@
 # ============================================================
 # Create users with TLS requirements and verify requirements are assigned
 #
+- name: find out the database version
+  mysql_info:
+    login_unix_socket: '{{ mysql_socket }}'
+    filter: version
+  register: db_ver
+- debug:
+    var: db_var
+    
 - name: create user with TLS requirements state=present (expect changed=true)
   mysql_user:
     name: '{{ item[0] }}'
