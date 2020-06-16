@@ -1,7 +1,8 @@
 - set_fact:
     db_to_create=testdb1
-    config_file="/root/.my.cnf"
+    config_file="/root/.my1.cnf"
     fake_port=9999
+    fake_host="blahblah.local"
 
 - name: Create custom config file
   shell: 'echo "[client]" > {{ config_file }}'
@@ -39,6 +40,27 @@
   assert:
     that:
     - result is changed
+
+- name: Reinit custom config file
+  shell: 'echo "[client]" > {{ config_file }}'
+
+- name: Add fake host to config file
+  shell: 'echo "host = {{ fake_host }}" >> {{ config_file }}'
+
+- name: Remove database using fake login_host
+  mysql_db:
+    name: '{{ db_to_create }}'
+    state: absent
+    config_file: '{{ config_file }}'
+    config_overrides_defaults: yes
+  register: result
+  ignore_errors: yes
+
+- name: Must fail because login_host default has beed overriden by wrong value from config file
+  assert:
+    that:
+    - result is failed
+    - result.msg is search("unable to connect to database")
 
 # Clean up
 - name: Remove test db
