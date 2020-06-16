@@ -29,7 +29,7 @@ options:
     choices: ['present','absent']
   wait:
     description:
-      - This option does nothing and will be removed in Ansible 2.14.
+      - This option does nothing and will be removed in community.general 3.0.0.
     type: bool
 requirements:
     - python = 2.7
@@ -183,7 +183,7 @@ class ClcAntiAffinityPolicy:
         argument_spec = dict(
             name=dict(required=True),
             location=dict(required=True),
-            wait=dict(type='bool', removed_in_version='2.14'),
+            wait=dict(type='bool', removed_in_version='3.0.0', removed_from_collection='community.general'),  # was Ansible 2.14
             state=dict(default='present', choices=['present', 'absent']),
         )
         return argument_spec

@@ -93,7 +93,7 @@ options:
     description:
       - UUID of another server to create an anti-affinity group with.
       - Mutually exclusive with I(server_groups).
-      - Deprecated, removed in version 2.11.
+      - Deprecated, removed in community.general 2.0.0.
     type: str
   server_groups:
     description:
@@ -245,7 +245,7 @@ ssh_host_keys:
 anti_affinity_with:
   description:
   - List of servers in the same anti-affinity group
-  - Deprecated, removed in version 2.11.
+  - Deprecated, removed in community.general 2.0.0.
   returned: success when not state == absent
   type: list
   sample: []
@@ -521,7 +521,7 @@ def main():
         use_public_network=dict(type='bool', default=True),
         use_private_network=dict(type='bool', default=False),
         use_ipv6=dict(type='bool', default=True),
-        anti_affinity_with=dict(removed_in_version='2.11'),
+        anti_affinity_with=dict(removed_in_version='2.0.0', removed_from_collection='community.general'),  # was Ansible 2.11
         server_groups=dict(type='list'),
         user_data=dict(),
         force=dict(type='bool', default=False),

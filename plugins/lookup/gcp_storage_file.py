@@ -24,7 +24,7 @@ options:
       - The name of the bucket.
     required: false
 extends_documentation_fragment:
-- community.general.gcp
+- community.general._gcp
 
 '''
 

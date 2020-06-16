@@ -14,7 +14,7 @@ DOCUMENTATION = '''
     short_description: Splits output, sending failed tasks to stderr
     deprecated:
         why: The 'default' callback plugin now supports this functionality
-        removed_in: '2.11'
+        removed_in: '2.0.0'  # was Ansible 2.11
         alternative: "'default' callback plugin with 'display_failed_stderr = yes' option"
     extends_documentation_fragment:
       - default_callback

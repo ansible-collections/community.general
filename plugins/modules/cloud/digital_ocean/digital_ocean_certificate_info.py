@@ -100,7 +100,8 @@ def main():
     )
     module = AnsibleModule(argument_spec=argument_spec)
     if module._name in ('digital_ocean_certificate_facts', 'community.general.digital_ocean_certificate_facts'):
-        module.deprecate("The 'digital_ocean_certificate_facts' module has been renamed to 'digital_ocean_certificate_info'", version='2.13')
+        module.deprecate("The 'digital_ocean_certificate_facts' module has been renamed to 'digital_ocean_certificate_info'",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     try:
         core(module)

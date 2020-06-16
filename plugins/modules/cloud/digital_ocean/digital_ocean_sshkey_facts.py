@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 ---
 module: digital_ocean_sshkey_facts
 deprecated:
-  removed_in: '2.13'
+  removed_in: 3.0.0  # was Ansible 2.13
   why: Deprecated in favour of C(_info) module.
   alternative: Use M(digital_ocean_sshkey_info) instead.
 short_description: DigitalOcean SSH keys facts
@@ -91,7 +91,8 @@ def main():
         supports_check_mode=False,
     )
 
-    module.deprecate("The 'digital_ocean_sshkey_facts' module has been deprecated, use the new 'digital_ocean_sshkey_info' module", version='2.13')
+    module.deprecate("The 'digital_ocean_sshkey_facts' module has been deprecated, use the new 'digital_ocean_sshkey_info' module",
+                     version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     core(module)
 

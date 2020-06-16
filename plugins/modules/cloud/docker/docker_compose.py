@@ -308,7 +308,7 @@ services:
   - A dictionary mapping the service's name to a dictionary of containers.
   - Note that facts are part of the registered vars since Ansible 2.8. For compatibility reasons, the facts
     are also accessible directly. The service's name is the variable with which the container dictionary
-    can be accessed. Note that the returned facts will be removed in Ansible 2.12.
+    can be accessed. Note that the returned facts will be removed in community.general 2.0.0.
   returned: success
   type: complex
   contains:
@@ -1136,7 +1136,8 @@ def main():
         min_docker_api_version='1.20',
     )
     if client.module._name in ('docker_service', 'community.general.docker_service'):
-        client.module.deprecate("The 'docker_service' module has been renamed to 'docker_compose'.", version='2.12')
+        client.module.deprecate("The 'docker_service' module has been renamed to 'docker_compose'.",
+                                version='2.0.0', collection_name='community.general')  # was Ansible 2.12
 
     try:
         result = ContainerManager(client).exec_module()

@@ -162,7 +162,8 @@ def main():
     is_old_facts = module._name in ('hpilo_facts', 'community.general.hpilo_facts')
     if is_old_facts:
         module.deprecate("The 'hpilo_facts' module has been renamed to 'hpilo_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     if not HAS_HPILO:
         module.fail_json(msg=missing_required_lib('python-hpilo'), exception=HPILO_IMP_ERR)

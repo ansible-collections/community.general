@@ -21,7 +21,7 @@ requirements:
   - "google-auth >= 0.9.0"
   - "google-auth-httplib2 >= 0.0.2"
 deprecated:
-    removed_in: "2.12"
+    removed_in: 2.0.0  # was Ansible 2.12
     why: Updated modules released with increased functionality
     alternative: Use M(gcp_compute_target_http_proxy) instead.
 notes:
