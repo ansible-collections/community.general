@@ -110,7 +110,8 @@ class ActionModule(ActionBase):
                         msg = "Setting the async dir from the environment keyword " \
                               "ANSIBLE_ASYNC_DIR is deprecated. Set the async_dir " \
                               "shell option instead"
-                        display.deprecated(msg, "2.12")
+                        display.deprecated(msg, version='2.0.0',
+                                           collection_name='community.general')  # was Ansible 2.12
                     else:
                         # inject the async directory based on the shell option into the
                         # module args
