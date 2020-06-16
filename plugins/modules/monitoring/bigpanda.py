@@ -133,7 +133,9 @@ def main():
             env=dict(required=False),
             owner=dict(required=False),
             description=dict(required=False),
-            deployment_message=dict(required=False, aliases=['message'], deprecated_aliases=[dict(name='message', version='2.14')]),
+            deployment_message=dict(required=False, aliases=['message'],
+                                    deprecated_aliases=[dict(name='message', version='3.0.0',
+                                                             collection_name='community.general')]),  # was Ansible 2.14
             source_system=dict(required=False, default='ansible'),
             validate_certs=dict(default='yes', type='bool'),
             url=dict(required=False, default='https://api.bigpanda.io'),

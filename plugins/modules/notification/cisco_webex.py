@@ -174,7 +174,9 @@ def main():
             recipient_id=dict(required=True, no_log=True),
             msg_type=dict(required=False, default='text', aliases=['message_type'], choices=['text', 'markdown']),
             personal_token=dict(required=True, no_log=True, aliases=['token']),
-            msg=dict(required=True, aliases=['message']),
+            msg=dict(required=True, aliases=['message'],
+                     deprecated_aliases=[dict(name='message', version='3.0.0',
+                                              collection_name='community.general')]),  # was Ansible 2.14
         ),
 
         supports_check_mode=True

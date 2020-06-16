@@ -160,7 +160,8 @@ class EnclosureInfoModule(OneViewModuleBase):
         self.is_old_facts = self.module._name in ('oneview_enclosure_facts', 'community.general.oneview_enclosure_facts')
         if self.is_old_facts:
             self.module.deprecate("The 'oneview_enclosure_facts' module has been renamed to 'oneview_enclosure_info', "
-                                  "and the renamed one no longer returns ansible_facts", version='2.13')
+                                  "and the renamed one no longer returns ansible_facts",
+                                  version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     def execute_module(self):
 

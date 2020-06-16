@@ -256,7 +256,8 @@ def main():
                            mutually_exclusive=[['ids', 'name']],
                            supports_check_mode=True)
     if module._name in ('one_image_facts', 'community.general.one_image_facts'):
-        module.deprecate("The 'one_image_facts' module has been renamed to 'one_image_info'", version='2.13')
+        module.deprecate("The 'one_image_facts' module has been renamed to 'one_image_info'",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     if not HAS_PYONE:
         module.fail_json(msg='This module requires pyone to work!')

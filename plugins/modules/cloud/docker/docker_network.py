@@ -82,7 +82,7 @@ options:
   ipam_options:
     description:
       - Dictionary of IPAM options.
-      - Deprecated in 2.8, will be removed in 2.12. Use parameter I(ipam_config) instead. In Docker 1.10.0, IPAM
+      - Deprecated in 2.8, will be removed in community.general 2.0.0. Use parameter I(ipam_config) instead. In Docker 1.10.0, IPAM
         options were introduced (see L(here,https://github.com/moby/moby/pull/17316)). This module parameter addresses
         the IPAM config not the newly introduced IPAM options. For the IPAM options, see the I(ipam_driver_options)
         parameter.
@@ -271,7 +271,7 @@ network:
     description:
     - Network inspection results for the affected network.
     - Note that facts are part of the registered vars since Ansible 2.8. For compatibility reasons, the facts
-      are also accessible directly as C(docker_network). Note that the returned fact will be removed in Ansible 2.12.
+      are also accessible directly as C(docker_network). Note that the returned fact will be removed in community.general 2.0.0.
     returned: success
     type: dict
     sample: {}
@@ -668,7 +668,7 @@ def main():
             iprange=dict(type='str'),
             gateway=dict(type='str'),
             aux_addresses=dict(type='dict'),
-        ), removed_in_version='2.12'),
+        ), removed_in_version='2.0.0', removed_from_collection='community.general'),  # was Ansible 2.12
         ipam_config=dict(type='list', elements='dict', options=dict(
             subnet=dict(type='str'),
             iprange=dict(type='str'),

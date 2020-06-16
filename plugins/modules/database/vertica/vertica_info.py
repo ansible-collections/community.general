@@ -231,7 +231,8 @@ def main():
     is_old_facts = module._name in ('vertica_facts', 'community.general.vertica_facts')
     if is_old_facts:
         module.deprecate("The 'vertica_facts' module has been renamed to 'vertica_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     if not pyodbc_found:
         module.fail_json(msg=missing_required_lib('pyodbc'), exception=PYODBC_IMP_ERR)
