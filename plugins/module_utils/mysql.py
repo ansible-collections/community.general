@@ -61,8 +61,13 @@ def mysql_connect(module, login_user=None, login_password=None, config_file='', 
         cp = parse_from_mysql_config_file(config_file)
         # Override some commond defaults with values from config file if needed
         if cp and cp.has_section('client') and config_overrides_defaults:
-            module.params['login_host'] = cp.get('client', 'host', fallback=module.params['login_host'])
-            module.params['login_port'] = cp.getint('client', 'port', fallback=module.params['login_port'])
+            try:
+                module.params['login_host'] = cp.get('client', 'host', fallback=module.params['login_host'])
+                module.params['login_port'] = cp.getint('client', 'port', fallback=module.params['login_port'])
+            except Exception as e:
+                if "got an unexpected keyword argument 'fallback'" in e.message:
+                    module.fail_json('To use config_overrides_defaults, '
+                                     'it needs Python 3.5+ as the default interpreter on a target host')
 
     if ssl_ca is not None or ssl_key is not None or ssl_cert is not None:
         config['ssl'] = {}

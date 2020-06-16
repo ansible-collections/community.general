@@ -149,6 +149,7 @@ options:
       - If C(yes), connection parameters from I(config_file) will override the default
         values of I(login_host) and I(login_port) parameters.
       - Used when I(stat) is C(present) or C(absent), ignored otherwise.
+      - It needs Python 3.5+ as the default interpreter on a target host.
     type: bool
     default: no
     version_added: '0.2.0'
