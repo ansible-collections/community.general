@@ -1,1 +1,0 @@
-./cloud/cloudscale/cloudscale_floating_ip.py
