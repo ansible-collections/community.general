@@ -35,7 +35,7 @@ notes:
 deprecated:
   removed_in: 3.0.0  # was Ansible 2.14
   why: 'The current "ldap_attr" module does not support LDAP attribute insertions or deletions with objectClass dependencies.'
-  alternative: 'Use M(ldap_attrs) instead. Deprecated in Ansible 2.10.'
+  alternative: 'Use M(ldap_attrs) instead. Deprecated in community.general 0.2.0.'
 author:
   - Jiri Tyr (@jtyr)
 requirements:

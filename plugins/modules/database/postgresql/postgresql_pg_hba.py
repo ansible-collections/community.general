@@ -79,7 +79,7 @@ options:
       - The entries will be written out in a specific order.
         With this option you can control by which field they are ordered first, second and last.
         s=source, d=databases, u=users.
-        This option is deprecated since 2.9 and will be removed in 2.11.
+        This option is deprecated since 2.9 and will be removed in community.general 3.0.0.
         Sortorder is now hardcoded to sdu.
     type: str
     default: sdu
@@ -670,7 +670,8 @@ def main():
         method=dict(type='str', default='md5', choices=PG_HBA_METHODS),
         netmask=dict(type='str'),
         options=dict(type='str'),
-        order=dict(type='str', default="sdu", choices=PG_HBA_ORDERS),
+        order=dict(type='str', default="sdu", choices=PG_HBA_ORDERS,
+                   removed_in_version='3.0.0', removed_from_collection='community.general'),
         state=dict(type='str', default="present", choices=["absent", "present"]),
         users=dict(type='str', default='all')
     )

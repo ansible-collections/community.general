@@ -45,7 +45,7 @@ options:
     description:
       - CA certificate string used to validate the feed source SSL certificate.
         This can be the file content or the path to the file.
-        The ca_cert alias will be removed in Ansible 2.14.
+        The ca_cert alias will be removed in community.general 3.0.0.
     type: str
     aliases: [ importer_ssl_ca_cert, ca_cert ]
   feed_client_cert:
@@ -57,7 +57,7 @@ options:
         single file containing both the certificate and private key. This can be
         the file content or the path to the file.
       - If not specified the default value will come from client_cert. Which will
-        change in Ansible 2.14.
+        change in community.general 3.0.0.
     type: str
     aliases: [ importer_ssl_client_cert ]
   feed_client_key:
@@ -66,7 +66,7 @@ options:
         assuming it is not included in the certificate file itself. This can be
         the file content or the path to the file.
       - If not specified the default value will come from client_key. Which will
-        change in Ansible 2.14.
+        change in community.general 3.0.0.
     type: str
     aliases: [ importer_ssl_client_key ]
   name:
@@ -564,13 +564,14 @@ def main():
         importer_ssl_client_cert = module.params['client_cert']
         module.deprecate("To specify client certificates to be used with the repo to sync, and not for communication with the "
                          "Pulp instance, use the new options `feed_client_cert` and `feed_client_key` (available since "
-                         "Ansible 2.9.2). Until Ansible 2.14, the default value for `feed_client_cert` will be taken from "
-                         "`client_cert` if only the latter is specified",
+                         "Ansible 2.9.2). Until community.general 3.0.0, the default value for `feed_client_cert` will be "
+                         "taken from `client_cert` if only the latter is specified",
                          version="3.0.0", collection_name='community.general')  # was Ansible 2.14
     importer_ssl_client_key = module.params['feed_client_key']
     if importer_ssl_client_key is None and module.params['client_key'] is not None:
         importer_ssl_client_key = module.params['client_key']
-        module.deprecate("In Ansible 2.9.2 `feed_client_key` option was added. Until 2.14 the default value will come from client_key option",
+        module.deprecate("In Ansible 2.9.2 `feed_client_key` option was added. Until community.general 3.0.0 the default "
+                         "value will come from client_key option",
                          version="3.0.0", collection_name='community.general')  # was Ansible 2.14
     proxy_host = module.params['proxy_host']
     proxy_port = module.params['proxy_port']
