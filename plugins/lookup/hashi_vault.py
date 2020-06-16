@@ -22,9 +22,9 @@ DOCUMENTATION = """
     - Retrieve secrets from HashiCorp's vault.
   notes:
     - Due to a current limitation in the HVAC library there won't necessarily be an error if a bad endpoint is specified.
-    - As of Ansible 2.10, only the latest version of a secret is returned when specifying a KV v2 path.
-    - As of Ansible 2.10, all options can be supplied via term string (space delimited key=value pairs) or by parameters (see examples).
-    - As of Ansible 2.10, when C(secret) is the first option in the term string, C(secret=) is not required (see examples).
+    - As of community.general 0.2.0, only the latest version of a secret is returned when specifying a KV v2 path.
+    - As of community.general 0.2.0, all options can be supplied via term string (space delimited key=value pairs) or by parameters (see examples).
+    - As of community.general 0.2.0, when C(secret) is the first option in the term string, C(secret=) is not required (see examples).
   options:
     secret:
       description: query you are making.
@@ -79,7 +79,7 @@ DOCUMENTATION = """
       description:
         - Authentication method to be used.
         - C(userpass) is added in Ansible 2.8.
-        - C(aws_iam_login) is added in Ansible 2.10.
+        - C(aws_iam_login) is added in community.general 0.2.0.
       env:
         - name: VAULT_AUTH_METHOD
       ini:
@@ -96,7 +96,7 @@ DOCUMENTATION = """
     return_format:
       description:
         - Controls how multiple key/value pairs in a path are treated on return.
-        - C(dict) returns a single dict containing the key/value pairs (same behavior as before Ansible 2.10).
+        - C(dict) returns a single dict containing the key/value pairs (same behavior as before community.general 0.2.0).
         - C(values) returns a list of all the values only. Use when you don't care about the keys.
         - C(raw) returns the actual API result, which includes metadata and may have the data nested in other keys.
       choices:
@@ -198,7 +198,7 @@ EXAMPLES = """
   debug:
     msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/data/hello token=my_vault_token url=http://myvault_url:8200') }}"
 
-# The following examples work in collection releases after Ansible 2.10
+# The following examples work in collection releases after community.general 0.2.0
 
 - name: secret= is not required if secret is first
   debug:

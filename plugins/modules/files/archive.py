@@ -554,7 +554,7 @@ def main():
     try:
         file_args = module.load_file_common_arguments(params, path=b_dest)
     except TypeError:
-        # The path argument is only supported in Ansible 2.10+. Fall back to
+        # The path argument is only supported in Ansible-base 2.10+. Fall back to
         # pre-2.10 behavior for older Ansible versions.
         params['path'] = b_dest
         file_args = module.load_file_common_arguments(params)
