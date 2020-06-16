@@ -34,9 +34,9 @@ options:
     required: true
   log_error_path:
     description:
-      - The path to the root of the Terraform directory with the
-        vars.tf/main.tf/etc to use.
-    required: false
+      - The path to the terraform directory to log error(s).
+    type: path
+    version_added: 0.2.0
   workspace:
     description:
       - The terraform workspace to work with.
@@ -116,7 +116,7 @@ EXAMPLES = """
 - name: Define the backend configuration at init
   terraform:
     project_path: 'project/'
-    log_error_path: 'error/'
+    log_error_path: './path_for_error/error.txt'
     state: "{{ state }}"
     force_init: true
     backend_config:
@@ -167,36 +167,43 @@ from ansible.module_utils.basic import AnsibleModule
 DESTROY_ARGS = ('destroy', '-no-color', '-force')
 APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve=true')
 module = None
-current_DateTime = datetime.now().strftime("%d/%m/%Y %H:%M:$S")
+current_DateTime = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+
+def write_error_to_file(log_error_path, content):
+    error_dir_name, error_file_name = os.path.split(log_error_path)
+    if not os.path.exists(error_dir_name):
+        os.mkdir(error_dir_name)
+        if not os.path.exists(error_file_name):
+            with open(log_error_path, 'w+') as file:
+                writer = csv.writer(file, delimiter=',')
+                writer.writerow(StringIO('ERROR RECORDED on ' + current_DateTime + '\r' + content))
+    elif os.path.exists(log_error_path):
+        with open(log_error_path, 'a+', newline='') as file_o:
+            writer = csv.writer(file_o, delimiter=',')
+            writer.writerow(StringIO('ERROR RECORDED on ' + current_DateTime + '\r' + content))
 
 
 def preflight_validation(bin_path, project_path, log_error_path, variables_args=None, plan_file=None):
-    dir_name = log_error_path
 
     if project_path in [None, ''] or '/' not in project_path:
+        if log_error_path is not None:
+            write_error_to_file(log_error_path, "Path for Terraform project can not be None or ''.")
         module.fail_json(msg="Path for Terraform project can not be None or ''.")
     if not os.path.exists(bin_path):
+        if log_error_path is not None:
+            write_error_to_file(log_error_path, "Path for Terraform binary '{0}' doesn't exist on this host.".format(bin_path))
         module.fail_json(msg="Path for Terraform binary '{0}' doesn't exist on this host - check the path and try again please.".format(bin_path))
     if not os.path.isdir(project_path):
+        if log_error_path is not None:
+            write_error_to_file(log_error_path, "Path for Terraform project '{0}' doesn't exist on this host. ".format(project_path))
         module.fail_json(msg="Path for Terraform project '{0}' doesn't exist on this host - check the path and try again please.".format(project_path))
 
     rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, cwd=project_path, use_unsafe_shell=True)
     if rc != 0:
-        with open(dir_name, 'a+', newline='') as file_op:
-            writer = csv.writer(file_op)
-            writer.writerow(StringIO("ERROR RECORDED on " + current_DateTime + '\r\n' + err))
+        if log_error_path is not None:
+            write_error_to_file(log_error_path, "Failed to validate Terraform configuration files:\r\n{0}".format(err))
         module.fail_json(msg="Failed to validate Terraform configuration files:\r\n{0}".format(err))
-
-
-def create_error_file_and_directory(log_error_path):
-    error_directory_name, error_file_name = os.path.split(log_error_path)
-    if not os.path.exists(error_directory_name):
-        os.makedirs(error_directory_name)
-
-    if not os.path.exists(log_error_path):
-        with open(log_error_path, 'w') as file:
-            writer = csv.writer(file, delimiter=',')
-            writer.writerow(StringIO(file))
 
 
 def _state_args(state_file):
@@ -320,7 +327,6 @@ def main():
     force_init = module.params.get('force_init')
     backend_config = module.params.get('backend_config')
 
-    create_error_file_and_directory(log_error_path)
 
     if bin_path is not None:
         command = [bin_path]
