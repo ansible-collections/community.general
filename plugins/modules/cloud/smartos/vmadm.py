@@ -30,7 +30,7 @@ options:
     choices: [ joyent, joyent-minimal, lx, kvm, bhyve ]
     default: joyent
     description:
-      - Type of virtual machine. The C(bhyve) option was added in Ansible 2.10.
+      - Type of virtual machine. The C(bhyve) option was added in community.general 0.2.0.
   boot:
     required: false
     description:
