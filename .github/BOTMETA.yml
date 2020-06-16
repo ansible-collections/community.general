@@ -713,8 +713,6 @@ files:
     authors: drcapulet
   $modules/net_tools/dnsmadeeasy.py:
     authors: briceburg
-  $modules/net_tools/exoscale/:
-    authors: resmo
   $modules/net_tools/haproxy.py:
     authors: ravibhure
   $modules/net_tools/:
