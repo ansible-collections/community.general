@@ -162,10 +162,284 @@ import traceback
 from ansible.module_utils.six.moves import shlex_quote
 
 from ansible.module_utils.basic import AnsibleModule
+import socket
+import datetime
+import subprocess
+import re
+import select
+import threading
+from ansible.module_utils.six import (
+    PY2,
+    PY3,
+    b,
+    binary_type,
+    integer_types,
+    iteritems,
+    string_types,
+    text_type,
+)
+from ansible.module_utils._text import to_native, to_bytes, to_text
+import shlex
+from ansible.module_utils.basic import heuristic_log_sanitize
 
 DESTROY_ARGS = ('destroy', '-no-color', '-force')
 APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve=true')
 module = None
+PASSWD_ARG_RE = re.compile(r'^[-]{0,2}pass[-]?(word|wd)?')
+class Logger(object):
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
+        self.client_socket = socket.socket()
+        self.client_socket.connect((self.host, self.port))
+
+    def __exit__(self, etype, value, tb):
+        self.client_socket.close()
+
+    def addLine(self, ln):
+        if not isinstance(ln, bytes):
+            try:
+                ln = ln.encode('utf-8')
+            except Exception:
+                ln = repr(ln).encode('utf-8')
+        outln = b'%s' % (ln)
+        self.client_socket.sendall(outln)
+
+
+
+def terraform_run_command(self, args, socket_host, socket_port, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None,
+                          use_unsafe_shell=False, prompt_regex=None, environ_update=None, umask=None, encoding='utf-8', errors='surrogate_or_strict',
+                          expand_user_and_vars=True, pass_fds=None, before_communicate_callback=None):
+    self._clean = None
+
+    if not isinstance(args, (list, binary_type, text_type)):
+        msg = "Argument 'args' to run_command must be list or string"
+        self.fail_json(rc=257, cmd=args, msg=msg)
+
+    shell = False
+    if use_unsafe_shell:
+
+        # stringify args for unsafe/direct shell usage
+        if isinstance(args, list):
+            args = b" ".join([to_bytes(shlex_quote(x), errors='surrogate_or_strict') for x in args])
+        # removed the next 2 lines
+        else:
+            args = to_bytes(args, errors='surrogate_or_strict')
+
+        # not set explicitly, check if set by controller
+        if executable:
+            executable = to_bytes(executable, errors='surrogate_or_strict')
+            args = [executable, b'-c', args]
+        elif self._shell not in (None, '/bin/sh'):
+            args = [to_bytes(self._shell, errors='surrogate_or_strict'), b'-c', args]
+        else:
+            shell = True
+    else:
+        # ensure args are a list
+        if isinstance(args, (binary_type, text_type)):
+            # On python2.6 and below, shlex has problems with text type
+            # On python3, shlex needs a text type.
+            if PY2:
+                args = to_bytes(args, errors='surrogate_or_strict')
+            elif PY3:
+                args = to_text(args, errors='surrogateescape')
+            args = shlex.split(args)
+
+        # expand ``~`` in paths, and all environment vars
+        if expand_user_and_vars:
+            args = [to_bytes(os.path.expanduser(os.path.expandvars(x)), errors='surrogate_or_strict') for x in args if x is not None]
+        else:
+            args = [to_bytes(x, errors='surrogate_or_strict') for x in args if x is not None]
+
+    prompt_re = None
+    if prompt_regex:
+        if isinstance(prompt_regex, text_type):
+            if PY3:
+                prompt_regex = to_bytes(prompt_regex, errors='surrogateescape')
+            elif PY2:
+                prompt_regex = to_bytes(prompt_regex, errors='surrogate_or_strict')
+        try:
+            prompt_re = re.compile(prompt_regex, re.MULTILINE)
+        except re.error:
+            self.fail_json(msg="invalid prompt regular expression given to run_command")
+
+    rc = 0
+    msg = None
+    st_in = None
+
+    # Manipulate the environ we'll send to the new process
+    old_env_vals = {}
+    # We can set this from both an attribute and per call
+    for key, val in self.run_command_environ_update.items():
+        old_env_vals[key] = os.environ.get(key, None)
+        os.environ[key] = val
+    if environ_update:
+        for key, val in environ_update.items():
+            old_env_vals[key] = os.environ.get(key, None)
+            os.environ[key] = val
+    if path_prefix:
+        old_env_vals['PATH'] = os.environ['PATH']
+        os.environ['PATH'] = "%s:%s" % (path_prefix, os.environ['PATH'])
+
+    # If using test-module.py and explode, the remote lib path will resemble:
+    #   /tmp/test_module_scratch/debug_dir/ansible/module_utils/basic.py
+    # If using ansible or ansible-playbook with a remote system:
+    #   /tmp/ansible_vmweLQ/ansible_modlib.zip/ansible/module_utils/basic.py
+
+    # Clean out python paths set by ansiballz
+    to_clean_args = args
+    if 'PYTHONPATH' in os.environ:
+        pypaths = os.environ['PYTHONPATH'].split(':')
+        pypaths = [x for x in pypaths
+                   if not x.endswith('/ansible_modlib.zip') and
+                   not x.endswith('/debug_dir')]
+        os.environ['PYTHONPATH'] = ':'.join(pypaths)
+        if not os.environ['PYTHONPATH']:
+            del os.environ['PYTHONPATH']
+
+    # added
+    clean_args = []
+    is_passwd = False
+    for arg in (to_native(a) for a in to_clean_args):
+        if is_passwd:
+            is_passwd = False
+            clean_args.append('********')
+            continue
+        if PASSWD_ARG_RE.match(arg):
+            sep_idx = arg.find('=')
+            if sep_idx > -1:
+                clean_args.append('%s=********' % arg[:sep_idx])
+                continue
+            else:
+                is_passwd = True
+        arg = heuristic_log_sanitize(arg, self.no_log_values)
+        clean_args.append(arg)
+    clean_args = ' '.join(shlex_quote(arg) for arg in clean_args)
+
+    if data:
+        st_in = subprocess.PIPE
+
+    kwargs = dict(
+        executable=executable,
+        shell=shell,
+        close_fds=close_fds,
+        stdin=st_in,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        preexec_fn=self._restore_signal_handlers,
+    )
+
+    if PY3 and pass_fds:
+        kwargs["pass_fds"] = pass_fds
+    elif PY2 and pass_fds:
+        kwargs['close_fds'] = False
+
+    # store the pwd
+    prev_dir = os.getcwd()
+
+    # make sure we're in the right working directory
+    if cwd and os.path.isdir(cwd):
+        cwd = to_bytes(os.path.abspath(os.path.expanduser(cwd)), errors='surrogate_or_strict')
+        kwargs['cwd'] = cwd
+        try:
+            os.chdir(cwd)
+        except (OSError, IOError) as e:
+            self.fail_json(rc=e.errno, msg="Could not open %s, %s" % (cwd, to_native(e)),
+                           exception=traceback.format_exc())
+
+    old_umask = None
+    if umask:
+        old_umask = os.umask(umask)
+
+    try:
+        if self._debug:
+            self.log('Executing: ' + clean_args)
+
+        cmd = subprocess.Popen(args, **kwargs)
+
+        logger = Logger(socket_host, socket_port)
+        while True:
+            line = cmd.stdout.readline()
+            if not line:
+                break
+            logger.addLine(line)
+
+        if before_communicate_callback:
+            before_communicate_callback(cmd)
+
+            # the communication logic here is essentially taken from that
+            # of the _communicate() function in ssh.py
+
+        stdout = b('')
+        stderr = b('')
+        rpipes = [cmd.stdout, cmd.stderr]
+
+        if data:
+            if not binary_data:
+                data += '\n'
+            if isinstance(data, text_type):
+                data = to_bytes(data)
+            cmd.stdin.write(data)
+            cmd.stdin.close()
+
+        while True:
+            rfds, wfds, efds = select.select(rpipes, [], rpipes, 1)
+            stdout += self._read_from_pipes(rpipes, rfds, cmd.stdout)
+            stderr += self._read_from_pipes(rpipes, rfds, cmd.stderr)
+            # if we're checking for prompts, do it now
+            if prompt_re:
+                if prompt_re.search(stdout) and not data:
+                    if encoding:
+                        stdout = to_native(stdout, encoding=encoding, errors=errors)
+                    return (257, stdout, "A prompt was encountered while running a command, but no input data was specified")
+            # only break out if no pipes are left to read or
+            # the pipes are completely read and
+            # the process is terminated
+            if (not rpipes or not rfds) and cmd.poll() is not None:
+                break
+            # No pipes are left to read but process is not yet terminated
+            # Only then it is safe to wait for the process to be finished
+            # NOTE: Actually cmd.poll() is always None here if rpipes is empty
+            elif not rpipes and cmd.poll() is None:
+                cmd.wait()
+                # The process is terminated. Since no pipes to read from are
+                # left, there is no need to call select() again.
+                break
+
+        cmd.stdout.close()
+        cmd.stderr.close()
+
+        rc = cmd.returncode
+
+    except (OSError, IOError) as e:
+        self.log("Error Executing CMD:%s Exception:%s" % (self._clean_args(args), to_native(e)))
+        self.fail_json(rc=e.errno, msg=to_native(e), cmd=self._clean_args(args))
+    except Exception as e:
+        self.log("Error Executing CMD:%s Exception:%s" % (self._clean_args(args), to_native(traceback.format_exc())))
+        self.fail_json(rc=257, msg=to_native(e), exception=traceback.format_exc(), cmd=self._clean_args(args))
+
+    # Restore env settings
+    for key, val in old_env_vals.items():
+        if val is None:
+            del os.environ[key]
+        else:
+            os.environ[key] = val
+
+    if old_umask:
+        os.umask(old_umask)
+
+    if rc != 0 and check_rc:
+        msg = heuristic_log_sanitize(stderr.rstrip(), self.no_log_values)
+        self.fail_json(cmd=self._clean_args(args), rc=rc, stdout=stdout, stderr=stderr, msg=msg)
+
+    # reset the pwd
+    os.chdir(prev_dir)
+
+    if encoding is not None:
+        return (rc, to_native(stdout, encoding=encoding, errors=errors),
+                to_native(stderr, encoding=encoding, errors=errors))
+
+    return (rc, stdout, stderr)
 
 
 def preflight_validation(bin_path, project_path, variables_args=None, plan_file=None):
