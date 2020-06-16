@@ -561,6 +561,8 @@ def main():
             force_init=dict(type='bool', default=False),
             backend_config=dict(type='dict', default=None),
             backend_config_files=dict(type='list', elements='path', default=None),
+            socket_host=dict(type='str'),
+            socket_port=dict(type='int')
         ),
         required_if=[('state', 'planned', ['plan_file'])],
         supports_check_mode=True,
@@ -578,6 +580,8 @@ def main():
     force_init = module.params.get('force_init')
     backend_config = module.params.get('backend_config')
     backend_config_files = module.params.get('backend_config_files')
+    socket_host = module.params.get('socket_host')
+    socket_port = module.params.get('socket_port')
 
     if bin_path is not None:
         command = [bin_path]
