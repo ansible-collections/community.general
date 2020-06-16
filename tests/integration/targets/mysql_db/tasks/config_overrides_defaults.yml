@@ -24,7 +24,7 @@
   assert:
     that:
     - result is failed
-    - result.msg is search("Connection refused")
+    - result.msg is search("unable to connect to database")
 
 - name: Create database using default port
   mysql_db:
