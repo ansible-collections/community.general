@@ -48,7 +48,9 @@ options:
     choices: [ s, B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, '%', cyl, chs, compact ]
     default: KiB
   label:
-    description: Creates a new disk label.
+    description:
+     - Disk label type to use.
+     - If C(device) already contains different label, it will be changed to C(label) and any previous partitions will be lost.
     type: str
     choices: [ aix, amiga, bsd, dvh, gpt, loop, mac, msdos, pc98, sun ]
     default: msdos
