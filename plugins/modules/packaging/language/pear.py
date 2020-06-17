@@ -45,7 +45,7 @@ options:
             - If you want to specify that a package will not need prompts in the middle of a list,  C(null)
         type: list
         elements: raw
-        version_added: "2.10"
+        version_added: 0.2.0
 '''
 
 EXAMPLES = r'''
