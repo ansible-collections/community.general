@@ -16,54 +16,54 @@
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 
-- name: firewalld internal zone target ACCEPT
+- name: firewalld dmz zone target DROP
   firewalld:
-    zone: internal
+    zone: dmz
     permanent: True
     state: enabled
-    target: ACCEPT
+    target: DROP
   register: result
 
-- name: assert firewalld internal zone target ACCEPT enabled worked
+- name: assert firewalld dmz zone target DROP enabled worked
   assert:
     that:
     - result is changed
 
-- name: firewalld internal zone target ACCEPT rerun (verify not changed)
+- name: firewalld dmz zone target DROP rerun (verify not changed)
   firewalld:
-    zone: internal
+    zone: dmz
     permanent: True
     state: enabled
-    target: ACCEPT
+    target: DROP
   register: result
 
-- name: assert firewalld internal zone target ACCEPT enabled worked (verify not changed)
+- name: assert firewalld dmz zone target DROP enabled worked (verify not changed)
   assert:
     that:
     - result is not changed
 
-- name: firewalld internal zone target ACCEPT disabled
+- name: firewalld dmz zone target DROP disabled
   firewalld:
-    zone: internal
+    zone: dmz
     permanent: True
     state: disabled
-    target: ACCEPT
+    target: DROP
   register: result
 
-- name: assert firewalld internal zone target ACCEPT disabled worked
+- name: assert firewalld dmz zone target DROP disabled worked
   assert:
     that:
     - result is changed
 
-- name: firewalld internal zone target ACCEPT rerun (verify not changed)
+- name: firewalld dmz zone target DROP rerun (verify not changed)
   firewalld:
-    zone: internal
+    zone: dmz
     permanent: True
     state: disabled
-    target: ACCEPT
+    target: DROP
   register: result
 
-- name: assert firewalld internal zone target ACCEPT enabled worked (verify not changed)
+- name: assert firewalld dmz zone target DROP enabled worked (verify not changed)
   assert:
     that:
     - result is not changed

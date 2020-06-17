@@ -608,7 +608,7 @@ class ZoneTargetTransaction(FirewallTransaction):
     def get_enabled_permanent(self, target):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         current_target = fw_settings.getTarget()
-        return current_target == target
+        return (current_target == target)
 
     def set_enabled_immediate(self, target):
         self.module.fail_json(msg=self.tx_not_permanent_error_msg)
