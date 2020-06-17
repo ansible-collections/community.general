@@ -68,7 +68,7 @@ DOCUMENTATION = '''
                          filter are additiionnal, all conditions must
                          match
             required: False
-            type: dictionary
+            type: dict
         group_metadata:
             description: regroup devices by metadata
             required: False
