@@ -95,7 +95,7 @@ options:
     version_added: '0.2.0'
   check_deletes:
     description:
-      - Check and apply only when there are no deletes to resources
+      - Check and apply only when there are no deletes to resources.
     type: bool
     default: false
     version_added: '0.2.0'
