@@ -169,7 +169,7 @@ EXAMPLES = r'''
 
 - firewalld:
     zone: internal
-    state: enabled
+    state: present
     permanent: yes
     target: ACCEPT
 
@@ -590,8 +590,8 @@ class ZoneTargetTransaction(FirewallTransaction):
         super(ZoneTargetTransaction, self).__init__(
             module, action_args=action_args, desired_state=desired_state, zone=zone,
             permanent=permanent, immediate=immediate,
-            enabled_values=enabled_values or ["present"],
-            disabled_values=disabled_values or ["absent"])
+            enabled_values=enabled_values or ["present", "enabled"],
+            disabled_values=disabled_values or ["absent", "disabled"])
 
         self.enabled_msg = "Set zone %s target to %s" % \
             (self.zone, action_args[0])
@@ -765,7 +765,7 @@ def main():
         module.fail_json(
             msg='can only operate on port, service, rich_rule, masquerade, icmp_block, icmp_block_inversion, interface or source at once'
         )
-    elif modification_count > 0 and desired_state in ['absent', 'present']:
+    elif (modification_count > 0) and (desired_state in ['absent', 'present']) and (target is None):
         module.fail_json(
             msg='absent and present state can only be used in zone level operations'
         )

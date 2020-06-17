@@ -20,11 +20,11 @@
   firewalld:
     zone: dmz
     permanent: True
-    state: enabled
+    state: present
     target: DROP
   register: result
 
-- name: assert firewalld dmz zone target DROP enabled worked
+- name: assert firewalld dmz zone target DROP present worked
   assert:
     that:
     - result is changed
@@ -33,24 +33,24 @@
   firewalld:
     zone: dmz
     permanent: True
-    state: enabled
+    state: present
     target: DROP
   register: result
 
-- name: assert firewalld dmz zone target DROP enabled worked (verify not changed)
+- name: assert firewalld dmz zone target DROP present worked (verify not changed)
   assert:
     that:
     - result is not changed
 
-- name: firewalld dmz zone target DROP disabled
+- name: firewalld dmz zone target DROP absent
   firewalld:
     zone: dmz
     permanent: True
-    state: disabled
+    state: absent
     target: DROP
   register: result
 
-- name: assert firewalld dmz zone target DROP disabled worked
+- name: assert firewalld dmz zone target DROP absent worked
   assert:
     that:
     - result is changed
@@ -59,11 +59,11 @@
   firewalld:
     zone: dmz
     permanent: True
-    state: disabled
+    state: absent
     target: DROP
   register: result
 
-- name: assert firewalld dmz zone target DROP enabled worked (verify not changed)
+- name: assert firewalld dmz zone target DROP present worked (verify not changed)
   assert:
     that:
     - result is not changed
