@@ -417,12 +417,14 @@ def get_tls_requires(cursor, user, host):
         requires = dict(zip(items, items))
     return requires
 
+
 def get_grant_query(cursor, user, host):
     cursor.execute('SHOW GRANTS FOR %s@%s', (user, host))
     grants_line = filter(lambda x: 'ON *.*' in x, cursor.fetchall()).next()
     pattern = r"(?<=\bGRANT\b)(.*?)(?=(?:\bON\b))"
     grants = re.search(pattern, grants_line).group().strip()
     return "GRANT %s ON *.* TO" % grants
+
 
 def user_add(cursor, user, host, host_all, password, encrypted, plugin, plugin_hash_string,
              plugin_auth_string, new_priv, tls_requires, check_mode):
