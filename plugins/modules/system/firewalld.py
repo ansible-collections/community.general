@@ -85,7 +85,7 @@ options:
     type: bool
   target:
     description:
-      - firewalld Zone target, any one of: C(default), C(ACCEPT), C(DROP), C(REJECT)
+      - firewalld Zone target
       - If state is set to C(absent), this will reset the target to default
     choices: [ default, ACCEPT, DROP, REJECT ]
     type: str
@@ -166,6 +166,12 @@ EXAMPLES = r'''
     state: enabled
     permanent: yes
     icmp_block: echo-request
+
+- firewalld:
+    zone: internal
+    state: enabled
+    permanent: yes
+    target: ACCEPT
 
 - name: Redirect port 443 to 8443 with Rich Rule
   firewalld:
@@ -573,6 +579,7 @@ class SourceTransaction(FirewallTransaction):
         fw_settings.removeSource(source)
         self.update_fw_settings(fw_zone, fw_settings)
 
+
 class ZoneTargetTransaction(FirewallTransaction):
     """
     ZoneTargetTransaction
@@ -618,6 +625,7 @@ class ZoneTargetTransaction(FirewallTransaction):
         fw_zone, fw_settings = self.get_fw_zone_settings()
         fw_settings.setTarget("default")
         self.update_fw_settings(fw_zone, fw_settings)
+
 
 class ZoneTransaction(FirewallTransaction):
     """
