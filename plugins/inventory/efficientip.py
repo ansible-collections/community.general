@@ -35,6 +35,7 @@ DOCUMENTATION = '''
     name: efficientip
     plugin_type: inventory
     short_description: inventory based on EfficientIP IPAM
+    version_added: 1.0.0
     requirements:
         - SOLIDserverRest > 2.0.1
         - python 3
