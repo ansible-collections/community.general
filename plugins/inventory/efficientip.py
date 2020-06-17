@@ -56,7 +56,7 @@ DOCUMENTATION = '''
             required: True
             type: dictionary
         space:
-            description: name of the space
+            description: Name of the space.
             required: False
             type: string
             default: Local
