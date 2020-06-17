@@ -72,6 +72,7 @@ options:
       specify distance from the end of the disk.
     - The distance can be specified with all the units supported by parted
       (except compat) and it is case sensitive, e.g. C(10GiB), C(15%).
+    - Using negative values may require setting of C(fs_type) (see notes).
     type: str
     default: 0%
   part_end:
@@ -100,6 +101,7 @@ options:
   fs_type:
     description:
      - If specified and the partition does not exist, will set filesystem type to given partition.
+     - Parameter optional, but see notes below about negative negative C(part_start) values.
     type: str
     version_added: '2.10'
 notes:
@@ -107,6 +109,9 @@ notes:
     installed on the system is before version 3.1, the module queries the kernel
     through C(/sys/) to obtain disk information. In this case the units CHS and
     CYL are not supported.
+  - Negative C(part_start) start values were rejected if C(fs_type) was not given.
+    This bug was fixed in parted 3.2.153. If you want to use negative C(part_start),
+    specify C(fs_type) as well or make sure your system contains newer parted.
 '''
 
 RETURN = r'''
@@ -624,10 +629,6 @@ def main():
         # Assign label if required
         if current_device['generic'].get('table', None) != label:
             script += "mklabel %s " % label
-
-        # parted <= 3.2.153 bug: optional filesystem parameter is mandatory for negative part_start
-        if fs_type is None and part_start.startswith('-'):
-            fs_type = 'ext2'
 
         # Create partition if required
         if part_type and not part_exists(current_parts, 'num', number):

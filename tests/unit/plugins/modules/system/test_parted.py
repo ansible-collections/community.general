@@ -180,6 +180,7 @@ class TestParted(ModuleTestCase):
             'device': '/dev/sdb',
             'number': 4,
             'state': 'present',
+            'fs_type': 'ext2',
             'part_start': '-1GiB',
         })
         with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
