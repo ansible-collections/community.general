@@ -58,7 +58,7 @@ DOCUMENTATION = '''
         space:
             description: Name of the space.
             required: False
-            type: string
+            type: str
             default: Local
         filter:
             description: List of filters to reduce the set of devices
