@@ -69,6 +69,24 @@
         that:
           - not (yarn_install is changed)
 
+    - name: 'Install all packages in check mode.'
+      yarn:
+        path: '{{ output_dir }}'
+        executable: '{{ yarn_bin_path }}/yarn'
+        state: present
+      environment:
+        PATH: '{{ node_bin_path }}:{{ ansible_env.PATH }}'
+      check_mode: true
+      register: yarn_install_check
+
+    - name: verify test yarn global installation in check mode
+      assert:
+        that:
+          - yarn_install_check.err is defined
+          - yarn_install_check.out is defined
+          - yarn_install_check.err is none
+          - yarn_install_check.out is none
+
     - name: 'Install package with explicit version (older version of package)'
       yarn:
         path: '{{ output_dir }}'
