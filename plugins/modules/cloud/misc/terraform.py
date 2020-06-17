@@ -343,7 +343,7 @@ def main():
         for f in variables_files:
             variables_args.extend(['-var-file', f])
 
-    if state == 'present' and check_deletes is True:
+    if state == 'present' and check_destroy:
         plan_file, needs_application, out, err, command = build_plan(command, project_path, variables_args, state_file,
                                                                      module.params.get('targets'), state, plan_file)
         if '- destroy' in out:
