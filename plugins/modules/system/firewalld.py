@@ -83,6 +83,12 @@ options:
     description:
       - Whether to run this module even when firewalld is offline.
     type: bool
+  target:
+    description:
+      - firewalld Zone target, any one of: C(default), C(ACCEPT), C(DROP), C(REJECT)
+      - If state is set to C(absent), this will reset the target to default
+    choices: [ default, ACCEPT, DROP, REJECT ]
+    type: str
 notes:
   - Not tested on any Debian based system.
   - Requires the python2 bindings of firewalld, which may not be installed by default.
@@ -567,6 +573,51 @@ class SourceTransaction(FirewallTransaction):
         fw_settings.removeSource(source)
         self.update_fw_settings(fw_zone, fw_settings)
 
+class ZoneTargetTransaction(FirewallTransaction):
+    """
+    ZoneTargetTransaction
+    """
+
+    def __init__(self, module, action_args=None, zone=None, desired_state=None,
+                 permanent=True, immediate=False, enabled_values=None, disabled_values=None):
+        super(ZoneTargetTransaction, self).__init__(
+            module, action_args=action_args, desired_state=desired_state, zone=zone,
+            permanent=permanent, immediate=immediate,
+            enabled_values=enabled_values or ["present"],
+            disabled_values=disabled_values or ["absent"])
+
+        self.enabled_msg = "Set zone %s target to %s" % \
+            (self.zone, action_args[0])
+
+        self.disabled_msg = "Reset zone %s target to default" % \
+            (self.zone)
+
+        self.tx_not_permanent_error_msg = "Zone operations must be permanent. " \
+            "Make sure you didn't set the 'permanent' flag to 'false' or the 'immediate' flag to 'true'."
+
+    def get_enabled_immediate(self, target):
+        self.module.fail_json(msg=self.tx_not_permanent_error_msg)
+
+    def get_enabled_permanent(self, target):
+        fw_zone, fw_settings = self.get_fw_zone_settings()
+        current_target = fw_settings.getTarget()
+        return current_target == target
+
+    def set_enabled_immediate(self, target):
+        self.module.fail_json(msg=self.tx_not_permanent_error_msg)
+
+    def set_enabled_permanent(self, target):
+        fw_zone, fw_settings = self.get_fw_zone_settings()
+        fw_settings.setTarget(target)
+        self.update_fw_settings(fw_zone, fw_settings)
+
+    def set_disabled_immediate(self, target):
+        self.module.fail_json(msg=self.tx_not_permanent_error_msg)
+
+    def set_disabled_permanent(self, target):
+        fw_zone, fw_settings = self.get_fw_zone_settings()
+        fw_settings.setTarget("default")
+        self.update_fw_settings(fw_zone, fw_settings)
 
 class ZoneTransaction(FirewallTransaction):
     """
@@ -633,10 +684,12 @@ def main():
             interface=dict(type='str'),
             masquerade=dict(type='str'),
             offline=dict(type='bool'),
+            target=dict(type='str', required=False, choices=['default', 'ACCEPT', 'DROP', 'REJECT']),
         ),
         supports_check_mode=True,
         required_by=dict(
             interface=('zone',),
+            target=('zone',),
             source=('permanent',),
         ),
     )
@@ -668,6 +721,7 @@ def main():
     rich_rule = module.params['rich_rule']
     source = module.params['source']
     zone = module.params['zone']
+    target = module.params['target']
 
     if module.params['port'] is not None:
         if '/' in module.params['port']:
@@ -695,6 +749,8 @@ def main():
     if masquerade is not None:
         modification_count += 1
     if source is not None:
+        modification_count += 1
+    if target is not None:
         modification_count += 1
 
     if modification_count > 1:
@@ -823,6 +879,20 @@ def main():
         transaction = MasqueradeTransaction(
             module,
             action_args=(),
+            zone=zone,
+            desired_state=desired_state,
+            permanent=permanent,
+            immediate=immediate,
+        )
+
+        changed, transaction_msgs = transaction.run()
+        msgs = msgs + transaction_msgs
+
+    if target is not None:
+
+        transaction = ZoneTargetTransaction(
+            module,
+            action_args=(target,),
             zone=zone,
             desired_state=desired_state,
             permanent=permanent,
