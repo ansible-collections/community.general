@@ -409,7 +409,8 @@ def get_tls_requires(cursor, user, host):
             query = "SHOW GRANTS for '%s'@'%s'" % (user, host)
 
         cursor.execute(query)
-        require_line = filter(lambda x: 'REQUIRE' in x, cursor.fetchall()).next()
+        require_list = list(filter(lambda x: 'REQUIRE' in x, cursor.fetchall()))
+        require_line = require_list[0] if require_list else ''
         pattern = r"(?<=\bREQUIRE\b)(.*?)(?=(?:\bPASSWORD\b|$))"
         requires = re.search(pattern, require_line).group().strip()
         if len(requires.split()) > 1:
