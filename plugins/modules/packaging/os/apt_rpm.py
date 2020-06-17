@@ -17,10 +17,13 @@ short_description: apt_rpm package manager
 description:
   - Manages packages with I(apt-rpm). Both low-level (I(rpm)) and high-level (I(apt-get)) package manager binaries required.
 options:
-  pkg:
+  package:
     description:
-      - name of package to install, upgrade or remove.
+      - list of packages to install, upgrade or remove.
     required: true
+    aliases: [ name, pkg ]
+    type: list
+    elements: str
   state:
     description:
       - Indicates the desired package state.
@@ -39,6 +42,13 @@ EXAMPLES = '''
 - name: Install package foo
   apt_rpm:
     pkg: foo
+    state: present
+
+- name: Install packages foo and bar
+  apt_rpm:
+    pkg:
+      - foo
+      - bar
     state: present
 
 - name: Remove package foo
@@ -146,7 +156,7 @@ def main():
         argument_spec=dict(
             state=dict(type='str', default='installed', choices=['absent', 'installed', 'present', 'removed']),
             update_cache=dict(type='bool', default=False, aliases=['update-cache']),
-            package=dict(type='str', required=True, aliases=['name', 'pkg']),
+            package=dict(type='list', elements='str', required=True, aliases=['name', 'pkg']),
         ),
     )
 
@@ -158,7 +168,7 @@ def main():
     if p['update_cache']:
         update_package_db(module)
 
-    packages = p['package'].split(',')
+    packages = p['package']
 
     if p['state'] in ['installed', 'present']:
         install_packages(module, packages)
