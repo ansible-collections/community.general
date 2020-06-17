@@ -43,7 +43,9 @@ from ansible.module_utils.basic import env_fallback, AnsibleFallbackNotFound
 def _env_then_dns_fallback(*args, **kwargs):
     ''' Load value from environment or DNS in that order'''
     try:
-        return env_fallback(*args, **kwargs)
+        result = env_fallback(*args, **kwargs)
+        if result == '':
+            raise AnsibleFallbackNotFound
     except AnsibleFallbackNotFound:
         # If no host was given, we try to guess it from IPA.
         # The ipa-ca entry is a standard entry that IPA will have set for
