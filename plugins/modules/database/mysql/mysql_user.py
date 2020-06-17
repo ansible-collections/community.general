@@ -412,12 +412,13 @@ def get_tls_requires(cursor, user, host):
         require_list = list(filter(lambda x: 'REQUIRE' in x, cursor.fetchall()))
         require_line = require_list[0] if require_list else ''
         pattern = r"(?<=\bREQUIRE\b)(.*?)(?=(?:\bPASSWORD\b|$))"
-        requires = re.search(pattern, require_line).group().strip()
+        requires_match = re.search(pattern, require_line)
+        requires = requires_match.group().strip() if requires_match else ''
         if len(requires.split()) > 1:
             import shlex
             items = iter(shlex.split(requires))
             requires = dict(zip(items, items))
-        return requires
+        return requires or None
 
 
 def get_grant_query(cursor, user, host):
