@@ -93,7 +93,7 @@ options:
     type: list
     elements: path
     version_added: '0.2.0'
-  check_deletes:
+  check_destroy:
     description:
       - Check and apply only when there are no deletes to resources.
     type: bool
