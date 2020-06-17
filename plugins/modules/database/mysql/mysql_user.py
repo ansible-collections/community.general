@@ -374,6 +374,7 @@ def sanitize_requires(tls_requires):
         if any([key in ['CIPHER', 'ISSUER', 'SUBJECT'] for key in tls_requires.keys()]):
             tls_requires.pop('SSL', None)
             tls_requires.pop('X509', None)
+            return tls_requires
 
         if 'X509' in tls_requires.keys():
             tls_requires = 'X509'
@@ -381,7 +382,6 @@ def sanitize_requires(tls_requires):
             tls_requires = 'SSL'
 
         return tls_requires
-#        return " REQUIRE %s" % ' AND '.join([' '.join(filter(None, (key, fix_quotes(value)))) for key, value in tls_requires.items()])
     return None
 
 
@@ -397,6 +397,33 @@ def mogrify_requires(query, params, tls_requires):
     return query, params
 
 
+def do_not_mogrify_requires(query, params, tls_requires):
+    return query, params
+
+
+def get_tls_requires(cursor, user, host):
+    if server_suports_requires_create(cursor):
+        query = "SHOW CREATE USER for '%s'@'%s'" % (user, host)
+    else:
+        query = "SHOW GRANTS for '%s'@'%s'" % (user, host)
+
+    cursor.execute(query)
+    require_line = filter(lambda x: 'REQUIRE' in x, cursor.fetchall()).next()
+    pattern = r"(?<=\bREQUIRE\b)(.*?)(?=(?:\bPASSWORD\b|$))"
+    requires = re.search(pattern, require_line).group().strip()
+    if len(requires.split()) > 1:
+        import shlex
+        items = iter(shlex.split(requires))
+        requires = dict(zip(items, items))
+    return requires
+
+def get_grant_query(cursor, user, host):
+    cursor.execute('SHOW GRANTS FOR %s@%s', (user, host))
+    grants_line = filter(lambda x: 'ON *.*' in x, cursor.fetchall()).next()
+    pattern = r"(?<=\bGRANT\b)(.*?)(?=(?:\bON\b))"
+    grants = re.search(pattern, grants_line).group().strip()
+    return "GRANT %s ON *.* TO" % grants
+
 def user_add(cursor, user, host, host_all, password, encrypted, plugin, plugin_hash_string,
              plugin_auth_string, new_priv, tls_requires, check_mode):
     # we cannot create users without a proper hostname
@@ -406,21 +433,23 @@ def user_add(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
     if check_mode:
         return True
 
+    mogrify = mogrify_requires if server_suports_requires_create(cursor) else do_not_mogrify_requires
+
     if password and encrypted:
-        cursor.execute(*mogrify_requires("CREATE USER %s@%s IDENTIFIED BY PASSWORD %s", (user, host, password), tls_requires))
+        cursor.execute(*mogrify("CREATE USER %s@%s IDENTIFIED BY PASSWORD %s", (user, host, password), tls_requires))
     elif password and not encrypted:
-        cursor.execute(*mogrify_requires("CREATE USER %s@%s IDENTIFIED BY %s", (user, host, password), tls_requires))
+        cursor.execute(*mogrify("CREATE USER %s@%s IDENTIFIED BY %s", (user, host, password), tls_requires))
     elif plugin and plugin_hash_string:
-        cursor.execute(*mogrify_requires("CREATE USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin, plugin_hash_string), tls_requires))
+        cursor.execute(*mogrify("CREATE USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin, plugin_hash_string), tls_requires))
     elif plugin and plugin_auth_string:
-        cursor.execute(*mogrify_requires("CREATE USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin, plugin_auth_string), tls_requires))
+        cursor.execute(*mogrify("CREATE USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin, plugin_auth_string), tls_requires))
     elif plugin:
-        cursor.execute(*mogrify_requires("CREATE USER %s@%s IDENTIFIED WITH %s", (user, host, plugin), tls_requires))
+        cursor.execute(*mogrify("CREATE USER %s@%s IDENTIFIED WITH %s", (user, host, plugin), tls_requires))
     else:
-        cursor.execute(*mogrify_requires("CREATE USER %s@%s", (user, host), tls_requires))
+        cursor.execute(*mogrify("CREATE USER %s@%s", (user, host), tls_requires))
     if new_priv is not None:
         for db_table, priv in iteritems(new_priv):
-            privileges_grant(cursor, user, host, db_table, priv)
+            privileges_grant(cursor, user, host, db_table, priv, tls_requires)
     return True
 
 
@@ -543,8 +572,19 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
                 changed = True
 
         # Handle TLS requirements
-        if tls_requires is not None:
-            cursor.execute(*mogrify_requires("ALTER USER %s@%s", (user, host), tls_requires))
+        current_requires = get_tls_requires(cursor, user, host)
+        if current_requires != tls_requires:
+            if server_suports_requires_create(cursor):
+                pre_query = "ALTER USER"
+            else:
+                pre_query = get_grant_query(cursor, user, host)
+
+            if tls_requires is not None:
+                query = ' '.join(pre_query, '%s@%s')
+                cursor.execute(*mogrify_requires(query, (user, host), tls_requires))
+            else:
+                query = ' '.join(pre_query, '%s@%s REQUIRE NONE')
+                cursor.execute(query, (user, host))
             changed = True
 
         # Handle privileges
@@ -725,19 +765,23 @@ def privileges_revoke(cursor, user, host, db_table, priv, grant_option):
     cursor.execute(query, (user, host))
 
 
-def privileges_grant(cursor, user, host, db_table, priv):
+def privileges_grant(cursor, user, host, db_table, priv, tls_requires):
     # Escape '%' since mysql db.execute uses a format string and the
     # specification of db and table often use a % (SQL wildcard)
     db_table = db_table.replace('%', '%%')
     priv_string = ",".join([p for p in priv if p not in ('GRANT', 'REQUIRESSL')])
     query = ["GRANT %s ON %s" % (priv_string, db_table)]
     query.append("TO %s@%s")
-    if 'REQUIRESSL' in priv:
+    params = (user, host)
+    if tls_requires and not server_suports_requires_create(cursor):
+        query, params = mogrify_requires(' '.join(query), params, tls_requires)
+        query = [query]
+    if 'REQUIRESSL' in priv and not tls_requires:
         query.append("REQUIRE SSL")
     if 'GRANT' in priv:
         query.append("WITH GRANT OPTION")
     query = ' '.join(query)
-    cursor.execute(query, (user, host))
+    cursor.execute(query, params)
 
 
 def convert_priv_dict_to_str(priv):
@@ -752,6 +796,33 @@ def convert_priv_dict_to_str(priv):
     priv_list = ['%s:%s' % (key, val) for key, val in iteritems(priv)]
 
     return '/'.join(priv_list)
+
+
+# TLS requires on user create statement is supported since MySQL 5.7 and MariaDB 10.2
+def server_suports_requires_create(cursor):
+    """Check if the server supports REQUIRES on the CREATE USER statement or doesn't.
+
+    Args:
+        cursor (cursor): DB driver cursor object.
+
+    Returns: True if supports, False otherwise.
+    """
+    cursor.execute("SELECT VERSION()")
+    version_str = cursor.fetchone()[0]
+    version = version_str.split('.')
+
+    if 'mariadb' in version_str.lower():
+        # MariaDB 10.2 and later
+        if int(version[0]) * 1000 + int(version[1]) >= 10002:
+            return True
+        else:
+            return False
+    else:
+        # MySQL 5.6 and later
+        if int(version[0]) * 1000 + int(version[1]) >= 5007:
+            return True
+        else:
+            return False
 
 
 # Alter user is supported since MySQL 5.6 and MariaDB 10.2.0

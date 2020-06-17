@@ -119,10 +119,8 @@
   mysql_info:
     login_unix_socket: '{{ mysql_socket }}'
     filter: version
-  register: db_ver
-- debug:
-    var: db_var
-    
+  register: db_version
+
 - name: create user with TLS requirements state=present (expect changed=true)
   mysql_user:
     name: '{{ item[0] }}'
@@ -138,41 +136,94 @@
         cipher: 'ECDHE-ECDSA-AES256-SHA384'
         issuer: '/CN=org/O=MyDom, Inc./C=US/ST=Oregon/L=Portland'
 
-- name: retrieve TLS requiremets for users
-  command: mysql -e "SELECT * FROM mysql.user where User='{{ item }}'\G"
-  #command: mysql -L -N -s -e "SELECT ssl_type, ssl_cipher, x509_issuer, x509_subject FROM mysql.user where User='{{ item }}';"
-  register: result
-  with_items: ['{{ user_name_1 }}', '{{ user_name_2 }}', '{{ user_name_3 }}']
+- block:
+  - name: retrieve TLS requiremets for users in old database version
+    command: mysql -L -N -s -e "SHOW GRANTS for '{{ item }}'@'localhost'"
+    register: result
+    with_items: ['{{ user_name_1 }}', '{{ user_name_2 }}', '{{ user_name_3 }}']
 
-- name: assert user1 TLS requirements
-  assert:
-    that:
-      - reqs[0] == 'ANY'
-      - reqs[1] == '0x'
-      - reqs[2] == '0x'
-      - reqs[3] == '0x'
-  vars:
-    - reqs: (result.results | selectattr('item', 'eq', user_name_1) | first).stdout.split()
+  - name: assert user1 TLS requirements
+    assert:
+      that: 'SSL' in reqs
+    vars:
+      - reqs: (result.results | selectattr('item', 'eq', user_name_1) | first).stdout.split('REQUIRE')[1].split('\n')[0].strip()
 
-- name: assert user2 TLS requirements
-  assert:
-    that:
-      - reqs[0] == 'X509'
-      - reqs[1] == '0x'
-      - reqs[2] == '0x'
-      - reqs[3] == '0x'
-  vars:
-    - reqs: (result.results | selectattr('item', 'eq', user_name_2) | first).stdout.split()
+  - name: assert user2 TLS requirements
+    assert:
+      that: 'X509' in reqs
+    vars:
+      - reqs: (result.results | selectattr('item', 'eq', user_name_1) | first).stdout.split('REQUIRE')[1].split('\n')[0].strip()
 
-- name: assert user3 TLS requirements
-  assert:
-    that:
-      - reqs[0] == 'SPECIFIED'
-      - reqs[1] == '0x45434448452D45434453412D4145533235362D534841333834'
-      - reqs[2] == '0x2F434E3D6F72672F4F3D4D79446F6D2C20496E632E2F433D55532F53543D4F7265676F6E2F4C3D506F72746C616E64'
-      - reqs[3] == '0x2F434E3D616C6963652F4F3D4D79446F6D2C20496E632E2F433D55532F53543D4F7265676F6E2F4C3D506F72746C616E64'
-  vars:
-    - reqs: (result.results | selectattr('item', 'eq', user_name_3) | first).stdout.split()
+  - name: assert user3 TLS requirements
+    assert:
+      that:
+        - '/CN=alice/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in (reqs | select('in', 'SUBJECT'))
+        - '/CN=org/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in (reqs | select('in', 'ISSUER'))
+        - 'ECDHE-ECDSA-AES256-SHA384' in (reqs | select('in', 'CIPHER'))
+    vars:
+      - reqs: (result.results | selectattr('item', 'eq', user_name_1) | first).stdout.split('REQUIRE')[1].split('\n')[0].replace("' ", "':").split(":")
+  when: db_version.version.major <= 5 and db_version.version.minor <= 6 or db_version.version.major == 10 and db_version.version.minor < 2
+
+- block:
+  - name: retrieve TLS requiremets for users in new database version
+    command: mysql -L -N -s -e "SHOW CREATE USER '{{ item }}'@'localhost'"
+    register: result
+    with_items: ['{{ user_name_1 }}', '{{ user_name_2 }}', '{{ user_name_3 }}']
+
+  - name: assert user1 TLS requirements
+    assert:
+      that: 'SSL' in reqs
+    vars:
+      - reqs: (result.results | selectattr('item', 'eq', user_name_1) | first).stdout.split('REQUIRE')[1].split('PASSWORD')[0].strip()
+
+  - name: assert user2 TLS requirements
+    assert:
+      that: 'X509' in reqs
+    vars:
+      - reqs: (result.results | selectattr('item', 'eq', user_name_1) | first).stdout.split('REQUIRE')[1].split('PASSWORD')[0].strip()
+
+  - name: assert user3 TLS requirements
+    assert:
+      that:
+        - '/CN=alice/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in (reqs | select('in', 'SUBJECT'))
+        - '/CN=org/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in (reqs | select('in', 'ISSUER'))
+        - 'ECDHE-ECDSA-AES256-SHA384' in (reqs | select('in', 'CIPHER'))
+    vars:
+      - reqs: (result.results | selectattr('item', 'eq', user_name_1) | first).stdout.split('REQUIRE')[1].split('PASSWORD')[0].replace("' ", "':").split(":")
+  when: db_version.version.major >= 5 and db_version.version.major < 10 and db_version.version.minor > 6 or db_version.version.major == 10 and db_version.version.minor >= 2
+
+- name: modify user with TLS requirements state=present (expect changed=true)
+  mysql_user:
+    name: '{{ user_name_1 }}'
+    password: '{{ user_password_1 }}'
+    tls_requires:
+      - X509:
+    login_unix_socket: '{{ mysql_socket }}'
+
+- block:
+  - name: retrieve TLS requiremets for users in old database version
+    command: mysql -L -N -s -e "SHOW GRANTS for '{{ user_name_1 }}'@'localhost'"
+    register: result
+
+  - name: assert user1 TLS requirements
+    assert:
+      that: 'X509' in reqs
+    vars:
+      - reqs: result.stdout.split('REQUIRE')[1].split('\n')[0].strip()
+  when: db_version.version.major <= 5 and db_version.version.minor <= 6 or db_version.version.major == 10 and db_version.version.minor < 2
+
+- block:
+  - name: retrieve TLS requiremets for users in new database version
+    command: mysql -L -N -s -e "SHOW CREATE USER '{{ user_name_1 }}'@'localhost'"
+    register: result
+
+  - name: assert user1 TLS requirements
+    assert:
+      that: 'X509' in reqs
+    vars:
+      - reqs: result.stdout.split('REQUIRE')[1].split('PASSWORD')[0].strip()
+  when: db_version.version.major >= 5 and db_version.version.major < 10 and db_version.version.minor > 6 or db_version.version.major == 10 and db_version.version.minor >= 2
+
 
 - include: remove_user.yml user_name={{user_name_1}} user_password={{ user_password_1 }}
 
