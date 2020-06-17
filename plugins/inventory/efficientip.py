@@ -41,7 +41,7 @@ DOCUMENTATION = '''
     extends_documentation_fragment:
         - inventory_cache
     description:
-        - Get inventory hosts from EfficientIP IPAM and Device Manager
+        - Get inventory hosts from EfficientIP IPAM and Device Manager.
         - Uses a YAML configuration file C(efficientip.(yml|yaml)).
     author:
         - Alex Chauvin (@efficientip)
