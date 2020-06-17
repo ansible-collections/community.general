@@ -190,6 +190,7 @@ EXAMPLES = r'''
     device: /dev/sdb
     number: 3
     state: present
+    fs_type: ext3
     part_start: -1GiB
 
 # Example on how to read info and reuse it in subsequent task
