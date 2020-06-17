@@ -61,7 +61,7 @@ DOCUMENTATION = '''
             type: string
             default: Local
         filter:
-            description: list of filters to reduce the set of devices
+            description: List of filters to reduce the set of devices
                          returned from Device Manager. Can mix limit,
                          device_in_subnet, device_of_class,
                          device_metadata, device_intf_space. All
