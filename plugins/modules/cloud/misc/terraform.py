@@ -311,7 +311,7 @@ def main():
     force_init = module.params.get('force_init')
     backend_config = module.params.get('backend_config')
     backend_config_files = module.params.get('backend_config_files')
-    check_deletes = module.params.get('check_deletes')
+    check_destroy = module.params.get('check_destroy')
 
     if bin_path is not None:
         command = [bin_path]
