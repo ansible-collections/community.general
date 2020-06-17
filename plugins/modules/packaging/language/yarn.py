@@ -218,7 +218,7 @@ class Yarn(object):
             rc, out, err = self.module.run_command(cmd, check_rc=check_rc, cwd=cwd)
             return out, err
 
-        return ''
+        return(None, None)
 
     def list(self):
         cmd = ['list', '--depth=0', '--json']

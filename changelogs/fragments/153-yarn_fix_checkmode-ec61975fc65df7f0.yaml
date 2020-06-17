@@ -1,0 +1,3 @@
+---
+bugfixes:
+- yarn - Return correct values when running yarn in check mode (https://github.com/ansible-collections/community.general/pull/153).
