@@ -389,7 +389,7 @@ def mogrify_requires(query, params, tls_requires):
     if tls_requires:
         if isinstance(tls_requires, dict):
             k, v = zip(*tls_requires.items())
-            requires_query = ' AND '.join(('{} %s'.format(key) for key in k))
+            requires_query = ' AND '.join(('%s %%s' % key for key in k))
             params += v
         else:
             requires_query = tls_requires
