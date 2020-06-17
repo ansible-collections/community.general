@@ -32,17 +32,17 @@ options:
         choices: ["present", "absent", "latest"]
     executable:
         description:
-            - Path to the pear executable
+            - Path to the pear executable.
     prompts:
         description:
             - List of regular expressions that can be used to detect prompts during pear package installation to answer the expected question.
-            - Prompts will be processed in the same order as the packages list
-            - You can optionnally specify an answer to any question in the list
+            - Prompts will be processed in the same order as the packages list.
+            - You can optionnally specify an answer to any question in the list.
             - If no answer is provided, the list item will only contain the regular expression.
-            - "To specify an answer, the item will be a dict with the regular expression as key and the answer as value C(my_regular_expression: 'an_answer')"
-            - You can provide a list containing items with or without answer
-            - A prompt list can be shorter or longer than the packages list but will issue a warning
-            - If you want to specify that a package will not need prompts in the middle of a list,  C(null)
+            - "To specify an answer, the item will be a dict with the regular expression as key and the answer as value C(my_regular_expression: 'an_answer')."
+            - You can provide a list containing items with or without answer.
+            - A prompt list can be shorter or longer than the packages list but will issue a warning.
+            - If you want to specify that a package will not need prompts in the middle of a list,  C(null).
         type: list
         elements: raw
         version_added: 0.2.0
