@@ -52,7 +52,7 @@ DOCUMENTATION = '''
             required: True
             choices: ['efficientip']
         api:
-            description: information to get connected to the SOLIDserver
+            description: Information to get connected to the SOLIDserver.
             required: True
             type: dictionary
         space:
