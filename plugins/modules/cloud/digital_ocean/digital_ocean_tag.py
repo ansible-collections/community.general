@@ -24,7 +24,7 @@ options:
   resource_id:
     description:
     - The ID of the resource to operate on.
-    - The data type of resource_id is changed from integer to string since version 2.5.
+    - The data type of resource_id is changed from integer to string since Ansible 2.5.
     aliases: ['droplet_id']
   resource_type:
     description:
