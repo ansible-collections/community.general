@@ -42,8 +42,8 @@ options:
     description:
     - Type of database object to set privileges on.
     - The C(default_privs) choice is available starting at version 2.7.
-    - The C(foreign_data_wrapper) and C(foreign_server) object types are available from Ansible version '2.8'.
-    - The C(type) choice is available from Ansible version '2.10'.
+    - The C(foreign_data_wrapper) and C(foreign_server) object types are available since Ansible version '2.8'.
+    - The C(type) choice is available since Ansible version '2.10'.
     type: str
     default: table
     choices: [ database, default_privs, foreign_data_wrapper, foreign_server, function,
@@ -55,7 +55,7 @@ options:
       the special valueC(ALL_IN_SCHEMA) can be provided instead to specify all
       database objects of type I(type) in the schema specified via I(schema).
       (This also works with PostgreSQL < 9.0.) (C(ALL_IN_SCHEMA) is available
-       for C(function) and C(partition table) from version 2.8)
+       for C(function) and C(partition table) since version 2.8)
     - If I(type) is C(database), this parameter can be omitted, in which case
       privileges are set for the database specified via I(database).
     - 'If I(type) is I(function), colons (":") in object names will be
