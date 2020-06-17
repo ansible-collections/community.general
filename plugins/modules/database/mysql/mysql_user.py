@@ -402,20 +402,21 @@ def do_not_mogrify_requires(query, params, tls_requires):
 
 
 def get_tls_requires(cursor, user, host):
-    if server_suports_requires_create(cursor):
-        query = "SHOW CREATE USER for '%s'@'%s'" % (user, host)
-    else:
-        query = "SHOW GRANTS for '%s'@'%s'" % (user, host)
+    if user:
+        if server_suports_requires_create(cursor):
+            query = "SHOW CREATE USER for '%s'@'%s'" % (user, host)
+        else:
+            query = "SHOW GRANTS for '%s'@'%s'" % (user, host)
 
-    cursor.execute(query)
-    require_line = filter(lambda x: 'REQUIRE' in x, cursor.fetchall()).next()
-    pattern = r"(?<=\bREQUIRE\b)(.*?)(?=(?:\bPASSWORD\b|$))"
-    requires = re.search(pattern, require_line).group().strip()
-    if len(requires.split()) > 1:
-        import shlex
-        items = iter(shlex.split(requires))
-        requires = dict(zip(items, items))
-    return requires
+        cursor.execute(query)
+        require_line = filter(lambda x: 'REQUIRE' in x, cursor.fetchall()).next()
+        pattern = r"(?<=\bREQUIRE\b)(.*?)(?=(?:\bPASSWORD\b|$))"
+        requires = re.search(pattern, require_line).group().strip()
+        if len(requires.split()) > 1:
+            import shlex
+            items = iter(shlex.split(requires))
+            requires = dict(zip(items, items))
+        return requires
 
 
 def get_grant_query(cursor, user, host):
