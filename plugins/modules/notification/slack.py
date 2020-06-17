@@ -95,7 +95,7 @@ options:
     description:
       - Allow text to use default colors - use the default of 'normal' to not send a custom color bar at the start of the message.
       - Allowed values for color can be one of 'normal', 'good', 'warning', 'danger', any valid 3 digit or 6 digit hex color value.
-      - Specifying value in hex is supported from version 2.8.
+      - Specifying value in hex is supported since Ansible 2.8.
     default: 'normal'
   attachments:
     description:
