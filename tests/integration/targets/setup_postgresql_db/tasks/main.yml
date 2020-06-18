@@ -158,7 +158,7 @@
 # To get rid of hangs in CI:
 - name: stop postgresql service
   became: postgres
-  shell: pg_ctl -D {{ pg_dir }} -m immediate
+  shell: 'pg_ctl -D {{ pg_dir }} -m immediate'
 
 - name: start postgresql service
   service: name={{ postgresql_service }} state=started
