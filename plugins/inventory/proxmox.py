@@ -59,7 +59,7 @@ validate_certs: False
 
 import re
 
-from collections import MutableMapping
+from ansible.module_utils.common._collections_compat import MutableMapping
 from distutils.version import LooseVersion
 
 from ansible.errors import AnsibleError
