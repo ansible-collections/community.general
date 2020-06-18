@@ -180,7 +180,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         for iface in ret:
             try:
                 return iface['address']
-            except:
+            except Exception:
                 return None
 
     def _get_vm_config(self, node, vmid, vmtype, name):
@@ -210,7 +210,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     # skip over any keys that cannot be processed
                     try:
                         value = dict(key.split("=") for key in value.split(","))
-                    except:
+                    except Exception:
                         continue
 
                 self.inventory.set_variable(name, key, value)

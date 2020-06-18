@@ -16,18 +16,26 @@ options:
     description:
       - the host of the Proxmox VE cluster
     required: true
+    type: str
   api_user:
     description:
       - the user to authenticate with
     required: true
+    type: str
   api_password:
     description:
       - the password to authenticate with
       - you can use PROXMOX_PASSWORD environment variable
+    type: str
+  hostname:
+    description
+      - the instance name
+    type: str
   vmid:
     description:
       - the instance id
       - if not set, will be fetched from PromoxAPI based on the hostname
+    type: int
   validate_certs:
     description:
       - enable / disable https certificate verification
@@ -38,14 +46,17 @@ options:
      - Indicate desired state of the instance snapshot
     choices: ['present', 'absent']
     default: present
+    type: str
   force:
     description:
       - For removal from config file, even if removing disk snapshot fails.
     default: 'no'
+    type: bool
   vmstate:
     description:
       - Snapshot includes RAM
     default: 'no'
+    type: bool
   description:
     description:
       - Specify the description for the snapshot. Only used on the configuration web interface.
@@ -56,6 +67,7 @@ options:
     description:
       - timeout for operations
     default: 30
+    type: int
   snapname:
     description:
       - Name of the snapshot that has to be created
@@ -138,6 +150,7 @@ def get_vmid(proxmox, hostname):
 
 def get_instance(proxmox, vmid):
     return [vm for vm in proxmox.cluster.resources.get(type='vm') if vm['vmid'] == int(vmid)]
+
 
 def proxmox_version(proxmox):
     apireturn = proxmox.version.get()
@@ -272,6 +285,7 @@ def main():
                     module.exit_json(changed=True, msg="Snapshot %s removed" % snapname)
         except Exception as e:
             module.fail_json(msg="Removing snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, e))
+
 
 if __name__ == '__main__':
     main()
