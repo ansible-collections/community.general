@@ -258,3 +258,6 @@
 - include: multi_db_create_delete.yml 
 
 - include: encoding_dump_import.yml file=latin1.sql format_msg_type=ASCII
+
+- include: config_overrides_defaults.yml
+  when: ansible_python.version_info[0] >= 3

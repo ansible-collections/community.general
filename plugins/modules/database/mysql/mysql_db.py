@@ -144,6 +144,15 @@ options:
     type: bool
     default: no
     version_added: '0.2.0'
+  config_overrides_defaults:
+    description:
+      - If C(yes), connection parameters from I(config_file) will override the default
+        values of I(login_host) and I(login_port) parameters.
+      - Used when I(stat) is C(present) or C(absent), ignored otherwise.
+      - It needs Python 3.5+ as the default interpreter on a target host.
+    type: bool
+    default: no
+    version_added: '0.2.0'
 
 seealso:
 - module: mysql_info
@@ -563,6 +572,7 @@ def main():
             unsafe_login_password=dict(type='bool', default=False),
             restrict_config_file=dict(type='bool', default=False),
             check_implicit_admin=dict(type='bool', default=False),
+            config_overrides_defaults=dict(type='bool', default=False),
         ),
         supports_check_mode=True,
     )
@@ -606,6 +616,7 @@ def main():
     use_shell = module.params["use_shell"]
     restrict_config_file = module.params["restrict_config_file"]
     check_implicit_admin = module.params['check_implicit_admin']
+    config_overrides_defaults = module.params['config_overrides_defaults']
 
     if len(db) > 1 and state == 'import':
         module.fail_json(msg="Multiple databases are not supported with state=import")
@@ -625,14 +636,15 @@ def main():
         if check_implicit_admin:
             try:
                 cursor, db_conn = mysql_connect(module, 'root', '', config_file, ssl_cert, ssl_key, ssl_ca,
-                                                connect_timeout=connect_timeout)
+                                                connect_timeout=connect_timeout,
+                                                config_overrides_defaults=config_overrides_defaults)
             except Exception as e:
                 check_implicit_admin = False
                 pass
 
         if not cursor:
             cursor, db_conn = mysql_connect(module, login_user, login_password, config_file, ssl_cert, ssl_key, ssl_ca,
-                                            connect_timeout=connect_timeout)
+                                            connect_timeout=connect_timeout, config_overrides_defaults=config_overrides_defaults)
     except Exception as e:
         if os.path.exists(config_file):
             module.fail_json(msg="unable to connect to database, check login_user and login_password are correct or %s has the credentials. "
