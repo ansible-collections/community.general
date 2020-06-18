@@ -421,12 +421,12 @@ def get_tls_requires(cursor, user, host):
         return requires or None
 
 
-def get_grant_query(cursor, user, host):
+def get_grants(cursor, user, host):
     cursor.execute('SHOW GRANTS FOR %s@%s', (user, host))
-    grants_line = filter(lambda x: 'ON *.*' in x, cursor.fetchall()).next()
+    grants_line = list(filter(lambda x: 'ON *.*' in x[0], cursor.fetchall()))[0]
     pattern = r"(?<=\bGRANT\b)(.*?)(?=(?:\bON\b))"
-    grants = re.search(pattern, grants_line).group().strip()
-    return "GRANT %s ON *.* TO" % grants
+    grants = re.search(pattern, grants_line[0]).group().strip()
+    return grants.split(', ')
 
 
 def user_add(cursor, user, host, host_all, password, encrypted, plugin, plugin_hash_string,
@@ -455,6 +455,8 @@ def user_add(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
     if new_priv is not None:
         for db_table, priv in iteritems(new_priv):
             privileges_grant(cursor, user, host, db_table, priv, tls_requires)
+    if tls_requires is not None:
+        privileges_grant(cursor, user, host, '*.*', get_grants(cursor, user, host), tls_requires)
     return True
 
 
@@ -582,10 +584,10 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
             if server_suports_requires_create(cursor):
                 pre_query = "ALTER USER"
             else:
-                pre_query = get_grant_query(cursor, user, host)
+                pre_query = 'GRANT %s ON *.* TO' % ','.join(get_grants(cursor, user, host))
 
             if tls_requires is not None:
-                query = ' '.join(pre_query, '%s@%s')
+                query = ' '.join((pre_query, '%s@%s'))
                 cursor.execute(*mogrify_requires(query, (user, host), tls_requires))
             else:
                 query = ' '.join(pre_query, '%s@%s REQUIRE NONE')
