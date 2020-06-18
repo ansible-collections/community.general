@@ -150,8 +150,8 @@
     line: postgresql_enable="YES"
   when: ansible_os_family == "FreeBSD"
 
-- name: start postgresql service
-  service: name={{ postgresql_service }} state=started
+- name: restart postgresql service
+  service: name={{ postgresql_service }} state=restarted
 
 - name: copy control file for dummy ext
   copy:
