@@ -1,0 +1,2 @@
+minor_changes:
+ - Fix idempotent issue when using lvol with %VG or %PVS size options and VG is fully allocated.
