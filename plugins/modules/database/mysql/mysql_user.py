@@ -191,14 +191,14 @@ EXAMPLES = r'''
     priv: '*.*:REQUIRESSL'
     state: present
 
-- name: Modifiy user to require TLS connection with a valid client certificate
+- name: Modify user to require TLS connection with a valid client certificate
   mysql_user:
     name: bob
     tls_requires:
       x509:
     state: present
 
-- name: Modifiy user to require TLS connection with a specific client certificate and cipher
+- name: Modify user to require TLS connection with a specific client certificate and cipher
   mysql_user:
     name: bob
     tls_requires:

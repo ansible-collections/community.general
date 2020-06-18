@@ -144,13 +144,13 @@
 
   - name: assert user1 TLS requirements
     assert:
-      that: "'SSL' in reqs"
+      that: "'SSL' in {{reqs}}"
     vars:
       - reqs: (result.results | selectattr('item', 'eq', user_name_1) | first).stdout.split('REQUIRE')[1].split('\n')[0].strip()
 
   - name: assert user2 TLS requirements
     assert:
-      that: "'X509' in reqs"
+      that: "'X509' in {{reqs}}"
     vars:
       - reqs: (result.results | selectattr('item', 'eq', user_name_1) | first).stdout.split('REQUIRE')[1].split('\n')[0].strip()
 
@@ -172,13 +172,16 @@
 
   - name: assert user1 TLS requirements
     assert:
-      that: "'SSL' in reqs"
+      that:
+        - "'SSL' in {{reqs}}"
+      fail_msg: "{{ reqs }}"
     vars:
       - reqs: (result.results | selectattr('item', 'eq', user_name_1) | first).stdout.split('REQUIRE')[1].split('PASSWORD')[0].strip()
 
   - name: assert user2 TLS requirements
     assert:
-      that: "'X509' in reqs"
+      that:
+        - "'X509' in {{reqs}}"
     vars:
       - reqs: (result.results | selectattr('item', 'eq', user_name_1) | first).stdout.split('REQUIRE')[1].split('PASSWORD')[0].strip()
 
@@ -207,7 +210,7 @@
 
   - name: assert user1 TLS requirements
     assert:
-      that: "'X509' in reqs"
+      that: "'X509' in {{reqs}}"
     vars:
       - reqs: result.stdout.split('REQUIRE')[1].split('\n')[0].strip()
   when: db_version.version.major <= 5 and db_version.version.minor <= 6 or db_version.version.major == 10 and db_version.version.minor < 2
@@ -219,7 +222,7 @@
 
   - name: assert user1 TLS requirements
     assert:
-      that: "'X509' in reqs"
+      that: "'X509' in {{reqs}}"
     vars:
       - reqs: result.stdout.split('REQUIRE')[1].split('PASSWORD')[0].strip()
   when: db_version.version.major >= 5 and db_version.version.major < 10 and db_version.version.minor > 6 or db_version.version.major == 10 and db_version.version.minor >= 2
