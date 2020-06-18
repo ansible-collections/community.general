@@ -83,7 +83,7 @@
   when: ansible_os_family == 'Debian'
 
 - name: Initialize postgres (Suse)
-  service: name=postgresql state=started
+  service: name=postgresql state=restarted
   when: ansible_os_family == 'Suse'
 
 - name: Copy pg_hba into place
