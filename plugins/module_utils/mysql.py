@@ -29,6 +29,8 @@
 
 import os
 
+from ansible.module_utils.six.moves import configparser
+
 try:
     import pymysql as mysql_driver
     _mysql_cursor_param = 'cursor'
@@ -43,9 +45,29 @@ except ImportError:
 mysql_driver_fail_msg = 'The PyMySQL (Python 2.7 and Python 3.X) or MySQL-python (Python 2.X) module is required.'
 
 
-def mysql_connect(module, login_user=None, login_password=None, config_file='', ssl_cert=None, ssl_key=None, ssl_ca=None, db=None, cursor_class=None,
-                  connect_timeout=30, autocommit=False):
+def parse_from_mysql_config_file(cnf):
+    cp = configparser.ConfigParser()
+    cp.read(cnf)
+    return cp
+
+
+def mysql_connect(module, login_user=None, login_password=None, config_file='', ssl_cert=None,
+                  ssl_key=None, ssl_ca=None, db=None, cursor_class=None,
+                  connect_timeout=30, autocommit=False, config_overrides_defaults=False):
     config = {}
+
+    if config_file and os.path.exists(config_file):
+        config['read_default_file'] = config_file
+        cp = parse_from_mysql_config_file(config_file)
+        # Override some commond defaults with values from config file if needed
+        if cp and cp.has_section('client') and config_overrides_defaults:
+            try:
+                module.params['login_host'] = cp.get('client', 'host', fallback=module.params['login_host'])
+                module.params['login_port'] = cp.getint('client', 'port', fallback=module.params['login_port'])
+            except Exception as e:
+                if "got an unexpected keyword argument 'fallback'" in e.message:
+                    module.fail_json('To use config_overrides_defaults, '
+                                     'it needs Python 3.5+ as the default interpreter on a target host')
 
     if ssl_ca is not None or ssl_key is not None or ssl_cert is not None:
         config['ssl'] = {}
@@ -55,9 +77,6 @@ def mysql_connect(module, login_user=None, login_password=None, config_file='', 
     else:
         config['host'] = module.params['login_host']
         config['port'] = module.params['login_port']
-
-    if os.path.exists(config_file):
-        config['read_default_file'] = config_file
 
     # If login_user or login_password are given, they should override the
     # config file
