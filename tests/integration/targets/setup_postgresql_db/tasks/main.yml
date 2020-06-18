@@ -153,16 +153,8 @@
 - name: start postgresql service
   service: name={{ postgresql_service }} state=started
 
-#- name: restart postgresql service
-#  service: name={{ postgresql_service }} state=restarted
-# To get rid of hangs in CI:
-- name: stop postgresql service
-  become: yes
-  become_user: postgres
-  shell: 'pg_ctl -D {{ pg_dir }} -m immediate stop'
-
-- name: start postgresql service
-  service: name={{ postgresql_service }} state=started
+- name: restart postgresql service
+  service: name={{ postgresql_service }} state=restarted
 
 - name: copy control file for dummy ext
   copy:
