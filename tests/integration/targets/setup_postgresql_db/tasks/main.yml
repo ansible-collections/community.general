@@ -150,8 +150,18 @@
     line: postgresql_enable="YES"
   when: ansible_os_family == "FreeBSD"
 
-- name: restart postgresql service
-  service: name={{ postgresql_service }} state=restarted
+- name: start postgresql service
+  service: name={{ postgresql_service }} state=started
+
+#- name: restart postgresql service
+#  service: name={{ postgresql_service }} state=restarted
+# To get rid of hangs in CI:
+- name: stop postgresql service
+  became: postgres
+  shell: pg_ctl -D {{ pg_dir }} -m immediate
+
+- name: start postgresql service
+  service: name={{ postgresql_service }} state=started
 
 - name: copy control file for dummy ext
   copy:
