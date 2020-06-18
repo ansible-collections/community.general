@@ -59,6 +59,7 @@ options:
      - A string specifying the UUID of the VPC to which the Droplet will be assigned. If excluded, Droplet will be
        assigned to the account's default VPC for the region.
     type: str
+    version_added: 0.2.0
   user_data:
     description:
       - opaque blob of data which is made available to the droplet
