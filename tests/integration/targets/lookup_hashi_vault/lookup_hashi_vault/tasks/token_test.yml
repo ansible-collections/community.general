@@ -9,6 +9,7 @@
         kv1_secret2: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv1_path ~ '/secret2 token=' ~ user_token) }}"
         kv2_secret1: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret1 auth_method=token token=' ~ user_token) }}"
         kv2_secret2: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret2 token=' ~ user_token) }}"
+        kv2_secret4: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret4?version=2 token=' ~ user_token) }}"
         kv2_secret2_as_raw: "{{ lookup('community.general.hashi_vault', vault_kv2_path ~ '/secret2 ' ~  conn_params, auth_method='token', token=user_token, return_format='raw') }}"
         kv2_secrets_as_dict: "{{ lookup('community.general.hashi_vault', vault_kv2_multi_path ~ '/secrets ' ~  conn_params, auth_method='token', token=user_token) }}"
         kv2_secrets_as_values: "{{ query('community.general.hashi_vault', vault_kv2_multi_path ~ '/secrets ' ~  conn_params, auth_method='token', token=user_token, return_format='values') }}"
@@ -26,7 +27,7 @@
     - name: 'Check secret kv2 values'
       fail:
         msg: 'unexpected secret values'
-      when: kv2_secret1['value'] != 'foo1' or kv2_secret2['value'] != 'foo2'
+      when: kv2_secret1['value'] != 'foo1' or kv2_secret2['value'] != 'foo2' or kv2_secret4['value'] != 'foo5'
 
     - name: 'Check kv2 secret raw return value'
       fail:
@@ -72,7 +73,7 @@
 
     - name: 'Failure expected when inexistent secret is read'
       vars:
-        secret_inexistent: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret4 token=' ~ user_token) }}"
+        secret_inexistent: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/non_existent_secret4 token=' ~ user_token) }}"
       debug:
         msg: 'Failure is expected ({{ secret_inexistent }})'
       register: test_inexistent
