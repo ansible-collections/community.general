@@ -444,7 +444,7 @@ class LookupModule(LookupBase):
 
         for i, param in enumerate(term.split()):
             try:
-                key, value = param.split('=')
+                key, value = param.split('=', 1)
             except ValueError:
                 if (i == 0):
                     # allow secret to be specified as value only if it's first
