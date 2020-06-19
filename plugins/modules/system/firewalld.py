@@ -89,6 +89,7 @@ options:
       - If state is set to C(absent), this will reset the target to default
     choices: [ default, ACCEPT, DROP, REJECT ]
     type: str
+    version_added: 0.2.0
 notes:
   - Not tested on any Debian based system.
   - Requires the python2 bindings of firewalld, which may not be installed by default.
