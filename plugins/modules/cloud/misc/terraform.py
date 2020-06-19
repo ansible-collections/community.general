@@ -642,7 +642,7 @@ def main():
         command.append(plan_file)
 
     if needs_application and not module.check_mode and not state == 'planned':
-        if socket_port is None:
+        if socket_port is None and socket_host is None:
             rc, out, err = module.run_command(command, cwd=project_path)
         else:
             rc, out, err = custom_run_command(module, command, cwd=project_path, socket_host=socket_host, socket_port=socket_port)
