@@ -707,7 +707,6 @@ files:
     authors: nate-kingsley
   $modules/net_tools/cloudflare_dns.py:
     authors: mgruener
-    maintainers: andreaso
     labels: cloudflare_dns
   $modules/net_tools/dnsimple.py:
     authors: drcapulet
