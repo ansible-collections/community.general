@@ -33,3 +33,6 @@
 
 # firewalld source operation test cases
 - import_tasks: source_test_cases.yml
+
+# firewalld zone target operation test cases
+- import_tasks: zone_target_test_cases.yml
