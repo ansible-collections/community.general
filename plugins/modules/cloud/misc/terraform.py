@@ -186,30 +186,30 @@ DESTROY_ARGS = ('destroy', '-no-color', '-force')
 APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve=true')
 module = None
 PASSWD_ARG_RE = re.compile(r'^[-]{0,2}pass[-]?(word|wd)?')
-class Logger(object):
-    def __init__(self, host, port):
-        self.host = host
-        self.port = port
-        self.client_socket = socket.socket()
-        self.client_socket.connect((self.host, self.port))
-
-    def __exit__(self, etype, value, tb):
-        self.client_socket.close()
-
-    def addLine(self, ln):
-        if not isinstance(ln, bytes):
-            try:
-                ln = ln.encode('utf-8')
-            except Exception:
-                ln = repr(ln).encode('utf-8')
-        outln = b'%s' % (ln)
-        self.client_socket.sendall(outln)
 
 
+def socket_client(data, port, host):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    if not isinstance(data, bytes):
+        try:
+            data = data.encode('utf-8')
+        except Exception:
+            data = repr(data).encode('utf-8')
+    outln = b'%s' % (data)
+    sock.sendto(outln, (host, port))
 
-def terraform_run_command(self, args, socket_host, socket_port, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None,
-                          use_unsafe_shell=False, prompt_regex=None, environ_update=None, umask=None, encoding='utf-8', errors='surrogate_or_strict',
-                          expand_user_and_vars=True, pass_fds=None, before_communicate_callback=None):
+
+def custom_run_command(self, args, socket_host, socket_port, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None,
+                       cwd=None, use_unsafe_shell=False, prompt_regex=None, environ_update=None, umask=None, encoding='utf-8', errors='surrogate_or_strict',
+                       expand_user_and_vars=True, pass_fds=None, before_communicate_callback=None):
+    '''
+        This is a fork lifted run_command function from ansible core
+        https://github.com/ansible/ansible/blob/devel/lib/ansible/module_utils/basic.py
+
+        The only difference is it sends output from subprocess command to a socket
+        server which is a callback plugin(terraform_stream).
+    '''
+
     self._clean = None
 
     if not isinstance(args, (list, binary_type, text_type)):
@@ -356,13 +356,11 @@ def terraform_run_command(self, args, socket_host, socket_port, check_rc=False, 
             self.log('Executing: ' + clean_args)
 
         cmd = subprocess.Popen(args, **kwargs)
-
-        logger = Logger(socket_host, socket_port)
         while True:
             line = cmd.stdout.readline()
             if not line:
                 break
-            logger.addLine(line)
+            socket_client(line, socket_port, socket_host)
 
         if before_communicate_callback:
             before_communicate_callback(cmd)
@@ -561,8 +559,8 @@ def main():
             force_init=dict(type='bool', default=False),
             backend_config=dict(type='dict', default=None),
             backend_config_files=dict(type='list', elements='path', default=None),
-            socket_host=dict(type='str'),
-            socket_port=dict(type='int')
+            socket_port=dict(type='int'),
+            socket_host=dict(type='str')
         ),
         required_if=[('state', 'planned', ['plan_file'])],
         supports_check_mode=True,
@@ -580,8 +578,8 @@ def main():
     force_init = module.params.get('force_init')
     backend_config = module.params.get('backend_config')
     backend_config_files = module.params.get('backend_config_files')
-    socket_host = module.params.get('socket_host')
     socket_port = module.params.get('socket_port')
+    socket_host = module.params.get('socket_host')
 
     if bin_path is not None:
         command = [bin_path]
@@ -644,12 +642,10 @@ def main():
         command.append(plan_file)
 
     if needs_application and not module.check_mode and not state == 'planned':
-       if socket_host is None and socket_port is None:
+        if socket_port is None:
             rc, out, err = module.run_command(command, cwd=project_path)
         else:
-            rc, out, err = terraform_run_command(module, command, cwd=project_path, socket_host=socket_host, socket_port=socket_port)
-        # checks out to decide if changes were made during execution
-        rc, out, err = module.run_command(command, cwd=project_path)
+            rc, out, err = custom_run_command(module, command, cwd=project_path, socket_host=socket_host, socket_port=socket_port)
         # checks out to decide if changes were made during execution
         if '0 added, 0 changed' not in out and not state == "absent" or '0 destroyed' not in out:
             changed = True
