@@ -54,6 +54,12 @@ options:
      - add an additional, private network interface to droplet for inter-droplet communication.
     default: False
     type: bool
+  vpc_uuid:
+    description:
+     - A string specifying the UUID of the VPC to which the Droplet will be assigned. If excluded, Droplet will be
+       assigned to the account's default VPC for the region.
+    type: str
+    version_added: 0.2.0
   user_data:
     description:
       - opaque blob of data which is made available to the droplet
@@ -317,6 +323,7 @@ def main():
             region=dict(aliases=['region_id']),
             ssh_keys=dict(type='list'),
             private_networking=dict(type='bool', default=False),
+            vpc_uuid=dict(type='str'),
             backups=dict(type='bool', default=False),
             monitoring=dict(type='bool', default=False),
             id=dict(aliases=['droplet_id'], type='int'),
