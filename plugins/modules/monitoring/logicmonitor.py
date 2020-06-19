@@ -22,6 +22,11 @@ success:
 DOCUMENTATION = '''
 ---
 module: logicmonitor
+deprecated:
+  removed_in: 3.0.0
+  why: The module is unmaintained, and the API used by this module has been turned off in 2017
+       (https://www.logicmonitor.com/support/rpc-api-developers-guide/overview/using-logicmonitors-rpc-api/).
+  alternative: There is no alternative.
 short_description: Manage your LogicMonitor account through Ansible Playbooks
 description:
   - LogicMonitor is a hosted, full-stack, infrastructure monitoring platform.

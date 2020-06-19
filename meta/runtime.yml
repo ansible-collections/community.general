@@ -458,3 +458,11 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
+    logicmonitor_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: Module is no longer maintained and the API it uses has been disabled in 2017
+    logicmonitor:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: Module is no longer maintained and the API it uses has been disabled in 2017
