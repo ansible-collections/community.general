@@ -22,7 +22,6 @@ import os
 import re
 import socket
 import multiprocessing
-import socketserver
 import random
 from ansible import constants as C
 from ansible import context
@@ -31,24 +30,11 @@ from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
 
 
-class MyUDPHandler(socketserver.BaseRequestHandler):
-    """
-    This class works similar to the TCP handler class, except that
-    self.request consists of a pair of data and client socket, and since
-    there is no connection the client address must be given explicitly
-    when sending data back via sendto().
-    """
-
-    def handle(self):
-        data = self.request[0].strip()
-        socket = self.request[1]
-        print(data.decode('utf-8'))
-        socket.sendto(data.upper(), self.client_address)
-
-
 def sample_server(display_self):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server_socket.bind(('192.168.8.119', 8080))
+    socket_port = int(os.environ.get('ANSIBLE_TERRAFORM_STREAM_PORT'))
+    socket_host = os.environ.get('ANSIBLE_TERRAFORM_STREAM_HOST')
+    server_socket.bind((socket_host, socket_port))
 
     while True:
         message, address = server_socket.recvfrom(1024)
