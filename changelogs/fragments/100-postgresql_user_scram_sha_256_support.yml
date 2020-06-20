@@ -1,2 +1,0 @@
-minor_changes:
-- postgresql_user - add scram-sha-256 support (https://github.com/ansible/ansible/issues/49878).

@@ -1,2 +1,0 @@
-bugfixes:
-- "influxdb_user - Don't grant admin privilege in check mode"

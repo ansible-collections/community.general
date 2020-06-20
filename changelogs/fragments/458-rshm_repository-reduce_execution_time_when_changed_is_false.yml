@@ -1,3 +1,0 @@
-bugfixes:
-  - rshm_repository - reduce execution time when changed is False
-    (https://github.com/ansible-collections/community.general/pull/458).

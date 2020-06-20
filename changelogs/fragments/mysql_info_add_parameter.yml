@@ -1,2 +1,0 @@
-bugfixes:
-- mysql_info - add parameter for __collect to get only what are wanted (https://github.com/ansible-collections/community.general/pull/136).

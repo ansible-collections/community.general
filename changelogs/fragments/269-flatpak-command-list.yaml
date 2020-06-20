@@ -1,2 +1,0 @@
-bugfixes:
-- flatpak and flatpak_remote - fix command line construction to build commands as lists instead of strings.

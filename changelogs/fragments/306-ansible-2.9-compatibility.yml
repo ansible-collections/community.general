@@ -1,4 +1,0 @@
-bugfixes:
-- "archive - make module compatible with older Ansible versions (https://github.com/ansible-collections/community.general/pull/306)."
-- "maven_artifact - make module compatible with older Ansible versions (https://github.com/ansible-collections/community.general/pull/306)."
-- "java_keystore - make module compatible with older Ansible versions (https://github.com/ansible-collections/community.general/pull/306)."
