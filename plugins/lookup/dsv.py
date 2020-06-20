@@ -1,4 +1,3 @@
-# python 3 headers, required if submitting to Ansible
 from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
@@ -14,10 +13,10 @@ requirements:
     - python-dsv-sdk - https://pypi.org/project/python-dsv-sdk/
 options:
     _terms:
-        description: the path to the secret e.g. /staging/servers/web1
+        description: The path to the secret, e.g. C(/staging/servers/web1).
         required: True
     tenant:
-        description: the first format parameter in the default `url_template`
+        description: The first format parameter in the default I(url_template).
         env:
             - name: DSV_TENANT
         ini:
@@ -26,8 +25,8 @@ options:
         required: True
     tld:
         default: com
-        description: the top-level domain of the tenant; the second format
-            parameter in the default `url_template`
+        description: The top-level domain of the tenant; the second format
+            parameter in the default I(url_template).
         env:
             - name: DSV_TLD
         ini:
@@ -35,7 +34,7 @@ options:
               key: tld
         required: False
     client_id:
-        description: the client_id with which to request the Access Grant
+        description: The client_id with which to request the Access Grant.
         env:
             - name: DSV_CLIENT_ID
         ini:
@@ -43,7 +42,7 @@ options:
               key: client_id
         required: True
     client_secret:
-        description: the client_secret associated with the specific client_id
+        description: The client secret associated with the specific I(client_id).
         env:
             - name: DSV_CLIENT_SECRET
         ini:
@@ -52,20 +51,22 @@ options:
         required: True
     url_template:
         default: https://{}.secretsvaultcloud.{}/v1
-        description: the path to append to the base URL to form a valid REST
-            API request
+        description: The path to prepend to the base URL to form a valid REST
+            API request.
         env:
             - name: DSV_URL_TEMPLATE
         ini:
             - section: dsv_lookup
               key: url_template
-        required: False"""
+        required: False
+"""
 
 RETURN = r"""
 _list:
     description:
-        - One or more JSON responses to `GET /secrets/{path}`
-        - See https://dsv.thycotic.com/api/index.html#operation/getSecret"""
+        - One or more JSON responses to C(GET /secrets/{path}).
+        - See U(https://dsv.thycotic.com/api/index.html#operation/getSecret).
+"""
 
 EXAMPLES = r"""
 - hosts: localhost
