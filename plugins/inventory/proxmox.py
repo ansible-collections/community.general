@@ -9,7 +9,7 @@ DOCUMENTATION = '''
     name: proxmox
     plugin_type: inventory
     short_description: proxmox inventory source
-    version_added: "2.7"
+    version_added: "1.0.0"
     requirements:
         - requests >= 1.1
     description:
@@ -24,15 +24,19 @@ DOCUMENTATION = '''
         description: the name of this plugin, it should alwys be set to 'proxmox' for this plugin to recognize it as it's own.
         required: True
         choices: ['proxmox']
+        type: str
       url:
         description: url to proxmox
         default: 'http://localhost:8006'
+        type: str
       user:
         description: proxmox authentication user
         required: True
+        type: bool
       password:
         description: proxmox authentication password
         required: True
+        type: str
       validate_certs:
         description: verify SSL certificate if using https
         type: boolean
@@ -40,12 +44,15 @@ DOCUMENTATION = '''
       group_prefix:
         description: prefix to apply to proxmox groups
         default: proxmox_
+        type: str
       facts_prefix:
         description: prefix to apply to vm config facts
         default: proxmox_
+        type: str
       want_facts:
         description: gather vm configuration facts
         default: False
+        type: bool
 '''
 
 EXAMPLES = '''
@@ -71,9 +78,9 @@ from ansible.module_utils.six.moves.urllib.parse import urlencode
 try:
     import requests
     if LooseVersion(requests.__version__) < LooseVersion('1.1.0'):
-        raise ImportError
+        HAS_REQUESTS = True
 except ImportError:
-    raise AnsibleError('This script requires python-requests 1.1 as a minimum version')
+    HAS_REQUESTS = False
 
 
 class InventoryModule(BaseInventoryPlugin, Cacheable):
@@ -291,6 +298,9 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
     def parse(self, inventory, loader, path, cache=True):
 
         super(InventoryModule, self).parse(inventory, loader, path)
+
+        if not HAS_REQUESTS:
+            module.fail_json(msg='requests 1.1.0 or higher is required for this module')
 
         # read config from file, this sets 'options'
         self._read_config_data(path)
