@@ -62,7 +62,8 @@ RETURN = r"""
 _list:
     description:
         - The JSON responses to C(GET /secrets/{id}).
-        - See https://updates.thycotic.net/secretserver/restapiguide/TokenAuth/#operation--secrets--id--get>"""
+        - See U(https://updates.thycotic.net/secretserver/restapiguide/TokenAuth/#operation--secrets--id--get).
+"""
 
 EXAMPLES = r"""
 - hosts: localhost
@@ -119,5 +120,4 @@ class LookupModule(LookupBase):
                 raise AnsibleOptionsError("Secret ID must be an integer")
             except SecretServerError as error:
                 raise AnsibleError("Secret Server lookup failure: %s" % error.message)
-        display.debug(u"tss_lookup result: %s" % result)
         return result
