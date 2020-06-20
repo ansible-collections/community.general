@@ -1,2 +1,0 @@
-minor_changes:
-  - zypper - Added ``allow_vendor_change`` and ``replacefiles`` zypper options (https://github.com/ansible-collections/community.general/issues/381)
