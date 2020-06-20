@@ -767,7 +767,7 @@ class ContainerManager(DockerBaseClass):
                         ))
                     result['actions'].append(result_action)
 
-        if not self.check_mode and result['changed']:
+        if not self.check_mode and result['changed'] and not self.stopped:
             out_redir_name, err_redir_name = make_redirection_tempfiles()
             try:
                 with stdout_redirector(out_redir_name):
