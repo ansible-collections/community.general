@@ -1,2 +1,0 @@
-bugfixes:
-  - apt_rpm - fix ``package`` type from ``str`` to ``list`` to fix invoking with list of packages (https://github.com/ansible-collections/community.general/issues/143).

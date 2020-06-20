@@ -1,2 +1,0 @@
-minor_changes:
-  - digital_ocean_droplet - add support for new vpc_uuid parameter 

@@ -1,3 +1,0 @@
----
-bugfixes:
-- hashi_vault - Handle equal sign in key=value (https://github.com/ansible/ansible/issues/55658).

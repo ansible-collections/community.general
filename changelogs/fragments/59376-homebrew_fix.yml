@@ -1,2 +1,0 @@
-minor_changes:
-- Add information about changed packages in homebrew returned facts (https://github.com/ansible/ansible/issues/59376).
