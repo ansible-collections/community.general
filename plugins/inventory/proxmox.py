@@ -226,6 +226,17 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             except NameError:
                 return None
 
+    def _get_vm_status(self, node, vmid, vmtype, name):
+        ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/status/current" % (self.proxmox_url, node, vmtype, vmid))
+
+        status = ret['status']
+
+        # if we want the fact, then set it
+        if self.get_option('want_facts'):
+            status_key = 'status'
+            status_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), status_key.lower()))
+            self.inventory.set_variable(name, status_key, status)
+
     def to_safe(self, word):
         '''Converts 'bad' characters in a string to underscores so they can be used as Ansible groups
         #> ProxmoxInventory.to_safe("foo-bar baz")
@@ -251,6 +262,12 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             nodes_group = 'nodes'
             nodes_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), nodes_group.lower()))
             self.inventory.add_group(nodes_group)
+            running_group = 'all_running'
+            running_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), running_group.lower()))
+            self.inventory.add_group(running_group)
+            stopped_group = 'all_stopped'
+            stopped_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), stopped_group.lower()))
+            self.inventory.add_group(stopped_group)
 
             if node.get('node'):
                 self.inventory.add_host(node['node'])
@@ -270,6 +287,13 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     self.inventory.add_child(lxc_group, lxc['name'])
                     self.inventory.add_child(node_lxc_group, lxc['name'])
 
+                    # get lxc status
+                    self._get_vm_status(node['node'], lxc['vmid'], 'lxc', lxc['name'])
+                    if lxc['status'] == 'stopped':
+                        self.inventory.add_child(stopped_group, lxc['name'])
+                    elif lxc['status'] == 'running':
+                        self.inventory.add_child(running_group, lxc['name'])
+
                     # get lxc config for facts
                     if self.get_option('want_facts'):
                         self._get_vm_config(node['node'], lxc['vmid'], 'lxc', lxc['name'])
@@ -281,6 +305,13 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     self.inventory.add_host(qemu['name'])
                     self.inventory.add_child(qemu_group, qemu['name'])
                     self.inventory.add_child(node_qemu_group, qemu['name'])
+
+                    # get qemu status
+                    self._get_vm_status(node['node'], qemu['vmid'], 'qemu', qemu['name'])
+                    if qemu['status'] == 'stopped':
+                        self.inventory.add_child(stopped_group, qemu['name'])
+                    elif qemu['status'] == 'running':
+                        self.inventory.add_child(running_group, qemu['name'])
 
                     # get qemu config for facts
                     if self.get_option('want_facts'):
