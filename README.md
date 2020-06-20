@@ -32,6 +32,10 @@ You can find more information in the [developer guide for collections](https://d
 
 See [here](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#testing-collections).
 
+## Release notes
+
+See [here](https://github.com/ansible-collections/community.general/tree/master/CHANGELOG.rst).
+
 ## Publishing New Version
 
 TBD
