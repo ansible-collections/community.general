@@ -1,2 +1,0 @@
-minor_changes:
-  - "Add a make option to the make module to be able to choose a specific make executable"

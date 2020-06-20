@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ---
 title: ansible-core
 release_tag_re: '(v(?:[\d.ab\-]|rc)+)'
@@ -23,6 +24,9 @@ sections:
 - ['known_issues', 'Known Issues']
 =======
 changelog_filename_template: CHANGELOG.rst
+=======
+changelog_filename_template: ../CHANGELOG.rst
+>>>>>>> e54dd3a01f (Release 0.2.0 of community.general (#546))
 changelog_filename_version_depth: 0
 changes_file: changelog.yaml
 changes_format: combined

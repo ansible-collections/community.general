@@ -1,5 +1,0 @@
-minor_changes:
-- mysql_db - add the ``use_shell`` parameter (https://github.com/ansible/ansible/issues/20196).
-
-bugfixes:
-- mysql_db - fix Broken pipe error appearance when state is import and the target file is compressed (https://github.com/ansible/ansible/issues/20196).

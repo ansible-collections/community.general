@@ -1,2 +1,0 @@
-minor_changes:
-- packet_device - add ``tags`` parameter on device creation (https://github.com/ansible-collections/community.general/pull/418)
