@@ -1,2 +1,0 @@
-security_fixes:
-  - '**security issue** - Ansible: Splunk and Sumologic callback plugins leak sensitive data in logs (CVE-2019-14864)'
