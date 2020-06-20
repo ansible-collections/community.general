@@ -192,14 +192,14 @@ def snapshot_remove(module, proxmox, vm, vmid, timeout, snapname, force):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            api_host=dict(required=True),
-            api_user=dict(required=True),
-            api_password=dict(no_log=True),
-            vmid=dict(required=False),
+            api_host=dict(type='str', required=True),
+            api_user=dict(type='str', required=True),
+            api_password=dict(type='str', no_log=True),
+            vmid=dict(type='int', required=False),
+            hostname=dict(type='str', required=False),
             validate_certs=dict(type='bool', default='no'),
-            hostname=dict(),
             timeout=dict(type='int', default=30),
-            state=dict(default='present', choices=['present', 'absent']),
+            state=dict(type='str', default='present', choices=['present', 'absent']),
             description=dict(type='str'),
             snapname=dict(type='str', default='ansible_snap'),
             force=dict(type='bool', default='no'),
