@@ -15,6 +15,6 @@ dependencies:
   google.cloud: '>=0.0.9'
 repository: https://github.com/ansible-collections/community.general
 documentation: https://github.com/ansible-collection-migration/community.general/tree/master/docs
-homepage: https://github.com/ansible-collections/community.general
+#homepage: https://github.com/ansible-collections/community.general
 issues: https://github.com/ansible-collections/community.general/issues
 #type: flatmap
