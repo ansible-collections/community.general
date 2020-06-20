@@ -32,7 +32,7 @@ DOCUMENTATION = '''
       user:
         description: proxmox authentication user
         required: True
-        type: bool
+        type: str
       password:
         description: proxmox authentication password
         required: True
@@ -73,14 +73,13 @@ from ansible.errors import AnsibleError
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 
-
 # 3rd party imports
 try:
     import requests
     if LooseVersion(requests.__version__) < LooseVersion('1.1.0'):
-        HAS_REQUESTS = True
+        raise ImportError
 except ImportError:
-    HAS_REQUESTS = False
+    raise AnsibleError('This script requires python-requests 1.1 as a minimum version')
 
 
 class InventoryModule(BaseInventoryPlugin, Cacheable):
@@ -298,9 +297,6 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
     def parse(self, inventory, loader, path, cache=True):
 
         super(InventoryModule, self).parse(inventory, loader, path)
-
-        if not HAS_REQUESTS:
-            module.fail_json(msg='requests 1.1.0 or higher is required for this module')
 
         # read config from file, this sets 'options'
         self._read_config_data(path)
