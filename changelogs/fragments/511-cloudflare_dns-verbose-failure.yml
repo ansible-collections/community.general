@@ -1,2 +1,0 @@
-minor_changes:
-  - cloudflare_dns - Report unexpected failure with more detail (https://github.com/ansible-collections/community.general/pull/511).

@@ -1,2 +1,0 @@
-removed_features:
-- "core - remove support for ``check_invalid_arguments`` in ``UTMModule``."

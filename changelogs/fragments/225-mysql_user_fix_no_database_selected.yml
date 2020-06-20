@@ -1,2 +1,0 @@
-bugfixes:
-- mysql_user - fix the error No database selected (https://github.com/ansible/ansible/issues/68070).

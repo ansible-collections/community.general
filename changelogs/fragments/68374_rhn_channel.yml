@@ -1,2 +1,0 @@
-minor_changes:
-- "rhn_channel - Added ``validate_certs`` option (https://github.com/ansible/ansible/issues/68374)."

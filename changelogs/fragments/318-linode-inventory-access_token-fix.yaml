@@ -1,2 +1,0 @@
-bugfixes:
-  - linode inventory plugin - fix parsing of access_token (https://github.com/ansible/ansible/issues/66874)

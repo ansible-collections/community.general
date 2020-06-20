@@ -1,2 +1,0 @@
-minor_changes:
-- "homebrew - ``install_options`` is now validated to be a list of strings."

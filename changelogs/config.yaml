@@ -1,4 +1,4 @@
-changelog_filename_template: CHANGELOG.rst
+changelog_filename_template: ../CHANGELOG.rst
 changelog_filename_version_depth: 0
 changes_file: changelog.yaml
 changes_format: combined
