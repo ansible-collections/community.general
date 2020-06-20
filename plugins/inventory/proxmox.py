@@ -78,8 +78,9 @@ try:
     import requests
     if LooseVersion(requests.__version__) < LooseVersion('1.1.0'):
         raise ImportError
+    HAS_REQUESTS = True
 except ImportError:
-    raise AnsibleError('This script requires python-requests 1.1 as a minimum version')
+    HAS_REQUESTS = FALSE
 
 
 class InventoryModule(BaseInventoryPlugin, Cacheable):
@@ -295,6 +296,9 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                         self.inventory.add_child(pool_group, member['name'])
 
     def parse(self, inventory, loader, path, cache=True):
+        if not HAS_REQUESTS:
+            raise AnsibleError('This module requires Python Requests 1.1.0 or higher: '
+                               'https://github.com/psf/requests.')
 
         super(InventoryModule, self).parse(inventory, loader, path)
 
