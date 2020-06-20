@@ -1,0 +1,6 @@
+---
+bugfixes:
+  - docker_compose - Add a condition to prevent service startup
+    if parameter ``stopped`` is true. Otherwise, the service will be
+    started on each play and stopped again immediately due to
+    the ``stopped`` parameter and breaks the idempotency of the module.
