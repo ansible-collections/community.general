@@ -1,2 +1,0 @@
-bugfixes:
-- postgresql_membership - remove unused import of exec_sql function (https://github.com/ansible-collections/community.general/pull/178).

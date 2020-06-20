@@ -1,2 +1,0 @@
-minor_changes:
-- "homebrew_tap - ``name`` is now validated to be a list of strings."
