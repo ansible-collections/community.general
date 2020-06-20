@@ -9,6 +9,7 @@ DOCUMENTATION = r'''
 ---
 module: proxmox_snap
 short_description: snapshot management of instances in Proxmox VE cluster
+version_added: 1.0.0
 description:
   - allows you to create/delete snapshots from instances in Proxmox VE cluster
 options:
@@ -28,7 +29,7 @@ options:
       - you can use PROXMOX_PASSWORD environment variable
     type: str
   hostname:
-    description
+    description:
       - the instance name
     type: str
   vmid:
@@ -62,7 +63,6 @@ options:
       - Specify the description for the snapshot. Only used on the configuration web interface.
       - This is saved as a comment inside the configuration file.
     type: str
-    version_added: '0.2.0'
   timeout:
     description:
       - timeout for operations
@@ -73,7 +73,6 @@ options:
       - Name of the snapshot that has to be created
     default: 'ansible_snap'
     type: str
-    version_added: '0.2.0'
 
 notes:
   - Requires proxmoxer and requests modules on host. This modules can be installed with pip.
