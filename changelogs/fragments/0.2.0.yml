@@ -1,0 +1,4 @@
+release_summary: |
+  This is the first proper release of the ``community.general`` collection on 2020-06-20.
+  The changelog describes all changes made to the modules and plugins included in this
+  collection since Ansible 2.9.0.
