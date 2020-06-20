@@ -80,7 +80,7 @@ try:
         raise ImportError
     HAS_REQUESTS = True
 except ImportError:
-    HAS_REQUESTS = FALSE
+    HAS_REQUESTS = False
 
 
 class InventoryModule(BaseInventoryPlugin, Cacheable):
