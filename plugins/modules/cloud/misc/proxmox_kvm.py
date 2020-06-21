@@ -66,6 +66,19 @@ options:
   clone:
     description:
       - Name of VM to be cloned. If C(vmid) is setted, C(clone) can take arbitrary value but required for initiating the clone.
+  cicustom:
+    description:
+      - cloud-init: Specify custom files to replace the automatically generated ones at start.
+  cipassword:
+    description:
+      - cloud-init: Password to assign the user. Using this is generally not recommended. Use ssh keys instead. Also note that older cloud-init versions do not support hashed passwords.
+  citype:
+    description:
+      - cloud-init: Specifies the cloud-init configuration format. The default depends on the configured operating system type (`ostype`. We use the `nocloud` format for Linux, and `configdrive2` for windows.
+    choices: ['nocloud', 'configdrive2']
+  ciuser:
+    description:
+      - cloud-init: User name to change ssh keys and password for instead of the image's configured default user.
   cores:
     description:
       - Specify number of cores per socket.
@@ -283,6 +296,9 @@ options:
     description:
       - Sets the number of CPU sockets. (1 - N).
     default: 1
+  sshkeys:
+    description:
+      - cloud-init: Setup public SSH keys (one key per line, OpenSSH format).
   startdate:
     description:
       - Sets the initial date of the real time clock.
@@ -785,6 +801,10 @@ def main():
             bios=dict(choices=['seabios', 'ovmf']),
             boot=dict(type='str', default='cnd'),
             bootdisk=dict(type='str'),
+            cicustom=dict(type='str', default=None),
+            cipassword=dict(type='str', default=None),
+            citype=dict(type='str', choices=['nocloud', 'configdrive2']),
+            ciuser=dict(type='str', default=None),
             clone=dict(type='str', default=None),
             cores=dict(type='int', default=1),
             cpu=dict(type='str', default='kvm64'),
@@ -831,6 +851,7 @@ def main():
             smbios=dict(type='str'),
             snapname=dict(type='str'),
             sockets=dict(type='int', default=1),
+            sshkeys=dict(type='str'),
             startdate=dict(type='str'),
             startup=dict(),
             state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'current']),
@@ -965,6 +986,10 @@ def main():
                       bios=module.params['bios'],
                       boot=module.params['boot'],
                       bootdisk=module.params['bootdisk'],
+                      cicustom=module.params['cicustom'],
+                      cipassword=module.params['cipassword'],
+                      citype=module.params['citype'],
+                      ciuser=module.params['ciuser'],
                       cpulimit=module.params['cpulimit'],
                       cpuunits=module.params['cpuunits'],
                       description=module.params['description'],
@@ -999,6 +1024,7 @@ def main():
                       skiplock=module.params['skiplock'],
                       smbios1=module.params['smbios'],
                       snapname=module.params['snapname'],
+                      sshkeys=module.params['sshkeys'],
                       startdate=module.params['startdate'],
                       startup=module.params['startup'],
                       tablet=module.params['tablet'],
