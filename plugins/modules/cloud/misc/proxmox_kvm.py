@@ -5,6 +5,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+import urllib
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -156,6 +157,16 @@ options:
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
+  ipconfig:
+    description:
+      - A hash/dictionary of network ip configurations. C(ipconfig='{"key":"value", "key":"value"}').
+      - Keys allowed are - C(ipconfig[n]) where 0 ≤ n ≤ network interfaces.
+      - Values allowed are -  C("[gw=<GatewayIPv4>] [,gw6=<GatewayIPv6>] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]").
+      - cloud-init: Specify IP addresses and gateways for the corresponding interface.
+      - IP addresses use CIDR notation, gateways are optional but need an IP of the same type specified.
+      - The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided.
+      - For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.
+      - If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4.
   keyboard:
     description:
       - Sets the keyboard layout for VNC server.
@@ -821,6 +832,7 @@ def main():
             hotplug=dict(type='str'),
             hugepages=dict(choices=['any', '2', '1024']),
             ide=dict(type='dict', default=None),
+            ipconfig=dict(type='dict', default=None),
             keyboard=dict(type='str'),
             kvm=dict(type='bool', default='yes'),
             localtime=dict(type='bool'),
@@ -978,6 +990,8 @@ def main():
             elif not node_check(proxmox, node):
                 module.fail_json(msg="node '%s' does not exist in cluster" % node)
 
+            sshkeys = None if module.params['sshkeys'] is None else urllib.quote(module.params['sshkeys'], '')
+
             create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sockets, timeout, update,
                       acpi=module.params['acpi'],
                       agent=module.params['agent'],
@@ -1000,6 +1014,7 @@ def main():
                       hotplug=module.params['hotplug'],
                       hugepages=module.params['hugepages'],
                       ide=module.params['ide'],
+                      ipconfig=module.params['ipconfig'],
                       keyboard=module.params['keyboard'],
                       kvm=module.params['kvm'],
                       localtime=module.params['localtime'],
@@ -1024,7 +1039,7 @@ def main():
                       skiplock=module.params['skiplock'],
                       smbios1=module.params['smbios'],
                       snapname=module.params['snapname'],
-                      sshkeys=module.params['sshkeys'],
+                      sshkeys=sshkeys,
                       startdate=module.params['startdate'],
                       startup=module.params['startup'],
                       tablet=module.params['tablet'],
