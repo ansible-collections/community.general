@@ -686,19 +686,6 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
             if p in kwargs:
                 del kwargs[p]
 
-    # If update, don't update disk (virtio, ide, sata, scsi) and network interface
-    if update:
-        if 'virtio' in kwargs:
-            del kwargs['virtio']
-        if 'sata' in kwargs:
-            del kwargs['sata']
-        if 'scsi' in kwargs:
-            del kwargs['scsi']
-        if 'ide' in kwargs:
-            del kwargs['ide']
-        if 'net' in kwargs:
-            del kwargs['net']
-
     # Convert all dict in kwargs to elements. For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n]
     for k in list(kwargs.keys()):
         if isinstance(kwargs[k], dict):
@@ -712,8 +699,7 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
 
     # -args and skiplock require root@pam user
     if module.params['api_user'] == "root@pam" and module.params['args'] is None:
-        if not update:
-            kwargs['args'] = vm_args
+        kwargs['args'] = vm_args
     elif module.params['api_user'] == "root@pam" and module.params['args'] is not None:
         kwargs['args'] = module.params['args']
     elif module.params['api_user'] != "root@pam" and module.params['args'] is not None:
@@ -912,6 +898,12 @@ def main():
                 vmid = get_nextvmid(module, proxmox)
             except Exception as e:
                 module.fail_json(msg="Can't get the next vmid for VM {0} automatically. Ensure your cluster state is good".format(name))
+        elif state == 'current':
+            try:
+                vmid = get_vmid(proxmox, name)[0]
+            except Exception as e:
+                status = {'status':'absent'}
+                module.exit_json(changed=False, msg="VM {0} does not exist in cluster.".format(name), **status)
         else:
             try:
                 if not clone:
@@ -1086,7 +1078,7 @@ def main():
                 module.exit_json(changed=False, msg="VM %s does not exist" % vmid)
 
             if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'running':
-                module.exit_json(changed=False, msg="VM %s is running. Stop it before deletion." % vmid)
+                module.fail_json(changed=False, msg="VM %s is running. Stop it before deletion." % vmid)
 
             taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE).delete(vmid)
             while timeout:
@@ -1107,7 +1099,8 @@ def main():
         try:
             vm = get_vm(proxmox, vmid)
             if not vm:
-                module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
+                status['status'] = 'absent'
+                module.exit_json(changed=False, msg='VM with vmid = %s does not exist in cluster' % vmid, **status)
             current = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status']
             status['status'] = current
             if status:
