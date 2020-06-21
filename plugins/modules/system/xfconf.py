@@ -12,13 +12,11 @@ DOCUMENTATION = '''
 module: xfconf
 author:
     - "Joseph Benden (@jbenden)"
+    - "Alexei Znamensky (@russoz)"
 short_description: Edit XFCE4 Configurations
 description:
   - This module allows for the manipulation of Xfce 4 Configuration via
     xfconf-query.  Please see the xfconf-query(1) man pages for more details.
-    
-    TO-DO: add unit tests, add a 'list' state to retrieve properties, add recursive reset
-version_added: "2.8"
 options:
   channel:
     description:
@@ -41,7 +39,7 @@ options:
     - The type of value being set. This is ignored if the state is "get".
       For array mode, use a list of types.
     choices: [ int, bool, float, string ]
-7  state:
+  state:
     description:
     - The action to take upon the property/value.
     choices: [ get, present, absent ]
@@ -60,12 +58,14 @@ EXAMPLES = """
     property: "/Xft/DPI"
     value_type: "int"
     value: "192"
+
 - name: Set workspace names (4)
   xfconf:
     channel: xfwm4
     property: /general/workspace_names
     value_type: string
     value: ['Main', 'Work1', 'Work2', 'Tmp']
+
 - name: Set workspace names (1)
   xfconf:
     channel: xfwm4
@@ -97,7 +97,7 @@ RETURN = '''
     type: str
     sample: "192"
   previous_value:
-    description: The value of the preference key before executing the module (None for "get" state)
+    description: The value of the preference key before executing the module (None for "get" state).
     returned: success
     type: str
     sample: "96"
@@ -129,9 +129,9 @@ class XfConfProperty(object):
         self.force_array = module.params['force_array']
 
         self.cmd = "{0} --channel {1} --property {2}".format(
-                module.get_bin_path('xfconf-query', True),
-                shlex_quote(self.channel),
-                shlex_quote(self.property)
+            module.get_bin_path('xfconf-query', True),
+            shlex_quote(self.channel),
+            shlex_quote(self.property)
         )
         self.method_map = dict(zip((self.SET, self.GET, self.RESET),
                                    (self.set, self.get, self.reset)))
@@ -177,7 +177,7 @@ class XfConfProperty(object):
     def reset(self):
         self._execute_xfconf_query("--reset")
         return None
-        
+
     @staticmethod
     def _fix_bool(value):
         if value.lower() in ("true", "false"):
@@ -241,29 +241,27 @@ class XfConfProperty(object):
 
 
 def main():
-    module_name = "xfconf"
+    facts_name = "xfconf"
     # Setup the Ansible module
     module = AnsibleModule(
         argument_spec=dict(
             channel=dict(required=True, type='str'),
             property=dict(required=True, type='str'),
-            value_type=dict(required=False, type='list'),
-            value=dict(required=False, type='list'),
+            value_type=dict(required=False, type='list',
+                            elements='str', choices=['int', 'bool', 'float', 'string']),
+            value=dict(required=False, type='list', elements='raw'),
             state=dict(default=XfConfProperty.SET,
                        choices=XfConfProperty.VALID_STATES,
                        type='str'),
             force_array=dict(default=False, type='bool', aliases=['array']),
+            required_if=[
+                ('state', XfConfProperty.SET, ['value', 'value_type'])
+            ]
         ),
         supports_check_mode=True
     )
 
     state = module.params['state']
-
-    if state == XfConfProperty.SET:
-        if not module.params.get('value'):
-            module.fail_json(msg='State {0} requires "value" to be set'.format(state))
-        elif not module.params.get('value_type'):
-            module.fail_json(msg='State {0} requires "value_type" to be set'.format(state))
 
     try:
         # Create a Xfconf preference
@@ -272,11 +270,13 @@ def main():
 
         previous_value = xfconf.get()
         facts = {
-            module_name: dict(
+            facts_name: dict(
                 channel=xfconf.channel,
                 property=xfconf.property,
                 value_type=xfconf.value_type,
-                value=previous_value,)}
+                value=previous_value,
+            )
+        }
 
         if state == XfConfProperty.GET \
                 or (previous_value is not None
@@ -290,7 +290,7 @@ def main():
         else:
             new_value = xfconf.call(state)
 
-        facts[module_name].update(value=new_value, previous_value=previous_value)
+        facts[facts_name].update(value=new_value, previous_value=previous_value)
         module.exit_json(changed=True, ansible_facts=facts)
 
     except Exception as e:
