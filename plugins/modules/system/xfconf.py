@@ -24,20 +24,26 @@ options:
       Xfconf repository that corresponds to the location for which all
       application properties/keys are stored. See man xfconf-query(1)
     required: yes
+    type: str
   property:
     description:
     - A Xfce preference key is an element in the Xfconf repository
       that corresponds to an application preference. See man xfconf-query(1)
     required: yes
+    type: str
   value:
     description:
     - Preference properties typically have simple values such as strings,
       integers, or lists of strings and integers. This is ignored if the state
       is "get". For array mode, use a list of values. See man xfconf-query(1)
+    type: list
+    elements: raw
   value_type:
     description:
     - The type of value being set. This is ignored if the state is "get".
       For array mode, use a list of types.
+    type: list
+    elements: str
     choices: [ int, bool, float, string ]
   state:
     description:
@@ -49,6 +55,7 @@ options:
     - Force array even if only one element
     type: bool
     default: 'no'
+    aliases: ['array']
 '''
 
 EXAMPLES = """
