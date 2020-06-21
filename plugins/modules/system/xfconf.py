@@ -211,11 +211,6 @@ class XfConfProperty(object):
         if (self.value is None) ^ (self.value_type is None):
             raise XfConfException('Must set both "value" and "value_type"')
 
-        # Check for invalid value types
-        for v in self.value_type:
-            if v not in self.VALID_VALUE_TYPES:
-                raise XfConfException('value_type {0} is not supported'.format(v))
-
         # stringify all values - in the CLI they will all be happy strings anyway
         # and by doing this here the rest of the code can be agnostic to it
         self.value = [str(v) for v in self.value]
@@ -245,19 +240,19 @@ def main():
     # Setup the Ansible module
     module = AnsibleModule(
         argument_spec=dict(
-            channel=dict(required=True, type='str'),
-            property=dict(required=True, type='str'),
-            value_type=dict(required=False, type='list',
-                            elements='str', choices=['int', 'bool', 'float', 'string']),
-            value=dict(required=False, type='list', elements='raw'),
             state=dict(default=XfConfProperty.SET,
                        choices=XfConfProperty.VALID_STATES,
                        type='str'),
+            channel=dict(required=True, type='str'),
+            property=dict(required=True, type='str'),
+            value_type=dict(required=False, type='list',
+                            elements='str', choices=XfConfProperty.VALID_VALUE_TYPES),
+            value=dict(required=False, type='list', elements='raw'),
             force_array=dict(default=False, type='bool', aliases=['array']),
-            required_if=[
-                ('state', XfConfProperty.SET, ['value', 'value_type'])
-            ]
         ),
+        required_if=[
+            ('state', XfConfProperty.SET, ['value', 'value_type'])
+        ],
         supports_check_mode=True
     )
 
