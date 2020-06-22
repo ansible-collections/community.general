@@ -325,7 +325,7 @@ def main():
     p = module.params
 
     if p['no_cache']:
-       APK_PATH = "%s --no-cache" % (APK_PATH, )
+        APK_PATH = "%s --no-cache" % (APK_PATH, )
 
     # add repositories to the APK_PATH
     if p['repository']:
