@@ -290,7 +290,7 @@ def main():
             name=dict(required=False),
             repo=dict(required=False),
             state=dict(choices=['present', 'absent'], default='present'),
-            runrefresh=dict(required=False, default='no', type='bool'),
+            runrefresh=dict(required=False, default=False, type='bool'),
             description=dict(required=False),
             disable_gpg_check=dict(required=False, default=False, type='bool'),
             autorefresh=dict(required=False, default=True, type='bool', aliases=['refresh']),
