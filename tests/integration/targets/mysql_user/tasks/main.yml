@@ -157,9 +157,9 @@
   - name: assert user3 TLS requirements
     assert:
       that:
-        - "'/CN=alice/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in (reqs | select('contains', 'SUBJECT'))"
-        - "'/CN=org/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in (reqs | select('contains', 'ISSUER'))"
-        - "'ECDHE-ECDSA-AES256-SHA384' in (reqs | select('contains', 'CIPHER'))"
+        - "'/CN=alice/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in {{reqs | select('contains', 'SUBJECT')}}"
+        - "'/CN=org/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in {{reqs | select('contains', 'ISSUER')}}"
+        - "'ECDHE-ECDSA-AES256-SHA384' in {{reqs | select('contains', 'CIPHER')}}"
     vars:
       - reqs: (result.results | selectattr('item', 'contains', user_name_3) | first).stdout.split('REQUIRE')[1].split('\n')[0].replace("' ", "':").split(":")
   when: db_version.version.major <= 5 and db_version.version.minor <= 6 or db_version.version.major == 10 and db_version.version.minor < 2
@@ -174,7 +174,6 @@
     assert:
       that:
         - "'SSL' in {{reqs}}"
-      fail_msg: "{{ reqs }}"
     vars:
       - reqs: (result.results | selectattr('item', 'contains', user_name_1) | first).stdout.split('REQUIRE')[1].split('PASSWORD')[0].strip()
 
@@ -188,9 +187,9 @@
   - name: assert user3 TLS requirements
     assert:
       that:
-        - "'/CN=alice/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in (reqs | select('contains', 'SUBJECT'))"
-        - "'/CN=org/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in (reqs | select('contains', 'ISSUER'))"
-        - "'ECDHE-ECDSA-AES256-SHA384' in (reqs | select('contains', 'CIPHER'))"
+        - "'/CN=alice/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in {{reqs | select('contains', 'SUBJECT')}}"
+        - "'/CN=org/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in {{reqs | select('contains', 'ISSUER')}}"
+        - "'ECDHE-ECDSA-AES256-SHA384' in {{reqs | select('contains', 'CIPHER')}}"
     vars:
       - reqs: (result.results | selectattr('item', 'contains', user_name_3) | first).stdout.split('REQUIRE')[1].split('PASSWORD')[0].replace("' ", "':").split(":")
   when: db_version.version.major >= 5 and db_version.version.major < 10 and db_version.version.minor > 6 or db_version.version.major == 10 and db_version.version.minor >= 2
