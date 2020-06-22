@@ -322,11 +322,11 @@ def main():
         argument_spec=dict(
             state=dict(default="present", choices=["present", "absent"]),
             name=dict(aliases=["pkg"], type='list'),
-            update_cache=dict(default='no', type='bool'),
-            upgrade=dict(default='no', type='bool'),
-            full_upgrade=dict(default='no', type='bool'),
-            clean=dict(default='no', type='bool'),
-            force=dict(default='no', type='bool')),
+            update_cache=dict(default=False, type='bool'),
+            upgrade=dict(default=False, type='bool'),
+            full_upgrade=dict(default=False, type='bool'),
+            clean=dict(default=False, type='bool'),
+            force=dict(default=False, type='bool')),
         required_one_of=[['name', 'update_cache', 'upgrade', 'full_upgrade', 'clean']],
         supports_check_mode=True)
 
