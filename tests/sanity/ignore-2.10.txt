@@ -1179,9 +1179,6 @@ plugins/modules/packaging/language/pip_package_info.py validate-modules:paramete
 plugins/modules/packaging/language/yarn.py validate-modules:doc-missing-type
 plugins/modules/packaging/language/yarn.py validate-modules:parameter-type-not-in-doc
 plugins/modules/packaging/os/apk.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/packaging/os/apk.py validate-modules:doc-missing-type
-plugins/modules/packaging/os/apk.py validate-modules:parameter-list-no-elements
-plugins/modules/packaging/os/apk.py validate-modules:parameter-type-not-in-doc
 plugins/modules/packaging/os/apt_repo.py validate-modules:parameter-type-not-in-doc
 plugins/modules/packaging/os/apt_rpm.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/packaging/os/apt_rpm.py validate-modules:doc-default-does-not-match-spec
