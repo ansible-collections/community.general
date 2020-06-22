@@ -202,7 +202,7 @@ def main():
             icon_url=dict(type='str', default='https://www.ansible.com/favicon.ico'),
             icon_emoji=dict(type='str', default=None),
             link_names=dict(type='int', default=1, choices=[0, 1]),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
             color=dict(type='str', default='normal', choices=['normal', 'good', 'warning', 'danger']),
             attachments=dict(type='list', required=False, default=None)
         )

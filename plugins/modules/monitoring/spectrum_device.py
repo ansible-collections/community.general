@@ -306,8 +306,8 @@ def main():
             url=dict(required=True, aliases=['oneclick_url']),
             url_username=dict(required=True, aliases=['oneclick_user']),
             url_password=dict(required=True, no_log=True, aliases=['oneclick_password']),
-            use_proxy=dict(type='bool', default='yes'),
-            validate_certs=dict(type='bool', default='yes'),
+            use_proxy=dict(type='bool', default=True),
+            validate_certs=dict(type='bool', default=True),
         ),
         required_if=[('state', 'present', ['community'])],
         supports_check_mode=True
