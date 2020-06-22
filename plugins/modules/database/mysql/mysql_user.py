@@ -67,6 +67,7 @@ options:
       - SUBJECT, ISSUER and CIPHER are complementary, and mutually exclusive with SSL and X509.
       - U(https://mariadb.com/kb/en/securing-connections-for-client-and-server/#requiring-tls).
     type: dict
+    version_added: 1.0.0
   sql_log_bin:
     description:
       - Whether binary logging should be enabled or disabled for the connection.
@@ -404,7 +405,7 @@ def do_not_mogrify_requires(query, params, tls_requires):
 def get_tls_requires(cursor, user, host):
     if user:
         if server_suports_requires_create(cursor):
-            query = "SHOW CREATE USER for '%s'@'%s'" % (user, host)
+            query = "SHOW CREATE USER '%s'@'%s'" % (user, host)
         else:
             query = "SHOW GRANTS for '%s'@'%s'" % (user, host)
 
@@ -581,6 +582,9 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
         # Handle TLS requirements
         current_requires = get_tls_requires(cursor, user, host)
         if current_requires != tls_requires:
+            msg = "TLS requires updated"
+            if module.check_mode:
+                return (True, msg)
             if server_suports_requires_create(cursor):
                 pre_query = "ALTER USER"
             else:
