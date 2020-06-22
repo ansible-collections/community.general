@@ -231,7 +231,7 @@ def main():
             hours=dict(default='1', required=False),
             minutes=dict(default='0', required=False),
             desc=dict(default='Created by Ansible', required=False),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         )
     )
 

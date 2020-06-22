@@ -234,7 +234,7 @@ def main():
             cache_table=dict(default=None, required=False),
             clear=dict(default=None, required=False, type='bool'),
             database=dict(default=None, required=False),
-            failfast=dict(default='no', required=False, type='bool', aliases=['fail_fast']),
+            failfast=dict(default=False, required=False, type='bool', aliases=['fail_fast']),
             fixtures=dict(default=None, required=False),
             liveserver=dict(default=None, required=False, aliases=['live_server']),
             testrunner=dict(default=None, required=False, aliases=['test_runner']),

@@ -128,7 +128,7 @@ def main():
                    choices=['present', 'latest'],
                    type='str'),
         virtualenv=dict(default=None, required=False),
-        virtualenv_site_packages=dict(default='no', type='bool'),
+        virtualenv_site_packages=dict(default=False, type='bool'),
         virtualenv_command=dict(default='virtualenv', required=False),
         executable=dict(default='easy_install', required=False),
     )

@@ -238,7 +238,7 @@ def main():
         name=dict(default=None, type='str'),
         path=dict(default=None, type='path'),
         version=dict(default=None, type='str'),
-        production=dict(default='no', type='bool'),
+        production=dict(default=False, type='bool'),
         executable=dict(default=None, type='path'),
         registry=dict(default=None, type='str'),
         state=dict(default='present', choices=['present', 'absent', 'latest']),
@@ -246,7 +246,7 @@ def main():
         unsafe_perm=dict(default=False, type='bool'),
         ci=dict(default=False, type='bool'),
     )
-    arg_spec['global'] = dict(default='no', type='bool')
+    arg_spec['global'] = dict(default=False, type='bool')
     module = AnsibleModule(
         argument_spec=arg_spec,
         supports_check_mode=True

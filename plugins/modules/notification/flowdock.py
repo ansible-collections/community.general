@@ -120,7 +120,7 @@ def main():
             project=dict(required=False),
             tags=dict(required=False),
             link=dict(required=False),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         ),
         supports_check_mode=True
     )
