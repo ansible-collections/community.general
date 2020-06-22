@@ -34,12 +34,15 @@ options:
     description:
       - A package repository or multiple repositories.
         Unlike with the underlying apk command, this list will override the system repositories rather than supplement them.
+    type: list
+    elements: str
   state:
     description:
       - Indicates the desired package(s) state.
       - C(present) ensures the package(s) is/are present.
       - C(absent) ensures the package(s) is/are absent.
       - C(latest) ensures the package(s) is/are present and the latest version(s).
+    type: str
     default: present
     choices: [ "present", "absent", "latest" ]
   update_cache:
@@ -293,7 +296,7 @@ def main():
         argument_spec=dict(
             state=dict(default='present', choices=['present', 'installed', 'absent', 'removed', 'latest']),
             name=dict(type='list', elements='str'),
-            repository=dict(type='list'),
+            repository=dict(type='list', elements='str'),
             update_cache=dict(default=False, type='bool'),
             upgrade=dict(default=False, type='bool'),
             available=dict(default=False, type='bool'),
