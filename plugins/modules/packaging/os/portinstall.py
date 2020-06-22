@@ -190,7 +190,7 @@ def main():
         argument_spec=dict(
             state=dict(default="present", choices=["present", "absent"]),
             name=dict(aliases=["pkg"], required=True),
-            use_packages=dict(type='bool', default='yes')))
+            use_packages=dict(type='bool', default=True)))
 
     p = module.params
 
