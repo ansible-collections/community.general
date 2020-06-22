@@ -308,7 +308,7 @@ def main():
             icon_emoji=dict(type='str', default=None),
             link_names=dict(type='int', default=1, choices=[0, 1]),
             parse=dict(type='str', default=None, choices=['none', 'full']),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
             color=dict(type='str', default='normal'),
             attachments=dict(type='list', required=False, default=None)
         )

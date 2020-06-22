@@ -137,7 +137,7 @@ def main():
             dest=dict(type='path', required=True),
             name=dict(type='str', required=True, aliases=['parent']),
             version=dict(type='str', default='head'),
-            force=dict(type='bool', default='no'),
+            force=dict(type='bool', default=False),
             executable=dict(type='str'),
         )
     )

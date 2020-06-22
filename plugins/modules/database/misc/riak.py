@@ -97,7 +97,7 @@ def main():
             wait_for_ring=dict(default=False, type='int'),
             wait_for_service=dict(
                 required=False, default=None, choices=['kv']),
-            validate_certs=dict(default='yes', type='bool'))
+            validate_certs=dict(default=True, type='bool'))
     )
 
     command = module.params.get('command')

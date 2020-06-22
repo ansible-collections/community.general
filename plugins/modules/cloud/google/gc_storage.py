@@ -409,7 +409,7 @@ def main():
             gs_access_key=dict(required=True),
             overwrite=dict(default=True, type='bool', aliases=['force']),
             region=dict(default='US', type='str'),
-            versioning=dict(default='no', type='bool')
+            versioning=dict(default=False, type='bool')
         ),
     )
 
