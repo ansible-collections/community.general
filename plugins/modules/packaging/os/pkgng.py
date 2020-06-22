@@ -332,7 +332,7 @@ def autoremove_packages(module, pkgng_path, dir_arg):
         autoremove_c = int(match.group(1))
 
     if autoremove_c == 0:
-        return False, "no package(s) to autoremove"
+        return (False, "no package(s) to autoremove", stdout, stderr)
 
     if not module.check_mode:
         rc, out, err = module.run_command("%s %s autoremove -y" % (pkgng_path, dir_arg))
