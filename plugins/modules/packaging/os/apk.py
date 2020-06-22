@@ -30,6 +30,12 @@ options:
       - A package name, like C(foo), or multiple packages, like C(foo, bar).
     type: list
     elements: str
+  no_cache:
+    description:
+      - Do not use any local cache path.
+    type: bool
+    default: 'no'
+    version_added: 1.0.0
   repository:
     description:
       - A package repository or multiple repositories.
@@ -119,6 +125,12 @@ EXAMPLES = '''
     state: latest
     update_cache: yes
     repository: http://dl-3.alpinelinux.org/alpine/edge/main
+
+- name: Install package without using cache
+  apk:
+    name: foo
+    state: latest
+    no_cache: yes
 '''
 
 RETURN = '''
@@ -293,6 +305,7 @@ def main():
         argument_spec=dict(
             state=dict(default='present', choices=['present', 'installed', 'absent', 'removed', 'latest']),
             name=dict(type='list', elements='str'),
+            no_cache=dict(default=False, type='bool'),
             repository=dict(type='list'),
             update_cache=dict(default=False, type='bool'),
             upgrade=dict(default=False, type='bool'),
@@ -310,6 +323,9 @@ def main():
     APK_PATH = module.get_bin_path('apk', required=True)
 
     p = module.params
+
+    if p['no_cache']:
+       APK_PATH = "%s --no-cache" % (APK_PATH, )
 
     # add repositories to the APK_PATH
     if p['repository']:
