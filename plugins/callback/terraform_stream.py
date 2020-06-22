@@ -10,12 +10,14 @@ DOCUMENTATION = '''
     type: locking
     short_description: creates a daemonized UDP socket server
     description:
-      - Creates a socket server that is daemonized and  receives logs from terraform module
+      - Creates a socket server that is daemonized and  receives logs from terraform module.
+        The IP to stream the logs over should be set as an environment variable with name `ANSIBLE_TERRAFORM_STREAM_PORT`.
+        It should be the IP of the control node.
+        The port to stream over as well should be provided as environment variable with name `ANSIBLE_TERRAFORM_STREAM_HOST`.
     requirements:
      - Whitelist in configuration
      - A writeable /var/log/ansible/hosts directory by the user executing Ansible on the controller
 '''
-
 import time
 import sys
 import os

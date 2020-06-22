@@ -93,6 +93,16 @@ options:
     type: list
     elements: path
     version_added: '0.2.0'
+  socket_host:
+    description:
+      - The IP address of the control node to stream terraform output during long running tasks.
+        It should match the one set to be used by the terraform_ stream plugin
+    type: str
+  socket_port:
+    description:
+      - The port to stream long running terraform tasks from
+    type: str
+    version_added: '0.2.0'
 notes:
    - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]
