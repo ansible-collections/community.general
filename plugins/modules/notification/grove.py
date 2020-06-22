@@ -91,7 +91,7 @@ def main():
             service=dict(type='str', default='ansible'),
             url=dict(type='str', default=None),
             icon_url=dict(type='str', default=None),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         )
     )
 

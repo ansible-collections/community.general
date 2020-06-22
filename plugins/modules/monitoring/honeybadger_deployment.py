@@ -79,7 +79,7 @@ def main():
             repo=dict(required=False),
             revision=dict(required=False),
             url=dict(required=False, default='https://api.honeybadger.io/v1/deploys'),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         ),
         supports_check_mode=True
     )
