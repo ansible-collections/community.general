@@ -1,0 +1,2 @@
+minor_changes:
+- apk - Enable ignored sanity tests for apk module (https://github.com/ansible-collections/community.general/pull/557).
