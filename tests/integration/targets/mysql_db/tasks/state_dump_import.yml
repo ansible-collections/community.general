@@ -22,17 +22,33 @@
     wrong_sql_file="{{tmp_dir}}/wrong.sql"
     dump_file1="{{tmp_dir}}/{{file2}}"
     dump_file2="{{tmp_dir}}/{{file3}}"
+    db_user="test"
+    db_user_unsafe_password="pass!word"
+    config_file="/root/.my.cnf"
+
+- name: create custom config file
+  shell: 'echo "[client]" > {{ config_file }}'
+
+- name: create user for test unsafe_login_password parameter
+  mysql_user:
+    name: '{{ db_user }}'
+    password: '{{ db_user_unsafe_password }}'
+    priv: '*.*:ALL'
+    state: present
+    login_unix_socket: '{{ mysql_socket }}'
 
 - name: state dump/import - create database
   mysql_db:
     name: '{{ db_name }}'
     state: present
+    check_implicit_admin: yes
     login_unix_socket: '{{ mysql_socket }}'
 
 - name: create database
   mysql_db:
     name: '{{ db_name2 }}'
     state: present
+    check_implicit_admin: no
     login_unix_socket: '{{ mysql_socket }}'
 
 - name: state dump/import - create table department
@@ -58,6 +74,9 @@
 
 - name: state dump without department table.
   mysql_db:
+    login_user: '{{ db_user }}'
+    login_password: '{{ db_user_unsafe_password }}'
+    unsafe_login_password: yes
     name: "{{ db_name }}"
     state: dump
     target: "{{ db_file_name }}"
@@ -68,13 +87,16 @@
     master_data: 1
     skip_lock_tables: yes
     dump_extra_args: --skip-triggers
+    config_file: '{{ config_file }}'
+    restrict_config_file: yes
+    check_implicit_admin: no
   register: result
 
 - name: assert successful completion of dump operation
   assert:
     that:
     - result is changed
-    - result.executed_commands[0] is search("mysqldump --force --socket={{ mysql_socket }} {{ db_name }} --skip-lock-tables --quick --ignore-table={{ db_name }}.department --master-data=1 --skip-triggers")
+    - result.executed_commands[0] is search("mysqldump --defaults-file={{ config_file }} --user={{ db_user }} --password=\*\*\*\*\*\*\*\* --force --socket={{ mysql_socket }} {{ db_name }} --skip-lock-tables --quick --ignore-table={{ db_name }}.department --master-data=1 --skip-triggers")
 
 - name: state dump/import - file name should exist
   file: name={{ db_file_name }} state=file
@@ -85,12 +107,14 @@
     state: dump
     target: "{{ dump_file1 }}"
     login_unix_socket: '{{ mysql_socket }}'
+    check_implicit_admin: yes
   register: dump_result1
 
 - name: assert successful completion of dump operation (with multiple databases in comma separated form)
   assert:
     that:
-       - "dump_result1.changed == true"
+       - dump_result1 is changed
+       - dump_result1.executed_commands[0] is search(" --user=root --password=''")
 
 - name: state dump - dump file1 should exist
   file: name={{ dump_file1 }} state=file
@@ -153,10 +177,14 @@
 
 - name: test state=import to restore the database of type {{ format_type }} (expect changed=true)
   mysql_db:
+    login_user: '{{ db_user }}'
+    login_password: '{{ db_user_unsafe_password }}'
+    unsafe_login_password: yes
     name: '{{ db_name }}'
     state: import
     target: '{{ db_file_name }}'
     login_unix_socket: '{{ mysql_socket }}'
+    use_shell: yes
   register: result
 
 - name: show the tables
@@ -174,6 +202,7 @@
     state: import
     target: '{{ dump_file1 }}'
     login_unix_socket: '{{ mysql_socket }}'
+    use_shell: no
   register: import_result
 
 - name: assert output message restored a database from dump file1

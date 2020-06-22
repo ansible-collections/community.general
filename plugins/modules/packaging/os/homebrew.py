@@ -13,11 +13,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: homebrew
@@ -74,6 +69,7 @@ options:
             - Option flags to upgrade.
         type: list
         elements: str
+        version_added: '0.2.0'
 notes:
   - When used with a `loop:` each package will be processed individually,
     it is much more efficient to pass the list directly to the `name` option.
@@ -145,17 +141,17 @@ msg:
 unchanged_pkgs:
     description:
     - List of package names which are unchanged after module run
-    - "Added in version 2.10"
     returned: success
     type: list
     sample: ["awscli", "ag"]
+    version_added: '0.2.0'
 changed_pkgs:
     description:
     - List of package names which are changed after module run
-    - "Added in version 2.10"
     returned: success
     type: list
     sample: ['git', 'git-cola']
+    version_added: '0.2.0'
 '''
 
 import os.path

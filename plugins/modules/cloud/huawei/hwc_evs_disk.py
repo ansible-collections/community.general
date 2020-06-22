@@ -12,16 +12,13 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ["preview"],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: hwc_evs_disk
 description:
     - block storage management.
 short_description: Creates a resource of Evs/Disk in Huawei Cloud
+version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
     - keystoneauth1 >= 3.6.0
@@ -158,7 +155,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 # test create disk
-- name: create a disk
+- name: Create a disk
   hwc_evs_disk:
     availability_zone: "cn-north-1a"
     name: "ansible_evs_disk_test"

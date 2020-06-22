@@ -24,10 +24,6 @@ You should have received a clone of the GNU General Public License
 along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-ANSIBLE_METADATA = {'status': ['preview'],
-                    'supported_by': 'community',
-                    'metadata_version': '1.1'}
-
 DOCUMENTATION = '''
 ---
 module: one_image_info
@@ -69,31 +65,31 @@ author:
 '''
 
 EXAMPLES = '''
-# Gather facts about all images
-- one_image_info:
+- name: Gather facts about all images
+  one_image_info:
   register: result
 
-# Print all images facts
-- debug:
+- name: Print all images facts
+  debug:
     msg: result
 
-# Gather facts about an image using ID
-- one_image_info:
+- name: Gather facts about an image using ID
+  one_image_info:
     ids:
       - 123
 
-# Gather facts about an image using the name
-- one_image_info:
+- name: Gather facts about an image using the name
+  one_image_info:
     name: 'foo-image'
   register: foo_image
 
-# Gather facts about all IMAGEs whose name matches regex 'app-image-.*'
-- one_image_info:
+- name: Gather facts about all IMAGEs whose name matches regex 'app-image-.*'
+  one_image_info:
     name: '~app-image-.*'
   register: app_images
 
-# Gather facts about all IMAGEs whose name matches regex 'foo-image-.*' ignoring cases
-- one_image_info:
+- name: Gather facts about all IMAGEs whose name matches regex 'foo-image-.*' ignoring cases
+  one_image_info:
     name: '~*foo-image-.*'
   register: foo_images
 '''
@@ -259,8 +255,9 @@ def main():
     module = AnsibleModule(argument_spec=fields,
                            mutually_exclusive=[['ids', 'name']],
                            supports_check_mode=True)
-    if module._name == 'one_image_facts':
-        module.deprecate("The 'one_image_facts' module has been renamed to 'one_image_info'", version='2.13')
+    if module._name in ('one_image_facts', 'community.general.one_image_facts'):
+        module.deprecate("The 'one_image_facts' module has been renamed to 'one_image_info'",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     if not HAS_PYONE:
         module.fail_json(msg='This module requires pyone to work!')

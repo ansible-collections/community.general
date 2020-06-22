@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: sensu_subscription
@@ -56,11 +51,11 @@ reasons:
 
 EXAMPLES = '''
 # Subscribe to the nginx channel
-- name: subscribe to nginx checks
+- name: Subscribe to nginx checks
   sensu_subscription: name=nginx
 
 # Unsubscribe from the common checks channel
-- name: unsubscribe from common checks
+- name: Unsubscribe from common checks
   sensu_subscription: name=common state=absent
 '''
 

@@ -7,15 +7,11 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: scaleway_volume_facts
 deprecated:
-  removed_in: '2.13'
+  removed_in: 3.0.0  # was Ansible 2.13
   why: Deprecated in favour of C(_info) module.
   alternative: Use M(scaleway_volume_info) instead.
 short_description: Gather facts about the Scaleway volumes available.

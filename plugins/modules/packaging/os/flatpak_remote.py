@@ -30,10 +30,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: flatpak_remote
@@ -55,6 +51,7 @@ options:
     description:
     - The path to the C(flatpak) executable to use.
     - By default, this module looks for the C(flatpak) executable on the path.
+    type: str
     default: flatpak
   flatpakrepo_url:
     description:
@@ -63,11 +60,13 @@ options:
       is added using the specified installation C(method).
     - When used with I(state=absent), this is not required.
     - Required when I(state=present).
+    type: str
   method:
     description:
     - The installation method to use.
     - Defines if the I(flatpak) is supposed to be installed globally for the whole C(system)
       or only for the current C(user).
+    type: str
     choices: [ system, user ]
     default: system
   name:
@@ -76,10 +75,12 @@ options:
     - When used with I(state=present), the remote will be added to the managed host under
       the specified I(name).
     - When used with I(state=absent) the remote with that name will be removed.
+    type: str
     required: true
   state:
     description:
     - Indicates the desired package state.
+    type: str
     choices: [ absent, present ]
     default: present
 '''
@@ -138,7 +139,6 @@ stdout:
   sample: "flathub\tFlathub\thttps://dl.flathub.org/repo/\t1\t\n"
 '''
 
-import subprocess
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_bytes, to_native
 
@@ -146,8 +146,7 @@ from ansible.module_utils._text import to_bytes, to_native
 def add_remote(module, binary, name, flatpakrepo_url, method):
     """Add a new remote."""
     global result
-    command = "{0} remote-add --{1} {2} {3}".format(
-        binary, method, name, flatpakrepo_url)
+    command = [binary, "remote-add", "--{0}".format(method), name, flatpakrepo_url]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
@@ -155,15 +154,14 @@ def add_remote(module, binary, name, flatpakrepo_url, method):
 def remove_remote(module, binary, name, method):
     """Remove an existing remote."""
     global result
-    command = "{0} remote-delete --{1} --force {2} ".format(
-        binary, method, name)
+    command = [binary, "remote-delete", "--{0}".format(method), "--force", name]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
 
 def remote_exists(module, binary, name, method):
     """Check if the remote exists."""
-    command = "{0} remote-list -d --{1}".format(binary, method)
+    command = [binary, "remote-list", "-d", "--{0}".format(method)]
     # The query operation for the remote needs to be run even in check mode
     output = _flatpak_command(module, False, command)
     for line in output.splitlines():
@@ -177,21 +175,15 @@ def remote_exists(module, binary, name, method):
 
 def _flatpak_command(module, noop, command):
     global result
+    result['command'] = ' '.join(command)
     if noop:
         result['rc'] = 0
-        result['command'] = command
         return ""
 
-    process = subprocess.Popen(
-        command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout_data, stderr_data = process.communicate()
-    result['rc'] = process.returncode
-    result['command'] = command
-    result['stdout'] = stdout_data
-    result['stderr'] = stderr_data
-    if result['rc'] != 0:
-        module.fail_json(msg="Failed to execute flatpak command", **result)
-    return to_native(stdout_data)
+    result['rc'], result['stdout'], result['stderr'] = module.run_command(
+        command, check_rc=True
+    )
+    return result['stdout']
 
 
 def main():

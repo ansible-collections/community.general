@@ -51,7 +51,8 @@ EXAMPLES = '''
 # M(proxysql_manage_config) module).  It uses supplied credentials to connect
 # to the proxysql admin interface.
 
-- proxysql_replication_hostgroups:
+- name: Add a replication hostgroup
+  proxysql_replication_hostgroups:
     login_user: 'admin'
     login_password: 'admin'
     writer_hostgroup: 1
@@ -64,7 +65,8 @@ EXAMPLES = '''
 # credentials in a supplied config file to connect to the proxysql admin
 # interface.
 
-- proxysql_replication_hostgroups:
+- name: Remove a replication hostgroup
+  proxysql_replication_hostgroups:
     config_file: '~/proxysql.cnf'
     writer_hostgroup: 3
     reader_hostgroup: 4
@@ -88,11 +90,6 @@ stdout:
         "state": "present"
     }
 '''
-
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['stableinterface'],
-                    'supported_by': 'community'}
-
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.mysql import mysql_connect, mysql_driver, mysql_driver_fail_msg

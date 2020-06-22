@@ -11,11 +11,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 module: rocketchat
 short_description: Send notifications to Rocket Chat
@@ -106,7 +101,7 @@ EXAMPLES = """
     link_names: 0
   delegate_to: localhost
 
-- name: insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured in rocketchat
+- name: Insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured in rocketchat
   rocketchat:
     token: thetoken/generatedby/rocketchat
     domain: chat.example.com

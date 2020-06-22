@@ -1,23 +1,20 @@
 namespace: community
 name: general
-version: 0.1.1
+version: 1.0.0
 readme: README.md
 authors:
   - Ansible (https://github.com/ansible)
 description: null
-license: GPL-3.0-or-later
 license_file: COPYING
 tags: null
 # NOTE: No more dependencies can be added to this list
 dependencies:
-#  ansible.netcommon: '>=0.1.0'
-#  ansible.posix: '>=0.1.0'
-#  cisco.intersight: '>=0.1.0'
-#  community.kubernetes: '>=0.1.0'
-#  google.cloud: '>=0.1.0'
-  ovirt.ovirt: '>=1.0.0'
+  ansible.netcommon: '>=0.0.2'
+  ansible.posix: '>=0.1.0'
+  community.kubernetes: '>=0.1.0'
+  google.cloud: '>=0.0.9'
 repository: https://github.com/ansible-collections/community.general
 documentation: https://github.com/ansible-collection-migration/community.general/tree/master/docs
-homepage: https://github.com/ansible-collections/community.general
+#homepage: https://github.com/ansible-collections/community.general
 issues: https://github.com/ansible-collections/community.general/issues
 #type: flatmap

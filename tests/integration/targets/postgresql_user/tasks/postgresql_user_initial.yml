@@ -50,6 +50,7 @@
     password: "password"
     role_attr_flags: "CREATEDB,LOGIN,CREATEROLE"
     login_user: "{{ pg_user }}"
+    trust_input: no
     db: postgres
 
 - name: Create db
@@ -80,6 +81,7 @@
     login_user: "{{ db_user1 }}"
     login_password: "password"
     login_host: "localhost"
+    trust_input: no
 
 - name: Check that it was created
   become: yes
@@ -123,6 +125,7 @@
     login_user: "{{ db_user1 }}"
     login_password: "password"
     login_host: "localhost"
+    trust_input: no
 
 - name: Check that they were removed
   become: yes

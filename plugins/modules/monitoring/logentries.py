@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: logentries
@@ -44,14 +39,14 @@ notes:
     - Requires the LogEntries agent which can be installed following the instructions at logentries.com
 '''
 EXAMPLES = '''
-# Track nginx logs
-- logentries:
+- name: Track nginx logs
+  logentries:
     path: /var/log/nginx/access.log
     state: present
     name: nginx-access-log
 
-# Stop tracking nginx logs
-- logentries:
+- name: Stop tracking nginx logs
+  logentries:
     path: /var/log/nginx/error.log
     state: absent
 '''

@@ -6,11 +6,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: znode
@@ -51,40 +46,40 @@ author: "Trey Perry (@treyperry)"
 '''
 
 EXAMPLES = """
-# Creating or updating a znode with a given value
-- znode:
+- name: Creating or updating a znode with a given value
+  znode:
     hosts: 'localhost:2181'
     name: /mypath
     value: myvalue
     state: present
 
-# Getting the value and stat structure for a znode
-- znode:
+- name: Getting the value and stat structure for a znode
+  znode:
     hosts: 'localhost:2181'
     name: /mypath
     op: get
 
-# Listing a particular znode's children
-- znode:
+- name: Listing a particular znode's children
+  znode:
     hosts: 'localhost:2181'
     name: /zookeeper
     op: list
 
-# Waiting 20 seconds for a znode to appear at path /mypath
-- znode:
+- name: Waiting 20 seconds for a znode to appear at path /mypath
+  znode:
     hosts: 'localhost:2181'
     name: /mypath
     op: wait
     timeout: 20
 
-# Deleting a znode at path /mypath
-- znode:
+- name: Deleting a znode at path /mypath
+  znode:
     hosts: 'localhost:2181'
     name: /mypath
     state: absent
 
-# Creating or updating a znode with a given value on a remote Zookeeper
-- znode:
+- name: Creating or updating a znode with a given value on a remote Zookeeper
+  znode:
     hosts: 'my-zookeeper-node:2181'
     name: /mypath
     value: myvalue

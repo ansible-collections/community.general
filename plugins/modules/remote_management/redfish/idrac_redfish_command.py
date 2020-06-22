@@ -7,10 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'status': ['preview'],
-                    'supported_by': 'community',
-                    'metadata_version': '1.1'}
-
 DOCUMENTATION = '''
 ---
 module: idrac_redfish_command
@@ -55,6 +51,7 @@ options:
     description:
       - The ID of the System, Manager or Chassis to modify
     type: str
+    version_added: '0.2.0'
 
 author: "Jose Delarosa (@jose-delarosa)"
 '''

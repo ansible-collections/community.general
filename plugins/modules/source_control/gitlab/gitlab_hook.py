@@ -10,10 +10,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: gitlab_hook
@@ -61,6 +57,7 @@ options:
     description:
       - Branch name of wildcard to trigger hook on push events
     type: str
+    version_added: '0.2.0'
   issues_events:
     description:
       - Trigger hook on issues events.

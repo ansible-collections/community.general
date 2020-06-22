@@ -23,10 +23,6 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: ali_instance_info
@@ -58,6 +54,7 @@ options:
       description:
         - Use a instance name prefix to filter ecs instances.
       type: str
+      version_added: '0.2.0'
     tags:
       description:
         - A hash/dictionaries of instance tags. C({"key":"value"})
@@ -71,6 +68,7 @@ options:
           connect different words in one parameter. 'InstanceIds' should be a list and it will be appended to
           I(instance_ids) automatically. 'Tag.n.Key' and 'Tag.n.Value' should be a dict and using I(tags) instead.
       type: dict
+      version_added: '0.2.0'
 author:
     - "He Guimin (@xiaozhu36)"
 requirements:
@@ -385,8 +383,9 @@ def main():
     )
     )
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name == 'ali_instance_facts':
-        module.deprecate("The 'ali_instance_facts' module has been renamed to 'ali_instance_info'", version='2.13')
+    if module._name in ('ali_instance_facts', 'community.general.ali_instance_facts'):
+        module.deprecate("The 'ali_instance_facts' module has been renamed to 'ali_instance_info'",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     if HAS_FOOTMARK is False:
         module.fail_json(msg=missing_required_lib('footmark'), exception=FOOTMARK_IMP_ERR)

@@ -6,16 +6,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 
 module: sf_snapshot_schedule_manager
 deprecated:
-  removed_in: "2.11"
+  removed_in: 2.0.0  # was Ansible 2.11
   why: This Module has been replaced
   alternative: please use M(na_elementsw_snapshot_schedule)
 short_description: Manage SolidFire snapshot schedules

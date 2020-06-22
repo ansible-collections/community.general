@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: monit
@@ -39,8 +34,8 @@ author: "Darryl Stoflet (@dstoflet)"
 '''
 
 EXAMPLES = '''
-# Manage the state of program "httpd" to be in "started" state.
-- monit:
+- name: Manage the state of program httpd to be in started state
+  monit:
     name: httpd
     state: started
 '''

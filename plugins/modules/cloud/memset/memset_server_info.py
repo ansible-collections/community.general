@@ -7,12 +7,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: memset_server_info
@@ -36,7 +30,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: get details for testyaa1
+- name: Get details for testyaa1
   memset_server_info:
     name: testyaa1
     api_key: 5eb86c9896ab03919abcf03857163741
@@ -280,8 +274,9 @@ def main():
         ),
         supports_check_mode=False
     )
-    if module._name == 'memset_server_facts':
-        module.deprecate("The 'memset_server_facts' module has been renamed to 'memset_server_info'", version='2.13')
+    if module._name in ('memset_server_facts', 'community.general.memset_server_facts'):
+        module.deprecate("The 'memset_server_facts' module has been renamed to 'memset_server_info'",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     # populate the dict with the user-provided vars.
     args = dict()

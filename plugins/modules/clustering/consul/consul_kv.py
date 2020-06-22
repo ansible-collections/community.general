@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 module: consul_kv
 short_description: Manipulate entries in the key/value store of a consul cluster
@@ -114,7 +109,7 @@ options:
 EXAMPLES = '''
 # If the key does not exist, the value associated to the "data" property in `retrieved_key` will be `None`
 # If the key value is empty string, `retrieved_key["data"]["Value"]` will be `None`
-- name: retrieve a value from the key/value store
+- name: Retrieve a value from the key/value store
   consul_kv:
     key: somekey
   register: retrieved_key

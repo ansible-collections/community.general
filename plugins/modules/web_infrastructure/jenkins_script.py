@@ -9,11 +9,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 author: James Hogarth (@hogarthj)
@@ -77,13 +72,13 @@ EXAMPLES = '''
         instance.setMode(${jenkins_mode})
         instance.save()
 
-- name: use the variable as the script
+- name: Use the variable as the script
   jenkins_script:
     script: "{{ setmaster_mode }}"
     args:
       jenkins_mode: Node.Mode.EXCLUSIVE
 
-- name: interacting with an untrusted HTTPS connection
+- name: Interacting with an untrusted HTTPS connection
   jenkins_script:
     script: "println(Jenkins.instance.pluginManager.plugins)"
     user: admin

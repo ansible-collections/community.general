@@ -7,10 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'status': ['preview'],
-                    'supported_by': 'community',
-                    'metadata_version': '1.1'}
-
 DOCUMENTATION = '''
 ---
 module: redfish_info
@@ -309,10 +305,11 @@ def main():
         ),
         supports_check_mode=False
     )
-    is_old_facts = module._name == 'redfish_facts'
+    is_old_facts = module._name in ('redfish_facts', 'community.general.redfish_facts')
     if is_old_facts:
         module.deprecate("The 'redfish_facts' module has been renamed to 'redfish_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     # admin credentials used for authentication
     creds = {'user': module.params['username'],

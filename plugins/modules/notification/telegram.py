@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 
 module: telegram
@@ -49,7 +44,7 @@ options:
 
 EXAMPLES = """
 
-- name: send a message to chat in playbook
+- name: Send a message to chat in playbook
   telegram:
     token: '9999999:XXXXXXXXXXXXXXXXXXXXXXX'
     chat_id: 000000

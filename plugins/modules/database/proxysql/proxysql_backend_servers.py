@@ -99,7 +99,8 @@ EXAMPLES = '''
 # runtime in a single batch using the M(proxysql_manage_config) module).  It
 # uses supplied credentials to connect to the proxysql admin interface.
 
-- proxysql_backend_servers:
+- name: Add a server
+  proxysql_backend_servers:
     login_user: 'admin'
     login_password: 'admin'
     hostname: 'mysql01'
@@ -110,7 +111,8 @@ EXAMPLES = '''
 # dynamically loads the mysql server config to runtime.  It uses credentials
 # in a supplied config file to connect to the proxysql admin interface.
 
-- proxysql_backend_servers:
+- name: Remove a server
+  proxysql_backend_servers:
     config_file: '~/proxysql.cnf'
     hostname: 'mysql02'
     state: absent
@@ -142,11 +144,6 @@ stdout:
         "state": "present"
     }
 '''
-
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['stableinterface'],
-                    'supported_by': 'community'}
-
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.mysql import mysql_connect, mysql_driver, mysql_driver_fail_msg

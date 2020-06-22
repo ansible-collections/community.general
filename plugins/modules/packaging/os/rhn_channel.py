@@ -6,10 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: rhn_channel
@@ -54,10 +50,12 @@ options:
               can modify traffic between the module and the site.
         type: bool
         default: true
+        version_added: '0.2.0'
 '''
 
 EXAMPLES = '''
-- rhn_channel:
+- name: Add a Red Hat software channel
+  rhn_channel:
     name: rhel-x86_64-server-v2vwin-6
     sysname: server01
     url: https://rhn.redhat.com/rpc/api

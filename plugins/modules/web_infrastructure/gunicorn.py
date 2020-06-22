@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: gunicorn
@@ -60,24 +55,24 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: simple gunicorn run example
+- name: Simple gunicorn run example
   gunicorn:
     app: 'wsgi'
     chdir: '/workspace/example'
 
-- name: run gunicorn on a virtualenv
+- name: Run gunicorn on a virtualenv
   gunicorn:
     app: 'wsgi'
     chdir: '/workspace/example'
     venv: '/workspace/example/venv'
 
-- name: run gunicorn with a config file
+- name: Run gunicorn with a config file
   gunicorn:
     app: 'wsgi'
     chdir: '/workspace/example'
     conf: '/workspace/example/gunicorn.cfg'
 
-- name: run gunicorn as ansible user with specified pid and config file
+- name: Run gunicorn as ansible user with specified pid and config file
   gunicorn:
     app: 'wsgi'
     chdir: '/workspace/example'

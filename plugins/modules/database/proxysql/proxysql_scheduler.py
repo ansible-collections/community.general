@@ -75,7 +75,8 @@ EXAMPLES = '''
 # runtime in a single batch using the M(proxysql_manage_config) module).  It
 # uses supplied credentials to connect to the proxysql admin interface.
 
-- proxysql_scheduler:
+- name: Add a schedule
+  proxysql_scheduler:
     login_user: 'admin'
     login_password: 'admin'
     interval_ms: 1000
@@ -87,7 +88,8 @@ EXAMPLES = '''
 # dynamically loads the scheduler config to runtime.  It uses credentials
 # in a supplied config file to connect to the proxysql admin interface.
 
-- proxysql_scheduler:
+- name: Remove a schedule
+  proxysql_scheduler:
     config_file: '~/proxysql.cnf'
     filename: "/opt/old_script.py"
     state: absent
@@ -120,11 +122,6 @@ stdout:
         "state": "present"
     }
 '''
-
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['stableinterface'],
-                    'supported_by': 'community'}
-
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.mysql import mysql_connect, mysql_driver, mysql_driver_fail_msg

@@ -6,12 +6,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: github_webhook
@@ -100,7 +94,7 @@ EXAMPLES = '''
     user: "{{ github_user }}"
     password: "{{ github_password }}"
 
-- name: create a new webhook in a github enterprise installation with multiple event triggers (token auth)
+- name: Create a new webhook in a github enterprise installation with multiple event triggers (token auth)
   github_webhook:
     repository: myorg/myrepo
     url: https://jenkins.example.com/ghprbhook/
@@ -114,7 +108,7 @@ EXAMPLES = '''
     token: "{{ github_user_api_token }}"
     github_url: https://github.example.com
 
-- name: delete a webhook (password auth)
+- name: Delete a webhook (password auth)
   github_webhook:
     repository: ansible/ansible
     url: https://www.example.com/hooks/

@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: vertica_role
@@ -65,10 +60,10 @@ author: "Dariusz Owczarek (@dareko)"
 '''
 
 EXAMPLES = """
-- name: creating a new vertica role
+- name: Creating a new vertica role
   vertica_role: name=role_name db=db_name state=present
 
-- name: creating a new vertica role with other role assigned
+- name: Creating a new vertica role with other role assigned
   vertica_role: name=role_name assigned_role=other_role_name state=present
 """
 import traceback

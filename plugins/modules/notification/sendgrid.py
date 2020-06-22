@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: sendgrid
@@ -79,8 +74,8 @@ author: "Matt Makai (@makaimc)"
 '''
 
 EXAMPLES = '''
-# send an email to a single recipient that the deployment was successful
-- sendgrid:
+- name: Send an email to a single recipient that the deployment was successful
+  sendgrid:
     username: "{{ sendgrid_username }}"
     password: "{{ sendgrid_password }}"
     from_address: "ansible@mycompany.com"
@@ -90,8 +85,8 @@ EXAMPLES = '''
     body: "The most recent Ansible deployment was successful."
   delegate_to: localhost
 
-# send an email to more than one recipient that the build failed
-- sendgrid:
+- name: Send an email to more than one recipient that the build failed
+  sendgrid:
       username: "{{ sendgrid_username }}"
       password: "{{ sendgrid_password }}"
       from_address: "build@mycompany.com"

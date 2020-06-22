@@ -9,15 +9,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 module: mas
 short_description: Manage Mac App Store applications with mas-cli
 description:
     - Installs, uninstalls and updates macOS applications from the Mac App Store using the C(mas-cli).
+version_added: '0.2.0'
 author:
     - Michael Heap (@mheap)
     - Lukas Bestle (@lukasbestle)

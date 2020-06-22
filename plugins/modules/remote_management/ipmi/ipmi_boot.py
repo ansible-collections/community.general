@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: ipmi_boot
@@ -93,15 +88,15 @@ uefimode:
 '''
 
 EXAMPLES = '''
-# Ensure bootdevice is HD.
-- ipmi_boot:
+- name: Ensure bootdevice is HD
+  ipmi_boot:
     name: test.testdomain.com
     user: admin
     password: password
     bootdev: hd
 
-# Ensure bootdevice is not Network
-- ipmi_boot:
+- name: Ensure bootdevice is not Network
+  ipmi_boot:
     name: test.testdomain.com
     user: admin
     password: password

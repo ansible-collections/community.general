@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: campfire
@@ -57,13 +52,15 @@ author: "Adam Garside (@fabulops)"
 '''
 
 EXAMPLES = '''
-- campfire:
+- name: Send a message to Campfire
+  campfire:
     subscription: foo
     token: 12345
     room: 123
     msg: Task completed.
 
-- campfire:
+- name: Send a message to Campfire
+  campfire:
     subscription: foo
     token: 12345
     room: 123

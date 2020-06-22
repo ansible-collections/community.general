@@ -7,11 +7,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 
 module: stackdriver
@@ -62,7 +57,8 @@ options:
 '''
 
 EXAMPLES = '''
-- stackdriver:
+- name: Send a code deploy event to stackdriver
+  stackdriver:
     key: AAAAAA
     event: deploy
     deployed_to: production
@@ -70,7 +66,8 @@ EXAMPLES = '''
     repository: MyWebApp
     revision_id: abcd123
 
-- stackdriver:
+- name: Send an annotation event to stackdriver
+  stackdriver:
     key: AAAAAA
     event: annotation
     msg: Greetings from Ansible

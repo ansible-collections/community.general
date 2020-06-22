@@ -10,10 +10,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: yarn
@@ -222,7 +218,7 @@ class Yarn(object):
             rc, out, err = self.module.run_command(cmd, check_rc=check_rc, cwd=cwd)
             return out, err
 
-        return ''
+        return(None, None)
 
     def list(self):
         cmd = ['list', '--depth=0', '--json']

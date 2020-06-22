@@ -14,11 +14,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: slackpkg
@@ -51,18 +46,18 @@ requirements: [ "Slackware >= 12.2" ]
 '''
 
 EXAMPLES = '''
-# Install package foo
-- slackpkg:
+- name: Install package foo
+  slackpkg:
     name: foo
     state: present
 
-# Remove packages foo and bar
-- slackpkg:
+- name: Remove packages foo and bar
+  slackpkg:
     name: foo,bar
     state: absent
 
-# Make sure that it is the most updated package
-- slackpkg:
+- name: Make sure that it is the most updated package
+  slackpkg:
     name: foo
     state: latest
 '''
@@ -72,12 +67,16 @@ from ansible.module_utils.basic import AnsibleModule
 
 def query_package(module, slackpkg_path, name):
 
-    import glob
     import platform
+    import os
+    import re
 
     machine = platform.machine()
-    packages = glob.glob("/var/log/packages/%s-*-[%s|noarch]*" % (name,
-                                                                  machine))
+    # Exception for kernel-headers package on x86_64
+    if name == 'kernel-headers' and machine == 'x86_64':
+        machine = 'x86'
+    pattern = re.compile('^%s-[^-]+-(%s|noarch|fw)-[^-]+$' % (re.escape(name), re.escape(machine)))
+    packages = [f for f in os.listdir('/var/log/packages') if pattern.match(f)]
 
     if len(packages) > 0:
         return True

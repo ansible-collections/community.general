@@ -9,11 +9,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: mssql_db
@@ -64,17 +59,19 @@ author: Vedit Firat Arig (@vedit)
 '''
 
 EXAMPLES = '''
-# Create a new database with name 'jackdata'
-- mssql_db:
+- name: Create a new database with name 'jackdata'
+  mssql_db:
     name: jackdata
     state: present
 
 # Copy database dump file to remote host and restore it to database 'my_db'
-- copy:
+- name: Copy database dump file to remote host
+  copy:
     src: dump.sql
     dest: /tmp
 
-- mssql_db:
+- name: Restore the dump file to database 'my_db'
+  mssql_db:
     name: my_db
     state: import
     target: /tmp/dump.sql

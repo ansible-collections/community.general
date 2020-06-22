@@ -18,10 +18,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: ip_netns
@@ -44,13 +40,13 @@ options:
 '''
 
 EXAMPLES = '''
-# Create a namespace named mario
 - name: Create a namespace named mario
-  namespace:
+  ip_netns:
     name: mario
     state: present
+
 - name: Delete a namespace named luigi
-  namespace:
+  ip_netns:
     name: luigi
     state: absent
 '''

@@ -12,11 +12,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = """
 module: jira
 short_description: create and modify issues in a JIRA instance
@@ -113,6 +108,7 @@ options:
     description:
      - Query JIRA in JQL Syntax, e.g. 'CMDB Hostname'='test.example.com'.
     type: str
+    version_added: '0.2.0'
 
   maxresults:
     required: false
@@ -120,6 +116,7 @@ options:
      - Limit the result of I(operation=search). If no value is specified, the default jira limit will be used.
      - Used when I(operation=search) only, ignored otherwise.
     type: int
+    version_added: '0.2.0'
 
   timeout:
     required: false
@@ -286,7 +283,9 @@ EXAMPLES = """
 import base64
 import json
 import sys
-import urllib
+
+from ansible.module_utils.six.moves.urllib.request import pathname2url
+
 from ansible.module_utils._text import to_text, to_bytes
 
 from ansible.module_utils.basic import AnsibleModule
@@ -401,10 +400,10 @@ def fetch(restbase, user, passwd, params):
 
 
 def search(restbase, user, passwd, params):
-    url = restbase + '/search?jql=' + urllib.request.pathname2url(params['jql'])
+    url = restbase + '/search?jql=' + pathname2url(params['jql'])
     if params['fields']:
         fields = params['fields'].keys()
-        url = url + '&fields=' + '&fields='.join([urllib.request.pathname2url(f) for f in fields])
+        url = url + '&fields=' + '&fields='.join([pathname2url(f) for f in fields])
     if params['maxresults']:
         url = url + '&maxResults=' + str(params['maxresults'])
     ret = get(url, user, passwd, params['timeout'])

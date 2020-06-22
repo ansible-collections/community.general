@@ -1,0 +1,461 @@
+requires_ansible: '>=2.9.10'
+action_groups:
+  docker:
+  - docker_swarm
+  - docker_image_facts
+  - docker_service
+  - docker_compose
+  - docker_config
+  - docker_container
+  - docker_container_info
+  - docker_host_info
+  - docker_image
+  - docker_image_info
+  - docker_login
+  - docker_network
+  - docker_network_info
+  - docker_node
+  - docker_node_info
+  - docker_prune
+  - docker_secret
+  - docker_swarm
+  - docker_swarm_info
+  - docker_swarm_service
+  - docker_swarm_service_info
+  - docker_volume
+  - docker_volume_info
+  k8s:
+  - kubevirt_cdi_upload
+  - kubevirt_preset
+  - kubevirt_pvc
+  - kubevirt_rs
+  - kubevirt_template
+  - kubevirt_vm
+  ovirt:
+  - ovirt_affinity_label_facts
+  - ovirt_api_facts
+  - ovirt_cluster_facts
+  - ovirt_datacenter_facts
+  - ovirt_disk_facts
+  - ovirt_event_facts
+  - ovirt_external_provider_facts
+  - ovirt_group_facts
+  - ovirt_host_facts
+  - ovirt_host_storage_facts
+  - ovirt_network_facts
+  - ovirt_nic_facts
+  - ovirt_permission_facts
+  - ovirt_quota_facts
+  - ovirt_scheduling_policy_facts
+  - ovirt_snapshot_facts
+  - ovirt_storage_domain_facts
+  - ovirt_storage_template_facts
+  - ovirt_storage_vm_facts
+  - ovirt_tag_facts
+  - ovirt_template_facts
+  - ovirt_user_facts
+  - ovirt_vm_facts
+  - ovirt_vmpool_facts
+
+plugin_routing:
+  modules:
+    ali_instance_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_account_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_certificate_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_domain_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_firewall_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_floating_ip_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_image_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_load_balancer_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_region_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_size_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_snapshot_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_sshkey_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_tag_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_volume_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    docker_image_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    docker_service:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    gcdns_record:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    gcdns_zone:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    gce:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    gcp_target_proxy:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    gcp_url_map:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    gcpubsub_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    gcspanner:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    helm:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: The helm module in community.general has been deprecated. Use community.kubernetes.helm instead.
+    memset_memstore_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    memset_server_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    online_server_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    online_user_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    one_image_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_affinity_label_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_api_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_cluster_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_datacenter_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_disk_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_event_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_external_provider_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_group_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_host_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_host_storage_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_network_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_nic_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_permission_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_quota_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_scheduling_policy_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_snapshot_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_storage_domain_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_storage_template_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_storage_vm_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_tag_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_template_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_user_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_vm_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ovirt_vmpool_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    scaleway_image_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    scaleway_ip_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    scaleway_organization_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    scaleway_security_group_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    scaleway_server_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    scaleway_snapshot_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    scaleway_volume_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    smartos_image_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    xenserver_guest_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    vertica_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    onepassword_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    ldap_attr:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    foreman:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    katello:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    hpilo_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_datacenter_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_enclosure_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_ethernet_network_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_fc_network_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_fcoe_network_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_logical_interconnect_group_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_network_set_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_san_manager_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    idrac_redfish_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    redfish_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    github_hooks:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_aggregate:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_license:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_lun:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_qtree:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_svm:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_user:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_user_role:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_volume:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_ontap_gather_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    sf_account_manager:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    sf_check_connections:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    sf_snapshot_schedule_manager:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    sf_volume_access_group_manager:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    sf_volume_manager:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    purefa_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    purefb_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    python_requirements_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    jenkins_job_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    nginx_status_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details

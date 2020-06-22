@@ -7,12 +7,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: memset_zone
@@ -56,7 +50,7 @@ options:
 
 EXAMPLES = '''
 # Create the zone 'test'
-- name: create zone
+- name: Create zone
   memset_zone:
     name: test
     state: present
@@ -65,7 +59,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 # Force zone deletion
-- name: force delete zone
+- name: Force delete zone
   memset_zone:
     name: test
     state: absent

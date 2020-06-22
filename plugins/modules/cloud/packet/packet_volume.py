@@ -8,11 +8,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: packet_volume
@@ -23,6 +18,7 @@ description:
      - Create/delete a volume in Packet host.
      - API is documented at U(https://www.packet.com/developers/api/#volumes).
 
+version_added: '0.2.0'
 
 author:
     - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>
@@ -131,7 +127,7 @@ EXAMPLES = '''
     project_id: 53000fb2-ee46-4673-93a8-de2c2bdba33b
 
   tasks:
-    - name: test create volume
+    - name: Create volume
       packet_volume:
         description: "{{ volname }}"
         project_id: "{{ project_id }}"
@@ -144,7 +140,7 @@ EXAMPLES = '''
           snapshot_frequency: 1day
       register: result_create
 
-    - name: test delete volume
+    - name: Delete volume
       packet_volume:
         id: "{{ result_create.id }}"
         project_id: "{{ project_id }}"

@@ -11,11 +11,6 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 module: onepassword_info
 author:
@@ -383,9 +378,10 @@ def main():
 
     results = {'onepassword': OnePasswordInfo().run()}
 
-    if module._name == 'onepassword_facts':
+    if module._name in ('onepassword_facts', 'community.general.onepassword_facts'):
         module.deprecate("The 'onepassword_facts' module has been renamed to 'onepassword_info'. "
-                         "When called with the new name it no longer returns 'ansible_facts'", version='2.13')
+                         "When called with the new name it no longer returns 'ansible_facts'",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
         module.exit_json(changed=False, ansible_facts=results)
     else:
         module.exit_json(changed=False, **results)

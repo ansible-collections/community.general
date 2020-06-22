@@ -15,6 +15,8 @@ DOCUMENTATION = '''
       _uri:
         description:
           - A colon separated string of connection information for Redis.
+          - The format is C(host:port:db:password), for example C(localhost:6379:0:changeme).
+          - To use encryption in transit, prefix the connection with C(tls://), as in C(tls://localhost:6379:0:changeme).
         required: True
         env:
           - name: ANSIBLE_CACHE_PLUGIN_CONNECTION
@@ -67,24 +69,32 @@ class CacheModule(BaseCacheModule):
     performance.
     """
     def __init__(self, *args, **kwargs):
-        connection = []
+        uri = ''
 
         try:
             super(CacheModule, self).__init__(*args, **kwargs)
             if self.get_option('_uri'):
-                connection = self.get_option('_uri').split(':')
+                uri = self.get_option('_uri')
             self._timeout = float(self.get_option('_timeout'))
             self._prefix = self.get_option('_prefix')
         except KeyError:
             display.deprecated('Rather than importing CacheModules directly, '
-                               'use ansible.plugins.loader.cache_loader', version='2.12')
+                               'use ansible.plugins.loader.cache_loader',
+                               version='2.0.0', collection_name='community.general')  # was Ansible 2.12
             if C.CACHE_PLUGIN_CONNECTION:
-                connection = C.CACHE_PLUGIN_CONNECTION.split(':')
+                uri = C.CACHE_PLUGIN_CONNECTION
             self._timeout = float(C.CACHE_PLUGIN_TIMEOUT)
             self._prefix = C.CACHE_PLUGIN_PREFIX
 
         self._cache = {}
-        self._db = StrictRedis(*connection)
+        kw = {}
+        tlsprefix = 'tls://'
+        if uri.startswith(tlsprefix):
+            kw['ssl'] = True
+            uri = uri[len(tlsprefix):]
+
+        connection = uri.split(':')
+        self._db = StrictRedis(*connection, **kw)
         self._keys_set = 'ansible_cache_keys'
 
     def _make_key(self, key):

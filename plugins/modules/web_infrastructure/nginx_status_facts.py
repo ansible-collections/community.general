@@ -8,16 +8,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: nginx_status_facts
 deprecated:
-  removed_in: '2.13'
+  removed_in: 3.0.0  # was Ansible 2.13
   why: Deprecated in favour of C(_info) module.
   alternative: Use M(nginx_status_info) instead.
 short_description: Retrieve nginx status facts.
@@ -41,12 +36,12 @@ notes:
 
 EXAMPLES = '''
 # Gather status facts from nginx on localhost
-- name: get current http stats
+- name: Get current http stats
   nginx_status_facts:
     url: http://localhost/nginx_status
 
 # Gather status facts from nginx on localhost with a custom timeout of 20 seconds
-- name: get current http stats
+- name: Get current http stats
   nginx_status_facts:
     url: http://localhost/nginx_status
     timeout: 20

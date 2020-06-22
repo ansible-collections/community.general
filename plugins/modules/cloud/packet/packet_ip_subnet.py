@@ -9,10 +9,6 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: packet_ip_subnet
@@ -25,6 +21,7 @@ description:
     - IPv6 subnets must come from publicly routable /56 block from your project.
     - See U(https://support.packet.com/kb/articles/elastic-ips) for more info on IP block reservation.
 
+version_added: '0.2.0'
 
 author:
     - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>
@@ -86,7 +83,7 @@ EXAMPLES = '''
 # All the examples assume that you have your Packet api token in env var PACKET_API_TOKEN.
 # You can also pass it to the auth_token parameter of the module instead.
 
-- name: create 1 device and assign an arbitrary public IPv4 subnet to it
+- name: Create 1 device and assign an arbitrary public IPv4 subnet to it
   hosts: localhost
   tasks:
 
@@ -107,7 +104,7 @@ EXAMPLES = '''
 
 # Release IP address 147.75.201.78
 
-- name: unassign IP address from any device in your project
+- name: Unassign IP address from any device in your project
   hosts: localhost
   tasks:
   - packet_ip_subnet:

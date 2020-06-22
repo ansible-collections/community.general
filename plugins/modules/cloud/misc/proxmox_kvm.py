@@ -7,11 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = r'''
 ---
 module: proxmox_kvm
@@ -367,171 +362,174 @@ requirements: [ "proxmoxer", "requests" ]
 '''
 
 EXAMPLES = '''
-# Create new VM with minimal options
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Create new VM with minimal options
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
 
-# Create new VM with minimal options and given vmid
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Create new VM with minimal options and given vmid
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
-    vmid        : 100
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    vmid: 100
 
-# Create new VM with two network interface options.
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Create new VM with two network interface options
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
-    net         : '{"net0":"virtio,bridge=vmbr1,rate=200", "net1":"e1000,bridge=vmbr2,"}'
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    net: '{"net0":"virtio,bridge=vmbr1,rate=200", "net1":"e1000,bridge=vmbr2,"}'
 
-# Create new VM with one network interface, three virto hard disk, 4 cores, and 2 vcpus.
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Create new VM with one network interface, three virto hard disk, 4 cores, and 2 vcpus
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
-    net         : '{"net0":"virtio,bridge=vmbr1,rate=200"}'
-    virtio      : '{"virtio0":"VMs_LVM:10", "virtio1":"VMs:2,format=qcow2", "virtio2":"VMs:5,format=raw"}'
-    cores       : 4
-    vcpus       : 2
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    net: '{"net0":"virtio,bridge=vmbr1,rate=200"}'
+    virtio: '{"virtio0":"VMs_LVM:10", "virtio1":"VMs:2,format=qcow2", "virtio2":"VMs:5,format=raw"}'
+    cores: 4
+    vcpus: 2
 
-# Clone VM with only source VM name
-- proxmox_kvm:
-    api_user    : root@pam
+- name: >
+    Clone VM with only source VM name.
+    The VM source is spynal.
+    The target VM name is zavala
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    clone       : spynal   # The VM source
-    name        : zavala  # The target VM name
-    node        : sabrewulf
-    storage     : VMs
-    format      : qcow2
-    timeout     : 500  # Note: The task can take a while. Adapt
+    api_host: helldorado
+    clone: spynal
+    name: zavala
+    node: sabrewulf
+    storage: VMs
+    format: qcow2
+    timeout: 500
 
-# Clone VM with source vmid and target newid and raw format
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Clone VM with source vmid and target newid and raw format
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    clone       : arbitrary_name
-    vmid        : 108
-    newid       : 152
-    name        : zavala  # The target VM name
-    node        : sabrewulf
-    storage     : LVM_STO
-    format      : raw
-    timeout     : 300  # Note: The task can take a while. Adapt
+    api_host: helldorado
+    clone: arbitrary_name
+    vmid: 108
+    newid: 152
+    name: zavala
+    node: sabrewulf
+    storage: LVM_STO
+    format: raw
+    timeout: 300
 
-# Create new VM and lock it for snapashot.
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Create new VM and lock it for snapashot
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
-    lock        : snapshot
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    lock: snapshot
 
-# Create new VM and set protection to disable the remove VM and remove disk operations
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Create new VM and set protection to disable the remove VM and remove disk operations
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
-    protection  : yes
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    protection: yes
 
-# Start VM
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Start VM
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
-    state       : started
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    state: started
 
-# Stop VM
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Stop VM
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
-    state       : stopped
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    state: stopped
 
-# Stop VM with force
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Stop VM with force
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
-    state       : stopped
-    force       : yes
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    state: stopped
+    force: yes
 
-# Restart VM
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Restart VM
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
-    state       : restarted
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    state: restarted
 
-# Remove VM
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Remove VM
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
-    state       : absent
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    state: absent
 
-# Get VM current state
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Get VM current state
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
-    state       : current
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    state: current
 
-# Update VM configuration
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Update VM configuration
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
-    cores       : 8
-    memory      : 16384
-    update      : yes
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    cores: 8
+    memory: 16384
+    update: yes
 
-# Delete QEMU parameters
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Delete QEMU parameters
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
-    delete      : 'args,template,cpulimit'
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    delete: 'args,template,cpulimit'
 
-# Revert a pending change
-- proxmox_kvm:
-    api_user    : root@pam
+- name: Revert a pending change
+  proxmox_kvm:
+    api_user: root@pam
     api_password: secret
-    api_host    : helldorado
-    name        : spynal
-    node        : sabrewulf
-    revert      : 'template,cpulimit'
+    api_host: helldorado
+    name: spynal
+    node: sabrewulf
+    revert: 'template,cpulimit'
 '''
 
 RETURN = '''

@@ -6,11 +6,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: gce_lb
@@ -104,8 +99,8 @@ author: "Eric Johnson (@erjohnso) <erjohnso@google.com>"
 '''
 
 EXAMPLES = '''
-# Simple example of creating a new LB, adding members, and a health check
-- local_action:
+- name: Simple example of creating a new LB, adding members, and a health check
+  local_action:
     module: gce_lb
     name: testlb
     region: us-central1

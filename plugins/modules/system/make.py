@@ -7,10 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: make
@@ -39,6 +35,11 @@ options:
     description:
       - Use a custom Makefile.
     type: path
+  make:
+    description:
+      - Use a specific make binary.
+    type: path
+    version_added: '0.2.0'
 '''
 
 EXAMPLES = r'''
@@ -109,15 +110,19 @@ def main():
             params=dict(type='dict'),
             chdir=dict(type='path', required=True),
             file=dict(type='path'),
+            make=dict(type='path'),
         ),
         supports_check_mode=True,
     )
-    # Build up the invocation of `make` we are going to use
-    # For non-Linux OSes, prefer gmake (GNU make) over make
-    make_path = module.get_bin_path('gmake', required=False)
-    if not make_path:
-        # Fall back to system make
-        make_path = module.get_bin_path('make', required=True)
+
+    make_path = module.params['make']
+    if make_path is None:
+        # Build up the invocation of `make` we are going to use
+        # For non-Linux OSes, prefer gmake (GNU make) over make
+        make_path = module.get_bin_path('gmake', required=False)
+        if not make_path:
+            # Fall back to system make
+            make_path = module.get_bin_path('make', required=True)
     make_target = module.params['target']
     if module.params['params'] is not None:
         make_parameters = [k + '=' + str(v) for k, v in iteritems(module.params['params'])]

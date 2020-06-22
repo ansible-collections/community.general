@@ -5,11 +5,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: proxmox
@@ -134,6 +129,17 @@ options:
       - Indicate if the container should be unprivileged
     type: bool
     default: 'no'
+  description:
+    description:
+      - Specify the description for the container. Only used on the configuration web interface.
+      - This is saved as a comment inside the configuration file.
+    type: str
+    version_added: '0.2.0'
+  hookscript:
+    description:
+      - Script that will be executed during various steps in the containers lifetime.
+    type: str
+    version_added: '0.2.0'
 
 notes:
   - Requires proxmoxer and requests modules on host. This modules can be installed with pip.
@@ -141,9 +147,9 @@ requirements: [ "proxmoxer", "python >= 2.7", "requests" ]
 author: Sergei Antipov (@UnderGreen)
 '''
 
-EXAMPLES = '''
-# Create new container with minimal options
-- proxmox:
+EXAMPLES = r'''
+- name: Create new container with minimal options
+  proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -153,8 +159,21 @@ EXAMPLES = '''
     hostname: example.org
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
-# Create new container automatically selecting the next available vmid.
-- proxmox:
+- name: Create new container with hookscript and description
+  proxmox:
+    vmid: 100
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    password: 123456
+    hostname: example.org
+    ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
+    hookscript: 'local:snippets/vm_hook.sh'
+    description: created with ansible
+
+- name: Create new container automatically selecting the next available vmid.
+  proxmox:
     node: 'uk-mc02'
     api_user: 'root@pam'
     api_password: '1q2w3e'
@@ -163,8 +182,8 @@ EXAMPLES = '''
     hostname: 'example.org'
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
-# Create new container with minimal options with force(it will rewrite existing container)
-- proxmox:
+- name: Create new container with minimal options with force(it will rewrite existing container)
+  proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -175,8 +194,8 @@ EXAMPLES = '''
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     force: yes
 
-# Create new container with minimal options use environment PROXMOX_PASSWORD variable(you should export it before)
-- proxmox:
+- name: Create new container with minimal options use environment PROXMOX_PASSWORD variable(you should export it before)
+  proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -185,8 +204,8 @@ EXAMPLES = '''
     hostname: example.org
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
-# Create new container with minimal options defining network interface with dhcp
-- proxmox:
+- name: Create new container with minimal options defining network interface with dhcp
+  proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -197,8 +216,8 @@ EXAMPLES = '''
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     netif: '{"net0":"name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr0"}'
 
-# Create new container with minimal options defining network interface with static ip
-- proxmox:
+- name: Create new container with minimal options defining network interface with static ip
+  proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -209,8 +228,8 @@ EXAMPLES = '''
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     netif: '{"net0":"name=eth0,gw=192.168.0.1,ip=192.168.0.2/24,bridge=vmbr0"}'
 
-# Create new container with minimal options defining a mount with 8GB
-- proxmox:
+- name: Create new container with minimal options defining a mount with 8GB
+  proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -221,8 +240,8 @@ EXAMPLES = '''
     ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     mounts: '{"mp0":"local:8,mp=/mnt/test/"}'
 
-# Create new container with minimal options defining a cpu core limit
-- proxmox:
+- name: Create new container with minimal options defining a cpu core limit
+  proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -233,16 +252,18 @@ EXAMPLES = '''
     ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     cores: 2
 
-# Start container
-- proxmox:
+- name: Start container
+  proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
     api_host: node1
     state: started
 
-# Start container with mount. You should enter a 90-second timeout because servers with additional disks take longer to boot.
-- proxmox:
+- name: >
+    Start container with mount. You should enter a 90-second timeout because servers
+    with additional disks take longer to boot
+  proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -250,16 +271,16 @@ EXAMPLES = '''
     state: started
     timeout: 90
 
-# Stop container
-- proxmox:
+- name: Stop container
+  proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
     api_host: node1
     state: stopped
 
-# Stop container with force
-- proxmox:
+- name: Stop container with force
+  proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -267,16 +288,16 @@ EXAMPLES = '''
     force: yes
     state: stopped
 
-# Restart container(stopped or mounted container you can't restart)
-- proxmox:
+- name: Restart container(stopped or mounted container you can't restart)
+  proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
     api_host: node1
     state: restarted
 
-# Remove container
-- proxmox:
+- name: Remove container
+  proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -446,7 +467,9 @@ def main():
             force=dict(type='bool', default='no'),
             state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted']),
             pubkey=dict(type='str', default=None),
-            unprivileged=dict(type='bool', default='no')
+            unprivileged=dict(type='bool', default='no'),
+            description=dict(type='str'),
+            hookscript=dict(type='str'),
         )
     )
 
@@ -527,7 +550,9 @@ def main():
                             searchdomain=module.params['searchdomain'],
                             force=int(module.params['force']),
                             pubkey=module.params['pubkey'],
-                            unprivileged=int(module.params['unprivileged']))
+                            unprivileged=int(module.params['unprivileged']),
+                            description=module.params['description'],
+                            hookscript=module.params['hookscript'])
 
             module.exit_json(changed=True, msg="deployed VM %s from template %s" % (vmid, module.params['ostemplate']))
         except Exception as e:

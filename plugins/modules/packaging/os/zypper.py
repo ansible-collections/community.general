@@ -17,11 +17,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: zypper
@@ -92,6 +87,7 @@ options:
         required: false
         default: "no"
         type: bool
+        version_added: '0.2.0'
     update_cache:
         description:
           - Run the equivalent of C(zypper refresh) before the operation. Disabled in check mode.
@@ -111,6 +107,20 @@ options:
         description:
           - Add additional options to C(zypper) command.
           - Options should be supplied in a single line as if given in the command line.
+    allow_vendor_change:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Adds C(--allow_vendor_change) option to I(zypper) dist-upgrade command.
+        version_added: '0.2.0'
+    replacefiles:
+        type: bool
+        required: false
+        default: false
+        description:
+          - Adds C(--replacefiles) option to I(zypper) install/update command.
+        version_added: '0.2.0'
 notes:
   - When used with a `loop:` each package will be processed individually,
     it is much more efficient to pass the list directly to the `name` option.
@@ -122,68 +132,75 @@ requirements:
 '''
 
 EXAMPLES = '''
-# Install "nmap"
-- zypper:
+- name: Install nmap
+  zypper:
     name: nmap
     state: present
 
-# Install apache2 with recommended packages
-- zypper:
+- name: Install apache2 with recommended packages
+  zypper:
     name: apache2
     state: present
     disable_recommends: no
 
-# Apply a given patch
-- zypper:
+- name: Apply a given patch
+  zypper:
     name: openSUSE-2016-128
     state: present
     type: patch
 
-# Remove the "nmap" package
-- zypper:
+- name: Remove the nmap package
+  zypper:
     name: nmap
     state: absent
 
-# Install the nginx rpm from a remote repo
-- zypper:
+- name: Install the nginx rpm from a remote repo
+  zypper:
     name: 'http://nginx.org/packages/sles/12/x86_64/RPMS/nginx-1.8.0-1.sles12.ngx.x86_64.rpm'
     state: present
 
-# Install local rpm file
-- zypper:
+- name: Install local rpm file
+  zypper:
     name: /tmp/fancy-software.rpm
     state: present
 
-# Update all packages
-- zypper:
+- name: Update all packages
+  zypper:
     name: '*'
     state: latest
 
-# Apply all available patches
-- zypper:
+- name: Apply all available patches
+  zypper:
     name: '*'
     state: latest
     type: patch
 
-# Perform a dist-upgrade with additional arguments
-- zypper:
+- name: Perform a dist-upgrade with additional arguments
+  zypper:
     name: '*'
     state: dist-upgrade
-    extra_args: '--no-allow-vendor-change --allow-arch-change'
+    allow_vendor_change: true
+    extra_args: '--allow-arch-change'
 
-# Refresh repositories and update package "openssl"
-- zypper:
+- name: Perform a installaion of nmap with the install option replacefiles
+  zypper:
+    name: 'nmap'
+    state: latest
+    replacefiles: true
+
+- name: Refresh repositories and update package openssl
+  zypper:
     name: openssl
     state: present
     update_cache: yes
 
-# Install specific version (possible comparisons: <, >, <=, >=, =)
-- zypper:
+- name: "Install specific version (possible comparisons: <, >, <=, >=, =)"
+  zypper:
     name: 'docker>=1.10'
     state: present
 
-# Wait 20 seconds to acquire the lock before failing
-- zypper:
+- name: Wait 20 seconds to acquire the lock before failing
+  zypper:
     name: mosh
     state: present
   environment:
@@ -193,7 +210,6 @@ EXAMPLES = '''
 import xml
 import re
 from xml.dom.minidom import parseString as parseXML
-from ansible.module_utils.six import iteritems
 from ansible.module_utils._text import to_native
 
 # import module snippets
@@ -340,6 +356,10 @@ def get_cmd(m, subcommand):
             cmd.append('--force-resolution')
         if m.params['oldpackage']:
             cmd.append('--oldpackage')
+        if m.params['replacefiles']:
+            cmd.append('--replacefiles')
+    if subcommand == 'dist-upgrade' and m.params['allow_vendor_change']:
+        cmd.append('--allow-vendor-change')
     if m.params['extra_args']:
         args_list = m.params['extra_args'].split(' ')
         cmd.extend(args_list)
@@ -483,6 +503,8 @@ def main():
             update_cache=dict(required=False, aliases=['refresh'], default='no', type='bool'),
             oldpackage=dict(required=False, default='no', type='bool'),
             extra_args=dict(required=False, default=None),
+            allow_vendor_change=dict(required=False, default=False, type='bool'),
+            replacefiles=dict(required=False, default=False, type='bool')
         ),
         supports_check_mode=True
     )

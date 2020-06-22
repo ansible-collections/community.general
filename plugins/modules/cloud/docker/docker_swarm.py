@@ -6,10 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: docker_swarm
@@ -448,7 +444,7 @@ class SwarmManager(DockerBaseClass):
         if self.state == 'inspect':
             self.client.module.deprecate(
                 "The 'inspect' state is deprecated, please use 'docker_swarm_info' to inspect swarm cluster",
-                version='2.12')
+                version='2.0.0', collection_name='community.general')  # was Ansible 2.12
 
         choice_map.get(self.state)()
 

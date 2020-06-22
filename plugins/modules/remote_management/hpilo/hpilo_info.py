@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = r'''
 ---
 module: hpilo_info
@@ -51,8 +46,8 @@ notes:
 '''
 
 EXAMPLES = r'''
-# Task to gather facts from a HP iLO interface only if the system is an HP server
-- hpilo_info:
+- name: Gather facts from a HP iLO interface only if the system is an HP server
+  hpilo_info:
     host: YOUR_ILO_ADDRESS
     login: YOUR_ILO_LOGIN
     password: YOUR_ILO_PASSWORD
@@ -164,10 +159,11 @@ def main():
         ),
         supports_check_mode=True,
     )
-    is_old_facts = module._name == 'hpilo_facts'
+    is_old_facts = module._name in ('hpilo_facts', 'community.general.hpilo_facts')
     if is_old_facts:
         module.deprecate("The 'hpilo_facts' module has been renamed to 'hpilo_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     if not HAS_HPILO:
         module.fail_json(msg=missing_required_lib('python-hpilo'), exception=HPILO_IMP_ERR)

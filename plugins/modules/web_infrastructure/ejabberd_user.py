@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: ejabberd_user
@@ -55,13 +50,13 @@ notes:
 EXAMPLES = '''
 # Example playbook entries using the ejabberd_user module to manage users state.
 
-- name: create a user if it does not exist
+- name: Create a user if it does not exist
   ejabberd_user:
     username: test
     host: server
     password: password
 
-- name: delete a user if it exists
+- name: Delete a user if it exists
   ejabberd_user:
     username: test
     host: server

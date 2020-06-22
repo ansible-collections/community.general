@@ -7,11 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: gluster_heal_info
@@ -165,10 +160,11 @@ def main():
             status_filter=dict(type='str', default='self-heal', choices=['self-heal', 'rebalance']),
         ),
     )
-    is_old_facts = module._name == 'gluster_heal_facts'
+    is_old_facts = module._name in ('gluster_heal_facts', 'community.general.gluster_heal_facts')
     if is_old_facts:
         module.deprecate("The 'gluster_heal_facts' module has been renamed to 'gluster_heal_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     glusterbin = module.get_bin_path('gluster', True)
     required_version = "3.2"

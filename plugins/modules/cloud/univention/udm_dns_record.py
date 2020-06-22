@@ -9,11 +9,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: udm_dns_record
@@ -59,17 +54,19 @@ options:
 
 
 EXAMPLES = '''
-# Create a DNS record on a UCS
-- udm_dns_record:
+- name: Create a DNS record on a UCS
+  udm_dns_record:
     name: www
     zone: example.com
     type: host_record
     data:
-      - a: 192.0.2.1
+      a:
+         - 192.0.2.1
+         - 2001:0db8::42
 '''
 
 
-RETURN = '''# '''
+RETURN = '''#'''
 
 HAVE_UNIVENTION = False
 try:

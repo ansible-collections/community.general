@@ -7,10 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: postgresql_ext
@@ -80,6 +76,14 @@ options:
         When version downgrade is needed, remove the extension and create new one with appropriate version.
       - Set I(version=latest) to update the extension to the latest available version.
     type: str
+  trust_input:
+    description:
+    - If C(no), check whether values of parameters I(ext), I(schema),
+      I(version), I(session_role) are potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
+    type: bool
+    default: yes
+    version_added: '0.2.0'
 seealso:
 - name: PostgreSQL extensions
   description: General information about PostgreSQL extensions.
@@ -175,6 +179,9 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     get_conn_params,
@@ -183,10 +190,6 @@ from ansible_collections.community.general.plugins.module_utils.postgres import 
 from ansible.module_utils._text import to_native
 
 executed_queries = []
-
-
-class NotSupportedError(Exception):
-    pass
 
 
 # ===========================================
@@ -221,32 +224,33 @@ def ext_update_version(cursor, ext, version):
       ext (str) -- extension name
       version (str) -- extension version
     """
+    query = "ALTER EXTENSION \"%s\" UPDATE" % ext
+    params = {}
+
     if version != 'latest':
-        query = ("ALTER EXTENSION \"%s\"" % ext)
-        cursor.execute(query + " UPDATE TO %(ver)s", {'ver': version})
-        executed_queries.append(cursor.mogrify(query + " UPDATE TO %(ver)s", {'ver': version}))
-    else:
-        query = ("ALTER EXTENSION \"%s\" UPDATE" % ext)
-        cursor.execute(query)
-        executed_queries.append(query)
+        query += " TO %(ver)s"
+        params['ver'] = version
+
+    cursor.execute(query, params)
+    executed_queries.append(cursor.mogrify(query, params))
+
     return True
 
 
 def ext_create(cursor, ext, schema, cascade, version):
     query = "CREATE EXTENSION \"%s\"" % ext
+    params = {}
+
     if schema:
         query += " WITH SCHEMA \"%s\"" % schema
     if version:
         query += " VERSION %(ver)s"
+        params['ver'] = version
     if cascade:
         query += " CASCADE"
 
-    if version:
-        cursor.execute(query, {'ver': version})
-        executed_queries.append(cursor.mogrify(query, {'ver': version}))
-    else:
-        cursor.execute(query)
-        executed_queries.append(query)
+    cursor.execute(query, params)
+    executed_queries.append(cursor.mogrify(query, params))
     return True
 
 
@@ -282,12 +286,11 @@ def ext_get_versions(cursor, ext):
     cursor.execute(query, {'ext': ext})
     res = cursor.fetchall()
 
-    available_versions = []
-    if res:
-        # Make the list of available versions:
-        for line in res:
-            if LooseVersion(line[0]) > LooseVersion(current_version):
-                available_versions.append(line['version'])
+    available_versions = [
+        line['version']
+        for line in res
+        if LooseVersion(line['version']) > LooseVersion(current_version)
+    ]
 
     if current_version == '0':
         current_version = False
@@ -309,6 +312,7 @@ def main():
         cascade=dict(type="bool", default=False),
         session_role=dict(type="str"),
         version=dict(type="str"),
+        trust_input=dict(type="bool", default=True),
     )
 
     module = AnsibleModule(
@@ -321,7 +325,12 @@ def main():
     state = module.params["state"]
     cascade = module.params["cascade"]
     version = module.params["version"]
+    session_role = module.params["session_role"]
+    trust_input = module.params["trust_input"]
     changed = False
+
+    if not trust_input:
+        check_input(module, ext, schema, version, session_role)
 
     if version and state == 'absent':
         module.warn("Parameter version is ignored when state=absent")
@@ -356,7 +365,7 @@ def main():
                                              "the passed version is not available" % (version, curr_version))
 
                 # If the specific version is passed and it is higher that the current version:
-                if curr_version and version:
+                if curr_version:
                     if LooseVersion(curr_version) < LooseVersion(version):
                         if module.check_mode:
                             changed = True

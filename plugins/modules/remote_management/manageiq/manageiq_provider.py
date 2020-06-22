@@ -8,13 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
-
 DOCUMENTATION = '''
 module: manageiq_provider
 short_description: Management of provider in ManageIQ.
@@ -571,7 +564,7 @@ def delete_nulls(h):
         a hash without nulls
     """
     if isinstance(h, list):
-        return map(delete_nulls, h)
+        return [delete_nulls(i) for i in h]
     if isinstance(h, dict):
         return dict((k, delete_nulls(v)) for k, v in h.items() if v is not None)
 

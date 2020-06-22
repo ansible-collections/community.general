@@ -7,10 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: sl_vm
@@ -65,6 +61,7 @@ options:
   flavor:
     description:
       - Specify which SoftLayer flavor template to use instead of cpus and memory.
+    version_added: '0.2.0'
   disks:
     description:
       - List of disk sizes to be assigned to new virtual instance.

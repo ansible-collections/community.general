@@ -12,10 +12,6 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ["preview"],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: hwc_network_vpc
@@ -69,7 +65,7 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = '''
-- name: create a vpc
+- name: Create a vpc
   hwc_network_vpc:
       identity_endpoint: "{{ identity_endpoint }}"
       user: "{{ user }}"

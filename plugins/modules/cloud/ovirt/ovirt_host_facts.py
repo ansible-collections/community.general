@@ -7,20 +7,15 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: ovirt_host_facts
 short_description: Retrieve information about one or more oVirt/RHV hosts
 author: "Ondra Machacek (@machacekondra)"
 deprecated:
-    removed_in: "2.10"
+    removed_in: 3.0.0  # was Ansible 2.13
     why: When migrating to collection we decided to use only _info modules.
-    alternative: Use M(ovirt_host_info) instead
+    alternative: Use C(ovirt_host_info) from the C(ovirt.ovirt) collection instead
 description:
     - "Retrieve information about one or more oVirt/RHV hosts."
     - This module was called C(ovirt_host_facts) before Ansible 2.9, returning C(ansible_facts).
@@ -47,7 +42,7 @@ options:
       type: str
 
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- community.general.ovirt_facts
 
 '''
 
@@ -55,19 +50,23 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about all hosts which names start with C(host) and
-# belong to data center C(west):
-- ovirt_host_info:
+- name: Gather information about all hosts which names start with host and belong to data center west
+  ovirt_host_info:
     pattern: name=host* and datacenter=west
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_hosts }}"
-# All hosts with cluster version 4.2:
-- ovirt_host_info:
+
+- name: Gather information about all hosts with cluster version 4.2
+  ovirt_host_info:
     pattern: name=host*
     cluster_version: "4.2"
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_hosts }}"
 '''
 
@@ -83,7 +82,7 @@ import traceback
 
 from ansible.module_utils.common.removed import removed_module
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.ovirt.ovirt.plugins.module_utils.ovirt import (
+from ansible_collections.community.general.plugins.module_utils._ovirt import (
     check_sdk,
     create_connection,
     get_dict_of_struct,
@@ -109,10 +108,11 @@ def main():
         cluster_version=dict(default=None, type='str'),
     )
     module = AnsibleModule(argument_spec)
-    is_old_facts = module._name == 'ovirt_host_facts'
+    is_old_facts = module._name in ('ovirt_host_facts', 'community.general.ovirt_host_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_host_facts' module has been renamed to 'ovirt_host_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     check_sdk(module)
 
@@ -148,4 +148,4 @@ def main():
 
 
 if __name__ == '__main__':
-    removed_module("2.10")
+    main()

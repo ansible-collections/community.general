@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: ipinfoio_facts
@@ -37,7 +32,7 @@ notes:
 
 EXAMPLES = '''
 # Retrieve geolocation data of a host's IP address
-- name: get IP geolocation data
+- name: Get IP geolocation data
   ipinfoio_facts:
 '''
 

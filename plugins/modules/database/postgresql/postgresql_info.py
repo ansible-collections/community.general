@@ -7,12 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = r'''
 ---
 module: postgresql_info
@@ -46,6 +40,13 @@ options:
     - Permissions checking for SQL commands is carried out as though
       the session_role were the one that had logged in originally.
     type: str
+  trust_input:
+    description:
+    - If C(no), check whether a value of I(session_role) is potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections via I(session_role) are possible.
+    type: bool
+    default: yes
+    version_added: '0.2.0'
 seealso:
 - module: postgresql_ping
 author:
@@ -244,6 +245,7 @@ databases:
           returned: if configured
           type: dict
           sample: { "pub1": { "ownername": "postgres", "puballtables": true, "pubinsert": true, "pubupdate": true } }
+          version_added: '0.2.0'
         subscriptions:
           description:
           - Information about replication subscriptions (available for PostgreSQL 10 and higher)
@@ -253,6 +255,7 @@ databases:
           type: dict
           sample:
           - { "my_subscription": {"ownername": "postgres", "subenabled": true, "subpublications": ["first_publication"] } }
+          version_added: '0.2.0'
 repl_slots:
   description:
   - Replication slots (available in 9.4 and later)
@@ -291,7 +294,7 @@ replications:
   returned: if pg_stat_replication view existent
   type: dict
   sample:
-  - { 76580: { "app_name": "standby1", "backend_start": "2019-02-03 00:14:33.908593+03",
+  - { "76580": { "app_name": "standby1", "backend_start": "2019-02-03 00:14:33.908593+03",
     "client_addr": "10.10.10.2", "client_hostname": "", "state": "streaming", "usename": "postgres" } }
   contains:
     usename:
@@ -483,6 +486,9 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     get_conn_params,
@@ -988,13 +994,18 @@ def main():
         db=dict(type='str', aliases=['login_db']),
         filter=dict(type='list', elements='str'),
         session_role=dict(type='str'),
+        trust_input=dict(type='bool', default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
 
-    filter_ = module.params["filter"]
+    filter_ = module.params['filter']
+
+    if not module.params['trust_input']:
+        # Check input for potentially dangerous elements:
+        check_input(module, module.params['session_role'])
 
     db_conn_obj = PgDbConn(module)
 

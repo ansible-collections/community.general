@@ -8,12 +8,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = r'''
 ---
 module: nmcli
@@ -26,7 +20,7 @@ requirements:
 - nmcli
 description:
     - Manage the network devices. Create, modify and manage various connection and device type e.g., ethernet, teams, bonds, vlans etc.
-    - 'On CentOS 8 and Fedora >=29 like systems, the requirements can be met by installing the following packages: NetworkManager-nmlib,
+    - 'On CentOS 8 and Fedora >=29 like systems, the requirements can be met by installing the following packages: NetworkManager-libnm,
       libsemanage-python, policycoreutils-python.'
     - 'On CentOS 7 and Fedora <=28 like systems, the requirements can be met by installing the following packages: NetworkManager-glib,
       libnm-qt-devel.x86_64, nm-connection-editor.x86_64, libsemanage-python, policycoreutils-python.'
@@ -360,7 +354,7 @@ EXAMPLES = r'''
   remote_user: root
   tasks:
 
-  - name: install needed network manager libs
+  - name: Install needed network manager libs
     package:
       name:
         - NetworkManager-libnm
@@ -451,12 +445,12 @@ EXAMPLES = r'''
 
   - name: Add an Ethernet connection with static IP configuration
     nmcli:
-    conn_name: my-eth1
-    ifname: eth1
-    type: ethernet
-    ip4: 192.0.2.100/24
-    gw4: 192.0.2.1
-    state: present
+      conn_name: my-eth1
+      ifname: eth1
+      type: ethernet
+      ip4: 192.0.2.100/24
+      gw4: 192.0.2.1
+      state: present
 
   - name: Add an Team connection with static IP configuration
     nmcli:
@@ -573,7 +567,7 @@ except (ImportError, ValueError):
         HAVE_NM_CLIENT = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_native
+from ansible.module_utils._text import to_native, to_text
 
 
 class Nmcli(object):
@@ -677,6 +671,10 @@ class Nmcli(object):
         self.dhcp_client_id = module.params['dhcp_client_id']
 
     def execute_command(self, cmd, use_unsafe_shell=False, data=None):
+        if isinstance(cmd, list):
+            cmd = [to_text(item) for item in cmd]
+        else:
+            cmd = to_text(cmd)
         return self.module.run_command(cmd, use_unsafe_shell=use_unsafe_shell, data=data)
 
     def merge_secrets(self, proxy, config, setting_name):
@@ -857,8 +855,7 @@ class Nmcli(object):
         cmd = [self.nmcli_bin, 'con', 'mod', self.conn_name, 'connection.master', self.master]
         # format for modifying team-slave interface
         if self.mtu is not None:
-            cmd.append('802-3-ethernet.mtu')
-            cmd.append(self.mtu)
+            cmd.extend(['802-3-ethernet.mtu', self.mtu])
         return cmd
 
     def create_connection_bond(self):
@@ -1132,7 +1129,7 @@ class Nmcli(object):
         elif self.ifname is not None:
             cmd.append(self.ifname)
         else:
-            cmd.append('vlan%s' % self.vlanid)
+            cmd.append('vlan%s' % to_text(self.vlanid))
 
         cmd.append('ifname')
         if self.ifname is not None:
@@ -1140,10 +1137,10 @@ class Nmcli(object):
         elif self.conn_name is not None:
             cmd.append(self.conn_name)
         else:
-            cmd.append('vlan%s' % self.vlanid)
+            cmd.append('vlan%s' % to_text(self.vlanid))
 
         params = {'dev': self.vlandev,
-                  'id': str(self.vlanid),
+                  'id': self.vlanid,
                   'ip4': self.ip4 or '',
                   'gw4': self.gw4 or '',
                   'ip6': self.ip6 or '',
@@ -1165,10 +1162,10 @@ class Nmcli(object):
         elif self.ifname is not None:
             cmd.append(self.ifname)
         else:
-            cmd.append('vlan%s' % self.vlanid)
+            cmd.append('vlan%s' % to_text(self.vlanid))
 
         params = {'vlan.parent': self.vlandev,
-                  'vlan.id': str(self.vlanid),
+                  'vlan.id': self.vlanid,
                   'ipv4.address': self.ip4 or '',
                   'ipv4.gateway': self.gw4 or '',
                   'ipv4.dns': self.dns4 or '',
@@ -1191,7 +1188,7 @@ class Nmcli(object):
         elif self.ifname is not None:
             cmd.append(self.ifname)
         else:
-            cmd.append('vxlan%s' % self.vxlanid)
+            cmd.append('vxlan%s' % to_text(self.vxlan_id))
 
         cmd.append('ifname')
         if self.ifname is not None:
@@ -1199,7 +1196,7 @@ class Nmcli(object):
         elif self.conn_name is not None:
             cmd.append(self.conn_name)
         else:
-            cmd.append('vxan%s' % self.vxlanid)
+            cmd.append('vxan%s' % to_text(self.vxlan_id))
 
         params = {'vxlan.id': self.vxlan_id,
                   'vxlan.local': self.vxlan_local,
@@ -1219,7 +1216,7 @@ class Nmcli(object):
         elif self.ifname is not None:
             cmd.append(self.ifname)
         else:
-            cmd.append('vxlan%s' % self.vxlanid)
+            cmd.append('vxlan%s' % to_text(self.vxlan_id))
 
         params = {'vxlan.id': self.vxlan_id,
                   'vxlan.local': self.vxlan_local,
@@ -1238,7 +1235,7 @@ class Nmcli(object):
         elif self.ifname is not None:
             cmd.append(self.ifname)
         elif self.ip_tunnel_dev is not None:
-            cmd.append('ipip%s' % self.ip_tunnel_dev)
+            cmd.append('ipip%s' % to_text(self.ip_tunnel_dev))
 
         cmd.append('ifname')
         if self.ifname is not None:
@@ -1246,11 +1243,10 @@ class Nmcli(object):
         elif self.conn_name is not None:
             cmd.append(self.conn_name)
         else:
-            cmd.append('ipip%s' % self.ipip_dev)
+            cmd.append('ipip%s' % to_text(self.ipip_dev))
 
         if self.ip_tunnel_dev is not None:
-            cmd.append('dev')
-            cmd.append(self.ip_tunnel_dev)
+            cmd.extend(['dev', self.ip_tunnel_dev])
 
         params = {'ip-tunnel.local': self.ip_tunnel_local,
                   'ip-tunnel.remote': self.ip_tunnel_remote,
@@ -1269,7 +1265,7 @@ class Nmcli(object):
         elif self.ifname is not None:
             cmd.append(self.ifname)
         elif self.ip_tunnel_dev is not None:
-            cmd.append('ipip%s' % self.ip_tunnel_dev)
+            cmd.append('ipip%s' % to_text(self.ip_tunnel_dev))
 
         params = {'ip-tunnel.local': self.ip_tunnel_local,
                   'ip-tunnel.remote': self.ip_tunnel_remote,
@@ -1287,7 +1283,7 @@ class Nmcli(object):
         elif self.ifname is not None:
             cmd.append(self.ifname)
         elif self.ip_tunnel_dev is not None:
-            cmd.append('sit%s' % self.ip_tunnel_dev)
+            cmd.append('sit%s' % to_text(self.ip_tunnel_dev))
 
         cmd.append('ifname')
         if self.ifname is not None:
@@ -1295,11 +1291,10 @@ class Nmcli(object):
         elif self.conn_name is not None:
             cmd.append(self.conn_name)
         else:
-            cmd.append('sit%s' % self.ipip_dev)
+            cmd.append('sit%s' % to_text(self.ipip_dev))
 
         if self.ip_tunnel_dev is not None:
-            cmd.append('dev')
-            cmd.append(self.ip_tunnel_dev)
+            cmd.extend(['dev', self.ip_tunnel_dev])
 
         params = {'ip-tunnel.local': self.ip_tunnel_local,
                   'ip-tunnel.remote': self.ip_tunnel_remote,
@@ -1318,7 +1313,7 @@ class Nmcli(object):
         elif self.ifname is not None:
             cmd.append(self.ifname)
         elif self.ip_tunnel_dev is not None:
-            cmd.append('sit%s' % self.ip_tunnel_dev)
+            cmd.append('sit%s' % to_text(self.ip_tunnel_dev))
 
         params = {'ip-tunnel.local': self.ip_tunnel_local,
                   'ip-tunnel.remote': self.ip_tunnel_remote,
@@ -1501,10 +1496,11 @@ def main():
     if nmcli.conn_name is None:
         nmcli.module.fail_json(msg="Please specify a name for the connection")
     # team-slave checks
-    if nmcli.type == 'team-slave' and nmcli.master is None:
-        nmcli.module.fail_json(msg="Please specify a name for the master")
-    if nmcli.type == 'team-slave' and nmcli.ifname is None:
-        nmcli.module.fail_json(msg="Please specify an interface name for the connection")
+    if nmcli.type == 'team-slave':
+        if nmcli.master is None:
+            nmcli.module.fail_json(msg="Please specify a name for the master when type is %s" % nmcli.type)
+        if nmcli.ifname is None:
+            nmcli.module.fail_json(msg="Please specify an interface name for the connection when type is %s" % nmcli.type)
 
     if nmcli.state == 'absent':
         if nmcli.connection_exists():

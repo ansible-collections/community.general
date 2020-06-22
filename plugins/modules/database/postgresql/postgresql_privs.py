@@ -8,10 +8,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['stableinterface'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: postgresql_privs
@@ -46,8 +42,8 @@ options:
     description:
     - Type of database object to set privileges on.
     - The C(default_privs) choice is available starting at version 2.7.
-    - The C(foreign_data_wrapper) and C(foreign_server) object types are available from Ansible version '2.8'.
-    - The C(type) choice is available from Ansible version '2.10'.
+    - The C(foreign_data_wrapper) and C(foreign_server) object types are available since Ansible version '2.8'.
+    - The C(type) choice is available since Ansible version '2.10'.
     type: str
     default: table
     choices: [ database, default_privs, foreign_data_wrapper, foreign_server, function,
@@ -59,7 +55,7 @@ options:
       the special valueC(ALL_IN_SCHEMA) can be provided instead to specify all
       database objects of type I(type) in the schema specified via I(schema).
       (This also works with PostgreSQL < 9.0.) (C(ALL_IN_SCHEMA) is available
-       for C(function) and C(partition table) from version 2.8)
+       for C(function) and C(partition table) since Ansible 2.8)
     - If I(type) is C(database), this parameter can be omitted, in which case
       privileges are set for the database specified via I(database).
     - 'If I(type) is I(function), colons (":") in object names will be
@@ -157,6 +153,14 @@ options:
     type: str
     aliases:
     - ssl_rootcert
+  trust_input:
+    description:
+    - If C(no), check whether values of parameters I(roles), I(target_roles), I(session_role),
+      I(schema) are potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
+    type: bool
+    default: yes
+    version_added: '0.2.0'
 
 notes:
 - Parameters that accept comma separated lists (I(privs), I(objs), I(roles))
@@ -326,7 +330,7 @@ EXAMPLES = r'''
     type: foreign_data_wrapper
     role: reader
 
-# Available since version 2.10
+# Available since community.general 0.2.0
 - name: GRANT ALL PRIVILEGES ON TYPE customtype TO reader
   postgresql_privs:
     db: test
@@ -355,7 +359,7 @@ EXAMPLES = r'''
     objs: ALL_IN_SCHEMA
     schema: common
 
-# Available since version 2.8
+# Available since Ansible 2.8
 # ALTER DEFAULT PRIVILEGES FOR ROLE librarian IN SCHEMA library GRANT SELECT ON TABLES TO reader
 # GRANT SELECT privileges for new TABLES objects created by librarian as
 # default to the role reader.
@@ -386,7 +390,7 @@ EXAMPLES = r'''
     role: reader
     target_roles: librarian
 
-# Available since version 2.10
+# Available since community.general 0.2.0
 - name: Grant type privileges for pg_catalog.numeric type to alice
   postgresql_privs:
     type: type
@@ -417,7 +421,10 @@ except ImportError:
 
 # import module snippets
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.community.general.plugins.module_utils.database import pg_quote_identifier
+from ansible_collections.community.general.plugins.module_utils.database import (
+    pg_quote_identifier,
+    check_input,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import postgres_common_argument_spec
 from ansible.module_utils._text import to_native
 
@@ -943,6 +950,7 @@ def main():
         login=dict(default='postgres', aliases=['login_user']),
         password=dict(default='', aliases=['login_password'], no_log=True),
         fail_on_role=dict(type='bool', default=True),
+        trust_input=dict(type='bool', default=True),
     )
 
     module = AnsibleModule(
@@ -976,6 +984,11 @@ def main():
     elif not p.privs:
         module.fail_json(msg='Argument "privs" is required '
                              'for type "%s".' % p.type)
+
+    # Check input
+    if not p.trust_input:
+        # Check input for potentially dangerous elements:
+        check_input(module, p.roles, p.target_roles, p.session_role, p.schema)
 
     # Connect to Database
     if not psycopg2:

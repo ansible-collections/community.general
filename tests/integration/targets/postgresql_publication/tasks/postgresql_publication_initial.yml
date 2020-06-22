@@ -8,6 +8,7 @@
     test_table3: acme3
     test_pub: acme_publ
     test_role: alice
+    dangerous_name: 'curious.anonymous"; SELECT * FROM information_schema.tables; --'
     test_schema: acme_schema
     test_db: acme_db
     task_parameters: &task_parameters
@@ -63,6 +64,7 @@
     postgresql_publication: 
       <<: *pg_parameters
       name: '{{ test_pub }}'
+      trust_input: no
     check_mode: yes
 
   - assert:
@@ -88,6 +90,7 @@
     postgresql_publication: 
       <<: *pg_parameters
       name: '{{ test_pub }}'
+      trust_input: no
 
   - assert:
       that:
@@ -119,6 +122,7 @@
       <<: *pg_parameters
       name: '{{ test_pub }}'
       state: absent
+      trust_input: no
     check_mode: yes
 
   - assert:
@@ -180,6 +184,7 @@
       - '{{ test_schema }}.{{ test_table2 }}'
       parameters:
         publish: 'insert'
+      trust_input: no
 
   - assert:
       that:
@@ -226,6 +231,22 @@
       - result.rowcount == 1
 
   # Test
+  - name: postgresql_publication - test trust_input parameter
+    <<: *task_parameters
+    postgresql_publication: 
+      <<: *pg_parameters
+      name: '{{ test_pub }}'
+      session_role: '{{ dangerous_name }}'
+      owner: '{{ dangerous_name }}'
+      trust_input: no
+    ignore_errors: yes
+
+  - assert:
+      that:
+      - result is failed
+      - result.msg is search('is potentially dangerous')
+
+  # Test
   - name: postgresql_publication - add table to publication, change owner, check_mode
     <<: *task_parameters
     postgresql_publication: 
@@ -236,6 +257,7 @@
       - '{{ test_table1 }}'
       - '{{ test_schema }}.{{ test_table2 }}'
       - '{{ test_table3 }}'
+      trust_input: no
     check_mode: yes
 
   - assert:
@@ -279,6 +301,7 @@
       - '{{ test_table1 }}'
       - '{{ test_schema }}.{{ test_table2 }}'
       - '{{ test_table3 }}'
+      trust_input: no
 
   - assert:
       that:
@@ -320,6 +343,7 @@
       - '{{ test_schema }}.{{ test_table2 }}'
       parameters:
         publish: 'insert'
+      trust_input: no
     check_mode: yes
 
   - assert:
@@ -361,6 +385,7 @@
       - '{{ test_schema }}.{{ test_table2 }}'
       parameters:
         publish: 'delete'
+      trust_input: no
 
   - assert:
       that:

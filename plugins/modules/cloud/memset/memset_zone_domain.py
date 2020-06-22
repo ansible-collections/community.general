@@ -7,12 +7,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: memset_zone_domain
@@ -50,7 +44,7 @@ options:
 
 EXAMPLES = '''
 # Create the zone domain 'test.com'
-- name: create zone domain
+- name: Create zone domain
   memset_zone_domain:
     domain: test.com
     zone: testzone

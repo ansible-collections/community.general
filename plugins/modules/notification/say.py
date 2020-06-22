@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['stableinterface'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: say
@@ -39,7 +34,8 @@ author:
 '''
 
 EXAMPLES = '''
-- say:
+- name: Makes a computer to speak
+  say:
     msg: '{{ inventory_hostname }} is all done'
     voice: Zarvox
   delegate_to: localhost

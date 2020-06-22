@@ -24,10 +24,6 @@ You should have received a clone of the GNU General Public License
 along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-ANSIBLE_METADATA = {'status': ['preview'],
-                    'supported_by': 'community',
-                    'metadata_version': '1.1'}
-
 DOCUMENTATION = '''
 ---
 module: one_image
@@ -78,40 +74,40 @@ author:
 '''
 
 EXAMPLES = '''
-# Fetch the IMAGE by id
-- one_image:
+- name: Fetch the IMAGE by id
+  one_image:
     id: 45
   register: result
 
-# Print the IMAGE properties
-- debug:
+- name: Print the IMAGE properties
+  debug:
     msg: result
 
-# Rename existing IMAGE
-- one_image:
+- name: Rename existing IMAGE
+  one_image:
     id: 34
     state: renamed
     new_name: bar-image
 
-# Disable the IMAGE by id
-- one_image:
+- name: Disable the IMAGE by id
+  one_image:
     id: 37
     enabled: no
 
-# Enable the IMAGE by name
-- one_image:
+- name: Enable the IMAGE by name
+  one_image:
     name: bar-image
     enabled: yes
 
-# Clone the IMAGE by name
-- one_image:
+- name: Clone the IMAGE by name
+  one_image:
     name: bar-image
     state: cloned
     new_name: bar-image-clone
   register: result
 
-# Delete the IMAGE by id
-- one_image:
+- name: Delete the IMAGE by id
+  one_image:
     id: '{{ result.id }}'
     state: absent
 '''

@@ -8,17 +8,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: digital_ocean
 short_description: Create/delete a droplet/SSH_key in DigitalOcean
 deprecated:
-  removed_in: '2.12'
+  removed_in: 2.0.0  # was Ansible 2.12
   why: Updated module to remove external dependency with increased functionality.
   alternative: Use M(digital_ocean_droplet) instead.
 description:
@@ -115,17 +110,17 @@ EXAMPLES = '''
 # If a key matches this name, will return the ssh key id and changed = False
 # If no existing key matches this name, a new key is created, the ssh key id is returned and changed = False
 
-- digital_ocean:
+- name: Ensure a SSH key is present
+  digital_ocean:
     state: present
     command: ssh
     name: my_ssh_key
     ssh_pub_key: 'ssh-rsa AAAA...'
     api_token: XXX
 
-# Create a new Droplet
 # Will return the droplet details including the droplet id (used for idempotence)
-
-- digital_ocean:
+- name: Create a new Droplet
+  digital_ocean:
     state: present
     command: droplet
     name: mydroplet
@@ -146,7 +141,8 @@ EXAMPLES = '''
 # If droplet id already exist, will return the droplet details and changed = False
 # If no droplet matches the id, a new droplet will be created and the droplet details (including the new id) are returned, changed = True.
 
-- digital_ocean:
+- name: Ensure a droplet is present
+  digital_ocean:
     state: present
     command: droplet
     id: 123
@@ -162,7 +158,8 @@ EXAMPLES = '''
 # Several keys can be added to ssh_key_ids as id1,id2,id3
 # The keys are used to connect as root to the droplet.
 
-- digital_ocean:
+- name: Create a droplet with ssh key
+  digital_ocean:
     state: present
     ssh_key_ids: 123,456
     name: mydroplet
@@ -170,7 +167,6 @@ EXAMPLES = '''
     size_id: 2gb
     region_id: ams2
     image_id: fedora-19-x64
-
 '''
 
 import os

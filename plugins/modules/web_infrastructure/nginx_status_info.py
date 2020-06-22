@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = r'''
 ---
 module: nginx_status_info
@@ -39,13 +34,13 @@ notes:
 
 EXAMPLES = r'''
 # Gather status info from nginx on localhost
-- name: get current http stats
+- name: Get current http stats
   nginx_status_info:
     url: http://localhost/nginx_status
   register: result
 
 # Gather status info from nginx on localhost with a custom timeout of 20 seconds
-- name: get current http stats
+- name: Get current http stats
   nginx_status_info:
     url: http://localhost/nginx_status
     timeout: 20

@@ -6,10 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: rhsm_repository
@@ -221,7 +217,7 @@ def repository_modify(module, state, name, purge=False):
             'before_header': "RHSM repositories",
             'after_header': "RHSM repositories"}
 
-    if not module.check_mode:
+    if not module.check_mode and changed:
         rc, out, err = run_subscription_manager(module, rhsm_arguments)
         results = out.splitlines()
     module.exit_json(results=results, changed=changed, repositories=updated_repo_list, diff=diff)

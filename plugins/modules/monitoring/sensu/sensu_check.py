@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: sensu_check
@@ -134,7 +129,7 @@ author: "Anders Ingemann (@andsens)"
 EXAMPLES = '''
 # Fetch metrics about the CPU load every 60 seconds,
 # the sensu server has a handler called 'relay' which forwards stats to graphite
-- name: get cpu metrics
+- name: Get cpu metrics
   sensu_check:
     name: cpu_load
     command: /etc/sensu/plugins/system/cpu-mpstat-metrics.rb
@@ -144,7 +139,7 @@ EXAMPLES = '''
     interval: 60
 
 # Check whether nginx is running
-- name: check nginx process
+- name: Check nginx process
   sensu_check:
     name: nginx_running
     command: /etc/sensu/plugins/processes/check-procs.rb -f /var/run/nginx.pid
@@ -155,7 +150,7 @@ EXAMPLES = '''
 # Stop monitoring the disk capacity.
 # Note that the check will still show up in the sensu dashboard,
 # to remove it completely you need to issue a DELETE request to the sensu api.
-- name: check disk
+- name: Check disk
   sensu_check:
     name: check_disk_capacity
     state: absent

@@ -8,10 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: sensu_silence
@@ -198,7 +194,7 @@ def create(
                     (check is None or check == i['check']) and
                     (
                         creator == '' or
-                        creator == i['creator'])and
+                        creator == i['creator']) and
                     (
                         reason == '' or
                         reason == i['reason']) and

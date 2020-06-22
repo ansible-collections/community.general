@@ -11,11 +11,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['stableinterface'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: pkgutil
@@ -53,13 +48,13 @@ options:
 '''
 
 EXAMPLES = '''
-# Install a package
-- pkgutil:
+- name: Install a package
+  pkgutil:
     name: CSWcommon
     state: present
 
-# Install a package from a specific repository
-- pkgutil:
+- name: Install a package from a specific repository
+  pkgutil:
     name: CSWnrpe
     site: 'ftp://myinternal.repo/opencsw/kiel'
     state: latest

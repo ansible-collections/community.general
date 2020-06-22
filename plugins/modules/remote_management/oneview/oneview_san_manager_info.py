@@ -5,10 +5,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: oneview_san_manager_info
@@ -94,10 +90,11 @@ class SanManagerInfoModule(OneViewModuleBase):
     def __init__(self):
         super(SanManagerInfoModule, self).__init__(additional_arg_spec=self.argument_spec)
         self.resource_client = self.oneview_client.san_managers
-        self.is_old_facts = self.module._name == 'oneview_san_manager_facts'
+        self.is_old_facts = self.module._name in ('oneview_san_manager_facts', 'community.general.oneview_san_manager_facts')
         if self.is_old_facts:
             self.module.deprecate("The 'oneview_san_manager_facts' module has been renamed to 'oneview_san_manager_info', "
-                                  "and the renamed one no longer returns ansible_facts", version='2.13')
+                                  "and the renamed one no longer returns ansible_facts",
+                                  version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     def execute_module(self):
         if self.module.params.get('provider_display_name'):

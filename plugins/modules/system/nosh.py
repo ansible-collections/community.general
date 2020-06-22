@@ -8,10 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: nosh
@@ -64,42 +60,42 @@ notes:
 '''
 
 EXAMPLES = '''
-- name: start dnscache if not running
+- name: Start dnscache if not running
   nosh: name=dnscache state=started
 
-- name: stop mpd, if running
+- name: Stop mpd, if running
   nosh: name=mpd state=stopped
 
-- name: restart unbound or start it if not already running
+- name: Restart unbound or start it if not already running
   nosh:
     name: unbound
     state: restarted
 
-- name: reload fail2ban or start it if not already running
+- name: Reload fail2ban or start it if not already running
   nosh:
     name: fail2ban
     state: reloaded
 
-- name: disable nsd
+- name: Disable nsd
   nosh: name=nsd enabled=no
 
-- name: for package installers, set nginx running state according to local enable settings, preset and reset
+- name: For package installers, set nginx running state according to local enable settings, preset and reset
   nosh: name=nginx preset=True state=reset
 
-- name: reboot the host if nosh is the system manager, would need a "wait_for*" task at least, not recommended as-is
+- name: Reboot the host if nosh is the system manager, would need a "wait_for*" task at least, not recommended as-is
   nosh: name=reboot state=started
 
-- name: using conditionals with the module facts
+- name: Using conditionals with the module facts
   tasks:
-    - name: obtain information on tinydns service
+    - name: Obtain information on tinydns service
       nosh: name=tinydns
       register: result
 
-    - name: fail if service not loaded
+    - name: Fail if service not loaded
       fail: msg="The {{ result.name }} service is not loaded"
       when: not result.status
 
-    - name: fail if service is running
+    - name: Fail if service is running
       fail: msg="The {{ result.name }} service is running"
       when: result.status and result.status['DaemontoolsEncoreState'] == "running"
 '''
@@ -136,138 +132,172 @@ status:
     type: complex
     contains:
         After:
+            description: []  # FIXME
             returned: success
             type: list
             sample: ["/etc/service-bundles/targets/basic","../sshdgenkeys", "log"]
         Before:
+            description: []  # FIXME
             returned: success
             type: list
             sample: ["/etc/service-bundles/targets/shutdown"]
         Conflicts:
+            description: []  # FIXME
             returned: success
             type: list
             sample: '[]'
         DaemontoolsEncoreState:
+            description: []  # FIXME
             returned: success
             type: str
             sample: "running"
         DaemontoolsState:
+            description: []  # FIXME
             returned: success
             type: str
             sample: "up"
         Enabled:
+            description: []  # FIXME
             returned: success
             type: bool
             sample: True
         LogService:
+            description: []  # FIXME
             returned: success
             type: str
             sample: "../cyclog@sshd"
         MainPID:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 661
         Paused:
+            description: []  # FIXME
             returned: success
             type: bool
             sample: 'False'
         ReadyAfterRun:
+            description: []  # FIXME
             returned: success
             type: bool
             sample: 'False'
         RemainAfterExit:
+            description: []  # FIXME
             returned: success
             type: bool
             sample: 'False'
         Required-By:
+            description: []  # FIXME
             returned: success
             type: list
             sample: '[]'
         RestartExitStatusCode:
+            description: []  # FIXME
             returned: success
             type: int
             sample: '0'
         RestartExitStatusNumber:
+            description: []  # FIXME
             returned: success
             type: int
             sample: '0'
         RestartTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 4611686019935648081
         RestartUTCTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 1508260140
         RunExitStatusCode:
+            description: []  # FIXME
             returned: success
             type: int
             sample: '0'
         RunExitStatusNumber:
+            description: []  # FIXME
             returned: success
             type: int
             sample: '0'
         RunTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 4611686019935648081
         RunUTCTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 1508260140
         StartExitStatusCode:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 1
         StartExitStatusNumber:
+            description: []  # FIXME
             returned: success
             type: int
             sample: '0'
         StartTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 4611686019935648081
         StartUTCTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 1508260140
         StopExitStatusCode:
+            description: []  # FIXME
             returned: success
             type: int
             sample: '0'
         StopExitStatusNumber:
+            description: []  # FIXME
             returned: success
             type: int
             sample: '0'
         StopTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 4611686019935648081
         StopUTCTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 1508260140
         Stopped-By:
+            description: []  # FIXME
             returned: success
             type: list
             sample: ["/etc/service-bundles/targets/shutdown"]
         Timestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 4611686019935648081
         UTCTimestamp:
+            description: []  # FIXME
             returned: success
             type: int
             sample: 1508260140
         Want:
+            description: []  # FIXME
             returned: success
             type: str
             sample: "nothing"
         Wanted-By:
+            description: []  # FIXME
             returned: success
             type: list
             sample: ["/etc/service-bundles/targets/server","/etc/service-bundles/targets/sockets"]
         Wants:
+            description: []  # FIXME
             returned: success
             type: list
             sample: ["/etc/service-bundles/targets/basic","../sshdgenkeys"]

@@ -22,20 +22,15 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: ovirt_disk_facts
 short_description: Retrieve information about one or more oVirt/RHV disks
 author: "Katerina Koukiou (@KKoukiou)"
 deprecated:
-    removed_in: "2.10"
+    removed_in: 3.0.0  # was Ansible 2.13
     why: When migrating to collection we decided to use only _info modules.
-    alternative: Use M(ovirt_disk_info) instead
+    alternative: Use C(ovirt_disk_info) from the C(ovirt.ovirt) collection instead
 description:
     - "Retrieve information about one or more oVirt/RHV disks."
     - This module was called C(ovirt_disk_facts) before Ansible 2.9, returning C(ansible_facts).
@@ -51,7 +46,7 @@ options:
         - "For example to search Disk X from storage Y use following pattern:
            name=X and storage.name=Y"
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- community.general.ovirt_facts
 
 '''
 
@@ -59,11 +54,13 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about all Disks which names start with C(centos)
-- ovirt_disk_info:
+- name: Gather information about all Disks which names start with centos
+  ovirt_disk_info:
     pattern: name=centos*
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_disks }}"
 '''
 
@@ -79,7 +76,7 @@ import traceback
 
 from ansible.module_utils.common.removed import removed_module
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.ovirt.ovirt.plugins.module_utils.ovirt import (
+from ansible_collections.community.general.plugins.module_utils._ovirt import (
     check_sdk,
     create_connection,
     get_dict_of_struct,
@@ -92,10 +89,11 @@ def main():
         pattern=dict(default='', required=False),
     )
     module = AnsibleModule(argument_spec)
-    is_old_facts = module._name == 'ovirt_disk_facts'
+    is_old_facts = module._name in ('ovirt_disk_facts', 'community.general.ovirt_disk_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_disk_facts' module has been renamed to 'ovirt_disk_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
     check_sdk(module)
 
     try:
@@ -126,4 +124,4 @@ def main():
 
 
 if __name__ == '__main__':
-    removed_module("2.10")
+    main()

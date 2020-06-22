@@ -6,11 +6,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: rax_clb_nodes
@@ -81,8 +76,8 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = '''
-# Add a new node to the load balancer
-- local_action:
+- name: Add a new node to the load balancer
+  local_action:
     module: rax_clb_nodes
     load_balancer_id: 71
     address: 10.2.2.3
@@ -92,8 +87,8 @@ EXAMPLES = '''
     wait: yes
     credentials: /path/to/credentials
 
-# Drain connections from a node
-- local_action:
+- name: Drain connections from a node
+  local_action:
     module: rax_clb_nodes
     load_balancer_id: 71
     node_id: 410
@@ -101,8 +96,8 @@ EXAMPLES = '''
     wait: yes
     credentials: /path/to/credentials
 
-# Remove a node from the load balancer
-- local_action:
+- name: Remove a node from the load balancer
+  local_action:
     module: rax_clb_nodes
     load_balancer_id: 71
     node_id: 410

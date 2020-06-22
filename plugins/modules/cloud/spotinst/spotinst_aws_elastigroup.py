@@ -3,9 +3,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import (absolute_import, division, print_function)
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
 DOCUMENTATION = '''
 ---
 module: spotinst_aws_elastigroup
@@ -469,7 +466,7 @@ EXAMPLES = '''
 
 - hosts: localhost
   tasks:
-    - name: create elastigroup
+    - name: Create elastigroup
       spotinst_aws_elastigroup:
           state: present
           risk: 100
@@ -503,7 +500,7 @@ EXAMPLES = '''
 
 - hosts: localhost
   tasks:
-    - name: create elastigroup
+    - name: Create elastigroup
       spotinst_aws_elastigroup:
           state: present
           account_id: act-1a9dd2b
@@ -550,7 +547,7 @@ EXAMPLES = '''
 
 - hosts: localhost
   tasks:
-    - name: create elastigroup
+    - name: Create elastigroup
       spotinst_aws_elastigroup:
           state: present
           account_id: act-1a9dd2b
@@ -600,7 +597,7 @@ EXAMPLES = '''
 
 - hosts: localhost
   tasks:
-    - name: create elastigroup
+    - name: Create elastigroup
       spotinst_aws_elastigroup:
           state: present
           risk: 100
@@ -640,7 +637,7 @@ EXAMPLES = '''
 
 - hosts: localhost
   tasks:
-    - name: create elastigroup
+    - name: Create elastigroup
       spotinst_aws_elastigroup:
           state: present
           risk: 100
@@ -678,7 +675,7 @@ EXAMPLES = '''
 
 - hosts: localhost
   tasks:
-    - name: create elastigroup
+    - name: Create elastigroup
       spotinst_aws_elastigroup:
           account_id: act-92d45673
           state: present
@@ -717,8 +714,8 @@ EXAMPLES = '''
             - image_id
       register: result
     - debug: var=result
-
 '''
+
 RETURN = '''
 ---
 instances:

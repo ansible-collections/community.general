@@ -7,10 +7,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: github_deploy_key
@@ -26,6 +22,7 @@ options:
       - The base URL of the GitHub API
     required: false
     type: str
+    version_added: '0.2.0'
     default: https://api.github.com
   owner:
     description:
@@ -79,8 +76,8 @@ notes:
 '''
 
 EXAMPLES = '''
-# add a new read-only deploy key to a GitHub repository using basic authentication
-- github_deploy_key:
+- name: Add a new read-only deploy key to a GitHub repository using basic authentication
+  github_deploy_key:
     owner: "johndoe"
     repo: "example"
     name: "new-deploy-key"
@@ -89,8 +86,8 @@ EXAMPLES = '''
     username: "johndoe"
     password: "supersecretpassword"
 
-# remove an existing deploy key from a GitHub repository
-- github_deploy_key:
+- name: Remove an existing deploy key from a GitHub repository
+  github_deploy_key:
     owner: "johndoe"
     repository: "example"
     name: "new-deploy-key"
@@ -100,8 +97,8 @@ EXAMPLES = '''
     password: "supersecretpassword"
     state: absent
 
-# add a new deploy key to a GitHub repository, replace an existing key, use an OAuth2 token to authenticate
-- github_deploy_key:
+- name: Add a new deploy key to a GitHub repository, replace an existing key, use an OAuth2 token to authenticate
+  github_deploy_key:
     owner: "johndoe"
     repository: "example"
     name: "new-deploy-key"
@@ -109,8 +106,8 @@ EXAMPLES = '''
     force: yes
     token: "ABAQDAwXxn7kIMNWzcDfo..."
 
-# re-add a deploy key to a GitHub repository but with a different name
-- github_deploy_key:
+- name: Re-add a deploy key to a GitHub repository but with a different name
+  github_deploy_key:
     owner: "johndoe"
     repository: "example"
     name: "replace-deploy-key"
@@ -118,8 +115,8 @@ EXAMPLES = '''
     username: "johndoe"
     password: "supersecretpassword"
 
-# add a new deploy key to a GitHub repository using 2FA
-- github_deploy_key:
+- name: Add a new deploy key to a GitHub repository using 2FA
+  github_deploy_key:
     owner: "johndoe"
     repo: "example"
     name: "new-deploy-key-2"
@@ -128,8 +125,8 @@ EXAMPLES = '''
     password: "supersecretpassword"
     otp: 123456
 
-# add a read-only deploy key to a repository hosted on GitHub Enterprise
-- github_deploy_key:
+- name: Add a read-only deploy key to a repository hosted on GitHub Enterprise
+  github_deploy_key:
     github_url: "https://api.example.com"
     owner: "janedoe"
     repo: "example"

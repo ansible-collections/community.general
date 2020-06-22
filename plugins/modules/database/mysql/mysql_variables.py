@@ -8,10 +8,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: mysql_variables
@@ -46,6 +42,7 @@ options:
     type: str
     choices: ['global', 'persist', 'persist_only']
     default: global
+    version_added: '0.2.0'
 
 seealso:
 - module: mysql_info
@@ -76,6 +73,7 @@ queries:
   returned: if executed
   type: list
   sample: ["SET GLOBAL `read_only` = 1"]
+  version_added: '0.2.0'
 '''
 
 import os

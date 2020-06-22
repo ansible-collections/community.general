@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: librato_annotation
@@ -65,16 +60,16 @@ options:
 '''
 
 EXAMPLES = '''
-# Create a simple annotation event with a source
-- librato_annotation:
+- name: Create a simple annotation event with a source
+  librato_annotation:
     user: user@example.com
     api_key: XXXXXXXXXXXXXXXXX
     title: App Config Change
     source: foo.bar
     description: This is a detailed description of the config change
 
-# Create an annotation that includes a link
-- librato_annotation:
+- name: Create an annotation that includes a link
+  librato_annotation:
     user: user@example.com
     api_key: XXXXXXXXXXXXXXXXXX
     name: code.deploy
@@ -84,8 +79,8 @@ EXAMPLES = '''
       - rel: example
         href: http://www.example.com/deploy
 
-# Create an annotation with a start_time and end_time
-- librato_annotation:
+- name: Create an annotation with a start_time and end_time
+  librato_annotation:
     user: user@example.com
     api_key: XXXXXXXXXXXXXXXXXX
     name: maintenance

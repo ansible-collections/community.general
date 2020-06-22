@@ -8,13 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
-
 DOCUMENTATION = '''
 ---
 module: digital_ocean_size_info
@@ -106,8 +99,9 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
     )
-    if module._name == 'digital_ocean_size_facts':
-        module.deprecate("The 'digital_ocean_size_facts' module has been renamed to 'digital_ocean_size_info'", version='2.13')
+    if module._name in ('digital_ocean_size_facts', 'community.general.digital_ocean_size_facts'):
+        module.deprecate("The 'digital_ocean_size_facts' module has been renamed to 'digital_ocean_size_info'",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     try:
         core(module)

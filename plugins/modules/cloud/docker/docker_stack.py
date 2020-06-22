@@ -8,10 +8,6 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'status': ['preview'],
-                    'supported_by': 'community',
-                    'metadata_version': '1.1'}
-
 DOCUMENTATION = '''
 ---
 module: docker_stack
@@ -82,7 +78,7 @@ requirements:
   - pyyaml
 
 notes:
-  - Return values I(out) and I(err) have been deprecated and will be removed in Ansible 2.14. Use I(stdout) and I(stderr) instead.
+  - Return values I(out) and I(err) have been deprecated and will be removed in community.general 3.0.0. Use I(stdout) and I(stderr) instead.
 '''
 
 RETURN = '''

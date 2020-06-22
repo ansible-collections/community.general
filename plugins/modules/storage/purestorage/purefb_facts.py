@@ -8,15 +8,11 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: purefb_facts
 deprecated:
-  removed_in: '2.13'
+  removed_in: 3.0.0  # was Ansible 2.13
   why: Deprecated in favor of C(_info) module.
   alternative: Use M(purefb_info) instead.
 short_description: Collect facts from Pure Storage FlashBlade
@@ -43,12 +39,12 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = r'''
-- name: collect default set of facts
+- name: Collect default set of facts
   purefb_facts:
     fb_url: 10.10.10.2
     api_token: T-55a68eb5-c785-4720-a2ca-8b03903bf641
 
-- name: collect configuration and capacity facts
+- name: Collect configuration and capacity facts
   purefb_facts:
     gather_subset:
       - config
@@ -56,7 +52,7 @@ EXAMPLES = r'''
     fb_url: 10.10.10.2
     api_token: T-55a68eb5-c785-4720-a2ca-8b03903bf641
 
-- name: collect all facts
+- name: Collect all facts
   purefb_facts:
     gather_subset:
       - all

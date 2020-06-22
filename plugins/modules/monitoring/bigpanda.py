@@ -7,11 +7,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: bigpanda
@@ -71,28 +66,32 @@ options:
   deployment_message:
     description:
     - Message about the deployment.
-    - C(message) alias is deprecated in Ansible 2.10, since it is used internally by Ansible Core Engine.
+    - C(message) alias is deprecated in community.general 0.2.0, since it is used internally by Ansible Core Engine.
     aliases: ['message']
+    version_added: '0.2.0'
 
 # informational: requirements for nodes
 requirements: [ ]
 '''
 
 EXAMPLES = '''
-- bigpanda:
+- name: Notify BigPanda about a deployment
+  bigpanda:
     component: myapp
     version: '1.3'
     token: '{{ bigpanda_token }}'
     state: started
 
-- bigpanda:
+- name: Notify BigPanda about a deployment
+  bigpanda:
     component: myapp
     version: '1.3'
     token: '{{ bigpanda_token }}'
     state: finished
 
 # If outside servers aren't reachable from your machine, use delegate_to and override hosts:
-- bigpanda:
+- name: Notify BigPanda about a deployment
+  bigpanda:
     component: myapp
     version: '1.3'
     token: '{{ bigpanda_token }}'
@@ -101,7 +100,8 @@ EXAMPLES = '''
   delegate_to: localhost
   register: deployment
 
-- bigpanda:
+- name: Notify BigPanda about a deployment
+  bigpanda:
     component: '{{ deployment.component }}'
     version: '{{ deployment.version }}'
     token: '{{ deployment.token }}'
@@ -133,7 +133,9 @@ def main():
             env=dict(required=False),
             owner=dict(required=False),
             description=dict(required=False),
-            deployment_message=dict(required=False, aliases=['message'], deprecated_aliases=[dict(name='message', version='2.14')]),
+            deployment_message=dict(required=False, aliases=['message'],
+                                    deprecated_aliases=[dict(name='message', version='3.0.0',
+                                                             collection_name='community.general')]),  # was Ansible 2.14
             source_system=dict(required=False, default='ansible'),
             validate_certs=dict(default='yes', type='bool'),
             url=dict(required=False, default='https://api.bigpanda.io'),

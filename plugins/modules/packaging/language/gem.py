@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: gem
@@ -99,19 +94,19 @@ author:
 '''
 
 EXAMPLES = '''
-# Installs version 1.0 of vagrant.
-- gem:
+- name: Install version 1.0 of vagrant
+  gem:
     name: vagrant
     version: 1.0
     state: present
 
-# Installs latest available version of rake.
-- gem:
+- name: Install latest available version of rake
+  gem:
     name: rake
     state: latest
 
-# Installs rake version 1.0 from a local gem on disk.
-- gem:
+- name: Install rake version 1.0 from a local gem on disk
+  gem:
     name: rake
     gem_source: /path/to/gems/rake-1.0.gem
     state: present

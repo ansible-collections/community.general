@@ -7,11 +7,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 
 module: pingdom
@@ -50,16 +45,16 @@ notes:
 '''
 
 EXAMPLES = '''
-# Pause the check with the ID of 12345.
-- pingdom:
+- name: Pause the check with the ID of 12345
+  pingdom:
     uid: example@example.com
     passwd: password123
     key: apipassword123
     checkid: 12345
     state: paused
 
-# Unpause the check with the ID of 12345.
-- pingdom:
+- name: Unpause the check with the ID of 12345
+  pingdom:
     uid: example@example.com
     passwd: password123
     key: apipassword123

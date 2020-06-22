@@ -7,11 +7,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: vertica_configuration
@@ -60,7 +55,7 @@ author: "Dariusz Owczarek (@dareko)"
 '''
 
 EXAMPLES = """
-- name: updating load_balance_policy
+- name: Updating load_balance_policy
   vertica_configuration: name=failovertostandbyafter value='8 hours'
 """
 import traceback

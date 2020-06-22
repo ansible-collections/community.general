@@ -13,11 +13,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['stableinterface'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = """
 module: slack
 short_description: Send Slack notifications
@@ -100,7 +95,7 @@ options:
     description:
       - Allow text to use default colors - use the default of 'normal' to not send a custom color bar at the start of the message.
       - Allowed values for color can be one of 'normal', 'good', 'warning', 'danger', any valid 3 digit or 6 digit hex color value.
-      - Specifying value in hex is supported from version 2.8.
+      - Specifying value in hex is supported since Ansible 2.8.
     default: 'normal'
   attachments:
     description:
@@ -127,7 +122,7 @@ EXAMPLES = """
     parse: 'none'
   delegate_to: localhost
 
-- name: insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured in Slack
+- name: Insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured in Slack
   slack:
     token: thetoken/generatedby/slack
     msg: '{{ inventory_hostname }} is alive!'
@@ -135,7 +130,7 @@ EXAMPLES = """
     username: ''
     icon_url: ''
 
-- name: insert a color bar in front of the message with valid hex color value
+- name: Insert a color bar in front of the message with valid hex color value
   slack:
     token: thetoken/generatedby/slack
     msg: 'This message uses color in hex value'

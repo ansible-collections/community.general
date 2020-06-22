@@ -7,20 +7,15 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: ovirt_datacenter_facts
 short_description: Retrieve information about one or more oVirt/RHV datacenters
 author: "Ondra Machacek (@machacekondra)"
 deprecated:
-    removed_in: "2.10"
+    removed_in: 3.0.0  # was Ansible 2.13
     why: When migrating to collection we decided to use only _info modules.
-    alternative: Use M(ovirt_datacenter_info) instead
+    alternative: Use C(ovirt_datacenter_info) from the C(ovirt.ovirt) collection instead
 description:
     - "Retrieve information about one or more oVirt/RHV datacenters."
     - This module was called C(ovirt_datacenter_facts) before Ansible 2.9, returning C(ansible_facts).
@@ -35,7 +30,7 @@ options:
         - "Search term which is accepted by oVirt/RHV search backend."
         - "For example to search datacenter I(X) use following pattern: I(name=X)"
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- community.general.ovirt_facts
 
 '''
 
@@ -43,11 +38,13 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about all data centers which names start with C(production):
-- ovirt_datacenter_info:
+- name: Gather information about all data centers which names start with production
+  ovirt_datacenter_info:
     pattern: name=production*
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_datacenters }}"
 '''
 
@@ -63,7 +60,7 @@ import traceback
 
 from ansible.module_utils.common.removed import removed_module
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.ovirt.ovirt.plugins.module_utils.ovirt import (
+from ansible_collections.community.general.plugins.module_utils._ovirt import (
     check_sdk,
     create_connection,
     get_dict_of_struct,
@@ -76,10 +73,11 @@ def main():
         pattern=dict(default='', required=False),
     )
     module = AnsibleModule(argument_spec)
-    is_old_facts = module._name == 'ovirt_datacenter_facts'
+    is_old_facts = module._name in ('ovirt_datacenter_facts', 'community.general.ovirt_datacenter_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_datacenter_facts' module has been renamed to 'ovirt_datacenter_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     check_sdk(module)
 
@@ -109,4 +107,4 @@ def main():
 
 
 if __name__ == '__main__':
-    removed_module("2.10")
+    main()

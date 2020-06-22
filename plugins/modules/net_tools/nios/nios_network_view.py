@@ -5,11 +5,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'certified'}
-
-
 DOCUMENTATION = '''
 ---
 module: nios_network_view
@@ -57,7 +52,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: configure a new network view
+- name: Configure a new network view
   nios_network_view:
     name: ansible
     state: present
@@ -66,7 +61,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: update the comment for network view
+- name: Update the comment for network view
   nios_network_view:
     name: ansible
     comment: this is an example comment
@@ -76,7 +71,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: remove the network view
+- name: Remove the network view
   nios_network_view:
     name: ansible
     state: absent
@@ -85,7 +80,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: update a existing network view
+- name: Update a existing network view
   nios_network_view:
     name: {new_name: ansible-new, old_name: ansible}
     state: present

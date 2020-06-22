@@ -7,12 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = r'''
 ---
 module: postgresql_ping
@@ -26,6 +20,21 @@ options:
     type: str
     aliases:
     - login_db
+  session_role:
+    description:
+    - Switch to session_role after connecting. The specified session_role must
+      be a role that the current login_user is a member of.
+    - Permissions checking for SQL commands is carried out as though
+      the session_role were the one that had logged in originally.
+    type: str
+    version_added: '0.2.0'
+  trust_input:
+    description:
+    - If C(no), check whether a value of I(session_role) is potentially dangerous.
+    - It does make sense to use C(yes) only when SQL injections via I(session_role) are possible.
+    type: bool
+    default: yes
+    version_added: '0.2.0'
 seealso:
 - module: postgresql_info
 author:
@@ -72,6 +81,9 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     exec_sql,
@@ -117,11 +129,17 @@ def main():
     argument_spec = postgres_common_argument_spec()
     argument_spec.update(
         db=dict(type='str', aliases=['login_db']),
+        session_role=dict(type='str'),
+        trust_input=dict(type='bool', default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
+
+    if not module.params['trust_input']:
+        # Check input for potentially dangerous elements:
+        check_input(module, module.params['session_role'])
 
     # Set some default values:
     cursor = False

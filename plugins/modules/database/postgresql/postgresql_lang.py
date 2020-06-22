@@ -8,10 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: postgresql_lang
@@ -73,7 +69,8 @@ options:
     description:
     - Switch to session_role after connecting.
     - The specified I(session_role) must be a role that the current I(login_user) is a member of.
-    - Permissions checking for SQL commands is carried out as though the I(session_role) were the one that had logged in originally.
+    - Permissions checking for SQL commands is carried out as though the
+      I(session_role) were the one that had logged in originally.
     type: str
   state:
     description:
@@ -104,6 +101,15 @@ options:
       - Set an owner for the language.
       - Ignored when I(state=absent).
     type: str
+    version_added: '0.2.0'
+  trust_input:
+    description:
+    - If C(no), check whether values of parameters I(lang), I(session_role),
+      I(owner) are potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
+    type: bool
+    default: yes
+    version_added: '0.2.0'
 seealso:
 - name: PostgreSQL languages
   description: General information about PostgreSQL languages.
@@ -176,6 +182,7 @@ queries:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import check_input
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     get_conn_params,
@@ -258,7 +265,7 @@ def set_lang_owner(cursor, lang, owner):
         lang (str): language name.
         owner (str): name of new owner.
     """
-    query = "ALTER LANGUAGE \"%s\" OWNER TO %s" % (lang, owner)
+    query = "ALTER LANGUAGE \"%s\" OWNER TO \"%s\"" % (lang, owner)
     executed_queries.append(query)
     cursor.execute(query)
     return True
@@ -276,6 +283,7 @@ def main():
         fail_on_drop=dict(type="bool", default="yes"),
         session_role=dict(type="str"),
         owner=dict(type="str"),
+        trust_input=dict(type="bool", default="yes")
     )
 
     module = AnsibleModule(
@@ -291,6 +299,12 @@ def main():
     cascade = module.params["cascade"]
     fail_on_drop = module.params["fail_on_drop"]
     owner = module.params["owner"]
+    session_role = module.params["session_role"]
+    trust_input = module.params["trust_input"]
+
+    if not trust_input:
+        # Check input for potentially dangerous elements:
+        check_input(module, lang, session_role, owner)
 
     conn_params = get_conn_params(module, module.params)
     db_connection = connect_to_db(module, conn_params, autocommit=False)

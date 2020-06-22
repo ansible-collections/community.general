@@ -5,11 +5,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'certified'}
-
-
 DOCUMENTATION = '''
 ---
 module: nios_cname_record
@@ -70,7 +65,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: configure a CNAME record
+- name: Configure a CNAME record
   nios_cname_record:
     name: cname.ansible.com
     canonical: realhost.ansible.com
@@ -81,7 +76,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: add a comment to an existing CNAME record
+- name: Add a comment to an existing CNAME record
   nios_cname_record:
     name: cname.ansible.com
     canonical: realhost.ansible.com
@@ -93,7 +88,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: remove a CNAME record from the system
+- name: Remove a CNAME record from the system
   nios_cname_record:
     name: cname.ansible.com
     canonical: realhost.ansible.com

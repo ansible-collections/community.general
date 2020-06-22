@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['stableinterface'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: hipchat
@@ -70,12 +65,13 @@ author:
 '''
 
 EXAMPLES = '''
-- hipchat:
+- name: Send a message to a Hipchat room
+  hipchat:
     room: notif
     msg: Ansible task finished
 
-# Use Hipchat API version 2
-- hipchat:
+- name: Send a message to a Hipchat room using Hipchat API version 2
+  hipchat:
     api: https://api.hipchat.com/v2/
     token: OAUTH2_TOKEN
     room: notify

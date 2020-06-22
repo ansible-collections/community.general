@@ -5,11 +5,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'certified'}
-
-
 DOCUMENTATION = '''
 ---
 module: nios_srv_record
@@ -80,7 +75,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: configure an SRV record
+- name: Configure an SRV record
   nios_srv_record:
     name: _sip._tcp.service.ansible.com
     port: 5080
@@ -94,7 +89,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: add a comment to an existing SRV record
+- name: Add a comment to an existing SRV record
   nios_srv_record:
     name: _sip._tcp.service.ansible.com
     port: 5080
@@ -109,7 +104,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: remove an SRV record from the system
+- name: Remove an SRV record from the system
   nios_srv_record:
     name: _sip._tcp.service.ansible.com
     port: 5080

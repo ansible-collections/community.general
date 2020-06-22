@@ -9,11 +9,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: pkg5_publisher
@@ -53,14 +48,14 @@ options:
       - Multiple values may be provided.
 '''
 EXAMPLES = '''
-# Fetch packages for the solaris publisher direct from Oracle:
-- pkg5_publisher:
+- name: Fetch packages for the solaris publisher direct from Oracle
+  pkg5_publisher:
     name: solaris
     sticky: true
     origin: https://pkg.oracle.com/solaris/support/
 
-# Configure a publisher for locally-produced packages:
-- pkg5_publisher:
+- name: Configure a publisher for locally-produced packages
+  pkg5_publisher:
     name: site
     origin: 'https://pkg.example.com/site/'
 '''

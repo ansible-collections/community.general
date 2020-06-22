@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = r'''
 ---
 author:
@@ -24,7 +19,8 @@ description:
     command line tool. For a full description of the fields and the options
     check the GNU parted manual.
 requirements:
-  - This module requires parted version 1.8.3 and above.
+  - This module requires parted version 1.8.3 and above
+  - align option (except 'undefined') requires parted 2.1 and above
   - If the version of parted is below 3.1, it requires a Linux version running
     the sysfs file system C(/sys/).
 options:
@@ -33,9 +29,9 @@ options:
     type: str
     required: True
   align:
-    description: Set alignment for newly created partitions.
+    description: Set alignment for newly created partitions. Use 'undefined' for parted default aligment.
     type: str
-    choices: [ cylinder, minimal, none, optimal ]
+    choices: [ cylinder, minimal, none, optimal, undefined ]
     default: optimal
   number:
     description:
@@ -53,7 +49,9 @@ options:
     choices: [ s, B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, '%', cyl, chs, compact ]
     default: KiB
   label:
-    description: Creates a new disk label.
+    description:
+     - Disk label type to use.
+     - If C(device) already contains different label, it will be changed to C(label) and any previous partitions will be lost.
     type: str
     choices: [ aix, amiga, bsd, dvh, gpt, loop, mac, msdos, pc98, sun ]
     default: msdos
@@ -95,6 +93,11 @@ options:
     type: str
     choices: [ absent, present, info ]
     default: info
+  fs_type:
+    description:
+     - If specified and the partition does not exist, will set filesystem type to given partition.
+    type: str
+    version_added: '0.2.0'
 notes:
   - When fetching information about a new disk and when the version of parted
     installed on the system is before version 3.1, the module queries the kernel
@@ -108,12 +111,15 @@ partition_info:
   returned: success
   type: complex
   contains:
-    device:
+    disk:
       description: Generic device information.
       type: dict
     partitions:
       description: List of device partitions.
       type: list
+    script:
+      description: parted script executed by module
+      type: str
   sample: {
       "disk": {
         "dev": "/dev/sdb",
@@ -140,16 +146,18 @@ partition_info:
         "name": "",
         "num": 2,
         "size": 4.0
-      }]
+      }],
+      "script": "unit KiB print "
     }
 '''
 
 EXAMPLES = r'''
-- name: Create a new primary partition
+- name: Create a new ext4 primary partition
   parted:
     device: /dev/sdb
     number: 1
     state: present
+    fs_type: ext4
 
 - name: Remove partition number 1
   parted:
@@ -482,8 +490,12 @@ def parted(script, device, align):
     """
     global module, parted_exec
 
+    align_option = '-a %s' % align
+    if align == 'undefined':
+        align_option = ''
+
     if script and not module.check_mode:
-        command = "%s -s -m -a %s %s -- %s" % (parted_exec, align, device, script)
+        command = "%s -s -m %s %s -- %s" % (parted_exec, align_option, device, script)
         rc, out, err = module.run_command(command)
 
         if rc != 0:
@@ -535,7 +547,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             device=dict(type='str', required=True),
-            align=dict(type='str', default='optimal', choices=['cylinder', 'minimal', 'none', 'optimal']),
+            align=dict(type='str', default='optimal', choices=['cylinder', 'minimal', 'none', 'optimal', 'undefined']),
             number=dict(type='int'),
 
             # unit <unit> command
@@ -548,6 +560,7 @@ def main():
             part_type=dict(type='str', default='primary', choices=['extended', 'logical', 'primary']),
             part_start=dict(type='str', default='0%'),
             part_end=dict(type='str', default='100%'),
+            fs_type=dict(type='str'),
 
             # name <partition> <name> command
             name=dict(type='str'),
@@ -578,6 +591,7 @@ def main():
     name = module.params['name']
     state = module.params['state']
     flags = module.params['flags']
+    fs_type = module.params['fs_type']
 
     # Parted executable
     parted_exec = module.get_bin_path('parted', True)
@@ -610,8 +624,9 @@ def main():
 
         # Create partition if required
         if part_type and not part_exists(current_parts, 'num', number):
-            script += "mkpart %s %s %s " % (
+            script += "mkpart %s %s%s %s " % (
                 part_type,
+                '%s ' % fs_type if fs_type is not None else '',
                 part_start,
                 part_end
             )
@@ -628,11 +643,13 @@ def main():
             changed = True
             script = ""
 
-            current_parts = get_device_info(device, unit)['partitions']
+            if not module.check_mode:
+                current_parts = get_device_info(device, unit)['partitions']
 
         if part_exists(current_parts, 'num', number) or module.check_mode:
-            partition = {'flags': []}      # Empty structure for the check-mode
-            if not module.check_mode:
+            if changed and module.check_mode:
+                partition = {'flags': []}   # Empty structure for the check-mode
+            else:
                 partition = [p for p in current_parts if p['num'] == number][0]
 
             # Assign name to the partition

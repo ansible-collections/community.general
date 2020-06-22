@@ -8,12 +8,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['deprecated'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = r'''
 ---
 module: ldap_attr
@@ -39,9 +33,9 @@ notes:
      handling.  The I(params) parameter started disallowing setting the I(bind_pw) parameter in
      Ansible-2.7 as it was insecure to set the parameter that way."
 deprecated:
-  removed_in: '2.14'
+  removed_in: 3.0.0  # was Ansible 2.14
   why: 'The current "ldap_attr" module does not support LDAP attribute insertions or deletions with objectClass dependencies.'
-  alternative: 'Use M(ldap_attrs) instead. Deprecated in 2.10.'
+  alternative: 'Use M(ldap_attrs) instead. Deprecated in community.general 0.2.0.'
 author:
   - Jiri Tyr (@jtyr)
 requirements:

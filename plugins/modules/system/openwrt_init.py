@@ -7,10 +7,6 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 module: openwrt_init
 author:
@@ -46,23 +42,23 @@ requirements:
 '''
 
 EXAMPLES = '''
-# Example action to start service httpd, if not running
-- openwrt_init:
+- name: Start service httpd, if not running
+  openwrt_init:
     state: started
     name: httpd
 
-# Example action to stop service cron, if running
-- openwrt_init:
+- name: Stop service cron, if running
+  openwrt_init:
     name: cron
     state: stopped
 
-# Example action to reload service httpd, in all cases
-- openwrt_init:
+- name: Reload service httpd, in all cases
+  openwrt_init:
     name: httpd
     state: reloaded
 
-# Example action to enable service httpd
-- openwrt_init:
+- name: Enable service httpd
+  openwrt_init:
     name: httpd
     enabled: yes
 '''

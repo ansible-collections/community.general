@@ -10,10 +10,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: ufw
@@ -140,6 +136,7 @@ options:
         compatible with I(interface_out) for routed rules.
     type: str
     aliases: [ if_in ]
+    version_added: '0.2.0'
   interface_out:
     description:
       - Specify output interface for the rule.  This is mutually
@@ -147,6 +144,7 @@ options:
         compatible with I(interface_in) for routed rules.
     type: str
     aliases: [ if_out ]
+    version_added: '0.2.0'
   route:
     description:
       - Apply the rule to routed/forwarded packets.

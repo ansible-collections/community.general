@@ -5,9 +5,16 @@ set -o pipefail -eux
 declare -a args
 IFS='/:' read -ra args <<< "$1"
 
-script="${args[0]}"
+ansible_version="${args[0]}"
+script="${args[1]}"
 
-test="$1"
+function join {
+    local IFS="$1";
+    shift;
+    echo "$*";
+}
+
+test="$(join / "${args[@]:1}")"
 
 docker images ansible/ansible
 docker images quay.io/ansible/*
@@ -28,6 +35,7 @@ python -V
 
 function retry
 {
+    # shellcheck disable=SC2034
     for repetition in 1 2 3; do
         set +e
         "$@"
@@ -36,16 +44,20 @@ function retry
         if [ ${result} == 0 ]; then
             return ${result}
         fi
-        echo "$@ -> ${result}"
+        echo "@* -> ${result}"
     done
-    echo "Command '$@' failed 3 times!"
+    echo "Command '@*' failed 3 times!"
     exit -1
 }
 
 command -v pip
 pip --version
 pip list --disable-pip-version-check
-retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+if [ "${ansible_version}" == "devel" ]; then
+    retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+else
+    retry pip install "https://github.com/ansible/ansible/archive/stable-${ansible_version}.tar.gz" --disable-pip-version-check
+fi
 
 export ANSIBLE_COLLECTIONS_PATHS="${HOME}/.ansible"
 SHIPPABLE_RESULT_DIR="$(pwd)/shippable"
@@ -54,14 +66,14 @@ mkdir -p "${TEST_DIR}"
 cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
 cd "${TEST_DIR}"
 
-# STAR: HACK install dependencies
+# START: HACK install dependencies
 retry ansible-galaxy -vvv collection install ansible.netcommon
 retry ansible-galaxy -vvv collection install ansible.posix
-retry ansible-galaxy -vvv collection install cisco.intersight
 retry ansible-galaxy -vvv collection install community.crypto
+# retry ansible-galaxy -vvv collection install community.internal_test_tools - we need git checkout until 0.2.0 has been released
+retry git clone https://github.com/ansible-collections/community.internal_test_tools.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/internal_test_tools"
 retry ansible-galaxy -vvv collection install community.kubernetes
 retry ansible-galaxy -vvv collection install google.cloud
-retry ansible-galaxy -vvv collection install ovirt.ovirt
 
 # END: HACK
 

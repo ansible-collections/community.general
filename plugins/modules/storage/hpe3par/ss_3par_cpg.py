@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = r'''
 ---
 short_description: Manage HPE StoreServ 3PAR CPG
@@ -97,31 +92,31 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r'''
-    - name: Create CPG sample_cpg
-      ss_3par_cpg:
-        storage_system_ip: 10.10.10.1
-        storage_system_username: username
-        storage_system_password: password
-        state: present
-        cpg_name: sample_cpg
-        domain: sample_domain
-        growth_increment: 32000 MiB
-        growth_limit: 64000 MiB
-        growth_warning: 48000 MiB
-        raid_type: R6
-        set_size: 8
-        high_availability: MAG
-        disk_type: FC
-        secure: no
+- name: Create CPG sample_cpg
+  ss_3par_cpg:
+    storage_system_ip: 10.10.10.1
+    storage_system_username: username
+    storage_system_password: password
+    state: present
+    cpg_name: sample_cpg
+    domain: sample_domain
+    growth_increment: 32000 MiB
+    growth_limit: 64000 MiB
+    growth_warning: 48000 MiB
+    raid_type: R6
+    set_size: 8
+    high_availability: MAG
+    disk_type: FC
+    secure: no
 
-    - name: Delete CPG sample_cpg
-      ss_3par_cpg:
-        storage_system_ip: 10.10.10.1
-        storage_system_username: username
-        storage_system_password: password
-        state: absent
-        cpg_name: sample_cpg
-        secure: no
+- name: Delete CPG sample_cpg
+  ss_3par_cpg:
+    storage_system_ip: 10.10.10.1
+    storage_system_username: username
+    storage_system_password: password
+    state: absent
+    cpg_name: sample_cpg
+    secure: no
 '''
 
 RETURN = r'''

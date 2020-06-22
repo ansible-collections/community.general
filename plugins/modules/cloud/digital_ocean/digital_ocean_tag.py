@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: digital_ocean_tag
@@ -29,7 +24,7 @@ options:
   resource_id:
     description:
     - The ID of the resource to operate on.
-    - The data type of resource_id is changed from integer to string, from version 2.5.
+    - The data type of resource_id is changed from integer to string since Ansible 2.5.
     aliases: ['droplet_id']
   resource_type:
     description:
@@ -56,12 +51,12 @@ requirements:
 
 
 EXAMPLES = '''
-- name: create a tag
+- name: Create a tag
   digital_ocean_tag:
     name: production
     state: present
 
-- name: tag a resource; creating the tag if it does not exist
+- name: Tag a resource; creating the tag if it does not exist
   digital_ocean_tag:
     name: "{{ item }}"
     resource_id: "73333005"
@@ -70,7 +65,7 @@ EXAMPLES = '''
     - staging
     - dbserver
 
-- name: untag a resource
+- name: Untag a resource
   digital_ocean_tag:
     name: staging
     resource_id: "73333005"
@@ -78,7 +73,7 @@ EXAMPLES = '''
 
 # Deleting a tag also untags all the resources that have previously been
 # tagged with it
-- name: remove a tag
+- name: Remove a tag
   digital_ocean_tag:
     name: dbserver
     state: absent

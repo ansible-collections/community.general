@@ -8,12 +8,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'supported_by': 'community',
-    'status': ['preview']
-}
-
 DOCUMENTATION = r'''
 ---
 module: postgresql_query
@@ -73,6 +67,14 @@ options:
     - Set the client encoding for the current session (e.g. C(UTF-8)).
     - The default is the encoding defined by the database.
     type: str
+    version_added: '0.2.0'
+  trust_input:
+    description:
+    - If C(no), check whether a value of I(session_role) is potentially dangerous.
+    - It does make sense to use C(yes) only when SQL injections via I(session_role) are possible.
+    type: bool
+    default: yes
+    version_added: '0.2.0'
 seealso:
 - module: postgresql_db
 author:
@@ -186,6 +188,9 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     get_conn_params,
@@ -248,6 +253,7 @@ def main():
         path_to_script=dict(type='path'),
         autocommit=dict(type='bool', default=False),
         encoding=dict(type='str'),
+        trust_input=dict(type='bool', default=True),
     )
 
     module = AnsibleModule(
@@ -262,6 +268,12 @@ def main():
     path_to_script = module.params["path_to_script"]
     autocommit = module.params["autocommit"]
     encoding = module.params["encoding"]
+    session_role = module.params["session_role"]
+    trust_input = module.params["trust_input"]
+
+    if not trust_input:
+        # Check input for potentially dangerous elements:
+        check_input(module, session_role)
 
     if autocommit and module.check_mode:
         module.fail_json(msg="Using autocommit is mutually exclusive with check_mode")

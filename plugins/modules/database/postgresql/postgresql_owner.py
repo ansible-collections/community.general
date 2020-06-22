@@ -7,12 +7,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'supported_by': 'community',
-    'status': ['preview']
-}
-
 DOCUMENTATION = r'''
 ---
 module: postgresql_owner
@@ -70,6 +64,14 @@ options:
     - Permissions checking for SQL commands is carried out as though
       the session_role were the one that had logged in originally.
     type: str
+  trust_input:
+    description:
+    - If C(no), check whether values of parameters I(new_owner), I(obj_name),
+      I(reassign_owned_by), I(session_role) are potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
+    type: bool
+    default: yes
+    version_added: '0.2.0'
 seealso:
 - module: postgresql_user
 - module: postgresql_privs
@@ -147,7 +149,10 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.database import pg_quote_identifier
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+    pg_quote_identifier,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     exec_sql,
@@ -218,7 +223,7 @@ class PgOwnership(object):
         roles = []
         for r in old_owners:
             if self.check_role_exists(r, fail_on_role):
-                roles.append(pg_quote_identifier(r, 'role'))
+                roles.append('"%s"' % r)
 
         # Roles do not exist, nothing to do, exit:
         if not roles:
@@ -228,7 +233,7 @@ class PgOwnership(object):
 
         query = ['REASSIGN OWNED BY']
         query.append(old_owners)
-        query.append('TO %s' % pg_quote_identifier(self.role, 'role'))
+        query.append('TO "%s"' % self.role)
         query = ' '.join(query)
 
         self.changed = exec_sql(self, query, return_bool=True)
@@ -323,50 +328,47 @@ class PgOwnership(object):
 
     def __set_db_owner(self):
         """Set the database owner."""
-        query = "ALTER DATABASE %s OWNER TO %s" % (pg_quote_identifier(self.obj_name, 'database'),
-                                                   pg_quote_identifier(self.role, 'role'))
+        query = 'ALTER DATABASE "%s" OWNER TO "%s"' % (self.obj_name, self.role)
         self.changed = exec_sql(self, query, return_bool=True)
 
     def __set_func_owner(self):
         """Set the function owner."""
-        query = "ALTER FUNCTION %s OWNER TO %s" % (self.obj_name,
-                                                   pg_quote_identifier(self.role, 'role'))
+        query = 'ALTER FUNCTION %s OWNER TO "%s"' % (self.obj_name, self.role)
         self.changed = exec_sql(self, query, return_bool=True)
 
     def __set_seq_owner(self):
         """Set the sequence owner."""
-        query = "ALTER SEQUENCE %s OWNER TO %s" % (pg_quote_identifier(self.obj_name, 'table'),
-                                                   pg_quote_identifier(self.role, 'role'))
+        query = 'ALTER SEQUENCE %s OWNER TO "%s"' % (pg_quote_identifier(self.obj_name, 'table'),
+                                                     self.role)
         self.changed = exec_sql(self, query, return_bool=True)
 
     def __set_schema_owner(self):
         """Set the schema owner."""
-        query = "ALTER SCHEMA %s OWNER TO %s" % (pg_quote_identifier(self.obj_name, 'schema'),
-                                                 pg_quote_identifier(self.role, 'role'))
+        query = 'ALTER SCHEMA %s OWNER TO "%s"' % (pg_quote_identifier(self.obj_name, 'schema'),
+                                                   self.role)
         self.changed = exec_sql(self, query, return_bool=True)
 
     def __set_table_owner(self):
         """Set the table owner."""
-        query = "ALTER TABLE %s OWNER TO %s" % (pg_quote_identifier(self.obj_name, 'table'),
-                                                pg_quote_identifier(self.role, 'role'))
+        query = 'ALTER TABLE %s OWNER TO "%s"' % (pg_quote_identifier(self.obj_name, 'table'),
+                                                  self.role)
         self.changed = exec_sql(self, query, return_bool=True)
 
     def __set_tablespace_owner(self):
         """Set the tablespace owner."""
-        query = "ALTER TABLESPACE %s OWNER TO %s" % (pg_quote_identifier(self.obj_name, 'database'),
-                                                     pg_quote_identifier(self.role, 'role'))
+        query = 'ALTER TABLESPACE "%s" OWNER TO "%s"' % (self.obj_name, self.role)
         self.changed = exec_sql(self, query, return_bool=True)
 
     def __set_view_owner(self):
         """Set the view owner."""
-        query = "ALTER VIEW %s OWNER TO %s" % (pg_quote_identifier(self.obj_name, 'table'),
-                                               pg_quote_identifier(self.role, 'role'))
+        query = 'ALTER VIEW %s OWNER TO "%s"' % (pg_quote_identifier(self.obj_name, 'table'),
+                                                 self.role)
         self.changed = exec_sql(self, query, return_bool=True)
 
     def __set_mat_view_owner(self):
         """Set the materialized view owner."""
-        query = "ALTER MATERIALIZED VIEW %s OWNER TO %s" % (pg_quote_identifier(self.obj_name, 'table'),
-                                                            pg_quote_identifier(self.role, 'role'))
+        query = 'ALTER MATERIALIZED VIEW %s OWNER TO "%s"' % (pg_quote_identifier(self.obj_name, 'table'),
+                                                              self.role)
         self.changed = exec_sql(self, query, return_bool=True)
 
     def __role_exists(self, role):
@@ -392,6 +394,7 @@ def main():
         fail_on_role=dict(type='bool', default=True),
         db=dict(type='str', aliases=['login_db']),
         session_role=dict(type='str'),
+        trust_input=dict(type='bool', default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -409,6 +412,11 @@ def main():
     obj_type = module.params['obj_type']
     reassign_owned_by = module.params['reassign_owned_by']
     fail_on_role = module.params['fail_on_role']
+    session_role = module.params['session_role']
+    trust_input = module.params['trust_input']
+    if not trust_input:
+        # Check input for potentially dangerous elements:
+        check_input(module, new_owner, obj_name, reassign_owned_by, session_role)
 
     conn_params = get_conn_params(module, module.params)
     db_connection = connect_to_db(module, conn_params, autocommit=False)

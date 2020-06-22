@@ -12,16 +12,13 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ["preview"],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: hwc_vpc_subnet
 description:
     - subnet management.
 short_description: Creates a resource of Vpc/Subnet in Huawei Cloud
+version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
     - keystoneauth1 >= 3.6.0
@@ -101,12 +98,12 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 # create subnet
-- name: create vpc
+- name: Create vpc
   hwc_network_vpc:
     cidr: "192.168.100.0/24"
     name: "ansible_network_vpc_test"
   register: vpc
-- name: create subnet
+- name: Create subnet
   hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"

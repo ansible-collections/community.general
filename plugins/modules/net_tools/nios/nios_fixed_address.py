@@ -5,11 +5,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'certified'}
-
-
 DOCUMENTATION = '''
 ---
 module: nios_fixed_address
@@ -99,7 +94,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: configure ipv4 dhcp fixed address
+- name: Configure ipv4 dhcp fixed address
   nios_fixed_address:
     name: ipv4_fixed
     ipaddr: 192.168.10.1
@@ -113,7 +108,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: configure a ipv6 dhcp fixed address
+- name: Configure a ipv6 dhcp fixed address
   nios_fixed_address:
     name: ipv6_fixed
     ipaddr: fe80::1/10
@@ -127,7 +122,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: set dhcp options for a ipv4 fixed address
+- name: Set dhcp options for a ipv4 fixed address
   nios_fixed_address:
     name: ipv4_fixed
     ipaddr: 192.168.10.1
@@ -144,7 +139,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: remove a ipv4 dhcp fixed address
+- name: Remove a ipv4 dhcp fixed address
   nios_fixed_address:
     name: ipv4_fixed
     ipaddr: 192.168.10.1

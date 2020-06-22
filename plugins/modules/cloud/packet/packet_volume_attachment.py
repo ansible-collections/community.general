@@ -9,11 +9,6 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: packet_volume_attachment
@@ -27,6 +22,7 @@ description:
        the block devices on the server, you have to run the Attach Scripts,
        as documented at U(https://help.packet.net/technical/storage/packet-block-storage-linux)."
 
+version_added: '0.2.0'
 
 author:
     - Tomas Karasek (@t0mk) <tom.to.the.k@gmail.com>
@@ -82,7 +78,7 @@ EXAMPLES = '''
     project_id: 52000fb2-ee46-4673-93a8-de2c2bdba33b
 
   tasks:
-    - name: test create volume
+    - name: Create volume
       packet_volume:
         description: "{{ volname }}"
         project_id: "{{ project_id }}"
@@ -94,7 +90,8 @@ EXAMPLES = '''
           snapshot_count: 10
           snapshot_frequency: 1day
 
-    - packet_device:
+    - name: Create a device
+      packet_device:
         project_id: "{{ project_id }}"
         hostnames: "{{ devname }}"
         operating_system: ubuntu_16_04
@@ -114,7 +111,6 @@ EXAMPLES = '''
         volume: "{{ volname }}"
         device: "{{ devname }}"
         state: absent
-
 '''
 
 RETURN = '''

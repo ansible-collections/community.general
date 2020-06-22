@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: riak
@@ -59,17 +54,17 @@ options:
 '''
 
 EXAMPLES = '''
-# Join's a Riak node to another node
-- riak:
+- name: "Join's a Riak node to another node"
+  riak:
     command: join
     target_node: riak@10.1.1.1
 
-# Wait for handoffs to finish.  Use with async and poll.
-- riak:
+- name: Wait for handoffs to finish. Use with async and poll.
+  riak:
     wait_for_handoffs: yes
 
-# Wait for riak_kv service to startup
-- riak:
+- name: Wait for riak_kv service to startup
+  riak:
     wait_for_service: kv
 '''
 

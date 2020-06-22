@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 module: clc_alert_policy
 short_description: Create or Delete Alert Policies at CenturyLink Cloud.
@@ -91,7 +86,7 @@ EXAMPLES = '''
         state: present
       register: policy
 
-    - name: debug
+    - name: Debug
       debug: var=policy
 
 ---
@@ -107,7 +102,7 @@ EXAMPLES = '''
         state: absent
       register: policy
 
-    - name: debug
+    - name: Debug
       debug: var=policy
 '''
 

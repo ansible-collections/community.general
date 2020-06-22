@@ -6,11 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = r'''
 ---
 module: ipa_user
@@ -94,6 +89,7 @@ options:
     description:
     - Default home directory of the user.
     type: str
+    version_added: '0.2.0'
 extends_documentation_fragment:
 - community.general.ipa.documentation
 
@@ -117,8 +113,8 @@ EXAMPLES = r'''
     sshpubkey:
     - ssh-rsa ....
     - ssh-dsa ....
-    uidnumber: 1001
-    gidnumber: 100
+    uidnumber: '1001'
+    gidnumber: '100'
     homedirectory: /home/pinky
     ipa_host: ipa.example.com
     ipa_user: admin

@@ -7,11 +7,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 
 module: na_cdot_license
@@ -23,7 +18,7 @@ extends_documentation_fragment:
 author: Sumit Kumar (@timuster) <sumit4@netapp.com>
 
 deprecated:
-  removed_in: '2.11'
+  removed_in: 2.0.0  # was Ansible 2.11
   why: Updated modules released with increased functionality
   alternative: Use M(na_ontap_license) instead.
 

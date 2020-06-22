@@ -64,17 +64,47 @@ class TestCreateJavaKeystore(ModuleTestCase):
         module.exit_json = Mock()
 
         with patch('os.remove', return_value=True):
-            self.run_commands.side_effect = lambda args, kwargs: (0, '', '')
-            create_jks(module, "test", "openssl", "keytool", "/path/to/keystore.jks", "changeit")
+            self.run_commands.side_effect = lambda module, cmd, data: (0, '', '')
+            create_jks(module, "test", "openssl", "keytool", "/path/to/keystore.jks", "changeit", "")
             module.exit_json.assert_called_once_with(
                 changed=True,
-                cmd="keytool -importkeystore "
-                    "-destkeystore '/path/to/keystore.jks' "
-                    "-srckeystore '/tmp/keystore.p12' -srcstoretype pkcs12 -alias 'test' "
-                    "-deststorepass 'changeit' -srcstorepass 'changeit' -noprompt",
+                cmd=["keytool", "-importkeystore",
+                     "-destkeystore", "/path/to/keystore.jks",
+                     "-srckeystore", "/tmp/keystore.p12", "-srcstoretype", "pkcs12", "-alias", "test",
+                     "-deststorepass", "changeit", "-srcstorepass", "changeit", "-noprompt"],
                 msg='',
                 rc=0,
                 stdout_lines=''
+            )
+
+    def test_create_jks_keypass_fail_export_pkcs12(self):
+        set_module_args(dict(
+            certificate='cert-foo',
+            private_key='private-foo',
+            private_key_passphrase='passphrase-foo',
+            dest='/path/to/keystore.jks',
+            name='foo',
+            password='changeit'
+        ))
+
+        module = AnsibleModule(
+            argument_spec=self.spec.argument_spec,
+            supports_check_mode=self.spec.supports_check_mode
+        )
+
+        module.fail_json = Mock()
+
+        with patch('os.remove', return_value=True):
+            self.run_commands.side_effect = [(1, '', ''), (0, '', '')]
+            create_jks(module, "test", "openssl", "keytool", "/path/to/keystore.jks", "changeit", "passphrase-foo")
+            module.fail_json.assert_called_once_with(
+                cmd=["openssl", "pkcs12", "-export", "-name", "test",
+                     "-in", "/tmp/foo.crt", "-inkey", "/tmp/foo.key",
+                     "-out", "/tmp/keystore.p12",
+                     "-passout", "stdin",
+                     "-passin", "stdin"],
+                msg='',
+                rc=1
             )
 
     def test_create_jks_fail_export_pkcs12(self):
@@ -95,12 +125,12 @@ class TestCreateJavaKeystore(ModuleTestCase):
 
         with patch('os.remove', return_value=True):
             self.run_commands.side_effect = [(1, '', ''), (0, '', '')]
-            create_jks(module, "test", "openssl", "keytool", "/path/to/keystore.jks", "changeit")
+            create_jks(module, "test", "openssl", "keytool", "/path/to/keystore.jks", "changeit", "")
             module.fail_json.assert_called_once_with(
-                cmd="openssl pkcs12 -export -name 'test' "
-                    "-in '/tmp/foo.crt' -inkey '/tmp/foo.key' "
-                    "-out '/tmp/keystore.p12' "
-                    "-passout 'pass:changeit'",
+                cmd=["openssl", "pkcs12", "-export", "-name", "test",
+                     "-in", "/tmp/foo.crt", "-inkey", "/tmp/foo.key",
+                     "-out", "/tmp/keystore.p12",
+                     "-passout", "stdin"],
                 msg='',
                 rc=1
             )
@@ -123,12 +153,12 @@ class TestCreateJavaKeystore(ModuleTestCase):
 
         with patch('os.remove', return_value=True):
             self.run_commands.side_effect = [(0, '', ''), (1, '', '')]
-            create_jks(module, "test", "openssl", "keytool", "/path/to/keystore.jks", "changeit")
+            create_jks(module, "test", "openssl", "keytool", "/path/to/keystore.jks", "changeit", "")
             module.fail_json.assert_called_once_with(
-                cmd="keytool -importkeystore "
-                    "-destkeystore '/path/to/keystore.jks' "
-                    "-srckeystore '/tmp/keystore.p12' -srcstoretype pkcs12 -alias 'test' "
-                    "-deststorepass 'changeit' -srcstorepass 'changeit' -noprompt",
+                cmd=["keytool", "-importkeystore",
+                     "-destkeystore", "/path/to/keystore.jks",
+                     "-srckeystore", "/tmp/keystore.p12", "-srcstoretype", "pkcs12", "-alias", "test",
+                     "-deststorepass", "changeit", "-srcstorepass", "changeit", "-noprompt"],
                 msg='',
                 rc=1
             )
@@ -231,7 +261,7 @@ class TestCertChanged(ModuleTestCase):
             self.run_commands.side_effect = [(1, '', 'Oops'), (0, 'SHA256: wxyz:9876:stuv', '')]
             cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
             module.fail_json.assert_called_once_with(
-                cmd="openssl x509 -noout -in /tmp/foo.crt -fingerprint -sha256",
+                cmd=["openssl", "x509", "-noout", "-in", "/tmp/foo.crt", "-fingerprint", "-sha256"],
                 msg='',
                 err='Oops',
                 rc=1
@@ -257,7 +287,7 @@ class TestCertChanged(ModuleTestCase):
             self.run_commands.side_effect = [(0, 'foo: wxyz:9876:stuv', ''), (1, '', 'Oops')]
             cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
             module.fail_json.assert_called_with(
-                cmd="keytool -list -alias 'foo' -keystore '/path/to/keystore.jks' -storepass 'changeit' -v",
+                cmd=["keytool", "-list", "-alias", "foo", "-keystore", "/path/to/keystore.jks", "-storepass", "changeit", "-v"],
                 msg='',
                 err='Oops',
                 rc=1

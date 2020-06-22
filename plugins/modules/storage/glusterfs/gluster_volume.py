@@ -7,10 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 module: gluster_volume
 short_description: Manage GlusterFS volumes
@@ -90,7 +86,7 @@ author:
 '''
 
 EXAMPLES = """
-- name: create gluster volume
+- name: Create gluster volume
   gluster_volume:
     state: present
     name: test1
@@ -101,7 +97,7 @@ EXAMPLES = """
       - 192.0.2.11
   run_once: true
 
-- name: tune
+- name: Tune
   gluster_volume:
     state: present
     name: test1
@@ -118,29 +114,29 @@ EXAMPLES = """
         quick-read: 'on'
       }
 
-- name: start gluster volume
+- name: Start gluster volume
   gluster_volume:
     state: started
     name: test1
 
-- name: limit usage
+- name: Limit usage
   gluster_volume:
     state: present
     name: test1
     directory: /foo
     quota: 20.0MB
 
-- name: stop gluster volume
+- name: Stop gluster volume
   gluster_volume:
     state: stopped
     name: test1
 
-- name: remove gluster volume
+- name: Remove gluster volume
   gluster_volume:
     state: absent
     name: test1
 
-- name: create gluster volume with multiple bricks
+- name: Create gluster volume with multiple bricks
   gluster_volume:
     state: present
     name: test2

@@ -6,10 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: heroku_collaborator
@@ -51,13 +47,15 @@ notes:
 '''
 
 EXAMPLES = '''
-- heroku_collaborator:
+- name: Create a heroku collaborator
+  heroku_collaborator:
     api_key: YOUR_API_KEY
     user: max.mustermann@example.com
     apps: heroku-example-app
     state: present
 
-- heroku_collaborator:
+- name: An example of using the module in loop
+  heroku_collaborator:
     api_key: YOUR_API_KEY
     user: '{{ item.user }}'
     apps: '{{ item.apps | default(apps) }}'

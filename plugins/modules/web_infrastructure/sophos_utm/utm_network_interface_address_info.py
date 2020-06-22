@@ -6,12 +6,6 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: utm_network_interface_address_info
@@ -37,7 +31,7 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = """
-- name: utm network interface address
+- name: Get network interface address info
   utm_proxy_interface_address_info:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234

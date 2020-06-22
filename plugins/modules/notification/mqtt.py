@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: mqtt
@@ -100,7 +95,8 @@ author: "Jan-Piet Mens (@jpmens)"
 '''
 
 EXAMPLES = '''
-- mqtt:
+- name: Publish a message on an MQTT topic
+  mqtt:
     topic: 'service/ansible/{{ ansible_hostname }}'
     payload: 'Hello at {{ ansible_date_time.iso8601 }}'
     qos: 0

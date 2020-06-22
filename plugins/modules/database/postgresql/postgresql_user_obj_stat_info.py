@@ -7,18 +7,13 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = r'''
 ---
 module: postgresql_user_obj_stat_info
 short_description: Gather statistics about PostgreSQL user objects
 description:
 - Gathers statistics about PostgreSQL user objects.
+version_added: '0.2.0'
 options:
   filter:
     description:
@@ -45,6 +40,14 @@ options:
     - Permissions checking for SQL commands is carried out as though
       the session_role were the one that had logged in originally.
     type: str
+  trust_input:
+    description:
+    - If C(no), check the value of I(session_role) is potentially dangerous.
+    - It only makes sense to use C(no) only when SQL injections via I(session_role) are possible.
+    type: bool
+    default: yes
+    version_added: '0.2.0'
+
 notes:
 - C(size) and C(total_size) returned values are presented in bytes.
 - For tracking function statistics the PostgreSQL C(track_functions) parameter must be enabled.
@@ -57,6 +60,7 @@ seealso:
   link: https://www.postgresql.org/docs/current/monitoring-stats.html
 author:
 - Andrew Klychkov (@Andersson007)
+- Thomas O'Donnell (@andytom)
 extends_documentation_fragment:
 - community.general.postgres
 
@@ -104,6 +108,9 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     exec_sql,
@@ -180,13 +187,12 @@ class PgUserObjStatInfo():
 
     def get_func_stat(self):
         """Get function statistics and fill out self.info dictionary."""
-        if not self.schema:
-            query = "SELECT * FROM pg_stat_user_functions"
-            result = exec_sql(self, query, add_to_executed=False)
-        else:
+        query = "SELECT * FROM pg_stat_user_functions"
+        if self.schema:
             query = "SELECT * FROM pg_stat_user_functions WHERE schemaname = %s"
-            result = exec_sql(self, query, query_params=(self.schema,),
-                              add_to_executed=False)
+
+        result = exec_sql(self, query, query_params=(self.schema,),
+                          add_to_executed=False)
 
         if not result:
             return
@@ -198,13 +204,12 @@ class PgUserObjStatInfo():
 
     def get_idx_stat(self):
         """Get index statistics and fill out self.info dictionary."""
-        if not self.schema:
-            query = "SELECT * FROM pg_stat_user_indexes"
-            result = exec_sql(self, query, add_to_executed=False)
-        else:
+        query = "SELECT * FROM pg_stat_user_indexes"
+        if self.schema:
             query = "SELECT * FROM pg_stat_user_indexes WHERE schemaname = %s"
-            result = exec_sql(self, query, query_params=(self.schema,),
-                              add_to_executed=False)
+
+        result = exec_sql(self, query, query_params=(self.schema,),
+                          add_to_executed=False)
 
         if not result:
             return
@@ -216,13 +221,12 @@ class PgUserObjStatInfo():
 
     def get_tbl_stat(self):
         """Get table statistics and fill out self.info dictionary."""
-        if not self.schema:
-            query = "SELECT * FROM pg_stat_user_tables"
-            result = exec_sql(self, query, add_to_executed=False)
-        else:
+        query = "SELECT * FROM pg_stat_user_tables"
+        if self.schema:
             query = "SELECT * FROM pg_stat_user_tables WHERE schemaname = %s"
-            result = exec_sql(self, query, query_params=(self.schema,),
-                              add_to_executed=False)
+
+        result = exec_sql(self, query, query_params=(self.schema,),
+                          add_to_executed=False)
 
         if not result:
             return
@@ -251,30 +255,22 @@ class PgUserObjStatInfo():
                     self.info[info_key][elem[schema_key]][elem[name_key]][key] = val
 
             if info_key in ('tables', 'indexes'):
-                relname = elem[name_key]
                 schemaname = elem[schema_key]
-                if not self.schema:
-                    result = exec_sql(self, "SELECT pg_relation_size ('%s.%s')" % (schemaname, relname),
-                                      add_to_executed=False)
-                else:
-                    relname = '%s.%s' % (self.schema, relname)
-                    result = exec_sql(self, "SELECT pg_relation_size (%s)",
-                                      query_params=(relname,),
-                                      add_to_executed=False)
+                if self.schema:
+                    schemaname = self.schema
+
+                relname = '%s.%s' % (schemaname, elem[name_key])
+
+                result = exec_sql(self, "SELECT pg_relation_size (%s)",
+                                  query_params=(relname,),
+                                  add_to_executed=False)
 
                 self.info[info_key][elem[schema_key]][elem[name_key]]['size'] = result[0][0]
 
                 if info_key == 'tables':
-                    relname = elem[name_key]
-                    schemaname = elem[schema_key]
-                    if not self.schema:
-                        result = exec_sql(self, "SELECT pg_total_relation_size ('%s.%s')" % (schemaname, relname),
-                                          add_to_executed=False)
-                    else:
-                        relname = '%s.%s' % (self.schema, relname)
-                        result = exec_sql(self, "SELECT pg_total_relation_size (%s)",
-                                          query_params=(relname,),
-                                          add_to_executed=False)
+                    result = exec_sql(self, "SELECT pg_total_relation_size (%s)",
+                                      query_params=(relname,),
+                                      add_to_executed=False)
 
                     self.info[info_key][elem[schema_key]][elem[name_key]]['total_size'] = result[0][0]
 
@@ -302,6 +298,7 @@ def main():
         filter=dict(type='list', elements='str'),
         session_role=dict(type='str'),
         schema=dict(type='str'),
+        trust_input=dict(type="bool", default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -310,6 +307,9 @@ def main():
 
     filter_ = module.params["filter"]
     schema = module.params["schema"]
+
+    if not module.params["trust_input"]:
+        check_input(module, module.params['session_role'])
 
     # Connect to DB and make cursor object:
     pg_conn_params = get_conn_params(module, module.params)

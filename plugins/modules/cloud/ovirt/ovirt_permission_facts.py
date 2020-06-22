@@ -22,20 +22,15 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: ovirt_permission_facts
 short_description: Retrieve information about one or more oVirt/RHV permissions
 author: "Ondra Machacek (@machacekondra)"
 deprecated:
-    removed_in: "2.10"
+    removed_in: 3.0.0  # was Ansible 2.13
     why: When migrating to collection we decided to use only _info modules.
-    alternative: Use M(ovirt_permission_info) instead
+    alternative: Use C(ovirt_permission_info) from the C(ovirt.ovirt) collection instead
 description:
     - "Retrieve information about one or more oVirt/RHV permissions."
     - This module was called C(ovirt_permission_facts) before Ansible 2.9, returning C(ansible_facts).
@@ -61,7 +56,7 @@ options:
             - "Namespace of the authorization provider, where user/group resides."
         required: false
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- community.general.ovirt_facts
 
 '''
 
@@ -69,12 +64,14 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about all permissions of user with username C(john):
-- ovirt_permission_info:
+- name: Gather information about all permissions of user with username john
+  ovirt_permission_info:
     user_name: john
     authz_name: example.com-authz
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_permissions }}"
 '''
 
@@ -95,7 +92,7 @@ except ImportError:
 
 from ansible.module_utils.common.removed import removed_module
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.ovirt.ovirt.plugins.module_utils.ovirt import (
+from ansible_collections.community.general.plugins.module_utils._ovirt import (
     check_sdk,
     create_connection,
     get_link_name,
@@ -135,10 +132,11 @@ def main():
         namespace=dict(default=None),
     )
     module = AnsibleModule(argument_spec)
-    is_old_facts = module._name == 'ovirt_permission_facts'
+    is_old_facts = module._name in ('ovirt_permission_facts', 'community.general.ovirt_permission_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_permission_facts' module has been renamed to 'ovirt_permission_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     check_sdk(module)
 
@@ -167,4 +165,4 @@ def main():
 
 
 if __name__ == '__main__':
-    removed_module("2.10")
+    main()

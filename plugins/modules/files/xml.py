@@ -10,10 +10,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: xml
@@ -828,7 +824,7 @@ def main():
         supports_check_mode=True,
         required_by=dict(
             add_children=['xpath'],
-            # TODO: Reinstate this in Ansible v2.12 when we have deprecated the incorrect use below
+            # TODO: Reinstate this in community.general 2.0.0 when we have deprecated the incorrect use below
             # attribute=['value'],
             content=['xpath'],
             set_children=['xpath'],
@@ -879,9 +875,10 @@ def main():
         module.warn('Using lxml version lower than 3.0.0 does not guarantee predictable element attribute order.')
 
     # Report wrongly used attribute parameter when using content=attribute
-    # TODO: Remove this in Ansible v2.12 (and reinstate strict parameter test above) and remove the integration test example
+    # TODO: Remove this in community.general 2.0.0 (and reinstate strict parameter test above) and remove the integration test example
     if content == 'attribute' and attribute is not None:
-        module.deprecate("Parameter 'attribute=%s' is ignored when using 'content=attribute' only 'xpath' is used. Please remove entry." % attribute, '2.12')
+        module.deprecate("Parameter 'attribute=%s' is ignored when using 'content=attribute' only 'xpath' is used. Please remove entry." % attribute,
+                         version='2.0.0', collection_name='community.general')  # was Ansible 2.12
 
     # Check if the file exists
     if xml_string:

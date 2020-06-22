@@ -7,12 +7,6 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: utm_ca_host_key_cert_info
@@ -38,7 +32,7 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = """
-- name: utm ca_host_key_cert_info
+- name: Get info for a ca host_key_cert entry
   utm_ca_host_key_cert_info:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234

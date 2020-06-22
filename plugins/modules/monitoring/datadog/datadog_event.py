@@ -12,11 +12,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: datadog_event
@@ -69,15 +64,16 @@ options:
 '''
 
 EXAMPLES = '''
-# Post an event with low priority
-- datadog_event:
+- name: Post an event with low priority
+  datadog_event:
     title: Testing from ansible
     text: Test
     priority: low
     api_key: 9775a026f1ca7d1c6c5af9d94d9595a4
     app_key: j4JyCYfefWHhgFgiZUqRm63AXHNZQyPGBfJtAzmN
-# Post an event with several tags
-- datadog_event:
+
+- name: Post an event with several tags
+  datadog_event:
     title: Testing from ansible
     text: Test
     api_key: 9775a026f1ca7d1c6c5af9d94d9595a4

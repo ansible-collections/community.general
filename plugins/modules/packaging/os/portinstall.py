@@ -11,11 +11,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: portinstall
@@ -43,18 +38,18 @@ author: "berenddeboer (@berenddeboer)"
 '''
 
 EXAMPLES = '''
-# Install package foo
-- portinstall:
+- name: Install package foo
+  portinstall:
     name: foo
     state: present
 
-# Install package security/cyrus-sasl2-saslauthd
-- portinstall:
+- name: Install package security/cyrus-sasl2-saslauthd
+  portinstall:
     name: security/cyrus-sasl2-saslauthd
     state: present
 
-# Remove packages foo and bar
-- portinstall:
+- name: Remove packages foo and bar
+  portinstall:
     name: foo,bar
     state: absent
 '''

@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: bundler
@@ -88,28 +83,28 @@ author: "Tim Hoiberg (@thoiberg)"
 '''
 
 EXAMPLES = '''
-# Installs gems from a Gemfile in the current directory
-- bundler:
+- name: Install gems from a Gemfile in the current directory
+  bundler:
     state: present
     executable: ~/.rvm/gems/2.1.5/bin/bundle
 
-# Excludes the production group from installing
-- bundler:
+- name: Exclude the production group from installing
+  bundler:
     state: present
     exclude_groups: production
 
-# Install gems into ./vendor/bundle
-- bundler:
+- name: Install gems into ./vendor/bundle
+  bundler:
     state: present
     deployment_mode: yes
 
-# Installs gems using a Gemfile in another directory
-- bundler:
+- name: Install gems using a Gemfile in another directory
+  bundler:
     state: present
     gemfile: ../rails_project/Gemfile
 
-# Updates Gemfile in another directory
-- bundler:
+- name: Update Gemfile in another directory
+  bundler:
     state: latest
     chdir: ~/rails_project
 '''

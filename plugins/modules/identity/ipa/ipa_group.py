@@ -6,10 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: ipa_group
@@ -73,7 +69,7 @@ EXAMPLES = r'''
 - name: Ensure group is present
   ipa_group:
     name: oinstall
-    gidnumber: 54321
+    gidnumber: '54321'
     state: present
     ipa_host: ipa.example.com
     ipa_user: admin

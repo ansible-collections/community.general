@@ -7,11 +7,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: jenkins_job
@@ -66,48 +61,48 @@ options:
 '''
 
 EXAMPLES = '''
-# Create a jenkins job using basic authentication
-- jenkins_job:
+- name: Create a jenkins job using basic authentication
+  jenkins_job:
     config: "{{ lookup('file', 'templates/test.xml') }}"
     name: test
     password: admin
     url: http://localhost:8080
     user: admin
 
-# Create a jenkins job using the token
-- jenkins_job:
+- name: Create a jenkins job using the token
+  jenkins_job:
     config: "{{ lookup('template', 'templates/test.xml.j2') }}"
     name: test
     token: asdfasfasfasdfasdfadfasfasdfasdfc
     url: http://localhost:8080
     user: admin
 
-# Delete a jenkins job using basic authentication
-- jenkins_job:
+- name: Delete a jenkins job using basic authentication
+  jenkins_job:
     name: test
     password: admin
     state: absent
     url: http://localhost:8080
     user: admin
 
-# Delete a jenkins job using the token
-- jenkins_job:
+- name: Delete a jenkins job using the token
+  jenkins_job:
     name: test
     token: asdfasfasfasdfasdfadfasfasdfasdfc
     state: absent
     url: http://localhost:8080
     user: admin
 
-# Disable a jenkins job using basic authentication
-- jenkins_job:
+- name: Disable a jenkins job using basic authentication
+  jenkins_job:
     name: test
     password: admin
     enabled: False
     url: http://localhost:8080
     user: admin
 
-# Disable a jenkins job using the token
-- jenkins_job:
+- name: Disable a jenkins job using the token
+  jenkins_job:
     name: test
     token: asdfasfasfasdfasdfadfasfasdfasdfc
     enabled: False

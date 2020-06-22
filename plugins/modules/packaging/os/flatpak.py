@@ -30,10 +30,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: flatpak
@@ -51,12 +47,14 @@ options:
     description:
     - The path to the C(flatpak) executable to use.
     - By default, this module looks for the C(flatpak) executable on the path.
+    type: path
     default: flatpak
   method:
     description:
     - The installation method to use.
     - Defines if the I(flatpak) is supposed to be installed globally for the whole C(system)
       or only for the current C(user).
+    type: str
     choices: [ system, user ]
     default: system
   name:
@@ -72,6 +70,7 @@ options:
       installed flatpak based on the name of the flatpakref to remove it. However, there is no
       guarantee that the names of the flatpakref file and the reverse DNS name of the installed
       flatpak do match.
+    type: str
     required: true
   remote:
     description:
@@ -79,11 +78,13 @@ options:
     - By default, C(flathub) is assumed, but you do need to add the flathub flatpak_remote before
       you can use this.
     - See the M(flatpak_remote) module for managing flatpak remotes.
+    type: str
     default: flathub
   state:
     description:
     - Indicates the desired package state.
     choices: [ absent, present ]
+    type: str
     default: present
 '''
 
@@ -144,10 +145,8 @@ stdout:
   sample: "org.gnome.Calendar/x86_64/stable\tcurrent\norg.gnome.gitg/x86_64/stable\tcurrent\n"
 '''
 
-import subprocess
 from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_native
 
 OUTDATED_FLATPAK_VERSION_ERROR_MESSAGE = "Unknown option --columns=application"
 
@@ -156,9 +155,9 @@ def install_flat(module, binary, remote, name, method):
     """Add a new flatpak."""
     global result
     if name.startswith('http://') or name.startswith('https://'):
-        command = "{0} install --{1} -y {2}".format(binary, method, name)
+        command = [binary, "install", "--{0}".format(method), "-y", name]
     else:
-        command = "{0} install --{1} -y {2} {3}".format(binary, method, remote, name)
+        command = [binary, "install", "--{0}".format(method), "-y", remote, name]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
@@ -167,14 +166,14 @@ def uninstall_flat(module, binary, name, method):
     """Remove an existing flatpak."""
     global result
     installed_flat_name = _match_installed_flat_name(module, binary, name, method)
-    command = "{0} uninstall -y --{1} {2}".format(binary, method, installed_flat_name)
+    command = [binary, "uninstall", "--{0}".format(method), "-y", name]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
 
 def flatpak_exists(module, binary, name, method):
     """Check if the flatpak is installed."""
-    command = "{0} list --{1} --app".format(binary, method)
+    command = [binary, "list", "--{0}".format(method), "--app"]
     output = _flatpak_command(module, False, command)
     name = _parse_flatpak_name(name).lower()
     if name in output.lower():
@@ -189,7 +188,7 @@ def _match_installed_flat_name(module, binary, name, method):
     global result
     parsed_name = _parse_flatpak_name(name)
     # Try running flatpak list with columns feature
-    command = "{0} list --{1} --app --columns=application".format(binary, method)
+    command = [binary, "list", "--{0}".format(method), "--app", "--columns=application"]
     _flatpak_command(module, False, command, ignore_failure=True)
     if result['rc'] != 0 and OUTDATED_FLATPAK_VERSION_ERROR_MESSAGE in result['stderr']:
         # Probably flatpak before 1.2
@@ -211,7 +210,7 @@ def _match_installed_flat_name(module, binary, name, method):
 
 def _match_flat_using_outdated_flatpak_format(module, binary, parsed_name, method):
     global result
-    command = "{0} list --{1} --app --columns=application".format(binary, method)
+    command = [binary, "list", "--{0}".format(method), "--app", "--columns=application"]
     output = _flatpak_command(module, False, command)
     for row in output.split('\n'):
         if parsed_name.lower() == row.lower():
@@ -220,7 +219,7 @@ def _match_flat_using_outdated_flatpak_format(module, binary, parsed_name, metho
 
 def _match_flat_using_flatpak_column_feature(module, binary, parsed_name, method):
     global result
-    command = "{0} list --{1} --app".format(binary, method)
+    command = [binary, "list", "--{0}".format(method), "--app"]
     output = _flatpak_command(module, False, command)
     for row in output.split('\n'):
         if parsed_name.lower() in row.lower():
@@ -239,21 +238,15 @@ def _parse_flatpak_name(name):
 
 def _flatpak_command(module, noop, command, ignore_failure=False):
     global result
+    result['command'] = ' '.join(command)
     if noop:
         result['rc'] = 0
-        result['command'] = command
         return ""
 
-    process = subprocess.Popen(
-        command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout_data, stderr_data = process.communicate()
-    result['rc'] = process.returncode
-    result['command'] = command
-    result['stdout'] = to_native(stdout_data)
-    result['stderr'] = to_native(stderr_data)
-    if result['rc'] != 0 and not ignore_failure:
-        module.fail_json(msg="Failed to execute flatpak command", **result)
-    return to_native(stdout_data)
+    result['rc'], result['stdout'], result['stderr'] = module.run_command(
+        command, check_rc=not ignore_failure
+    )
+    return result['stdout']
 
 
 def main():

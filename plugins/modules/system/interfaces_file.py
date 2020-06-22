@@ -8,10 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['stableinterface'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: interfaces_file
@@ -127,8 +123,8 @@ ifaces:
 '''
 
 EXAMPLES = '''
-# Set eth1 mtu configuration value to 8000
-- interfaces_file:
+- name: Set eth1 mtu configuration value to 8000
+  interfaces_file:
     dest: /etc/network/interfaces.d/eth1.cfg
     iface: eth1
     option: mtu

@@ -9,11 +9,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: udm_share
@@ -297,8 +292,8 @@ options:
 
 
 EXAMPLES = '''
-# Create a share named home on the server ucs.example.com with the path /home.
-- udm_share:
+- name: Create a share named home on the server ucs.example.com with the path /home
+  udm_share:
     name: home
     path: /home
     host: ucs.example.com

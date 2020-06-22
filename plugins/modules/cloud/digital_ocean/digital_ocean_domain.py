@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['stableinterface'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: digital_ocean_domain
@@ -50,26 +45,24 @@ requirements:
 
 
 EXAMPLES = '''
-# Create a domain
-
-- digital_ocean_domain:
+- name: Create a domain
+  digital_ocean_domain:
     state: present
     name: my.digitalocean.domain
     ip: 127.0.0.1
 
-# Create a droplet and a corresponding domain
-
-- digital_ocean:
+# Create a droplet and corresponding domain
+- name: Create a droplet
+  digital_ocean:
     state: present
     name: test_droplet
     size_id: 1gb
     region_id: sgp1
     image_id: ubuntu-14-04-x64
-
-
   register: test_droplet
 
-- digital_ocean_domain:
+- name: Create a corresponding domain
+  digital_ocean_domain:
     state: present
     name: "{{ test_droplet.droplet.name }}.my.domain"
     ip: "{{ test_droplet.droplet.ip_address }}"

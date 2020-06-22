@@ -7,16 +7,12 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: katello
 short_description: Manage Katello Resources
 deprecated:
-    removed_in: "2.12"
+    removed_in: '2.0.0'  # was Ansible 2.12
     why: "Replaced by re-designed individual modules living at https://github.com/theforeman/foreman-ansible-modules"
     alternative: https://github.com/theforeman/foreman-ansible-modules
 description:

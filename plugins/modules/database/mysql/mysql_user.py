@@ -9,11 +9,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = r'''
 ---
 module: mysql_user
@@ -80,6 +75,7 @@ options:
   check_implicit_admin:
     description:
       - Check if mysql allows login as root/nopassword before trying supplied credentials.
+      - If success, passed I(login_user)/I(login_password) will be ignored.
     type: bool
     default: no
   update_password:
@@ -93,14 +89,17 @@ options:
     description:
       - User's plugin to authenticate (``CREATE USER user IDENTIFIED WITH plugin``).
     type: str
+    version_added: '0.2.0'
   plugin_hash_string:
     description:
       - User's plugin hash string (``CREATE USER user IDENTIFIED WITH plugin AS plugin_hash_string``).
     type: str
+    version_added: '0.2.0'
   plugin_auth_string:
     description:
       - User's plugin auth_string (``CREATE USER user IDENTIFIED WITH plugin BY plugin_auth_string``).
     type: str
+    version_added: '0.2.0'
   resource_limits:
     description:
       - Limit the user for certain server resources. Provided since MySQL 5.6 / MariaDB 10.2.
@@ -108,6 +107,7 @@ options:
         C(MAX_CONNECTIONS_PER_HOUR: num), C(MAX_USER_CONNECTIONS: num)."
       - Used when I(state=present), ignored otherwise.
     type: dict
+    version_added: '0.2.0'
 
 notes:
    - "MySQL server installs with default login_user of 'root' and no password. To secure this user
@@ -189,6 +189,18 @@ EXAMPLES = r'''
 
 - name: Ensure no user named 'sally'@'localhost' exists, also passing in the auth credentials.
   mysql_user:
+    login_user: root
+    login_password: 123456
+    name: sally
+    state: absent
+
+# check_implicit_admin example
+- name: >
+    Ensure no user named 'sally'@'localhost' exists, also passing in the auth credentials.
+    If mysql allows root/nopassword login, try it without the credentials first.
+    If it's not allowed, pass the credentials.
+  mysql_user:
+    check_implicit_admin: yes
     login_user: root
     login_password: 123456
     name: sally
@@ -282,7 +294,8 @@ VALID_PRIVS = frozenset(('CREATE', 'DROP', 'GRANT', 'GRANT OPTION',
                          'ROLE_ADMIN', 'SESSION_VARIABLES_ADMIN', 'SET_USER_ID',
                          'SYSTEM_USER', 'SYSTEM_VARIABLES_ADMIN', 'SYSTEM_USER',
                          'TABLE_ENCRYPTION_ADMIN', 'VERSION_TOKEN_ADMIN',
-                         'XA_RECOVER_ADMIN', 'LOAD FROM S3', 'SELECT INTO S3'))
+                         'XA_RECOVER_ADMIN', 'LOAD FROM S3', 'SELECT INTO S3',
+                         'INVOKE LAMBDA'))
 
 
 class InvalidPrivsError(Exception):
@@ -327,7 +340,7 @@ def get_mode(cursor):
 
 def user_exists(cursor, user, host, host_all):
     if host_all:
-        cursor.execute("SELECT count(*) FROM mysql.user WHERE user = %s", ([user]))
+        cursor.execute("SELECT count(*) FROM mysql.user WHERE user = %s", (user,))
     else:
         cursor.execute("SELECT count(*) FROM mysql.user WHERE user = %s AND host = %s", (user, host))
 
@@ -441,7 +454,7 @@ def user_mod(cursor, user, host, host_all, password, encrypted,
                         # Replacing empty root password with new authentication mechanisms fails with error 1396
                         if e.args[0] == 1396:
                             cursor.execute(
-                                "UPDATE user SET plugin = %s, authentication_string = %s, Password = '' WHERE User = %s AND Host = %s",
+                                "UPDATE mysql.user SET plugin = %s, authentication_string = %s, Password = '' WHERE User = %s AND Host = %s",
                                 ('mysql_native_password', encrypted_password, user, host)
                             )
                             cursor.execute("FLUSH PRIVILEGES")
@@ -530,7 +543,7 @@ def user_delete(cursor, user, host, host_all, check_mode):
         return True
 
     if host_all:
-        hostnames = user_get_hostnames(cursor, [user])
+        hostnames = user_get_hostnames(cursor, user)
 
         for hostname in hostnames:
             cursor.execute("DROP USER %s@%s", (user, hostname))
@@ -541,7 +554,7 @@ def user_delete(cursor, user, host, host_all, check_mode):
 
 
 def user_get_hostnames(cursor, user):
-    cursor.execute("SELECT Host FROM mysql.user WHERE user = %s", user)
+    cursor.execute("SELECT Host FROM mysql.user WHERE user = %s", (user,))
     hostnames_raw = cursor.fetchall()
     hostnames = []
 

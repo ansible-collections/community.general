@@ -5,11 +5,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'certified'}
-
-
 DOCUMENTATION = '''
 ---
 module: nios_aaaa_record
@@ -70,7 +65,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: configure an AAAA record
+- name: Configure an AAAA record
   nios_aaaa_record:
     name: aaaa.ansible.com
     ipv6: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
@@ -81,7 +76,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: add a comment to an existing AAAA record
+- name: Add a comment to an existing AAAA record
   nios_aaaa_record:
     name: aaaa.ansible.com
     ipv6: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
@@ -93,7 +88,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: remove an AAAA record from the system
+- name: Remove an AAAA record from the system
   nios_aaaa_record:
     name: aaaa.ansible.com
     ipv6: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
@@ -104,7 +99,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: update an AAAA record name
+- name: Update an AAAA record name
   nios_aaaa_record:
     name: {new_name: aaaa_new.ansible.com, old_name: aaaa.ansible.com}
     ipv6: 2001:0db8:85a3:0000:0000:8a2e:0370:7334

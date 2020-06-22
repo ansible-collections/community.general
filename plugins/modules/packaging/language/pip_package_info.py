@@ -7,10 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 module: pip_package_info
 short_description: pip package information
@@ -36,11 +32,11 @@ EXAMPLES = '''
 - name: Just get the list from default pip
   pip_package_info:
 
-- name: get the facts for default pip, pip2 and pip3.6
+- name: Get the facts for default pip, pip2 and pip3.6
   pip_package_info:
     clients: ['pip', 'pip2', 'pip3.6']
 
-- name: get from specific paths (virtualenvs?)
+- name: Get from specific paths (virtualenvs?)
   pip_package_info:
     clients: '/home/me/projec42/python/pip3.5'
 '''

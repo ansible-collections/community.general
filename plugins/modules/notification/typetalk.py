@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: typetalk
@@ -41,7 +36,8 @@ author: "Takashi Someda (@tksmd)"
 '''
 
 EXAMPLES = '''
-- typetalk:
+- name: Send a message to typetalk
+  typetalk:
     client_id: 12345
     client_secret: 12345
     topic: 1

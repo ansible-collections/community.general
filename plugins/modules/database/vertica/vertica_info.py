@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: vertica_info
@@ -54,7 +49,7 @@ author: "Dariusz Owczarek (@dareko)"
 '''
 
 EXAMPLES = """
-- name: gathering vertica facts
+- name: Gathering vertica facts
   vertica_info: db=db_name
   register: result
 
@@ -233,10 +228,11 @@ def main():
             login_user=dict(default='dbadmin'),
             login_password=dict(default=None, no_log=True),
         ), supports_check_mode=True)
-    is_old_facts = module._name == 'vertica_facts'
+    is_old_facts = module._name in ('vertica_facts', 'community.general.vertica_facts')
     if is_old_facts:
         module.deprecate("The 'vertica_facts' module has been renamed to 'vertica_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     if not pyodbc_found:
         module.fail_json(msg=missing_required_lib('pyodbc'), exception=PYODBC_IMP_ERR)

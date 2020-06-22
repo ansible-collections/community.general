@@ -6,12 +6,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: github_webhook_info
@@ -51,14 +45,14 @@ author:
 '''
 
 EXAMPLES = '''
-- name: list hooks for a repository (password auth)
+- name: List hooks for a repository (password auth)
   github_webhook_info:
     repository: ansible/ansible
     user: "{{ github_user }}"
     password: "{{ github_password }}"
   register: ansible_webhooks
 
-- name: list hooks for a repository on GitHub Enterprise (token auth)
+- name: List hooks for a repository on GitHub Enterprise (token auth)
   github_webhook_info:
     repository: myorg/myrepo
     user: "{{ github_user }}"
@@ -126,8 +120,9 @@ def main():
         mutually_exclusive=(('password', 'token'), ),
         required_one_of=(("password", "token"), ),
         supports_check_mode=True)
-    if module._name == 'github_webhook_facts':
-        module.deprecate("The 'github_webhook_facts' module has been renamed to 'github_webhook_info'", version='2.13')
+    if module._name in ('github_webhook_facts', 'community.general.github_webhook_facts'):
+        module.deprecate("The 'github_webhook_facts' module has been renamed to 'github_webhook_info'",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     if not HAS_GITHUB:
         module.fail_json(msg=missing_required_lib('PyGithub'),

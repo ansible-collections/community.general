@@ -12,10 +12,6 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ["preview"],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: hwc_smn_topic
@@ -54,7 +50,7 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = '''
-- name: create a smn topic
+- name: Create a smn topic
   hwc_smn_topic:
       identity_endpoint: "{{ identity_endpoint }}"
       user_name: "{{ user_name }}"

@@ -7,10 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: cloudflare_dns
@@ -29,6 +25,7 @@ options:
     - "You can obtain your API token from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)"
     type: str
     required: false
+    version_added: '0.2.0'
   account_api_key:
     description:
     - Account API key.
@@ -200,7 +197,7 @@ EXAMPLES = r'''
     account_api_key: dummyapitoken
     state: absent
 
-- name: create a example.net CNAME record to example.com and proxy through Cloudflare's network
+- name: Create a example.net CNAME record to example.com and proxy through Cloudflare's network
   cloudflare_dns:
     zone: example.net
     type: CNAME
@@ -455,7 +452,7 @@ class CloudflareAPI(object):
                                timeout=self.timeout)
 
         if info['status'] not in [200, 304, 400, 401, 403, 429, 405, 415]:
-            self.module.fail_json(msg="Failed API call {0}; got unexpected HTTP code {1}".format(api_call, info['status']))
+            self.module.fail_json(msg="Failed API call {0}; got unexpected HTTP code {1}: {2}".format(api_call, info['status'], info.get('msg')))
 
         error_msg = ''
         if info['status'] == 401:
@@ -494,6 +491,10 @@ class CloudflareAPI(object):
 
         # Without a valid/parsed JSON response no more error processing can be done
         if result is None:
+            self.module.fail_json(msg=error_msg)
+
+        if 'success' not in result:
+            error_msg += "; Unexpected error details: {0}".format(result.get('error'))
             self.module.fail_json(msg=error_msg)
 
         if not result['success']:

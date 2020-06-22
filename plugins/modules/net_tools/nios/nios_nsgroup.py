@@ -7,10 +7,6 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'certified'}
-
 DOCUMENTATION = '''
 ---
 module: nios_nsgroup
@@ -186,7 +182,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: create simple infoblox nameserver group
+- name: Create simple infoblox nameserver group
   nios_nsgroup:
     name: my-simple-group
     comment: "this is a simple nameserver group"
@@ -199,7 +195,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: create infoblox nameserver group with external primaries
+- name: Create infoblox nameserver group with external primaries
   nios_nsgroup:
     name: my-example-group
     use_external_primary: true
@@ -216,7 +212,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: delete infoblox nameserver group
+- name: Delete infoblox nameserver group
   nios_nsgroup:
     name: my-simple-group
     comment: "this is a simple nameserver group"

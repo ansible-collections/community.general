@@ -7,12 +7,6 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: utm_ca_host_key_cert
@@ -62,8 +56,7 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = """
-# Create a ca_host_key_cert entry
-- name: utm ca_host_key_cert
+- name: Create a ca_host_key_cert entry
   utm_ca_host_key_cert:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
@@ -78,16 +71,14 @@ EXAMPLES = """
       --- END CERTIFICATE ---
     state: present
 
-# Remove a ca_host_key_cert entry
-- name: utm ca_host_key_cert
+- name: Remove a ca_host_key_cert entry
   utm_ca_host_key_cert:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestHostKeyCertEntry
     state: absent
 
-# Read a ca_host_key_cert entry
-- name: utm ca_host_key_cert
+- name: Read a ca_host_key_cert entry
   utm_ca_host_key_cert:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234

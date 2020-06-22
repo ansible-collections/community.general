@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: atomic_container
@@ -62,8 +57,8 @@ options:
 
 EXAMPLES = '''
 
-# Install the etcd system container
-- atomic_container:
+- name: Install the etcd system container
+  atomic_container:
     name: etcd
     image: rhel/etcd
     backend: ostree
@@ -72,8 +67,8 @@ EXAMPLES = '''
     values:
         - ETCD_NAME=etcd.server
 
-# Uninstall the etcd system container
-- atomic_container:
+- name: Uninstall the etcd system container
+  atomic_container:
     name: etcd
     image: rhel/etcd
     backend: ostree

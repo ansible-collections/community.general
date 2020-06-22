@@ -1,2 +1,0 @@
-bugfixes:
-  - docker connection plugin - do not prefix remote path if running on Windows containers.

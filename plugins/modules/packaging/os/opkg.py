@@ -10,11 +10,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: opkg
@@ -58,24 +53,29 @@ requirements:
     - python
 '''
 EXAMPLES = '''
-- opkg:
+- name: Install foo
+  opkg:
     name: foo
     state: present
 
-- opkg:
+- name: Update cache and install foo
+  opkg:
     name: foo
     state: present
     update_cache: yes
 
-- opkg:
+- name: Remove foo
+  opkg:
     name: foo
     state: absent
 
-- opkg:
+- name: Remove foo and bar
+  opkg:
     name: foo,bar
     state: absent
 
-- opkg:
+- name: Install foo using overwrite option forcibly
+  opkg:
     name: foo
     state: present
     force: overwrite

@@ -9,11 +9,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = r'''
 ---
 module: postgresql_publication
@@ -62,6 +57,22 @@ options:
     - Drop publication dependencies. Has effect with I(state=absent) only.
     type: bool
     default: false
+  session_role:
+    description:
+    - Switch to session_role after connecting. The specified session_role must
+      be a role that the current login_user is a member of.
+    - Permissions checking for SQL commands is carried out as though
+      the session_role were the one that had logged in originally.
+    type: str
+    version_added: '0.2.0'
+  trust_input:
+    description:
+    - If C(no), check whether values of parameters I(name), I(tables), I(owner),
+      I(session_role), I(params) are potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
+    type: bool
+    default: yes
+    version_added: '0.2.0'
 notes:
 - PostgreSQL version must be 10 or greater.
 seealso:
@@ -167,7 +178,10 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.database import pg_quote_identifier
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+    pg_quote_identifier,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     exec_sql,
@@ -538,8 +552,8 @@ class PgPublication():
         Returns:
             True if successful, False otherwise.
         """
-        query = ("ALTER PUBLICATION %s OWNER TO %s" % (pg_quote_identifier(self.name, 'publication'),
-                                                       pg_quote_identifier(role, 'role')))
+        query = ('ALTER PUBLICATION %s '
+                 'OWNER TO "%s"' % (pg_quote_identifier(self.name, 'publication'), role))
         return self.__exec_sql(query, check_mode=check_mode)
 
     def __exec_sql(self, query, check_mode=False):
@@ -580,6 +594,8 @@ def main():
         parameters=dict(type='dict'),
         owner=dict(type='str'),
         cascade=dict(type='bool', default=False),
+        session_role=dict(type='str'),
+        trust_input=dict(type='bool', default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -593,6 +609,17 @@ def main():
     params = module.params['parameters']
     owner = module.params['owner']
     cascade = module.params['cascade']
+    session_role = module.params['session_role']
+    trust_input = module.params['trust_input']
+
+    if not trust_input:
+        # Check input for potentially dangerous elements:
+        if not params:
+            params_list = None
+        else:
+            params_list = ['%s = %s' % (k, v) for k, v in iteritems(params)]
+
+        check_input(module, name, tables, owner, session_role, params_list)
 
     if state == 'absent':
         if tables:

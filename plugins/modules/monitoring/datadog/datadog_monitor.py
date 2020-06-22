@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: datadog_monitor
@@ -34,6 +29,7 @@ options:
           - This value can also be set with the C(DATADOG_HOST) environment variable.
         required: false
         type: str
+        version_added: '0.2.0'
     app_key:
         description:
           - Your Datadog app key.
@@ -53,7 +49,7 @@ options:
     type:
         description:
           - The type of the monitor.
-        choices: ['metric alert', 'service check', 'event alert', 'process alert']
+        choices: ['metric alert', 'service check', 'event alert', 'process alert', 'log alert']
         type: str
     query:
         description:
@@ -70,7 +66,7 @@ options:
           - A message to include with notifications for this monitor.
           - Email notifications can be sent to specific users by using the same '@username' notation as events.
           - Monitor message template variables can be accessed by using double square brackets, i.e '[[' and ']]'.
-          - C(message) alias is deprecated in Ansible 2.10, since it is used internally by Ansible Core Engine.
+          - C(message) alias is deprecated in community.general 0.2.0, since it is used internally by Ansible Core Engine.
         type: str
         aliases: [ 'message' ]
     silenced:
@@ -142,8 +138,8 @@ options:
 '''
 
 EXAMPLES = '''
-# Create a metric monitor
-- datadog_monitor:
+- name: Create a metric monitor
+  datadog_monitor:
     type: "metric alert"
     name: "Test monitor"
     state: "present"
@@ -152,30 +148,30 @@ EXAMPLES = '''
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
-# Deletes a monitor
-- datadog_monitor:
+- name: Deletes a monitor
+  datadog_monitor:
     name: "Test monitor"
     state: "absent"
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
-# Mutes a monitor
-- datadog_monitor:
+- name: Mutes a monitor
+  datadog_monitor:
     name: "Test monitor"
     state: "mute"
     silenced: '{"*":None}'
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
-# Unmutes a monitor
-- datadog_monitor:
+- name: Unmutes a monitor
+  datadog_monitor:
     name: "Test monitor"
     state: "unmute"
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
-# Use datadoghq.eu platform instead of datadoghq.com
-- datadog_monitor:
+- name: Use datadoghq.eu platform instead of datadoghq.com
+  datadog_monitor:
     name: "Test monitor"
     state: "absent"
     api_host: https://api.datadoghq.eu
@@ -204,10 +200,12 @@ def main():
             api_host=dict(required=False),
             app_key=dict(required=True, no_log=True),
             state=dict(required=True, choices=['present', 'absent', 'mute', 'unmute']),
-            type=dict(required=False, choices=['metric alert', 'service check', 'event alert', 'process alert']),
+            type=dict(required=False, choices=['metric alert', 'service check', 'event alert', 'process alert', 'log alert']),
             name=dict(required=True),
             query=dict(required=False),
-            notification_message=dict(required=False, default=None, aliases=['message'], deprecated_aliases=[dict(name='message', version='2.14')]),
+            notification_message=dict(required=False, default=None, aliases=['message'],
+                                      deprecated_aliases=[dict(name='message', version='3.0.0',
+                                                               collection_name='community.general')]),  # was Ansible 2.14
             silenced=dict(required=False, default=None, type='dict'),
             notify_no_data=dict(required=False, default=False, type='bool'),
             no_data_timeframe=dict(required=False, default=None),
@@ -306,7 +304,7 @@ def _update_monitor(module, monitor, options):
     try:
         kwargs = dict(id=monitor['id'], query=module.params['query'],
                       name=_fix_template_vars(module.params['name']),
-                      message=_fix_template_vars(module.params['message']),
+                      message=_fix_template_vars(module.params['notification_message']),
                       escalation_message=_fix_template_vars(module.params['escalation_message']),
                       options=options)
         if module.params['tags'] is not None:

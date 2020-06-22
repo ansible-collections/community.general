@@ -8,15 +8,10 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = r"""
 ---
 module: ldap_search
+version_added: '0.2.0'
 short_description: Search for entries in a LDAP server
 description:
   - Return the results of an LDAP search.

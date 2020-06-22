@@ -6,10 +6,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 module: gce_eip
 short_description: Create or Destroy Global or Regional External IP addresses.
@@ -40,8 +36,8 @@ options:
 '''
 
 EXAMPLES = '''
-# Create a Global external IP address
-- gce_eip:
+- name: Create a Global external IP address
+  gce_eip:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"
@@ -49,8 +45,8 @@ EXAMPLES = '''
     region: global
     state: present
 
-# Create a Regional external IP address
-- gce_eip:
+- name: Create a Regional external IP address
+  gce_eip:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"

@@ -5,11 +5,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'certified'}
-
-
 DOCUMENTATION = '''
 ---
 module: nios_host_record
@@ -89,6 +84,7 @@ options:
         required: false
         aliases:
           - add
+        version_added: '0.2.0'
       remove:
         description:
           - If user wants to remove the ipv4 address from an existing host record.
@@ -98,6 +94,7 @@ options:
         required: false
         aliases:
           - remove
+        version_added: '0.2.0'
   ipv6addrs:
     description:
       - Configures the IPv6 addresses for the host record.  This argument
@@ -149,7 +146,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: configure an ipv4 host record
+- name: Configure an ipv4 host record
   nios_host_record:
     name: host.ansible.com
     ipv4:
@@ -162,7 +159,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: add a comment to an existing host record
+- name: Add a comment to an existing host record
   nios_host_record:
     name: host.ansible.com
     ipv4:
@@ -174,7 +171,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: remove a host record from the system
+- name: Remove a host record from the system
   nios_host_record:
     name: host.ansible.com
     state: absent
@@ -183,7 +180,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: update an ipv4 host record
+- name: Update an ipv4 host record
   nios_host_record:
     name: {new_name: host-new.ansible.com, old_name: host.ansible.com}
     ipv4:
@@ -194,7 +191,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: create an ipv4 host record bypassing DNS
+- name: Create an ipv4 host record bypassing DNS
   nios_host_record:
     name: new_host
     ipv4:
@@ -206,7 +203,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: create an ipv4 host record over DHCP
+- name: Create an ipv4 host record over DHCP
   nios_host_record:
     name: host.ansible.com
     ipv4:
@@ -219,7 +216,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: dynamically add host record to next available ip
+- name: Dynamically add host record to next available ip
   nios_host_record:
     name: host.ansible.com
     ipv4:
@@ -231,7 +228,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: add ip to host record
+- name: Add ip to host record
   nios_host_record:
     name: host.ansible.com
     ipv4:
@@ -243,7 +240,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: remove ip to host record
+- name: Remove ip to host record
   nios_host_record:
     name: host.ansible.com
     ipv4:

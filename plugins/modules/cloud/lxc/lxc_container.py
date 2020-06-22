@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: lxc_container
@@ -309,7 +304,7 @@ EXAMPLES = """
     archive_compression: gzip
   register: clone_container_info
 
-- name: debug info on container "test-container"
+- name: Debug info on container "test-container"
   debug:
     var: clone_container_info
 

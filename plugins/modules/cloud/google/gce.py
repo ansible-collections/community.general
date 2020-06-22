@@ -6,10 +6,6 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: gce
@@ -20,7 +16,7 @@ description:
        Full install/configuration instructions for the gce* modules can
        be found in the comments of ansible/test/gce_tests.py.
 deprecated:
-    removed_in: "2.12"
+    removed_in: 2.0.0  # was Ansible 2.12
     why: Updated modules released with increased functionality
     alternative: Use M(gcp_compute_instance) instead.
 options:
@@ -224,7 +220,7 @@ EXAMPLES = '''
     credentials_file: "/path/to/your-key.json"
     project_id: "your-project-name"
   tasks:
-    - name: create multiple instances
+    - name: Create multiple instances
       # Basic provisioning example.  Create multiple Debian 8 instances in the
       # us-central1-a Zone of n1-standard-1 machine type.
       gce:
@@ -264,7 +260,7 @@ EXAMPLES = '''
       tags:
         - config
 
-    - name: delete test-instances
+    - name: Delete test-instances
       # Basic termination of instance.
       gce:
         service_account_email: "{{ service_account_email }}"

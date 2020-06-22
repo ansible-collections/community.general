@@ -7,10 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['stableinterface'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: postgresql_db
@@ -105,6 +101,15 @@ options:
       - Provides additional arguments when I(state) is C(dump).
       - Cannot be used with dump-file-format-related arguments like ``--format=d``.
     type: str
+    version_added: '0.2.0'
+  trust_input:
+    description:
+    - If C(no), check whether values of parameters I(owner), I(conn_limit), I(encoding),
+      I(db), I(template), I(tablespace), I(session_role) are potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
+    type: bool
+    default: yes
+    version_added: '0.2.0'
 seealso:
 - name: CREATE DATABASE reference
   description: Complete reference of the CREATE DATABASE command documentation.
@@ -175,6 +180,13 @@ EXAMPLES = r'''
     target: /tmp/acme.sql
     target_opts: "-n public"
 
+- name: Dump only table1 and table2 from the acme database
+  postgresql_db:
+    name: acme
+    state: dump
+    target: /tmp/table1_table2.sql
+    target_opts: "-t table1 -t table2"
+
 # Note: In the example below, if database foo exists and has another tablespace
 # the tablespace will be changed to foo. Access to the database will be locked
 # until the copying of database files is finished.
@@ -190,6 +202,7 @@ executed_commands:
   returned: always
   type: list
   sample: ["CREATE DATABASE acme"]
+  version_added: '0.2.0'
 '''
 
 
@@ -207,7 +220,10 @@ else:
 
 import ansible_collections.community.general.plugins.module_utils.postgres as pgutils
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.database import SQLParseError, pg_quote_identifier
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+    SQLParseError,
+)
 from ansible.module_utils.six import iteritems
 from ansible.module_utils.six.moves import shlex_quote
 from ansible.module_utils._text import to_native
@@ -224,18 +240,14 @@ class NotSupportedError(Exception):
 
 
 def set_owner(cursor, db, owner):
-    query = 'ALTER DATABASE %s OWNER TO "%s"' % (
-            pg_quote_identifier(db, 'database'),
-            owner)
+    query = 'ALTER DATABASE "%s" OWNER TO "%s"' % (db, owner)
     executed_commands.append(query)
     cursor.execute(query)
     return True
 
 
 def set_conn_limit(cursor, db, conn_limit):
-    query = "ALTER DATABASE %s CONNECTION LIMIT %s" % (
-            pg_quote_identifier(db, 'database'),
-            conn_limit)
+    query = 'ALTER DATABASE "%s" CONNECTION LIMIT %s' % (db, conn_limit)
     executed_commands.append(query)
     cursor.execute(query)
     return True
@@ -270,7 +282,7 @@ def db_exists(cursor, db):
 
 def db_delete(cursor, db):
     if db_exists(cursor, db):
-        query = "DROP DATABASE %s" % pg_quote_identifier(db, 'database')
+        query = 'DROP DATABASE "%s"' % db
         executed_commands.append(query)
         cursor.execute(query)
         return True
@@ -281,11 +293,11 @@ def db_delete(cursor, db):
 def db_create(cursor, db, owner, template, encoding, lc_collate, lc_ctype, conn_limit, tablespace):
     params = dict(enc=encoding, collate=lc_collate, ctype=lc_ctype, conn_limit=conn_limit, tablespace=tablespace)
     if not db_exists(cursor, db):
-        query_fragments = ['CREATE DATABASE %s' % pg_quote_identifier(db, 'database')]
+        query_fragments = ['CREATE DATABASE "%s"' % db]
         if owner:
             query_fragments.append('OWNER "%s"' % owner)
         if template:
-            query_fragments.append('TEMPLATE %s' % pg_quote_identifier(template, 'database'))
+            query_fragments.append('TEMPLATE "%s"' % template)
         if encoding:
             query_fragments.append('ENCODING %(enc)s')
         if lc_collate:
@@ -293,7 +305,7 @@ def db_create(cursor, db, owner, template, encoding, lc_collate, lc_ctype, conn_
         if lc_ctype:
             query_fragments.append('LC_CTYPE %(ctype)s')
         if tablespace:
-            query_fragments.append('TABLESPACE %s' % pg_quote_identifier(tablespace, 'tablespace'))
+            query_fragments.append('TABLESPACE "%s"' % tablespace)
         if conn_limit:
             query_fragments.append("CONNECTION LIMIT %(conn_limit)s" % {"conn_limit": conn_limit})
         query = ' '.join(query_fragments)
@@ -491,9 +503,7 @@ def do_with_password(module, cmd, password):
 
 
 def set_tablespace(cursor, db, tablespace):
-    query = "ALTER DATABASE %s SET TABLESPACE %s" % (
-            pg_quote_identifier(db, 'database'),
-            pg_quote_identifier(tablespace, 'tablespace'))
+    query = 'ALTER DATABASE "%s" SET TABLESPACE "%s"' % (db, tablespace)
     executed_commands.append(query)
     cursor.execute(query)
     return True
@@ -520,6 +530,7 @@ def main():
         conn_limit=dict(type='str', default=''),
         tablespace=dict(type='path', default=''),
         dump_extra_args=dict(type='str', default=None),
+        trust_input=dict(type='bool', default=True),
     )
 
     module = AnsibleModule(
@@ -542,6 +553,12 @@ def main():
     conn_limit = module.params['conn_limit']
     tablespace = module.params['tablespace']
     dump_extra_args = module.params['dump_extra_args']
+    trust_input = module.params['trust_input']
+
+    # Check input
+    if not trust_input:
+        # Check input for potentially dangerous elements:
+        check_input(module, owner, conn_limit, encoding, db, template, tablespace, session_role)
 
     raw_connection = state in ("dump", "restore")
 

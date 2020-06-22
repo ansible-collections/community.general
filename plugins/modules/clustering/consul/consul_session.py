@@ -7,10 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 module: consul_session
 short_description: Manipulate consul sessions
@@ -101,27 +97,27 @@ options:
 '''
 
 EXAMPLES = '''
-- name: register basic session with consul
+- name: Register basic session with consul
   consul_session:
     name: session1
 
-- name: register a session with an existing check
+- name: Register a session with an existing check
   consul_session:
     name: session_with_check
     checks:
       - existing_check_name
 
-- name: register a session with lock_delay
+- name: Register a session with lock_delay
   consul_session:
     name: session_with_delay
     delay: 20s
 
-- name: retrieve info about session by id
+- name: Retrieve info about session by id
   consul_session:
     id: session_id
     state: info
 
-- name: retrieve active sessions
+- name: Retrieve active sessions
   consul_session:
     state: list
 '''

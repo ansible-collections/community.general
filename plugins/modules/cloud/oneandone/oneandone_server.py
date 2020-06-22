@@ -17,11 +17,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: oneandone_server
@@ -144,10 +139,8 @@ author:
 '''
 
 EXAMPLES = '''
-
-# Provisioning example. Creates three servers and enumerate their names.
-
-- oneandone_server:
+- name: Create three servers and enumerate their names
+  oneandone_server:
     auth_token: oneandone_private_api_key
     hostname: node%02d
     fixed_instance_size: XL
@@ -156,9 +149,8 @@ EXAMPLES = '''
     auto_increment: true
     count: 3
 
-# Create three servers, passing in an ssh_key.
-
-- oneandone_server:
+- name: Create three servers, passing in an ssh_key
+  oneandone_server:
     auth_token: oneandone_private_api_key
     hostname: node%02d
     vcore: 2
@@ -175,23 +167,20 @@ EXAMPLES = '''
     wait_interval: 10
     ssh_key: SSH_PUBLIC_KEY
 
-# Removing server
-
-- oneandone_server:
+- name: Removing server
+  oneandone_server:
     auth_token: oneandone_private_api_key
     state: absent
     server: 'node01'
 
-# Starting server.
-
-- oneandone_server:
+- name: Starting server
+  oneandone_server:
     auth_token: oneandone_private_api_key
     state: running
     server: 'node01'
 
-# Stopping server
-
-- oneandone_server:
+- name: Stopping server
+  oneandone_server:
     auth_token: oneandone_private_api_key
     state: stopped
     server: 'node01'

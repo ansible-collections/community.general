@@ -9,11 +9,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: udm_group
@@ -57,18 +52,21 @@ options:
 
 
 EXAMPLES = '''
-# Create a POSIX group
-- udm_group:
+- name: Create a POSIX group
+  udm_group:
     name: g123m-1A
 
 # Create a POSIX group with the exact DN
 # C(cn=g123m-1A,cn=classes,cn=students,cn=groups,ou=school,dc=school,dc=example,dc=com)
-- udm_group:
+- name: Create a POSIX group with a DN
+  udm_group:
     name: g123m-1A
     subpath: 'cn=classes,cn=students,cn=groups'
     ou: school
+
 # or
-- udm_group:
+- name: Create a POSIX group with a DN
+  udm_group:
     name: g123m-1A
     position: 'cn=classes,cn=students,cn=groups,ou=school,dc=school,dc=example,dc=com'
 '''

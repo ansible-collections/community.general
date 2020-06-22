@@ -5,10 +5,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'certified'}
-
 DOCUMENTATION = '''
 ---
 module: nios_member
@@ -302,7 +298,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: add a member to the grid with IPv4 address
+- name: Add a member to the grid with IPv4 address
   nios_member:
     host_name: member01.localdomain
     vip_setting:
@@ -318,7 +314,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: add a HA member to the grid
+- name: Add a HA member to the grid
   nios_member:
     host_name: memberha.localdomain
     vip_setting:
@@ -343,7 +339,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: update the member with pre-provisioning details specified
+- name: Update the member with pre-provisioning details specified
   nios_member:
     name: member01.localdomain
     pre_provisioning:
@@ -362,7 +358,7 @@ EXAMPLES = '''
       username: admin
       password: admin
   connection: local
-- name: remove the member
+- name: Remove the member
   nios_member:
     name: member01.localdomain
     state: absent

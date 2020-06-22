@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: flowdock
@@ -82,7 +77,8 @@ requirements: [ ]
 '''
 
 EXAMPLES = '''
-- flowdock:
+- name: Send a message to a flowdock
+  flowdock:
     type: inbox
     token: AAAAAA
     from_address: user@example.com
@@ -90,7 +86,8 @@ EXAMPLES = '''
     msg: test from ansible
     subject: test subject
 
-- flowdock:
+- name: Send a message to a flowdock
+  flowdock:
     type: chat
     token: AAAAAA
     external_user_name: testuser

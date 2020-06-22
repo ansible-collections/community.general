@@ -12,11 +12,6 @@ __metaclass__ = type
 # Documentation
 ################################################################################
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: gcdns_zone
@@ -27,7 +22,7 @@ author: "William Albert (@walbert947)"
 requirements:
     - "apache-libcloud >= 0.19.0"
 deprecated:
-    removed_in: "2.12"
+    removed_in: 2.0.0  # was Ansible 2.12
     why: Updated modules released with increased functionality
     alternative: Use M(gcp_dns_managed_zone) instead.
 options:

@@ -7,11 +7,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: docker_image_info
@@ -253,8 +248,9 @@ def main():
         supports_check_mode=True,
         min_docker_api_version='1.20',
     )
-    if client.module._name == 'docker_image_facts':
-        client.module.deprecate("The 'docker_image_facts' module has been renamed to 'docker_image_info'", version='2.12')
+    if client.module._name in ('docker_image_facts', 'community.general.docker_image_facts'):
+        client.module.deprecate("The 'docker_image_facts' module has been renamed to 'docker_image_info'",
+                                version='2.0.0', collection_name='community.general')  # was Ansible 2.12
 
     try:
         results = dict(

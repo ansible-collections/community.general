@@ -1,2 +1,0 @@
-bugfixes:
-- Add validate_certs in rhn_channel module (https://github.com/ansible/ansible/issues/68374).

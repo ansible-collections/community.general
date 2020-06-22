@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: cpanm
@@ -71,47 +66,41 @@ author: "Franck Cuny (@fcuny)"
 '''
 
 EXAMPLES = '''
-# install latest version of Dancer perl package
-- cpanm:
+- name: Install Dancer perl package
+  cpanm:
     name: Dancer
 
-# install Dancer 1.3513 or later Perl package
-- cpanm:
-    name: Dancer
-    version: ~1.3513
-
-# install version 0.99_05 of the Plack perl package
-- cpanm:
+- name: Install version 0.99_05 of the Plack perl package
+  cpanm:
     name: MIYAGAWA/Plack-0.99_05.tar.gz
 
-# install Dancer into the specified locallib
-- cpanm:
+- name: Install Dancer into the specified locallib
+  cpanm:
     name: Dancer
     locallib: /srv/webapps/my_app/extlib
 
-# install perl dependencies from local directory
-- cpanm:
+- name: Install perl dependencies from local directory
+  cpanm:
     from_path: /srv/webapps/my_app/src/
 
-# install Dancer perl package without running the unit tests in indicated locallib
-- cpanm:
+- name: Install Dancer perl package without running the unit tests in indicated locallib
+  cpanm:
     name: Dancer
     notest: True
     locallib: /srv/webapps/my_app/extlib
 
-# install Dancer perl package from a specific mirror
-- cpanm:
+- name: Install Dancer perl package from a specific mirror
+  cpanm:
     name: Dancer
     mirror: 'http://cpan.cpantesters.org/'
 
-# install Dancer perl package into the system root path
-- cpanm:
+- name: Install Dancer perl package into the system root path
+  cpanm:
     name: Dancer
     system_lib: yes
 
-# install Dancer if it's not already installed
-# OR the installed version is older than version 1.0
-- cpanm:
+- name: Install Dancer if it is not already installed OR the installed version is older than version 1.0
+  cpanm:
     name: Dancer
     version: '1.0'
 '''

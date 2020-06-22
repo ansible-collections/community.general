@@ -7,12 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = r'''
 ---
 module: postgresql_idx
@@ -94,6 +88,7 @@ options:
     - Only btree currently supports unique indexes.
     type: bool
     default: no
+    version_added: '0.2.0'
   tablespace:
     description:
     - Set a tablespace for the index.
@@ -114,6 +109,15 @@ options:
     - Mutually exclusive with I(concurrent=yes)
     type: bool
     default: no
+  trust_input:
+    description:
+    - If C(no), check whether values of parameters I(idxname), I(session_role),
+      I(schema), I(table), I(columns), I(tablespace), I(storage_params),
+      I(cond) are potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
+    type: bool
+    default: yes
+    version_added: '0.2.0'
 
 seealso:
 - module: postgresql_table
@@ -137,6 +141,7 @@ notes:
 
 author:
 - Andrew Klychkov (@Andersson007)
+- Thomas O'Donnell (@andytom)
 
 extends_documentation_fragment:
 - community.general.postgres
@@ -258,6 +263,7 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.database import check_input
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     exec_sql,
@@ -360,7 +366,8 @@ class Index(object):
             self.exists = False
             return False
 
-    def create(self, tblname, idxtype, columns, cond, tblspace, storage_params, concurrent=True, unique=False):
+    def create(self, tblname, idxtype, columns, cond, tblspace,
+               storage_params, concurrent=True, unique=False):
         """Create PostgreSQL index.
 
         Return True if success, otherwise, return False.
@@ -391,12 +398,9 @@ class Index(object):
         if concurrent:
             query += ' CONCURRENTLY'
 
-        query += ' %s' % self.name
+        query += ' "%s"' % self.name
 
-        if self.schema:
-            query += ' ON %s.%s ' % (self.schema, tblname)
-        else:
-            query += 'public.%s ' % tblname
+        query += ' ON "%s"."%s" ' % (self.schema, tblname)
 
         query += 'USING %s (%s)' % (idxtype, columns)
 
@@ -404,19 +408,16 @@ class Index(object):
             query += ' WITH (%s)' % storage_params
 
         if tblspace:
-            query += ' TABLESPACE %s' % tblspace
+            query += ' TABLESPACE "%s"' % tblspace
 
         if cond:
             query += ' WHERE %s' % cond
 
         self.executed_query = query
 
-        if exec_sql(self, query, return_bool=True, add_to_executed=False):
-            return True
+        return exec_sql(self, query, return_bool=True, add_to_executed=False)
 
-        return False
-
-    def drop(self, schema, cascade=False, concurrent=True):
+    def drop(self, cascade=False, concurrent=True):
         """Drop PostgreSQL index.
 
         Return True if success, otherwise, return False.
@@ -437,20 +438,14 @@ class Index(object):
         if concurrent:
             query += ' CONCURRENTLY'
 
-        if not schema:
-            query += ' public.%s' % self.name
-        else:
-            query += ' %s.%s' % (schema, self.name)
+        query += ' "%s"."%s"' % (self.schema, self.name)
 
         if cascade:
             query += ' CASCADE'
 
         self.executed_query = query
 
-        if exec_sql(self, query, return_bool=True, add_to_executed=False):
-            return True
-
-        return False
+        return exec_sql(self, query, return_bool=True, add_to_executed=False)
 
 
 # ===========================================
@@ -475,6 +470,7 @@ def main():
         storage_params=dict(type='list', elements='str'),
         cascade=dict(type='bool', default=False),
         schema=dict(type='str'),
+        trust_input=dict(type='bool', default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -493,6 +489,13 @@ def main():
     storage_params = module.params["storage_params"]
     cascade = module.params["cascade"]
     schema = module.params["schema"]
+    session_role = module.params["session_role"]
+    trust_input = module.params["trust_input"]
+
+    if not trust_input:
+        # Check input for potentially dangerous elements:
+        check_input(module, idxname, session_role, schema, table, columns,
+                    tablespace, storage_params, cond)
 
     if concurrent and cascade:
         module.fail_json(msg="Concurrent mode and cascade parameters are mutually exclusive")
@@ -564,7 +567,7 @@ def main():
             kw['query'] = index.executed_query
 
     else:
-        changed = index.drop(schema, cascade, concurrent)
+        changed = index.drop(cascade, concurrent)
 
         if changed:
             kw['state'] = 'absent'

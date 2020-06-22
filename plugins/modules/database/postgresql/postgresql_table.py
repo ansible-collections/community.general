@@ -7,12 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = r'''
 ---
 module: postgresql_table
@@ -99,6 +93,13 @@ options:
       Used with I(state=absent) only.
     type: bool
     default: no
+  trust_input:
+    description:
+    - If C(no), check whether values of parameters are potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections are possible.
+    type: bool
+    default: yes
+    version_added: '0.2.0'
 notes:
 - If you do not pass db parameter, tables will be created in the database
   named postgres.
@@ -244,7 +245,10 @@ except ImportError:
     pass
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.database import pg_quote_identifier
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+    pg_quote_identifier,
+)
 from ansible_collections.community.general.plugins.module_utils.postgres import (
     connect_to_db,
     exec_sql,
@@ -365,7 +369,7 @@ class Table(object):
             query += " WITH (%s)" % params
 
         if tblspace:
-            query += " TABLESPACE %s" % pg_quote_identifier(tblspace, 'database')
+            query += ' TABLESPACE "%s"' % tblspace
 
         if exec_sql(self, query, return_bool=True):
             changed = True
@@ -412,7 +416,7 @@ class Table(object):
             query += " WITH (%s)" % params
 
         if tblspace:
-            query += " TABLESPACE %s" % pg_quote_identifier(tblspace, 'database')
+            query += ' TABLESPACE "%s"' % tblspace
 
         if exec_sql(self, query, return_bool=True):
             changed = True
@@ -432,8 +436,7 @@ class Table(object):
         return exec_sql(self, query, return_bool=True)
 
     def set_owner(self, username):
-        query = "ALTER TABLE %s OWNER TO %s" % (pg_quote_identifier(self.name, 'table'),
-                                                pg_quote_identifier(username, 'role'))
+        query = 'ALTER TABLE %s OWNER TO "%s"' % (pg_quote_identifier(self.name, 'table'), username)
         return exec_sql(self, query, return_bool=True)
 
     def drop(self, cascade=False):
@@ -446,8 +449,7 @@ class Table(object):
         return exec_sql(self, query, return_bool=True)
 
     def set_tblspace(self, tblspace):
-        query = "ALTER TABLE %s SET TABLESPACE %s" % (pg_quote_identifier(self.name, 'table'),
-                                                      pg_quote_identifier(tblspace, 'database'))
+        query = 'ALTER TABLE %s SET TABLESPACE "%s"' % (pg_quote_identifier(self.name, 'table'), tblspace)
         return exec_sql(self, query, return_bool=True)
 
     def set_stor_params(self, params):
@@ -464,7 +466,7 @@ def main():
     argument_spec = postgres_common_argument_spec()
     argument_spec.update(
         table=dict(type='str', required=True, aliases=['name']),
-        state=dict(type='str', default="present", choices=["absent", "present"]),
+        state=dict(type='str', default='present', choices=['absent', 'present']),
         db=dict(type='str', default='', aliases=['login_db']),
         tablespace=dict(type='str'),
         owner=dict(type='str'),
@@ -477,24 +479,32 @@ def main():
         storage_params=dict(type='list', elements='str'),
         session_role=dict(type='str'),
         cascade=dict(type='bool', default=False),
+        trust_input=dict(type='bool', default=True),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
 
-    table = module.params["table"]
-    state = module.params["state"]
-    tablespace = module.params["tablespace"]
-    owner = module.params["owner"]
-    unlogged = module.params["unlogged"]
-    like = module.params["like"]
-    including = module.params["including"]
-    newname = module.params["rename"]
-    storage_params = module.params["storage_params"]
-    truncate = module.params["truncate"]
-    columns = module.params["columns"]
-    cascade = module.params["cascade"]
+    table = module.params['table']
+    state = module.params['state']
+    tablespace = module.params['tablespace']
+    owner = module.params['owner']
+    unlogged = module.params['unlogged']
+    like = module.params['like']
+    including = module.params['including']
+    newname = module.params['rename']
+    storage_params = module.params['storage_params']
+    truncate = module.params['truncate']
+    columns = module.params['columns']
+    cascade = module.params['cascade']
+    session_role = module.params['session_role']
+    trust_input = module.params['trust_input']
+
+    if not trust_input:
+        # Check input for potentially dangerous elements:
+        check_input(module, table, tablespace, owner, like, including,
+                    newname, storage_params, columns, session_role)
 
     if state == 'present' and cascade:
         module.warn("cascade=true is ignored when state=present")

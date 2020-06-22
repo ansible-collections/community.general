@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: easy_install
@@ -66,13 +61,13 @@ author: "Matt Wright (@mattupstate)"
 '''
 
 EXAMPLES = '''
-# Examples from Ansible Playbooks
-- easy_install:
+- name: Install or update pip
+  easy_install:
     name: pip
     state: latest
 
-# Install Bottle into the specified virtualenv.
-- easy_install:
+- name: Install Bottle into the specified virtualenv
+  easy_install:
     name: bottle
     virtualenv: /webapps/myapp/venv
 '''

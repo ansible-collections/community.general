@@ -7,12 +7,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: memset_dns_reload
@@ -43,7 +37,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: submit DNS reload and poll.
+- name: Submit DNS reload and poll
   memset_dns_reload:
     api_key: 5eb86c9196ab03919abcf03857163741
     poll: True

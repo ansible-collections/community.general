@@ -7,11 +7,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 module: consul
 short_description: "Add, modify & delete services within a consul cluster."
@@ -144,32 +139,32 @@ options:
 '''
 
 EXAMPLES = '''
-- name: register nginx service with the local consul agent
+- name: Register nginx service with the local consul agent
   consul:
     service_name: nginx
     service_port: 80
 
-- name: register nginx service with curl check
+- name: Register nginx service with curl check
   consul:
     service_name: nginx
     service_port: 80
     script: curl http://localhost
     interval: 60s
 
-- name: register nginx with an http check
+- name: Register nginx with an http check
   consul:
     service_name: nginx
     service_port: 80
     interval: 60s
     http: http://localhost:80/status
 
-- name: register external service nginx available at 10.1.5.23
+- name: Register external service nginx available at 10.1.5.23
   consul:
     service_name: nginx
     service_port: 80
     service_address: 10.1.5.23
 
-- name: register nginx with some service tags
+- name: Register nginx with some service tags
   consul:
     service_name: nginx
     service_port: 80
@@ -177,26 +172,26 @@ EXAMPLES = '''
       - prod
       - webservers
 
-- name: remove nginx service
+- name: Remove nginx service
   consul:
     service_name: nginx
     state: absent
 
-- name: register celery worker service
+- name: Register celery worker service
   consul:
     service_name: celery-worker
     tags:
       - prod
       - worker
 
-- name: create a node level check to test disk usage
+- name: Create a node level check to test disk usage
   consul:
     check_name: Disk usage
     check_id: disk_usage
     script: /opt/disk_usage.py
     interval: 5m
 
-- name: register an http check against a service that's already registered
+- name: Register an http check against a service that's already registered
   consul:
     check_name: nginx-check2
     check_id: nginx-check2

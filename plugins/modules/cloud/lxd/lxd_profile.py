@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: lxd_profile
@@ -119,7 +114,7 @@ EXAMPLES = '''
 - hosts: localhost
   connection: local
   tasks:
-  - name: create macvlan profile
+  - name: Create macvlan profile
     lxd_profile:
       url: https://127.0.0.1:8443
       # These client_cert and client_key values are equal to the default values.

@@ -6,13 +6,6 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'supported_by': 'community',
-    'status': ['preview']
-}
-
-
 DOCUMENTATION = '''
 ---
 author:
@@ -48,14 +41,14 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 # get all cmms info
-- name: get nodes data from LXCA
+- name: Get nodes data from LXCA
   lxca_cmms:
     login_user: USERID
     login_password: Password
     auth_url: "https://10.243.15.168"
 
 # get specific cmms info by uuid
-- name: get nodes data from LXCA
+- name: Get nodes data from LXCA
   lxca_cmms:
     login_user: USERID
     login_password: Password
@@ -64,7 +57,7 @@ EXAMPLES = '''
     command_options: cmms_by_uuid
 
 # get specific cmms info by chassis uuid
-- name: get nodes data from LXCA
+- name: Get nodes data from LXCA
   lxca_cmms:
     login_user: USERID
     login_password: Password

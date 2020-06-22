@@ -12,10 +12,6 @@ __metaclass__ = type
 # Documentation
 ###############################################################################
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ["preview"],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: hwc_vpc_security_group
@@ -30,6 +26,7 @@ notes:
     execution is aborted.
   - No parameter support updating. If one of option is changed, the module
     will create a new resource.
+version_added: '0.2.0'
 author: Huawei Inc. (@huaweicloud)
 requirements:
     - keystoneauth1 >= 3.6.0
@@ -68,7 +65,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 # create a security group
-- name: create a security group
+- name: Create a security group
   hwc_vpc_security_group:
     name: "ansible_network_security_group_test"
 '''

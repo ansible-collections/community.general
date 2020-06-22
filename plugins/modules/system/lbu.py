@@ -6,18 +6,13 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: lbu
 
 short_description: Local Backup Utility for Alpine Linux
 
+version_added: '0.2.0'
 
 description:
 - Manage Local Backup Utility of Alpine Linux in run-from-RAM mode

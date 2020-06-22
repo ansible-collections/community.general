@@ -7,12 +7,6 @@ from __future__ import (absolute_import, division, print_function)
 
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: aerospike_migrations
@@ -111,7 +105,7 @@ options:
 '''
 EXAMPLES = '''
 # check for migrations on local node
-- name: wait for migrations on local node before proceeding
+- name: Wait for migrations on local node before proceeding
   aerospike_migrations:
     host: "localhost"
     connect_timeout: 2000
@@ -122,7 +116,7 @@ EXAMPLES = '''
 
 # example playbook:
 ---
-- name: upgrade aerospike
+- name: Upgrade aerospike
   hosts: all
   become: true
   serial: 1
@@ -134,7 +128,7 @@ EXAMPLES = '''
             - python-pip
             - python-setuptools
         state: latest
-    - name: setup aerospike
+    - name: Setup aerospike
       pip:
           name: aerospike
 # check for migrations every (sleep_between_checks)
@@ -143,7 +137,7 @@ EXAMPLES = '''
 # nodes not returning data, or other reasons.
 # Maximum runtime before giving up in this case will be:
 # Tries Limit * Sleep Between Checks * delay * retries
-    - name: wait for aerospike migrations
+    - name: Wait for aerospike migrations
       aerospike_migrations:
           local_only: True
           sleep_between_checks: 1
@@ -157,10 +151,10 @@ EXAMPLES = '''
       changed_when: false
       delay: 60
       retries: 120
-    - name: another thing
+    - name: Another thing
       shell: |
           echo foo
-    - name: reboot
+    - name: Reboot
       reboot:
 '''
 

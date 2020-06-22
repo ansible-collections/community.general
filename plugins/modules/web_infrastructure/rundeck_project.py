@@ -12,10 +12,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: rundeck_project
@@ -47,6 +43,24 @@ options:
         description:
             - Sets the token to authenticate against Rundeck API.
         required: True
+    client_cert:
+        version_added: '0.2.0'
+    client_key:
+        version_added: '0.2.0'
+    force:
+        version_added: '0.2.0'
+    force_basic_auth:
+        version_added: '0.2.0'
+    http_agent:
+        version_added: '0.2.0'
+    url_password:
+        version_added: '0.2.0'
+    url_username:
+        version_added: '0.2.0'
+    use_proxy:
+        version_added: '0.2.0'
+    validate_certs:
+        version_added: '0.2.0'
 extends_documentation_fragment: url
 '''
 

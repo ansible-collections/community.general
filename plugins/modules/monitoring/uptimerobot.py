@@ -7,11 +7,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 
 module: uptimerobot
@@ -40,14 +35,14 @@ notes:
 '''
 
 EXAMPLES = '''
-# Pause the monitor with an ID of 12345.
-- uptimerobot:
+- name: Pause the monitor with an ID of 12345
+  uptimerobot:
     monitorid: 12345
     apikey: 12345-1234512345
     state: paused
 
-# Start the monitor with an ID of 12345.
-- uptimerobot:
+- name: Start the monitor with an ID of 12345
+  uptimerobot:
     monitorid: 12345
     apikey: 12345-1234512345
     state: started

@@ -24,10 +24,6 @@ You should have received a copy of the GNU General Public License
 along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-ANSIBLE_METADATA = {'status': ['preview'],
-                    'supported_by': 'community',
-                    'metadata_version': '1.1'}
-
 DOCUMENTATION = '''
 ---
 module: one_service
@@ -108,70 +104,70 @@ author:
 '''
 
 EXAMPLES = '''
-# Instantiate a new service
-- one_service:
+- name: Instantiate a new service
+  one_service:
     template_id: 90
   register: result
 
-# Print service properties
-- debug:
+- name: Print service properties
+  debug:
     msg: result
 
-# Instantiate a new service with specified service_name, service group and mode
-- one_service:
+- name: Instantiate a new service with specified service_name, service group and mode
+  one_service:
     template_name: 'app1_template'
     service_name: 'app1'
     group_id: 1
     mode: '660'
 
-# Instantiate a new service with template_id and pass custom_attrs dict
-- one_service:
+- name: Instantiate a new service with template_id and pass custom_attrs dict
+  one_service:
     template_id: 90
     custom_attrs:
       public_network_id: 21
       private_network_id: 26
 
-# Instantiate a new service 'foo' if the service doesn't already exist, otherwise do nothing
-- one_service:
+- name: Instantiate a new service 'foo' if the service doesn't already exist, otherwise do nothing
+  one_service:
     template_id: 53
     service_name: 'foo'
     unique: yes
 
-# Delete a service by ID
-- one_service:
+- name: Delete a service by ID
+  one_service:
     service_id: 153
     state: absent
 
-# Get service info
-- one_service:
+- name: Get service info
+  one_service:
     service_id: 153
   register: service_info
 
-# Change service owner, group and mode
-- one_service:
+- name: Change service owner, group and mode
+  one_service:
     service_name: 'app2'
     owner_id: 34
     group_id: 113
     mode: '600'
 
-# Instantiate service and wait for it to become RUNNING
--  one_service:
+- name: Instantiate service and wait for it to become RUNNING
+  one_service:
     template_id: 43
     service_name: 'foo1'
 
-# Wait service to become RUNNING
-- one_service:
+- name: Wait service to become RUNNING
+  one_service:
     service_id: 112
     wait: yes
 
-# Change role cardinality
-- one_service:
+- name: Change role cardinality
+  one_service:
     service_id: 153
     role: bar
     cardinality: 5
 
-# Change role cardinality and wait for it to be applied
-- one_service:
+- name: Change role cardinality and wait for it to be applied
+  one_service:
     service_id: 112
     role: foo
     cardinality: 7

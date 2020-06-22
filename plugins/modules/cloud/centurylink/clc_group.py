@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 module: clc_group
 short_description: Create/delete Server Groups at Centurylink Cloud
@@ -81,7 +76,7 @@ EXAMPLES = '''
         state: present
       register: clc
 
-    - name: debug
+    - name: Debug
       debug:
         var: clc
 
@@ -100,7 +95,7 @@ EXAMPLES = '''
         state: absent
       register: clc
 
-    - name: debug
+    - name: Debug
       debug:
         var: clc
 '''

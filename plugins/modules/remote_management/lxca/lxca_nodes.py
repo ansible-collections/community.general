@@ -6,13 +6,6 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'supported_by': 'community',
-    'status': ['preview']
-}
-
-
 DOCUMENTATION = '''
 ---
 author:
@@ -50,7 +43,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 # get all nodes info
-- name: get nodes data from LXCA
+- name: Get nodes data from LXCA
   lxca_nodes:
     login_user: USERID
     login_password: Password
@@ -58,7 +51,7 @@ EXAMPLES = '''
     command_options: nodes
 
 # get specific nodes info by uuid
-- name: get nodes data from LXCA
+- name: Get nodes data from LXCA
   lxca_nodes:
     login_user: USERID
     login_password: Password
@@ -67,7 +60,7 @@ EXAMPLES = '''
     command_options: nodes_by_uuid
 
 # get specific nodes info by chassis uuid
-- name: get nodes data from LXCA
+- name: Get nodes data from LXCA
   lxca_nodes:
     login_user: USERID
     login_password: Password
@@ -76,7 +69,7 @@ EXAMPLES = '''
     command_options: nodes_by_chassis_uuid
 
 # get managed nodes
-- name: get nodes data from LXCA
+- name: Get nodes data from LXCA
   lxca_nodes:
     login_user: USERID
     login_password: Password
@@ -84,7 +77,7 @@ EXAMPLES = '''
     command_options: nodes_status_managed
 
 # get unmanaged nodes
-- name: get nodes data from LXCA
+- name: Get nodes data from LXCA
   lxca_nodes:
     login_user: USERID
     login_password: Password

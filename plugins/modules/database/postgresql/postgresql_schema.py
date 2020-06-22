@@ -7,10 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: postgresql_schema
@@ -69,6 +65,13 @@ options:
       - If the file exists, the server's certificate will be verified to be signed by one of these authorities.
     type: str
     aliases: [ ssl_rootcert ]
+  trust_input:
+    description:
+    - If C(no), check whether values of parameters I(schema), I(owner), I(session_role) are potentially dangerous.
+    - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
+    type: bool
+    default: yes
+    version_added: '0.2.0'
 seealso:
 - name: PostgreSQL schemas
   description: General information about PostgreSQL schemas.
@@ -136,7 +139,11 @@ from ansible_collections.community.general.plugins.module_utils.postgres import 
     get_conn_params,
     postgres_common_argument_spec,
 )
-from ansible_collections.community.general.plugins.module_utils.database import SQLParseError, pg_quote_identifier
+from ansible_collections.community.general.plugins.module_utils.database import (
+    check_input,
+    pg_quote_identifier,
+    SQLParseError,
+)
 from ansible.module_utils._text import to_native
 
 executed_queries = []
@@ -151,9 +158,8 @@ class NotSupportedError(Exception):
 #
 
 def set_owner(cursor, schema, owner):
-    query = "ALTER SCHEMA %s OWNER TO %s" % (
-            pg_quote_identifier(schema, 'schema'),
-            pg_quote_identifier(owner, 'role'))
+    query = 'ALTER SCHEMA %s OWNER TO "%s"' % (
+            pg_quote_identifier(schema, 'schema'), owner)
     cursor.execute(query)
     executed_queries.append(query)
     return True
@@ -190,7 +196,7 @@ def schema_create(cursor, schema, owner):
     if not schema_exists(cursor, schema):
         query_fragments = ['CREATE SCHEMA %s' % pg_quote_identifier(schema, 'schema')]
         if owner:
-            query_fragments.append('AUTHORIZATION %s' % pg_quote_identifier(owner, 'role'))
+            query_fragments.append('AUTHORIZATION "%s"' % owner)
         query = ' '.join(query_fragments)
         cursor.execute(query)
         executed_queries.append(query)
@@ -227,6 +233,7 @@ def main():
         cascade_drop=dict(type="bool", default=False),
         state=dict(type="str", default="present", choices=["absent", "present"]),
         session_role=dict(type="str"),
+        trust_input=dict(type="bool", default=True),
     )
 
     module = AnsibleModule(
@@ -238,6 +245,13 @@ def main():
     owner = module.params["owner"]
     state = module.params["state"]
     cascade_drop = module.params["cascade_drop"]
+    session_role = module.params["session_role"]
+    trust_input = module.params["trust_input"]
+
+    if not trust_input:
+        # Check input for potentially dangerous elements:
+        check_input(module, schema, owner, session_role)
+
     changed = False
 
     conn_params = get_conn_params(module, module.params)

@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: vmadm
@@ -35,7 +30,7 @@ options:
     choices: [ joyent, joyent-minimal, lx, kvm, bhyve ]
     default: joyent
     description:
-      - Type of virtual machine. The C(bhyve) option was added in Ansible 2.10.
+      - Type of virtual machine. The C(bhyve) option was added in community.general 0.2.0.
   boot:
     required: false
     description:
@@ -293,7 +288,7 @@ requirements:
 '''
 
 EXAMPLES = '''
-- name: create SmartOS zone
+- name: Create SmartOS zone
   vmadm:
     brand: joyent
     state: present

@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: grove
@@ -52,10 +47,11 @@ author: "Jonas Pfenniger (@zimbatm)"
 '''
 
 EXAMPLES = '''
-- grove: >
-    channel_token=6Ph62VBBJOccmtTPZbubiPzdrhipZXtg
-    service=my-app
-    message=deployed {{ target }}
+- name: Sends a notification to a grove.io channel
+  grove:
+    channel_token: 6Ph62VBBJOccmtTPZbubiPzdrhipZXtg
+    service: my-app
+    message: 'deployed {{ target }}'
 '''
 
 from ansible.module_utils.basic import AnsibleModule

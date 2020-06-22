@@ -7,11 +7,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: vertica_user
@@ -88,10 +83,10 @@ author: "Dariusz Owczarek (@dareko)"
 '''
 
 EXAMPLES = """
-- name: creating a new vertica user with password
+- name: Creating a new vertica user with password
   vertica_user: name=user_name password=md5<encrypted_password> db=db_name state=present
 
-- name: creating a new vertica user authenticated via ldap with roles assigned
+- name: Creating a new vertica user authenticated via ldap with roles assigned
   vertica_user:
     name=user_name
     ldap=true

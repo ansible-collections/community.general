@@ -53,7 +53,7 @@
   postgresql_query:
     db: postgres
     login_user: "{{ pg_user }}"
-    query: "SELECT 1 FROM pg_stat_all_tables WHERE relname ='test1'"
+    query: "SELECT 1 FROM pg_stat_all_tables WHERE relname = 'test1'"
   ignore_errors: yes
   register: result
  
@@ -92,7 +92,7 @@
   postgresql_query:
     db: postgres
     login_user: "{{ pg_user }}"
-    query: "SELECT 1 FROM pg_stat_all_tables WHERE relname ='test1'"
+    query: "SELECT 1 FROM pg_stat_all_tables WHERE relname = 'test1'"
   ignore_errors: yes
   register: result
  
@@ -146,7 +146,7 @@
   postgresql_query:
     db: postgres
     login_user: "{{ pg_user }}"
-    query: "SELECT 1 FROM pg_stat_all_tables WHERE relname ='test2'"
+    query: "SELECT 1 FROM pg_stat_all_tables WHERE relname = 'test2'"
   ignore_errors: yes
   register: result
  
@@ -183,7 +183,7 @@
   postgresql_query:
     db: postgres
     login_user: "{{ pg_user }}"
-    query: "SELECT 1 FROM pg_stat_all_tables WHERE relname ='test2'"
+    query: "SELECT 1 FROM pg_stat_all_tables WHERE relname = 'test2'"
   ignore_errors: yes
   register: result
  
@@ -224,7 +224,7 @@
   postgresql_query:
     db: postgres
     login_user: "{{ pg_user }}"
-    query: "SELECT 1 FROM pg_stat_all_tables WHERE relname ='test2'"
+    query: "SELECT 1 FROM pg_stat_all_tables WHERE relname = 'test2'"
   ignore_errors: yes
   register: result
  
@@ -257,7 +257,7 @@
   postgresql_query:
     db: postgres
     login_user: "{{ pg_user }}"
-    query: "SELECT 1 FROM pg_stat_all_tables WHERE relname ='test2'"
+    query: "SELECT 1 FROM pg_stat_all_tables WHERE relname = 'test2'"
   ignore_errors: yes
   register: result
 
@@ -846,12 +846,31 @@
     login_user: "{{ pg_user }}"
     name: public.test_schema_table
     rename: new_test_schema_table
+    trust_input: yes
   register: result
 
 - assert:
     that:
       - result is changed
       - result.queries == ['ALTER TABLE "public"."test_schema_table" RENAME TO "new_test_schema_table"']
+
+############################
+# Test trust_input parameter
+- name: postgresql_table - check trust_input
+  postgresql_table:
+    db: postgres
+    login_user: "{{ pg_user }}"
+    name: postgres.acme.test_schema_table
+    state: absent
+    trust_input: no
+    session_role: 'curious.anonymous"; SELECT * FROM information_schema.tables; --'
+  register: result
+  ignore_errors: yes
+
+- assert:
+    that:
+    - result is failed
+    - result.msg is search('is potentially dangerous')
 
 #
 # Clean up

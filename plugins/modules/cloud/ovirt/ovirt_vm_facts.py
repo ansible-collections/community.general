@@ -22,20 +22,15 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['deprecated'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: ovirt_vm_facts
 short_description: Retrieve information about one or more oVirt/RHV virtual machines
 author: "Ondra Machacek (@machacekondra)"
 deprecated:
-    removed_in: "2.10"
+    removed_in: 3.0.0  # was Ansible 2.13
     why: When migrating to collection we decided to use only _info modules.
-    alternative: Use M(ovirt_vm_info) instead
+    alternative: Use C(ovirt_vm_info) from the C(ovirt.ovirt) collection instead
 description:
     - "Retrieve information about one or more oVirt/RHV virtual machines."
     - This module was called C(ovirt_vm_facts) before Ansible 2.9, returning C(ansible_facts).
@@ -70,7 +65,7 @@ options:
            effect when the virtual machine is restarted. By default the value is set by engine."
       type: bool
 extends_documentation_fragment:
-- ovirt.ovirt.ovirt_info
+- community.general.ovirt_facts
 
 '''
 
@@ -78,20 +73,23 @@ EXAMPLES = '''
 # Examples don't contain auth parameter for simplicity,
 # look at ovirt_auth module to see how to reuse authentication:
 
-# Gather information about all VMs which names start with C(centos) and
-# belong to cluster C(west):
-- ovirt_vm_info:
+- name: Gather information about all VMs which names start with centos and belong to cluster west
+  ovirt_vm_info:
     pattern: name=centos* and cluster=west
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_vms }}"
 
-# Gather info about next run configuration of virtual machine named myvm
-- ovirt_vm_info:
+- name: Gather info about next run configuration of virtual machine named myvm
+  ovirt_vm_info:
     pattern: name=myvm
     next_run: true
   register: result
-- debug:
+
+- name: Print gathered information
+  debug:
     msg: "{{ result.ovirt_vms[0] }}"
 '''
 
@@ -107,7 +105,7 @@ import traceback
 
 from ansible.module_utils.common.removed import removed_module
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.ovirt.ovirt.plugins.module_utils.ovirt import (
+from ansible_collections.community.general.plugins.module_utils._ovirt import (
     check_sdk,
     create_connection,
     get_dict_of_struct,
@@ -124,10 +122,11 @@ def main():
         max=dict(default=None, type='int'),
     )
     module = AnsibleModule(argument_spec)
-    is_old_facts = module._name == 'ovirt_vm_facts'
+    is_old_facts = module._name in ('ovirt_vm_facts', 'community.general.ovirt_vm_facts')
     if is_old_facts:
         module.deprecate("The 'ovirt_vm_facts' module has been renamed to 'ovirt_vm_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     check_sdk(module)
 
@@ -165,4 +164,4 @@ def main():
 
 
 if __name__ == '__main__':
-    removed_module("2.10")
+    main()

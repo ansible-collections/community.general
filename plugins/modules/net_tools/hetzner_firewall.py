@@ -8,14 +8,10 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = r'''
 ---
 module: hetzner_firewall
+version_added: '0.2.0'
 short_description: Manage Hetzner's dedicated server firewall
 author:
   - Felix Fontein (@felixfontein)

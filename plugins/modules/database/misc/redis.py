@@ -7,10 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = '''
 ---
 module: redis
@@ -73,6 +69,8 @@ notes:
    - If the redis master instance we are making slave of is password protected
      this needs to be in the redis.conf in the masterauth variable
 
+seealso:
+    - module: redis_info
 requirements: [ redis ]
 author: "Xabier Larrakoetxea (@slok)"
 '''

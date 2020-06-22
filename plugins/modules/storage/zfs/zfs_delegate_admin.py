@@ -7,10 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'status': ['preview'],
-                    'supported_by': 'community',
-                    'metadata_version': '1.1'}
-
 DOCUMENTATION = r'''
 ---
 module: zfs_delegate_admin
@@ -54,7 +50,7 @@ options:
     description:
       - The list of permission(s) to delegate (required if C(state) is C(present)).
     type: list
-    choices: [ allow, clone, create, destroy, mount, promote, readonly, receive, rename, rollback, send, share, snapshot, unallow ]
+    choices: [ allow, clone, create, destroy, diff, hold, mount, promote, readonly, receive, release, rename, rollback, send, share, snapshot, unallow ]
   local:
     description:
       - Apply permissions to C(name) locally (C(zfs allow -l)).
@@ -94,7 +90,7 @@ EXAMPLES = r'''
     local: yes
 
 - name: Revoke all permissions from everyone (permissions specifically assigned to users and groups remain)
-- zfs_delegate_admin:
+  zfs_delegate_admin:
     name: rpool/myfs
     everyone: yes
     state: absent
@@ -250,8 +246,9 @@ def main():
             groups=dict(type='list'),
             everyone=dict(type='bool', default=False),
             permissions=dict(type='list',
-                             choices=['allow', 'clone', 'create', 'destroy', 'mount', 'promote', 'readonly', 'receive',
-                                      'rename', 'rollback', 'send', 'share', 'snapshot', 'unallow']),
+                             choices=['allow', 'clone', 'create', 'destroy', 'diff', 'hold', 'mount', 'promote',
+                                      'readonly', 'receive', 'release', 'rename', 'rollback', 'send', 'share',
+                                      'snapshot', 'unallow']),
             local=dict(type='bool'),
             descendents=dict(type='bool'),
             recursive=dict(type='bool', default=False),

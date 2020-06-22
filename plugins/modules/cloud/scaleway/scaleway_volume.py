@@ -10,12 +10,6 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: scaleway_volume
@@ -61,22 +55,21 @@ options:
 '''
 
 EXAMPLES = '''
-  - name: Create 10GB volume
-    scaleway_volume:
-      name: my-volume
-      state: present
-      region: par1
-      organization: "{{ scw_org }}"
-      "size": 10000000000
-      volume_type: l_ssd
-    register: server_creation_check_task
+- name: Create 10GB volume
+  scaleway_volume:
+    name: my-volume
+    state: present
+    region: par1
+    organization: "{{ scw_org }}"
+    "size": 10000000000
+    volume_type: l_ssd
+  register: server_creation_check_task
 
-  - name: Make sure volume deleted
-    scaleway_volume:
-      name: my-volume
-      state: absent
-      region: par1
-
+- name: Make sure volume deleted
+  scaleway_volume:
+    name: my-volume
+    state: absent
+    region: par1
 '''
 
 RETURN = '''

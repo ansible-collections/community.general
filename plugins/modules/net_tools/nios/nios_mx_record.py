@@ -5,11 +5,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'certified'}
-
-
 DOCUMENTATION = '''
 ---
 module: nios_mx_record
@@ -74,7 +69,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: configure an MX record
+- name: Configure an MX record
   nios_mx_record:
     name: ansible.com
     mx: mailhost.ansible.com
@@ -86,7 +81,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: add a comment to an existing MX record
+- name: Add a comment to an existing MX record
   nios_mx_record:
     name: ansible.com
     mx: mailhost.ansible.com
@@ -99,7 +94,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 
-- name: remove an MX record from the system
+- name: Remove an MX record from the system
   nios_mx_record:
     name: ansible.com
     mx: mailhost.ansible.com

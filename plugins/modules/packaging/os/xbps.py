@@ -9,11 +9,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: xbps
@@ -59,6 +54,7 @@ options:
               upgrades and installations will fail when xbps is not up to date.
         type: bool
         default: 'yes'
+        version_added: '0.2.0'
 '''
 
 EXAMPLES = '''

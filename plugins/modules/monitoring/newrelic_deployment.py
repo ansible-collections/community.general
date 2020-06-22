@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: newrelic_deployment
@@ -69,7 +64,8 @@ requirements: []
 '''
 
 EXAMPLES = '''
-- newrelic_deployment:
+- name:  Notify newrelic about an app deployment
+  newrelic_deployment:
     token: AAAAAA
     app_name: myapp
     user: ansible deployment

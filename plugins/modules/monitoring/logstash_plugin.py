@@ -7,11 +7,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: logstash_plugin
@@ -62,7 +57,7 @@ EXAMPLES = '''
     state: absent
     name: logstash-filter-multiline
 
-- name: install Logstash plugin with alternate heap size
+- name: Install Logstash plugin with alternate heap size
   logstash_plugin:
     state: present
     name: logstash-input-beats

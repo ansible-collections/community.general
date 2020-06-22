@@ -8,11 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: smartos_image_info
@@ -32,27 +27,32 @@ options:
 '''
 
 EXAMPLES = '''
-# Return information about all installed images.
-- smartos_image_info:
+- name: Return information about all installed images
+  smartos_image_info:
   register: result
 
-# Return all private active Linux images.
-- smartos_image_info: filters="os=linux state=active public=false"
+- name: Return all private active Linux images
+  smartos_image_info:
+    filters: "os=linux state=active public=false"
   register: result
 
-# Show, how many clones does every image have.
-- smartos_image_info:
+- name: Show, how many clones does every image have
+  smartos_image_info:
   register: result
 
-- debug: msg="{{ result.smartos_images[item]['name'] }}-{{ result.smartos_images[item]['version'] }}
-            has {{ result.smartos_images[item]['clones'] }} VM(s)"
+- name: Print information
+  debug:
+    msg: "{{ result.smartos_images[item]['name'] }}-{{ result.smartos_images[item]['version'] }}
+         has {{ result.smartos_images[item]['clones'] }} VM(s)"
   with_items: "{{ result.smartos_images.keys() | list }}"
 
 # When the module is called as smartos_image_facts, return values are published
 # in ansible_facts['smartos_images'] and can be used as follows.
-# Note that this is deprecated and will stop working in Ansible 2.13.
-- debug: msg="{{ smartos_images[item]['name'] }}-{{ smartos_images[item]['version'] }}
-            has {{ smartos_images[item]['clones'] }} VM(s)"
+# Note that this is deprecated and will stop working in community.general 3.0.0.
+- name: Print information
+  debug:
+    msg: "{{ smartos_images[item]['name'] }}-{{ smartos_images[item]['version'] }}
+         has {{ smartos_images[item]['clones'] }} VM(s)"
   with_items: "{{ smartos_images.keys() | list }}"
 '''
 
@@ -104,10 +104,11 @@ def main():
         ),
         supports_check_mode=False,
     )
-    is_old_facts = module._name == 'smartos_image_facts'
+    is_old_facts = module._name in ('smartos_image_facts', 'community.general.smartos_image_facts')
     if is_old_facts:
         module.deprecate("The 'smartos_image_facts' module has been renamed to 'smartos_image_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
+                         "and the renamed one no longer returns ansible_facts",
+                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     image_facts = ImageFacts(module)
 

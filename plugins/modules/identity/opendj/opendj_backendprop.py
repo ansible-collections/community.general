@@ -7,11 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: opendj_backendprop
@@ -70,7 +65,7 @@ options:
 '''
 
 EXAMPLES = '''
-  - name: "Add or update OpenDJ backend properties"
+  - name: Add or update OpenDJ backend properties
     action: opendj_backendprop
             hostname=localhost
             port=4444

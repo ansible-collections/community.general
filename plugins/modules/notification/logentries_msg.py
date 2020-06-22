@@ -8,10 +8,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'status': ['preview'],
-                    'supported_by': 'community',
-                    'metadata_version': '1.1'}
-
 DOCUMENTATION = '''
 ---
 module: logentries_msg
@@ -43,7 +39,8 @@ author: "Jimmy Tang (@jcftang) <jimmy_tang@rapid7.com>"
 RETURN = '''# '''
 
 EXAMPLES = '''
-- logentries_msg:
+- name: Send a message to logentries
+  logentries_msg:
     token=00000000-0000-0000-0000-000000000000
     msg="{{ ansible_hostname }}"
 '''

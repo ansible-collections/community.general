@@ -13,11 +13,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: portage
@@ -169,44 +164,44 @@ author:
 '''
 
 EXAMPLES = '''
-# Make sure package foo is installed
-- portage:
+- name: Make sure package foo is installed
+  portage:
     package: foo
     state: present
 
-# Make sure package foo is not installed
-- portage:
+- name: Make sure package foo is not installed
+  portage:
     package: foo
     state: absent
 
-# Update package foo to the "latest" version ( os specific alternative to latest )
-- portage:
+- name: Update package foo to the latest version (os specific alternative to latest)
+  portage:
     package: foo
     update: yes
 
-# Install package foo using PORTAGE_BINHOST setup
-- portage:
+- name: Install package foo using PORTAGE_BINHOST setup
+  portage:
     package: foo
     getbinpkg: yes
 
-# Re-install world from binary packages only and do not allow any compiling
-- portage:
+- name: Re-install world from binary packages only and do not allow any compiling
+  portage:
     package: '@world'
     usepkgonly: yes
 
-# Sync repositories and update world
-- portage:
+- name: Sync repositories and update world
+  portage:
     package: '@world'
     update: yes
     deep: yes
     sync: yes
 
-# Remove unneeded packages
-- portage:
+- name: Remove unneeded packages
+  portage:
     depclean: yes
 
-# Remove package foo if it is not explicitly needed
-- portage:
+- name: Remove package foo if it is not explicitly needed
+  portage:
     package: foo
     state: absent
     depclean: yes
