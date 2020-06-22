@@ -129,9 +129,11 @@ class LookupModule(LookupBase):
         url = self.get_option('url')
         if url is not None:
             u = urlparse(url)
-            scheme = u.scheme
+            if u.scheme:
+                scheme = u.scheme
             host = u.hostname
-            port = u.port
+            if u.port is not None:
+                port = u.port
 
         validate_certs = self.get_option('validate_certs')
         client_cert = self.get_option('client_cert')
