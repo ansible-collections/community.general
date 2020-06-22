@@ -146,22 +146,22 @@
     assert:
       that: "'SSL' in {{reqs}}"
     vars:
-      - reqs: (result.results | selectattr('item', 'contains', user_name_1) | first).stdout.split('REQUIRE')[1].split('\n')[0].strip()
+      - reqs: "{{(result.results | selectattr('item', 'contains', user_name_1) | first).stdout.split('REQUIRE')[1].split('\n')[0].strip()}}"
 
   - name: assert user2 TLS requirements
     assert:
       that: "'X509' in {{reqs}}"
     vars:
-      - reqs: (result.results | selectattr('item', 'contains', user_name_2) | first).stdout.split('REQUIRE')[1].split('\n')[0].strip()
+      - reqs: "{{(result.results | selectattr('item', 'contains', user_name_2) | first).stdout.split('REQUIRE')[1].split('\n')[0].strip()}}"
 
   - name: assert user3 TLS requirements
     assert:
       that:
-        - "'/CN=alice/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in {{reqs | select('contains', 'SUBJECT')}}"
-        - "'/CN=org/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in {{reqs | select('contains', 'ISSUER')}}"
-        - "'ECDHE-ECDSA-AES256-SHA384' in {{reqs | select('contains', 'CIPHER')}}"
+        - "'/CN=alice/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in {{reqs | select('contains', 'SUBJECT') | first}}"
+        - "'/CN=org/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in {{reqs | select('contains', 'ISSUER') | first}}"
+        - "'ECDHE-ECDSA-AES256-SHA384' in {{reqs | select('contains', 'CIPHER') | first}}"
     vars:
-      - reqs: (result.results | selectattr('item', 'contains', user_name_3) | first).stdout.split('REQUIRE')[1].split('\n')[0].replace("' ", "':").split(":")
+      - reqs: "{{(result.results | selectattr('item', 'contains', user_name_3) | first).stdout.split('REQUIRE')[1].split('\n')[0].replace(\"' \", \"':\").split(\":\")}}"
   when: db_version.version.major <= 5 and db_version.version.minor <= 6 or db_version.version.major == 10 and db_version.version.minor < 2
 
 - block:
@@ -175,23 +175,23 @@
       that:
         - "'SSL' in {{reqs}}"
     vars:
-      - reqs: (result.results | selectattr('item', 'contains', user_name_1) | first).stdout.split('REQUIRE')[1].split('PASSWORD')[0].strip()
+      - reqs: "{{(result.results | selectattr('item', 'contains', user_name_1) | first).stdout.split('REQUIRE')[1].split('PASSWORD')[0].strip()}}"
 
   - name: assert user2 TLS requirements
     assert:
       that:
         - "'X509' in {{reqs}}"
     vars:
-      - reqs: (result.results | selectattr('item', 'contains', user_name_2) | first).stdout.split('REQUIRE')[1].split('PASSWORD')[0].strip()
+      - reqs: "{{(result.results | selectattr('item', 'contains', user_name_2) | first).stdout.split('REQUIRE')[1].split('PASSWORD')[0].strip()}}"
 
   - name: assert user3 TLS requirements
     assert:
       that:
-        - "'/CN=alice/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in {{reqs | select('contains', 'SUBJECT')}}"
-        - "'/CN=org/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in {{reqs | select('contains', 'ISSUER')}}"
-        - "'ECDHE-ECDSA-AES256-SHA384' in {{reqs | select('contains', 'CIPHER')}}"
+        - "'/CN=alice/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in {{reqs | select('contains', 'SUBJECT') | first}}"
+        - "'/CN=org/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in {{reqs | select('contains', 'ISSUER')| first}}"
+        - "'ECDHE-ECDSA-AES256-SHA384' in {{reqs | select('contains', 'CIPHER') | first}}"
     vars:
-      - reqs: (result.results | selectattr('item', 'contains', user_name_3) | first).stdout.split('REQUIRE')[1].split('PASSWORD')[0].replace("' ", "':").split(":")
+      - reqs: "{{(result.results | selectattr('item', 'contains', user_name_3) | first).stdout.split('REQUIRE')[1].split('PASSWORD')[0].replace(\"' \", \"':\").split(\":\")}}"
   when: db_version.version.major >= 5 and db_version.version.major < 10 and db_version.version.minor > 6 or db_version.version.major == 10 and db_version.version.minor >= 2
 
 - name: modify user with TLS requirements state=present (expect changed=true)
@@ -211,7 +211,7 @@
     assert:
       that: "'X509' in {{reqs}}"
     vars:
-      - reqs: result.stdout.split('REQUIRE')[1].split('\n')[0].strip()
+      - reqs: "{{result.stdout.split('REQUIRE')[1].split('\n')[0].strip()}}"
   when: db_version.version.major <= 5 and db_version.version.minor <= 6 or db_version.version.major == 10 and db_version.version.minor < 2
 
 - block:
@@ -223,7 +223,7 @@
     assert:
       that: "'X509' in {{reqs}}"
     vars:
-      - reqs: result.stdout.split('REQUIRE')[1].split('PASSWORD')[0].strip()
+      - reqs: "{{result.stdout.split('REQUIRE')[1].split('PASSWORD')[0].strip()}}"
   when: db_version.version.major >= 5 and db_version.version.major < 10 and db_version.version.minor > 6 or db_version.version.major == 10 and db_version.version.minor >= 2
 
 
