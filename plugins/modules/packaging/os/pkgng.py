@@ -153,8 +153,9 @@ def pkgng_older_than(module, pkgng_path, compare_version):
 
 
 def remove_packages(module, pkgng_path, packages, dir_arg):
-
     remove_c = 0
+    stdout = ""
+    stderr = ""
     # Using a for loop in case of error, we can report the package that failed
     for package in packages:
         # Query the package first, to see if we even need to remove
@@ -163,22 +164,24 @@ def remove_packages(module, pkgng_path, packages, dir_arg):
 
         if not module.check_mode:
             rc, out, err = module.run_command("%s %s delete -y %s" % (pkgng_path, dir_arg, package))
+            stdout += out
+            stderr += err
 
         if not module.check_mode and query_package(module, pkgng_path, package, dir_arg):
-            module.fail_json(msg="failed to remove %s: %s" % (package, out))
+            module.fail_json(msg="failed to remove %s: %s" % (package, out), stdout=stdout, stderr=stderr)
 
         remove_c += 1
 
     if remove_c > 0:
+        return (True, "removed %s package(s)" % remove_c, stdout, stderr)
 
-        return (True, "removed %s package(s)" % remove_c)
-
-    return (False, "package(s) already absent")
+    return (False, "package(s) already absent", stdout, stderr)
 
 
 def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, state):
-
     install_c = 0
+    stdout = ""
+    stderr = ""
 
     # as of pkg-1.1.4, PACKAGESITE is deprecated in favor of repository definitions
     # in /usr/local/etc/pkg/repos
@@ -198,8 +201,10 @@ def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, sta
             rc, out, err = module.run_command("%s %s update" % (pkgsite, pkgng_path))
         else:
             rc, out, err = module.run_command("%s %s update" % (pkgng_path, dir_arg))
+        stdout += out
+        stderr += err
         if rc != 0:
-            module.fail_json(msg="Could not update catalogue [%d]: %s %s" % (rc, out, err))
+            module.fail_json(msg="Could not update catalogue [%d]: %s %s" % (rc, out, err), stdout=stdout, stderr=stderr)
 
     for package in packages:
         already_installed = query_package(module, pkgng_path, package, dir_arg)
@@ -219,16 +224,18 @@ def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, sta
                 rc, out, err = module.run_command("%s %s %s %s -g -U -y %s" % (batch_var, pkgsite, pkgng_path, action, package))
             else:
                 rc, out, err = module.run_command("%s %s %s %s %s -g -U -y %s" % (batch_var, pkgng_path, dir_arg, action, pkgsite, package))
+            stdout += out
+            stderr += err
 
         if not module.check_mode and not query_package(module, pkgng_path, package, dir_arg):
-            module.fail_json(msg="failed to %s %s: %s" % (action, package, out), stderr=err)
+            module.fail_json(msg="failed to %s %s: %s" % (action, package, out), stdout=stdout, stderr=stderr)
 
         install_c += 1
 
     if install_c > 0:
-        return (True, "added %s package(s)" % (install_c))
+        return (True, "added %s package(s)" % (install_c), stdout, stderr)
 
-    return (False, "package(s) already %s" % (state))
+    return (False, "package(s) already %s" % (state), stdout, stderr)
 
 
 def annotation_query(module, pkgng_path, package, tag, dir_arg):
@@ -314,6 +321,8 @@ def annotate_packages(module, pkgng_path, packages, annotation, dir_arg):
 
 
 def autoremove_packages(module, pkgng_path, dir_arg):
+    stdout = ""
+    stderr = ""
     rc, out, err = module.run_command("%s %s autoremove -n" % (pkgng_path, dir_arg))
 
     autoremove_c = 0
@@ -327,8 +336,10 @@ def autoremove_packages(module, pkgng_path, dir_arg):
 
     if not module.check_mode:
         rc, out, err = module.run_command("%s %s autoremove -y" % (pkgng_path, dir_arg))
+        stdout += out
+        stderr += err
 
-    return True, "autoremoved %d package(s)" % (autoremove_c)
+    return (True, "autoremoved %d package(s)" % (autoremove_c), stdout, stderr)
 
 
 def main():
@@ -354,6 +365,8 @@ def main():
 
     changed = False
     msgs = []
+    stdout = ""
+    stderr = ""
     dir_arg = ""
 
     if p["rootdir"] != "":
@@ -370,18 +383,24 @@ def main():
         dir_arg = '--jail %s' % (p["jail"])
 
     if p["state"] in ("present", "latest"):
-        _changed, _msg = install_packages(module, pkgng_path, pkgs, p["cached"], p["pkgsite"], dir_arg, p["state"])
+        _changed, _msg, _stdout, _stderr = install_packages(module, pkgng_path, pkgs, p["cached"], p["pkgsite"], dir_arg, p["state"])
         changed = changed or _changed
+        stdout += _stdout
+        stderr += _stderr
         msgs.append(_msg)
 
     elif p["state"] == "absent":
-        _changed, _msg = remove_packages(module, pkgng_path, pkgs, dir_arg)
+        _changed, _msg, _stdout, _stderr = remove_packages(module, pkgng_path, pkgs, dir_arg)
         changed = changed or _changed
+        stdout += _stdout
+        stderr += _stderr
         msgs.append(_msg)
 
     if p["autoremove"]:
-        _changed, _msg = autoremove_packages(module, pkgng_path, dir_arg)
+        _changed, _msg, _stdout, _stderr = autoremove_packages(module, pkgng_path, dir_arg)
         changed = changed or _changed
+        stdout += _stdout
+        stderr += _stderr
         msgs.append(_msg)
 
     if p["annotation"]:
@@ -389,7 +408,7 @@ def main():
         changed = changed or _changed
         msgs.append(_msg)
 
-    module.exit_json(changed=changed, msg=", ".join(msgs))
+    module.exit_json(changed=changed, msg=", ".join(msgs), stdout=stdout, stderr=stderr)
 
 
 if __name__ == '__main__':
