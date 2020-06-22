@@ -199,7 +199,7 @@
     name: '{{ user_name_1 }}'
     password: '{{ user_password_1 }}'
     tls_requires:
-      - X509:
+      X509:
     login_unix_socket: '{{ mysql_socket }}'
 
 - block:
