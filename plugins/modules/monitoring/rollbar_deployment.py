@@ -95,7 +95,7 @@ def main():
                 required=False,
                 default='https://api.rollbar.com/api/1/deploy/'
             ),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         ),
         supports_check_mode=True
     )

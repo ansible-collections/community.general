@@ -152,7 +152,7 @@ def main():
     module = AnsibleModule(argument_spec={
         'url': dict(type='str', required=True, no_log=True),
         'text': dict(type='str'),
-        'markdown': dict(default='yes', type='bool'),
+        'markdown': dict(default=True, type='bool'),
         'channel': dict(type='str'),
         'attachments': dict(type='list'),
     })

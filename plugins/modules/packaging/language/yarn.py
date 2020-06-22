@@ -295,13 +295,13 @@ def main():
         name=dict(default=None),
         path=dict(default=None, type='path'),
         version=dict(default=None),
-        production=dict(default='no', type='bool'),
+        production=dict(default=False, type='bool'),
         executable=dict(default=None, type='path'),
         registry=dict(default=None),
         state=dict(default='present', choices=['present', 'absent', 'latest']),
         ignore_scripts=dict(default=False, type='bool'),
     )
-    arg_spec['global'] = dict(default='no', type='bool')
+    arg_spec['global'] = dict(default=False, type='bool')
     module = AnsibleModule(
         argument_spec=arg_spec,
         supports_check_mode=True

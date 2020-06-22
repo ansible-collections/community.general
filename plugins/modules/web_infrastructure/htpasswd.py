@@ -200,7 +200,7 @@ def main():
         password=dict(required=False, default=None, no_log=True),
         crypt_scheme=dict(required=False, default="apr_md5_crypt"),
         state=dict(required=False, default="present"),
-        create=dict(type='bool', default='yes'),
+        create=dict(type='bool', default=True),
 
     )
     module = AnsibleModule(argument_spec=arg_spec,

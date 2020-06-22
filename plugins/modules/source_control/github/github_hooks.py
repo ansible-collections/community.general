@@ -159,7 +159,7 @@ def main():
             oauthkey=dict(required=True, no_log=True),
             repo=dict(required=True),
             user=dict(required=True),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
             content_type=dict(default='json', choices=['json', 'form']),
         )
     )

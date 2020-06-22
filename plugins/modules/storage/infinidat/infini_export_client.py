@@ -175,7 +175,7 @@ def main():
         dict(
             client=dict(required=True),
             access_mode=dict(choices=['RO', 'RW'], default='RW'),
-            no_root_squash=dict(type='bool', default='no'),
+            no_root_squash=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent']),
             export=dict(required=True)
         )
