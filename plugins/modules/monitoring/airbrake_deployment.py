@@ -104,7 +104,7 @@ def main():
             repo=dict(required=False),
             revision=dict(required=False),
             url=dict(required=False, default='https://api.airbrake.io/api/v4/projects/'),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         ),
         supports_check_mode=True,
         required_together=[('project_id', 'project_key')],

@@ -175,8 +175,8 @@ class Bower(object):
 def main():
     arg_spec = dict(
         name=dict(default=None),
-        offline=dict(default='no', type='bool'),
-        production=dict(default='no', type='bool'),
+        offline=dict(default=False, type='bool'),
+        production=dict(default=False, type='bool'),
         path=dict(required=True, type='path'),
         relative_execpath=dict(default=None, required=False, type='path'),
         state=dict(default='present', choices=['present', 'absent', 'latest', ]),

@@ -137,7 +137,7 @@ def main():
                                     deprecated_aliases=[dict(name='message', version='3.0.0',
                                                              collection_name='community.general')]),  # was Ansible 2.14
             source_system=dict(required=False, default='ansible'),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
             url=dict(required=False, default='https://api.bigpanda.io'),
         ),
         supports_check_mode=True,
