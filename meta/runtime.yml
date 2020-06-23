@@ -459,3 +459,11 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
+    logicmonitor_facts:
+      tombstone:
+        removal_version: 1.0.0
+        warning_text: The logicmonitor_facts module is no longer maintained and the API used has been disabled in 2017.
+    logicmonitor:
+      tombstone:
+        removal_version: 1.0.0
+        warning_text: The logicmonitor_facts module is no longer maintained and the API used has been disabled in 2017.

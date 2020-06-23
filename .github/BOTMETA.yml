@@ -665,10 +665,6 @@ files:
     authors: ivanvanderbyl
     labels: logentries
     ignore: ivanvanderbyl
-  $modules/monitoring/:
-    authors: ethanculler woz5999
-    labels: logicmonitor
-    ignore: ethanculler woz5999
   $modules/monitoring/logstash_plugin.py:
     authors: nerzhul
   $modules/monitoring/monit.py:
