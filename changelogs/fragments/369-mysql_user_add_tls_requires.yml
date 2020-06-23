@@ -1,4 +1,4 @@
 minor_changes:
   - mysql_user - add TLS REQUIRES parameters (https://github.com/ansible-collections/community.general/pull/369).
 deprecated_features:
-  - mysql_user - REQUIRESSL is deprecated in favor of `tls_requires`.
+  - mysql_user - using ``REQUIRESSL`` in ``priv`` is deprecated in favor of ``tls_requires`` (https://github.com/ansible-collections/community.general/pull/369).
