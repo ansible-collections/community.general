@@ -139,7 +139,7 @@
 - block:
   - name: retrieve TLS requiremets for users in old database version
     command: mysql -L -N -s -e "SHOW GRANTS for '{{ item }}'@'localhost'"
-    register: result
+    register: old_result
     with_items: ['{{ user_name_1 }}', '{{ user_name_2 }}', '{{ user_name_3 }}']
 
   - name: set old database separator
@@ -150,7 +150,7 @@
 - block:
   - name: retrieve TLS requiremets for users in new database version
     command: mysql -L -N -s -e "SHOW CREATE USER '{{ item }}'@'localhost'"
-    register: result
+    register: new_result
     with_items: ['{{ user_name_1 }}', '{{ user_name_2 }}', '{{ user_name_3 }}']
 
   - name: set new database separator
@@ -164,14 +164,14 @@
       that:
         - "'SSL' in reqs"
     vars:
-      - reqs: "{{(result.results | selectattr('item', 'contains', user_name_1) | first).stdout.split('REQUIRE')[1].split(separator)[0].strip()}}"
+      - reqs: "{{((old_result.results[0] is skipped | ternary(new_result, old_result)).results | selectattr('item', 'contains', user_name_1) | first).stdout.split('REQUIRE')[1].split(separator)[0].strip()}}"
 
   - name: assert user2 TLS requirements
     assert:
       that:
         - "'X509' in reqs"
     vars:
-      - reqs: "{{(result.results | selectattr('item', 'contains', user_name_2) | first).stdout.split('REQUIRE')[1].split(separator)[0].strip()}}"
+      - reqs: "{{((old_result.results[0] is skipped | ternary(new_result, old_result)).results | selectattr('item', 'contains', user_name_2) | first).stdout.split('REQUIRE')[1].split(separator)[0].strip()}}"
 
   - name: assert user3 TLS requirements
     assert:
@@ -180,7 +180,7 @@
         - "'/CN=org/O=MyDom, Inc./C=US/ST=Oregon/L=Portland' in (reqs | select('contains', 'ISSUER') | first)"
         - "'ECDHE-ECDSA-AES256-SHA384' in (reqs | select('contains', 'CIPHER') | first)"
     vars:
-      - reqs: "{{(result.results | selectattr('item', 'contains', user_name_3) | first).stdout.split('REQUIRE')[1].split(separator)[0].replace(\"' \", \"':\").split(\":\")}}"
+      - reqs: "{{((old_result.results[0] is skipped | ternary(new_result, old_result)).results | selectattr('item', 'contains', user_name_3) | first).stdout.split('REQUIRE')[1].split(separator)[0].replace(\"' \", \"':\").split(\":\")}}"
   # CentOS 6 uses an older version of jinja that does not provide the selectattr filter.
   when: ansible_distribution != 'CentOS' or ansible_distribution_major_version != '6'
 
@@ -194,19 +194,19 @@
 
 - name: retrieve TLS requiremets for users in old database version
   command: mysql -L -N -s -e "SHOW GRANTS for '{{ user_name_1 }}'@'localhost'"
-  register: result
+  register: old_result
   when: db_version.version.major <= 5 and db_version.version.minor <= 6 or db_version.version.major == 10 and db_version.version.minor < 2
 
 - name: retrieve TLS requiremets for users in new database version
   command: mysql -L -N -s -e "SHOW CREATE USER '{{ user_name_1 }}'@'localhost'"
-  register: result
+  register: new_result
   when: db_version.version.major >= 5 and db_version.version.major < 10 and db_version.version.minor > 6 or db_version.version.major == 10 and db_version.version.minor >= 2
 
 - name: assert user1 TLS requirements
   assert:
     that: "'X509' in reqs"
   vars:
-    - reqs: "{{result.stdout.split('REQUIRE')[1].split(separator)[0].strip()}}"
+    - reqs: "{{(old_result is skipped | ternary(new_result, old_result)).stdout.split('REQUIRE')[1].split(separator)[0].strip()}}"
 
 
 - include: remove_user.yml user_name={{user_name_1}} user_password={{ user_password_1 }}
