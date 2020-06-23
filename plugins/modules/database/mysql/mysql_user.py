@@ -622,7 +622,7 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
                     msg = "New privileges granted"
                     if module.check_mode:
                         return (True, msg)
-                    privileges_grant(cursor, user, host, db_table, priv)
+                    privileges_grant(cursor, user, host, db_table, priv, tls_requires)
                     changed = True
 
             # If the db.table specification exists in both the user's current privileges
@@ -636,7 +636,7 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
                         return (True, msg)
                     if not append_privs:
                         privileges_revoke(cursor, user, host, db_table, curr_priv[db_table], grant_option)
-                    privileges_grant(cursor, user, host, db_table, new_priv[db_table])
+                    privileges_grant(cursor, user, host, db_table, new_priv[db_table], tls_requires)
                     changed = True
 
     return (changed, msg)
