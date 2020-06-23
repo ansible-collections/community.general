@@ -95,7 +95,8 @@ options:
     version_added: '0.2.0'
   check_destroy:
     description:
-      - Check and apply only when there are no deletes to resources.
+      - Check and apply only when there are no resource destruction. Note that it only prevents "destroy" actions,
+      but allows "destroy and then create replacement" actions. This option will be ignored if state=absent.
     type: bool
     default: false
     version_added: '0.2.0'
