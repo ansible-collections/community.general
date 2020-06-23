@@ -520,6 +520,7 @@ def parted(script, device, align='', unit=''):
 
     return script
 
+
 def run_parted(command):
     """
     Runs formatted parted script
@@ -530,6 +531,7 @@ def run_parted(command):
             msg="Error while running parted script: %s" % command.strip(),
             rc=rc, out=out, err=err
         )
+
 
 def read_record(file_path, default=None):
     """
