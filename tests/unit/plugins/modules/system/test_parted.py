@@ -198,6 +198,17 @@ class TestParted(ModuleTestCase):
         with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
             self.execute_module(changed=True, script='unit KiB mkpart primary 0% 1GiB')
 
+    def test_create_new_partition_minus_1G(self):
+        set_module_args({
+            'device': '/dev/sdb',
+            'number': 4,
+            'state': 'present',
+            'fs_type': 'ext2',
+            'part_start': '-1GiB',
+        })
+        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+            self.execute_module(changed=True, script='unit KiB mkpart primary ext2 -1GiB 100%')
+
     def test_remove_partition_number_1(self):
         set_module_args({
             'device': '/dev/sdb',
