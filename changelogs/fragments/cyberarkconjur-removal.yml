@@ -1,2 +1,2 @@
 removed_features:
-  - "cyberark conjur lookup plugin has been removed in 3.0.0 since it is maintained by cyberark and is part of cyberark.conjur collection"
+  - "conjur_variable lookup - has been moved to the ``cyberark.conjur`` collection. A redirection is active, which will be removed in version 3.0.0 (https://github.com/ansible-collections/community.general/pull/570)."
