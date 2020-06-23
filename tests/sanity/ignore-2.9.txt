@@ -723,13 +723,6 @@ plugins/modules/monitoring/logentries.py validate-modules:doc-choices-do-not-mat
 plugins/modules/monitoring/logentries.py validate-modules:doc-missing-type
 plugins/modules/monitoring/logentries.py validate-modules:parameter-type-not-in-doc
 plugins/modules/monitoring/logentries.py validate-modules:undocumented-parameter
-plugins/modules/monitoring/logicmonitor.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/monitoring/logicmonitor.py validate-modules:doc-missing-type
-plugins/modules/monitoring/logicmonitor.py validate-modules:no-default-for-required-parameter
-plugins/modules/monitoring/logicmonitor.py validate-modules:parameter-type-not-in-doc
-plugins/modules/monitoring/logicmonitor_facts.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/monitoring/logicmonitor_facts.py validate-modules:doc-missing-type
-plugins/modules/monitoring/logicmonitor_facts.py validate-modules:no-default-for-required-parameter
 plugins/modules/monitoring/logstash_plugin.py validate-modules:doc-missing-type
 plugins/modules/monitoring/logstash_plugin.py validate-modules:parameter-type-not-in-doc
 plugins/modules/monitoring/monit.py validate-modules:doc-missing-type
