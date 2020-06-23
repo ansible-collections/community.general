@@ -23,11 +23,13 @@ options:
     description:
       - Name of the repository to add or remove.
     required: true
+    type: str
   state:
     description:
       - Indicates the desired repository state.
     choices: [ absent, present ]
     default: present
+    type: str
   remove_others:
     description:
       - Remove other then added repositories

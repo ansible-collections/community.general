@@ -35,11 +35,14 @@ options:
         description:
             - Name of package to install/remove;
             - multiple names may be given, separated by commas
+        type: list
+        elements: str
     state:
         description:
             - Intended state of the package
         choices: [ 'present', 'absent' ]
         default: present
+        type: str
     update_cache:
         description:
           - Update repository database. Can be run with other steps or on it's own.
@@ -321,7 +324,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(default="present", choices=["present", "absent"]),
-            name=dict(aliases=["pkg"], type='list'),
+            name=dict(aliases=["pkg"], type='list', elements='str'),
             update_cache=dict(default=False, type='bool'),
             upgrade=dict(default=False, type='bool'),
             full_upgrade=dict(default=False, type='bool'),

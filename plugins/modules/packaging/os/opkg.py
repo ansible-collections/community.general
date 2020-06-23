@@ -22,11 +22,13 @@ options:
         description:
             - name of package to install/remove
         required: true
+        type: str
     state:
         description:
             - state of the package
         choices: [ 'present', 'absent' ]
         default: present
+        type: str
     force:
         description:
             - opkg --force parameter used
@@ -43,6 +45,7 @@ options:
             - "checksum"
             - "removal-of-dependent-packages"
         default: absent
+        type: str
     update_cache:
         description:
             - update the package db first

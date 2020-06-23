@@ -25,6 +25,7 @@ options:
   feed:
     description:
       - Upstream feed URL to receive updates from.
+    type: str
   force_basic_auth:
     description:
       - httplib2, the library used by the M(uri) module only sends
@@ -73,43 +74,51 @@ options:
     description:
       - Name of the repo to add or remove. This correlates to repo-id in Pulp.
     required: true
+    type: str
   proxy_host:
     description:
       - Proxy url setting for the pulp repository importer. This is in the
         format scheme://host.
     required: false
     default: null
+    type: str
   proxy_port:
     description:
       - Proxy port setting for the pulp repository importer.
     required: false
     default: null
+    type: str
   proxy_username:
     description:
       - Proxy username for the pulp repository importer.
     required: false
     default: null
+    type: str
   proxy_password:
     description:
       - Proxy password for the pulp repository importer.
     required: false
     default: null
+    type: str
   publish_distributor:
     description:
       - Distributor to use when state is C(publish). The default is to
         publish all distributors.
+    type: str
   pulp_host:
     description:
       - URL of the pulp server to connect to.
-    default: http://127.0.0.1
+    default: https://127.0.0.1
+    type: str
   relative_url:
     description:
-      - Relative URL for the local repository.
-    required: true
+      - Relative URL for the local repository. It's required when state=present.
+    type: str
   repo_type:
     description:
       - Repo plugin type to use (i.e. C(rpm), C(docker)).
     default: rpm
+    type: str
   repoview:
     description:
       - Whether to generate repoview files for a published repository. Setting
@@ -134,6 +143,7 @@ options:
         C(publish) will use the repository's distributor to publish the content.
     default: present
     choices: [ "present", "absent", "sync", "publish" ]
+    type: str
   url_password:
     description:
       - The password for use in HTTP basic authentication to the pulp API.

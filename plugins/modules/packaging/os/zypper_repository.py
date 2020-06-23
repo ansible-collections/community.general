@@ -21,17 +21,21 @@ options:
     name:
         description:
             - A name for the repository. Not required when adding repofiles.
+        type: str
     repo:
         description:
             - URI of the repository or .repo file. Required when state=present.
+        type: str
     state:
         description:
             - A source string state.
         choices: [ "absent", "present" ]
         default: "present"
+        type: str
     description:
         description:
             - A description of the repository
+        type: str
     disable_gpg_check:
         description:
             - Whether to disable GPG signature checking of
@@ -51,6 +55,7 @@ options:
             - Set priority of repository. Packages will always be installed
               from the repository with the smallest priority number.
             - Needs zypper version >= 1.12.25.
+        type: int
     overwrite_multiple:
         description:
             - Overwrite multiple repository entries, if repositories with both name and

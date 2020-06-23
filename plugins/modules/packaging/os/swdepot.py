@@ -24,14 +24,17 @@ options:
         description:
             - package name.
         required: true
+        type: str
     state:
         description:
             - whether to install (C(present), C(latest)), or remove (C(absent)) a package.
         required: true
         choices: [ 'present', 'latest', 'absent']
+        type: str
     depot:
         description:
             - The source repository from which install or upgrade a package.
+        type: str
 '''
 
 EXAMPLES = '''

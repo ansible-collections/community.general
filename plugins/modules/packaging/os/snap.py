@@ -24,12 +24,15 @@ options:
         description:
             - Name of the snap to install or remove. Can be a list of snaps.
         required: true
+        type: list
+        elements: str
     state:
         description:
             - Desired state of the package.
         required: false
         default: present
         choices: [ absent, present ]
+        type: str
     classic:
         description:
             - Confinement policy. The classic confinement allows a snap to have
@@ -233,7 +236,7 @@ def execute_action(module):
 
 def main():
     module_args = {
-        'name': dict(type='list', required=True),
+        'name': dict(type='list', elements='str', required=True),
         'state': dict(type='str', required=False, default='present', choices=['absent', 'present']),
         'classic': dict(type='bool', required=False, default=False),
         'channel': dict(type='str', required=False, default='stable'),

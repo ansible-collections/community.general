@@ -26,14 +26,16 @@ options:
       - If state is equal to present or disabled, indicates the desired
         repository state.
     choices: [present, enabled, absent, disabled]
-    required: True
-    default: "present"
+    default: "enabled"
+    type: str
   name:
     description:
       - The ID of repositories to enable.
       - To operate on several repositories this can accept a comma separated
         list or a YAML list.
     required: True
+    type: list
+    elements: str
   purge:
     description:
       - Disable all currently enabled repositories that are not not specified in C(name).
@@ -226,7 +228,7 @@ def repository_modify(module, state, name, purge=False):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='list', required=True),
+            name=dict(type='list', elements='str', required=True),
             state=dict(choices=['enabled', 'disabled', 'present', 'absent'], default='enabled'),
             purge=dict(type='bool', default=False),
         ),

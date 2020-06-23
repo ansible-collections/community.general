@@ -24,6 +24,8 @@ options:
         description:
         - A name or a list of names of the packages.
         required: yes
+        type: list
+        elements: str
     state:
         description:
           - C(present) will make sure the package is installed.
@@ -31,6 +33,7 @@ options:
             C(absent) will make sure the specified package is not installed.
         choices: [ absent, latest, present ]
         default: present
+        type: str
     build:
         description:
           - Build the package from source instead of downloading and installing
@@ -44,6 +47,7 @@ options:
           - When used in combination with the C(build) option, allows overriding
             the default ports source directory.
         default: /usr/ports
+        type: path
     clean:
         description:
           - When updating or removing packages, delete the extra configuration
@@ -513,7 +517,7 @@ def upgrade_packages(pkg_spec, module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='list', required=True),
+            name=dict(type='list', elements='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'installed', 'latest', 'present', 'removed']),
             build=dict(type='bool', default=False),
             ports_dir=dict(type='path', default='/usr/ports'),

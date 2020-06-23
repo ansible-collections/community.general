@@ -22,11 +22,14 @@ options:
     name:
         description:
             - Name of the package to install, upgrade, or remove.
+        type: list
+        elements: str
     state:
         description:
             - Desired state of the package.
         default: "present"
         choices: ["present", "absent", "latest"]
+        type: str
     recurse:
         description:
             - When removing a package, also remove its dependencies, provided
@@ -272,7 +275,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(default=None, aliases=['pkg', 'package'], type='list'),
+            name=dict(default=None, aliases=['pkg', 'package'], type='list', elements='str'),
             state=dict(default='present', choices=['present', 'installed',
                                                    'latest', 'absent',
                                                    'removed']),

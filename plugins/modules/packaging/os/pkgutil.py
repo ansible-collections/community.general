@@ -27,11 +27,13 @@ options:
     description:
       - Package name, e.g. (C(CSWnrpe))
     required: true
+    type: str
   site:
     description:
       - Specifies the repository path to install the package from.
       - Its global definition is done in C(/etc/opt/csw/pkgutil.conf).
     required: false
+    type: str
   state:
     description:
       - Whether to install (C(present)), or remove (C(absent)) a package.
@@ -39,6 +41,7 @@ options:
       - "Note: The module has a limitation that (C(latest)) only works for one package, not lists of them."
     required: true
     choices: ["present", "absent", "latest"]
+    type: str
   update_catalog:
     description:
       - If you want to refresh your catalog from the mirror, set this to (C(yes)).

@@ -32,6 +32,7 @@ options:
       - State of the package atom
     default: "present"
     choices: [ "present", "installed", "emerged", "absent", "removed", "unmerged", "latest" ]
+    type: str
 
   update:
     description:
@@ -109,6 +110,7 @@ options:
       - If yes, perform "emerge --sync"
       - If web, perform "emerge-webrsync"
     choices: [ "web", "yes", "no" ]
+    type: str
 
   getbinpkg:
     description:
@@ -119,6 +121,12 @@ options:
   usepkgonly:
     description:
       - Merge only binaries (no compiling). This sets getbinpkg=yes.
+    type: bool
+    default: 'no'
+
+  usepkg:
+    description:
+      - Tries to use the binary package(s) in the locally available packages directory. If the binary packages are not found, a regular (source-based) installation will be performed.
     type: bool
     default: 'no'
 
@@ -133,6 +141,7 @@ options:
       - Specifies the number of packages to build simultaneously.
       - "Since version 2.6: Value of 0 or False resets any previously added"
       - --jobs setting values
+    type: int
 
   loadavg:
     description:
@@ -140,6 +149,7 @@ options:
       - other builds running and the load average is at least LOAD
       - "Since version 2.6: Value of 0 or False resets any previously added"
       - --load-average setting values
+    type: int
 
   quietbuild:
     description:

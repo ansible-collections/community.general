@@ -24,6 +24,8 @@ options:
         description:
             - Name or list of names of packages to install/remove.
         required: true
+        type: list
+        elements: str
     state:
         description:
             - State of the package.
@@ -31,6 +33,7 @@ options:
         choices: [ 'present', 'latest', 'absent' ]
         required: false
         default: present
+        type: str
     cached:
         description:
             - Use local package base instead of fetching an updated one.
@@ -45,6 +48,7 @@ options:
               annotation.
               If setting or modifying annotations, a value must be provided.
         required: false
+        type: str
     pkgsite:
         description:
             - For pkgng versions before 1.1.4, specify packagesite to use
@@ -53,21 +57,25 @@ options:
             - For newer pkgng versions, specify a the name of a repository
               configured in C(/usr/local/etc/pkg/repos).
         required: false
+        type: str
     rootdir:
         description:
             - For pkgng versions 1.5 and later, pkg will install all packages
               within the specified root directory.
             - Can not be used together with I(chroot) or I(jail) options.
         required: false
+        type: path
     chroot:
         description:
             - Pkg will chroot in the specified environment.
             - Can not be used together with I(rootdir) or I(jail) options.
         required: false
+        type: path
     jail:
         description:
             - Pkg will execute in the given jail name or id.
             - Can not be used together with I(chroot) or I(rootdir) options.
+        type: str
     autoremove:
         description:
             - Remove automatically installed packages which are no longer needed.
@@ -335,7 +343,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(default="present", choices=["present", "latest", "absent"], required=False),
-            name=dict(aliases=["pkg"], required=True, type='list'),
+            name=dict(aliases=["pkg"], required=True, type='list', elements='str'),
             cached=dict(default=False, type='bool'),
             annotation=dict(default="", required=False),
             pkgsite=dict(default="", required=False),
