@@ -1,0 +1,2 @@
+removed_features:
+  - "cyberark conjur lookup plugin has been removed in 3.0.0 since it is maintained by cyberark and is part of cyberark.conjur collection"

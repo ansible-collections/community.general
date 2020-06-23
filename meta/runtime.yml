@@ -58,6 +58,12 @@ action_groups:
   - ovirt_vmpool_facts
 
 plugin_routing:
+  lookup:
+    conjur_variable:
+      redirect: cyberark.conjur.conjur_variable
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
   modules:
     ali_instance_facts:
       deprecation:
