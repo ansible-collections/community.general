@@ -182,7 +182,7 @@
     vars:
       - reqs: "{{(result.results | selectattr('item', 'contains', user_name_3) | first).stdout.split('REQUIRE')[1].split(separator)[0].replace(\"' \", \"':\").split(\":\")}}"
   # CentOS 6 uses an older version of jinja that does not provide the selectattr filter.
-  when: ansible_distribution is not 'CentOS' or ansible_distribution_major_version is not '6'
+  when: ansible_distribution != 'CentOS' or ansible_distribution_major_version != '6'
 
 - name: modify user with TLS requirements state=present (expect changed=true)
   mysql_user:
