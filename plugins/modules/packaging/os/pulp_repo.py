@@ -75,6 +75,7 @@ options:
       - Name of the repo to add or remove. This correlates to repo-id in Pulp.
     required: true
     type: str
+    aliases: [ repo ]
   proxy_host:
     description:
       - Proxy url setting for the pulp repository importer. This is in the
