@@ -367,22 +367,21 @@ def user_exists(cursor, user, host, host_all):
 
 
 def sanitize_requires(tls_requires):
+    sanitized_requires = {}
     if tls_requires:
         for key in tls_requires.keys():
-            if not key.isupper():
-                tls_requires[key.upper()] = tls_requires[key]
-                tls_requires.pop(key)
-        if any([key in ['CIPHER', 'ISSUER', 'SUBJECT'] for key in tls_requires.keys()]):
-            tls_requires.pop('SSL', None)
-            tls_requires.pop('X509', None)
-            return tls_requires
+            sanitized_requires[key.upper()] = tls_requires[key]
+        if any([key in ['CIPHER', 'ISSUER', 'SUBJECT'] for key in sanitized_requires.keys()]):
+            sanitized_requires.pop('SSL', None)
+            sanitized_requires.pop('X509', None)
+            return sanitized_requires
 
-        if 'X509' in tls_requires.keys():
-            tls_requires = 'X509'
+        if 'X509' in sanitized_requires.keys():
+            sanitized_requires = 'X509'
         else:
-            tls_requires = 'SSL'
+            sanitized_requires = 'SSL'
 
-        return tls_requires
+        return sanitized_requires
     return None
 
 
