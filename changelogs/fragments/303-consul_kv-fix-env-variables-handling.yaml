@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - consul_kv lookup - fix ``ANSIBLE_CONSUL_URL`` environment variable handling (https://github.com/ansible/ansible/issues/51960).
+  - consul_kv lookup - fix arguments handling (https://github.com/ansible-collections/community.general/pull/303).
