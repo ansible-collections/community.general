@@ -499,26 +499,37 @@ def parted_version():
     return major, minor, rev
 
 
-def parted(script, device, align):
+def parted(script, device, align='', unit=''):
     """
-    Runs a parted script.
+    Formats and runs a parted script.
     """
     global module, parted_exec
 
-    align_option = '-a %s' % align
-    if align == 'undefined':
-        align_option = ''
+    # Set alignment if necessary
+    align_option = ''
+    if align and align != 'undefined':
+        align_option = '-a %s' % align
+
+    # Set the unit of the run
+    if unit and script:
+        script = "unit %s %s" % (unit, script)
 
     if script and not module.check_mode:
         command = "%s -s -m %s %s -- %s" % (parted_exec, align_option, device, script)
-        rc, out, err = module.run_command(command)
+        run_parted(command)
 
-        if rc != 0:
-            module.fail_json(
-                msg="Error while running parted script: %s" % command.strip(),
-                rc=rc, out=out, err=err
-            )
+    return script
 
+def run_parted(command):
+    """
+    Runs formatted parted script
+    """
+    rc, out, err = module.run_command(command)
+    if rc != 0:
+        module.fail_json(
+            msg="Error while running parted script: %s" % command.strip(),
+            rc=rc, out=out, err=err
+        )
 
 def read_record(file_path, default=None):
     """
@@ -646,15 +657,11 @@ def main():
                 part_end
             )
 
-        # Set the unit of the run
-        if unit and script:
-            script = "unit %s %s" % (unit, script)
-
         # Execute the script and update the data structure.
         # This will create the partition for the next steps
         if script:
+            script = parted(script, device, align, unit)
             output_script += script
-            parted(script, device, align)
             changed = True
             script = ""
 
@@ -691,23 +698,19 @@ def main():
                 for f in flags_off:
                     script += "set %s %s off " % (number, f)
 
-        # Set the unit of the run
-        if unit and script:
-            script = "unit %s %s" % (unit, script)
-
         # Execute the script
         if script:
-            output_script += script
+            script = parted(script, device, align, unit)
             changed = True
-            parted(script, device, align)
+            output_script += script
 
     elif state == 'absent':
         # Remove the partition
         if part_exists(current_parts, 'num', number) or module.check_mode:
             script = "rm %s " % number
-            output_script += script
             changed = True
-            parted(script, device, align)
+            script = parted(script, device)
+            output_script += script
 
     elif state == 'info':
         output_script = "unit '%s' print " % unit

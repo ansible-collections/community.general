@@ -120,8 +120,8 @@ class TestParted(ModuleTestCase):
         self.mock_check_parted_label = (patch('ansible_collections.community.general.plugins.modules.system.parted.check_parted_label', return_value=False))
         self.check_parted_label = self.mock_check_parted_label.start()
 
-        self.mock_parted = (patch('ansible_collections.community.general.plugins.modules.system.parted.parted'))
-        self.parted = self.mock_parted.start()
+        self.mock_run_parted = (patch('ansible_collections.community.general.plugins.modules.system.parted.run_parted'))
+        self.run_parted = self.mock_run_parted.start()
 
         self.mock_run_command = (patch('ansible.module_utils.basic.AnsibleModule.run_command'))
         self.run_command = self.mock_run_command.start()
@@ -133,7 +133,7 @@ class TestParted(ModuleTestCase):
         super(TestParted, self).tearDown()
         self.mock_run_command.stop()
         self.mock_get_bin_path.stop()
-        self.mock_parted.stop()
+        self.mock_run_parted.stop()
         self.mock_check_parted_label.stop()
 
     def execute_module(self, failed=False, changed=False, script=None):
@@ -232,17 +232,12 @@ class TestParted(ModuleTestCase):
         })
 
         with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
-            self.parted.reset_mock()
-            self.execute_module(changed=True)
+            result = self.execute_module(changed=True)
             # When using multiple flags:
             # order of execution is non deterministic, because set() operations are used in
             # the current implementation.
-            expected_calls_order1 = [call('unit KiB set 3 lvm on set 3 boot on ',
-                                          '/dev/sdb', 'optimal')]
-            expected_calls_order2 = [call('unit KiB set 3 boot on set 3 lvm on ',
-                                          '/dev/sdb', 'optimal')]
-            self.assertTrue(self.parted.mock_calls == expected_calls_order1 or
-                            self.parted.mock_calls == expected_calls_order2)
+            expected_scripts = ['unit KiB set 3 lvm on set 3 boot on', 'unit KiB set 3 boot on set 3 lvm on']
+            self.assertTrue(result['script'] in expected_scripts)
 
     def test_create_new_primary_lvm_partition(self):
         # use check_mode, see previous test comment
