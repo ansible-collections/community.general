@@ -96,6 +96,20 @@ class Device(object):
         else:
             self.module.fail_json(changed=False, msg="Target device not supported: %s" % self)
 
+    def get_mountpoint(self):
+        """Return (first) mountpoint of device. Returns None when not mounted."""
+        cmd_findmnt = self.module.get_bin_path("findmnt", required=True)
+
+        # find mountpoint
+        rc, mountpoint, _ = self.module.run_command([cmd_findmnt, "--mtab", "--noheadings", "--output",
+                                                    "TARGET", "--source", self.path], check_rc=False)
+        if rc != 0:
+            mountpoint = None
+        else:
+            mountpoint = mountpoint.split('\n')[0]
+
+        return mountpoint
+
     def __str__(self):
         return self.path
 
@@ -187,7 +201,13 @@ class XFS(Filesystem):
 
     def get_fs_size(self, dev):
         cmd = self.module.get_bin_path('xfs_growfs', required=True)
-        _, size, _ = self.module.run_command([cmd, '-n', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
+        mountpoint = dev.get_mountpoint()
+
+        if not mountpoint:
+            # xfs filesystem needs to be mounted
+            self.module.fail_json(msg="%s needs to be mounted for xfs operations" % dev)
+
+        _, size, _ = self.module.run_command([cmd, '-n', str(mountpoint)], check_rc=True, environ_update=self.LANG_ENV)
         for line in size.splitlines():
             col = line.split('=')
             if col[0].strip() == 'data':
@@ -198,6 +218,16 @@ class XFS(Filesystem):
                 block_size = int(col[2].split()[0])
                 block_count = int(col[3].split(',')[0])
                 return block_size * block_count
+
+    def grow_cmd(self, dev):
+        mountpoint = dev.get_mountpoint()
+        if not mountpoint:
+            # xfs filesystem needs to be mounted
+            self.module.fail_json(msg="%s needs to be mounted for xfs operations" % dev)
+
+        cmd = self.module.get_bin_path(self.GROW, required=True)
+
+        return [cmd, str(mountpoint)]
 
 
 class Reiserfs(Filesystem):
