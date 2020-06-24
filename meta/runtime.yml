@@ -62,7 +62,7 @@ plugin_routing:
     conjur_variable:
       redirect: cyberark.conjur.conjur_variable
       deprecation:
-        removal_version: 3.0.0
+        removal_version: 2.0.0
         warning_text: The conjur_variable lookup has been moved to the cyberark.conjur collection.
   modules:
     ali_instance_facts:
