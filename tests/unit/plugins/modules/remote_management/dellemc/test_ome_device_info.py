@@ -10,7 +10,8 @@
 # Other trademarks may be trademarks of their respective owners.
 #
 
-from __future__ import absolute_import
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 import pytest
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args, exit_json, \

@@ -3,24 +3,11 @@
 #
 # Copyright (C) 2016 Guido Günther <agx@sigxcpu.org>
 #
-# This script is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with it.  If not, see <http://www.gnu.org/licenses/>.
-#
-# This is loosely based on the foreman inventory script
-# -- Josh Preston <jpreston@redhat.com>
-#
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import print_function
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import argparse
 from ansible.module_utils.six.moves import configparser as ConfigParser
 import os

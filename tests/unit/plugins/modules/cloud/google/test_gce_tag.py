@@ -1,3 +1,8 @@
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import unittest
 
 from ansible_collections.community.general.plugins.modules.cloud.google.gce_tag import _get_changed_items, _intersect_items, _union_items

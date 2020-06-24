@@ -2,17 +2,14 @@
 
 # Simplified BSD License (see licenses/simplified_bsd.txt or https://opensource.org/licenses/BSD-2-Clause)
 
-# Make coding more python3-ish
 from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 import json
 
 from ansible.module_utils._text import to_text
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.urls import fetch_url, basic_auth_header
-
-# Makes all classes defined in the file into new-style classes without explicitly inheriting from object
-__metaclass__ = type
 
 
 class BitbucketHelper:

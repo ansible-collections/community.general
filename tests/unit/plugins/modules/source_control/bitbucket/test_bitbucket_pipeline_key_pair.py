@@ -1,3 +1,8 @@
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper
 from ansible_collections.community.general.plugins.modules.source_control.bitbucket import bitbucket_pipeline_key_pair
 from ansible_collections.community.general.tests.unit.compat import unittest

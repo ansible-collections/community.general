@@ -136,7 +136,9 @@ Here are some examples shown from just calling the command directly::
 
 '''
 
-from __future__ import print_function
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import sys
 import os
 import pkg_resources
