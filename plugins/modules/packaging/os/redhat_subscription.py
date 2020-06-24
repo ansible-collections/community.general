@@ -105,7 +105,6 @@ options:
               C(0123456789abcdef0123456789abcdef: 2). If the quantity is provided, it is used to consume multiple
               entitlements from a pool (the pool must support this). Mutually exclusive with I(pool).
         default: []
-        type: list
     consumer_type:
         description:
             - The type of unit to register, defaults to system
