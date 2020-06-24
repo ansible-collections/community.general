@@ -35,12 +35,13 @@ options:
       - Update the package database first C(urpmi.update -a).
     type: bool
     default: 'no'
+    aliases: ['update-cache']
   no-recommends:
     description:
       - Corresponds to the C(--no-recommends) option for I(urpmi).
     type: bool
     default: 'yes'
-    aliases: ['no-recommends']
+    aliases: ['no_recommends']
   force:
     description:
       - Assume "yes" is the answer to any question urpmi has to ask.

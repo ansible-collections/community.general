@@ -149,7 +149,7 @@ options:
       - other builds running and the load average is at least LOAD
       - "Since version 2.6: Value of 0 or False resets any previously added"
       - --load-average setting values
-    type: int
+    type: float
 
   quietbuild:
     description:

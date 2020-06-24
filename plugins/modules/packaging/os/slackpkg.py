@@ -28,6 +28,7 @@ options:
         required: true
         type: list
         elements: str
+        aliases: [pkg]
 
     state:
         description:
@@ -43,6 +44,7 @@ options:
         required: false
         default: false
         type: bool
+        aliases: [update-cache]
 
 author: Kim Nørgaard (@KimNorgaard)
 requirements: [ "Slackware >= 12.2" ]

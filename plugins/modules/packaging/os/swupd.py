@@ -33,7 +33,7 @@ options:
         Specify a Manifest version to verify against that version or leave unspecified to
         verify against the current version.
     aliases: [release, version]
-    type: str
+    type: int
   name:
     description:
       - Name of the (I)bundle to install or remove.

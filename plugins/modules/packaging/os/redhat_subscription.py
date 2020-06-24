@@ -803,7 +803,7 @@ def main():
                     'role': {},
                     'usage': {},
                     'service_level_agreement': {},
-                    'addons': {'type': 'list', elements='str'},
+                    'addons': {'type': 'list', elements: 'str'},
                     'sync': {'type': 'bool', 'default': False}
                 }
             }
