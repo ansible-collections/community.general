@@ -93,6 +93,24 @@ options:
     type: list
     elements: path
     version_added: '0.2.0'
+  plan_id:
+    description:
+      - A plan_id linked to a temporary plan file created if no plan_path
+        is specified.
+    required: false
+    version_added: '1.0.0'
+  log_activity_folder:
+    description:
+      - The path to a folder to create the logging file. If path does not exist,it is created.
+        If not specified, the current directory will be used to store the logging file.
+    required: false
+    version_added: '1.0.0'
+  file_name:
+    description:
+      - A string to name the logging file with. If not specified,
+        a default name 'audit' will be specified.
+    required: false
+    version_added: '1.0.0'
 notes:
    - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]
@@ -123,6 +141,16 @@ EXAMPLES = """
     backend_config_files:
       - /path/to/backend_config_file_1
       - /path/to/backend_config_file_2
+
+- name: Define the plan_id, log_activity folder and file name for audit
+  terraform:
+    project_path: 'project/'
+    state: "{{ state }}"
+    force_init: true
+    plan_id: 'tmpER44'
+    log_activity_folder: '/path/to/folder/'
+    file_name: 'process'
+
 """
 
 RETURN = """
@@ -158,6 +186,7 @@ command:
 import os
 import json
 import tempfile
+import time
 import traceback
 from ansible.module_utils.six.moves import shlex_quote
 
@@ -168,7 +197,7 @@ APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve=true')
 module = None
 
 
-def preflight_validation(bin_path, project_path, variables_args=None, plan_file=None):
+def preflight_validation(module, bin_path, project_path, variables_args=None, plan_file=None):
     if project_path in [None, ''] or '/' not in project_path:
         module.fail_json(msg="Path for Terraform project can not be None or ''.")
     if not os.path.exists(bin_path):
@@ -181,7 +210,7 @@ def preflight_validation(bin_path, project_path, variables_args=None, plan_file=
         module.fail_json(msg="Failed to validate Terraform configuration files:\r\n{0}".format(err))
 
 
-def _state_args(state_file):
+def _state_args(module, state_file):
     if state_file and os.path.exists(state_file):
         return ['-state', state_file]
     if state_file and not os.path.exists(state_file):
@@ -205,7 +234,7 @@ def init_plugins(bin_path, project_path, backend_config, backend_config_files):
         module.fail_json(msg="Failed to initialize Terraform modules:\r\n{0}".format(err))
 
 
-def get_workspace_context(bin_path, project_path):
+def get_workspace_context(module, bin_path, project_path):
     workspace_ctx = {"current": "default", "all": []}
     command = [bin_path, 'workspace', 'list', '-no-color']
     rc, out, err = module.run_command(command, cwd=project_path)
@@ -222,7 +251,7 @@ def get_workspace_context(bin_path, project_path):
     return workspace_ctx
 
 
-def _workspace_cmd(bin_path, project_path, action, workspace):
+def _workspace_cmd(module, bin_path, project_path, action, workspace):
     command = [bin_path, 'workspace', action, workspace, '-no-color']
     rc, out, err = module.run_command(command, cwd=project_path)
     if rc != 0:
@@ -242,7 +271,7 @@ def remove_workspace(bin_path, project_path, workspace):
     _workspace_cmd(bin_path, project_path, 'delete', workspace)
 
 
-def build_plan(command, project_path, variables_args, state_file, targets, state, plan_path=None):
+def build_plan(module, command, project_path, variables_args, state_file, targets, state, plan_path=None):
     if plan_path is None:
         f, plan_path = tempfile.mkstemp(suffix='.tfplan')
 
@@ -251,7 +280,7 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
     for t in (module.params.get('targets') or []):
         plan_command.extend(['-target', t])
 
-    plan_command.extend(_state_args(state_file))
+    plan_command.extend(_state_args(module, state_file))
 
     rc, out, err = module.run_command(plan_command + variables_args, cwd=project_path, use_unsafe_shell=True)
 
@@ -266,6 +295,98 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
         return plan_path, True, out, err, plan_command if state == 'planned' else command
 
     module.fail_json(msg='Terraform plan failed with unexpected exit code {0}. \r\nSTDOUT: {1}\r\n\r\nSTDERR: {2}'.format(rc, out, err))
+
+
+def return_full_path(log_activity_folder, file_name):
+    if log_activity_folder[-1] != '/':
+        full_path = log_activity_folder + '/' + file_name + '.json'
+    else:
+        full_path = log_activity_folder + file_name + '.json'
+
+    return full_path
+
+
+def create_logging_file_and_directory(log_activity_folder, file_name):
+    full_path = return_full_path(log_activity_folder, file_name)
+    if not os.path.exists(log_activity_folder):
+        os.makedirs(log_activity_folder)
+
+    if not os.path.exists(full_path):
+        with open(full_path, 'w') as file_created:
+            json.dump([], file_created, indent=4)
+
+
+def logging(log_activity_folder, file_name, plan_used, command_run, stdout):
+    path_to_audit_file = return_full_path(log_activity_folder, file_name)
+    timestamp = time.strftime('%d-%m-%Y %H:%M:%S')
+    command_used = command_run[1]
+    outcome = ''
+    list_destruction = []
+    list_creation = []
+    list_modification = []
+    if command_used == "apply" or command_used == "destroy":
+        for line in stdout.split('\n'):
+            if line.startswith('Apply complete!') or line.startswith('No changes') or line.startswith('Destroy complete!'):
+                outcome = line
+                break
+            else:
+                try:
+                    if line.split(':')[1].startswith(" Destruction"):
+                        list_destruction.append(line.split(':')[0])
+                    if line.split(':')[1].startswith(" Creation"):
+                        list_creation.append(line.split(':')[0])
+                    if line.split(':')[1].startswith(" Modification"):
+                        list_modification.append(line.split(':')[0])
+                except IndexError:
+                    pass
+    elif command_used == "plan":
+        for line in stdout.split('\n'):
+            if line.startswith('Plan:') or line.startswith('No changes'):
+                outcome = line
+    items_to_write = {
+        'time': timestamp,
+        'plan_used': plan_used,
+        'command_run': command_used,
+        'outcome': outcome,
+        'resources_added': list_creation,
+        'resources_changed': list_modification,
+        'resources_destroyed': list_destruction}
+
+    with open(path_to_audit_file, 'r') as file_opened:
+        data_stored = json.load(file_opened)
+
+    data_stored.append(items_to_write)
+
+    with open(path_to_audit_file, 'w') as file_opened:
+        json.dump(data_stored, file_opened, indent=4)
+
+
+def get_plan_file_name_without_extension(plan_file_path):
+    file_name, extension = os.path.basename(plan_file_path).split(".")
+    return file_name
+
+
+def get_plans_used(log_activity_folder, file_name):
+    log_activity_path = return_full_path(log_activity_folder, file_name)
+    plans = []
+    with open(log_activity_path, 'r') as file_opened:
+        data_stored = json.load(file_opened)
+    for record in data_stored:
+        if 'plan' in record.values():
+            plans.append(record)
+    return plans
+
+
+def get_plan_file_from_logging_file(log_activity_folder, file_name, plan_id):
+    all_entries_with_file = []
+    search_file_path = '/tmp/{0}.tfplan'.format(plan_id)
+    for i in get_plans_used(log_activity_folder, file_name):
+        if search_file_path in i.values():
+            all_entries_with_file.append(i)
+    if all_entries_with_file:
+        return all_entries_with_file[0]['plan_used']
+    else:
+        return ''
 
 
 def main():
@@ -287,8 +408,10 @@ def main():
             force_init=dict(type='bool', default=False),
             backend_config=dict(type='dict', default=None),
             backend_config_files=dict(type='list', elements='path', default=None),
+            plan_id=dict(type='str'),
+            log_activity_folder=dict(type='path', default='./'),
+            file_name=dict(type='str', default='audit'),
         ),
-        required_if=[('state', 'planned', ['plan_file'])],
         supports_check_mode=True,
     )
 
@@ -304,6 +427,9 @@ def main():
     force_init = module.params.get('force_init')
     backend_config = module.params.get('backend_config')
     backend_config_files = module.params.get('backend_config_files')
+    plan_id = module.params.get('plan_id')
+    log_activity_folder = module.params.get('log_activity_folder')
+    file_name = module.params.get('file_name')
 
     if bin_path is not None:
         command = [bin_path]
@@ -313,7 +439,7 @@ def main():
     if force_init:
         init_plugins(command[0], project_path, backend_config, backend_config_files)
 
-    workspace_ctx = get_workspace_context(command[0], project_path)
+    workspace_ctx = get_workspace_context(module, command[0], project_path)
     if workspace_ctx["current"] != workspace:
         if workspace not in workspace_ctx["all"]:
             create_workspace(command[0], project_path, workspace)
@@ -335,7 +461,7 @@ def main():
         for f in variables_files:
             variables_args.extend(['-var-file', f])
 
-    preflight_validation(command[0], project_path, variables_args)
+    preflight_validation(module, command[0], project_path, variables_args)
 
     if module.params.get('lock') is not None:
         if module.params.get('lock'):
@@ -353,6 +479,8 @@ def main():
 
     out, err = '', ''
 
+    create_logging_file_and_directory(log_activity_folder, file_name)
+
     if state == 'absent':
         command.extend(variables_args)
     elif state == 'present' and plan_file:
@@ -360,10 +488,39 @@ def main():
             command.append(plan_file)
         else:
             module.fail_json(msg='Could not find plan_file "{0}", check the path and try again.'.format(plan_file))
+    elif state == 'planned' and plan_file:
+        if any([os.path.isfile(project_path + "/" + plan_file), os.path.isfile(plan_file)]):
+            command.append(plan_file)
+        else:
+            module.fail_json(msg='Could not find plan_file "{0}", check the path and try again.'.format(plan_file))
+    elif state == 'present' and plan_id:
+        plan_file = get_plan_file_from_logging_file(log_activity_folder, file_name, plan_id)
+        if plan_file:
+            command.append(plan_file)
+            message = "running apply with plan_id: {0}".format(plan_id)
+        else:
+            module.fail_json(msg="plan file with id does not exist!")
+    elif state == 'present' and not plan_id:
+        last_plan_used = get_plans_used(log_activity_folder, file_name)
+        if last_plan_used:
+            message = "no plan file specified. running 'apply' with plan created from recently run 'plan' \
+            command with id: {0}".format(get_plan_file_name_without_extension(last_plan_used[-1]['plan_used']))
+            command.append(last_plan_used[-1]['plan_used'])
+            plan_file = last_plan_used[-1]['plan_used']
+        else:
+            # no plan command run yet
+            plan_file, needs_application, out, err, command = build_plan(
+                module, command, project_path,
+                variables_args, state_file, module.params.get('targets'), state, plan_file)
+            command.append(plan_file)
+            message = "running apply without having run plan before"
+
     else:
-        plan_file, needs_application, out, err, command = build_plan(command, project_path, variables_args, state_file,
-                                                                     module.params.get('targets'), state, plan_file)
+        plan_file, needs_application, out, err, command = build_plan(
+            module, command, project_path,
+            variables_args, state_file, module.params.get('targets'), state, plan_file)
         command.append(plan_file)
+        message = "plan command executed. plan_id generated: {0}".format(get_plan_file_name_without_extension(plan_file))
 
     if needs_application and not module.check_mode and not state == 'planned':
         rc, out, err = module.run_command(command, cwd=project_path)
@@ -376,7 +533,7 @@ def main():
                 command=' '.join(command)
             )
 
-    outputs_command = [command[0], 'output', '-no-color', '-json'] + _state_args(state_file)
+    outputs_command = [command[0], 'output', '-no-color', '-json'] + _state_args(module, state_file)
     rc, outputs_text, outputs_err = module.run_command(outputs_command, cwd=project_path)
     if rc == 1:
         module.warn("Could not get Terraform outputs. This usually means none have been defined.\nstdout: {0}\nstderr: {1}".format(outputs_text, outputs_err))
@@ -395,7 +552,9 @@ def main():
     if state == 'absent' and workspace != 'default' and purge_workspace is True:
         remove_workspace(command[0], project_path, workspace)
 
-    module.exit_json(changed=changed, state=state, workspace=workspace, outputs=outputs, stdout=out, stderr=err, command=' '.join(command))
+    logging(log_activity_folder, file_name, plan_file, command, out)
+
+    module.exit_json(changed=changed, message=message, state=state, workspace=workspace, outputs=outputs, stdout=out, stderr=err, command=' '.join(command))
 
 
 if __name__ == '__main__':
