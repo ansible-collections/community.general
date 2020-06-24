@@ -4,27 +4,16 @@
 # openvz.py
 #
 # Copyright 2014 jordonr <jordon@beamsyn.net>
-#
-# This file is part of Ansible.
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 #
 # Inspired by libvirt_lxc.py inventory script
 # https://github.com/ansible/ansible/blob/e5ef0eca03cbb6c8950c06dc50d0ca22aa8902f4/plugins/inventory/libvirt_lxc.py
 #
 # Groups are determined by the description field of openvz guests
 # multiple groups can be separated by commas: webserver,dbserver
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 from subprocess import Popen, PIPE
 import sys

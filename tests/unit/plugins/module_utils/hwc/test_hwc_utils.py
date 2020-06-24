@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.module_utils.hwc_utils import (HwcModuleException, navigate_value)
