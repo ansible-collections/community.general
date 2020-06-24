@@ -282,7 +282,6 @@ def main():
                                                    'latest', 'absent',
                                                    'removed']),
             recurse=dict(default=False, type='bool'),
-            force=dict(default=False, type='bool'),
             upgrade=dict(default=False, type='bool'),
             update_cache=dict(default=True, aliases=['update-cache'],
                               type='bool'),
