@@ -1201,7 +1201,6 @@ plugins/modules/packaging/os/urpmi.py validate-modules:doc-choices-do-not-match-
 plugins/modules/packaging/os/urpmi.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/xbps.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/packaging/os/xbps.py validate-modules:parameter-invalid
-plugins/modules/packaging/os/xbps.py validate-modules:parameter-type-not-in-doc
 plugins/modules/packaging/os/zypper.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/remote_management/cobbler/cobbler_sync.py validate-modules:doc-required-mismatch
 plugins/modules/remote_management/cobbler/cobbler_sync.py validate-modules:parameter-type-not-in-doc
