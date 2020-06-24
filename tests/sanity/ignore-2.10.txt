@@ -1198,6 +1198,7 @@ plugins/modules/packaging/os/pkgin.py validate-modules:undocumented-parameter
 plugins/modules/packaging/os/pkgng.py validate-modules:undocumented-parameter
 plugins/modules/packaging/os/portage.py validate-modules:undocumented-parameter
 plugins/modules/packaging/os/portinstall.py validate-modules:undocumented-parameter
+plugins/modules/packaging/os/redhat_subscription.py validate-modules:mutually_exclusive-unknown
 plugins/modules/packaging/os/redhat_subscription.py validate-modules:parameter-list-no-elements
 plugins/modules/packaging/os/rhn_channel.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/packaging/os/rhn_channel.py validate-modules:undocumented-parameter

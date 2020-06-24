@@ -105,6 +105,7 @@ options:
               C(0123456789abcdef0123456789abcdef: 2). If the quantity is provided, it is used to consume multiple
               entitlements from a pool (the pool must support this). Mutually exclusive with I(pool).
         default: []
+        type: list
     consumer_type:
         description:
             - The type of unit to register, defaults to system
@@ -143,10 +144,13 @@ options:
         suboptions:
             usage:
                 description: Syspurpose attribute usage
+                type: str
             role:
                 description: Syspurpose attribute role
+                type: str
             service_level_agreement:
                 description: Syspurpose attribute service_level_agreement
+                type: str
             addons:
                 description: Syspurpose attribute addons
                 type: list
