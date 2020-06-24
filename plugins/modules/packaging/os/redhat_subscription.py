@@ -150,7 +150,6 @@ options:
             addons:
                 description: Syspurpose attribute addons
                 type: list
-                elements: str
             sync:
                 description:
                     - When this option is true, then syspurpose attributes are synchronized with
@@ -801,7 +800,7 @@ def main():
                     'role': {},
                     'usage': {},
                     'service_level_agreement': {},
-                    'addons': {'type': 'list', elements: 'str'},
+                    'addons': {'type': 'list'},
                     'sync': {'type': 'bool', 'default': False}
                 }
             }
