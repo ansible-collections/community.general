@@ -24,6 +24,7 @@ options:
   package:
     description:
       - Package atom or set, e.g. C(sys-apps/foo) or C(>foo-2.13) or C(@world)
+    aliases: [name]
     type: list
     elements: str
 

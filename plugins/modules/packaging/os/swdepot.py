@@ -23,6 +23,7 @@ options:
     name:
         description:
             - package name.
+        aliases: [pkg]
         required: true
         type: str
     state:

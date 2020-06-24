@@ -21,6 +21,7 @@ options:
     name:
         description:
             - name of package to install/remove
+        aliases: [pkg]
         required: true
         type: str
     state:

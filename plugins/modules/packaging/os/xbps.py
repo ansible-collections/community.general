@@ -22,6 +22,7 @@ options:
     name:
         description:
             - Name of the package to install, upgrade, or remove.
+        aliases: [pkg,package]
         type: list
         elements: str
     state:
@@ -41,6 +42,7 @@ options:
         description:
             - Whether or not to refresh the master package lists. This can be
               run as part of a package installation or as a separate step.
+        aliases: ['update-cache']
         type: bool
         default: 'yes'
     upgrade:

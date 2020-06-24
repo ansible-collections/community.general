@@ -33,6 +33,7 @@ options:
   update_cache:
     description:
       - update the package database first C(apt-get update).
+    aliases: [ 'update-cache' ]
     type: bool
     default: 'no'
 author:

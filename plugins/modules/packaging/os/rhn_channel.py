@@ -46,6 +46,7 @@ options:
     password:
         description:
             - RHN/Satellite password.
+        aliases: [pwd]
         required: true
         type: str
     validate_certs:

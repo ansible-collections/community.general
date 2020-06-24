@@ -21,6 +21,7 @@ options:
     name:
         description:
             - name of package to install/remove
+        aliases: [pkg]
         required: true
         type: str
     state:
@@ -49,6 +50,7 @@ options:
     update_cache:
         description:
             - update the package db first
+        aliases: ['update-cache']
         default: "no"
         type: bool
 requirements:

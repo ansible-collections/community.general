@@ -24,6 +24,7 @@ options:
         description:
             - Name or list of names of packages to install/remove.
         required: true
+        aliases: [pkg]
         type: list
         elements: str
     state:

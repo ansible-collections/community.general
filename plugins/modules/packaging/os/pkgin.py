@@ -35,6 +35,7 @@ options:
         description:
             - Name of package to install/remove;
             - multiple names may be given, separated by commas
+        aliases: [pkg]
         type: list
         elements: str
     state:
