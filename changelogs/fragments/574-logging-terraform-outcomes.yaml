@@ -1,0 +1,3 @@
+minor_changes:
+  - terraform - extra parameters(plan_id, log_activity_folder, file_name) are added to log outcomes from 
+  a terraform command. (https://github.com/ansible-collections/community.general/pull/574).
