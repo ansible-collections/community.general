@@ -578,25 +578,6 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
                     cursor.execute("ALTER USER %s@%s IDENTIFIED WITH %s", (user, host, plugin))
                 changed = True
 
-        # Handle TLS requirements
-        current_requires = get_tls_requires(cursor, user, host)
-        if current_requires != tls_requires:
-            msg = "TLS requires updated"
-            if module.check_mode:
-                return (True, msg)
-            if server_suports_requires_create(cursor):
-                pre_query = "ALTER USER"
-            else:
-                pre_query = 'GRANT %s ON *.* TO' % ','.join(get_grants(cursor, user, host))
-
-            if tls_requires is not None:
-                query = ' '.join((pre_query, '%s@%s'))
-                cursor.execute(*mogrify_requires(query, (user, host), tls_requires))
-            else:
-                query = ' '.join(pre_query, '%s@%s REQUIRE NONE')
-                cursor.execute(query, (user, host))
-            changed = True
-
         # Handle privileges
         if new_priv is not None:
             curr_priv = privileges_get(cursor, user, host)
@@ -638,6 +619,25 @@ def user_mod(cursor, user, host, host_all, password, encrypted, plugin, plugin_h
                         privileges_revoke(cursor, user, host, db_table, curr_priv[db_table], grant_option)
                     privileges_grant(cursor, user, host, db_table, new_priv[db_table], tls_requires)
                     changed = True
+
+        # Handle TLS requirements
+        current_requires = get_tls_requires(cursor, user, host)
+        if current_requires != tls_requires:
+            msg = "TLS requires updated"
+            if module.check_mode:
+                return (True, msg)
+            if server_suports_requires_create(cursor):
+                pre_query = "ALTER USER"
+            else:
+                pre_query = 'GRANT %s ON *.* TO' % ','.join(get_grants(cursor, user, host))
+
+            if tls_requires is not None:
+                query = ' '.join((pre_query, '%s@%s'))
+                cursor.execute(*mogrify_requires(query, (user, host), tls_requires))
+            else:
+                query = ' '.join(pre_query, '%s@%s REQUIRE NONE')
+                cursor.execute(query, (user, host))
+            changed = True
 
     return (changed, msg)
 
