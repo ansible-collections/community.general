@@ -126,7 +126,7 @@ options:
 
   usepkg:
     description:
-      - Tries to use the binary package(s) in the locally available packages directory. If the binary packages are not found, a regular (source-based) installation will be performed.
+      - Tries to use the binary package(s) in the locally available packages directory.
     type: bool
     default: 'no'
 

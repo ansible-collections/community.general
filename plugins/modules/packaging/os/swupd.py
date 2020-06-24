@@ -50,7 +50,6 @@ options:
     description:
       - Updates the OS to the latest version.
     type: bool
-    type: str
   url:
     description:
       - Overrides both I(contenturl) and I(versionurl).

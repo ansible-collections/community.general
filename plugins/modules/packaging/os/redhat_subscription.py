@@ -787,7 +787,7 @@ def main():
             'org_id': {},
             'environment': {},
             'pool': {'default': '^$'},
-            'pool_ids': {'default': [], 'type': 'list', elements='str'},
+            'pool_ids': {'default': [], 'type': 'list', elements: 'str'},
             'consumer_type': {},
             'consumer_name': {},
             'consumer_id': {},
