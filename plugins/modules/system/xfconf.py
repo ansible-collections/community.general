@@ -56,6 +56,7 @@ options:
     type: bool
     default: 'no'
     aliases: ['array']
+    version_added: 1.0.0
 '''
 
 EXAMPLES = """
