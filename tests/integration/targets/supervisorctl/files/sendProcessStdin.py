@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import sys
-import time
 
 proc = sys.argv[1]
 value = sys.argv[2]

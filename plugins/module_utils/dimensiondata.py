@@ -2,25 +2,17 @@
 #
 # Copyright (c) 2016 Dimension Data
 #
-# This module is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This software is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this software.  If not, see <http://www.gnu.org/licenses/>.
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 #
 # Authors:
 #   - Aimon Bustardo <aimon.bustardo@dimensiondata.com>
 #   - Mark Maglana   <mmaglana@gmail.com>
 #   - Adam Friedman  <tintoy@tintoy.io>
 #
-# Common functionality to be used by versious module components
+# Common functionality to be used by various module components
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 import os
 import re
