@@ -1,5 +1,8 @@
 # Copyright (c) 2018 Antoine Catton
 # MIT License (see licenses/MIT-license.txt or https://opensource.org/licenses/MIT)
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import copy
 
 import pytest
