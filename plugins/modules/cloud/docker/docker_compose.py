@@ -639,6 +639,9 @@ class ContainerManager(DockerBaseClass):
                              "Upgrade docker-compose to a min version of %s." %
                              (compose_version, MINIMUM_COMPOSE_VERSION, MINIMUM_COMPOSE_VERSION))
 
+        if self.restarted and self.stopped:
+            self.client.fail("Cannot use restarted and stopped at the same time.")
+
         self.log("options: ")
         self.log(self.options, pretty_print=True)
 
