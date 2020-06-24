@@ -4,24 +4,13 @@
 # Copyright (C) 2016 Guido Günther <agx@sigxcpu.org>,
 #                    Daniel Lobato Garcia <dlobatog@redhat.com>
 #
-# This script is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with it.  If not, see <http://www.gnu.org/licenses/>.
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 #
 # This is somewhat based on cobbler inventory
 
-# Stdlib imports
-# __future__ imports must occur at the beginning of file
-from __future__ import print_function
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import json
 import argparse
 import copy
