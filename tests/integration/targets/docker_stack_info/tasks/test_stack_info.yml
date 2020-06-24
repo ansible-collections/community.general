@@ -1,0 +1,102 @@
+---
+- block:
+  - name: Make sure we're not already using Docker swarm
+    docker_swarm:
+      state: absent
+      force: true
+
+  - name: Get docker_stack_info when docker is not running in swarm mode
+    docker_stack_info:
+    ignore_errors: true
+    register: output
+
+  - name: Assert failure when called when swarm is not running
+    assert:
+      that:
+        - 'output is failed'
+        - 'output.msg == "Error running docker stack module"'
+
+  - name: Create a swarm cluster
+    docker_swarm:
+      state: present
+      advertise_addr: "{{ansible_default_ipv4.address}}"
+
+  - name: Get docker_stack_info when docker is running and not stack available
+    docker_stack_info:
+    register: output
+
+  - name: Assert stack facts
+    assert:
+      that:
+        - 'output.stack_facts | type_debug == "list"'
+        - 'output.stack_facts | length == 0'
+
+  - name: Copy compose files
+    copy:
+      src: "{{ item }}"
+      dest: "{{ output_dir }}/"
+    with_items:
+    - stack_compose_base.yml
+    - stack_compose_overrides.yml
+
+  - name: Install docker_stack python requirements
+    pip:
+      name: jsondiff,pyyaml
+
+  - name: Create stack with compose file
+    register: output
+    docker_stack:
+      state: present
+      name: test_stack
+      compose:
+      - "{{ output_dir }}/stack_compose_base.yml"
+
+  - name: Assert test_stack changed on stack creation with compose file
+    assert:
+      that:
+      - output is changed
+
+  - name: Get docker_stack_info when docker is running
+    docker_stack_info:
+    register: output
+
+  - name: assert stack facts
+    assert:
+      that:
+        - 'output.stack_facts | type_debug == "list"'
+        - 'output.stack_facts[0].Name == "test_stack"'
+        - 'output.stack_facts[0].Orchestrator == "Swarm"'
+        - 'output.stack_facts[0].Services == "1"'
+
+  - name: Get docker_stack_info when first element
+    docker_stack_info:
+      name: "{{ output.stack_facts[0].Name }}"
+      action: tasks
+    register: output
+
+  - name: Assert stack facts
+    assert:
+      that:
+        - 'output.stack_facts | type_debug == "list"'
+        - 'output.stack_facts[0].DesiredState == "Running"'
+        - 'output.stack_facts[0].Image == "busybox:latest"'
+        - 'output.stack_facts[0].Name == "test_stack_busybox.1"'
+        - 'output.stack_facts[0].Node == "docker-desktop"'
+
+  - name: Get docker_stack_info when name is not defined
+    docker_stack_info:
+      action: tasks
+    ignore_errors: true
+    register: output
+
+  - name: Assert failure when called when name is not defined
+    assert:
+      that:
+        - 'output is failed'
+        - 'output.msg == "action requires a stack name"'
+
+  always:
+  - name: Cleanup
+    docker_swarm:
+      state: absent
+      force: true
