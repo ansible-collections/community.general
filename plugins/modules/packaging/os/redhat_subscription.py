@@ -106,7 +106,6 @@ options:
               entitlements from a pool (the pool must support this). Mutually exclusive with I(pool).
         default: []
         type: list
-        elements: str
     consumer_type:
         description:
             - The type of unit to register, defaults to system
@@ -787,7 +786,7 @@ def main():
             'org_id': {},
             'environment': {},
             'pool': {'default': '^$'},
-            'pool_ids': {'default': [], 'type': 'list', elements: 'str'},
+            'pool_ids': {'default': [], 'type': 'list'},
             'consumer_type': {},
             'consumer_name': {},
             'consumer_id': {},
