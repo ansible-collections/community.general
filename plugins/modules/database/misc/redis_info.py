@@ -35,7 +35,7 @@ notes:
   install it with pip (C(pip install redis)) or with a package manager.
   U(https://github.com/andymccurdy/redis-py)
 seealso:
-- module: redis
+- module: community.general.redis
 requirements: [ redis ]
 author: "Pavlo Bashynskyi (@levonet)"
 '''

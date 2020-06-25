@@ -21,7 +21,7 @@ seealso:
   - name: Firewall documentation
     description: Hetzner's documentation on the stateless firewall for dedicated servers
     link: https://wiki.hetzner.de/index.php/Robot_Firewall/en
-  - module: hetzner_firewall
+  - module: community.general.hetzner_firewall
     description: Configure firewall.
 extends_documentation_fragment:
 - community.general.hetzner
