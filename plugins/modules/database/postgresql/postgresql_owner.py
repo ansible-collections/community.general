@@ -73,9 +73,9 @@ options:
     default: yes
     version_added: '0.2.0'
 seealso:
-- module: postgresql_user
-- module: postgresql_privs
-- module: postgresql_membership
+- module: community.general.postgresql_user
+- module: community.general.postgresql_privs
+- module: community.general.postgresql_membership
 - name: PostgreSQL REASSIGN OWNED command reference
   description: Complete reference of the PostgreSQL REASSIGN OWNED command documentation.
   link: https://www.postgresql.org/docs/current/sql-reassign-owned.html
