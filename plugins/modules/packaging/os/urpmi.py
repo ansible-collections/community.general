@@ -52,7 +52,6 @@ options:
     description:
       - Specifies an alternative install root, relative to which all packages will be installed.
         Corresponds to the C(--root) option for I(urpmi).
-    default: /
     aliases: [ installroot ]
     type: str
 author:
