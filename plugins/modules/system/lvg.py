@@ -62,9 +62,9 @@ options:
     type: bool
     default: no
 seealso:
-- module: filesystem
-- module: lvol
-- module: parted
+- module: community.general.filesystem
+- module: community.general.lvol
+- module: community.general.parted
 notes:
   - This module does not modify PE size for already present volume group.
 '''
