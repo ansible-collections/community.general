@@ -123,9 +123,9 @@ seealso:
 - name: pg_restore reference
   description: Complete reference of pg_restore documentation.
   link: https://www.postgresql.org/docs/current/app-pgrestore.html
-- module: postgresql_tablespace
-- module: postgresql_info
-- module: postgresql_ping
+- module: community.general.postgresql_tablespace
+- module: community.general.postgresql_info
+- module: community.general.postgresql_ping
 notes:
 - State C(dump) and C(restore) don't require I(psycopg2) since version 2.8.
 author: "Ansible Core Team"

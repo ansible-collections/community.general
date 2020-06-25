@@ -36,7 +36,7 @@ options:
     default: yes
     version_added: '0.2.0'
 seealso:
-- module: postgresql_info
+- module: community.general.postgresql_info
 author:
 - Andrew Klychkov (@Andersson007)
 extends_documentation_fragment:

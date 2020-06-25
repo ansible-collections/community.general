@@ -158,9 +158,9 @@ notes:
 - SCRAM-SHA-256-hashed passwords (SASL Authentication) require PostgreSQL version 10 or newer.
   On the previous versions the whole hashed string will be used as a password.
 seealso:
-- module: postgresql_privs
-- module: postgresql_membership
-- module: postgresql_owner
+- module: community.general.postgresql_privs
+- module: community.general.postgresql_membership
+- module: community.general.postgresql_owner
 - name: PostgreSQL database roles
   description: Complete reference of the PostgreSQL database roles documentation.
   link: https://www.postgresql.org/docs/current/user-manag.html

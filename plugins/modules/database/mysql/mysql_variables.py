@@ -45,7 +45,7 @@ options:
     version_added: '0.2.0'
 
 seealso:
-- module: mysql_info
+- module: community.general.mysql_info
 - name: MySQL SET command reference
   description: Complete reference of the MySQL SET command documentation.
   link: https://dev.mysql.com/doc/refman/8.0/en/set-statement.html

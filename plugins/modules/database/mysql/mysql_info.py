@@ -49,10 +49,10 @@ notes:
   To avoid this, use I(exclude_fields=db_size).
 
 seealso:
-- module: mysql_variables
-- module: mysql_db
-- module: mysql_user
-- module: mysql_replication
+- module: community.general.mysql_variables
+- module: community.general.mysql_db
+- module: community.general.mysql_user
+- module: community.general.mysql_replication
 
 author:
 - Andrew Klychkov (@Andersson007)
