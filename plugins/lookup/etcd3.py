@@ -92,7 +92,7 @@ DOCUMENTATION = '''
     - The recommanded way to connect to etcd3 server is using C(ETCDCTL_ENDPOINT)
       environment variable and keep I(endpoints), I(host), and I(port) unused.
     seealso:
-    - module: etcd3
+    - module: community.general.etcd3
     - ref: etcd_lookup
 
     requirements:
