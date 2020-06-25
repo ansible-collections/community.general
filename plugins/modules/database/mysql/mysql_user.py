@@ -118,7 +118,7 @@ notes:
    - Currently, there is only support for the `mysql_native_password` encrypted password hash module.
 
 seealso:
-- module: mysql_info
+- module: community.general.mysql_info
 - name: MySQL access control and account management reference
   description: Complete reference of the MySQL access control and account management documentation.
   link: https://dev.mysql.com/doc/refman/8.0/en/access-control.html

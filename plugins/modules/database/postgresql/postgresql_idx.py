@@ -120,8 +120,8 @@ options:
     version_added: '0.2.0'
 
 seealso:
-- module: postgresql_table
-- module: postgresql_tablespace
+- module: community.general.postgresql_table
+- module: community.general.postgresql_tablespace
 - name: PostgreSQL indexes reference
   description: General information about PostgreSQL indexes.
   link: https://www.postgresql.org/docs/current/indexes.html
