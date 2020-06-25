@@ -46,7 +46,7 @@ options:
         set to C(no) when no other option exists.  Prior to 1.9.3 the code
         defaulted to C(no).
     type: bool
-    default: 'yes'
+    default: True
 '''
 
 EXAMPLES = '''

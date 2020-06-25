@@ -35,12 +35,12 @@ options:
       - Remove other then added repositories
       - Used if I(state=present)
     type: bool
-    default: 'no'
+    default: False
   update:
     description:
       - Update the package database after changing repositories.
     type: bool
-    default: 'no'
+    default: False
 author:
 - Mikhail Gordeev (@obirvalger)
 '''

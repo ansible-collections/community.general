@@ -43,12 +43,12 @@ options:
               I(present).
             - Needs zypper version >= 1.6.2.
         type: bool
-        default: 'no'
+        default: False
     autorefresh:
         description:
             - Enable autorefresh of the repository.
         type: bool
-        default: 'yes'
+        default: True
         aliases: [ "refresh" ]
     priority:
         description:
@@ -61,7 +61,7 @@ options:
             - Overwrite multiple repository entries, if repositories with both name and
               URL already exist.
         type: bool
-        default: 'no'
+        default: False
     auto_import_keys:
         description:
             - Automatically import the gpg signing key of the new or changed repository.
@@ -69,18 +69,18 @@ options:
             - Implies runrefresh.
             - Only works with C(.repo) files if `name` is given explicitly.
         type: bool
-        default: 'no'
+        default: False
     runrefresh:
         description:
             - Refresh the package list of the given repository.
             - Can be used with repo=* to refresh all repositories.
         type: bool
-        default: 'no'
+        default: False
     enabled:
         description:
             - Set repository to enabled (or disabled).
         type: bool
-        default: 'yes'
+        default: True
 
 
 requirements:

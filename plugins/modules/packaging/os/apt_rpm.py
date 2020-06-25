@@ -35,7 +35,7 @@ options:
       - update the package database first C(apt-get update).
     aliases: [ 'update-cache' ]
     type: bool
-    default: 'no'
+    default: False
 author:
 - Evgenii Terechkov (@evgkrsk)
 '''

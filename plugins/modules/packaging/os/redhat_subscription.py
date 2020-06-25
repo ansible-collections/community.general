@@ -75,7 +75,7 @@ options:
             - Upon successful registration, auto-consume available subscriptions
             - Added in favor of deprecated autosubscribe in 2.5.
         type: bool
-        default: 'no'
+        default: False
         aliases: [autosubscribe]
     activationkey:
         description:
@@ -126,7 +126,7 @@ options:
         description:
             -  Register the system even if it is already registered
         type: bool
-        default: 'no'
+        default: False
     release:
         description:
             - Set a release version

@@ -48,27 +48,27 @@ options:
         description:
           - Update repository database. Can be run with other steps or on it's own.
         type: bool
-        default: 'no'
+        default: False
     upgrade:
         description:
           - Upgrade main packages to their newer versions
         type: bool
-        default: 'no'
+        default: False
     full_upgrade:
         description:
           - Upgrade all packages to their newer versions
         type: bool
-        default: 'no'
+        default: False
     clean:
         description:
           - Clean packages cache
         type: bool
-        default: 'no'
+        default: False
     force:
         description:
           - Force package reinstall
         type: bool
-        default: 'no'
+        default: False
 '''
 
 EXAMPLES = '''

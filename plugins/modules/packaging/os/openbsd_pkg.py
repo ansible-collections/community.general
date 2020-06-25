@@ -41,7 +41,7 @@ options:
             Automatically builds and installs the 'sqlports' package, if it is
             not already installed.
         type: bool
-        default: 'no'
+        default: False
     ports_dir:
         description:
           - When used in combination with the C(build) option, allows overriding
@@ -54,13 +54,13 @@ options:
             file(s) in the old packages which are annotated with @extra in
             the packaging-list.
         type: bool
-        default: 'no'
+        default: False
     quick:
         description:
           - Replace or delete packages quickly; do not bother with checksums
             before removing normal files.
         type: bool
-        default: 'no'
+        default: False
 notes:
   - When used with a `loop:` each package will be processed individually,
     it is much more efficient to pass the list directly to the `name` option.

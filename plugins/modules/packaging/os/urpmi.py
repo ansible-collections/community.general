@@ -34,20 +34,20 @@ options:
     description:
       - Update the package database first C(urpmi.update -a).
     type: bool
-    default: 'no'
+    default: False
     aliases: ['update-cache']
   no-recommends:
     description:
       - Corresponds to the C(--no-recommends) option for I(urpmi).
     type: bool
-    default: 'yes'
+    default: True
     aliases: ['no_recommends']
   force:
     description:
       - Assume "yes" is the answer to any question urpmi has to ask.
         Corresponds to the C(--force) option for I(urpmi).
     type: bool
-    default: 'yes'
+    default: True
   root:
     description:
       - Specifies an alternative install root, relative to which all packages will be installed.
