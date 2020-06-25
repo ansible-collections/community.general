@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - "airbrake_deployment - Add ``version`` param; clarified docs on ``revision`` param"
