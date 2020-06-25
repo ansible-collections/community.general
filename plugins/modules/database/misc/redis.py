@@ -70,7 +70,7 @@ notes:
      this needs to be in the redis.conf in the masterauth variable
 
 seealso:
-    - module: redis_info
+    - module: community.general.redis_info
 requirements: [ redis ]
 author: "Xabier Larrakoetxea (@slok)"
 '''
