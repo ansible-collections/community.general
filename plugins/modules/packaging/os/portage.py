@@ -45,13 +45,13 @@ options:
     description:
       - Consider the entire dependency tree of packages (--deep)
     type: bool
-    default: 'no'
+    default: no
 
   newuse:
     description:
       - Include installed packages where USE flags have changed (--newuse)
     type: bool
-    default: 'no'
+    default: no
 
   changed_use:
     description:
@@ -59,31 +59,31 @@ options:
       - flags that the user has not enabled are added or removed
       - (--changed-use)
     type: bool
-    default: 'no'
+    default: no
 
   oneshot:
     description:
       - Do not add the packages to the world file (--oneshot)
     type: bool
-    default: 'no'
+    default: no
 
   noreplace:
     description:
       - Do not re-emerge installed packages (--noreplace)
     type: bool
-    default: 'yes'
+    default: yes
 
   nodeps:
     description:
       - Only merge packages but not their dependencies (--nodeps)
     type: bool
-    default: 'no'
+    default: no
 
   onlydeps:
     description:
       - Only merge packages' dependencies but not the packages (--onlydeps)
     type: bool
-    default: 'no'
+    default: no
 
   depclean:
     description:
@@ -91,19 +91,19 @@ options:
       - If no package is specified, clean up the world's dependencies
       - Otherwise, --depclean serves as a dependency aware version of --unmerge
     type: bool
-    default: 'no'
+    default: no
 
   quiet:
     description:
       - Run emerge in quiet mode (--quiet)
     type: bool
-    default: 'no'
+    default: no
 
   verbose:
     description:
       - Run emerge in verbose mode (--verbose)
     type: bool
-    default: 'no'
+    default: no
 
   sync:
     description:
@@ -117,25 +117,25 @@ options:
     description:
       - Prefer packages specified at PORTAGE_BINHOST in make.conf
     type: bool
-    default: 'no'
+    default: no
 
   usepkgonly:
     description:
       - Merge only binaries (no compiling). This sets getbinpkg=yes.
     type: bool
-    default: 'no'
+    default: no
 
   usepkg:
     description:
       - Tries to use the binary package(s) in the locally available packages directory.
     type: bool
-    default: 'no'
+    default: no
 
   keepgoing:
     description:
       - Continue as much as possible after an error.
     type: bool
-    default: 'no'
+    default: no
 
   jobs:
     description:
@@ -157,7 +157,7 @@ options:
       - Redirect all build output to logs alone, and do not display it
       - on stdout (--quiet-build)
     type: bool
-    default: 'no'
+    default: no
 
   quietfail:
     description:
@@ -165,7 +165,7 @@ options:
       - Only the die message and the path of the build log will be
       - displayed on stdout.
     type: bool
-    default: 'no'
+    default: no
 
 requirements: [ gentoolkit ]
 author:
