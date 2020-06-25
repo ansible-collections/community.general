@@ -1,3 +1,2 @@
 minor_changes:
-- xbps: force - deprecated, will remove 3.0.0 (https://github.com/ansible-collections/community.general/pull/568)
-
+- xbps - the ``force`` option never had any effect. It is now- deprecated, and will be removed in 3.0.0 (https://github.com/ansible-collections/community.general/pull/568).
