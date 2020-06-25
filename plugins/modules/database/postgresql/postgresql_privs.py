@@ -175,9 +175,9 @@ notes:
 - When revoking privileges, C(RESTRICT) is assumed (see PostgreSQL docs).
 
 seealso:
-- module: postgresql_user
-- module: postgresql_owner
-- module: postgresql_membership
+- module: community.general.postgresql_user
+- module: community.general.postgresql_owner
+- module: community.general.postgresql_membership
 - name: PostgreSQL privileges
   description: General information about PostgreSQL privileges.
   link: https://www.postgresql.org/docs/current/ddl-priv.html

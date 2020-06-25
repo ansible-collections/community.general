@@ -106,13 +106,13 @@ notes:
 - PostgreSQL allows to create columnless table, so columns param is optional.
 - Unlogged tables are available from PostgreSQL server version 9.1.
 seealso:
-- module: postgresql_sequence
-- module: postgresql_idx
-- module: postgresql_info
-- module: postgresql_tablespace
-- module: postgresql_owner
-- module: postgresql_privs
-- module: postgresql_copy
+- module: community.general.postgresql_sequence
+- module: community.general.postgresql_idx
+- module: community.general.postgresql_info
+- module: community.general.postgresql_tablespace
+- module: community.general.postgresql_owner
+- module: community.general.postgresql_privs
+- module: community.general.postgresql_copy
 - name: CREATE TABLE reference
   description: Complete reference of the CREATE TABLE command documentation.
   link: https://www.postgresql.org/docs/current/sql-createtable.html

@@ -53,8 +53,8 @@ notes:
 - For tracking function statistics the PostgreSQL C(track_functions) parameter must be enabled.
   See U(https://www.postgresql.org/docs/current/runtime-config-statistics.html) for more information.
 seealso:
-- module: postgresql_info
-- module: postgresql_ping
+- module: community.general.postgresql_info
+- module: community.general.postgresql_ping
 - name: PostgreSQL statistics collector reference
   description: Complete reference of the PostgreSQL statistics collector documentation.
   link: https://www.postgresql.org/docs/current/monitoring-stats.html

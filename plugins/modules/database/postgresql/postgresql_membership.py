@@ -75,9 +75,9 @@ options:
     default: yes
     version_added: '0.2.0'
 seealso:
-- module: postgresql_user
-- module: postgresql_privs
-- module: postgresql_owner
+- module: community.general.postgresql_user
+- module: community.general.postgresql_privs
+- module: community.general.postgresql_owner
 - name: PostgreSQL role membership reference
   description: Complete reference of the PostgreSQL role membership documentation.
   link: https://www.postgresql.org/docs/current/role-membership.html

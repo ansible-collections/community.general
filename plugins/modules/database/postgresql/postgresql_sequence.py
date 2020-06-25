@@ -141,10 +141,10 @@ notes:
 - If you do not pass db parameter, sequence will be created in the database
   named postgres.
 seealso:
-- module: postgresql_table
-- module: postgresql_owner
-- module: postgresql_privs
-- module: postgresql_tablespace
+- module: community.general.postgresql_table
+- module: community.general.postgresql_owner
+- module: community.general.postgresql_privs
+- module: community.general.postgresql_tablespace
 - name: CREATE SEQUENCE reference
   description: Complete reference of the CREATE SEQUENCE command documentation.
   link: https://www.postgresql.org/docs/current/sql-createsequence.html
