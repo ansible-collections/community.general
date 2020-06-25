@@ -97,8 +97,8 @@ notes:
 - PostgreSQL version must be 10 or greater.
 
 seealso:
-- module: postgresql_publication
-- module: postgresql_info
+- module: community.general.postgresql_publication
+- module: community.general.postgresql_info
 - name: CREATE SUBSCRIPTION reference
   description: Complete reference of the CREATE SUBSCRIPTION command documentation.
   link: https://www.postgresql.org/docs/current/sql-createsubscription.html

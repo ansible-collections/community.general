@@ -71,7 +71,7 @@ notes:
 - For some parameters restart of PostgreSQL server is required.
   See official documentation U(https://www.postgresql.org/docs/current/view-pg-settings.html).
 seealso:
-- module: postgresql_info
+- module: community.general.postgresql_info
 - name: PostgreSQL server configuration
   description: General information about PostgreSQL server configuration.
   link: https://www.postgresql.org/docs/current/runtime-config.html
