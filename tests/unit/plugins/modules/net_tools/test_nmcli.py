@@ -203,8 +203,7 @@ TESTCASE_ETHERNET_DHCP = [
     }
 ]
 
-
-def mocker_set(mocker, connection_exists=False):
+def mocker_set(mocker, connection_exists=False, is_connection_changed=True):
     """
     Common mocker object
     """
@@ -212,6 +211,8 @@ def mocker_set(mocker, connection_exists=False):
     mocker.patch('ansible_collections.community.general.plugins.modules.net_tools.nmcli.HAVE_NM_CLIENT', True)
     get_bin_path = mocker.patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
     get_bin_path.return_value = '/usr/bin/nmcli'
+    connection_changed = mocker.patch.object(nmcli.Nmcli, 'is_connection_changed')
+    connection_changed.return_value = is_connection_changed
     connection = mocker.patch.object(nmcli.Nmcli, 'connection_exists')
     connection.return_value = connection_exists
     return connection
