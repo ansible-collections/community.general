@@ -200,7 +200,7 @@ def main():
             force=dict(type='bool', default=True),
             no_recommends=dict(type='bool', default=True, aliases=['no-recommends']),
             name=dict(type='list', elements='str', required=True, aliases=['package', 'pkg']),
-            root=dict(type='str', aliases=['installroot'], default='/'),
+            root=dict(type='str', aliases=['installroot']),
         ),
     )
 

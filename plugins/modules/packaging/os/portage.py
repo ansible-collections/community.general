@@ -39,7 +39,7 @@ options:
     description:
       - Update packages to the best version available (--update)
     type: bool
-    default: 'no'
+    default: no
 
   deep:
     description:
