@@ -155,10 +155,10 @@ options:
     version_added: '0.2.0'
 
 seealso:
-- module: mysql_info
-- module: mysql_variables
-- module: mysql_user
-- module: mysql_replication
+- module: community.general.mysql_info
+- module: community.general.mysql_variables
+- module: community.general.mysql_user
+- module: community.general.mysql_replication
 - name: MySQL command-line client reference
   description: Complete reference of the MySQL command-line client documentation.
   link: https://dev.mysql.com/doc/refman/8.0/en/mysql.html

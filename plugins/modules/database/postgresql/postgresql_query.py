@@ -76,7 +76,7 @@ options:
     default: yes
     version_added: '0.2.0'
 seealso:
-- module: postgresql_db
+- module: community.general.postgresql_db
 author:
 - Felix Archambault (@archf)
 - Andrew Klychkov (@Andersson007)
