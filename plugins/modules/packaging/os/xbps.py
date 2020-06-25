@@ -60,6 +60,12 @@ options:
         type: bool
         default: 'yes'
         version_added: '0.2.0'
+    force:
+        description:
+            - This option doesn't have any effect and is deprecated, it will be
+              removed in 3.0.0.
+        type: bool
+        default: no
 '''
 
 EXAMPLES = '''
