@@ -154,7 +154,7 @@ extends_documentation_fragment:
 
 
 seealso:
-- module: mysql_info
+- module: community.general.mysql_info
 - name: MySQL replication reference
   description: Complete reference of the MySQL replication documentation.
   link: https://dev.mysql.com/doc/refman/8.0/en/replication.html
