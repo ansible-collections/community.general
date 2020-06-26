@@ -1451,37 +1451,19 @@ class Nmcli(object):
 
     def show_connection(self):
         cmd = [self.nmcli_bin, 'con', 'show']
-        if self.type == 'vlan':
-            if self.conn_name is not None:
-                cmd.append(self.conn_name)
-            elif self.ifname is not None:
-                cmd.append(self.ifname)
-            else:
-                cmd.append('vlan%s' % to_text(self.vlanid))
-        elif self.type == 'vxlan':
-            if self.conn_name is not None:
-                cmd.append(self.conn_name)
-            elif self.ifname is not None:
-                cmd.append(self.ifname)
-            else:
-                cmd.append('vxlan%s' % to_text(self.vxlan_id))
-        elif self.type == 'ipip':
-            if self.conn_name is not None:
-                cmd.append(self.conn_name)
-            elif self.ifname is not None:
-                cmd.append(self.ifname)
-            elif self.ip_tunnel_dev is not None:
-                cmd.append('ipip%s' % self.ip_tunnel_dev)
-        elif self.type == 'sit':
-            if self.conn_name is not None:
-                cmd.append(self.conn_name)
-            elif self.ifname is not None:
-                cmd.append(self.ifname)
-            elif self.ip_tunnel_dev is not None:
-                cmd.append('sit%s' % self.ip_tunnel_dev)
+        if self.conn_name is not None:
+            cmd.append(self.conn_name)
+        elif self.ifname is not None:
+            cmd.append(self.ifname)
         else:
-            if self.conn_name is not None:
-                cmd.append(self.conn_name)
+            if self.type == 'vlan':
+                cmd.append('vlan%s' % to_text(self.vlanid))
+            elif self.type == 'vxlan':
+                cmd.append('vxlan%s' % to_text(self.vxlan_id))
+            elif self.type == 'ipip':
+                cmd.append('ipip%s' % self.ip_tunnel_dev)
+            elif self.type == 'sit':
+                cmd.append('sit%s' % self.ip_tunnel_dev)
             else:
                 raise NmcliModuleError(
                     "Invalid connection identifier for nmcli")
