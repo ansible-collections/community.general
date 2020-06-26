@@ -22,26 +22,33 @@ options:
         description:
             - Name of the software channel.
         required: true
+        type: str
     sysname:
         description:
             - Name of the system as it is known in RHN/Satellite.
         required: true
+        type: str
     state:
         description:
             - Whether the channel should be present or not, taking action if the state is different from what is stated.
         default: present
+        type: str
     url:
         description:
             - The full URL to the RHN/Satellite API.
         required: true
+        type: str
     user:
         description:
             - RHN/Satellite login.
         required: true
+        type: str
     password:
         description:
             - RHN/Satellite password.
+        aliases: [pwd]
         required: true
+        type: str
     validate_certs:
         description:
             - If C(False), SSL certificates will not be validated.

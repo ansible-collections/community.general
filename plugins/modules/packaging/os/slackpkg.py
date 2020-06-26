@@ -26,6 +26,9 @@ options:
         description:
             - name of package to install/remove
         required: true
+        type: list
+        elements: str
+        aliases: [pkg]
 
     state:
         description:
@@ -33,6 +36,7 @@ options:
         choices: [ 'present', 'absent', 'latest' ]
         required: false
         default: present
+        type: str
 
     update_cache:
         description:
@@ -40,6 +44,7 @@ options:
         required: false
         default: false
         type: bool
+        aliases: [update-cache]
 
 author: Kim Nørgaard (@KimNorgaard)
 requirements: [ "Slackware >= 12.2" ]
@@ -170,8 +175,8 @@ def update_cache(module, slackpkg_path):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default="installed", choices=['installed', 'removed', 'absent', 'present', 'latest']),
-            name=dict(aliases=["pkg"], required=True, type='list'),
+            state=dict(default="present", choices=['installed', 'removed', 'absent', 'present', 'latest']),
+            name=dict(aliases=["pkg"], required=True, type='list', elements='str'),
             update_cache=dict(default=False, aliases=["update-cache"],
                               type='bool'),
         ),
