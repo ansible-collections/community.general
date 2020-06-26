@@ -7,7 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: atomic_image
 short_description: Manage the container images on the atomic host platform
@@ -25,17 +25,20 @@ options:
     backend:
         description:
           - Define the backend where the image is pulled.
-        choices: [ docker, ostree ]
+        choices: [ 'docker', 'ostree' ]
+        type: str
     name:
         description:
           - Name of the container image.
         required: True
+        type: str
     state:
         description:
           - The state of the container image.
           - The state C(latest) will ensure container image is upgraded to the latest version and forcefully restart container, if running.
-        choices: [ absent, latest, present ]
-        default: latest
+        choices: [ 'absent', 'latest', 'present' ]
+        default: 'latest'
+        type: str
     started:
         description:
           - Start or Stop the container.
@@ -43,7 +46,7 @@ options:
         default: 'yes'
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Execute the run command on rsyslog container image (atomic run rhel7/rsyslog)
   atomic_image:
     name: rhel7/rsyslog
@@ -56,7 +59,7 @@ EXAMPLES = '''
     backend: ostree
 '''
 
-RETURN = '''
+RETURN = r'''
 msg:
     description: The command standard output
     returned: always

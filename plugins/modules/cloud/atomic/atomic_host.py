@@ -7,7 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: atomic_host
 short_description: Manage the atomic host platform
@@ -24,12 +24,14 @@ requirements:
 options:
     revision:
         description:
-          - The version number of the atomic host to be deployed. Providing C(latest) will upgrade to the latest available version.
-        default: latest
+          - The version number of the atomic host to be deployed.
+          - Providing C(latest) will upgrade to the latest available version.
+        default: 'latest'
         aliases: [ version ]
+        type: str
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Upgrade the atomic host platform to the latest version (atomic host upgrade)
   atomic_host:
     revision: latest
@@ -39,7 +41,7 @@ EXAMPLES = '''
     revision: 23.130
 '''
 
-RETURN = '''
+RETURN = r'''
 msg:
     description: The command standard output
     returned: always
