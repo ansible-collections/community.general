@@ -315,10 +315,22 @@ TESTCASE_ETHERNET_STATIC = [
         'ifname': 'ethernet_non_existant',
         'ip4': '10.10.10.10/24',
         'gw4': '10.10.10.1',
+        'dns4': ['1.1.1.1', '8.8.8.8'],
         'state': 'present',
         '_ansible_check_mode': False,
-    },
+    }
 ]
+
+TESTCASE_ETHERNET_STATIC_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              ethernet_non_existant
+connection.autoconnect:                 yes
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.gateway:                           10.10.10.1
+ipv4.dns:                               1.1.1.1,8.8.8.8
+ipv6.method:                            auto
+"""
 
 
 def mocker_set(mocker, connection_exists=False):
@@ -445,6 +457,14 @@ def mocked_ethernet_connection_dhcp_unchanged(mocker):
     mocker_set(mocker, connection_exists=True)
     command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
     command_result.return_value = (0, TESTCASE_ETHERNET_DHCP_SHOW_OUTPUT, "")
+    return command_result
+
+
+@pytest.fixture
+def mocked_ethernet_connection_static_unchanged(mocker):
+    mocker_set(mocker, connection_exists=True)
+    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
+    command_result.return_value = (0, TESTCASE_ETHERNET_STATIC_SHOW_OUTPUT, "")
     return command_result
 
 
@@ -1132,3 +1152,58 @@ def test_modify_ethernet_dhcp_to_static(mocked_ethernet_connection_dhcp_to_stati
     results = json.loads(out)
     assert not results.get('failed')
     assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_STATIC, indirect=['patch_ansible_module'])
+def test_create_ethernet_static(mocked_generic_connection_create, capfd):
+    """
+    Test : Create ethernet connection with static IP configuration
+    """
+
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 3
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    add_args, _ = arg_list[0]
+    mod_args, _ = arg_list[1]
+
+    assert add_args[0][0] == '/usr/bin/nmcli'
+    assert add_args[0][1] == 'con'
+    assert add_args[0][2] == 'add'
+    assert add_args[0][3] == 'type'
+    assert add_args[0][4] == 'ethernet'
+    assert add_args[0][5] == 'con-name'
+    assert add_args[0][6] == 'non_existent_nw_device'
+    assert add_args[0][7] == 'ifname'
+    assert add_args[0][8] == 'ethernet_non_existant'
+
+    for param in ['ip4', '10.10.10.10/24', 'gw4', '10.10.10.1']:
+        assert param in map(to_text, add_args[0])
+
+    assert mod_args[0][0] == '/usr/bin/nmcli'
+    assert mod_args[0][1] == 'con'
+    assert mod_args[0][2] == 'mod'
+    assert mod_args[0][3] == 'non_existent_nw_device'
+
+    for param in ['ipv4.dns', '1.1.1.1 8.8.8.8']:
+        assert param in map(to_text, mod_args[0])
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_STATIC, indirect=['patch_ansible_module'])
+def test_ethernet_connection_static_unchanged(mocked_ethernet_connection_static_unchanged, capfd):
+    """
+    Test : Ethernet connection with static IP configuration unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']

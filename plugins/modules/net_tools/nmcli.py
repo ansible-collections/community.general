@@ -1481,7 +1481,9 @@ class Nmcli(object):
             key = pair[0].strip()
             if key and len(pair) > 1:
                 raw_value = pair[1].lstrip()
-                if key == 'bond.options':
+                if raw_value == '--':
+                    conn_info[key] = None
+                elif key == 'bond.options':
                     # Aliases such as 'miimon', 'downdelay' are equivalent to the +bond.options 'option=value' syntax.
                     opts = raw_value.split(',')
                     for opt in opts:
@@ -1490,8 +1492,9 @@ class Nmcli(object):
                             alias_key = alias_pair[0]
                             alias_value = alias_pair[1]
                             conn_info[alias_key] = alias_value
-                elif raw_value == '--':
-                    conn_info[key] = None
+                elif key in ['ipv4.dns', 'ipv4.dns-search', 'ipv6.dns', 'ipv6.dns-search']:
+                    values = raw_value.split(',')
+                    conn_info[key] = values
                 else:
                     m_enum = p_enum_value.match(raw_value)
                     if m_enum is not None:
@@ -1519,6 +1522,11 @@ class Nmcli(object):
             if not value:
                 continue
 
+            # TODO: retain typed list arguments in Nmcli object instead of encoded strings
+            if key in ['ipv4.dns', 'ipv4.dns-search', 'ipv6.dns', 'ipv6.dns-search']:
+                list_values = value.split()
+                value = list_values
+
             if key in conn_info:
                 current_value = conn_info[key]
             elif key in param_alias:
@@ -1532,8 +1540,13 @@ class Nmcli(object):
                 # parameter does not exist
                 current_value = None
 
-            if current_value != to_text(value):
-                override_options[key] = [current_value, value]
+            if isinstance(current_value, list) and isinstance(value, list):
+                # compare values between two lists
+                if sorted(current_value) != sorted(value):
+                    override_options[key] = [current_value, value]
+            else:
+                if current_value != to_text(value):
+                    override_options[key] = [current_value, value]
 
         return override_options
 
