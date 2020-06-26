@@ -365,7 +365,7 @@ def mocked_generic_connection_modify(mocker):
     mocker_set(mocker, connection_exists=True)
     connection_changed = mocker.patch.object(
         nmcli.Nmcli, 'is_connection_changed')
-    connection_changed.return_value = True
+    connection_changed.return_value = (True, dict())
     command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
     command_result.return_value = (0, "", "")
     return command_result
@@ -1165,8 +1165,8 @@ def test_create_ethernet_static(mocked_generic_connection_create, capfd):
 
     assert nmcli.Nmcli.execute_command.call_count == 3
     arg_list = nmcli.Nmcli.execute_command.call_args_list
-    add_args, _ = arg_list[0]
-    mod_args, _ = arg_list[1]
+    add_args, add_kw = arg_list[0]
+    mod_args, mod_kw = arg_list[1]
 
     assert add_args[0][0] == '/usr/bin/nmcli'
     assert add_args[0][1] == 'con'

@@ -1516,7 +1516,9 @@ class Nmcli(object):
             'slave-type': 'connection.slave-type',
         }
 
-        override_options = dict()
+        changed = False
+        diff_before = dict()
+        diff_after = dict()
 
         for key, value in options.items():
             if not value:
@@ -1543,19 +1545,26 @@ class Nmcli(object):
             if isinstance(current_value, list) and isinstance(value, list):
                 # compare values between two lists
                 if sorted(current_value) != sorted(value):
-                    override_options[key] = [current_value, value]
+                    changed = True
             else:
                 if current_value != to_text(value):
-                    override_options[key] = [current_value, value]
+                    changed = True
 
-        return override_options
+            diff_before[key] = current_value
+            diff_after[key] = value
+
+        diff = {
+            'before': diff_before,
+            'after': diff_after,
+        }
+        return (changed, diff)
 
     def is_connection_changed(self):
         conn_info = self.show_connection()
         changed = False
 
         if self.type == 'team':
-            override_options = self._compare_conn_params(conn_info, {
+            changed, diff = self._compare_conn_params(conn_info, {
                 'ipv4.method': self.ipv4_method,
                 'ipv4.addresses': self.ip4,
                 'ipv4.gateway': self.gw4,
@@ -1570,12 +1579,12 @@ class Nmcli(object):
                 'ipv4.dhcp-client-id': self.dhcp_client_id,
             })
         elif self.type == 'team-slave':
-            override_options = self._compare_conn_params(conn_info, {
+            changed, diff = self._compare_conn_params(conn_info, {
                 'connection.master': self.master,
                 '802-3-ethernet.mtu': to_text(self.mtu)
             })
         elif self.type == 'bond':
-            override_options = self._compare_conn_params(conn_info, {
+            changed, diff = self._compare_conn_params(conn_info, {
                 'ipv4.method': self.ipv4_method,
                 'ipv4.addresses': self.ip4,
                 'ipv4.gateway': self.gw4,
@@ -1595,11 +1604,11 @@ class Nmcli(object):
                 'ipv4.dhcp-client-id': self.dhcp_client_id,
             })
         elif self.type == 'bond-slave':
-            override_options = self._compare_conn_params(conn_info, {
+            changed, diff = self._compare_conn_params(conn_info, {
                 'connection.master': self.master,
             })
         elif self.type == 'ethernet':
-            override_options = self._compare_conn_params(conn_info, {
+            changed, diff = self._compare_conn_params(conn_info, {
                 'ipv4.method': self.ipv4_method,
                 'ipv4.addresses': self.ip4,
                 'ipv4.gateway': self.gw4,
@@ -1615,7 +1624,7 @@ class Nmcli(object):
                 'ipv4.dhcp-client-id': self.dhcp_client_id,
             })
         elif self.type == 'bridge':
-            override_options = self._compare_conn_params(conn_info, {
+            changed, diff = self._compare_conn_params(conn_info, {
                 'ipv4.method': self.ipv4_method,
                 'ipv4.addresses': self.ip4,
                 'ipv4.gateway': self.gw4,
@@ -1632,14 +1641,14 @@ class Nmcli(object):
                 'bridge.stp': self.bool_to_string(self.stp)
             })
         elif self.type == 'bridge-slave':
-            override_options = self._compare_conn_params(conn_info, {
+            changed, diff = self._compare_conn_params(conn_info, {
                 'master': self.master,
                 'bridge-port.path-cost': self.path_cost,
                 'bridge-port.hairpin-mode': self.bool_to_string(self.hairpin),
                 'bridge-port.priority': self.slavepriority,
             })
         elif self.type == 'vlan':
-            override_options = self._compare_conn_params(conn_info, {
+            changed, diff = self._compare_conn_params(conn_info, {
                 'vlan.parent': self.vlandev,
                 'vlan.id': self.vlanid,
                 'ipv4.method': self.ipv4_method,
@@ -1653,26 +1662,26 @@ class Nmcli(object):
                 'autoconnect': self.bool_to_string(self.autoconnect),
             })
         elif self.type == 'vxlan':
-            override_options = self._compare_conn_params(conn_info, {
+            changed, diff = self._compare_conn_params(conn_info, {
                 'vxlan.id': self.vxlan_id,
                 'vxlan.local': self.vxlan_local,
                 'vxlan.remote': self.vxlan_remote,
                 'autoconnect': self.bool_to_string(self.autoconnect),
             })
         elif self.type == 'ipip':
-            override_options = self._compare_conn_params(conn_info, {
+            changed, diff = self._compare_conn_params(conn_info, {
                 'ip-tunnel.local': self.ip_tunnel_local,
                 'ip-tunnel.remote': self.ip_tunnel_remote,
                 'autoconnect': self.bool_to_string(self.autoconnect),
             })
         elif self.type == 'sit':
-            override_options = self._compare_conn_params(conn_info, {
+            changed, diff = self._compare_conn_params(conn_info, {
                 'ip-tunnel.local': self.ip_tunnel_local,
                 'ip-tunnel.remote': self.ip_tunnel_remote,
                 'autoconnect': self.bool_to_string(self.autoconnect),
             })
         elif self.type == 'generic':
-            override_options = self._compare_conn_params(conn_info, {
+            changed, diff = self._compare_conn_params(conn_info, {
                 'ipv4.method': self.ipv4_method,
                 'ipv4.addresses': self.ip4,
                 'ipv4.gateway': self.gw4,
@@ -1689,15 +1698,7 @@ class Nmcli(object):
         else:
             raise NmcliModuleError("Unknown type of device: %s" % self.type)
 
-        self._override_options = override_options
-
-        if override_options:
-            changed = True
-        return changed
-
-    @property
-    def override_options(self):
-        return getattr(self, '_override_options', dict())
+        return changed, diff
 
 
 def main():
@@ -1793,22 +1794,25 @@ def main():
 
         elif nmcli.state == 'present':
             if nmcli.connection_exists():
-                if nmcli.is_connection_changed():
+                changed, diff = nmcli.is_connection_changed()
+                if module._diff:
+                    result['diff'] = diff
+
+                if changed:
                     # modify connection (note: this function is check mode aware)
                     # result['Connection']=('Connection %s of Type %s is not being added' % (nmcli.conn_name, nmcli.type))
                     result['Exists'] = 'Connections do exist so we are modifying them'
-                    result['override_options'] = nmcli.override_options
                     if module.check_mode:
-                        module.exit_json(changed=True)
+                        module.exit_json(changed=True, **result)
                     (rc, out, err) = nmcli.modify_connection()
                 else:
                     result['Exists'] = 'Connections already exist and no changes made'
                     if module.check_mode:
-                        module.exit_json(changed=False)
+                        module.exit_json(changed=False, **result)
             if not nmcli.connection_exists():
                 result['Connection'] = ('Connection %s of Type %s is being added' % (nmcli.conn_name, nmcli.type))
                 if module.check_mode:
-                    module.exit_json(changed=True)
+                    module.exit_json(changed=True, **result)
                 (rc, out, err) = nmcli.create_connection()
             if rc is not None and rc != 0:
                 module.fail_json(name=nmcli.conn_name, msg=err, rc=rc)
