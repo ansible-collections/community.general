@@ -56,7 +56,7 @@ notes:
     - Requires lzma or backports.lzma if using xz format.
     - Can produce I(gzip), I(bzip2), I(lzma) and I(zip) compressed files or archives.
 seealso:
-- module: unarchive
+- module: ansible.builtin.unarchive
 author:
 - Ben Doherty (@bendoh)
 '''
