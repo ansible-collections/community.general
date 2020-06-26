@@ -118,7 +118,7 @@ def main():
             user=dict(required=False),
             repo=dict(required=False),
             revision=dict(required=False),
-            version=dict(required=False),
+            version=dict(required=False, type='str'),
             url=dict(required=False, default='https://api.airbrake.io/api/v4/projects/'),
             validate_certs=dict(default=True, type='bool'),
         ),
