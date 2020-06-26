@@ -1,0 +1,5 @@
+release_summary: >
+  This is a experimental release to test whether ``meta/runtime.yml`` redirects work as expected for flatmapping.
+  There will be no final 0.3.0 release; the next release will be 1.0.0. This experimental pre-release will not
+  appear in the versioning history of 0.3.0, it is solely for testing certain technical aspects of ansible-base
+  and antsibull.

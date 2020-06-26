@@ -35,7 +35,7 @@ options:
       - Do not use any local cache path.
     type: bool
     default: no
-    version_added: 1.0.0
+    version_added: 0.3.0
   repository:
     description:
       - A package repository or multiple repositories.

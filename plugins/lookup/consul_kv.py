@@ -69,7 +69,7 @@ DOCUMENTATION = '''
       url:
         description: "The target to connect to, should look like this: C(https://my.consul.server:8500)."
         type: str
-        version_added: 1.0.0
+        version_added: 0.3.0
         env:
           - name: ANSIBLE_CONSUL_URL
         ini:
