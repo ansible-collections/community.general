@@ -1,0 +1,1 @@
+cloud/opennebula/one_image_facts.py
