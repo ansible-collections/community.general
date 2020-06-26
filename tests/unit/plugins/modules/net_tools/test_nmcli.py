@@ -92,6 +92,7 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv6.method:                            auto
 """
 
 TESTCASE_GENERIC_DNS4_SEARCH = [
@@ -117,6 +118,7 @@ ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
 ipv4.dns-search:                        search.redhat.com
 ipv6.dns-search:                        search6.redhat.com
+ipv6.method:                            auto
 """
 
 TESTCASE_BOND = [
@@ -140,6 +142,7 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv6.method:                            auto
 bond.options:                           mode=active-backup,primary=non_existent_primary
 """
 
@@ -164,6 +167,7 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv6.method:                            auto
 bridge.stp:                             yes
 bridge.max-age:                         100
 bridge.ageing-time:                     300
@@ -212,6 +216,7 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv6.method:                            auto
 vlan.id:                                10
 """
 
@@ -288,23 +293,32 @@ TESTCASE_ETHERNET_DHCP = [
         'type': 'ethernet',
         'conn_name': 'non_existent_nw_device',
         'ifname': 'ethernet_non_existant',
-        'ip4': '10.10.10.10/24',
-        'gw4': '10.10.10.1',
+        'dhcp_client_id': '00:11:22:AA:BB:CC:DD',
         'state': 'present',
         '_ansible_check_mode': False,
-        'dhcp_client_id': '00:11:22:AA:BB:CC:DD',
     }
 ]
 
 TESTCASE_ETHERNET_DHCP_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
-connection.interface-name:              vlan_not_exists
+connection.interface-name:              ethernet_non_existant
 connection.autoconnect:                 yes
 ipv4.method:                            auto
-ipv4.addresses:                         10.10.10.10/24
-ipv4.gateway:                           10.10.10.1
 ipv4.dhcp-client-id:                    00:11:22:AA:BB:CC:DD
+ipv6.method:                            auto
 """
+
+TESTCASE_ETHERNET_STATIC = [
+    {
+        'type': 'ethernet',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'ethernet_non_existant',
+        'ip4': '10.10.10.10/24',
+        'gw4': '10.10.10.1',
+        'state': 'present',
+        '_ansible_check_mode': False,
+    },
+]
 
 
 def mocker_set(mocker, connection_exists=False):
@@ -431,6 +445,17 @@ def mocked_ethernet_connection_dhcp_unchanged(mocker):
     mocker_set(mocker, connection_exists=True)
     command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
     command_result.return_value = (0, TESTCASE_ETHERNET_DHCP_SHOW_OUTPUT, "")
+    return command_result
+
+
+@pytest.fixture
+def mocked_ethernet_connection_dhcp_to_static(mocker):
+    mocker_set(mocker, connection_exists=True)
+    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
+    command_result.side_effect = [
+        (0, TESTCASE_ETHERNET_DHCP_SHOW_OUTPUT, ""),
+        (0, "", ""),
+    ]
     return command_result
 
 
@@ -1081,3 +1106,29 @@ def test_ethernet_connection_dhcp_unchanged(mocked_ethernet_connection_dhcp_unch
     results = json.loads(out)
     assert not results.get('failed')
     assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_STATIC, indirect=['patch_ansible_module'])
+def test_modify_ethernet_dhcp_to_static(mocked_ethernet_connection_dhcp_to_static, capfd):
+    """
+    Test : Modify ethernet connection from DHCP to static
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 2
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[1]
+
+    assert args[0][0] == '/usr/bin/nmcli'
+    assert args[0][1] == 'con'
+    assert args[0][2] == 'mod'
+    assert args[0][3] == 'non_existent_nw_device'
+
+    for param in ['ipv4.method', 'ipv4.gateway', 'ipv4.address']:
+        assert param in args[0]
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']

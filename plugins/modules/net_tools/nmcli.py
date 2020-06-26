@@ -675,6 +675,20 @@ class Nmcli(object):
         self.nmcli_bin = self.module.get_bin_path('nmcli', True)
         self.dhcp_client_id = module.params['dhcp_client_id']
 
+        if self.ip4:
+            self.ipv4_method = 'manual'
+        else:
+            # supported values for 'ipv4.method': [auto, link-local, manual, shared, disabled]
+            # TODO: add a new module parameter to specify a non 'manual' value
+            self.ipv4_method = None
+
+        if self.ip6:
+            self.ipv6_method = 'manual'
+        else:
+            # supported values for 'ipv6.method': [ignore, auto, dhcp, link-local, manual, shared]
+            # TODO: add a new module parameter to specify a non 'manual' value
+            self.ipv6_method = None
+
     def execute_command(self, cmd, use_unsafe_shell=False, data=None):
         if isinstance(cmd, list):
             cmd = [to_text(item) for item in cmd]
@@ -821,9 +835,11 @@ class Nmcli(object):
     def modify_connection_team(self):
         cmd = [self.nmcli_bin, 'con', 'mod', self.conn_name]
         options = {
+            'ipv4.method': self.ipv4_method,
             'ipv4.address': self.ip4,
             'ipv4.gateway': self.gw4,
             'ipv4.dns': self.dns4,
+            'ipv6.method': self.ipv6_method,
             'ipv6.address': self.ip6,
             'ipv6.gateway': self.gw6,
             'ipv6.dns': self.dns6,
@@ -903,9 +919,11 @@ class Nmcli(object):
         # format for modifying bond interface
 
         options = {
+            'ipv4.method': self.ipv4_method,
             'ipv4.address': self.ip4,
             'ipv4.gateway': self.gw4,
             'ipv4.dns': self.dns4,
+            'ipv6.method': self.ipv6_method,
             'ipv6.address': self.ip6,
             'ipv6.gateway': self.gw6,
             'ipv6.dns': self.dns6,
@@ -993,9 +1011,11 @@ class Nmcli(object):
         # - nmcli: conn_name=my-eth1 ifname=eth1 type=ethernet ip4=192.0.2.100/24 gw4=192.0.2.1 state=present
         # nmcli con mod con-name my-eth1 ifname eth1 type ethernet ipv4.address 192.0.2.100/24 ipv4.gateway 192.0.2.1
         options = {
+            'ipv4.method': self.ipv4_method,
             'ipv4.address': self.ip4,
             'ipv4.gateway': self.gw4,
             'ipv4.dns': self.dns4,
+            'ipv6.method': self.ipv6_method,
             'ipv6.address': self.ip6,
             'ipv6.gateway': self.gw6,
             'ipv6.dns': self.dns6,
@@ -1059,8 +1079,10 @@ class Nmcli(object):
         cmd = [self.nmcli_bin, 'con', 'mod', self.conn_name]
 
         options = {
+            'ipv4.method': self.ipv4_method,
             'ipv4.address': self.ip4,
             'ipv4.gateway': self.gw4,
+            'ipv6.method': self.ipv6_method,
             'ipv6.address': self.ip6,
             'ipv6.gateway': self.gw6,
             'autoconnect': self.bool_to_string(self.autoconnect),
@@ -1171,9 +1193,11 @@ class Nmcli(object):
 
         params = {'vlan.parent': self.vlandev,
                   'vlan.id': self.vlanid,
+                  'ipv4.method': self.ipv4_method,
                   'ipv4.address': self.ip4 or '',
                   'ipv4.gateway': self.gw4 or '',
                   'ipv4.dns': self.dns4 or '',
+                  'ipv6.method': self.ipv6_method,
                   'ipv6.address': self.ip6 or '',
                   'ipv6.gateway': self.gw6 or '',
                   'ipv6.dns': self.dns6 or '',
@@ -1537,9 +1561,11 @@ class Nmcli(object):
 
         if self.type == 'team':
             override_options = self._compare_conn_params(conn_info, {
+                'ipv4.method': self.ipv4_method,
                 'ipv4.addresses': self.ip4,
                 'ipv4.gateway': self.gw4,
                 'ipv4.dns': self.dns4,
+                'ipv6.method': self.ipv6_method,
                 'ipv6.addresses': self.ip6,
                 'ipv6.gateway': self.gw6,
                 'ipv6.dns': self.dns6,
@@ -1555,9 +1581,11 @@ class Nmcli(object):
             })
         elif self.type == 'bond':
             override_options = self._compare_conn_params(conn_info, {
+                'ipv4.method': self.ipv4_method,
                 'ipv4.addresses': self.ip4,
                 'ipv4.gateway': self.gw4,
                 'ipv4.dns': self.dns4,
+                'ipv6.method': self.ipv6_method,
                 'ipv6.addresses': self.ip6,
                 'ipv6.gateway': self.gw6,
                 'ipv6.dns': self.dns6,
@@ -1577,9 +1605,11 @@ class Nmcli(object):
             })
         elif self.type == 'ethernet':
             override_options = self._compare_conn_params(conn_info, {
+                'ipv4.method': self.ipv4_method,
                 'ipv4.addresses': self.ip4,
                 'ipv4.gateway': self.gw4,
                 'ipv4.dns': self.dns4,
+                'ipv6.method': self.ipv6_method,
                 'ipv6.addresses': self.ip6,
                 'ipv6.gateway': self.gw6,
                 'ipv6.dns': self.dns6,
@@ -1591,8 +1621,10 @@ class Nmcli(object):
             })
         elif self.type == 'bridge':
             override_options = self._compare_conn_params(conn_info, {
+                'ipv4.method': self.ipv4_method,
                 'ipv4.addresses': self.ip4,
                 'ipv4.gateway': self.gw4,
+                'ipv6.method': self.ipv6_method,
                 'ipv6.addresses': self.ip6,
                 'ipv6.gateway': self.gw6,
                 'autoconnect': self.bool_to_string(self.autoconnect),
@@ -1615,9 +1647,11 @@ class Nmcli(object):
             override_options = self._compare_conn_params(conn_info, {
                 'vlan.parent': self.vlandev,
                 'vlan.id': self.vlanid,
+                'ipv4.method': self.ipv4_method,
                 'ipv4.addresses': self.ip4 or '',
                 'ipv4.gateway': self.gw4 or '',
                 'ipv4.dns': self.dns4 or '',
+                'ipv6.method': self.ipv6_method,
                 'ipv6.addresses': self.ip6 or '',
                 'ipv6.gateway': self.gw6 or '',
                 'ipv6.dns': self.dns6 or '',
@@ -1644,9 +1678,11 @@ class Nmcli(object):
             })
         elif self.type == 'generic':
             override_options = self._compare_conn_params(conn_info, {
+                'ipv4.method': self.ipv4_method,
                 'ipv4.addresses': self.ip4,
                 'ipv4.gateway': self.gw4,
                 'ipv4.dns': self.dns4,
+                'ipv6.method': self.ipv6_method,
                 'ipv6.addresses': self.ip6,
                 'ipv6.gateway': self.gw6,
                 'ipv6.dns': self.dns6,
