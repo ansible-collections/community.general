@@ -476,7 +476,7 @@ def test_bond_connection_unchanged(mocked_bond_connection_unchanged, capfd):
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert not results.get('failed')
-    assert results['changed'] == False
+    assert not results['changed']
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC, indirect=['patch_ansible_module'])
@@ -545,7 +545,7 @@ def test_generic_connection_unchanged(mocked_generic_connection_unchanged, capfd
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert not results.get('failed')
-    assert results['changed'] == False
+    assert not results['changed']
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_DNS4_SEARCH, indirect=['patch_ansible_module'])
@@ -601,7 +601,7 @@ def test_generic_connection_dns_search_unchanged(mocked_generic_connection_dns_s
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert not results.get('failed')
-    assert results['changed'] == False
+    assert not results['changed']
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_CONNECTION, indirect=['patch_ansible_module'])
@@ -684,7 +684,7 @@ def test_bridge_connection_unchanged(mocked_bridge_connection_unchanged, capfd):
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert not results.get('failed')
-    assert results['changed'] == False
+    assert not results['changed']
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_BRIDGE_SLAVE, indirect=['patch_ansible_module'])
@@ -755,7 +755,7 @@ def test_bridge_slave_unchanged(mocked_bridge_slave_unchanged, capfd):
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert not results.get('failed')
-    assert results['changed'] == False
+    assert not results['changed']
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_VLAN, indirect=['patch_ansible_module'])
@@ -826,7 +826,7 @@ def test_vlan_connection_unchanged(mocked_vlan_connection_unchanged, capfd):
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert not results.get('failed')
-    assert results['changed'] == False
+    assert not results['changed']
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_VXLAN, indirect=['patch_ansible_module'])
@@ -896,7 +896,7 @@ def test_vxlan_connection_unchanged(mocked_vxlan_connection_unchanged, capfd):
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert not results.get('failed')
-    assert results['changed'] == False
+    assert not results['changed']
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_IPIP, indirect=['patch_ansible_module'])
@@ -971,7 +971,7 @@ def test_ipip_connection_unchanged(mocked_ipip_connection_unchanged, capfd):
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert not results.get('failed')
-    assert results['changed'] == False
+    assert not results['changed']
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_SIT, indirect=['patch_ansible_module'])
@@ -1046,7 +1046,7 @@ def test_sit_connection_unchanged(mocked_sit_connection_unchanged, capfd):
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert not results.get('failed')
-    assert results['changed'] == False
+    assert not results['changed']
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_ETHERNET_DHCP, indirect=['patch_ansible_module'])
@@ -1080,4 +1080,4 @@ def test_ethernet_connection_dhcp_unchanged(mocked_ethernet_connection_dhcp_unch
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert not results.get('failed')
-    assert results['changed'] == False
+    assert not results['changed']
