@@ -37,19 +37,19 @@ options:
               that they are not required by other packages and were not
               explicitly installed by a user.
         type: bool
-        default: False
+        default: no
     update_cache:
         description:
             - Whether or not to refresh the master package lists. This can be
               run as part of a package installation or as a separate step.
         aliases: ['update-cache']
         type: bool
-        default: True
+        default: yes
     upgrade:
         description:
             - Whether or not to upgrade whole system
         type: bool
-        default: False
+        default: no
     upgrade_xbps:
         description:
             - Whether or not to upgrade the xbps package when necessary.
@@ -58,7 +58,7 @@ options:
               Thus when this option is set to C(no),
               upgrades and installations will fail when xbps is not up to date.
         type: bool
-        default: True
+        default: yes
         version_added: '0.2.0'
     force:
         description:

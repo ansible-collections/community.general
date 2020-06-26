@@ -41,7 +41,7 @@ options:
               This option can only be specified if there is a single snap in the task.
         type: bool
         required: false
-        default: False
+        default: no
     channel:
         description:
             - Define which release of a snap is installed and tracked for updates.

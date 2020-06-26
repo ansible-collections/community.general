@@ -46,7 +46,7 @@ options:
     description:
       - If you want to refresh your catalog from the mirror, set this to (C(yes)).
     required: false
-    default: False
+    default: no
     type: bool
 '''
 

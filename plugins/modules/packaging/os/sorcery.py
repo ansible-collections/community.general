@@ -60,13 +60,13 @@ options:
         description:
             - Whether or not to update sorcery scripts at the very first stage
         type: bool
-        default: False
+        default: no
 
     update_cache:
         description:
             - Whether or not to update grimoire collection before casting spells
         type: bool
-        default: False
+        default: no
         aliases: ["update_codex"]
 
     cache_valid_time:

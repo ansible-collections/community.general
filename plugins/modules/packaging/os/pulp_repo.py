@@ -21,7 +21,7 @@ options:
     description:
       - Whether or not to add the export distributor to new C(rpm) repositories.
     type: bool
-    default: False
+    default: no
   feed:
     description:
       - Upstream feed URL to receive updates from.
@@ -34,14 +34,14 @@ options:
         properly send a 401, logins will fail. This option forces the sending of
         the Basic authentication header upon initial request.
     type: bool
-    default: False
+    default: no
   generate_sqlite:
     description:
       - Boolean flag to indicate whether sqlite files should be generated during
         a repository publish.
     required: false
     type: bool
-    default: False
+    default: no
   feed_ca_cert:
     description:
       - CA certificate string used to validate the feed source SSL certificate.
@@ -126,17 +126,17 @@ options:
         this to "yes" automatically activates `generate_sqlite`.
     required: false
     type: bool
-    default: False
+    default: no
   serve_http:
     description:
       - Make the repo available over HTTP.
     type: bool
-    default: False
+    default: no
   serve_https:
     description:
       - Make the repo available over HTTPS.
     type: bool
-    default: True
+    default: yes
   state:
     description:
       - The repo state. A state of C(sync) will queue a sync of the repo.
@@ -158,12 +158,12 @@ options:
       - If C(no), SSL certificates will not be validated. This should only be
         used on personally controlled sites using self-signed certificates.
     type: bool
-    default: True
+    default: yes
   wait_for_completion:
     description:
       - Wait for asynchronous tasks to complete before returning.
     type: bool
-    default: False
+    default: no
 notes:
   - This module can currently only create distributors and importers on rpm
     repositories. Contributions to support other repo types are welcome.

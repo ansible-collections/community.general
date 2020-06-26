@@ -75,7 +75,7 @@ options:
             - Upon successful registration, auto-consume available subscriptions
             - Added in favor of deprecated autosubscribe in 2.5.
         type: bool
-        default: False
+        default: no
         aliases: [autosubscribe]
     activationkey:
         description:
@@ -126,7 +126,7 @@ options:
         description:
             -  Register the system even if it is already registered
         type: bool
-        default: False
+        default: no
     release:
         description:
             - Set a release version
@@ -160,7 +160,7 @@ options:
                       RHSM server immediately. When this option is false, then syspurpose attributes
                       will be synchronized with RHSM server by rhsmcertd daemon.
                 type: bool
-                default: False
+                default: no
 '''
 
 EXAMPLES = '''

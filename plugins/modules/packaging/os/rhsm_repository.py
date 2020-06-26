@@ -42,7 +42,7 @@ options:
         Only set this to C(True) if passing in a list of repositories to the C(name) field.
         Using this with C(loop) will most likely not have the desired result.
     type: bool
-    default: False
+    default: no
 '''
 
 EXAMPLES = '''

@@ -24,7 +24,7 @@ options:
       - During upgrade, reset versioned world dependencies and change logic to prefer replacing or downgrading packages (instead of holding them)
         if the currently installed package is no longer available from any repository.
     type: bool
-    default: False
+    default: no
   name:
     description:
       - A package name, like C(foo), or multiple packages, like C(foo, bar).
@@ -34,7 +34,7 @@ options:
     description:
       - Do not use any local cache path.
     type: bool
-    default: False
+    default: no
     version_added: 1.0.0
   repository:
     description:
@@ -55,12 +55,12 @@ options:
     description:
       - Update repository indexes. Can be run with other steps or on it's own.
     type: bool
-    default: False
+    default: no
   upgrade:
     description:
       - Upgrade all installed packages to their latest version.
     type: bool
-    default: False
+    default: no
 notes:
   - '"name" and "upgrade" are mutually exclusive.'
   - When used with a `loop:` each package will be processed individually, it is much more efficient to pass the list directly to the `name` option.
