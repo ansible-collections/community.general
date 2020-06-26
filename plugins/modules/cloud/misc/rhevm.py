@@ -13,7 +13,7 @@ module: rhevm
 short_description: RHEV/oVirt automation
 description:
     - This module only supports oVirt/RHEV version 3.
-    - A newer module M(ovirt_vm) supports oVirt/RHV version 4.
+    - A newer module M(ovirt.ovirt.ovirt_vm) supports oVirt/RHV version 4.
     - Allows you to create/remove/update or powermanage virtual machines on a RHEV/oVirt platform.
 requirements:
     - ovirtsdk

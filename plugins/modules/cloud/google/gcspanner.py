@@ -23,7 +23,7 @@ notes:
 deprecated:
     removed_in: 2.0.0  # was Ansible 2.12
     why: Updated modules released with increased functionality
-    alternative: Use M(gcp_spanner_database) and/or M(gcp_spanner_instance) instead.
+    alternative: Use M(google.cloud.gcp_spanner_database) and/or M(google.cloud.gcp_spanner_instance) instead.
 author:
   - Tom Melendez (@supertom) <tom@supertom.com>
 options:

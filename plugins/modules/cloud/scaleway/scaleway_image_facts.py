@@ -13,7 +13,7 @@ module: scaleway_image_facts
 deprecated:
   removed_in: 3.0.0  # was Ansible 2.13
   why: Deprecated in favour of C(_info) module.
-  alternative: Use M(scaleway_image_info) instead.
+  alternative: Use M(community.general.scaleway_image_info) instead.
 short_description: Gather facts about the Scaleway images available.
 description:
   - Gather facts about the Scaleway images available.

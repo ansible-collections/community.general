@@ -30,11 +30,9 @@ author: "Ondra Machacek (@machacekondra)"
 deprecated:
     removed_in: 3.0.0  # was Ansible 2.13
     why: When migrating to collection we decided to use only _info modules.
-    alternative: Use C(ovirt_external_provider_info) from the C(ovirt.ovirt) collection instead
+    alternative: Use M(ovirt.ovirt.ovirt_external_provider_info) instead.
 description:
     - "Retrieve information about one or more oVirt/RHV external providers."
-    - This module was called C(ovirt_external_provider_facts) before Ansible 2.9, returning C(ansible_facts).
-      Note that the M(ovirt_external_provider_info) module no longer returns C(ansible_facts)!
 notes:
     - "This module returns a variable C(ovirt_external_providers), which
        contains a list of external_providers. You need to register the result with

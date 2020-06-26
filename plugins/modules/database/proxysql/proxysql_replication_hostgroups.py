@@ -48,8 +48,8 @@ EXAMPLES = '''
 # to disk, but avoids loading the mysql server config to runtime (this might be
 # because several replication hostgroup are being added and the user wants to
 # push the config to runtime in a single batch using the
-# M(proxysql_manage_config) module).  It uses supplied credentials to connect
-# to the proxysql admin interface.
+# community.general.proxysql_manage_config module).  It uses supplied credentials
+# to connect to the proxysql admin interface.
 
 - name: Add a replication hostgroup
   proxysql_replication_hostgroups:

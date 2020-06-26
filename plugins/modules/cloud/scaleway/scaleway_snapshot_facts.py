@@ -13,7 +13,7 @@ module: scaleway_snapshot_facts
 deprecated:
   removed_in: 3.0.0  # was Ansible 2.13
   why: Deprecated in favour of C(_info) module.
-  alternative: Use M(scaleway_snapshot_info) instead.
+  alternative: Use M(community.general.scaleway_snapshot_info) instead.
 short_description: Gather facts about the Scaleway snapshots available.
 description:
   - Gather facts about the Scaleway snapshot available.
