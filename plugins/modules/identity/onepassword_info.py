@@ -60,7 +60,8 @@ options:
     auto_login:
         type: dict
         description:
-            - A dictionary containing authentication details. If this is set, M(community.general.onepassword_info) will attempt to sign in to 1Password automatically.
+            - A dictionary containing authentication details. If this is set, M(community.general.onepassword_info)
+              will attempt to sign in to 1Password automatically.
             - Without this option, you must have already logged in via the 1Password CLI before running Ansible.
             - It is B(highly) recommended to store 1Password credentials in an Ansible Vault. Ensure that the key used to encrypt
               the Ansible Vault is equal to or greater in strength than the 1Password master password.
