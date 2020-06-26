@@ -39,6 +39,8 @@ options:
         - When using state=latest, this can be '*', which updates all installed packages.
         required: true
         aliases: [ 'pkg' ]
+        type: list
+        elements: str
     state:
         description:
           - C(present) will make sure the package is installed.
@@ -49,17 +51,20 @@ options:
         required: false
         choices: [ present, latest, absent, dist-upgrade ]
         default: "present"
+        type: str
     type:
         description:
           - The type of package to be operated on.
         required: false
         choices: [ package, patch, pattern, product, srcpackage, application ]
         default: "package"
+        type: str
     extra_args_precommand:
        required: false
        description:
          - Add additional global target options to C(zypper).
          - Options should be supplied in a single line as if given in the command line.
+       type: str
     disable_gpg_check:
         description:
           - Whether to disable to GPG signature checking of the package
@@ -107,6 +112,7 @@ options:
         description:
           - Add additional options to C(zypper) command.
           - Options should be supplied in a single line as if given in the command line.
+        type: str
     allow_vendor_change:
         type: bool
         required: false
@@ -492,7 +498,7 @@ def repo_refresh(m):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True, aliases=['pkg'], type='list'),
+            name=dict(required=True, aliases=['pkg'], type='list', elements='str'),
             state=dict(required=False, default='present', choices=['absent', 'installed', 'latest', 'present', 'removed', 'dist-upgrade']),
             type=dict(required=False, default='package', choices=['package', 'patch', 'pattern', 'product', 'srcpackage', 'application']),
             extra_args_precommand=dict(required=False, default=None),

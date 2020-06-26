@@ -29,11 +29,13 @@ options:
       - Indicates the desired package state.
     choices: [ absent, present ]
     default: present
+    type: str
   update_cache:
     description:
       - update the package database first C(apt-get update).
+    aliases: [ 'update-cache' ]
     type: bool
-    default: 'no'
+    default: no
 author:
 - Evgenii Terechkov (@evgkrsk)
 '''
@@ -154,7 +156,7 @@ def install_packages(module, pkgspec):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='installed', choices=['absent', 'installed', 'present', 'removed']),
+            state=dict(type='str', default='present', choices=['absent', 'installed', 'present', 'removed']),
             update_cache=dict(type='bool', default=False, aliases=['update-cache']),
             package=dict(type='list', elements='str', required=True, aliases=['name', 'pkg']),
         ),

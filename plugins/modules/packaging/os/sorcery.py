@@ -31,6 +31,8 @@ options:
             - special value '*' in conjunction with states C(latest) or
               C(rebuild) will update or rebuild the whole system respectively
         aliases: ["spell"]
+        type: list
+        elements: str
 
     state:
         description:
@@ -41,6 +43,7 @@ options:
               those existed before
         choices: ["present", "latest", "absent", "cast", "dispelled", "rebuild"]
         default: "present"
+        type: str
 
     depends:
         description:
@@ -51,18 +54,19 @@ options:
               contains more than one spell
             - providers must be supplied in the form recognized by Sorcery, e.g.
               'openssl(SSL)'
+        type: str
 
     update:
         description:
             - Whether or not to update sorcery scripts at the very first stage
         type: bool
-        default: 'no'
+        default: no
 
     update_cache:
         description:
             - Whether or not to update grimoire collection before casting spells
         type: bool
-        default: 'no'
+        default: no
         aliases: ["update_codex"]
 
     cache_valid_time:
@@ -70,6 +74,7 @@ options:
             - Time in seconds to invalidate grimoire collection on update
             - especially useful for SCM and rsync grimoires
             - makes sense only in pair with C(update_cache)
+        type: int
 '''
 
 
@@ -593,7 +598,7 @@ def manage_spells(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(default=None, aliases=['spell'], type='list'),
+            name=dict(default=None, aliases=['spell'], type='list', elements='str'),
             state=dict(default='present', choices=['present', 'latest',
                                                    'absent', 'cast', 'dispelled', 'rebuild']),
             depends=dict(default=None),
