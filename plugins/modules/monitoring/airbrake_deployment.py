@@ -56,6 +56,7 @@ options:
       - A string identifying what version was deployed
     required: false
     type: str
+    version_added: '1.0.0'
   url:
     description:
       - Optional URL to submit the notification to. Use to send notifications to Airbrake-compliant tools like Errbit.
