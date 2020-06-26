@@ -56,7 +56,6 @@ action_groups:
   - ovirt_user_facts
   - ovirt_vm_facts
   - ovirt_vmpool_facts
-
 plugin_routing:
   modules:
     ali_instance_facts:
