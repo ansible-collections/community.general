@@ -1,1 +1,0 @@
-./database/misc/kibana_plugin.py

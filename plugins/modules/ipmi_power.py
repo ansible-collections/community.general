@@ -1,1 +1,0 @@
-./remote_management/ipmi/ipmi_power.py

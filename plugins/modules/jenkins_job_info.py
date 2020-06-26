@@ -1,1 +1,0 @@
-./web_infrastructure/jenkins_job_info.py

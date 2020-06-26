@@ -1,1 +1,0 @@
-./cloud/centurylink/clc_server_snapshot.py

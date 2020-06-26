@@ -1,1 +1,0 @@
-./remote_management/manageiq/manageiq_alert_profiles.py

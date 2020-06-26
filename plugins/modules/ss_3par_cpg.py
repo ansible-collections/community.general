@@ -1,1 +1,0 @@
-./storage/hpe3par/ss_3par_cpg.py
