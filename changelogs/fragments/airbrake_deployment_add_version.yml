@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - "airbrake_deployment - add ``version`` param; clarified docs on ``revision`` param (https://github.com/ansible-collections/community.general/pull/583)."
