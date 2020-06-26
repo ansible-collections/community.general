@@ -113,3 +113,135 @@
     that:
       - "double_url_removal_result.changed == false"
     msg: "state=absent with url as name shall not do anything when flatpak is not present"
+
+# state=present with list of packages
+
+- name: Test addition with list - {{ method }}
+  flatpak:
+    name:
+      - org.gnome.Characters
+      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
+    remote: flathub
+    state: present
+    method: "{{ method }}"
+  register: addition_result
+
+- name: Verify addition with list test result - {{ method }}
+  assert:
+    that:
+      - "addition_result.changed == true"
+    msg: "state=present shall add flatpak when absent"
+
+- name: Test idempotency of addition with list - {{ method }}
+  flatpak:
+    name:
+      - org.gnome.Characters
+      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
+    remote: flathub
+    state: present
+    method: "{{ method }}"
+  register: double_addition_result
+
+- name: Verify idempotency of addition with list test result - {{ method }}
+  assert:
+    that:
+      - "double_addition_result.changed == false"
+    msg: "state=present shall not do anything when flatpak is already present"
+
+- name: Test addition with list partially installed - {{ method }}
+  flatpak:
+    name:
+      - org.gnome.Characters
+      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
+      - org.inkscape.Inkscape
+    remote: flathub
+    state: present
+    method: "{{ method }}"
+  register: addition_result
+
+- name: Verify addition with list partially installed test result - {{ method }}
+  assert:
+    that:
+      - "addition_result.changed == true"
+    msg: "state=present shall add flatpak when absent"
+
+- name: Test idempotency of addition with list partially installed - {{ method }}
+  flatpak:
+    name:
+      - org.gnome.Characters
+      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
+      - org.inkscape.Inkscape
+    remote: flathub
+    state: present
+    method: "{{ method }}"
+  register: double_addition_result
+
+- name: Verify idempotency of addition with list partially installed test result - {{ method }}
+  assert:
+    that:
+      - "double_addition_result.changed == false"
+    msg: "state=present shall not do anything when flatpak is already present"
+
+# state=absent with list of packages
+
+- name: Test removal with list - {{ method }}
+  flatpak:
+    name:
+      - org.gnome.Characters
+      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
+    state: absent
+    method: "{{ method }}"
+  register: removal_result
+
+- name: Verify removal with list test result - {{ method }}
+  assert:
+    that:
+      - "removal_result.changed == true"
+    msg: "state=absent shall remove flatpak when present"
+
+- name: Test idempotency of removal with list - {{ method }}
+  flatpak:
+    name:
+      - org.gnome.Characters
+      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
+    state: absent
+    method: "{{ method }}"
+  register: double_removal_result
+
+- name: Verify idempotency of removal with list test result - {{ method }}
+  assert:
+    that:
+      - "double_removal_result.changed == false"
+    msg: "state=absent shall not do anything when flatpak is not present"
+
+- name: Test removal with list partially removed - {{ method }}
+  flatpak:
+    name:
+      - org.gnome.Characters
+      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
+      - org.inkscape.Inkscape
+    state: absent
+    method: "{{ method }}"
+  register: removal_result
+
+- name: Verify removal with list partially removed test result - {{ method }}
+  assert:
+    that:
+      - "removal_result.changed == true"
+    msg: "state=absent shall remove flatpak when present"
+
+- name: Test idempotency of removal with list partially removed - {{ method }}
+  flatpak:
+    name:
+      - org.gnome.Characters
+      - https://flathub.org/repo/appstream/org.gnu.emacs.flatpakref
+      - org.inkscape.Inkscape
+    state: absent
+    method: "{{ method }}"
+  register: double_removal_result
+
+- name: Verify idempotency of removal with list partially removed test result - {{ method }}
+  assert:
+    that:
+      - "double_removal_result.changed == false"
+    msg: "state=absent shall not do anything when flatpak is not present"
