@@ -26,6 +26,7 @@ options:
     - One or more packages to install or remove.
     - Use C(all) to install all packages available on informed C(repository_path).
     type: list
+    elements: str
     required: true
     aliases: [ pkg ]
   repository_path:
@@ -257,7 +258,7 @@ def install(module, installp_cmd, packages, repository_path, accept_license):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='list', required=True, aliases=['pkg']),
+            name=dict(type='list', elements='str', required=True, aliases=['pkg']),
             repository_path=dict(type='path'),
             accept_license=dict(type='bool', default=False),
             state=dict(type='str', default='present', choices=['absent', 'present']),

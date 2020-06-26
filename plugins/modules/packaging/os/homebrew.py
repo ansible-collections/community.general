@@ -50,13 +50,13 @@ options:
         description:
             - update homebrew itself first.
         type: bool
-        default: 'no'
+        default: no
         aliases: ['update-brew']
     upgrade_all:
         description:
             - upgrade all homebrew packages.
         type: bool
-        default: 'no'
+        default: no
         aliases: ['upgrade']
     install_options:
         description:
