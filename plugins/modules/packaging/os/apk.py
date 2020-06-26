@@ -24,7 +24,7 @@ options:
       - During upgrade, reset versioned world dependencies and change logic to prefer replacing or downgrading packages (instead of holding them)
         if the currently installed package is no longer available from any repository.
     type: bool
-    default: 'no'
+    default: no
   name:
     description:
       - A package name, like C(foo), or multiple packages, like C(foo, bar).
@@ -34,12 +34,14 @@ options:
     description:
       - Do not use any local cache path.
     type: bool
-    default: 'no'
+    default: no
     version_added: 1.0.0
   repository:
     description:
       - A package repository or multiple repositories.
         Unlike with the underlying apk command, this list will override the system repositories rather than supplement them.
+    type: list
+    elements: str
   state:
     description:
       - Indicates the desired package(s) state.
@@ -48,16 +50,17 @@ options:
       - C(latest) ensures the package(s) is/are present and the latest version(s).
     default: present
     choices: [ "present", "absent", "latest" ]
+    type: str
   update_cache:
     description:
       - Update repository indexes. Can be run with other steps or on it's own.
     type: bool
-    default: 'no'
+    default: no
   upgrade:
     description:
       - Upgrade all installed packages to their latest version.
     type: bool
-    default: 'no'
+    default: no
 notes:
   - '"name" and "upgrade" are mutually exclusive.'
   - When used with a `loop:` each package will be processed individually, it is much more efficient to pass the list directly to the `name` option.
@@ -306,7 +309,7 @@ def main():
             state=dict(default='present', choices=['present', 'installed', 'absent', 'removed', 'latest']),
             name=dict(type='list', elements='str'),
             no_cache=dict(default=False, type='bool'),
-            repository=dict(type='list'),
+            repository=dict(type='list', elements='str'),
             update_cache=dict(default=False, type='bool'),
             upgrade=dict(default=False, type='bool'),
             available=dict(default=False, type='bool'),
