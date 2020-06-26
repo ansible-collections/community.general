@@ -21,13 +21,16 @@ options:
     name:
         description:
             - name of package to install/remove
+        aliases: [pkg]
         required: true
+        type: str
     state:
         description:
             - state of the package
         choices: [ 'present', 'absent' ]
         required: false
         default: present
+        type: str
     use_packages:
         description:
             - use packages instead of ports whenever available

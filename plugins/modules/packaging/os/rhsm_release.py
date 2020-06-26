@@ -23,6 +23,7 @@ options:
     description:
       - RHSM release version to use (use null to unset)
     required: true
+    type: str
 author:
   - Sean Myers (@seandst)
 '''

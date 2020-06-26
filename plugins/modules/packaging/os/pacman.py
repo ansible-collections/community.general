@@ -33,6 +33,7 @@ options:
             - Desired state of the package.
         default: present
         choices: [ absent, latest, present ]
+        type: str
 
     force:
         description:
@@ -47,6 +48,7 @@ options:
         description:
             - Additional option to pass to pacman when enforcing C(state).
         default:
+        type: str
 
     update_cache:
         description:
@@ -60,6 +62,7 @@ options:
         description:
             - Additional option to pass to pacman when enforcing C(update_cache).
         default:
+        type: str
 
     upgrade:
         description:
@@ -72,6 +75,7 @@ options:
         description:
             - Additional option to pass to pacman when enforcing C(upgrade).
         default:
+        type: str
 
 notes:
   - When used with a `loop:` each package will be processed individually,

@@ -22,34 +22,38 @@ options:
       - A list of package names to install, upgrade or remove.
     required: yes
     aliases: [ package, pkg ]
+    type: list
+    elements: str
   state:
     description:
       - Indicates the desired package state.
     choices: [ absent, present ]
     default: present
+    type: str
   update_cache:
     description:
       - Update the package database first C(urpmi.update -a).
     type: bool
-    default: 'no'
+    default: no
+    aliases: ['update-cache']
   no-recommends:
     description:
       - Corresponds to the C(--no-recommends) option for I(urpmi).
     type: bool
-    default: 'yes'
-    aliases: ['no-recommends']
+    default: yes
+    aliases: ['no_recommends']
   force:
     description:
       - Assume "yes" is the answer to any question urpmi has to ask.
         Corresponds to the C(--force) option for I(urpmi).
     type: bool
-    default: 'yes'
+    default: yes
   root:
     description:
       - Specifies an alternative install root, relative to which all packages will be installed.
         Corresponds to the C(--root) option for I(urpmi).
-    default: /
     aliases: [ installroot ]
+    type: str
 author:
 - Philippe Makowski (@pmakowski)
 '''
@@ -189,12 +193,12 @@ def root_option(root):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='installed',
+            state=dict(type='str', default='present',
                        choices=['absent', 'installed', 'present', 'removed']),
             update_cache=dict(type='bool', default=False, aliases=['update-cache']),
             force=dict(type='bool', default=True),
             no_recommends=dict(type='bool', default=True, aliases=['no-recommends']),
-            name=dict(type='list', required=True, aliases=['package', 'pkg']),
+            name=dict(type='list', elements='str', required=True, aliases=['package', 'pkg']),
             root=dict(type='str', aliases=['installroot']),
         ),
     )
