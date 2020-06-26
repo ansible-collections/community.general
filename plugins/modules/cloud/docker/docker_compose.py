@@ -639,6 +639,9 @@ class ContainerManager(DockerBaseClass):
                              "Upgrade docker-compose to a min version of %s." %
                              (compose_version, MINIMUM_COMPOSE_VERSION, MINIMUM_COMPOSE_VERSION))
 
+        if self.restarted and self.stopped:
+            self.client.fail("Cannot use restarted and stopped at the same time.")
+
         self.log("options: ")
         self.log(self.options, pretty_print=True)
 
@@ -767,7 +770,7 @@ class ContainerManager(DockerBaseClass):
                         ))
                     result['actions'].append(result_action)
 
-        if not self.check_mode and result['changed']:
+        if not self.check_mode and result['changed'] and not self.stopped:
             out_redir_name, err_redir_name = make_redirection_tempfiles()
             try:
                 with stdout_redirector(out_redir_name):
