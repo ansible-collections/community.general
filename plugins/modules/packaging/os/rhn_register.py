@@ -62,6 +62,7 @@ options:
         description:
             - Optionally specify a list of channels to subscribe to upon successful registration.
         type: list
+        elements: str
         default: []
     enable_eus:
         description:
@@ -346,7 +347,7 @@ def main():
             systemorgid=dict(type='str'),
             enable_eus=dict(type='bool', default=False),
             nopackages=dict(type='bool', default=False),
-            channels=dict(type='list', default=[]),
+            channels=dict(type='list', elements='str', default=[]),
         ),
         # username/password is required for state=absent, or if channels is not empty
         # (basically anything that uses self.api requires username/password) but it doesn't

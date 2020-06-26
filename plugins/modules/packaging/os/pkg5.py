@@ -23,11 +23,14 @@ options:
       - An FRMI of the package(s) to be installed/removed/updated.
       - Multiple packages may be specified, separated by C(,).
     required: true
+    type: list
+    elements: str
   state:
     description:
       - Whether to install (I(present), I(latest)), or remove (I(absent)) a package.
     choices: [ absent, latest, present ]
     default: present
+    type: str
   accept_licenses:
     description:
       - Accept any licences.
@@ -74,7 +77,7 @@ from ansible.module_utils.basic import AnsibleModule
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='list', required=True),
+            name=dict(type='list', elements='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'installed', 'latest', 'present', 'removed', 'uninstalled']),
             accept_licenses=dict(type='bool', default=False, aliases=['accept', 'accept_licences']),
             be_name=dict(type='str'),
