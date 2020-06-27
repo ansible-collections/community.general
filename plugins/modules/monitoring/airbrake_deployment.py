@@ -111,15 +111,15 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            token=dict(required=False, no_log=True),
-            project_id=dict(required=False, no_log=True),
-            project_key=dict(required=False, no_log=True),
-            environment=dict(required=True),
-            user=dict(required=False),
-            repo=dict(required=False),
-            revision=dict(required=False),
+            token=dict(required=False, no_log=True, type='str'),
+            project_id=dict(required=False, no_log=True, type='str'),
+            project_key=dict(required=False, no_log=True, type='str'),
+            environment=dict(required=True, type='str'),
+            user=dict(required=False, type='str'),
+            repo=dict(required=False, type='str'),
+            revision=dict(required=False, type='str'),
             version=dict(required=False, type='str'),
-            url=dict(required=False, default='https://api.airbrake.io/api/v4/projects/'),
+            url=dict(required=False, default='https://api.airbrake.io/api/v4/projects/', type='str'),
             validate_certs=dict(default=True, type='bool'),
         ),
         supports_check_mode=True,
