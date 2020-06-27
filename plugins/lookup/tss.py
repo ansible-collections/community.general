@@ -94,20 +94,25 @@ display = Display()
 
 
 class LookupModule(LookupBase):
+    @staticmethod
+    def Client(server_parameters):
+        return SecretServer(**server_parameters)
+
     def run(self, terms, variables, **kwargs):
         if sdk_is_missing:
             raise AnsibleError("python-tss-sdk must be installed to use this plugin")
 
         self.set_options(var_options=variables, direct=kwargs)
 
-        server_parameters = {
-            "base_url": self.get_option("base_url"),
-            "username": self.get_option("username"),
-            "password": self.get_option("password"),
-            "api_path_uri": self.get_option("api_path_uri"),
-            "token_path_uri": self.get_option("token_path_uri"),
-        }
-        secret_server = SecretServer(**server_parameters)
+        secret_server = LookupModule.Client(
+            {
+                "base_url": self.get_option("base_url"),
+                "username": self.get_option("username"),
+                "password": self.get_option("password"),
+                "api_path_uri": self.get_option("api_path_uri"),
+                "token_path_uri": self.get_option("token_path_uri"),
+            }
+        )
         result = []
 
         for term in terms:
