@@ -5,6 +5,43 @@ Community General Release Notes
 .. contents:: Topics
 
 
+v0.3.0-experimental.meta.redirects
+==================================
+
+Release Summary
+---------------
+
+This is a experimental release to test whether ``meta/runtime.yml`` redirects work as expected for flatmapping. There will be no final 0.3.0 release; the next release will be 1.0.0. This experimental pre-release will not appear in the versioning history of 0.3.0, it is solely for testing certain technical aspects of ansible-base and antsibull.
+
+
+Minor Changes
+-------------
+
+- apk - added ``no_cache`` option (https://github.com/ansible-collections/community.general/pull/548).
+- parted - accept negative numbers in ``part_start`` and ``part_end``
+- pkgng - added ``stdout`` and ``stderr`` attributes to the result (https://github.com/ansible-collections/community.general/pull/560).
+
+Deprecated Features
+-------------------
+
+- xbps - the ``force`` option never had any effect. It is now deprecated, and will be removed in 3.0.0 (https://github.com/ansible-collections/community.general/pull/568).
+
+Removed Features (previously deprecated)
+----------------------------------------
+
+- logicmonitor - the module has been removed in 1.0.0 since it is unmaintained and the API used by the module has been turned off in 2017 (https://github.com/ansible-collections/community.general/issues/539, https://github.com/ansible-collections/community.general/pull/541).
+- logicmonitor_facts - the module has been removed in 1.0.0 since it is unmaintained and the API used by the module has been turned off in 2017 (https://github.com/ansible-collections/community.general/issues/539, https://github.com/ansible-collections/community.general/pull/541).
+
+Bugfixes
+--------
+
+- aix_filesystem - fix issues with ismount module_util pathing for Ansible 2.9 (https://github.com/ansible-collections/community.general/pull/567).
+- consul_kv lookup - fix ``ANSIBLE_CONSUL_URL`` environment variable handling (https://github.com/ansible/ansible/issues/51960).
+- consul_kv lookup - fix arguments handling (https://github.com/ansible-collections/community.general/pull/303).
+- docker_compose - add a condition to prevent service startup if parameter ``stopped`` is true. Otherwise, the service will be started on each play and stopped again immediately due to the ``stopped`` parameter and breaks the idempotency of the module (https://github.com/ansible-collections/community.general/issues/532).
+- docker_compose - disallow usage of the parameters ``stopped`` and ``restarted`` at the same time. This breaks also the idempotency (https://github.com/ansible-collections/community.general/issues/532).
+- filesystem - resizefs of xfs filesystems is fixed. Filesystem needs to be mounted.
+
 v0.2.0
 ======
 
