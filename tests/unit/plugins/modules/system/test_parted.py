@@ -128,6 +128,7 @@ class TestParted(ModuleTestCase):
 
         self.mock_get_bin_path = (patch('ansible.module_utils.basic.AnsibleModule.get_bin_path'))
         self.get_bin_path = self.mock_get_bin_path.start()
+        self.get_bin_path.return_value = '/sbin/parted'
 
     def tearDown(self):
         super(TestParted, self).tearDown()
@@ -294,3 +295,18 @@ class TestParted(ModuleTestCase):
         })
         with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict3):
             self.execute_module(changed=True)
+
+    def test_ignore_kernel_multiple_parted_calls(self):
+        set_module_args({
+            'device': '/dev/sdb',
+            'number': 3,
+            'state': 'present',
+            'name': 'test',
+            'flags': ['lvm'],
+            'ignore_kernel': True
+        })
+        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+            self.run_parted.reset_mock()
+            self.execute_module(changed=True, script='unit KiB name 3 \'"test"\' set 3 lvm on')
+            # name and flag should be set in separate run_parted calls
+            self.assertTrue(self.run_parted.call_count == 2)
