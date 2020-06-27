@@ -572,7 +572,7 @@ def main():
     global module, units_si, units_iec, parted_exec
 
     changed = False
-    output_script = ""
+    output_scripts = []
     commands = []
     module = AnsibleModule(
         argument_spec=dict(
@@ -667,7 +667,7 @@ def main():
         # This will create the partition for the next steps
         if commands:
             script = parted(commands, device, align, unit)
-            output_script += script
+            output_scripts.append(script)
             commands = []
             changed = True
 
@@ -711,7 +711,7 @@ def main():
         if commands:
             script = parted(commands, device, align, unit)
             changed = True
-            output_script += script
+            output_scripts.append(script)
 
     elif state == 'absent':
         # Remove the partition
@@ -719,10 +719,10 @@ def main():
             script = "rm %s" % number
             changed = True
             script = parted([script], device)
-            output_script += script
+            output_scripts.append(script)
 
     elif state == 'info':
-        output_script = "unit '%s' print" % unit
+        output_scripts = ["unit '%s' print" % unit]
 
     # Final status of the device
     final_device_status = get_device_info(device, unit)
@@ -730,7 +730,7 @@ def main():
         changed=changed,
         disk=final_device_status['generic'],
         partitions=final_device_status['partitions'],
-        script=output_script.strip()
+        script=" ".join(output_scripts)
     )
 
 
