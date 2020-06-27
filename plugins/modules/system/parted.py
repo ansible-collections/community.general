@@ -102,6 +102,15 @@ options:
      - Parameter optional, but see notes below about negative negative C(part_start) values.
     type: str
     version_added: '0.2.0'
+  ignore_kernel:
+    description:
+      - By default parted fails when partition on C(device) is used by kernel and modification script might not be executed in whole.
+      - When C(ingore_kernel) = C(true) module edits table contents on C(device) even if current table is used by kernel 
+      - This is achieved by multiple parted program calls and ignoring "WARNING: the kernel failed to re-read the partition table" messages.
+      - You may need to use partprobe, kpartx or even reboot the system to make the kernel recognize changes in partition table.
+    type: bool
+    default: False
+    version+added: '1.0.0'
 notes:
   - When fetching information about a new disk and when the version of parted
     installed on the system is before version 3.1, the module queries the kernel
@@ -503,7 +512,7 @@ def parted(commands, device, align='', unit=''):
     """
     Formats and runs a parted script.
     """
-    global module, parted_exec
+    global module, parted_exec, ignore_kernel
 
     # Set alignment if necessary
     align_option = ''
@@ -511,14 +520,24 @@ def parted(commands, device, align='', unit=''):
         align_option = '-a %s' % align
 
     script = " ".join(commands)
+    parted_commands = commands
 
-    # Set the unit of the run
-    if unit and script:
+    if not ignore_kernel:
+        # execute whole script with single parted call
+        parted_commands = [script]
+
+    for command in parted_commands:
+
+        if command and not module.check_mode:
+            # Set the unit of the run
+            if unit:
+                command = "unit %s %s" % (unit, command)
+            command = "%s -s -m %s %s -- %s" % (parted_exec, align_option, device, command)
+            run_parted(command)
+
+    # Record unit in script
+    if script and unit:
         script = "unit %s %s" % (unit, script)
-
-    if script and not module.check_mode:
-        command = "%s -s -m %s %s -- %s" % (parted_exec, align_option, device, script)
-        run_parted(command)
 
     return script
 
@@ -569,7 +588,7 @@ def check_size_format(size_str):
 
 
 def main():
-    global module, units_si, units_iec, parted_exec
+    global module, units_si, units_iec, parted_exec, ignore_kernel
 
     changed = False
     output_scripts = []
@@ -600,6 +619,9 @@ def main():
 
             # rm/mkpart command
             state=dict(type='str', default='info', choices=['absent', 'info', 'present']),
+
+            # ignore_kernel mode
+            ignore_kernel=dict(type='bool', default=False)
         ),
         required_if=[
             ['state', 'present', ['number']],
@@ -622,6 +644,7 @@ def main():
     state = module.params['state']
     flags = module.params['flags']
     fs_type = module.params['fs_type']
+    ignore_kernel = module.params['ignore_kernel']
 
     # Parted executable
     parted_exec = module.get_bin_path('parted', True)
