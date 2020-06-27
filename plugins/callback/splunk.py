@@ -168,8 +168,8 @@ class CallbackModule(CallbackBase):
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super(CallbackModule, self).set_options(task_keys=task_keys,
-						var_options=var_options,
-						direct=direct)
+                                                var_options=var_options,
+                                                direct=direct)
 
         self.url = self.get_option('url')
 
@@ -190,7 +190,8 @@ class CallbackModule(CallbackBase):
                                   'authentication token can be provided using the '
                                   '`SPLUNK_AUTHTOKEN` environment variable or '
                                   'in the ansible.cfg file.')
-	self.validate_certs = self.get_option('validate_certs')
+
+        self.validate_certs = self.get_option('validate_certs')
 
     def v2_playbook_on_start(self, playbook):
         self.splunk.ansible_playbook = basename(playbook._file_name)
