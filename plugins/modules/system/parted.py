@@ -499,7 +499,7 @@ def parted_version():
     return major, minor, rev
 
 
-def parted(script, device, align='', unit=''):
+def parted(commands, device, align='', unit=''):
     """
     Formats and runs a parted script.
     """
@@ -509,6 +509,8 @@ def parted(script, device, align='', unit=''):
     align_option = ''
     if align and align != 'undefined':
         align_option = '-a %s' % align
+
+    script = " ".join(commands)
 
     # Set the unit of the run
     if unit and script:
@@ -571,7 +573,7 @@ def main():
 
     changed = False
     output_script = ""
-    script = ""
+    commands = []
     module = AnsibleModule(
         argument_spec=dict(
             device=dict(type='str', required=True),
@@ -648,24 +650,26 @@ def main():
 
         # Assign label if required
         if current_device['generic'].get('table', None) != label:
-            script += "mklabel %s " % label
+            script = "mklabel %s" % label
+            commands.append(script)
 
         # Create partition if required
         if part_type and not part_exists(current_parts, 'num', number):
-            script += "mkpart %s %s%s %s " % (
+            script = "mkpart %s %s%s %s" % (
                 part_type,
                 '%s ' % fs_type if fs_type is not None else '',
                 part_start,
                 part_end
             )
+            commands.append(script)
 
-        # Execute the script and update the data structure.
+        # Execute commands and update the data structure.
         # This will create the partition for the next steps
-        if script:
-            script = parted(script, device, align, unit)
+        if commands:
+            script = parted(commands, device, align, unit)
             output_script += script
+            commands = []
             changed = True
-            script = ""
 
             if not module.check_mode:
                 current_parts = get_device_info(device, unit)['partitions']
@@ -681,7 +685,8 @@ def main():
                 # Wrap double quotes in single quotes so the shell doesn't strip
                 # the double quotes as those need to be included in the arg
                 # passed to parted
-                script += 'name %s \'"%s"\' ' % (number, name)
+                script = 'name %s \'"%s"\'' % (number, name)
+                commands.append(script)
 
             # Manage flags
             if flags:
@@ -695,27 +700,29 @@ def main():
                 flags_on = list(set(flags) - set(partition['flags']))
 
                 for f in flags_on:
-                    script += "set %s %s on " % (number, f)
+                    script = "set %s %s on" % (number, f)
+                    commands.append(script)
 
                 for f in flags_off:
-                    script += "set %s %s off " % (number, f)
+                    script += "set %s %s off" % (number, f)
+                    commands.append(script)
 
         # Execute the script
-        if script:
-            script = parted(script, device, align, unit)
+        if commands:
+            script = parted(commands, device, align, unit)
             changed = True
             output_script += script
 
     elif state == 'absent':
         # Remove the partition
         if part_exists(current_parts, 'num', number) or module.check_mode:
-            script = "rm %s " % number
+            script = "rm %s" % number
             changed = True
-            script = parted(script, device)
+            script = parted([script], device)
             output_script += script
 
     elif state == 'info':
-        output_script = "unit '%s' print " % unit
+        output_script = "unit '%s' print" % unit
 
     # Final status of the device
     final_device_status = get_device_info(device, unit)
