@@ -81,7 +81,6 @@
         - 'output.stack_facts[0].DesiredState == "Running"'
         - 'output.stack_facts[0].Image == "busybox:latest"'
         - 'output.stack_facts[0].Name == "test_stack_busybox.1"'
-        - 'output.stack_facts[0].Node == "docker-desktop"'
 
   - name: Get docker_stack_info when name is not defined
     docker_stack_info:
