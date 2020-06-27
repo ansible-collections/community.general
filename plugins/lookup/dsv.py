@@ -97,19 +97,24 @@ display = Display()
 
 
 class LookupModule(LookupBase):
+    @staticmethod
+    def Client(vault_parameters):
+        return SecretsVault(**vault_parameters)
+
     def run(self, terms, variables, **kwargs):
         if sdk_is_missing:
             raise AnsibleError("python-dsv-sdk must be installed to use this plugin")
 
         self.set_options(var_options=variables, direct=kwargs)
 
-        vault_parameters = {
-            "tenant": self.get_option("tenant"),
-            "client_id": self.get_option("client_id"),
-            "client_secret": self.get_option("client_secret"),
-            "url_template": self.get_option("url_template"),
-        }
-        vault = SecretsVault(**vault_parameters)
+        vault = LookupModule.Client(
+            **{
+                "tenant": self.get_option("tenant"),
+                "client_id": self.get_option("client_id"),
+                "client_secret": self.get_option("client_secret"),
+                "url_template": self.get_option("url_template"),
+            }
+        )
         result = []
 
         for term in terms:
