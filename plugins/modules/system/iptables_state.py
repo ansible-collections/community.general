@@ -12,7 +12,7 @@ DOCUMENTATION = r'''
 ---
 module: iptables_state
 short_description: Save iptables state into a file or restore it from a file
-version_added: '0.2.0'
+version_added: '1.0.0'
 author: quidame (@quidame)
 description:
   - C(iptables) is used to set up, maintain, and inspect the tables of IP
