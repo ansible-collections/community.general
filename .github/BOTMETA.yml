@@ -457,12 +457,12 @@ files:
     authors: Spredzy sieben
   $modules/cloud/smartos/smartos_image_facts.py:
     authors: xen0l
-    maintainers: bcoca danowar2k fishman jasperla jpdasma mator scathatheworm troy2914
+    maintainers: bcoca fishman jasperla jpdasma mator scathatheworm troy2914
     labels: solaris
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/cloud/smartos/imgadm.py:
     authors: jasperla
-    maintainers: bcoca danowar2k fishman jpdasma mator scathatheworm troy2914 xen0l
+    maintainers: bcoca fishman jpdasma mator scathatheworm troy2914 xen0l
     labels: solaris
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/cloud/smartos/nictagadm.py:
@@ -472,12 +472,12 @@ files:
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/cloud/smartos/smartos_image_info.py:
     authors: xen0l
-    maintainers: bcoca danowar2k fishman jasperla jpdasma mator scathatheworm troy2914
+    maintainers: bcoca fishman jasperla jpdasma mator scathatheworm troy2914
     labels: solaris
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/cloud/smartos/vmadm.py:
     authors: jasperla
-    maintainers: bcoca danowar2k fishman jpdasma mator scathatheworm troy2914 xen0l
+    maintainers: bcoca fishman jpdasma mator scathatheworm troy2914 xen0l
     labels: solaris
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/cloud/softlayer/sl_vm.py:
@@ -935,7 +935,7 @@ files:
     ignore: elasticdog
   $modules/packaging/os/pkgin.py:
     authors: L2G jasperla szinck
-    maintainers: bcoca danowar2k fishman jpdasma mator scathatheworm troy2914 xen0l
+    maintainers: bcoca fishman jpdasma mator scathatheworm troy2914 xen0l
     labels: pkgin solaris
   $modules/packaging/os/pkgng.py:
     authors: bleader
@@ -1132,7 +1132,7 @@ files:
     maintainers: $team_solaris
   $modules/storage/zfs/:
     authors: xen0l
-    maintainers: bcoca danowar2k fishman jasperla jpdasma mator scathatheworm troy2914
+    maintainers: bcoca fishman jasperla jpdasma mator scathatheworm troy2914
     labels: solaris
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/system/python_requirements_facts.py:
@@ -1157,7 +1157,7 @@ files:
     authors: tdtrask
   $modules/system/beadm.py:
     authors: xen0l
-    maintainers: bcoca danowar2k fishman jasperla jpdasma mator scathatheworm troy2914
+    maintainers: bcoca fishman jasperla jpdasma mator scathatheworm troy2914
     labels: beadm solaris
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/system/capabilities.py:
@@ -1390,6 +1390,6 @@ macros:
   team_redfish: billdodd jose-delarosa mraineri tomasg2012
   team_rhn: FlossWare alikins barnabycourt vritant
   team_scaleway: DenBeke QuentinBrosse abarbare jerome-quere kindermoumoute remyleone
-  team_solaris: bcoca danowar2k fishman jasperla jpdasma mator scathatheworm troy2914 xen0l
+  team_solaris: bcoca fishman jasperla jpdasma mator scathatheworm troy2914 xen0l
   team_suse: commel dcermak evrardjp lrupp toabctl
   team_virt: joshainglis karmab
