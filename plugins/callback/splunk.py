@@ -46,7 +46,7 @@ DOCUMENTATION = '''
           - section: callback_splunk
             key: authtoken
       validate_certs:
-        description: Whether to validate certificates for connections to HEC. Do not set to
+        description: Whether to validate certificates for connections to HEC. It is not recommended to set to
                      C(false) except when you are sure that nobody can intercept the connection
                      between this plugin and HEC, as setting it to C(false) allows man-in-the-middle attacks!
         env:
@@ -56,7 +56,7 @@ DOCUMENTATION = '''
             key: validate_certs
         type: bool
         default: true
-        version_added: '2.10'
+        version_added: '1.0.0'
 '''
 
 EXAMPLES = '''

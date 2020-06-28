@@ -1,2 +1,2 @@
 minor_changes:
-  - splunk - Add an option to allow not to validate certificate from HEC (https://github.com/ansible-collections/community.general/pull/596).
+  - splunk callback - add an option to allow not to validate certificate from HEC (https://github.com/ansible-collections/community.general/pull/596).
