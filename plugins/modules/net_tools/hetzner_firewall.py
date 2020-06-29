@@ -124,7 +124,7 @@ options:
         the status changes to C(active) or C(disabled).
       - Please note that there is a request limit. If you have to do multiple
         updates, it can be better to disable waiting, and regularly use
-        M(hetzner_firewall_info) to query status.
+        M(community.general.hetzner_firewall_info) to query status.
     type: bool
     default: yes
   wait_delay:

@@ -15,7 +15,7 @@ short_description: Retrieves facts about docker container
 
 description:
   - Retrieves facts about a docker container.
-  - Essentially returns the output of C(docker inspect <name>), similar to what M(docker_container)
+  - Essentially returns the output of C(docker inspect <name>), similar to what M(community.general.docker_container)
     returns for a non-absent container.
 
 

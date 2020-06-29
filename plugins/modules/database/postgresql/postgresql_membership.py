@@ -16,8 +16,8 @@ description:
 - Users are roles with login privilege.
 - Groups are PostgreSQL roles usually without LOGIN privilege.
 - "Common use case:"
-- 1) add a new group (groups) by M(postgresql_user) module with I(role_attr_flags=NOLOGIN)
-- 2) grant them desired privileges by M(postgresql_privs) module
+- 1) add a new group (groups) by M(community.general.postgresql_user) module with I(role_attr_flags=NOLOGIN)
+- 2) grant them desired privileges by M(community.general.postgresql_privs) module
 - 3) add desired PostgreSQL users to the new group (groups) by this module
 options:
   groups:

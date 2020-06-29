@@ -21,7 +21,7 @@ description:
    - The module allows to reset parameter to boot_val (cluster initial value) by I(reset=yes) or remove parameter
      string from postgresql.auto.conf and reload I(value=default) (for settings with postmaster context restart is required).
    - After change you can see in the ansible output the previous and
-     the new parameter value and other information using returned values and M(debug) module.
+     the new parameter value and other information using returned values and M(ansible.builtin.debug) module.
 options:
   name:
     description:

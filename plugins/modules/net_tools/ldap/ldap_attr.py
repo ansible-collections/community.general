@@ -16,7 +16,7 @@ description:
   - Add or remove LDAP attribute values.
 notes:
   - This only deals with attributes on existing entries. To add or remove
-    whole entries, see M(ldap_entry).
+    whole entries, see M(community.general.ldap_entry).
   - The default authentication settings will attempt to use a SASL EXTERNAL
     bind over a UNIX domain socket. This works well with the default Ubuntu
     install for example, which includes a cn=peercred,cn=external,cn=auth ACL
@@ -35,7 +35,7 @@ notes:
 deprecated:
   removed_in: 3.0.0  # was Ansible 2.14
   why: 'The current "ldap_attr" module does not support LDAP attribute insertions or deletions with objectClass dependencies.'
-  alternative: 'Use M(ldap_attrs) instead. Deprecated in community.general 0.2.0.'
+  alternative: 'Use M(community.general.ldap_attrs) instead. Deprecated in community.general 0.2.0.'
 author:
   - Jiri Tyr (@jtyr)
 requirements:

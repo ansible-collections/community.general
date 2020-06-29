@@ -12,7 +12,7 @@ short_description: Retrieve the information about one or more of the OneView FCo
 description:
     - Retrieve the information about one or more of the FCoE Networks from OneView.
     - This module was called C(oneview_fcoe_network_facts) before Ansible 2.9, returning C(ansible_facts).
-      Note that the M(oneview_fcoe_network_info) module no longer returns C(ansible_facts)!
+      Note that the M(community.general.oneview_fcoe_network_info) module no longer returns C(ansible_facts)!
 requirements:
     - hpOneView >= 2.0.1
 author:

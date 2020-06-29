@@ -12,7 +12,7 @@ module: proxysql_mysql_users
 author: "Ben Mildren (@bmildren)"
 short_description: Adds or removes mysql users from proxysql admin interface.
 description:
-   - The M(proxysql_mysql_users) module adds or removes mysql users using the
+   - The M(community.general.proxysql_mysql_users) module adds or removes mysql users using the
      proxysql admin interface.
 options:
   username:
@@ -91,8 +91,9 @@ EXAMPLES = '''
 # This example adds a user, it saves the mysql user config to disk, but
 # avoids loading the mysql user config to runtime (this might be because
 # several users are being added and the user wants to push the config to
-# runtime in a single batch using the M(proxysql_manage_config) module).  It
-# uses supplied credentials to connect to the proxysql admin interface.
+# runtime in a single batch using the community.general.proxysql_manage_config
+# module).  It uses supplied credentials to connect to the proxysql admin
+# interface.
 
 - name: Add a user
   proxysql_mysql_users:

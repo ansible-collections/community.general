@@ -522,7 +522,7 @@ options:
       - List of networks the container belongs to.
       - For examples of the data structure and usage see EXAMPLES below.
       - To remove a container from one or more networks, use the I(purge_networks) option.
-      - Note that as opposed to C(docker run ...), M(docker_container) does not remove the default
+      - Note that as opposed to C(docker run ...), M(community.general.docker_container) does not remove the default
         network if I(networks) is specified. You need to explicitly use I(purge_networks) to enforce
         the removal of the default network (and all other networks not explicitly mentioned in I(networks)).
         Alternatively, use the I(networks_cli_compatible) option, which will be enabled by default from community.general 2.0.0 on.
