@@ -20,7 +20,7 @@ author: Sumit Kumar (@timuster) <sumit4@netapp.com>
 deprecated:
   removed_in: 2.0.0  # was Ansible 2.11
   why: Updated modules released with increased functionality
-  alternative: Use M(na_ontap_user) instead.
+  alternative: Use M(netapp.ontap.na_ontap_user) instead.
 
 description:
 - Create or destroy users.

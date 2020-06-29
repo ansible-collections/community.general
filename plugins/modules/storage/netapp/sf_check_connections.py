@@ -13,7 +13,7 @@ module: sf_check_connections
 deprecated:
   removed_in: 2.0.0  # was Ansible 2.11
   why: This Module has been replaced
-  alternative: please use M(na_elementsw_check_connections)
+  alternative: please use M(netapp.elementsw.na_elementsw_check_connections)
 short_description: Check connectivity to MVIP and SVIP.
 extends_documentation_fragment:
 - community.general._netapp.solidfire

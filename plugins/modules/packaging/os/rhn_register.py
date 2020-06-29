@@ -16,7 +16,7 @@ description:
 author:
 - James Laska (@jlaska)
 notes:
-    - This is for older Red Hat products. You probably want the M(redhat_subscription) module instead.
+    - This is for older Red Hat products. You probably want the M(community.general.redhat_subscription) module instead.
     - In order to register a system, C(rhnreg_ks) requires either a username and password, or an activationkey.
 requirements:
     - rhnreg_ks

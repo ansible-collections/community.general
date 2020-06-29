@@ -12,7 +12,7 @@ module: proxysql_query_rules
 author: "Ben Mildren (@bmildren)"
 short_description: Modifies query rules using the proxysql admin interface.
 description:
-   - The M(proxysql_query_rules) module modifies query rules using the
+   - The M(community.general.proxysql_query_rules) module modifies query rules using the
      proxysql admin interface.
 options:
   rule_id:
@@ -79,7 +79,7 @@ options:
     description:
       - Route matched queries to this hostgroup. This happens unless there is a
         started transaction and the logged in user has
-        I(transaction_persistent) set to C(True) (see M(proxysql_mysql_users)).
+        I(transaction_persistent) set to C(True) (see M(community.general.proxysql_mysql_users)).
   cache_ttl:
     description:
       - The number of milliseconds for which to cache the result of the query.
@@ -150,8 +150,8 @@ EXAMPLES = '''
 # hostgroup, it saves the mysql query rule config to disk, but avoids loading
 # the mysql query config config to runtime (this might be because several
 # rules are being added and the user wants to push the config to runtime in a
-# single batch using the M(proxysql_manage_config) module). It uses supplied
-# credentials to connect to the proxysql admin interface.
+# single batch using the community.general.proxysql_manage_config module). It
+# uses supplied credentials to connect to the proxysql admin interface.
 
 - name: Add a rule
   proxysql_query_rules:

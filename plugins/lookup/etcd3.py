@@ -14,7 +14,7 @@ DOCUMENTATION = '''
     short_description: Get key values from etcd3 server
     description:
     - Retrieves key values and/or key prefixes from etcd3 server using its native gRPC API.
-    - Try to reuse M(etcd3) options for connection parameters, but add support for some C(ETCDCTL_*) environment variables.
+    - Try to reuse M(community.general.etcd3) options for connection parameters, but add support for some C(ETCDCTL_*) environment variables.
     - See U(https://github.com/etcd-io/etcd/tree/master/Documentation/op-guide) for etcd overview.
 
     options:

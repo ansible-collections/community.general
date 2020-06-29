@@ -14,7 +14,7 @@ module: purefb_facts
 deprecated:
   removed_in: 3.0.0  # was Ansible 2.13
   why: Deprecated in favor of C(_info) module.
-  alternative: Use M(purefb_info) instead.
+  alternative: Use M(purestorage.flashblade.purefb_info) instead.
 short_description: Collect facts from Pure Storage FlashBlade
 description:
   - Collect facts information from a Pure Storage FlashBlade running the

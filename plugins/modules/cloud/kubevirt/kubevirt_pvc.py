@@ -115,7 +115,7 @@ options:
       - "If data is to be copied onto the PVC using the Containerized Data Importer you can specify the source of
         the data (along with any additional configuration) as well as it's format."
       - "Valid source types are: blank, http, s3, registry, pvc and upload. The last one requires using the
-        M(kubevirt_cdi_upload) module to actually perform an upload."
+        M(community.general.kubevirt_cdi_upload) module to actually perform an upload."
       - "Source data format is specified using the optional I(content_type). Valid options are C(kubevirt)
         (default; raw image) and C(archive) (tar.gz)."
       - "This uses the DataVolume source syntax:

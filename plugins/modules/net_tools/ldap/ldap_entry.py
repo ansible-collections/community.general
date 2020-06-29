@@ -17,7 +17,7 @@ short_description: Add or remove LDAP entries.
 description:
   - Add or remove LDAP entries. This module only asserts the existence or
     non-existence of an LDAP entry, not its attributes. To assert the
-    attribute values of an entry, see M(ldap_attr).
+    attribute values of an entry, see M(community.general.ldap_attr).
 notes:
   - The default authentication settings will attempt to use a SASL EXTERNAL
     bind over a UNIX domain socket. This works well with the default Ubuntu
@@ -37,7 +37,7 @@ options:
     description:
       - If I(state=present), attributes necessary to create an entry. Existing
         entries are never modified. To assert specific attribute values on an
-        existing entry, use M(ldap_attr) module instead.
+        existing entry, use M(community.general.ldap_attr) module instead.
   objectClass:
     description:
       - If I(state=present), value or list of values to use when creating

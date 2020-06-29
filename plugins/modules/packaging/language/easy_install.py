@@ -52,8 +52,8 @@ options:
 notes:
     - Please note that the C(easy_install) module can only install Python
       libraries. Thus this module is not able to remove libraries. It is
-      generally recommended to use the M(pip) module which you can first install
-      using M(easy_install).
+      generally recommended to use the M(ansible.builtin.pip) module which you can first install
+      using M(community.general.easy_install).
     - Also note that I(virtualenv) must be installed on the remote host if the
       C(virtualenv) parameter is specified.
 requirements: [ "virtualenv" ]
