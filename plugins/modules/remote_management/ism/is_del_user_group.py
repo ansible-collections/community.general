@@ -66,7 +66,8 @@ changed:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.ism import ism_argument_spec,get_connection
+from ansible_collections.community.general.plugins.module_utils.ism import ism_argument_spec, get_connection
+
 
 class UserGroup(object):
     def __init__(self, argument_spec):
@@ -94,6 +95,7 @@ class UserGroup(object):
         self.run_command()
         self.show_result()
 
+
 def main():
     argument_spec = dict(
         name=dict(type='str', required=True),
@@ -101,7 +103,6 @@ def main():
     argument_spec.update(ism_argument_spec)
     usergroup_obj = UserGroup(argument_spec)
     usergroup_obj.work()
-    
 
 
 if __name__ == '__main__':
