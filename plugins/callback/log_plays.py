@@ -53,7 +53,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_NEEDS_WHITELIST = True
 
     TIME_FORMAT = "%b %d %Y %H:%M:%S"
-    MSG_FORMAT = "%(now)s - %(category)s - %(data)s\n\n"
+    MSG_FORMAT = "%(now)s - %(playbook)s - %(task_name)s - %(task_action)s - %(category)s - %(data)s\n\n"
 
     def __init__(self):
 
@@ -67,7 +67,8 @@ class CallbackModule(CallbackBase):
         if not os.path.exists(self.log_folder):
             makedirs_safe(self.log_folder)
 
-    def log(self, host, category, data):
+    def log(self, result, category):
+        data = result._result
         if isinstance(data, MutableMapping):
             if '_ansible_verbose_override' in data:
                 # avoid logging extraneous data
@@ -79,30 +80,43 @@ class CallbackModule(CallbackBase):
                 if invocation is not None:
                     data = json.dumps(invocation) + " => %s " % data
 
-        path = os.path.join(self.log_folder, host)
+        path = os.path.join(self.log_folder, result._host.get_name())
         now = time.strftime(self.TIME_FORMAT, time.localtime())
 
-        msg = to_bytes(self.MSG_FORMAT % dict(now=now, category=category, data=data))
+        msg = to_bytes(
+            self.MSG_FORMAT
+            % dict(
+                now=now,
+                playbook=self.playbook,
+                task_name=result._task.name,
+                task_action=result._task.action,
+                category=category,
+                data=data,
+            )
+        )
         with open(path, "ab") as fd:
             fd.write(msg)
 
-    def runner_on_failed(self, host, res, ignore_errors=False):
-        self.log(host, 'FAILED', res)
+    def v2_runner_on_failed(self, result, ignore_errors=False):
+        self.log(result, 'FAILED')
 
-    def runner_on_ok(self, host, res):
-        self.log(host, 'OK', res)
+    def v2_runner_on_ok(self, result):
+        self.log(result, 'OK')
 
-    def runner_on_skipped(self, host, item=None):
-        self.log(host, 'SKIPPED', '...')
+    def v2_runner_on_skipped(self, result):
+        self.log(result, 'SKIPPED')
 
-    def runner_on_unreachable(self, host, res):
-        self.log(host, 'UNREACHABLE', res)
+    def v2_runner_on_unreachable(self, result):
+        self.log(result, 'UNREACHABLE')
 
-    def runner_on_async_failed(self, host, res, jid):
-        self.log(host, 'ASYNC_FAILED', res)
+    def v2_runner_on_async_failed(self, result):
+        self.log(result, 'ASYNC_FAILED')
 
-    def playbook_on_import_for_host(self, host, imported_file):
-        self.log(host, 'IMPORTED', imported_file)
+    def v2_playbook_on_start(self, playbook):
+        self.playbook = playbook._file_name
 
-    def playbook_on_not_import_for_host(self, host, missing_file):
-        self.log(host, 'NOTIMPORTED', missing_file)
+    def v2_playbook_on_import_for_host(self, result, imported_file):
+        self.log(result, 'IMPORTED', imported_file)
+
+    def v2_playbook_on_not_import_for_host(self, result, missing_file):
+        self.log(result, 'NOTIMPORTED', missing_file)
