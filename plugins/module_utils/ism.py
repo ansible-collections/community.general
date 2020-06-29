@@ -4,11 +4,8 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-try:
-    from ansible.plugins.inspur_sdk import ism
-    ism_temp = True
-except:
-    ism_temp = False
+
+from ansible_collections.community.general.plugins.inspur_sdk import ism
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.six import iteritems
 
@@ -42,8 +39,5 @@ def get_connection(module):
     """get_connection"""
     load_params(module)
     dict_cpu = module.params
-    if not ism_temp:
-        result = {"[Inspur support] inspur_sdk Please download the installation first!"}
-    else:
-        result = ism.main(dict_cpu)
+    result = ism.main(dict_cpu)
     return result
