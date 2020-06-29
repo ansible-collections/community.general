@@ -13,7 +13,7 @@ module: purefa_facts
 deprecated:
   removed_in: 3.0.0  # was Ansible 2.13
   why: Deprecated in favor of C(_info) module.
-  alternative: Use M(purefa_info) instead.
+  alternative: Use M(purestorage.flasharray.purefa_info) instead.
 short_description: Collect facts from Pure Storage FlashArray
 description:
   - Collect facts information from a Pure Storage Flasharray running the

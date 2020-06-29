@@ -12,7 +12,7 @@ DOCUMENTATION = r'''
 module: timezone
 short_description: Configure timezone setting
 description:
-  - This module configures the timezone setting, both of the system clock and of the hardware clock. If you want to set up the NTP, use M(service) module.
+  - This module configures the timezone setting, both of the system clock and of the hardware clock. If you want to set up the NTP, use M(ansible.builtin.service) module.
   - It is recommended to restart C(crond) after changing the timezone, otherwise the jobs may run at the wrong time.
   - Several different tools are used depending on the OS/Distribution involved.
     For Linux it can use C(timedatectl) or edit C(/etc/sysconfig/clock) or C(/etc/timezone) and C(hwclock).
