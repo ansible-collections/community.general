@@ -1,25 +1,26 @@
 #!/usr/bin/python
-# coding: utf-8 -*-
+# -*- coding:utf-8 -*-
 
 # Copyright (C) 2020 Inspur Inc. All Rights Reserved.
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (absolute_import, division, print_function)
+
 __metaclass__ = type
 
-
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
+ANSIBLE_METADATA = {
+    'metadata_version': '1.1',
+    'status': ['preview'],
+    'supported_by': 'community'
+}
 
 DOCUMENTATION = '''
 ---
 module: is_del_user
-version_added: 1.0
+version_added: "2.9"
 author:
-    - WangBaoshan
-short_description: Delete user
+    - WangBaoshan (@ISIB-group)
+short_description: Delete user 
 description:
    - Delete user on Inspur server.
 options:
@@ -28,7 +29,7 @@ options:
             - User name .
         type: str
         required: true
-
+extends_documentation_fragment: ism
 '''
 
 EXAMPLES = '''
@@ -67,7 +68,7 @@ changed:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.ism import ism_argument_spec, get_connection
+from ansible_collections.community.general.plugins.module_utils.ism import (ism_argument_spec, get_connection)
 
 
 class User(object):

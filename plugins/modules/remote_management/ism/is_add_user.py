@@ -1,25 +1,26 @@
 #!/usr/bin/python
-# coding: utf-8 -*-
+# -*- coding:utf-8 -*-
 
 # Copyright(C) 2020 Inspur Inc. All Rights Reserved.
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (absolute_import, division, print_function)
+
 __metaclass__ = type
 
-
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
+ANSIBLE_METADATA = {
+    'metadata_version': '1.1',
+    'status': ['preview'],
+    'supported_by': 'community'
+}
 
 DOCUMENTATION = '''
 ---
 module: is_add_user
-version_added: 1.0
+version_added: "2.9"
 author:
-    - WangBaoshan
-short_description: Create user
+    - WangBaoshan (@ISIB-group)
+short_description: Create user 
 description:
    - Create user on Inspur server.
 options:
@@ -37,13 +38,14 @@ options:
         description:
             - user role id of new user.
         default: NoAccess
-        choices: ['Administrator', 'Operator', 'Commonuser', 'OEM', 'NoAccess']
+        choices: ['Administrator', 'Operator', 'Commonuser','OEM','NoAccess']
         type: str
     priv:
         description:
             - user access, select one or more from None/KVM/VMM/SOL.
         type: str
         required: true
+extends_documentation_fragment: ism
 '''
 
 EXAMPLES = '''
@@ -64,12 +66,11 @@ EXAMPLES = '''
       uname: "wbs"
       upass: "admin"
       role_id: "Administrator"
-      priv: "KVM, SOL"
+      priv: "KVM,SOL"
       provider: "{{ ism }}"
 '''
 
 RETURN = '''
-
 message:
     description: messages returned after module execution
     returned: always
@@ -85,7 +86,7 @@ changed:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.ism import ism_argument_spec, get_connection
+from ansible_collections.community.general.plugins.module_utils.ism import (ism_argument_spec, get_connection)
 
 
 class User(object):
