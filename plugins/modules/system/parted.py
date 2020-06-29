@@ -105,7 +105,7 @@ options:
   ignore_kernel:
     description:
       - By default parted fails when partition on C(device) is used by kernel and modification script might not be executed in whole.
-      - When C(ingore_kernel) = C(true) module edits table contents on C(device) even if current table is used by kernel
+      - When I(ingore_kernel) = C(true) module edits table contents on C(device) even if current table is used by kernel.
       - This is achieved by multiple parted program calls and ignoring kernel re-reading warnings.
       - You may need to use utilities like partprobe, kpartx or even reboot the system to make the kernel recognize changes in partition table.
     type: bool
