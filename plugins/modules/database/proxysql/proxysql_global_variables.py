@@ -12,7 +12,7 @@ module: proxysql_global_variables
 author: "Ben Mildren (@bmildren)"
 short_description: Gets or sets the proxysql global variables.
 description:
-   - The M(proxysql_global_variables) module gets or sets the proxysql global
+   - The M(community.general.proxysql_global_variables) module gets or sets the proxysql global
      variables.
 options:
   variable:

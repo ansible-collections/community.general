@@ -25,7 +25,7 @@ DOCUMENTATION = '''
 module: bearychat
 short_description: Send BearyChat notifications
 description:
-    - The M(bearychat) module sends notifications to U(https://bearychat.com)
+    - The M(community.general.bearychat) module sends notifications to U(https://bearychat.com)
       via the Incoming Robot integration.
 author: "Jiangge Zhang (@tonyseek)"
 options:

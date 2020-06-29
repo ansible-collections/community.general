@@ -15,7 +15,7 @@ author: "Devyani Kota (@devyanikota)"
 description:
   - Gather facts about either self-heal or rebalance status.
   - This module was called C(gluster_heal_facts) before Ansible 2.9, returning C(ansible_facts).
-    Note that the M(gluster_heal_info) module no longer returns C(ansible_facts)!
+    Note that the M(community.general.gluster_heal_info) module no longer returns C(ansible_facts)!
 options:
   name:
     description:

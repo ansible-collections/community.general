@@ -12,7 +12,7 @@ module: online_user_facts
 deprecated:
   removed_in: 3.0.0  # was Ansible 2.13
   why: Deprecated in favour of C(_info) module.
-  alternative: Use M(online_user_info) instead.
+  alternative: Use M(community.general.online_user_info) instead.
 short_description: Gather facts about Online user.
 description:
   - Gather facts about the user.

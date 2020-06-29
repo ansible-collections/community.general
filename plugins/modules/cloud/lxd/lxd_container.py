@@ -136,7 +136,7 @@ notes:
     2.1, the later requires python to be installed in the container which can
     be done with the command module.
   - You can copy a file from the host to the container
-    with the Ansible M(copy) and M(template) module and the `lxd` connection plugin.
+    with the Ansible M(ansible.builtin.copy) and M(ansible.builtin.template) module and the `lxd` connection plugin.
     See the example below.
   - You can copy a file in the created container to the localhost
     with `command=lxc file pull container_name/dir/filename filename`.

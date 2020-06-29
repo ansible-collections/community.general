@@ -15,7 +15,7 @@ short_description: Retrieves facts about docker network
 
 description:
   - Retrieves facts about a docker network.
-  - Essentially returns the output of C(docker network inspect <name>), similar to what M(docker_network)
+  - Essentially returns the output of C(docker network inspect <name>), similar to what M(community.general.docker_network)
     returns for a non-absent network.
 
 

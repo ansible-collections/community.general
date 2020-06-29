@@ -12,7 +12,7 @@ module: sf_snapshot_schedule_manager
 deprecated:
   removed_in: 2.0.0  # was Ansible 2.11
   why: This Module has been replaced
-  alternative: please use M(na_elementsw_snapshot_schedule)
+  alternative: please use M(netapp.elementsw.na_elementsw_snapshot_schedule)
 short_description: Manage SolidFire snapshot schedules
 extends_documentation_fragment:
 - community.general._netapp.solidfire

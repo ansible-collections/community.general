@@ -40,7 +40,7 @@ description:
   formats.
 - Currently, remote addition is only supported via I(flatpakrepo) file URLs.
 - Existing remotes will not be updated.
-- See the M(flatpak) module for managing flatpaks.
+- See the M(community.general.flatpak) module for managing flatpaks.
 author:
 - John Kwiatkoski (@JayKayy)
 - Alexander Bethke (@oolongbrothers)

@@ -40,7 +40,7 @@ options:
     description:
       - Specifies the location to install the package from. Required when C(state=present).
       - "Can be any path acceptable to the C(pkgadd) command's C(-d) option. e.g.: C(somefile.pkg), C(/dir/with/pkgs), C(http:/server/mypkgs.pkg)."
-      - If using a file or directory, they must already be accessible by the host. See the M(copy) module for a way to get them there.
+      - If using a file or directory, they must already be accessible by the host. See the M(ansible.builtin.copy) module for a way to get them there.
     type: str
   proxy:
     description:

@@ -14,7 +14,7 @@ module: nginx_status_facts
 deprecated:
   removed_in: 3.0.0  # was Ansible 2.13
   why: Deprecated in favour of C(_info) module.
-  alternative: Use M(nginx_status_info) instead.
+  alternative: Use M(community.general.nginx_status_info) instead.
 short_description: Retrieve nginx status facts.
 description:
   - Gathers facts from nginx from an URL having C(stub_status) enabled.

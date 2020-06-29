@@ -19,7 +19,7 @@ description:
   - Add or remove multiple LDAP attribute values.
 notes:
   - This only deals with attributes on existing entries. To add or remove
-    whole entries, see M(ldap_entry).
+    whole entries, see M(community.general.ldap_entry).
   - The default authentication settings will attempt to use a SASL EXTERNAL
     bind over a UNIX domain socket. This works well with the default Ubuntu
     install for example, which includes a cn=peercred,cn=external,cn=auth ACL

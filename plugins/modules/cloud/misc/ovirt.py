@@ -17,7 +17,7 @@ deprecated:
     why: This module is for deprecated version of ovirt.
     alternative: Use C(ovirt_vm) from the C(ovirt.ovirt) collection instead
 description:
-    - This module only supports oVirt/RHEV version 3. A newer module M(ovirt_vm) supports oVirt/RHV version 4.
+    - This module only supports oVirt/RHEV version 3. A newer module M(ovirt.ovirt.ovirt_vm) supports oVirt/RHV version 4.
     - Allows you to create new instances, either from scratch or an image, in addition to deleting or stopping instances on the oVirt/RHEV platform.
 options:
   user:
