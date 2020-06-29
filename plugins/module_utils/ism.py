@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # coding: utf-8 -*-
 # Copyright (c), Inspur isib-group, 2020
 
@@ -24,6 +23,7 @@ ism_top_spec = {
     'password': dict(removed_in_version=2.9, no_log=True),
 }
 ism_argument_spec.update(ism_top_spec)
+
 
 def load_params(module):
     """load_params"""
