@@ -28,7 +28,7 @@ options:
     type: str
   force_basic_auth:
     description:
-      - httplib2, the library used by the M(uri) module only sends
+      - httplib2, the library used by the M(ansible.builtin.uri) module only sends
         authentication information when a webservice responds to an initial
         request with a 401 status. Since some basic auth services do not
         properly send a 401, logins will fail. This option forces the sending of

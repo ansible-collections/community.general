@@ -18,7 +18,7 @@ description:
 deprecated:
     removed_in: 2.0.0  # was Ansible 2.12
     why: Updated modules released with increased functionality
-    alternative: Use M(gcp_compute_instance) instead.
+    alternative: Use M(google.cloud.gcp_compute_instance) instead.
 options:
   image:
     description:
