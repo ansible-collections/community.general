@@ -45,6 +45,18 @@ DOCUMENTATION = '''
         ini:
           - section: callback_splunk
             key: authtoken
+      validate_certs:
+        description: Whether to validate certificates for connections to HEC. It is not recommended to set to
+                     C(false) except when you are sure that nobody can intercept the connection
+                     between this plugin and HEC, as setting it to C(false) allows man-in-the-middle attacks!
+        env:
+          - name: SPLUNK_VALIDATE_CERTS
+        ini:
+          - section: callback_splunk
+            key: validate_certs
+        type: bool
+        default: true
+        version_added: '1.0.0'
 '''
 
 EXAMPLES = '''
@@ -84,7 +96,7 @@ class SplunkHTTPCollectorSource(object):
         self.ip_address = socket.gethostbyname(socket.gethostname())
         self.user = getpass.getuser()
 
-    def send_event(self, url, authtoken, state, result, runtime):
+    def send_event(self, url, authtoken, validate_certs, state, result, runtime):
         if result._task_fields['args'].get('_ansible_check_mode') is True:
             self.ansible_check_mode = True
 
@@ -129,7 +141,8 @@ class SplunkHTTPCollectorSource(object):
                 'Content-type': 'application/json',
                 'Authorization': 'Splunk ' + authtoken
             },
-            method='POST'
+            method='POST',
+            validate_certs=validate_certs
         )
 
 
@@ -144,6 +157,7 @@ class CallbackModule(CallbackBase):
         self.start_datetimes = {}  # Collect task start times
         self.url = None
         self.authtoken = None
+        self.validate_certs = None
         self.splunk = SplunkHTTPCollectorSource()
 
     def _runtime(self, result):
@@ -153,7 +167,9 @@ class CallbackModule(CallbackBase):
         ).total_seconds()
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-        super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
+        super(CallbackModule, self).set_options(task_keys=task_keys,
+                                                var_options=var_options,
+                                                direct=direct)
 
         self.url = self.get_option('url')
 
@@ -175,6 +191,8 @@ class CallbackModule(CallbackBase):
                                   '`SPLUNK_AUTHTOKEN` environment variable or '
                                   'in the ansible.cfg file.')
 
+        self.validate_certs = self.get_option('validate_certs')
+
     def v2_playbook_on_start(self, playbook):
         self.splunk.ansible_playbook = basename(playbook._file_name)
 
@@ -188,6 +206,7 @@ class CallbackModule(CallbackBase):
         self.splunk.send_event(
             self.url,
             self.authtoken,
+            self.validate_certs,
             'OK',
             result,
             self._runtime(result)
@@ -197,6 +216,7 @@ class CallbackModule(CallbackBase):
         self.splunk.send_event(
             self.url,
             self.authtoken,
+            self.validate_certs,
             'SKIPPED',
             result,
             self._runtime(result)
@@ -206,6 +226,7 @@ class CallbackModule(CallbackBase):
         self.splunk.send_event(
             self.url,
             self.authtoken,
+            self.validate_certs,
             'FAILED',
             result,
             self._runtime(result)
@@ -215,6 +236,7 @@ class CallbackModule(CallbackBase):
         self.splunk.send_event(
             self.url,
             self.authtoken,
+            self.validate_certs,
             'FAILED',
             result,
             self._runtime(result)
@@ -224,6 +246,7 @@ class CallbackModule(CallbackBase):
         self.splunk.send_event(
             self.url,
             self.authtoken,
+            self.validate_certs,
             'UNREACHABLE',
             result,
             self._runtime(result)
