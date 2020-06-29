@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 try:
-    from ansible.plugins.inspur_sdk import ism
+    from ansible_collections.community.general.plugins.module_utils.inspur_sdk import ism
     ism_temp = True
 except ImportError:
     ism_temp = False

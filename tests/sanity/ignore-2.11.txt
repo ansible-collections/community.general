@@ -1389,3 +1389,12 @@ scripts/inventory/gce.py pylint:blacklisted-name
 tests/unit/plugins/modules/system/interfaces_file/test_interfaces_file.py pylint:blacklisted-name
 tests/utils/shippable/check_matrix.py replace-urlopen
 tests/utils/shippable/timing.py shebang
+plugins/modules/remote_management/ism/is_add_user.py validate-modules:doc-elements-mismatch
+plugins/modules/remote_management/ism/is_add_user_group.py validate-modules:doc-elements-mismatch
+plugins/modules/remote_management/ism/is_del_user.py validate-modules:doc-elements-mismatch
+plugins/modules/remote_management/ism/is_del_user_group.py validate-modules:doc-elements-mismatch
+plugins/modules/remote_management/ism/is_edit_pass_user.py validate-modules:doc-elements-mismatch
+plugins/modules/remote_management/ism/is_edit_priv_user.py validate-modules:doc-elements-mismatch
+plugins/modules/remote_management/ism/is_edit_user_group.py validate-modules:doc-elements-mismatch
+plugins/modules/remote_management/ism/is_user_group_info.py validate-modules:doc-elements-mismatch
+plugins/modules/remote_management/ism/is_user_info.py validate-modules:doc-elements-mismatch
