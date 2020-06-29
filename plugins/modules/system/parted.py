@@ -110,7 +110,7 @@ options:
       - You may need to use utilities like partprobe, kpartx or even reboot the system to make the kernel recognize changes in partition table.
     type: bool
     default: False
-    version+added: '1.0.0'
+    version_added: '1.0.0'
 notes:
   - When fetching information about a new disk and when the version of parted
     installed on the system is before version 3.1, the module queries the kernel
