@@ -1,0 +1,1 @@
+./remote_management/ism/is_del_user_group.py
