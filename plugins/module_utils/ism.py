@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # coding: utf-8 -*-
+# Copyright (c), Inspur isib-group, 2020
 
-
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 from ansible.plugins.inspur_sdk import ism
 from ansible.module_utils.basic import env_fallback
