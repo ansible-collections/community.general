@@ -4,8 +4,11 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-
-from ansible_collections.community.general.plugins.inspur_sdk import ism
+try:
+    from ansible.plugins.inspur_sdk import ism
+    ism_temp = True
+except ImportError:
+    ism_temp = False
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.six import iteritems
 
@@ -39,5 +42,7 @@ def get_connection(module):
     """get_connection"""
     load_params(module)
     dict_cpu = module.params
+    if not ism_temp:
+        module.fail_json(msg='inspur_sdk must be installed to use this module')
     result = ism.main(dict_cpu)
     return result
