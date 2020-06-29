@@ -103,6 +103,7 @@ DOCUMENTATION = '''
                 - In case of multiple network attached to virtual machine, define which interface should be returned as primary IP
                     address.
                 type: str
+                aliases: [ interface_name ]
             api_version:
                 description:
                 - "Specify the KubeVirt API version."
