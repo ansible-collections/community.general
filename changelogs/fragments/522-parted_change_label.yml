@@ -1,2 +1,2 @@
 bugfixes:
- - "parted - fix creating partition when label is changed (https://github.com/ansible-collections/community.general/issues/522)"
+ - "parted - fix creating partition when label is changed (https://github.com/ansible-collections/community.general/issues/522)."
