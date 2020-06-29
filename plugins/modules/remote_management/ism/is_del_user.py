@@ -20,7 +20,7 @@ module: is_del_user
 version_added: "2.9"
 author:
     - WangBaoshan (@ISIB-group)
-short_description: Delete user 
+short_description: Delete user
 description:
    - Delete user on Inspur server.
 options:

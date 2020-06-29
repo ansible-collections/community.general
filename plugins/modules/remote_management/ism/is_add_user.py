@@ -20,7 +20,7 @@ module: is_add_user
 version_added: "2.9"
 author:
     - WangBaoshan (@ISIB-group)
-short_description: Create user 
+short_description: Create user
 description:
    - Create user on Inspur server.
 options:
