@@ -25,7 +25,7 @@ requirements:
 deprecated:
     removed_in: 2.0.0  # was Ansible 2.12
     why: Updated modules released with increased functionality
-    alternative: Use M(gcp_dns_resource_record_set) instead.
+    alternative: Use M(google.cloud.gcp_dns_resource_record_set) instead.
 options:
     state:
         description:
@@ -116,7 +116,7 @@ options:
         description:
             - The Google Cloud Platform project ID to use.
 notes:
-    - See also M(gcdns_zone).
+    - See also M(community.general.gcdns_zone).
     - This modules's underlying library does not support in-place updates for
       DNS resource records. Instead, resource records are quickly deleted and
       recreated.

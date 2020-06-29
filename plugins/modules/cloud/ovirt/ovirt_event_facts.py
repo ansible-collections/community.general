@@ -14,11 +14,9 @@ author: "Chris Keller (@nasx)"
 deprecated:
     removed_in: 3.0.0  # was Ansible 2.13
     why: When migrating to collection we decided to use only _info modules.
-    alternative: Use C(ovirt_event_info) from the C(ovirt.ovirt) collection instead
+    alternative: Use M(ovirt.ovirt.ovirt_event_info) instead.
 description:
     - "Retrieve information about one or more oVirt/RHV events."
-    - This module was called C(ovirt_event_facts) before Ansible 2.9, returning C(ansible_facts).
-      Note that the M(ovirt_event_info) module no longer returns C(ansible_facts)!
 options:
     case_sensitive:
         description:

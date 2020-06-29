@@ -20,7 +20,7 @@ options:
   region_name:
     description:
      - Name of region to restrict results to volumes available in a specific region.
-     - Please use M(digital_ocean_region_info) for getting valid values related regions.
+     - Please use M(community.general.digital_ocean_region_info) for getting valid values related regions.
     required: false
 
 requirements:

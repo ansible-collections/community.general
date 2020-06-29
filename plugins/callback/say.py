@@ -16,7 +16,7 @@ DOCUMENTATION = '''
     description:
       - This plugin will use the 'say' or 'espeak' program to "speak" about play events.
     notes:
-      - In 2.8, this callback has been renamed from C(osx_say) into M(say).
+      - In 2.8, this callback has been renamed from C(osx_say) into M(community.general.say).
 '''
 
 import distutils.spawn

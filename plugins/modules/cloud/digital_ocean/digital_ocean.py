@@ -15,7 +15,7 @@ short_description: Create/delete a droplet/SSH_key in DigitalOcean
 deprecated:
   removed_in: 2.0.0  # was Ansible 2.12
   why: Updated module to remove external dependency with increased functionality.
-  alternative: Use M(digital_ocean_droplet) instead.
+  alternative: Use M(community.general.digital_ocean_droplet) instead.
 description:
      - Create/delete a droplet in DigitalOcean and optionally wait for it to be 'running', or deploy an SSH key.
 author: "Vincent Viallet (@zbal)"

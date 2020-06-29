@@ -46,7 +46,7 @@ options:
         C(finalize) will remove the unfinished_filename file, create a symlink to the newly
           deployed release and optionally clean old releases,
         C(clean) will remove failed & old releases,
-        C(absent) will remove the project folder (synonymous to the M(file) module with C(state=absent))
+        C(absent) will remove the project folder (synonymous to the M(ansible.builtin.file) module with C(state=absent))
     choices: [ present, finalize, absent, clean, query ]
     default: present
 

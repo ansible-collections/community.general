@@ -45,7 +45,7 @@ options:
   content:
     description:
     - When used instead of C(path), sets the content of the API requests directly.
-    - This may be convenient to template simple requests, for anything complex use the M(template) module.
+    - This may be convenient to template simple requests, for anything complex use the M(ansible.builtin.template) module.
     - You can collate multiple IMC XML fragments and they will be processed sequentially in a single stream,
       the Cisco IMC output is subsequently merged.
     - Parameter C(content) is mutual exclusive with parameter C(path).

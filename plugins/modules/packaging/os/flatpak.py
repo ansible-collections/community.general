@@ -36,7 +36,7 @@ module: flatpak
 short_description: Manage flatpaks
 description:
 - Allows users to add or remove flatpaks.
-- See the M(flatpak_remote) module for managing flatpak remotes.
+- See the M(community.general.flatpak_remote) module for managing flatpak remotes.
 author:
 - John Kwiatkoski (@JayKayy)
 - Alexander Bethke (@oolongbrothers)
@@ -77,7 +77,7 @@ options:
     - The flatpak remote (repository) to install the flatpak from.
     - By default, C(flathub) is assumed, but you do need to add the flathub flatpak_remote before
       you can use this.
-    - See the M(flatpak_remote) module for managing flatpak remotes.
+    - See the M(community.general.flatpak_remote) module for managing flatpak remotes.
     type: str
     default: flathub
   state:
