@@ -15,7 +15,7 @@ short_description: Run PostgreSQL queries
 description:
 - Runs arbitrary PostgreSQL queries.
 - Can run queries from SQL script files.
-- Does not run against backup files. Use M(postgresql_db) with I(state=restore)
+- Does not run against backup files. Use M(community.general.postgresql_db) with I(state=restore)
   to run queries on files made by pg_dump/pg_dumpall utilities.
 options:
   query:

@@ -69,7 +69,7 @@ options:
     default: no
 notes:
 - The changes are persistent across reboots.
-- The M(sefcontext) module does not modify existing files to the new
+- The M(community.general.sefcontext) module does not modify existing files to the new
   SELinux context(s), so it is advisable to first create the SELinux
   file contexts before creating files, or run C(restorecon) manually
   for the existing files that require the new SELinux file contexts.

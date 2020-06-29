@@ -24,7 +24,7 @@ requirements:
 deprecated:
     removed_in: 2.0.0  # was Ansible 2.12
     why: Updated modules released with increased functionality
-    alternative: Use M(gcp_dns_managed_zone) instead.
+    alternative: Use M(google.cloud.gcp_dns_managed_zone) instead.
 options:
     state:
         description:
@@ -61,7 +61,7 @@ options:
         description:
             - The Google Cloud Platform project ID to use.
 notes:
-    - See also M(gcdns_record).
+    - See also M(community.general.gcdns_record).
     - Zones that are newly created must still be set up with a domain registrar
       before they can be used.
 '''
