@@ -22,9 +22,9 @@ ism_argument_spec = {
     'provider': dict(type='dict', options=ism_provider_spec),
 }
 ism_top_spec = {
-    'host': dict(type='str', removed_in_version=2.9),
-    'username': dict(type='str', removed_in_version=2.9),
-    'password': dict(type='str', removed_in_version=2.9, no_log=True),
+    'host': dict(type='str'),
+    'username': dict(type='str'),
+    'password': dict(type='str', no_log=True),
 }
 ism_argument_spec.update(ism_top_spec)
 
