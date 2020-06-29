@@ -78,7 +78,7 @@ options:
     type: path
   target_opts:
     description:
-    - Further arguments for pg_dump or pg_restore.
+    - Additional arguments for pg_dump or restore program (pg_restore or psql, depending on target's format).
     - Used when I(state) is C(dump) or C(restore).
     type: str
   maintenance_db:
