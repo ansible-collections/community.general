@@ -2121,7 +2121,7 @@ class Container(DockerBaseClass):
             ipc_mode=host_config.get("IpcMode"),
             labels=config.get('Labels'),
             expected_links=host_config.get('Links'),
-            mac_address=network.get('MacAddress'),
+            mac_address=config.get('MacAddress', network.get('MacAddress')),
             memory_swappiness=host_config.get('MemorySwappiness'),
             network_mode=host_config.get('NetworkMode'),
             userns_mode=host_config.get('UsernsMode'),
