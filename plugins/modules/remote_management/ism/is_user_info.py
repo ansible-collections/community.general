@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: community.general.is_user_info
+module: is_user_info
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
@@ -19,7 +19,9 @@ short_description: Get user information
 description:
    - Get user information on Inspur server.
 options: {}
-extends_documentation_fragment: ism
+extends_documentation_fragment: 
+- community.general.ism
+
 '''
 
 EXAMPLES = '''
@@ -36,7 +38,7 @@ EXAMPLES = '''
   tasks:
 
   - name: get user information
-    community.general.is_user_info:
+    is_user_info:
       provider: "{{ ism }}"
 '''
 

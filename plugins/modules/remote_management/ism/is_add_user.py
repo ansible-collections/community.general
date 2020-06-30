@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: community.general.is_add_user
+module: is_add_user
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
@@ -40,7 +40,9 @@ options:
             - user access, select one or more from None/KVM/VMM/SOL.
         type: str
         required: true
-extends_documentation_fragment: ism
+extends_documentation_fragment: 
+- community.general.ism
+
 '''
 
 EXAMPLES = '''
@@ -57,7 +59,7 @@ EXAMPLES = '''
   tasks:
 
   - name: "add user"
-    community.general.is_add_user:
+    is_add_user:
       uname: "wbs"
       upass: "admin"
       role_id: "Administrator"

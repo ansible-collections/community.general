@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: community.general.is_edit_pass_user
+module: is_edit_pass_user
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
@@ -29,7 +29,9 @@ options:
             - User password.
         type: str
         required: true
-extends_documentation_fragment: ism
+extends_documentation_fragment: 
+- community.general.ism
+
 '''
 
 EXAMPLES = '''
@@ -46,7 +48,7 @@ EXAMPLES = '''
   tasks:
 
   - name: "change user password"
-    community.general.is_edit_pass_user:
+    is_edit_pass_user:
       uname: "wbs"
       upass: "admin1"
       provider: "{{ ism }}"

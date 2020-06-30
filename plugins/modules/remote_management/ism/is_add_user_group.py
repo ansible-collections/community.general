@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: community.general.is_add_user_group
+module: is_add_user_group
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
@@ -30,7 +30,9 @@ options:
         choices: ['administrator', 'operator', 'user', 'oem', 'none']
         required: true
         type: str
-extends_documentation_fragment: ism
+extends_documentation_fragment: 
+- community.general.ism
+
 '''
 
 EXAMPLES = '''
@@ -47,7 +49,7 @@ EXAMPLES = '''
   tasks:
 
   - name: "add user group"
-    community.general.is_add_user_group:
+    is_add_user_group:
       name: "test"
       pri: "administrator"
       provider: "{{ ism }}"
