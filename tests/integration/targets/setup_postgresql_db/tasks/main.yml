@@ -1,3 +1,7 @@
+# Exit when Suse because it causes CI problems
+- meta: end_play
+  when: ansible_os_family == 'Suse'
+
 - name: python 2
   set_fact:
     python_suffix: ''
@@ -25,6 +29,12 @@
     name: dbus
     state: started
   when: ansible_service_mgr == 'systemd' and ansible_distribution == 'Fedora'
+
+- name: Kill all postgres processes
+  shell: 'pkill -u {{ pg_user }}'
+  become: yes
+  when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
+  ignore_errors: yes
 
 - name: stop postgresql service
   service: name={{ postgresql_service }} state=stopped
@@ -162,8 +172,20 @@
 - name: start postgresql service
   service: name={{ postgresql_service }} state=started
 
+- name: Pause between start and stop
+  pause:
+    seconds: 5
+
+- name: Kill all postgres processes
+  shell: 'pkill -u {{ pg_user }}'
+  become: yes
+  when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
+  ignore_errors: yes
+  register: terminate
+
 - name: Stop postgresql service
   service: name={{ postgresql_service }} state=stopped
+  when: terminate is not succeeded
 
 - name: Pause between stop and start
   pause:

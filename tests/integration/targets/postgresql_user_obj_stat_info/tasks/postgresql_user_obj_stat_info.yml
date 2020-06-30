@@ -61,6 +61,13 @@
       name: track_functions
       value: all
 
+  # To avoid CI timeouts
+  - name: Kill all postgres processes
+    shell: 'pkill -u {{ pg_user }}'
+    become: yes
+    when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
+    ignore_errors: yes
+
   - name: Stop PostgreSQL
     become: yes
     service:
@@ -71,7 +78,7 @@
     pause:
       seconds: 5
 
-  - name: Stop PostgreSQL
+  - name: Start PostgreSQL
     become: yes
     service:
       name: "{{ postgresql_service }}"
