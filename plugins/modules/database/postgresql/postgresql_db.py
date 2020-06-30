@@ -67,6 +67,7 @@ options:
     - The format of the backup will be detected based on the target name.
     - Supported compression formats for dump and restore include C(.pgc), C(.bz2), C(.gz) and C(.xz)
     - Supported formats for dump and restore include C(.sql) and C(.tar)
+    - "Restore program is selected by target file format: C(.tar) and C(.pgc) are handled by pg_restore, other with pgsql."
     type: str
     choices: [ absent, dump, present, restore ]
     default: present
@@ -77,7 +78,7 @@ options:
     type: path
   target_opts:
     description:
-    - Further arguments for pg_dump or pg_restore.
+    - Additional arguments for pg_dump or restore program (pg_restore or psql, depending on target's format).
     - Used when I(state) is C(dump) or C(restore).
     type: str
   maintenance_db:
