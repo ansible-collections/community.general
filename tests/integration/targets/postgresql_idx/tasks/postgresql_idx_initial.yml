@@ -53,7 +53,7 @@
     login_user: '{{ pg_user }}'
     table: test_table
     columns: id, story
-    idxname: test0_idx
+    idxname: Test0_idx
   check_mode: true
   register: result
   ignore_errors: true
@@ -62,7 +62,7 @@
     that:
     - result is changed
     - result.tblname == ''
-    - result.name == 'test0_idx'
+    - result.name == 'Test0_idx'
     - result.state == 'absent'
     - result.valid != ''
     - result.tblspace == ''
@@ -76,7 +76,7 @@
   postgresql_query:
     db: postgres
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_indexes WHERE indexname = 'test0_idx'
+    query: SELECT 1 FROM pg_indexes WHERE indexname = 'Test0_idx'
   register: result
 
 - assert:
@@ -91,7 +91,7 @@
     login_user: '{{ pg_user }}'
     table: test_table
     columns: id, story
-    idxname: test0_idx
+    idxname: Test0_idx
     trust_input: no
   register: result
   ignore_errors: true
@@ -100,13 +100,13 @@
     that:
     - result is changed
     - result.tblname == 'test_table'
-    - result.name == 'test0_idx'
+    - result.name == 'Test0_idx'
     - result.state == 'present'
     - result.valid != ''
     - result.tblspace == ''
     - result.storage_params == []
     - result.schema == 'public'
-    - result.query == 'CREATE INDEX CONCURRENTLY "test0_idx" ON "public"."test_table" USING BTREE (id, story)'
+    - result.query == 'CREATE INDEX CONCURRENTLY "Test0_idx" ON "public"."test_table" USING BTREE (id, story)'
 
 - name: postgresql_idx - check the index exists after the previous step
   become_user: '{{ pg_user }}'
@@ -114,7 +114,7 @@
   postgresql_query:
     db: postgres
     login_user: '{{ pg_user }}'
-    query: SELECT 1 FROM pg_indexes WHERE indexname = 'test0_idx'
+    query: SELECT 1 FROM pg_indexes WHERE indexname = 'Test0_idx'
   register: result
 
 - assert:
@@ -129,7 +129,7 @@
     login_user: '{{ pg_user }}'
     table: test_table
     columns: id, story
-    idxname: test0_idx
+    idxname: Test0_idx
   register: result
   ignore_errors: true
 
@@ -137,7 +137,7 @@
     that:
     - result is not changed
     - result.tblname == 'test_table'
-    - result.name == 'test0_idx'
+    - result.name == 'Test0_idx'
     - result.state == 'present'
     - result.valid != ''
     - result.tblspace == ''
