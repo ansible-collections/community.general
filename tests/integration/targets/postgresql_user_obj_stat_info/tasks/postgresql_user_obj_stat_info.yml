@@ -61,11 +61,21 @@
       name: track_functions
       value: all
 
-  - name: Restart PostgreSQL
+  - name: Stop PostgreSQL
     become: yes
     service:
       name: "{{ postgresql_service }}"
-      state: restarted
+      state: stopped
+
+  - name: Pause between stop and start PosgreSQL
+    pause:
+      seconds: 5
+
+  - name: Stop PostgreSQL
+    become: yes
+    service:
+      name: "{{ postgresql_service }}"
+      state: started
 
   - name: Create test functions
     <<: *task_parameters

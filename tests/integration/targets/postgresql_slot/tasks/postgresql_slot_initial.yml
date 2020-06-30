@@ -20,11 +20,21 @@
     name: wal_level
     value: logical
 
-- name: postgresql_slot - restart PostgreSQL
+- name: postgresql_slot - stop PostgreSQL
   become: yes
   service:
     name: "{{ postgresql_service }}"
-    state: restarted
+    state: stopped
+
+- name: postgresql_slot - pause between stop and start PostgreSQL
+  pause:
+    seconds: 5
+
+- name: postgresql_slot - start PostgreSQL
+  become: yes
+  service:
+    name: "{{ postgresql_service }}"
+    state: started
 
 #
 # state=present
