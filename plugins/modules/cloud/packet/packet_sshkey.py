@@ -22,7 +22,7 @@ options:
     choices: ['present', 'absent']
   auth_token:
     description:
-     - Packet api token. You can also supply it in env var C(PACKET_API_TOKEN).
+     - Packet API token. You can also supply it in env var C(PACKET_API_TOKEN).
   label:
      description:
      - Label for the key. If you keep it empty, it will be read from key string.
@@ -77,7 +77,7 @@ changed:
     sample: True
     returned: always
 sshkeys:
-    description: Information about sshkeys that were createe/removed.
+    description: Information about sshkeys that were created/removed.
     type: list
     sample: [
         {
