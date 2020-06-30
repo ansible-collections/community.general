@@ -30,7 +30,7 @@ author:
 options:
   auth_token:
     description:
-      - Packet api token. You can also supply it in env var C(PACKET_API_TOKEN).
+      - Packet API token. You can also supply it in env var C(PACKET_API_TOKEN).
     type: str
 
   hostname:
@@ -80,7 +80,7 @@ requirements:
 '''
 
 EXAMPLES = '''
-# All the examples assume that you have your Packet api token in env var PACKET_API_TOKEN.
+# All the examples assume that you have your Packet API token in env var PACKET_API_TOKEN.
 # You can also pass it to the auth_token parameter of the module instead.
 
 - name: Create 1 device and assign an arbitrary public IPv4 subnet to it
