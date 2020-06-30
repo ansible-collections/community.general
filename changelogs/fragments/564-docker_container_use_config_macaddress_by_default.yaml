@@ -1,0 +1,2 @@
+bugfixes:
+  - docker_container - use Config MacAddress by default instead of Networks. Networks MacAddress is empty in some cases (https://github.com/ansible/ansible/issues/70206).
