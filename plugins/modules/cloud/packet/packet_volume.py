@@ -40,7 +40,7 @@ options:
 
   auth_token:
     description:
-      - Packet api token. You can also supply it in env var C(PACKET_API_TOKEN).
+      - Packet API token. You can also supply it in env var C(PACKET_API_TOKEN).
     type: str
 
   name:
