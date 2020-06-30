@@ -38,7 +38,7 @@ options:
     type: path
   exclude_path:
     description:
-      - Remote absolute path, glob, or list of paths or globs for the file or files to exclude from C(path) list and glob expansion.
+      - Remote absolute path, glob, or list of paths or globs for the file or files to exclude from I(path) list and glob expansion.
     type: list
   force_archive:
     description:
