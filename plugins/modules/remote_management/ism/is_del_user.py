@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: is_del_user
+module: community.general.is_del_user
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
@@ -41,7 +41,7 @@ EXAMPLES = '''
   tasks:
 
   - name: "del user"
-    is_del_user:
+    community.general.is_del_user:
       uname: "wbs"
       provider: "{{ ism }}"
 '''

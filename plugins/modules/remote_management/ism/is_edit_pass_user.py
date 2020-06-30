@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: is_edit_pass_user
+module: community.general.is_edit_pass_user
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
@@ -46,7 +46,7 @@ EXAMPLES = '''
   tasks:
 
   - name: "change user password"
-    is_edit_pass_user:
+    community.general.is_edit_pass_user:
       uname: "wbs"
       upass: "admin1"
       provider: "{{ ism }}"

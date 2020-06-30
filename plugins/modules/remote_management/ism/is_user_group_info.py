@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: is_user_group_info
+module: community.general.is_user_group_info
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
@@ -36,7 +36,7 @@ EXAMPLES = '''
   tasks:
 
   - name: "get user group information"
-    is_user_group_info:
+    community.general.is_user_group_info:
       provider: "{{ ism }}"
 '''
 

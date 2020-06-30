@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: is_edit_user_group
+module: community.general.is_edit_user_group
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
@@ -47,7 +47,7 @@ EXAMPLES = '''
   tasks:
 
   - name: "set user group"
-    is_edit_user_group:
+    community.general.is_edit_user_group:
       name: "test"
       pri: "administrator"
       provider: "{{ ism }}"

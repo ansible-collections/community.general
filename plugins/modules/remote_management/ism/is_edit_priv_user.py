@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: is_edit_priv_user
+module: community.general.is_edit_priv_user
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
@@ -53,7 +53,7 @@ EXAMPLES = '''
   tasks:
 
   - name: "change user privilege"
-    is_edit_priv_user:
+    community.general.is_edit_priv_user:
       uname: "wbs"
       role_id: "Administrator"
       priv: "KVM,SOL"

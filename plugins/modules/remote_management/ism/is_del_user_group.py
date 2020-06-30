@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: is_del_user_group
+module: community.general.is_del_user_group
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
@@ -41,7 +41,7 @@ EXAMPLES = '''
   tasks:
 
   - name: "delete user group"
-    is_del_user_group:
+    community.general.is_del_user_group:
       name: "test"
       provider: "{{ ism }}"
 '''

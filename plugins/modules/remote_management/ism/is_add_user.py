@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: is_add_user
+module: community.general.is_add_user
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
@@ -57,7 +57,7 @@ EXAMPLES = '''
   tasks:
 
   - name: "add user"
-    is_add_user:
+    community.general.is_add_user:
       uname: "wbs"
       upass: "admin"
       role_id: "Administrator"
