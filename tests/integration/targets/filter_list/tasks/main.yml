@@ -1,0 +1,6 @@
+---
+- name: test lists meged by attribute name
+  assert:
+    that:
+      - "(list1 | community.general.lists_mergeby(list2, 'name') | list |
+          difference(list3) | length) == 0"
