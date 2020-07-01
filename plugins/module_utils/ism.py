@@ -14,17 +14,17 @@ from ansible.module_utils.six import iteritems
 
 
 ism_provider_spec = {
-    'host': dict(type='str', required=True),
-    'username': dict(type='str', required=True, fallback=(env_fallback, ['ANSIBLE_NET_USERNAME'])),
-    'password': dict(type='str', required=True, fallback=(env_fallback, ['ANSIBLE_NET_PASSWORD']), no_log=True),
+    'host': dict(type='str'),
+    'username': dict(type='str', fallback=(env_fallback, ['ANSIBLE_NET_USERNAME'])),
+    'password': dict(type='str', fallback=(env_fallback, ['ANSIBLE_NET_PASSWORD']), no_log=True),
 }
 ism_argument_spec = {
     'provider': dict(type='dict', options=ism_provider_spec),
 }
 ism_top_spec = {
-    'host': dict(type='str', required=True),
-    'username': dict(type='str', required=True),
-    'password': dict(type='str', required=True, no_log=True),
+    'host': dict(type='str'),
+    'username': dict(type='str'),
+    'password': dict(type='str', no_log=True),
 }
 ism_argument_spec.update(ism_top_spec)
 

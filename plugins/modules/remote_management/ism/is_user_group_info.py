@@ -55,7 +55,7 @@ state:
 changed:
     description: check to see if a change was made on the device
     returned: always
-    type: false
+    type: bool
 '''
 
 from ansible.module_utils.basic import AnsibleModule

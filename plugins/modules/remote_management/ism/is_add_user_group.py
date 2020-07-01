@@ -68,7 +68,7 @@ state:
 changed:
     description: check to see if a change was made on the device
     returned: always
-    type: false
+    type: bool
 '''
 
 from ansible_collections.community.general.plugins.module_utils.ism import (ism_argument_spec, get_connection)
