@@ -19,7 +19,7 @@ short_description: Get user information
 description:
    - Get user information on Inspur server.
 options: {}
-extends_documentation_fragment: 
+extends_documentation_fragment:
 - community.general.ism
 
 '''

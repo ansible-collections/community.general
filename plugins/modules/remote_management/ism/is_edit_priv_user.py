@@ -36,7 +36,7 @@ options:
         type: list
         elements: str
         required: true
-extends_documentation_fragment: 
+extends_documentation_fragment:
 - community.general.ism
 
 '''

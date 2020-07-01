@@ -24,7 +24,7 @@ options:
             - group name.
         required: true
         type: str
-extends_documentation_fragment: 
+extends_documentation_fragment:
 - community.general.ism
 
 '''

@@ -40,7 +40,7 @@ options:
             - user access, select one or more from None/KVM/VMM/SOL.
         type: str
         required: true
-extends_documentation_fragment: 
+extends_documentation_fragment:
 - community.general.ism
 
 '''

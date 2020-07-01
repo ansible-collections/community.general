@@ -14,6 +14,7 @@ options:
   provider:
     description:
       - A dict object containing connection details.
+    type: dict
     suboptions:
       host:
         description:
