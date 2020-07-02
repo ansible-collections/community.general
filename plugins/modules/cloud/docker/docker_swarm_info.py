@@ -116,7 +116,7 @@ EXAMPLES = '''
 - name: Get info on Docker Swarm and filtered list of registered nodes
   docker_swarm_info:
     nodes: yes
-    nodes_filter:
+    nodes_filters:
       name: mynode
   register: result
 
