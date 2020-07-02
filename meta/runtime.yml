@@ -278,6 +278,36 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: The helm module in community.general has been deprecated. Use community.kubernetes.helm instead.
+    infini_export:
+      redirect: infinidat.infinibox.infini_export
+      deprecated:
+        removal_version: 2.0.0
+        warning_text: The infini_export module has been moved to the infinidat collection.
+    infini_export_client:
+      redirect: infinidat.infinibox.infini_export_client
+      deprecated:
+        removal_version: 2.0.0
+        warning_text: The infini_export_client module has been moved to the infinidat collection.
+    infini_fs:
+      redirect: infinidat.infinibox.infini_fs
+      deprecated:
+        removal_version: 2.0.0
+        warning_text: The infini_fs module has been moved to the infinidat collection.
+    infini_host:
+      redirect: infinidat.infinibox.infini_host
+      deprecated:
+        removal_version: 2.0.0
+        warning_text: The infini_host module has been moved to the infinidat collection.
+    infini_pool:
+      redirect: infinidat.infinibox.infini_pool
+      deprecated:
+        removal_version: 2.0.0
+        warning_text: The infini_pool module has been moved to the infinidat collection.
+    infini_vol:
+      redirect: infinidat.infinibox.infini_vol
+      deprecated:
+        removal_version: 2.0.0
+        warning_text: The infini_vol module has been moved to the infinidat collection.
     memset_memstore_facts:
       deprecation:
         removal_version: 3.0.0
@@ -657,6 +687,11 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: The digital_ocean docs_fragment has been moved to the community.digitalocean collection.
       redirect: community.digitalocean.digital_ocean
+    infinibox:
+      redirect: infinidat.infinibox.infinibox
+      deprecated:
+        removal_version: 2.0.0
+        warning_text: The infinibox doc_fragments plugin has been moved to the infinidat.infinibox collection.
     mysql:
       deprecation:
         removal_version: 2.0.0
@@ -673,6 +708,11 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: The digital_ocean module_utils has been moved to the community.digitalocean collection.
       redirect: community.digitalocean.digital_ocean
+    infinibox:
+      redirect: infinidat.infinibox.infinibox
+      deprecated:
+        removal_version: 2.0.0
+        warning_text: The infinibox module_utils plugin has been moved to the infinidat.infinibox collection.
     mysql:
       deprecation:
         removal_version: 2.0.0
