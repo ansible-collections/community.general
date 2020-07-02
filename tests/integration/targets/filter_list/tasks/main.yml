@@ -1,5 +1,5 @@
 ---
-- name: test lists meged by attribute name
+- name: Test lists merged by attribute name
   assert:
     that:
       - "(list1 | community.general.lists_mergeby(list2, 'name') | list |
