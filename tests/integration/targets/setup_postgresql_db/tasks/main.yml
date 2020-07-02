@@ -1,3 +1,7 @@
+# Exit when Suse because it causes CI problems
+- meta: end_play
+  when: ansible_os_family == 'Suse'
+
 - name: python 2
   set_fact:
     python_suffix: ''
@@ -25,6 +29,12 @@
     name: dbus
     state: started
   when: ansible_service_mgr == 'systemd' and ansible_distribution == 'Fedora'
+
+- name: Kill all postgres processes
+  shell: 'pkill -u {{ pg_user }}'
+  become: yes
+  when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
+  ignore_errors: yes
 
 - name: stop postgresql service
   service: name={{ postgresql_service }} state=stopped
@@ -83,7 +93,16 @@
   when: ansible_os_family == 'Debian'
 
 - name: Initialize postgres (Suse)
-  service: name=postgresql state=restarted
+  service: name=postgresql state=stopped
+  when: ansible_os_family == 'Suse'
+
+- name: Pause between stop and start postgresql
+  pause:
+    seconds: 5
+  when: ansible_os_family == 'Suse'
+
+- name: Initialize postgres (Suse)
+  service: name=postgresql state=started
   when: ansible_os_family == 'Suse'
 
 - name: Copy pg_hba into place
@@ -153,8 +172,27 @@
 - name: start postgresql service
   service: name={{ postgresql_service }} state=started
 
-- name: restart postgresql service
-  service: name={{ postgresql_service }} state=restarted
+- name: Pause between start and stop
+  pause:
+    seconds: 5
+
+- name: Kill all postgres processes
+  shell: 'pkill -u {{ pg_user }}'
+  become: yes
+  when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
+  ignore_errors: yes
+  register: terminate
+
+- name: Stop postgresql service
+  service: name={{ postgresql_service }} state=stopped
+  when: terminate is not succeeded
+
+- name: Pause between stop and start
+  pause:
+    seconds: 5
+
+- name: Start postgresql service
+  service: name={{ postgresql_service }} state=started
 
 - name: copy control file for dummy ext
   copy:
