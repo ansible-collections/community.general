@@ -15,7 +15,7 @@ module: is_edit_priv_user
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
-short_description: Change user privilege
+short_description: Change user privilege.
 description:
    - Change user privilege on Inspur server.
 options:
@@ -26,7 +26,7 @@ options:
         required: true
     role_id:
         description:
-            - user role id of new user.
+            - User role id of new user.
         default: NoAccess
         choices: ['Administrator', 'Operator', 'Commonuser','OEM','NoAccess']
         type: str
@@ -63,17 +63,16 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-
 message:
-    description: messages returned after module execution
+    description: Messages returned after module execution.
     returned: always
     type: str
 state:
-    description: status after module execution
+    description: Status after module execution.
     returned: always
     type: str
 changed:
-    description: check to see if a change was made on the device
+    description: Check to see if a change was made on the device.
     returned: always
     type: bool
 '''

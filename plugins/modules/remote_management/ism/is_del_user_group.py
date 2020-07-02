@@ -15,13 +15,13 @@ module: is_del_user_group
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
-short_description: Delete user group
+short_description: Delete user group.
 description:
    - Delete user group on Inspur server.
 options:
     name:
         description:
-            - group name.
+            - Group name.
         required: true
         type: str
 extends_documentation_fragment:
@@ -49,17 +49,16 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-
 message:
-    description: messages returned after module execution
+    description: Messages returned after module execution.
     returned: always
     type: str
 state:
-    description: status after module execution
+    description: Status after module execution.
     returned: always
     type: str
 changed:
-    description: check to see if a change was made on the device
+    description: Check to see if a change was made on the device.
     returned: always
     type: bool
 '''

@@ -15,7 +15,7 @@ module: is_user_group_info
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
-short_description: Get user group information
+short_description: Get user group information.
 description:
    - Get user group information on Inspur server.
 options: {}
@@ -43,17 +43,16 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-
 message:
-    description: messages returned after module execution
+    description: Messages returned after module execution.
     returned: always
     type: str
 state:
-    description: status after module execution
+    description: Status after module execution.
     returned: always
     type: str
 changed:
-    description: check to see if a change was made on the device
+    description: Check to see if a change was made on the device.
     returned: always
     type: bool
 '''

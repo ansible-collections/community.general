@@ -15,7 +15,7 @@ module: is_add_user
 version_added: "0.1.0"
 author:
     - WangBaoshan (@ISIB-group)
-short_description: Create user
+short_description: Create user.
 description:
    - Create user on Inspur server.
 options:
@@ -31,13 +31,13 @@ options:
         required: true
     role_id:
         description:
-            - user role id of new user.
+            - User role id of new user.
         default: NoAccess
         choices: ['Administrator', 'Operator', 'Commonuser','OEM','NoAccess']
         type: str
     priv:
         description:
-            - user access, select one or more from None/KVM/VMM/SOL.
+            - User access, select one or more from None/KVM/VMM/SOL.
         type: str
         required: true
 extends_documentation_fragment:
@@ -69,15 +69,15 @@ EXAMPLES = '''
 
 RETURN = '''
 message:
-    description: messages returned after module execution
+    description: Messages returned after module execution.
     returned: always
     type: str
 state:
-    description: status after module execution
+    description: Status after module execution.
     returned: always
     type: str
 changed:
-    description: check to see if a change was made on the device
+    description: Check to see if a change was made on the device.
     returned: always
     type: bool
 '''
