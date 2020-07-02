@@ -1,0 +1,2 @@
+minor_changes:
+- "The collection is now actively tested in CI with the latest Ansible 2.9 release."
