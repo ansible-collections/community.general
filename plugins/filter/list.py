@@ -12,7 +12,7 @@ from operator import itemgetter
 
 def lists_mergeby(l1, l2, index):
     '''Merge lists by attribute index. Example:
-    - debug: msg="{{ l1|lists_mergeby(l2, 'index')|list }}"
+    - debug: msg="{{ l1|community.general.lists_mergeby(l2, 'index')|list }}"
     '''
     d = defaultdict(dict)
     for l in (l1, l2):
