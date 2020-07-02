@@ -6,9 +6,7 @@ This repo contains the `community.general` Ansible Collection. The collection in
 
 ## Tested with Ansible
 
-Tested with the current Ansible 2.10 release and the current development version of Ansible.
-
-We do not actively test against Ansible 2.9, but the collection should be mostly functional with 2.9 as well. Ansible versions before 2.9.10 are not supported.
+Tested with the current Ansible 2.9 and 2.10 releases and the current development version of Ansible. Ansible versions before 2.9.10 are not supported.
 
 ## External requirements
 
