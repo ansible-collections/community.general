@@ -307,7 +307,7 @@ options:
       propagation:
         description:
           - The propagation mode to use.
-          - Can only be used when I(mode) is C(bind).
+          - Can only be used when I(type) is C(bind).
         type: str
         choices:
           - shared
@@ -319,12 +319,12 @@ options:
       no_copy:
         description:
           - Disable copying of data from a container when a volume is created.
-          - Can only be used when I(mode) is C(volume).
+          - Can only be used when I(type) is C(volume).
         type: bool
       driver_config:
         description:
           - Volume driver configuration.
-          - Can only be used when I(mode) is C(volume).
+          - Can only be used when I(type) is C(volume).
         suboptions:
           name:
             description:
@@ -340,12 +340,12 @@ options:
           - "Size of the tmpfs mount in format C(<number>[<unit>]). Number is a positive integer.
             Unit can be C(B) (byte), C(K) (kibibyte, 1024B), C(M) (mebibyte), C(G) (gibibyte),
             C(T) (tebibyte), or C(P) (pebibyte)."
-          - Can only be used when I(mode) is C(tmpfs).
+          - Can only be used when I(type) is C(tmpfs).
         type: str
       tmpfs_mode:
         description:
           - File mode of the tmpfs in octal.
-          - Can only be used when I(mode) is C(tmpfs).
+          - Can only be used when I(type) is C(tmpfs).
         type: int
   name:
     description:
