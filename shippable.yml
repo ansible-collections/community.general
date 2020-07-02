@@ -18,7 +18,11 @@ matrix:
     - env: T=2.10/sanity/2
     - env: T=2.10/sanity/3
     - env: T=2.10/sanity/4
-    - env: T=2.10/sanity/extra
+
+    - env: T=2.9/sanity/1
+    - env: T=2.9/sanity/2
+    - env: T=2.9/sanity/3
+    - env: T=2.9/sanity/4
 
     - env: T=devel/units/2.6/1
     - env: T=devel/units/2.7/1
@@ -35,6 +39,13 @@ matrix:
     - env: T=2.10/units/3.7/1
     - env: T=2.10/units/3.8/1
     - env: T=2.10/units/3.9/1
+
+    - env: T=2.9/units/2.6/1
+    - env: T=2.9/units/2.7/1
+    - env: T=2.9/units/3.5/1
+    - env: T=2.9/units/3.6/1
+    - env: T=2.9/units/3.7/1
+    - env: T=2.9/units/3.8/1
 
     #- env: T=devel/aix/7.2/1
     - env: T=devel/osx/10.11/1
@@ -127,6 +138,15 @@ matrix:
     - env: T=2.10/linux/opensuse15/3
     - env: T=2.10/linux/ubuntu1804/4
     - env: T=2.10/cloud/3.6/1
+
+    - env: T=2.9/osx/10.11/1
+    - env: T=2.9/rhel/8.2/1
+    - env: T=2.9/freebsd/12.0/2
+    - env: T=2.9/linux/centos8/2
+    - env: T=2.9/linux/fedora31/3
+    - env: T=2.9/linux/opensuse15/3
+    - env: T=2.9/linux/ubuntu1804/4
+    - env: T=2.9/cloud/3.6/1
 
 branches:
   except:
