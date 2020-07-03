@@ -1,3 +1,4 @@
+plugins/action/iptables_state.py action-plugin-docs
 plugins/callback/hipchat.py pylint:blacklisted-name
 plugins/connection/lxc.py pylint:blacklisted-name
 plugins/module_utils/compat/ipaddress.py no-assert
@@ -947,6 +948,7 @@ plugins/modules/system/gconftool2.py pylint:blacklisted-name
 plugins/modules/system/gconftool2.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/interfaces_file.py pylint:blacklisted-name
 plugins/modules/system/interfaces_file.py validate-modules:parameter-type-not-in-doc
+plugins/modules/system/iptables_state.py validate-modules:undocumented-parameter
 plugins/modules/system/java_cert.py pylint:blacklisted-name
 plugins/modules/system/java_keystore.py validate-modules:doc-missing-type
 plugins/modules/system/kernel_blacklist.py validate-modules:parameter-type-not-in-doc
