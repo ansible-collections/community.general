@@ -51,8 +51,6 @@ def docker_stack_list(module):
 def main():
     module = AnsibleModule(
         argument_spec={
-            'name': dict(type='str', required=False),
-            'action': dict(type='str', choices=['list', 'tasks'], default="list"),
         },
         supports_check_mode=False
     )
