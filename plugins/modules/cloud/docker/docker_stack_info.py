@@ -58,7 +58,7 @@ def main():
     rc, out, err = docker_stack_list(module)
 
     if rc != 0:
-        module.fail_json(msg="Error running docker stack module",
+        module.fail_json(msg="Error running docker stack. {0}".format(err),
                          rc=rc, out=out, stdout=out, stderr=err)
     else:
         if out:
