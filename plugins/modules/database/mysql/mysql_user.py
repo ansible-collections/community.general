@@ -357,10 +357,19 @@ def user_add(cursor, user, host, host_all, password, encrypted,
     if check_mode:
         return True
 
+    # Determine what user management method server uses
+    old_user_mgmt = use_old_user_mgmt(cursor)
+
     if password and encrypted:
         cursor.execute("CREATE USER %s@%s IDENTIFIED BY PASSWORD %s", (user, host, password))
     elif password and not encrypted:
-        cursor.execute("CREATE USER %s@%s IDENTIFIED BY %s", (user, host, password))
+        if old_user_mgmt:
+            cursor.execute("CREATE USER %s@%s IDENTIFIED BY %s", (user, host, password))
+        else:
+            cursor.execute("SELECT CONCAT('*', UCASE(SHA1(UNHEX(SHA1(%s)))))", (password,))
+            encrypted_password = cursor.fetchone()[0]
+            cursor.execute("CREATE USER %s@%s IDENTIFIED WITH mysql_native_password AS %s", (user, host, encrypted_password))
+
     elif plugin and plugin_hash_string:
         cursor.execute("CREATE USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin, plugin_hash_string))
     elif plugin and plugin_auth_string:
