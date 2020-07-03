@@ -1,2 +1,2 @@
 bugfixes:
-  - snmp_facts module - Skip EndOfMibView values in snmp_facts.py (https://github.com/ansible/ansible/issues/49044)
+  - snmp_facts module - skip ``EndOfMibView`` values (https://github.com/ansible/ansible/issues/49044).
