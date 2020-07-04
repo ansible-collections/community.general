@@ -139,7 +139,7 @@ matrix:
     - env: T=2.10/linux/ubuntu1804/4
     - env: T=2.10/cloud/3.6/1
 
-    - env: T=2.9/osx/10.11/1
+    #- env: T=2.9/osx/10.11/1
     - env: T=2.9/rhel/8.2/1
     - env: T=2.9/freebsd/12.0/2
     - env: T=2.9/linux/centos8/2
