@@ -31,6 +31,7 @@ DOCUMENTATION = '''
         ini:
           - section: callback_logstash
             key: port
+            version_added: 1.0.0
         default: 5000
       type:
         description: Message type
@@ -39,6 +40,7 @@ DOCUMENTATION = '''
         ini:
           - section: callback_logstash
             key: type
+            version_added: 1.0.0
         default: ansible
 '''
 
