@@ -1,2 +1,2 @@
 minor_changes:
-- "add ini config to logstash callback"
+- "logstash callback - add ini config (https://github.com/ansible-collections/community.general/pull/610)."
