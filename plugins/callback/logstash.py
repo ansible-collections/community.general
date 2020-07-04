@@ -22,6 +22,7 @@ DOCUMENTATION = '''
         ini:
           - section: callback_logstash
             key: server
+            version_added: 1.0.0
         default: localhost
       port:
         description: Port on which logstash is listening
