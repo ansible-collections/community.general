@@ -32,6 +32,7 @@ DOCUMENTATION = '''
             description: The URL of the GitLab server, with protocol (i.e. http or https).
             env:
               - name: GITLAB_SERVER_URL
+                version_added: 1.0.0
             type: str
             required: true
             default: https://gitlab.com
