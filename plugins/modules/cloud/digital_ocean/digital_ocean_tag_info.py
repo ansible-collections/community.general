@@ -90,7 +90,7 @@ def core(module):
         resp_json = response.json
         tag = resp_json['tag']
     else:
-        tag = rest.get_paginated_data(base_url=base_url+'?', data_key_name='tags')
+        tag = rest.get_paginated_data(base_url=base_url + '?', data_key_name='tags')
 
     module.exit_json(changed=False, data=tag)
 
