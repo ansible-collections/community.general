@@ -101,7 +101,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 runners = gl.runners.all(scope=self.get_option('filter'))
             else:
                 runners = gl.runners.all(all=True)
-                version_added: 1.0.0
             for runner in runners:
                 host = str(runner['id'])
                 ip_address = runner['ip_address']
