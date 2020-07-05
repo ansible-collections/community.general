@@ -79,7 +79,7 @@ def core(module):
     tag_name = module.params.get('tag_name', None)
     rest = DigitalOceanHelper(module)
 
-    base_url = 'tags?'
+    base_url = 'tags'
     if tag_name is not None:
         response = rest.get("%s/%s" % (base_url, tag_name))
         status_code = response.status_code
@@ -90,7 +90,7 @@ def core(module):
         resp_json = response.json
         tag = resp_json['tag']
     else:
-        tag = rest.get_paginated_data(base_url=base_url, data_key_name='tags')
+        tag = rest.get_paginated_data(base_url=base_url + '?', data_key_name='tags')
 
     module.exit_json(changed=False, data=tag)
 
