@@ -5,6 +5,14 @@ Community General Release Notes
 .. contents:: Topics
 
 
+v0.3.0-experimental.meta.redirects.2
+====================================
+
+Release Summary
+---------------
+
+Maintenance release where the ``master`` branch was renamed to ``main``. Contains no other change.
+
 v0.3.0-experimental.meta.redirects
 ==================================
 

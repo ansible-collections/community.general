@@ -954,3 +954,10 @@ releases:
     - logicmonitor-removal.yml
     - parted_negative_numbers.yml
     release_date: '2020-06-27'
+  0.3.0-experimental.meta.redirects.2:
+    changes:
+      release_summary: Maintenance release where the ``master`` branch was renamed
+        to ``main``. Contains no other change.
+    fragments:
+    - 0.3.0-experimental.meta.redirects.2.yml
+    release_date: '2020-07-06'
