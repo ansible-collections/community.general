@@ -1,1 +1,0 @@
-cloud/digital_ocean/digital_ocean_size_facts.py
