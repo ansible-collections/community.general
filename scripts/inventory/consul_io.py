@@ -512,9 +512,9 @@ class ConsulConfig(dict):
 
     def read_env_vars(self):
         env_var_options = ['host', 'token', 'datacenter', 'servers_suffix',
-                          'tags', 'kv_metadata', 'kv_groups', 'availability',
-                          'unavailable_suffix', 'available_suffix', 'url',
-                          'domain', 'suffixes', 'bulk_load']
+                           'tags', 'kv_metadata', 'kv_groups', 'availability',
+                           'unavailable_suffix', 'available_suffix', 'url',
+                           'domain', 'suffixes', 'bulk_load']
         for option in env_var_options:
             value = None
             env_var = 'CONSUL_' + option.upper()
