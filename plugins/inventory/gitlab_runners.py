@@ -40,6 +40,7 @@ DOCUMENTATION = '''
             description: GitLab token for logging in.
             env:
               - name: GITLAB_API_TOKEN
+                version_added: 1.0.0
             type: str
             aliases:
               - private_token
