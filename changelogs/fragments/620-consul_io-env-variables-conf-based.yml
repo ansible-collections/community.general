@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - kv_groups - fix byte chain decoding for python3
+minor_changes:
+  - conf options - Allow custom configuration options via env variables
