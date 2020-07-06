@@ -295,7 +295,17 @@ VALID_PRIVS = frozenset(('CREATE', 'DROP', 'GRANT', 'GRANT OPTION',
                          'SYSTEM_USER', 'SYSTEM_VARIABLES_ADMIN', 'SYSTEM_USER',
                          'TABLE_ENCRYPTION_ADMIN', 'VERSION_TOKEN_ADMIN',
                          'XA_RECOVER_ADMIN', 'LOAD FROM S3', 'SELECT INTO S3',
-                         'INVOKE LAMBDA'))
+                         'INVOKE LAMBDA',
+                         'ALTER ROUTINE',
+                         'BINLOG ADMIN',
+                         'BINLOG MONITOR',
+                         'BINLOG REPLAY',
+                         'CONNECTION ADMIN',
+                         'READ_ONLY ADMIN',
+                         'REPLICATION MASTER ADMIN',
+                         'REPLICATION SLAVE',
+                         'REPLICATION SLAVE ADMIN',
+                         'SET USER',))
 
 
 class InvalidPrivsError(Exception):
