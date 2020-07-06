@@ -69,7 +69,7 @@ cd "${TEST_DIR}"
 # START: HACK install dependencies
 retry ansible-galaxy -vvv collection install ansible.netcommon
 retry ansible-galaxy -vvv collection install ansible.posix
-# retry ansible-galaxy -vvv collection install community.crypto -- the currently published version doesn't work well with Ansible 2.9, use master instead:
+# retry ansible-galaxy -vvv collection install community.crypto -- the currently published version doesn't work well with Ansible 2.9, use main instead:
 retry git clone https://github.com/ansible-collections/community.crypto.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/crypto"
 # retry ansible-galaxy -vvv collection install community.internal_test_tools - we need git checkout until 0.2.0 has been released
 retry git clone https://github.com/ansible-collections/community.internal_test_tools.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/internal_test_tools"
