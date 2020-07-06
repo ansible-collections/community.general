@@ -198,10 +198,8 @@ module = None
 PASSWD_ARG_RE = re.compile(r'^[-]{0,2}pass[-]?(word|wd)?')
 
 
-def socket_client(data):
+def socket_client(data, socket_host, socket_port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    socket_port = int(os.environ.get('ANSIBLE_TERRAFORM_STREAM_PORT'))
-    socket_host = os.environ.get('ANSIBLE_TERRAFORM_STREAM_HOST')
     if not isinstance(data, bytes):
         try:
             data = data.encode('utf-8')
@@ -211,7 +209,7 @@ def socket_client(data):
     sock.sendto(outln, (socket_host, socket_port))
 
 
-def custom_run_command(self, args, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None,
+def custom_run_command(self, args, socket_host, socket_port, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None,
                        cwd=None, use_unsafe_shell=False, prompt_regex=None, environ_update=None, umask=None, encoding='utf-8', errors='surrogate_or_strict',
                        expand_user_and_vars=True, pass_fds=None, before_communicate_callback=None):
     '''
@@ -372,7 +370,7 @@ def custom_run_command(self, args, check_rc=False, close_fds=True, executable=No
             line = cmd.stdout.readline()
             if not line:
                 break
-            socket_client(line)
+            socket_client(line, socket_host, socket_port)
 
         if before_communicate_callback:
             before_communicate_callback(cmd)
@@ -571,8 +569,8 @@ def main():
             force_init=dict(type='bool', default=False),
             backend_config=dict(type='dict', default=None),
             backend_config_files=dict(type='list', elements='path', default=None),
-            # socket_port=dict(type='int'),
-            # socket_host=dict(type='str')
+            socket_port=dict(type='int'),
+            socket_host=dict(type='str'),
             stream_output=dict(type='bool', default=False)
         ),
         required_if=[('state', 'planned', ['plan_file'])],
@@ -591,8 +589,8 @@ def main():
     force_init = module.params.get('force_init')
     backend_config = module.params.get('backend_config')
     backend_config_files = module.params.get('backend_config_files')
-    # socket_port = module.params.get('socket_port')
-    # socket_host = module.params.get('socket_host')
+    socket_port = module.params.get('socket_port')
+    socket_host = module.params.get('socket_host')
     stream_output = module.params.get('stream_output')
     if bin_path is not None:
         command = [bin_path]
@@ -658,7 +656,7 @@ def main():
         if not stream_output:
             rc, out, err = module.run_command(command, cwd=project_path)
         else:
-            rc, out, err = custom_run_command(module, command, cwd=project_path)
+            rc, out, err = custom_run_command(module, command, cwd=project_path, socket_host=socket_host, socket_port=socket_port)
         # checks out to decide if changes were made during execution
         if '0 added, 0 changed' not in out and not state == "absent" or '0 destroyed' not in out:
             changed = True
