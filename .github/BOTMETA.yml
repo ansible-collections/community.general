@@ -67,15 +67,11 @@ files:
   $doc_fragments/mysql.py:
     maintainers: $team_mysql
     labels: database mysql
-    keywords: mariadb proxysql
+    keywords: mariadb
   $doc_fragments/postgres.py:
     maintainers: $team_postgresql
     labels: postgres postgresql
     keywords: database postgres postgresql
-  $doc_fragments/proxysql.py:
-    maintainers: $team_mysql
-    labels: database mysql proxysql
-    keywords: mariadb proxysql
   $doc_fragments/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
@@ -162,7 +158,7 @@ files:
   $module_utils/mysql.py:
     maintainers: $team_mysql
     labels: database mysql
-    keywords: mariadb proxysql
+    keywords: mariadb
   $module_utils/net_tools/nios/api.py:
     maintainers: $team_networking sganesh-infoblox
     labels: infoblox networking
@@ -535,7 +531,7 @@ files:
   $modules/database/mysql/:
     authors: Andersson007
     maintainers: Alexander198961 Xyon bmalynovytch bmildren kurtdavis michaelcoburn oneiroi tolland
-    keywords: mariadb proxysql
+    keywords: mariadb
   $modules/database/mysql/mysql_replication.py:
     authors: Andersson007 banyek
   $modules/database/mysql/mysql_user.py:
@@ -583,11 +579,6 @@ files:
   $modules/database/postgresql/postgresql_user.py:
     authors: ansible
     maintainers: $team_postgresql
-  $modules/database/proxysql/:
-    authors: bmildren
-    maintainers: Alexander198961 Andersson007 Xyon bmalynovytch kurtdavis michaelcoburn oneiroi tolland
-    labels: mysql
-    keywords: mariadb proxysql
   $modules/database/vertica/:
     authors: dareko
   $modules/files/archive.py:

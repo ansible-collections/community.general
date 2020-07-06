@@ -1,0 +1,2 @@
+removed_features:
+- "proxysql_* - all ProxySQL modules have been moved to the ``community.proxysql`` collection. A redirection is active, which will be removed in version 2.0.0." 
