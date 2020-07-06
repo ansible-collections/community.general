@@ -360,7 +360,7 @@ class ConsulInventory(object):
             else:
                 index, groups = self.consul_api.kv.get(key)
             if groups and groups['Value']:
-                for group in groups['Value'].split(','):
+                for group in groups['Value'].decode().split(','):
                     self.add_node_to_map(self.nodes_by_kv, group.strip(), node)
 
     def load_data_from_service(self, service_name, service, node_data):
