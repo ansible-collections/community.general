@@ -119,7 +119,7 @@ EXAMPLES = '''
     name: baz
     state: latest
 
-- name: Upgrade all installed packages (see warning for I(name) first!)
+- name: Upgrade all installed packages (see warning for the name option first!)
   pkgng:
     name: "*"
     state: latest
