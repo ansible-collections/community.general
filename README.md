@@ -1,6 +1,6 @@
-[![Run Status](https://api.shippable.com/projects/5e664a167c32620006c9fa50/badge?branch=master)](https://app.shippable.com/github/ansible-collections/community.general/dashboard) [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
+# Community General Collection
 
-# Ansible Collection: community.general
+[![Run Status](https://api.shippable.com/projects/5e664a167c32620006c9fa50/badge?branch=main)](https://app.shippable.com/github/ansible-collections/community.general/dashboard) [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
 
 This repo contains the `community.general` Ansible Collection.
 
@@ -34,7 +34,7 @@ See [here](https://docs.ansible.com/ansible/devel/dev_guide/developing_collectio
 
 ## Release notes
 
-See [here](https://github.com/ansible-collections/community.general/tree/master/CHANGELOG.rst).
+See [here](https://github.com/ansible-collections/community.general/tree/main/CHANGELOG.rst).
 
 ## Publishing New Version
 
