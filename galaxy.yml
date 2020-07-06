@@ -1,6 +1,6 @@
 namespace: community
 name: general
-version: 0.3.0-experimental.meta.redirects
+version: 0.3.0-experimental.meta.redirects.2
 readme: README.md
 authors:
   - Ansible (https://github.com/ansible)
