@@ -35,6 +35,7 @@ options:
       description:
         - Parameters to pass to the SQL squery
       type: list
+      elements: str
 
 requirements:
   - "python >= 2.6"
@@ -78,7 +79,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             dsn=dict(type='str', required=True, no_log=True),
-            query=dict(type='str',),
+            query=dict(type='str', required=True),
             params=dict(type='list'),
         ),
     )
