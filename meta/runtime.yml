@@ -284,6 +284,41 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
+    proxysql_backend_servers:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: The proxysql_backend_servers module has been moved to the community.proxysql collection.
+      redirect: community.proxysql.proxysql_backend_servers
+    proxysql_global_variables:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: The proxysql_global_variables module has been moved to the community.proxysql collection.
+      redirect: community.proxysql.proxysql_global_variables
+    proxysql_manage_config:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: The proxysql_manage_config module has been moved to the community.proxysql collection.
+      redirect: community.proxysql.proxysql_manage_config
+    proxysql_mysql_users:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: The proxysql_mysql_users module has been moved to the community.proxysql collection.
+      redirect: community.proxysql.proxysql_mysql_users
+    proxysql_query_rules:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: The proxysql_query_rules module has been moved to the community.proxysql collection.
+      redirect: community.proxysql.proxysql_query_rules
+    proxysql_replication_hostgroups:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: The proxysql_replication_hostgroups module has been moved to the community.proxysql collection.
+      redirect: community.proxysql.proxysql_replication_hostgroups
+    proxysql_scheduler:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: The proxysql_scheduler module has been moved to the community.proxysql collection.
+      redirect: community.proxysql.proxysql_scheduler
     scaleway_image_facts:
       deprecation:
         removal_version: 3.0.0
