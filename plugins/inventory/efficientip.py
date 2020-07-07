@@ -1,11 +1,11 @@
 # -*- Mode: Python; python-indent-offset: 4 -*-
 #
-# Time-stamp: <2020-04-18 16:19:07 alex>
+# Time-stamp: <2020-07-07 18:18:40 alex>
 #
 
 """
- EfficientIP inventory for ansible
- SOLIDserver Device Manager connection to gather devices filtered
+ EfficientIP inventory for ansible.
+ SOLIDserver Device Manager connection to gather devices filtered.
 """
 
 from __future__ import (absolute_import, division, print_function)
@@ -14,6 +14,7 @@ __metaclass__ = type
 import ipaddress
 # import pprint
 import logging
+import re
 
 from ansible.plugins.inventory import BaseInventoryPlugin
 from ansible.plugins.inventory import Constructable, Cacheable
@@ -34,8 +35,8 @@ logging.basicConfig(format='[%(filename)s:%(lineno)d]'
 DOCUMENTATION = '''
     name: efficientip
     plugin_type: inventory
-    short_description: inventory based on EfficientIP IPAM
-    version_added: 1.0.0
+    short_description: Inventory based on EfficientIP IPAM.
+    version_added: 1.0.1
     requirements:
         - SOLIDserverRest > 2.0.1
         - python 3
@@ -55,7 +56,7 @@ DOCUMENTATION = '''
         api:
             description: Information to get connected to the SOLIDserver.
             required: True
-            type: dictionary
+            type: dict
         space:
             description: Name of the space.
             required: False
@@ -67,11 +68,11 @@ DOCUMENTATION = '''
                          device_in_subnet, device_of_class,
                          device_metadata, device_intf_space. All
                          filter are additiionnal, all conditions must
-                         match
+                         match.
             required: False
             type: dict
         group_metadata:
-            description: regroup devices by metadata
+            description: Regroup devices by meta-data.
             required: False
             type: list
 '''
@@ -260,8 +261,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             return True
 
         for group in config['group_metadata']:
-            self.group_metadata.append(str(group))
-            self.inventory.add_group(str(group))
+            normalized_g = re.sub(r'[- .\(\)]', '', str(group))
+            self.group_metadata.append(normalized_g)
+            self.inventory.add_group(normalized_g)
 
         return True
 
@@ -285,18 +287,22 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             # check if group
             for _group in self.group_metadata:
                 if _group in dev and dev[_group] != '':
-                    _group_val = "{0}_{1}".format(_group, dev[_group])
+                    norm_g1 = re.sub(r'[- ]', '', str(_group))
+                    norm_g2 = re.sub(r'[- ]', '', str(dev[_group]))
+                    _group_val = "{0}_{1}".format(norm_g1, norm_g2)
                     if _group_val not in self.group_metadata_val:
                         self.inventory.add_group(_group_val)
-                        self.inventory.add_child(_group, _group_val)
-                    self.inventory.add_host(dev['name'], _group_val)
+                        self.inventory.add_child(norm_g1, _group_val)
+                    self.inventory.add_host(norm_g2, _group_val)
 
                     badded = True
 
             if not badded:
                 self.inventory.add_host(dev['name'])
 
-            if 'extracted_ips' in dev:
+            if ('extracted_ips' in dev
+                    and isinstance(dev['extracted_ips'], list)
+                    and len(dev['extracted_ips']) > 0):
                 self.inventory.set_variable(dev['name'],
                                             'ansible_host',
                                             dev['extracted_ips'][0])
