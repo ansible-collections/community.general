@@ -1,4 +1,4 @@
 bugfixes:
-  - plugin inventory gitlab_runners - Remove default 20 items limit to runners list by adding "all" bool to True 
-  in gl.runners.all (https://github.com/python-gitlab/python-gitlab/blob/df485a92b713a0f2f983c72d9d41ea3a771abf88/gitlab/v4/objects.py#L4922)
-  Permit env var input for server_url and api_token options values
+  - gitlab_runners inventory plugin - make sure that all runners are returned, and not only the first 20 items (https://github.com/ansible-collections/community.general/pull/611).
+minor_changes:
+  - gitlab_runners inventory plugin - permit environment variable input for ``server_url`` and ``api_token`` options (https://github.com/ansible-collections/community.general/pull/611). values.
