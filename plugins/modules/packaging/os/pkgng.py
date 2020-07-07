@@ -23,6 +23,13 @@ options:
     name:
         description:
             - Name or list of names of packages to install/remove.
+            - "With I(name=*), I(state: latest) will operate, but I(state: present) and I(state: absent) will be noops."
+            - >
+                Warning: In Ansible 2.9 and earlier this module had a misfeature
+                where I(name=*) with I(state: latest) or I(state: present) would
+                install every package from every package repository, filling up
+                the machines disk. Avoid using them unless you are certain that
+                your role will only be used with newer versions.
         required: true
         aliases: [pkg]
         type: list
@@ -111,6 +118,11 @@ EXAMPLES = '''
   pkgng:
     name: baz
     state: latest
+
+- name: Upgrade all installed packages (see warning for the name option first!)
+  pkgng:
+    name: "*"
+    state: latest
 '''
 
 
@@ -159,6 +171,24 @@ def pkgng_older_than(module, pkgng_path, compare_version):
         if compare_version[i] > version[i]:
             new_pkgng = False
     return not new_pkgng
+
+
+def upgrade_packages(module, pkgng_path, dir_arg):
+    # Run a 'pkg upgrade', updating all packages.
+    upgraded_c = 0
+
+    cmd = "%s %s upgrade -y" % (pkgng_path, dir_arg)
+    if module.check_mode:
+        cmd += " -n"
+    rc, out, err = module.run_command(cmd)
+
+    match = re.search('^Number of packages to be upgraded: ([0-9]+)', out, re.MULTILINE)
+    if match:
+        upgraded_c = int(match.group(1))
+
+    if upgraded_c > 0:
+        return (True, "updated %s package(s)" % upgraded_c, out, err)
+    return (False, "no packages need upgrades", out, err)
 
 
 def remove_packages(module, pkgng_path, packages, dir_arg):
@@ -391,18 +421,28 @@ def main():
     if p["jail"] != "":
         dir_arg = '--jail %s' % (p["jail"])
 
-    if p["state"] in ("present", "latest"):
-        _changed, _msg, _stdout, _stderr = install_packages(module, pkgng_path, pkgs, p["cached"], p["pkgsite"], dir_arg, p["state"])
+    if pkgs == ['*'] and p["state"] == 'latest':
+        # Operate on all installed packages. Only state: latest makes sense here.
+        _changed, _msg, _stdout, _stderr = upgrade_packages(module, pkgng_path, dir_arg)
         changed = changed or _changed
         stdout += _stdout
         stderr += _stderr
         msgs.append(_msg)
 
-    elif p["state"] == "absent":
-        _changed, _msg, _stdout, _stderr = remove_packages(module, pkgng_path, pkgs, dir_arg)
+    # Operate on named packages
+    named_packages = [pkg for pkg in pkgs if pkg != '*']
+    if p["state"] in ("present", "latest") and named_packages:
+        _changed, _msg, _out, _err = install_packages(module, pkgng_path, named_packages, p["cached"], p["pkgsite"], dir_arg, p["state"])
+        stdout += _out
+        stderr += _err
         changed = changed or _changed
-        stdout += _stdout
-        stderr += _stderr
+        msgs.append(_msg)
+
+    elif p["state"] == "absent" and named_packages:
+        _changed, _msg, _out, _err = remove_packages(module, pkgng_path, named_packages, dir_arg)
+        stdout += _out
+        stderr += _err
+        changed = changed or _changed
         msgs.append(_msg)
 
     if p["autoremove"]:
