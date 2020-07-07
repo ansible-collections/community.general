@@ -1,1 +1,0 @@
-./database/proxysql/proxysql_scheduler.py
