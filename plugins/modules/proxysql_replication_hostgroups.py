@@ -1,1 +1,0 @@
-./database/proxysql/proxysql_replication_hostgroups.py
