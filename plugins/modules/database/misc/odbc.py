@@ -80,7 +80,7 @@ def main():
         argument_spec=dict(
             dsn=dict(type='str', required=True, no_log=True),
             query=dict(type='str', required=True),
-            params=dict(type='list'),
+            params=dict(type='list', elements='str'),
         ),
     )
 
