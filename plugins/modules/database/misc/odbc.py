@@ -25,14 +25,16 @@ options:
       description:
         - The connection string passed into ODBC
       required: True
+      type: str
     query:
       description:
         - The SQL query to perform
       required: True
+      type: str
     params:
       description:
         - Parameters to pass to the SQL squery
-      required: False
+      type: list
 
 requirements:
   - "python >= 2.6"
@@ -75,9 +77,9 @@ except ImportError as e:
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            dsn=dict(type=str, required=True, no_log=True),
-            query=dict(type=str, required=False),
-            params=dict(type=list, required=False, default=None)
+            dsn=dict(type='str', required=True, no_log=True),
+            query=dict(type='str',),
+            params=dict(type='list'),
         ),
     )
 
