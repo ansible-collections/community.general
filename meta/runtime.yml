@@ -543,7 +543,7 @@ plugin_routing:
         warning_text: see plugin documentation for details
     firewalld:
       deprecation:
-        removal_version: 0.2.1
+        removal_version: 2.0.0
         warning_text: migrated to the ansible.posix collection
       redirect: ansible.posix.firewalld
     foreman:
