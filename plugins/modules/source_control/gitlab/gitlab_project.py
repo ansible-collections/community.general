@@ -8,7 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: gitlab_project
 short_description: Creates/updates/deletes GitLab Projects
@@ -95,11 +95,19 @@ options:
     default: present
     type: str
     choices: ["present", "absent"]
+  merge_method:
+    description:
+      - What requirements are placed upon merges.
+      - Possible values are C(merge), C(rebase_merge) merge commit with semi-linear history, C(ff) fast-forward merges only.
+    type: str
+    choices: ["ff", "merge", "rebase_merge"]
+    default: merge
+    version_added: "1.0.0"
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Delete GitLab Project
-  gitlab_project:
+  community.general.gitlab_project:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     validate_certs: False
@@ -108,7 +116,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Create GitLab Project in group Ansible
-  gitlab_project:
+  community.general.gitlab_project:
     api_url: https://gitlab.example.com/
     validate_certs: True
     api_username: dj-wasabi
@@ -116,6 +124,7 @@ EXAMPLES = '''
     name: my_first_project
     group: ansible
     issues_enabled: False
+    merge_method: rebase_merge
     wiki_enabled: True
     snippets_enabled: True
     import_url: http://git.example.com/example/lab.git
@@ -123,26 +132,26 @@ EXAMPLES = '''
   delegate_to: localhost
 '''
 
-RETURN = '''
+RETURN = r'''
 msg:
-  description: Success or failure message
+  description: Success or failure message.
   returned: always
   type: str
   sample: "Success"
 
 result:
-  description: json parsed response from the server
+  description: json parsed response from the server.
   returned: always
   type: dict
 
 error:
-  description: the error message returned by the GitLab API
+  description: the error message returned by the GitLab API.
   returned: failed
   type: str
   sample: "400: path is already in use"
 
 project:
-  description: API object
+  description: API object.
   returned: always
   type: dict
 '''
@@ -186,6 +195,7 @@ class GitLabProject(object):
                 'description': options['description'],
                 'issues_enabled': options['issues_enabled'],
                 'merge_requests_enabled': options['merge_requests_enabled'],
+                'merge_method': options['merge_method'],
                 'wiki_enabled': options['wiki_enabled'],
                 'snippets_enabled': options['snippets_enabled'],
                 'visibility': options['visibility'],
@@ -197,6 +207,7 @@ class GitLabProject(object):
                 'description': options['description'],
                 'issues_enabled': options['issues_enabled'],
                 'merge_requests_enabled': options['merge_requests_enabled'],
+                'merge_method': options['merge_method'],
                 'wiki_enabled': options['wiki_enabled'],
                 'snippets_enabled': options['snippets_enabled'],
                 'visibility': options['visibility']})
@@ -276,6 +287,7 @@ def main():
         description=dict(type='str'),
         issues_enabled=dict(type='bool', default=True),
         merge_requests_enabled=dict(type='bool', default=True),
+        merge_method=dict(type='str', default='merge', choices=["merge", "rebase_merge", "ff"]),
         wiki_enabled=dict(type='bool', default=True),
         snippets_enabled=dict(default=True, type='bool'),
         visibility=dict(type='str', default="private", choices=["internal", "private", "public"], aliases=["visibility_level"]),
@@ -304,6 +316,7 @@ def main():
     project_description = module.params['description']
     issues_enabled = module.params['issues_enabled']
     merge_requests_enabled = module.params['merge_requests_enabled']
+    merge_method = module.params['merge_method']
     wiki_enabled = module.params['wiki_enabled']
     snippets_enabled = module.params['snippets_enabled']
     visibility = module.params['visibility']
@@ -346,6 +359,7 @@ def main():
                                                 "description": project_description,
                                                 "issues_enabled": issues_enabled,
                                                 "merge_requests_enabled": merge_requests_enabled,
+                                                "merge_method": merge_method,
                                                 "wiki_enabled": wiki_enabled,
                                                 "snippets_enabled": snippets_enabled,
                                                 "visibility": visibility,
