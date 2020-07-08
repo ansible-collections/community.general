@@ -8,4 +8,4 @@
 - assert:
     that:
       - results is failed
-      - results.msg == 'pyodbc python module must be installed to use this module'
+      - "'Failed to import the required Python library (pyodbc) on' in results.msg"

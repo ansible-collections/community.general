@@ -16,20 +16,20 @@ DOCUMENTATION = '''
 ---
 module: odbc
 author: "John Westcott IV (@john-westcott-iv)"
-version_added: "2.8"
+version_added: "1.0.0"
 short_description: Execute SQL via ODBC
 description:
-    - Read/Write info via ODBC
+    - Read/Write info via ODBC drivers.
 options:
     dsn:
       description:
         - The connection string passed into ODBC
-      required: True
+      required: true
       type: str
     query:
       description:
         - The SQL query to perform
-      required: True
+      required: true
       type: str
     params:
       description:
@@ -56,17 +56,19 @@ results:
     description: List of dicts containing selected rows, likley empty for DDL statements.
     returned: success
     type: list
+    elements: str
 description:
-    description: "List of dicts about the columns selected from the cursors. See https://github.com/mkleehammer/pyodbc/wiki/Cursor"
+    description: "List of dicts about the columns selected from the cursors. See https://github.com/mkleehammer/pyodbc/wiki/Cursor."
     returned: success
     type: list
+    elements: str
 row_count:
-    description: "The number of rows selected or modified according to the cursor. See https://github.com/mkleehammer/pyodbc/wiki/Cursor"
+    description: "The number of rows selected or modified according to the cursor. See https://github.com/mkleehammer/pyodbc/wiki/Cursor."
     returned: success
     type: str
 '''
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 HAS_PYODBC = None
 try:
     import pyodbc
@@ -89,7 +91,7 @@ def main():
     params = module.params.get('params')
 
     if not HAS_PYODBC:
-        module.fail_json(msg='pyodbc python module must be installed to use this module')
+        module.fail_json(msg=missing_required_lib('pyodbc'))
 
     # Try to make a connection with the DSN
     connection = None
