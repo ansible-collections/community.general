@@ -68,6 +68,7 @@ options:
       or a hash where the key is an element name and the value is the element value.
     - This parameter requires C(xpath) to be set.
     type: list
+    elements: str
   set_children:
     description:
     - Set the child-element(s) of a selected element for a given C(xpath).
@@ -75,6 +76,7 @@ options:
     - Child elements must be specified as in C(add_children).
     - This parameter requires C(xpath) to be set.
     type: list
+    elements: str
   count:
     description:
     - Search for a given C(xpath) and provide the count of any matches.
@@ -809,8 +811,8 @@ def main():
             state=dict(type='str', default='present', choices=['absent', 'present'], aliases=['ensure']),
             value=dict(type='raw'),
             attribute=dict(type='raw'),
-            add_children=dict(type='list'),
-            set_children=dict(type='list'),
+            add_children=dict(type='list', elements='str'),
+            set_children=dict(type='list', elements='str'),
             count=dict(type='bool', default=False),
             print_match=dict(type='bool', default=False),
             pretty_print=dict(type='bool', default=False),
