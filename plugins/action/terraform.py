@@ -5,7 +5,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 import socket
-import os
 from ansible.plugins.action import ActionBase
 import multiprocessing
 from ansible.utils.display import Display
@@ -19,13 +18,13 @@ def host_andPort():
     Returns the host and a randomly available port for streaming
     """
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as socket_server:
-        socket_server.bind((os.environ.get("TERRAFORM_STREAM_HOST"), 0))
+        socket_server.bind(("", 0))
         return socket_server.getsockname()
 
 
-def sample_server(host, port):
+def sample_server(port):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    server_socket.bind((host, port))
+    server_socket.bind(("", port))
 
     try:
         while True:
@@ -51,12 +50,11 @@ class ActionModule(ActionBase):
             )
         else:
             try:
-                module_args["socket_host"] = host_andPort()[0]
                 module_args["socket_port"] = host_andPort()[1]
                 server = multiprocessing.Process(
                     name="terraform_stream",
                     target=sample_server,
-                    args=(module_args["socket_host"], module_args["socket_port"]),
+                    args=(module_args["socket_port"],),
                 )
                 server.daemon = True
                 server.start()
