@@ -1,2 +1,0 @@
-bugfixes:
-- mysql_user - add missed privileges to support (https://github.com/ansible-collections/community.general/issues/617).
