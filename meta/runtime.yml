@@ -280,32 +280,32 @@ plugin_routing:
         warning_text: The helm module in community.general has been deprecated. Use community.kubernetes.helm instead.
     infini_export:
       redirect: infinidat.infinibox.infini_export
-      deprecated:
+      deprecation:
         removal_version: 2.0.0
         warning_text: The infini_export module has been moved to the infinidat collection.
     infini_export_client:
       redirect: infinidat.infinibox.infini_export_client
-      deprecated:
+      deprecation:
         removal_version: 2.0.0
         warning_text: The infini_export_client module has been moved to the infinidat collection.
     infini_fs:
       redirect: infinidat.infinibox.infini_fs
-      deprecated:
+      deprecation:
         removal_version: 2.0.0
         warning_text: The infini_fs module has been moved to the infinidat collection.
     infini_host:
       redirect: infinidat.infinibox.infini_host
-      deprecated:
+      deprecation:
         removal_version: 2.0.0
         warning_text: The infini_host module has been moved to the infinidat collection.
     infini_pool:
       redirect: infinidat.infinibox.infini_pool
-      deprecated:
+      deprecation:
         removal_version: 2.0.0
         warning_text: The infini_pool module has been moved to the infinidat collection.
     infini_vol:
       redirect: infinidat.infinibox.infini_vol
-      deprecated:
+      deprecation:
         removal_version: 2.0.0
         warning_text: The infini_vol module has been moved to the infinidat collection.
     memset_memstore_facts:
@@ -689,7 +689,7 @@ plugin_routing:
       redirect: community.digitalocean.digital_ocean
     infinibox:
       redirect: infinidat.infinibox.infinibox
-      deprecated:
+      deprecation:
         removal_version: 2.0.0
         warning_text: The infinibox doc_fragments plugin has been moved to the infinidat.infinibox collection.
     mysql:
@@ -710,7 +710,7 @@ plugin_routing:
       redirect: community.digitalocean.digital_ocean
     infinibox:
       redirect: infinidat.infinibox.infinibox
-      deprecated:
+      deprecation:
         removal_version: 2.0.0
         warning_text: The infinibox module_utils plugin has been moved to the infinidat.infinibox collection.
     mysql:
