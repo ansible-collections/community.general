@@ -7,11 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: odbc
@@ -24,22 +19,26 @@ options:
     dsn:
       description:
         - The connection string passed into ODBC
-      required: true
+      required: yes
       type: str
     query:
       description:
         - The SQL query to perform
-      required: true
+      required: yes
       type: str
     params:
       description:
-        - Parameters to pass to the SQL squery
+        - Parameters to pass to the SQL query
       type: list
       elements: str
 
 requirements:
   - "python >= 2.6"
   - "pyodbc"
+
+notes:
+  - "Like the command module, this module always returns changed = yes whether or not the query would change the database."
+  - "To alter this behavior you can use C(changed_when): [yes or no]."
 '''
 
 EXAMPLES = '''
@@ -49,26 +48,32 @@ EXAMPLES = '''
     query: "Select * from table_a where column1 = ?"
     params:
       - "value1"
+  changed_when: no
 '''
 
 RETURN = '''
 results:
-    description: List of dicts containing selected rows, likley empty for DDL statements.
+    description: List of dicts containing selected rows, likely empty for DDL statements.
     returned: success
     type: list
     elements: str
+    default: []
 description:
     description: "List of dicts about the columns selected from the cursors. See https://github.com/mkleehammer/pyodbc/wiki/Cursor."
     returned: success
     type: list
     elements: str
+    default: []
 row_count:
     description: "The number of rows selected or modified according to the cursor. See https://github.com/mkleehammer/pyodbc/wiki/Cursor."
     returned: success
     type: str
+    default: -1
 '''
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils._text import to_native
+
 HAS_PYODBC = None
 try:
     import pyodbc
@@ -98,23 +103,25 @@ def main():
     try:
         connection = pyodbc.connect(dsn)
     except Exception as e:
-        module.fail_json(msg='Failed to connect to DSN: {0}'.format(e))
+        module.fail_json(msg='Failed to connect to DSN: {0}'.format(to_native(e)))
 
     result = dict(
         changed=True,
+        description=[],
+        row_count=-1,
+        results=[],
     )
 
     try:
         cursor = connection.cursor()
 
-        # Get the rows out into an 2d array
-        result['results'] = []
         if params:
             cursor.execute(query, params)
         else:
             cursor.execute(query)
         cursor.commit()
         try:
+            # Get the rows out into an 2d array
             for row in cursor.fetchall():
                 new_row = []
                 for column in row:
@@ -122,7 +129,6 @@ def main():
                 result['results'].append(new_row)
 
             # Return additional information from the cursor
-            result['description'] = []
             for row_description in cursor.description:
                 description = {}
                 description['name'] = row_description[0]
@@ -138,11 +144,11 @@ def main():
         except pyodbc.ProgrammingError as pe:
             pass
         except Exception as e:
-            module.fail_json(msg="Exception while reading rows: {0}".format(e))
+            module.fail_json(msg="Exception while reading rows: {0}".format(to_native(e)))
 
         cursor.close()
     except Exception as e:
-        module.fail_json(msg="Failed to execute query: {0}".format(e))
+        module.fail_json(msg="Failed to execute query: {0}".format(to_native(e)))
     finally:
         connection.close()
 

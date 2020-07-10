@@ -57,9 +57,6 @@
   become: True
   register: results
 
-- debug:
-    var: results
-
 - assert:
     that:
       - results is changed
@@ -97,25 +94,26 @@
 - assert:
     that:
       - results is changed
+      - results['row_count'] == -1
+      - results['results'] == []
+      - results['description'] == []
 
 #
 # Select data
 #
-- name: Perform select single row without params
+- name: Perform select single row without params (do not coherse changed)
   odbc:
     dsn: "{{ dsn }}"
     query: "SELECT * FROM films WHERE code='asdfg'"
   register: results
 
-- debug:
-    var: results
-
 - assert:
     that:
+      - results is changed
       - results is successful
       - results.row_count == 1
 
-- name: Perform select multiple rows with params
+- name: Perform select multiple rows with params (coherse changed)
   odbc:
     dsn: "{{ dsn }}"
     query: 'SELECT * FROM films WHERE code=? or code=?'
@@ -123,12 +121,11 @@
       - 'asdfg'
       - 'qwert'
   register: results
-
-- debug:
-    var: results
+  changed_when: False
 
 - assert:
     that:
+      - results is not changed
       - results is successful
       - results.row_count == 2
 
@@ -138,9 +135,10 @@
     query: "DROP TABLE films"
   register: results
 
-- debug:
-    var: results
-
 - assert:
     that:
       - results is successful
+      - results is changed
+      - results['row_count'] == -1
+      - results['results'] == []
+      - results['description'] == []
