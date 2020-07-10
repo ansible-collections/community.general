@@ -500,9 +500,6 @@ plugins/modules/database/misc/riak.py validate-modules:doc-default-does-not-matc
 plugins/modules/database/misc/riak.py validate-modules:doc-missing-type
 plugins/modules/database/misc/riak.py validate-modules:parameter-type-not-in-doc
 plugins/modules/database/mssql/mssql_db.py validate-modules:doc-missing-type
-plugins/modules/database/mysql/mysql_db.py validate-modules:use-run-command-not-popen
-plugins/modules/database/mysql/mysql_user.py validate-modules:parameter-type-not-in-doc
-plugins/modules/database/mysql/mysql_user.py validate-modules:undocumented-parameter
 plugins/modules/database/postgresql/postgresql_db.py use-argspec-type-path
 plugins/modules/database/postgresql/postgresql_db.py validate-modules:parameter-type-not-in-doc
 plugins/modules/database/postgresql/postgresql_db.py validate-modules:use-run-command-not-popen

@@ -64,10 +64,6 @@ files:
   $doc_fragments/hwc.py:
     maintainers: $team_huawei
     labels: hwc
-  $doc_fragments/mysql.py:
-    maintainers: $team_mysql
-    labels: database mysql
-    keywords: mariadb
   $doc_fragments/postgres.py:
     maintainers: $team_postgresql
     labels: postgres postgresql
@@ -155,10 +151,6 @@ files:
   $module_utils/memset.py:
     maintainers: glitchcrab
     labels: cloud memset
-  $module_utils/mysql.py:
-    maintainers: $team_mysql
-    labels: database mysql
-    keywords: mariadb
   $module_utils/net_tools/nios/api.py:
     maintainers: $team_networking sganesh-infoblox
     labels: infoblox networking
@@ -498,22 +490,6 @@ files:
     authors: vedit
     maintainers: Jmainguy kenichi-ogawa-1988
     labels: mssql_db
-  $modules/database/mysql/mysql_db.py:
-    authors: ansible
-    maintainers: $team_mysql
-  $modules/database/mysql/:
-    authors: Andersson007
-    maintainers: Alexander198961 Xyon bmalynovytch bmildren kurtdavis michaelcoburn oneiroi tolland
-    keywords: mariadb
-  $modules/database/mysql/mysql_replication.py:
-    authors: Andersson007 banyek
-  $modules/database/mysql/mysql_user.py:
-    authors: Jmainguy bmalynovytch
-    maintainers: Alexander198961 Andersson007 Xyon bmildren kurtdavis michaelcoburn oneiroi tolland
-    ignore: tomaszkiewicz
-  $modules/database/mysql/mysql_variables.py:
-    authors: banyek
-    maintainers: $team_mysql
   $modules/database/postgresql/postgresql_db.py:
     authors: ansible
     maintainers: $team_postgresql
@@ -1341,7 +1317,6 @@ macros:
   team_linode: InTheCloudDan decentral1se displague rmcintosh
   team_macos: akasurde kyleabenson martinm82
   team_manageiq: abellotti cben gtanzillo yaacov zgalor
-  team_mysql: Alexander198961 Andersson007 Xyon bmalynovytch bmildren kurtdavis michaelcoburn oneiroi tolland
   team_netapp: amit0701 carchi8py hulquest lmprice lonico ndswartz schmots1
   team_netscaler: chiradeep giorgos-nikolopoulos
   team_netvisor: Qalthos amitsi csharpe-pn pdam preetiparasar
