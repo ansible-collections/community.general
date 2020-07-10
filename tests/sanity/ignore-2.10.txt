@@ -631,14 +631,6 @@ plugins/modules/database/misc/riak.py validate-modules:doc-missing-type
 plugins/modules/database/misc/riak.py validate-modules:parameter-type-not-in-doc
 plugins/modules/database/mssql/mssql_db.py validate-modules:doc-missing-type
 plugins/modules/database/mssql/mssql_db.py validate-modules:doc-required-mismatch
-plugins/modules/database/mysql/mysql_db.py validate-modules:doc-elements-mismatch
-plugins/modules/database/mysql/mysql_db.py validate-modules:parameter-list-no-elements
-plugins/modules/database/mysql/mysql_db.py validate-modules:use-run-command-not-popen
-plugins/modules/database/mysql/mysql_info.py validate-modules:doc-elements-mismatch
-plugins/modules/database/mysql/mysql_info.py validate-modules:parameter-list-no-elements
-plugins/modules/database/mysql/mysql_query.py validate-modules:parameter-list-no-elements
-plugins/modules/database/mysql/mysql_user.py validate-modules:undocumented-parameter
-plugins/modules/database/mysql/mysql_variables.py validate-modules:doc-required-mismatch
 plugins/modules/database/postgresql/postgresql_db.py use-argspec-type-path
 plugins/modules/database/postgresql/postgresql_db.py validate-modules:use-run-command-not-popen
 plugins/modules/database/postgresql/postgresql_privs.py validate-modules:parameter-documented-multiple-times

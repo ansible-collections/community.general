@@ -1,1 +1,0 @@
-./database/mysql/mysql_variables.py
