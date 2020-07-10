@@ -667,7 +667,6 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: The proxysql docs_fragment has been moved to the community.proxysql collection.
       redirect: community.proxysql.proxysql
-
   module_utils:
     digital_ocean:
       deprecation:
