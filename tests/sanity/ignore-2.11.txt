@@ -657,6 +657,7 @@ plugins/modules/files/archive.py use-argspec-type-path # fix needed
 plugins/modules/files/archive.py validate-modules:parameter-list-no-elements
 plugins/modules/files/iso_extract.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/files/xml.py validate-modules:doc-required-mismatch
+plugins/modules/files/xml.py validate-modules:parameter-list-no-elements
 plugins/modules/identity/ipa/ipa_hbacrule.py validate-modules:doc-elements-mismatch
 plugins/modules/identity/keycloak/keycloak_client.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/identity/keycloak/keycloak_client.py validate-modules:doc-elements-mismatch
