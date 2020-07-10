@@ -809,7 +809,7 @@ def main():
             state=dict(type='str', default='present', choices=['absent', 'present'], aliases=['ensure']),
             value=dict(type='raw'),
             attribute=dict(type='raw'),
-            add_children=dict(type='list')
+            add_children=dict(type='list'),
             set_children=dict(type='list'),
             count=dict(type='bool', default=False),
             print_match=dict(type='bool', default=False),
