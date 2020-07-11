@@ -46,6 +46,7 @@ options:
     - A list of files to extract from the image.
     - Extracting directories does not work.
     type: list
+    elements: str
     required: yes
   force:
     description:
@@ -99,7 +100,7 @@ def main():
         argument_spec=dict(
             image=dict(type='path', required=True, aliases=['path', 'src']),
             dest=dict(type='path', required=True),
-            files=dict(type='list', required=True),
+            files=dict(type='list', elements='str', required=True),
             force=dict(type='bool', default=True, aliases=['thirsty']),
             executable=dict(type='path'),  # No default on purpose
         ),
