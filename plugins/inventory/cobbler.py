@@ -72,11 +72,16 @@ from ansible.module_utils.common._collections_compat import MutableMapping
 from ansible.module_utils.six import iteritems
 from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable, to_safe_group_name
 
-# 3rd party imports
+# xmlrpc
 try:
     import xmlrpclib as xmlrpc_client
+    HAS_XMLRPC_CLIENT = True
 except ImportError:
-    import xmlrpc.client as xmlrpc_client
+    try:
+        import xmlrpc.client as xmlrpc_client
+        HAS_XMLRPC_CLIENT = True
+    except ImportError:
+        HAS_XMLRPC_CLIENT = False
 
 
 class InventoryModule(BaseInventoryPlugin, Cacheable):
@@ -108,6 +113,9 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         return valid
 
     def _get_connection(self):
+        if not HAS_XMLRPC_CLIENT:
+            module.fail_json(msg='Could not import xmlrpc client library')
+
         if self.connection is None:
             self.display.vvvv('Connecting to %s\n' % self.cobbler_url)
             self.connection = xmlrpc_client.Server(self.cobbler_url, allow_none=True)
