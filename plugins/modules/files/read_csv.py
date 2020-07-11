@@ -39,6 +39,7 @@ options:
     - A list of field names for every column.
     - This is needed if the CSV does not have a header.
     type: list
+    elements: str
   unique:
     description:
     - Whether the C(key) used is expected to be unique.
@@ -164,7 +165,7 @@ def main():
             path=dict(type='path', required=True, aliases=['filename']),
             dialect=dict(type='str', default='excel'),
             key=dict(type='str'),
-            fieldnames=dict(type='list'),
+            fieldnames=dict(type='list', elements='str'),
             unique=dict(type='bool', default=True),
             delimiter=dict(type='str'),
             skipinitialspace=dict(type='bool'),
