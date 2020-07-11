@@ -31,23 +31,24 @@ DOCUMENTATION = '''
         env:
             - name: COBBLER_USER
       password:
-        description: cobbler authentication password
+        description: Cobbler authentication password
         required: no
         env:
             - name: COBBLER_PASSWORD
       exclude_profiles:
-        description: profiles to exclude from inventory
+        description: Profiles to exclude from inventory
         type: list
         default: []
+        elements: str
       group_by:
-        description: keys to group hosts by
+        description: Keys to group hosts by
         type: list
         default: [ 'mgmt_classes', 'owners', 'status' ]
       group:
-        description: group to place all hosts into
+        description: Group to place all hosts into
         default: cobbler
       group_prefix:
-        description: prefix to apply to cobbler groups
+        description: Prefix to apply to cobbler groups
         default: cobbler_
       want_facts:
         description: Toggle, if C(true) the plugin will retrieve host facts from the server
