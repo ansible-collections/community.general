@@ -1799,7 +1799,7 @@ class TaskParameters(DockerBaseClass):
             for k, v in self.log_options.items():
                 if not isinstance(v, string_types):
                     self.client.module.warn(
-                        "Non-string value found for log_options option '%s'. The value is automatically converted to %s. "
+                        "Non-string value found for log_options option '%s'. The value is automatically converted to '%s'. "
                         "If this is not correct, or you want to avoid such warnings, please quote the value." % (
                             k, to_text(v, errors='surrogate_or_strict'))
                     )
