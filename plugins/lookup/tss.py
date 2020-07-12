@@ -9,6 +9,7 @@ DOCUMENTATION = r"""
 lookup: tss
 author: Adam Migus (adam@migus.org)
 short_description: Get secrets from Thycotic Secret Server
+version_added: 1.0.0
 description:
     - Uses the Thycotic Secret Server Python SDK to get Secrets from Secret
       Server using token authentication with I(username) and I(password) on
@@ -18,8 +19,8 @@ requirements:
 options:
     _terms:
         description: The integer ID of the secret.
-        required: True
-        type: integer
+        required: true
+        type: int
     base_url:
         description: The base URL of the server, e.g. C(https://localhost/SecretServer).
         env:
@@ -27,7 +28,7 @@ options:
         ini:
             - section: tss_lookup
               key: base_url
-        required: True
+        required: true
     username:
         description: The username with which to request the OAuth2 Access Grant.
         env:
@@ -35,7 +36,7 @@ options:
         ini:
             - section: tss_lookup
               key: username
-        required: True
+        required: true
     password:
         description: The password associated with the supplied username.
         env:
@@ -43,21 +44,21 @@ options:
         ini:
             - section: tss_lookup
               key: password
-        required: True
+        required: true
     api_path_uri:
         default: /api/v1
         description: The path to append to the base URL to form a valid REST
             API request.
         env:
             - name: TSS_API_PATH_URI
-        required: False
+        required: false
     token_path_uri:
         default: /oauth2/token
         description: The path to append to the base URL to form a valid OAuth2
             Access Grant request.
         env:
             - name: TSS_TOKEN_PATH_URI
-        required: False
+        required: false
 """
 
 RETURN = r"""
