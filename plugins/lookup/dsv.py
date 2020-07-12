@@ -26,7 +26,7 @@ options:
         ini:
             - section: dsv_lookup
               key: tenant
-        required: True
+        required: true
     tld:
         default: com
         description: The top-level domain of the tenant; the second format
@@ -36,7 +36,7 @@ options:
         ini:
             - section: dsv_lookup
               key: tld
-        required: False
+        required: false
     client_id:
         description: The client_id with which to request the Access Grant.
         env:
@@ -44,7 +44,7 @@ options:
         ini:
             - section: dsv_lookup
               key: client_id
-        required: True
+        required: true
     client_secret:
         description: The client secret associated with the specific I(client_id).
         env:
@@ -52,7 +52,7 @@ options:
         ini:
             - section: dsv_lookup
               key: client_secret
-        required: True
+        required: true
     url_template:
         default: https://{}.secretsvaultcloud.{}/v1
         description: The path to prepend to the base URL to form a valid REST
@@ -62,7 +62,7 @@ options:
         ini:
             - section: dsv_lookup
               key: url_template
-        required: False
+        required: false
 """
 
 RETURN = r"""
