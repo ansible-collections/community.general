@@ -52,6 +52,6 @@ class TestLookupModule(TestCase):
             self.lookup.run(
                 [1],
                 [],
-                **{"base_url": "dummy", "username": "dummy", "password": "dummy",}
+                **{"base_url": "dummy", "username": "dummy", "password": "dummy", }
             ),
         )
