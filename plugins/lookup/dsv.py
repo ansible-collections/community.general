@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright: (c) 2020, Adam Migus <adam@migus.org>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-# python 3 headers, required if submitting to Ansible
 from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
@@ -10,15 +9,16 @@ DOCUMENTATION = r"""
 lookup: dsv
 author: Adam Migus (adam@migus.org)
 short_description: Get secrets from Thycotic DevOps Secrets Vault
+version_added: 1.0.0
 description:
     - Uses the Thycotic DevOps Secrets Vault Python SDK to get Secrets from a
-       DSV `tenant` using a `client_id` and `client_secret`.
+      DSV I(tenant) using a I(client_id) and I(client_secret).
 requirements:
     - python-dsv-sdk - https://pypi.org/project/python-dsv-sdk/
 options:
     _terms:
         description: The path to the secret, e.g. C(/staging/servers/web1).
-        required: True
+        required: true
     tenant:
         description: The first format parameter in the default I(url_template).
         env:
