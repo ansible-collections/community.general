@@ -176,7 +176,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Connect to acme database, create django user, and grant access to database and products table
-  postgresql_user:
+  community.general.postgresql_user:
     db: acme
     name: django
     password: ceec4eif7ya
@@ -184,7 +184,7 @@ EXAMPLES = r'''
     expires: "Jan 31 2020"
 
 - name: Add a comment on django user
-  postgresql_user:
+  community.general.postgresql_user:
     db: acme
     name: django
     comment: This is a test user
@@ -192,13 +192,13 @@ EXAMPLES = r'''
 # Connect to default database, create rails user, set its password (MD5-hashed),
 # and grant privilege to create other databases and demote rails from super user status if user exists
 - name: Create rails user, set MD5-hashed password, grant privs
-  postgresql_user:
+  community.general.postgresql_user:
     name: rails
     password: md59543f1d82624df2b31672ec0f7050460
     role_attr_flags: CREATEDB,NOSUPERUSER
 
 - name: Connect to acme database and remove test user privileges from there
-  postgresql_user:
+  community.general.postgresql_user:
     db: acme
     name: test
     priv: "ALL/products:ALL"
@@ -206,14 +206,14 @@ EXAMPLES = r'''
     fail_on_user: no
 
 - name: Connect to test database, remove test user from cluster
-  postgresql_user:
+  community.general.postgresql_user:
     db: test
     name: test
     priv: ALL
     state: absent
 
 - name: Connect to acme database and set user's password with no expire date
-  postgresql_user:
+  community.general.postgresql_user:
     db: acme
     name: django
     password: mysupersecretword
@@ -224,13 +224,13 @@ EXAMPLES = r'''
 # INSERT,UPDATE/table:SELECT/anothertable:ALL
 
 - name: Connect to test database and remove an existing user's password
-  postgresql_user:
+  community.general.postgresql_user:
     db: test
     user: test
     password: ""
 
 - name: Create user test and grant group user_ro and user_rw to it
-  postgresql_user:
+  community.general.postgresql_user:
     name: test
     groups:
     - user_ro
@@ -239,7 +239,7 @@ EXAMPLES = r'''
 # Create user with a cleartext password if it does not exist or update its password.
 # The password will be encrypted with SCRAM algorithm (available since PostgreSQL 10)
 - name: Create appclient user with SCRAM-hashed password
-  postgresql_user:
+  community.general.postgresql_user:
     name: appclient
     password: "secret123"
   environment:

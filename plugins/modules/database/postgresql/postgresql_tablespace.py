@@ -109,31 +109,31 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create a new tablespace called acme and set bob as an its owner
-  postgresql_tablespace:
+  community.general.postgresql_tablespace:
     name: acme
     owner: bob
     location: /data/foo
 
 - name: Create a new tablespace called bar with tablespace options
-  postgresql_tablespace:
+  community.general.postgresql_tablespace:
     name: bar
     set:
       random_page_cost: 1
       seq_page_cost: 1
 
 - name: Reset random_page_cost option
-  postgresql_tablespace:
+  community.general.postgresql_tablespace:
     name: bar
     set:
       random_page_cost: reset
 
 - name: Rename the tablespace from bar to pcie_ssd
-  postgresql_tablespace:
+  community.general.postgresql_tablespace:
     name: bar
     rename_to: pcie_ssd
 
 - name: Drop tablespace called bloat
-  postgresql_tablespace:
+  community.general.postgresql_tablespace:
     name: bloat
     state: absent
 '''
