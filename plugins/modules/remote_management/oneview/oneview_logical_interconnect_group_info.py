@@ -32,7 +32,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Gather information about all Logical Interconnect Groups
-  oneview_logical_interconnect_group_info:
+  community.general.oneview_logical_interconnect_group_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -45,7 +45,7 @@ EXAMPLES = '''
     msg: "{{ result.logical_interconnect_groups }}"
 
 - name: Gather paginated, filtered and sorted information about Logical Interconnect Groups
-  oneview_logical_interconnect_group_info:
+  community.general.oneview_logical_interconnect_group_info:
     params:
       start: 0
       count: 3
@@ -63,7 +63,7 @@ EXAMPLES = '''
     msg: "{{ result.logical_interconnect_groups }}"
 
 - name: Gather information about a Logical Interconnect Group by name
-  oneview_logical_interconnect_group_info:
+  community.general.oneview_logical_interconnect_group_info:
     name: logical interconnect group name
     hostname: 172.16.101.48
     username: administrator

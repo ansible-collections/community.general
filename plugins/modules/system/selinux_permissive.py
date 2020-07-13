@@ -47,7 +47,7 @@ author:
 
 EXAMPLES = r'''
 - name: Change the httpd_t domain to permissive
-  selinux_permissive:
+  community.general.selinux_permissive:
     name: httpd_t
     permissive: true
 '''

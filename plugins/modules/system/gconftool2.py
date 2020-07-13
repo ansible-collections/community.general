@@ -51,7 +51,7 @@ options:
 
 EXAMPLES = """
 - name: Change the widget font to "Serif 12"
-  gconftool2:
+  community.general.gconftool2:
     key: "/desktop/gnome/interface/font_name"
     value_type: "string"
     value: "Serif 12"

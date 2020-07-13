@@ -75,7 +75,7 @@ author:
 EXAMPLES = '''
 
 - name: Create config foo (from a file on the control machine)
-  docker_config:
+  community.general.docker_config:
     name: foo
     # If the file is JSON or binary, Ansible might modify it (because
     # it is first decoded and later re-encoded). Base64-encoding the
@@ -85,7 +85,7 @@ EXAMPLES = '''
     state: present
 
 - name: Change the config data
-  docker_config:
+  community.general.docker_config:
     name: foo
     data: Goodnight everyone!
     labels:
@@ -94,7 +94,7 @@ EXAMPLES = '''
     state: present
 
 - name: Add a new label
-  docker_config:
+  community.general.docker_config:
     name: foo
     data: Goodnight everyone!
     labels:
@@ -105,7 +105,7 @@ EXAMPLES = '''
     state: present
 
 - name: No change
-  docker_config:
+  community.general.docker_config:
     name: foo
     data: Goodnight everyone!
     labels:
@@ -115,7 +115,7 @@ EXAMPLES = '''
     state: present
 
 - name: Update an existing label
-  docker_config:
+  community.general.docker_config:
     name: foo
     data: Goodnight everyone!
     labels:
@@ -124,14 +124,14 @@ EXAMPLES = '''
     state: present
 
 - name: Force the (re-)creation of the config
-  docker_config:
+  community.general.docker_config:
     name: foo
     data: Goodnight everyone!
     force: yes
     state: present
 
 - name: Remove config foo
-  docker_config:
+  community.general.docker_config:
     name: foo
     state: absent
 '''

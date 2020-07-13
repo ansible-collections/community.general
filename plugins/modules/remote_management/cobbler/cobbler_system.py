@@ -71,7 +71,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Ensure the system exists in Cobbler
-  cobbler_system:
+  community.general.cobbler_system:
     host: cobbler01
     username: cobbler
     password: MySuperSecureP4sswOrd
@@ -87,7 +87,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Enable network boot in Cobbler
-  cobbler_system:
+  community.general.cobbler_system:
     host: bdsol-aci-cobbler-01
     username: cobbler
     password: ins3965!
@@ -98,7 +98,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Query all systems in Cobbler
-  cobbler_system:
+  community.general.cobbler_system:
     host: cobbler01
     username: cobbler
     password: MySuperSecureP4sswOrd
@@ -107,7 +107,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Query a specific system in Cobbler
-  cobbler_system:
+  community.general.cobbler_system:
     host: cobbler01
     username: cobbler
     password: MySuperSecureP4sswOrd
@@ -117,7 +117,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Ensure the system does not exist in Cobbler
-  cobbler_system:
+  community.general.cobbler_system:
     host: cobbler01
     username: cobbler
     password: MySuperSecureP4sswOrd

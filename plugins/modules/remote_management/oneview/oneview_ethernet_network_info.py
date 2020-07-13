@@ -35,7 +35,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Gather information about all Ethernet Networks
-  oneview_ethernet_network_info:
+  community.general.oneview_ethernet_network_info:
     config: /etc/oneview/oneview_config.json
   delegate_to: localhost
   register: result
@@ -44,7 +44,7 @@ EXAMPLES = '''
     msg: "{{ result.ethernet_networks }}"
 
 - name: Gather paginated and filtered information about Ethernet Networks
-  oneview_ethernet_network_info:
+  community.general.oneview_ethernet_network_info:
     config: /etc/oneview/oneview_config.json
     params:
       start: 1
@@ -58,7 +58,7 @@ EXAMPLES = '''
     msg: "{{ result.ethernet_networks }}"
 
 - name: Gather information about an Ethernet Network by name
-  oneview_ethernet_network_info:
+  community.general.oneview_ethernet_network_info:
     config: /etc/oneview/oneview_config.json
     name: Ethernet network name
   delegate_to: localhost
@@ -68,7 +68,7 @@ EXAMPLES = '''
     msg: "{{ result.ethernet_networks }}"
 
 - name: Gather information about an Ethernet Network by name with options
-  oneview_ethernet_network_info:
+  community.general.oneview_ethernet_network_info:
     config: /etc/oneview/oneview_config.json
     name: eth1
     options:

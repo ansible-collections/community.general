@@ -51,13 +51,13 @@ notes:
 
 EXAMPLES = '''
 - name: Sends a push notification to a device
-  pushbullet:
+  community.general.pushbullet:
     api_key: "ABC123abc123ABC123abc123ABC123ab"
     device: "Chrome"
     title: "You may see this on Google Chrome"
 
 - name: Sends a link to a device
-  pushbullet:
+  community.general.pushbullet:
     api_key: ABC123abc123ABC123abc123ABC123ab
     device: Chrome
     push_type: link
@@ -65,13 +65,13 @@ EXAMPLES = '''
     body: https://docs.ansible.com/
 
 - name: Sends a push notification to a channel
-  pushbullet:
+  community.general.pushbullet:
     api_key: ABC123abc123ABC123abc123ABC123ab
     channel: my-awesome-channel
     title: Broadcasting a message to the #my-awesome-channel folks
 
 - name: Sends a push notification with title and body to a channel
-  pushbullet:
+  community.general.pushbullet:
     api_key: ABC123abc123ABC123abc123ABC123ab
     channel: my-awesome-channel
     title: ALERT! Signup service is down

@@ -52,20 +52,20 @@ EXAMPLES = '''
 - name: Create sshkey from string
   hosts: localhost
   tasks:
-    packet_sshkey:
+    community.general.packet_sshkey:
       key: "{{ lookup('file', 'my_packet_sshkey.pub') }}"
 
 - name: Create sshkey from file
   hosts: localhost
   tasks:
-    packet_sshkey:
+    community.general.packet_sshkey:
       label: key from file
       key_file: ~/ff.pub
 
 - name: Remove sshkey by id
   hosts: localhost
   tasks:
-    packet_sshkey:
+    community.general.packet_sshkey:
       state: absent
       id: eef49903-7a09-4ca1-af67-4087c29ab5b6
 '''

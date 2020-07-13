@@ -58,7 +58,7 @@ options:
 
 EXAMPLES = '''
 - name: Send a code deploy event to stackdriver
-  stackdriver:
+  community.general.stackdriver:
     key: AAAAAA
     event: deploy
     deployed_to: production
@@ -67,7 +67,7 @@ EXAMPLES = '''
     revision_id: abcd123
 
 - name: Send an annotation event to stackdriver
-  stackdriver:
+  community.general.stackdriver:
     key: AAAAAA
     event: annotation
     msg: Greetings from Ansible

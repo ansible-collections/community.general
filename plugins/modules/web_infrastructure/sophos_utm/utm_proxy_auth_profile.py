@@ -165,7 +165,7 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Create UTM proxy_auth_profile
-  utm_proxy_auth_profile:
+  community.general.utm_proxy_auth_profile:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestAuthProfileEntry
@@ -176,14 +176,14 @@ EXAMPLES = """
     state: present
 
 - name: Remove UTM proxy_auth_profile
-  utm_proxy_auth_profile:
+  community.general.utm_proxy_auth_profile:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestAuthProfileEntry
     state: absent
 
 - name: Read UTM proxy_auth_profile
-  utm_proxy_auth_profile:
+  community.general.utm_proxy_auth_profile:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestAuthProfileEntry

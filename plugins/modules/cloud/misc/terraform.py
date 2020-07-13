@@ -101,12 +101,12 @@ author: "Ryan Scott Brown (@ryansb)"
 
 EXAMPLES = """
 - name: Basic deploy of a service
-  terraform:
+  community.general.terraform:
     project_path: '{{ project_dir }}'
     state: present
 
 - name: Define the backend configuration at init
-  terraform:
+  community.general.terraform:
     project_path: 'project/'
     state: "{{ state }}"
     force_init: true
@@ -116,7 +116,7 @@ EXAMPLES = """
       key: "random.tfstate"
 
 - name: Define the backend configuration with one or more files at init
-  terraform:
+  community.general.terraform:
     project_path: 'project/'
     state: "{{ state }}"
     force_init: true

@@ -49,55 +49,55 @@ options:
 
 EXAMPLES = r'''
 - name: Scan new devices
-  aix_devices:
+  community.general.aix_devices:
     device: all
     state: available
 
 - name: Scan new virtual devices (vio0)
-  aix_devices:
+  community.general.aix_devices:
     device: vio0
     state: available
 
 - name: Removing IP alias to en0
-  aix_devices:
+  community.general.aix_devices:
     device: en0
     attributes:
       delalias4: 10.0.0.100,255.255.255.0
 
 - name: Removes ent2
-  aix_devices:
+  community.general.aix_devices:
     device: ent2
     state: removed
 
 - name: Put device en2 in Defined
-  aix_devices:
+  community.general.aix_devices:
     device: en2
     state: defined
 
 - name: Removes ent4 (inexistent).
-  aix_devices:
+  community.general.aix_devices:
     device: ent4
     state: removed
 
 - name: Put device en4 in Defined (inexistent)
-  aix_devices:
+  community.general.aix_devices:
     device: en4
     state: defined
 
 - name: Put vscsi1 and children devices in Defined state.
-  aix_devices:
+  community.general.aix_devices:
     device: vscsi1
     recursive: yes
     state: defined
 
 - name: Removes vscsi1 and children devices.
-  aix_devices:
+  community.general.aix_devices:
     device: vscsi1
     recursive: yes
     state: removed
 
 - name: Changes en1 mtu to 9000 and disables arp.
-  aix_devices:
+  community.general.aix_devices:
     device: en1
     attributes:
       mtu: 900
@@ -105,7 +105,7 @@ EXAMPLES = r'''
     state: available
 
 - name: Configure IP, netmask and set en1 up.
-  aix_devices:
+  community.general.aix_devices:
     device: en1
     attributes:
       netaddr: 192.168.0.100
@@ -114,7 +114,7 @@ EXAMPLES = r'''
     state: available
 
 - name: Adding IP alias to en0
-  aix_devices:
+  community.general.aix_devices:
     device: en0
     attributes:
       alias4: 10.0.0.100,255.255.255.0

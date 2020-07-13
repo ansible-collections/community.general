@@ -48,7 +48,7 @@ author:
 
 EXAMPLES = '''
 - name: Add lun to storage group
-  emc_vnx_sg_member:
+  community.general.emc_vnx_sg_member:
     name: sg01
     sp_address: sp1a.fqdn
     sp_user: sysadmin
@@ -57,7 +57,7 @@ EXAMPLES = '''
     state: present
 
 - name: Remove lun from storage group
-  emc_vnx_sg_member:
+  community.general.emc_vnx_sg_member:
     name: sg01
     sp_address: sp1a.fqdn
     sp_user: sysadmin

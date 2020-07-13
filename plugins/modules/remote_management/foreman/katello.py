@@ -106,7 +106,7 @@ EXAMPLES = '''
 # Simple Example:
 
 - name: Create Product
-  katello:
+  community.general.katello:
       username: admin
       password: admin
       server_url: https://fakeserver.com
@@ -119,7 +119,7 @@ EXAMPLES = '''
 # katello.yml
 ---
 - name: "{{ name }}"
-  katello:
+  community.general.katello:
       username: admin
       password: admin
       server_url: https://fakeserver.com
@@ -199,7 +199,7 @@ EXAMPLES = '''
 # So you should use a "until success" loop to catch this.
 
 - name: Promote Contentview Environment with increased Timeout
-  katello:
+  community.general.katello:
   username: ansibleuser
   password: supersecret
   task_timeout: 10800

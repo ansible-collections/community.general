@@ -33,7 +33,7 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Get info for a ca host_key_cert entry
-  utm_ca_host_key_cert_info:
+  community.general.utm_ca_host_key_cert_info:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestHostKeyCertEntry

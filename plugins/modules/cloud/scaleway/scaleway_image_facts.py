@@ -39,7 +39,7 @@ options:
 
 EXAMPLES = r'''
 - name: Gather Scaleway images facts
-  scaleway_image_facts:
+  community.general.scaleway_image_facts:
     region: par1
 '''
 

@@ -43,7 +43,7 @@ EXAMPLES = '''
   gather_facts: no
   tasks:
   - name: Get cluster state
-    pacemaker_cluster:
+    community.general.pacemaker_cluster:
       state: online
 '''
 

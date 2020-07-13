@@ -72,7 +72,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Power on VM
-  xenserver_guest_powerstate:
+  community.general.xenserver_guest_powerstate:
     hostname: "{{ xenserver_hostname }}"
     username: "{{ xenserver_username }}"
     password: "{{ xenserver_password }}"

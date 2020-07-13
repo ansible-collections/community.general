@@ -39,12 +39,12 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Set a password for the admin user
-  ldap_passwd:
+  community.general.ldap_passwd:
     dn: cn=admin,dc=example,dc=com
     passwd: "{{ vault_secret }}"
 
 - name: Setting passwords in bulk
-  ldap_passwd:
+  community.general.ldap_passwd:
     dn: "{{ item.key }}"
     passwd: "{{ item.value }}"
   with_dict:

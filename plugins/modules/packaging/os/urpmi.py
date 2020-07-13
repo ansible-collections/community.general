@@ -60,22 +60,22 @@ author:
 
 EXAMPLES = '''
 - name: Install package foo
-  urpmi:
+  community.general.urpmi:
     pkg: foo
     state: present
 
 - name: Remove package foo
-  urpmi:
+  community.general.urpmi:
     pkg: foo
     state: absent
 
 - name: Remove packages foo and bar
-  urpmi:
+  community.general.urpmi:
     pkg: foo,bar
     state: absent
 
 - name: Update the package database (urpmi.update -a -q) and install bar (bar will be the updated if a newer version exists)
-- urpmi:
+- community.general.urpmi:
     name: bar
     state: present
     update_cache: yes

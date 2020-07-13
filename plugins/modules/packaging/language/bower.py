@@ -48,25 +48,25 @@ options:
 
 EXAMPLES = '''
 - name: Install "bootstrap" bower package.
-  bower:
+  community.general.bower:
     name: bootstrap
 
 - name: Install "bootstrap" bower package on version 3.1.1.
-  bower:
+  community.general.bower:
     name: bootstrap
     version: '3.1.1'
 
 - name: Remove the "bootstrap" bower package.
-  bower:
+  community.general.bower:
     name: bootstrap
     state: absent
 
 - name: Install packages based on bower.json.
-  bower:
+  community.general.bower:
     path: /app/location
 
 - name: Update packages based on bower.json to their latest version.
-  bower:
+  community.general.bower:
     path: /app/location
     state: latest
 
@@ -75,7 +75,7 @@ EXAMPLES = '''
     path: /app/location
     name: bower
     global: no
-- bower:
+- community.general.bower:
     path: /app/location
     relative_execpath: node_modules/.bin
 '''

@@ -38,7 +38,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Create a Network Set
-  oneview_network_set:
+  community.general.oneview_network_set:
     config: /etc/oneview/oneview_config.json
     state: present
     data:
@@ -49,7 +49,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Update the Network Set name to 'OneViewSDK Test Network Set - Renamed' and change the associated networks
-  oneview_network_set:
+  community.general.oneview_network_set:
     config: /etc/oneview/oneview_config.json
     state: present
     data:
@@ -60,7 +60,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Delete the Network Set
-  oneview_network_set:
+  community.general.oneview_network_set:
     config: /etc/oneview/oneview_config.json
     state: absent
     data:
@@ -68,7 +68,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Update the Network set with two scopes
-  oneview_network_set:
+  community.general.oneview_network_set:
     config: /etc/oneview/oneview_config.json
     state: present
     data:

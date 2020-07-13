@@ -29,14 +29,14 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure the default login shell is bash.
-  ipa_config:
+  community.general.ipa_config:
     ipadefaultloginshell: /bin/bash
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
 - name: Ensure the default e-mail domain is ansible.com.
-  ipa_config:
+  community.general.ipa_config:
     ipadefaultemaildomain: ansible.com
     ipa_host: localhost
     ipa_user: admin

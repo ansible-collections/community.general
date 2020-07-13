@@ -75,17 +75,17 @@ author:
 
 EXAMPLES = r'''
 - name: Ensure entry like "EMAIL=doug@ansibmod.con.com" exists
-  cronvar:
+  community.general.cronvar:
     name: EMAIL
     value: doug@ansibmod.con.com
 
 - name: Ensure a variable does not exist. This may remove any variable named "LEGACY"
-  cronvar:
+  community.general.cronvar:
     name: LEGACY
     state: absent
 
 - name: Add a variable to a file under /etc/cron.d
-  cronvar:
+  community.general.cronvar:
     name: LOGFILE
     value: /var/log/yum-autoupdate.log
     user: root
@@ -318,13 +318,13 @@ class CronVar(object):
 def main():
     # The following example playbooks:
     #
-    # - cronvar: name="SHELL" value="/bin/bash"
+    # - community.general.cronvar: name="SHELL" value="/bin/bash"
     #
     # - name: Set the email
-    #   cronvar: name="EMAILTO" value="doug@ansibmod.con.com"
+    #   community.general.cronvar: name="EMAILTO" value="doug@ansibmod.con.com"
     #
     # - name: Get rid of the old new host variable
-    #   cronvar: name="NEW_HOST" state=absent
+    #   community.general.cronvar: name="NEW_HOST" state=absent
     #
     # Would produce:
     # SHELL = /bin/bash

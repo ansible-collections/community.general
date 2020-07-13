@@ -46,18 +46,18 @@ requirements: [ update-alternatives ]
 
 EXAMPLES = r'''
 - name: Correct java version selected
-  alternatives:
+  community.general.alternatives:
     name: java
     path: /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java
 
 - name: Alternatives link created
-  alternatives:
+  community.general.alternatives:
     name: hadoop-conf
     link: /etc/hadoop/conf
     path: /etc/hadoop/conf.ansible
 
 - name: Make java 32 bit an alternative with low priority
-  alternatives:
+  community.general.alternatives:
     name: java
     path: /usr/lib/jvm/java-7-openjdk-i386/jre/bin/java
     priority: -10

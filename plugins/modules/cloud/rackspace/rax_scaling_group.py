@@ -110,7 +110,7 @@ EXAMPLES = '''
   gather_facts: false
   connection: local
   tasks:
-    - rax_scaling_group:
+    - community.general.rax_scaling_group:
         credentials: ~/.raxpub
         region: ORD
         cooldown: 300

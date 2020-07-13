@@ -45,7 +45,7 @@ options:
 EXAMPLES = """
 
 - name: Send a message to chat in playbook
-  telegram:
+  community.general.telegram:
     token: '9999999:XXXXXXXXXXXXXXXXXXXXXXX'
     chat_id: 000000
     msg: Ansible task finished

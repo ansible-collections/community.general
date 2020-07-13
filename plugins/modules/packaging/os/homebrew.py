@@ -77,57 +77,57 @@ notes:
 
 EXAMPLES = '''
 # Install formula foo with 'brew' in default path (C(/usr/local/bin))
-- homebrew:
+- community.general.homebrew:
     name: foo
     state: present
 
 # Install formula foo with 'brew' in alternate path C(/my/other/location/bin)
-- homebrew:
+- community.general.homebrew:
     name: foo
     path: /my/other/location/bin
     state: present
 
 # Update homebrew first and install formula foo with 'brew' in default path
-- homebrew:
+- community.general.homebrew:
     name: foo
     state: present
     update_homebrew: yes
 
 # Update homebrew first and upgrade formula foo to latest available with 'brew' in default path
-- homebrew:
+- community.general.homebrew:
     name: foo
     state: latest
     update_homebrew: yes
 
 # Update homebrew and upgrade all packages
-- homebrew:
+- community.general.homebrew:
     update_homebrew: yes
     upgrade_all: yes
 
 # Miscellaneous other examples
-- homebrew:
+- community.general.homebrew:
     name: foo
     state: head
 
-- homebrew:
+- community.general.homebrew:
     name: foo
     state: linked
 
-- homebrew:
+- community.general.homebrew:
     name: foo
     state: absent
 
-- homebrew:
+- community.general.homebrew:
     name: foo,bar
     state: absent
 
-- homebrew:
+- community.general.homebrew:
     name: foo
     state: present
     install_options: with-baz,enable-debug
 
 - name: Use ignored-pinned option while upgrading all
-  homebrew:
+  community.general.homebrew:
     upgrade_all: yes
     upgrade_options: ignored-pinned
 '''

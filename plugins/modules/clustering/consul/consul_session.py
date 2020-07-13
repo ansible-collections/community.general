@@ -98,27 +98,27 @@ options:
 
 EXAMPLES = '''
 - name: Register basic session with consul
-  consul_session:
+  community.general.consul_session:
     name: session1
 
 - name: Register a session with an existing check
-  consul_session:
+  community.general.consul_session:
     name: session_with_check
     checks:
       - existing_check_name
 
 - name: Register a session with lock_delay
-  consul_session:
+  community.general.consul_session:
     name: session_with_delay
     delay: 20s
 
 - name: Retrieve info about session by id
-  consul_session:
+  community.general.consul_session:
     id: session_id
     state: info
 
 - name: Retrieve active sessions
-  consul_session:
+  community.general.consul_session:
     state: list
 '''
 

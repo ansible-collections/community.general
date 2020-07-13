@@ -52,12 +52,12 @@ options:
 
 EXAMPLES = '''
 - name: Install a package
-  pkgutil:
+  community.general.pkgutil:
     name: CSWcommon
     state: present
 
 - name: Install a package from a specific repository
-  pkgutil:
+  community.general.pkgutil:
     name: CSWnrpe
     site: 'ftp://myinternal.repo/opencsw/kiel'
     state: latest

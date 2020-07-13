@@ -69,13 +69,13 @@ options:
 
 EXAMPLES = '''
 - name: List ongoing maintenance windows using a token
-  pagerduty:
+  community.general.pagerduty:
     name: companyabc
     token: xxxxxxxxxxxxxx
     state: ongoing
 
 - name: Create a 1 hour maintenance window for service FOO123
-  pagerduty:
+  community.general.pagerduty:
     name: companyabc
     user: example@example.com
     token: yourtoken
@@ -83,7 +83,7 @@ EXAMPLES = '''
     service: FOO123
 
 - name: Create a 5 minute maintenance window for service FOO123
-  pagerduty:
+  community.general.pagerduty:
     name: companyabc
     token: xxxxxxxxxxxxxx
     hours: 0
@@ -93,7 +93,7 @@ EXAMPLES = '''
 
 
 - name: Create a 4 hour maintenance window for service FOO123 with the description "deployment"
-  pagerduty:
+  community.general.pagerduty:
     name: companyabc
     user: example@example.com
     state: running
@@ -103,7 +103,7 @@ EXAMPLES = '''
   register: pd_window
 
 - name: Delete the previous maintenance window
-  pagerduty:
+  community.general.pagerduty:
     name: companyabc
     user: example@example.com
     state: absent
@@ -112,14 +112,14 @@ EXAMPLES = '''
 # Delete a maintenance window from a separate playbook than its creation,
 # and if it is the only existing maintenance window
 - name: Check
-  pagerduty:
+  community.general.pagerduty:
     requester_id: XXXXXXX
     token: yourtoken
     state: ongoing
   register: pd_window
 
 - name: Delete
-  pagerduty:
+  community.general.pagerduty:
     requester_id: XXXXXXX
     token: yourtoken
     state: absent

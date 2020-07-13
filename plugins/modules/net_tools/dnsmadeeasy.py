@@ -184,7 +184,7 @@ author: "Brice Burgess (@briceburg)"
 
 EXAMPLES = '''
 - name: Fetch my.com domain records
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -192,7 +192,7 @@ EXAMPLES = '''
   register: response
 
 - name: Create a record
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -202,7 +202,7 @@ EXAMPLES = '''
     record_value: 127.0.0.1
 
 - name: Update the previously created record
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -211,7 +211,7 @@ EXAMPLES = '''
     record_value: 192.0.2.23
 
 - name: Fetch a specific record
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -220,7 +220,7 @@ EXAMPLES = '''
   register: response
 
 - name: Delete a record
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -229,7 +229,7 @@ EXAMPLES = '''
     record_name: test
 
 - name: Add a failover
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -242,7 +242,7 @@ EXAMPLES = '''
     ip2: 127.0.0.3
 
 - name: Add a failover
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -258,7 +258,7 @@ EXAMPLES = '''
     ip5: 127.0.0.6
 
 - name: Add a monitor
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -275,7 +275,7 @@ EXAMPLES = '''
     contactList: my contact list
 
 - name: Add a monitor with http options
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -295,7 +295,7 @@ EXAMPLES = '''
     httpQueryString: some string
 
 - name: Add a monitor and a failover
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -314,7 +314,7 @@ EXAMPLES = '''
     contactList: emergencycontacts
 
 - name: Remove a failover
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -325,7 +325,7 @@ EXAMPLES = '''
     failover: no
 
 - name: Remove a monitor
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com

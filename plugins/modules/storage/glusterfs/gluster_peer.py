@@ -48,20 +48,20 @@ notes:
 
 EXAMPLES = '''
 - name: Create a trusted storage pool
-  gluster_peer:
+  community.general.gluster_peer:
         state: present
         nodes:
              - 10.0.1.5
              - 10.0.1.10
 
 - name: Delete a node from the trusted storage pool
-  gluster_peer:
+  community.general.gluster_peer:
          state: absent
          nodes:
               - 10.0.1.10
 
 - name: Delete a node from the trusted storage pool by force
-  gluster_peer:
+  community.general.gluster_peer:
          state: absent
          nodes:
               - 10.0.0.1

@@ -38,7 +38,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Gather information about all Enclosures
-  oneview_enclosure_info:
+  community.general.oneview_enclosure_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -50,7 +50,7 @@ EXAMPLES = '''
     msg: "{{ result.enclosures }}"
 
 - name: Gather paginated, filtered and sorted information about Enclosures
-  oneview_enclosure_info:
+  community.general.oneview_enclosure_info:
     params:
       start: 0
       count: 3
@@ -67,7 +67,7 @@ EXAMPLES = '''
     msg: "{{ result.enclosures }}"
 
 - name: Gather information about an Enclosure by name
-  oneview_enclosure_info:
+  community.general.oneview_enclosure_info:
     name: Enclosure-Name
     hostname: 172.16.101.48
     username: administrator
@@ -80,7 +80,7 @@ EXAMPLES = '''
     msg: "{{ result.enclosures }}"
 
 - name: Gather information about an Enclosure by name with options
-  oneview_enclosure_info:
+  community.general.oneview_enclosure_info:
     name: Test-Enclosure
     options:
       - script                       # optional
@@ -104,7 +104,7 @@ EXAMPLES = '''
 
 - name: "Gather information about an Enclosure with temperature data at a resolution of one sample per day, between two
          specified dates"
-  oneview_enclosure_info:
+  community.general.oneview_enclosure_info:
     name: Test-Enclosure
     options:
       - utilization:                   # optional

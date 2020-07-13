@@ -140,7 +140,7 @@ author:
 
 EXAMPLES = '''
 - name: Create three servers and enumerate their names
-  oneandone_server:
+  community.general.oneandone_server:
     auth_token: oneandone_private_api_key
     hostname: node%02d
     fixed_instance_size: XL
@@ -150,7 +150,7 @@ EXAMPLES = '''
     count: 3
 
 - name: Create three servers, passing in an ssh_key
-  oneandone_server:
+  community.general.oneandone_server:
     auth_token: oneandone_private_api_key
     hostname: node%02d
     vcore: 2
@@ -168,19 +168,19 @@ EXAMPLES = '''
     ssh_key: SSH_PUBLIC_KEY
 
 - name: Removing server
-  oneandone_server:
+  community.general.oneandone_server:
     auth_token: oneandone_private_api_key
     state: absent
     server: 'node01'
 
 - name: Starting server
-  oneandone_server:
+  community.general.oneandone_server:
     auth_token: oneandone_private_api_key
     state: running
     server: 'node01'
 
 - name: Stopping server
-  oneandone_server:
+  community.general.oneandone_server:
     auth_token: oneandone_private_api_key
     state: stopped
     server: 'node01'

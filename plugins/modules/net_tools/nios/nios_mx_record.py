@@ -70,7 +70,7 @@ options:
 
 EXAMPLES = '''
 - name: Configure an MX record
-  nios_mx_record:
+  community.general.nios_mx_record:
     name: ansible.com
     mx: mailhost.ansible.com
     preference: 0
@@ -82,7 +82,7 @@ EXAMPLES = '''
   connection: local
 
 - name: Add a comment to an existing MX record
-  nios_mx_record:
+  community.general.nios_mx_record:
     name: ansible.com
     mx: mailhost.ansible.com
     preference: 0
@@ -95,7 +95,7 @@ EXAMPLES = '''
   connection: local
 
 - name: Remove an MX record from the system
-  nios_mx_record:
+  community.general.nios_mx_record:
     name: ansible.com
     mx: mailhost.ansible.com
     preference: 0

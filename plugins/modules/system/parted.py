@@ -160,27 +160,27 @@ partition_info:
 
 EXAMPLES = r'''
 - name: Create a new ext4 primary partition
-  parted:
+  community.general.parted:
     device: /dev/sdb
     number: 1
     state: present
     fs_type: ext4
 
 - name: Remove partition number 1
-  parted:
+  community.general.parted:
     device: /dev/sdb
     number: 1
     state: absent
 
 - name: Create a new primary partition with a size of 1GiB
-  parted:
+  community.general.parted:
     device: /dev/sdb
     number: 1
     state: present
     part_end: 1GiB
 
 - name: Create a new primary partition for LVM
-  parted:
+  community.general.parted:
     device: /dev/sdb
     number: 2
     flags: [ lvm ]
@@ -188,7 +188,7 @@ EXAMPLES = r'''
     part_start: 1GiB
 
 - name: Create a new primary partition with a size of 1GiB at disk's end
-  parted:
+  community.general.parted:
     device: /dev/sdb
     number: 3
     state: present
@@ -197,11 +197,11 @@ EXAMPLES = r'''
 
 # Example on how to read info and reuse it in subsequent task
 - name: Read device information (always use unit when probing)
-  parted: device=/dev/sdb unit=MiB
+  community.general.parted: device=/dev/sdb unit=MiB
   register: sdb_info
 
 - name: Remove all partitions from disk
-  parted:
+  community.general.parted:
     device: /dev/sdb
     number: '{{ item.num }}'
     state: absent

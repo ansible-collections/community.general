@@ -84,14 +84,14 @@ options:
 
 EXAMPLES = """
 - name: Send notification message via Rocket Chat
-  rocketchat:
+  community.general.rocketchat:
     token: thetoken/generatedby/rocketchat
     domain: chat.example.com
     msg: '{{ inventory_hostname }} completed'
   delegate_to: localhost
 
 - name: Send notification message via Rocket Chat all options
-  rocketchat:
+  community.general.rocketchat:
     domain: chat.example.com
     token: thetoken/generatedby/rocketchat
     msg: '{{ inventory_hostname }} completed'
@@ -102,7 +102,7 @@ EXAMPLES = """
   delegate_to: localhost
 
 - name: Insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured in rocketchat
-  rocketchat:
+  community.general.rocketchat:
     token: thetoken/generatedby/rocketchat
     domain: chat.example.com
     msg: '{{ inventory_hostname }} is alive!'
@@ -112,7 +112,7 @@ EXAMPLES = """
   delegate_to: localhost
 
 - name: Use the attachments API
-  rocketchat:
+  community.general.rocketchat:
     token: thetoken/generatedby/rocketchat
     domain: chat.example.com
     attachments:

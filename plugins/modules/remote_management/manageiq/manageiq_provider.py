@@ -143,7 +143,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a new provider in ManageIQ ('Hawkular' metrics)
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngLab'
     type: 'OpenShift'
     state: 'present'
@@ -206,7 +206,7 @@ EXAMPLES = '''
 
 
 - name: Update an existing provider named 'EngLab' (defaults to 'Prometheus' metrics)
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngLab'
     type: 'Openshift'
     state: 'present'
@@ -268,7 +268,7 @@ EXAMPLES = '''
 
 
 - name: Delete a provider in ManageIQ
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngLab'
     type: 'Openshift'
     state: 'absent'
@@ -280,7 +280,7 @@ EXAMPLES = '''
 
 
 - name: Create a new Amazon provider in ManageIQ using token authentication
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngAmazon'
     type: 'Amazon'
     state: 'present'
@@ -295,7 +295,7 @@ EXAMPLES = '''
 
 
 - name: Create a new oVirt provider in ManageIQ
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'RHEV'
     type: 'oVirt'
     state: 'present'
@@ -355,7 +355,7 @@ EXAMPLES = '''
       validate_certs: true
 
 - name: Create a new VMware provider in ManageIQ
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngVMware'
     type: 'VMware'
     state: 'present'
@@ -371,7 +371,7 @@ EXAMPLES = '''
       validate_certs: true
 
 - name: Create a new Azure provider in ManageIQ
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngAzure'
     type: 'Azure'
     provider_region: 'northeurope'
@@ -389,7 +389,7 @@ EXAMPLES = '''
       validate_certs: false
 
 - name: Create a new OpenStack Director provider in ManageIQ with rsa keypair
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngDirector'
     type: 'Director'
     api_version: 'v3'
@@ -425,7 +425,7 @@ EXAMPLES = '''
       auth_key: 'SecretSSHPrivateKey'
 
 - name: Create a new OpenStack provider in ManageIQ with amqp metrics
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngOpenStack'
     type: 'OpenStack'
     api_version: 'v3'
@@ -468,7 +468,7 @@ EXAMPLES = '''
 
 
 - name: Create a new GCE provider in ManageIQ
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngGoogle'
     type: 'GCE'
     provider_region: 'europe-west1'

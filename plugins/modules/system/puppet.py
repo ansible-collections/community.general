@@ -95,36 +95,36 @@ author:
 
 EXAMPLES = r'''
 - name: Run puppet agent and fail if anything goes wrong
-  puppet:
+  community.general.puppet:
 
 - name: Run puppet and timeout in 5 minutes
-  puppet:
+  community.general.puppet:
     timeout: 5m
 
 - name: Run puppet using a different environment
-  puppet:
+  community.general.puppet:
     environment: testing
 
 - name: Run puppet using a specific certname
-  puppet:
+  community.general.puppet:
     certname: agent01.example.com
 
 - name: Run puppet using a specific piece of Puppet code. Has no effect with a puppetmaster
-  puppet:
+  community.general.puppet:
     execute: include ::mymodule
 
 - name: Run puppet using a specific tags
-  puppet:
+  community.general.puppet:
     tags:
     - update
     - nginx
 
 - name: Run puppet agent in noop mode
-  puppet:
+  community.general.puppet:
     noop: yes
 
 - name: Run a manifest with debug, log to both syslog and stdout, specify module path
-  puppet:
+  community.general.puppet:
     modulepath: /etc/puppet/modules:/opt/stack/puppet-modules:/usr/share/openstack-puppet/modules
     logdest: all
     manifest: /var/lib/example/puppet_step_config.pp

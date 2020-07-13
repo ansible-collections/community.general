@@ -82,7 +82,7 @@ options:
 
 EXAMPLES = '''
   - name: Create a test app
-    webfaction_app:
+    community.general.webfaction_app:
       name: "my_wsgi_app1"
       state: present
       type: mod_wsgi35-python27

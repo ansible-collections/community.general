@@ -58,20 +58,20 @@ author:
 
 EXAMPLES = '''
 - name: Add tags to instance
-  gce_tag:
+  community.general.gce_tag:
     instance_name: staging-server
     tags: http-server,https-server,staging
     zone: us-central1-a
     state: present
 
 - name: Remove tags from instance in default zone (us-central1-a)
-  gce_tag:
+  community.general.gce_tag:
     instance_name: test-server
     tags: foo,bar
     state: absent
 
 - name: Add tags to instances in zone that match pattern
-  gce_tag:
+  community.general.gce_tag:
     instance_pattern: test-server-*
     tags: foo,bar
     zone: us-central1-a

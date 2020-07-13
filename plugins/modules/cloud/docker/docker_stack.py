@@ -96,14 +96,14 @@ stack_spec_diff:
 
 EXAMPLES = '''
   - name: Deploy stack from a compose file
-    docker_stack:
+    community.general.docker_stack:
       state: present
       name: mystack
       compose:
         - /opt/docker-compose.yml
 
   - name: Deploy stack from base compose file and override the web service
-    docker_stack:
+    community.general.docker_stack:
       state: present
       name: mystack
       compose:
@@ -116,7 +116,7 @@ EXAMPLES = '''
                 ENVVAR: envvar
 
   - name: Remove stack
-    docker_stack:
+    community.general.docker_stack:
       name: mystack
       state: absent
 '''

@@ -52,7 +52,7 @@ EXAMPLES = '''
   connection: local
   tasks:
   - name: Establish who gets called when.
-    rax_mon_notification_plan:
+    community.general.rax_mon_notification_plan:
       credentials: ~/.rax_pub
       state: present
       label: defcon1

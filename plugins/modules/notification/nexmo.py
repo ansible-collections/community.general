@@ -48,7 +48,7 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Send notification message via Nexmo
-  nexmo:
+  community.general.nexmo:
     api_key: 640c8a53
     api_secret: 0ce239a6
     src: 12345678901

@@ -56,32 +56,32 @@ options:
 
 EXAMPLES = '''
 - name: Start svc dnscache, if not running
-  svc:
+  community.general.svc:
     name: dnscache
     state: started
 
 - name: Stop svc dnscache, if running
-  svc:
+  community.general.svc:
     name: dnscache
     state: stopped
 
 - name: Kill svc dnscache, in all cases
-  svc:
+  community.general.svc:
     name: dnscache
     state: killed
 
 - name: Restart svc dnscache, in all cases
-  svc:
+  community.general.svc:
     name: dnscache
     state: restarted
 
 - name: Reload svc dnscache, in all cases
-  svc:
+  community.general.svc:
     name: dnscache
     state: reloaded
 
 - name: Using alternative svc directory location
-  svc:
+  community.general.svc:
     name: dnscache
     state: reloaded
     service_dir: /var/service

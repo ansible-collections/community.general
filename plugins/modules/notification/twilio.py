@@ -56,7 +56,7 @@ EXAMPLES = '''
 # note: replace account_sid and auth_token values with your credentials
 # and you have to have the 'from_number' on your Twilio account
 - name: Send a text message to a mobile phone through Twilio
-  twilio:
+  community.general.twilio:
     msg: All servers with webserver role are now configured.
     account_sid: ACXXXXXXXXXXXXXXXXX
     auth_token: ACXXXXXXXXXXXXXXXXX
@@ -68,7 +68,7 @@ EXAMPLES = '''
 # note: replace account_sid and auth_token values with your credentials
 # and you have to have the 'from_number' on your Twilio account
 - name: Send a text message to a mobile phone through Twilio
-  twilio:
+  community.general.twilio:
     msg: This server configuration is now complete.
     account_sid: ACXXXXXXXXXXXXXXXXX
     auth_token: ACXXXXXXXXXXXXXXXXX
@@ -84,7 +84,7 @@ EXAMPLES = '''
 # note: replace account_sid and auth_token values with your credentials
 # and you have to have the 'from_number' on your Twilio account
 - name: Send a text message to a mobile phone through Twilio
-  twilio:
+  community.general.twilio:
     msg: Deployment complete!
     account_sid: ACXXXXXXXXXXXXXXXXX
     auth_token: ACXXXXXXXXXXXXXXXXX

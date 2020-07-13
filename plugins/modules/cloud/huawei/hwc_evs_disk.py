@@ -156,7 +156,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 # test create disk
 - name: Create a disk
-  hwc_evs_disk:
+  community.general.hwc_evs_disk:
     availability_zone: "cn-north-1a"
     name: "ansible_evs_disk_test"
     volume_type: "SATA"

@@ -37,7 +37,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Gather Scaleway security groups facts
-  scaleway_security_group_facts:
+  community.general.scaleway_security_group_facts:
     region: par1
 '''
 

@@ -91,7 +91,7 @@ options:
 EXAMPLES = """
 
     - name: Create FlexVol
-      na_cdot_volume:
+      community.general.na_cdot_volume:
         state: present
         name: ansibleVolume
         infinite: False
@@ -107,7 +107,7 @@ EXAMPLES = """
         snapshot_policy: daily
 
     - name: Make FlexVol offline
-      na_cdot_volume:
+      community.general.na_cdot_volume:
         state: present
         name: ansibleVolume
         infinite: False

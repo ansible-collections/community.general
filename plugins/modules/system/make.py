@@ -44,17 +44,17 @@ options:
 
 EXAMPLES = r'''
 - name: Build the default target
-  make:
+  community.general.make:
     chdir: /home/ubuntu/cool-project
 
 - name: Run 'install' target as root
-  make:
+  community.general.make:
     chdir: /home/ubuntu/cool-project
     target: install
   become: yes
 
 - name: Build 'all' target with extra arguments
-  make:
+  community.general.make:
     chdir: /home/ubuntu/cool-project
     target: all
     params:
@@ -62,7 +62,7 @@ EXAMPLES = r'''
       BACKEND: lapack
 
 - name: Build 'all' target with a custom Makefile
-  make:
+  community.general.make:
     chdir: /home/ubuntu/cool-project
     target: all
     file: /some-project/Makefile

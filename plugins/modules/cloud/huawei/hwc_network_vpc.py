@@ -66,7 +66,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Create a vpc
-  hwc_network_vpc:
+  community.general.hwc_network_vpc:
       identity_endpoint: "{{ identity_endpoint }}"
       user: "{{ user }}"
       password: "{{ password }}"

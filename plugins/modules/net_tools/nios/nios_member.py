@@ -299,7 +299,7 @@ options:
 
 EXAMPLES = '''
 - name: Add a member to the grid with IPv4 address
-  nios_member:
+  community.general.nios_member:
     host_name: member01.localdomain
     vip_setting:
       - address: 192.168.1.100
@@ -315,7 +315,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Add a HA member to the grid
-  nios_member:
+  community.general.nios_member:
     host_name: memberha.localdomain
     vip_setting:
       - address: 192.168.1.100
@@ -340,7 +340,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Update the member with pre-provisioning details specified
-  nios_member:
+  community.general.nios_member:
     name: member01.localdomain
     pre_provisioning:
       - hardware_info:
@@ -359,7 +359,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Remove the member
-  nios_member:
+  community.general.nios_member:
     name: member01.localdomain
     state: absent
     provider:

@@ -73,7 +73,7 @@ options:
 '''
 EXAMPLES = r'''
 - name: Add a host using OMAPI
-  omapi_host:
+  community.general.omapi_host:
     key_name: defomapi
     key: +bFQtBCta6j2vWkjPkNFtgA==
     host: 10.98.4.55
@@ -87,7 +87,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Remove a host using OMAPI
-  omapi_host:
+  community.general.omapi_host:
     key_name: defomapi
     key: +bFQtBCta6j2vWkjPkNFtgA==
     host: 10.1.1.1

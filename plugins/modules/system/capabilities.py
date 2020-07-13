@@ -43,13 +43,13 @@ author:
 
 EXAMPLES = r'''
 - name: Set cap_sys_chroot+ep on /foo
-  capabilities:
+  community.general.capabilities:
     path: /foo
     capability: cap_sys_chroot+ep
     state: present
 
 - name: Remove cap_net_bind_service from /bar
-  capabilities:
+  community.general.capabilities:
     path: /bar
     capability: cap_net_bind_service
     state: absent

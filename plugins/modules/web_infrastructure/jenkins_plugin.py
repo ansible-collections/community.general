@@ -103,46 +103,46 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Install plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: build-pipeline-plugin
 
 - name: Install plugin without its dependencies
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: build-pipeline-plugin
     with_dependencies: no
 
 - name: Make sure the plugin is always up-to-date
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: token-macro
     state: latest
 
 - name: Install specific version of the plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: token-macro
     version: "1.15"
 
 - name: Pin the plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: token-macro
     state: pinned
 
 - name: Unpin the plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: token-macro
     state: unpinned
 
 - name: Enable the plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: token-macro
     state: enabled
 
 - name: Disable the plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: token-macro
     state: disabled
 
 - name: Uninstall plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: build-pipeline-plugin
     state: absent
 
@@ -150,7 +150,7 @@ EXAMPLES = '''
 # Example of how to authenticate
 #
 - name: Install plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: build-pipeline-plugin
     url_username: admin
     url_password: p4ssw0rd
@@ -171,7 +171,7 @@ EXAMPLES = '''
         enabled: yes
   tasks:
     - name: Install plugins without a specific version
-      jenkins_plugin:
+      community.general.jenkins_plugin:
         name: "{{ item.key }}"
       register: my_jenkins_plugin_unversioned
       when: >
@@ -179,7 +179,7 @@ EXAMPLES = '''
       with_dict: "{{ my_jenkins_plugins }}"
 
     - name: Install plugins with a specific version
-      jenkins_plugin:
+      community.general.jenkins_plugin:
         name: "{{ item.key }}"
         version: "{{ item.value['version'] }}"
       register: my_jenkins_plugin_versioned
@@ -229,7 +229,7 @@ EXAMPLES = '''
       when: jenkins_restart_required
 
     - name: Plugin pinning
-      jenkins_plugin:
+      community.general.jenkins_plugin:
         name: "{{ item.key }}"
         state: "{{ 'pinned' if item.value['pinned'] else 'unpinned'}}"
       when: >
@@ -237,7 +237,7 @@ EXAMPLES = '''
       with_dict: "{{ my_jenkins_plugins }}"
 
     - name: Plugin enabling
-      jenkins_plugin:
+      community.general.jenkins_plugin:
         name: "{{ item.key }}"
         state: "{{ 'enabled' if item.value['enabled'] else 'disabled'}}"
       when: >

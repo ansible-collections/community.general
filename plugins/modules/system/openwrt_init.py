@@ -43,22 +43,22 @@ requirements:
 
 EXAMPLES = '''
 - name: Start service httpd, if not running
-  openwrt_init:
+  community.general.openwrt_init:
     state: started
     name: httpd
 
 - name: Stop service cron, if running
-  openwrt_init:
+  community.general.openwrt_init:
     name: cron
     state: stopped
 
 - name: Reload service httpd, in all cases
-  openwrt_init:
+  community.general.openwrt_init:
     name: httpd
     state: reloaded
 
 - name: Enable service httpd
-  openwrt_init:
+  community.general.openwrt_init:
     name: httpd
     enabled: yes
 '''

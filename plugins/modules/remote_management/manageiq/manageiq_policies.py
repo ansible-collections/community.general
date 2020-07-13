@@ -47,7 +47,7 @@ options:
 
 EXAMPLES = '''
 - name: Assign new policy_profile for a provider in ManageIQ
-  manageiq_policies:
+  community.general.manageiq_policies:
     resource_name: 'EngLab'
     resource_type: 'provider'
     policy_profiles:
@@ -59,7 +59,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Unassign a policy_profile for a provider in ManageIQ
-  manageiq_policies:
+  community.general.manageiq_policies:
     state: absent
     resource_name: 'EngLab'
     resource_type: 'provider'
@@ -72,7 +72,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: List current policy_profile and policies for a provider in ManageIQ
-  manageiq_policies:
+  community.general.manageiq_policies:
     state: list
     resource_name: 'EngLab'
     resource_type: 'provider'

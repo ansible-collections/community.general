@@ -25,10 +25,10 @@ author:
 
 EXAMPLES = '''
 - name: Show python lib/site paths
-  python_requirements_info:
+  community.general.python_requirements_info:
 
 - name: Check for modern boto3 and botocore versions
-  python_requirements_info:
+  community.general.python_requirements_info:
     dependencies:
     - boto3>1.6
     - botocore<2

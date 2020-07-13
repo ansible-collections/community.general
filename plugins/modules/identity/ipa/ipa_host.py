@@ -89,7 +89,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure host is present
-  ipa_host:
+  community.general.ipa_host:
     name: host01.example.com
     description: Example host
     ip_address: 192.168.0.123
@@ -100,51 +100,51 @@ EXAMPLES = r'''
     - "08:00:27:E3:B1:2D"
     - "52:54:00:BD:97:1E"
     state: present
-    ipa_host: ipa.example.com
+    community.general.ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
 
 - name: Generate a random password for bulk enrolment
-  ipa_host:
+  community.general.ipa_host:
     name: host01.example.com
     description: Example host
     ip_address: 192.168.0.123
     state: present
-    ipa_host: ipa.example.com
+    community.general.ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
     validate_certs: False
     random_password: True
 
 - name: Ensure host is disabled
-  ipa_host:
+  community.general.ipa_host:
     name: host01.example.com
     state: disabled
-    ipa_host: ipa.example.com
+    community.general.ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
 
 - name: Ensure that all user certificates are removed
-  ipa_host:
+  community.general.ipa_host:
     name: host01.example.com
     user_certificate: []
-    ipa_host: ipa.example.com
+    community.general.ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
 
 - name: Ensure host is absent
-  ipa_host:
+  community.general.ipa_host:
     name: host01.example.com
     state: absent
-    ipa_host: ipa.example.com
+    community.general.ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
 
 - name: Ensure host and its DNS record is absent
-  ipa_host:
+  community.general.ipa_host:
     name: host01.example.com
     state: absent
-    ipa_host: ipa.example.com
+    community.general.ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
     update_dns: True

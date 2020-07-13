@@ -100,29 +100,29 @@ requirements:
 
 EXAMPLES = '''
 - name: Get info on docker host
-  docker_host_info:
+  community.general.docker_host_info:
   register: result
 
 - name: Get info on docker host and list images
-  docker_host_info:
+  community.general.docker_host_info:
     images: yes
   register: result
 
 - name: Get info on docker host and list images matching the filter
-  docker_host_info:
+  community.general.docker_host_info:
     images: yes
     images_filters:
       label: "mylabel"
   register: result
 
 - name: Get info on docker host and verbose list images
-  docker_host_info:
+  community.general.docker_host_info:
     images: yes
     verbose_output: yes
   register: result
 
 - name: Get info on docker host and used disk space
-  docker_host_info:
+  community.general.docker_host_info:
     disk_usage: yes
   register: result
 

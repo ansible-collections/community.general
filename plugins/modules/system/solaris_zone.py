@@ -93,7 +93,7 @@ options:
 
 EXAMPLES = '''
 - name: Create and install a zone, but don't boot it
-  solaris_zone:
+  community.general.solaris_zone:
     name: zone1
     state: present
     path: /zones/zone1
@@ -102,7 +102,7 @@ EXAMPLES = '''
     config: 'set autoboot=true; add net; set physical=bge0; set address=10.1.1.1; end'
 
 - name: Create and install a zone and boot it
-  solaris_zone:
+  community.general.solaris_zone:
     name: zone1
     state: running
     path: /zones/zone1
@@ -110,27 +110,27 @@ EXAMPLES = '''
     config: 'set autoboot=true; add net; set physical=bge0; set address=10.1.1.1; end'
 
 - name: Boot an already installed zone
-  solaris_zone:
+  community.general.solaris_zone:
     name: zone1
     state: running
 
 - name: Stop a zone
-  solaris_zone:
+  community.general.solaris_zone:
     name: zone1
     state: stopped
 
 - name: Destroy a zone
-  solaris_zone:
+  community.general.solaris_zone:
     name: zone1
     state: absent
 
 - name: Detach a zone
-  solaris_zone:
+  community.general.solaris_zone:
     name: zone1
     state: detached
 
 - name: Configure a zone, ready to be attached
-  solaris_zone:
+  community.general.solaris_zone:
     name: zone1
     state: configured
     path: /zones/zone1
@@ -138,7 +138,7 @@ EXAMPLES = '''
     config: 'set autoboot=true; add net; set physical=bge0; set address=10.1.1.1; end'
 
 - name: Attach zone1
-  solaris_zone:
+  community.general.solaris_zone:
     name: zone1
     state: attached
     attach_options: -u

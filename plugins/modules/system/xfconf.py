@@ -46,7 +46,7 @@ options:
 
 EXAMPLES = """
 - name: Change the DPI to "192"
-  xfconf:
+  community.general.xfconf:
     channel: "xsettings"
     property: "/Xft/DPI"
     value_type: "int"

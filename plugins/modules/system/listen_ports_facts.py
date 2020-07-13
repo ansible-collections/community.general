@@ -22,7 +22,7 @@ short_description: Gather facts on processes listening on TCP and UDP ports.
 
 EXAMPLES = r'''
 - name: Gather facts on listening ports
-  listen_ports_facts:
+  community.general.listen_ports_facts:
 
 - name: TCP whitelist violation
   debug:

@@ -289,7 +289,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Create SmartOS zone
-  vmadm:
+  community.general.vmadm:
     brand: joyent
     state: present
     alias: fw_zone
@@ -305,12 +305,12 @@ EXAMPLES = '''
     quota: 1
 
 - name: Delete a zone
-  vmadm:
+  community.general.vmadm:
     alias: test_zone
     state: deleted
 
 - name: Stop all zones
-  vmadm:
+  community.general.vmadm:
     uuid: '*'
     state: stopped
 '''

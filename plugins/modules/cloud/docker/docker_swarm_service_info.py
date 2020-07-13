@@ -40,7 +40,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Get info from a service
-  docker_swarm_service_info:
+  community.general.docker_swarm_service_info:
     name: myservice
   register: result
 '''

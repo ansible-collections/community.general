@@ -42,23 +42,23 @@ options:
 
 EXAMPLES = '''
 - name: Install Logstash beats input plugin
-  logstash_plugin:
+  community.general.logstash_plugin:
     state: present
     name: logstash-input-beats
 
 - name: Install specific version of a plugin
-  logstash_plugin:
+  community.general.logstash_plugin:
     state: present
     name: logstash-input-syslog
     version: '3.2.0'
 
 - name: Uninstall Logstash plugin
-  logstash_plugin:
+  community.general.logstash_plugin:
     state: absent
     name: logstash-filter-multiline
 
 - name: Install Logstash plugin with alternate heap size
-  logstash_plugin:
+  community.general.logstash_plugin:
     state: present
     name: logstash-input-beats
   environment:

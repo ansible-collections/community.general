@@ -76,7 +76,7 @@ EXAMPLES = '''
   gather_facts: false
   connection: local
   tasks:
-    - rax_scaling_policy:
+    - community.general.rax_scaling_policy:
         credentials: ~/.raxpub
         region: ORD
         at: '2013-05-19T08:07:08Z'
@@ -88,7 +88,7 @@ EXAMPLES = '''
         scaling_group: ASG Test
       register: asps_at
 
-    - rax_scaling_policy:
+    - community.general.rax_scaling_policy:
         credentials: ~/.raxpub
         region: ORD
         cron: '1 0 * * *'
@@ -100,7 +100,7 @@ EXAMPLES = '''
         scaling_group: ASG Test
       register: asp_cron
 
-    - rax_scaling_policy:
+    - community.general.rax_scaling_policy:
         credentials: ~/.raxpub
         region: ORD
         cooldown: 300

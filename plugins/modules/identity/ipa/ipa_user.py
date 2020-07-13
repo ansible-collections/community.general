@@ -100,7 +100,7 @@ requirements:
 
 EXAMPLES = r'''
 - name: Ensure pinky is present and always reset password
-  ipa_user:
+  community.general.ipa_user:
     name: pinky
     state: present
     krbpasswordexpiration: 20200119235959
@@ -121,7 +121,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure brain is absent
-  ipa_user:
+  community.general.ipa_user:
     name: brain
     state: absent
     ipa_host: ipa.example.com
@@ -129,7 +129,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure pinky is present but don't reset password if already exists
-  ipa_user:
+  community.general.ipa_user:
     name: pinky
     state: present
     givenname: Pinky

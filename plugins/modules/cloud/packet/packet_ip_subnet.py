@@ -97,7 +97,7 @@ EXAMPLES = '''
 
 # Pick an IPv4 address from a block allocated to your project.
 
-  - packet_ip_subnet:
+  - community.general.packet_ip_subnet:
       project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
       hostname: myserver
       cidr: "147.75.201.78/32"
@@ -107,7 +107,7 @@ EXAMPLES = '''
 - name: Unassign IP address from any device in your project
   hosts: localhost
   tasks:
-  - packet_ip_subnet:
+  - community.general.packet_ip_subnet:
       project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
       cidr: "147.75.201.78/32"
       state: absent

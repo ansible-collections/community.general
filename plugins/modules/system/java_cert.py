@@ -89,7 +89,7 @@ author:
 
 EXAMPLES = r'''
 - name: Import SSL certificate from google.com to a given cacerts keystore
-  java_cert:
+  community.general.java_cert:
     cert_url: google.com
     cert_port: 443
     keystore_path: /usr/lib/jvm/jre7/lib/security/cacerts
@@ -97,7 +97,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Remove certificate with given alias from a keystore
-  java_cert:
+  community.general.java_cert:
     cert_url: google.com
     keystore_path: /usr/lib/jvm/jre7/lib/security/cacerts
     keystore_pass: changeit
@@ -105,7 +105,7 @@ EXAMPLES = r'''
     state: absent
 
 - name: Import trusted CA from SSL certificate
-  java_cert:
+  community.general.java_cert:
     cert_path: /opt/certs/rootca.crt
     keystore_path: /tmp/cacerts
     keystore_pass: changeit
@@ -115,7 +115,7 @@ EXAMPLES = r'''
     trust_cacert: True
 
 - name: Import SSL certificate from google.com to a keystore, create it if it doesn't exist
-  java_cert:
+  community.general.java_cert:
     cert_url: google.com
     keystore_path: /tmp/cacerts
     keystore_pass: changeit
@@ -123,7 +123,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Import a pkcs12 keystore with a specified alias, create it if it doesn't exist
-  java_cert:
+  community.general.java_cert:
     pkcs12_path: "/tmp/importkeystore.p12"
     cert_alias: default
     keystore_path: /opt/wildfly/standalone/configuration/defaultkeystore.jks
@@ -132,7 +132,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Import SSL certificate to JCEKS keystore
-  java_cert:
+  community.general.java_cert:
     pkcs12_path: "/tmp/importkeystore.p12"
     pkcs12_alias: default
     pkcs12_password: somepass

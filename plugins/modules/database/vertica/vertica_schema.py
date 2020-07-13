@@ -73,13 +73,13 @@ author: "Dariusz Owczarek (@dareko)"
 
 EXAMPLES = """
 - name: Creating a new vertica schema
-  vertica_schema: name=schema_name db=db_name state=present
+  community.general.vertica_schema: name=schema_name db=db_name state=present
 
 - name: Creating a new schema with specific schema owner
-  vertica_schema: name=schema_name owner=dbowner db=db_name state=present
+  community.general.vertica_schema: name=schema_name owner=dbowner db=db_name state=present
 
 - name: Creating a new schema with roles
-  vertica_schema:
+  community.general.vertica_schema:
     name=schema_name
     create_roles=schema_name_all
     usage_roles=schema_name_ro,schema_name_rw

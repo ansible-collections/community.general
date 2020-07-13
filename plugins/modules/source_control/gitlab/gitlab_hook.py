@@ -110,7 +110,7 @@ options:
 
 EXAMPLES = '''
 - name: "Adding a project hook"
-  gitlab_hook:
+  community.general.gitlab_hook:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     project: "my_group/my_project"
@@ -122,7 +122,7 @@ EXAMPLES = '''
     token: "my-super-secret-token-that-my-ci-server-will-check"
 
 - name: "Delete the previous hook"
-  gitlab_hook:
+  community.general.gitlab_hook:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     project: "my_group/my_project"
@@ -130,7 +130,7 @@ EXAMPLES = '''
     state: absent
 
 - name: "Delete a hook by numeric project id"
-  gitlab_hook:
+  community.general.gitlab_hook:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     project: 10

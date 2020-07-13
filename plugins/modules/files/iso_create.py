@@ -73,7 +73,7 @@ options:
 
 EXAMPLES = r'''
 - name: Create an ISO file
-  iso_create:
+  community.general.iso_create:
     src_files:
       - /root/testfile.yml
       - /root/testfolder
@@ -81,7 +81,7 @@ EXAMPLES = r'''
     interchange_level: 3
 
 - name: Create an ISO file with Rock Ridge extension
-  iso_create:
+  community.general.iso_create:
     src_files:
       - /root/testfile.yml
       - /root/testfolder

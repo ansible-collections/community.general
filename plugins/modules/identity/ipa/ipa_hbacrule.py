@@ -108,7 +108,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure rule to allow all users to access any host from any host
-  ipa_hbacrule:
+  community.general.ipa_hbacrule:
     name: allow_all
     description: Allow all users to access any host from any host
     hostcategory: all
@@ -120,7 +120,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure rule with certain limitations
-  ipa_hbacrule:
+  community.general.ipa_hbacrule:
     name: allow_all_developers_access_to_db
     description: Allow all developers to access any database from any host
     hostgroup:
@@ -133,7 +133,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure rule is absent
-  ipa_hbacrule:
+  community.general.ipa_hbacrule:
     name: rule_to_be_deleted
     state: absent
     ipa_host: ipa.example.com

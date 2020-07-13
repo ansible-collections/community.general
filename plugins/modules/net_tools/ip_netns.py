@@ -41,12 +41,12 @@ options:
 
 EXAMPLES = '''
 - name: Create a namespace named mario
-  ip_netns:
+  community.general.ip_netns:
     name: mario
     state: present
 
 - name: Delete a namespace named luigi
-  ip_netns:
+  community.general.ip_netns:
     name: luigi
     state: absent
 '''

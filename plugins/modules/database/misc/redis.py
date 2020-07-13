@@ -77,41 +77,41 @@ author: "Xabier Larrakoetxea (@slok)"
 
 EXAMPLES = '''
 - name: Set local redis instance to be slave of melee.island on port 6377
-  redis:
+  community.general.redis:
     command: slave
     master_host: melee.island
     master_port: 6377
 
 - name: Deactivate slave mode
-  redis:
+  community.general.redis:
     command: slave
     slave_mode: master
 
 - name: Flush all the redis db
-  redis:
+  community.general.redis:
     command: flush
     flush_mode: all
 
 - name: Flush only one db in a redis instance
-  redis:
+  community.general.redis:
     command: flush
     db: 1
     flush_mode: db
 
 - name: Configure local redis to have 10000 max clients
-  redis:
+  community.general.redis:
     command: config
     name: maxclients
     value: 10000
 
 - name: Configure local redis maxmemory to 4GB
-  redis:
+  community.general.redis:
     command: config
     name: maxmemory
     value: 4GB
 
 - name: Configure local redis to have lua time limit of 100 ms
-  redis:
+  community.general.redis:
     command: config
     name: lua-time-limit
     value: 100

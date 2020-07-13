@@ -92,56 +92,56 @@ packages:
 
 EXAMPLES = '''
 - name: Install package foo from repo
-  pacman:
+  community.general.pacman:
     name: foo
     state: present
 
 - name: Install package bar from file
-  pacman:
+  community.general.pacman:
     name: ~/bar-1.0-1-any.pkg.tar.xz
     state: present
 
 - name: Install package foo from repo and bar from file
-  pacman:
+  community.general.pacman:
     name:
       - foo
       - ~/bar-1.0-1-any.pkg.tar.xz
     state: present
 
 - name: Upgrade package foo
-  pacman:
+  community.general.pacman:
     name: foo
     state: latest
     update_cache: yes
 
 - name: Remove packages foo and bar
-  pacman:
+  community.general.pacman:
     name:
       - foo
       - bar
     state: absent
 
 - name: Recursively remove package baz
-  pacman:
+  community.general.pacman:
     name: baz
     state: absent
     extra_args: --recursive
 
 - name: Run the equivalent of "pacman -Sy" as a separate step
-  pacman:
+  community.general.pacman:
     update_cache: yes
 
 - name: Run the equivalent of "pacman -Su" as a separate step
-  pacman:
+  community.general.pacman:
     upgrade: yes
 
 - name: Run the equivalent of "pacman -Syu" as a separate step
-  pacman:
+  community.general.pacman:
     update_cache: yes
     upgrade: yes
 
 - name: Run the equivalent of "pacman -Rdd", force remove package baz
-  pacman:
+  community.general.pacman:
     name: baz
     state: absent
     force: yes
