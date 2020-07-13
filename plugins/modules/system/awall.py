@@ -38,12 +38,12 @@ options:
 
 EXAMPLES = r'''
 - name: Enable "foo" and "bar" policy
-  awall:
+  community.general.awall:
     name: [ foo bar ]
     state: enabled
 
 - name: Disable "foo" and "bar" policy and activate new rules
-  awall:
+  community.general.awall:
     name:
     - foo
     - bar
@@ -51,7 +51,7 @@ EXAMPLES = r'''
     activate: no
 
 - name: Activate currently enabled firewall rules
-  awall:
+  community.general.awall:
     activate: yes
 '''
 

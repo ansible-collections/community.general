@@ -122,7 +122,7 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Create UTM proxy_exception
-  utm_proxy_exception:
+  community.general.utm_proxy_exception:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestExceptionEntry
@@ -130,7 +130,7 @@ EXAMPLES = """
     state: present
 
 - name: Remove UTM proxy_exception
-  utm_proxy_exception:
+  community.general.utm_proxy_exception:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestExceptionEntry

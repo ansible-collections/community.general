@@ -46,7 +46,7 @@ notes:
 
 EXAMPLES = '''
 - name: Pause the check with the ID of 12345
-  pingdom:
+  community.general.pingdom:
     uid: example@example.com
     passwd: password123
     key: apipassword123
@@ -54,7 +54,7 @@ EXAMPLES = '''
     state: paused
 
 - name: Unpause the check with the ID of 12345
-  pingdom:
+  community.general.pingdom:
     uid: example@example.com
     passwd: password123
     key: apipassword123

@@ -65,7 +65,7 @@ options:
 
 EXAMPLES = '''
 - name: Post an event with low priority
-  datadog_event:
+  community.general.datadog_event:
     title: Testing from ansible
     text: Test
     priority: low
@@ -73,7 +73,7 @@ EXAMPLES = '''
     app_key: j4JyCYfefWHhgFgiZUqRm63AXHNZQyPGBfJtAzmN
 
 - name: Post an event with several tags
-  datadog_event:
+  community.general.datadog_event:
     title: Testing from ansible
     text: Test
     api_key: 9775a026f1ca7d1c6c5af9d94d9595a4

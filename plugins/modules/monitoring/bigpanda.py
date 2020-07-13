@@ -76,14 +76,14 @@ requirements: [ ]
 
 EXAMPLES = '''
 - name: Notify BigPanda about a deployment
-  bigpanda:
+  community.general.bigpanda:
     component: myapp
     version: '1.3'
     token: '{{ bigpanda_token }}'
     state: started
 
 - name: Notify BigPanda about a deployment
-  bigpanda:
+  community.general.bigpanda:
     component: myapp
     version: '1.3'
     token: '{{ bigpanda_token }}'
@@ -91,7 +91,7 @@ EXAMPLES = '''
 
 # If outside servers aren't reachable from your machine, use delegate_to and override hosts:
 - name: Notify BigPanda about a deployment
-  bigpanda:
+  community.general.bigpanda:
     component: myapp
     version: '1.3'
     token: '{{ bigpanda_token }}'
@@ -101,7 +101,7 @@ EXAMPLES = '''
   register: deployment
 
 - name: Notify BigPanda about a deployment
-  bigpanda:
+  community.general.bigpanda:
     component: '{{ deployment.component }}'
     version: '{{ deployment.version }}'
     token: '{{ deployment.token }}'

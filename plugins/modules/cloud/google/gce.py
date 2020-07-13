@@ -153,7 +153,7 @@ EXAMPLES = '''
 # Create multiple instances by specifying multiple names, separated by
 # commas in the instance_names field
 # (e.g. my-test-instance1,my-test-instance2)
-  - gce:
+  - community.general.gce:
       instance_names: my-test-instance1
       zone: us-central1-a
       machine_type: n1-standard-1
@@ -167,7 +167,7 @@ EXAMPLES = '''
 # Create a single instance of an image from the "my-base-image" image family
 # in the us-central1-a Zone of the n1-standard-1 machine type.
 # This image family is in the "my-other-project" GCP project.
-  - gce:
+  - community.general.gce:
       instance_names: my-test-instance1
       zone: us-central1-a
       machine_type: n1-standard-1
@@ -183,7 +183,7 @@ EXAMPLES = '''
 # Create a single Debian 8 instance in the us-central1-a Zone
 # Use existing disks, custom network/subnetwork, set service account permissions
 # add tags and metadata.
-  - gce:
+  - community.general.gce:
       instance_names: my-test-instance
       zone: us-central1-a
       machine_type: n1-standard-1
@@ -223,7 +223,7 @@ EXAMPLES = '''
     - name: Create multiple instances
       # Basic provisioning example.  Create multiple Debian 8 instances in the
       # us-central1-a Zone of n1-standard-1 machine type.
-      gce:
+      community.general.gce:
         instance_names: test1,test2,test3
         zone: us-central1-a
         machine_type: n1-standard-1
@@ -262,7 +262,7 @@ EXAMPLES = '''
 
     - name: Delete test-instances
       # Basic termination of instance.
-      gce:
+      community.general.gce:
         service_account_email: "{{ service_account_email }}"
         credentials_file: "{{ credentials_file }}"
         project_id: "{{ project_id }}"
@@ -354,7 +354,7 @@ def create_instances(module, gce, instance_names, number, lc_zone):
     up from 'module'
 
     module : AnsibleModule object
-    gce: authenticated GCE libcloud driver
+    community.general.gce: authenticated GCE libcloud driver
     instance_names: python list of instance names to create
     number: number of instances to create
     lc_zone: GCEZone object
@@ -550,7 +550,7 @@ def change_instance_state(module, gce, instance_names, number, zone, state):
     change from started to stopped, or started to absent.
 
     module: Ansible module object
-    gce: authenticated GCE connection object
+    community.general.gce: authenticated GCE connection object
     instance_names: a list of instance names to terminate
     zone: GCEZone object where the instances reside prior to termination
     state: 'state' parameter passed into module as argument

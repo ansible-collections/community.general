@@ -55,7 +55,7 @@ EXAMPLES = '''
 # Note - You must set the CLC_V2_API_USERNAME And CLC_V2_API_PASSWD Environment variables before running these examples
 
 - name: Create server snapshot
-  clc_server_snapshot:
+  community.general.clc_server_snapshot:
     server_ids:
         - UC1TEST-SVR01
         - UC1TEST-SVR02
@@ -64,7 +64,7 @@ EXAMPLES = '''
     state: present
 
 - name: Restore server snapshot
-  clc_server_snapshot:
+  community.general.clc_server_snapshot:
     server_ids:
         - UC1TEST-SVR01
         - UC1TEST-SVR02
@@ -72,7 +72,7 @@ EXAMPLES = '''
     state: restore
 
 - name: Delete server snapshot
-  clc_server_snapshot:
+  community.general.clc_server_snapshot:
     server_ids:
         - UC1TEST-SVR01
         - UC1TEST-SVR02

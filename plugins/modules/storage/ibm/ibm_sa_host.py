@@ -59,7 +59,7 @@ author:
 
 EXAMPLES = '''
 - name: Define new host.
-  ibm_sa_host:
+  community.general.ibm_sa_host:
     host: host_name
     state: present
     username: admin
@@ -67,7 +67,7 @@ EXAMPLES = '''
     endpoints: hostdev-system
 
 - name: Delete host.
-  ibm_sa_host:
+  community.general.ibm_sa_host:
     host: host_name
     state: absent
     username: admin

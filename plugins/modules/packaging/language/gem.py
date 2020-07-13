@@ -95,18 +95,18 @@ author:
 
 EXAMPLES = '''
 - name: Install version 1.0 of vagrant
-  gem:
+  community.general.gem:
     name: vagrant
     version: 1.0
     state: present
 
 - name: Install latest available version of rake
-  gem:
+  community.general.gem:
     name: rake
     state: latest
 
 - name: Install rake version 1.0 from a local gem on disk
-  gem:
+  community.general.gem:
     name: rake
     gem_source: /path/to/gems/rake-1.0.gem
     state: present

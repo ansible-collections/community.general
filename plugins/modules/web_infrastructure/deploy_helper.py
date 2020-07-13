@@ -145,7 +145,7 @@ EXAMPLES = '''
 
 # Typical usage
 - name: Initialize the deploy root and gather facts
-  deploy_helper:
+  community.general.deploy_helper:
     path: /path/to/root
 - name: Clone the project to the new release folder
   git:
@@ -178,83 +178,83 @@ EXAMPLES = '''
       - path: web/uploads
         src: uploads
 - name: Finalize the deploy, removing the unfinished file and switching the symlink
-  deploy_helper:
+  community.general.deploy_helper:
     path: /path/to/root
     release: '{{ deploy_helper.new_release }}'
     state: finalize
 
 # Retrieving facts before running a deploy
 - name: Run 'state=query' to gather facts without changing anything
-  deploy_helper:
+  community.general.deploy_helper:
     path: /path/to/root
     state: query
 # Remember to set the 'release' parameter when you actually call 'state=present' later
 - name: Initialize the deploy root
-  deploy_helper:
+  community.general.deploy_helper:
     path: /path/to/root
     release: '{{ deploy_helper.new_release }}'
     state: present
 
 # all paths can be absolute or relative (to the 'path' parameter)
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     releases_path: /var/www/project/releases
     shared_path: /var/www/shared
     current_path: /var/www/active
 
 # Using your own naming strategy for releases (a version tag in this case):
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     release: v1.1.1
     state: present
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     release: '{{ deploy_helper.new_release }}'
     state: finalize
 
 # Using a different unfinished_filename:
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     unfinished_filename: README.md
     release: '{{ deploy_helper.new_release }}'
     state: finalize
 
 # Postponing the cleanup of older builds:
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     release: '{{ deploy_helper.new_release }}'
     state: finalize
     clean: False
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     state: clean
 # Or running the cleanup ahead of the new deploy
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     state: clean
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     state: present
 
 # Keeping more old releases:
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     release: '{{ deploy_helper.new_release }}'
     state: finalize
     keep_releases: 10
 # Or, if you use 'clean=false' on finalize:
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     state: clean
     keep_releases: 10
 
 # Removing the entire project root folder
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     state: absent
 
 # Debugging the facts returned by the module
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
 - debug:
     var: deploy_helper

@@ -65,27 +65,27 @@ requirements:
 
 EXAMPLES = '''
 - name: Get latest release of a public repository
-  github_release:
+  community.general.github_release:
     user: ansible
     repo: ansible
     action: latest_release
 
 - name: Get latest release of testuseer/testrepo
-  github_release:
+  community.general.github_release:
     token: tokenabc1234567890
     user: testuser
     repo: testrepo
     action: latest_release
 
 - name: Get latest release of test repo using username and password. Ansible 2.4.
-  github_release:
+  community.general.github_release:
     user: testuser
     password: secret123
     repo: testrepo
     action: latest_release
 
 - name: Create a new release
-  github_release:
+  community.general.github_release:
     token: tokenabc1234567890
     user: testuser
     repo: testrepo

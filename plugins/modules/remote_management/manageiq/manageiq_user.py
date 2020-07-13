@@ -64,7 +64,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a new user in ManageIQ
-  manageiq_user:
+  community.general.manageiq_user:
     userid: 'jdoe'
     name: 'Jane Doe'
     password: 'VerySecret'
@@ -77,7 +77,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Create a new user in ManageIQ using a token
-  manageiq_user:
+  community.general.manageiq_user:
     userid: 'jdoe'
     name: 'Jane Doe'
     password: 'VerySecret'
@@ -89,7 +89,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Delete a user in ManageIQ
-  manageiq_user:
+  community.general.manageiq_user:
     state: 'absent'
     userid: 'jdoe'
     manageiq_connection:
@@ -99,7 +99,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Delete a user in ManageIQ using a token
-  manageiq_user:
+  community.general.manageiq_user:
     state: 'absent'
     userid: 'jdoe'
     manageiq_connection:
@@ -108,7 +108,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Update email of user in ManageIQ
-  manageiq_user:
+  community.general.manageiq_user:
     userid: 'jdoe'
     email: 'jaustine@example.com'
     manageiq_connection:
@@ -118,7 +118,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Update email of user in ManageIQ using a token
-  manageiq_user:
+  community.general.manageiq_user:
     userid: 'jdoe'
     email: 'jaustine@example.com'
     manageiq_connection:

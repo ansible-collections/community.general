@@ -112,25 +112,25 @@ notes:
 
 EXAMPLES = '''
 - name: Download and installs all libs and dependencies outlined in the /path/to/project/composer.lock
-  composer:
+  community.general.composer:
     command: install
     working_dir: /path/to/project
 
 - name: Install a new package
-  composer:
+  community.general.composer:
     command: require
     arguments: my/package
     working_dir: /path/to/project
 
 - name: Clone and install a project with all dependencies
-  composer:
+  community.general.composer:
     command: create-project
     arguments: package/package /path/to/project ~1.0
     working_dir: /path/to/project
     prefer_dist: yes
 
 - name: Install a package globally
-  composer:
+  community.general.composer:
     command: require
     global_command: yes
     arguments: my/package

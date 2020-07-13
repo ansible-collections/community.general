@@ -190,37 +190,37 @@ author:
 EXAMPLES = '''
 
 - name: Init a new swarm with default parameters
-  docker_swarm:
+  community.general.docker_swarm:
     state: present
 
 - name: Update swarm configuration
-  docker_swarm:
+  community.general.docker_swarm:
     state: present
     election_tick: 5
 
 - name: Add nodes
-  docker_swarm:
+  community.general.docker_swarm:
     state: join
     advertise_addr: 192.168.1.2
     join_token: SWMTKN-1--xxxxx
     remote_addrs: [ '192.168.1.1:2377' ]
 
 - name: Leave swarm for a node
-  docker_swarm:
+  community.general.docker_swarm:
     state: absent
 
 - name: Remove a swarm manager
-  docker_swarm:
+  community.general.docker_swarm:
     state: absent
     force: true
 
 - name: Remove node from swarm
-  docker_swarm:
+  community.general.docker_swarm:
     state: remove
     node_id: mynode
 
 - name: Inspect swarm
-  docker_swarm:
+  community.general.docker_swarm:
     state: inspect
   register: swarm_info
 '''

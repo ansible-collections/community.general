@@ -60,14 +60,14 @@ options:
 
 EXAMPLES = '''
 - name: Create an IP
-  scaleway_ip:
+  community.general.scaleway_ip:
     organization: '{{ scw_org }}'
     state: present
     region: par1
   register: ip_creation_task
 
 - name: Make sure IP deleted
-  scaleway_ip:
+  community.general.scaleway_ip:
     id: '{{ ip_creation_task.scaleway_ip.id }}'
     state: absent
     region: par1

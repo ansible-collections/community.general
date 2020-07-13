@@ -99,7 +99,7 @@ options:
 
 EXAMPLES = '''
 - name: Delete GitLab Project
-  gitlab_project:
+  community.general.gitlab_project:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     validate_certs: False
@@ -108,7 +108,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Create GitLab Project in group Ansible
-  gitlab_project:
+  community.general.gitlab_project:
     api_url: https://gitlab.example.com/
     validate_certs: True
     api_username: dj-wasabi

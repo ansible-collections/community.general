@@ -56,12 +56,12 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Make sure we have a parent entry for users
-  ldap_entry:
+  community.general.ldap_entry:
     dn: ou=users,dc=example,dc=com
     objectClass: organizationalUnit
 
 - name: Make sure we have an admin user
-  ldap_entry:
+  community.general.ldap_entry:
     dn: cn=admin,dc=example,dc=com
     objectClass:
       - simpleSecurityObject
@@ -71,7 +71,7 @@ EXAMPLES = """
       userPassword: "{SSHA}tabyipcHzhwESzRaGA7oQ/SDoBZQOGND"
 
 - name: Get rid of an old entry
-  ldap_entry:
+  community.general.ldap_entry:
     dn: ou=stuff,dc=example,dc=com
     state: absent
     server_uri: ldap://localhost/
@@ -89,7 +89,7 @@ EXAMPLES = """
 #
 # In the example below, 'args' is a task keyword, passed at the same level as the module
 - name: Get rid of an old entry
-  ldap_entry:
+  community.general.ldap_entry:
     dn: ou=stuff,dc=example,dc=com
     state: absent
   args: "{{ ldap_auth }}"

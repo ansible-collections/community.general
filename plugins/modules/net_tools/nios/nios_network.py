@@ -93,7 +93,7 @@ options:
 
 EXAMPLES = '''
 - name: Configure a network ipv4
-  nios_network:
+  community.general.nios_network:
     network: 192.168.10.0/24
     comment: this is a test comment
     state: present
@@ -103,7 +103,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Configure a network ipv6
-  nios_network:
+  community.general.nios_network:
     network: fe80::/64
     comment: this is a test comment
     state: present
@@ -113,7 +113,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Set dhcp options for a network ipv4
-  nios_network:
+  community.general.nios_network:
     network: 192.168.10.0/24
     comment: this is a test comment
     options:
@@ -126,7 +126,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Remove a network ipv4
-  nios_network:
+  community.general.nios_network:
     network: 192.168.10.0/24
     state: absent
     provider:
@@ -135,7 +135,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Configure a ipv4 network container
-  nios_network:
+  community.general.nios_network:
     network: 192.168.10.0/24
     container: true
     comment: test network container
@@ -146,7 +146,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Configure a ipv6 network container
-  nios_network:
+  community.general.nios_network:
     network: fe80::/64
     container: true
     comment: test network container
@@ -157,7 +157,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Remove a ipv4 network container
-  nios_network:
+  community.general.nios_network:
     networkr: 192.168.10.0/24
     container: true
     comment: test network container

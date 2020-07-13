@@ -66,25 +66,25 @@ options:
 
 EXAMPLES = '''
 - name: Update the OS to the latest version
-  swupd:
+  community.general.swupd:
     update: yes
 
 - name: Installs the "foo" bundle
-  swupd:
+  community.general.swupd:
     name: foo
     state: present
 
 - name: Removes the "foo" bundle
-  swupd:
+  community.general.swupd:
     name: foo
     state: absent
 
 - name: Check integrity of filesystem
-  swupd:
+  community.general.swupd:
     verify: yes
 
 - name: Downgrade OS to release 12920
-  swupd:
+  community.general.swupd:
     verify: yes
     manifest: 12920
 '''

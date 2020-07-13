@@ -63,7 +63,7 @@ options:
 
 EXAMPLES = '''
 - name: Set or update some CI/CD variables
-  gitlab_project_variable:
+  community.general.gitlab_project_variable:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: markuman/dotfiles
@@ -73,7 +73,7 @@ EXAMPLES = '''
       SECRET_ACCESS_KEY: 321cba
 
 - name: Set or update some CI/CD variables
-  gitlab_project_variable:
+  community.general.gitlab_project_variable:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: markuman/dotfiles
@@ -87,7 +87,7 @@ EXAMPLES = '''
         variable_type: env_var
 
 - name: Delete one variable
-  gitlab_project_variable:
+  community.general.gitlab_project_variable:
     api_url: https://gitlab.com
     api_token: secret_access_token
     project: markuman/dotfiles

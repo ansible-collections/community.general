@@ -73,44 +73,44 @@ options:
 
 EXAMPLES = '''
 - name: Install package foo
-  pkgin:
+  community.general.pkgin:
     name: foo
     state: present
 
 - name: Update cache and install foo package
-  pkgin:
+  community.general.pkgin:
     name: foo
     update_cache: yes
 
 - name: Remove package foo
-  pkgin:
+  community.general.pkgin:
     name: foo
     state: absent
 
 - name: Remove packages foo and bar
-  pkgin:
+  community.general.pkgin:
     name: foo,bar
     state: absent
 
 - name: Update repositories as a separate step
-  pkgin:
+  community.general.pkgin:
     update_cache: yes
 
 - name: Upgrade main packages (equivalent to pkgin upgrade)
-  pkgin:
+  community.general.pkgin:
     upgrade: yes
 
 - name: Upgrade all packages (equivalent to pkgin full-upgrade)
-  pkgin:
+  community.general.pkgin:
     full_upgrade: yes
 
 - name: Force-upgrade all packages (equivalent to pkgin -F full-upgrade)
-  pkgin:
+  community.general.pkgin:
     full_upgrade: yes
     force: yes
 
 - name: Clean packages cache (equivalent to pkgin clean)
-  pkgin:
+  community.general.pkgin:
     clean: yes
 '''
 

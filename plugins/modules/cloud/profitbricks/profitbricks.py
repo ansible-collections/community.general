@@ -117,7 +117,7 @@ EXAMPLES = '''
 
 # Provisioning example
 - name: Create three servers and enumerate their names
-  profitbricks:
+  community.general.profitbricks:
     datacenter: Tardis One
     name: web%02d.stackpointcloud.com
     cores: 4
@@ -130,7 +130,7 @@ EXAMPLES = '''
     assign_public_ip: true
 
 - name: Remove virtual machines
-  profitbricks:
+  community.general.profitbricks:
     datacenter: Tardis One
     instance_ids:
       - 'web001.stackpointcloud.com'
@@ -140,7 +140,7 @@ EXAMPLES = '''
     state: absent
 
 - name: Start virtual machines
-  profitbricks:
+  community.general.profitbricks:
     datacenter: Tardis One
     instance_ids:
       - 'web001.stackpointcloud.com'
@@ -150,7 +150,7 @@ EXAMPLES = '''
     state: running
 
 - name: Stop virtual machines
-  profitbricks:
+  community.general.profitbricks:
     datacenter: Tardis One
     instance_ids:
       - 'web001.stackpointcloud.com'
@@ -326,7 +326,7 @@ def create_virtual_machine(module, profitbricks):
     Create new virtual machine
 
     module : AnsibleModule object
-    profitbricks: authenticated profitbricks object
+    community.general.profitbricks: authenticated profitbricks object
 
     Returns:
         True if a new virtual machine was created, false otherwise
@@ -413,7 +413,7 @@ def remove_virtual_machine(module, profitbricks):
     This will remove the virtual machine along with the bootVolume.
 
     module : AnsibleModule object
-    profitbricks: authenticated profitbricks object.
+    community.general.profitbricks: authenticated profitbricks object.
 
     Not yet supported: handle deletion of attached data disks.
 
@@ -472,7 +472,7 @@ def startstop_machine(module, profitbricks, state):
     Starts or Stops a virtual machine.
 
     module : AnsibleModule object
-    profitbricks: authenticated profitbricks object.
+    community.general.profitbricks: authenticated profitbricks object.
 
     Returns:
         True when the servers process the action successfully, false otherwise.

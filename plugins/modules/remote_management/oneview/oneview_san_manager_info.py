@@ -38,7 +38,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Gather information about all SAN Managers
-  oneview_san_manager_info:
+  community.general.oneview_san_manager_info:
     config: /etc/oneview/oneview_config.json
   delegate_to: localhost
   register: result
@@ -47,7 +47,7 @@ EXAMPLES = '''
     msg: "{{ result.san_managers }}"
 
 - name: Gather paginated, filtered and sorted information about SAN Managers
-  oneview_san_manager_info:
+  community.general.oneview_san_manager_info:
     config: /etc/oneview/oneview_config.json
     params:
       start: 0
@@ -61,7 +61,7 @@ EXAMPLES = '''
     msg: "{{ result.san_managers }}"
 
 - name: Gather information about a SAN Manager by provider display name
-  oneview_san_manager_info:
+  community.general.oneview_san_manager_info:
     config: /etc/oneview/oneview_config.json
     provider_display_name: Brocade Network Advisor
   delegate_to: localhost

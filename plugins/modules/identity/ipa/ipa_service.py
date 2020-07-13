@@ -45,7 +45,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure service is present
-  ipa_service:
+  community.general.ipa_service:
     name: http/host01.example.com
     state: present
     ipa_host: ipa.example.com
@@ -53,7 +53,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure service is absent
-  ipa_service:
+  community.general.ipa_service:
     name: http/host01.example.com
     state: absent
     ipa_host: ipa.example.com
@@ -61,7 +61,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Changing Managing hosts list
-  ipa_service:
+  community.general.ipa_service:
     name: http/host01.example.com
     host:
        - host01.example.com

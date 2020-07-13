@@ -47,7 +47,7 @@ options:
 
 EXAMPLES = '''
 - name: Add an alert profile to ManageIQ
-  manageiq_alert_profiles:
+  community.general.manageiq_alert_profiles:
     state: present
     name: Test profile
     resource_type: ContainerNode
@@ -61,7 +61,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Delete an alert profile from ManageIQ
-  manageiq_alert_profiles:
+  community.general.manageiq_alert_profiles:
     state: absent
     name: Test profile
     manageiq_connection:

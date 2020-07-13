@@ -39,10 +39,10 @@ options:
 
 EXAMPLES = '''
 - name: Gather facts about ZFS pool rpool
-  zpool_facts: pool=rpool
+  community.general.zpool_facts: pool=rpool
 
 - name: Gather space usage about all imported ZFS pools
-  zpool_facts: properties='free,size'
+  community.general.zpool_facts: properties='free,size'
 
 - name: Print gathered information
   debug:

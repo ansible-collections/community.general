@@ -172,7 +172,7 @@ notes:
 
 EXAMPLES = """
 - name: Create a started container
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-started
     container_log: true
     template: ubuntu
@@ -180,7 +180,7 @@ EXAMPLES = """
     template_options: --release trusty
 
 - name: Create a stopped container
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-stopped
     container_log: true
     template: ubuntu
@@ -188,7 +188,7 @@ EXAMPLES = """
     template_options: --release trusty
 
 - name: Create a frozen container
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-frozen
     container_log: true
     template: ubuntu
@@ -199,7 +199,7 @@ EXAMPLES = """
 
 # Create filesystem container, configure it, and archive it, and start it.
 - name: Create filesystem container
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-config
     backing_store: dir
     container_log: true
@@ -216,7 +216,7 @@ EXAMPLES = """
 # configuration to it, create an archive of it, and finally leave the container
 # in a frozen state. The container archive will be compressed using bzip2
 - name: Create a frozen lvm container
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-lvm
     container_log: true
     template: ubuntu
@@ -242,33 +242,33 @@ EXAMPLES = """
     var: lvm_container_info
 
 - name: Run a command in a container and ensure its in a "stopped" state.
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-started
     state: stopped
     container_command: |
       echo 'hello world.' | tee /opt/stopped
 
 - name: Run a command in a container and ensure its it in a "frozen" state.
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-stopped
     state: frozen
     container_command: |
       echo 'hello world.' | tee /opt/frozen
 
 - name: Start a container
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-stopped
     state: started
 
 - name: Run a command in a container and then restart it
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-started
     state: restarted
     container_command: |
       echo 'hello world.' | tee /opt/restarted
 
 - name: Run a complex command within a "running" container
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-started
     container_command: |
       apt-get update
@@ -281,7 +281,7 @@ EXAMPLES = """
 # Create an archive of an existing container, save the archive to a defined
 # path and then destroy it.
 - name: Archive container
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-started
     state: absent
     archive: true
@@ -291,7 +291,7 @@ EXAMPLES = """
 # snapshot clone of the container and and finally leave the container
 # in a frozen state. The container archive will be compressed using gzip.
 - name: Create an overlayfs container archive and clone it
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-overlayfs
     container_log: true
     template: ubuntu
@@ -309,20 +309,20 @@ EXAMPLES = """
     var: clone_container_info
 
 - name: Clone a container using snapshot
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-overlayfs-clone-snapshot
     backing_store: overlayfs
     clone_name: test-container-overlayfs-clone-snapshot2
     clone_snapshot: true
 
 - name: Create a new container and clone it
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-new-archive
     backing_store: dir
     clone_name: test-container-new-archive-clone
 
 - name: Archive and clone a container then destroy it
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-new-archive
     state: absent
     clone_name: test-container-new-archive-destroyed-clone
@@ -330,12 +330,12 @@ EXAMPLES = """
     archive_compression: gzip
 
 - name: Start a cloned container.
-  lxc_container:
+  community.general.lxc_container:
     name: test-container-new-archive-destroyed-clone
     state: started
 
 - name: Destroy a container
-  lxc_container:
+  community.general.lxc_container:
     name: '{{ item }}'
     state: absent
   with_items:

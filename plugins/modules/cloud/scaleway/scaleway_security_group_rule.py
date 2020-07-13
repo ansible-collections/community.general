@@ -86,7 +86,7 @@ options:
 
 EXAMPLES = '''
   - name: Create a Security Group Rule
-    scaleway_security_group_rule:
+    community.general.scaleway_security_group_rule:
       state: present
       region: par1
       protocol: TCP

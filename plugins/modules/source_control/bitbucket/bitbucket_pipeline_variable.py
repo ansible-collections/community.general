@@ -64,7 +64,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Create or update pipeline variables from the list
-  bitbucket_pipeline_variable:
+  community.general.bitbucket_pipeline_variable:
     repository: 'bitbucket-repo'
     username: bitbucket_username
     name: '{{ item.name }}'
@@ -76,7 +76,7 @@ EXAMPLES = r'''
     - { name: AWS_SECRET, value: qwe789poi123vbn0, secured: True }
 
 - name: Remove pipeline variable
-  bitbucket_pipeline_variable:
+  community.general.bitbucket_pipeline_variable:
     repository: bitbucket-repo
     username: bitbucket_username
     name: AWS_ACCESS_KEY

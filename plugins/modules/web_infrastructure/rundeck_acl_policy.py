@@ -73,7 +73,7 @@ extends_documentation_fragment: url
 
 EXAMPLES = '''
 - name: Create or update a rundeck ACL policy in project Ansible
-  rundeck_acl_policy:
+  community.general.rundeck_acl_policy:
     name: "Project_01"
     api_version: 18
     url: "https://rundeck.example.org"
@@ -91,7 +91,7 @@ EXAMPLES = '''
         group: "build"
 
 - name: Remove a rundeck system policy
-  rundeck_acl_policy:
+  community.general.rundeck_acl_policy:
     name: "Project_02"
     url: "https://rundeck.example.org"
     token: "mytoken"

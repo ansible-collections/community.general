@@ -176,43 +176,43 @@ author:
 
 EXAMPLES = '''
 - name: Make sure package foo is installed
-  portage:
+  community.general.portage:
     package: foo
     state: present
 
 - name: Make sure package foo is not installed
-  portage:
+  community.general.portage:
     package: foo
     state: absent
 
 - name: Update package foo to the latest version (os specific alternative to latest)
-  portage:
+  community.general.portage:
     package: foo
     update: yes
 
 - name: Install package foo using PORTAGE_BINHOST setup
-  portage:
+  community.general.portage:
     package: foo
     getbinpkg: yes
 
 - name: Re-install world from binary packages only and do not allow any compiling
-  portage:
+  community.general.portage:
     package: '@world'
     usepkgonly: yes
 
 - name: Sync repositories and update world
-  portage:
+  community.general.portage:
     package: '@world'
     update: yes
     deep: yes
     sync: yes
 
 - name: Remove unneeded packages
-  portage:
+  community.general.portage:
     depclean: yes
 
 - name: Remove package foo if it is not explicitly needed
-  portage:
+  community.general.portage:
     package: foo
     state: absent
     depclean: yes

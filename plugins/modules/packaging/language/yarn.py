@@ -76,38 +76,38 @@ requirements:
 
 EXAMPLES = '''
 - name: Install "imagemin" node.js package.
-  yarn:
+  community.general.yarn:
     name: imagemin
     path: /app/location
 
 - name: Install "imagemin" node.js package on version 5.3.1
-  yarn:
+  community.general.yarn:
     name: imagemin
     version: '5.3.1'
     path: /app/location
 
 - name: Install "imagemin" node.js package globally.
-  yarn:
+  community.general.yarn:
     name: imagemin
     global: yes
 
 - name: Remove the globally-installed package "imagemin".
-  yarn:
+  community.general.yarn:
     name: imagemin
     global: yes
     state: absent
 
 - name: Install "imagemin" node.js package from custom registry.
-  yarn:
+  community.general.yarn:
     name: imagemin
     registry: 'http://registry.mysite.com'
 
 - name: Install packages based on package.json.
-  yarn:
+  community.general.yarn:
     path: /app/location
 
 - name: Update all packages in package.json to their latest version.
-  yarn:
+  community.general.yarn:
     path: /app/location
     state: latest
 '''

@@ -71,14 +71,14 @@ options:
 
 EXAMPLES = r'''
 - name: Gather facts with SNMP version 2
-  snmp_facts:
+  community.general.snmp_facts:
     host: '{{ inventory_hostname }}'
     version: v2c
     community: public
   delegate_to: local
 
 - name: Gather facts using SNMP version 3
-  snmp_facts:
+  community.general.snmp_facts:
     host: '{{ inventory_hostname }}'
     version: v3
     level: authPriv

@@ -101,7 +101,7 @@ author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
 
 EXAMPLES = '''
 - name: Create multiple volumes
-  profitbricks_volume:
+  community.general.profitbricks_volume:
     datacenter: Tardis One
     name: vol%02d
     count: 5
@@ -110,7 +110,7 @@ EXAMPLES = '''
     state: present
 
 - name: Remove Volumes
-  profitbricks_volume:
+  community.general.profitbricks_volume:
     datacenter: Tardis One
     instance_ids:
       - 'vol01'

@@ -55,13 +55,13 @@ options:
 '''
 EXAMPLES = '''
 - name: Fetch packages for the solaris publisher direct from Oracle
-  pkg5_publisher:
+  community.general.pkg5_publisher:
     name: solaris
     sticky: true
     origin: https://pkg.oracle.com/solaris/support/
 
 - name: Configure a publisher for locally-produced packages
-  pkg5_publisher:
+  community.general.pkg5_publisher:
     name: site
     origin: 'https://pkg.example.com/site/'
 '''

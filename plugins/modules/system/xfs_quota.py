@@ -81,7 +81,7 @@ requirements:
 
 EXAMPLES = r'''
 - name: Set default project soft and hard limit on /opt of 1g
-  xfs_quota:
+  community.general.xfs_quota:
     type: project
     mountpoint: /opt
     bsoft: 1g
@@ -89,13 +89,13 @@ EXAMPLES = r'''
     state: present
 
 - name: Remove the default limits on /opt
-  xfs_quota:
+  community.general.xfs_quota:
     type: project
     mountpoint: /opt
     state: absent
 
 - name: Set default soft user inode limits on /home of 1024 inodes and hard of 2048
-  xfs_quota:
+  community.general.xfs_quota:
     type: user
     mountpoint: /home
     isoft: 1024

@@ -74,7 +74,7 @@ options:
 
 EXAMPLES = '''
   - name: Create website
-    webfaction_site:
+    community.general.webfaction_site:
       name: testsite1
       state: present
       host: myhost.webfaction.com

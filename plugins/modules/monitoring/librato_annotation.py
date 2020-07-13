@@ -61,7 +61,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a simple annotation event with a source
-  librato_annotation:
+  community.general.librato_annotation:
     user: user@example.com
     api_key: XXXXXXXXXXXXXXXXX
     title: App Config Change
@@ -69,7 +69,7 @@ EXAMPLES = '''
     description: This is a detailed description of the config change
 
 - name: Create an annotation that includes a link
-  librato_annotation:
+  community.general.librato_annotation:
     user: user@example.com
     api_key: XXXXXXXXXXXXXXXXXX
     name: code.deploy
@@ -80,7 +80,7 @@ EXAMPLES = '''
         href: http://www.example.com/deploy
 
 - name: Create an annotation with a start_time and end_time
-  librato_annotation:
+  community.general.librato_annotation:
     user: user@example.com
     api_key: XXXXXXXXXXXXXXXXXX
     name: maintenance

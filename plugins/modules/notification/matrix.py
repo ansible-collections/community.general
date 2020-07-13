@@ -46,7 +46,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Send matrix notification with token
-  matrix:
+  community.general.matrix:
     msg_plain: "**hello world**"
     msg_html: "<b>hello world</b>"
     room_id: "!12345678:server.tld"
@@ -54,7 +54,7 @@ EXAMPLES = '''
     token: "{{ matrix_auth_token }}"
 
 - name: Send matrix notification with user_id and password
-  matrix:
+  community.general.matrix:
     msg_plain: "**hello world**"
     msg_html: "<b>hello world</b>"
     room_id: "!12345678:server.tld"

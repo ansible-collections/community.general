@@ -51,11 +51,11 @@ author:
 
 EXAMPLES = '''
 - name: Inspect a single image
-  docker_image_info:
+  community.general.docker_image_info:
     name: pacur/centos-7
 
 - name: Inspect multiple images
-  docker_image_info:
+  community.general.docker_image_info:
     name:
       - pacur/centos-7
       - sinatra

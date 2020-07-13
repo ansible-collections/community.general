@@ -42,17 +42,17 @@ author: "berenddeboer (@berenddeboer)"
 
 EXAMPLES = '''
 - name: Install package foo
-  portinstall:
+  community.general.portinstall:
     name: foo
     state: present
 
 - name: Install package security/cyrus-sasl2-saslauthd
-  portinstall:
+  community.general.portinstall:
     name: security/cyrus-sasl2-saslauthd
     state: present
 
 - name: Remove packages foo and bar
-  portinstall:
+  community.general.portinstall:
     name: foo,bar
     state: absent
 '''

@@ -74,7 +74,7 @@ options:
 
 EXAMPLES = '''
 - name: Trigger an incident with just the basic options
-  pagerduty_alert:
+  community.general.pagerduty_alert:
     name: companyabc
     integration_key: xxx
     api_key: yourapikey
@@ -83,7 +83,7 @@ EXAMPLES = '''
     desc: problem that led to this trigger
 
 - name: Trigger an incident with more options
-  pagerduty_alert:
+  community.general.pagerduty_alert:
     integration_key: xxx
     api_key: yourapikey
     service_id: PDservice
@@ -94,7 +94,7 @@ EXAMPLES = '''
     client_url: http://service.example.com
 
 - name: Acknowledge an incident based on incident_key
-  pagerduty_alert:
+  community.general.pagerduty_alert:
     integration_key: xxx
     api_key: yourapikey
     service_id: PDservice
@@ -103,7 +103,7 @@ EXAMPLES = '''
     desc: "some text for incident's log"
 
 - name: Resolve an incident based on incident_key
-  pagerduty_alert:
+  community.general.pagerduty_alert:
     integration_key: xxx
     api_key: yourapikey
     service_id: PDservice

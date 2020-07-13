@@ -63,7 +63,7 @@ options:
 EXAMPLES = """
 
     - name: Create SVM
-      na_cdot_svm:
+      community.general.na_cdot_svm:
         state: present
         name: ansibleVServer
         root_volume: vol1

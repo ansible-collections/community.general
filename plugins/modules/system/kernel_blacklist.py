@@ -33,7 +33,7 @@ options:
 
 EXAMPLES = '''
 - name: Blacklist the nouveau driver module
-  kernel_blacklist:
+  community.general.kernel_blacklist:
     name: nouveau
     state: present
 '''

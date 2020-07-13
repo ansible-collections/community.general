@@ -50,21 +50,21 @@ requirements: [ homebrew ]
 
 EXAMPLES = '''
 - name: Tap a Homebrew repository, state present
-  homebrew_tap:
+  community.general.homebrew_tap:
     name: homebrew/dupes
 
 - name: Tap a Homebrew repository, state absent
-  homebrew_tap:
+  community.general.homebrew_tap:
     name: homebrew/dupes
     state: absent
 
 - name: Tap a Homebrew repository, state present
-  homebrew_tap:
+  community.general.homebrew_tap:
     name: homebrew/dupes,homebrew/science
     state: present
 
 - name: Tap a Homebrew repository using url, state present
-  homebrew_tap:
+  community.general.homebrew_tap:
     name: telemachus/brew
     url: 'https://bitbucket.org/telemachus/brew'
 '''

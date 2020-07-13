@@ -67,7 +67,7 @@ options:
 EXAMPLES = '''
 # Create DNS record for www.domain.com
 - name: Create DNS record
-  memset_zone_record:
+  community.general.memset_zone_record:
     api_key: dcf089a2896940da9ffefb307ef49ccd
     state: present
     zone: domain.com
@@ -80,7 +80,7 @@ EXAMPLES = '''
 
 # create an SPF record for domain.com
 - name: Create SPF record for domain.com
-  memset_zone_record:
+  community.general.memset_zone_record:
     api_key: dcf089a2896940da9ffefb307ef49ccd
     state: present
     zone: domain.com
@@ -90,7 +90,7 @@ EXAMPLES = '''
 
 # create multiple DNS records
 - name: Create multiple DNS records
-  memset_zone_record:
+  community.general.memset_zone_record:
     api_key: dcf089a2896940da9ffefb307ef49ccd
     zone: "{{ item.zone }}"
     type: "{{ item.type }}"

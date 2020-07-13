@@ -87,7 +87,7 @@ author:
 EXAMPLES = r'''
 # Before Ansible 2.3, option 'dest' was used instead of 'path'
 - name: Ensure "fav=lemonade is in section "[drinks]" in specified file
-  ini_file:
+  community.general.ini_file:
     path: /etc/conf
     section: drinks
     option: fav
@@ -96,7 +96,7 @@ EXAMPLES = r'''
     backup: yes
 
 - name: Ensure "temperature=cold is in section "[drinks]" in specified file
-  ini_file:
+  community.general.ini_file:
     path: /etc/anotherconf
     section: drinks
     option: temperature

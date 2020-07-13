@@ -40,13 +40,13 @@ notes:
 '''
 EXAMPLES = '''
 - name: Track nginx logs
-  logentries:
+  community.general.logentries:
     path: /var/log/nginx/access.log
     state: present
     name: nginx-access-log
 
 - name: Stop tracking nginx logs
-  logentries:
+  community.general.logentries:
     path: /var/log/nginx/error.log
     state: absent
 '''

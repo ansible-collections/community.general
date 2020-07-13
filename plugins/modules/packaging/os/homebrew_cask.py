@@ -80,57 +80,57 @@ options:
 '''
 EXAMPLES = '''
 - name: Install cask
-  homebrew_cask:
+  community.general.homebrew_cask:
     name: alfred
     state: present
 
 - name: Remove cask
-  homebrew_cask:
+  community.general.homebrew_cask:
     name: alfred
     state: absent
 
 - name: Install cask with install options
-  homebrew_cask:
+  community.general.homebrew_cask:
     name: alfred
     state: present
     install_options: 'appdir=/Applications'
 
 - name: Install cask with install options
-  homebrew_cask:
+  community.general.homebrew_cask:
     name: alfred
     state: present
     install_options: 'debug,appdir=/Applications'
 
 - name: Allow external app
-  homebrew_cask:
+  community.general.homebrew_cask:
     name: alfred
     state: present
     accept_external_apps: True
 
 - name: Remove cask with force option
-  homebrew_cask:
+  community.general.homebrew_cask:
     name: alfred
     state: absent
     install_options: force
 
 - name: Upgrade all casks
-  homebrew_cask:
+  community.general.homebrew_cask:
     upgrade_all: true
 
 - name: Upgrade given cask with force option
-  homebrew_cask:
+  community.general.homebrew_cask:
     name: alfred
     state: upgraded
     install_options: force
 
 - name: Upgrade cask with greedy option
-  homebrew_cask:
+  community.general.homebrew_cask:
     name: 1password
     state: upgraded
     greedy: True
 
 - name: Using sudo password for installing cask
-  homebrew_cask:
+  community.general.homebrew_cask:
     name: wireshark
     state: present
     sudo_password: "{{ ansible_become_pass }}"

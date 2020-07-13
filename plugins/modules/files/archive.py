@@ -63,22 +63,22 @@ author:
 
 EXAMPLES = r'''
 - name: Compress directory /path/to/foo/ into /path/to/foo.tgz
-  archive:
+  community.general.archive:
     path: /path/to/foo
     dest: /path/to/foo.tgz
 
 - name: Compress regular file /path/to/foo into /path/to/foo.gz and remove it
-  archive:
+  community.general.archive:
     path: /path/to/foo
     remove: yes
 
 - name: Create a zip archive of /path/to/foo
-  archive:
+  community.general.archive:
     path: /path/to/foo
     format: zip
 
 - name: Create a bz2 archive of multiple files, rooted at /path
-  archive:
+  community.general.archive:
     path:
     - /path/to/foo
     - /path/wong/foo
@@ -86,7 +86,7 @@ EXAMPLES = r'''
     format: bz2
 
 - name: Create a bz2 archive of a globbed path, while excluding specific dirnames
-  archive:
+  community.general.archive:
     path:
     - /path/to/foo/*
     dest: /path/file.tar.bz2
@@ -96,7 +96,7 @@ EXAMPLES = r'''
     format: bz2
 
 - name: Create a bz2 archive of a globbed path, while excluding a glob of dirnames
-  archive:
+  community.general.archive:
     path:
     - /path/to/foo/*
     dest: /path/file.tar.bz2
@@ -105,13 +105,13 @@ EXAMPLES = r'''
     format: bz2
 
 - name: Use gzip to compress a single archive (i.e don't archive it first with tar)
-  archive:
+  community.general.archive:
     path: /path/to/foo/single.file
     dest: /path/file.gz
     format: gz
 
 - name: Create a tar.gz archive of a single file.
-  archive:
+  community.general.archive:
     path: /path/to/foo/single.file
     dest: /path/file.tar.gz
     format: gz

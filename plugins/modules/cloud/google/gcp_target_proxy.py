@@ -45,7 +45,7 @@ options:
 
 EXAMPLES = '''
 - name: Create Minimum HTTP Target_Proxy
-  gcp_target_proxy:
+  community.general.gcp_target_proxy:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"

@@ -78,26 +78,26 @@ author: "Alex Coomans (@drcapulet)"
 
 EXAMPLES = '''
 - name: Authenticate using email and API token and fetch all domains
-  dnsimple:
+  community.general.dnsimple:
     account_email: test@example.com
     account_api_token: dummyapitoken
   delegate_to: localhost
 
 - name: Fetch my.com domain records
-  dnsimple:
+  community.general.dnsimple:
     domain: my.com
     state: present
   delegate_to: localhost
   register: records
 
 - name: Delete a domain
-  dnsimple:
+  community.general.dnsimple:
     domain: my.com
     state: absent
   delegate_to: localhost
 
 - name: Create a test.my.com A record to point to 127.0.0.1
-  dnsimple:
+  community.general.dnsimple:
     domain: my.com
     record: test
     type: A
@@ -106,14 +106,14 @@ EXAMPLES = '''
   register: record
 
 - name: Delete record using record_ids
-  dnsimple:
+  community.general.dnsimple:
     domain: my.com
     record_ids: '{{ record["id"] }}'
     state: absent
   delegate_to: localhost
 
 - name: Create a my.com CNAME record to example.com
-  dnsimple:
+  community.general.dnsimple:
     domain: my.com
     record: ''
     type: CNAME
@@ -122,7 +122,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Change TTL value for a record
-  dnsimple:
+  community.general.dnsimple:
     domain: my.com
     record: ''
     type: CNAME
@@ -132,7 +132,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Delete the record
-  dnsimple:
+  community.general.dnsimple:
     domain: my.com
     record: ''
     type: CNAME

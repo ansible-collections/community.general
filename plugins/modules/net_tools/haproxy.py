@@ -95,25 +95,25 @@ options:
 
 EXAMPLES = r'''
 - name: Disable server in 'www' backend pool
-  haproxy:
+  community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
     backend: www
 
 - name: Disable server without backend pool name (apply to all available backend pool)
-  haproxy:
+  community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
 
 - name: Disable server, provide socket file
-  haproxy:
+  community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
     socket: /var/run/haproxy.sock
     backend: www
 
 - name: Disable server, provide socket file, wait until status reports in maintenance
-  haproxy:
+  community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
     socket: /var/run/haproxy.sock
@@ -123,7 +123,7 @@ EXAMPLES = r'''
 # Place server in drain mode, providing a socket file.  Then check the server's
 # status every minute to see if it changes to maintenance mode, continuing if it
 # does in an hour and failing otherwise.
-- haproxy:
+- community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
     socket: /var/run/haproxy.sock
@@ -134,7 +134,7 @@ EXAMPLES = r'''
     wait_retries: 60
 
 - name: Disable backend server in 'www' backend pool and drop open sessions to it
-  haproxy:
+  community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
     backend: www
@@ -142,26 +142,26 @@ EXAMPLES = r'''
     shutdown_sessions: yes
 
 - name: Disable server without backend pool name (apply to all available backend pool) but fail when the backend host is not found
-  haproxy:
+  community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
     fail_on_not_found: yes
 
 - name: Enable server in 'www' backend pool
-  haproxy:
+  community.general.haproxy:
     state: enabled
     host: '{{ inventory_hostname }}'
     backend: www
 
 - name: Enable server in 'www' backend pool wait until healthy
-  haproxy:
+  community.general.haproxy:
     state: enabled
     host: '{{ inventory_hostname }}'
     backend: www
     wait: yes
 
 - name: Enable server in 'www' backend pool wait until healthy. Retry 10 times with intervals of 5 seconds to retrieve the health
-  haproxy:
+  community.general.haproxy:
     state: enabled
     host: '{{ inventory_hostname }}'
     backend: www
@@ -170,7 +170,7 @@ EXAMPLES = r'''
     wait_interval: 5
 
 - name: Enable server in 'www' backend pool with change server(s) weight
-  haproxy:
+  community.general.haproxy:
     state: enabled
     host: '{{ inventory_hostname }}'
     socket: /var/run/haproxy.sock
@@ -178,7 +178,7 @@ EXAMPLES = r'''
     backend: www
 
 - name: Set the server in 'www' backend pool to drain mode
-  haproxy:
+  community.general.haproxy:
     state: drain
     host: '{{ inventory_hostname }}'
     socket: /var/run/haproxy.sock

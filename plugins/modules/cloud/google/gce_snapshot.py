@@ -56,7 +56,7 @@ author: Rob Wagner (@robwagner33)
 
 EXAMPLES = '''
 - name: Create gce snapshot
-  gce_snapshot:
+  community.general.gce_snapshot:
     instance_name: example-instance
     snapshot_name: example-snapshot
     state: present
@@ -66,7 +66,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Delete gce snapshot
-  gce_snapshot:
+  community.general.gce_snapshot:
     instance_name: example-instance
     snapshot_name: example-snapshot
     state: absent
@@ -78,7 +78,7 @@ EXAMPLES = '''
 # This example creates snapshots for only two of the available disks as
 # disk0-example-snapshot and disk1-example-snapshot
 - name: Create snapshots of specific disks
-  gce_snapshot:
+  community.general.gce_snapshot:
     instance_name: example-instance
     snapshot_name: example-snapshot
     state: present

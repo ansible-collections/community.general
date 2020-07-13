@@ -66,7 +66,7 @@ options:
 
 EXAMPLES = '''
 - name: Configure a CNAME record
-  nios_cname_record:
+  community.general.nios_cname_record:
     name: cname.ansible.com
     canonical: realhost.ansible.com
     state: present
@@ -77,7 +77,7 @@ EXAMPLES = '''
   connection: local
 
 - name: Add a comment to an existing CNAME record
-  nios_cname_record:
+  community.general.nios_cname_record:
     name: cname.ansible.com
     canonical: realhost.ansible.com
     comment: this is a test comment
@@ -89,7 +89,7 @@ EXAMPLES = '''
   connection: local
 
 - name: Remove a CNAME record from the system
-  nios_cname_record:
+  community.general.nios_cname_record:
     name: cname.ansible.com
     canonical: realhost.ansible.com
     state: absent

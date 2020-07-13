@@ -139,7 +139,7 @@ notes:
 EXAMPLES = '''
 
 - name: Create a new Linode
-  linode:
+  community.general.linode:
     name: linode-test1
     plan: 1
     datacenter: 7
@@ -148,7 +148,7 @@ EXAMPLES = '''
   register: linode_creation
 
 - name: Create a server with a private IP Address
-  linode:
+  community.general.linode:
      module: linode
      api_key: 'longStringFromLinodeApi'
      name: linode-test1
@@ -166,7 +166,7 @@ EXAMPLES = '''
   register: linode_creation
 
 - name: Fully configure new server
-  linode:
+  community.general.linode:
      api_key: 'longStringFromLinodeApi'
      name: linode-test1
      plan: 4
@@ -201,7 +201,7 @@ EXAMPLES = '''
   register: linode_creation
 
 - name: Ensure a running server (create if missing)
-  linode:
+  community.general.linode:
      api_key: 'longStringFromLinodeApi'
      name: linode-test1
      plan: 1
@@ -217,7 +217,7 @@ EXAMPLES = '''
   register: linode_creation
 
 - name: Delete a server
-  linode:
+  community.general.linode:
      api_key: 'longStringFromLinodeApi'
      name: linode-test1
      linode_id: "{{ linode_creation.instance.id }}"
@@ -225,7 +225,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Stop a server
-  linode:
+  community.general.linode:
      api_key: 'longStringFromLinodeApi'
      name: linode-test1
      linode_id: "{{ linode_creation.instance.id }}"
@@ -233,7 +233,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Reboot a server
-  linode:
+  community.general.linode:
      api_key: 'longStringFromLinodeApi'
      name: linode-test1
      linode_id: "{{ linode_creation.instance.id }}"

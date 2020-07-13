@@ -95,14 +95,14 @@ notes:
 
 EXAMPLES = '''
 - name: Add or modify nofile soft limit for the user joe
-  pam_limits:
+  community.general.pam_limits:
     domain: joe
     limit_type: soft
     limit_item: nofile
     value: 64000
 
 - name: Add or modify fsize hard limit for the user smith. Keep or set the maximal value.
-  pam_limits:
+  community.general.pam_limits:
     domain: smith
     limit_type: hard
     limit_item: fsize
@@ -110,7 +110,7 @@ EXAMPLES = '''
     use_max: yes
 
 - name: Add or modify memlock, both soft and hard, limit for the user james with a comment.
-  pam_limits:
+  community.general.pam_limits:
     domain: james
     limit_type: '-'
     limit_item: memlock
@@ -118,7 +118,7 @@ EXAMPLES = '''
     comment: unlimited memory lock for james
 
 - name: Add or modify hard nofile limits for wildcard domain
-  pam_limits:
+  community.general.pam_limits:
     domain: '*'
     limit_type: hard
     limit_item: nofile

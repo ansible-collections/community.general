@@ -84,53 +84,53 @@ EXAMPLES = '''
   gather_facts: False
   tasks:
     - name: "Get objects from test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         dest: ~/Downloads/testcont
 
     - name: "Get single object from test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         src: file1
         dest: ~/Downloads/testcont
 
     - name: "Get several objects from test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         src: file1,file2,file3
         dest: ~/Downloads/testcont
 
     - name: "Delete one object in test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: delete
         dest: file1
 
     - name: "Delete several objects in test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: delete
         dest: file2,file3,file4
 
     - name: "Delete all objects in test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: delete
 
     - name: "Upload all files to test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: put
         src: ~/Downloads/onehundred
 
     - name: "Upload one file to test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: put
         src: ~/Downloads/testcont/file1
 
     - name: "Upload one file to test container with metadata"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         src: ~/Downloads/testcont/file2
         method: put
@@ -139,14 +139,14 @@ EXAMPLES = '''
           who_uploaded_this: someuser@example.com
 
     - name: "Upload one file to test container with TTL of 60 seconds"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: put
         src: ~/Downloads/testcont/file3
         expires: 60
 
     - name: "Attempt to get remote object that does not exist"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: get
         src: FileThatDoesNotExist.jpg
@@ -154,7 +154,7 @@ EXAMPLES = '''
       ignore_errors: yes
 
     - name: "Attempt to delete remote object that does not exist"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: delete
         dest: FileThatDoesNotExist.jpg
@@ -165,19 +165,19 @@ EXAMPLES = '''
   gather_facts: false
   tasks:
     - name: "Get metadata on one object"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         type: meta
         dest: file2
 
     - name: "Get metadata on several objects"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         type: meta
         src: file2,file1
 
     - name: "Set metadata on an object"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         type: meta
         dest: file17
@@ -188,13 +188,13 @@ EXAMPLES = '''
         clear_meta: true
 
     - name: "Verify metadata is set"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         type: meta
         src: file17
 
     - name: "Delete metadata"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         type: meta
         dest: file17
@@ -204,7 +204,7 @@ EXAMPLES = '''
           key2: ''
 
     - name: "Get metadata on all objects"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         type: meta
 '''

@@ -44,17 +44,17 @@ options:
 
 EXAMPLES = '''
 - name: "Add SSH key"
-  scaleway_sshkey:
+  community.general.scaleway_sshkey:
     ssh_pub_key: "ssh-rsa AAAA..."
     state: "present"
 
 - name: "Delete SSH key"
-  scaleway_sshkey:
+  community.general.scaleway_sshkey:
     ssh_pub_key: "ssh-rsa AAAA..."
     state: "absent"
 
 - name: "Add SSH key with explicit token"
-  scaleway_sshkey:
+  community.general.scaleway_sshkey:
     ssh_pub_key: "ssh-rsa AAAA..."
     state: "present"
     oauth_token: "6ecd2c9b-6f4f-44d4-a187-61a92078d08c"

@@ -81,7 +81,7 @@ options:
 
 EXAMPLES = """
 - name: Create LUN
-  na_cdot_lun:
+  community.general.na_cdot_lun:
     state: present
     name: ansibleLUN
     flexvol_name: ansibleVolume
@@ -93,7 +93,7 @@ EXAMPLES = """
     password: "{{ netapp_password }}"
 
 - name: Resize Lun
-  na_cdot_lun:
+  community.general.na_cdot_lun:
     state: present
     name: ansibleLUN
     force_resize: True

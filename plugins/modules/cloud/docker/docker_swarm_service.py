@@ -891,7 +891,7 @@ rebuilt:
 
 EXAMPLES = '''
 - name: Set command and arguments
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: alpine
     command: sleep
@@ -899,7 +899,7 @@ EXAMPLES = '''
       - "3600"
 
 - name: Set a bind mount
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: alpine
     mounts:
@@ -908,7 +908,7 @@ EXAMPLES = '''
         type: bind
 
 - name: Set service labels
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: alpine
     labels:
@@ -916,7 +916,7 @@ EXAMPLES = '''
       com.example.department: "Finance"
 
 - name: Set environment variables
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: alpine
     env:
@@ -927,7 +927,7 @@ EXAMPLES = '''
       - envs/apps/web.env
 
 - name: Set fluentd logging
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: alpine
     logging:
@@ -938,7 +938,7 @@ EXAMPLES = '''
         tag: myservice
 
 - name: Set restart policies
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: alpine
     restart_config:
@@ -948,7 +948,7 @@ EXAMPLES = '''
       window: 120s
 
 - name: Set update config
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: alpine
     update_config:
@@ -957,7 +957,7 @@ EXAMPLES = '''
       order: stop-first
 
 - name: Set rollback config
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: alpine
     update_config:
@@ -968,7 +968,7 @@ EXAMPLES = '''
       order: stop-first
 
 - name: Set placement preferences
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: alpine:edge
     placement:
@@ -979,7 +979,7 @@ EXAMPLES = '''
         - engine.labels.operatingsystem == ubuntu 14.04
 
 - name: Set configs
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: alpine:edge
     configs:
@@ -987,14 +987,14 @@ EXAMPLES = '''
         filename: "/tmp/config.txt"
 
 - name: Set networks
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: alpine:edge
     networks:
       - mynetwork
 
 - name: Set networks as a dictionary
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: alpine:edge
     networks:
@@ -1005,7 +1005,7 @@ EXAMPLES = '''
           foo: bar
 
 - name: Set secrets
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: alpine:edge
     secrets:
@@ -1013,7 +1013,7 @@ EXAMPLES = '''
         filename: "/run/secrets/secret.txt"
 
 - name: Start service with healthcheck
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: nginx:1.13
     healthcheck:
@@ -1026,7 +1026,7 @@ EXAMPLES = '''
       start_period: 30s
 
 - name: Configure service resources
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     image: alpine:edge
     reservations:
@@ -1037,7 +1037,7 @@ EXAMPLES = '''
       memory: 50M
 
 - name: Remove service
-  docker_swarm_service:
+  community.general.docker_swarm_service:
     name: myservice
     state: absent
 '''

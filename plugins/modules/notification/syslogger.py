@@ -45,18 +45,18 @@ author:
 
 EXAMPLES = r'''
 - name: Simple Usage
-  syslogger:
+  community.general.syslogger:
     msg: "I will end up as daemon.info"
 
 - name: Send a log message with err priority and user facility with log_pid
-  syslogger:
+  community.general.syslogger:
     msg: "Hello from Ansible"
     priority: "err"
     facility: "user"
     log_pid: true
 
 - name: Specify the name of application which is sending log message
-  syslogger:
+  community.general.syslogger:
     ident: "MyApp"
     msg: "I want to believe"
     priority: "alert"

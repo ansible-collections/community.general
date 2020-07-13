@@ -59,7 +59,7 @@ options:
 EXAMPLES = """
 
     - name: Create User Role
-      na_cdot_user_role:
+      community.general.na_cdot_user_role:
         state: present
         name: ansibleRole
         command_directory_name: DEFAULT

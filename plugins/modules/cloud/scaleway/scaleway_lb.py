@@ -80,7 +80,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a load-balancer
-  scaleway_lb:
+  community.general.scaleway_lb:
     name: foobar
     state: present
     organization_id: 951df375-e094-4d26-97c1-ba548eeb9c42
@@ -89,7 +89,7 @@ EXAMPLES = '''
       - hello
 
 - name: Delete a load-balancer
-  scaleway_lb:
+  community.general.scaleway_lb:
     name: foobar
     state: absent
     organization_id: 951df375-e094-4d26-97c1-ba548eeb9c42

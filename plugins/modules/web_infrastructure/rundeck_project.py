@@ -66,7 +66,7 @@ extends_documentation_fragment: url
 
 EXAMPLES = '''
 - name: Create a rundeck project
-  rundeck_project:
+  community.general.rundeck_project:
     name: "Project_01"
     api_version: 18
     url: "https://rundeck.example.org"
@@ -74,7 +74,7 @@ EXAMPLES = '''
     state: present
 
 - name: Remove a rundeck project
-  rundeck_project:
+  community.general.rundeck_project:
     name: "Project_02"
     url: "https://rundeck.example.org"
     token: "mytoken"

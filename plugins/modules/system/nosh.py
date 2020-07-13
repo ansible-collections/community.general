@@ -61,34 +61,34 @@ notes:
 
 EXAMPLES = '''
 - name: Start dnscache if not running
-  nosh: name=dnscache state=started
+  community.general.nosh: name=dnscache state=started
 
 - name: Stop mpd, if running
-  nosh: name=mpd state=stopped
+  community.general.nosh: name=mpd state=stopped
 
 - name: Restart unbound or start it if not already running
-  nosh:
+  community.general.nosh:
     name: unbound
     state: restarted
 
 - name: Reload fail2ban or start it if not already running
-  nosh:
+  community.general.nosh:
     name: fail2ban
     state: reloaded
 
 - name: Disable nsd
-  nosh: name=nsd enabled=no
+  community.general.nosh: name=nsd enabled=no
 
 - name: For package installers, set nginx running state according to local enable settings, preset and reset
-  nosh: name=nginx preset=True state=reset
+  community.general.nosh: name=nginx preset=True state=reset
 
 - name: Reboot the host if nosh is the system manager, would need a "wait_for*" task at least, not recommended as-is
-  nosh: name=reboot state=started
+  community.general.nosh: name=reboot state=started
 
 - name: Using conditionals with the module facts
   tasks:
     - name: Obtain information on tinydns service
-      nosh: name=tinydns
+      community.general.nosh: name=tinydns
       register: result
 
     - name: Fail if service not loaded

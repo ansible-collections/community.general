@@ -92,16 +92,16 @@ requirements:
 
 EXAMPLES = '''
 - name: Create a volume
-  docker_volume:
+  community.general.docker_volume:
     name: volume_one
 
 - name: Remove a volume
-  docker_volume:
+  community.general.docker_volume:
     name: volume_one
     state: absent
 
 - name: Create a volume with options
-  docker_volume:
+  community.general.docker_volume:
     name: volume_two
     driver_options:
       type: btrfs

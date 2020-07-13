@@ -34,7 +34,7 @@ options:
 
 EXAMPLES = r'''
 - name: Get value of failover IP 1.2.3.4
-  hetzner_failover_ip_info:
+  community.general.hetzner_failover_ip_info:
     hetzner_user: foo
     hetzner_password: bar
     failover_ip: 1.2.3.4

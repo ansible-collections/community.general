@@ -313,19 +313,19 @@ author:
 EXAMPLES = '''
 
 - name: Pull an image
-  docker_image:
+  community.general.docker_image:
     name: pacur/centos-7
     source: pull
 
 - name: Tag and push to docker hub
-  docker_image:
+  community.general.docker_image:
     name: pacur/centos-7:56
     repository: dcoppenhagan/myimage:7.56
     push: yes
     source: local
 
 - name: Tag and push to local registry
-  docker_image:
+  community.general.docker_image:
     # Image will be centos:7
     name: centos
     # Will be pushed to localhost:5000/centos:7
@@ -335,7 +335,7 @@ EXAMPLES = '''
     source: local
 
 - name: Add tag latest to image
-  docker_image:
+  community.general.docker_image:
     name: myimage:7.1.2
     repository: myimage:latest
     # As 'latest' usually already is present, we need to enable overwriting of existing tags:
@@ -343,13 +343,13 @@ EXAMPLES = '''
     source: local
 
 - name: Remove image
-  docker_image:
+  community.general.docker_image:
     state: absent
     name: registry.ansible.com/chouseknecht/sinatra
     tag: v1
 
 - name: Build an image and push it to a private repo
-  docker_image:
+  community.general.docker_image:
     build:
       path: ./sinatra
     name: registry.ansible.com/chouseknecht/sinatra
@@ -358,14 +358,14 @@ EXAMPLES = '''
     source: build
 
 - name: Archive image
-  docker_image:
+  community.general.docker_image:
     name: registry.ansible.com/chouseknecht/sinatra
     tag: v1
     archive_path: my_sinatra.tar
     source: local
 
 - name: Load image from archive and push to a private registry
-  docker_image:
+  community.general.docker_image:
     name: localhost:5000/myimages/sinatra
     tag: v1
     push: yes
@@ -373,7 +373,7 @@ EXAMPLES = '''
     source: load
 
 - name: Build image and with build args
-  docker_image:
+  community.general.docker_image:
     name: myimage
     build:
       path: /path/to/build/dir
@@ -383,7 +383,7 @@ EXAMPLES = '''
     source: build
 
 - name: Build image using cache source
-  docker_image:
+  community.general.docker_image:
     name: myimage:latest
     build:
       path: /path/to/build/dir

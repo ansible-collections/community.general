@@ -77,7 +77,7 @@ notes:
 
 EXAMPLES = '''
 - name: Add a new read-only deploy key to a GitHub repository using basic authentication
-  github_deploy_key:
+  community.general.github_deploy_key:
     owner: "johndoe"
     repo: "example"
     name: "new-deploy-key"
@@ -87,7 +87,7 @@ EXAMPLES = '''
     password: "supersecretpassword"
 
 - name: Remove an existing deploy key from a GitHub repository
-  github_deploy_key:
+  community.general.github_deploy_key:
     owner: "johndoe"
     repository: "example"
     name: "new-deploy-key"
@@ -98,7 +98,7 @@ EXAMPLES = '''
     state: absent
 
 - name: Add a new deploy key to a GitHub repository, replace an existing key, use an OAuth2 token to authenticate
-  github_deploy_key:
+  community.general.github_deploy_key:
     owner: "johndoe"
     repository: "example"
     name: "new-deploy-key"
@@ -107,7 +107,7 @@ EXAMPLES = '''
     token: "ABAQDAwXxn7kIMNWzcDfo..."
 
 - name: Re-add a deploy key to a GitHub repository but with a different name
-  github_deploy_key:
+  community.general.github_deploy_key:
     owner: "johndoe"
     repository: "example"
     name: "replace-deploy-key"
@@ -116,7 +116,7 @@ EXAMPLES = '''
     password: "supersecretpassword"
 
 - name: Add a new deploy key to a GitHub repository using 2FA
-  github_deploy_key:
+  community.general.github_deploy_key:
     owner: "johndoe"
     repo: "example"
     name: "new-deploy-key-2"
@@ -126,7 +126,7 @@ EXAMPLES = '''
     otp: 123456
 
 - name: Add a read-only deploy key to a repository hosted on GitHub Enterprise
-  github_deploy_key:
+  community.general.github_deploy_key:
     github_url: "https://api.example.com"
     owner: "janedoe"
     repo: "example"

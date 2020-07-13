@@ -37,7 +37,7 @@ options:
 
 EXAMPLES = r'''
 - name: Gather Scaleway ips facts
-  scaleway_ip_facts:
+  community.general.scaleway_ip_facts:
     region: par1
 '''
 

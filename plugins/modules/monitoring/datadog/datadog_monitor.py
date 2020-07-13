@@ -139,7 +139,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a metric monitor
-  datadog_monitor:
+  community.general.datadog_monitor:
     type: "metric alert"
     name: "Test monitor"
     state: "present"
@@ -149,14 +149,14 @@ EXAMPLES = '''
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
 - name: Deletes a monitor
-  datadog_monitor:
+  community.general.datadog_monitor:
     name: "Test monitor"
     state: "absent"
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
 - name: Mutes a monitor
-  datadog_monitor:
+  community.general.datadog_monitor:
     name: "Test monitor"
     state: "mute"
     silenced: '{"*":None}'
@@ -164,14 +164,14 @@ EXAMPLES = '''
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
 - name: Unmutes a monitor
-  datadog_monitor:
+  community.general.datadog_monitor:
     name: "Test monitor"
     state: "unmute"
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
 - name: Use datadoghq.eu platform instead of datadoghq.com
-  datadog_monitor:
+  community.general.datadog_monitor:
     name: "Test monitor"
     state: "absent"
     api_host: https://api.datadoghq.eu

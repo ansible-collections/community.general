@@ -57,7 +57,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Create virtual machine preset 'vmi-preset-small'
-  kubevirt_preset:
+  community.general.kubevirt_preset:
       state: present
       name: vmi-preset-small
       namespace: vms
@@ -67,7 +67,7 @@ EXAMPLES = '''
             kubevirt.io/vmPreset: vmi-preset-small
 
 - name: Remove virtual machine preset 'vmi-preset-small'
-  kubevirt_preset:
+  community.general.kubevirt_preset:
       state: absent
       name: vmi-preset-small
       namespace: vms

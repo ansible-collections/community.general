@@ -100,13 +100,13 @@ EXAMPLES = '''
         state: present
 
     - name: Attach testvol to testdev
-      packet_volume_attachment:
+      community.general.packet_volume_attachment:
         project_id: "{{ project_id }}"
         volume: "{{ volname }}"
         device: "{{ devname }}"
 
     - name: Detach testvol from testdev
-      packet_volume_attachment:
+      community.general.packet_volume_attachment:
         project_id: "{{ project_id }}"
         volume: "{{ volname }}"
         device: "{{ devname }}"

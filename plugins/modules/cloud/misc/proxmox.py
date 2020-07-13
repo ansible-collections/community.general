@@ -149,7 +149,7 @@ author: Sergei Antipov (@UnderGreen)
 
 EXAMPLES = r'''
 - name: Create new container with minimal options
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -160,7 +160,7 @@ EXAMPLES = r'''
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
 - name: Create new container with hookscript and description
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -173,7 +173,7 @@ EXAMPLES = r'''
     description: created with ansible
 
 - name: Create new container automatically selecting the next available vmid.
-  proxmox:
+  community.general.proxmox:
     node: 'uk-mc02'
     api_user: 'root@pam'
     api_password: '1q2w3e'
@@ -183,7 +183,7 @@ EXAMPLES = r'''
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
 - name: Create new container with minimal options with force(it will rewrite existing container)
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -195,7 +195,7 @@ EXAMPLES = r'''
     force: yes
 
 - name: Create new container with minimal options use environment PROXMOX_PASSWORD variable(you should export it before)
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -205,7 +205,7 @@ EXAMPLES = r'''
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
 - name: Create new container with minimal options defining network interface with dhcp
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -217,7 +217,7 @@ EXAMPLES = r'''
     netif: '{"net0":"name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr0"}'
 
 - name: Create new container with minimal options defining network interface with static ip
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -229,7 +229,7 @@ EXAMPLES = r'''
     netif: '{"net0":"name=eth0,gw=192.168.0.1,ip=192.168.0.2/24,bridge=vmbr0"}'
 
 - name: Create new container with minimal options defining a mount with 8GB
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -241,7 +241,7 @@ EXAMPLES = r'''
     mounts: '{"mp0":"local:8,mp=/mnt/test/"}'
 
 - name: Create new container with minimal options defining a cpu core limit
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -253,7 +253,7 @@ EXAMPLES = r'''
     cores: 2
 
 - name: Start container
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -263,7 +263,7 @@ EXAMPLES = r'''
 - name: >
     Start container with mount. You should enter a 90-second timeout because servers
     with additional disks take longer to boot
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -272,7 +272,7 @@ EXAMPLES = r'''
     timeout: 90
 
 - name: Stop container
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -280,7 +280,7 @@ EXAMPLES = r'''
     state: stopped
 
 - name: Stop container with force
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -289,7 +289,7 @@ EXAMPLES = r'''
     state: stopped
 
 - name: Restart container(stopped or mounted container you can't restart)
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -297,7 +297,7 @@ EXAMPLES = r'''
     state: restarted
 
 - name: Remove container
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e

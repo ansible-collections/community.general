@@ -79,7 +79,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a PTR Record
-  nios_ptr_record:
+  community.general.nios_ptr_record:
     ipv4: 192.168.10.1
     ptrdname: host.ansible.com
     state: present
@@ -90,7 +90,7 @@ EXAMPLES = '''
   connection: local
 
 - name: Delete a PTR Record
-  nios_ptr_record:
+  community.general.nios_ptr_record:
     ipv4: 192.168.10.1
     ptrdname: host.ansible.com
     state: absent

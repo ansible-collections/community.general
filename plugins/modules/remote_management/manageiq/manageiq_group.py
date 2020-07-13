@@ -95,7 +95,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a group in ManageIQ with the role EvmRole-user and tenant 'my_tenant'
-  manageiq_group:
+  community.general.manageiq_group:
     description: 'MyGroup-user'
     role: 'EvmRole-user'
     tenant: 'my_tenant'
@@ -106,7 +106,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Create a group in ManageIQ with the role EvmRole-user and tenant with tenant_id 4
-  manageiq_group:
+  community.general.manageiq_group:
     description: 'MyGroup-user'
     role: 'EvmRole-user'
     tenant_id: 4
@@ -120,7 +120,7 @@ EXAMPLES = '''
   - Create or update a group in ManageIQ with the role EvmRole-user and tenant my_tenant.
   - Apply 3 prov_max_cpu and 2 department tags to the group.
   - Limit access to a cluster for the group.
-  manageiq_group:
+  community.general.manageiq_group:
     description: 'MyGroup-user'
     role: 'EvmRole-user'
     tenant: my_tenant
@@ -143,7 +143,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Delete a group in ManageIQ
-  manageiq_group:
+  community.general.manageiq_group:
     state: 'absent'
     description: 'MyGroup-user'
     manageiq_connection:
@@ -152,7 +152,7 @@ EXAMPLES = '''
       password: 'smartvm'
 
 - name: Delete a group in ManageIQ using a token
-  manageiq_group:
+  community.general.manageiq_group:
     state: 'absent'
     description: 'MyGroup-user'
     manageiq_connection:

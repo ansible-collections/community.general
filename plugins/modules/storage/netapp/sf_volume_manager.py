@@ -83,7 +83,7 @@ options:
 
 EXAMPLES = """
    - name: Create Volume
-     sf_volume_manager:
+     community.general.sf_volume_manager:
        hostname: "{{ solidfire_hostname }}"
        username: "{{ solidfire_username }}"
        password: "{{ solidfire_password }}"
@@ -96,7 +96,7 @@ EXAMPLES = """
        size_unit: gb
 
    - name: Update Volume
-     sf_volume_manager:
+     community.general.sf_volume_manager:
        hostname: "{{ solidfire_hostname }}"
        username: "{{ solidfire_username }}"
        password: "{{ solidfire_password }}"
@@ -106,7 +106,7 @@ EXAMPLES = """
        access: readWrite
 
    - name: Delete Volume
-     sf_volume_manager:
+     community.general.sf_volume_manager:
        hostname: "{{ solidfire_hostname }}"
        username: "{{ solidfire_username }}"
        password: "{{ solidfire_password }}"

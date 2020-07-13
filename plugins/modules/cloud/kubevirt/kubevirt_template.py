@@ -144,7 +144,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Create template 'mytemplate'
-  kubevirt_template:
+  community.general.kubevirt_template:
     state: present
     name: myvmtemplate
     namespace: templates
@@ -182,7 +182,7 @@ EXAMPLES = '''
         value: 1Gi
 
 - name: Remove template 'myvmtemplate'
-  kubevirt_template:
+  community.general.kubevirt_template:
     state: absent
     name: myvmtemplate
     namespace: templates

@@ -52,7 +52,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Gather facts
-  xenserver_guest_info:
+  community.general.xenserver_guest_info:
     hostname: "{{ xenserver_hostname }}"
     username: "{{ xenserver_username }}"
     password: "{{ xenserver_password }}"

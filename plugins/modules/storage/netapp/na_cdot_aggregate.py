@@ -50,7 +50,7 @@ options:
 
 EXAMPLES = """
 - name: Manage Aggregates
-  na_cdot_aggregate:
+  community.general.na_cdot_aggregate:
     state: present
     name: ansibleAggr
     disk_count: 1
@@ -59,7 +59,7 @@ EXAMPLES = """
     password: "{{ netapp_password }}"
 
 - name: Manage Aggregates
-  na_cdot_aggregate:
+  community.general.na_cdot_aggregate:
     state: present
     name: ansibleAggr
     hostname: "{{ netapp_hostname }}"

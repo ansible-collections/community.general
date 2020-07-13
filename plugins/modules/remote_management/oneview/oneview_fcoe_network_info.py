@@ -31,7 +31,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Gather information about all FCoE Networks
-  oneview_fcoe_network_info:
+  community.general.oneview_fcoe_network_info:
     config: /etc/oneview/oneview_config.json
   delegate_to: localhost
   register: result
@@ -40,7 +40,7 @@ EXAMPLES = '''
     msg: "{{ result.fcoe_networks }}"
 
 - name: Gather paginated, filtered and sorted information about FCoE Networks
-  oneview_fcoe_network_info:
+  community.general.oneview_fcoe_network_info:
     config: /etc/oneview/oneview_config.json
     params:
       start: 0
@@ -54,7 +54,7 @@ EXAMPLES = '''
     msg: "{{ result.fcoe_networks }}"
 
 - name: Gather information about a FCoE Network by name
-  oneview_fcoe_network_info:
+  community.general.oneview_fcoe_network_info:
     config: /etc/oneview/oneview_config.json
     name: Test FCoE Network Information
   delegate_to: localhost

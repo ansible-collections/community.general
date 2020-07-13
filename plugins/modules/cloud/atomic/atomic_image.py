@@ -45,12 +45,12 @@ options:
 
 EXAMPLES = '''
 - name: Execute the run command on rsyslog container image (atomic run rhel7/rsyslog)
-  atomic_image:
+  community.general.atomic_image:
     name: rhel7/rsyslog
     state: latest
 
 - name: Pull busybox to the OSTree backend
-  atomic_image:
+  community.general.atomic_image:
     name: busybox
     state: latest
     backend: ostree

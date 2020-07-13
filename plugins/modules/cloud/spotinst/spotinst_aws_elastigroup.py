@@ -467,7 +467,7 @@ EXAMPLES = '''
 - hosts: localhost
   tasks:
     - name: Create elastigroup
-      spotinst_aws_elastigroup:
+      community.general.spotinst_aws_elastigroup:
           state: present
           risk: 100
           availability_vs_cost: balanced
@@ -501,7 +501,7 @@ EXAMPLES = '''
 - hosts: localhost
   tasks:
     - name: Create elastigroup
-      spotinst_aws_elastigroup:
+      community.general.spotinst_aws_elastigroup:
           state: present
           account_id: act-1a9dd2b
           risk: 100
@@ -548,7 +548,7 @@ EXAMPLES = '''
 - hosts: localhost
   tasks:
     - name: Create elastigroup
-      spotinst_aws_elastigroup:
+      community.general.spotinst_aws_elastigroup:
           state: present
           account_id: act-1a9dd2b
           risk: 100
@@ -598,7 +598,7 @@ EXAMPLES = '''
 - hosts: localhost
   tasks:
     - name: Create elastigroup
-      spotinst_aws_elastigroup:
+      community.general.spotinst_aws_elastigroup:
           state: present
           risk: 100
           availability_vs_cost: balanced
@@ -638,7 +638,7 @@ EXAMPLES = '''
 - hosts: localhost
   tasks:
     - name: Create elastigroup
-      spotinst_aws_elastigroup:
+      community.general.spotinst_aws_elastigroup:
           state: present
           risk: 100
           availability_vs_cost: balanced
@@ -676,7 +676,7 @@ EXAMPLES = '''
 - hosts: localhost
   tasks:
     - name: Create elastigroup
-      spotinst_aws_elastigroup:
+      community.general.spotinst_aws_elastigroup:
           account_id: act-92d45673
           state: present
           risk: 100

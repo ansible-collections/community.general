@@ -39,7 +39,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Creates a Device Manager for the Brocade SAN provider with the given hostname and credentials
-  oneview_san_manager:
+  community.general.oneview_san_manager:
     config: /etc/oneview/oneview_config.json
     state: present
     data:
@@ -58,7 +58,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Ensure a Device Manager for the Cisco SAN Provider is present
-  oneview_san_manager:
+  community.general.oneview_san_manager:
     config: /etc/oneview/oneview_config.json
     state: present
     data:
@@ -80,7 +80,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Sets the SAN Manager connection information
-  oneview_san_manager:
+  community.general.oneview_san_manager:
     config: /etc/oneview/oneview_config.json
     state: connection_information_set
     data:
@@ -98,7 +98,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Refreshes the SAN Manager
-  oneview_san_manager:
+  community.general.oneview_san_manager:
     config: /etc/oneview/oneview_config.json
     state: present
     data:
@@ -107,7 +107,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Delete the SAN Manager recently created
-  oneview_san_manager:
+  community.general.oneview_san_manager:
     config: /etc/oneview/oneview_config.json
     state: absent
     data:

@@ -82,7 +82,7 @@ author:
 
 EXAMPLES = '''
 - name: Create a Keycloak group
-  keycloak_group:
+  community.general.keycloak_group:
     name: my-new-kc-group
     realm: MyCustomRealm
     state: present
@@ -94,7 +94,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Delete a keycloak group
-  keycloak_group:
+  community.general.keycloak_group:
     id: '9d59aa76-2755-48c6-b1af-beb70a82c3cd'
     state: absent
     realm: MyCustomRealm
@@ -106,7 +106,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Delete a Keycloak group based on name
-  keycloak_group:
+  community.general.keycloak_group:
     name: my-group-for-deletion
     state: absent
     auth_client_id: admin-cli
@@ -117,7 +117,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Update the name of a Keycloak group
-  keycloak_group:
+  community.general.keycloak_group:
     id: '9d59aa76-2755-48c6-b1af-beb70a82c3cd'
     name: an-updated-kc-group-name
     state: present
@@ -129,7 +129,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Create a keycloak group with some custom attributes
-  keycloak_group:
+  community.general.keycloak_group:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master

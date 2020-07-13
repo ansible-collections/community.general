@@ -74,7 +74,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Configure directory number 1 for example.com
-  ldap_attrs:
+  community.general.ldap_attrs:
     dn: olcDatabase={1}hdb,cn=config
     attributes:
         olcSuffix: dc=example,dc=com
@@ -82,7 +82,7 @@ EXAMPLES = r'''
 
 # The complex argument format is required here to pass a list of ACL strings.
 - name: Set up the ACL
-  ldap_attrs:
+  community.general.ldap_attrs:
     dn: olcDatabase={1}hdb,cn=config
     attributes:
         olcAccess:
@@ -100,7 +100,7 @@ EXAMPLES = r'''
 
 # An alternative approach with automatic X-ORDERED numbering
 - name: Set up the ACL
-  ldap_attrs:
+  community.general.ldap_attrs:
     dn: olcDatabase={1}hdb,cn=config
     attributes:
         olcAccess:
@@ -118,7 +118,7 @@ EXAMPLES = r'''
     state: exact
 
 - name: Declare some indexes
-  ldap_attrs:
+  community.general.ldap_attrs:
     dn: olcDatabase={1}hdb,cn=config
     attributes:
         olcDbIndex:
@@ -126,7 +126,7 @@ EXAMPLES = r'''
             - uid eq
 
 - name: Set up a root user, which we can use later to bootstrap the directory
-  ldap_attrs:
+  community.general.ldap_attrs:
     dn: olcDatabase={1}hdb,cn=config
     attributes:
         olcRootDN: cn=root,dc=example,dc=com
@@ -134,7 +134,7 @@ EXAMPLES = r'''
     state: exact
 
 - name: Remove an attribute with a specific value
-  ldap_attrs:
+  community.general.ldap_attrs:
     dn: uid=jdoe,ou=people,dc=example,dc=com
     attributes:
         description: "An example user account"
@@ -144,7 +144,7 @@ EXAMPLES = r'''
     bind_pw: password
 
 - name: Remove specified attribute(s) from an entry
-  ldap_attrs:
+  community.general.ldap_attrs:
     dn: uid=jdoe,ou=people,dc=example,dc=com
     attributes:
         description: []

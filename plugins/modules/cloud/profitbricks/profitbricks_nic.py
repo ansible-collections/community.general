@@ -60,7 +60,7 @@ author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
 
 EXAMPLES = '''
 - name: Create a NIC
-  profitbricks_nic:
+  community.general.profitbricks_nic:
     datacenter: Tardis One
     server: node002
     lan: 2
@@ -68,7 +68,7 @@ EXAMPLES = '''
     state: present
 
 - name: Remove a NIC
-  profitbricks_nic:
+  community.general.profitbricks_nic:
     datacenter: Tardis One
     server: node002
     name: 7341c2454f

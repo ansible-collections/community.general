@@ -44,7 +44,7 @@ extends_documentation_fragment:
 EXAMPLES = '''
 # get all nodes info
 - name: Get nodes data from LXCA
-  lxca_nodes:
+  community.general.lxca_nodes:
     login_user: USERID
     login_password: Password
     auth_url: "https://10.243.15.168"
@@ -52,7 +52,7 @@ EXAMPLES = '''
 
 # get specific nodes info by uuid
 - name: Get nodes data from LXCA
-  lxca_nodes:
+  community.general.lxca_nodes:
     login_user: USERID
     login_password: Password
     auth_url: "https://10.243.15.168"
@@ -61,7 +61,7 @@ EXAMPLES = '''
 
 # get specific nodes info by chassis uuid
 - name: Get nodes data from LXCA
-  lxca_nodes:
+  community.general.lxca_nodes:
     login_user: USERID
     login_password: Password
     auth_url: "https://10.243.15.168"
@@ -70,7 +70,7 @@ EXAMPLES = '''
 
 # get managed nodes
 - name: Get nodes data from LXCA
-  lxca_nodes:
+  community.general.lxca_nodes:
     login_user: USERID
     login_password: Password
     auth_url: "https://10.243.15.168"
@@ -78,7 +78,7 @@ EXAMPLES = '''
 
 # get unmanaged nodes
 - name: Get nodes data from LXCA
-  lxca_nodes:
+  community.general.lxca_nodes:
     login_user: USERID
     login_password: Password
     auth_url: "https://10.243.15.168"

@@ -55,25 +55,25 @@ notes:
 
 EXAMPLES = r'''
 - name: Create a volume group datavg
-  aix_lvg:
+  community.general.aix_lvg:
     vg: datavg
     pp_size: 128
     vg_type: scalable
     state: present
 
 - name: Removing a volume group datavg
-  aix_lvg:
+  community.general.aix_lvg:
     vg: datavg
     state: absent
 
 - name: Extending rootvg
-  aix_lvg:
+  community.general.aix_lvg:
     vg: rootvg
     pvs: hdisk1
     state: present
 
 - name: Reducing rootvg
-  aix_lvg:
+  community.general.aix_lvg:
     vg: rootvg
     pvs: hdisk1
     state: absent

@@ -54,7 +54,7 @@ options:
 
 EXAMPLES = '''
   - name: Create a mailbox
-    webfaction_mailbox:
+    community.general.webfaction_mailbox:
       mailbox_name="mybox"
       mailbox_password="myboxpw"
       state=present

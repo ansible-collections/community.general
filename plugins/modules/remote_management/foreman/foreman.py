@@ -53,7 +53,7 @@ options:
 
 EXAMPLES = '''
 - name: Create CI Organization
-  foreman:
+  community.general.foreman:
     username: admin
     password: admin
     server_url: https://fakeserver.com

@@ -47,7 +47,7 @@ options:
 
 EXAMPLES = '''
 - name: Create new tags for a provider in ManageIQ
-  manageiq_tags:
+  community.general.manageiq_tags:
     resource_name: 'EngLab'
     resource_type: 'provider'
     tags:
@@ -62,7 +62,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Remove tags for a provider in ManageIQ
-  manageiq_tags:
+  community.general.manageiq_tags:
     state: absent
     resource_name: 'EngLab'
     resource_type: 'provider'
@@ -78,7 +78,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: List current tags for a provider in ManageIQ
-  manageiq_tags:
+  community.general.manageiq_tags:
     state: list
     resource_name: 'EngLab'
     resource_type: 'provider'
