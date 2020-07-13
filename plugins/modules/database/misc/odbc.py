@@ -39,6 +39,7 @@ requirements:
 notes:
   - "Like the command module, this module always returns changed = yes whether or not the query would change the database."
   - "To alter this behavior you can use C(changed_when): [yes or no]."
+  - "For details about return values (description and row_count) see https://github.com/mkleehammer/pyodbc/wiki/Cursor."
 '''
 
 EXAMPLES = '''
@@ -58,12 +59,12 @@ results:
     type: list
     elements: str
 description:
-    description: "List of dicts about the columns selected from the cursors, likely emptry for DDL statements. See https://github.com/mkleehammer/pyodbc/wiki/Cursor."
+    description: "List of dicts about the columns selected from the cursors, likely emptry for DDL statements. See notes."
     returned: success
     type: list
     elements: str
 row_count:
-    description: "The number of rows selected or modified according to the cursor defaults to -1. See https://github.com/mkleehammer/pyodbc/wiki/Cursor."
+    description: "The number of rows selected or modified according to the cursor defaults to -1. See notes."
     returned: success
     type: str
 '''
