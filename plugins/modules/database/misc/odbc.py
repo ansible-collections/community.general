@@ -57,18 +57,15 @@ results:
     returned: success
     type: list
     elements: str
-    default: []
 description:
-    description: "List of dicts about the columns selected from the cursors. See https://github.com/mkleehammer/pyodbc/wiki/Cursor."
+    description: "List of dicts about the columns selected from the cursors, likely emptry for DDL statements. See https://github.com/mkleehammer/pyodbc/wiki/Cursor."
     returned: success
     type: list
     elements: str
-    default: []
 row_count:
-    description: "The number of rows selected or modified according to the cursor. See https://github.com/mkleehammer/pyodbc/wiki/Cursor."
+    description: "The number of rows selected or modified according to the cursor defaults to -1. See https://github.com/mkleehammer/pyodbc/wiki/Cursor."
     returned: success
     type: str
-    default: -1
 '''
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
