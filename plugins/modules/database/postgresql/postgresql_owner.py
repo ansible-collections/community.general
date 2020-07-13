@@ -91,41 +91,41 @@ EXAMPLES = r'''
 # ansible -m postgresql_owner -a "db=bar new_owner=alice obj_name=myfunc obj_type=function"
 
 - name: The same as above by playbook
-  postgresql_owner:
+  community.general.postgresql_owner:
     db: bar
     new_owner: alice
     obj_name: myfunc
     obj_type: function
 
 - name: Set owner as bob for table acme in database bar
-  postgresql_owner:
+  community.general.postgresql_owner:
     db: bar
     new_owner: bob
     obj_name: acme
     obj_type: table
 
 - name: Set owner as alice for view test_view in database bar
-  postgresql_owner:
+  community.general.postgresql_owner:
     db: bar
     new_owner: alice
     obj_name: test_view
     obj_type: view
 
 - name: Set owner as bob for tablespace ssd in database foo
-  postgresql_owner:
+  community.general.postgresql_owner:
     db: foo
     new_owner: bob
     obj_name: ssd
     obj_type: tablespace
 
 - name: Reassign all object in database bar owned by bob to alice
-  postgresql_owner:
+  community.general.postgresql_owner:
     db: bar
     new_owner: alice
     reassign_owned_by: bob
 
 - name: Reassign all object in database bar owned by bob and bill to alice
-  postgresql_owner:
+  community.general.postgresql_owner:
     db: bar
     new_owner: alice
     reassign_owned_by:

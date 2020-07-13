@@ -133,13 +133,13 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Add language pltclu to database testdb if it doesn't exist
-  postgresql_lang: db=testdb lang=pltclu state=present
+  community.general.postgresql_lang: db=testdb lang=pltclu state=present
 
 # Add language pltclu to database testdb if it doesn't exist and mark it as trusted.
 # Marks the language as trusted if it exists but isn't trusted yet.
 # force_trust makes sure that the language will be marked as trusted
 - name: Add language pltclu to database testdb if it doesn't exist and mark it as trusted
-  postgresql_lang:
+  community.general.postgresql_lang:
     db: testdb
     lang: pltclu
     state: present
@@ -147,27 +147,27 @@ EXAMPLES = r'''
     force_trust: yes
 
 - name: Remove language pltclu from database testdb
-  postgresql_lang:
+  community.general.postgresql_lang:
     db: testdb
     lang: pltclu
     state: absent
 
 - name: Remove language pltclu from database testdb and remove all dependencies
-  postgresql_lang:
+  community.general.postgresql_lang:
     db: testdb
     lang: pltclu
     state: absent
     cascade: yes
 
 - name: Remove language c from database testdb but ignore errors if something prevents the removal
-  postgresql_lang:
+  community.general.postgresql_lang:
     db: testdb
     lang: pltclu
     state: absent
     fail_on_drop: no
 
 - name: In testdb change owner of mylang to alice
-  postgresql_lang:
+  community.general.postgresql_lang:
     db: testdb
     lang: mylang
     owner: alice
