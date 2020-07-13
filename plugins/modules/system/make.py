@@ -35,7 +35,7 @@ options:
     description:
       - Use a custom Makefile.
     type: path
-  community.general.make:
+  make:
     description:
       - Use a specific make binary.
     type: path

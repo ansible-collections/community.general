@@ -55,7 +55,7 @@ options:
     description:
       - Specifies the mount group.
     type: str
-  community.general.filesystem:
+  filesystem:
     description:
       - Specifies the mount point, which is the directory where the file system will be mounted.
     type: str
