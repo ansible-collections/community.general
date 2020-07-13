@@ -54,19 +54,19 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Create a VCN
-  oci_vcn:
+  community.general.oci_vcn:
     cidr_block: '10.0.0.0/16'
     compartment_id: 'ocid1.compartment.oc1..xxxxxEXAMPLExxxxx'
     display_name: my_vcn
     dns_label: ansiblevcn
 
 - name: Updates the specified VCN's display name
-  oci_vcn:
+  community.general.oci_vcn:
     vcn_id: ocid1.vcn.oc1.phx.xxxxxEXAMPLExxxxx
     display_name: ansible_vcn
 
 - name: Delete the specified VCN
-  oci_vcn:
+  community.general.oci_vcn:
     vcn_id: ocid1.vcn.oc1.phx.xxxxxEXAMPLExxxxx
     state: absent
 """

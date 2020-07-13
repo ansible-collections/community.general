@@ -63,7 +63,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Create virtual machine replica set 'myvmir'
-  kubevirt_rs:
+  community.general.kubevirt_rs:
       state: present
       name: myvmir
       namespace: vms
@@ -85,7 +85,7 @@ EXAMPLES = '''
              bus: virtio
 
 - name: Remove virtual machine replica set 'myvmir'
-  kubevirt_rs:
+  community.general.kubevirt_rs:
       state: absent
       name: myvmir
       namespace: vms

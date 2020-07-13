@@ -81,7 +81,7 @@ author: "Rajeev Arakkal (@rajeevarakkal)"
 EXAMPLES = """
 ---
 - name: Update firmware from repository on a Network Share
-  idrac_firmware:
+  community.general.idrac_firmware:
        idrac_ip: "192.168.0.1"
        idrac_user: "user_name"
        idrac_password: "user_password"

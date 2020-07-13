@@ -52,11 +52,11 @@ reasons:
 EXAMPLES = '''
 # Subscribe to the nginx channel
 - name: Subscribe to nginx checks
-  sensu_subscription: name=nginx
+  community.general.sensu_subscription: name=nginx
 
 # Unsubscribe from the common checks channel
 - name: Unsubscribe from common checks
-  sensu_subscription: name=common state=absent
+  community.general.sensu_subscription: name=common state=absent
 '''
 
 import json

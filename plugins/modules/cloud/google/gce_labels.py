@@ -56,7 +56,7 @@ options:
 
 EXAMPLES = '''
 - name: Add labels on an existing instance (using resource_url)
-  gce_labels:
+  community.general.gce_labels:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"
@@ -67,7 +67,7 @@ EXAMPLES = '''
     resource_url: https://www.googleapis.com/compute/beta/projects/myproject/zones/us-central1-f/instances/example-instance
     state: present
 - name: Add labels on an image (using resource params)
-  gce_labels:
+  community.general.gce_labels:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"
@@ -80,7 +80,7 @@ EXAMPLES = '''
     resource_name: my-custom-image
     state: present
 - name: Remove specified labels from the GCE instance
-  gce_labels:
+  community.general.gce_labels:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"

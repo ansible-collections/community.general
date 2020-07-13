@@ -123,7 +123,7 @@ options:
 EXAMPLES = '''
 # Event handler create example.
 - name: Create single event handler
-  pubnub_blocks:
+  community.general.pubnub_blocks:
     email: '{{ email }}'
     password: '{{ password }}'
     application: '{{ app_name }}'
@@ -138,7 +138,7 @@ EXAMPLES = '''
 
 # Change event handler trigger event type.
 - name: Change event handler 'event'
-  pubnub_blocks:
+  community.general.pubnub_blocks:
     email: '{{ email }}'
     password: '{{ password }}'
     application: '{{ app_name }}'
@@ -151,7 +151,7 @@ EXAMPLES = '''
 
 # Stop block and event handlers.
 - name: Stopping block
-  pubnub_blocks:
+  community.general.pubnub_blocks:
     email: '{{ email }}'
     password: '{{ password }}'
     application: '{{ app_name }}'
@@ -162,7 +162,7 @@ EXAMPLES = '''
 # Multiple module calls with cached result passing
 - name: Create '{{ block_name }}' block
   register: module_cache
-  pubnub_blocks:
+  community.general.pubnub_blocks:
     email: '{{ email }}'
     password: '{{ password }}'
     application: '{{ app_name }}'
@@ -171,7 +171,7 @@ EXAMPLES = '''
     state: present
 - name: Add '{{ event_handler_1_name }}' handler to '{{ block_name }}'
   register: module_cache
-  pubnub_blocks:
+  community.general.pubnub_blocks:
     cache: '{{ module_cache }}'
     application: '{{ app_name }}'
     keyset: '{{ keyset_name }}'
@@ -185,7 +185,7 @@ EXAMPLES = '''
         event: 'js-before-publish'
 - name: Add '{{ event_handler_2_name }}' handler to '{{ block_name }}'
   register: module_cache
-  pubnub_blocks:
+  community.general.pubnub_blocks:
     cache: '{{ module_cache }}'
     application: '{{ app_name }}'
     keyset: '{{ keyset_name }}'
@@ -199,7 +199,7 @@ EXAMPLES = '''
         event: 'js-before-publish'
 - name: Start '{{ block_name }}' block
   register: module_cache
-  pubnub_blocks:
+  community.general.pubnub_blocks:
     cache: '{{ module_cache }}'
     application: '{{ app_name }}'
     keyset: '{{ keyset_name }}'

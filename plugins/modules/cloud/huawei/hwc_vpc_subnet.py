@@ -104,7 +104,7 @@ EXAMPLES = '''
     name: "ansible_network_vpc_test"
   register: vpc
 - name: Create subnet
-  hwc_vpc_subnet:
+  community.general.hwc_vpc_subnet:
     vpc_id: "{{ vpc.id }}"
     cidr: "192.168.100.0/26"
     gateway_ip: "192.168.100.32"

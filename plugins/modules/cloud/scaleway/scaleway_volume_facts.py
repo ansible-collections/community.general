@@ -37,7 +37,7 @@ options:
 
 EXAMPLES = r'''
 - name: Gather Scaleway volumes facts
-  scaleway_volume_facts:
+  community.general.scaleway_volume_facts:
     region: par1
 '''
 

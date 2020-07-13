@@ -31,7 +31,7 @@ options:
 
 EXAMPLES = '''
 - name: Get details for testyaa1
-  memset_server_info:
+  community.general.memset_server_info:
     name: testyaa1
     api_key: 5eb86c9896ab03919abcf03857163741
   delegate_to: localhost

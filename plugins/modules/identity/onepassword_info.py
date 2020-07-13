@@ -99,7 +99,7 @@ options:
 EXAMPLES = '''
 # Gather secrets from 1Password, assuming there is a 'password' field:
 - name: Get a password
-  onepassword_info:
+  community.general.onepassword_info:
     search_terms: My 1Password item
   delegate_to: localhost
   register: my_1password_item
@@ -107,7 +107,7 @@ EXAMPLES = '''
 
 # Gather secrets from 1Password, with more advanced search terms:
 - name: Get a password
-  onepassword_info:
+  community.general.onepassword_info:
     search_terms:
       - name:    My 1Password item
         field:   Custom field name       # optional, defaults to 'password'
@@ -121,7 +121,7 @@ EXAMPLES = '''
 # fields. In the first 'password' is fetched, as a field name is not specified (default behaviour) and in the
 # second, 'Custom field name' is fetched, as that is specified explicitly.
 - name: Get a password
-  onepassword_info:
+  community.general.onepassword_info:
     search_terms:
       - My 1Password item                # 'name' is optional when passing a simple string...
       - name: My Other 1Password item    # ...but it can also be set for consistency

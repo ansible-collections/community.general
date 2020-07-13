@@ -363,7 +363,7 @@ requirements: [ "proxmoxer", "requests" ]
 
 EXAMPLES = '''
 - name: Create new VM with minimal options
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -371,7 +371,7 @@ EXAMPLES = '''
     node: sabrewulf
 
 - name: Create new VM with minimal options and given vmid
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -380,7 +380,7 @@ EXAMPLES = '''
     vmid: 100
 
 - name: Create new VM with two network interface options
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -389,7 +389,7 @@ EXAMPLES = '''
     net: '{"net0":"virtio,bridge=vmbr1,rate=200", "net1":"e1000,bridge=vmbr2,"}'
 
 - name: Create new VM with one network interface, three virto hard disk, 4 cores, and 2 vcpus
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -404,7 +404,7 @@ EXAMPLES = '''
     Clone VM with only source VM name.
     The VM source is spynal.
     The target VM name is zavala
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -416,7 +416,7 @@ EXAMPLES = '''
     timeout: 500
 
 - name: Clone VM with source vmid and target newid and raw format
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -430,7 +430,7 @@ EXAMPLES = '''
     timeout: 300
 
 - name: Create new VM and lock it for snapashot
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -439,7 +439,7 @@ EXAMPLES = '''
     lock: snapshot
 
 - name: Create new VM and set protection to disable the remove VM and remove disk operations
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -448,7 +448,7 @@ EXAMPLES = '''
     protection: yes
 
 - name: Start VM
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -457,7 +457,7 @@ EXAMPLES = '''
     state: started
 
 - name: Stop VM
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -466,7 +466,7 @@ EXAMPLES = '''
     state: stopped
 
 - name: Stop VM with force
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -476,7 +476,7 @@ EXAMPLES = '''
     force: yes
 
 - name: Restart VM
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -485,7 +485,7 @@ EXAMPLES = '''
     state: restarted
 
 - name: Remove VM
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -494,7 +494,7 @@ EXAMPLES = '''
     state: absent
 
 - name: Get VM current state
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -503,7 +503,7 @@ EXAMPLES = '''
     state: current
 
 - name: Update VM configuration
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -514,7 +514,7 @@ EXAMPLES = '''
     update: yes
 
 - name: Delete QEMU parameters
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado
@@ -523,7 +523,7 @@ EXAMPLES = '''
     delete: 'args,template,cpulimit'
 
 - name: Revert a pending change
-  proxmox_kvm:
+  community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
     api_host: helldorado

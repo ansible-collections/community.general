@@ -81,7 +81,7 @@ requirements: []
 
 EXAMPLES = '''
 - name: Notify airbrake about an app deployment
-  airbrake_deployment:
+  community.general.airbrake_deployment:
     project_id: '12345'
     project_key: 'AAAAAA'
     environment: staging
@@ -89,7 +89,7 @@ EXAMPLES = '''
     revision: '4.2'
 
 - name: Notify airbrake about an app deployment, using git hash as revision
-  airbrake_deployment:
+  community.general.airbrake_deployment:
     project_id: '12345'
     project_key: 'AAAAAA'
     environment: staging

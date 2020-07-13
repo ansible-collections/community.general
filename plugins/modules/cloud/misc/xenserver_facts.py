@@ -22,7 +22,7 @@ options: {}
 
 EXAMPLES = '''
 - name: Gather facts from xenserver
-  xenserver_facts:
+  community.general.xenserver_facts:
 
 - name: Print running VMs
   debug:

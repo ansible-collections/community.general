@@ -102,7 +102,7 @@ author:
 
 EXAMPLES = '''
 - name: Create a firewall policy
-  oneandone_firewall_policy:
+  community.general.oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     name: ansible-firewall-policy
     description: Testing creation of firewall policies with ansible
@@ -116,13 +116,13 @@ EXAMPLES = '''
     wait_timeout: 500
 
 - name: Destroy a firewall policy
-  oneandone_firewall_policy:
+  community.general.oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     state: absent
     name: ansible-firewall-policy
 
 - name: Update a firewall policy
-  oneandone_firewall_policy:
+  community.general.oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     state: update
     firewall_policy: ansible-firewall-policy
@@ -130,7 +130,7 @@ EXAMPLES = '''
     description: Testing creation of firewall policies with ansible - updated
 
 - name: Add server to a firewall policy
-  oneandone_firewall_policy:
+  community.general.oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     firewall_policy: ansible-firewall-policy-updated
     add_server_ips:
@@ -141,7 +141,7 @@ EXAMPLES = '''
     state: update
 
 - name: Remove server from a firewall policy
-  oneandone_firewall_policy:
+  community.general.oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     firewall_policy: ansible-firewall-policy-updated
     remove_server_ips:
@@ -151,7 +151,7 @@ EXAMPLES = '''
     state: update
 
 - name: Add rules to a firewall policy
-  oneandone_firewall_policy:
+  community.general.oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     firewall_policy: ansible-firewall-policy-updated
     description: Adding rules to an existing firewall policy
@@ -171,7 +171,7 @@ EXAMPLES = '''
     state: update
 
 - name: Remove rules from a firewall policy
-  oneandone_firewall_policy:
+  community.general.oneandone_firewall_policy:
     auth_token: oneandone_private_api_key
     firewall_policy: ansible-firewall-policy-updated
     remove_rules:

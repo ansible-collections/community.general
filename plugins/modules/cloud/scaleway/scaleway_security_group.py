@@ -84,7 +84,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a Security Group
-  scaleway_security_group:
+  community.general.scaleway_security_group:
     state: present
     region: par1
     name: security_group

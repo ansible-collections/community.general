@@ -84,21 +84,21 @@ author:
 
 EXAMPLES = '''
 - name: Create a public IP
-  oneandone_public_ip:
+  community.general.oneandone_public_ip:
     auth_token: oneandone_private_api_key
     reverse_dns: example.com
     datacenter: US
     type: IPV4
 
 - name: Update a public IP
-  oneandone_public_ip:
+  community.general.oneandone_public_ip:
     auth_token: oneandone_private_api_key
     public_ip_id: public ip id
     reverse_dns: secondexample.com
     state: update
 
 - name: Delete a public IP
-  oneandone_public_ip:
+  community.general.oneandone_public_ip:
     auth_token: oneandone_private_api_key
     public_ip_id: public ip id
     state: absent

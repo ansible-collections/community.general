@@ -139,74 +139,74 @@ requirements:
 
 EXAMPLES = '''
 - name: Install nmap
-  zypper:
+  community.general.zypper:
     name: nmap
     state: present
 
 - name: Install apache2 with recommended packages
-  zypper:
+  community.general.zypper:
     name: apache2
     state: present
     disable_recommends: no
 
 - name: Apply a given patch
-  zypper:
+  community.general.zypper:
     name: openSUSE-2016-128
     state: present
     type: patch
 
 - name: Remove the nmap package
-  zypper:
+  community.general.zypper:
     name: nmap
     state: absent
 
 - name: Install the nginx rpm from a remote repo
-  zypper:
+  community.general.zypper:
     name: 'http://nginx.org/packages/sles/12/x86_64/RPMS/nginx-1.8.0-1.sles12.ngx.x86_64.rpm'
     state: present
 
 - name: Install local rpm file
-  zypper:
+  community.general.zypper:
     name: /tmp/fancy-software.rpm
     state: present
 
 - name: Update all packages
-  zypper:
+  community.general.zypper:
     name: '*'
     state: latest
 
 - name: Apply all available patches
-  zypper:
+  community.general.zypper:
     name: '*'
     state: latest
     type: patch
 
 - name: Perform a dist-upgrade with additional arguments
-  zypper:
+  community.general.zypper:
     name: '*'
     state: dist-upgrade
     allow_vendor_change: true
     extra_args: '--allow-arch-change'
 
 - name: Perform a installaion of nmap with the install option replacefiles
-  zypper:
+  community.general.zypper:
     name: 'nmap'
     state: latest
     replacefiles: true
 
 - name: Refresh repositories and update package openssl
-  zypper:
+  community.general.zypper:
     name: openssl
     state: present
     update_cache: yes
 
 - name: "Install specific version (possible comparisons: <, >, <=, >=, =)"
-  zypper:
+  community.general.zypper:
     name: 'docker>=1.10'
     state: present
 
 - name: Wait 20 seconds to acquire the lock before failing
-  zypper:
+  community.general.zypper:
     name: mosh
     state: present
   environment:

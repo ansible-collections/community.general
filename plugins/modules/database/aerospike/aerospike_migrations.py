@@ -106,7 +106,7 @@ options:
 EXAMPLES = '''
 # check for migrations on local node
 - name: Wait for migrations on local node before proceeding
-  aerospike_migrations:
+  community.general.aerospike_migrations:
     host: "localhost"
     connect_timeout: 2000
     consecutive_good_checks: 5
@@ -138,7 +138,7 @@ EXAMPLES = '''
 # Maximum runtime before giving up in this case will be:
 # Tries Limit * Sleep Between Checks * delay * retries
     - name: Wait for aerospike migrations
-      aerospike_migrations:
+      community.general.aerospike_migrations:
           local_only: True
           sleep_between_checks: 1
           tries_limit: 5

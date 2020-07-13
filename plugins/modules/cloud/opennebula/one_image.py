@@ -75,7 +75,7 @@ author:
 
 EXAMPLES = '''
 - name: Fetch the IMAGE by id
-  one_image:
+  community.general.one_image:
     id: 45
   register: result
 
@@ -84,30 +84,30 @@ EXAMPLES = '''
     msg: result
 
 - name: Rename existing IMAGE
-  one_image:
+  community.general.one_image:
     id: 34
     state: renamed
     new_name: bar-image
 
 - name: Disable the IMAGE by id
-  one_image:
+  community.general.one_image:
     id: 37
     enabled: no
 
 - name: Enable the IMAGE by name
-  one_image:
+  community.general.one_image:
     name: bar-image
     enabled: yes
 
 - name: Clone the IMAGE by name
-  one_image:
+  community.general.one_image:
     name: bar-image
     state: cloned
     new_name: bar-image-clone
   register: result
 
 - name: Delete the IMAGE by id
-  one_image:
+  community.general.one_image:
     id: '{{ result.id }}'
     state: absent
 '''

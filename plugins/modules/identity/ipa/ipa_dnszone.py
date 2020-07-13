@@ -39,14 +39,14 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure dns zone is present
-  ipa_dnszone:
+  community.general.ipa_dnszone:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: present
     zone_name: example.com
 
 - name: Ensure dns zone is present and is dynamic update
-  ipa_dnszone:
+  community.general.ipa_dnszone:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: present
@@ -54,7 +54,7 @@ EXAMPLES = r'''
     dynamicupdate: true
 
 - name: Ensure that dns zone is removed
-  ipa_dnszone:
+  community.general.ipa_dnszone:
     zone_name: example.com
     ipa_host: localhost
     ipa_user: admin

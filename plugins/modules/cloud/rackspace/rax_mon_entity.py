@@ -54,7 +54,7 @@ EXAMPLES = '''
   connection: local
   tasks:
   - name: Ensure an entity exists
-    rax_mon_entity:
+    community.general.rax_mon_entity:
       credentials: ~/.rax_pub
       state: present
       label: my_entity

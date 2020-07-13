@@ -36,7 +36,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure sudo command exists
-  ipa_sudocmd:
+  community.general.ipa_sudocmd:
     name: su
     description: Allow to run su via sudo
     ipa_host: ipa.example.com
@@ -44,7 +44,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure sudo command does not exist
-  ipa_sudocmd:
+  community.general.ipa_sudocmd:
     name: su
     state: absent
     ipa_host: ipa.example.com

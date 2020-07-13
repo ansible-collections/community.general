@@ -67,7 +67,7 @@ options:
 
 EXAMPLES = """
 - name: Create Account
-  sf_account_manager:
+  community.general.sf_account_manager:
     hostname: "{{ solidfire_hostname }}"
     username: "{{ solidfire_username }}"
     password: "{{ solidfire_password }}"
@@ -75,7 +75,7 @@ EXAMPLES = """
     name: TenantA
 
 - name: Modify Account
-  sf_account_manager:
+  community.general.sf_account_manager:
     hostname: "{{ solidfire_hostname }}"
     username: "{{ solidfire_username }}"
     password: "{{ solidfire_password }}"
@@ -84,7 +84,7 @@ EXAMPLES = """
     new_name: TenantA-Renamed
 
 - name: Delete Account
-  sf_account_manager:
+  community.general.sf_account_manager:
     hostname: "{{ solidfire_hostname }}"
     username: "{{ solidfire_username }}"
     password: "{{ solidfire_password }}"

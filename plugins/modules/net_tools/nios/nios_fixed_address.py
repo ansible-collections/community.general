@@ -95,7 +95,7 @@ options:
 
 EXAMPLES = '''
 - name: Configure ipv4 dhcp fixed address
-  nios_fixed_address:
+  community.general.nios_fixed_address:
     name: ipv4_fixed
     ipaddr: 192.168.10.1
     mac: 08:6d:41:e8:fd:e8
@@ -109,7 +109,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Configure a ipv6 dhcp fixed address
-  nios_fixed_address:
+  community.general.nios_fixed_address:
     name: ipv6_fixed
     ipaddr: fe80::1/10
     mac: 08:6d:41:e8:fd:e8
@@ -123,7 +123,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Set dhcp options for a ipv4 fixed address
-  nios_fixed_address:
+  community.general.nios_fixed_address:
     name: ipv4_fixed
     ipaddr: 192.168.10.1
     mac: 08:6d:41:e8:fd:e8
@@ -140,7 +140,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Remove a ipv4 dhcp fixed address
-  nios_fixed_address:
+  community.general.nios_fixed_address:
     name: ipv4_fixed
     ipaddr: 192.168.10.1
     mac: 08:6d:41:e8:fd:e8

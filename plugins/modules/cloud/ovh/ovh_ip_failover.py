@@ -75,14 +75,14 @@ options:
 
 EXAMPLES = '''
 # Route an IP address 1.1.1.1 to the service ns666.ovh.net
-- ovh_ip_failover:
+- community.general.ovh_ip_failover:
     name: 1.1.1.1
     service: ns666.ovh.net
     endpoint: ovh-eu
     application_key: yourkey
     application_secret: yoursecret
     consumer_key: yourconsumerkey
-- ovh_ip_failover:
+- community.general.ovh_ip_failover:
     name: 1.1.1.1
     service: ns666.ovh.net
     endpoint: ovh-eu
@@ -91,7 +91,7 @@ EXAMPLES = '''
     application_secret: yoursecret
     consumer_key: yourconsumerkey
   register: moved
-- ovh_ip_failover:
+- community.general.ovh_ip_failover:
     name: 1.1.1.1
     service: ns666.ovh.net
     endpoint: ovh-eu

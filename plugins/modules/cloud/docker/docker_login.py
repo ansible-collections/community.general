@@ -86,25 +86,25 @@ author:
 EXAMPLES = '''
 
 - name: Log into DockerHub
-  docker_login:
+  community.general.docker_login:
     username: docker
     password: rekcod
 
 - name: Log into private registry and force re-authorization
-  docker_login:
+  community.general.docker_login:
     registry_url: your.private.registry.io
     username: yourself
     password: secrets3
     reauthorize: yes
 
 - name: Log into DockerHub using a custom config file
-  docker_login:
+  community.general.docker_login:
     username: docker
     password: rekcod
     config_path: /tmp/.mydockercfg
 
 - name: Log out of DockerHub
-  docker_login:
+  community.general.docker_login:
     state: absent
 '''
 

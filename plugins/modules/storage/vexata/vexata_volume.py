@@ -39,7 +39,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create new 2 TiB volume named foo
-  vexata_volume:
+  community.general.vexata_volume:
     name: foo
     size: 2T
     state: present
@@ -48,7 +48,7 @@ EXAMPLES = r'''
     password: secret
 
 - name: Expand volume named foo to 4 TiB
-  vexata_volume:
+  community.general.vexata_volume:
     name: foo
     size: 4T
     state: present
@@ -57,7 +57,7 @@ EXAMPLES = r'''
     password: secret
 
 - name: Delete volume named foo
-  vexata_volume:
+  community.general.vexata_volume:
     name: foo
     state: absent
     array: vx100_ultra.test.com

@@ -123,12 +123,12 @@ options:
 
 EXAMPLES = r'''
 - name: Example playbook sending mail to root
-  mail:
+  community.general.mail:
     subject: System {{ ansible_hostname }} has been successfully provisioned.
   delegate_to: localhost
 
 - name: Sending an e-mail using Gmail SMTP servers
-  mail:
+  community.general.mail:
     host: smtp.gmail.com
     port: 587
     username: username@gmail.com
@@ -139,7 +139,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Send e-mail to a bunch of users, attaching files
-  mail:
+  community.general.mail:
     host: 127.0.0.1
     port: 2025
     subject: Ansible-report
@@ -159,7 +159,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Sending an e-mail using the remote machine, not the Ansible controller node
-  mail:
+  community.general.mail:
     host: localhost
     port: 25
     to: John Smith <john.smith@example.com>
@@ -167,7 +167,7 @@ EXAMPLES = r'''
     body: System {{ ansible_hostname }} has been successfully provisioned.
 
 - name: Sending an e-mail using Legacy SSL to the remote machine
-  mail:
+  community.general.mail:
     host: localhost
     port: 25
     to: John Smith <john.smith@example.com>
@@ -176,7 +176,7 @@ EXAMPLES = r'''
     secure: always
 
 - name: Sending an e-mail using StartTLS to the remote machine
-  mail:
+  community.general.mail:
     host: localhost
     port: 25
     to: John Smith <john.smith@example.com>
@@ -360,7 +360,7 @@ def main():
             part.add_header('Content-disposition', 'attachment', filename=os.path.basename(filename))
             msg.attach(part)
         except Exception as e:
-            module.fail_json(rc=1, msg="Failed to send mail: can't attach file %s: %s" %
+            module.fail_json(rc=1, msg="Failed to send community.general.mail: can't attach file %s: %s" %
                              (filename, to_native(e)), exception=traceback.format_exc())
 
     composed = msg.as_string()
