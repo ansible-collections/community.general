@@ -70,7 +70,7 @@ author: "Nicolai Buchwitz (@nbuchwitz)"
 
 EXAMPLES = '''
 - name: Create a record of type A
-  netcup_dns:
+  community.general.netcup_dns:
     api_key: "..."
     api_password: "..."
     customer_id: "..."
@@ -80,7 +80,7 @@ EXAMPLES = '''
     value: "127.0.0.1"
 
 - name: Delete that record
-  netcup_dns:
+  community.general.netcup_dns:
     api_key: "..."
     api_password: "..."
     customer_id: "..."
@@ -91,7 +91,7 @@ EXAMPLES = '''
     state: absent
 
 - name: Create a wildcard record
-  netcup_dns:
+  community.general.netcup_dns:
     api_key: "..."
     api_password: "..."
     customer_id: "..."
@@ -101,7 +101,7 @@ EXAMPLES = '''
     value: "127.0.1.1"
 
 - name: Set the MX record for example.com
-  netcup_dns:
+  community.general.netcup_dns:
     api_key: "..."
     api_password: "..."
     customer_id: "..."
@@ -110,7 +110,7 @@ EXAMPLES = '''
     value: "mail.example.com"
 
 - name: Set a record and ensure that this is the only one
-  netcup_dns:
+  community.general.netcup_dns:
     api_key: "..."
     api_password: "..."
     customer_id: "..."

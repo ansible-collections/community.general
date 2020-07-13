@@ -103,57 +103,57 @@ notes:
 
 EXAMPLES = r'''
 - name: Create filesystem in a previously defined logical volume.
-  aix_filesystem:
+  community.general.aix_filesystem:
     device: testlv
-    filesystem: /testfs
+    community.general.filesystem: /testfs
     state: present
 
 - name: Creating NFS filesystem from nfshost.
-  aix_filesystem:
+  community.general.aix_filesystem:
     device: /home/ftp
     nfs_server: nfshost
-    filesystem: /home/ftp
+    community.general.filesystem: /home/ftp
     state: present
 
 - name: Creating a new file system without a previously logical volume.
-  aix_filesystem:
-    filesystem: /newfs
+  community.general.aix_filesystem:
+    community.general.filesystem: /newfs
     size: 1G
     state: present
     vg: datavg
 
 - name: Unmounting /testfs.
-  aix_filesystem:
-    filesystem: /testfs
+  community.general.aix_filesystem:
+    community.general.filesystem: /testfs
     state: unmounted
 
 - name: Resizing /mksysb to +512M.
-  aix_filesystem:
-    filesystem: /mksysb
+  community.general.aix_filesystem:
+    community.general.filesystem: /mksysb
     size: +512M
     state: present
 
 - name: Resizing /mksysb to 11G.
-  aix_filesystem:
-    filesystem: /mksysb
+  community.general.aix_filesystem:
+    community.general.filesystem: /mksysb
     size: 11G
     state: present
 
 - name: Resizing /mksysb to -2G.
-  aix_filesystem:
-    filesystem: /mksysb
+  community.general.aix_filesystem:
+    community.general.filesystem: /mksysb
     size: -2G
     state: present
 
 - name: Remove NFS filesystem /home/ftp.
-  aix_filesystem:
-    filesystem: /home/ftp
+  community.general.aix_filesystem:
+    community.general.filesystem: /home/ftp
     rm_mount_point: yes
     state: absent
 
 - name: Remove /newfs.
-  aix_filesystem:
-    filesystem: /newfs
+  community.general.aix_filesystem:
+    community.general.filesystem: /newfs
     rm_mount_point: yes
     state: absent
 '''
@@ -179,7 +179,7 @@ def _fs_exists(module, filesystem):
     Check if file system already exists on /etc/filesystems.
 
     :param module: Ansible module.
-    :param filesystem: filesystem name.
+    :param community.general.filesystem: filesystem name.
     :return: True or False.
     """
     lsfs_cmd = module.get_bin_path('lsfs', True)

@@ -35,7 +35,7 @@ author: "Darryl Stoflet (@dstoflet)"
 
 EXAMPLES = '''
 - name: Manage the state of program httpd to be in started state
-  monit:
+  community.general.monit:
     name: httpd
     state: started
 '''

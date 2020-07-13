@@ -32,7 +32,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Gather information about all Fibre Channel Networks
-  oneview_fc_network_info:
+  community.general.oneview_fc_network_info:
     config: /etc/oneview/oneview_config.json
   delegate_to: localhost
   register: result
@@ -41,7 +41,7 @@ EXAMPLES = '''
     msg: "{{ result.fc_networks }}"
 
 - name: Gather paginated, filtered and sorted information about Fibre Channel Networks
-  oneview_fc_network_info:
+  community.general.oneview_fc_network_info:
     config: /etc/oneview/oneview_config.json
     params:
       start: 1
@@ -54,7 +54,7 @@ EXAMPLES = '''
     msg: "{{ result.fc_networks }}"
 
 - name: Gather information about a Fibre Channel Network by name
-  oneview_fc_network_info:
+  community.general.oneview_fc_network_info:
     config: /etc/oneview/oneview_config.json
     name: network name
   delegate_to: localhost

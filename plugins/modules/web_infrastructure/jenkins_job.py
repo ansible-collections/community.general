@@ -62,7 +62,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a jenkins job using basic authentication
-  jenkins_job:
+  community.general.jenkins_job:
     config: "{{ lookup('file', 'templates/test.xml') }}"
     name: test
     password: admin
@@ -70,7 +70,7 @@ EXAMPLES = '''
     user: admin
 
 - name: Create a jenkins job using the token
-  jenkins_job:
+  community.general.jenkins_job:
     config: "{{ lookup('template', 'templates/test.xml.j2') }}"
     name: test
     token: asdfasfasfasdfasdfadfasfasdfasdfc
@@ -78,7 +78,7 @@ EXAMPLES = '''
     user: admin
 
 - name: Delete a jenkins job using basic authentication
-  jenkins_job:
+  community.general.jenkins_job:
     name: test
     password: admin
     state: absent
@@ -86,7 +86,7 @@ EXAMPLES = '''
     user: admin
 
 - name: Delete a jenkins job using the token
-  jenkins_job:
+  community.general.jenkins_job:
     name: test
     token: asdfasfasfasdfasdfadfasfasdfasdfc
     state: absent
@@ -94,7 +94,7 @@ EXAMPLES = '''
     user: admin
 
 - name: Disable a jenkins job using basic authentication
-  jenkins_job:
+  community.general.jenkins_job:
     name: test
     password: admin
     enabled: False
@@ -102,7 +102,7 @@ EXAMPLES = '''
     user: admin
 
 - name: Disable a jenkins job using the token
-  jenkins_job:
+  community.general.jenkins_job:
     name: test
     token: asdfasfasfasdfasdfadfasfasdfasdfc
     enabled: False

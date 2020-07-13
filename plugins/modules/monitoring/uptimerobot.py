@@ -36,13 +36,13 @@ notes:
 
 EXAMPLES = '''
 - name: Pause the monitor with an ID of 12345
-  uptimerobot:
+  community.general.uptimerobot:
     monitorid: 12345
     apikey: 12345-1234512345
     state: paused
 
 - name: Start the monitor with an ID of 12345
-  uptimerobot:
+  community.general.uptimerobot:
     monitorid: 12345
     apikey: 12345-1234512345
     state: started

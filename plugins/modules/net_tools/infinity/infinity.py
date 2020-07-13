@@ -88,7 +88,7 @@ EXAMPLES = r'''
   strategy: debug
   tasks:
     - name: Reserve network into Infinity IPAM
-      infinity:
+      community.general.infinity:
         server_ip: 80.75.107.12
         username: username
         password: password

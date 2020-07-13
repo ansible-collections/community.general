@@ -84,7 +84,7 @@ author:
 
 EXAMPLES = '''
 - name: Send a message to an IRC channel from nick ansible
-  irc:
+  community.general.irc:
     server: irc.example.net
     channel: #t1
     msg: Hello world

@@ -365,7 +365,7 @@ EXAMPLES = r'''
 
 ##### Working with all cloud nodes - Teaming
   - name: Try nmcli add team - conn_name only & ip4 gw4
-    nmcli:
+    community.general.nmcli:
       type: team
       conn_name: '{{ item.conn_name }}'
       ip4: '{{ item.ip4 }}'
@@ -375,7 +375,7 @@ EXAMPLES = r'''
       - '{{ nmcli_team }}'
 
   - name: Try nmcli add teams-slave
-    nmcli:
+    community.general.nmcli:
       type: team-slave
       conn_name: '{{ item.conn_name }}'
       ifname: '{{ item.ifname }}'
@@ -386,7 +386,7 @@ EXAMPLES = r'''
 
 ###### Working with all cloud nodes - Bonding
   - name: Try nmcli add bond - conn_name only & ip4 gw4 mode
-    nmcli:
+    community.general.nmcli:
       type: bond
       conn_name: '{{ item.conn_name }}'
       ip4: '{{ item.ip4 }}'
@@ -397,7 +397,7 @@ EXAMPLES = r'''
       - '{{ nmcli_bond }}'
 
   - name: Try nmcli add bond-slave
-    nmcli:
+    community.general.nmcli:
       type: bond-slave
       conn_name: '{{ item.conn_name }}'
       ifname: '{{ item.ifname }}'
@@ -408,7 +408,7 @@ EXAMPLES = r'''
 
 ##### Working with all cloud nodes - Ethernet
   - name: Try nmcli add Ethernet - conn_name only & ip4 gw4
-    nmcli:
+    community.general.nmcli:
       type: ethernet
       conn_name: '{{ item.conn_name }}'
       ip4: '{{ item.ip4 }}'
@@ -423,7 +423,7 @@ EXAMPLES = r'''
   tasks:
 
   - name: Try nmcli del team - multiple
-    nmcli:
+    community.general.nmcli:
       conn_name: '{{ item.conn_name }}'
       state: absent
     with_items:
@@ -444,7 +444,7 @@ EXAMPLES = r'''
       - conn_name: team-p2p2
 
   - name: Add an Ethernet connection with static IP configuration
-    nmcli:
+    community.general.nmcli:
       conn_name: my-eth1
       ifname: eth1
       type: ethernet
@@ -453,7 +453,7 @@ EXAMPLES = r'''
       state: present
 
   - name: Add an Team connection with static IP configuration
-    nmcli:
+    community.general.nmcli:
       conn_name: my-team1
       ifname: my-team1
       type: team
@@ -463,7 +463,7 @@ EXAMPLES = r'''
       autoconnect: yes
 
   - name: Optionally, at the same time specify IPv6 addresses for the device
-    nmcli:
+    community.general.nmcli:
       conn_name: my-eth1
       ifname: eth1
       type: ethernet
@@ -474,7 +474,7 @@ EXAMPLES = r'''
       state: present
 
   - name: Add two IPv4 DNS server addresses
-    nmcli:
+    community.general.nmcli:
       conn_name: my-eth1
       type: ethernet
       dns4:
@@ -483,21 +483,21 @@ EXAMPLES = r'''
       state: present
 
   - name: Make a profile usable for all compatible Ethernet interfaces
-    nmcli:
+    community.general.nmcli:
       ctype: ethernet
       name: my-eth1
       ifname: '*'
       state: present
 
   - name: Change the property of a setting e.g. MTU
-    nmcli:
+    community.general.nmcli:
       conn_name: my-eth1
       mtu: 9000
       type: ethernet
       state: present
 
   - name: Add VxLan
-    nmcli:
+    community.general.nmcli:
       type: vxlan
       conn_name: vxlan_test1
       vxlan_id: 16
@@ -505,7 +505,7 @@ EXAMPLES = r'''
       vxlan_remote: 192.168.1.5
 
   - name: Add ipip
-    nmcli:
+    community.general.nmcli:
       type: ipip
       conn_name: ipip_test1
       ip_tunnel_dev: eth0
@@ -513,7 +513,7 @@ EXAMPLES = r'''
       ip_tunnel_remote: 192.168.1.5
 
   - name: Add sit
-    nmcli:
+    community.general.nmcli:
       type: sit
       conn_name: sit_test1
       ip_tunnel_dev: eth0
@@ -969,7 +969,7 @@ class Nmcli(object):
     def create_connection_ethernet(self, conn_type='ethernet'):
         # format for creating ethernet interface
         # To add an Ethernet connection with static IP configuration, issue a command as follows
-        # - nmcli: name=add conn_name=my-eth1 ifname=eth1 type=ethernet ip4=192.0.2.100/24 gw4=192.0.2.1 state=present
+        # - community.general.nmcli: name=add conn_name=my-eth1 ifname=eth1 type=ethernet ip4=192.0.2.100/24 gw4=192.0.2.1 state=present
         # nmcli con add con-name my-eth1 ifname eth1 type ethernet ip4 192.0.2.100/24 gw4 192.0.2.1
         cmd = [self.nmcli_bin, 'con', 'add', 'type']
         if conn_type == 'ethernet':
@@ -1008,7 +1008,7 @@ class Nmcli(object):
         cmd = [self.nmcli_bin, 'con', 'mod', self.conn_name]
         # format for modifying ethernet interface
         # To modify an Ethernet connection with static IP configuration, issue a command as follows
-        # - nmcli: conn_name=my-eth1 ifname=eth1 type=ethernet ip4=192.0.2.100/24 gw4=192.0.2.1 state=present
+        # - community.general.nmcli: conn_name=my-eth1 ifname=eth1 type=ethernet ip4=192.0.2.100/24 gw4=192.0.2.1 state=present
         # nmcli con mod con-name my-eth1 ifname eth1 type ethernet ipv4.address 192.0.2.100/24 ipv4.gateway 192.0.2.1
         options = {
             'ipv4.method': self.ipv4_method,
@@ -1037,7 +1037,7 @@ class Nmcli(object):
     def create_connection_bridge(self):
         # format for creating bridge interface
         # To add an Bridge connection with static IP configuration, issue a command as follows
-        # - nmcli: name=add conn_name=my-eth1 ifname=eth1 type=bridge ip4=192.0.2.100/24 gw4=192.0.2.1 state=present
+        # - community.general.nmcli: name=add conn_name=my-eth1 ifname=eth1 type=bridge ip4=192.0.2.100/24 gw4=192.0.2.1 state=present
         # nmcli con add con-name my-eth1 ifname eth1 type bridge ip4 192.0.2.100/24 gw4 192.0.2.1
         cmd = [self.nmcli_bin, 'con', 'add', 'type', 'bridge', 'con-name']
         if self.conn_name is not None:
@@ -1074,7 +1074,7 @@ class Nmcli(object):
     def modify_connection_bridge(self):
         # format for modifying bridge interface
         # To add an Bridge connection with static IP configuration, issue a command as follows
-        # - nmcli: name=mod conn_name=my-eth1 ifname=eth1 type=bridge ip4=192.0.2.100/24 gw4=192.0.2.1 state=present
+        # - community.general.nmcli: name=mod conn_name=my-eth1 ifname=eth1 type=bridge ip4=192.0.2.100/24 gw4=192.0.2.1 state=present
         # nmcli con mod my-eth1 ifname eth1 type bridge ip4 192.0.2.100/24 gw4 192.0.2.1
         cmd = [self.nmcli_bin, 'con', 'mod', self.conn_name]
 

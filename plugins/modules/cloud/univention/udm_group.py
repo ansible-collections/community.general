@@ -53,20 +53,20 @@ options:
 
 EXAMPLES = '''
 - name: Create a POSIX group
-  udm_group:
+  community.general.udm_group:
     name: g123m-1A
 
 # Create a POSIX group with the exact DN
 # C(cn=g123m-1A,cn=classes,cn=students,cn=groups,ou=school,dc=school,dc=example,dc=com)
 - name: Create a POSIX group with a DN
-  udm_group:
+  community.general.udm_group:
     name: g123m-1A
     subpath: 'cn=classes,cn=students,cn=groups'
     ou: school
 
 # or
 - name: Create a POSIX group with a DN
-  udm_group:
+  community.general.udm_group:
     name: g123m-1A
     position: 'cn=classes,cn=students,cn=groups,ou=school,dc=school,dc=example,dc=com'
 '''

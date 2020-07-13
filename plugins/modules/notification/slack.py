@@ -105,13 +105,13 @@ options:
 
 EXAMPLES = """
 - name: Send notification message via Slack
-  slack:
+  community.general.slack:
     token: thetoken/generatedby/slack
     msg: '{{ inventory_hostname }} completed'
   delegate_to: localhost
 
 - name: Send notification message via Slack all options
-  slack:
+  community.general.slack:
     token: thetoken/generatedby/slack
     msg: '{{ inventory_hostname }} completed'
     channel: '#ansible'
@@ -123,7 +123,7 @@ EXAMPLES = """
   delegate_to: localhost
 
 - name: Insert a color bar in front of the message for visibility purposes and use the default webhook icon and name configured in Slack
-  slack:
+  community.general.slack:
     token: thetoken/generatedby/slack
     msg: '{{ inventory_hostname }} is alive!'
     color: good
@@ -131,7 +131,7 @@ EXAMPLES = """
     icon_url: ''
 
 - name: Insert a color bar in front of the message with valid hex color value
-  slack:
+  community.general.slack:
     token: thetoken/generatedby/slack
     msg: 'This message uses color in hex value'
     color: '#00aacc'
@@ -139,7 +139,7 @@ EXAMPLES = """
     icon_url: ''
 
 - name: Use the attachments API
-  slack:
+  community.general.slack:
     token: thetoken/generatedby/slack
     attachments:
       - text: Display my system load on host A and B
@@ -154,23 +154,23 @@ EXAMPLES = """
             short: True
 
 - name: Send a message with a link using Slack markup
-  slack:
+  community.general.slack:
     token: thetoken/generatedby/slack
     msg: We sent this message using <https://www.ansible.com|Ansible>!
 
 - name: Send a message with angle brackets and ampersands
-  slack:
+  community.general.slack:
     token: thetoken/generatedby/slack
     msg: This message has &lt;brackets&gt; &amp; ampersands in plain text.
 
 - name: Initial Threaded Slack message
-  slack:
+  community.general.slack:
     channel: '#ansible'
     token: xoxb-1234-56789abcdefghijklmnop
     msg: 'Starting a thread with my initial post.'
   register: slack_response
 - name: Add more info to thread
-  slack:
+  community.general.slack:
     channel: '#ansible'
     token: xoxb-1234-56789abcdefghijklmnop
     thread_id: "{{ slack_response['ts'] }}"

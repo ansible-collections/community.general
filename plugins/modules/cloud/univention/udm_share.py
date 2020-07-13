@@ -293,7 +293,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a share named home on the server ucs.example.com with the path /home
-  udm_share:
+  community.general.udm_share:
     name: home
     path: /home
     host: ucs.example.com

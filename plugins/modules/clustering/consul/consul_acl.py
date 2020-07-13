@@ -77,7 +77,7 @@ requirements:
 
 EXAMPLES = """
 - name: Create an ACL with rules
-  consul_acl:
+  community.general.consul_acl:
     host: consul1.example.com
     mgmt_token: some_management_acl
     name: Foo access
@@ -88,7 +88,7 @@ EXAMPLES = """
         policy: deny
 
 - name: Create an ACL with a specific token
-  consul_acl:
+  community.general.consul_acl:
     host: consul1.example.com
     mgmt_token: some_management_acl
     name: Foo access
@@ -98,7 +98,7 @@ EXAMPLES = """
         policy: read
 
 - name: Update the rules associated to an ACL token
-  consul_acl:
+  community.general.consul_acl:
     host: consul1.example.com
     mgmt_token: some_management_acl
     name: Foo access
@@ -122,7 +122,7 @@ EXAMPLES = """
         policy: write
 
 - name: Remove a token
-  consul_acl:
+  community.general.consul_acl:
     host: consul1.example.com
     mgmt_token: some_management_acl
     token: 172bd5c8-9fe9-11e4-b1b0-3c15c2c9fd5e

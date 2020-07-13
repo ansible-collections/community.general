@@ -52,14 +52,14 @@ options:
 
 EXAMPLES = r'''
 - name: Create 'storage0' on '00:1b:21:a3:f5:4d'
-  nictagadm:
+  community.general.nictagadm:
     name: storage0
     mac: 00:1b:21:a3:f5:4d
     mtu: 9000
     state: present
 
 - name: Remove 'storage0' nic tag
-  nictagadm:
+  community.general.nictagadm:
     name: storage0
     state: absent
 '''

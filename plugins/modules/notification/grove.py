@@ -48,7 +48,7 @@ author: "Jonas Pfenniger (@zimbatm)"
 
 EXAMPLES = '''
 - name: Sends a notification to a grove.io channel
-  grove:
+  community.general.grove:
     channel_token: 6Ph62VBBJOccmtTPZbubiPzdrhipZXtg
     service: my-app
     message: 'deployed {{ target }}'

@@ -58,7 +58,7 @@ author: "Jose Delarosa (@jose-delarosa)"
 
 EXAMPLES = '''
   - name: Create BIOS configuration job (schedule BIOS setting update)
-    idrac_redfish_command:
+    community.general.idrac_redfish_command:
       category: Systems
       command: CreateBiosConfigJob
       resource_id: System.Embedded.1

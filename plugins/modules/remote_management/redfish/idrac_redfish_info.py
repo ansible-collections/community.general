@@ -56,7 +56,7 @@ author: "Jose Delarosa (@jose-delarosa)"
 
 EXAMPLES = '''
   - name: Get Manager attributes with a default of 20 seconds
-    idrac_redfish_info:
+    community.general.idrac_redfish_info:
       category: Manager
       command: GetManagerAttributes
       baseuri: "{{ baseuri }}"

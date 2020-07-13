@@ -96,7 +96,7 @@ options:
 
 EXAMPLES = """
 - name: Add licenses
-  na_cdot_license:
+  community.general.na_cdot_license:
     hostname: "{{ netapp_hostname }}"
     username: "{{ netapp_username }}"
     password: "{{ netapp_password }}"
@@ -110,7 +110,7 @@ EXAMPLES = """
       flexclone: #################
 
 - name: Remove licenses
-  na_cdot_license:
+  community.general.na_cdot_license:
     hostname: "{{ netapp_hostname }}"
     username: "{{ netapp_username }}"
     password: "{{ netapp_password }}"

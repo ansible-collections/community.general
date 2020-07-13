@@ -69,7 +69,7 @@ EXAMPLES = '''
   # name as the database, and the specified password.
 
   - name: Create a database
-    webfaction_db:
+    community.general.webfaction_db:
       name: "{{webfaction_user}}_db1"
       password: mytestsql
       type: mysql

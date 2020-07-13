@@ -43,12 +43,12 @@ author:
 
 EXAMPLES = r'''
 - name: Send a magic Wake-on-LAN packet to 00:00:5E:00:53:66
-  wakeonlan:
+  community.general.wakeonlan:
     mac: '00:00:5E:00:53:66'
     broadcast: 192.0.2.23
   delegate_to: localhost
 
-- wakeonlan:
+- community.general.wakeonlan:
     mac: 00:00:5E:00:53:66
     port: 9
   delegate_to: localhost

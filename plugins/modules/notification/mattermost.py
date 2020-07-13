@@ -57,13 +57,13 @@ options:
 
 EXAMPLES = """
 - name: Send notification message via Mattermost
-  mattermost:
+  community.general.mattermost:
     url: http://mattermost.example.com
     api_key: my_api_key
     text: '{{ inventory_hostname }} completed'
 
 - name: Send notification message via Mattermost all options
-  mattermost:
+  community.general.mattermost:
     url: http://mattermost.example.com
     api_key: my_api_key
     text: '{{ inventory_hostname }} completed'

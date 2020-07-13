@@ -59,28 +59,28 @@ requirements:
 '''
 EXAMPLES = '''
 - name: Install foo
-  opkg:
+  community.general.opkg:
     name: foo
     state: present
 
 - name: Update cache and install foo
-  opkg:
+  community.general.opkg:
     name: foo
     state: present
     update_cache: yes
 
 - name: Remove foo
-  opkg:
+  community.general.opkg:
     name: foo
     state: absent
 
 - name: Remove foo and bar
-  opkg:
+  community.general.opkg:
     name: foo,bar
     state: absent
 
 - name: Install foo using overwrite option forcibly
-  opkg:
+  community.general.opkg:
     name: foo
     state: present
     force: overwrite

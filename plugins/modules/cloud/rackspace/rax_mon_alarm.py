@@ -72,7 +72,7 @@ EXAMPLES = '''
   connection: local
   tasks:
   - name: Ensure that a specific alarm exists.
-    rax_mon_alarm:
+    community.general.rax_mon_alarm:
       credentials: ~/.rax_pub
       state: present
       label: uhoh

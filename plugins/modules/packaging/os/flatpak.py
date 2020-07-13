@@ -90,29 +90,29 @@ options:
 
 EXAMPLES = r'''
 - name: Install the spotify flatpak
-  flatpak:
+  community.general.flatpak:
     name:  https://s3.amazonaws.com/alexlarsson/spotify-repo/spotify.flatpakref
     state: present
 
 - name: Install the gedit flatpak package
-  flatpak:
+  community.general.flatpak:
     name: https://git.gnome.org/browse/gnome-apps-nightly/plain/gedit.flatpakref
     state: present
 
 - name: Install the gedit package from flathub for current user
-  flatpak:
+  community.general.flatpak:
     name: org.gnome.gedit
     state: present
     method: user
 
 - name: Install the Gnome Calendar flatpak from the gnome remote system-wide
-  flatpak:
+  community.general.flatpak:
     name: org.gnome.Calendar
     state: present
     remote: gnome
 
 - name: Remove the gedit flatpak
-  flatpak:
+  community.general.flatpak:
     name: org.gnome.gedit
     state: absent
 '''

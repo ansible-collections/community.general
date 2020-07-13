@@ -38,7 +38,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Gather information about all Network Sets
-  oneview_network_set_info:
+  community.general.oneview_network_set_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -51,7 +51,7 @@ EXAMPLES = '''
     msg: "{{ result.network_sets }}"
 
 - name: Gather paginated, filtered, and sorted information about Network Sets
-  oneview_network_set_info:
+  community.general.oneview_network_set_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -69,7 +69,7 @@ EXAMPLES = '''
     msg: "{{ result.network_sets }}"
 
 - name: Gather information about all Network Sets, excluding Ethernet networks
-  oneview_network_set_info:
+  community.general.oneview_network_set_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -84,7 +84,7 @@ EXAMPLES = '''
     msg: "{{ result.network_sets }}"
 
 - name: Gather information about a Network Set by name
-  oneview_network_set_info:
+  community.general.oneview_network_set_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -98,7 +98,7 @@ EXAMPLES = '''
     msg: "{{ result.network_sets }}"
 
 - name: Gather information about a Network Set by name, excluding Ethernet networks
-  oneview_network_set_info:
+  community.general.oneview_network_set_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password

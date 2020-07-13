@@ -56,7 +56,7 @@ author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
 
 EXAMPLES = '''
 - name: Attach a volume
-  profitbricks_volume_attachments:
+  community.general.profitbricks_volume_attachments:
     datacenter: Tardis One
     server: node002
     volume: vol01
@@ -64,7 +64,7 @@ EXAMPLES = '''
     state: present
 
 - name: Detach a volume
-  profitbricks_volume_attachments:
+  community.general.profitbricks_volume_attachments:
     datacenter: Tardis One
     server: node002
     volume: vol01

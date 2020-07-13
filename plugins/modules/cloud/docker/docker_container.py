@@ -830,14 +830,14 @@ requirements:
 
 EXAMPLES = '''
 - name: Create a data container
-  docker_container:
+  community.general.docker_container:
     name: mydata
     image: busybox
     volumes:
       - /data
 
 - name: Re-create a redis container
-  docker_container:
+  community.general.docker_container:
     name: myredis
     image: redis
     command: redis-server --appendonly yes
@@ -849,7 +849,7 @@ EXAMPLES = '''
       - mydata
 
 - name: Restart a container
-  docker_container:
+  community.general.docker_container:
     name: myapplication
     image: someuser/appimage
     state: started
@@ -876,19 +876,19 @@ EXAMPLES = '''
         BOOLEAN_KEY: "yes"
 
 - name: Container present
-  docker_container:
+  community.general.docker_container:
     name: mycontainer
     state: present
     image: ubuntu:14.04
     command: sleep infinity
 
 - name: Stop a container
-  docker_container:
+  community.general.docker_container:
     name: mycontainer
     state: stopped
 
 - name: Start 4 load-balanced containers
-  docker_container:
+  community.general.docker_container:
     name: "container{{ item }}"
     recreate: yes
     image: someuser/anotherappimage
@@ -896,12 +896,12 @@ EXAMPLES = '''
   with_sequence: count=4
 
 - name: Remove container
-  docker_container:
+  community.general.docker_container:
     name: ohno
     state: absent
 
 - name: Syslogging output
-  docker_container:
+  community.general.docker_container:
     name: myservice
     image: busybox
     log_driver: syslog
@@ -913,14 +913,14 @@ EXAMPLES = '''
       tag: myservice
 
 - name: Create db container and connect to network
-  docker_container:
+  community.general.docker_container:
     name: db_test
     image: "postgres:latest"
     networks:
       - name: "{{ docker_network_name }}"
 
 - name: Start container, connect to network and link
-  docker_container:
+  community.general.docker_container:
     name: sleeper
     image: ubuntu:14.04
     networks:
@@ -933,13 +933,13 @@ EXAMPLES = '''
       - name: TestingNet2
 
 - name: Start a container with a command
-  docker_container:
+  community.general.docker_container:
     name: sleepy
     image: ubuntu:14.04
     command: ["sleep", "infinity"]
 
 - name: Add container to networks
-  docker_container:
+  community.general.docker_container:
     name: sleepy
     networks:
       - name: TestingNet
@@ -950,7 +950,7 @@ EXAMPLES = '''
         ipv4_address: 172.1.10.20
 
 - name: Update network with aliases
-  docker_container:
+  community.general.docker_container:
     name: sleepy
     networks:
       - name: TestingNet
@@ -959,25 +959,25 @@ EXAMPLES = '''
           - zzzz
 
 - name: Remove container from one network
-  docker_container:
+  community.general.docker_container:
     name: sleepy
     networks:
       - name: TestingNet2
     purge_networks: yes
 
 - name: Remove container from all networks
-  docker_container:
+  community.general.docker_container:
     name: sleepy
     purge_networks: yes
 
 - name: Start a container and use an env file
-  docker_container:
+  community.general.docker_container:
     name: agent
     image: jenkinsci/ssh-slave
     env_file: /var/tmp/jenkins/agent.env
 
 - name: Create a container with limited capabilities
-  docker_container:
+  community.general.docker_container:
     name: sleepy
     image: ubuntu:16.04
     command: sleep infinity
@@ -987,7 +987,7 @@ EXAMPLES = '''
       - all
 
 - name: Finer container restart/update control
-  docker_container:
+  community.general.docker_container:
     name: test
     image: ubuntu:18.04
     env:
@@ -1001,7 +1001,7 @@ EXAMPLES = '''
       volumes: allow_more_present   # if there are more volumes, that's ok, as long as `/tmp:/tmp` is there
 
 - name: Finer container restart/update control II
-  docker_container:
+  community.general.docker_container:
     name: test
     image: ubuntu:18.04
     env:
@@ -1012,7 +1012,7 @@ EXAMPLES = '''
       env: strict   # except for environment variables; there, we want to be strict
 
 - name: Start container with healthstatus
-  docker_container:
+  community.general.docker_container:
     name: nginx-proxy
     image: nginx:1.13
     state: started
@@ -1026,7 +1026,7 @@ EXAMPLES = '''
       start_period: 30s
 
 - name: Remove healthcheck from container
-  docker_container:
+  community.general.docker_container:
     name: nginx-proxy
     image: nginx:1.13
     state: started
@@ -1035,7 +1035,7 @@ EXAMPLES = '''
       test: ["NONE"]
 
 - name: Start container with block device read limit
-  docker_container:
+  community.general.docker_container:
     name: test
     image: ubuntu:18.04
     state: started

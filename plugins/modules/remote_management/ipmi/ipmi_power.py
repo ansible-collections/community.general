@@ -61,7 +61,7 @@ powerstate:
 
 EXAMPLES = '''
 - name: Ensure machine is powered on
-  ipmi_power:
+  community.general.ipmi_power:
     name: test.testdomain.com
     user: admin
     password: password

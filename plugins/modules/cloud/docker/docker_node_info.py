@@ -51,23 +51,23 @@ requirements:
 
 EXAMPLES = '''
 - name: Get info on all nodes
-  docker_node_info:
+  community.general.docker_node_info:
   register: result
 
 - name: Get info on node
-  docker_node_info:
+  community.general.docker_node_info:
     name: mynode
   register: result
 
 - name: Get info on list of nodes
-  docker_node_info:
+  community.general.docker_node_info:
     name:
       - mynode1
       - mynode2
   register: result
 
 - name: Get info on host if it is Swarm Manager
-  docker_node_info:
+  community.general.docker_node_info:
     self: true
   register: result
 '''

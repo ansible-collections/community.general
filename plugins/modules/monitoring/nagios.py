@@ -87,21 +87,21 @@ author: "Tim Bielawa (@tbielawa)"
 
 EXAMPLES = '''
 - name: Set 30 minutes of apache downtime
-  nagios:
+  community.general.nagios:
     action: downtime
     minutes: 30
     service: httpd
     host: '{{ inventory_hostname }}'
 
 - name: Schedule an hour of HOST downtime
-  nagios:
+  community.general.nagios:
     action: downtime
     minutes: 60
     service: host
     host: '{{ inventory_hostname }}'
 
 - name: Schedule an hour of HOST downtime starting at 2019-04-23T02:00:00+00:00
-  nagios:
+  community.general.nagios:
     action: downtime
     start: 1555984800
     minutes: 60
@@ -109,7 +109,7 @@ EXAMPLES = '''
     host: '{{ inventory_hostname }}'
 
 - name: Schedule an hour of HOST downtime, with a comment describing the reason
-  nagios:
+  community.general.nagios:
     action: downtime
     minutes: 60
     service: host
@@ -117,83 +117,83 @@ EXAMPLES = '''
     comment: Rebuilding machine
 
 - name: Schedule downtime for ALL services on HOST
-  nagios:
+  community.general.nagios:
     action: downtime
     minutes: 45
     service: all
     host: '{{ inventory_hostname }}'
 
 - name: Schedule downtime for a few services
-  nagios:
+  community.general.nagios:
     action: downtime
     services: frob,foobar,qeuz
     host: '{{ inventory_hostname }}'
 
 - name: Set 30 minutes downtime for all services in servicegroup foo
-  nagios:
+  community.general.nagios:
     action: servicegroup_service_downtime
     minutes: 30
     servicegroup: foo
     host: '{{ inventory_hostname }}'
 
 - name: Set 30 minutes downtime for all host in servicegroup foo
-  nagios:
+  community.general.nagios:
     action: servicegroup_host_downtime
     minutes: 30
     servicegroup: foo
     host: '{{ inventory_hostname }}'
 
 - name: Delete all downtime for a given host
-  nagios:
+  community.general.nagios:
     action: delete_downtime
     host: '{{ inventory_hostname }}'
     service: all
 
 - name: Delete all downtime for HOST with a particular comment
-  nagios:
+  community.general.nagios:
     action: delete_downtime
     host: '{{ inventory_hostname }}'
     service: host
     comment: Planned maintenance
 
 - name: Enable SMART disk alerts
-  nagios:
+  community.general.nagios:
     action: enable_alerts
     service: smart
     host: '{{ inventory_hostname }}'
 
 - name: Disable httpd and nfs alerts
-  nagios:
+  community.general.nagios:
     action: disable_alerts
     service: httpd,nfs
     host: '{{ inventory_hostname }}'
 
 - name: Disable HOST alerts
-  nagios:
+  community.general.nagios:
     action: disable_alerts
     service: host
     host: '{{ inventory_hostname }}'
 
 - name: Silence ALL alerts
-  nagios:
+  community.general.nagios:
     action: silence
     host: '{{ inventory_hostname }}'
 
 - name: Unsilence all alerts
-  nagios:
+  community.general.nagios:
     action: unsilence
     host: '{{ inventory_hostname }}'
 
 - name: Shut up nagios
-  nagios:
+  community.general.nagios:
     action: silence_nagios
 
 - name: Annoy me negios
-  nagios:
+  community.general.nagios:
     action: unsilence_nagios
 
 - name: Command something
-  nagios:
+  community.general.nagios:
     action: command
     command: DISABLE_FAILURE_PREDICTION
 '''

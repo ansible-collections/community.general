@@ -58,7 +58,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create an Anti Affinity Policy
-      clc_aa_policy:
+      community.general.clc_aa_policy:
         name: Hammer Time
         location: UK3
         state: present
@@ -75,7 +75,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Delete an Anti Affinity Policy
-      clc_aa_policy:
+      community.general.clc_aa_policy:
         name: Hammer Time
         location: UK3
         state: absent

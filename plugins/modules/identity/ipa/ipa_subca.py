@@ -44,7 +44,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Ensure IPA Sub CA is present
-  ipa_subca:
+  community.general.ipa_subca:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: present
@@ -53,14 +53,14 @@ EXAMPLES = '''
     subca_desc: Ansible Sub CA
 
 - name: Ensure that IPA Sub CA is removed
-  ipa_subca:
+  community.general.ipa_subca:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: absent
     subca_name: AnsibleSubCA1
 
 - name: Ensure that IPA Sub CA is disabled
-  ipa_subca:
+  community.general.ipa_subca:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: disable

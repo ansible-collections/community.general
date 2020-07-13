@@ -62,7 +62,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create Public IP For Servers
-      clc_publicip:
+      community.general.clc_publicip:
         protocol: TCP
         ports:
           - 80
@@ -82,7 +82,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create Public IP For Servers
-      clc_publicip:
+      community.general.clc_publicip:
         server_ids:
           - UC1TEST-SVR01
           - UC1TEST-SVR02

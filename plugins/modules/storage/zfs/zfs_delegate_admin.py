@@ -70,27 +70,27 @@ author:
 
 EXAMPLES = r'''
 - name: Grant `zfs allow` and `unallow` permission to the `adm` user with the default local+descendents scope
-  zfs_delegate_admin:
+  community.general.zfs_delegate_admin:
     name: rpool/myfs
     users: adm
     permissions: allow,unallow
 
 - name: Grant `zfs send` to everyone, plus the group `backup`
-  zfs_delegate_admin:
+  community.general.zfs_delegate_admin:
     name: rpool/myvol
     groups: backup
     everyone: yes
     permissions: send
 
 - name: Grant `zfs send,receive` to users `foo` and `bar` with local scope only
-  zfs_delegate_admin:
+  community.general.zfs_delegate_admin:
     name: rpool/myfs
     users: foo,bar
     permissions: send,receive
     local: yes
 
 - name: Revoke all permissions from everyone (permissions specifically assigned to users and groups remain)
-  zfs_delegate_admin:
+  community.general.zfs_delegate_admin:
     name: rpool/myfs
     everyone: yes
     state: absent

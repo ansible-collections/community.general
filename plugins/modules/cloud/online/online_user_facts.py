@@ -25,7 +25,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Gather Online user facts
-  online_user_facts:
+  community.general.online_user_facts:
 '''
 
 RETURN = r'''

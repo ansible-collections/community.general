@@ -36,7 +36,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Ensure that FCoE Network is present using the default configuration
-  oneview_fcoe_network:
+  community.general.oneview_fcoe_network:
     config: '/etc/oneview/oneview_config.json'
     state: present
     data:
@@ -45,7 +45,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Update the FCOE network scopes
-  oneview_fcoe_network:
+  community.general.oneview_fcoe_network:
     config: '/etc/oneview/oneview_config.json'
     state: present
     data:
@@ -56,7 +56,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Ensure that FCoE Network is absent
-  oneview_fcoe_network:
+  community.general.oneview_fcoe_network:
     config: '/etc/oneview/oneview_config.json'
     state: absent
     data:

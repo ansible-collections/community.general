@@ -142,7 +142,7 @@ EXAMPLES = '''
 - name: Create 1 device
   hosts: localhost
   tasks:
-  - packet_device:
+  - community.general.packet_device:
       project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
       hostnames: myserver
       tags: ci-xyz
@@ -157,7 +157,7 @@ EXAMPLES = '''
 - name: Create device and wait up to 10 minutes for active state
   hosts: localhost
   tasks:
-  - packet_device:
+  - community.general.packet_device:
       project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
       hostnames: myserver
       operating_system: ubuntu_16_04
@@ -169,7 +169,7 @@ EXAMPLES = '''
 - name: Create 3 ubuntu devices called server-01, server-02 and server-03
   hosts: localhost
   tasks:
-  - packet_device:
+  - community.general.packet_device:
       project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
       hostnames: server-%02d
       count: 3
@@ -181,7 +181,7 @@ EXAMPLES = '''
   hosts: localhost
   tasks:
   - name: Create 3 devices and register their facts
-    packet_device:
+    community.general.packet_device:
       hostnames: [coreos-one, coreos-two, coreos-three]
       operating_system: coreos_stable
       plan: baremetal_0
@@ -222,7 +222,7 @@ EXAMPLES = '''
 - name: Remove 3 devices by uuid
   hosts: localhost
   tasks:
-  - packet_device:
+  - community.general.packet_device:
       project_id: 89b497ee-5afc-420a-8fb5-56984898f4df
       state: absent
       device_ids:

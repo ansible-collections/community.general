@@ -77,7 +77,7 @@ options:
 
 EXAMPLES = '''
 - name: Update the root tenant in ManageIQ
-  manageiq_tenant:
+  community.general.manageiq_tenant:
     name: 'My Company'
     description: 'My company name'
     manageiq_connection:
@@ -87,7 +87,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Create a tenant in ManageIQ
-  manageiq_tenant:
+  community.general.manageiq_tenant:
     name: 'Dep1'
     description: 'Manufacturing department'
     parent_id: 1
@@ -98,7 +98,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Delete a tenant in ManageIQ
-  manageiq_tenant:
+  community.general.manageiq_tenant:
     state: 'absent'
     name: 'Dep1'
     parent_id: 1
@@ -109,7 +109,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Set tenant quota for cpu_allocated, mem_allocated, remove quota for vms_allocated
-  manageiq_tenant:
+  community.general.manageiq_tenant:
     name: 'Dep1'
     parent_id: 1
     quotas:
@@ -124,7 +124,7 @@ EXAMPLES = '''
 
 
 - name: Delete a tenant in ManageIQ using a token
-  manageiq_tenant:
+  community.general.manageiq_tenant:
     state: 'absent'
     name: 'Dep1'
     parent_id: 1

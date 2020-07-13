@@ -80,7 +80,7 @@ author:
 
 EXAMPLES = '''
 - name: Define new domain.
-  ibm_sa_domain:
+  community.general.ibm_sa_domain:
     domain: domain_name
     size: domain_size
     state: present
@@ -89,7 +89,7 @@ EXAMPLES = '''
     endpoints: hostdev-system
 
 - name: Delete domain.
-  ibm_sa_domain:
+  community.general.ibm_sa_domain:
     domain: domain_name
     state: absent
     username: admin

@@ -55,7 +55,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a DNS record on a UCS
-  udm_dns_record:
+  community.general.udm_dns_record:
     name: www
     zone: example.com
     type: host_record

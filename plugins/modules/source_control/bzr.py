@@ -46,7 +46,7 @@ options:
 
 EXAMPLES = '''
 - name: Checkout
-  bzr:
+  community.general.bzr:
     name: bzr+ssh://foosball.example.org/path/to/branch
     dest: /srv/checkout
     version: 22

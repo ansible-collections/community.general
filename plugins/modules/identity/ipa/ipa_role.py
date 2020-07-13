@@ -84,7 +84,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure role is present
-  ipa_role:
+  community.general.ipa_role:
     name: dba
     description: Database Administrators
     state: present
@@ -96,7 +96,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure role with certain details
-  ipa_role:
+  community.general.ipa_role:
     name: another-role
     description: Just another role
     group:
@@ -112,7 +112,7 @@ EXAMPLES = r'''
     - service01
 
 - name: Ensure role is absent
-  ipa_role:
+  community.general.ipa_role:
     name: dba
     state: absent
     ipa_host: ipa.example.com

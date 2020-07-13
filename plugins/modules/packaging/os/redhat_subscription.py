@@ -165,21 +165,21 @@ options:
 
 EXAMPLES = '''
 - name: Register as user (joe_user) with password (somepass) and auto-subscribe to available content.
-  redhat_subscription:
+  community.general.redhat_subscription:
     state: present
     username: joe_user
     password: somepass
     auto_attach: true
 
 - name: Same as above but subscribe to a specific pool by ID.
-  redhat_subscription:
+  community.general.redhat_subscription:
     state: present
     username: joe_user
     password: somepass
     pool_ids: 0123456789abcdef0123456789abcdef
 
 - name: Register and subscribe to multiple pools.
-  redhat_subscription:
+  community.general.redhat_subscription:
     state: present
     username: joe_user
     password: somepass
@@ -188,7 +188,7 @@ EXAMPLES = '''
       - 1123456789abcdef0123456789abcdef
 
 - name: Same as above but consume multiple entitlements.
-  redhat_subscription:
+  community.general.redhat_subscription:
     state: present
     username: joe_user
     password: somepass
@@ -197,28 +197,28 @@ EXAMPLES = '''
       - 1123456789abcdef0123456789abcdef: 4
 
 - name: Register and pull existing system data.
-  redhat_subscription:
+  community.general.redhat_subscription:
     state: present
     username: joe_user
     password: somepass
     consumer_id: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
 - name: Register with activationkey and consume subscriptions matching Red Hat Enterprise Server or Red Hat Virtualization
-  redhat_subscription:
+  community.general.redhat_subscription:
     state: present
     activationkey: 1-222333444
     org_id: 222333444
     pool: '^(Red Hat Enterprise Server|Red Hat Virtualization)$'
 
 - name: Update the consumed subscriptions from the previous example (remove Red Hat Virtualization subscription)
-  redhat_subscription:
+  community.general.redhat_subscription:
     state: present
     activationkey: 1-222333444
     org_id: 222333444
     pool: '^Red Hat Enterprise Server$'
 
 - name: Register as user credentials into given environment (against Red Hat Satellite 6.x), and auto-subscribe.
-  redhat_subscription:
+  community.general.redhat_subscription:
     state: present
     username: joe_user
     password: somepass
@@ -226,14 +226,14 @@ EXAMPLES = '''
     auto_attach: true
 
 - name: Register as user (joe_user) with password (somepass) and a specific release
-  redhat_subscription:
+  community.general.redhat_subscription:
     state: present
     username: joe_user
     password: somepass
     release: 7.4
 
 - name: Register as user (joe_user) with password (somepass), set syspurpose attributes and synchronize them with server
-  redhat_subscription:
+  community.general.redhat_subscription:
     state: present
     username: joe_user
     password: somepass

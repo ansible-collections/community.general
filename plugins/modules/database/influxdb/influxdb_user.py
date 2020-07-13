@@ -56,19 +56,19 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create a user on localhost using default login credentials
-  influxdb_user:
+  community.general.influxdb_user:
     user_name: john
     user_password: s3cr3t
 
 - name: Create a user on localhost using custom login credentials
-  influxdb_user:
+  community.general.influxdb_user:
     user_name: john
     user_password: s3cr3t
     login_username: "{{ influxdb_username }}"
     login_password: "{{ influxdb_password }}"
 
 - name: Create an admin user on a remote host using custom login credentials
-  influxdb_user:
+  community.general.influxdb_user:
     user_name: john
     user_password: s3cr3t
     admin: yes
@@ -77,7 +77,7 @@ EXAMPLES = r'''
     login_password: "{{ influxdb_password }}"
 
 - name: Create a user on localhost with privileges
-  influxdb_user:
+  community.general.influxdb_user:
     user_name: john
     user_password: s3cr3t
     login_username: "{{ influxdb_username }}"
@@ -89,7 +89,7 @@ EXAMPLES = r'''
         privilege: 'READ'
 
 - name: Destroy a user using custom login credentials
-  influxdb_user:
+  community.general.influxdb_user:
     user_name: john
     login_username: "{{ influxdb_username }}"
     login_password: "{{ influxdb_password }}"

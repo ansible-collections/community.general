@@ -86,7 +86,7 @@ author:
 
 EXAMPLES = r'''
 - name: Allow apache to modify files in /srv/git_repos
-  sefcontext:
+  community.general.sefcontext:
     target: '/srv/git_repos(/.*)?'
     setype: httpd_git_rw_content_t
     state: present

@@ -73,7 +73,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Task to boot a system using an ISO from an HP iLO interface only if the system is an HP server
-  hpilo_boot:
+  community.general.hpilo_boot:
     host: YOUR_ILO_ADDRESS
     login: YOUR_ILO_LOGIN
     password: YOUR_ILO_PASSWORD
@@ -83,7 +83,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Power off a server
-  hpilo_boot:
+  community.general.hpilo_boot:
     host: YOUR_ILO_HOST
     login: YOUR_ILO_LOGIN
     password: YOUR_ILO_PASSWORD

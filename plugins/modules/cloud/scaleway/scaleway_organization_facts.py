@@ -33,7 +33,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Gather Scaleway organizations facts
-  scaleway_organization_facts:
+  community.general.scaleway_organization_facts:
 '''
 
 RETURN = r'''

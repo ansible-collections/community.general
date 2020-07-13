@@ -56,7 +56,7 @@ author: "Dariusz Owczarek (@dareko)"
 
 EXAMPLES = """
 - name: Updating load_balance_policy
-  vertica_configuration: name=failovertostandbyafter value='8 hours'
+  community.general.vertica_configuration: name=failovertostandbyafter value='8 hours'
 """
 import traceback
 

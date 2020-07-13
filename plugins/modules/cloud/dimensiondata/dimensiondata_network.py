@@ -48,13 +48,13 @@ options:
 
 EXAMPLES = '''
 - name: Create an MCP 1.0 network
-  dimensiondata_network:
+  community.general.dimensiondata_network:
     region: na
     location: NA5
     name: mynet
 
 - name: Create an MCP 2.0 network
-  dimensiondata_network:
+  community.general.dimensiondata_network:
     region: na
     mcp_user: my_user
     mcp_password: my_password
@@ -63,7 +63,7 @@ EXAMPLES = '''
     service_plan: ADVANCED
 
 - name: Delete a network
-  dimensiondata_network:
+  community.general.dimensiondata_network:
     region: na
     location: NA1
     name: mynet

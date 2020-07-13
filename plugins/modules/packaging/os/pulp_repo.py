@@ -173,13 +173,13 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Create a new repo with name 'my_repo'
-  pulp_repo:
+  community.general.pulp_repo:
     name: my_repo
     relative_url: my/repo
     state: present
 
 - name: Create a repo with a feed and a relative URL
-  pulp_repo:
+  community.general.pulp_repo:
     name: my_centos_updates
     repo_type: rpm
     feed: http://mirror.centos.org/centos/6/updates/x86_64/
@@ -190,7 +190,7 @@ EXAMPLES = '''
     state: present
 
 - name: Remove a repo from the pulp server
-  pulp_repo:
+  community.general.pulp_repo:
     name: my_old_repo
     repo_type: rpm
     state: absent

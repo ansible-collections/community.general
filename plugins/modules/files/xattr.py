@@ -60,30 +60,30 @@ author:
 
 EXAMPLES = '''
 - name: Obtain the extended attributes  of /etc/foo.conf
-  xattr:
+  community.general.xattr:
     path: /etc/foo.conf
 
 - name: Set the key 'user.foo' to value 'bar'
-  xattr:
+  community.general.xattr:
     path: /etc/foo.conf
     key: foo
     value: bar
 
 - name: Set the key 'trusted.glusterfs.volume-id' to value '0x817b94343f164f199e5b573b4ea1f914'
-  xattr:
+  community.general.xattr:
     path: /mnt/bricks/brick1
     namespace: trusted
     key: glusterfs.volume-id
     value: "0x817b94343f164f199e5b573b4ea1f914"
 
 - name: Remove the key 'user.foo'
-  xattr:
+  community.general.xattr:
     path: /etc/foo.conf
     key: foo
     state: absent
 
 - name: Remove the key 'trusted.glusterfs.volume-id'
-  xattr:
+  community.general.xattr:
     path: /mnt/bricks/brick1
     namespace: trusted
     key: glusterfs.volume-id

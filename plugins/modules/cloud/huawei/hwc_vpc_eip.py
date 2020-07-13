@@ -145,7 +145,7 @@ EXAMPLES = '''
     ip_address: "192.168.100.33"
   register: port
 - name: Create an eip and bind it to a port
-  hwc_vpc_eip:
+  community.general.hwc_vpc_eip:
     type: "5_bgp"
     dedicated_bandwidth:
       charge_mode: "traffic"

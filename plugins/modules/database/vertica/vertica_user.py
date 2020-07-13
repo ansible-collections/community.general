@@ -84,10 +84,10 @@ author: "Dariusz Owczarek (@dareko)"
 
 EXAMPLES = """
 - name: Creating a new vertica user with password
-  vertica_user: name=user_name password=md5<encrypted_password> db=db_name state=present
+  community.general.vertica_user: name=user_name password=md5<encrypted_password> db=db_name state=present
 
 - name: Creating a new vertica user authenticated via ldap with roles assigned
-  vertica_user:
+  community.general.vertica_user:
     name=user_name
     ldap=true
     db=db_name

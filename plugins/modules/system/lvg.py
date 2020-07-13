@@ -71,13 +71,13 @@ notes:
 
 EXAMPLES = r'''
 - name: Create a volume group on top of /dev/sda1 with physical extent size = 32MB
-  lvg:
+  community.general.lvg:
     vg: vg.services
     pvs: /dev/sda1
     pesize: 32
 
 - name: Create a volume group on top of /dev/sdb with physical extent size = 128KiB
-  lvg:
+  community.general.lvg:
     vg: vg.services
     pvs: /dev/sdb
     pesize: 128K
@@ -87,17 +87,17 @@ EXAMPLES = r'''
 # top of /dev/sda5, we first extend it with /dev/sdb1 and /dev/sdc5,
 # and then reduce by /dev/sda5.
 - name: Create or resize a volume group on top of /dev/sdb1 and /dev/sdc5.
-  lvg:
+  community.general.lvg:
     vg: vg.services
     pvs: /dev/sdb1,/dev/sdc5
 
 - name: Remove a volume group with name vg.services
-  lvg:
+  community.general.lvg:
     vg: vg.services
     state: absent
 
 - name: Create a volume group on top of /dev/sda3 and resize the volume group /dev/sda3 to the maximum possible
-  lvg:
+  community.general.lvg:
     vg: resizableVG
     pvs: /dev/sda3
     pvresize: yes

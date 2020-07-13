@@ -47,21 +47,21 @@ options:
 
 EXAMPLES = '''
 - name: Enable a RHSM repository
-  rhsm_repository:
+  community.general.rhsm_repository:
     name: rhel-7-server-rpms
 
 - name: Disable all RHSM repositories
-  rhsm_repository:
+  community.general.rhsm_repository:
     name: '*'
     state: disabled
 
 - name: Enable all repositories starting with rhel-6-server
-  rhsm_repository:
+  community.general.rhsm_repository:
     name: rhel-6-server*
     state: enabled
 
 - name: Disable all repositories except rhel-7-server-rpms
-  rhsm_repository:
+  community.general.rhsm_repository:
     name: rhel-7-server-rpms
     purge: True
 '''

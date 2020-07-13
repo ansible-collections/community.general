@@ -43,7 +43,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure sudo command group exists
-  ipa_sudocmdgroup:
+  community.general.ipa_sudocmdgroup:
     name: group01
     description: Group of important commands
     sudocmd:
@@ -53,7 +53,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure sudo command group does not exist
-  ipa_sudocmdgroup:
+  community.general.ipa_sudocmdgroup:
     name: group01
     state: absent
     ipa_host: ipa.example.com

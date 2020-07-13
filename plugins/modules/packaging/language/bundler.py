@@ -84,27 +84,27 @@ author: "Tim Hoiberg (@thoiberg)"
 
 EXAMPLES = '''
 - name: Install gems from a Gemfile in the current directory
-  bundler:
+  community.general.bundler:
     state: present
     executable: ~/.rvm/gems/2.1.5/bin/bundle
 
 - name: Exclude the production group from installing
-  bundler:
+  community.general.bundler:
     state: present
     exclude_groups: production
 
 - name: Install gems into ./vendor/bundle
-  bundler:
+  community.general.bundler:
     state: present
     deployment_mode: yes
 
 - name: Install gems using a Gemfile in another directory
-  bundler:
+  community.general.bundler:
     state: present
     gemfile: ../rails_project/Gemfile
 
 - name: Update Gemfile in another directory
-  bundler:
+  community.general.bundler:
     state: latest
     chdir: ~/rails_project
 '''

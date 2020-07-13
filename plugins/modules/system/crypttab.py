@@ -58,13 +58,13 @@ author:
 
 EXAMPLES = r'''
 - name: Set the options explicitly a device which must already exist
-  crypttab:
+  community.general.crypttab:
     name: luks-home
     state: present
     opts: discard,cipher=aes-cbc-essiv:sha256
 
 - name: Add the 'discard' option to any existing options for all devices
-  crypttab:
+  community.general.crypttab:
     name: '{{ item.device }}'
     state: opts_present
     opts: discard

@@ -59,12 +59,12 @@ notes:
 
 EXAMPLES = '''
 - name: Create a ext2 filesystem on /dev/sdb1
-  filesystem:
+  community.general.filesystem:
     fstype: ext2
     dev: /dev/sdb1
 
 - name: Create a ext4 filesystem on /dev/sdb1 and check disk blocks
-  filesystem:
+  community.general.filesystem:
     fstype: ext4
     dev: /dev/sdb1
     opts: -cc

@@ -76,7 +76,7 @@ EXAMPLES = r'''
 
 # Read a CSV file and access user 'dag'
 - name: Read users from CSV file and return a dictionary
-  read_csv:
+  community.general.read_csv:
     path: users.csv
     key: name
   register: users
@@ -87,7 +87,7 @@ EXAMPLES = r'''
 
 # Read a CSV file and access the first item
 - name: Read users from CSV file and return a list
-  read_csv:
+  community.general.read_csv:
     path: users.csv
   register: users
   delegate_to: localhost
@@ -102,7 +102,7 @@ EXAMPLES = r'''
 
 # Read a CSV file without headers
 - name: Read users from CSV file and return a list
-  read_csv:
+  community.general.read_csv:
     path: users.csv
     fieldnames: name,uid,gid
     delimiter: ';'

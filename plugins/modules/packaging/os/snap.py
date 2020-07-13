@@ -58,26 +58,26 @@ author:
 EXAMPLES = '''
 # Install "foo" and "bar" snap
 - name: Install foo
-  snap:
+  community.general.snap:
     name:
       - foo
       - bar
 
 # Remove "foo" snap
 - name: Remove foo
-  snap:
+  community.general.snap:
     name: foo
     state: absent
 
 # Install a snap with classic confinement
 - name: Install "foo" with option --classic
-  snap:
+  community.general.snap:
     name: foo
     classic: yes
 
 # Install a snap with from a specific channel
 - name: Install "foo" with option --channel=latest/edge
-  snap:
+  community.general.snap:
     name: foo
     channel: latest/edge
 '''

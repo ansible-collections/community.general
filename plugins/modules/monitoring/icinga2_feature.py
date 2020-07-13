@@ -37,12 +37,12 @@ options:
 
 EXAMPLES = '''
 - name: Enable ido-pgsql feature
-  icinga2_feature:
+  community.general.icinga2_feature:
     name: ido-pgsql
     state: present
 
 - name: Disable api feature
-  icinga2_feature:
+  community.general.icinga2_feature:
     name: api
     state: absent
 '''

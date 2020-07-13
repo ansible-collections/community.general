@@ -56,18 +56,18 @@ options:
 
 EXAMPLES = '''
 - name: Install Elasticsearch head plugin
-  kibana_plugin:
+  community.general.kibana_plugin:
     state: present
     name: elasticsearch/marvel
 
 - name: Install specific version of a plugin
-  kibana_plugin:
+  community.general.kibana_plugin:
     state: present
     name: elasticsearch/marvel
     version: '2.3.3'
 
 - name: Uninstall Elasticsearch head plugin
-  kibana_plugin:
+  community.general.kibana_plugin:
     state: absent
     name: elasticsearch/marvel
 '''

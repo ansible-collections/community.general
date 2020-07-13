@@ -71,7 +71,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Extract kernel and ramdisk from a LiveCD
-  iso_extract:
+  community.general.iso_extract:
     image: /tmp/rear-test.iso
     dest: /tmp/virt-rear/
     files:

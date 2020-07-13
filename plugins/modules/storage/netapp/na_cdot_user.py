@@ -82,7 +82,7 @@ options:
 EXAMPLES = """
 
     - name: Create User
-      na_cdot_user:
+      community.general.na_cdot_user:
         state: present
         name: SampleUser
         application: ssh

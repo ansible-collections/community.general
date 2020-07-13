@@ -30,14 +30,14 @@ author:
 
 EXAMPLES = '''
 - name: Just get the list from default pip
-  pip_package_info:
+  community.general.pip_package_info:
 
 - name: Get the facts for default pip, pip2 and pip3.6
-  pip_package_info:
+  community.general.pip_package_info:
     clients: ['pip', 'pip2', 'pip3.6']
 
 - name: Get from specific paths (virtualenvs?)
-  pip_package_info:
+  community.general.pip_package_info:
     clients: '/home/me/projec42/python/pip3.5'
 '''
 

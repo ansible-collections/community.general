@@ -52,7 +52,7 @@ author:
 
 EXAMPLES = '''
 - name: Add a host named test-1
-  stacki_host:
+  community.general.stacki_host:
     name: test-1
     stacki_user: usr
     stacki_password: pwd
@@ -62,7 +62,7 @@ EXAMPLES = '''
     prim_intf: eth0
 
 - name: Remove a host named test-1
-  stacki_host:
+  community.general.stacki_host:
     name: test-1
     stacki_user: usr
     stacki_password: pwd

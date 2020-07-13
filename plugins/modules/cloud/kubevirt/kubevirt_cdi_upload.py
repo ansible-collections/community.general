@@ -64,7 +64,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Upload local image to pvc-vm1
-  kubevirt_cdi_upload:
+  community.general.kubevirt_cdi_upload:
     pvc_namespace: default
     pvc_name: pvc-vm1
     upload_host: https://localhost:8443

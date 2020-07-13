@@ -59,7 +59,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Create access key
-  bitbucket_access_key:
+  community.general.bitbucket_access_key:
     repository: 'bitbucket-repo'
     username: bitbucket_username
     key: '{{lookup("file", "bitbucket.pub") }}'
@@ -67,7 +67,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Delete access key
-  bitbucket_access_key:
+  community.general.bitbucket_access_key:
     repository: bitbucket-repo
     username: bitbucket_username
     label: Bitbucket

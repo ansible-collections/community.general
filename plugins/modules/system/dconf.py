@@ -76,41 +76,41 @@ value:
 
 EXAMPLES = """
 - name: Configure available keyboard layouts in Gnome
-  dconf:
+  community.general.dconf:
     key: "/org/gnome/desktop/input-sources/sources"
     value: "[('xkb', 'us'), ('xkb', 'se')]"
     state: present
 
 - name: Read currently available keyboard layouts in Gnome
-  dconf:
+  community.general.dconf:
     key: "/org/gnome/desktop/input-sources/sources"
     state: read
   register: keyboard_layouts
 
 - name: Reset the available keyboard layouts in Gnome
-  dconf:
+  community.general.dconf:
     key: "/org/gnome/desktop/input-sources/sources"
     state: absent
 
 - name: Configure available keyboard layouts in Cinnamon
-  dconf:
+  community.general.dconf:
     key: "/org/gnome/libgnomekbd/keyboard/layouts"
     value: "['us', 'se']"
     state: present
 
 - name: Read currently available keyboard layouts in Cinnamon
-  dconf:
+  community.general.dconf:
     key: "/org/gnome/libgnomekbd/keyboard/layouts"
     state: read
   register: keyboard_layouts
 
 - name: Reset the available keyboard layouts in Cinnamon
-  dconf:
+  community.general.dconf:
     key: "/org/gnome/libgnomekbd/keyboard/layouts"
     state: absent
 
 - name: Disable desktop effects in Cinnamon
-  dconf:
+  community.general.dconf:
     key: "/org/cinnamon/desktop-effects"
     value: "false"
     state: present

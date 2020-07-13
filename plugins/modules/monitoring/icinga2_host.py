@@ -95,7 +95,7 @@ options:
 
 EXAMPLES = '''
 - name: Add host to icinga
-  icinga2_host:
+  community.general.icinga2_host:
     url: "https://icinga2.example.com"
     url_username: "ansible"
     url_password: "a_secret"

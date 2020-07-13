@@ -74,7 +74,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create an Alert Policy for disk above 80% for 5 minutes
-      clc_alert_policy:
+      community.general.clc_alert_policy:
         alias: wfad
         name: 'alert for disk > 80%'
         alert_recipients:
@@ -96,7 +96,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Delete an Alert Policy
-      clc_alert_policy:
+      community.general.clc_alert_policy:
         alias: wfad
         name: 'alert for disk > 80%'
         state: absent

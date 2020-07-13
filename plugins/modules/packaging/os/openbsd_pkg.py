@@ -68,54 +68,54 @@ notes:
 
 EXAMPLES = '''
 - name: Make sure nmap is installed
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: nmap
     state: present
 
 - name: Make sure nmap is the latest version
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: nmap
     state: latest
 
 - name: Make sure nmap is not installed
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: nmap
     state: absent
 
 - name: Make sure nmap is installed, build it from source if it is not
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: nmap
     state: present
     build: yes
 
 - name: Specify a pkg flavour with '--'
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: vim--no_x11
     state: present
 
 - name: Specify the default flavour to avoid ambiguity errors
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: vim--
     state: present
 
 - name: Specify a package branch (requires at least OpenBSD 6.0)
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: python%3.5
     state: present
 
 - name: Update all packages on the system
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: '*'
     state: latest
 
 - name: Purge a package and it's configuration files
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: mpd
     clean: yes
     state: absent
 
 - name: Quickly remove a package without checking checksums
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: qt5
     quick: yes
     state: absent

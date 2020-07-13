@@ -70,25 +70,25 @@ options:
 
 EXAMPLES = '''
 - name: Install package foo (automatically updating the xbps package if needed)
-  xbps: name=foo state=present
+  community.general.xbps: name=foo state=present
 
 - name: Upgrade package foo
-  xbps: name=foo state=latest update_cache=yes
+  community.general.xbps: name=foo state=latest update_cache=yes
 
 - name: Remove packages foo and bar
-  xbps: name=foo,bar state=absent
+  community.general.xbps: name=foo,bar state=absent
 
 - name: Recursively remove package foo
-  xbps: name=foo state=absent recurse=yes
+  community.general.xbps: name=foo state=absent recurse=yes
 
 - name: Update package cache
-  xbps: update_cache=yes
+  community.general.xbps: update_cache=yes
 
 - name: Upgrade packages
-  xbps: upgrade=yes
+  community.general.xbps: upgrade=yes
 
 - name: Install a package, failing if the xbps package is out of date
-  xbps:
+  community.general.xbps:
     name: foo
     state: present
     upgrade_xbps: no
