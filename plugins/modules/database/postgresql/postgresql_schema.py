@@ -95,17 +95,17 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create a new schema with name acme in test database
-  postgresql_schema:
+  community.general.postgresql_schema:
     db: test
     name: acme
 
 - name: Create a new schema acme with a user bob who will own it
-  postgresql_schema:
+  community.general.postgresql_schema:
     name: acme
     owner: bob
 
 - name: Drop schema "acme" with cascade
-  postgresql_schema:
+  community.general.postgresql_schema:
     name: acme
     state: absent
     cascade_drop: yes
