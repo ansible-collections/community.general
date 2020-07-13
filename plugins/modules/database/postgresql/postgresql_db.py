@@ -137,12 +137,12 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create a new database with name "acme"
-  postgresql_db:
+  community.general.postgresql_db:
     name: acme
 
 # Note: If a template different from "template0" is specified, encoding and locale settings must match those of the template.
 - name: Create a new database with name "acme" and specific encoding and locale # settings.
-  postgresql_db:
+  community.general.postgresql_db:
     name: acme
     encoding: UTF-8
     lc_collate: de_DE.UTF-8
@@ -151,38 +151,38 @@ EXAMPLES = r'''
 
 # Note: Default limit for the number of concurrent connections to a specific database is "-1", which means "unlimited"
 - name: Create a new database with name "acme" which has a limit of 100 concurrent connections
-  postgresql_db:
+  community.general.postgresql_db:
     name: acme
     conn_limit: "100"
 
 - name: Dump an existing database to a file
-  postgresql_db:
+  community.general.postgresql_db:
     name: acme
     state: dump
     target: /tmp/acme.sql
 
 - name: Dump an existing database to a file excluding the test table
-  postgresql_db:
+  community.general.postgresql_db:
     name: acme
     state: dump
     target: /tmp/acme.sql
     dump_extra_args: --exclude-table=test
 
 - name: Dump an existing database to a file (with compression)
-  postgresql_db:
+  community.general.postgresql_db:
     name: acme
     state: dump
     target: /tmp/acme.sql.gz
 
 - name: Dump a single schema for an existing database
-  postgresql_db:
+  community.general.postgresql_db:
     name: acme
     state: dump
     target: /tmp/acme.sql
     target_opts: "-n public"
 
 - name: Dump only table1 and table2 from the acme database
-  postgresql_db:
+  community.general.postgresql_db:
     name: acme
     state: dump
     target: /tmp/table1_table2.sql
@@ -192,7 +192,7 @@ EXAMPLES = r'''
 # the tablespace will be changed to foo. Access to the database will be locked
 # until the copying of database files is finished.
 - name: Create a new database called foo in tablespace bar
-  postgresql_db:
+  community.general.postgresql_db:
     name: foo
     tablespace: bar
 '''

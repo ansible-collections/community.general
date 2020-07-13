@@ -88,12 +88,12 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Simple select query to acme db
-  postgresql_query:
+  community.general.postgresql_query:
     db: acme
     query: SELECT version()
 
 - name: Select query to db acme with positional arguments and non-default credentials
-  postgresql_query:
+  community.general.postgresql_query:
     db: acme
     login_user: django
     login_password: mysecretpass
@@ -103,7 +103,7 @@ EXAMPLES = r'''
     - test
 
 - name: Select query to test_db with named_args
-  postgresql_query:
+  community.general.postgresql_query:
     db: test_db
     query: SELECT * FROM test WHERE id = %(id_val)s AND story = %(story_val)s
     named_args:
@@ -111,12 +111,12 @@ EXAMPLES = r'''
       story_val: test
 
 - name: Insert query to test_table in db test_db
-  postgresql_query:
+  community.general.postgresql_query:
     db: test_db
     query: INSERT INTO test_table (id, story) VALUES (2, 'my_long_story')
 
 - name: Run queries from SQL script using UTF-8 client encoding for session
-  postgresql_query:
+  community.general.postgresql_query:
     db: test_db
     path_to_script: /var/lib/pgsql/test.sql
     positional_args:
@@ -124,7 +124,7 @@ EXAMPLES = r'''
     encoding: UTF-8
 
 - name: Example of using autocommit parameter
-  postgresql_query:
+  community.general.postgresql_query:
     db: test_db
     query: VACUUM
     autocommit: yes
@@ -132,7 +132,7 @@ EXAMPLES = r'''
 - name: >
     Insert data to the column of array type using positional_args.
     Note that we use quotes here, the same as for passing JSON, etc.
-  postgresql_query:
+  community.general.postgresql_query:
     query: INSERT INTO test_table (array_column) VALUES (%s)
     positional_args:
     - '{1,2,3}'
@@ -147,7 +147,7 @@ EXAMPLES = r'''
     my_arr: '{1, 2, 3}'
 
 - name: Select from test table by passing positional_args as arrays
-  postgresql_query:
+  community.general.postgresql_query:
     query: SELECT * FROM test_array_table WHERE arr_col1 = %s AND arr_col2 = %s
     positional_args:
     - '{{ my_list }}'

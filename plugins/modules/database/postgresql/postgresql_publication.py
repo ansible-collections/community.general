@@ -95,12 +95,12 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create a new publication with name "acme" targeting all tables in database "test".
-  postgresql_publication:
+  community.general.postgresql_publication:
     db: test
     name: acme
 
 - name: Create publication "acme" publishing only prices and vehicles tables.
-  postgresql_publication:
+  community.general.postgresql_publication:
     name: acme
     tables:
     - prices
@@ -109,7 +109,7 @@ EXAMPLES = r'''
 - name: >
     Create publication "acme", set user alice as an owner, targeting all tables.
     Allowable DML operations are INSERT and UPDATE only
-  postgresql_publication:
+  community.general.postgresql_publication:
     name: acme
     owner: alice
     parameters:
@@ -118,7 +118,7 @@ EXAMPLES = r'''
 - name: >
     Assuming publication "acme" exists and there are targeted
     tables "prices" and "vehicles", add table "stores" to the publication.
-  postgresql_publication:
+  community.general.postgresql_publication:
     name: acme
     tables:
     - prices
@@ -126,7 +126,7 @@ EXAMPLES = r'''
     - stores
 
 - name: Remove publication "acme" if exists in database "test".
-  postgresql_publication:
+  community.general.postgresql_publication:
     db: test
     name: acme
     state: absent

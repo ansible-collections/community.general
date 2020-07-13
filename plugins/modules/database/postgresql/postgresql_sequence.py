@@ -165,25 +165,25 @@ extends_documentation_fragment:
 EXAMPLES = r'''
 - name: Create an ascending bigint sequence called foobar in the default
         database
-  postgresql_sequence:
+  community.general.postgresql_sequence:
     name: foobar
 
 - name: Create an ascending integer sequence called foobar, starting at 101
-  postgresql_sequence:
+  community.general.postgresql_sequence:
     name: foobar
     data_type: integer
     start: 101
 
 - name: Create an descending sequence called foobar, starting at 101 and
         preallocated 10 sequence numbers in cache
-  postgresql_sequence:
+  community.general.postgresql_sequence:
     name: foobar
     increment: -1
     cache: 10
     start: 101
 
 - name: Create an ascending sequence called foobar, which cycle between 1 to 10
-  postgresql_sequence:
+  community.general.postgresql_sequence:
     name: foobar
     cycle: yes
     min: 1
@@ -191,32 +191,32 @@ EXAMPLES = r'''
 
 - name: Create an ascending bigint sequence called foobar in the default
         database with owner foobar
-  postgresql_sequence:
+  community.general.postgresql_sequence:
     name: foobar
     owner: foobar
 
 - name: Rename an existing sequence named foo to bar
-  postgresql_sequence:
+  community.general.postgresql_sequence:
     name: foo
     rename_to: bar
 
 - name: Change the schema of an existing sequence to foobar
-  postgresql_sequence:
+  community.general.postgresql_sequence:
     name: foobar
     newschema: foobar
 
 - name: Change the owner of an existing sequence to foobar
-  postgresql_sequence:
+  community.general.postgresql_sequence:
     name: foobar
     owner: foobar
 
 - name: Drop a sequence called foobar
-  postgresql_sequence:
+  community.general.postgresql_sequence:
     name: foobar
     state: absent
 
 - name: Drop a sequence called foobar with cascade
-  postgresql_sequence:
+  community.general.postgresql_sequence:
     name: foobar
     cascade: yes
     state: absent
