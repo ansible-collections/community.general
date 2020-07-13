@@ -119,19 +119,19 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Adds postgis extension to the database acme in the schema foo
-  postgresql_ext:
+  community.general.postgresql_ext:
     name: postgis
     db: acme
     schema: foo
 
 - name: Removes postgis extension to the database acme
-  postgresql_ext:
+  community.general.postgresql_ext:
     name: postgis
     db: acme
     state: absent
 
 - name: Adds earthdistance extension to the database template1 cascade
-  postgresql_ext:
+  community.general.postgresql_ext:
     name: earthdistance
     db: template1
     cascade: true
@@ -139,20 +139,20 @@ EXAMPLES = r'''
 # In the example below, if earthdistance extension is installed,
 # it will be removed too because it depends on cube:
 - name: Removes cube extension from the database acme cascade
-  postgresql_ext:
+  community.general.postgresql_ext:
     name: cube
     db: acme
     cascade: yes
     state: absent
 
 - name: Create extension foo of version 1.2 or update it if it's already created
-  postgresql_ext:
+  community.general.postgresql_ext:
     db: acme
     name: foo
     version: 1.2
 
 - name: Assuming extension foo is created, update it to the latest version
-  postgresql_ext:
+  community.general.postgresql_ext:
     db: acme
     name: foo
     version: latest

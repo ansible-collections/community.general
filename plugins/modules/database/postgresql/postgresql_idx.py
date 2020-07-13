@@ -150,14 +150,14 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create btree index if not exists test_idx concurrently covering columns id and name of table products
-  postgresql_idx:
+  community.general.postgresql_idx:
     db: acme
     table: products
     columns: id,name
     name: test_idx
 
 - name: Create btree index test_idx concurrently with tablespace called ssd and storage parameter
-  postgresql_idx:
+  community.general.postgresql_idx:
     db: acme
     table: products
     columns:
@@ -169,7 +169,7 @@ EXAMPLES = r'''
     - fillfactor=90
 
 - name: Create gist index test_gist_idx concurrently on column geo_data of table map
-  postgresql_idx:
+  community.general.postgresql_idx:
     db: somedb
     table: map
     idxtype: gist
@@ -178,7 +178,7 @@ EXAMPLES = r'''
 
 # Note: for the example below pg_trgm extension must be installed for gin_trgm_ops
 - name: Create gin index gin0_idx not concurrently on column comment of table test
-  postgresql_idx:
+  community.general.postgresql_idx:
     idxname: gin0_idx
     table: test
     columns: comment gin_trgm_ops
@@ -186,13 +186,13 @@ EXAMPLES = r'''
     idxtype: gin
 
 - name: Drop btree test_idx concurrently
-  postgresql_idx:
+  community.general.postgresql_idx:
     db: mydb
     idxname: test_idx
     state: absent
 
 - name: Drop test_idx cascade
-  postgresql_idx:
+  community.general.postgresql_idx:
     db: mydb
     idxname: test_idx
     state: absent
@@ -200,7 +200,7 @@ EXAMPLES = r'''
     concurrent: no
 
 - name: Create btree index test_idx concurrently on columns id,comment where column id > 1
-  postgresql_idx:
+  community.general.postgresql_idx:
     db: mydb
     table: test
     columns: id,comment
@@ -208,7 +208,7 @@ EXAMPLES = r'''
     cond: id > 1
 
 - name: Create unique btree index if not exists test_unique_idx on column name of table products
-  postgresql_idx:
+  community.general.postgresql_idx:
     db: acme
     table: products
     columns: name

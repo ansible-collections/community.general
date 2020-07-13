@@ -72,13 +72,13 @@ EXAMPLES = r'''
 - name: Collect PostgreSQL version and extensions
   become: yes
   become_user: postgres
-  postgresql_info:
+  community.general.postgresql_info:
     filter: ver*,ext*
 
 - name: Collect all info except settings and roles
   become: yes
   become_user: postgres
-  postgresql_info:
+  community.general.postgresql_info:
     filter: "!settings,!roles"
 
 # On FreeBSD with PostgreSQL 9.5 version and lower use pgsql user to become
@@ -86,7 +86,7 @@ EXAMPLES = r'''
 - name: Collect tablespaces and repl_slots info
   become: yes
   become_user: pgsql
-  postgresql_info:
+  community.general.postgresql_info:
     db: postgres
     filter:
     - tablesp*
@@ -95,7 +95,7 @@ EXAMPLES = r'''
 - name: Collect all info except databases
   become: yes
   become_user: postgres
-  postgresql_info:
+  community.general.postgresql_info:
     filter:
     - "!databases"
 '''
