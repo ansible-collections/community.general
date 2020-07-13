@@ -47,39 +47,39 @@ author: "Trey Perry (@treyperry)"
 
 EXAMPLES = """
 - name: Creating or updating a znode with a given value
-  znode:
+  community.general.znode:
     hosts: 'localhost:2181'
     name: /mypath
     value: myvalue
     state: present
 
 - name: Getting the value and stat structure for a znode
-  znode:
+  community.general.znode:
     hosts: 'localhost:2181'
     name: /mypath
     op: get
 
 - name: Listing a particular znode's children
-  znode:
+  community.general.znode:
     hosts: 'localhost:2181'
     name: /zookeeper
     op: list
 
 - name: Waiting 20 seconds for a znode to appear at path /mypath
-  znode:
+  community.general.znode:
     hosts: 'localhost:2181'
     name: /mypath
     op: wait
     timeout: 20
 
 - name: Deleting a znode at path /mypath
-  znode:
+  community.general.znode:
     hosts: 'localhost:2181'
     name: /mypath
     state: absent
 
 - name: Creating or updating a znode with a given value on a remote Zookeeper
-  znode:
+  community.general.znode:
     hosts: 'my-zookeeper-node:2181'
     name: /mypath
     value: myvalue

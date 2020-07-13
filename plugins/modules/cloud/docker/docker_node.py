@@ -83,35 +83,35 @@ author:
 
 EXAMPLES = '''
 - name: Set node role
-  docker_node:
+  community.general.docker_node:
     hostname: mynode
     role: manager
 
 - name: Set node availability
-  docker_node:
+  community.general.docker_node:
     hostname: mynode
     availability: drain
 
 - name: Replace node labels with new labels
-  docker_node:
+  community.general.docker_node:
     hostname: mynode
     labels:
       key: value
     labels_state: replace
 
 - name: Merge node labels and new labels
-  docker_node:
+  community.general.docker_node:
     hostname: mynode
     labels:
       key: value
 
 - name: Remove all labels assigned to node
-  docker_node:
+  community.general.docker_node:
     hostname: mynode
     labels_state: replace
 
 - name: Remove selected labels from the node
-  docker_node:
+  community.general.docker_node:
     hostname: mynode
     labels_to_remove:
       - key1

@@ -35,7 +35,7 @@ author:
 
 EXAMPLES = '''
 - name: Makes a computer to speak
-  say:
+  community.general.say:
     msg: '{{ inventory_hostname }} is all done'
     voice: Zarvox
   delegate_to: localhost

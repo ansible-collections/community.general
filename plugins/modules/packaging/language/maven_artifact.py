@@ -122,20 +122,20 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Download the latest version of the JUnit framework artifact from Maven Central
-  maven_artifact:
+  community.general.maven_artifact:
     group_id: junit
     artifact_id: junit
     dest: /tmp/junit-latest.jar
 
 - name: Download JUnit 4.11 from Maven Central
-  maven_artifact:
+  community.general.maven_artifact:
     group_id: junit
     artifact_id: junit
     version: 4.11
     dest: /tmp/junit-4.11.jar
 
 - name: Download an artifact from a private repository requiring authentication
-  maven_artifact:
+  community.general.maven_artifact:
     group_id: com.company
     artifact_id: library-name
     repository_url: 'https://repo.company.com/maven'
@@ -144,7 +144,7 @@ EXAMPLES = '''
     dest: /tmp/library-name-latest.jar
 
 - name: Download a WAR File to the Tomcat webapps directory to be deployed
-  maven_artifact:
+  community.general.maven_artifact:
     group_id: com.company
     artifact_id: web-app
     extension: war
@@ -152,7 +152,7 @@ EXAMPLES = '''
     dest: /var/lib/tomcat7/webapps/web-app.war
 
 - name: Keep a downloaded artifact's name, i.e. retain the version
-  maven_artifact:
+  community.general.maven_artifact:
     version: latest
     artifact_id: spring-core
     group_id: org.springframework
@@ -160,14 +160,14 @@ EXAMPLES = '''
     keep_name: yes
 
 - name: Download the latest version of the JUnit framework artifact from Maven local
-  maven_artifact:
+  community.general.maven_artifact:
     group_id: junit
     artifact_id: junit
     dest: /tmp/junit-latest.jar
     repository_url: "file://{{ lookup('env','HOME') }}/.m2/repository"
 
 - name: Download the latest version between 3.8 and 4.0 (exclusive) of the JUnit framework artifact from Maven Central
-  maven_artifact:
+  community.general.maven_artifact:
     group_id: junit
     artifact_id: junit
     version_by_spec: "[3.8,4.0)"

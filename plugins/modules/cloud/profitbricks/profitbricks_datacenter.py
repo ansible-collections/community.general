@@ -59,12 +59,12 @@ author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
 
 EXAMPLES = '''
 - name: Create a datacenter
-  profitbricks_datacenter:
+  community.general.profitbricks_datacenter:
     datacenter: Tardis One
     wait_timeout: 500
 
 - name: Destroy a datacenter (remove all servers, volumes, and other objects in the datacenter)
-  profitbricks_datacenter:
+  community.general.profitbricks_datacenter:
     datacenter: Tardis One
     wait_timeout: 500
     state: absent

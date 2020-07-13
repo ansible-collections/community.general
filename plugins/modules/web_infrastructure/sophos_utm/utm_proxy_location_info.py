@@ -34,7 +34,7 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Remove UTM proxy_location
-  utm_proxy_location_info:
+  community.general.utm_proxy_location_info:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestLocationEntry

@@ -50,12 +50,12 @@ options:
 
 EXAMPLES = """
 - name: Create a simple Connector Card
-  office_365_connector_card:
+  community.general.office_365_connector_card:
     webhook: https://outlook.office.com/webhook/GUID/IncomingWebhook/GUID/GUID
     text: 'Hello, World!'
 
 - name: Create a Connector Card with the full format
-  office_365_connector_card:
+  community.general.office_365_connector_card:
     webhook: https://outlook.office.com/webhook/GUID/IncomingWebhook/GUID/GUID
     summary: This is the summary property
     title: This is the **card's title** property

@@ -119,14 +119,14 @@ author:
 
 EXAMPLES = '''
 - name: Create A record
-  ipwcli_dns:
+  community.general.ipwcli_dns:
     dnsname: example.com
     type: A
     container: ZoneOne
     address: 127.0.0.1
 
 - name: Remove SRV record if exists
-  ipwcli_dns:
+  community.general.ipwcli_dns:
     dnsname: _sip._tcp.test.example.com
     type: SRV
     container: ZoneOne
@@ -136,7 +136,7 @@ EXAMPLES = '''
     port: 5060
 
 - name: Create NAPTR record
-  ipwcli_dns:
+  community.general.ipwcli_dns:
     dnsname: test.example.com
     type: NAPTR
     preference: 10

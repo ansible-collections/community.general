@@ -105,7 +105,7 @@ options:
 
 EXAMPLES = '''
 - name: "Delete GitLab User"
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     validate_certs: False
@@ -113,7 +113,7 @@ EXAMPLES = '''
     state: absent
 
 - name: "Create GitLab User"
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: https://gitlab.example.com/
     validate_certs: True
     api_username: dj-wasabi
@@ -129,7 +129,7 @@ EXAMPLES = '''
     access_level: owner
 
 - name: "Block GitLab User"
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     validate_certs: False
@@ -137,7 +137,7 @@ EXAMPLES = '''
     state: blocked
 
 - name: "Unblock GitLab User"
-  gitlab_user:
+  community.general.gitlab_user:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     validate_certs: False

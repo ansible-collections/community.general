@@ -80,7 +80,7 @@ EXAMPLES = '''
   gather_facts: False
   tasks:
     - name: Create MIG
-      gce_mig:
+      community.general.gce_mig:
         name: ansible-mig-example
         zone: us-central1-c
         state: present
@@ -97,7 +97,7 @@ EXAMPLES = '''
         seconds: 30
 
     - name: Recreate MIG Instances with Instance Template change.
-      gce_mig:
+      community.general.gce_mig:
         name: ansible-mig-example
         zone: us-central1-c
         state: present
@@ -109,14 +109,14 @@ EXAMPLES = '''
         seconds: 30
 
     - name: Resize MIG
-      gce_mig:
+      community.general.gce_mig:
         name: ansible-mig-example
         zone: us-central1-c
         state: present
         size: 3
 
     - name: Update MIG with Autoscaler
-      gce_mig:
+      community.general.gce_mig:
         name: ansible-mig-example
         zone: us-central1-c
         state: present
@@ -140,7 +140,7 @@ EXAMPLES = '''
         seconds: 30
 
     - name: Delete MIG
-      gce_mig:
+      community.general.gce_mig:
         name: ansible-mig-example
         zone: us-central1-c
         state: absent

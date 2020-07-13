@@ -98,7 +98,7 @@ options:
 
 EXAMPLES = '''
 - name: "Register runner"
-  gitlab_runner:
+  community.general.gitlab_runner:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     registration_token: 4gfdsg345
@@ -110,7 +110,7 @@ EXAMPLES = '''
     locked: False
 
 - name: "Delete runner"
-  gitlab_runner:
+  community.general.gitlab_runner:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     description: Docker Machine t1

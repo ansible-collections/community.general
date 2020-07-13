@@ -77,7 +77,7 @@ author: Sergei Antipov (@UnderGreen)
 
 EXAMPLES = '''
 - name: Upload new openvz template with minimal options
-  proxmox_template:
+  community.general.proxmox_template:
     node: uk-mc02
     api_user: root@pam
     api_password: 1q2w3e
@@ -87,14 +87,14 @@ EXAMPLES = '''
 - name: >
     Upload new openvz template with minimal options use environment
     PROXMOX_PASSWORD variable(you should export it before)
-  proxmox_template:
+  community.general.proxmox_template:
     node: uk-mc02
     api_user: root@pam
     api_host: node1
     src: ~/ubuntu-14.04-x86_64.tar.gz
 
 - name: Upload new openvz template with all options and force overwrite
-  proxmox_template:
+  community.general.proxmox_template:
     node: uk-mc02
     api_user: root@pam
     api_password: 1q2w3e
@@ -105,7 +105,7 @@ EXAMPLES = '''
     force: yes
 
 - name: Delete template with minimal options
-  proxmox_template:
+  community.general.proxmox_template:
     node: uk-mc02
     api_user: root@pam
     api_password: 1q2w3e

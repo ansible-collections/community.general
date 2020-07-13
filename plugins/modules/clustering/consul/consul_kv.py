@@ -110,27 +110,27 @@ EXAMPLES = '''
 # If the key does not exist, the value associated to the "data" property in `retrieved_key` will be `None`
 # If the key value is empty string, `retrieved_key["data"]["Value"]` will be `None`
 - name: Retrieve a value from the key/value store
-  consul_kv:
+  community.general.consul_kv:
     key: somekey
   register: retrieved_key
 
 - name: Add or update the value associated with a key in the key/value store
-  consul_kv:
+  community.general.consul_kv:
     key: somekey
     value: somevalue
 
 - name: Remove a key from the store
-  consul_kv:
+  community.general.consul_kv:
     key: somekey
     state: absent
 
 - name: Add a node to an arbitrary group via consul inventory (see consul.ini)
-  consul_kv:
+  community.general.consul_kv:
     key: ansible/groups/dc1/somenode
     value: top_secret
 
 - name: Register a key/value pair with an associated session
-  consul_kv:
+  community.general.consul_kv:
     key: stg/node/server_birthday
     value: 20160509
     session: "{{ sessionid }}"

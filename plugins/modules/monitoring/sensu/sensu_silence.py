@@ -59,14 +59,14 @@ options:
 EXAMPLES = '''
 # Silence ALL checks for a given client
 - name: Silence server1.example.dev
-  sensu_silence:
+  community.general.sensu_silence:
     subscription: client:server1.example.dev
     creator: "{{ ansible_user_id }}"
     reason: Performing maintenance
 
 # Silence specific check for a client
 - name: Silence CPU_Usage check for server1.example.dev
-  sensu_silence:
+  community.general.sensu_silence:
     subscription: client:server1.example.dev
     check: CPU_Usage
     creator: "{{ ansible_user_id }}"
@@ -80,7 +80,7 @@ EXAMPLES = '''
       reason: 'Deployment in progress'
 
 - name: Silence several clients from a dict
-  sensu_silence:
+  community.general.sensu_silence:
     subscription: "client:{{ item.key }}"
     reason: "{{ item.value.reason }}"
     creator: "{{ ansible_user_id }}"

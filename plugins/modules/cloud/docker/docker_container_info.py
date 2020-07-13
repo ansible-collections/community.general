@@ -41,7 +41,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Get infos on container
-  docker_container_info:
+  community.general.docker_container_info:
     name: mydata
   register: result
 

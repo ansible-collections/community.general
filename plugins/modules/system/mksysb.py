@@ -75,7 +75,7 @@ options:
 
 EXAMPLES = '''
 - name: Running a backup image mksysb
-  mksysb:
+  community.general.mksysb:
     name: myserver
     storage_path: /repository/images
     exclude_files: yes

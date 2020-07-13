@@ -108,74 +108,74 @@ author:
 '''
 
 EXAMPLES = r'''
-- firewalld:
+- community.general.firewalld:
     service: https
     permanent: yes
     state: enabled
 
-- firewalld:
+- community.general.firewalld:
     port: 8081/tcp
     permanent: yes
     state: disabled
 
-- firewalld:
+- community.general.firewalld:
     port: 161-162/udp
     permanent: yes
     state: enabled
 
-- firewalld:
+- community.general.firewalld:
     zone: dmz
     service: http
     permanent: yes
     state: enabled
 
-- firewalld:
+- community.general.firewalld:
     rich_rule: rule service name="ftp" audit limit value="1/m" accept
     permanent: yes
     state: enabled
 
-- firewalld:
+- community.general.firewalld:
     source: 192.0.2.0/24
     zone: internal
     state: enabled
 
-- firewalld:
+- community.general.firewalld:
     zone: trusted
     interface: eth2
     permanent: yes
     state: enabled
 
-- firewalld:
+- community.general.firewalld:
     masquerade: yes
     state: enabled
     permanent: yes
     zone: dmz
 
-- firewalld:
+- community.general.firewalld:
     zone: custom
     state: present
     permanent: yes
 
-- firewalld:
+- community.general.firewalld:
     zone: drop
     state: enabled
     permanent: yes
     icmp_block_inversion: yes
 
-- firewalld:
+- community.general.firewalld:
     zone: drop
     state: enabled
     permanent: yes
     icmp_block: echo-request
 
-- firewalld:
+- community.general.firewalld:
     zone: internal
     state: present
     permanent: yes
     target: ACCEPT
 
 - name: Redirect port 443 to 8443 with Rich Rule
-  firewalld:
+  community.general.firewalld:
     rich_rule: rule family=ipv4 forward-port port=443 protocol=tcp to-port=8443
     zone: public
     permanent: yes

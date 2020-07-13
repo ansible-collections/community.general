@@ -75,119 +75,119 @@ notes:
 
 EXAMPLES = '''
 - name: Create a logical volume of 512m
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     size: 512
 
 - name: Create a logical volume of 512m with disks /dev/sda and /dev/sdb
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     size: 512
     pvs: /dev/sda,/dev/sdb
 
 - name: Create cache pool logical volume
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: lvcache
     size: 512m
     opts: --type cache-pool
 
 - name: Create a logical volume of 512g.
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     size: 512g
 
 - name: Create a logical volume the size of all remaining space in the volume group
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     size: 100%FREE
 
 - name: Create a logical volume with special options
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     size: 512g
     opts: -r 16
 
 - name: Extend the logical volume to 1024m.
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     size: 1024
 
 - name: Extend the logical volume to consume all remaining space in the volume group
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     size: +100%FREE
 
 - name: Extend the logical volume to take all remaining space of the PVs and resize the underlying filesystem
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     size: 100%PVS
     resizefs: true
 
 - name: Resize the logical volume to % of VG
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     size: 80%VG
     force: yes
 
 - name: Reduce the logical volume to 512m
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     size: 512
     force: yes
 
 - name: Set the logical volume to 512m and do not try to shrink if size is lower than current one
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     size: 512
     shrink: no
 
 - name: Remove the logical volume.
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     state: absent
     force: yes
 
 - name: Create a snapshot volume of the test logical volume.
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     snapshot: snap1
     size: 100m
 
 - name: Deactivate a logical volume
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     active: false
 
 - name: Create a deactivated logical volume
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     size: 512g
     active: false
 
 - name: Create a thin pool of 512g
-  lvol:
+  community.general.lvol:
     vg: firefly
     thinpool: testpool
     size: 512g
 
 - name: Create a thin volume of 128g
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     thinpool: testpool

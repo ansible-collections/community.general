@@ -22,7 +22,7 @@ options:
 EXAMPLES = '''
 # Pass the process name
 - name: Getting process IDs of the process
-  pids:
+  community.general.pids:
       name: python
   register: pids_of_python
 

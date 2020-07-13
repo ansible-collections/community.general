@@ -140,7 +140,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Basic example to provision from image
-  ovirt:
+  community.general.ovirt:
     user: admin@internal
     url: https://ovirt.example.com
     instance_name: ansiblevm04
@@ -150,7 +150,7 @@ EXAMPLES = '''
     resource_type: template
 
 - name: Full example to create new instance from scratch
-  ovirt:
+  community.general.ovirt:
     instance_name: testansible
     resource_type: new
     instance_type: server
@@ -171,7 +171,7 @@ EXAMPLES = '''
     disk_int: virtio
 
 - name: Stopping an existing instance
-  ovirt:
+  community.general.ovirt:
     instance_name: testansible
     state: stopped
     user: admin@internal
@@ -179,7 +179,7 @@ EXAMPLES = '''
     url: https://ovirt.example.com
 
 - name: Start an existing instance
-  ovirt:
+  community.general.ovirt:
     instance_name: testansible
     state: started
     user: admin@internal
@@ -187,7 +187,7 @@ EXAMPLES = '''
     url: https://ovirt.example.com
 
 - name: Start an instance with cloud init information
-  ovirt:
+  community.general.ovirt:
     instance_name: testansible
     state: started
     user: admin@internal
