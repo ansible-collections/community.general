@@ -35,7 +35,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Gather self-heal facts about all gluster hosts in the cluster
-  gluster_heal_info:
+  community.general.gluster_heal_info:
     name: test_volume
     status_filter: self-heal
   register: self_heal_status
@@ -43,7 +43,7 @@ EXAMPLES = '''
     var: self_heal_status
 
 - name: Gather rebalance facts about all gluster hosts in the cluster
-  gluster_heal_info:
+  community.general.gluster_heal_info:
     name: test_volume
     status_filter: rebalance
   register: rebalance_status

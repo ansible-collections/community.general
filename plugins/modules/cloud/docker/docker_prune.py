@@ -87,14 +87,14 @@ requirements:
 
 EXAMPLES = '''
 - name: Prune containers older than 24h
-  docker_prune:
+  community.general.docker_prune:
     containers: yes
     containers_filters:
       # only consider containers created more than 24 hours ago
       until: 24h
 
 - name: Prune everything
-  docker_prune:
+  community.general.docker_prune:
     containers: yes
     images: yes
     networks: yes
@@ -102,7 +102,7 @@ EXAMPLES = '''
     builder_cache: yes
 
 - name: Prune everything (including non-dangling images)
-  docker_prune:
+  community.general.docker_prune:
     containers: yes
     images: yes
     images_filters:

@@ -45,7 +45,7 @@ options:
 EXAMPLES = '''
 # Create the zone domain 'test.com'
 - name: Create zone domain
-  memset_zone_domain:
+  community.general.memset_zone_domain:
     domain: test.com
     zone: testzone
     state: present

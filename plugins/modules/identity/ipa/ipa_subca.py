@@ -44,7 +44,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Ensure IPA Sub CA is present
-  ipa_subca:
+  community.general.ipa_subca:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: present
@@ -53,14 +53,14 @@ EXAMPLES = '''
     subca_desc: Ansible Sub CA
 
 - name: Ensure that IPA Sub CA is removed
-  ipa_subca:
+  community.general.ipa_subca:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: absent
     subca_name: AnsibleSubCA1
 
 - name: Ensure that IPA Sub CA is disabled
-  ipa_subca:
+  community.general.ipa_subca:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: disable
@@ -139,7 +139,7 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not ipa_subca:
+        if not community.general.ipa_subca:
             changed = True
             if not module.check_mode:
                 client.subca_add(subca_name=subca_name, subject_dn=subca_subject_dn, details=module_subca)
@@ -156,7 +156,7 @@ def ensure(module, client):
                 if not module.check_mode:
                     client.subca_mod(subca_name=subca_name, diff=diff, details=module_subca)
     elif state == 'absent':
-        if ipa_subca:
+        if community.general.ipa_subca:
             changed = True
             if not module.check_mode:
                 client.subca_del(subca_name=subca_name)
@@ -165,7 +165,7 @@ def ensure(module, client):
         if LooseVersion(ipa_version) < LooseVersion('4.4.2'):
             module.fail_json(msg="Current version of IPA server [%s] does not support 'CA disable' option. Please upgrade to "
                                  "version greater than 4.4.2")
-        if ipa_subca:
+        if community.general.ipa_subca:
             changed = True
             if not module.check_mode:
                 client.subca_disable(subca_name=subca_name)
@@ -174,7 +174,7 @@ def ensure(module, client):
         if LooseVersion(ipa_version) < LooseVersion('4.4.2'):
             module.fail_json(msg="Current version of IPA server [%s] does not support 'CA enable' option. Please upgrade to "
                                  "version greater than 4.4.2")
-        if ipa_subca:
+        if community.general.ipa_subca:
             changed = True
             if not module.check_mode:
                 client.subca_enable(subca_name=subca_name)

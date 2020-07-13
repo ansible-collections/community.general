@@ -43,7 +43,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure sudo command group exists
-  ipa_sudocmdgroup:
+  community.general.ipa_sudocmdgroup:
     name: group01
     description: Group of important commands
     sudocmd:
@@ -53,7 +53,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure sudo command group does not exist
-  ipa_sudocmdgroup:
+  community.general.ipa_sudocmdgroup:
     name: group01
     state: absent
     ipa_host: ipa.example.com
@@ -125,7 +125,7 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not ipa_sudocmdgroup:
+        if not community.general.ipa_sudocmdgroup:
             changed = True
             if not module.check_mode:
                 ipa_sudocmdgroup = client.sudocmdgroup_add(name=name, item=module_sudocmdgroup)
@@ -144,7 +144,7 @@ def ensure(module, client):
                                             client.sudocmdgroup_add_member_sudocmd,
                                             client.sudocmdgroup_remove_member_sudocmd)
     else:
-        if ipa_sudocmdgroup:
+        if community.general.ipa_sudocmdgroup:
             changed = True
             if not module.check_mode:
                 client.sudocmdgroup_del(name=name)

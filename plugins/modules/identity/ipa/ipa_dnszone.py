@@ -39,14 +39,14 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure dns zone is present
-  ipa_dnszone:
+  community.general.ipa_dnszone:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: present
     zone_name: example.com
 
 - name: Ensure dns zone is present and is dynamic update
-  ipa_dnszone:
+  community.general.ipa_dnszone:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: present
@@ -54,7 +54,7 @@ EXAMPLES = r'''
     dynamicupdate: true
 
 - name: Ensure that dns zone is removed
-  ipa_dnszone:
+  community.general.ipa_dnszone:
     zone_name: example.com
     ipa_host: localhost
     ipa_user: admin
@@ -114,14 +114,14 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not ipa_dnszone:
+        if not community.general.ipa_dnszone:
             changed = True
             if not module.check_mode:
                 client.dnszone_add(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate})
         else:
             changed = False
     else:
-        if ipa_dnszone:
+        if community.general.ipa_dnszone:
             changed = True
             if not module.check_mode:
                 client.dnszone_del(zone_name=zone_name)

@@ -52,7 +52,7 @@ author:
 
 EXAMPLES = '''
 - name: Add ports for host.
-  ibm_sa_host_ports:
+  community.general.ibm_sa_host_ports:
     host: test_host
     iscsi_name: iqn.1994-05.com***
     username: admin
@@ -61,7 +61,7 @@ EXAMPLES = '''
     state: present
 
 - name: Remove ports for host.
-  ibm_sa_host_ports:
+  community.general.ibm_sa_host_ports:
     host: test_host
     iscsi_name: iqn.1994-05.com***
     username: admin

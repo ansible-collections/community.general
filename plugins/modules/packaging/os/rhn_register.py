@@ -78,38 +78,38 @@ options:
 
 EXAMPLES = r'''
 - name: Unregister system from RHN
-  rhn_register:
+  community.general.rhn_register:
     state: absent
     username: joe_user
     password: somepass
 
 - name: Register as user with password and auto-subscribe to available content
-  rhn_register:
+  community.general.rhn_register:
     state: present
     username: joe_user
     password: somepass
 
 - name: Register with activationkey and enable extended update support
-  rhn_register:
+  community.general.rhn_register:
     state: present
     activationkey: 1-222333444
     enable_eus: yes
 
 - name: Register with activationkey and set a profilename which may differ from the hostname
-  rhn_register:
+  community.general.rhn_register:
     state: present
     activationkey: 1-222333444
     profilename: host.example.com.custom
 
 - name: Register as user with password against a satellite server
-  rhn_register:
+  community.general.rhn_register:
     state: present
     username: joe_user
     password: somepass
     server_url: https://xmlrpc.my.satellite/XMLRPC
 
 - name: Register as user with password and enable channels
-  rhn_register:
+  community.general.rhn_register:
     state: present
     username: joe_user
     password: somepass

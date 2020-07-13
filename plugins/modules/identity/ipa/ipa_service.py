@@ -45,7 +45,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure service is present
-  ipa_service:
+  community.general.ipa_service:
     name: http/host01.example.com
     state: present
     ipa_host: ipa.example.com
@@ -53,7 +53,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure service is absent
-  ipa_service:
+  community.general.ipa_service:
     name: http/host01.example.com
     state: absent
     ipa_host: ipa.example.com
@@ -61,7 +61,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Changing Managing hosts list
-  ipa_service:
+  community.general.ipa_service:
     name: http/host01.example.com
     host:
        - host01.example.com
@@ -138,7 +138,7 @@ def ensure(module, client):
     module_service = get_service_dict(force=module.params['force'])
     changed = False
     if state in ['present', 'enabled', 'disabled']:
-        if not ipa_service:
+        if not community.general.ipa_service:
             changed = True
             if not module.check_mode:
                 client.service_add(name=name, service=module_service)
@@ -152,7 +152,7 @@ def ensure(module, client):
                         data[key] = module_service.get(key)
                     client.service_mod(name=name, service=data)
         if hosts is not None:
-            if 'managedby_host' in ipa_service:
+            if 'managedby_host' in community.general.ipa_service:
                 for host in ipa_service['managedby_host']:
                     if host not in hosts:
                         if not module.check_mode:
@@ -170,7 +170,7 @@ def ensure(module, client):
                     changed = True
 
     else:
-        if ipa_service:
+        if community.general.ipa_service:
             changed = True
             if not module.check_mode:
                 client.service_del(name=name)

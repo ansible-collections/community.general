@@ -68,7 +68,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure dns record is present
-  ipa_dnsrecord:
+  community.general.ipa_dnsrecord:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: present
@@ -78,7 +78,7 @@ EXAMPLES = r'''
     record_value: '::1'
 
 - name: Ensure that dns record exists with a TTL
-  ipa_dnsrecord:
+  community.general.ipa_dnsrecord:
     name: host02
     zone_name: example.com
     record_type: 'AAAA'
@@ -89,7 +89,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Ensure a PTR record is present
-  ipa_dnsrecord:
+  community.general.ipa_dnsrecord:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: present
@@ -99,7 +99,7 @@ EXAMPLES = r'''
     record_value: 'internal.ipa.example.com'
 
 - name: Ensure a TXT record is present
-  ipa_dnsrecord:
+  community.general.ipa_dnsrecord:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: present
@@ -109,7 +109,7 @@ EXAMPLES = r'''
     record_value: 'EXAMPLE.COM'
 
 - name: Ensure an SRV record is present
-  ipa_dnsrecord:
+  community.general.ipa_dnsrecord:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: present
@@ -119,7 +119,7 @@ EXAMPLES = r'''
     record_value: '10 50 88 ipa.example.com'
 
 - name: Ensure an MX record is present
-  ipa_dnsrecord:
+  community.general.ipa_dnsrecord:
     ipa_host: spider.example.com
     ipa_pass: Passw0rd!
     state: present
@@ -129,7 +129,7 @@ EXAMPLES = r'''
     record_value: '1 mailserver.example.com'
 
 - name: Ensure that dns record is removed
-  ipa_dnsrecord:
+  community.general.ipa_dnsrecord:
     name: host01
     zone_name: example.com
     record_type: 'AAAA'
@@ -255,7 +255,7 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not ipa_dnsrecord:
+        if not community.general.ipa_dnsrecord:
             changed = True
             if not module.check_mode:
                 client.dnsrecord_add(zone_name=zone_name,
@@ -270,7 +270,7 @@ def ensure(module, client):
                                          record_name=record_name,
                                          details=module_dnsrecord)
     else:
-        if ipa_dnsrecord:
+        if community.general.ipa_dnsrecord:
             changed = True
             if not module.check_mode:
                 client.dnsrecord_del(zone_name=zone_name,

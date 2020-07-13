@@ -47,18 +47,18 @@ author:
 
 EXAMPLES = '''
 - name: Remove all repositories
-  apt_repo:
+  community.general.apt_repo:
     repo: all
     state: absent
 
 - name: Add repository `Sisysphus` and remove other repositories
-  apt_repo:
+  community.general.apt_repo:
     repo: Sisysphus
     state: present
     remove_others: yes
 
 - name: Add local repository `/space/ALT/Sisyphus` and update package cache
-  apt_repo:
+  community.general.apt_repo:
     repo: copy:///space/ALT/Sisyphus
     state: present
     update: yes

@@ -104,7 +104,7 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Create UTM aaa_group
-  utm_aaa_group:
+  community.general.utm_aaa_group:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestAAAGroupEntry
@@ -116,7 +116,7 @@ EXAMPLES = """
     state: present
 
 - name: Remove UTM aaa_group
-  utm_aaa_group:
+  community.general.utm_aaa_group:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestAAAGroupEntry

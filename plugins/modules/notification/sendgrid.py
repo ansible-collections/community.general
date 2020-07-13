@@ -75,7 +75,7 @@ author: "Matt Makai (@makaimc)"
 
 EXAMPLES = '''
 - name: Send an email to a single recipient that the deployment was successful
-  sendgrid:
+  community.general.sendgrid:
     username: "{{ sendgrid_username }}"
     password: "{{ sendgrid_password }}"
     from_address: "ansible@mycompany.com"
@@ -86,7 +86,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Send an email to more than one recipient that the build failed
-  sendgrid:
+  community.general.sendgrid:
       username: "{{ sendgrid_username }}"
       password: "{{ sendgrid_password }}"
       from_address: "build@mycompany.com"

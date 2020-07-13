@@ -54,7 +54,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure host-group databases is present
-  ipa_hostgroup:
+  community.general.ipa_hostgroup:
     name: databases
     state: present
     host:
@@ -67,7 +67,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure host-group databases is absent
-  ipa_hostgroup:
+  community.general.ipa_hostgroup:
     name: databases
     state: absent
     ipa_host: ipa.example.com
@@ -146,7 +146,7 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not ipa_hostgroup:
+        if not community.general.ipa_hostgroup:
             changed = True
             if not module.check_mode:
                 ipa_hostgroup = client.hostgroup_add(name=name, item=module_hostgroup)
@@ -171,7 +171,7 @@ def ensure(module, client):
                                             client.hostgroup_remove_hostgroup) or changed
 
     else:
-        if ipa_hostgroup:
+        if community.general.ipa_hostgroup:
             changed = True
             if not module.check_mode:
                 client.hostgroup_del(name=name)

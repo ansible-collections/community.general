@@ -268,14 +268,14 @@ requirements:
 
 EXAMPLES = r'''
 - name: Create 2 TB VDO volume vdo1 on device /dev/md0
-  vdo:
+  community.general.vdo:
     name: vdo1
     state: present
     device: /dev/md0
     logicalsize: 2T
 
 - name: Remove VDO volume vdo1
-  vdo:
+  community.general.vdo:
     name: vdo1
     state: absent
 '''

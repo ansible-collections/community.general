@@ -84,7 +84,7 @@ notes:
 EXAMPLES = '''
 # Configure a handler that sends event data as STDIN (pipe)
 - name: Configure IRC Sensu handler
-  sensu_handler:
+  community.general.sensu_handler:
     name: "irc_handler"
     type: "pipe"
     command: "/usr/local/bin/notify-irc.sh"
@@ -100,13 +100,13 @@ EXAMPLES = '''
 
 # Delete a handler
 - name: Delete IRC Sensu handler
-  sensu_handler:
+  community.general.sensu_handler:
     name: "irc_handler"
     state: "absent"
 
 # Example of a TCP handler
 - name: Configure TCP Sensu handler
-  sensu_handler:
+  community.general.sensu_handler:
     name: "tcp_handler"
     type: "tcp"
     timeout: 30

@@ -79,13 +79,13 @@ requirements:
 
 EXAMPLES = '''
 - name: Start virtual machine 'myvm'
-  kubevirt_vm:
+  community.general.kubevirt_vm:
       state: running
       name: myvm
       namespace: vms
 
 - name: Create virtual machine 'myvm' and start it
-  kubevirt_vm:
+  community.general.kubevirt_vm:
       state: running
       name: myvm
       namespace: vms
@@ -111,7 +111,7 @@ EXAMPLES = '''
             bus: virtio
 
 - name: Create virtual machine 'myvm' with multus network interface
-  kubevirt_vm:
+  community.general.kubevirt_vm:
       name: myvm
       namespace: vms
       memory: 512M
@@ -127,7 +127,7 @@ EXAMPLES = '''
               networkName: mynetconf
 
 - name: Combine inline definition with Ansible parameters
-  kubevirt_vm:
+  community.general.kubevirt_vm:
       # Kubernetes specification:
       definition:
         metadata:
@@ -151,7 +151,7 @@ EXAMPLES = '''
             bus: virtio
 
 - name: Start ephemeral virtual machine 'myvm' and wait to be running
-  kubevirt_vm:
+  community.general.kubevirt_vm:
       ephemeral: true
       state: running
       wait: true
@@ -171,7 +171,7 @@ EXAMPLES = '''
             bus: virtio
 
 - name: Start fedora vm with cloud init
-  kubevirt_vm:
+  community.general.kubevirt_vm:
       state: running
       wait: true
       name: myvm
@@ -201,7 +201,7 @@ EXAMPLES = '''
                     - S2
 
 - name: Create virtual machine with datavolume and specify node affinity
-  kubevirt_vm:
+  community.general.kubevirt_vm:
     name: myvm
     namespace: default
     memory: 1024Mi
@@ -224,7 +224,7 @@ EXAMPLES = '''
                   - S1
 
 - name: Remove virtual machine 'myvm'
-  kubevirt_vm:
+  community.general.kubevirt_vm:
       state: absent
       name: myvm
       namespace: vms

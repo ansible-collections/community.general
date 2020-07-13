@@ -81,7 +81,7 @@ EXAMPLES = '''
       vpc_id: "{{ vpc2.id }}"
   register: connect
 - name: Create a route
-  hwc_vpc_route:
+  community.general.hwc_vpc_route:
     vpc_id: "{{ vpc1.id }}"
     destination: "192.168.0.0/16"
     next_hop: "{{ connect.id }}"

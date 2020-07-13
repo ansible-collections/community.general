@@ -183,7 +183,7 @@ options:
 
 EXAMPLES = '''
 - name: Create simple infoblox nameserver group
-  nios_nsgroup:
+  community.general.nios_nsgroup:
     name: my-simple-group
     comment: "this is a simple nameserver group"
     grid_primary:
@@ -196,7 +196,7 @@ EXAMPLES = '''
   connection: local
 
 - name: Create infoblox nameserver group with external primaries
-  nios_nsgroup:
+  community.general.nios_nsgroup:
     name: my-example-group
     use_external_primary: true
     comment: "this is my example nameserver group"
@@ -213,7 +213,7 @@ EXAMPLES = '''
   connection: local
 
 - name: Delete infoblox nameserver group
-  nios_nsgroup:
+  community.general.nios_nsgroup:
     name: my-simple-group
     comment: "this is a simple nameserver group"
     grid_primary:

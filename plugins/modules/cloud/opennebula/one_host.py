@@ -75,13 +75,13 @@ author:
 
 EXAMPLES = '''
 - name: Create a new host in OpenNebula
-  one_host:
+  community.general.one_host:
     name: host1
     cluster_id: 1
     api_url: http://127.0.0.1:2633/RPC2
 
 - name: Create a host and adjust its template
-  one_host:
+  community.general.one_host:
     name: host2
     cluster_name: default
     template:

@@ -58,7 +58,7 @@ author:
 
 EXAMPLES = '''
 - name: Map volume to host.
-  ibm_sa_vol_map:
+  community.general.ibm_sa_vol_map:
     vol: volume_name
     lun: 1
     host: host_name
@@ -68,7 +68,7 @@ EXAMPLES = '''
     state: present
 
 - name: Map volume to cluster.
-  ibm_sa_vol_map:
+  community.general.ibm_sa_vol_map:
     vol: volume_name
     lun: 1
     cluster: cluster_name
@@ -78,7 +78,7 @@ EXAMPLES = '''
     state: present
 
 - name: Unmap volume.
-  ibm_sa_vol_map:
+  community.general.ibm_sa_vol_map:
     host: host_name
     username: admin
     password: secret

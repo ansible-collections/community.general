@@ -195,7 +195,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create a VM from a template
-  xenserver_guest:
+  community.general.xenserver_guest:
     hostname: "{{ xenserver_hostname }}"
     username: "{{ xenserver_username }}"
     password: "{{ xenserver_password }}"
@@ -222,7 +222,7 @@ EXAMPLES = r'''
   register: deploy
 
 - name: Create a VM template
-  xenserver_guest:
+  community.general.xenserver_guest:
     hostname: "{{ xenserver_hostname }}"
     username: "{{ xenserver_username }}"
     password: "{{ xenserver_password }}"
@@ -240,7 +240,7 @@ EXAMPLES = r'''
   register: deploy
 
 - name: Rename a VM (requires the VM's UUID)
-  xenserver_guest:
+  community.general.xenserver_guest:
     hostname: "{{ xenserver_hostname }}"
     username: "{{ xenserver_username }}"
     password: "{{ xenserver_password }}"
@@ -250,7 +250,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Remove a VM by UUID
-  xenserver_guest:
+  community.general.xenserver_guest:
     hostname: "{{ xenserver_hostname }}"
     username: "{{ xenserver_username }}"
     password: "{{ xenserver_password }}"
@@ -259,7 +259,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Modify custom params (boot order)
-  xenserver_guest:
+  community.general.xenserver_guest:
     hostname: "{{ xenserver_hostname }}"
     username: "{{ xenserver_username }}"
     password: "{{ xenserver_password }}"
@@ -271,7 +271,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Customize network parameters
-  xenserver_guest:
+  community.general.xenserver_guest:
     hostname: "{{ xenserver_hostname }}"
     username: "{{ xenserver_username }}"
     password: "{{ xenserver_password }}"

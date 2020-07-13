@@ -29,7 +29,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Gather Scaleway organizations information
-  scaleway_organization_info:
+  community.general.scaleway_organization_info:
   register: result
 
 - debug:

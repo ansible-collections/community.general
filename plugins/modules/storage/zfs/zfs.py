@@ -39,39 +39,39 @@ author:
 
 EXAMPLES = '''
 - name: Create a new file system called myfs in pool rpool with the setuid property turned off
-  zfs:
+  community.general.zfs:
     name: rpool/myfs
     state: present
     extra_zfs_properties:
       setuid: off
 
 - name: Create a new volume called myvol in pool rpool.
-  zfs:
+  community.general.zfs:
     name: rpool/myvol
     state: present
     extra_zfs_properties:
       volsize: 10M
 
 - name: Create a snapshot of rpool/myfs file system.
-  zfs:
+  community.general.zfs:
     name: rpool/myfs@mysnapshot
     state: present
 
 - name: Create a new file system called myfs2 with snapdir enabled
-  zfs:
+  community.general.zfs:
     name: rpool/myfs2
     state: present
     extra_zfs_properties:
       snapdir: enabled
 
 - name: Create a new file system by cloning a snapshot
-  zfs:
+  community.general.zfs:
     name: rpool/cloned_fs
     state: present
     origin: rpool/myfs@mysnapshot
 
 - name: Destroy a filesystem
-  zfs:
+  community.general.zfs:
     name: rpool/myfs
     state: absent
 '''

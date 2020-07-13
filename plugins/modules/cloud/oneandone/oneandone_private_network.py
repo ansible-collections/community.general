@@ -92,7 +92,7 @@ author:
 
 EXAMPLES = '''
 - name: Create a private network
-  oneandone_private_network:
+  community.general.oneandone_private_network:
     auth_token: oneandone_private_api_key
     name: backup_network
     description: Testing creation of a private network with ansible
@@ -101,13 +101,13 @@ EXAMPLES = '''
     datacenter: US
 
 - name: Destroy a private network
-  oneandone_private_network:
+  community.general.oneandone_private_network:
     auth_token: oneandone_private_api_key
     state: absent
     name: backup_network
 
 - name: Modify the private network
-  oneandone_private_network:
+  community.general.oneandone_private_network:
     auth_token: oneandone_private_api_key
     state: update
     private_network: backup_network
@@ -115,7 +115,7 @@ EXAMPLES = '''
     subnet_mask: 255.255.255.0
 
 - name: Add members to the private network
-  oneandone_private_network:
+  community.general.oneandone_private_network:
     auth_token: oneandone_private_api_key
     state: update
     private_network: backup_network
@@ -123,7 +123,7 @@ EXAMPLES = '''
      - server identifier (id or name)
 
 - name: Remove members from the private network
-  oneandone_private_network:
+  community.general.oneandone_private_network:
     auth_token: oneandone_private_api_key
     state: update
     private_network: backup_network

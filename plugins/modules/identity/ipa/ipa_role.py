@@ -84,7 +84,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure role is present
-  ipa_role:
+  community.general.ipa_role:
     name: dba
     description: Database Administrators
     state: present
@@ -96,7 +96,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure role with certain details
-  ipa_role:
+  community.general.ipa_role:
     name: another-role
     description: Just another role
     group:
@@ -112,7 +112,7 @@ EXAMPLES = r'''
     - service01
 
 - name: Ensure role is absent
-  ipa_role:
+  community.general.ipa_role:
     name: dba
     state: absent
     ipa_host: ipa.example.com
@@ -219,7 +219,7 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not ipa_role:
+        if not community.general.ipa_role:
             changed = True
             if not module.check_mode:
                 ipa_role = client.role_add(name=name, item=module_role)
@@ -261,7 +261,7 @@ def ensure(module, client):
                                             client.role_remove_user) or changed
 
     else:
-        if ipa_role:
+        if community.general.ipa_role:
             changed = True
             if not module.check_mode:
                 client.role_del(name)

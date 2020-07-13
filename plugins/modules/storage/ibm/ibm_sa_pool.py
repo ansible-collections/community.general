@@ -55,7 +55,7 @@ author:
 
 EXAMPLES = '''
 - name: Create new pool.
-  ibm_sa_pool:
+  community.general.ibm_sa_pool:
     name: pool_name
     size: 300
     state: present
@@ -64,7 +64,7 @@ EXAMPLES = '''
     endpoints: hostdev-system
 
 - name: Delete pool.
-  ibm_sa_pool:
+  community.general.ibm_sa_pool:
     name: pool_name
     state: absent
     username: admin

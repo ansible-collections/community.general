@@ -67,7 +67,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure group is present
-  ipa_group:
+  community.general.ipa_group:
     name: oinstall
     gidnumber: '54321'
     state: present
@@ -76,7 +76,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure that groups sysops and appops are assigned to ops but no other group
-  ipa_group:
+  community.general.ipa_group:
     name: ops
     group:
     - sysops
@@ -86,7 +86,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure that users linus and larry are assign to the group, but no other user
-  ipa_group:
+  community.general.ipa_group:
     name: sysops
     user:
     - linus
@@ -96,7 +96,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure group is absent
-  ipa_group:
+  community.general.ipa_group:
     name: sysops
     state: absent
     ipa_host: ipa.example.com
@@ -194,7 +194,7 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not ipa_group:
+        if not community.general.ipa_group:
             changed = True
             if not module.check_mode:
                 ipa_group = client.group_add(name, item=module_group)
@@ -219,7 +219,7 @@ def ensure(module, client):
                                             client.group_remove_member_user) or changed
 
     else:
-        if ipa_group:
+        if community.general.ipa_group:
             changed = True
             if not module.check_mode:
                 client.group_del(name)

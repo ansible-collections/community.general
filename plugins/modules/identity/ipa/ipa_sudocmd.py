@@ -36,7 +36,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure sudo command exists
-  ipa_sudocmd:
+  community.general.ipa_sudocmd:
     name: su
     description: Allow to run su via sudo
     ipa_host: ipa.example.com
@@ -44,7 +44,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure sudo command does not exist
-  ipa_sudocmd:
+  community.general.ipa_sudocmd:
     name: su
     state: absent
     ipa_host: ipa.example.com
@@ -103,7 +103,7 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not ipa_sudocmd:
+        if not community.general.ipa_sudocmd:
             changed = True
             if not module.check_mode:
                 client.sudocmd_add(name=name, item=module_sudocmd)
@@ -117,7 +117,7 @@ def ensure(module, client):
                         data[key] = module_sudocmd.get(key)
                     client.sudocmd_mod(name=name, item=data)
     else:
-        if ipa_sudocmd:
+        if community.general.ipa_sudocmd:
             changed = True
             if not module.check_mode:
                 client.sudocmd_del(name=name)

@@ -42,30 +42,30 @@ author:
 
 EXAMPLES = '''
 - name: Install package foo
-  apt_rpm:
+  community.general.apt_rpm:
     pkg: foo
     state: present
 
 - name: Install packages foo and bar
-  apt_rpm:
+  community.general.apt_rpm:
     pkg:
       - foo
       - bar
     state: present
 
 - name: Remove package foo
-  apt_rpm:
+  community.general.apt_rpm:
     pkg: foo
     state: absent
 
 - name: Remove packages foo and bar
-  apt_rpm:
+  community.general.apt_rpm:
     pkg: foo,bar
     state: absent
 
 # bar will be the updated if a newer version exists
 - name: Update the package database and install bar
-  apt_rpm:
+  community.general.apt_rpm:
     name: bar
     state: present
     update_cache: yes

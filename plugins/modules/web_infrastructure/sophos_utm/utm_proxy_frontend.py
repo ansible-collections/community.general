@@ -125,7 +125,7 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Create utm proxy_frontend
-  utm_proxy_frontend:
+  community.general.utm_proxy_frontend:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestFrontendEntry
@@ -133,7 +133,7 @@ EXAMPLES = """
     state: present
 
 - name: Remove utm proxy_frontend
-  utm_proxy_frontend:
+  community.general.utm_proxy_frontend:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestFrontendEntry

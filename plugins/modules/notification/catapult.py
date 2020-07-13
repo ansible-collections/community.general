@@ -54,7 +54,7 @@ notes:
 
 EXAMPLES = '''
 - name: Send a mms to multiple users
-  catapult:
+  community.general.catapult:
     src: "+15035555555"
     dest:
       - "+12525089000"
@@ -66,7 +66,7 @@ EXAMPLES = '''
     api_secret: "{{ api_secret }}"
 
 - name: Send a sms to a single user
-  catapult:
+  community.general.catapult:
     src: "+15035555555"
     dest: "+12018994225"
     msg: "Consider yourself notified"

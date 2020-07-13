@@ -59,7 +59,7 @@ notes:
 
 EXAMPLES = '''
 - name: Obtaining a list of plugins
-  jenkins_script:
+  community.general.jenkins_script:
     script: 'println(Jenkins.instance.pluginManager.plugins)'
     user: admin
     password: admin
@@ -73,13 +73,13 @@ EXAMPLES = '''
         instance.save()
 
 - name: Use the variable as the script
-  jenkins_script:
+  community.general.jenkins_script:
     script: "{{ setmaster_mode }}"
     args:
       jenkins_mode: Node.Mode.EXCLUSIVE
 
 - name: Interacting with an untrusted HTTPS connection
-  jenkins_script:
+  community.general.jenkins_script:
     script: "println(Jenkins.instance.pluginManager.plugins)"
     user: admin
     password: admin

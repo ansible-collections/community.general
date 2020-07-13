@@ -130,7 +130,7 @@ EXAMPLES = '''
 # Fetch metrics about the CPU load every 60 seconds,
 # the sensu server has a handler called 'relay' which forwards stats to graphite
 - name: Get cpu metrics
-  sensu_check:
+  community.general.sensu_check:
     name: cpu_load
     command: /etc/sensu/plugins/system/cpu-mpstat-metrics.rb
     metric: yes
@@ -140,7 +140,7 @@ EXAMPLES = '''
 
 # Check whether nginx is running
 - name: Check nginx process
-  sensu_check:
+  community.general.sensu_check:
     name: nginx_running
     command: /etc/sensu/plugins/processes/check-procs.rb -f /var/run/nginx.pid
     handlers: default
@@ -151,7 +151,7 @@ EXAMPLES = '''
 # Note that the check will still show up in the sensu dashboard,
 # to remove it completely you need to issue a DELETE request to the sensu api.
 - name: Check disk
-  sensu_check:
+  community.general.sensu_check:
     name: check_disk_capacity
     state: absent
 '''

@@ -99,28 +99,28 @@ notes:
 
 EXAMPLES = '''
 - name: Install package foo
-  pkgng:
+  community.general.pkgng:
     name: foo
     state: present
 
 - name: Annotate package foo and bar
-  pkgng:
+  community.general.pkgng:
     name: foo,bar
     annotation: '+test1=baz,-test2,:test3=foobar'
 
 - name: Remove packages foo and bar
-  pkgng:
+  community.general.pkgng:
     name: foo,bar
     state: absent
 
 # "latest" support added in 2.7
 - name: Upgrade package baz
-  pkgng:
+  community.general.pkgng:
     name: baz
     state: latest
 
 - name: Upgrade all installed packages (see warning for the name option first!)
-  pkgng:
+  community.general.pkgng:
     name: "*"
     state: latest
 '''

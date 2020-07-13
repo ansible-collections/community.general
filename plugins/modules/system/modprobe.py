@@ -35,12 +35,12 @@ options:
 
 EXAMPLES = '''
 - name: Add the 802.1q module
-  modprobe:
+  community.general.modprobe:
     name: 8021q
     state: present
 
 - name: Add the dummy module
-  modprobe:
+  community.general.modprobe:
     name: dummy
     state: present
     params: 'numdummies=2'

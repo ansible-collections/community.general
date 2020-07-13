@@ -74,19 +74,19 @@ author:
 
 EXAMPLES = r'''
 - name: Basic deploy of a service
-  serverless:
+  community.general.serverless:
     service_path: '{{ project_dir }}'
     state: present
 
 - name: Deploy specific functions
-  serverless:
+  community.general.serverless:
     service_path: '{{ project_dir }}'
     functions:
       - my_func_one
       - my_func_two
 
 - name: Deploy a project, then pull its resource list back into Ansible
-  serverless:
+  community.general.serverless:
     stage: dev
     region: us-east-1
     service_path: '{{ project_dir }}'
@@ -101,7 +101,7 @@ EXAMPLES = r'''
     stack_resources: true
 
 - name: Deploy a project using a locally installed serverless binary
-  serverless:
+  community.general.serverless:
     stage: dev
     region: us-east-1
     service_path: '{{ project_dir }}'

@@ -81,7 +81,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Power down server
-  imc_rest:
+  community.general.imc_rest:
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
@@ -93,7 +93,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Configure IMC using multiple XML fragments
-  imc_rest:
+  community.general.imc_rest:
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
@@ -118,7 +118,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Enable PXE boot and power-cycle server
-  imc_rest:
+  community.general.imc_rest:
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
@@ -136,7 +136,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Reconfigure IMC to boot from storage
-  imc_rest:
+  community.general.imc_rest:
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
@@ -148,7 +148,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Add customer description to server
-  imc_rest:
+  community.general.imc_rest:
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
@@ -160,7 +160,7 @@ EXAMPLES = r'''
     delegate_to: localhost
 
 - name: Disable HTTP and increase session timeout to max value 10800 secs
-  imc_rest:
+  community.general.imc_rest:
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'

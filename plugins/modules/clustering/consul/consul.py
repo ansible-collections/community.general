@@ -140,32 +140,32 @@ options:
 
 EXAMPLES = '''
 - name: Register nginx service with the local consul agent
-  consul:
+  community.general.consul:
     service_name: nginx
     service_port: 80
 
 - name: Register nginx service with curl check
-  consul:
+  community.general.consul:
     service_name: nginx
     service_port: 80
     script: curl http://localhost
     interval: 60s
 
 - name: Register nginx with an http check
-  consul:
+  community.general.consul:
     service_name: nginx
     service_port: 80
     interval: 60s
     http: http://localhost:80/status
 
 - name: Register external service nginx available at 10.1.5.23
-  consul:
+  community.general.consul:
     service_name: nginx
     service_port: 80
     service_address: 10.1.5.23
 
 - name: Register nginx with some service tags
-  consul:
+  community.general.consul:
     service_name: nginx
     service_port: 80
     tags:
@@ -173,26 +173,26 @@ EXAMPLES = '''
       - webservers
 
 - name: Remove nginx service
-  consul:
+  community.general.consul:
     service_name: nginx
     state: absent
 
 - name: Register celery worker service
-  consul:
+  community.general.consul:
     service_name: celery-worker
     tags:
       - prod
       - worker
 
 - name: Create a node level check to test disk usage
-  consul:
+  community.general.consul:
     check_name: Disk usage
     check_id: disk_usage
     script: /opt/disk_usage.py
     interval: 5m
 
 - name: Register an http check against a service that's already registered
-  consul:
+  community.general.consul:
     check_name: nginx-check2
     check_id: nginx-check2
     service_id: nginx

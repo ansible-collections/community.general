@@ -67,40 +67,40 @@ author: "Franck Cuny (@fcuny)"
 
 EXAMPLES = '''
 - name: Install Dancer perl package
-  cpanm:
+  community.general.cpanm:
     name: Dancer
 
 - name: Install version 0.99_05 of the Plack perl package
-  cpanm:
+  community.general.cpanm:
     name: MIYAGAWA/Plack-0.99_05.tar.gz
 
 - name: Install Dancer into the specified locallib
-  cpanm:
+  community.general.cpanm:
     name: Dancer
     locallib: /srv/webapps/my_app/extlib
 
 - name: Install perl dependencies from local directory
-  cpanm:
+  community.general.cpanm:
     from_path: /srv/webapps/my_app/src/
 
 - name: Install Dancer perl package without running the unit tests in indicated locallib
-  cpanm:
+  community.general.cpanm:
     name: Dancer
     notest: True
     locallib: /srv/webapps/my_app/extlib
 
 - name: Install Dancer perl package from a specific mirror
-  cpanm:
+  community.general.cpanm:
     name: Dancer
     mirror: 'http://cpan.cpantesters.org/'
 
 - name: Install Dancer perl package into the system root path
-  cpanm:
+  community.general.cpanm:
     name: Dancer
     system_lib: yes
 
 - name: Install Dancer if it is not already installed OR the installed version is older than version 1.0
-  cpanm:
+  community.general.cpanm:
     name: Dancer
     version: '1.0'
 '''

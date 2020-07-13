@@ -58,7 +58,7 @@ options:
 EXAMPLES = '''
 
 - name: Install the etcd system container
-  atomic_container:
+  community.general.atomic_container:
     name: etcd
     image: rhel/etcd
     backend: ostree
@@ -68,7 +68,7 @@ EXAMPLES = '''
         - ETCD_NAME=etcd.server
 
 - name: Uninstall the etcd system container
-  atomic_container:
+  community.general.atomic_container:
     name: etcd
     image: rhel/etcd
     backend: ostree

@@ -100,7 +100,7 @@ requirements:
 
 EXAMPLES = r'''
 - name: Ensure pinky is present and always reset password
-  ipa_user:
+  community.general.ipa_user:
     name: pinky
     state: present
     krbpasswordexpiration: 20200119235959
@@ -117,26 +117,26 @@ EXAMPLES = r'''
     gidnumber: '100'
     homedirectory: /home/pinky
     ipa_host: ipa.example.com
-    ipa_user: admin
+    community.general.ipa_user: admin
     ipa_pass: topsecret
 
 - name: Ensure brain is absent
-  ipa_user:
+  community.general.ipa_user:
     name: brain
     state: absent
     ipa_host: ipa.example.com
-    ipa_user: admin
+    community.general.ipa_user: admin
     ipa_pass: topsecret
 
 - name: Ensure pinky is present but don't reset password if already exists
-  ipa_user:
+  community.general.ipa_user:
     name: pinky
     state: present
     givenname: Pinky
     sn: Acme
     password: zounds
     ipa_host: ipa.example.com
-    ipa_user: admin
+    community.general.ipa_user: admin
     ipa_pass: topsecret
     update_password: on_create
 '''
@@ -223,7 +223,7 @@ def get_user_diff(client, ipa_user, module_user):
         The method will check if the value type of module_user.attr is not a list and
         create a list with that element if the same attribute in ipa_user is list. In this way I hope that the method
         must not be changed if the returned API dict is changed.
-    :param ipa_user:
+    :param community.general.ipa_user:
     :param module_user:
     :return:
     """
@@ -300,7 +300,7 @@ def ensure(module, client):
 
     changed = False
     if state in ['present', 'enabled', 'disabled']:
-        if not ipa_user:
+        if not community.general.ipa_user:
             changed = True
             if not module.check_mode:
                 ipa_user = client.user_add(name=name, item=module_user)
@@ -313,7 +313,7 @@ def ensure(module, client):
                 if not module.check_mode:
                     ipa_user = client.user_mod(name=name, item=module_user)
     else:
-        if ipa_user:
+        if community.general.ipa_user:
             changed = True
             if not module.check_mode:
                 client.user_del(name)

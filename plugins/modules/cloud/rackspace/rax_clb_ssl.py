@@ -73,7 +73,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Enable SSL termination on a load balancer
-  rax_clb_ssl:
+  community.general.rax_clb_ssl:
     loadbalancer: the_loadbalancer
     state: present
     private_key: "{{ lookup('file', 'credentials/server.key' ) }}"
@@ -83,7 +83,7 @@ EXAMPLES = '''
     wait: true
 
 - name: Disable SSL termination
-  rax_clb_ssl:
+  community.general.rax_clb_ssl:
     loadbalancer: "{{ registered_lb.balancer.id }}"
     state: absent
     wait: true

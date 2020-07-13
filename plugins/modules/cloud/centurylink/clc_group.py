@@ -70,7 +70,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create / Verify a Server Group at CenturyLink Cloud
-      clc_group:
+      community.general.clc_group:
         name: My Cool Server Group
         parent: Default Group
         state: present
@@ -89,7 +89,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Delete / Verify Absent a Server Group at CenturyLink Cloud
-      clc_group:
+      community.general.clc_group:
         name: My Cool Server Group
         parent: Default Group
         state: absent

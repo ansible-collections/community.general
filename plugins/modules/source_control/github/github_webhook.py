@@ -86,7 +86,7 @@ author:
 
 EXAMPLES = '''
 - name:  create a new webhook that triggers on push (password auth)
-  github_webhook:
+  community.general.github_webhook:
     repository: ansible/ansible
     url: https://www.example.com/hooks/
     events:
@@ -95,7 +95,7 @@ EXAMPLES = '''
     password: "{{ github_password }}"
 
 - name: Create a new webhook in a github enterprise installation with multiple event triggers (token auth)
-  github_webhook:
+  community.general.github_webhook:
     repository: myorg/myrepo
     url: https://jenkins.example.com/ghprbhook/
     content_type: json
@@ -109,7 +109,7 @@ EXAMPLES = '''
     github_url: https://github.example.com
 
 - name: Delete a webhook (password auth)
-  github_webhook:
+  community.general.github_webhook:
     repository: ansible/ansible
     url: https://www.example.com/hooks/
     state: absent
