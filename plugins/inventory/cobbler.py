@@ -114,7 +114,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
     def _get_connection(self):
         if not HAS_XMLRPC_CLIENT:
-            module.fail_json(msg='Could not import xmlrpc client library')
+            raise AnsibleError('Could not import xmlrpc client library')
 
         if self.connection is None:
             self.display.vvvv('Connecting to %s\n' % self.cobbler_url)
