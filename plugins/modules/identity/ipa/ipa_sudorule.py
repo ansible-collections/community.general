@@ -282,7 +282,7 @@ def ensure(module, client):
 
     changed = False
     if state in ['present', 'disabled', 'enabled']:
-        if not community.general.ipa_sudorule:
+        if not ipa_sudorule:
             changed = True
             if not module.check_mode:
                 ipa_sudorule = client.sudorule_add(name=name, item=module_sudorule)
@@ -350,7 +350,7 @@ def ensure(module, client):
                                             client.sudorule_add_user_group,
                                             client.sudorule_remove_user_group) or changed
     else:
-        if community.general.ipa_sudorule:
+        if ipa_sudorule:
             changed = True
             if not module.check_mode:
                 client.sudorule_del(name)

@@ -279,7 +279,7 @@ def main():
 
     # Default created file name (for single-file archives) to
     # <file>.<format>
-    if not b_dest and not community.general.archive:
+    if not b_dest and not archive:
         b_dest = b'%s.%s' % (b_expanded_paths[0], b_fmt)
 
     # Force archives to specify 'dest'
@@ -333,7 +333,7 @@ def main():
             state = 'compress'
 
     # Multiple files, or globbiness
-    elif community.general.archive:
+    elif archive:
         if not b_archive_paths:
             # No source files were found, but the archive is there.
             if os.path.lexists(b_dest):

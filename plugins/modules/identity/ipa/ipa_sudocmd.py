@@ -103,7 +103,7 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not community.general.ipa_sudocmd:
+        if not ipa_sudocmd:
             changed = True
             if not module.check_mode:
                 client.sudocmd_add(name=name, item=module_sudocmd)
@@ -117,7 +117,7 @@ def ensure(module, client):
                         data[key] = module_sudocmd.get(key)
                     client.sudocmd_mod(name=name, item=data)
     else:
-        if community.general.ipa_sudocmd:
+        if ipa_sudocmd:
             changed = True
             if not module.check_mode:
                 client.sudocmd_del(name=name)

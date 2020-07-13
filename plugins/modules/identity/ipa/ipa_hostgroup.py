@@ -146,7 +146,7 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not community.general.ipa_hostgroup:
+        if not ipa_hostgroup:
             changed = True
             if not module.check_mode:
                 ipa_hostgroup = client.hostgroup_add(name=name, item=module_hostgroup)
@@ -171,7 +171,7 @@ def ensure(module, client):
                                             client.hostgroup_remove_hostgroup) or changed
 
     else:
-        if community.general.ipa_hostgroup:
+        if ipa_hostgroup:
             changed = True
             if not module.check_mode:
                 client.hostgroup_del(name=name)

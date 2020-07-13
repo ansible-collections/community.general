@@ -300,7 +300,7 @@ def ensure(module, client):
 
     changed = False
     if state in ['present', 'enabled', 'disabled']:
-        if not community.general.ipa_user:
+        if not ipa_user:
             changed = True
             if not module.check_mode:
                 ipa_user = client.user_add(name=name, item=module_user)
@@ -313,7 +313,7 @@ def ensure(module, client):
                 if not module.check_mode:
                     ipa_user = client.user_mod(name=name, item=module_user)
     else:
-        if community.general.ipa_user:
+        if ipa_user:
             changed = True
             if not module.check_mode:
                 client.user_del(name)

@@ -255,7 +255,7 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not community.general.ipa_dnsrecord:
+        if not ipa_dnsrecord:
             changed = True
             if not module.check_mode:
                 client.dnsrecord_add(zone_name=zone_name,
@@ -270,7 +270,7 @@ def ensure(module, client):
                                          record_name=record_name,
                                          details=module_dnsrecord)
     else:
-        if community.general.ipa_dnsrecord:
+        if ipa_dnsrecord:
             changed = True
             if not module.check_mode:
                 client.dnsrecord_del(zone_name=zone_name,

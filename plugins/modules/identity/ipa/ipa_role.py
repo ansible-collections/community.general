@@ -219,7 +219,7 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not community.general.ipa_role:
+        if not ipa_role:
             changed = True
             if not module.check_mode:
                 ipa_role = client.role_add(name=name, item=module_role)
@@ -261,7 +261,7 @@ def ensure(module, client):
                                             client.role_remove_user) or changed
 
     else:
-        if community.general.ipa_role:
+        if ipa_role:
             changed = True
             if not module.check_mode:
                 client.role_del(name)

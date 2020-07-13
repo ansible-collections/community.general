@@ -114,14 +114,14 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not community.general.ipa_dnszone:
+        if not ipa_dnszone:
             changed = True
             if not module.check_mode:
                 client.dnszone_add(zone_name=zone_name, details={'idnsallowdynupdate': dynamicupdate})
         else:
             changed = False
     else:
-        if community.general.ipa_dnszone:
+        if ipa_dnszone:
             changed = True
             if not module.check_mode:
                 client.dnszone_del(zone_name=zone_name)

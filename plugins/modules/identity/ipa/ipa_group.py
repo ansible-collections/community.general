@@ -194,7 +194,7 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not community.general.ipa_group:
+        if not ipa_group:
             changed = True
             if not module.check_mode:
                 ipa_group = client.group_add(name, item=module_group)
@@ -219,7 +219,7 @@ def ensure(module, client):
                                             client.group_remove_member_user) or changed
 
     else:
-        if community.general.ipa_group:
+        if ipa_group:
             changed = True
             if not module.check_mode:
                 client.group_del(name)

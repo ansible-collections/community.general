@@ -189,7 +189,7 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not community.general.ipa_vault:
+        if not ipa_vault:
             # New vault
             changed = True
             if not module.check_mode:
@@ -207,7 +207,7 @@ def ensure(module, client):
                         client.vault_mod_internal(name=name, item=data)
 
     else:
-        if community.general.ipa_vault:
+        if ipa_vault:
             changed = True
             if not module.check_mode:
                 client.vault_del(name)

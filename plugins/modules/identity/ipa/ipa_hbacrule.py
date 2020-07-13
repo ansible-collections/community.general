@@ -251,7 +251,7 @@ def ensure(module, client):
 
     changed = False
     if state in ['present', 'enabled', 'disabled']:
-        if not community.general.ipa_hbacrule:
+        if not ipa_hbacrule:
             changed = True
             if not module.check_mode:
                 ipa_hbacrule = client.hbacrule_add(name=name, item=module_hbacrule)
@@ -306,7 +306,7 @@ def ensure(module, client):
                                             client.hbacrule_add_user,
                                             client.hbacrule_remove_user, 'group') or changed
     else:
-        if community.general.ipa_hbacrule:
+        if ipa_hbacrule:
             changed = True
             if not module.check_mode:
                 client.hbacrule_del(name=name)

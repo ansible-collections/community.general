@@ -125,7 +125,7 @@ def ensure(module, client):
 
     changed = False
     if state == 'present':
-        if not community.general.ipa_sudocmdgroup:
+        if not ipa_sudocmdgroup:
             changed = True
             if not module.check_mode:
                 ipa_sudocmdgroup = client.sudocmdgroup_add(name=name, item=module_sudocmdgroup)
@@ -144,7 +144,7 @@ def ensure(module, client):
                                             client.sudocmdgroup_add_member_sudocmd,
                                             client.sudocmdgroup_remove_member_sudocmd)
     else:
-        if community.general.ipa_sudocmdgroup:
+        if ipa_sudocmdgroup:
             changed = True
             if not module.check_mode:
                 client.sudocmdgroup_del(name=name)
