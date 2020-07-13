@@ -122,7 +122,7 @@ EXAMPLES = r'''
     Create acme subscription in mydb database using acme_publication and
     the following connection parameters to connect to the publisher.
     Set the subscription owner as alice.
-  postgresql_subscription:
+  community.general.postgresql_subscription:
     db: mydb
     name: acme
     state: present
@@ -136,7 +136,7 @@ EXAMPLES = r'''
       dbname: mydb
 
 - name: Assuming that acme subscription exists, try to change conn parameters
-  postgresql_subscription:
+  community.general.postgresql_subscription:
     db: mydb
     name: acme
     connparams:
@@ -147,20 +147,20 @@ EXAMPLES = r'''
       connect_timeout: 100
 
 - name: Refresh acme publication
-  postgresql_subscription:
+  community.general.postgresql_subscription:
     db: mydb
     name: acme
     state: refresh
 
 - name: Drop acme subscription from mydb with dependencies (cascade=yes)
-  postgresql_subscription:
+  community.general.postgresql_subscription:
     db: mydb
     name: acme
     state: absent
     cascade: yes
 
 - name: Assuming that acme subscription exists and enabled, disable the subscription
-  postgresql_subscription:
+  community.general.postgresql_subscription:
     db: mydb
     name: acme
     state: present

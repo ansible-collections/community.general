@@ -202,7 +202,7 @@ EXAMPLES = r'''
 # GRANT SELECT, INSERT, UPDATE ON TABLE public.books, public.authors
 # TO librarian, reader WITH GRANT OPTION
 - name: Grant privs to librarian and reader on database library
-  postgresql_privs:
+  community.general.postgresql_privs:
     database: library
     state: present
     privs: SELECT,INSERT,UPDATE
@@ -213,7 +213,7 @@ EXAMPLES = r'''
     grant_option: yes
 
 - name: Same as above leveraging default values
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: library
     privs: SELECT,INSERT,UPDATE
     objs: books,authors
@@ -224,7 +224,7 @@ EXAMPLES = r'''
 # Note that role "reader" will be *granted* INSERT privilege itself if this
 # isn't already the case (since state: present).
 - name: Revoke privs from reader
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: library
     state: present
     priv: INSERT
@@ -234,7 +234,7 @@ EXAMPLES = r'''
 
 # "public" is the default schema. This also works for PostgreSQL 8.x.
 - name: REVOKE INSERT, UPDATE ON ALL TABLES IN SCHEMA public FROM reader
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: library
     state: absent
     privs: INSERT,UPDATE
@@ -242,7 +242,7 @@ EXAMPLES = r'''
     role: reader
 
 - name: GRANT ALL PRIVILEGES ON SCHEMA public, math TO librarian
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: library
     privs: ALL
     type: schema
@@ -251,7 +251,7 @@ EXAMPLES = r'''
 
 # Note the separation of arguments with colons.
 - name: GRANT ALL PRIVILEGES ON FUNCTION math.add(int, int) TO librarian, reader
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: library
     privs: ALL
     type: function
@@ -262,7 +262,7 @@ EXAMPLES = r'''
 # Note that group role memberships apply cluster-wide and therefore are not
 # restricted to database "library" here.
 - name: GRANT librarian, reader TO alice, bob WITH ADMIN OPTION
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: library
     type: group
     objs: librarian,reader
@@ -272,7 +272,7 @@ EXAMPLES = r'''
 # Note that here "db: postgres" specifies the database to connect to, not the
 # database to grant privileges on (which is specified via the "objs" param)
 - name: GRANT ALL PRIVILEGES ON DATABASE library TO librarian
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: postgres
     privs: ALL
     type: database
@@ -282,7 +282,7 @@ EXAMPLES = r'''
 # If objs is omitted for type "database", it defaults to the database
 # to which the connection is established
 - name: GRANT ALL PRIVILEGES ON DATABASE library TO librarian
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: library
     privs: ALL
     type: database
@@ -293,7 +293,7 @@ EXAMPLES = r'''
 # ALL_DEFAULT works only with privs=ALL
 # For specific
 - name: ALTER DEFAULT PRIVILEGES ON DATABASE library TO librarian
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: library
     objs: ALL_DEFAULT
     privs: ALL
@@ -306,7 +306,7 @@ EXAMPLES = r'''
 # ALL_DEFAULT works only with privs=ALL
 # For specific
 - name: ALTER DEFAULT PRIVILEGES ON DATABASE library TO reader, step 1
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: library
     objs: TABLES,SEQUENCES
     privs: SELECT
@@ -314,7 +314,7 @@ EXAMPLES = r'''
     role: reader
 
 - name: ALTER DEFAULT PRIVILEGES ON DATABASE library TO reader, step 2
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: library
     objs: TYPES
     privs: USAGE
@@ -323,7 +323,7 @@ EXAMPLES = r'''
 
 # Available since version 2.8
 - name: GRANT ALL PRIVILEGES ON FOREIGN DATA WRAPPER fdw TO reader
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: test
     objs: fdw
     privs: ALL
@@ -332,7 +332,7 @@ EXAMPLES = r'''
 
 # Available since community.general 0.2.0
 - name: GRANT ALL PRIVILEGES ON TYPE customtype TO reader
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: test
     objs: customtype
     privs: ALL
@@ -341,7 +341,7 @@ EXAMPLES = r'''
 
 # Available since version 2.8
 - name: GRANT ALL PRIVILEGES ON FOREIGN SERVER fdw_server TO reader
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: test
     objs: fdw_server
     privs: ALL
@@ -351,7 +351,7 @@ EXAMPLES = r'''
 # Available since version 2.8
 # Grant 'execute' permissions on all functions in schema 'common' to role 'caller'
 - name: GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA common TO caller
-  postgresql_privs:
+  community.general.postgresql_privs:
     type: function
     state: present
     privs: EXECUTE
@@ -365,7 +365,7 @@ EXAMPLES = r'''
 # default to the role reader.
 # For specific
 - name: ALTER privs
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: library
     schema: library
     objs: TABLES
@@ -380,7 +380,7 @@ EXAMPLES = r'''
 # default from the role reader.
 # For specific
 - name: ALTER privs
-  postgresql_privs:
+  community.general.postgresql_privs:
     db: library
     state: absent
     schema: library
@@ -392,7 +392,7 @@ EXAMPLES = r'''
 
 # Available since community.general 0.2.0
 - name: Grant type privileges for pg_catalog.numeric type to alice
-  postgresql_privs:
+  community.general.postgresql_privs:
     type: type
     roles: alice
     privs: ALL
