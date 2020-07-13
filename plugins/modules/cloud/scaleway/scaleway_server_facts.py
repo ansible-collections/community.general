@@ -37,7 +37,7 @@ options:
 
 EXAMPLES = r'''
 - name: Gather Scaleway servers facts
-  scaleway_server_facts:
+  community.general.scaleway_server_facts:
     region: par1
 '''
 

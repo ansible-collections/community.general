@@ -207,7 +207,7 @@ vm:
 
 EXAMPLES = r'''
 - name: Basic get info from VM
-  rhevm:
+  community.general.rhevm:
     server: rhevm01
     user: '{{ rhev.admin.name }}'
     password: '{{ rhev.admin.pass }}'
@@ -215,7 +215,7 @@ EXAMPLES = r'''
     state: info
 
 - name: Basic create example from image
-  rhevm:
+  community.general.rhevm:
     server: rhevm01
     user: '{{ rhev.admin.name }}'
     password: '{{ rhev.admin.pass }}'
@@ -225,7 +225,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Power management
-  rhevm:
+  community.general.rhevm:
     server: rhevm01
     user: '{{ rhev.admin.name }}'
     password: '{{ rhev.admin.pass }}'
@@ -235,7 +235,7 @@ EXAMPLES = r'''
     state: down
 
 - name: Multi disk, multi nic create example
-  rhevm:
+  community.general.rhevm:
     server: rhevm01
     user: '{{ rhev.admin.name }}'
     password: '{{ rhev.admin.pass }}'
@@ -275,7 +275,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Add a CD to the disk cd_drive
-  rhevm:
+  community.general.rhevm:
     user: '{{ rhev.admin.name }}'
     password: '{{ rhev.admin.pass }}'
     name: server007
@@ -283,7 +283,7 @@ EXAMPLES = r'''
     state: cd
 
 - name: New host deployment + host network configuration
-  rhevm:
+  community.general.rhevm:
     password: '{{ rhevm.admin.pass }}'
     name: ovirt_node007
     type: host

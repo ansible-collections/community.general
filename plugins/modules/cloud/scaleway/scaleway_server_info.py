@@ -33,7 +33,7 @@ options:
 
 EXAMPLES = r'''
 - name: Gather Scaleway servers information
-  scaleway_server_info:
+  community.general.scaleway_server_info:
     region: par1
   register: result
 

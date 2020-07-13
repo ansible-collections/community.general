@@ -96,7 +96,7 @@ options:
 
 EXAMPLES = r'''
 - name: Update pamd rule's control in /etc/pam.d/system-auth
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: auth
     control: required
@@ -104,7 +104,7 @@ EXAMPLES = r'''
     new_control: sufficient
 
 - name: Update pamd rule's complex control in /etc/pam.d/system-auth
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: session
     control: '[success=1 default=ignore]'
@@ -112,7 +112,7 @@ EXAMPLES = r'''
     new_control: '[success=2 default=ignore]'
 
 - name: Insert a new rule before an existing rule
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: auth
     control: required
@@ -124,7 +124,7 @@ EXAMPLES = r'''
 
 - name: Insert a new rule pam_wheel.so with argument 'use_uid' after an \
         existing rule pam_rootok.so
-  pamd:
+  community.general.pamd:
     name: su
     type: auth
     control: sufficient
@@ -136,7 +136,7 @@ EXAMPLES = r'''
     state: after
 
 - name: Remove module arguments from an existing rule
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: auth
     control: required
@@ -145,7 +145,7 @@ EXAMPLES = r'''
     state: updated
 
 - name: Replace all module arguments in an existing rule
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: auth
     control: required
@@ -158,7 +158,7 @@ EXAMPLES = r'''
     state: updated
 
 - name: Remove specific arguments from a rule
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: session
     control: '[success=1 default=ignore]'
@@ -167,7 +167,7 @@ EXAMPLES = r'''
     state: args_absent
 
 - name: Ensure specific arguments are present in a rule
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: session
     control: '[success=1 default=ignore]'
@@ -176,7 +176,7 @@ EXAMPLES = r'''
     state: args_present
 
 - name: Ensure specific arguments are present in a rule (alternative)
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: session
     control: '[success=1 default=ignore]'
@@ -187,7 +187,7 @@ EXAMPLES = r'''
     state: args_present
 
 - name: Module arguments requiring commas must be listed as a Yaml list
-  pamd:
+  community.general.pamd:
     name: special-module
     type: account
     control: required
@@ -197,7 +197,7 @@ EXAMPLES = r'''
     state: args_present
 
 - name: Update specific argument value in a rule
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: auth
     control: required
@@ -206,7 +206,7 @@ EXAMPLES = r'''
     state: args_present
 
 - name: Add pam common-auth rule for duo
-  pamd:
+  community.general.pamd:
     name: common-auth
     new_type: auth
     new_control: '[success=1 default=ignore]'

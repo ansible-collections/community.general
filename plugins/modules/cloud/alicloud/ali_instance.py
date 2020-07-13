@@ -278,7 +278,7 @@ EXAMPLES = '''
 
   tasks:
     - name: Launch ECS instance in VPC network
-      ali_instance:
+      community.general.ali_instance:
         alicloud_access_key: '{{ alicloud_access_key }}'
         alicloud_secret_key: '{{ alicloud_secret_key }}'
         alicloud_region: '{{ alicloud_region }}'
@@ -296,7 +296,7 @@ EXAMPLES = '''
         password: '{{ password }}'
 
     - name: With count and count_tag to create a number of instances
-      ali_instance:
+      community.general.ali_instance:
         alicloud_access_key: '{{ alicloud_access_key }}'
         alicloud_secret_key: '{{ alicloud_secret_key }}'
         alicloud_region: '{{ alicloud_region }}'
@@ -318,7 +318,7 @@ EXAMPLES = '''
         password: '{{ password }}'
 
     - name: Start instance
-      ali_instance:
+      community.general.ali_instance:
         alicloud_access_key: '{{ alicloud_access_key }}'
         alicloud_secret_key: '{{ alicloud_secret_key }}'
         alicloud_region: '{{ alicloud_region }}'

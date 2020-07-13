@@ -70,7 +70,7 @@ EXAMPLES = '''
 # Note - You must set the CLC_V2_API_USERNAME And CLC_V2_API_PASSWD Environment variables before running these examples
 
 - name: Set the cpu count to 4 on a server
-  clc_modify_server:
+  community.general.clc_modify_server:
     server_ids:
         - UC1TESTSVR01
         - UC1TESTSVR02
@@ -78,7 +78,7 @@ EXAMPLES = '''
     state: present
 
 - name: Set the memory to 8GB on a server
-  clc_modify_server:
+  community.general.clc_modify_server:
     server_ids:
         - UC1TESTSVR01
         - UC1TESTSVR02
@@ -86,7 +86,7 @@ EXAMPLES = '''
     state: present
 
 - name: Set the anti affinity policy on a server
-  clc_modify_server:
+  community.general.clc_modify_server:
     server_ids:
         - UC1TESTSVR01
         - UC1TESTSVR02
@@ -94,7 +94,7 @@ EXAMPLES = '''
     state: present
 
 - name: Remove the anti affinity policy on a server
-  clc_modify_server:
+  community.general.clc_modify_server:
     server_ids:
         - UC1TESTSVR01
         - UC1TESTSVR02
@@ -102,7 +102,7 @@ EXAMPLES = '''
     state: absent
 
 - name: Add the alert policy on a server
-  clc_modify_server:
+  community.general.clc_modify_server:
     server_ids:
         - UC1TESTSVR01
         - UC1TESTSVR02
@@ -110,7 +110,7 @@ EXAMPLES = '''
     state: present
 
 - name: Remove the alert policy on a server
-  clc_modify_server:
+  community.general.clc_modify_server:
     server_ids:
         - UC1TESTSVR01
         - UC1TESTSVR02
@@ -118,7 +118,7 @@ EXAMPLES = '''
     state: absent
 
 - name: Ret the memory to 16GB and cpu to 8 core on a lust if servers
-  clc_modify_server:
+  community.general.clc_modify_server:
     server_ids:
         - UC1TESTSVR01
         - UC1TESTSVR02

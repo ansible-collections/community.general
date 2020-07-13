@@ -47,7 +47,7 @@ author:
 
 EXAMPLES = '''
 - name: Create a new volume.
-  ibm_sa_vol:
+  community.general.ibm_sa_vol:
     vol: volume_name
     pool: pool_name
     size: 17
@@ -57,7 +57,7 @@ EXAMPLES = '''
     endpoints: hostdev-system
 
 - name: Delete an existing volume.
-  ibm_sa_vol:
+  community.general.ibm_sa_vol:
     vol: volume_name
     state: absent
     username: admin

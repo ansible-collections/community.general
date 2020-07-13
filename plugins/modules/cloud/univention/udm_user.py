@@ -228,14 +228,14 @@ options:
 
 EXAMPLES = '''
 - name: Create a user on a UCS
-  udm_user:
+  community.general.udm_user:
     name: FooBar
     password: secure_password
     firstname: Foo
     lastname: Bar
 
 - name: Create a user with the DN C(uid=foo,cn=teachers,cn=users,ou=school,dc=school,dc=example,dc=com)
-  udm_user:
+  community.general.udm_user:
     name: foo
     password: secure_password
     firstname: Foo
@@ -245,7 +245,7 @@ EXAMPLES = '''
 
 # or define the position
 - name: Create a user with the DN C(uid=foo,cn=teachers,cn=users,ou=school,dc=school,dc=example,dc=com)
-  udm_user:
+  community.general.udm_user:
     name: foo
     password: secure_password
     firstname: Foo

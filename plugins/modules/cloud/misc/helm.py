@@ -61,7 +61,7 @@ RETURN = ''' # '''
 
 EXAMPLES = '''
 - name: Install helm chart
-  helm:
+  community.general.helm:
     host: localhost
     chart:
       name: memcached
@@ -74,13 +74,13 @@ EXAMPLES = '''
     namespace: default
 
 - name: Uninstall helm chart
-  helm:
+  community.general.helm:
     host: localhost
     state: absent
     name: my-memcached
 
 - name: Install helm chart from a git repo
-  helm:
+  community.general.helm:
     host: localhost
     chart:
       source:
@@ -93,7 +93,7 @@ EXAMPLES = '''
       foo: "bar"
 
 - name: Install helm chart from a git repo specifying path
-  helm:
+  community.general.helm:
     host: localhost
     chart:
       source:

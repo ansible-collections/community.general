@@ -63,21 +63,21 @@ options:
 
 EXAMPLES = '''
 - name: Create instance
-  gcspanner:
+  community.general.gcspanner:
     instance_id: '{{ instance_id }}'
     configuration: '{{ configuration }}'
     state: present
     node_count: 1
 
 - name: Create database
-  gcspanner:
+  community.general.gcspanner:
     instance_id: '{{ instance_id }}'
     configuration: '{{ configuration }}'
     database_name: '{{ database_name }}'
     state: present
 
 - name: Delete instance (and all databases)
-- gcspanner:
+- community.general.gcspanner:
     instance_id: '{{ instance_id }}'
     configuration: '{{ configuration }}'
     state: absent

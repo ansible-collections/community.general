@@ -104,7 +104,7 @@ author: "Jose Delarosa (@jose-delarosa)"
 
 EXAMPLES = '''
   - name: Set BootMode to UEFI
-    redfish_config:
+    community.general.redfish_config:
       category: Systems
       command: SetBiosAttributes
       resource_id: 437XR1138R2
@@ -115,7 +115,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Set multiple BootMode attributes
-    redfish_config:
+    community.general.redfish_config:
       category: Systems
       command: SetBiosAttributes
       resource_id: 437XR1138R2
@@ -128,7 +128,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Enable PXE Boot for NIC1 using deprecated options
-    redfish_config:
+    community.general.redfish_config:
       category: Systems
       command: SetBiosAttributes
       resource_id: 437XR1138R2
@@ -139,7 +139,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Set BIOS default settings with a timeout of 20 seconds
-    redfish_config:
+    community.general.redfish_config:
       category: Systems
       command: SetBiosDefaultSettings
       resource_id: 437XR1138R2
@@ -149,7 +149,7 @@ EXAMPLES = '''
       timeout: 20
 
   - name: Set boot order
-    redfish_config:
+    community.general.redfish_config:
       category: Systems
       command: SetBootOrder
       boot_order:
@@ -163,7 +163,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Set boot order to the default
-    redfish_config:
+    community.general.redfish_config:
       category: Systems
       command: SetDefaultBootOrder
       baseuri: "{{ baseuri }}"
@@ -171,7 +171,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Set Manager Network Protocols
-    redfish_config:
+    community.general.redfish_config:
       category: Manager
       command: SetNetworkProtocols
       network_protocols:
@@ -186,7 +186,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Set Manager NIC
-    redfish_config:
+    community.general.redfish_config:
       category: Manager
       command: SetManagerNic
       nic_config:

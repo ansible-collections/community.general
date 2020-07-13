@@ -79,7 +79,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Actually Create things
-      clc_loadbalancer:
+      community.general.clc_loadbalancer:
         name: test
         description: test
         alias: TEST
@@ -95,7 +95,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Actually Create things
-      clc_loadbalancer:
+      community.general.clc_loadbalancer:
         name: test
         description: test
         alias: TEST
@@ -111,7 +111,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Actually Create things
-      clc_loadbalancer:
+      community.general.clc_loadbalancer:
         name: test
         description: test
         alias: TEST
@@ -127,7 +127,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Actually Delete things
-      clc_loadbalancer:
+      community.general.clc_loadbalancer:
         name: test
         description: test
         alias: TEST
@@ -143,7 +143,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Actually Delete things
-      clc_loadbalancer:
+      community.general.clc_loadbalancer:
         name: test
         description: test
         alias: TEST

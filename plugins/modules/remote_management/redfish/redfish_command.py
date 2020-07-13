@@ -198,7 +198,7 @@ author: "Jose Delarosa (@jose-delarosa)"
 
 EXAMPLES = '''
   - name: Restart system power gracefully
-    redfish_command:
+    community.general.redfish_command:
       category: Systems
       command: PowerGracefulRestart
       resource_id: 437XR1138R2
@@ -207,7 +207,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Set one-time boot device to {{ bootdevice }}
-    redfish_command:
+    community.general.redfish_command:
       category: Systems
       command: SetOneTimeBoot
       resource_id: 437XR1138R2
@@ -217,7 +217,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Set one-time boot device to UefiTarget of "/0x31/0x33/0x01/0x01"
-    redfish_command:
+    community.general.redfish_command:
       category: Systems
       command: SetOneTimeBoot
       resource_id: 437XR1138R2
@@ -228,7 +228,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Set one-time boot device to BootNext target of "Boot0001"
-    redfish_command:
+    community.general.redfish_command:
       category: Systems
       command: SetOneTimeBoot
       resource_id: 437XR1138R2
@@ -239,7 +239,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Set chassis indicator LED to blink
-    redfish_command:
+    community.general.redfish_command:
       category: Chassis
       command: IndicatorLedBlink
       resource_id: 1U
@@ -248,7 +248,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Add user
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: AddUser
       baseuri: "{{ baseuri }}"
@@ -259,7 +259,7 @@ EXAMPLES = '''
       roleid: "{{ roleid }}"
 
   - name: Add user using new option aliases
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: AddUser
       baseuri: "{{ baseuri }}"
@@ -270,7 +270,7 @@ EXAMPLES = '''
       account_roleid: "{{ account_roleid }}"
 
   - name: Delete user
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: DeleteUser
       baseuri: "{{ baseuri }}"
@@ -279,7 +279,7 @@ EXAMPLES = '''
       account_username: "{{ account_username }}"
 
   - name: Disable user
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: DisableUser
       baseuri: "{{ baseuri }}"
@@ -288,7 +288,7 @@ EXAMPLES = '''
       account_username: "{{ account_username }}"
 
   - name: Enable user
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: EnableUser
       baseuri: "{{ baseuri }}"
@@ -297,7 +297,7 @@ EXAMPLES = '''
       account_username: "{{ account_username }}"
 
   - name: Add and enable user
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: AddUser,EnableUser
       baseuri: "{{ baseuri }}"
@@ -308,7 +308,7 @@ EXAMPLES = '''
       roleid: "{{ roleid }}"
 
   - name: Update user password
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: UpdateUserPassword
       baseuri: "{{ baseuri }}"
@@ -318,7 +318,7 @@ EXAMPLES = '''
       account_password: "{{ account_password }}"
 
   - name: Update user role
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: UpdateUserRole
       baseuri: "{{ baseuri }}"
@@ -328,7 +328,7 @@ EXAMPLES = '''
       roleid: "{{ roleid }}"
 
   - name: Update user name
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: UpdateUserName
       baseuri: "{{ baseuri }}"
@@ -338,7 +338,7 @@ EXAMPLES = '''
       account_updatename: "{{ account_updatename }}"
 
   - name: Update user name
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: UpdateUserName
       baseuri: "{{ baseuri }}"
@@ -348,7 +348,7 @@ EXAMPLES = '''
       update_username: "{{ update_username }}"
 
   - name: Update AccountService properties
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: UpdateAccountServiceProperties
       baseuri: "{{ baseuri }}"
@@ -359,7 +359,7 @@ EXAMPLES = '''
         AccountLockoutDuration: 600
 
   - name: Clear Manager Logs with a timeout of 20 seconds
-    redfish_command:
+    community.general.redfish_command:
       category: Manager
       command: ClearLogs
       resource_id: BMC
@@ -369,7 +369,7 @@ EXAMPLES = '''
       timeout: 20
 
   - name: Clear Sessions
-    redfish_command:
+    community.general.redfish_command:
       category: Sessions
       command: ClearSessions
       baseuri: "{{ baseuri }}"
@@ -377,7 +377,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Simple update
-    redfish_command:
+    community.general.redfish_command:
       category: Update
       command: SimpleUpdate
       baseuri: "{{ baseuri }}"
@@ -386,7 +386,7 @@ EXAMPLES = '''
       update_image_uri: https://example.com/myupdate.img
 
   - name: Simple update with additional options
-    redfish_command:
+    community.general.redfish_command:
       category: Update
       command: SimpleUpdate
       baseuri: "{{ baseuri }}"
@@ -401,7 +401,7 @@ EXAMPLES = '''
         password: supersecretpwd
 
   - name: Insert Virtual Media
-    redfish_command:
+    community.general.redfish_command:
       category: Manager
       command: VirtualMediaInsert
       baseuri: "{{ baseuri }}"
@@ -415,7 +415,7 @@ EXAMPLES = '''
       resource_id: BMC
 
   - name: Eject Virtual Media
-    redfish_command:
+    community.general.redfish_command:
       category: Manager
       command: VirtualMediaEject
       baseuri: "{{ baseuri }}"

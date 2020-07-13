@@ -70,7 +70,7 @@ options:
 
 EXAMPLES = '''
 - name: Add or update VLAN
-  dimensiondata_vlan:
+  community.general.dimensiondata_vlan:
     region: na
     location: NA5
     network_domain: test_network
@@ -82,7 +82,7 @@ EXAMPLES = '''
     wait: yes
 
 - name: Read / get VLAN details
-  dimensiondata_vlan:
+  community.general.dimensiondata_vlan:
     region: na
     location: NA5
     network_domain: test_network
@@ -91,7 +91,7 @@ EXAMPLES = '''
     wait: yes
 
 - name: Delete a VLAN
-  dimensiondata_vlan:
+  community.general.dimensiondata_vlan:
     region: na
     location: NA5
     network_domain: test_network

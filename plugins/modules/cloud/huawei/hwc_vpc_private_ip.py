@@ -68,7 +68,7 @@ EXAMPLES = '''
     cidr: "192.168.100.0/26"
   register: subnet
 - name: Create a private ip
-  hwc_vpc_private_ip:
+  community.general.hwc_vpc_private_ip:
     subnet_id: "{{ subnet.id }}"
     ip_address: "192.168.100.33"
 '''

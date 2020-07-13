@@ -50,29 +50,29 @@ requirements: ["a2enmod","a2dismod"]
 
 EXAMPLES = '''
 - name: Enable the Apache2 module wsgi
-  apache2_module:
+  community.general.apache2_module:
     state: present
     name: wsgi
 
 - name: Disables the Apache2 module wsgi
-  apache2_module:
+  community.general.apache2_module:
     state: absent
     name: wsgi
 
 - name: Disable default modules for Debian
-  apache2_module:
+  community.general.apache2_module:
     state: absent
     name: autoindex
     force: True
 
 - name: Disable mpm_worker and ignore warnings about missing mpm module
-  apache2_module:
+  community.general.apache2_module:
     state: absent
     name: mpm_worker
     ignore_configcheck: True
 
 - name: Enable dump_io module, which is identified as dumpio_module inside apache2
-  apache2_module:
+  community.general.apache2_module:
     state: present
     name: dump_io
     identifier: dumpio_module

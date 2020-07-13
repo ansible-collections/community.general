@@ -36,7 +36,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Gather information about all Data Centers
-  oneview_datacenter_info:
+  community.general.oneview_datacenter_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -47,7 +47,7 @@ EXAMPLES = '''
     msg: "{{ result.datacenters }}"
 
 - name: Gather paginated, filtered and sorted information about Data Centers
-  oneview_datacenter_info:
+  community.general.oneview_datacenter_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -62,7 +62,7 @@ EXAMPLES = '''
     msg: "{{ result.datacenters }}"
 
 - name: Gather information about a Data Center by name
-  oneview_datacenter_info:
+  community.general.oneview_datacenter_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -74,7 +74,7 @@ EXAMPLES = '''
     msg: "{{ result.datacenters }}"
 
 - name: Gather information about the Data Center Visual Content
-  oneview_datacenter_info:
+  community.general.oneview_datacenter_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password

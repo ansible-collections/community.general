@@ -40,11 +40,11 @@ notes:
 EXAMPLES = r'''
 # Gather IP facts from ipify.org
 - name: Get my public IP
-  ipify_facts:
+  community.general.ipify_facts:
 
 # Gather IP facts from your own ipify service endpoint with a custom timeout
 - name: Get my public IP
-  ipify_facts:
+  community.general.ipify_facts:
     api_url: http://api.example.com/ipify
     timeout: 20
 '''

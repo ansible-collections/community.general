@@ -256,7 +256,7 @@ EXAMPLES = '''
     size: 10
   register: disk
 - name: Create an instance
-  hwc_ecs_instance:
+  community.general.hwc_ecs_instance:
     data_volumes:
       - volume_id: "{{ disk.id }}"
     enable_auto_recovery: false

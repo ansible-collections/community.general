@@ -106,7 +106,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure sudo rule is present that's allows all every body to execute any command on any host without being asked for a password.
-  ipa_sudorule:
+  community.general.ipa_sudorule:
     name: sudo_all_nopasswd
     cmdcategory: all
     description: Allow to run every command with sudo without password
@@ -119,7 +119,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure user group developers can run every command on host group db-server as well as on host db01.example.com.
-  ipa_sudorule:
+  community.general.ipa_sudorule:
     name: sudo_dev_dbserver
     description: Allow developers to run every command with sudo on all database server
     cmdcategory: all

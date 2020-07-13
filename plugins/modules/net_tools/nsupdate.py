@@ -77,7 +77,7 @@ options:
 
 EXAMPLES = '''
 - name: Add or modify ansible.example.org A to 192.168.1.1"
-  nsupdate:
+  community.general.nsupdate:
     key_name: "nsupdate"
     key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
     server: "10.1.1.1"
@@ -86,7 +86,7 @@ EXAMPLES = '''
     value: "192.168.1.1"
 
 - name: Add or modify ansible.example.org A to 192.168.1.1, 192.168.1.2 and 192.168.1.3"
-  nsupdate:
+  community.general.nsupdate:
     key_name: "nsupdate"
     key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
     server: "10.1.1.1"
@@ -95,7 +95,7 @@ EXAMPLES = '''
     value: ["192.168.1.1", "192.168.1.2", "192.168.1.3"]
 
 - name: Remove puppet.example.org CNAME
-  nsupdate:
+  community.general.nsupdate:
     key_name: "nsupdate"
     key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
     server: "10.1.1.1"
@@ -105,7 +105,7 @@ EXAMPLES = '''
     state: absent
 
 - name: Add 1.1.168.192.in-addr.arpa. PTR for ansible.example.org
-  nsupdate:
+  community.general.nsupdate:
     key_name: "nsupdate"
     key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
     server: "10.1.1.1"
@@ -115,7 +115,7 @@ EXAMPLES = '''
     state: present
 
 - name: Remove 1.1.168.192.in-addr.arpa. PTR
-  nsupdate:
+  community.general.nsupdate:
     key_name: "nsupdate"
     key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
     server: "10.1.1.1"

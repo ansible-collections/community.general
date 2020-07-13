@@ -51,7 +51,7 @@ options:
 
 EXAMPLES = """
 - name: Create QTree
-  na_cdot_qtree:
+  community.general.na_cdot_qtree:
     state: present
     name: ansibleQTree
     flexvol_name: ansibleVolume
@@ -61,7 +61,7 @@ EXAMPLES = """
     password: "{{ netapp_password }}"
 
 - name: Rename QTree
-  na_cdot_qtree:
+  community.general.na_cdot_qtree:
     state: present
     name: ansibleQTree
     flexvol_name: ansibleVolume

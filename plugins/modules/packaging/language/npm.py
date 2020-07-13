@@ -82,43 +82,43 @@ requirements:
 
 EXAMPLES = '''
 - name: Install "coffee-script" node.js package.
-  npm:
+  community.general.npm:
     name: coffee-script
     path: /app/location
 
 - name: Install "coffee-script" node.js package on version 1.6.1.
-  npm:
+  community.general.npm:
     name: coffee-script
     version: '1.6.1'
     path: /app/location
 
 - name: Install "coffee-script" node.js package globally.
-  npm:
+  community.general.npm:
     name: coffee-script
     global: yes
 
 - name: Remove the globally package "coffee-script".
-  npm:
+  community.general.npm:
     name: coffee-script
     global: yes
     state: absent
 
 - name: Install "coffee-script" node.js package from custom registry.
-  npm:
+  community.general.npm:
     name: coffee-script
     registry: 'http://registry.mysite.com'
 
 - name: Install packages based on package.json.
-  npm:
+  community.general.npm:
     path: /app/location
 
 - name: Update packages based on package.json to their latest version.
-  npm:
+  community.general.npm:
     path: /app/location
     state: latest
 
 - name: Install packages based on package.json using the npm installed with nvm v0.10.1.
-  npm:
+  community.general.npm:
     path: /app/location
     executable: /opt/nvm/v0.10.1/bin/npm
     state: present

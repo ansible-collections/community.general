@@ -49,7 +49,7 @@ options:
 
 EXAMPLES = '''
 - name: Update the cloud-init
-  scaleway_user_data:
+  community.general.scaleway_user_data:
     server_id: '5a33b4ab-57dd-4eb6-8b0a-d95eb63492ce'
     region: ams1
     user_data:

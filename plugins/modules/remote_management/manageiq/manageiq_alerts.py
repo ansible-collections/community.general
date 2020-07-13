@@ -59,7 +59,7 @@ options:
 
 EXAMPLES = '''
 - name: Add an alert with a "hash expression" to ManageIQ
-  manageiq_alerts:
+  community.general.manageiq_alerts:
     state: present
     description: Test Alert 01
     options:
@@ -80,7 +80,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Add an alert with a "miq expression" to ManageIQ
-  manageiq_alerts:
+  community.general.manageiq_alerts:
     state: present
     description: Test Alert 02
     options:
@@ -107,7 +107,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Delete an alert from ManageIQ
-  manageiq_alerts:
+  community.general.manageiq_alerts:
     state: absent
     description: Test Alert 01
     manageiq_connection:

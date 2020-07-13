@@ -56,23 +56,23 @@ author:
 
 EXAMPLES = '''
 - name: Manage the state of program to be in started state
-  supervisorctl:
+  community.general.supervisorctl:
     name: my_app
     state: started
 
 - name: Manage the state of program group to be in started state
-  supervisorctl:
+  community.general.supervisorctl:
     name: 'my_apps:'
     state: started
 
 - name: Restart my_app, reading supervisorctl configuration from a specified file
-  supervisorctl:
+  community.general.supervisorctl:
     name: my_app
     state: restarted
     config: /var/opt/my_project/supervisord.conf
 
 - name: Restart my_app, connecting to supervisord with credentials and server URL
-  supervisorctl:
+  community.general.supervisorctl:
     name: my_app
     state: restarted
     username: test
@@ -80,7 +80,7 @@ EXAMPLES = '''
     server_url: http://localhost:9001
 
 - name: Send a signal to my_app via supervisorctl
-  supervisorctl:
+  community.general.supervisorctl:
     name: my_app
     state: signalled
     signal: USR1

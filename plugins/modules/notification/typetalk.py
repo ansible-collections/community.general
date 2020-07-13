@@ -37,7 +37,7 @@ author: "Takashi Someda (@tksmd)"
 
 EXAMPLES = '''
 - name: Send a message to typetalk
-  typetalk:
+  community.general.typetalk:
     client_id: 12345
     client_secret: 12345
     topic: 1

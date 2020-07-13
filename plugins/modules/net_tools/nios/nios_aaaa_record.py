@@ -66,7 +66,7 @@ options:
 
 EXAMPLES = '''
 - name: Configure an AAAA record
-  nios_aaaa_record:
+  community.general.nios_aaaa_record:
     name: aaaa.ansible.com
     ipv6: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
     state: present
@@ -77,7 +77,7 @@ EXAMPLES = '''
   connection: local
 
 - name: Add a comment to an existing AAAA record
-  nios_aaaa_record:
+  community.general.nios_aaaa_record:
     name: aaaa.ansible.com
     ipv6: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
     comment: this is a test comment
@@ -89,7 +89,7 @@ EXAMPLES = '''
   connection: local
 
 - name: Remove an AAAA record from the system
-  nios_aaaa_record:
+  community.general.nios_aaaa_record:
     name: aaaa.ansible.com
     ipv6: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
     state: absent
@@ -100,7 +100,7 @@ EXAMPLES = '''
   connection: local
 
 - name: Update an AAAA record name
-  nios_aaaa_record:
+  community.general.nios_aaaa_record:
     name: {new_name: aaaa_new.ansible.com, old_name: aaaa.ansible.com}
     ipv6: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
     state: present

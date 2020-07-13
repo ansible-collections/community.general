@@ -117,7 +117,7 @@ EXAMPLES = '''
   gather_facts: no
   tasks:
   - name: Build instance request
-    sl_vm:
+    community.general.sl_vm:
       hostname: instance-1
       domain: anydomain.com
       datacenter: dal09
@@ -137,7 +137,7 @@ EXAMPLES = '''
   gather_facts: no
   tasks:
   - name: Build instances request
-    sl_vm:
+    community.general.sl_vm:
       hostname: "{{ item.hostname }}"
       domain: "{{ item.domain }}"
       datacenter: "{{ item.datacenter }}"
@@ -195,7 +195,7 @@ EXAMPLES = '''
   gather_facts: no
   tasks:
   - name: Cancel by tag
-    sl_vm:
+    community.general.sl_vm:
       state: absent
       tags: ansible-module-test
 '''

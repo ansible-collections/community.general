@@ -79,7 +79,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure vault is present
-  ipa_vault:
+  community.general.ipa_vault:
     name: vault01
     vault_type: standard
     user: user01
@@ -89,7 +89,7 @@ EXAMPLES = r'''
     validate_certs: false
 
 - name: Ensure vault is present for Admin user
-  ipa_vault:
+  community.general.ipa_vault:
     name: vault01
     vault_type: standard
     ipa_host: ipa.example.com
@@ -97,7 +97,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure vault is absent
-  ipa_vault:
+  community.general.ipa_vault:
     name: vault01
     vault_type: standard
     user: user01
@@ -107,7 +107,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Modify vault if already exists
-  ipa_vault:
+  community.general.ipa_vault:
     name: vault01
     vault_type: standard
     description: "Vault for test"
@@ -117,7 +117,7 @@ EXAMPLES = r'''
     replace: True
 
 - name: Get vault info if already exists
-  ipa_vault:
+  community.general.ipa_vault:
     name: vault01
     ipa_host: ipa.example.com
     ipa_user: admin

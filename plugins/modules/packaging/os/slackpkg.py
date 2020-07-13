@@ -52,17 +52,17 @@ requirements: [ "Slackware >= 12.2" ]
 
 EXAMPLES = '''
 - name: Install package foo
-  slackpkg:
+  community.general.slackpkg:
     name: foo
     state: present
 
 - name: Remove packages foo and bar
-  slackpkg:
+  community.general.slackpkg:
     name: foo,bar
     state: absent
 
 - name: Make sure that it is the most updated package
-  slackpkg:
+  community.general.slackpkg:
     name: foo
     state: latest
 '''

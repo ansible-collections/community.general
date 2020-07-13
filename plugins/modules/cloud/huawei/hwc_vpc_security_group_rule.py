@@ -111,7 +111,7 @@ EXAMPLES = '''
     name: "ansible_network_security_group_test"
   register: sg
 - name: Create a security group rule
-  hwc_vpc_security_group_rule:
+  community.general.hwc_vpc_security_group_rule:
     direction: "ingress"
     protocol: "tcp"
     ethertype: "IPv4"

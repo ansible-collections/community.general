@@ -37,7 +37,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Get infos on volume
-  docker_volume_info:
+  community.general.docker_volume_info:
     name: mydata
   register: result
 

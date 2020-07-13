@@ -99,7 +99,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create a profile
-      lxd_profile:
+      community.general.lxd_profile:
         name: macvlan
         state: present
         config: {}
@@ -115,7 +115,7 @@ EXAMPLES = '''
   connection: local
   tasks:
   - name: Create macvlan profile
-    lxd_profile:
+    community.general.lxd_profile:
       url: https://127.0.0.1:8443
       # These client_cert and client_key values are equal to the default values.
       #client_cert: "{{ lookup('env', 'HOME') }}/.config/lxc/client.crt"
@@ -136,7 +136,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Delete a profile
-      lxd_profile:
+      community.general.lxd_profile:
         name: macvlan
         state: absent
 
@@ -145,7 +145,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Rename a profile
-      lxd_profile:
+      community.general.lxd_profile:
         name: macvlan
         new_name: macvlan2
         state: present

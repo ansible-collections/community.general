@@ -41,7 +41,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Get infos on network
-  docker_network_info:
+  community.general.docker_network_info:
     name: mydata
   register: result
 

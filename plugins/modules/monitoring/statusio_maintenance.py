@@ -108,7 +108,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a maintenance window for 10 minutes on server1, with automation to stop the maintenance
-  statusio_maintenance:
+  community.general.statusio_maintenance:
     title: Router Upgrade from ansible
     desc: Performing a Router Upgrade
     components: server1.example.com
@@ -119,7 +119,7 @@ EXAMPLES = '''
     automation: True
 
 - name: Create a maintenance window for 60 minutes on server1 and server2
-  statusio_maintenance:
+  community.general.statusio_maintenance:
     title: Routine maintenance
     desc: Some security updates
     components:
@@ -134,7 +134,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Create a future maintenance window for 24 hours to all hosts inside the Primary Data Center
-  statusio_maintenance:
+  community.general.statusio_maintenance:
     title: Data center downtime
     desc: Performing a Upgrade to our data center
     components: Primary Data Center
@@ -146,7 +146,7 @@ EXAMPLES = '''
     minutes: 1440
 
 - name: Delete a maintenance window
-  statusio_maintenance:
+  community.general.statusio_maintenance:
     title: Remove a maintenance window
     maintenance_id: 561f90faf74bc94a4700087b
     statuspage: statuspage_id

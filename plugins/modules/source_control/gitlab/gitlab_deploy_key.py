@@ -61,7 +61,7 @@ options:
 
 EXAMPLES = '''
 - name: "Adding a project deploy key"
-  gitlab_deploy_key:
+  community.general.gitlab_deploy_key:
     api_url: https://gitlab.example.com/
     api_token: "{{ api_token }}"
     project: "my_group/my_project"
@@ -70,7 +70,7 @@ EXAMPLES = '''
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596k6YjzGGphH2TUxwKzxcKDKKezwkpfnxPkSMkuEspGRt/aZZ9w..."
 
 - name: "Update the above deploy key to add push access"
-  gitlab_deploy_key:
+  community.general.gitlab_deploy_key:
     api_url: https://gitlab.example.com/
     api_token: "{{ api_token }}"
     project: "my_group/my_project"
@@ -79,7 +79,7 @@ EXAMPLES = '''
     can_push: yes
 
 - name: "Remove the previous deploy key from the project"
-  gitlab_deploy_key:
+  community.general.gitlab_deploy_key:
     api_url: https://gitlab.example.com/
     api_token: "{{ api_token }}"
     project: "my_group/my_project"

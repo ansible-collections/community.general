@@ -59,28 +59,28 @@ author:
 
 EXAMPLES = r'''
 - name: Allow Apache to listen on tcp port 8888
-  seport:
+  community.general.seport:
     ports: 8888
     proto: tcp
     setype: http_port_t
     state: present
 
 - name: Allow sshd to listen on tcp port 8991
-  seport:
+  community.general.seport:
     ports: 8991
     proto: tcp
     setype: ssh_port_t
     state: present
 
 - name: Allow memcached to listen on tcp ports 10000-10100 and 10112
-  seport:
+  community.general.seport:
     ports: 10000-10100,10112
     proto: tcp
     setype: memcache_port_t
     state: present
 
 - name: Allow memcached to listen on tcp ports 10000-10100 and 10112
-  seport:
+  community.general.seport:
     ports:
       - 10000-10100
       - 10112
@@ -118,7 +118,7 @@ def get_runtime_status(ignore_selinux_state=False):
 def semanage_port_get_ports(seport, setype, proto):
     """ Get the list of ports that have the specified type definition.
 
-    :param seport: Instance of seobject.portRecords
+    :param community.general.seport: Instance of seobject.portRecords
 
     :type setype: str
     :param setype: SELinux type.
@@ -139,7 +139,7 @@ def semanage_port_get_ports(seport, setype, proto):
 def semanage_port_get_type(seport, port, proto):
     """ Get the SELinux type of the specified port.
 
-    :param seport: Instance of seobject.portRecords
+    :param community.general.seport: Instance of seobject.portRecords
 
     :type port: str
     :param port: Port or port range (example: "8080", "8080-9090")

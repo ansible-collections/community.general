@@ -142,7 +142,7 @@ author:
 EXAMPLES = """
 # Create a new issue and add a comment to it:
 - name: Create an issue
-  jira:
+  community.general.jira:
     uri: '{{ server }}'
     username: '{{ user }}'
     password: '{{ pass }}'
@@ -158,7 +158,7 @@ EXAMPLES = """
   register: issue
 
 - name: Comment on issue
-  jira:
+  community.general.jira:
     uri: '{{ server }}'
     username: '{{ user }}'
     password: '{{ pass }}'
@@ -168,7 +168,7 @@ EXAMPLES = """
 
 # Assign an existing issue using edit
 - name: Assign an issue using free-form fields
-  jira:
+  community.general.jira:
     uri: '{{ server }}'
     username: '{{ user }}'
     password: '{{ pass }}'
@@ -178,7 +178,7 @@ EXAMPLES = """
 
 # Create an issue with an existing assignee
 - name: Create an assigned issue
-  jira:
+  community.general.jira:
     uri: '{{ server }}'
     username: '{{ user }}'
     password: '{{ pass }}'
@@ -191,7 +191,7 @@ EXAMPLES = """
 
 # Edit an issue
 - name: Set the labels on an issue using free-form fields
-  jira:
+  community.general.jira:
     uri: '{{ server }}'
     username: '{{ user }}'
     password: '{{ pass }}'
@@ -205,7 +205,7 @@ EXAMPLES = """
 
 # Updating a field using operations: add, set & remove
 - name: Change the value of a Select dropdown
-  jira:
+  community.general.jira:
     uri: '{{ server }}'
     username: '{{ user }}'
     password: '{{ pass }}'
@@ -221,7 +221,7 @@ EXAMPLES = """
 
 # Retrieve metadata for an issue and use it to create an account
 - name: Get an issue
-  jira:
+  community.general.jira:
     uri: '{{ server }}'
     username: '{{ user }}'
     password: '{{ pass }}'
@@ -233,7 +233,7 @@ EXAMPLES = """
 # Search for an issue
 # You can limit the search for specific fields by adding optional args. Note! It must be a dict, hence, lastViewed: null
 - name: Search for an issue
-  jira:
+  community.general.jira:
     uri: '{{ server }}'
     username: '{{ user }}'
     password: '{{ pass }}'
@@ -255,7 +255,7 @@ EXAMPLES = """
 # You can get list of valid linktypes at /rest/api/2/issueLinkType
 # url of your jira installation.
 - name: Create link from HSP-1 to MKY-1
-  jira:
+  community.general.jira:
     uri: '{{ server }}'
     username: '{{ user }}'
     password: '{{ pass }}'
@@ -266,7 +266,7 @@ EXAMPLES = """
 
 # Transition an issue by target status
 - name: Close the issue
-  jira:
+  community.general.jira:
     uri: '{{ server }}'
     username: '{{ user }}'
     password: '{{ pass }}'

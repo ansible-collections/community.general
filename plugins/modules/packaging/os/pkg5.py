@@ -49,21 +49,21 @@ options:
 '''
 EXAMPLES = '''
 - name: Install Vim
-  pkg5:
+  community.general.pkg5:
     name: editor/vim
 
 - name: Install Vim without refreshing publishers
-  pkg5:
+  community.general.pkg5:
     name: editor/vim
     refresh: no
 
 - name: Remove finger daemon
-  pkg5:
+  community.general.pkg5:
     name: service/network/finger
     state: absent
 
 - name: Install several packages at once
-  pkg5:
+  community.general.pkg5:
     name:
     - /file/gnu-findutils
     - /text/gnu-grep

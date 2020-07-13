@@ -45,7 +45,7 @@ options:
 
 EXAMPLES = """
    - name: Check connections to MVIP and SVIP
-     sf_check_connections:
+     community.general.sf_check_connections:
        hostname: "{{ solidfire_hostname }}"
        username: "{{ solidfire_username }}"
        password: "{{ solidfire_password }}"

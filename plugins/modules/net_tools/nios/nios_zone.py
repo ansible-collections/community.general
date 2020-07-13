@@ -90,7 +90,7 @@ options:
 
 EXAMPLES = '''
 - name: Configure a zone on the system using grid primary and secondaries
-  nios_zone:
+  community.general.nios_zone:
     name: ansible.com
     grid_primary:
       - name: gridprimary.grid.com
@@ -105,7 +105,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Configure a zone on the system using a name server group
-  nios_zone:
+  community.general.nios_zone:
     name: ansible.com
     ns_group: examplensg
     restart_if_needed: true
@@ -116,7 +116,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Configure a reverse mapping zone on the system using IPV4 zone format
-  nios_zone:
+  community.general.nios_zone:
     name: 10.10.10.0/24
     zone_format: IPV4
     state: present
@@ -126,7 +126,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Configure a reverse mapping zone on the system using IPV6 zone format
-  nios_zone:
+  community.general.nios_zone:
     name: 100::1/128
     zone_format: IPV6
     state: present
@@ -136,7 +136,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Update the comment and ext attributes for an existing zone
-  nios_zone:
+  community.general.nios_zone:
     name: ansible.com
     comment: this is an example comment
     extattrs:
@@ -148,7 +148,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Remove the dns zone
-  nios_zone:
+  community.general.nios_zone:
     name: ansible.com
     state: absent
     provider:
@@ -157,7 +157,7 @@ EXAMPLES = '''
       password: admin
   connection: local
 - name: Remove the reverse mapping dns zone from the system with IPV4 zone format
-  nios_zone:
+  community.general.nios_zone:
     name: 10.10.10.0/24
     zone_format: IPV4
     state: absent

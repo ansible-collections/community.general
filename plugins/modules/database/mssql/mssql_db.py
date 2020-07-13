@@ -60,7 +60,7 @@ author: Vedit Firat Arig (@vedit)
 
 EXAMPLES = '''
 - name: Create a new database with name 'jackdata'
-  mssql_db:
+  community.general.mssql_db:
     name: jackdata
     state: present
 
@@ -71,7 +71,7 @@ EXAMPLES = '''
     dest: /tmp
 
 - name: Restore the dump file to database 'my_db'
-  mssql_db:
+  community.general.mssql_db:
     name: my_db
     state: import
     target: /tmp/dump.sql

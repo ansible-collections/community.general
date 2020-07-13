@@ -56,7 +56,7 @@ options:
 
 EXAMPLES = '''
 - name: Create 10GB volume
-  scaleway_volume:
+  community.general.scaleway_volume:
     name: my-volume
     state: present
     region: par1
@@ -66,7 +66,7 @@ EXAMPLES = '''
   register: server_creation_check_task
 
 - name: Make sure volume deleted
-  scaleway_volume:
+  community.general.scaleway_volume:
     name: my-volume
     state: absent
     region: par1

@@ -49,7 +49,7 @@ options:
 
 EXAMPLES = '''
 - name: Get NetApp info (Password Authentication)
-  na_ontap_gather_facts:
+  community.general.na_ontap_gather_facts:
     state: info
     hostname: "na-vsim"
     username: "admin"
@@ -57,14 +57,14 @@ EXAMPLES = '''
 - debug:
     var: ontap_facts
 - name: Limit Fact Gathering to Aggregate Information
-  na_ontap_gather_facts:
+  community.general.na_ontap_gather_facts:
     state: info
     hostname: "na-vsim"
     username: "admin"
     password: "admins_password"
     gather_subset: "aggregate_info"
 - name: Limit Fact Gathering to Volume and Lun Information
-  na_ontap_gather_facts:
+  community.general.na_ontap_gather_facts:
     state: info
     hostname: "na-vsim"
     username: "admin"
@@ -73,7 +73,7 @@ EXAMPLES = '''
       - volume_info
       - lun_info
 - name: Gather all facts except for volume and lun information
-  na_ontap_gather_facts:
+  community.general.na_ontap_gather_facts:
     state: info
     hostname: "na-vsim"
     username: "admin"

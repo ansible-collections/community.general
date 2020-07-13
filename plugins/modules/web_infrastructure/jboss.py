@@ -51,20 +51,20 @@ author:
 
 EXAMPLES = r"""
 - name: Deploy a hello world application to the default deploy_path
-  jboss:
+  community.general.jboss:
     src: /tmp/hello-1.0-SNAPSHOT.war
     deployment: hello.war
     state: present
 
 - name: Update the hello world application to the non-default deploy_path
-  jboss:
+  community.general.jboss:
     src: /tmp/hello-1.1-SNAPSHOT.war
     deploy_path: /opt/wildfly/deployment
     deployment: hello.war
     state: present
 
 - name: Undeploy the hello world application from the default deploy_path
-  jboss:
+  community.general.jboss:
     deployment: hello.war
     state: absent
 """

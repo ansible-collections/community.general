@@ -52,7 +52,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Commit Cobbler changes
-  cobbler_sync:
+  community.general.cobbler_sync:
     host: cobbler01
     username: cobbler
     password: MySuperSecureP4sswOrd

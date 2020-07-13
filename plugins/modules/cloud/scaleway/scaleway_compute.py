@@ -111,7 +111,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a server
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: foobar
     state: present
     image: 89ee4018-f8c3-4dc4-a6b5-bca14f985ebe
@@ -123,7 +123,7 @@ EXAMPLES = '''
       - www
 
 - name: Create a server attached to a security group
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: foobar
     state: present
     image: 89ee4018-f8c3-4dc4-a6b5-bca14f985ebe
@@ -136,7 +136,7 @@ EXAMPLES = '''
       - www
 
 - name: Destroy it right after
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: foobar
     state: absent
     image: 89ee4018-f8c3-4dc4-a6b5-bca14f985ebe

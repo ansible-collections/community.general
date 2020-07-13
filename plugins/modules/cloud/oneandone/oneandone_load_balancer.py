@@ -139,7 +139,7 @@ author:
 
 EXAMPLES = '''
 - name: Create a load balancer
-  oneandone_load_balancer:
+  community.general.oneandone_load_balancer:
     auth_token: oneandone_private_api_key
     name: ansible load balancer
     description: Testing creation of load balancer with ansible
@@ -159,7 +159,7 @@ EXAMPLES = '''
     wait_timeout: 500
 
 - name: Destroy a load balancer
-  oneandone_load_balancer:
+  community.general.oneandone_load_balancer:
     auth_token: oneandone_private_api_key
     name: ansible load balancer
     wait: true
@@ -167,7 +167,7 @@ EXAMPLES = '''
     state: absent
 
 - name: Update a load balancer
-  oneandone_load_balancer:
+  community.general.oneandone_load_balancer:
     auth_token: oneandone_private_api_key
     load_balancer: ansible load balancer
     name: ansible load balancer updated
@@ -177,7 +177,7 @@ EXAMPLES = '''
     state: update
 
 - name: Add server to a load balancer
-  oneandone_load_balancer:
+  community.general.oneandone_load_balancer:
     auth_token: oneandone_private_api_key
     load_balancer: ansible load balancer updated
     description: Adding server to a load balancer with ansible
@@ -188,7 +188,7 @@ EXAMPLES = '''
     state: update
 
 - name: Remove server from a load balancer
-  oneandone_load_balancer:
+  community.general.oneandone_load_balancer:
     auth_token: oneandone_private_api_key
     load_balancer: ansible load balancer updated
     description: Removing server from a load balancer with ansible
@@ -199,7 +199,7 @@ EXAMPLES = '''
     state: update
 
 - name: Add rules to a load balancer
-  oneandone_load_balancer:
+  community.general.oneandone_load_balancer:
     auth_token: oneandone_private_api_key
     load_balancer: ansible load balancer updated
     description: Adding rules to a load balancer with ansible
@@ -219,7 +219,7 @@ EXAMPLES = '''
     state: update
 
 - name: Remove rules from a load balancer
-  oneandone_load_balancer:
+  community.general.oneandone_load_balancer:
     auth_token: oneandone_private_api_key
     load_balancer: ansible load balancer updated
     description: Adding rules to a load balancer with ansible

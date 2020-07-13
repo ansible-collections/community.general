@@ -71,7 +71,7 @@ requirements:
 EXAMPLES = '''
 # Add service startmyservice to the inittab, directly after service existingservice.
 - name: Add startmyservice to inittab
-  aix_inittab:
+  community.general.aix_inittab:
     name: startmyservice
     runlevel: 4
     action: once
@@ -82,7 +82,7 @@ EXAMPLES = '''
 
 # Change inittab entry startmyservice to runlevel "2" and processaction "wait".
 - name: Change startmyservice to inittab
-  aix_inittab:
+  community.general.aix_inittab:
     name: startmyservice
     runlevel: 2
     action: wait
@@ -91,7 +91,7 @@ EXAMPLES = '''
   become: yes
 
 - name: Remove startmyservice from inittab
-  aix_inittab:
+  community.general.aix_inittab:
     name: startmyservice
     runlevel: 2
     action: wait

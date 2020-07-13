@@ -51,7 +51,7 @@ options:
 EXAMPLES = '''
 # Create the zone 'test'
 - name: Create zone
-  memset_zone:
+  community.general.memset_zone:
     name: test
     state: present
     api_key: 5eb86c9196ab03919abcf03857163741
@@ -60,7 +60,7 @@ EXAMPLES = '''
 
 # Force zone deletion
 - name: Force delete zone
-  memset_zone:
+  community.general.memset_zone:
     name: test
     state: absent
     api_key: 5eb86c9196ab03919abcf03857163741

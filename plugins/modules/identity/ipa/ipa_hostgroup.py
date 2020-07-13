@@ -54,7 +54,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure host-group databases is present
-  ipa_hostgroup:
+  community.general.ipa_hostgroup:
     name: databases
     state: present
     host:
@@ -67,7 +67,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure host-group databases is absent
-  ipa_hostgroup:
+  community.general.ipa_hostgroup:
     name: databases
     state: absent
     ipa_host: ipa.example.com

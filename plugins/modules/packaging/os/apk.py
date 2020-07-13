@@ -68,69 +68,69 @@ notes:
 
 EXAMPLES = '''
 - name: Update repositories and install foo package
-  apk:
+  community.general.apk:
     name: foo
     update_cache: yes
 
 - name: Update repositories and install foo and bar packages
-  apk:
+  community.general.apk:
     name: foo,bar
     update_cache: yes
 
 - name: Remove foo package
-  apk:
+  community.general.apk:
     name: foo
     state: absent
 
 - name: Remove foo and bar packages
-  apk:
+  community.general.apk:
     name: foo,bar
     state: absent
 
 - name: Install the package foo
-  apk:
+  community.general.apk:
     name: foo
     state: present
 
 - name: Install the packages foo and bar
-  apk:
+  community.general.apk:
     name: foo,bar
     state: present
 
 - name: Update repositories and update package foo to latest version
-  apk:
+  community.general.apk:
     name: foo
     state: latest
     update_cache: yes
 
 - name: Update repositories and update packages foo and bar to latest versions
-  apk:
+  community.general.apk:
     name: foo,bar
     state: latest
     update_cache: yes
 
 - name: Update all installed packages to the latest versions
-  apk:
+  community.general.apk:
     upgrade: yes
 
 - name: Upgrade / replace / downgrade / uninstall all installed packages to the latest versions available
-  apk:
+  community.general.apk:
     available: yes
     upgrade: yes
 
 - name: Update repositories as a separate step
-  apk:
+  community.general.apk:
     update_cache: yes
 
 - name: Install package from a specific repository
-  apk:
+  community.general.apk:
     name: foo
     state: latest
     update_cache: yes
     repository: http://dl-3.alpinelinux.org/alpine/edge/main
 
 - name: Install package without using cache
-  apk:
+  community.general.apk:
     name: foo
     state: latest
     no_cache: yes

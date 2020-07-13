@@ -108,7 +108,7 @@ EXAMPLES = '''
   connection: local
   tasks:
   - name: Associate a check with an existing entity.
-    rax_mon_check:
+    community.general.rax_mon_check:
       credentials: ~/.rax_pub
       state: present
       entity_id: "{{ the_entity['entity']['id'] }}"

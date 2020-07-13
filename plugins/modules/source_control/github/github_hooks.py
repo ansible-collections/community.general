@@ -61,7 +61,7 @@ author: "Phillip Gentry, CX Inc (@pcgentry)"
 
 EXAMPLES = '''
 - name: Create a new service hook ignoring duplicates
-  github_hooks:
+  community.general.github_hooks:
     action: create
     hookurl: http://11.111.111.111:2222
     user: '{{ gituser }}'
@@ -71,7 +71,7 @@ EXAMPLES = '''
 # Cleaning all hooks for this repo that had an error on the last update.
 # Since this works for all hooks in a repo it is probably best that this would be called from a handler.
 - name: Clean all hooks
-  github_hooks:
+  community.general.github_hooks:
     action: cleanall
     user: '{{ gituser }}'
     oauthkey: '{{ oauthkey }}'

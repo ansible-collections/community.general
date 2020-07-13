@@ -157,18 +157,18 @@ options:
 
 EXAMPLES = r'''
 - name: Allow everything and enable UFW
-  ufw:
+  community.general.ufw:
     state: enabled
     policy: allow
 
 - name: Set logging
-  ufw:
+  community.general.ufw:
     logging: 'on'
 
 # Sometimes it is desirable to let the sender know when traffic is
 # being denied, rather than simply ignoring it. In these cases, use
 # reject instead of deny. In addition, log rejected connections:
-- ufw:
+- community.general.ufw:
     rule: reject
     port: auth
     log: yes
@@ -178,7 +178,7 @@ EXAMPLES = r'''
 # address has attempted to initiate 6 or more connections in the last
 # 30 seconds. See  http://www.debian-administration.org/articles/187
 # for details. Typical usage is:
-- ufw:
+- community.general.ufw:
     rule: limit
     port: ssh
     proto: tcp
@@ -186,35 +186,35 @@ EXAMPLES = r'''
 # Allow OpenSSH. (Note that as ufw manages its own state, simply removing
 # a rule=allow task can leave those ports exposed. Either use delete=yes
 # or a separate state=reset task)
-- ufw:
+- community.general.ufw:
     rule: allow
     name: OpenSSH
 
 - name: Delete OpenSSH rule
-  ufw:
+  community.general.ufw:
     rule: allow
     name: OpenSSH
     delete: yes
 
 - name: Deny all access to port 53
-  ufw:
+  community.general.ufw:
     rule: deny
     port: '53'
 
 - name: Allow port range 60000-61000
-  ufw:
+  community.general.ufw:
     rule: allow
     port: 60000:61000
     proto: tcp
 
 - name: Allow all access to tcp port 80
-  ufw:
+  community.general.ufw:
     rule: allow
     port: '80'
     proto: tcp
 
 - name: Allow all access from RFC1918 networks to this host
-  ufw:
+  community.general.ufw:
     rule: allow
     src: '{{ item }}'
   loop:
@@ -223,7 +223,7 @@ EXAMPLES = r'''
     - 192.168.0.0/16
 
 - name: Deny access to udp port 514 from host 1.2.3.4 and include a comment
-  ufw:
+  community.general.ufw:
     rule: deny
     proto: udp
     src: 1.2.3.4
@@ -231,7 +231,7 @@ EXAMPLES = r'''
     comment: Block syslog
 
 - name: Allow incoming access to eth0 from 1.2.3.5 port 5469 to 1.2.3.4 port 5469
-  ufw:
+  community.general.ufw:
     rule: allow
     interface: eth0
     direction: in
@@ -243,7 +243,7 @@ EXAMPLES = r'''
 
 # Note that IPv6 must be enabled in /etc/default/ufw for IPv6 firewalling to work.
 - name: Deny all traffic from the IPv6 2001:db8::/32 to tcp port 25 on this host
-  ufw:
+  community.general.ufw:
     rule: deny
     proto: tcp
     src: 2001:db8::/32
@@ -251,7 +251,7 @@ EXAMPLES = r'''
 
 - name: Deny all IPv6 traffic to tcp port 20 on this host
   # this should be the first IPv6 rule
-  ufw:
+  community.general.ufw:
     rule: deny
     proto: tcp
     port: '20'
@@ -265,7 +265,7 @@ EXAMPLES = r'''
   #  so the new rule will be inserted before the second
   #  to last IPv4 rule, and will be come the third to last
   #  IPv4 rule.)
-  ufw:
+  community.general.ufw:
     rule: deny
     proto: tcp
     port: '20'
@@ -275,7 +275,7 @@ EXAMPLES = r'''
 
 # Can be used to further restrict a global FORWARD policy set to allow
 - name: Deny forwarded/routed traffic from subnet 1.2.3.0/24 to subnet 4.5.6.0/24
-  ufw:
+  community.general.ufw:
     rule: deny
     route: yes
     src: 1.2.3.0/24

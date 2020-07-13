@@ -152,7 +152,7 @@ options:
 
 EXAMPLES = r'''
 - name: Create a test.example.net A record to point to 127.0.0.1
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.net
     record: test
     type: A
@@ -162,7 +162,7 @@ EXAMPLES = r'''
   register: record
 
 - name: Create a record using api token
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.net
     record: test
     type: A
@@ -170,7 +170,7 @@ EXAMPLES = r'''
     api_token: dummyapitoken
 
 - name: Create a example.net CNAME record to example.com
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.net
     type: CNAME
     value: example.com
@@ -179,7 +179,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Change its TTL
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.net
     type: CNAME
     value: example.com
@@ -189,7 +189,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Delete the record
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.net
     type: CNAME
     value: example.com
@@ -198,7 +198,7 @@ EXAMPLES = r'''
     state: absent
 
 - name: Create a example.net CNAME record to example.com and proxy through Cloudflare's network
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.net
     type: CNAME
     value: example.com
@@ -209,7 +209,7 @@ EXAMPLES = r'''
 
 # This deletes all other TXT records named "test.example.net"
 - name: Create TXT record "test.example.net" with value "unique value"
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     domain: example.net
     record: test
     type: TXT
@@ -220,7 +220,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Create an SRV record _foo._tcp.example.net
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     domain: example.net
     service: foo
     proto: tcp
@@ -231,7 +231,7 @@ EXAMPLES = r'''
     value: fooserver.example.net
 
 - name: Create a SSHFP record login.example.com
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.com
     record: login
     type: SSHFP
@@ -240,7 +240,7 @@ EXAMPLES = r'''
     value: 9dc1d6742696d2f51ca1f1a78b3d16a840f7d111eb9454239e70db31363f33e1
 
 - name: Create a TLSA record _25._tcp.mail.example.com
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.com
     record: mail
     port: 25
@@ -252,7 +252,7 @@ EXAMPLES = r'''
     value: 6b76d034492b493e15a7376fccd08e63befdad0edab8e442562f532338364bf3
 
 - name: Create a DS record for subdomain.example.com
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.com
     record: subdomain
     type: DS

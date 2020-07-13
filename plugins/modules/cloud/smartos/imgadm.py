@@ -53,38 +53,38 @@ requirements:
 
 EXAMPLES = '''
 - name: Import an image
-  imgadm:
+  community.general.imgadm:
     uuid: '70e3ae72-96b6-11e6-9056-9737fd4d0764'
     state: imported
 
 - name: Delete an image
-  imgadm:
+  community.general.imgadm:
     uuid: '70e3ae72-96b6-11e6-9056-9737fd4d0764'
     state: deleted
 
 - name: Update all images
-  imgadm:
+  community.general.imgadm:
     uuid: '*'
     state: updated
 
 - name: Update a single image
-  imgadm:
+  community.general.imgadm:
     uuid: '70e3ae72-96b6-11e6-9056-9737fd4d0764'
     state: updated
 
 - name: Add a source
-  imgadm:
+  community.general.imgadm:
     source: 'https://datasets.project-fifo.net'
     state: present
 
 - name: Add a Docker source
-  imgadm:
+  community.general.imgadm:
     source: 'https://docker.io'
     type: docker
     state: present
 
 - name: Remove a source
-  imgadm:
+  community.general.imgadm:
     source: 'https://docker.io'
     state: absent
 '''

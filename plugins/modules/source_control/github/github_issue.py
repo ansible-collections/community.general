@@ -46,7 +46,7 @@ get_status:
 
 EXAMPLES = '''
 - name: Check if GitHub issue is closed or not
-  github_issue:
+  community.general.github_issue:
     organization: ansible
     repo: ansible
     issue: 23642

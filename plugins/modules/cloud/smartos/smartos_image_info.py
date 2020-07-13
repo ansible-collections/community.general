@@ -28,16 +28,16 @@ options:
 
 EXAMPLES = '''
 - name: Return information about all installed images
-  smartos_image_info:
+  community.general.smartos_image_info:
   register: result
 
 - name: Return all private active Linux images
-  smartos_image_info:
+  community.general.smartos_image_info:
     filters: "os=linux state=active public=false"
   register: result
 
 - name: Show, how many clones does every image have
-  smartos_image_info:
+  community.general.smartos_image_info:
   register: result
 
 - name: Print information

@@ -78,7 +78,7 @@ author: "Jose Delarosa (@jose-delarosa)"
 
 EXAMPLES = '''
   - name: Enable NTP and set NTP server and Time zone attributes in iDRAC
-    idrac_redfish_config:
+    community.general.idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
       resource_id: iDRAC.Embedded.1
@@ -91,7 +91,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Enable Syslog and set Syslog servers in iDRAC
-    idrac_redfish_config:
+    community.general.idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
       resource_id: iDRAC.Embedded.1
@@ -104,7 +104,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Configure SNMP community string, port, protocol and trap format
-    idrac_redfish_config:
+    community.general.idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
       resource_id: iDRAC.Embedded.1
@@ -120,7 +120,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Enable CSIOR
-    idrac_redfish_config:
+    community.general.idrac_redfish_config:
       category: Manager
       command: SetLifecycleControllerAttributes
       resource_id: iDRAC.Embedded.1
@@ -131,7 +131,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Set Power Supply Redundancy Policy to A/B Grid Redundant
-    idrac_redfish_config:
+    community.general.idrac_redfish_config:
       category: Manager
       command: SetSystemAttributes
       resource_id: iDRAC.Embedded.1

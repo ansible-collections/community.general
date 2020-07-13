@@ -82,23 +82,23 @@ EXAMPLES = '''
 # Fetch instances details according to setting different filters
 
 - name: Find all instances in the specified region
-  ali_instance_info:
+  community.general.ali_instance_info:
   register: all_instances
 
 - name: Find all instances based on the specified ids
-  ali_instance_info:
+  community.general.ali_instance_info:
     instance_ids:
       - "i-35b333d9"
       - "i-ddav43kd"
   register: instances_by_ids
 
 - name: Find all instances based on the specified name_prefix
-  ali_instance_info:
+  community.general.ali_instance_info:
     name_prefix: "ecs_instance_"
   register: instances_by_name_prefix
 
 - name: Find instances based on tags
-  ali_instance_info:
+  community.general.ali_instance_info:
     tags:
       Test: "add"
 '''

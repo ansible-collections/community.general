@@ -93,7 +93,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create CPG sample_cpg
-  ss_3par_cpg:
+  community.general.ss_3par_cpg:
     storage_system_ip: 10.10.10.1
     storage_system_username: username
     storage_system_password: password
@@ -110,7 +110,7 @@ EXAMPLES = r'''
     secure: no
 
 - name: Delete CPG sample_cpg
-  ss_3par_cpg:
+  community.general.ss_3par_cpg:
     storage_system_ip: 10.10.10.1
     storage_system_username: username
     storage_system_password: password

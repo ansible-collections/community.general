@@ -62,12 +62,12 @@ author: "Matt Wright (@mattupstate)"
 
 EXAMPLES = '''
 - name: Install or update pip
-  easy_install:
+  community.general.easy_install:
     name: pip
     state: latest
 
 - name: Install Bottle into the specified virtualenv
-  easy_install:
+  community.general.easy_install:
     name: bottle
     virtualenv: /webapps/myapp/venv
 '''

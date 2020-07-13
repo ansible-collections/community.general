@@ -168,12 +168,12 @@ EXAMPLES = '''
   gather_facts: no
   tasks:
     - name: Tear down existing services
-      docker_compose:
+      community.general.docker_compose:
         project_src: flask
         state: absent
 
     - name: Create and start services
-      docker_compose:
+      community.general.docker_compose:
         project_src: flask
       register: output
 
@@ -181,7 +181,7 @@ EXAMPLES = '''
         var: output
 
     - name: Run `docker-compose up` again
-      docker_compose:
+      community.general.docker_compose:
         project_src: flask
         build: no
       register: output
@@ -193,7 +193,7 @@ EXAMPLES = '''
         that: "not output.changed "
 
     - name: Stop all services
-      docker_compose:
+      community.general.docker_compose:
         project_src: flask
         build: no
         stopped: yes
@@ -208,7 +208,7 @@ EXAMPLES = '''
           - "not db.flask_db_1.state.running"
 
     - name: Restart services
-      docker_compose:
+      community.general.docker_compose:
         project_src: flask
         build: no
         restarted: yes
@@ -226,7 +226,7 @@ EXAMPLES = '''
   hosts: localhost
   gather_facts: no
   tasks:
-    - docker_compose:
+    - community.general.docker_compose:
         project_src: flask
         scale:
           web: 2
@@ -239,11 +239,11 @@ EXAMPLES = '''
   hosts: localhost
   gather_facts: no
   tasks:
-    - docker_compose:
+    - community.general.docker_compose:
         project_src: flask
         state: absent
 
-    - docker_compose:
+    - community.general.docker_compose:
         project_name: flask
         definition:
           version: '2'
@@ -273,11 +273,11 @@ EXAMPLES = '''
   hosts: localhost
   gather_facts: no
   tasks:
-    - docker_compose:
+    - community.general.docker_compose:
         project_src: flask
         state: absent
 
-    - docker_compose:
+    - community.general.docker_compose:
         project_name: flask
         definition:
             db:

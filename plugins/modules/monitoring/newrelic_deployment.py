@@ -65,7 +65,7 @@ requirements: []
 
 EXAMPLES = '''
 - name:  Notify newrelic about an app deployment
-  newrelic_deployment:
+  community.general.newrelic_deployment:
     token: AAAAAA
     app_name: myapp
     user: ansible deployment

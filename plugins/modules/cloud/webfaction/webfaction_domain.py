@@ -57,7 +57,7 @@ options:
 
 EXAMPLES = '''
   - name: Create a test domain
-    webfaction_domain:
+    community.general.webfaction_domain:
       name: mydomain.com
       state: present
       subdomains:
@@ -67,7 +67,7 @@ EXAMPLES = '''
       login_password: "{{webfaction_passwd}}"
 
   - name: Delete test domain and any subdomains
-    webfaction_domain:
+    community.general.webfaction_domain:
       name: mydomain.com
       state: absent
       login_name: "{{webfaction_user}}"

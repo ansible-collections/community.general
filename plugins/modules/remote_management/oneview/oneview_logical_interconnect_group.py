@@ -38,7 +38,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Ensure that the Logical Interconnect Group is present
-  oneview_logical_interconnect_group:
+  community.general.oneview_logical_interconnect_group:
     config: /etc/oneview/oneview_config.json
     state: present
     data:
@@ -59,7 +59,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Ensure that the Logical Interconnect Group has the specified scopes
-  oneview_logical_interconnect_group:
+  community.general.oneview_logical_interconnect_group:
     config: /etc/oneview/oneview_config.json
     state: present
     data:
@@ -70,7 +70,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Ensure that the Logical Interconnect Group is present with name 'Test'
-  oneview_logical_interconnect_group:
+  community.general.oneview_logical_interconnect_group:
     config: /etc/oneview/oneview_config.json
     state: present
     data:
@@ -79,7 +79,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Ensure that the Logical Interconnect Group is absent
-  oneview_logical_interconnect_group:
+  community.general.oneview_logical_interconnect_group:
     config: /etc/oneview/oneview_config.json
     state: absent
     data:

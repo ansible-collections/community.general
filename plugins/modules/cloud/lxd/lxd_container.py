@@ -149,7 +149,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create a started container
-      lxd_container:
+      community.general.lxd_container:
         name: mycontainer
         state: started
         source:
@@ -182,7 +182,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create a started container
-      lxd_container:
+      community.general.lxd_container:
         name: mycontainer
         state: started
         source:
@@ -203,7 +203,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Delete a container
-      lxd_container:
+      community.general.lxd_container:
         name: mycontainer
         state: absent
 
@@ -212,7 +212,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Restart a container
-      lxd_container:
+      community.general.lxd_container:
         name: mycontainer
         state: restarted
 
@@ -221,7 +221,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Restart a container
-      lxd_container:
+      community.general.lxd_container:
         url: https://127.0.0.1:8443
         # These client_cert and client_key values are equal to the default values.
         #client_cert: "{{ lookup('env', 'HOME') }}/.config/lxc/client.crt"

@@ -49,32 +49,32 @@ options:
 
 EXAMPLES = r'''
 - name: Start sv dnscache, if not running
-  runit:
+  community.general.runit:
     name: dnscache
     state: started
 
 - name: Stop sv dnscache, if running
-  runit:
+  community.general.runit:
     name: dnscache
     state: stopped
 
 - name: Kill sv dnscache, in all cases
-  runit:
+  community.general.runit:
     name: dnscache
     state: killed
 
 - name: Restart sv dnscache, in all cases
-  runit:
+  community.general.runit:
     name: dnscache
     state: restarted
 
 - name: Reload sv dnscache, in all cases
-  runit:
+  community.general.runit:
     name: dnscache
     state: reloaded
 
 - name: Use alternative sv directory location
-  runit:
+  community.general.runit:
     name: dnscache
     state: reloaded
     service_dir: /run/service

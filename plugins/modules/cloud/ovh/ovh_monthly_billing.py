@@ -48,7 +48,7 @@ options:
 
 EXAMPLES = '''
 - name: Basic usage, using auth from /etc/ovh.conf
-  ovh_monthly_billing:
+  community.general.ovh_monthly_billing:
     project_id: 0c727a20aa144485b70c44dee9123b46
     instance_id: 8fa89ad2-8f08-4220-9fa4-9695ea23e948
 
@@ -61,7 +61,7 @@ EXAMPLES = '''
   register: openstack_servers
 
 - name: Use IDs
-  ovh_monthly_billing:
+  community.general.ovh_monthly_billing:
     project_id: "{{ openstack_servers.0.tenant_id }}"
     instance_id: "{{ openstack_servers.0.id }}"
     application_key: yourkey

@@ -93,7 +93,7 @@ options:
 
 EXAMPLES = """
 - name: Create a new Linode.
-  linode_v4:
+  community.general.linode_v4:
     label: new-linode
     type: g6-nanode-1
     region: eu-west
@@ -104,7 +104,7 @@ EXAMPLES = """
     state: present
 
 - name: Delete that new Linode.
-  linode_v4:
+  community.general.linode_v4:
     label: new-linode
     state: absent
 """

@@ -89,7 +89,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Get info on Docker Swarm
-  docker_swarm_info:
+  community.general.docker_swarm_info:
   ignore_errors: yes
   register: result
 
@@ -103,18 +103,18 @@ EXAMPLES = '''
 - block:
 
 - name: Get info on Docker Swarm and list of registered nodes
-  docker_swarm_info:
+  community.general.docker_swarm_info:
     nodes: yes
   register: result
 
 - name: Get info on Docker Swarm and extended list of registered nodes
-  docker_swarm_info:
+  community.general.docker_swarm_info:
     nodes: yes
     verbose_output: yes
   register: result
 
 - name: Get info on Docker Swarm and filtered list of registered nodes
-  docker_swarm_info:
+  community.general.docker_swarm_info:
     nodes: yes
     nodes_filters:
       name: mynode
@@ -124,7 +124,7 @@ EXAMPLES = '''
     var: result.swarm_facts
 
 - name: Get the swarm unlock key
-  docker_swarm_info:
+  community.general.docker_swarm_info:
     unlock_key: yes
   register: result
 
