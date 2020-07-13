@@ -123,7 +123,7 @@ author: Sebastiaan Mannem (@sebasmannem)
 
 EXAMPLES = '''
 - name: Grant users joe and simon access to databases sales and logistics from ipv6 localhost ::1/128 using peer authentication.
-  postgresql_pg_hba:
+  community.general.postgresql_pg_hba:
     dest: /var/lib/postgres/data/pg_hba.conf
     contype: host
     users: joe,simon
@@ -133,7 +133,7 @@ EXAMPLES = '''
     create: true
 
 - name: Grant user replication from network 192.168.0.100/24 access for replication with client cert authentication.
-  postgresql_pg_hba:
+  community.general.postgresql_pg_hba:
     dest: /var/lib/postgres/data/pg_hba.conf
     contype: host
     users: replication
@@ -142,7 +142,7 @@ EXAMPLES = '''
     method: cert
 
 - name: Revoke access from local user mary on database mydb.
-  postgresql_pg_hba:
+  community.general.postgresql_pg_hba:
     dest: /var/lib/postgres/data/pg_hba.conf
     contype: local
     users: mary

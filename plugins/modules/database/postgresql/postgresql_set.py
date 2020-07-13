@@ -90,14 +90,14 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Restore wal_keep_segments parameter to initial state
-  postgresql_set:
+  community.general.postgresql_set:
     name: wal_keep_segments
     reset: yes
 
 # Set work_mem parameter to 32MB and show what's been changed and restart is required or not
 # (output example: "msg": "work_mem 4MB >> 64MB restart_req: False")
 - name: Set work mem parameter
-  postgresql_set:
+  community.general.postgresql_set:
     name: work_mem
     value: 32mb
   register: set
@@ -110,12 +110,12 @@ EXAMPLES = r'''
 # (If you passed the value that was different from the current server setting).
 
 - name: Set log_min_duration_statement parameter to 1 second
-  postgresql_set:
+  community.general.postgresql_set:
     name: log_min_duration_statement
     value: 1s
 
 - name: Set wal_log_hints parameter to default value (remove parameter from postgresql.auto.conf)
-  postgresql_set:
+  community.general.postgresql_set:
     name: wal_log_hints
     value: default
 '''
