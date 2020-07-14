@@ -88,7 +88,7 @@ options:
         type: bool
         default: no
         aliases: [ tls_verify ]
-    ansible.builtin.debug:
+    debug:
         description:
             - Debug mode
         type: bool

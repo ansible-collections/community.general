@@ -57,7 +57,7 @@ options:
     - If option is passed all assigned privileges that are not passed will be removed.
     type: list
     elements: str
-  ansible.builtin.service:
+  service:
     description:
     - List of service names to assign.
     - If an empty list is passed all assigned services will be removed from the role.
@@ -108,7 +108,7 @@ EXAMPLES = r'''
     privilege:
     - Group Administrators
     - User Administrators
-    ansible.builtin.service:
+    service:
     - service01
 
 - name: Ensure role is absent
