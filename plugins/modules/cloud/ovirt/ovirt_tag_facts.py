@@ -62,7 +62,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print gathered information
-  debug:
+  ansible.builtin.debug:
     msg: "{{ result.ovirt_tags }}"
 
 - name: Gather information about all tags, which are assigned to VM postgres
@@ -71,7 +71,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print gathered information
-  debug:
+  ansible.builtin.debug:
     msg: "{{ result.ovirt_tags }}"
 
 - name: Gather information about all tags, which are assigned to host west
@@ -80,7 +80,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print gathered information
-  debug:
+  ansible.builtin.debug:
     msg: "{{ result.ovirt_tags }}"
 '''
 

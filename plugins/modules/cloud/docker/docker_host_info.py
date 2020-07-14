@@ -126,7 +126,7 @@ EXAMPLES = '''
     disk_usage: yes
   register: result
 
-- debug:
+- ansible.builtin.debug:
     var: result.host_info
 
 '''

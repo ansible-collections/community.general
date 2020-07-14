@@ -135,7 +135,7 @@ EXAMPLES = '''
   no_log: true                           # Don't want to log the secrets to the console!
 
 - name: Debug a password (for example)
-  debug:
+  ansible.builtin.debug:
     msg: "{{ my_1password_item['onepassword']['My 1Password item'] }}"
 '''
 

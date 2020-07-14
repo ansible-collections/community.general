@@ -102,7 +102,7 @@ EXAMPLES = r'''
     value: 32mb
   register: set
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ set.name }} {{ set.prev_val_pretty }} >> {{ set.value_pretty }} restart_req: {{ set.restart_required }}"
   when: set.changed
 # Ensure that the restart of PostgreSQL server must be required for some parameters.

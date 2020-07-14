@@ -355,7 +355,7 @@ EXAMPLES = r'''
   tasks:
 
   - name: Install needed network manager libs
-    package:
+    ansible.builtin.package:
       name:
         - NetworkManager-libnm
         - nm-connection-editor

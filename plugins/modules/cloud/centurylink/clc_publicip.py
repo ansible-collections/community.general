@@ -73,7 +73,7 @@ EXAMPLES = '''
       register: clc
 
     - name: Debug
-      debug:
+      ansible.builtin.debug:
         var: clc
 
 - name: Delete Public IP from Server
@@ -90,7 +90,7 @@ EXAMPLES = '''
       register: clc
 
     - name: Debug
-      debug:
+      ansible.builtin.debug:
         var: clc
 '''
 

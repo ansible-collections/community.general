@@ -40,11 +40,11 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
     - name: all available resources
-      debug: msg="{{ lookup('manifold', api_token='SecretToken') }}"
+      ansible.builtin.debug: msg="{{ lookup('manifold', api_token='SecretToken') }}"
     - name: all available resources for a specific project in specific team
-      debug: msg="{{ lookup('manifold', api_token='SecretToken', project='poject-1', team='team-2') }}"
+      ansible.builtin.debug: msg="{{ lookup('manifold', api_token='SecretToken', project='poject-1', team='team-2') }}"
     - name: two specific resources
-      debug: msg="{{ lookup('manifold', 'resource-1', 'resource-2') }}"
+      ansible.builtin.debug: msg="{{ lookup('manifold', 'resource-1', 'resource-2') }}"
 '''
 
 RETURN = '''

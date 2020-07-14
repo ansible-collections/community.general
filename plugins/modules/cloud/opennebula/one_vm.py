@@ -194,7 +194,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print VM properties
-  debug:
+  ansible.builtin.debug:
     msg: result
 
 - name: Deploy a new VM on hold

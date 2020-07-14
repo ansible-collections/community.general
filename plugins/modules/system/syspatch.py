@@ -53,7 +53,7 @@ EXAMPLES = '''
   register: syspatch
 
 - name: Reboot if patch requires it
-  reboot:
+  ansible.builtin.reboot:
   when: syspatch.reboot_needed
 '''
 

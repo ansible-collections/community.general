@@ -20,10 +20,10 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: Example of the change in the description
-  debug: msg="{{ lookup('cartesian', [1,2,3], [a, b])}}"
+  ansible.builtin.debug: msg="{{ lookup('cartesian', [1,2,3], [a, b])}}"
 
 - name: loops over the cartesian product of the supplied lists
-  debug: msg="{{item}}"
+  ansible.builtin.debug: msg="{{item}}"
   with_cartesian:
     - "{{list1}}"
     - "{{list2}}"

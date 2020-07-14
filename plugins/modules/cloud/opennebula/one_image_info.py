@@ -70,7 +70,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print all images facts
-  debug:
+  ansible.builtin.debug:
     msg: result
 
 - name: Gather facts about an image using ID

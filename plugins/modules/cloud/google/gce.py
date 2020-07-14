@@ -236,7 +236,7 @@ EXAMPLES = '''
       register: gce
 
     - name: Save host data
-      add_host:
+      ansible.builtin.add_host:
         hostname: "{{ item.public_ip }}"
         groupname: gce_instances_ips
       with_items: "{{ gce.instance_data }}"

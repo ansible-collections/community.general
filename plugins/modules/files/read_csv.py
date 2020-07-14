@@ -82,7 +82,7 @@ EXAMPLES = r'''
   register: users
   delegate_to: localhost
 
-- debug:
+- ansible.builtin.debug:
     msg: 'User {{ users.dict.dag.name }} has UID {{ users.dict.dag.uid }} and GID {{ users.dict.dag.gid }}'
 
 # Read a CSV file and access the first item
@@ -92,7 +92,7 @@ EXAMPLES = r'''
   register: users
   delegate_to: localhost
 
-- debug:
+- ansible.builtin.debug:
     msg: 'User {{ users.list.1.name }} has UID {{ users.list.1.uid }} and GID {{ users.list.1.gid }}'
 
 # Example CSV file without header and semi-colon delimiter

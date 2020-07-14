@@ -62,7 +62,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print gathered information
-  debug:
+  ansible.builtin.debug:
     msg: "{{ result.ovirt_affinity_labels }}"
 
 - name: >
@@ -73,7 +73,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print gathered information
-  debug:
+  ansible.builtin.debug:
     msg: "{{ result.ovirt_affinity_labels }}"
 
 - name: >
@@ -84,7 +84,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print gathered information
-  debug:
+  ansible.builtin.debug:
     msg: "{{ result.ovirt_affinity_labels }}"
 
 - name: >
@@ -96,7 +96,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print gathered information
-  debug:
+  ansible.builtin.debug:
     msg: "{{ result.ovirt_affinity_labels }}"
 '''
 

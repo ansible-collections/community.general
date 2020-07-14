@@ -46,17 +46,17 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: query redis for somekey (default or configured settings used)
-  debug: msg="{{ lookup('redis', 'somekey') }}"
+  ansible.builtin.debug: msg="{{ lookup('redis', 'somekey') }}"
 
 - name: query redis for list of keys and non-default host and port
-  debug: msg="{{ lookup('redis', item, host='myredis.internal.com', port=2121) }}"
+  ansible.builtin.debug: msg="{{ lookup('redis', item, host='myredis.internal.com', port=2121) }}"
   loop: '{{list_of_redis_keys}}'
 
 - name: use list directly
-  debug: msg="{{ lookup('redis', 'key1', 'key2', 'key3') }}"
+  ansible.builtin.debug: msg="{{ lookup('redis', 'key1', 'key2', 'key3') }}"
 
 - name: use list directly with a socket
-  debug: msg="{{ lookup('redis', 'key1', 'key2', socket='/var/tmp/redis.sock') }}"
+  ansible.builtin.debug: msg="{{ lookup('redis', 'key1', 'key2', socket='/var/tmp/redis.sock') }}"
 
 """
 

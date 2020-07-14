@@ -55,7 +55,7 @@ EXAMPLES = r'''
   delegate_to: localhost
   register: results
 
-- fail:
+- ansible.builtin.fail:
     msg: 'CMDB serial ({{ cmdb_serialno }}) does not match hardware serial ({{ results.hw_system_serial }}) !'
   when: cmdb_serialno != results.hw_system_serial
 '''

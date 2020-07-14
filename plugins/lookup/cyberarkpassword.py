@@ -36,7 +36,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
   - name: passing options to the lookup
-    debug: msg={{ lookup("cyberarkpassword", cyquery)}}
+    ansible.builtin.debug: msg={{ lookup("cyberarkpassword", cyquery)}}
     vars:
       cyquery:
         appid: "app_ansible"
@@ -45,7 +45,7 @@ EXAMPLES = """
 
 
   - name: used in a loop
-    debug: msg={{item}}
+    ansible.builtin.debug: msg={{item}}
     with_cyberarkpassword:
         appid: 'app_ansible'
         query: 'safe=CyberArk_Passwords;folder=root;object=AdminPass'

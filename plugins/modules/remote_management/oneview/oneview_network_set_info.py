@@ -47,7 +47,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 
 - name: Gather paginated, filtered, and sorted information about Network Sets
@@ -65,7 +65,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 
 - name: Gather information about all Network Sets, excluding Ethernet networks
@@ -80,7 +80,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 
 - name: Gather information about a Network Set by name
@@ -94,7 +94,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 
 - name: Gather information about a Network Set by name, excluding Ethernet networks
@@ -110,7 +110,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 '''
 

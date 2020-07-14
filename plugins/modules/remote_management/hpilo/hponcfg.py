@@ -42,7 +42,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Example hponcfg configuration XML
-  copy:
+  ansible.builtin.copy:
     content: |
       <ribcl VERSION="2.0">
         <login USER_LOGIN="user" PASSWORD="password">

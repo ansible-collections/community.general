@@ -40,7 +40,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.ethernet_networks }}"
 
 - name: Gather paginated and filtered information about Ethernet Networks
@@ -54,7 +54,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.ethernet_networks }}"
 
 - name: Gather information about an Ethernet Network by name
@@ -64,7 +64,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.ethernet_networks }}"
 
 - name: Gather information about an Ethernet Network by name with options
@@ -77,9 +77,9 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.enet_associated_profiles }}"
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.enet_associated_uplink_groups }}"
 '''
 

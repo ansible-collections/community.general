@@ -36,7 +36,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.fcoe_networks }}"
 
 - name: Gather paginated, filtered and sorted information about FCoE Networks
@@ -50,7 +50,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.fcoe_networks }}"
 
 - name: Gather information about a FCoE Network by name
@@ -60,7 +60,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.fcoe_networks }}"
 '''
 

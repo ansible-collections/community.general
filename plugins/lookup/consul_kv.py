@@ -78,19 +78,19 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = """
-  - debug:
+  - ansible.builtin.debug:
       msg: 'key contains {{item}}'
     with_consul_kv:
       - 'key/to/retrieve'
 
   - name: Parameters can be provided after the key be more specific about what to retrieve
-    debug:
+    ansible.builtin.debug:
       msg: 'key contains {{item}}'
     with_consul_kv:
       - 'key/to recurse=true token=E6C060A9-26FB-407A-B83E-12DDAFCB4D98'
 
   - name: retrieving a KV from a remote cluster on non default port
-    debug:
+    ansible.builtin.debug:
       msg: "{{ lookup('consul_kv', 'my/key', host='10.10.10.10', port='2000') }}"
 """
 
