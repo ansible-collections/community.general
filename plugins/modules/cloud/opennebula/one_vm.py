@@ -327,7 +327,7 @@ EXAMPLES = '''
   register: vm
 
 - name: Wait for SSH to come up
-  ansible.builtin.wait_for_connection:
+  wait_for_connection:
   delegate_to: '{{ vm.instances[0].networks[0].ip }}'
 
 - name: Terminate VMs by ids
