@@ -1,0 +1,3 @@
+bugfixes:
+  - pacman - treat package names containing .zst as package files during installation
+    (https://www.archlinux.org/news/now-using-zstandard-instead-of-xz-for-package-compression/).
