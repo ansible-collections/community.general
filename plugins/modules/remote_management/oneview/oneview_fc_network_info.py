@@ -37,7 +37,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.fc_networks }}"
 
 - name: Gather paginated, filtered and sorted information about Fibre Channel Networks
@@ -50,7 +50,7 @@ EXAMPLES = '''
       filter: 'fabricType=FabricAttach'
   delegate_to: localhost
   register: result
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.fc_networks }}"
 
 - name: Gather information about a Fibre Channel Network by name
@@ -60,7 +60,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.fc_networks }}"
 '''
 

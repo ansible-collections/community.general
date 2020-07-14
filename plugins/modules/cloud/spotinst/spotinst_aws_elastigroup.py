@@ -494,7 +494,7 @@ EXAMPLES = '''
             - image_id
             - target
       register: result
-    - debug: var=result
+    - ansible.builtin.debug: var=result
 
 # In this example, we create an elastigroup and wait 600 seconds to retrieve the instances, and use their private ips
 
@@ -538,9 +538,9 @@ EXAMPLES = '''
       register: result
 
     - name: Store private ips to file
-      shell: echo {{ item.private_ip }}\\n >> list-of-private-ips
+      ansible.builtin.shell: echo {{ item.private_ip }}\\n >> list-of-private-ips
       with_items: "{{ result.instances }}"
-    - debug: var=result
+    - ansible.builtin.debug: var=result
 
 # In this example, we create an elastigroup with multiple block device mappings, tags, and also an account id
 # In organizations with more than one account, it is required to specify an account_id
@@ -589,9 +589,9 @@ EXAMPLES = '''
       register: result
 
     - name: Store private ips to file
-      shell: echo {{ item.private_ip }}\\n >> list-of-private-ips
+      ansible.builtin.shell: echo {{ item.private_ip }}\\n >> list-of-private-ips
       with_items: "{{ result.instances }}"
-    - debug: var=result
+    - ansible.builtin.debug: var=result
 
 # In this example we have set up block device mapping with ephemeral devices
 
@@ -630,7 +630,7 @@ EXAMPLES = '''
             - image_id
             - target
       register: result
-    - debug: var=result
+    - ansible.builtin.debug: var=result
 
 # In this example we create a basic group configuration with a network interface defined.
 # Each network interface must have a device index
@@ -668,7 +668,7 @@ EXAMPLES = '''
             - image_id
             - target
       register: result
-    - debug: var=result
+    - ansible.builtin.debug: var=result
 
 
 # In this example we create a basic group configuration with a target tracking scaling policy defined
@@ -713,7 +713,7 @@ EXAMPLES = '''
           do_not_update:
             - image_id
       register: result
-    - debug: var=result
+    - ansible.builtin.debug: var=result
 '''
 
 RETURN = '''

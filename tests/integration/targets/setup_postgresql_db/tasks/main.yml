@@ -2,6 +2,10 @@
 - meta: end_play
   when: ansible_os_family == 'Suse'
 
+# To avoid hangings on service start/stop postgres during CI runs:
+- meta: end_play
+  when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
+
 - name: python 2
   set_fact:
     python_suffix: ''

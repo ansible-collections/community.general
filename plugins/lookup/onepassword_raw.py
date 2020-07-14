@@ -51,11 +51,11 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: Retrieve all data about Wintermute
-  debug:
+  ansible.builtin.debug:
     var: lookup('onepassword_raw', 'Wintermute')
 
 - name: Retrieve all data about Wintermute when not signed in to 1Password
-  debug:
+  ansible.builtin.debug:
     var: lookup('onepassword_raw', 'Wintermute', subdomain='Turing', vault_password='DmbslfLvasjdl')
 """
 

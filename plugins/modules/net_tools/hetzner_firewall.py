@@ -164,7 +164,7 @@ EXAMPLES = r'''
           action: discard
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result }}"
 '''
 

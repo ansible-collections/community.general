@@ -25,7 +25,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: get 'custom_field' from lastpass entry 'entry-name'
-  debug:
+  ansible.builtin.debug:
     msg: "{{ lookup('lastpass', 'entry-name', field='custom_field') }}"
 """
 

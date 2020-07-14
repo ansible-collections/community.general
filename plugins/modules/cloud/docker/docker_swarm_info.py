@@ -94,7 +94,7 @@ EXAMPLES = '''
   register: result
 
 - name: Inform about basic flags
-  debug:
+  ansible.builtin.debug:
     msg: |
       Was able to talk to docker daemon: {{ result.can_talk_to_docker }}
       Docker in Swarm mode: {{ result.docker_swarm_active }}
@@ -120,7 +120,7 @@ EXAMPLES = '''
       name: mynode
   register: result
 
-- debug:
+- ansible.builtin.debug:
     var: result.swarm_facts
 
 - name: Get the swarm unlock key
@@ -128,7 +128,7 @@ EXAMPLES = '''
     unlock_key: yes
   register: result
 
-- debug:
+- ansible.builtin.debug:
     var: result.swarm_unlock_key
 
 '''

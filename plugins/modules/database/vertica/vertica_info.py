@@ -54,7 +54,7 @@ EXAMPLES = """
   register: result
 
 - name: Print schemas
-  debug:
+  ansible.builtin.debug:
     msg: "{{ result.vertica_schemas }}"
 """
 import traceback

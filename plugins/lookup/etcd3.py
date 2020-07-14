@@ -101,19 +101,19 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
     - name: "a value from a locally running etcd"
-      debug:
+      ansible.builtin.debug:
         msg: "{{ lookup('community.general.etcd3', 'foo/bar') }}"
 
     - name: "values from multiple folders on a locally running etcd"
-      debug:
+      ansible.builtin.debug:
         msg: "{{ lookup('community.general.etcd3', 'foo', 'bar', 'baz') }}"
 
     - name: "look for a key prefix"
-      debug:
+      ansible.builtin.debug:
         msg: "{{ lookup('community.general.etcd3', '/foo/bar', prefix=True) }}"
 
     - name: "connect to etcd3 with a client certificate"
-      debug:
+      ansible.builtin.debug:
         msg: "{{ lookup('community.general.etcd3', 'foo/bar', cert_cert='/etc/ssl/etcd/client.pem', cert_key='/etc/ssl/etcd/client.key') }}"
 '''
 

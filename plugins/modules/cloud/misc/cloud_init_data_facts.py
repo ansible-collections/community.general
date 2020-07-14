@@ -29,7 +29,7 @@ EXAMPLES = '''
   community.general.cloud_init_data_facts:
   register: result
 
-- debug:
+- ansible.builtin.debug:
     var: result
 
 - name: Wait for cloud init to finish

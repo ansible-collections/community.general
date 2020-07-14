@@ -92,7 +92,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Apply new SELinux file context to filesystem
-  command: restorecon -irv /srv/git_repos
+  ansible.builtin.command: restorecon -irv /srv/git_repos
 '''
 
 RETURN = r'''

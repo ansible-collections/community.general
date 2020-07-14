@@ -93,7 +93,7 @@ EXAMPLES = '''
           port: 82
 
     - name: Pause for 30 seconds
-      pause:
+      ansible.builtin.pause:
         seconds: 30
 
     - name: Recreate MIG Instances with Instance Template change.
@@ -105,7 +105,7 @@ EXAMPLES = '''
         recreate_instances: yes
 
     - name: Pause for 30 seconds
-      pause:
+      ansible.builtin.pause:
         seconds: 30
 
     - name: Resize MIG
@@ -136,7 +136,7 @@ EXAMPLES = '''
               target: 0.4
 
     - name: Pause for 30 seconds
-      pause:
+      ansible.builtin.pause:
         seconds: 30
 
     - name: Delete MIG
