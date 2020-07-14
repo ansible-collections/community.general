@@ -177,7 +177,7 @@ EXAMPLES = '''
         project_src: flask
       register: output
 
-    - debug:
+    - ansible.builtin.debug:
         var: output
 
     - name: Run `docker-compose up` again
@@ -186,10 +186,10 @@ EXAMPLES = '''
         build: no
       register: output
 
-    - debug:
+    - ansible.builtin.debug:
         var: output
 
-    - assert:
+    - ansible.builtin.assert:
         that: "not output.changed "
 
     - name: Stop all services
@@ -199,10 +199,10 @@ EXAMPLES = '''
         stopped: yes
       register: output
 
-    - debug:
+    - ansible.builtin.debug:
         var: output
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - "not web.flask_web_1.state.running"
           - "not db.flask_db_1.state.running"
@@ -214,10 +214,10 @@ EXAMPLES = '''
         restarted: yes
       register: output
 
-    - debug:
+    - ansible.builtin.debug:
         var: output
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - "web.flask_web_1.state.running"
           - "db.flask_db_1.state.running"
@@ -232,7 +232,7 @@ EXAMPLES = '''
           web: 2
       register: output
 
-    - debug:
+    - ansible.builtin.debug:
         var: output
 
 - name: Run with inline v2 compose
@@ -252,7 +252,7 @@ EXAMPLES = '''
               image: postgres
             web:
               build: "{{ playbook_dir }}/flask"
-              command: "python manage.py runserver 0.0.0.0:8000"
+              ansible.builtin.command: "python manage.py runserver 0.0.0.0:8000"
               volumes:
                 - "{{ playbook_dir }}/flask:/code"
               ports:
@@ -261,10 +261,10 @@ EXAMPLES = '''
                 - db
       register: output
 
-    - debug:
+    - ansible.builtin.debug:
         var: output
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - "web.flask_web_1.state.running"
           - "db.flask_db_1.state.running"
@@ -284,7 +284,7 @@ EXAMPLES = '''
               image: postgres
             web:
               build: "{{ playbook_dir }}/flask"
-              command: "python manage.py runserver 0.0.0.0:8000"
+              ansible.builtin.command: "python manage.py runserver 0.0.0.0:8000"
               volumes:
                 - "{{ playbook_dir }}/flask:/code"
               ports:
@@ -293,10 +293,10 @@ EXAMPLES = '''
                 - db
       register: output
 
-    - debug:
+    - ansible.builtin.debug:
         var: output
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - "web.flask_web_1.state.running"
           - "db.flask_db_1.state.running"

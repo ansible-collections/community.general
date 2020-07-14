@@ -27,7 +27,7 @@ EXAMPLES = r'''
     api_token: '0d1627e8-bbf0-44c5-a46f-5c4d3aef033f'
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.online_server_info }}"
 '''
 

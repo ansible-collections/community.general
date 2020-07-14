@@ -67,41 +67,41 @@ EXAMPLES = '''
 
   # Examples to display the value of all or a single iDRAC attribute
   - name: Store iDRAC attributes as a fact variable
-    set_fact:
+    ansible.builtin.set_fact:
       idrac_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'iDRACAttributes') | list | first }}"
 
   - name: Display all iDRAC attributes
-    debug:
+    ansible.builtin.debug:
       var: idrac_attributes
 
   - name: Display the value of 'Syslog.1.SysLogEnable' iDRAC attribute
-    debug:
+    ansible.builtin.debug:
       var: idrac_attributes['Syslog.1.SysLogEnable']
 
   # Examples to display the value of all or a single LifecycleController attribute
   - name: Store LifecycleController attributes as a fact variable
-    set_fact:
+    ansible.builtin.set_fact:
       lc_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'LCAttributes') | list | first }}"
 
   - name: Display LifecycleController attributes
-    debug:
+    ansible.builtin.debug:
       var: lc_attributes
 
   - name: Display the value of 'CollectSystemInventoryOnRestart' attribute
-    debug:
+    ansible.builtin.debug:
       var: lc_attributes['LCAttributes.1.CollectSystemInventoryOnRestart']
 
   # Examples to display the value of all or a single System attribute
   - name: Store System attributes as a fact variable
-    set_fact:
+    ansible.builtin.set_fact:
       system_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'SystemAttributes') | list | first }}"
 
   - name: Display System attributes
-    debug:
+    ansible.builtin.debug:
       var: system_attributes
 
   - name: Display the value of 'PSRedPolicy'
-    debug:
+    ansible.builtin.debug:
       var: system_attributes['ServerPwr.1.PSRedPolicy']
 
 '''

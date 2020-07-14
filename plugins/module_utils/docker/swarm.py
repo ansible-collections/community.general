@@ -270,10 +270,10 @@ class AnsibleDockerSwarmClient(AnsibleDockerClient):
                 return None
         except APIError as exc:
             if exc.status_code == 503:
-                self.fail("Cannot inspect service: To inspect service execute module on Swarm Manager")
-            self.fail("Error inspecting swarm service: %s" % exc)
+                self.fail("Cannot inspect ansible.builtin.service: To inspect service execute module on Swarm Manager")
+            self.fail("Error inspecting swarm ansible.builtin.service: %s" % exc)
         except Exception as exc:
-            self.fail("Error inspecting swarm service: %s" % exc)
+            self.fail("Error inspecting swarm ansible.builtin.service: %s" % exc)
 
         json_str = json.dumps(service_info, ensure_ascii=False)
         service_info = json.loads(json_str)

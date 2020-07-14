@@ -188,29 +188,29 @@ EXAMPLES = '''
       with_dict: "{{ my_jenkins_plugins }}"
 
     - name: Initiate the fact
-      set_fact:
+      ansible.builtin.set_fact:
         jenkins_restart_required: no
 
     - name: Check if restart is required by any of the versioned plugins
-      set_fact:
+      ansible.builtin.set_fact:
         jenkins_restart_required: yes
       when: item.changed
       with_items: "{{ my_jenkins_plugin_versioned.results }}"
 
     - name: Check if restart is required by any of the unversioned plugins
-      set_fact:
+      ansible.builtin.set_fact:
         jenkins_restart_required: yes
       when: item.changed
       with_items: "{{ my_jenkins_plugin_unversioned.results }}"
 
     - name: Restart Jenkins if required
-      service:
+      ansible.builtin.service:
         name: jenkins
         state: restarted
       when: jenkins_restart_required
 
     - name: Wait for Jenkins to start up
-      uri:
+      ansible.builtin.uri:
         url: http://localhost:8080
         status_code: 200
         timeout: 5
@@ -224,7 +224,7 @@ EXAMPLES = '''
       when: jenkins_restart_required
 
     - name: Reset the fact
-      set_fact:
+      ansible.builtin.set_fact:
         jenkins_restart_required: no
       when: jenkins_restart_required
 

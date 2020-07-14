@@ -54,7 +54,7 @@ EXAMPLES = '''
     hostname: "na-vsim"
     username: "admin"
     password: "admins_password"
-- debug:
+- ansible.builtin.debug:
     var: ontap_facts
 - name: Limit Fact Gathering to Aggregate Information
   community.general.na_ontap_gather_facts:

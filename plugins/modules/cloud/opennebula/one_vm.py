@@ -194,7 +194,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print VM properties
-  debug:
+  ansible.builtin.debug:
     msg: result
 
 - name: Deploy a new VM on hold
@@ -327,7 +327,7 @@ EXAMPLES = '''
   register: vm
 
 - name: Wait for SSH to come up
-  wait_for_connection:
+  ansible.builtin.wait_for_connection:
   delegate_to: '{{ vm.instances[0].networks[0].ip }}'
 
 - name: Terminate VMs by ids

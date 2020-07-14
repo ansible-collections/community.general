@@ -110,7 +110,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print service properties
-  debug:
+  ansible.builtin.debug:
     msg: result
 
 - name: Instantiate a new service with specified service_name, service group and mode

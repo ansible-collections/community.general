@@ -87,7 +87,7 @@ EXAMPLES = '''
       register: policy
 
     - name: Debug
-      debug: var=policy
+      ansible.builtin.debug: var=policy
 
 ---
 - name: Delete Alert Policy Example
@@ -103,7 +103,7 @@ EXAMPLES = '''
       register: policy
 
     - name: Debug
-      debug: var=policy
+      ansible.builtin.debug: var=policy
 '''
 
 RETURN = '''
