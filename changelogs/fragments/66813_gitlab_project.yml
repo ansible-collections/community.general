@@ -1,0 +1,2 @@
+minor_changes:
+- gitlab_project - add support for merge_method on projects (https://github.com/ansible/ansible/pull/66813).
