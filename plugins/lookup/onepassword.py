@@ -55,26 +55,26 @@ DOCUMENTATION = '''
 EXAMPLES = """
 # These examples only work when already signed in to 1Password
 - name: Retrieve password for KITT when already signed in to 1Password
-  debug:
+  ansible.builtin.debug:
     var: lookup('onepassword', 'KITT')
 
 - name: Retrieve password for Wintermute when already signed in to 1Password
-  debug:
+  ansible.builtin.debug:
     var: lookup('onepassword', 'Tessier-Ashpool', section='Wintermute')
 
 - name: Retrieve username for HAL when already signed in to 1Password
-  debug:
+  ansible.builtin.debug:
     var: lookup('onepassword', 'HAL 9000', field='username', vault='Discovery')
 
 - name: Retrieve password for HAL when not signed in to 1Password
-  debug:
+  ansible.builtin.debug:
     var: lookup('onepassword'
                 'HAL 9000'
                 subdomain='Discovery'
                 master_password=vault_master_password)
 
 - name: Retrieve password for HAL when never signed in to 1Password
-  debug:
+  ansible.builtin.debug:
     var: lookup('onepassword'
                 'HAL 9000'
                 subdomain='Discovery'

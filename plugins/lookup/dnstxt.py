@@ -21,17 +21,17 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: show txt entry
-  debug: msg="{{lookup('dnstxt', ['test.example.com'])}}"
+  ansible.builtin.debug: msg="{{lookup('dnstxt', ['test.example.com'])}}"
 
 - name: iterate over txt entries
-  debug: msg="{{item}}"
+  ansible.builtin.debug: msg="{{item}}"
   with_dnstxt:
     - 'test.example.com'
     - 'other.example.com'
     - 'last.example.com'
 
 - name: iterate of a comma delimited DNS TXT entry
-  debug: msg="{{item}}"
+  ansible.builtin.debug: msg="{{item}}"
   with_dnstxt: "{{lookup('dnstxt', ['test.example.com']).split(',')}}"
 """
 

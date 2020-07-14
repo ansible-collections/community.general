@@ -60,7 +60,7 @@ key:
 
 EXAMPLES = '''
 - name: Read SSH public key to authorize
-  shell: cat /home/foo/.ssh/id_rsa.pub
+  ansible.builtin.shell: cat /home/foo/.ssh/id_rsa.pub
   register: ssh_pub_key
 
 - name: Authorize key with GitHub

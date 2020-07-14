@@ -42,7 +42,7 @@ EXAMPLES = r'''
   register: result
 
 - name: Print value of failover IP 1.2.3.4 in case it is routed
-  debug:
+  ansible.builtin.debug:
     msg: "1.2.3.4 routes to {{ result.value }}"
   when: result.state == 'routed'
 '''

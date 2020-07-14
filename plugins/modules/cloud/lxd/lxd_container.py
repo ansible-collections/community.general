@@ -164,14 +164,14 @@ EXAMPLES = '''
 
     - name: Check python is installed in container
       delegate_to: mycontainer
-      raw: dpkg -s python
+      ansible.builtin.raw: dpkg -s python
       register: python_install_check
       failed_when: python_install_check.rc not in [0, 1]
       changed_when: false
 
     - name: Install python in container
       delegate_to: mycontainer
-      raw: apt-get install -y python
+      ansible.builtin.raw: apt-get install -y python
       when: python_install_check.rc == 1
 
 # An example for creating an Ubuntu 14.04 container using an image fingerprint.
@@ -239,7 +239,7 @@ EXAMPLES = '''
     - mycontainer
   tasks:
     - name: Copy /etc/hosts in the created container to localhost with name "mycontainer-hosts"
-      fetch:
+      ansible.builtin.fetch:
         src: /etc/hosts
         dest: /tmp/mycontainer-hosts
         flat: true

@@ -32,7 +32,7 @@ EXAMPLES = r'''
   community.general.scaleway_organization_info:
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.scaleway_organization_info }}"
 '''
 
