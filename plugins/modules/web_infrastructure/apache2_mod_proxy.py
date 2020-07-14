@@ -86,7 +86,7 @@ EXAMPLES = '''
   delegate_to: myloadbalancernode
 
 - name: Step 2
-  ansible.builtin.wait_for:
+  wait_for:
     host: '{{ member.host }}'
     port: '{{ member.port }}'
     state: drained

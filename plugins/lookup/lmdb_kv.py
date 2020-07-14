@@ -36,7 +36,7 @@ EXAMPLES = """
      - "n*"
 
 - name: get an item by key
-  ansible.builtin.assert:
+  assert:
     that:
       - item == 'Belgium'
     vars:

@@ -208,7 +208,7 @@ EXAMPLES = '''
     register: newhosts
 
   - name: Wait for ssh
-    ansible.builtin.wait_for:
+    wait_for:
       delay: 1
       host: "{{ item.public_ipv4 }}"
       port: 22
