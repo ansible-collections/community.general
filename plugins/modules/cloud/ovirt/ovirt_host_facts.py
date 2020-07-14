@@ -54,7 +54,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print gathered information
-  debug:
+  ansible.builtin.debug:
     msg: "{{ result.ovirt_hosts }}"
 
 - name: Gather information about all hosts with cluster version 4.2
@@ -64,7 +64,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print gathered information
-  debug:
+  ansible.builtin.debug:
     msg: "{{ result.ovirt_hosts }}"
 '''
 

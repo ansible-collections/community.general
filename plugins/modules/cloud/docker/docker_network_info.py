@@ -46,11 +46,11 @@ EXAMPLES = '''
   register: result
 
 - name: Does network exist?
-  debug:
+  ansible.builtin.debug:
     msg: "The network {{ 'exists' if result.exists else 'does not exist' }}"
 
 - name: Print information about network
-  debug:
+  ansible.builtin.debug:
     var: result.network
   when: result.exists
 '''

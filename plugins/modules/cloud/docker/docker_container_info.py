@@ -46,11 +46,11 @@ EXAMPLES = '''
   register: result
 
 - name: Does container exist?
-  debug:
+  ansible.builtin.debug:
     msg: "The container {{ 'exists' if result.exists else 'does not exist' }}"
 
 - name: Print information about container
-  debug:
+  ansible.builtin.debug:
     var: result.container
   when: result.exists
 '''
