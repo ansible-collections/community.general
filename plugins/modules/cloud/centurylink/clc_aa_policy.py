@@ -64,8 +64,8 @@ EXAMPLES = '''
         state: present
       register: policy
 
-    - name: debug
-      debug:
+    - name: Debug
+      ansible.builtin.debug:
         var: policy
 
 ---
@@ -82,7 +82,7 @@ EXAMPLES = '''
       register: policy
 
     - name: Debug
-      debug:
+      ansible.builtin.debug:
         var: policy
 '''
 

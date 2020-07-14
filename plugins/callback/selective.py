@@ -30,8 +30,8 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = """
-  - debug: msg="This will not be printed"
-  - debug: msg="But this will"
+  - ansible.builtin.debug: msg="This will not be printed"
+  - ansible.builtin.debug: msg="But this will"
     tags: [print_action]
 """
 

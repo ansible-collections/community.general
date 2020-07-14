@@ -27,7 +27,7 @@ EXAMPLES = '''
   register: pids_of_python
 
 - name: Printing the process IDs obtained
-  debug:
+  ansible.builtin.debug:
     msg: "PIDS of python:{{pids_of_python.pids|join(',')}}"
 '''
 

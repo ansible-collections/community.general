@@ -37,7 +37,7 @@ EXAMPLES = r'''
     region: par1
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.scaleway_snapshot_info }}"
 '''
 

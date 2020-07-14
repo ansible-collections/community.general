@@ -49,7 +49,7 @@ EXAMPLES = r'''
   register: connection
 
 - name: Print results from the query
-  debug:
+  ansible.builtin.debug:
     var: connection.query_results
 '''
 

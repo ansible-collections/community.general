@@ -114,7 +114,7 @@ EXAMPLES = '''
     - Restart sensu-client
 
 - name: Secure Sensu client configuration file
-  file:
+  ansible.builtin.file:
     path: "{{ client['file'] }}"
     owner: "sensu"
     group: "sensu"

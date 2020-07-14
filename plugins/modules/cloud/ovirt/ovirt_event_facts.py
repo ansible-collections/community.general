@@ -88,7 +88,7 @@ EXAMPLES = '''
   ovirt_event_info:
     search: "severity=alert"
   register: result
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.ovirt_events }}"
 '''
 

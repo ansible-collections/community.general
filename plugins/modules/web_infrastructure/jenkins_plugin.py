@@ -204,13 +204,13 @@ EXAMPLES = '''
       with_items: "{{ my_jenkins_plugin_unversioned.results }}"
 
     - name: Restart Jenkins if required
-      service:
+      ansible.builtin.service:
         name: jenkins
         state: restarted
       when: jenkins_restart_required
 
     - name: Wait for Jenkins to start up
-      uri:
+      ansible.builtin.uri:
         url: http://localhost:8080
         status_code: 200
         timeout: 5

@@ -54,7 +54,7 @@ EXAMPLES = '''
   register: r
 
 - name: Take action depending upon issue status
-  debug:
+  ansible.builtin.debug:
     msg: Do something when issue 23642 is open
   when: r.issue_status == 'open'
 '''

@@ -77,7 +77,7 @@ EXAMPLES = r"""
   vars:
       secret: "{{ lookup('community.general.dsv', '/test/secret') }}"
   tasks:
-      - debug:
+      - ansible.builtin.debug:
           msg: 'the password is {{ secret["data"]["password"] }}'
 """
 

@@ -21,7 +21,7 @@ options:
 
 EXAMPLES = """
 - name: Create directories
-  file:
+  ansible.builtin.file:
     path: /web/{{ item.path }}
     state: directory
     mode: '{{ item.mode }}'
@@ -29,7 +29,7 @@ EXAMPLES = """
   when: item.state == 'directory'
 
 - name: Template files (explicitly skip directories in order to use the 'src' attribute)
-  template:
+  ansible.builtin.template:
     src: '{{ item.src }}'
     dest: /web/{{ item.path }}
     mode: '{{ item.mode }}'
@@ -37,7 +37,7 @@ EXAMPLES = """
   when: item.state == 'file'
 
 - name: Recreate symlinks
-  file:
+  ansible.builtin.file:
     src: '{{ item.src }}'
     dest: /web/{{ item.path }}
     state: link

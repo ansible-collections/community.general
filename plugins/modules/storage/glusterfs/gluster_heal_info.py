@@ -39,7 +39,7 @@ EXAMPLES = '''
     name: test_volume
     status_filter: self-heal
   register: self_heal_status
-- debug:
+- ansible.builtin.debug:
     var: self_heal_status
 
 - name: Gather rebalance facts about all gluster hosts in the cluster
@@ -47,7 +47,7 @@ EXAMPLES = '''
     name: test_volume
     status_filter: rebalance
   register: rebalance_status
-- debug:
+- ansible.builtin.debug:
     var: rebalance_status
 '''
 

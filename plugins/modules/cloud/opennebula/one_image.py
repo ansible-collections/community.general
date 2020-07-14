@@ -80,7 +80,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print the IMAGE properties
-  debug:
+  ansible.builtin.debug:
     msg: result
 
 - name: Rename existing IMAGE

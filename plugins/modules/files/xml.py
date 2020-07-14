@@ -195,7 +195,7 @@ EXAMPLES = r'''
     count: yes
   register: hits
 
-- debug:
+- ansible.builtin.debug:
     var: hits.count
 
 # Example where parent XML nodes are created automatically
@@ -251,7 +251,7 @@ EXAMPLES = r'''
   register: xmlresp
 
 - name: Show an attribute value
-  debug:
+  ansible.builtin.debug:
     var: xmlresp.matches[0].validxhtml.validatedon
 
 - name: Remove all children from the 'website' element (option 1)

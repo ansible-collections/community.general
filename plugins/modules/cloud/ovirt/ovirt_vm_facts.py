@@ -77,7 +77,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print gathered information
-  debug:
+  ansible.builtin.debug:
     msg: "{{ result.ovirt_vms }}"
 
 - name: Gather info about next run configuration of virtual machine named myvm
@@ -87,7 +87,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print gathered information
-  debug:
+  ansible.builtin.debug:
     msg: "{{ result.ovirt_vms[0] }}"
 '''
 

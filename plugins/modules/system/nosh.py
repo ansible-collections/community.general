@@ -92,11 +92,11 @@ EXAMPLES = '''
       register: result
 
     - name: Fail if service not loaded
-      fail: msg="The {{ result.name }} service is not loaded"
+      ansible.builtin.fail: msg="The {{ result.name }} service is not loaded"
       when: not result.status
 
     - name: Fail if service is running
-      fail: msg="The {{ result.name }} service is running"
+      ansible.builtin.fail: msg="The {{ result.name }} service is running"
       when: result.status and result.status['DaemontoolsEncoreState'] == "running"
 '''
 

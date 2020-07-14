@@ -238,7 +238,7 @@ EXAMPLES = """
   register: lvm_container_info
 
 - name: Debug info on container "test-container-lvm"
-  debug:
+  ansible.builtin.debug:
     var: lvm_container_info
 
 - name: Run a command in a container and ensure its in a "stopped" state.
@@ -305,7 +305,7 @@ EXAMPLES = """
   register: clone_container_info
 
 - name: Debug info on container "test-container"
-  debug:
+  ansible.builtin.debug:
     var: clone_container_info
 
 - name: Clone a container using snapshot
