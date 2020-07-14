@@ -252,7 +252,7 @@ EXAMPLES = '''
               image: postgres
             web:
               build: "{{ playbook_dir }}/flask"
-              ansible.builtin.command: "python manage.py runserver 0.0.0.0:8000"
+              command: "python manage.py runserver 0.0.0.0:8000"
               volumes:
                 - "{{ playbook_dir }}/flask:/code"
               ports:
@@ -284,7 +284,7 @@ EXAMPLES = '''
               image: postgres
             web:
               build: "{{ playbook_dir }}/flask"
-              ansible.builtin.command: "python manage.py runserver 0.0.0.0:8000"
+              command: "python manage.py runserver 0.0.0.0:8000"
               volumes:
                 - "{{ playbook_dir }}/flask:/code"
               ports:

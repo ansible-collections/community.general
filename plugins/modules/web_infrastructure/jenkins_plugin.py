@@ -188,17 +188,17 @@ EXAMPLES = '''
       with_dict: "{{ my_jenkins_plugins }}"
 
     - name: Initiate the fact
-      ansible.builtin.set_fact:
+      set_fact:
         jenkins_restart_required: no
 
     - name: Check if restart is required by any of the versioned plugins
-      ansible.builtin.set_fact:
+      set_fact:
         jenkins_restart_required: yes
       when: item.changed
       with_items: "{{ my_jenkins_plugin_versioned.results }}"
 
     - name: Check if restart is required by any of the unversioned plugins
-      ansible.builtin.set_fact:
+      set_fact:
         jenkins_restart_required: yes
       when: item.changed
       with_items: "{{ my_jenkins_plugin_unversioned.results }}"
@@ -224,7 +224,7 @@ EXAMPLES = '''
       when: jenkins_restart_required
 
     - name: Reset the fact
-      ansible.builtin.set_fact:
+      set_fact:
         jenkins_restart_required: no
       when: jenkins_restart_required
 

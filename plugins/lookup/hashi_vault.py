@@ -210,7 +210,7 @@ EXAMPLES = """
 
 # return_format (or its alias 'as') can control how secrets are returned to you
 - name: return secrets as a dict (default)
-  ansible.builtin.set_fact:
+  set_fact:
     my_secrets: "{{ lookup('community.general.hashi_vault', 'secret/data/manysecrets', token=my_token_var, url='http://myvault_url:8200') }}"
 - ansible.builtin.debug:
     msg: "{{ my_secrets['secret_key'] }}"
@@ -224,7 +224,7 @@ EXAMPLES = """
   loop: "{{ query('community.general.hashi_vault', 'secret/data/manysecrets', token=my_token_var, url='http://myvault_url:8200', return_format='values') }}"
 
 - name: return raw secret from API, including metadata
-  ansible.builtin.set_fact:
+  set_fact:
     my_secret: "{{ lookup('community.general.hashi_vault', 'secret/data/hello:value', token=my_token_var, url='http://myvault_url:8200', as='raw') }}"
 - ansible.builtin.debug:
     msg: "This is version {{ my_secret['metadata']['version'] }} of hello:value. The secret data is {{ my_secret['data']['data']['value'] }}"

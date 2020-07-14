@@ -41,7 +41,7 @@ EXAMPLES = '''
         name: "{{ inventory_hostname }}"
         region: DFW
     - name: Map some facts
-      ansible.builtin.set_fact:
+      set_fact:
         ansible_ssh_host: "{{ rax_accessipv4 }}"
 '''
 

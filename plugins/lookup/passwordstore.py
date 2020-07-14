@@ -82,7 +82,7 @@ EXAMPLES = """
     msg: "{{ lookup('passwordstore', 'example/test subkey=user')}}"
 
 - name: Return the entire password file content
-  ansible.builtin.set_fact:
+  set_fact:
     passfilecontent: "{{ lookup('passwordstore', 'example/test returnall=true')}}"
 """
 

@@ -67,7 +67,7 @@ EXAMPLES = '''
 
   # Examples to display the value of all or a single iDRAC attribute
   - name: Store iDRAC attributes as a fact variable
-    ansible.builtin.set_fact:
+    set_fact:
       idrac_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'iDRACAttributes') | list | first }}"
 
   - name: Display all iDRAC attributes
@@ -80,7 +80,7 @@ EXAMPLES = '''
 
   # Examples to display the value of all or a single LifecycleController attribute
   - name: Store LifecycleController attributes as a fact variable
-    ansible.builtin.set_fact:
+    set_fact:
       lc_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'LCAttributes') | list | first }}"
 
   - name: Display LifecycleController attributes
@@ -93,7 +93,7 @@ EXAMPLES = '''
 
   # Examples to display the value of all or a single System attribute
   - name: Store System attributes as a fact variable
-    ansible.builtin.set_fact:
+    set_fact:
       system_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'SystemAttributes') | list | first }}"
 
   - name: Display System attributes

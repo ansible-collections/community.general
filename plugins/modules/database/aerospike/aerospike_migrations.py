@@ -267,7 +267,7 @@ class Migrations:
         data = data.split("\t")
         if len(data) != 1 and len(data) != 2:
             self.module.fail_json(
-                msg="Unexpected number of values returned in info ansible.builtin.command: " +
+                msg="Unexpected number of values returned in info command: " +
                 str(len(data))
             )
         # data will be in format 'command\touput'
