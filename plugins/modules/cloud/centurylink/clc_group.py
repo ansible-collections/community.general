@@ -77,7 +77,7 @@ EXAMPLES = '''
       register: clc
 
     - name: Debug
-      debug:
+      ansible.builtin.debug:
         var: clc
 
 # Delete a Server Group
@@ -96,7 +96,7 @@ EXAMPLES = '''
       register: clc
 
     - name: Debug
-      debug:
+      ansible.builtin.debug:
         var: clc
 '''
 

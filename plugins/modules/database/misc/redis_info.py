@@ -46,7 +46,7 @@ EXAMPLES = r'''
   register: result
 
 - name: Print server information
-  debug:
+  ansible.builtin.debug:
     var: result.info
 '''
 

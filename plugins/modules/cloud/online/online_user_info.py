@@ -24,7 +24,7 @@ EXAMPLES = r'''
   community.general.online_user_info:
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.online_user_info }}"
 '''
 

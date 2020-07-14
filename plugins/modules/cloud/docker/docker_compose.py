@@ -177,7 +177,7 @@ EXAMPLES = '''
         project_src: flask
       register: output
 
-    - debug:
+    - ansible.builtin.debug:
         var: output
 
     - name: Run `docker-compose up` again
@@ -186,7 +186,7 @@ EXAMPLES = '''
         build: no
       register: output
 
-    - debug:
+    - ansible.builtin.debug:
         var: output
 
     - assert:
@@ -199,7 +199,7 @@ EXAMPLES = '''
         stopped: yes
       register: output
 
-    - debug:
+    - ansible.builtin.debug:
         var: output
 
     - assert:
@@ -214,7 +214,7 @@ EXAMPLES = '''
         restarted: yes
       register: output
 
-    - debug:
+    - ansible.builtin.debug:
         var: output
 
     - assert:
@@ -232,7 +232,7 @@ EXAMPLES = '''
           web: 2
       register: output
 
-    - debug:
+    - ansible.builtin.debug:
         var: output
 
 - name: Run with inline v2 compose
@@ -261,7 +261,7 @@ EXAMPLES = '''
                 - db
       register: output
 
-    - debug:
+    - ansible.builtin.debug:
         var: output
 
     - assert:
@@ -293,7 +293,7 @@ EXAMPLES = '''
                 - db
       register: output
 
-    - debug:
+    - ansible.builtin.debug:
         var: output
 
     - assert:

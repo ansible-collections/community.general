@@ -41,7 +41,7 @@ EXAMPLES = '''
   register: result
 
 - name: Print information
-  debug:
+  ansible.builtin.debug:
     msg: "{{ result.smartos_images[item]['name'] }}-{{ result.smartos_images[item]['version'] }}
          has {{ result.smartos_images[item]['clones'] }} VM(s)"
   with_items: "{{ result.smartos_images.keys() | list }}"
@@ -50,7 +50,7 @@ EXAMPLES = '''
 # in ansible_facts['smartos_images'] and can be used as follows.
 # Note that this is deprecated and will stop working in community.general 3.0.0.
 - name: Print information
-  debug:
+  ansible.builtin.debug:
     msg: "{{ smartos_images[item]['name'] }}-{{ smartos_images[item]['version'] }}
          has {{ smartos_images[item]['clones'] }} VM(s)"
   with_items: "{{ smartos_images.keys() | list }}"

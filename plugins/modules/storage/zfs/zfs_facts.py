@@ -61,7 +61,7 @@ EXAMPLES = '''
     recurse: yes
     type: filesystem
 
-- debug:
+- ansible.builtin.debug:
     msg: 'ZFS dataset {{ item.name }} consumes {{ item.used }} of disk space.'
   with_items: '{{ ansible_zfs_datasets }}'
 '''

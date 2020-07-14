@@ -119,7 +119,7 @@ EXAMPLES = '''
     - Restart sensu-server
 
 - name: Secure Sensu handler configuration file
-  file:
+  ansible.builtin.file:
     path: "{{ handler['file'] }}"
     owner: "sensu"
     group: "sensu"

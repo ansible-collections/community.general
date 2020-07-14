@@ -66,7 +66,7 @@ EXAMPLES = '''
 
 # Copy database dump file to remote host and restore it to database 'my_db'
 - name: Copy database dump file to remote host
-  copy:
+  ansible.builtin.copy:
     src: dump.sql
     dest: /tmp
 

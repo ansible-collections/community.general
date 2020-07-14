@@ -148,12 +148,12 @@ EXAMPLES = '''
   community.general.deploy_helper:
     path: /path/to/root
 - name: Clone the project to the new release folder
-  git:
-    repo: git://foosball.example.org/path/to/repo.git
+  ansible.builtin.git:
+    repo: ansible.builtin.git://foosball.example.org/path/to/repo.git
     dest: '{{ deploy_helper.new_release_path }}'
     version: v1.1.1
 - name: Add an unfinished file, to allow cleanup on successful finalize
-  file:
+  ansible.builtin.file:
     path: '{{ deploy_helper.new_release_path }}/{{ deploy_helper.unfinished_filename }}'
     state: touch
 - name: Perform some build steps, like running your dependency manager for example
@@ -161,14 +161,14 @@ EXAMPLES = '''
     command: install
     working_dir: '{{ deploy_helper.new_release_path }}'
 - name: Create some folders in the shared folder
-  file:
+  ansible.builtin.file:
     path: '{{ deploy_helper.shared_path }}/{{ item }}'
     state: directory
   with_items:
     - sessions
     - uploads
 - name: Add symlinks from the new release to the shared folder
-  file:
+  ansible.builtin.file:
     path: '{{ deploy_helper.new_release_path }}/{{ item.path }}'
     src: '{{ deploy_helper.shared_path }}/{{ item.src }}'
     state: link
@@ -256,7 +256,7 @@ EXAMPLES = '''
 # Debugging the facts returned by the module
 - community.general.deploy_helper:
     path: /path/to/root
-- debug:
+- ansible.builtin.debug:
     var: deploy_helper
 '''
 import os

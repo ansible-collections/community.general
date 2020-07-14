@@ -43,7 +43,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.san_managers }}"
 
 - name: Gather paginated, filtered and sorted information about SAN Managers
@@ -57,7 +57,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.san_managers }}"
 
 - name: Gather information about a SAN Manager by provider display name
@@ -67,7 +67,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.san_managers }}"
 '''
 

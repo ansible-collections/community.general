@@ -64,7 +64,7 @@ EXAMPLES = r'''
     server_ip: 1.2.3.4
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.firewall }}"
 '''
 
