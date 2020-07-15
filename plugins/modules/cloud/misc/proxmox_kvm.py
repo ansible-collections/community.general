@@ -295,7 +295,7 @@ options:
   state:
     description:
       - Indicates desired state of the instance.
-      - If C(current), the current state of the VM will be fetched. You can access it with C(results.status)
+      - If C(current), the current state of the VM will be fetched. You can access it with C(results.status), C(results.current) will have the current VMs information, C(results.config) will have the current VMs configuration.
     choices: ['present', 'started', 'absent', 'stopped', 'restarted','current']
     default: present
   storage:
@@ -569,6 +569,38 @@ status:
       "changed": false,
       "msg": "VM kropta with vmid = 110 is running",
       "status": "running"
+    }'
+current:
+    description:
+      - The current virtual maching runtime information.
+      - Returned only when C(state=current)
+    returned: success
+    type: dict
+    sample: '{
+      "changed": false,
+      "msg": "VM kropta with vmid = 110 is running",
+      "status": "running"
+      "current: {
+        agent: 1,
+        balloon: 2147483648,
+        ...
+      }"
+    }'
+config:
+    description:
+      - The current virtual maching configuration.
+      - Returned only when C(state=current)
+    returned: success
+    type: dict
+    sample: '{
+      "changed": false,
+      "msg": "VM kropta with vmid = 110 is running",
+      "status": "running"
+      "config: {
+        cors: 2,
+        memory: 2048,
+        ...
+      }"
     }'
 '''
 
@@ -1108,10 +1140,13 @@ def main():
             vm = get_vm(proxmox, vmid)
             if not vm:
                 module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
-            current = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status']
-            status['status'] = current
+            current = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()
+            config = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).config.get()
+            status['status'] = current['status']
+            status['current'] = current
+            status['config'] = config
             if status:
-                module.exit_json(changed=False, msg="VM %s with vmid = %s is %s" % (name, vmid, current), **status)
+                module.exit_json(changed=False, msg="VM %s with vmid = %s is %s" % (name, vmid, current['status']), **status)
         except Exception as e:
             module.fail_json(msg="Unable to get vm {0} with vmid = {1} status: ".format(name, vmid) + str(e))
 
