@@ -332,8 +332,7 @@ def main():
     cursor = db_connection.cursor(cursor_factory=DictCursor)
 
     if search_path:
-        search_path = [x.strip(' ') for x in search_path]
-        set_search_path(cursor, '%s' % ','.join(search_path))
+        set_search_path(cursor, '%s' % ','.join([x.strip(' ') for x in search_path]))
 
     # Prepare args:
     if module.params.get("positional_args"):
