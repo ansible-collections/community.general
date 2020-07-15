@@ -47,6 +47,9 @@ DOCUMENTATION = '''
               - access_token
         filter:
             description: filter runners from GitLab API
+            env:
+              - name: GITLAB_FILTER
+                version_added: 1.0.0
             type: str
             choices: ['active', 'paused', 'online', 'specific', 'shared']
         verbose_output:
