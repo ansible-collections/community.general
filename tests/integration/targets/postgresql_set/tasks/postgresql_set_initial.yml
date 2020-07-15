@@ -384,3 +384,15 @@
   - assert:
       that:
       - result.rowcount == 1
+
+  - name: postgresql_query - get data, must fail
+    <<: *task_parameters
+    postgresql_query:
+      <<: *pg_parameters
+      query: 'SELECT id FROM test2'
+    register: result
+    ignore_errors: yes
+
+  - assert:
+      that:
+      - result is failed
