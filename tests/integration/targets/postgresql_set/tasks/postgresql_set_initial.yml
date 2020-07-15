@@ -321,3 +321,64 @@
       that:
       - result is failed
       - result.msg is search('is potentially dangerous')
+
+  #############################
+  # Check search_path parameter
+
+  - name: postgresql_set - create test schemas
+    <<: *task_parameters
+    postgresql_schema:
+      <<: *pg_parameters
+      name: '{{ item }}'
+    loop:
+    - query_test1
+    - query_test2
+
+  - name: postgresql_set - create test tables
+    <<: *task_parameters
+    postgresql_table:
+      <<: *pg_parameters
+      name: '{{ item }}'
+      columns:
+      - id int
+    loop:
+    - 'query_test1.test1'
+    - 'query_test2.test2'
+
+  - name: postgresql_query - insert data
+    <<: *task_parameters
+    postgresql_table:
+      <<: *pg_parameters
+      query: 'INSERT INTO {{ item }} (id) VALUES (1)'
+      search_path:
+      - query_test1
+      - query_test2
+    loop:
+    - test1
+    - test2
+
+  - name: postgresql_query - get data
+    <<: *task_parameters
+    postgresql_table:
+      <<: *pg_parameters
+      query: 'SELECT id FROM test1'
+      search_path:
+      - query_test1
+      - query_test2
+
+  - assert:
+      that:
+      result.rowcount == 1
+
+  - name: postgresql_query - get data
+    <<: *task_parameters
+    postgresql_table:
+      <<: *pg_parameters
+      query: 'SELECT id FROM test2'
+      search_path:
+      - query_test1
+      - query_test2
+
+  - assert:
+      that:
+      result.rowcount == 1

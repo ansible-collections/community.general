@@ -158,6 +158,16 @@ EXAMPLES = r'''
     positional_args:
     - '{{ my_list }}'
     - '{{ my_arr|string }}'
+
+# Select from test table looking into app1 schema first, then,
+# if the schema doesn't exist or the table hasn't been found there,
+# try to find it in the schema public
+- name: Select from test using search_path
+  community.general.postgresql_query:
+    query: SELECT * FROM test_array_table
+    search_path:
+    - app1
+    - public
 '''
 
 RETURN = r'''
