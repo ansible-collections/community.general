@@ -368,7 +368,7 @@
 
   - assert:
       that:
-      result.rowcount == 1
+      - result.rowcount == 1
 
   - name: postgresql_query - get data
     <<: *task_parameters
@@ -381,4 +381,4 @@
 
   - assert:
       that:
-      result.rowcount == 1
+      - result.rowcount == 1
