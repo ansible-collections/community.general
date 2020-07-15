@@ -406,9 +406,6 @@ def main():
 
         changed = param_set(cursor, module, name, boot_val, context)
 
-    if restart_required:
-        module.warn("Restart of PostgreSQL is required for setting %s" % name)
-
     cursor.close()
     db_connection.close()
 
@@ -439,6 +436,10 @@ def main():
 
     kw['changed'] = changed
     kw['restart_required'] = restart_required
+
+    if restart_required and changed:
+        module.warn("Restart of PostgreSQL is required for setting %s" % name)
+
     module.exit_json(**kw)
 
 
