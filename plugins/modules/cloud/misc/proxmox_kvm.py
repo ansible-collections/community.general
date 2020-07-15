@@ -579,14 +579,9 @@ current:
     returned: success
     type: dict
     sample: '{
-      "changed": false,
-      "msg": "VM kropta with vmid = 110 is running",
-      "status": "running"
-      "current: {
-        agent: 1,
-        balloon: 2147483648,
-        ...
-      }"
+      agent: 1,
+      balloon: 2147483648,
+      "...": "...",
     }'
 config:
     description:
@@ -595,14 +590,9 @@ config:
     returned: success
     type: dict
     sample: '{
-      "changed": false,
-      "msg": "VM kropta with vmid = 110 is running",
-      "status": "running"
-      "config: {
-        cors: 2,
-        memory: 2048,
-        ...
-      }"
+      cores: 2,
+      memory: 2048,
+      "...": "...",
     }'
 '''
 
