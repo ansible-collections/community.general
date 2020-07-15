@@ -365,6 +365,7 @@
       search_path:
       - query_test1
       - query_test2
+    register: result
 
   - assert:
       that:
@@ -378,6 +379,7 @@
       search_path:
       - query_test1
       - query_test2
+    register: result
 
   - assert:
       that:
