@@ -1,4 +1,2 @@
-bugfixes:
-  - gitlab_runners inventory plugin - make sure that all runners are returned, and not only the first 20 items (https://github.com/ansible-collections/community.general/pull/611).
 minor_changes:
   - gitlab_runners inventory plugin - permit environment variable input for ``server_url`` and ``api_token`` options (https://github.com/ansible-collections/community.general/pull/611).
