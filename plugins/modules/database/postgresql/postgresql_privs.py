@@ -847,12 +847,12 @@ class QueryBuilder(object):
         for obj in self._objs:
             if self._as_who:
                 self.query.append(
-                    'ALTER DEFAULT PRIVILEGES FOR ROLE "{0}" IN SCHEMA "{1}" REVOKE ALL ON {2} FROM "{3}";'.format(self._as_who,
+                    'ALTER DEFAULT PRIVILEGES FOR ROLE {0} IN SCHEMA {1} REVOKE ALL ON {2} FROM {3};'.format(self._as_who,
                                                                                                              self._schema, obj,
                                                                                                              self._for_whom))
             else:
                 self.query.append(
-                    'ALTER DEFAULT PRIVILEGES IN SCHEMA "{0}" REVOKE ALL ON {1} FROM "{2}";'.format(self._schema, obj,
+                    'ALTER DEFAULT PRIVILEGES IN SCHEMA {0} REVOKE ALL ON {1} FROM {2};'.format(self._schema, obj,
                                                                                                 self._for_whom))
 
     def add_grant_option(self):
@@ -864,34 +864,34 @@ class QueryBuilder(object):
         else:
             self.query[-1] += ';'
             if self._obj_type == 'group':
-                self.query.append('REVOKE ADMIN OPTION FOR {0} FROM "{1}";'.format(self._set_what, self._for_whom))
+                self.query.append('REVOKE ADMIN OPTION FOR {0} FROM {1};'.format(self._set_what, self._for_whom))
             elif not self._obj_type == 'default_privs':
-                self.query.append('REVOKE GRANT OPTION FOR {0} FROM "{1}";'.format(self._set_what, self._for_whom))
+                self.query.append('REVOKE GRANT OPTION FOR {0} FROM {1};'.format(self._set_what, self._for_whom))
 
     def add_default_priv(self):
         for obj in self._objs:
             if self._as_who:
                 self.query.append(
-                    'ALTER DEFAULT PRIVILEGES FOR ROLE "{0}" IN SCHEMA "{1}" GRANT {2} ON {3} TO "{4}";'.format(self._as_who,
+                    'ALTER DEFAULT PRIVILEGES FOR ROLE {0} IN SCHEMA {1} GRANT {2} ON {3} TO {4}'.format(self._as_who,
                                                                                                          self._schema,
                                                                                                          self._set_what,
                                                                                                          obj,
                                                                                                          self._for_whom))
             else:
                 self.query.append(
-                    'ALTER DEFAULT PRIVILEGES IN SCHEMA "{0}" GRANT {1} ON {2} TO "{3}";'.format(self._schema,
+                    'ALTER DEFAULT PRIVILEGES IN SCHEMA {0} GRANT {1} ON {2} TO {3}'.format(self._schema,
                                                                                             self._set_what,
                                                                                             obj,
                                                                                             self._for_whom))
             self.add_grant_option()
         if self._as_who:
             self.query.append(
-                'ALTER DEFAULT PRIVILEGES FOR ROLE "{0}" IN SCHEMA "{1}" GRANT USAGE ON TYPES TO "{2}";'.format(self._as_who,
+                'ALTER DEFAULT PRIVILEGES FOR ROLE {0} IN SCHEMA {1} GRANT USAGE ON TYPES TO {2}'.format(self._as_who,
                                                                                                          self._schema,
                                                                                                          self._for_whom))
         else:
             self.query.append(
-                'ALTER DEFAULT PRIVILEGES IN SCHEMA "{0}" GRANT USAGE ON TYPES TO "{1}";'.format(self._schema, self._for_whom))
+                'ALTER DEFAULT PRIVILEGES IN SCHEMA {0} GRANT USAGE ON TYPES TO {1}'.format(self._schema, self._for_whom))
         self.add_grant_option()
 
     def build_present(self):
@@ -899,7 +899,7 @@ class QueryBuilder(object):
             self.add_default_revoke()
             self.add_default_priv()
         else:
-            self.query.append('GRANT {0} TO "{1}"'.format(self._set_what, self._for_whom))
+            self.query.append('GRANT {0} TO {1}'.format(self._set_what, self._for_whom))
             self.add_grant_option()
 
     def build_absent(self):
@@ -908,15 +908,15 @@ class QueryBuilder(object):
             for obj in ['TABLES', 'SEQUENCES', 'TYPES']:
                 if self._as_who:
                     self.query.append(
-                        'ALTER DEFAULT PRIVILEGES FOR ROLE "{0}" IN SCHEMA "{1}" REVOKE ALL ON {2} FROM "{3}";'.format(self._as_who,
+                        'ALTER DEFAULT PRIVILEGES FOR ROLE {0} IN SCHEMA {1} REVOKE ALL ON {2} FROM {3};'.format(self._as_who,
                                                                                                                  self._schema, obj,
                                                                                                                  self._for_whom))
                 else:
                     self.query.append(
-                        'ALTER DEFAULT PRIVILEGES IN SCHEMA "{0}" REVOKE ALL ON {1} FROM "{2}";'.format(self._schema, obj,
+                        'ALTER DEFAULT PRIVILEGES IN SCHEMA {0} REVOKE ALL ON {1} FROM {2};'.format(self._schema, obj,
                                                                                                     self._for_whom))
         else:
-            self.query.append('REVOKE {0} FROM "{1}";'.format(self._set_what, self._for_whom))
+            self.query.append('REVOKE {0} FROM {1};'.format(self._set_what, self._for_whom))
 
 
 def main():
