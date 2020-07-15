@@ -1,2 +1,2 @@
 minor_changes:
-  - proxmox_kvm - Added additional information to be returned when the option state: 'current' is used. The current runtime information of the virtual machine is returned in the dictionary 'current' and the configuration information is returned in the dictionary 'config'.
+- "proxmox_kvm - Added additional information to be returned when the option state: current' is used. The current runtime information of the virtual machine is returned in the dictionary 'current' and the configuration information is returned in the dictionary 'config'."
