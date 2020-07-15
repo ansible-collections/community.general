@@ -333,7 +333,7 @@ def main():
 
     if search_path:
         search_path = [x.strip(' ') for x in search_path]
-        set_search_path('%s' % ','.join(search_path))
+        set_search_path(cursor, '%s' % ','.join(search_path))
 
     # Prepare args:
     if module.params.get("positional_args"):
