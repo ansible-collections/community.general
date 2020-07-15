@@ -83,6 +83,9 @@ options:
     version_added: '1.0.0'
 seealso:
 - module: community.general.postgresql_db
+- name: PostgreSQL Schema reference
+  description: Complete reference of the PostgreSQL schema documentation.
+  link: https://www.postgresql.org/docs/current/ddl-schemas.html
 author:
 - Felix Archambault (@archf)
 - Andrew Klychkov (@Andersson007)
