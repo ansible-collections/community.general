@@ -75,6 +75,12 @@ options:
     type: bool
     default: yes
     version_added: '0.2.0'
+  search_path:
+    description:
+    - List of schema names to look in.
+    type: list
+    elements: str
+    version_added: '1.0.0'
 seealso:
 - module: community.general.postgresql_db
 author:
@@ -242,6 +248,16 @@ def convert_elements_to_pg_arrays(obj):
     return obj
 
 
+def set_search_path(cursor, search_path):
+    """Set session's search_path.
+
+    Args:
+        cursor (Psycopg2 cursor): Database cursor object.
+        search_path (str): String containing comma-separated schema names.
+    """
+    cursor.execute('SET search_path TO %s' % search_path)
+
+
 def main():
     argument_spec = postgres_common_argument_spec()
     argument_spec.update(
@@ -254,6 +270,7 @@ def main():
         autocommit=dict(type='bool', default=False),
         encoding=dict(type='str'),
         trust_input=dict(type='bool', default=True),
+        search_path=dict(type='list', elements='str'),
     )
 
     module = AnsibleModule(
@@ -270,6 +287,7 @@ def main():
     encoding = module.params["encoding"]
     session_role = module.params["session_role"]
     trust_input = module.params["trust_input"]
+    search_path = module.params["search_path"]
 
     if not trust_input:
         # Check input for potentially dangerous elements:
@@ -299,6 +317,9 @@ def main():
     if encoding is not None:
         db_connection.set_client_encoding(encoding)
     cursor = db_connection.cursor(cursor_factory=DictCursor)
+
+    if search_path:
+        set_search_path('%s' % ','.join(search_path.strip(' ')))
 
     # Prepare args:
     if module.params.get("positional_args"):
