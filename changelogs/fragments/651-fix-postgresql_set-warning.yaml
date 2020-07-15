@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - postgresql_set - only display a warning about restarts, when
+    restarting is needed
