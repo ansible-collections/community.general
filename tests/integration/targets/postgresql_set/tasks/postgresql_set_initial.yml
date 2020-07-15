@@ -347,7 +347,7 @@
 
   - name: postgresql_query - insert data
     <<: *task_parameters
-    postgresql_table:
+    postgresql_query:
       <<: *pg_parameters
       query: 'INSERT INTO {{ item }} (id) VALUES (1)'
       search_path:
@@ -359,7 +359,7 @@
 
   - name: postgresql_query - get data
     <<: *task_parameters
-    postgresql_table:
+    postgresql_query:
       <<: *pg_parameters
       query: 'SELECT id FROM test1'
       search_path:
@@ -372,7 +372,7 @@
 
   - name: postgresql_query - get data
     <<: *task_parameters
-    postgresql_table:
+    postgresql_query:
       <<: *pg_parameters
       query: 'SELECT id FROM test2'
       search_path:
