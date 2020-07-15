@@ -295,7 +295,9 @@ options:
   state:
     description:
       - Indicates desired state of the instance.
-      - If C(current), the current state of the VM will be fetched. You can access it with C(results.status), C(results.current) will have the current VMs information, C(results.config) will have the current VMs configuration.
+      - If C(current), the current state of the VM will be fetched. You can access it with C(results.status)
+      - If C(current), C(results.current) will have the current VMs information
+      - If C(current), C(results.config) will have the current VMs configuration.
     choices: ['present', 'started', 'absent', 'stopped', 'restarted','current']
     default: present
   storage:
