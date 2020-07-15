@@ -35,6 +35,10 @@ DOCUMENTATION = '''
         required: no
         env:
             - name: COBBLER_PASSWORD
+      cache_fallback:
+        description: Fallback to cached results if connection to cobbler fails
+        type: boolean
+        default: no
       exclude_profiles:
         description: Profiles to exclude from inventory
         type: list
@@ -65,6 +69,7 @@ password: secure
 '''
 
 from distutils.version import LooseVersion
+import socket
 
 from ansible.errors import AnsibleError
 from ansible.module_utils._text import to_bytes, to_native, to_text
@@ -128,29 +133,42 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         if self.cache_key not in self._cache:
             self._cache[self.cache_key] = {}
 
+    def _reload_cache(self):
+        if self.get_option('cache_fallback'):
+            self.display.vvv('Cannot connect to server, loading cache\n')
+            self._options['cache_timeout'] = 0
+            self.load_cache_plugin()
+            self._cache.get(self.cache_key, {})
+
     def _get_profiles(self):
         if not self.use_cache or 'profiles' not in self._cache.get(self.cache_key, {}):
-            self._init_cache()
-
             c = self._get_connection()
-            if self.token is not None:
-                data = c.get_profiles(self.token)
+            try:
+                if self.token is not None:
+                    data = c.get_profiles(self.token)
+                else:
+                    data = c.get_profiles()
+            except (socket.gaierror, socket.error, xmlrpc_client.ProtocolError):
+                self._reload_cache()
             else:
-                data = c.get_profiles()
-            self._cache[self.cache_key]['profiles'] = data
+                self._init_cache()
+                self._cache[self.cache_key]['profiles'] = data
 
         return self._cache[self.cache_key]['profiles']
 
     def _get_systems(self):
         if not self.use_cache or 'systems' not in self._cache.get(self.cache_key, {}):
-            self._init_cache()
-
             c = self._get_connection()
-            if self.token is not None:
-                data = c.get_systems(self.token)
+            try:
+                if self.token is not None:
+                    data = c.get_systems(self.token)
+                else:
+                    data = c.get_systems()
+            except (socket.gaierror, socket.error, xmlrpc_client.ProtocolError):
+                self._reload_cache()
             else:
-                data = c.get_systems()
-            self._cache[self.cache_key]['systems'] = data
+                self._init_cache()
+                self._cache[self.cache_key]['systems'] = data
 
         return self._cache[self.cache_key]['systems']
 
