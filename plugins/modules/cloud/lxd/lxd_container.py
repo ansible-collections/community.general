@@ -31,7 +31,7 @@ options:
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)'
           - If the container already exists and its "config" value in metadata
             obtained from
-            GET /1.0/containers/<name>
+            GET /1.0/instances/<name>
             U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#10containersname)
             are different, they this module tries to apply the configurations.
           - The key starts with 'volatile.' are ignored for this comparison.
@@ -393,13 +393,13 @@ class LXDContainerManagement(object):
 
     def _get_container_json(self):
         return self.client.do(
-            'GET', '/1.0/containers/{0}'.format(self.name),
+            'GET', '/1.0/instances/{0}'.format(self.name),
             ok_error_codes=[404]
         )
 
     def _get_container_state_json(self):
         return self.client.do(
-            'GET', '/1.0/containers/{0}/state'.format(self.name),
+            'GET', '/1.0/instances/{0}/state'.format(self.name),
             ok_error_codes=[404]
         )
 
@@ -413,7 +413,7 @@ class LXDContainerManagement(object):
         body_json = {'action': action, 'timeout': self.timeout}
         if force_stop:
             body_json['force'] = True
-        return self.client.do('PUT', '/1.0/containers/{0}/state'.format(self.name), body_json=body_json)
+        return self.client.do('PUT', '/1.0/instances/{0}/state'.format(self.name), body_json=body_json)
 
     def _create_container(self):
         config = self.config.copy()
@@ -437,7 +437,7 @@ class LXDContainerManagement(object):
         self.actions.append('restart')
 
     def _delete_container(self):
-        self.client.do('DELETE', '/1.0/containers/{0}'.format(self.name))
+        self.client.do('DELETE', '/1.0/instances/{0}'.format(self.name))
         self.actions.append('delete')
 
     def _freeze_container(self):
@@ -572,7 +572,7 @@ class LXDContainerManagement(object):
                 else:
                     body_json[param] = self.config[param]
 
-        self.client.do('PUT', '/1.0/containers/{0}'.format(self.name), body_json=body_json)
+        self.client.do('PUT', '/1.0/instances/{0}'.format(self.name), body_json=body_json)
         self.actions.append('apply_container_configs')
 
     def run(self):
