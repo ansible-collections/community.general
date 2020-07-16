@@ -964,7 +964,7 @@ def main():
     p = type('Params', (), module.params)
     # param "schema": default, allowed depends on param "type"
     if p.type in ['table', 'sequence', 'function', 'type', 'default_privs']:
-        p.schema = p.schema or 'public'
+        p.schema = '"%s"' % (p.schema or 'public')
     elif p.schema:
         module.fail_json(msg='Argument "schema" is not allowed '
                              'for type "%s".' % p.type)
