@@ -1271,8 +1271,6 @@ files:
     authors: abulimov
     maintainers: pilou-
     labels: filesystem
-  $modules/system/firewalld.py:
-    authors: maxamillion
   $modules/system/gconftool2.py:
     authors: kevensen
     maintainers: Akasurde
