@@ -28,6 +28,125 @@
     login_user: "{{ pg_user }}"
 
 #############################
+# Test of solving bug 656 #
+#############################
+- name: Create DB with hyphen in the name
+  become_user: "{{ pg_user }}"
+  become: yes
+  postgresql_db:
+    state: present
+    name: "{{ db_name_with_hyphens }}"
+    login_user: "{{ pg_user }}"
+  register: result
+
+- assert:
+    that:
+    - result is changed
+
+- name: Create a user with hyphen in the name
+  postgresql_user:
+    name: "{{ db_user_with_hyphens }}"
+    state: present
+    encrypted: yes
+    password: password
+    role_attr_flags: CREATEDB,LOGIN
+    db: "{{ db_name_with_hyphens }}"
+    login_user: "{{ pg_user }}"
+  register: result
+
+- assert:
+    that:
+    - result is changed
+
+- name: Create schema with hyphen in the name
+  postgresql_schema: 
+     login_user: "{{ pg_user }}"
+     login_password: password
+     db: "{{ db_name_with_hyphens }}"
+     name: "{{ db_schema_with_hyphens }}" 
+     state: present
+  register: result
+
+- assert:
+    that:
+    - result is changed
+
+- name: Set table default privs on the schema with hyphen in the name 
+  postgresql_privs:
+     login_user: "{{ pg_user }}"
+     password: password
+     db: "{{ db_name_with_hyphens }}"
+     schema: "{{ db_schema_with_hyphens }}" 
+     role: "{{ db_user_with_hyphens }}"
+     type: default_privs
+     obj: TABLES
+     privs: all
+     state: present
+  register: result
+
+- assert:
+    that:
+    - result is changed
+
+- name: Delete table default privs on the schema with hyphen in the name
+  postgresql_privs:
+     login_user: "{{ pg_user }}"
+     password: password
+     db: "{{ db_name_with_hyphens }}"
+     schema: "{{ db_schema_with_hyphens }}"
+     role: "{{ db_user_with_hyphens }}"
+     type: default_privs
+     obj: TABLES
+     privs: all
+     state: absent
+  register: result
+
+- assert:
+    that:
+    - result is changed
+
+- name: Delete schema with hyphen in the name
+  postgresql_schema:
+     login_user: "{{ pg_user }}"
+     login_password: password
+     db: "{{ db_name_with_hyphens }}"
+     name: "{{ db_schema_with_hyphens }}"
+     state: absent
+  register: result
+
+- assert:
+    that:
+    - result is changed
+
+- name: Delete a user with hyphen in the name
+  postgresql_user:
+    name: "{{ db_user_with_hyphens }}"
+    state: absent
+    encrypted: yes
+    password: password
+    role_attr_flags: CREATEDB,LOGIN
+    db: "{{ db_name_with_hyphens }}"
+    login_user: "{{ pg_user }}"
+  register: result
+
+- assert:
+    that:
+    - result is changed
+
+- name: Delete DB with hyphen in the name
+  become_user: "{{ pg_user }}"
+  become: yes
+  postgresql_db:
+    state: absent
+    name: "{{ db_name_with_hyphens }}"
+    login_user: "{{ pg_user }}"
+  register: result
+
+- assert:
+    that:
+    - result is changed
+
+#############################
 # Test of solving bug 27327 #
 #############################
 
