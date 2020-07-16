@@ -595,6 +595,7 @@ config:
       memory: 2048,
       "...": "...",
     }'
+    version_added: 1.0.0
 '''
 
 import os
