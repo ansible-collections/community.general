@@ -118,6 +118,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, url_argument_spec
 from ansible.module_utils._text import to_text
 import json
+import re
 
 
 class RundeckACLManager:
@@ -229,6 +230,9 @@ def main():
         ],
         supports_check_mode=True
     )
+
+    if not bool(re.match("[a-zA-Z0-9,.+_-]+", module.params["name"])):
+        module.fail_json(msg="Name contains forbidden characters. The policy can contain the characters: a-zA-Z0-9,.+_-")
 
     if module.params["api_version"] < 14:
         module.fail_json(msg="API version should be at least 14")
