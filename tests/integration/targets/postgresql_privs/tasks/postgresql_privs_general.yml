@@ -61,7 +61,7 @@
 - name: Create schema with hyphen in the name
   postgresql_schema: 
      login_user: "{{ pg_user }}"
-     password: password
+     login_password: password
      db: "{{ db_name_with_hyphens }}"
      name: "{{ db_schema_with_hyphens }}" 
      state: present
