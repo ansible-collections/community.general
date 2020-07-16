@@ -242,7 +242,7 @@ EXAMPLES = '''
       with_items: "{{ gce.instance_data }}"
 
     - name: Wait for SSH for instances
-      wait_for:
+      ansible.builtin.wait_for:
         delay: 1
         host: "{{ item.public_ip }}"
         port: 22
