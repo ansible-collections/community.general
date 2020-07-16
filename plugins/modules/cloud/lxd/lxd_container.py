@@ -336,6 +336,10 @@ CONFIG_PARAMS = [
     'architecture', 'config', 'devices', 'ephemeral', 'profiles', 'source'
 ]
 
+# CONFIG_CREATION_PARAMS is a list of attribute names that are only applied
+# on instance creation.
+CONFIG_CREATION_PARAMS = [ 'source' ]
+
 
 class LXDContainerManagement(object):
     def __init__(self, module):
@@ -549,33 +553,25 @@ class LXDContainerManagement(object):
             return self.config[key] != old_configs
 
     def _needs_to_apply_container_configs(self):
-        return (
-            self._needs_to_change_container_config('architecture') or
-            self._needs_to_change_container_config('config') or
-            self._needs_to_change_container_config('ephemeral') or
-            self._needs_to_change_container_config('devices') or
-            self._needs_to_change_container_config('profiles')
-        )
+        for param in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS):
+            if self._needs_to_change_container_config(param):
+                return True
+        return False
 
     def _apply_container_configs(self):
         old_metadata = self.old_container_json['metadata']
-        body_json = {
-            'architecture': old_metadata['architecture'],
-            'config': old_metadata['config'],
-            'devices': old_metadata['devices'],
-            'profiles': old_metadata['profiles']
-        }
-        if self._needs_to_change_container_config('architecture'):
-            body_json['architecture'] = self.config['architecture']
-        if self._needs_to_change_container_config('config'):
-            for k, v in self.config['config'].items():
-                body_json['config'][k] = v
-        if self._needs_to_change_container_config('ephemeral'):
-            body_json['ephemeral'] = self.config['ephemeral']
-        if self._needs_to_change_container_config('devices'):
-            body_json['devices'] = self.config['devices']
-        if self._needs_to_change_container_config('profiles'):
-            body_json['profiles'] = self.config['profiles']
+        body_json = {}
+        for param in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS):
+            if param in old_metadata:
+                body_json[param] = old_metadata[param]
+
+            if self._needs_to_change_container_config(param):
+                if param == 'config':
+                    for k, v in self.config['config'].items():
+                        body_json['config'][k] = v
+                else:
+                    body_json[param] = self.config[param]
+
         self.client.do('PUT', '/1.0/containers/{0}'.format(self.name), body_json=body_json)
         self.actions.append('apply_container_configs')
 
