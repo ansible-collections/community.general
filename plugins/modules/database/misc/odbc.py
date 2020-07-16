@@ -44,7 +44,7 @@ notes:
 
 EXAMPLES = '''
 - name: Set some values in the test db
-  odbc:
+  community.general.odbc:
     dsn: "DRIVER={ODBC Driver 13 for SQL Server};Server=db.ansible.com;Database=my_db;UID=admin;PWD=password;"
     query: "Select * from table_a where column1 = ?"
     params:
