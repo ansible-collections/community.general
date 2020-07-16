@@ -544,7 +544,7 @@ plugin_routing:
     firewalld:
       deprecation:
         removal_version: 2.0.0
-        warning_text: migrated to the ansible.posix collection
+        warning_text: The firewalld module has been moved to the ansible.posix collection.
       redirect: ansible.posix.firewalld
     foreman:
       deprecation:
