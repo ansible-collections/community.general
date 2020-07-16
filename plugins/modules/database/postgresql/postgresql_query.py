@@ -139,7 +139,7 @@ EXAMPLES = r'''
 
 # Pass list and string vars as positional_args
 - name: Set vars
-  set_fact:
+  ansible.builtin.set_fact:
     my_list:
     - 1
     - 2

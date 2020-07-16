@@ -62,7 +62,7 @@ EXAMPLES = '''
   register: result
 
 - name: Make sure that both images pacur/centos-7 and sinatra exist locally
-  assert:
+  ansible.builtin.assert:
     that:
       - result.images | length == 2
 '''
