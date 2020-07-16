@@ -766,6 +766,9 @@ class Connection(object):
         if target_roles:
             as_who = ','.join('"%s"' % r for r in target_roles)
 
+        if schema_qualifier:
+            schema_qualifier = '"%s"' % schema_qualifier
+
         status_before = get_status(objs)
 
         query = QueryBuilder(state) \
