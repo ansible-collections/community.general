@@ -514,3 +514,17 @@
 - assert:
     that:
     - result.rowcount == 1
+
+- name: postgresql_query - get data, must fail
+  become_user: '{{ pg_user }}'
+  become: true
+  postgresql_query:
+    login_user: '{{ pg_user }}'
+    login_db: postgres
+    query: 'SELECT id FROM test1'
+  register: result
+  ignore_errors: yes
+
+- assert:
+    that:
+    - result is failed
