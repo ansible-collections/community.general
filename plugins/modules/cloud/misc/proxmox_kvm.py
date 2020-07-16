@@ -572,6 +572,13 @@ status:
       "msg": "VM kropta with vmid = 110 is running",
       "status": "running"
     }'
+node:
+    description:
+      - The current node the virtual machine is located on.
+      - Returned only when C(state=current)
+    returned: success
+    type: str
+    version_added: 1.0.0
 current:
     description:
       - The current virtual maching runtime information.
@@ -1137,6 +1144,7 @@ def main():
             current = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()
             config = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).config.get()
             status['status'] = current['status']
+            status['node'] = vm[0]['node']
             status['current'] = current
             status['config'] = config
             if status:
