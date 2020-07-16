@@ -61,6 +61,14 @@ options:
           - 'See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1) for complete API documentation.'
           - 'Note that C(protocol) accepts two choices: C(lxd) or C(simplestreams)'
         required: false
+    type:
+        choices:
+          - container
+          - virtual-machine
+        description:
+          - Define the type of instance to be launched
+        required: false
+        default: container
     state:
         choices:
           - started
@@ -166,6 +174,7 @@ EXAMPLES = '''
           server: https://images.linuxcontainers.org
           protocol: lxd # if you get a 404, try setting protocol: simplestreams
           alias: ubuntu/xenial/amd64
+        type: container # optional, set to virtual-machine for a qemu VM
         profiles: ["default"]
         wait_for_ipv4_addresses: true
         timeout: 600
