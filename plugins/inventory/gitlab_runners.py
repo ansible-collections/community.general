@@ -30,17 +30,26 @@ DOCUMENTATION = '''
               - gitlab_runners
         server_url:
             description: The URL of the GitLab server, with protocol (i.e. http or https).
+            env:
+              - name: GITLAB_SERVER_URL
+                version_added: 1.0.0
             type: str
             required: true
             default: https://gitlab.com
         api_token:
             description: GitLab token for logging in.
+            env:
+              - name: GITLAB_API_TOKEN
+                version_added: 1.0.0
             type: str
             aliases:
               - private_token
               - access_token
         filter:
             description: filter runners from GitLab API
+            env:
+              - name: GITLAB_FILTER
+                version_added: 1.0.0
             type: str
             choices: ['active', 'paused', 'online', 'specific', 'shared']
         verbose_output:
