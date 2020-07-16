@@ -718,6 +718,11 @@ plugin_routing:
       deprecation:
         removal_version: 2.0.0
         warning_text: The infinibox module_utils plugin has been moved to the infinidat.infinibox collection.
+    firewalld:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: The firewalld module has been moved to the ansible.posix collection.
+      redirect: ansible.posix.firewalld
     mysql:
       deprecation:
         removal_version: 2.0.0
