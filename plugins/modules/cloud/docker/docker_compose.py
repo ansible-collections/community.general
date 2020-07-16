@@ -189,7 +189,7 @@ EXAMPLES = '''
     - ansible.builtin.debug:
         var: output
 
-    - assert:
+    - ansible.builtin.assert:
         that: "not output.changed "
 
     - name: Stop all services
@@ -202,7 +202,7 @@ EXAMPLES = '''
     - ansible.builtin.debug:
         var: output
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - "not web.flask_web_1.state.running"
           - "not db.flask_db_1.state.running"
@@ -217,7 +217,7 @@ EXAMPLES = '''
     - ansible.builtin.debug:
         var: output
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - "web.flask_web_1.state.running"
           - "db.flask_db_1.state.running"
@@ -264,7 +264,7 @@ EXAMPLES = '''
     - ansible.builtin.debug:
         var: output
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - "web.flask_web_1.state.running"
           - "db.flask_db_1.state.running"
@@ -296,7 +296,7 @@ EXAMPLES = '''
     - ansible.builtin.debug:
         var: output
 
-    - assert:
+    - ansible.builtin.assert:
         that:
           - "web.flask_web_1.state.running"
           - "db.flask_db_1.state.running"
