@@ -87,7 +87,7 @@
   shell: "{{ redis_bin[ansible_distribution] }} {{ slave_conf }} --slaveof 127.0.0.1 {{ master_port }}"
 
 - name: Wait for redis master to be started
-  wait_for:
+  ansible.builtin.wait_for:
     host: 127.0.0.1
     port: "{{ master_port }}"
     state: started
@@ -96,7 +96,7 @@
     timeout: 30
 
 - name: Wait for redis slave to be started
-  wait_for:
+  ansible.builtin.wait_for:
     host: 127.0.0.1
     port: "{{ slave_port }}"
     state: started

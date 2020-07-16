@@ -3,11 +3,11 @@
 #
 # unencrypted values are not supported on newer versions
 # do not run the encrypted: no tests if on 10+
-- set_fact:
+- ansible.builtin.set_fact:
     encryption_values:
     - 'yes'
 
-- set_fact:
+- ansible.builtin.set_fact:
     encryption_values: '{{ encryption_values + ["no"]}}'
   when: postgres_version_resp.stdout is version('10', '<=')
 
@@ -22,7 +22,7 @@
 # BYPASSRLS role attribute was introduced in PostgreSQL 9.5, so
 # we want to test attribute management differently depending
 # on the version.
-- set_fact:
+- ansible.builtin.set_fact:
     bypassrls_supported: "{{ postgres_version_resp.stdout is version('9.5.0', '>=') }}"
 
 # test 'no_password_change' and 'role_attr_flags' parameters
@@ -67,7 +67,7 @@
   shell: echo "select datname from pg_database where datname = '{{ db_name }}';" | psql -d postgres
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - "result.stdout_lines[-1] == '(1 row)'"
 
@@ -89,7 +89,7 @@
   shell: echo "select * from pg_user where usename='{{ db_user2 }}';" | psql -d postgres
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - "result.stdout_lines[-1] == '(1 row)'"
 
@@ -111,7 +111,7 @@
   shell: echo "select datacl from pg_database where datname='{{ db_name }}';" | psql {{ db_name }}
   register: result_database
 
-- assert:
+- ansible.builtin.assert:
     that:
       - "result_database.stdout_lines[-1] == '(1 row)'"
       - "db_user2 ~ '=Cc' in result_database.stdout"
@@ -133,7 +133,7 @@
   shell: echo "select * from pg_user where usename='{{ db_user2 }}';" | psql -d postgres
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - "result.stdout_lines[-1] == '(0 rows)'"
 
@@ -151,6 +151,6 @@
   shell: echo "select datname from pg_database where datname = '{{ db_name }}';" | psql -d postgres
   register: result
 
-- assert:
+- ansible.builtin.assert:
     that:
       - "result.stdout_lines[-1] == '(0 rows)'"
