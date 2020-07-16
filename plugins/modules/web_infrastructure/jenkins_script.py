@@ -65,7 +65,7 @@ EXAMPLES = '''
     password: admin
 
 - name: Setting master using a variable to hold a more complicate script
-  set_fact:
+  ansible.builtin.set_fact:
     setmaster_mode: |
         import jenkins.model.*
         instance = Jenkins.getInstance()
