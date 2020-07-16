@@ -766,6 +766,9 @@ class Connection(object):
         if target_roles:
             as_who = ','.join('"%s"' % r for r in target_roles)
 
+        if schema_qualifier:
+            schema_qualifier = '"%s"' % schema_qualifier
+
         status_before = get_status(objs)
 
         query = QueryBuilder(state) \
@@ -964,7 +967,7 @@ def main():
     p = type('Params', (), module.params)
     # param "schema": default, allowed depends on param "type"
     if p.type in ['table', 'sequence', 'function', 'type', 'default_privs']:
-        p.schema = '"%s"' % (p.schema or 'public')
+        p.schema = p.schema or 'public'
     elif p.schema:
         module.fail_json(msg='Argument "schema" is not allowed '
                              'for type "%s".' % p.type)
