@@ -331,7 +331,7 @@ ANSIBLE_LXD_STATES = {
 # ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
 ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
 
-LXD_INSTANCE_TYPES = [ 'container', 'virtual-machine' ]
+LXD_INSTANCE_TYPES = ['container', 'virtual-machine']
 
 # CONFIG_PARAMS is a list of config attribute names.
 CONFIG_PARAMS = [
@@ -340,7 +340,7 @@ CONFIG_PARAMS = [
 
 # CONFIG_CREATION_PARAMS is a list of attribute names that are only applied
 # on instance creation.
-CONFIG_CREATION_PARAMS = [ 'source', 'type' ]
+CONFIG_CREATION_PARAMS = ['source', 'type']
 
 
 class LXDContainerManagement(object):
