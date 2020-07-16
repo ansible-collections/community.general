@@ -430,6 +430,10 @@ CONFIG_PARAMS = [
     'architecture', 'config', 'devices', 'ephemeral', 'profiles', 'source'
 ]
 
+# CONFIG_CREATION_PARAMS is a list of attribute names that are only applied
+# on instance creation.
+CONFIG_CREATION_PARAMS = ['source']
+
 
 class LXDContainerManagement(object):
     def __init__(self, module):
@@ -677,34 +681,24 @@ class LXDContainerManagement(object):
             return self.config[key] != old_configs
 
     def _needs_to_apply_instance_configs(self):
-        return (
-            self._needs_to_change_instance_config('architecture') or
-            self._needs_to_change_instance_config('config') or
-            self._needs_to_change_instance_config('ephemeral') or
-            self._needs_to_change_instance_config('devices') or
-            self._needs_to_change_instance_config('profiles')
-        )
+        for param in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS):
+            if self._needs_to_change_instance_config(param):
+                return True
+        return False
 
     def _apply_instance_configs(self):
         old_metadata = self.old_instance_json['metadata']
-        body_json = {
-            'architecture': old_metadata['architecture'],
-            'config': old_metadata['config'],
-            'devices': old_metadata['devices'],
-            'profiles': old_metadata['profiles']
-        }
+        body_json = {}
+        for param in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS):
+            if param in old_metadata:
+                body_json[param] = old_metadata[param]
 
-        if self._needs_to_change_instance_config('architecture'):
-            body_json['architecture'] = self.config['architecture']
-        if self._needs_to_change_instance_config('config'):
-            for k, v in self.config['config'].items():
-                body_json['config'][k] = v
-        if self._needs_to_change_instance_config('ephemeral'):
-            body_json['ephemeral'] = self.config['ephemeral']
-        if self._needs_to_change_instance_config('devices'):
-            body_json['devices'] = self.config['devices']
-        if self._needs_to_change_instance_config('profiles'):
-            body_json['profiles'] = self.config['profiles']
+            if self._needs_to_change_instance_config(param):
+                if param == 'config':
+                    for k, v in self.config['config'].items():
+                        body_json['config'][k] = v
+                else:
+                    body_json[param] = self.config[param]
 
         url = '{0}/{1}'.format(self.api_endpoint, self.name)
         if self.project:
