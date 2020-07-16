@@ -35,7 +35,7 @@
   when: (ansible_facts.distribution_major_version != '8' and ansible_facts.distribution == 'CentOS') or ansible_facts.distribution != 'CentOS'
 
 - name: postgresql_slot - pause between stop and start PostgreSQL
-  pause:
+  ansible.builtin.pause:
     seconds: 5
 
 - name: postgresql_slot - start PostgreSQL
