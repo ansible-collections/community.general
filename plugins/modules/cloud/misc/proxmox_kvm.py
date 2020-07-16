@@ -583,6 +583,7 @@ current:
       balloon: 2147483648,
       "...": "...",
     }'
+    version_added: 1.0.0
 config:
     description:
       - The current virtual maching configuration.
