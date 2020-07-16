@@ -118,19 +118,6 @@
     that:
     - result is changed
 
-- name: Delete DB with hyphen in the name
-  become_user: "{{ pg_user }}"
-  become: yes
-  postgresql_db:
-    state: absent
-    name: "{{ db_name_with_hyphens }}"
-    login_user: "{{ pg_user }}"
-  register: result
-
-- assert:
-    that:
-    - result is changed
-
 - name: Delete a user with hyphen in the name
   postgresql_user:
     name: "{{ db_user_with_hyphens }}"
@@ -139,6 +126,19 @@
     password: password
     role_attr_flags: CREATEDB,LOGIN
     db: "{{ db_name_with_hyphens }}"
+    login_user: "{{ pg_user }}"
+  register: result
+
+- assert:
+    that:
+    - result is changed
+
+- name: Delete DB with hyphen in the name
+  become_user: "{{ pg_user }}"
+  become: yes
+  postgresql_db:
+    state: absent
+    name: "{{ db_name_with_hyphens }}"
     login_user: "{{ pg_user }}"
   register: result
 
