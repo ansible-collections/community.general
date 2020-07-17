@@ -1,0 +1,11 @@
+- name: Testing the module without pyodbc
+  odbc:
+    dsn: "Test"
+    query: "SELECT * FROM nothing"
+  ignore_errors: True
+  register: results
+
+- assert:
+    that:
+      - results is failed
+      - "'Failed to import the required Python library (pyodbc) on' in results.msg"
