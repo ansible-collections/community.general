@@ -77,11 +77,15 @@ message:
     returned: always
 '''
 
+try:
+    from google.oauth2 import service_account
+    from google.cloud import storage
+    HAS_GOOGLE = True
+except ImportError as e:
+    HAS_GOOGLE = False
+
 import datetime
 import json
-
-from google.oauth2 import service_account
-from google.cloud import storage
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -104,6 +108,9 @@ def run_module():
         argument_spec=module_args,
         supports_check_mode=True
     )
+
+    if not HAS_GOOGLE:
+        module.fail_json(msg="Please install google-cloud, google-auth library.")
 
     if module.check_mode:
         module.exit_json(**result)

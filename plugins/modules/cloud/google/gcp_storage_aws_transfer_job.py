@@ -142,11 +142,16 @@ message:
     returned: always
 '''
 
+
+try:
+    import googleapiclient.discovery
+    from google.oauth2 import service_account
+    HAS_GOOGLE = True
+except ImportError as e:
+    HAS_GOOGLE = False
+
 import datetime
 import json
-import googleapiclient.discovery
-
-from google.oauth2 import service_account
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -180,6 +185,9 @@ def run_module():
 
     if module.check_mode:
         module.exit_json(**result)
+
+    if not HAS_GOOGLE:
+        module.fail_json(msg="Please install google-api-python-client, google-auth library.")
 
     start_date = datetime.datetime.strptime(module.params['scheduled_start_date_utc'], '%Y/%m/%d')
     end_date = datetime.datetime.strptime(module.params['scheduled_end_date_utc'], '%Y/%m/%d')
