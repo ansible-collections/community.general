@@ -1,0 +1,2 @@
+minor_changes:
+- gitlab_service - new module to setup GitLab integration services (https://github.com/ansible-collections/community.general/pull/667)
