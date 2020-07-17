@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: gcp_storage_aws_transfer_job
-version_added: 2.10
+version_added: 1.0.0
 short_description: Creates GCP Transfer Jobs between AWS S3 and GCP Storage.
 description: This module will create GCP Storage Transfer Jobs which transfers AWS S3 Bucket objects into the specified
              GCP Bucket. If there is an existing Transfer Job with the same Description it will delete it and create a new job.
@@ -25,13 +25,13 @@ options:
         type: str
     scheduled_start_date_utc:
         description:
-            - Start date of transfer job in YYYY-MM-DD format.
-            - For details on how transfer job schedules work see https://cloud.google.com/storage-transfer/docs/reference/rest/v1/transferJobs#schedule.
+            - Start date of transfer job in YYYY/MM/DD format.
+            - For details on how transfer job schedules work see U(https://cloud.google.com/storage-transfer/docs/reference/rest/v1/transferJobs#schedule).
         required: true
         type: str
     scheduled_end_date_utc:
         description:
-            - End date of transfer job in YYYY-MM-DD format .
+            - End date of transfer job in YYYY/MM/DD format .
         required: true
         type: str
     scheduled_start_time_utc:
@@ -89,7 +89,7 @@ EXAMPLES = '''
 # Create a new job / replace existing job
 
 - name: Create Bucket Transfer Job
-  gcp_storage_aws_transfer_job:
+  community.general.gcp_storage_aws_transfer_job:
     project_id: "{{ item.project_id }}"
     scheduled_start_date_utc: "{{ item.scheduled_start_date_utc }}"
     scheduled_end_date_utc: "{{ item.scheduled_end_date_utc }}"
@@ -107,7 +107,7 @@ EXAMPLES = '''
 # Delete an existing job
 
 - name: Delete Bucket Transfer Job
-  gcp_storage_aws_transfer_job:
+  community.general.gcp_storage_aws_transfer_job:
     project_id: "{{ item.project_id }}"
     scheduled_start_date_utc: "{{ item.scheduled_start_date_utc }}"
     scheduled_end_date_utc: "{{ item.scheduled_end_date_utc }}"
@@ -126,12 +126,8 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-original_message:
-    description: The original name param that was passed in
-    type: str
-    returned: always
 message:
-    description: The output message that the sample module generates
+    description: Message indicating whether the job was created or deleted.
     type: str
     returned: always
 '''
@@ -147,6 +143,48 @@ except ImportError as e:
 import datetime
 import json
 from ansible.module_utils.basic import AnsibleModule
+
+
+def _validate_params(params):
+    """
+    Validate params.
+
+    This function calls _validated_date to verify
+    date time parameters.
+
+    :param params: Ansible dictionary containing configuration.
+    :type  params: ``dict``
+
+    :return: True or raises ValueError
+    :rtype: ``bool`` or `class:ValueError`
+    """
+    fields = [
+        {'name': 'scheduled_start_date_utc', 'type': str, 'required': True},
+        {'name': 'scheduled_end_date_utc', 'type': str, 'required': True},
+        {'name': 'scheduled_start_time_utc', 'type': str, 'required': True},
+    ]
+
+    date_format = '%Y/%m/%d'
+    time_format = '%H:%M'
+
+    try:
+        if 'scheduled_start_date_utc' in params and params['scheduled_start_date_utc'] is not None:
+                _validated_date(params['scheduled_start_date_utc'], date_format)
+        if 'scheduled_end_date_utc' in params and params['scheduled_end_date_utc'] is not None:
+                _validated_date(params['scheduled_end_date_utc'], date_format)
+        if 'scheduled_start_time_utc' in params and params['scheduled_start_time_utc'] is not None:
+                _validated_date(params['scheduled_start_time_utc'], time_format)
+    except Exception:
+        raise
+
+    return (True, '')
+
+
+def _validated_date(param, format):
+    try:
+        value = datetime.datetime.strptime(param, format)
+    except:
+        raise ValueError("Incorrect format. Date and Times must be formatted as YYYY/MM/DD and HH:SS")
 
 
 def run_module():
@@ -182,6 +220,11 @@ def run_module():
 
     if not HAS_GOOGLE:
         module.fail_json(msg="Please install google-api-python-client, google-auth library.")
+
+    try:
+        _validate_params(module.params)
+    except Exception as e:
+        module.fail_json(msg=e.message, changed=False)
 
     start_date = datetime.datetime.strptime(module.params['scheduled_start_date_utc'], '%Y/%m/%d')
     end_date = datetime.datetime.strptime(module.params['scheduled_end_date_utc'], '%Y/%m/%d')
@@ -252,13 +295,12 @@ def run_module():
         for transferJob in queryResult['transferJobs']:
             if transferJob['description'] == module.params['description']:
                 storagetransfer.transferJobs().patch(body=delete_transfer_job, jobName=transferJob['name']).execute()
-                result['message'] = 'Deleted existing Transfer Jobs with the same Description'
+                result['message'] = 'deleted'
 
     if 'present' in module.params['state']:
         storagetransfer.transferJobs().create(body=transfer_job).execute()
-        result['message'] = 'Created new Transfer Job'
+        result['message'] = 'created'
 
-    result['original_message'] = module.params
     result['changed'] = 'True'
 
     module.exit_json(**result)

@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: gcp_storage_bucket_permissions
-version_added: 2.10
+version_added: 1.0.0
 short_description: Add an IAM Member and IAM Role to a Storage Bucket.
 description: This module gives an IAM Member permissions to a Storage Bucket.
 
@@ -27,12 +27,12 @@ options:
         type: str
     member:
         description:
-            - IAM Member. https://cloud.google.com/storage/docs/json_api/v1/buckets/setIamPolicy
+            - IAM Member. U(https://cloud.google.com/storage/docs/json_api/v1/buckets/setIamPolicy).
         required: true
         type: str
     role:
         description:
-            - IAM Role to apply to IAM Member. https://cloud.google.com/storage/docs/access-control/iam-roles
+            - IAM Role to apply to IAM Member. U(https://cloud.google.com/storage/docs/access-control/iam-roles).
         required: true
         type: str
     service_account_file:
@@ -50,7 +50,7 @@ EXAMPLES = '''
 # Add permission
 
 - name: Add bucket permission
-  gcp_storage_bucket_permissions:
+  community.general.gcp_storage_bucket_permissions:
     project_id: "{{ item.project_id | default(lookup('env','GCE_PROJECT')) }}"
     bucket_name: "{{ item.bucket_name }}"
     member: "{{ item.project_transfer_service_account }}"
@@ -60,16 +60,6 @@ EXAMPLES = '''
 
 '''
 
-RETURN = '''
-original_message:
-    description: The original name param that was passed in
-    type: str
-    returned: always
-message:
-    description: The output message that the sample module generates
-    type: str
-    returned: always
-'''
 
 try:
     from google.oauth2 import service_account
@@ -127,8 +117,6 @@ def run_module():
     policy[role].add(member)
     bucket.set_iam_policy(policy)
 
-    result['message'] = 'Updated Bucket IAM Policy for member.'
-    result['original_message'] = module.params
     result['changed'] = 'True'
 
     module.exit_json(**result)
