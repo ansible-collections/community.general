@@ -158,6 +158,17 @@ DOCUMENTATION = """
         - name: EC2_REGION
         - name: AWS_REGION
         version_added: '0.2.0'
+    action_type:
+      description:
+        - The action type to be performed for the provided path
+      ini:
+        - section: lookup_hashi_vault
+          key: action_type
+          version_added: '0.2.0'
+      choices:
+        - READ
+        - LIST
+      default: READ
 """
 
 EXAMPLES = """
@@ -235,6 +246,16 @@ EXAMPLES = """
 - name: authenticate with aws_iam_login
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.hashi_vault', 'secret/hello:value', auth_method='aws_iam_login' role_id='myroleid', profile=my_boto_profile) }}"
+
+
+# Defining action to be performed
+# Uses the hvac Client for HashiCorp's Vault to extend the integration with HashiCorp's Vault
+- name: Read a secret (default)
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.hashi_vault', 'secret/data/hello action_type=READ token=my_token_var url=http://myvault_url:8200') }}"
+- name: List secrets on path
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.hashi_vault', 'secret/data/hello action_type=LIST token=my_token_var url=http://myvault_url:8200') }}"
 """
 
 RETURN = """
@@ -334,9 +355,10 @@ class HashiVault:
         secret = self.options['secret']
         field = self.options['secret_field']
         return_as = self.options['return_format']
+        action_type = self.options['action_type']
 
         try:
-            data = self.client.read(secret)
+            data = self.execute_request(secret, action_type)
         except hvac.exceptions.Forbidden:
             raise AnsibleError("Forbidden: Permission Denied to secret '%s'." % secret)
 
@@ -368,6 +390,13 @@ class HashiVault:
             raise AnsibleError("The secret %s does not contain the field '%s'. for hashi_vault lookup" % (secret, field))
 
         return [data['data'][field]]
+
+    def execute_request(self, secret, method):
+      httpMethods = {
+        'READ': lambda: self.client.read(secret),
+        'LIST': lambda: self.client.list(secret),
+      }
+      return httpMethods.get(method, httpMethods.get('READ'))()
 
     # begin auth implementation methods
     #
@@ -467,6 +496,9 @@ class LookupModule(LookupBase):
         # secret field splitter
         self.field_ops()
 
+        # hvac client actions
+        self.action_types()
+
     # begin options processing methods
 
     def boolean_or_cacert(self):
@@ -510,6 +542,18 @@ class LookupModule(LookupBase):
         auth_validator = 'validate_auth_' + auth_method
         if hasattr(self, auth_validator) and callable(getattr(self, auth_validator)):
             getattr(self, auth_validator)(auth_method)
+
+    def action_types(self):
+        # enforce and set the list of available hvac action types
+        # TODO: can this be read from the choices: field in documentation?
+        avail_action_types = ['READ', 'LIST']
+        self.set_option('avail_action_types', avail_action_types)
+        action_type = self.get_option('action_type')
+
+        if action_type not in avail_action_types:
+            raise AnsibleError(
+                "Action type '%s' not supported. Available options are %r" % (action_type, avail_action_types)
+            )
 
     # end options processing methods
 
