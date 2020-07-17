@@ -392,11 +392,11 @@ class HashiVault:
         return [data['data'][field]]
 
     def execute_request(self, secret, method):
-      httpMethods = {
-        'READ': lambda: self.client.read(secret),
-        'LIST': lambda: self.client.list(secret),
-      }
-      return httpMethods.get(method, httpMethods.get('READ'))()
+        httpMethods = {
+            'READ': lambda: self.client.read(secret),
+            'LIST': lambda: self.client.list(secret),
+        }
+        return httpMethods.get(method, httpMethods.get('READ'))()
 
     # begin auth implementation methods
     #
