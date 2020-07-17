@@ -496,9 +496,6 @@ class LookupModule(LookupBase):
         # secret field splitter
         self.field_ops()
 
-        # hvac client actions
-        self.action_types()
-
     # begin options processing methods
 
     def boolean_or_cacert(self):
@@ -542,18 +539,6 @@ class LookupModule(LookupBase):
         auth_validator = 'validate_auth_' + auth_method
         if hasattr(self, auth_validator) and callable(getattr(self, auth_validator)):
             getattr(self, auth_validator)(auth_method)
-
-    def action_types(self):
-        # enforce and set the list of available hvac action types
-        # TODO: can this be read from the choices: field in documentation?
-        avail_action_types = ['READ', 'LIST']
-        self.set_option('avail_action_types', avail_action_types)
-        action_type = self.get_option('action_type')
-
-        if action_type not in avail_action_types:
-            raise AnsibleError(
-                "Action type '%s' not supported. Available options are %r" % (action_type, avail_action_types)
-            )
 
     # end options processing methods
 
