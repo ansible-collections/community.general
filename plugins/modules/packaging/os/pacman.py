@@ -459,7 +459,7 @@ def main():
         for i, pkg in enumerate(pkgs):
             if not pkg:  # avoid empty strings
                 continue
-            elif re.match(r".*\.pkg\.tar(\.(gz|bz2|xz|lrz|lzo|Z))?$", pkg):
+            elif re.match(r".*\.pkg\.tar(\.(gz|bz2|xz|lrz|lzo|Z|zst))?$", pkg):
                 # The package given is a filename, extract the raw pkg name from
                 # it and store the filename
                 pkg_files.append(pkg)
