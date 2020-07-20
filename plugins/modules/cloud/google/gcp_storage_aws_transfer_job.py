@@ -11,48 +11,51 @@ DOCUMENTATION = '''
 ---
 module: gcp_storage_aws_transfer_job
 version_added: 1.0.0
-short_description: Creates GCP Transfer Jobs between AWS S3 and GCP Storage.
-description: This module will create GCP Storage Transfer Jobs which transfers AWS S3 Bucket objects into the specified
-             GCP Bucket. If there is an existing Transfer Job with the same Description it will delete it and create a new job.
-             If you include the parameter aws_s3_bucket_prefix, it will transfer that prefix only, otherwise it will transfer all
-             objects in the bucket. The Transfer Jobs will only pull changed or new objects when they execute.
+short_description: Creates GCP Transfer Jobs between AWS S3 and GCP Storage
+description:
+    - This module will create GCP Storage Transfer Jobs which transfers AWS S3 Bucket objects into the specified GCP Bucket.
+     - If there is an existing Transfer Job with the same description it will delete it and create a new job.
+     - If you include the parameter I(aws_s3_bucket_prefix), it will transfer that prefix only, otherwise it will transfer all objects in the bucket.
+     - The Transfer Jobs will only pull changed or new objects when they execute.
 
 options:
     project_id:
         description:
             - GCP account project id.
-        required: true
+        required: yes
         type: str
     scheduled_start_date_utc:
         description:
             - Start date of transfer job in YYYY/MM/DD format.
-            - For details on how transfer job schedules work see U(https://cloud.google.com/storage-transfer/docs/reference/rest/v1/transferJobs#schedule).
-        required: true
+            - For details on how transfer job schedules work see
+
+              U(https://cloud.google.com/storage-transfer/docs/reference/rest/v1/transferJobs#schedule).
+        required: yes
         type: str
     scheduled_end_date_utc:
         description:
-            - End date of transfer job in YYYY/MM/DD format .
-        required: true
+            - End date of transfer job in YYYY/MM/DD format.
+        required: yes
         type: str
     scheduled_start_time_utc:
         description:
             - Transfer job start time in HH:SS format.
-        required: true
+        required: yes
         type: str
     gcp_storage_bucket:
         description:
             - The GCP storage bucket to transfer objects into.
-        required: true
+        required: yes
         type: str
     service_account_file:
         description:
             - GCP credentails file.
-        required: true
+        required: yes
         type: str
     aws_s3_bucket:
         description:
             - AWS S3 bucket which contains the source objects.
-        required: true
+        required: yes
         type: str
     aws_s3_bucket_prefix:
         description:
@@ -62,22 +65,22 @@ options:
     description:
         description:
             - This is used as a unique name for the transfer job. If a job with the same description exists, it is replaced, or deleted depending on state.
-        required: true
+        required: yes
         type: str
     state:
         description:
             - Whether to create/update or delete a transfer job. Options are present and absent.
-        required: true
+        required: yes
         type: str
     aws_access_key:
         description:
             - The AWS IAM account access key used by the transfer job to retreive S3 objects.
-        required: true
+        required: yes
         type: str
     aws_secret_key:
         description:
             - The AWS IAM account access key secret used by the transfer job to retreive S3 objects.
-        required: true
+        required: yes
         type: str
 
 author:
@@ -122,7 +125,6 @@ EXAMPLES = '''
     state: absent
   loop: "{{ gcp_create_transfer_jobs }}"
 
-
 '''
 
 RETURN = '''
@@ -133,16 +135,19 @@ message:
 '''
 
 
+import datetime
+import json
+import traceback
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import missing_required_lib
+
 try:
     import googleapiclient.discovery
     from google.oauth2 import service_account
-    HAS_GOOGLE = True
+    HAS_LIB = True
 except ImportError as e:
-    HAS_GOOGLE = False
-
-import datetime
-import json
-from ansible.module_utils.basic import AnsibleModule
+    HAS_LIB = False
+    LIB_IMP_ERR = traceback.format_exc()
 
 
 def _validate_params(params):
@@ -169,21 +174,21 @@ def _validate_params(params):
 
     try:
         if 'scheduled_start_date_utc' in params and params['scheduled_start_date_utc'] is not None:
-                _validated_date(params['scheduled_start_date_utc'], date_format)
+            _validated_date(params['scheduled_start_date_utc'], date_format)
         if 'scheduled_end_date_utc' in params and params['scheduled_end_date_utc'] is not None:
-                _validated_date(params['scheduled_end_date_utc'], date_format)
+            _validated_date(params['scheduled_end_date_utc'], date_format)
         if 'scheduled_start_time_utc' in params and params['scheduled_start_time_utc'] is not None:
-                _validated_date(params['scheduled_start_time_utc'], time_format)
+            _validated_date(params['scheduled_start_time_utc'], time_format)
     except Exception:
         raise
 
-    return (True, '')
+    return True
 
 
 def _validated_date(param, format):
     try:
         value = datetime.datetime.strptime(param, format)
-    except:
+    except Exception as e:
         raise ValueError("Incorrect format. Date and Times must be formatted as YYYY/MM/DD and HH:SS")
 
 
@@ -212,14 +217,12 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=module_args,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
-    if module.check_mode:
-        module.exit_json(**result)
-
-    if not HAS_GOOGLE:
-        module.fail_json(msg="Please install google-api-python-client, google-auth library.")
+    if not HAS_LIB:
+        module.fail_json(msg=missing_required_lib("Please install google-api-python-client, google-auth library."),
+                         exception=LIB_IMP_ERR)
 
     try:
         _validate_params(module.params)

@@ -21,7 +21,7 @@ class TestParmeters(unittest.TestCase):
         }
 
         actual = _validate_params(params_dict)
-        self.assertEqual((True, ''), actual)
+        self.assertEqual(True, actual)
 
     def test_validate_params_fail_date(self):
         params_dict = {
