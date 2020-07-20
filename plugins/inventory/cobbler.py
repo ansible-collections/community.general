@@ -241,7 +241,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 for (iname, ivalue) in iteritems(interfaces):
                     if ivalue['management'] or not ivalue['static']:
                         this_dns_name = ivalue.get('dns_name', None)
-                        if this_dns_name is not None and this_dns_name is not "":
+                        if this_dns_name is not None and this_dns_name != "":
                             hostname = this_dns_name
                             self.display.vvvv('Set hostname to %s from %s\n' % (hostname, iname))
 
