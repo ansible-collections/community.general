@@ -1,0 +1,2 @@
+bugfixes:
+  - docker_swarm - removes ``advertise_addr`` from list of required arguments when ``state`` is ``"join"`` (https://github.com/ansible-collections/community.general/issues/439).
