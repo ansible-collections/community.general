@@ -10,11 +10,11 @@
   ignore_errors: yes
   register: output
 
-- name: assert failure when called with state=join and no advertise_addr,remote_addrs,join_token
+- name: assert failure when called with state=join and no remote_addrs,join_token
   assert:
     that:
        - 'output.failed'
-       - 'output.msg == "state is join but all of the following are missing: advertise_addr, remote_addrs, join_token"'
+       - 'output.msg == "state is join but all of the following are missing: remote_addrs, join_token"'
 
 - name: Test parameters with state=remove
   docker_swarm:
