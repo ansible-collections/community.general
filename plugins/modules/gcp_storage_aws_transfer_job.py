@@ -1,1 +1,0 @@
-cloud/google/gcp_storage_aws_transfer_job.py

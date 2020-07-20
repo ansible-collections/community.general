@@ -11,34 +11,34 @@ DOCUMENTATION = '''
 ---
 module: gcp_storage_bucket_permissions
 version_added: 1.0.0
-short_description: Add an IAM Member and IAM Role to a Storage Bucket.
+short_description: Add an IAM Member and IAM Role to a Storage Bucket
 description: This module gives an IAM Member permissions to a Storage Bucket.
 
 options:
     project_id:
         description:
             - GCP account project id.
-        required: true
+        required: yes
         type: str
     bucket_name:
         description:
             - GCP Storage Bucket to apply permissions to.
-        required: true
+        required: yes
         type: str
     member:
         description:
             - IAM Member. U(https://cloud.google.com/storage/docs/json_api/v1/buckets/setIamPolicy).
-        required: true
+        required: yes
         type: str
     role:
         description:
             - IAM Role to apply to IAM Member. U(https://cloud.google.com/storage/docs/access-control/iam-roles).
-        required: true
+        required: yes
         type: str
     service_account_file:
         description:
             - GCP credentails file.
-        required: true
+        required: yes
         type: str
 
 author:
@@ -60,17 +60,19 @@ EXAMPLES = '''
 
 '''
 
-
-try:
-    from google.oauth2 import service_account
-    from google.cloud import storage
-    HAS_GOOGLE = True
-except ImportError as e:
-    HAS_GOOGLE = False
-
+import traceback
 import datetime
 import json
 from ansible.module_utils.basic import AnsibleModule
+
+LIB_IMP_ERR = None
+try:
+    from google.oauth2 import service_account
+    from google.cloud import storage
+    HAS_LIB = True
+except:
+    HAS_LIB = False
+    LIB_IMP_ERR = traceback.format_exc()
 
 
 def run_module():
@@ -90,14 +92,12 @@ def run_module():
 
     module = AnsibleModule(
         argument_spec=module_args,
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
-    if not HAS_GOOGLE:
-        module.fail_json(msg="Please install google-cloud, google-auth library.")
-
-    if module.check_mode:
-        module.exit_json(**result)
+    if not HAS_LIB:
+        module.fail_json(msg=missing_required_lib("Please install google-cloud, google-auth library."),
+                         exception=LIB_IMP_ERR)
 
     # Perform changes
     credentials = service_account.Credentials.from_service_account_file(module.params['service_account_file'])
