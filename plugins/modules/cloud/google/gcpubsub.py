@@ -63,19 +63,19 @@ options:
 EXAMPLES = '''
 # (Message will be pushed; there is no check to see if the message was pushed before
 - name: Create a topic and publish a message to it
-  gcpubsub:
+  community.general.gcpubsub:
     topic: ansible-topic-example
     state: present
 
 # Subscriptions associated with topic are not deleted.
 - name: Delete Topic
-  gcpubsub:
+  community.general.gcpubsub:
     topic: ansible-topic-example
     state: absent
 
 # Setting absent will keep the messages from being sent
 - name: Publish multiple messages, with attributes (key:value available with the message)
-  gcpubsub:
+  community.general.gcpubsub:
     topic: '{{ topic_name }}'
     state: present
     publish:
@@ -91,7 +91,7 @@ EXAMPLES = '''
           owner: fred
 
 - name: Create Subscription (pull)
-  gcpubsub:
+  community.general.gcpubsub:
     topic: ansible-topic-example
     subscription:
     - name: mysub
@@ -99,7 +99,7 @@ EXAMPLES = '''
 
 # pull is default, ack_deadline is not required
 - name: Create Subscription with ack_deadline and push endpoint
-  gcpubsub:
+  community.general.gcpubsub:
     topic: ansible-topic-example
     subscription:
     - name: mysub
@@ -109,7 +109,7 @@ EXAMPLES = '''
 
 # Setting push_endpoint to "None" converts subscription to pull.
 - name: Subscription change from push to pull
-  gcpubsub:
+  community.general.gcpubsub:
     topic: ansible-topic-example
     subscription:
       name: mysub
@@ -117,7 +117,7 @@ EXAMPLES = '''
 
 ### Topic will not be deleted
 - name: Delete subscription
-  gcpubsub:
+  community.general.gcpubsub:
     topic: ansible-topic-example
     subscription:
     - name: mysub
@@ -125,7 +125,7 @@ EXAMPLES = '''
 
 # only pull keyword is required.
 - name: Pull messages from subscription
-  gcpubsub:
+  community.general.gcpubsub:
     topic: ansible-topic-example
     subscription:
       name: ansible-topic-example-sub

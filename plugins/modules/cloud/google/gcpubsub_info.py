@@ -40,17 +40,17 @@ options:
 
 EXAMPLES = '''
 - name: List all Topics in a project
-  gcpubsub_info:
+  community.general.gcpubsub_info:
     view: topics
     state: list
 
 - name: List all Subscriptions in a project
-  gcpubsub_info:
+  community.general.gcpubsub_info:
     view: subscriptions
     state: list
 
 - name: List all Subscriptions for a Topic in a project
-  gcpubsub_info:
+  community.general.gcpubsub_info:
     view: subscriptions
     topic: my-topic
     state: list

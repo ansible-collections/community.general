@@ -35,8 +35,8 @@ deprecated:
     removed_in: 2.0.0  # was Ansible 2.12
     why: Updated modules released with increased functionality
     alternative: >
-      Use M(gcp_compute_health_check), M(gcp_compute_http_health_check) or
-      M(gcp_compute_https_health_check) instead.
+      Use M(google.cloud.gcp_compute_health_check), M(google.cloud.gcp_compute_http_health_check) or
+      M(google.cloud.gcp_compute_https_health_check) instead.
 author:
   - "Tom Melendez (@supertom) <tom@supertom.com>"
 options:
@@ -113,7 +113,7 @@ options:
 
 EXAMPLES = '''
 - name: Create Minimum HealthCheck
-  gcp_healthcheck:
+  community.general.gcp_healthcheck:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"
@@ -121,7 +121,7 @@ EXAMPLES = '''
     healthcheck_type: HTTP
     state: present
 - name: Create HTTP HealthCheck
-  gcp_healthcheck:
+  community.general.gcp_healthcheck:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"
@@ -135,7 +135,7 @@ EXAMPLES = '''
     healthy_threshhold: 1
     state: present
 - name: Create HTTPS HealthCheck
-  gcp_healthcheck:
+  community.general.gcp_healthcheck:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"

@@ -25,7 +25,7 @@ requirements:
 deprecated:
     removed_in: 2.0.0  # was Ansible 2.12
     why: Updated modules released with increased functionality
-    alternative: Use M(gcp_compute_forwarding_rule) or M(gcp_compute_global_forwarding_rule) instead.
+    alternative: Use M(google.cloud.gcp_compute_forwarding_rule) or M(google.cloud.gcp_compute_global_forwarding_rule) instead.
 notes:
   - Currently only supports global forwarding rules.
     As such, Load Balancing Scheme is always EXTERNAL.
@@ -70,7 +70,7 @@ options:
 
 EXAMPLES = '''
 - name: Create Minimum GLOBAL Forwarding_Rule
-  gcp_forwarding_rule:
+  community.general.gcp_forwarding_rule:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"
@@ -82,7 +82,7 @@ EXAMPLES = '''
     state: present
 
 - name: Create Forwarding_Rule w/reserved static address
-  gcp_forwarding_rule:
+  community.general.gcp_forwarding_rule:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"

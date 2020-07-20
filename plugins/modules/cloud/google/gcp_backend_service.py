@@ -24,7 +24,7 @@ notes:
 deprecated:
     removed_in: 2.0.0  # was Ansible 2.12
     why: Updated modules released with increased functionality
-    alternative: Use M(gcp_compute_backend_service) instead.
+    alternative: Use M(google.cloud.gcp_compute_backend_service) instead.
 author:
   - "Tom Melendez (@supertom) <tom@supertom.com>"
 options:
@@ -79,7 +79,7 @@ options:
 
 EXAMPLES = '''
 - name: Create Minimum Backend Service
-  gcp_backend_service:
+  community.general.gcp_backend_service:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"
@@ -92,7 +92,7 @@ EXAMPLES = '''
     state: present
 
 - name: Create BES with extended backend parameters
-  gcp_backend_service:
+  community.general.gcp_backend_service:
     service_account_email: "{{ service_account_email }}"
     credentials_file: "{{ credentials_file }}"
     project_id: "{{ project_id }}"
