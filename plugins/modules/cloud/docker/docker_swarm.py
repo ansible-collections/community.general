@@ -627,7 +627,7 @@ def main():
     )
 
     required_if = [
-        ('state', 'join', ['advertise_addr', 'remote_addrs', 'join_token']),
+        ('state', 'join', ['remote_addrs', 'join_token']),
         ('state', 'remove', ['node_id'])
     ]
 
