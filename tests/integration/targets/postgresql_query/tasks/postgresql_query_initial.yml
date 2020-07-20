@@ -457,3 +457,74 @@
     name: test_array_table
     state: absent
   when: postgres_version_resp.stdout is version('9.4', '>=')
+
+#############################
+# Check search_path parameter
+
+- name: postgresql_set - create test schemas
+  become_user: '{{ pg_user }}'
+  become: true
+  postgresql_schema:
+    login_user: '{{ pg_user }}'
+    login_db: postgres
+    name: '{{ item }}'
+  loop:
+  - query_test1
+  - query_test2
+
+- name: postgresql_set - create test tables
+  become_user: '{{ pg_user }}'
+  become: true
+  postgresql_table:
+    login_user: '{{ pg_user }}'
+    login_db: postgres
+    name: '{{ item }}'
+    columns:
+    - id int
+  loop:
+  - 'query_test1.test1'
+  - 'query_test2.test2'
+
+- name: postgresql_query - insert data
+  become_user: '{{ pg_user }}'
+  become: true
+  postgresql_query:
+    login_user: '{{ pg_user }}'
+    login_db: postgres
+    query: 'INSERT INTO {{ item }} (id) VALUES (1)'
+    search_path:
+    - query_test1
+    - query_test2
+  loop:
+  - test1
+  - test2
+
+- name: postgresql_query - get data
+  become_user: '{{ pg_user }}'
+  become: true
+  postgresql_query:
+    login_user: '{{ pg_user }}'
+    login_db: postgres
+    query: 'SELECT id FROM test1'
+    search_path:
+    - query_test1
+    - query_test2
+  register: result
+
+- assert:
+    that:
+    - result.rowcount == 1
+
+- name: postgresql_query - get data, must fail
+  become_user: '{{ pg_user }}'
+  become: true
+  postgresql_query:
+    login_user: '{{ pg_user }}'
+    login_db: postgres
+    query: 'SELECT id FROM test1'
+  register: result
+  ignore_errors: yes
+
+- assert:
+    that:
+    - result is failed

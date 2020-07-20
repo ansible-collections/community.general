@@ -75,8 +75,17 @@ options:
     type: bool
     default: yes
     version_added: '0.2.0'
+  search_path:
+    description:
+    - List of schema names to look in.
+    type: list
+    elements: str
+    version_added: '1.0.0'
 seealso:
 - module: community.general.postgresql_db
+- name: PostgreSQL Schema reference
+  description: Complete reference of the PostgreSQL schema documentation.
+  link: https://www.postgresql.org/docs/current/ddl-schemas.html
 author:
 - Felix Archambault (@archf)
 - Andrew Klychkov (@Andersson007)
@@ -152,6 +161,16 @@ EXAMPLES = r'''
     positional_args:
     - '{{ my_list }}'
     - '{{ my_arr|string }}'
+
+# Select from test table looking into app1 schema first, then,
+# if the schema doesn't exist or the table hasn't been found there,
+# try to find it in the schema public
+- name: Select from test using search_path
+  community.general.postgresql_query:
+    query: SELECT * FROM test_array_table
+    search_path:
+    - app1
+    - public
 '''
 
 RETURN = r'''
@@ -242,6 +261,16 @@ def convert_elements_to_pg_arrays(obj):
     return obj
 
 
+def set_search_path(cursor, search_path):
+    """Set session's search_path.
+
+    Args:
+        cursor (Psycopg2 cursor): Database cursor object.
+        search_path (str): String containing comma-separated schema names.
+    """
+    cursor.execute('SET search_path TO %s' % search_path)
+
+
 def main():
     argument_spec = postgres_common_argument_spec()
     argument_spec.update(
@@ -254,6 +283,7 @@ def main():
         autocommit=dict(type='bool', default=False),
         encoding=dict(type='str'),
         trust_input=dict(type='bool', default=True),
+        search_path=dict(type='list', elements='str'),
     )
 
     module = AnsibleModule(
@@ -270,6 +300,7 @@ def main():
     encoding = module.params["encoding"]
     session_role = module.params["session_role"]
     trust_input = module.params["trust_input"]
+    search_path = module.params["search_path"]
 
     if not trust_input:
         # Check input for potentially dangerous elements:
@@ -299,6 +330,9 @@ def main():
     if encoding is not None:
         db_connection.set_client_encoding(encoding)
     cursor = db_connection.cursor(cursor_factory=DictCursor)
+
+    if search_path:
+        set_search_path(cursor, '%s' % ','.join([x.strip(' ') for x in search_path]))
 
     # Prepare args:
     if module.params.get("positional_args"):
