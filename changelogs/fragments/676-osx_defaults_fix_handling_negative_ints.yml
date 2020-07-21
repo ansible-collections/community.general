@@ -1,0 +1,2 @@
+bugfixes:
+- osx_defaults - fix handling negative integers (https://github.com/ansible-collections/community.general/issues/134).
