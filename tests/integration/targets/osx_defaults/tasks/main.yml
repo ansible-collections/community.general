@@ -177,6 +177,7 @@
   with_items: &data_type
     - { type: 'int', value: 1, key: 'sample_int'}
     - { type: 'integer', value: 1, key: 'sample_int_2'}
+    - { type: 'integer', value: -1, key: 'negative_int'}
     - { type: 'bool', value: True, key: 'sample_bool'}
     - { type: 'boolean', value: True, key: 'sample_bool_2'}
     - { type: 'date', value: "2019-02-19 10:10:10", key: 'sample_date'}

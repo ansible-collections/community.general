@@ -170,6 +170,14 @@ class OSXDefaults(object):
 
     # tools --------------------------------------------------------------- {{{
     @staticmethod
+    def is_int(value):
+        as_str = str(value)
+        if (as_str.startswith("-")):
+            return as_str[1:].isdigit()
+        else:
+            return as_str.isdigit()
+
+    @staticmethod
     def _convert_type(data_type, value):
         """ Converts value to given type """
         if data_type == "string":
@@ -190,7 +198,7 @@ class OSXDefaults(object):
                     "Invalid date value: {0}. Required format yyy-mm-dd hh:mm:ss.".format(repr(value))
                 )
         elif data_type in ["int", "integer"]:
-            if not str(value).isdigit():
+            if not OSXDefaults.is_int(value):
                 raise OSXDefaultsException("Invalid integer value: {0}".format(repr(value)))
             return int(value)
         elif data_type == "float":
