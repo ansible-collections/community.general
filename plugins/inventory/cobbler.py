@@ -62,7 +62,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 # my.cobbler.yml
-plugin: cobbler
+plugin: community.general.cobbler
 url: http://cobbler/cobbler_api
 user: ansible-tester
 password: secure
