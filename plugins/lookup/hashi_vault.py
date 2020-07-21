@@ -160,7 +160,7 @@ DOCUMENTATION = """
         version_added: '0.2.0'
     action_type:
       description:
-        - The action type to be performed for the provided path
+        - The action type to be performed for the provided path.
       ini:
         - section: lookup_hashi_vault
           key: action_type
