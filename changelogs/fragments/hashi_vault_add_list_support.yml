@@ -1,0 +1,2 @@
+minor_changes:
+  - hashi_vault - extended action types that can be performed against HashiCorp's Vault to include list secret as well as the default read secret (https://github.com/ansible-collections/community.general/pull/664).
