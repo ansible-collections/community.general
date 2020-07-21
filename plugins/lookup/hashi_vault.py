@@ -166,9 +166,9 @@ DOCUMENTATION = """
           key: action_type
       version_added: '1.0.0'
       choices:
-        - READ
-        - LIST
-      default: READ
+        - read
+        - list
+      default: read
 """
 
 EXAMPLES = """
@@ -393,10 +393,10 @@ class HashiVault:
 
     def execute_request(self, secret, method):
         httpMethods = {
-            'READ': lambda: self.client.read(secret),
-            'LIST': lambda: self.client.list(secret),
+            'read': lambda: self.client.read(secret),
+            'list': lambda: self.client.list(secret),
         }
-        return httpMethods.get(method, httpMethods.get('READ'))()
+        return httpMethods.get(method, httpMethods.get('read'))()
 
     # begin auth implementation methods
     #
