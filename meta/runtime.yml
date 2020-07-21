@@ -258,6 +258,18 @@ plugin_routing:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
+    gcp_backend_service:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    gcp_forwarding_rule:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    gcp_healthcheck:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
     gcp_target_proxy:
       deprecation:
         removal_version: 2.0.0
