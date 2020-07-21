@@ -173,6 +173,7 @@ from collections import defaultdict
 PYSNMP_IMP_ERR = None
 try:
     from pysnmp.entity.rfc3413.oneliner import cmdgen
+    from pysnmp.proto.rfc1905 import EndOfMibView
     has_pysnmp = True
 except Exception:
     PYSNMP_IMP_ERR = traceback.format_exc()
@@ -393,6 +394,8 @@ def main():
 
     for varBinds in varTable:
         for oid, val in varBinds:
+            if isinstance(val, EndOfMibView):
+                continue
             current_oid = oid.prettyPrint()
             current_val = val.prettyPrint()
             if v.ifIndex in current_oid:
