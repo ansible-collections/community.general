@@ -1210,6 +1210,7 @@ plugins/modules/system/java_keystore.py validate-modules:doc-missing-type
 plugins/modules/system/java_keystore.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/java_keystore.py validate-modules:undocumented-parameter
 plugins/modules/system/kernel_blacklist.py validate-modules:parameter-type-not-in-doc
+plugins/modules/system/launchd.py use-argspec-type-path  # False positive
 plugins/modules/system/lbu.py validate-modules:doc-elements-mismatch
 plugins/modules/system/locale_gen.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/lvg.py pylint:blacklisted-name
