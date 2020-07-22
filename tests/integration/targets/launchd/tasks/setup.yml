@@ -1,0 +1,20 @@
+---
+
+- name: "[{{ item }}] Deploy test service configuration"
+  template:
+    src: "{{ launchd_service_name }}.plist.j2"
+    dest: "{{ launchd_plist_location }}"
+  become: yes
+
+- name: install the test daemon script
+  copy:
+    src: ansible_test_service.py
+    dest: /usr/local/sbin/ansible_test_service
+    mode: '755'
+
+- name: rewrite shebang in the test daemon script
+  lineinfile:
+    path: /usr/local/sbin/ansible_test_service
+    line: "#!{{ ansible_python_interpreter | realpath }}"
+    insertbefore: BOF
+    firstmatch: yes
