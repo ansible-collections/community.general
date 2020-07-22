@@ -1,5 +1,5 @@
 ---
 bugfixes:
-  - jenkins_plugins - replace MD5 checksum verification with SHA1 due to MD5
+  - jenkins_plugin - replace MD5 checksum verification with SHA1 due to MD5
     being disabled on systems with FIPS-only algorithms enabled
-    (https://github.com/ansible/ansible/issues/34304)
+    (https://github.com/ansible/ansible/issues/34304).
