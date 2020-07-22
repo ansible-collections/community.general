@@ -955,6 +955,7 @@ plugins/modules/system/interfaces_file.py validate-modules:parameter-type-not-in
 plugins/modules/system/java_cert.py pylint:blacklisted-name
 plugins/modules/system/java_keystore.py validate-modules:doc-missing-type
 plugins/modules/system/kernel_blacklist.py validate-modules:parameter-type-not-in-doc
+plugins/modules/system/launchd.py use-argspec-type-path  # False positive
 plugins/modules/system/locale_gen.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/lvg.py pylint:blacklisted-name
 plugins/modules/system/lvol.py pylint:blacklisted-name
