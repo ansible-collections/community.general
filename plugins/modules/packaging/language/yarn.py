@@ -243,7 +243,7 @@ class Yarn(object):
             return installed, missing
 
         for dep in dependencies:
-            name, version = dep['name'].split('@')
+            name, version = dep['name'].rsplit('@', 1)
             installed.append(name)
 
         if self.name not in installed:
@@ -273,6 +273,9 @@ class Yarn(object):
         cmd_result, err = self._exec(['outdated', '--json'], True, False)
         if err:
             self.module.fail_json(msg=err)
+
+        if not cmd_result:
+            return outdated
 
         outdated_packages_data = cmd_result.splitlines()[1]
 
