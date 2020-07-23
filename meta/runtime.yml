@@ -246,6 +246,15 @@ plugin_routing:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
+    firewalld:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: The firewalld module has been moved to the ansible.posix collection.
+      redirect: ansible.posix.firewalld
+    foreman:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
     gcdns_record:
       deprecation:
         removal_version: 2.0.0
@@ -286,10 +295,22 @@ plugin_routing:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
+    github_hooks:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
     helm:
       deprecation:
         removal_version: 3.0.0
         warning_text: The helm module in community.general has been deprecated. Use community.kubernetes.helm instead.
+    hpilo_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    idrac_redfish_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
     infini_export:
       redirect: infinidat.infinibox.infini_export
       deprecation:
@@ -320,6 +341,26 @@ plugin_routing:
       deprecation:
         removal_version: 2.0.0
         warning_text: The infini_vol module has been moved to the infinidat collection.
+    jenkins_job_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    katello:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    ldap_attr:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    logicmonitor:
+      tombstone:
+        removal_version: 1.0.0
+        warning_text: The logicmonitor_facts module is no longer maintained and the API used has been disabled in 2017.
+    logicmonitor_facts:
+      tombstone:
+        removal_version: 1.0.0
+        warning_text: The logicmonitor_facts module is no longer maintained and the API used has been disabled in 2017.
     memset_memstore_facts:
       deprecation:
         removal_version: 3.0.0
@@ -358,7 +399,83 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: The mysql_variables module has been moved to the community.mysql collection.
       redirect: community.mysql.mysql_variables
-    ovirt:
+    na_cdot_aggregate:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_license:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_lun:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_qtree:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_svm:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_user:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_user_role:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_cdot_volume:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    na_ontap_gather_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    nginx_status_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    one_image_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    onepassword_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_datacenter_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_enclosure_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_ethernet_network_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_fc_network_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_fcoe_network_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_logical_interconnect_group_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_network_set_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    oneview_san_manager_facts:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
@@ -370,7 +487,7 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
-    one_image_facts:
+    ovirt:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
@@ -505,6 +622,22 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: The proxysql_scheduler module has been moved to the community.proxysql collection.
       redirect: community.proxysql.proxysql_scheduler
+    purefa_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    purefb_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    python_requirements_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
+    redfish_facts:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: see plugin documentation for details
     scaleway_image_facts:
       deprecation:
         removal_version: 3.0.0
@@ -533,123 +666,6 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
-    smartos_image_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    xenserver_guest_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    vertica_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    onepassword_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    ldap_attr:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    firewalld:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The firewalld module has been moved to the ansible.posix collection.
-      redirect: ansible.posix.firewalld
-    foreman:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: see plugin documentation for details
-    katello:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: see plugin documentation for details
-    hpilo_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    oneview_datacenter_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    oneview_enclosure_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    oneview_ethernet_network_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    oneview_fc_network_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    oneview_fcoe_network_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    oneview_logical_interconnect_group_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    oneview_network_set_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    oneview_san_manager_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    idrac_redfish_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    redfish_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    github_hooks:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: see plugin documentation for details
-    na_cdot_aggregate:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: see plugin documentation for details
-    na_cdot_license:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: see plugin documentation for details
-    na_cdot_lun:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: see plugin documentation for details
-    na_cdot_qtree:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: see plugin documentation for details
-    na_cdot_svm:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: see plugin documentation for details
-    na_cdot_user:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: see plugin documentation for details
-    na_cdot_user_role:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: see plugin documentation for details
-    na_cdot_volume:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: see plugin documentation for details
-    na_ontap_gather_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
     sf_account_manager:
       deprecation:
         removal_version: 2.0.0
@@ -670,34 +686,18 @@ plugin_routing:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    purefa_facts:
+    smartos_image_facts:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
-    purefb_facts:
+    vertica_facts:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
-    python_requirements_facts:
+    xenserver_guest_facts:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
-    jenkins_job_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    nginx_status_facts:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: see plugin documentation for details
-    logicmonitor_facts:
-      tombstone:
-        removal_version: 1.0.0
-        warning_text: The logicmonitor_facts module is no longer maintained and the API used has been disabled in 2017.
-    logicmonitor:
-      tombstone:
-        removal_version: 1.0.0
-        warning_text: The logicmonitor_facts module is no longer maintained and the API used has been disabled in 2017.
   doc_fragments:
     digital_ocean:
       deprecation:
@@ -725,16 +725,16 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: The digital_ocean module_utils has been moved to the community.digitalocean collection.
       redirect: community.digitalocean.digital_ocean
-    infinibox:
-      redirect: infinidat.infinibox.infinibox
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infinibox module_utils plugin has been moved to the infinidat.infinibox collection.
     firewalld:
       deprecation:
         removal_version: 2.0.0
         warning_text: The firewalld module_utils has been moved to the ansible.posix collection.
       redirect: ansible.posix.firewalld
+    infinibox:
+      redirect: infinidat.infinibox.infinibox
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: The infinibox module_utils plugin has been moved to the infinidat.infinibox collection.
     mysql:
       deprecation:
         removal_version: 2.0.0
