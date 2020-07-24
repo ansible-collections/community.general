@@ -64,7 +64,7 @@ options:
     choices: [ disabled, drain, enabled ]
   agent:
     description:
-      - Disable/enable agent checks (depending on`state` value).
+      - Disable/enable agent checks (depending on I(state) value).
     type: bool
     default: no
     version_added: 1.0.0
