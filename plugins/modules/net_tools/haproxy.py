@@ -67,6 +67,7 @@ options:
       - Disable/enable agent checks (depending on`state` value).
     required: false
     default: false
+    version_added: 1.0.0
   health:
     description:
       - Disable/enable health checks (depending on`state` value).
