@@ -36,7 +36,7 @@ options:
   value_type:
     description:
     - The type of value being set. This is ignored if the state is "get".
-    choices: [ int, bool, float, string ]
+    choices: [ int, uint, bool, float, string ]
   state:
     description:
     - The action to take upon the property/value.
@@ -131,7 +131,7 @@ def main():
             channel=dict(required=True, type='str'),
             property=dict(required=True, type='str'),
             value_type=dict(required=False,
-                            choices=['int', 'bool', 'float', 'string'],
+                            choices=['int', 'uint', 'bool', 'float', 'string'],
                             type='str'),
             value=dict(required=False, default=None, type='str'),
             state=dict(default='present',
