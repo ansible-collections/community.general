@@ -62,6 +62,17 @@ options:
     type: str
     required: true
     choices: [ disabled, drain, enabled ]
+  agent:
+    description:
+      - Disable/enable agent checks (depending on`state` value).
+    required: false
+    default: false
+  health:
+    description:
+      - Disable/enable health checks (depending on`state` value).
+    required: false
+    default: false
+    version_added: "2.10"
   fail_on_not_found:
     description:
       - Fail whenever trying to enable/disable a backend host that does not exist
@@ -228,6 +239,8 @@ class HAProxy(object):
         self.socket = self.module.params['socket']
         self.shutdown_sessions = self.module.params['shutdown_sessions']
         self.fail_on_not_found = self.module.params['fail_on_not_found']
+        self.agent = self.module.params['agent']
+        self.health = self.module.params['health']
         self.wait = self.module.params['wait']
         self.wait_retries = self.module.params['wait_retries']
         self.wait_interval = self.module.params['wait_interval']
@@ -360,6 +373,10 @@ class HAProxy(object):
         set the weight for haproxy backend server when provides.
         """
         cmd = "get weight $pxname/$svname; enable server $pxname/$svname"
+        if self.agent:
+            cmd += "; enable agent $pxname/$svname"
+        if self.health:
+            cmd += "; enable health $pxname/$svname"
         if weight:
             cmd += "; set weight $pxname/$svname %s" % weight
         self.execute_for_backends(cmd, backend, host, 'UP')
@@ -370,7 +387,12 @@ class HAProxy(object):
         performed on the server until it leaves maintenance,
         also it shutdown sessions while disabling backend host server.
         """
-        cmd = "get weight $pxname/$svname; disable server $pxname/$svname"
+        cmd = "get weight $pxname/$svname"
+        if self.agent:
+            cmd += "; disable agent $pxname/$svname"
+        if self.health:
+            cmd += "; disable health $pxname/$svname"
+        cmd += "; disable server $pxname/$svname"
         if shutdown_sessions:
             cmd += "; shutdown sessions server $pxname/$svname"
         self.execute_for_backends(cmd, backend, host, 'MAINT')
@@ -428,6 +450,8 @@ def main():
             socket=dict(type='path', default=DEFAULT_SOCKET_LOCATION),
             shutdown_sessions=dict(type='bool', default=False),
             fail_on_not_found=dict(type='bool', default=False),
+            health=dict(type='bool', default=False),
+            agent=dict(type='bool', default=False),
             wait=dict(type='bool', default=False),
             wait_retries=dict(type='int', default=WAIT_RETRIES),
             wait_interval=dict(type='int', default=WAIT_INTERVAL),
