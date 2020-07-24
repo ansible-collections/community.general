@@ -988,7 +988,7 @@ files:
     authors: fgbulsoni
   $modules/remote_management/redfish/:
     authors: jose-delarosa
-    maintainers: billdodd mraineri tomasg2012
+    maintainers: $team_redfish
   $modules/remote_management/stacki/stacki_host.py:
     authors: bbyhuy
     maintainers: bsanders
@@ -1323,7 +1323,7 @@ macros:
   team_postgresql: Andersson007 Dorn- amenonsen andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
   team_purestorage: bannaych dnix101 genegr lionmax opslounge raekins sdodsley sile16
   team_rabbitmq: chrishoffman manuel-sousa
-  team_redfish: billdodd jose-delarosa mraineri tomasg2012
+  team_redfish: billdodd mraineri tomasg2012
   team_rhn: FlossWare alikins barnabycourt vritant
   team_scaleway: DenBeke QuentinBrosse abarbare jerome-quere kindermoumoute remyleone
   team_solaris: bcoca fishman jasperla jpdasma mator scathatheworm troy2914 xen0l
