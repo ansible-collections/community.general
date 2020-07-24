@@ -73,7 +73,7 @@ options:
       - Disable/enable health checks (depending on`state` value).
     required: false
     default: false
-    version_added: "2.10"
+    version_added: "1.0.0"
   fail_on_not_found:
     description:
       - Fail whenever trying to enable/disable a backend host that does not exist
