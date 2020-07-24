@@ -65,6 +65,7 @@ options:
   agent:
     description:
       - Disable/enable agent checks (depending on`state` value).
+    type: bool
     default: false
     version_added: 1.0.0
   health:
