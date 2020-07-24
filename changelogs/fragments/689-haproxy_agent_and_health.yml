@@ -3,4 +3,5 @@ minor_changes:
   - haproxy - add options to dis/enable health and agent checks.  When health
     and agent checks are enabled for a service, a disabled service will
     re-enable itself automatically.  These options also change the state of
-    the agent checks to match the requested state for the backend.
+    the agent checks to match the requested state for the backend
+    (https://github.com/ansible-collections/community.general/issues/684).
