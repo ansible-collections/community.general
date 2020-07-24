@@ -66,13 +66,13 @@ options:
     description:
       - Disable/enable agent checks (depending on`state` value).
     type: bool
-    default: false
+    default: no
     version_added: 1.0.0
   health:
     description:
       - Disable/enable health checks (depending on`state` value).
-    required: false
-    default: false
+    type: bool
+    default: no
     version_added: "1.0.0"
   fail_on_not_found:
     description:
