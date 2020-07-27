@@ -88,6 +88,43 @@ class TestSlackModule(ModuleTestCase):
             assert call_data['thread_ts'] == '100.00'
             assert fetch_url_mock.call_args[1]['url'] == "https://hooks.slack.com/services/XXXX/YYYY/ZZZZ"
 
+    def test_message_with_blocks(self):
+        """tests sending a message with blocks"""
+        set_module_args({
+            'token': 'XXXX/YYYY/ZZZZ',
+            'msg': 'test',
+            'blocks': [{
+                'type': 'section',
+                'text': {
+                    'type': 'mrkdwn',
+                    'text': '*test*'
+                },
+                'accessory': {
+                    'type': 'image',
+                    'image_url': 'https://www.ansible.com/favicon.ico',
+                    'alt_text': 'test'
+                }
+            }, {
+                'type': 'section',
+                'text': {
+                    'type': 'plain_text',
+                    'text': 'test',
+                    'emoji': True
+                }
+            }]
+        })
+
+        with patch.object(slack, "fetch_url") as fetch_url_mock:
+            fetch_url_mock.return_value = (None, {"status": 200})
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
+
+            self.assertTrue(fetch_url_mock.call_count, 1)
+            call_data = json.loads(fetch_url_mock.call_args[1]['data'])
+            assert call_data['username'] == "Ansible"
+            assert call_data['blocks'][1]['text']['text'] == "test"
+            assert fetch_url_mock.call_args[1]['url'] == "https://hooks.slack.com/services/XXXX/YYYY/ZZZZ"
+
     def test_message_with_invalid_color(self):
         """tests sending invalid color value to module"""
         set_module_args({
