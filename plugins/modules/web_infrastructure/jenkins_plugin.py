@@ -429,12 +429,12 @@ class JenkinsPlugin(object):
                 self.module.fail_json(
                     msg="Jenkins home directory doesn't exist.")
 
-            md5sum_old = None
+            checksum_old = None
             if os.path.isfile(plugin_file):
                 # Make the checksum of the currently installed plugin
-                with open(plugin_file, 'rb') as md5_plugin_fh:
-                    md5_plugin_content = md5_plugin_fh.read()
-                md5sum_old = hashlib.md5(md5_plugin_content).hexdigest()
+                with open(plugin_file, 'rb') as plugin_fh:
+                    plugin_content = plugin_fh.read()
+                checksum_old = hashlib.sha1(plugin_content).hexdigest()
 
             if self.params['version'] in [None, 'latest']:
                 # Take latest version
@@ -454,13 +454,13 @@ class JenkinsPlugin(object):
             if (
                     self.params['updates_expiration'] == 0 or
                     self.params['version'] not in [None, 'latest'] or
-                    md5sum_old is None):
+                    checksum_old is None):
 
                 # Download the plugin file directly
                 r = self._download_plugin(plugin_url)
 
                 # Write downloaded plugin into file if checksums don't match
-                if md5sum_old is None:
+                if checksum_old is None:
                     # No previously installed plugin
                     if not self.module.check_mode:
                         self._write_file(plugin_file, r)
@@ -471,11 +471,11 @@ class JenkinsPlugin(object):
                     data = r.read()
 
                     # Make new checksum
-                    md5sum_new = hashlib.md5(data).hexdigest()
+                    checksum_new = hashlib.sha1(data).hexdigest()
 
                     # If the checksum is different from the currently installed
                     # plugin, store the new plugin
-                    if md5sum_old != md5sum_new:
+                    if checksum_old != checksum_new:
                         if not self.module.check_mode:
                             self._write_file(plugin_file, data)
 
@@ -484,19 +484,8 @@ class JenkinsPlugin(object):
                 # Check for update from the updates JSON file
                 plugin_data = self._download_updates()
 
-                try:
-                    with open(plugin_file, 'rb') as sha1_plugin_fh:
-                        sha1_plugin_content = sha1_plugin_fh.read()
-                    sha1_old = hashlib.sha1(sha1_plugin_content)
-                except Exception as e:
-                    self.module.fail_json(
-                        msg="Cannot calculate SHA1 of the old plugin.",
-                        details=to_native(e))
-
-                sha1sum_old = base64.b64encode(sha1_old.digest())
-
                 # If the latest version changed, download it
-                if sha1sum_old != to_bytes(plugin_data['sha1']):
+                if checksum_old != to_bytes(plugin_data['sha1']):
                     if not self.module.check_mode:
                         r = self._download_plugin(plugin_url)
                         self._write_file(plugin_file, r)
