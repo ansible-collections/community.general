@@ -1,2 +1,2 @@
 minor_changes:
-  - xfconf - add support for uint type
+  - xfconf - add support for ``uint`` type (https://github.com/ansible-collections/community.general/pull/692).
