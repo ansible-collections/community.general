@@ -206,13 +206,6 @@ OLD_SLACK_INCOMING_WEBHOOK = 'https://%s/services/hooks/incoming-webhook?token=%
 SLACK_INCOMING_WEBHOOK = 'https://hooks.slack.com/services/%s'
 SLACK_POSTMESSAGE_WEBAPI = 'https://slack.com/api/chat.postMessage'
 
-# Escaping quotes and apostrophes to avoid ending string prematurely in ansible call.
-# We do not escape other characters used as Slack metacharacters (e.g. &, <, >).
-escape_table = {
-    '"': "\"",
-    "'": "\'",
-}
-
 
 def is_valid_hex_color(color_choice):
     if re.match(r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$', color_choice):
@@ -220,36 +213,14 @@ def is_valid_hex_color(color_choice):
     return False
 
 
-def escape_quotes(text):
-    '''Backslash any quotes within text.'''
-    return "".join(escape_table.get(c, c) for c in text)
-
-
-def recursive_escape(obj):
-    '''Recursively escape quotes inside "text" and "alt_text" strings inside block kit objects'''
-    block_keys_to_escape = ['text', 'alt_text']
-    if isinstance(obj, dict):
-        escaped = {}
-        for k, v in obj.items():
-            if isinstance(v, str) and k in block_keys_to_escape:
-                escaped[k] = escape_quotes(v)
-            else:
-                escaped[k] = recursive_escape(v)
-    elif isinstance(obj, list):
-        escaped = [recursive_escape(v) for v in obj]
-    else:
-        return obj
-    return escaped
-
-
 def build_payload_for_slack(module, text, channel, thread_id, username, icon_url, icon_emoji, link_names,
                             parse, color, attachments, blocks):
     payload = {}
     if color == "normal" and text is not None:
-        payload = dict(text=escape_quotes(text))
+        payload['text'] = text
     elif text is not None:
         # With a custom color we have to set the message as attachment, and explicitly turn markdown parsing on for it.
-        payload = dict(attachments=[dict(text=escape_quotes(text), color=color, mrkdwn_in=["text"])])
+        payload = dict(attachments=[dict(text=text, color=color, mrkdwn_in=["text"])])
     if channel is not None:
         if (channel[0] == '#') or (channel[0] == '@'):
             payload['channel'] = channel
@@ -271,27 +242,13 @@ def build_payload_for_slack(module, text, channel, thread_id, username, icon_url
     if attachments is not None:
         if 'attachments' not in payload:
             payload['attachments'] = []
-
-    if attachments is not None:
-        attachment_keys_to_escape = [
-            'title',
-            'text',
-            'author_name',
-            'pretext',
-            'fallback',
-        ]
         for attachment in attachments:
-            for key in attachment_keys_to_escape:
-                if key in attachment:
-                    attachment[key] = escape_quotes(attachment[key])
-
             if 'fallback' not in attachment:
                 attachment['fallback'] = attachment['text']
-
             payload['attachments'].append(attachment)
 
     if blocks is not None:
-        payload['blocks'] = recursive_escape(blocks)
+        payload['blocks'] = blocks
 
     payload = module.jsonify(payload)
     return payload
