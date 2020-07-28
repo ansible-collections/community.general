@@ -1,0 +1,2 @@
+bugfixes:
+- doas - Address a bug with the parameters handling that was breaking the module with Ansible 2.10.
