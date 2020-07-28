@@ -112,6 +112,13 @@ EXAMPLES = r'''
     host: '{{ inventory_hostname }}'
     backend: www
 
+- name: Disable server in 'www' backend pool, also stop health/agent checks
+  community.general.haproxy:
+    state: disabled
+    host: '{{ inventory_hostname }}'
+    health: yes
+    agent: yes
+
 - name: Disable server without backend pool name (apply to all available backend pool)
   community.general.haproxy:
     state: disabled
