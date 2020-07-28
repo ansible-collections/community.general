@@ -286,7 +286,7 @@ import sys
 
 from ansible.module_utils.six.moves.urllib.request import pathname2url
 
-from ansible.module_utils._text import to_text, to_bytes
+from ansible.module_utils._text import to_text, to_bytes, to_native
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
@@ -311,10 +311,17 @@ def request(url, user, passwd, timeout, data=None, method=None):
     if info['status'] not in (200, 201, 204):
         error = json.loads(info['body'])
         if error:
-            module.fail_json(msg=error['errorMessages'])
+            msg = []
+            for key in ('errorMessages', 'errors'):
+                if error.get(key):
+                    msg.append(error[key])
+            if msg:
+                module.fail_json(msg=to_native(', '.join(msg)))
+            else:
+                module.fail_json(msg=to_native(error))
         else:
             # Fallback print body, if it cant be decoded
-            module.fail_json(msg=info['body'])
+            module.fail_json(msg=to_native(info['body']))
 
     body = response.read()
 
