@@ -231,18 +231,17 @@ def escape_quotes(text):
     return "".join(escape_table.get(c, c) for c in text)
 
 
-def recursive_escape(obj):
-    '''Recursively escape quotes inside "text" and "alt_text" strings inside block kit objects'''
-    block_keys_to_escape = ['text', 'alt_text']
+def recursive_escape_quotes(obj, keys):
+    '''Recursively escape quotes inside supplied keys inside block kit objects'''
     if isinstance(obj, dict):
         escaped = {}
         for k, v in obj.items():
-            if isinstance(v, str) and k in block_keys_to_escape:
+            if isinstance(v, str) and k in keys:
                 escaped[k] = escape_quotes(v)
             else:
-                escaped[k] = recursive_escape(v)
+                escaped[k] = recursive_escape_quotes(v, keys)
     elif isinstance(obj, list):
-        escaped = [recursive_escape(v) for v in obj]
+        escaped = [recursive_escape_quotes(v, keys) for v in obj]
     else:
         return obj
     return escaped
@@ -297,7 +296,11 @@ def build_payload_for_slack(module, text, channel, thread_id, username, icon_url
             payload['attachments'].append(attachment)
 
     if blocks is not None:
-        payload['blocks'] = recursive_escape(blocks)
+        block_keys_to_escape = [
+            'text',
+            'alt_text'
+        ]
+        payload['blocks'] = recursive_escape_quotes(blocks, block_keys_to_escape)
 
     payload = module.jsonify(payload)
     return payload
