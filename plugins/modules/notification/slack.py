@@ -86,12 +86,6 @@ options:
     choices:
       - 'full'
       - 'none'
-  validate_certs:
-    description:
-      - If C(no), SSL certificates will not be validated. This should only be used
-        on personally controlled sites using self-signed certificates.
-    type: bool
-    default: 'yes'
   color:
     description:
       - Allow text to use default colors - use the default of 'normal' to not send a custom color bar at the start of the message.
@@ -354,7 +348,6 @@ def main():
             icon_emoji=dict(type='str', default=None),
             link_names=dict(type='int', default=1, choices=[0, 1]),
             parse=dict(type='str', default=None, choices=['none', 'full']),
-            validate_certs=dict(default=True, type='bool'),
             color=dict(type='str', default='normal'),
             attachments=dict(type='list', required=False, default=None),
             blocks=dict(type='list', required=False, default=None)
