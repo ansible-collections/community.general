@@ -44,7 +44,7 @@ options:
       For array mode, use a list of types.
     type: list
     elements: str
-    choices: [ int, bool, float, string ]
+    choices: [ int, uint, bool, float, string ]
   state:
     description:
     - The action to take upon the property/value.
@@ -124,7 +124,7 @@ class XfConfProperty(object):
     GET = "get"
     RESET = "absent"
     VALID_STATES = (SET, GET, RESET)
-    VALID_VALUE_TYPES = ('int', 'bool', 'float', 'string')
+    VALID_VALUE_TYPES = ('int', 'uint', 'bool', 'float', 'string')
     previous_value = None
     is_array = None
 
