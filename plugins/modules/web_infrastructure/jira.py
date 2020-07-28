@@ -519,17 +519,12 @@ def main():
     restbase = uri + 'rest/api/2'
 
     # Dispatch
-    try:
+    # Lookup the corresponding method for this operation. This is
+    # safe as the AnsibleModule should remove any unknown operations.
+    thismod = sys.modules[__name__]
+    method = getattr(thismod, op)
 
-        # Lookup the corresponding method for this operation. This is
-        # safe as the AnsibleModule should remove any unknown operations.
-        thismod = sys.modules[__name__]
-        method = getattr(thismod, op)
-
-        ret = method(restbase, user, passwd, module.params)
-
-    except Exception as e:
-        return module.fail_json(msg=e.message)
+    ret = method(restbase, user, passwd, module.params)
 
     module.exit_json(changed=True, meta=ret)
 
