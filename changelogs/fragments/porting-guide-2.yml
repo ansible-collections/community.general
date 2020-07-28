@@ -1,0 +1,4 @@
+breaking_changes:
+  - pacman - the deprecated ``recurse`` option has been removed, you should use ``extra_args=--recursive`` instead.
+deprecated_features:
+  - The ldap_attr module has been deprecated and will be removed in a later release; use ldap_attrs instead.
