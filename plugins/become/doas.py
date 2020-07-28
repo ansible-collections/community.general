@@ -111,15 +111,14 @@ class BecomeModule(BecomeBase):
 
         self.prompt = True
 
-        become_exe = self.get_option('become_exe')
+        become_exe = self.get_option('become_exe') or "doas"
 
-        flags = self.get_option('become_flags')
+        flags = self.get_option('become_flags') or ''
         if not self.get_option('become_pass') and '-n' not in flags:
             flags += ' -n'
 
-        user = self.get_option('become_user')
-        if user:
-            user = '-u %s' % (user)
+        become_user = self.get_option('become_user')
+        user = '-u %s' % (become_user) if become_user else ''
 
         success_cmd = self._build_success_command(cmd, shell, noexe=True)
         executable = getattr(shell, 'executable', shell.SHELL_FAMILY)
