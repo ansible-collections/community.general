@@ -46,8 +46,7 @@ options:
         URL given to you in that section."
       - "WebAPI token:
         Slack WebAPI requires a personal, bot or work application token. These tokens start with C(xoxp-), C(xoxb-)
-        or C(xoxa-), eg. C(xoxb-1234-56789abcdefghijklmnop). WebAPI token is required if you inted to receive and use
-        thread_id.
+        or C(xoxa-), eg. C(xoxb-1234-56789abcdefghijklmnop). WebAPI token is required if you inted to receive thread_id.
         See Slack's documentation (U(https://api.slack.com/docs/token-types)) for more information."
     required: true
   msg:
