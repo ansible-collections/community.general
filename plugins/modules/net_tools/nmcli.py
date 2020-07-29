@@ -23,7 +23,7 @@ description:
     - 'On CentOS 8 and Fedora >=29 like systems, the requirements can be met by installing the following packages: NetworkManager-libnm,
       python3-libsemanage, python3-policycoreutils.'
     - 'On CentOS 7 and Fedora <=28 like systems, the requirements can be met by installing the following packages: NetworkManager-glib,
-      libnm-qt-devel.x86_64, nm-connection-editor.x86_64, python3-libsemanage, python3-policycoreutils.'
+      libnm-qt-devel.x86_64, nm-connection-editor.x86_64, python-libsemanage, python-policycoreutils.'
     - 'On Ubuntu and Debian like systems, the requirements can be met by installing the following packages: network-manager,
       python-dbus (or python3-dbus, depending on the Python version in use), libnm-dev.'
     - 'On older Ubuntu and Debian like systems, the requirements can be met by installing the following packages: network-manager,
