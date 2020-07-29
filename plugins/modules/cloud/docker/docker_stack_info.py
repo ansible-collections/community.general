@@ -33,6 +33,11 @@ results:
 EXAMPLES = '''
   - name: Shows stack info
     community.general.docker_stack_info:
+    register: result
+
+  - name: Show results
+    ansible.builtin.debug:
+      var: result.results
 '''
 
 import json
