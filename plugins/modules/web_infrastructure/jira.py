@@ -314,9 +314,9 @@ def request(url, user, passwd, timeout, data=None, method=None):
             msg = []
             for key in ('errorMessages', 'errors'):
                 if error.get(key):
-                    msg.append(error[key])
+                    msg.append(to_native(error[key]))
             if msg:
-                module.fail_json(msg=to_native(', '.join(msg)))
+                module.fail_json(msg=', '.join(msg))
             else:
                 module.fail_json(msg=to_native(error))
         else:
