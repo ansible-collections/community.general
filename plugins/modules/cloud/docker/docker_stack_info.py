@@ -22,7 +22,7 @@ version_added: "1.0.0"
 RETURN = '''
 results:
     description: |
-        dictionary containing the list of stacks or tasks associated
+        List of dictionaries containing the list of stacks or tasks associated
         to a stack name.
     sample: >
         "results": [{"name":"grafana","namespace":"default","orchestrator":"Kubernetes","services":"2"}]
@@ -32,10 +32,9 @@ results:
 
 EXAMPLES = '''
   - name: Shows stack info
-    docker_stack_info:
+    community.general.docker_stack_info:
 '''
 
-import ast
 import json
 from ansible.module_utils.basic import AnsibleModule
 
@@ -43,7 +42,7 @@ from ansible.module_utils.basic import AnsibleModule
 def docker_stack_list(module):
     docker_bin = module.get_bin_path('docker', required=True)
     rc, out, err = module.run_command(
-        [docker_bin, "stack", "ls", "--format='{{json .}}'"])
+        [docker_bin, "stack", "ls", "--format={{json .}}"])
 
     return rc, out.strip(), err.strip()
 
@@ -63,8 +62,8 @@ def main():
     else:
         if out:
             ret = list(
-                json.loads(ast.literal_eval(outitem))
-                for outitem in out.split("\n"))
+                json.loads(outitem)
+                for outitem in out.splitlines())
 
         else:
             ret = []
