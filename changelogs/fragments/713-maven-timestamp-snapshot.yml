@@ -1,0 +1,2 @@
+bugfixes:
+- "maven-artifact - handle timestamped snapshot version strings properly (https://github.com/ansible-collections/community.general/issues/709)."
