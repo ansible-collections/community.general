@@ -58,7 +58,7 @@ def main():
 
     if rc != 0:
         module.fail_json(msg="Error running docker stack. {0}".format(err),
-                         rc=rc, out=out, stdout=out, stderr=err)
+                         rc=rc, stdout=out, stderr=err)
     else:
         if out:
             ret = list(
@@ -69,11 +69,10 @@ def main():
             ret = []
 
         module.exit_json(changed=False,
-                         msg=out,
                          rc=rc,
                          stdout=out,
                          stderr=err,
-                         stack_facts=ret)
+                         results=ret)
 
 
 if __name__ == "__main__":
