@@ -181,6 +181,7 @@ import shutil
 import io
 import tempfile
 import traceback
+import re
 
 from ansible.module_utils.ansible_release import __version__ as ansible_version
 from re import match
@@ -273,7 +274,11 @@ class Artifact(object):
     def path(self, with_version=True):
         base = posixpath.join(self.group_id.replace(".", "/"), self.artifact_id)
         if with_version and self.version:
-            base = posixpath.join(base, self.version)
+            timestamp_version_match = re.match("^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$", self.version)
+            if timestamp_version_match:
+                base = posixpath.join(base, timestamp_version_match.group(1) + "SNAPSHOT") 
+            else:
+                base = posixpath.join(base, self.version)
         return base
 
     def _generate_filename(self):
