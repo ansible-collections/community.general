@@ -72,6 +72,12 @@ options:
           - Define the state of a container.
         required: false
         default: started
+    target:
+        description:
+          - For cluster deployments. Will attempt to create a container on a target node. 
+            If container exists elsewhere in a cluster, then container will not be replaced or moved. 
+            The name should respond to same name of the node you see in `lxc cluster list`.
+        required: false
     timeout:
         description:
           - A timeout for changing the state of the container.
@@ -273,7 +279,7 @@ import time
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
-
+from ansible.module_utils.six.moves.urllib.parse import urlencode
 
 # LXD_ANSIBLE_STATES is a map of states that contain values of methods used
 # when a particular state is evoked.
@@ -319,6 +325,7 @@ class LXDContainerManagement(object):
         self.wait_for_ipv4_addresses = self.module.params['wait_for_ipv4_addresses']
         self.force_stop = self.module.params['force_stop']
         self.addresses = None
+        self.target = self.module.params['target']
 
         self.key_file = self.module.params.get('client_key', None)
         self.cert_file = self.module.params.get('client_cert', None)
@@ -378,7 +385,10 @@ class LXDContainerManagement(object):
     def _create_container(self):
         config = self.config.copy()
         config['name'] = self.name
-        self.client.do('POST', '/1.0/containers', config)
+        if self.target:
+            self.client.do('POST', '/1.0/containers?' + urlencode(dict(target=self.target)), config)
+        else:
+            self.client.do('POST', '/1.0/containers', config)
         self.actions.append('create')
 
     def _start_container(self):
@@ -606,6 +616,9 @@ def main():
             state=dict(
                 choices=LXD_ANSIBLE_STATES.keys(),
                 default='started'
+            ),
+            target=dict(
+                type='str',
             ),
             timeout=dict(
                 type='int',
