@@ -70,7 +70,7 @@ options:
     version_added: 1.0.0
   health:
     description:
-      - Disable/enable health checks (depending on`state` value).
+      - Disable/enable health checks (depending on I(state) value).
     type: bool
     default: no
     version_added: "1.0.0"
