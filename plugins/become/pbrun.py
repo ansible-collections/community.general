@@ -97,9 +97,8 @@ class BecomeModule(BecomeBase):
         become_exe = self.get_option('become_exe')
 
         flags = self.get_option('become_flags')
-        user = self.get_option('become_user')
-        if user:
-            user = '-u %s' % (user)
+        become_user = self.get_option('become_user')
+        user = '-u %s' % (become_user) if become_user else ''
         noexe = not self.get_option('wrap_exe')
 
         return ' '.join([become_exe, flags, user, self._build_success_command(cmd, shell, noexe=noexe)])

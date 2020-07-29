@@ -89,8 +89,7 @@ class BecomeModule(BecomeBase):
             self.prompt = '[dzdo via ansible, key=%s] password:' % self._id
             flags = '%s -p "%s"' % (flags.replace('-n', ''), self.prompt)
 
-        user = self.get_option('become_user')
-        if user:
-            user = '-u %s' % (user)
+        become_user = self.get_option('become_user')
+        user = '-u %s' % (become_user) if become_user else ''
 
         return ' '.join([becomecmd, flags, user, self._build_success_command(cmd, shell)])

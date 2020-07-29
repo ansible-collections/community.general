@@ -14,6 +14,28 @@ from ansible import context
 from .helper import call_become_plugin
 
 
+def test_ksu_basic(mocker, parser, reset_cli_args):
+    options = parser.parse_args([])
+    context._init_global_context(options)
+
+    default_cmd = "/bin/foo"
+    default_exe = "/bin/bash"
+    ksu_exe = 'ksu'
+    ksu_flags = ''
+
+    success = 'BECOME-SUCCESS-.+?'
+
+    task = {
+        'become_user': 'foo',
+        'become_method': 'community.general.ksu',
+    }
+    var_options = {}
+    cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
+    print(cmd)
+    assert (re.match("""%s %s %s -e %s -c 'echo %s; %s'""" % (ksu_exe, task['become_user'], ksu_flags,
+                                                              default_exe, success, default_cmd), cmd) is not None)
+
+
 def test_ksu(mocker, parser, reset_cli_args):
     options = parser.parse_args([])
     context._init_global_context(options)
