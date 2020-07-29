@@ -1,0 +1,2 @@
+bugfixes:
+- doas become plugin - address a bug with the parameters handling that was breaking the plugin in community.general when `become_flags` and `become_user` were not explicitly specified (https://github.com/ansible-collections/community.general/pull/704).
