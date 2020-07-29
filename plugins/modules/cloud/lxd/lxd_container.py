@@ -74,9 +74,9 @@ options:
         default: started
     target:
         description:
-          - For cluster deployments. Will attempt to create a container on a target node. 
-            If container exists elsewhere in a cluster, then container will not be replaced or moved. 
-            The name should respond to same name of the node you see in `lxc cluster list`.
+          - For cluster deployments. Will attempt to create a container on a target node.
+            If container exists elsewhere in a cluster, then container will not be replaced or moved.
+            The name should respond to same name of the node you see in `lxc cluster list`
         required: false
     timeout:
         description:
