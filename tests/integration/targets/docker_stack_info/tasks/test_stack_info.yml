@@ -28,8 +28,8 @@
   - name: Assert stack facts
     assert:
       that:
-        - 'output.stack_facts | type_debug == "list"'
-        - 'output.stack_facts | length == 0'
+        - 'output.results | type_debug == "list"'
+        - 'output.results | length == 0'
 
   - name: Copy compose files
     copy:
@@ -63,10 +63,10 @@
   - name: assert stack facts
     assert:
       that:
-        - 'output.stack_facts | type_debug == "list"'
-        - 'output.stack_facts[0].Name == "test_stack"'
-        - 'output.stack_facts[0].Orchestrator == "Swarm"'
-        - 'output.stack_facts[0].Services == "1"'
+        - 'output.results | type_debug == "list"'
+        - 'output.results[0].Name == "test_stack"'
+        - 'output.results[0].Orchestrator == "Swarm"'
+        - 'output.results[0].Services == "1"'
 
   always:
   - name: Cleanup
