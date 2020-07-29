@@ -105,6 +105,9 @@ options:
     description:
       - Define a list of blocks. This list mirrors the Slack JSON API.
       - For more information, see U(https://api.slack.com/block-kit).
+    type: list
+    elements: dict
+    version_added: 1.0.0
 """
 
 EXAMPLES = """
@@ -243,7 +246,7 @@ def recursive_escape_quotes(obj, keys):
     elif isinstance(obj, list):
         escaped = [recursive_escape_quotes(v, keys) for v in obj]
     else:
-        return obj
+        escaped = obj
     return escaped
 
 
@@ -359,7 +362,7 @@ def main():
             validate_certs=dict(default=True, type='bool'),
             color=dict(type='str', default='normal'),
             attachments=dict(type='list', required=False, default=None),
-            blocks=dict(type='list', required=False, default=None),
+            blocks=dict(type='list', elements='dict'),
         )
     )
 
