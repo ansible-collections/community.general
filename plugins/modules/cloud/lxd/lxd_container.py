@@ -78,6 +78,7 @@ options:
             If container exists elsewhere in a cluster, then container will not be replaced or moved.
             The name should respond to same name of the node you see in C(lxc cluster list).
         required: false
+        version_added: 1.0.0
     timeout:
         description:
           - A timeout for changing the state of the container.
