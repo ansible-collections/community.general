@@ -13,7 +13,6 @@ DOCUMENTATION = '''
     options:
         become_user:
             description: User you 'become' to execute the task
-            default: ''
             ini:
               - section: privilege_escalation
                 key: become_user
