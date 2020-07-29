@@ -90,7 +90,6 @@ class BecomeModule(BecomeBase):
             flags = '%s -p "%s"' % (flags.replace('-n', ''), self.prompt)
 
         user = self.get_option('become_user')
-        if user:
-            user = '-u %s' % (user)
+        user = '-u %s' % (user) if user else ''
 
         return ' '.join([becomecmd, flags, user, self._build_success_command(cmd, shell)])
