@@ -72,6 +72,14 @@ options:
           - Define the state of a container.
         required: false
         default: started
+    target:
+        description:
+          - For cluster deployments. Will attempt to create a container on a target node.
+            If container exists elsewhere in a cluster, then container will not be replaced or moved.
+            The name should respond to same name of the node you see in C(lxc cluster list).
+        type: str
+        required: false
+        version_added: 1.0.0
     timeout:
         description:
           - A timeout for changing the state of the container.
@@ -243,6 +251,33 @@ EXAMPLES = '''
         src: /etc/hosts
         dest: /tmp/mycontainer-hosts
         flat: true
+
+# An example for LXD cluster deployments. This example will create two new container on specific
+# nodes - 'node01' and 'node02'. In 'target:', 'node01' and 'node02' are names of LXD cluster
+# members that LXD cluster recognizes, not ansible inventory names, see: 'lxc cluster list'.
+# LXD API calls can be made to any LXD member, in this example, we send API requests to
+#'node01.example.com', which matches ansible inventory name.
+- hosts: node01.example.com
+  tasks:
+    - name: Create LXD container
+      community.general.lxd_container:
+        name: new-container-1
+        state: started
+        source:
+          type: image
+          mode: pull
+          alias: ubuntu/xenial/amd64
+        target: node01
+
+    - name: Create container on another node
+      community.general.lxd_container:
+        name: new-container-2
+        state: started
+        source:
+          type: image
+          mode: pull
+          alias: ubuntu/xenial/amd64
+        target: node02
 '''
 
 RETURN = '''
@@ -273,7 +308,7 @@ import time
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
-
+from ansible.module_utils.six.moves.urllib.parse import urlencode
 
 # LXD_ANSIBLE_STATES is a map of states that contain values of methods used
 # when a particular state is evoked.
@@ -319,6 +354,7 @@ class LXDContainerManagement(object):
         self.wait_for_ipv4_addresses = self.module.params['wait_for_ipv4_addresses']
         self.force_stop = self.module.params['force_stop']
         self.addresses = None
+        self.target = self.module.params['target']
 
         self.key_file = self.module.params.get('client_key', None)
         self.cert_file = self.module.params.get('client_cert', None)
@@ -378,7 +414,10 @@ class LXDContainerManagement(object):
     def _create_container(self):
         config = self.config.copy()
         config['name'] = self.name
-        self.client.do('POST', '/1.0/containers', config)
+        if self.target:
+            self.client.do('POST', '/1.0/containers?' + urlencode(dict(target=self.target)), config)
+        else:
+            self.client.do('POST', '/1.0/containers', config)
         self.actions.append('create')
 
     def _start_container(self):
@@ -606,6 +645,9 @@ def main():
             state=dict(
                 choices=LXD_ANSIBLE_STATES.keys(),
                 default='started'
+            ),
+            target=dict(
+                type='str',
             ),
             timeout=dict(
                 type='int',
