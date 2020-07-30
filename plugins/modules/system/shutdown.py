@@ -42,6 +42,8 @@ options:
     elements: path
     default: ['/sbin', '/usr/sbin', '/usr/local/sbin']
 
+seealso:
+- module: reboot
 author:
     - Matt Davis (@nitzmahone)
     - Sam Doran (@samdoran)
