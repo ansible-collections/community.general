@@ -29,7 +29,7 @@ class ActionModule(ActionBase):
     _VALID_ARGS = frozenset((
         'connect_timeout',
         'msg',
-        'pre_shutdown_delay',
+        'delay',
         'search_paths'
     ))
 
@@ -64,8 +64,8 @@ class ActionModule(ActionBase):
         super(ActionModule, self).__init__(*args, **kwargs)
 
     @property
-    def pre_shutdown_delay(self):
-        return self._check_delay('pre_shutdown_delay', self.DEFAULT_PRE_SHUTDOWN_DELAY)
+    def delay(self):
+        return self._check_delay('delay', self.DEFAULT_PRE_SHUTDOWN_DELAY)
 
     def _check_delay(self, key, default):
         """Ensure that the value is positive or zero"""
@@ -89,9 +89,9 @@ class ActionModule(ActionBase):
     def get_shutdown_command_args(self, distribution):
         args = self._get_value_from_facts('SHUTDOWN_COMMAND_ARGS', distribution, 'DEFAULT_SHUTDOWN_COMMAND_ARGS')
         # Convert seconds to minutes. If less that 60, set it to 0.
-        delay_min = self.pre_shutdown_delay // 60
+        delay_min = self.delay // 60
         shutdown_message = self._task.args.get('msg', self.DEFAULT_SHUTDOWN_MESSAGE)
-        return args.format(delay_sec=self.pre_shutdown_delay, delay_min=delay_min, message=shutdown_message)
+        return args.format(delay_sec=self.delay, delay_min=delay_min, message=shutdown_message)
 
     def get_distribution(self, task_vars):
         # FIXME: only execute the module if we don't already have the facts we need
@@ -178,13 +178,13 @@ class ActionModule(ActionBase):
             display.debug('{action}: AnsibleConnectionFailure caught and handled: {error}'.format(action=self._task.action, error=to_text(e)))
             shutdown_result['rc'] = 0
 
-#        if shutdown_result['rc'] != 0:
-#            result['failed'] = True
-#            result['shutdown'] = False
-#            result['msg'] = "Shutdown command failed. Error was {stdout}, {stderr}".format(
-#                stdout=to_native(shutdown_result['stdout'].strip()),
-#                stderr=to_native(shutdown_result['stderr'].strip()))
-#            return result
+        if shutdown_result['rc'] != 0:
+            result['failed'] = True
+            result['shutdown'] = False
+            result['msg'] = "Shutdown command failed. Error was {stdout}, {stderr}".format(
+                stdout=to_native(shutdown_result['stdout'].strip()),
+                stderr=to_native(shutdown_result['stderr'].strip()))
+            return result
 
         result['failed'] = False
         return result
