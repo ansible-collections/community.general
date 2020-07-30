@@ -43,7 +43,7 @@ options:
     default: ['/sbin', '/usr/sbin', '/usr/local/sbin']
 
 seealso:
-- module: reboot
+- module: ansible.builtin.reboot
 author:
     - Matt Davis (@nitzmahone)
     - Sam Doran (@samdoran)
