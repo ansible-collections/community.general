@@ -268,6 +268,7 @@ EXAMPLES = '''
           mode: pull
           alias: ubuntu/xenial/amd64
         target: node01
+
     - name: Create container on another node
       community.general.lxd_container:
         name: new-container-2
