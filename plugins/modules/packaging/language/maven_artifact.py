@@ -276,7 +276,7 @@ class Artifact(object):
         if with_version and self.version:
             timestamp_version_match = re.match("^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$", self.version)
             if timestamp_version_match:
-                base = posixpath.join(base, timestamp_version_match.group(1) + "SNAPSHOT") 
+                base = posixpath.join(base, timestamp_version_match.group(1) + "SNAPSHOT")
             else:
                 base = posixpath.join(base, self.version)
         return base
