@@ -251,6 +251,32 @@ EXAMPLES = '''
         src: /etc/hosts
         dest: /tmp/mycontainer-hosts
         flat: true
+
+# An example for LXD cluster deployments. This example will create two new container on specific
+# nodes - 'node01' and 'node02'. In 'target:', 'node01' and 'node02' are names of LXD cluster
+# members that LXD cluster recognizes, not ansible inventory names, see: 'lxc cluster list'.
+# LXD API calls can be made to any LXD member, in this example, we send API requests to 
+#'node01.example.com', which matches ansible inventory name.
+- hosts: node01.example.com
+  tasks:
+    - name: Create LXD container
+      community.general.lxd_container:
+        name: new-container-1
+        state: started
+        source:
+          type: image
+          mode: pull
+          alias: ubuntu/xenial/amd64
+        target: node01
+    - name: Create container on another node
+      community.general.lxd_container:
+        name: new-container-2
+        state: started
+        source:
+          type: image
+          mode: pull
+          alias: ubuntu/xenial/amd64
+        target: node02
 '''
 
 RETURN = '''
