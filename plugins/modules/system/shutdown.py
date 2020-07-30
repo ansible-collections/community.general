@@ -17,7 +17,7 @@ description:
     - Shut downs a machine.
 version_added: "1.1.0"
 options:
-  pre_shutdown_delay:
+  delay:
     description:
       - Seconds to wait before shutdown. Passed as a parameter to the shutdown command.
       - On Linux, macOS and OpenBSD, this is converted to minutes and rounded down. If less than 60, it will be set to 0.
@@ -34,7 +34,6 @@ options:
       - Message to display to users before shutdown.
     type: str
     default: Shut down initiated by Ansible
-
   search_paths:
     description:
       - Paths to search on the remote machine for the C(shutdown) command.
@@ -55,7 +54,7 @@ EXAMPLES = r'''
 
 - name: Delay shutting down the remote node
   community.general.shutdown:
-    pre_shutdown_delay: 60
+    delay: 60
 
 - name: Shut down a machine with shutdown command in unusual place
   community.general.shutdown:
