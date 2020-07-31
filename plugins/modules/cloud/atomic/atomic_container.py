@@ -8,13 +8,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: atomic_container
 short_description: Manage the containers on the atomic host platform
 description:
-    - Manage the containers on the atomic host platform
-    - Allows to manage the lifecycle of a container on the atomic host platform
+    - Manage the containers on the atomic host platform.
+    - Allows to manage the lifecycle of a container on the atomic host platform.
 author: "Giuseppe Scrivano (@giuseppe)"
 notes:
     - Host should support C(atomic) command
@@ -24,38 +24,47 @@ requirements:
 options:
     backend:
         description:
-          - Define the backend to use for the container
+          - Define the backend to use for the container.
         required: True
         choices: ["docker", "ostree"]
+        type: str
     name:
         description:
-          - Name of the container
+          - Name of the container.
         required: True
+        type: str
     image:
         description:
-          - The image to use to install the container
+          - The image to use to install the container.
         required: True
+        type: str
     rootfs:
         description:
-          - Define the rootfs of the image
+          - Define the rootfs of the image.
+        type: str
     state:
         description:
-          - State of the container
+          - State of the container.
         required: True
-        choices: ["latest", "present", "absent", "rollback"]
+        choices: ["absent", "latest", "present", "rollback"]
         default: "latest"
+        type: str
     mode:
         description:
-          - Define if it is an user or a system container
+          - Define if it is an user or a system container.
         required: True
         choices: ["user", "system"]
+        type: str
     values:
         description:
-            - Values for the installation of the container.  This option is permitted only with mode 'user' or 'system'.
-              The values specified here will be used at installation time as --set arguments for atomic install.
+            - Values for the installation of the container.
+            - This option is permitted only with mode 'user' or 'system'.
+            - The values specified here will be used at installation time as --set arguments for atomic install.
+        type: list
+        elements: str
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 
 - name: Install the etcd system container
   community.general.atomic_container:
@@ -76,7 +85,7 @@ EXAMPLES = '''
     mode: system
 '''
 
-RETURN = '''
+RETURN = r'''
 msg:
     description: The command standard output
     returned: always
@@ -174,12 +183,12 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             mode=dict(default=None, choices=['user', 'system']),
-            name=dict(default=None, required=True),
-            image=dict(default=None, required=True),
+            name=dict(required=True),
+            image=dict(required=True),
             rootfs=dict(default=None),
             state=dict(default='latest', choices=['present', 'absent', 'latest', 'rollback']),
-            backend=dict(default=None, required=True, choices=['docker', 'ostree']),
-            values=dict(type='list', default=[]),
+            backend=dict(required=True, choices=['docker', 'ostree']),
+            values=dict(type='list', default=[], elements='str'),
         ),
     )
 
