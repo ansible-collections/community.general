@@ -2,11 +2,6 @@ plugins/callback/hipchat.py pylint:blacklisted-name
 plugins/connection/lxc.py pylint:blacklisted-name
 plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
-plugins/modules/cloud/atomic/atomic_container.py validate-modules:doc-missing-type
-plugins/modules/cloud/atomic/atomic_container.py validate-modules:no-default-for-required-parameter
-plugins/modules/cloud/atomic/atomic_container.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/atomic/atomic_host.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/atomic/atomic_image.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/centurylink/clc_aa_policy.py validate-modules:doc-missing-type
 plugins/modules/cloud/centurylink/clc_alert_policy.py validate-modules:doc-missing-type
 plugins/modules/cloud/centurylink/clc_alert_policy.py validate-modules:no-default-for-required-parameter
