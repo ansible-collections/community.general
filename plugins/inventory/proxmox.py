@@ -9,9 +9,9 @@ DOCUMENTATION = '''
     name: proxmox
     plugin_type: inventory
     short_description: proxmox inventory source
-    version_added: "1.0.0"
+    version_added: "1.1.0"
     author:
-        - Jeffrey van Pelt (@Thulium-Drake) <jeffrey.vanpelt@element-networks.nl>
+        - Jeffrey van Pelt (@Thulium-Drake) <jeff@vanpelt.one>
     requirements:
         - requests >= 1.1
     description:
