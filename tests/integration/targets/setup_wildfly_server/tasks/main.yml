@@ -58,19 +58,22 @@
   copy:
     src: wildfly.conf
     dest: '{{ wf_homedir }}/wildfly.conf'
+    mode: "0644"
 
 - name: Create launcher
   template:
     src: launch.sh.j2
     dest: '{{ wf_homedir }}/bin/launch.sh'
+    mode: "0755"
 
 - name: Make scripts executable
-  shell: 'chmod +x {{ wf_homedir }}/bin/*.sh'
+  shell: 'chmod +rx {{ wf_homedir }}/bin/*.sh'
 
 - name: Create service file
   template:
     src: wildfly.service.j2
     dest: '{{ wf_service_file_path }}'
+    mode: "0644"
 
 - name: Create directories for testing the default deploy_path
   become: yes
