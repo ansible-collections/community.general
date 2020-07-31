@@ -11,7 +11,7 @@ DOCUMENTATION = '''
     short_description: proxmox inventory source
     version_added: "1.0.0"
     author:
-      - Jeffrey van Pelt (@Thulium-Drake) <jeffrey.vanpelt@element-networks.nl>
+        - Jeffrey van Pelt (@Thulium-Drake) <jeffrey.vanpelt@element-networks.nl>
     requirements:
         - requests >= 1.1
     description:
@@ -23,7 +23,7 @@ DOCUMENTATION = '''
         - inventory_cache
     options:
       plugin:
-        description: the name of this plugin, it should alwys be set to 'proxmox' for this plugin to recognize it as it's own.
+        description: The name of this plugin, it should always be set to 'proxmox' for this plugin to recognize it as it's own.
         required: True
         choices: ['proxmox']
         type: str
@@ -33,16 +33,16 @@ DOCUMENTATION = '''
         type: str
       user:
         description: proxmox authentication user
-        required: True
+        required: yes
         type: str
       password:
         description: proxmox authentication password
-        required: True
+        required: yes
         type: str
       validate_certs:
         description: verify SSL certificate if using https
         type: boolean
-        default: False
+        default: no
       group_prefix:
         description: prefix to apply to proxmox groups
         default: proxmox_
@@ -53,7 +53,7 @@ DOCUMENTATION = '''
         type: str
       want_facts:
         description: gather vm configuration facts
-        default: False
+        default: no
         type: bool
 '''
 
@@ -63,7 +63,7 @@ plugin: proxmox
 url: http://localhost:8006
 user: ansible-tester
 password: secure
-validate_certs: False
+validate_certs: no
 '''
 
 import re
