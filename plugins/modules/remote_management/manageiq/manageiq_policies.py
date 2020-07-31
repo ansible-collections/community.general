@@ -46,7 +46,11 @@ options:
     type: str
     description:
       - the name of the resource to which the profile should be [un]assigned
-    required: true
+    required: only if resource_id is not set, mutually exclusive
+  resource_id:
+    description
+      - the id of the resource to which the profile should be [un]assigned
+    required: only if resource_name is not set, mutually exclusive
 '''
 
 EXAMPLES = '''
