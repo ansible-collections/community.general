@@ -42,11 +42,7 @@ options:
   resource_name:
     description:
       - the name of the resource to which the profile should be [un]assigned
-    required: only if resource_id is not set, mutually exclusive
-  resource_id:
-    description
-      - the id of the resource to which the profile should be [un]assigned
-    required: only if resource_name is not set, mutually exclusive
+    required: true
 '''
 
 EXAMPLES = '''
@@ -296,9 +292,8 @@ def main():
     actions = {'present': 'assign', 'absent': 'unassign', 'list': 'list'}
     argument_spec = dict(
         policy_profiles=dict(type='list'),
-        resource_id=dict(required=False, type='int'),
-        resource_name=dict(required=False, type='str'),
-        resource_type=dict(required=False, type='str',
+        resource_name=dict(required=True, type='str'),
+        resource_type=dict(required=True, type='str',
                            choices=manageiq_entities().keys()),
         state=dict(required=False, type='str',
                    choices=['present', 'absent', 'list'], default='present'),
@@ -308,8 +303,6 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
-        mutually_exclusive=[["resource_id", "resource_name"]],
-        required_one_of=[["resource_id", "resource_name"]],
         required_if=[
             ('state', 'present', ['policy_profiles']),
             ('state', 'absent', ['policy_profiles'])
@@ -317,7 +310,6 @@ def main():
     )
 
     policy_profiles = module.params['policy_profiles']
-    resource_id = module.params['resource_id']
     resource_type_key = module.params['resource_type']
     resource_name = module.params['resource_name']
     state = module.params['state']
@@ -329,8 +321,7 @@ def main():
     manageiq = ManageIQ(module)
 
     # query resource id, fail if resource does not exist
-    if not resource_id:
-        resource_id = manageiq.find_collection_resource_or_fail(resource_type, name=resource_name)['id']
+    resource_id = manageiq.find_collection_resource_or_fail(resource_type, name=resource_name)['id']
 
     manageiq_policies = ManageIQPolicies(manageiq, resource_type, resource_id)
 
