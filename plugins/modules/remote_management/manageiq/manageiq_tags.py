@@ -42,13 +42,32 @@ options:
   resource_name:
     description:
       - the relevant resource name in manageiq
-    required: true
+    required: only if resource_id is not set, mutually exclusive
+  resource_id:
+    description
+      - the relevant resource id in manageiq
+    required: only if resource_name is not set, mutually exclusive
 '''
 
 EXAMPLES = '''
 - name: Create new tags for a provider in ManageIQ
   community.general.manageiq_tags:
     resource_name: 'EngLab'
+    resource_type: 'provider'
+    tags:
+    - category: environment
+      name: prod
+    - category: owner
+      name: prod_ops
+    manageiq_connection:
+      url: 'http://127.0.0.1:3000'
+      username: 'admin'
+      password: 'smartvm'
+      validate_certs: False
+      
+- name: Create new tags for a provider in ManageIQ
+  community.general.manageiq_tags:
+    resource_id: 23000000790497
     resource_type: 'provider'
     tags:
     - category: environment
@@ -237,8 +256,9 @@ def main():
     actions = {'present': 'assign', 'absent': 'unassign', 'list': 'list'}
     argument_spec = dict(
         tags=dict(type='list'),
-        resource_name=dict(required=True, type='str'),
-        resource_type=dict(required=True, type='str',
+        resource_id=dict(required=False, type='int'),
+        resource_name=dict(required=False, type='str'),
+        resource_type=dict(required=False, type='str',
                            choices=manageiq_entities().keys()),
         state=dict(required=False, type='str',
                    choices=['present', 'absent', 'list'], default='present'),
@@ -248,6 +268,8 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
+        mutually_exclusive=[["resource_id", "resource_name"]],
+        required_one_of=[["resource_id", "resource_name"]],
         required_if=[
             ('state', 'present', ['tags']),
             ('state', 'absent', ['tags'])
@@ -255,6 +277,7 @@ def main():
     )
 
     tags = module.params['tags']
+    resource_id = module.params['resource_id']
     resource_type_key = module.params['resource_type']
     resource_name = module.params['resource_name']
     state = module.params['state']
@@ -266,7 +289,8 @@ def main():
     manageiq = ManageIQ(module)
 
     # query resource id, fail if resource does not exist
-    resource_id = query_resource_id(manageiq, resource_type, resource_name)
+    if not resource_id:
+        resource_id = query_resource_id(manageiq, resource_type, resource_name)
 
     manageiq_tags = ManageIQTags(manageiq, resource_type, resource_id)
 
