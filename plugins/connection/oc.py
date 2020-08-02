@@ -150,7 +150,7 @@ DOCUMENTATION = '''
 from ansible_collections.community.kubernetes.plugins.connection.kubectl import Connection as KubectlConnection
 
 
-CONNECTION_TRANSPORT = 'oc'
+CONNECTION_TRANSPORT = 'community.general.oc'
 
 CONNECTION_OPTIONS = {
     'oc_container': '-c',
