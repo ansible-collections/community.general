@@ -19,7 +19,7 @@ DOCUMENTATION = '''
       plugin:
         description: The name of this plugin, it should always be set to C(cobbler) for this plugin to recognize it as it's own.
         required: yes
-        choices: ['cobbler']
+        choices: [ 'cobbler', 'community.general.cobbler' ]
       url:
         description: URL to cobbler.
         default: 'http://cobbler/cobbler_api'
