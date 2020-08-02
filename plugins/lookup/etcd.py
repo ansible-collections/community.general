@@ -53,14 +53,17 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
-    - name: "a value from a locally running etcd"
-      ansible.builtin.debug: msg={{ lookup('etcd', 'foo/bar') }}
+- name: "a value from a locally running etcd"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.etcd', 'foo/bar') }}"
 
-    - name: "values from multiple folders on a locally running etcd"
-      ansible.builtin.debug: msg={{ lookup('etcd', 'foo', 'bar', 'baz') }}
+- name: "values from multiple folders on a locally running etcd"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.etcd', 'foo', 'bar', 'baz') }}"
 
-    - name: "since Ansible 2.5 you can set server options inline"
-      ansible.builtin.debug: msg="{{ lookup('etcd', 'foo', version='v2', url='http://192.168.0.27:4001') }}"
+- name: "since Ansible 2.5 you can set server options inline"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.etcd', 'foo', version='v2', url='http://192.168.0.27:4001') }}"
 '''
 
 RETURN = '''
