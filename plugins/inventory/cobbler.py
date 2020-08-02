@@ -92,7 +92,7 @@ except ImportError:
 class InventoryModule(BaseInventoryPlugin, Cacheable):
     ''' Host inventory parser for ansible using cobbler as source. '''
 
-    NAME = 'cobbler'
+    NAME = 'community.general.cobbler'
 
     def __init__(self):
 
