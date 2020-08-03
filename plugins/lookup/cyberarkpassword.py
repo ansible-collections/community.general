@@ -37,7 +37,7 @@ DOCUMENTATION = '''
 EXAMPLES = """
   - name: passing options to the lookup
     ansible.builtin.debug:
-        msg: "{{ lookup("community.general.cyberarkpassword", cyquery) }}"
+        msg: '{{ lookup("community.general.cyberarkpassword", cyquery) }}'
     vars:
       cyquery:
         appid: "app_ansible"
