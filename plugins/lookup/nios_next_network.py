@@ -56,7 +56,8 @@ options:
 EXAMPLES = """
 - name: return next available network for network-container 192.168.10.0/24
   ansible.builtin.set_fact:
-    networkaddr: "{{ lookup('community.general.nios_next_network', '192.168.10.0/24', cidr=25, provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
+    networkaddr: "{{ lookup('community.general.nios_next_network', '192.168.10.0/24', cidr=25,
+                        provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
 
 - name: return the next 2 available network addresses for network-container 192.168.10.0/24
   ansible.builtin.set_fact:

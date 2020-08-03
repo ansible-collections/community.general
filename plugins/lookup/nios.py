@@ -48,11 +48,13 @@ options:
 EXAMPLES = """
 - name: fetch all networkview objects
   ansible.builtin.set_fact:
-    networkviews: "{{ lookup('community.general.nios', 'networkview', provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
+    networkviews: "{{ lookup('community.general.nios', 'networkview',
+                         provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
 
 - name: fetch the default dns view
   ansible.builtin.set_fact:
-    dns_views: "{{ lookup('community.general.nios', 'view', filter={'name': 'default'}, provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
+    dns_views: "{{ lookup('community.general.nios', 'view', filter={'name': 'default'},
+                      provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
 
 # all of the examples below use credentials that are  set using env variables
 # export INFOBLOX_HOST=nios01
