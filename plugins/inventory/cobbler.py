@@ -17,7 +17,7 @@ DOCUMENTATION = '''
         - inventory_cache
     options:
       plugin:
-        description: The name of this plugin, it should always be set to C(cobbler) for this plugin to recognize it as it's own.
+        description: The name of this plugin, it should always be set to C(community.general.cobbler) for this plugin to recognize it as it's own.
         required: yes
         choices: [ 'cobbler', 'community.general.cobbler' ]
       url:

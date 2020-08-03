@@ -26,8 +26,8 @@ DOCUMENTATION = '''
           I(nonleaders) - all nodes except the swarm leader."
     options:
         plugin:
-            description: The name of this plugin, it should always be set to C(docker_swarm) for this plugin to
-                         recognize it as it's own.
+            description: The name of this plugin, it should always be set to C(community.general.docker_swarm)
+                         for this plugin to recognize it as it's own.
             type: str
             required: true
             choices: [ docker_swarm, community.general.docker_swarm ]
