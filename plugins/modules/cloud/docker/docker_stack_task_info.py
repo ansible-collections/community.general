@@ -16,6 +16,12 @@ short_description: Return information of the tasks on a docker stack
 description:
   - Retrieve information on docker stacks tasks using the C(docker stack) command
     on the target node (see examples).
+options:
+  name:
+    description:
+      - Stack name
+    type: str
+    required: yes
 version_added: "1.1.0"
 '''
 
@@ -25,9 +31,10 @@ results:
         List of dictionaries containing the list of tasks associated
         to a stack name.
     sample: >
-        "results": [{"CurrentState":"Running 9 minutes ago","DesiredState":"Running","Error":"","ID":"7wqv6m02ugkw","Image":"busybox:latest","Name":"test_stack_busybox.1","Node":"docker-desktop","Ports":""}]
+        "results": [{"CurrentState":"Running","DesiredState":"Running","Error":"","ID":"7wqv6m02ugkw","Image":"img","Name":"img.1","Node":"swarm","Ports":""}]
     returned: always
     type: list
+    elements: dict
 '''
 
 EXAMPLES = '''
