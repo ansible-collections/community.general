@@ -1,0 +1,1 @@
+plugins/modules/cloud/docker/docker_stack_tasks_info.py
