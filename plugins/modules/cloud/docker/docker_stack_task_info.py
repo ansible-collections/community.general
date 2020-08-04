@@ -19,7 +19,7 @@ description:
 options:
   name:
     description:
-      - Stack name
+      - Stack name.
     type: str
     required: yes
 version_added: "1.1.0"
@@ -31,7 +31,7 @@ results:
         List of dictionaries containing the list of tasks associated
         to a stack name.
     sample: >
-        "results": [{"CurrentState":"Running","DesiredState":"Running","Error":"","ID":"7wqv6m02ugkw","Image":"img","Name":"img.1","Node":"swarm","Ports":""}]
+        [{"CurrentState":"Running","DesiredState":"Running","Error":"","ID":"7wqv6m02ugkw","Image":"busybox","Name":"test_stack.1","Node":"swarm","Ports":""}]
     returned: always
     type: list
     elements: dict
