@@ -72,7 +72,6 @@
         - 'output.results[0].DesiredState == "Running"'
         - 'output.results[0].Image == "busybox:latest"'
         - 'output.results[0].Name == "test_stack_busybox.1"'
-        - 'output.results[0].Node == "docker-desktop"'
 
   always:
     - name: Cleanup
