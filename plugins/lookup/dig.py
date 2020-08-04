@@ -77,7 +77,7 @@ EXAMPLES = """
 RETURN = """
   _list:
     description:
-      - list of composed strings or dictonaries with key and value
+      - list of composed strings or dictionaries with key and value
         If a dictionary, fields shows the keys returned depending on query type
     contains:
        ALL:
