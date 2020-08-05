@@ -190,7 +190,7 @@ class InventoryModule(BaseInventoryPlugin):
                 container_list = self._exclude(
                     self.client.nodes(node).lxc.get())
             except Exception as e:
-                raise AnsibleError('Proxmoxer API error: {}'.format(
+                raise AnsibleError('Proxmoxer API error: {0}'.format(
                     to_native(e)))
 
             # Merge QEMU and Containers lists from this node
@@ -211,7 +211,7 @@ class InventoryModule(BaseInventoryPlugin):
                 except KeyError:
                     description = None
                 except Exception as e:
-                    raise AnsibleError('Proxmoxer API error: {}'.format(
+                    raise AnsibleError('Proxmoxer API error: {0}'.format(
                         to_native(e)))
 
                 try:
@@ -252,7 +252,7 @@ class InventoryModule(BaseInventoryPlugin):
                 pool_list = self._exclude(
                     self.client.pool(pool).get()['members'])
             except Exception as e:
-                raise AnsibleError('Proxmoxer API error: {}'.format(
+                raise AnsibleError('Proxmoxer API error: {0}'.format(
                     to_native(e)))
 
             members = [
