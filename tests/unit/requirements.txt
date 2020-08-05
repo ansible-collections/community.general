@@ -12,7 +12,8 @@ linode-python  # APIv3
 linode_api4 ; python_version > '2.6'  # APIv4
 
 # requirement for the proxmox module
-proxmoxer
+proxmoxer ; python_version >= '2.7'
+proxmoxer < 0.2.4 ; python_version < '2.7'
 requests
 
 # requirement for the gitlab module
