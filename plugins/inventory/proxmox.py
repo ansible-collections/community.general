@@ -106,8 +106,6 @@ class InventoryModule(BaseInventoryPlugin):
             names = [node['node'] for node in pve_list]
         elif pve_type == 'pool':
             names = [pool['poolid'] for pool in pve_list]
-        elif pve_type in ['qemu', 'container']:
-            names = [vm['name'] for vm in pve_list]
 
         return names
 
@@ -122,10 +120,6 @@ class InventoryModule(BaseInventoryPlugin):
                 variables[vm['name']] = nested
 
         return variables
-
-    def _get_by_name(self, pve_list, pve_name):
-        results = [vm for vm in pve_list if vm['name'] == pve_name]
-        return results[0] if len(results) > 0 else None
 
     def _get_ip_address(self, pve_type, pve_node, vmid):
         def validate(address):
