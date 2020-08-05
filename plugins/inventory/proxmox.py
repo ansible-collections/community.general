@@ -8,17 +8,17 @@ __metaclass__ = type
 DOCUMENTATION = '''
     name: proxmox
     plugin_type: inventory
-    short_description: proxmox inventory source
+    short_description: Proxmox inventory source
     version_added: "1.1.0"
     author:
         - Jeffrey van Pelt (@Thulium-Drake) <jeff@vanpelt.one>
     requirements:
         - requests >= 1.1
     description:
-        - Get inventory hosts from the proxmox service.
+        - Get inventory hosts from a Proxmox PVE cluster.
         - "Uses a configuration file as an inventory source, it must end in ``.proxmox.yml`` or ``.proxmox.yaml`` and has a ``plugin: proxmox`` entry."
-        - Will retrieve the first network interface with an IP for Proxmox nodes
-        - Can retrieve LXC/QEMU configuration as facts
+        - Will retrieve the first network interface with an IP for Proxmox nodes.
+        - Can retrieve LXC/QEMU configuration as facts.
     extends_documentation_fragment:
         - inventory_cache
     options:
@@ -28,31 +28,31 @@ DOCUMENTATION = '''
         choices: ['proxmox']
         type: str
       url:
-        description: url to proxmox
+        description: URL to Proxmox cluster.
         default: 'http://localhost:8006'
         type: str
       user:
-        description: proxmox authentication user
+        description: Proxmox authentication user.
         required: yes
         type: str
       password:
-        description: proxmox authentication password
+        description: Proxmox authentication password.
         required: yes
         type: str
       validate_certs:
-        description: verify SSL certificate if using https
+        description: Verify SSL certificate if using https.
         type: boolean
         default: no
       group_prefix:
-        description: prefix to apply to proxmox groups
+        description: Prefix to apply to Proxmox groups.
         default: proxmox_
         type: str
       facts_prefix:
-        description: prefix to apply to vm config facts
+        description: Prefix to apply to LXC/QEMU config facts.
         default: proxmox_
         type: str
       want_facts:
-        description: gather vm configuration facts
+        description: Gather LXC/QEMU configuration facts.
         default: no
         type: bool
 '''
@@ -61,7 +61,7 @@ EXAMPLES = '''
 # my.proxmox.yml
 plugin: proxmox
 url: http://localhost:8006
-user: ansible-tester
+user: ansible@pve
 password: secure
 validate_certs: no
 '''
@@ -86,7 +86,7 @@ except ImportError:
 
 
 class InventoryModule(BaseInventoryPlugin, Cacheable):
-    ''' Host inventory parser for ansible using proxmox as source. '''
+    ''' Host inventory parser for ansible using Proxmox as source. '''
 
     NAME = 'proxmox'
 
@@ -151,7 +151,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 # FIXME: This assumes 'return type' matches a specific query,
                 #        it will break if we expand the queries and they dont have different types
                 if 'data' not in json:
-                    # /hosts/:id dos not have a 'data' key
+                    # /hosts/:id does not have a 'data' key
                     data = json
                     break
                 elif isinstance(json['data'], MutableMapping):
@@ -231,7 +231,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
         status = ret['status']
 
-        # if we want the fact, then set it
+        # if we want the facts, then set it
         if self.get_option('want_facts'):
             status_key = 'status'
             status_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), status_key.lower()))
@@ -279,7 +279,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 ip = self._get_node_ip(node['node'])
                 self.inventory.set_variable(node['node'], 'ansible_host', ip)
 
-                # get lxc containers for this node
+                # get LXC containers for this node
                 node_lxc_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), ('%s_lxc' % node['node']).lower()))
                 self.inventory.add_group(node_lxc_group)
                 for lxc in self._get_lxc_per_node(node['node']):
@@ -287,18 +287,18 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     self.inventory.add_child(lxc_group, lxc['name'])
                     self.inventory.add_child(node_lxc_group, lxc['name'])
 
-                    # get lxc status
+                    # get LXC status
                     self._get_vm_status(node['node'], lxc['vmid'], 'lxc', lxc['name'])
                     if lxc['status'] == 'stopped':
                         self.inventory.add_child(stopped_group, lxc['name'])
                     elif lxc['status'] == 'running':
                         self.inventory.add_child(running_group, lxc['name'])
 
-                    # get lxc config for facts
+                    # get LXC config for facts
                     if self.get_option('want_facts'):
                         self._get_vm_config(node['node'], lxc['vmid'], 'lxc', lxc['name'])
 
-                # get qemu vm's for this node
+                # get QEMU vm's for this node
                 node_qemu_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), ('%s_qemu' % node['node']).lower()))
                 self.inventory.add_group(node_qemu_group)
                 for qemu in self._get_qemu_per_node(node['node']):
@@ -307,14 +307,14 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                         self.inventory.add_child(qemu_group, qemu['name'])
                         self.inventory.add_child(node_qemu_group, qemu['name'])
 
-                    # get qemu status
+                    # get QEMU status
                     self._get_vm_status(node['node'], qemu['vmid'], 'qemu', qemu['name'])
                     if qemu['status'] == 'stopped':
                         self.inventory.add_child(stopped_group, qemu['name'])
                     elif qemu['status'] == 'running':
                         self.inventory.add_child(running_group, qemu['name'])
 
-                    # get qemu config for facts
+                    # get QEMU config for facts
                     if self.get_option('want_facts'):
                         self._get_vm_config(node['node'], qemu['vmid'], 'qemu', qemu['name'])
 
