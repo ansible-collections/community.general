@@ -16,15 +16,15 @@ DOCUMENTATION = '''
         - requests >= 1.1
     description:
         - Get inventory hosts from a Proxmox PVE cluster.
-        - "Uses a configuration file as an inventory source, it must end in ``.proxmox.yml`` or ``.proxmox.yaml`` and has a ``plugin: proxmox`` entry."
+        - "Uses a configuration file as an inventory source, it must end in ``.proxmox.yml`` or ``.proxmox.yaml`` and has a ``plugin: community.general.proxmox`` entry."
         - Will retrieve the first network interface with an IP for Proxmox nodes.
         - Can retrieve LXC/QEMU configuration as facts.
     extends_documentation_fragment:
         - inventory_cache
     options:
       plugin:
-        description: The name of this plugin, it should always be set to 'proxmox' for this plugin to recognize it as it's own.
-        required: True
+        description: The name of this plugin, it should always be set to 'community.general.proxmox' for this plugin to recognize it as it's own.
+        required: yes
         choices: ['proxmox']
         type: str
       url:
@@ -40,7 +40,7 @@ DOCUMENTATION = '''
         required: yes
         type: str
       validate_certs:
-        description: Verify SSL certificate if using https.
+        description: Verify SSL certificate if using HTTPS.
         type: boolean
         default: no
       group_prefix:
@@ -59,7 +59,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 # my.proxmox.yml
-plugin: proxmox
+plugin: community.general.proxmox
 url: http://localhost:8006
 user: ansible@pve
 password: secure
@@ -88,7 +88,7 @@ except ImportError:
 class InventoryModule(BaseInventoryPlugin, Cacheable):
     ''' Host inventory parser for ansible using Proxmox as source. '''
 
-    NAME = 'proxmox'
+    NAME = 'community.general.proxmox'
 
     def __init__(self):
 
