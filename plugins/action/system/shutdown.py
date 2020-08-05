@@ -172,6 +172,7 @@ class ActionModule(ActionBase):
         try:
             display.vvv("{action}: shutting down server...".format(action=self._task.action))
             display.debug("{action}: shutting down server with command '{command}'".format(action=self._task.action, command=shutdown_command_exec))
+            self.cleanup(force=True)
             shutdown_result = self._low_level_execute_command(shutdown_command_exec, sudoable=self.DEFAULT_SUDOABLE)
         except AnsibleConnectionFailure as e:
             # If the connection is closed too quickly due to the system being shutdown, carry on
