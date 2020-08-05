@@ -12,7 +12,7 @@ DOCUMENTATION = '''
     name: proxmox
     plugin_type: inventory
     short_description: Proxmox VE inventory source
-    version_added: 1.0.0
+    version_added: 1.1.0
     description:
         - Get inventory hosts from the proxmox service.
         - "Uses a configuration file as an inventory source, it must end in C(.proxmox.yml) or C(.proxmox.yaml) and has a C(plugin: proxmox) entry."
