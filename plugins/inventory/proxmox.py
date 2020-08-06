@@ -16,7 +16,7 @@ DOCUMENTATION = '''
         - requests >= 1.1
     description:
         - Get inventory hosts from a Proxmox PVE cluster.
-        - "Uses a configuration file as an inventory source, it must end in ``.proxmox.yml`` or ``.proxmox.yaml`` and has a ``plugin: community.general.proxmox`` entry."
+        - "Uses a configuration file as an inventory source, it must end in ``.proxmox.yml`` or ``.proxmox.yaml``"
         - Will retrieve the first network interface with an IP for Proxmox nodes.
         - Can retrieve LXC/QEMU configuration as facts.
     extends_documentation_fragment:
