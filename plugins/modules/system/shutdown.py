@@ -61,7 +61,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 shutdown:
-  description: true if the machine has shut down
+  description: C(true) if the machine has been shut down.
   returned: always
   type: bool
   sample: true
