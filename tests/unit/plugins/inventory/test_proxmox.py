@@ -16,7 +16,7 @@ def inventory():
     return InventoryModule()
 
 
-def test_get_nodes(inventory):
+def test_get_nodes(inventory, mocker):
     nodes = [{
         'status': 'online',
         'type': 'node',
@@ -26,7 +26,7 @@ def test_get_nodes(inventory):
 
     inventory.client = mocker.MagicMock()
     inventory.client.nodes.return_value.get.return_value = nodes
-    assert ['testnode'] == inventory._get_nodes(None)
+    assert ['testnode'] == inventory._get_nodes()
 #
 #
 #def test_get_pools(inventory):
