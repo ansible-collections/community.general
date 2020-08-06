@@ -191,7 +191,6 @@ class ActionModule(ActionBase):
             msg = 'Running {0} with local connection would shutdown the control node.'.format(self._task.action)
             return {'changed': False, 'elapsed': 0, 'shutdown': False, 'failed': True, 'msg': msg}
 
-
         if task_vars is None:
             task_vars = {}
 
