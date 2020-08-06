@@ -18,44 +18,51 @@ description:
     - Manage Jenkins builds with Jenkins REST API.
 requirements:
   - "python-jenkins >= 0.4.12"
-version_added: "2.9"
 author: "Brett Milford (@brettmilford)"
 options:
   args:
     description:
       - A list of parameters to pass to the build.
     required: false
+    type: dict
   name:
     description:
       - Name of the Jenkins job to build.
     required: true
+    type: str
   build_number:
     description:
       - An integer which specifies a build of a job. Is required to remove a build from the queue.
     required: false
+    type: int
   password:
     description:
       - Password to authenticate with the Jenkins server.
     required: false
+    type: str
   state:
     description:
       - Attribute that specifies if the build is to be created or deleted.
     required: false
     default: present
     choices: ['present', 'absent']
+    type: str
   token:
     description:
       - API token used to authenticate with the Jenkins server.
     required: false
+    type: str
   url:
     description:
       - URL of the Jenkins server.
     required: false
     default: http://localhost:8080
+    type: str
   user:
     description:
        - User to authenticate with the Jenkins server.
     required: false
+    type: str
 '''
 
 EXAMPLES = '''
