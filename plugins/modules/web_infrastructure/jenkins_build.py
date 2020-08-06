@@ -66,8 +66,8 @@ options:
 '''
 
 EXAMPLES = '''
-# Create a jenkins build using basic authentication
-- jenkins_build:
+- name: Create a jenkins build using basic authentication
+  community.general.jenkins_build:
     name: "test-check"
     args:
       cloud: "test"
