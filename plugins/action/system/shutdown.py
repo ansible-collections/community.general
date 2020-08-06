@@ -86,9 +86,9 @@ class ActionModule(ActionBase):
     def get_shutdown_command_args(self, distribution):
         args = self._get_value_from_facts('SHUTDOWN_COMMAND_ARGS', distribution, 'DEFAULT_SHUTDOWN_COMMAND_ARGS')
         # Convert seconds to minutes. If less that 60, set it to 0.
-        delay_min = self.delay // 60
+        delay_sec = self.delay
         shutdown_message = self._task.args.get('msg', self.DEFAULT_SHUTDOWN_MESSAGE)
-        return args.format(delay_sec=self.delay, delay_min=delay_min, message=shutdown_message)
+        return args.format(delay_sec=delay_sec, delay_min=delay_sec // 60, message=shutdown_message)
 
     def get_distribution(self, task_vars):
         # FIXME: only execute the module if we don't already have the facts we need
