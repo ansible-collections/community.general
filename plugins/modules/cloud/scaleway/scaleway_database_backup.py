@@ -14,16 +14,17 @@ DOCUMENTATION = '''
 ---
 module: scaleway_database_backup
 short_description: Scaleway database backups management module
-version_added: "2.9"
 author: Guillaume Rodriguez (@guillaume_ro_fr)
 description:
     - This module manages database backups on Scaleway account
       U(https://developer.scaleway.com)
-extends_documentation_fragment: scaleway
+extends_documentation_fragment:
+    - community.general.scaleway
 options:
   state:
     description:
         - Indicate desired state of the database backup.
+    type: str
     default: present
     choices:
         - present
@@ -34,6 +35,7 @@ options:
   region:
     description:
         - Scaleway region to use (for example fr-par).
+    type: str
     required: true
     choices:
         - fr-par
@@ -43,29 +45,34 @@ options:
     description:
         - UUID used to identify the database backup.
         - Required for C(absent), C(exported) and C(restored) states
+    type: str
     required: false
 
   name:
     description:
         - Name used to identify the database backup.
         - Required for C(present) state
+    type: str
     required: false
 
   database_name:
     description:
         - Name used to identify the database.
         - Required for C(present) and C(restored) states
+    type: str
     required: false
 
   instance_id:
     description:
         - UUID of the instance associated to the database backup
         - Required for C(present) and C(restored) states
+    type: str
     required: false
 
   expires_at:
     description:
         - Expiration datetime of the database backup (ISO 8601 format)
+    type: str
     required: false
 
   wait:
@@ -77,12 +84,14 @@ options:
   wait_timeout:
     description:
         - Time to wait for the backup to reach the expected state
+    type: int
     required: false
     default: 300
 
   wait_sleep_time:
     description:
         - Time to wait before every attempt to check the state of the backup
+    type: int
     required: false
     default: 3
 '''
@@ -95,13 +104,13 @@ EXAMPLES = '''
         region: 'fr-par'
         database_name: 'my-database'
         instance_id: '50968a80-2909-4e5c-b1af-a2e19860dddb'
- 
+
   - name: Export a backup
     scaleway_database_backup:
         id: '6ef1125a-037e-494f-a911-6d9c49a51691'
         state: exported
         region: 'fr-par'
-        
+
   - name: Restore backup
     scaleway_database_backup:
         id: '6ef1125a-037e-494f-a911-6d9c49a51691'
@@ -143,10 +152,10 @@ from ansible_collections.community.general.plugins.module_utils.scaleway import 
     Scaleway, scaleway_argument_spec,
     SCALEWAY_REGIONS)
 
-stable_states = {
+stable_states = (
     'ready',
     'deleting',
-}
+)
 
 
 def wait_to_complete_state_transition(module, account_api, backup=None):
@@ -164,6 +173,7 @@ def wait_to_complete_state_transition(module, account_api, backup=None):
         response = account_api.get('/rdb/v1/regions/%s/backups/%s' % (module.params.get('region'), backup['id']))
         if not response.ok:
             module.fail_json(msg='Error getting backup [{0}: {1}]'.format(response.status_code, response.json))
+            break
         response_json = response.json
 
         if response_json['status'] in stable_states:
