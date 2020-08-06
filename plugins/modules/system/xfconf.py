@@ -13,6 +13,7 @@ module: xfconf
 author:
     - "Joseph Benden (@jbenden)"
     - "Alexei Znamensky (@russoz)"
+    - "Adriaan Callaerts (@call-a3)"
 short_description: Edit XFCE4 Configurations
 description:
   - This module allows for the manipulation of Xfce 4 Configuration via
@@ -44,7 +45,7 @@ options:
       For array mode, use a list of types.
     type: list
     elements: str
-    choices: [ int, uint, bool, float, string ]
+    choices: [ int, uint, bool, float, double, string ]
   state:
     description:
     - The action to take upon the property/value.
@@ -124,7 +125,7 @@ class XfConfProperty(object):
     GET = "get"
     RESET = "absent"
     VALID_STATES = (SET, GET, RESET)
-    VALID_VALUE_TYPES = ('int', 'uint', 'bool', 'float', 'string')
+    VALID_VALUE_TYPES = ('int', 'uint', 'bool', 'float', 'double', 'string')
     previous_value = None
     is_array = None
 
@@ -144,12 +145,11 @@ class XfConfProperty(object):
         self.method_map = dict(zip((self.SET, self.GET, self.RESET),
                                    (self.set, self.get, self.reset)))
 
-        # @TODO This will not work with non-English translations, but xfconf-query does not return
-        #       distinct result codes for distinct outcomes.
         self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.property, self.channel)
 
         def run(cmd):
-            return module.run_command(cmd, check_rc=False)
+            # Force language to 'C' to ensure return values are always formatted in english, even in non-english environments
+            return module.run_command(cmd, check_rc=False, environ_update=dict(LANG='C'))
         self._run = run
 
     def _execute_xfconf_query(self, args=None):
