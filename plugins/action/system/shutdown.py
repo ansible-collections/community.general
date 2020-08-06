@@ -39,8 +39,6 @@ class ActionModule(ActionBase):
     DEFAULT_SHUTDOWN_COMMAND_ARGS = '-h {delay_min} "{message}"'
     DEFAULT_SUDOABLE = True
 
-    DEPRECATED_ARGS = {}
-
     SHUTDOWN_COMMANDS = {
         'alpine': 'poweroff',
         'vmkernel': 'halt',
@@ -153,14 +151,6 @@ class ActionModule(ActionBase):
         self._shutdown_command = full_path[0]
         return self._shutdown_command
 
-    def deprecated_args(self):
-        for arg, version in self.DEPRECATED_ARGS.items():
-            if self._task.args.get(arg) is not None:
-                display.warning("Since Ansible {version}, {arg} is no longer a valid option for {action}".format(
-                    version=version,
-                    arg=arg,
-                    action=self._task.action))
-
     def perform_shutdown(self, task_vars, distribution):
         result = {}
         shutdown_result = {}
@@ -203,8 +193,6 @@ class ActionModule(ActionBase):
 
         if task_vars is None:
             task_vars = {}
-
-        self.deprecated_args()
 
         result = super(ActionModule, self).run(tmp, task_vars)
 
