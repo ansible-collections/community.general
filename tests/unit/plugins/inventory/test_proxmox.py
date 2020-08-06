@@ -16,35 +16,43 @@ def inventory():
     return InventoryModule()
 
 
-def test_get_names(inventory):
+def test_get_nodes(inventory):
     nodes = [{
         'status': 'online',
         'type': 'node',
         'id': 'node/testnode',
         'node': 'testnode'
     }]
+
+    assert ['testnode'] == inventory._get_nodes(nodes, 'node')
+
+def test_get_pools(inventory):
     pools = [{'poolid': 'testpool'}]
 
-    assert ['testnode'] == inventory._get_names(nodes, 'node')
-    assert ['testpool'] == inventory._get_names(pools, 'pool')
+    assert ['testpool'] == inventory._get_pools(pools, 'pool')
 
-
-def test_get_variables(inventory):
+def test_get_vm_info(inventory):
     pve_list = [{
-        'status': 'running',
         'vmid': '100',
         'name': 'test',
+        'status': 'running',
     }]
 
-    variables = {
+    config_variables = {
         'test': {
-            'proxmox_status': 'running',
             'proxmox_vmid': '100',
             'proxmox_name': 'test',
         }
     }
 
-    assert variables == inventory._get_variables(pve_list, 'qemu')
+    config_variables = {
+        'test': {
+            'proxmox_status': 'running',
+        }
+    }
+
+    assert config_variables == inventory._get_vm_config(pve_list, 'localhost', 'lxc', 100, 'test')
+    assert status_variables == inventory._get_vm_status(pve_list, 'localhost', 'lxc', 100, 'test')
 
 
 def test_get_ip_address(inventory, mocker):
