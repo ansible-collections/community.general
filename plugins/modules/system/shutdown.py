@@ -24,11 +24,6 @@ options:
       - On Solaris and FreeBSD, this will be seconds.
     type: int
     default: 0
-  connect_timeout:
-    description:
-      - Maximum seconds to wait for a successful connection to the managed hosts before trying again.
-      - If unspecified, the default setting for the underlying connection plugin is used.
-    type: int
   msg:
     description:
       - Message to display to users before shutdown.

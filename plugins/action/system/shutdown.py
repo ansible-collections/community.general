@@ -27,7 +27,6 @@ class TimedOutException(Exception):
 class ActionModule(ActionBase):
     TRANSFERS_FILES = False
     _VALID_ARGS = frozenset((
-        'connect_timeout',
         'msg',
         'delay',
         'search_paths'
@@ -214,13 +213,6 @@ class ActionModule(ActionBase):
 
         distribution = self.get_distribution(task_vars)
 
-        # Get the original connection_timeout option var so it can be reset after
-        original_connection_timeout = None
-        try:
-            original_connection_timeout = self._connection.get_option('connection_timeout')
-            display.debug("{action}: saving original connect_timeout of {timeout}".format(action=self._task.action, timeout=original_connection_timeout))
-        except KeyError:
-            display.debug("{action}: connect_timeout connection option has not been set".format(action=self._task.action))
         # Initiate shutdown
         shutdown_result = self.perform_shutdown(task_vars, distribution)
 
