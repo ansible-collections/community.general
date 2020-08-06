@@ -162,7 +162,10 @@ class ActionModule(ActionBase):
         try:
             display.vvv("{action}: shutting down server...".format(action=self._task.action))
             display.debug("{action}: shutting down server with command '{command}'".format(action=self._task.action, command=shutdown_command_exec))
-            shutdown_result = self._low_level_execute_command(shutdown_command_exec, sudoable=self.DEFAULT_SUDOABLE)
+            if self._play_context.check_mode:
+                shutdown_result['rc'] = 0
+            else:
+                shutdown_result = self._low_level_execute_command(shutdown_command_exec, sudoable=self.DEFAULT_SUDOABLE)
         except AnsibleConnectionFailure as e:
             # If the connection is closed too quickly due to the system being shutdown, carry on
             display.debug('{action}: AnsibleConnectionFailure caught and handled: {error}'.format(action=self._task.action, error=to_text(e)))
@@ -188,8 +191,6 @@ class ActionModule(ActionBase):
             msg = 'Running {0} with local connection would shutdown the control node.'.format(self._task.action)
             return {'changed': False, 'elapsed': 0, 'shutdown': False, 'failed': True, 'msg': msg}
 
-        if self._play_context.check_mode:
-            return {'changed': True, 'elapsed': 0, 'shutdown': True}
 
         if task_vars is None:
             task_vars = {}
