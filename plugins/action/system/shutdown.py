@@ -66,7 +66,7 @@ class ActionModule(ActionBase):
 
     def _check_delay(self, key, default):
         """Ensure that the value is positive or zero"""
-        value = int(self._task.args.get(key, self._task.args.get(key + '_sec', default)))
+        value = int(self._task.args.get(key, default))
         if value < 0:
             value = 0
         return value
