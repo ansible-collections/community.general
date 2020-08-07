@@ -31,7 +31,7 @@ DOCUMENTATION = '''
             default: False
         endpoints:
             description:
-            - Counterpart of C(ETCDCTL_ENDPOINTS) enviroment variable.
+            - Counterpart of C(ETCDCTL_ENDPOINTS) environment variable.
               Specify the etcd3 connection with and URL form eg. C(https://hostname:2379)  or C(<host>:<port>) form.
             - The C(host) part is overwritten by I(host) option, if defined.
             - The C(port) part is overwritten by I(port) option, if defined.
@@ -76,20 +76,20 @@ DOCUMENTATION = '''
             type: int
         user:
             description:
-            - Authentified user name.
+            - Authenticated user name.
             env:
             - name: ETCDCTL_USER
             type: str
         password:
             description:
-            - Authentified user password.
+            - Authenticated user password.
             env:
             - name: ETCDCTL_PASSWORD
             type: str
 
     notes:
     - I(host) and I(port) options take precedence over (endpoints) option.
-    - The recommanded way to connect to etcd3 server is using C(ETCDCTL_ENDPOINT)
+    - The recommended way to connect to etcd3 server is using C(ETCDCTL_ENDPOINT)
       environment variable and keep I(endpoints), I(host), and I(port) unused.
     seealso:
     - module: community.general.etcd3

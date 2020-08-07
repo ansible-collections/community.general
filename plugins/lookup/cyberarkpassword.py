@@ -29,7 +29,7 @@ DOCUMENTATION = '''
           - "They could be: Password, PassProps.<property>, PasswordChangeInProcess"
         default: 'password'
       _extra:
-        description: for extra_parms values please check parameters for clipasswordsdk in CyberArk's "Credential Provider and ASCP Implementation Guide"
+        description: for extra_params values please check parameters for clipasswordsdk in CyberArk's "Credential Provider and ASCP Implementation Guide"
     note:
       - For Ansible on windows, please change the -parameters (-p, -d, and -o) to /parameters (/p, /d, and /o) and change the location of CLIPasswordSDK.exe
 '''
