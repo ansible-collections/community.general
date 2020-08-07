@@ -27,7 +27,7 @@ DOCUMENTATION = '''
           - If the key has a value with the specified index then this is returned allowing access to historical values.
       datacenter:
         description:
-          - Retrieve the key from a consul datatacenter other than the default for the consul host.
+          - Retrieve the key from a consul datacenter other than the default for the consul host.
       token:
         description: The acl token to allow access to restricted values.
       host:
