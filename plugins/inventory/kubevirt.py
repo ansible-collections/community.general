@@ -24,7 +24,7 @@ DOCUMENTATION = '''
       plugin:
         description: token that ensures this is a source file for the 'kubevirt' plugin.
         required: True
-        choices: ['kubevirt']
+        choices: ['kubevirt', 'community.general.kubevirt']
         type: str
       host_format:
         description:
@@ -123,7 +123,7 @@ EXAMPLES = '''
 # File must be named kubevirt.yaml or kubevirt.yml
 
 # Authenticate with token, and return all virtual machines for all namespaces
-plugin: kubevirt
+plugin: community.general.kubevirt
 connections:
  - host: https://kubevirt.io
    token: xxxxxxxxxxxxxxxx
@@ -131,7 +131,7 @@ connections:
 
 # Use default config (~/.kube/config) file and active context, and return vms with interfaces
 # connected to network myovsnetwork and from namespace vms
-plugin: kubevirt
+plugin: community.general.kubevirt
 connections:
   - namespaces:
       - vms

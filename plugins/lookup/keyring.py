@@ -20,11 +20,11 @@ EXAMPLES = """
 - name : output secrets to screen (BAD IDEA)
   ansible.builtin.debug:
     msg: "Password: {{item}}"
-  with_keyring:
+  with_community.general.keyring:
     - 'servicename username'
 
 - name: access mysql with password from keyring
-  mysql_db: login_password={{lookup('keyring','mysql joe')}} login_user=joe
+  mysql_db: login_password={{lookup('community.general.keyring','mysql joe')}} login_user=joe
 """
 
 RETURN = """

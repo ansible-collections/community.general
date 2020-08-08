@@ -19,7 +19,7 @@ DOCUMENTATION = '''
         plugin:
             description: token that ensures this is a source file for the 'nmap' plugin.
             required: True
-            choices: ['nmap']
+            choices: ['nmap', 'community.general.nmap']
         address:
             description: Network IP or range of IPs to scan, you can use a simple range (10.2.2.15-25) or CIDR notation.
             required: True
@@ -43,10 +43,10 @@ DOCUMENTATION = '''
         - 'TODO: add OS fingerprinting'
 '''
 EXAMPLES = '''
-    # inventory.config file in YAML format
-    plugin: nmap
-    strict: False
-    address: 192.168.0.0/24
+# inventory.config file in YAML format
+plugin: community.general.nmap
+strict: False
+address: 192.168.0.0/24
 '''
 
 import os
