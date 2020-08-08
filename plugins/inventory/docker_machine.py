@@ -24,7 +24,7 @@ DOCUMENTATION = '''
         plugin:
             description: token that ensures this is a source file for the C(docker_machine) plugin.
             required: yes
-            choices: ['docker_machine']
+            choices: ['docker_machine', 'community.general.docker_machine']
         daemon_env:
             description:
                 - Whether docker daemon connection environment variables should be fetched, and how to behave if they cannot be fetched.
@@ -54,7 +54,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 # Minimal example
-plugin: docker_machine
+plugin: community.general.docker_machine
 
 # Example using constructed features to create a group per Docker Machine driver
 # (https://docs.docker.com/machine/drivers/), e.g.:

@@ -47,13 +47,16 @@ EXAMPLES = """
   ansible.builtin.shell: credstash put my-github-password secure123
 
 - name: "Test credstash lookup plugin -- get my github password"
-  ansible.builtin.debug: msg="Credstash lookup! {{ lookup('credstash', 'my-github-password') }}"
+  ansible.builtin.debug:
+    msg: "Credstash lookup! {{ lookup('community.general.credstash', 'my-github-password') }}"
 
 - name: "Test credstash lookup plugin -- get my other password from us-west-1"
-  ansible.builtin.debug: msg="Credstash lookup! {{ lookup('credstash', 'my-other-password', region='us-west-1') }}"
+  ansible.builtin.debug:
+    msg: "Credstash lookup! {{ lookup('community.general.credstash', 'my-other-password', region='us-west-1') }}"
 
 - name: "Test credstash lookup plugin -- get the company's github password"
-  ansible.builtin.debug: msg="Credstash lookup! {{ lookup('credstash', 'company-github-password', table='company-passwords') }}"
+  ansible.builtin.debug:
+    msg: "Credstash lookup! {{ lookup('community.general.credstash', 'company-github-password', table='company-passwords') }}"
 
 - name: Example play using the 'context' feature
   hosts: localhost
@@ -64,10 +67,12 @@ EXAMPLES = """
   tasks:
 
   - name: "Test credstash lookup plugin -- get the password with a context passed as a variable"
-    ansible.builtin.debug: msg="{{ lookup('credstash', 'some-password', context=context) }}"
+    ansible.builtin.debug:
+      msg: "{{ lookup('community.general.credstash', 'some-password', context=context) }}"
 
   - name: "Test credstash lookup plugin -- get the password with a context defined here"
-    ansible.builtin.debug: msg="{{ lookup('credstash', 'some-password', context=dict(app='my_app', environment='production')) }}"
+    ansible.builtin.debug:
+      msg: "{{ lookup('community.general.credstash', 'some-password', context=dict(app='my_app', environment='production')) }}"
 """
 
 RETURN = """

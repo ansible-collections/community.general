@@ -48,11 +48,13 @@ options:
 EXAMPLES = """
 - name: fetch all networkview objects
   ansible.builtin.set_fact:
-    networkviews: "{{ lookup('nios', 'networkview', provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
+    networkviews: "{{ lookup('community.general.nios', 'networkview',
+                         provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
 
 - name: fetch the default dns view
   ansible.builtin.set_fact:
-    dns_views: "{{ lookup('nios', 'view', filter={'name': 'default'}, provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
+    dns_views: "{{ lookup('community.general.nios', 'view', filter={'name': 'default'},
+                      provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
 
 # all of the examples below use credentials that are  set using env variables
 # export INFOBLOX_HOST=nios01
@@ -61,20 +63,20 @@ EXAMPLES = """
 
 - name: fetch all host records and include extended attributes
   ansible.builtin.set_fact:
-    host_records: "{{ lookup('nios', 'record:host', return_fields=['extattrs', 'name', 'view', 'comment']}) }}"
+    host_records: "{{ lookup('community.general.nios', 'record:host', return_fields=['extattrs', 'name', 'view', 'comment']}) }}"
 
 
 - name: use env variables to pass credentials
   ansible.builtin.set_fact:
-    networkviews: "{{ lookup('nios', 'networkview') }}"
+    networkviews: "{{ lookup('community.general.nios', 'networkview') }}"
 
 - name: get a host record
   ansible.builtin.set_fact:
-    host: "{{ lookup('nios', 'record:host', filter={'name': 'hostname.ansible.com'}) }}"
+    host: "{{ lookup('community.general.nios', 'record:host', filter={'name': 'hostname.ansible.com'}) }}"
 
 - name: get the authoritative zone from a non default dns view
   ansible.builtin.set_fact:
-    host: "{{ lookup('nios', 'zone_auth', filter={'fqdn': 'ansible.com', 'view': 'ansible-dns'}) }}"
+    host: "{{ lookup('community.general.nios', 'zone_auth', filter={'fqdn': 'ansible.com', 'view': 'ansible-dns'}) }}"
 """
 
 RETURN = """
