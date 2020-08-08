@@ -39,13 +39,16 @@ EXAMPLES = """
 # All this examples depends on hiera.yml that describes the hierarchy
 
 - name: "a value from Hiera 'DB'"
-  ansible.builtin.debug: msg={{ lookup('hiera', 'foo') }}
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.hiera', 'foo') }}"
 
 - name: "a value from a Hiera 'DB' on other environment"
-  ansible.builtin.debug: msg={{ lookup('hiera', 'foo environment=production') }}
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.hiera', 'foo environment=production') }}"
 
 - name: "a value from a Hiera 'DB' for a concrete node"
-  ansible.builtin.debug: msg={{ lookup('hiera', 'foo fqdn=puppet01.localdomain') }}
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.hiera', 'foo fqdn=puppet01.localdomain') }}"
 """
 
 RETURN = """

@@ -28,7 +28,7 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
     - ansible.builtin.debug:
-        msg: "{{ lookup('chef_databag', 'name=data_bag_name item=data_bag_item') }}"
+        msg: "{{ lookup('community.general.chef_databag', 'name=data_bag_name item=data_bag_item') }}"
 """
 
 RETURN = """

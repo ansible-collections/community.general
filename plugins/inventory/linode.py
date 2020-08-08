@@ -22,7 +22,7 @@ DOCUMENTATION = r'''
         plugin:
             description: marks this as an instance of the 'linode' plugin
             required: true
-            choices: ['linode']
+            choices: ['linode', 'community.general.linode']
         access_token:
             description: The Linode account personal access token.
             required: true
@@ -42,10 +42,10 @@ DOCUMENTATION = r'''
 
 EXAMPLES = r'''
 # Minimal example. `LINODE_ACCESS_TOKEN` is exposed in environment.
-plugin: linode
+plugin: community.general.linode
 
 # Example with regions, types, groups and access token
-plugin: linode
+plugin: community.general.linode
 access_token: foobar
 regions:
   - eu-west

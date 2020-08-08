@@ -18,7 +18,7 @@ DOCUMENTATION = '''
         plugin:
             description: token that ensures this is a source file for the 'online' plugin.
             required: True
-            choices: ['online']
+            choices: ['online', 'community.general.online']
         oauth_token:
             required: True
             description: Online OAuth token.
@@ -49,7 +49,7 @@ EXAMPLES = '''
 # online_inventory.yml file in YAML format
 # Example command line: ansible-inventory --list -i online_inventory.yml
 
-plugin: online
+plugin: community.general.online
 hostnames:
   - public_ipv4
 groups:
