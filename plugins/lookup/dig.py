@@ -44,25 +44,34 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: Simple A record (IPV4 address) lookup for example.com
-  ansible.builtin.debug: msg="{{ lookup('dig', 'example.com.')}}"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.dig', 'example.com.')}}"
 
 - name: "The TXT record for example.org."
-  ansible.builtin.debug: msg="{{ lookup('dig', 'example.org.', 'qtype=TXT') }}"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.dig', 'example.org.', 'qtype=TXT') }}"
 
 - name: "The TXT record for example.org, alternative syntax."
-  ansible.builtin.debug: msg="{{ lookup('dig', 'example.org./TXT') }}"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.dig', 'example.org./TXT') }}"
 
 - name: use in a loop
-  ansible.builtin.debug: msg="MX record for gmail.com {{ item }}"
-  with_items: "{{ lookup('dig', 'gmail.com./MX', wantlist=True) }}"
+  ansible.builtin.debug:
+    msg: "MX record for gmail.com {{ item }}"
+  with_items: "{{ lookup('community.general.dig', 'gmail.com./MX', wantlist=True) }}"
 
-- ansible.builtin.debug: msg="Reverse DNS for 192.0.2.5 is {{ lookup('dig', '192.0.2.5/PTR') }}"
-- ansible.builtin.debug: msg="Reverse DNS for 192.0.2.5 is {{ lookup('dig', '5.2.0.192.in-addr.arpa./PTR') }}"
-- ansible.builtin.debug: msg="Reverse DNS for 192.0.2.5 is {{ lookup('dig', '5.2.0.192.in-addr.arpa.', 'qtype=PTR') }}"
-- ansible.builtin.debug: msg="Querying 198.51.100.23 for IPv4 address for example.com. produces {{ lookup('dig', 'example.com', '@198.51.100.23') }}"
+- ansible.builtin.debug:
+    msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '192.0.2.5/PTR') }}"
+- ansible.builtin.debug:
+    msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '5.2.0.192.in-addr.arpa./PTR') }}"
+- ansible.builtin.debug:
+    msg: "Reverse DNS for 192.0.2.5 is {{ lookup('community.general.dig', '5.2.0.192.in-addr.arpa.', 'qtype=PTR') }}"
+- ansible.builtin.debug:
+    msg: "Querying 198.51.100.23 for IPv4 address for example.com. produces {{ lookup('dig', 'example.com', '@198.51.100.23') }}"
 
-- ansible.builtin.debug: msg="XMPP service for gmail.com. is available at {{ item.target }} on port {{ item.port }}"
-  with_items: "{{ lookup('dig', '_xmpp-server._tcp.gmail.com./SRV', 'flat=0', wantlist=True) }}"
+- ansible.builtin.debug:
+    msg: "XMPP service for gmail.com. is available at {{ item.target }} on port {{ item.port }}"
+  with_items: "{{ lookup('community.general.dig', '_xmpp-server._tcp.gmail.com./SRV', 'flat=0', wantlist=True) }}"
 """
 
 RETURN = """

@@ -17,7 +17,7 @@ DOCUMENTATION = '''
         plugin:
             description: token that ensures this is a source file for the 'scaleway' plugin.
             required: True
-            choices: ['scaleway']
+            choices: ['scaleway', 'community.general.scaleway']
         regions:
             description: Filter results on a specific Scaleway region
             type: list
@@ -60,7 +60,7 @@ EXAMPLES = '''
 
 # use hostname as inventory_hostname
 # use the private IP address to connect to the host
-plugin: scaleway
+plugin: community.general.scaleway
 regions:
   - ams1
   - par1
@@ -73,7 +73,7 @@ variables:
   state: state
 
 # use hostname as inventory_hostname and public IP address to connect to the host
-plugin: scaleway
+plugin: community.general.scaleway
 hostnames:
   - hostname
 regions:

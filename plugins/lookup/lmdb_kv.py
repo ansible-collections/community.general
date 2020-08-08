@@ -25,14 +25,14 @@ DOCUMENTATION = '''
 EXAMPLES = """
 - name: query LMDB for a list of country codes
   ansible.builtin.debug:
-    msg: "{{ query('lmdb_kv', 'nl', 'be', 'lu', db='jp.mdb') }}"
+    msg: "{{ query('community.general.lmdb_kv', 'nl', 'be', 'lu', db='jp.mdb') }}"
 
 - name: use list of values in a loop by key wildcard
   ansible.builtin.debug:
     msg: "Hello from {{ item.0 }} a.k.a. {{ item.1 }}"
   vars:
     - lmdb_kv_db: jp.mdb
-  with_lmdb_kv:
+  with_community.general.lmdb_kv:
      - "n*"
 
 - name: get an item by key
@@ -41,7 +41,7 @@ EXAMPLES = """
       - item == 'Belgium'
     vars:
       - lmdb_kv_db: jp.mdb
-    with_lmdb_kv:
+    with_community.general.lmdb_kv:
       - be
 """
 

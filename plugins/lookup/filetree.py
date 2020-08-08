@@ -25,7 +25,7 @@ EXAMPLES = r"""
     path: /web/{{ item.path }}
     state: directory
     mode: '{{ item.mode }}'
-  with_filetree: web/
+  with_community.general.filetree: web/
   when: item.state == 'directory'
 
 - name: Template files (explicitly skip directories in order to use the 'src' attribute)
@@ -33,7 +33,7 @@ EXAMPLES = r"""
     src: '{{ item.src }}'
     dest: /web/{{ item.path }}
     mode: '{{ item.mode }}'
-  with_filetree: web/
+  with_community.general.filetree: web/
   when: item.state == 'file'
 
 - name: Recreate symlinks
@@ -43,7 +43,7 @@ EXAMPLES = r"""
     state: link
     force: yes
     mode: '{{ item.mode }}'
-  with_filetree: web/
+  with_community.general.filetree: web/
   when: item.state == 'link'
 
 - name: list all files under web/

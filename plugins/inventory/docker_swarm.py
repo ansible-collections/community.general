@@ -26,11 +26,11 @@ DOCUMENTATION = '''
           I(nonleaders) - all nodes except the swarm leader."
     options:
         plugin:
-            description: The name of this plugin, it should always be set to C(docker_swarm) for this plugin to
-                         recognize it as it's own.
+            description: The name of this plugin, it should always be set to C(community.general.docker_swarm)
+                         for this plugin to recognize it as it's own.
             type: str
             required: true
-            choices: docker_swarm
+            choices: [ docker_swarm, community.general.docker_swarm ]
         docker_host:
             description:
                 - Socket of a Docker swarm manager node (C(tcp), C(unix)).
@@ -101,20 +101,20 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 # Minimal example using local docker
-plugin: docker_swarm
+plugin: community.general.docker_swarm
 docker_host: unix://var/run/docker.sock
 
 # Minimal example using remote docker
-plugin: docker_swarm
+plugin: community.general.docker_swarm
 docker_host: tcp://my-docker-host:2375
 
 # Example using remote docker with unverified TLS
-plugin: docker_swarm
+plugin: community.general.docker_swarm
 docker_host: tcp://my-docker-host:2376
 tls: yes
 
 # Example using remote docker with verified TLS and client certificate verification
-plugin: docker_swarm
+plugin: community.general.docker_swarm
 docker_host: tcp://my-docker-host:2376
 validate_certs: yes
 ca_cert: /somewhere/ca.pem
@@ -122,7 +122,7 @@ client_key: /somewhere/key.pem
 client_cert: /somewhere/cert.pem
 
 # Example using constructed features to create groups and set ansible_host
-plugin: docker_swarm
+plugin: community.general.docker_swarm
 docker_host: tcp://my-docker-host:2375
 strict: False
 keyed_groups:
