@@ -58,32 +58,33 @@ EXAMPLES = """
 # Debug is used for examples, BAD IDEA to show passwords on screen
 - name: Basic lookup. Fails if example/test doesn't exist
   ansible.builtin.debug:
-    msg: "{{ lookup('passwordstore', 'example/test')}}"
+    msg: "{{ lookup('community.general.passwordstore', 'example/test')}}"
 
 - name: Create pass with random 16 character password. If password exists just give the password
   ansible.builtin.debug:
     var: mypassword
   vars:
-    mypassword: "{{ lookup('passwordstore', 'example/test create=true')}}"
+    mypassword: "{{ lookup('community.general.passwordstore', 'example/test create=true')}}"
 
 - name: Different size password
   ansible.builtin.debug:
-    msg: "{{ lookup('passwordstore', 'example/test create=true length=42')}}"
+    msg: "{{ lookup('community.general.passwordstore', 'example/test create=true length=42')}}"
 
 - name: Create password and overwrite the password if it exists. As a bonus, this module includes the old password inside the pass file
   ansible.builtin.debug:
-    msg: "{{ lookup('passwordstore', 'example/test create=true overwrite=true')}}"
+    msg: "{{ lookup('community.general.passwordstore', 'example/test create=true overwrite=true')}}"
 
 - name: Create an alphanumeric password
-  ansible.builtin.debug: msg="{{ lookup('passwordstore', 'example/test create=true nosymbols=true') }}"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.passwordstore', 'example/test create=true nosymbols=true') }}"
 
 - name: Return the value for user in the KV pair user, username
   ansible.builtin.debug:
-    msg: "{{ lookup('passwordstore', 'example/test subkey=user')}}"
+    msg: "{{ lookup('community.general.passwordstore', 'example/test subkey=user')}}"
 
 - name: Return the entire password file content
   ansible.builtin.set_fact:
-    passfilecontent: "{{ lookup('passwordstore', 'example/test returnall=true')}}"
+    passfilecontent: "{{ lookup('community.general.passwordstore', 'example/test returnall=true')}}"
 """
 
 RETURN = """
