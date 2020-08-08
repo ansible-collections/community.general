@@ -17,9 +17,9 @@ DOCUMENTATION = '''
         - inventory_cache
     options:
       plugin:
-        description: The name of this plugin, it should always be set to C(cobbler) for this plugin to recognize it as it's own.
+        description: The name of this plugin, it should always be set to C(community.general.cobbler) for this plugin to recognize it as it's own.
         required: yes
-        choices: ['cobbler']
+        choices: [ 'cobbler', 'community.general.cobbler' ]
       url:
         description: URL to cobbler.
         default: 'http://cobbler/cobbler_api'
@@ -92,7 +92,7 @@ except ImportError:
 class InventoryModule(BaseInventoryPlugin, Cacheable):
     ''' Host inventory parser for ansible using cobbler as source. '''
 
-    NAME = 'cobbler'
+    NAME = 'community.general.cobbler'
 
     def __init__(self):
 

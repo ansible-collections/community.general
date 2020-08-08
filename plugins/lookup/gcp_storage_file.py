@@ -29,9 +29,11 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = '''
-- ansible.builtin.debug: msg="the value of foo.txt is {{ lookup('gcp_storage_file',
-    bucket='gcp-bucket', src='mydir/foo.txt', project='project-name',
-    auth_kind='serviceaccount', service_account_file='/tmp/myserviceaccountfile.json') }}"
+- ansible.builtin.debug:
+    msg: |
+         the value of foo.txt is {{ lookup('community.general.gcp_storage_file',
+         bucket='gcp-bucket', src='mydir/foo.txt', project='project-name',
+         auth_kind='serviceaccount', service_account_file='/tmp/myserviceaccountfile.json') }}
 '''
 
 RETURN = '''

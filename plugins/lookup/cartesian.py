@@ -20,11 +20,13 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: Example of the change in the description
-  ansible.builtin.debug: msg="{{ lookup('cartesian', [1,2,3], [a, b])}}"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.cartesian', [1,2,3], [a, b])}}"
 
 - name: loops over the cartesian product of the supplied lists
-  ansible.builtin.debug: msg="{{item}}"
-  with_cartesian:
+  ansible.builtin.debug:
+    msg: "{{item}}"
+  with_community.general.cartesian:
     - "{{list1}}"
     - "{{list2}}"
     - [1,2,3,4,5,6]
