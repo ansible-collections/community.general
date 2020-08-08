@@ -100,21 +100,21 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
-    - name: "a value from a locally running etcd"
-      ansible.builtin.debug:
-        msg: "{{ lookup('community.general.etcd3', 'foo/bar') }}"
+- name: "a value from a locally running etcd"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.etcd3', 'foo/bar') }}"
 
-    - name: "values from multiple folders on a locally running etcd"
-      ansible.builtin.debug:
-        msg: "{{ lookup('community.general.etcd3', 'foo', 'bar', 'baz') }}"
+- name: "values from multiple folders on a locally running etcd"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.etcd3', 'foo', 'bar', 'baz') }}"
 
-    - name: "look for a key prefix"
-      ansible.builtin.debug:
-        msg: "{{ lookup('community.general.etcd3', '/foo/bar', prefix=True) }}"
+- name: "look for a key prefix"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.etcd3', '/foo/bar', prefix=True) }}"
 
-    - name: "connect to etcd3 with a client certificate"
-      ansible.builtin.debug:
-        msg: "{{ lookup('community.general.etcd3', 'foo/bar', cert_cert='/etc/ssl/etcd/client.pem', cert_key='/etc/ssl/etcd/client.key') }}"
+- name: "connect to etcd3 with a client certificate"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.etcd3', 'foo/bar', cert_cert='/etc/ssl/etcd/client.pem', cert_key='/etc/ssl/etcd/client.key') }}"
 '''
 
 RETURN = '''

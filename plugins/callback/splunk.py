@@ -63,7 +63,7 @@ EXAMPLES = '''
 examples: >
   To enable, add this to your ansible.cfg file in the defaults block
     [defaults]
-    callback_whitelist = splunk
+    callback_whitelist = community.general.splunk
   Set the environment variable
     export SPLUNK_URL=http://mysplunkinstance.datapaas.io:8088/services/collector/event
     export SPLUNK_AUTHTOKEN=f23blad6-5965-4537-bf69-5b5a545blabla88

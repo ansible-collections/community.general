@@ -42,7 +42,7 @@ EXAMPLES = '''
 examples: >
   To enable, add this to your ansible.cfg file in the defaults block
     [defaults]
-    callback_whitelist = sumologic
+    callback_whitelist = community.general.sumologic
 
   Set the environment variable
     export SUMOLOGIC_URL=https://endpoint1.collection.us2.sumologic.com/receiver/v1/http/R8moSv1d8EW9LAUFZJ6dbxCFxwLH6kfCdcBfddlfxCbLuL-BN5twcTpMk__pYy_cDmp==

@@ -75,7 +75,7 @@ examples: >
   To enable, add this to your ansible.cfg file in the defaults block
 
     [defaults]
-    callback_whitelist = logentries
+    callback_whitelist = community.general.logentries
 
   Either set the environment variables
     export LOGENTRIES_API=data.logentries.com

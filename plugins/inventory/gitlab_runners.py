@@ -28,6 +28,7 @@ DOCUMENTATION = '''
             required: true
             choices:
               - gitlab_runners
+              - community.general.gitlab_runners
         server_url:
             description: The URL of the GitLab server, with protocol (i.e. http or https).
             env:
@@ -60,11 +61,11 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 # gitlab_runners.yml
-plugin: gitlab_runners
+plugin: community.general.gitlab_runners
 host: https://gitlab.com
 
 # Example using constructed features to create groups and set ansible_host
-plugin: gitlab_runners
+plugin: community.general.gitlab_runners
 host: https://gitlab.com
 strict: False
 keyed_groups:
