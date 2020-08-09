@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 lookup: dsv
-author: Adam Migus (adam@migus.org)
+author: Adam Migus (@amigus) <adam@migus.org>
 short_description: Get secrets from Thycotic DevOps Secrets Vault
 version_added: 1.0.0
 description:
