@@ -1,1 +1,1 @@
-./plugins/modules/web_infrastructure/jenkins_build.py
+./web_infrastructure/jenkins_build.py
