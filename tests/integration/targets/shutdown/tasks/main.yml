@@ -9,7 +9,8 @@
       assert:
         that: '"shutdown" in shutdown_result["shutdown_command"]'
 
-  when: not ansible_os_family in ['Alpine', 'VMKernel']
+  when: not (ansible_os_family in ['Alpine', 'VMKernel'] or
+        (ansible_os_family == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')))
 
 - block:
     - name: execute shutdown with check_mode true
@@ -21,7 +22,7 @@
       assert:
         that: '"poweroff" in shutdown_result["shutdown_command"]'
 
-  when: ansible_os_family in ['Alpine']
+  when: ansible_os_family == 'Alpine'
 
 - block:
     - name: execute shutdown with check_mode true
@@ -33,4 +34,4 @@
       assert:
         that: '"halt" in shutdown_result["shutdown_command"]'
 
-  when: ansible_os_family in ['VMKernel']
+  when: ansible_os_family == 'VMKernel'
