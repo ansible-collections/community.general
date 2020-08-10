@@ -1,6 +1,5 @@
 ---
-- name:
-  block:
+- block:
     - name: execute shutdown with check_mode true
       community.general.shutdown:
       check_mode: yes
@@ -12,7 +11,7 @@
 
   when: not ansible_os_family in ['Alpine', 'VMKernel']
 
-  block:
+- block:
     - name: execute shutdown with check_mode true
       community.general.shutdown:
       check_mode: yes
@@ -24,7 +23,7 @@
 
   when: ansible_os_family in ['Alpine']
 
-  block:
+- block:
     - name: execute shutdown with check_mode true
       community.general.shutdown:
       check_mode: yes
