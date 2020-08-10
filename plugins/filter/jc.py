@@ -44,7 +44,7 @@ def jc(data, parser, quiet=True, raw=False):
 
         dictionary or list of dictionaries
 
-    Example: 
+    Example:
 
         - name: run date command
           hosts: ubuntu
