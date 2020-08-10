@@ -182,7 +182,7 @@ class ActionModule(ActionBase):
         self._supports_async = True
 
         # If running with local connection, fail so we don't shutdown ourself
-        if self._connection.transport == 'local':
+        if self._connection.transport == 'local' and (not self._play_context.check_mode):
             msg = 'Running {0} with local connection would shutdown the control node.'.format(self._task.action)
             return {'changed': False, 'elapsed': 0, 'shutdown': False, 'failed': True, 'msg': msg}
 
