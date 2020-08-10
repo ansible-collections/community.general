@@ -174,6 +174,7 @@ class ActionModule(ActionBase):
             return result
 
         result['failed'] = False
+        result['shutdown_command'] = shutdown_command_exec
         return result
 
     def run(self, tmp=None, task_vars=None):
@@ -204,5 +205,6 @@ class ActionModule(ActionBase):
 
         result['shutdown'] = True
         result['changed'] = True
+        result['shutdown_command'] = shutdown_result['shutdown_command']
 
         return result

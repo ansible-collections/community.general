@@ -1,0 +1,37 @@
+---
+- name:
+  block:
+    - name: execute shutdown with check_mode true
+      community.general.shutdown:
+      check_mode: yes
+      register: shutdown_result
+
+    - name: Verify shutdown is present
+      assert:
+        that: '"shutdown" in shutdown_result["shutdown_command"]'
+
+  when: not ansible_os_family in ['Alpine', 'VMKernel']
+
+  block:
+    - name: execute shutdown with check_mode true
+      community.general.shutdown:
+      check_mode: yes
+      register: shutdown_result
+
+    - name: Verify shutdown is present
+      assert:
+        that: '"poweroff" in shutdown_result["shutdown_command"]'
+
+  when: ansible_os_family in ['Alpine']
+
+  block:
+    - name: execute shutdown with check_mode true
+      community.general.shutdown:
+      check_mode: yes
+      register: shutdown_result
+
+    - name: Verify shutdown is present
+      assert:
+        that: '"halt" in shutdown_result["shutdown_command"]'
+
+  when: ansible_os_family in ['VMKernel']
