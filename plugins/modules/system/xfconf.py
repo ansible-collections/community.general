@@ -13,7 +13,6 @@ module: xfconf
 author:
     - "Joseph Benden (@jbenden)"
     - "Alexei Znamensky (@russoz)"
-    - "Adriaan Callaerts (@call-a3)"
 short_description: Edit XFCE4 Configurations
 description:
   - This module allows for the manipulation of Xfce 4 Configuration via
@@ -148,8 +147,7 @@ class XfConfProperty(object):
         self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.property, self.channel)
 
         def run(cmd):
-            # Force language to 'C' to ensure return values are always formatted in english, even in non-english environments
-            return module.run_command(cmd, check_rc=False, environ_update=dict(LANG='C'))
+            return module.run_command(cmd, check_rc=False)
         self._run = run
 
     def _execute_xfconf_query(self, args=None):
@@ -263,6 +261,9 @@ def main():
         ],
         supports_check_mode=True
     )
+
+    # Force language to 'C' to ensure return values are always formatted in english, even in non-english environments
+    module.run_command_environ_update = dict(LANG='C')
 
     state = module.params['state']
 
