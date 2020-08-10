@@ -112,7 +112,7 @@ class LookupModule(LookupBase):
         self.set_options(var_options=variables, direct=kwargs)
 
         vault = LookupModule.Client(
-            **{
+            {
                 "tenant": self.get_option("tenant"),
                 "client_id": self.get_option("client_id"),
                 "client_secret": self.get_option("client_secret"),
