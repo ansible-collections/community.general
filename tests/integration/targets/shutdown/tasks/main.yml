@@ -81,4 +81,4 @@
   apt:
     name: systemd-sysv
     state: absent
-  when: systemd_sysv_install is changed and ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')
+  when: systemd_sysv_install is changed
