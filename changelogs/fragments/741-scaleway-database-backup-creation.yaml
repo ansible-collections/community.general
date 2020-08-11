@@ -1,3 +1,0 @@
----
-minor_changes:
-  - scaleway_database_backup - new module for Scaleway provider Managed database backups (https://developers.scaleway.com/en/products/rdb/api/#backups-d14bc7).
