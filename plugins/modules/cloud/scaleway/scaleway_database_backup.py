@@ -129,12 +129,12 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-data:
+metadata:
     description: Backup metadata.
     returned: when C(state=present), C(state=exported) or C(state=restored)
     type: dict
     sample: {
-        "data": {
+        "metadata": {
             "created_at": "2020-08-06T12:42:05.631049Z",
             "database_name": "my-database",
             "download_url": null,
@@ -220,7 +220,7 @@ def present_strategy(module, account_api, backup):
                                      payload)
         if response.ok:
             result = wait_to_complete_state_transition(module, account_api, response.json)
-            module.exit_json(changed=True, data=result)
+            module.exit_json(changed=True, metadata=result)
 
         module.fail_json(msg='Error modifying backup [{0}: {1}]'.format(response.status_code, response.json))
 
@@ -235,7 +235,7 @@ def present_strategy(module, account_api, backup):
 
     if response.ok:
         result = wait_to_complete_state_transition(module, account_api, response.json)
-        module.exit_json(changed=True, data=result)
+        module.exit_json(changed=True, metadata=result)
 
     module.fail_json(msg='Error creating backup [{0}: {1}]'.format(response.status_code, response.json))
 
@@ -250,7 +250,7 @@ def absent_strategy(module, account_api, backup):
     response = account_api.delete('/rdb/v1/regions/%s/backups/%s' % (module.params.get('region'), backup['id']))
     if response.ok:
         result = wait_to_complete_state_transition(module, account_api, response.json)
-        module.exit_json(changed=True, data=result)
+        module.exit_json(changed=True, metadata=result)
 
     module.fail_json(msg='Error deleting backup [{0}: {1}]'.format(response.status_code, response.json))
 
@@ -260,7 +260,7 @@ def exported_strategy(module, account_api, backup):
         module.fail_json(msg=('Backup "%s" not found' % module.params['id']))
 
     if backup['download_url'] is not None:
-        module.exit_json(changed=False, data=backup)
+        module.exit_json(changed=False, metadata=backup)
 
     if module.check_mode:
         module.exit_json(changed=True)
@@ -271,7 +271,7 @@ def exported_strategy(module, account_api, backup):
 
     if response.ok:
         result = wait_to_complete_state_transition(module, account_api, response.json)
-        module.exit_json(changed=True, data=result)
+        module.exit_json(changed=True, metadata=result)
 
     module.fail_json(msg='Error exporting backup [{0}: {1}]'.format(response.status_code, response.json))
 
@@ -294,7 +294,7 @@ def restored_strategy(module, account_api, backup):
 
     if response.ok:
         result = wait_to_complete_state_transition(module, account_api, response.json)
-        module.exit_json(changed=True, data=result)
+        module.exit_json(changed=True, metadata=result)
 
     module.fail_json(msg='Error restoring backup [{0}: {1}]'.format(response.status_code, response.json))
 
