@@ -9,8 +9,7 @@
       assert:
         that: '"shutdown" in shutdown_result["shutdown_command"]'
 
-  when: not (ansible_os_family in ['Alpine', 'VMKernel'] or
-        (ansible_os_family == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')))
+  when: not ansible_os_family in ['Alpine', 'VMKernel']
 
 - block:
     - name: execute shutdown with check_mode true
