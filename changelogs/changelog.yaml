@@ -245,19 +245,6 @@ releases:
       - terraform module - fixes usage for providers not supporting workspaces
       - yarn - Return correct values when running yarn in check mode (https://github.com/ansible-collections/community.general/pull/153).
       - yarn - handle no version when installing module by name (https://github.com/ansible/ansible/issues/55097)
-      - zabbix_action - arguments ``event_source`` and ``esc_period`` no longer required
-        when ``state=absent``
-      - zabbix_host - fixed inventory_mode key error, which occurs with Zabbix 4.4.1
-        or more (https://github.com/ansible/ansible/issues/65304).
-      - zabbix_host - was not possible to update a host where visible_name was not
-        set in zabbix
-      - zabbix_mediatype - Fixed to support zabbix 4.4 or more and python3 (https://github.com/ansible/ansible/pull/67693)
-      - zabbix_template - fixed error when providing empty ``link_templates`` to the
-        module (see https://github.com/ansible/ansible/issues/66417)
-      - zabbix_template - fixed invalid (non-importable) output provided by exporting
-        XML (see https://github.com/ansible/ansible/issues/66466)
-      - zabbix_user - Fixed an issue where module failed with zabbix 4.4 or above
-        (see https://github.com/ansible/ansible/pull/67475)
       - zfs_delegate_admin - add missing choices diff/hold/release to the permissions
         parameter (https://github.com/ansible-collections/community.general/pull/278)
       deprecated_features:
@@ -297,10 +284,6 @@ releases:
       - redfish_config, redfish_command - Behavior to modify the first System, Mananger,
         or Chassis resource when multiple are present is deprecated. Use the new ``resource_id``
         option to specify target resource to modify.
-      - zabbix_proxy - deprecates ``interface`` sub-options ``type`` and ``main``
-        when proxy type is set to passive via ``status=passive``. Make sure these
-        suboptions are removed from your playbook as they were never supported by
-        Zabbix in the first place.
       major_changes:
       - docker_container - the ``network_mode`` option will be set by default to the
         name of the first network in ``networks`` if at least one network is given
@@ -312,8 +295,6 @@ releases:
         whose default value will change from ``compatibility`` to ``no_defaults``.
         Set to an explicit value to avoid deprecation warnings.
       - gitlab_user - no longer requires ``name``, ``email`` and ``password`` arguments
-        when ``state=absent``.
-      - zabbix_action - no longer requires ``esc_period`` and ``event_source`` arguments
         when ``state=absent``.
       minor_changes:
       - A new filter ``to_time_unit`` with specializations ``to_milliseconds``, ``to_seconds``,
@@ -495,24 +476,6 @@ releases:
         paths to multiple configuration files (https://github.com/ansible-collections/community.general/pull/394).
       - terraform - Adds option ``variables_files`` for multiple var-files (https://github.com/ansible-collections/community.general/issues/224).
       - ufw - accept ``interface_in`` and ``interface_out`` as parameters.
-      - zabbix_action - allow str values for ``esc_period`` options (https://github.com/ansible/ansible/pull/66841).
-      - zabbix_host - now supports configuring user macros and host tags on the managed
-        host (see https://github.com/ansible/ansible/pull/66777)
-      - zabbix_host_info - ``host_name`` based search results now include host groups.
-      - zabbix_hostmacro - ``macro_name`` now accepts macros in zabbix native format
-        as well (e.g. ``{$MACRO}``)
-      - zabbix_hostmacro - ``macro_value`` is no longer required when ``state=absent``
-      - zabbix_proxy - ``interface`` sub-options ``type`` and ``main`` are now deprecated
-        and will be removed in community.general 3.0.0. Also, the values passed to
-        ``interface`` are now checked for correct types and unexpected keys.
-      - zabbix_proxy - added option proxy_address for comma-delimited list of IP/CIDR
-        addresses or DNS names to accept active proxy requests from
-      - zabbix_template - add new option omit_date to remove date from exported/dumped
-        template (https://github.com/ansible/ansible/pull/67302)
-      - zabbix_template - adding new update rule templateLinkage.deleteMissing for
-        newer zabbix versions (https://github.com/ansible/ansible/pull/66747).
-      - zabbix_template_info - add new option omit_date to remove date from exported/dumped
-        template (https://github.com/ansible/ansible/pull/67302)
       - zypper - Added ``allow_vendor_change`` and ``replacefiles`` zypper options
         (https://github.com/ansible-collections/community.general/issues/381)
       release_summary: 'This is the first proper release of the ``community.general``
@@ -680,10 +643,8 @@ releases:
     - 63629-postgresql_db_pgc_support.yaml
     - 63887-docker_swarm_service-sort-lists-when-checking-changes.yml
     - 63903-ufw.yaml
-    - 63969-zabbix_action_argsfix.yml
     - 63990-replace-deprecated-basic-functions.yml
     - 64007-postgresql_db_allow_user_name_with_dots.yml
-    - 64032-zabbix_template_fix_return_XML_as_a_string_even_python3.yml
     - 64059-mysql_user_fix_password_comparison.yaml
     - 64288-fix-hashi-vault-kv-v2.yaml
     - 64371-postgresql_privs-always-reports-as-changed-when-using-default_privs.yml
@@ -704,7 +665,6 @@ releases:
     - 65164-postgres_use_query_params_with_cursor.yml
     - 65223-postgresql_db-exception-added.yml
     - 65238-fix_pacman_stdout_parsing.yml
-    - 65304-fix_zabbix_host_inventory_mode_key_error.yml
     - 65310-postgresql_owner_use_query_params.yml
     - 65372-misc-context-manager.yml
     - 65387-homebrew_check_mode_option.yml
@@ -726,13 +686,11 @@ releases:
     - 65894-redfish-bios-attributes.yaml
     - 65903-postgresql_privs_sort_lists_with_none_elements.yml
     - 65993-restart-docker_container-on-restart-policy-updates.yaml
-    - 66026-zabbix_host_info.yml
     - 66048-mysql_add_master_data_parameter.yml
     - 66060-redfish-new-resource-id-option.yaml
     - 66144-docker_container-removal-timeout.yml
     - 66151-docker_swarm_service-healthcheck-start-period.yml
     - 66157-postgresql-create-unique-indexes.yml
-    - 66247-zabbix_proxy-address-field.yaml
     - 66252-mysql_replication_fail_on_error.yml
     - 66268-cyberarkpassword-fix-invalid-attr.yaml
     - 66322-moved_line_causing_terraform_output_suppression.yml
@@ -740,26 +698,20 @@ releases:
     - 66357-support-changing-fetch_url-settings-for-rundeck-modules.yaml
     - 66382-docker_container-port-range.yml
     - 66398-pamd_fix-attributeerror-when-removing-first-line.yml
-    - 66463-zabbix_template-fix-error-linktemplate-and-importdump.yml
     - 66592_ipa_encoding_fix.yml
     - 66599-docker-healthcheck.yml
     - 66600-docker_container-volumes.yml
     - 66688-mysql_db_add_skip_lock_tables_option.yml
     - 66711-postgresql_user_add_comment_parameter.yml
     - 66717-postgresql_db_add_dump_extra_args_param.yml
-    - 66747-zabbix_template-newupdaterule-deletemissinglinkedtemplate.yml
-    - 66777-zabbix_host_tags_macros_support.yml
     - 66801-mysql_user_priv_can_be_dict.yml
     - 66806-mysql_variables_not_support_variables_with_dot.yml
     - 66807-redhat_subscription-no-default-quantity.yaml
-    - 66837-zabbix-proxy-interface.yml
-    - 66841-zabbix_action-allowstrfor-esc_period.yml
     - 66914-purefa_user_string.yaml
     - 66929-pmrun-quote-entire-success-command-string.yml
     - 66957-scaleway-jsonify-only-for-json-requests.yml
     - 66974-mysql_user_doesnt_support_privs_with_underscore.yml
     - 67046-postgresql_modules_make_params_required.yml
-    - 67302-zabbix_template_info-add-omit_date-field.yml
     - 67337-fix-proxysql-mysql-cursor.yaml
     - 67353-docker_login-permissions.yml
     - 67418-postgresql_set_converts_value_to_uppercase.yml
@@ -767,7 +719,6 @@ releases:
     - 67464-postgresql_info_add_collecting_subscription_info.yml
     - 67614-postgresql_info_add_collecting_publication_info.yml
     - 67655-scaleway_compute-get-image-instead-loop-on-list.yml
-    - 67693-zabbix_mediatype.yml
     - 67747-mysql_db_add_dump_extra_args_param.yml
     - 67767-mysql_db_fix_bug_introduced_by_56721.yml
     - 67832-run_powershell_modules_on_windows_containers.yml
@@ -786,7 +737,6 @@ releases:
     - firewalld-version-0_7_0.yml
     - firewalld_zone_target.yml
     - fix-oc-conn-plugin-envvar.yml
-    - fix_zabbix_host_visible_name.yml
     - gitlab-project-variable-variable-type.yml
     - gitlab_project_variable.yml
     - ldap-params-removal.yml
@@ -805,8 +755,6 @@ releases:
     - solaris_zone_name_fix.yml
     - syslogger-disable-check-mode.yaml
     - xml-deprecated-functions.yml
-    - zabbix-hostmacro.yml
-    - zabbix_user-mediatype-error.yml
     modules:
     - description: Override a debian package's version of a file
       name: dpkg_divert
