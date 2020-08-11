@@ -56,6 +56,10 @@
       that:
         - output is changed
 
+  - name: Wait a bit to make sure stack is running
+    pause:
+      seconds: 5
+
   - name: Get docker_stack_info when docker is running
     docker_stack_info:
     register: output
