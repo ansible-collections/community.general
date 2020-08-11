@@ -263,7 +263,7 @@ def main():
     )
 
     # Force language to 'C' to ensure return values are always formatted in english, even in non-english environments
-    module.run_command_environ_update = dict(LANG='C')
+    module.run_command_environ_update = dict(LANGUAGE='C')
 
     state = module.params['state']
 
