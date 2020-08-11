@@ -25,7 +25,7 @@ DOCUMENTATION = '''
       plugin:
         description: The name of this plugin, it should always be set to 'community.general.proxmox' for this plugin to recognize it as it's own.
         required: yes
-        choices: ['proxmox']
+        choices: ['community.general.proxmox']
         type: str
       url:
         description: URL to Proxmox cluster.
