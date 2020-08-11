@@ -117,14 +117,17 @@ EXAMPLES = '''
         database_name: 'my-new-database'
         instance_id: '50968a80-2909-4e5c-b1af-a2e19860dddb'
     
-    - name: Remove a backup
-      ...
+  - name: Remove a backup
+    community.general.scaleway_database_backup:
+        id: '6ef1125a-037e-494f-a911-6d9c49a51691'
+        state: absent
+        region: 'fr-par'
 '''
 
 RETURN = '''
 data:
     description: Backup metadata.
-    returned: when C(state=present)
+    returned: when C(state=present), C(state=exported) or C(state=restored)
     type: dict
     sample: {
         "data": {
