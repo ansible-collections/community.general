@@ -15,6 +15,12 @@ description:
     - Runs the I(facter) discovery program
       (U(https://github.com/puppetlabs/facter)) on the remote system, returning
       JSON data that can be useful for inventory purposes.
+options:
+    arguments:
+        description:
+            - Specifies arguments for facter.
+        type: list
+        required: no
 requirements:
     - facter
     - ruby-json
@@ -27,7 +33,6 @@ EXAMPLES = '''
 # Example command-line invocation
 ansible www.example.net -m facter
 
----
 - name: execute facter no arguments
   facter:
 
