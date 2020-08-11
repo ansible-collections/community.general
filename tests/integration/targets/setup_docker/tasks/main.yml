@@ -27,10 +27,21 @@
           paths:
             - "{{ role_path }}/tasks"
 
+    # Detect docker API version
+    - name: Check Docker API version
+      command: "docker version -f {% raw %}'{{(index .Server.Components 0).Details.ApiVersion}}'{% endraw %}"
+      register: docker_api_version_stdout
+      ignore_errors: yes
+
+    - name: Limit docker pypi package version to < 4.3.0
+      set_fact:
+        docker_pip_package_limit: '<4.3.0'
+      when: (docker_api_version_stdout.stdout | default('0.0')) is version('1.39', '<')
+
     - name: Install Python requirements
       pip:
         state: present
-        name: "{{ docker_pip_packages | union(docker_pip_extra_packages) }}"
+        name: "{{ [docker_pip_package ~ docker_pip_package_limit] + docker_pip_extra_packages }}"
         extra_args: "-c {{ remote_constraints }}"
       notify: cleanup docker
 
