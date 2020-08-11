@@ -44,7 +44,7 @@ options:
       For array mode, use a list of types.
     type: list
     elements: str
-    choices: [ int, uint, bool, float, string ]
+    choices: [ int, uint, bool, float, double, string ]
   state:
     description:
     - The action to take upon the property/value.
@@ -124,7 +124,7 @@ class XfConfProperty(object):
     GET = "get"
     RESET = "absent"
     VALID_STATES = (SET, GET, RESET)
-    VALID_VALUE_TYPES = ('int', 'uint', 'bool', 'float', 'string')
+    VALID_VALUE_TYPES = ('int', 'uint', 'bool', 'float', 'double', 'string')
     previous_value = None
     is_array = None
 
@@ -144,8 +144,6 @@ class XfConfProperty(object):
         self.method_map = dict(zip((self.SET, self.GET, self.RESET),
                                    (self.set, self.get, self.reset)))
 
-        # @TODO This will not work with non-English translations, but xfconf-query does not return
-        #       distinct result codes for distinct outcomes.
         self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.property, self.channel)
 
         def run(cmd):
@@ -263,6 +261,9 @@ def main():
         ],
         supports_check_mode=True
     )
+
+    # Force language to 'C' to ensure return values are always formatted in english, even in non-english environments
+    module.run_command_environ_update = dict(LANGUAGE='C')
 
     state = module.params['state']
 
