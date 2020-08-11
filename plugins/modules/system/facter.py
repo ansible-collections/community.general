@@ -20,6 +20,7 @@ options:
         description:
             - Specifies arguments for facter.
         type: list
+        elements: str
         required: no
 requirements:
     - facter
@@ -31,7 +32,7 @@ author:
 
 EXAMPLES = '''
 # Example command-line invocation
-ansible www.example.net -m facter
+# ansible www.example.net -m facter
 
 - name: execute facter no arguments
   facter:
@@ -52,7 +53,7 @@ from ansible.module_utils.basic import AnsibleModule
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            arguments=dict(required=False, type=list)
+            arguments=dict(required=False, type='list')
         )
     )
 
