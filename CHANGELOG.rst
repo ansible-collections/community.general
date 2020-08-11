@@ -149,7 +149,6 @@ Major Changes
 - docker_container - the ``network_mode`` option will be set by default to the name of the first network in ``networks`` if at least one network is given and ``networks_cli_compatible`` is ``true`` (will be default from community.general 2.0.0 on). Set to an explicit value to avoid deprecation warnings if you specify networks and set ``networks_cli_compatible`` to ``true``. The current default (not specifying it) is equivalent to the value ``default``.
 - docker_container - the module has a new option, ``container_default_behavior``, whose default value will change from ``compatibility`` to ``no_defaults``. Set to an explicit value to avoid deprecation warnings.
 - gitlab_user - no longer requires ``name``, ``email`` and ``password`` arguments when ``state=absent``.
-- zabbix_action - no longer requires ``esc_period`` and ``event_source`` arguments when ``state=absent``.
 
 Minor Changes
 -------------
@@ -286,16 +285,6 @@ Minor Changes
 - terraform - Adds option ``backend_config_files``. This can accept a list of paths to multiple configuration files (https://github.com/ansible-collections/community.general/pull/394).
 - terraform - Adds option ``variables_files`` for multiple var-files (https://github.com/ansible-collections/community.general/issues/224).
 - ufw - accept ``interface_in`` and ``interface_out`` as parameters.
-- zabbix_action - allow str values for ``esc_period`` options (https://github.com/ansible/ansible/pull/66841).
-- zabbix_host - now supports configuring user macros and host tags on the managed host (see https://github.com/ansible/ansible/pull/66777)
-- zabbix_host_info - ``host_name`` based search results now include host groups.
-- zabbix_hostmacro - ``macro_name`` now accepts macros in zabbix native format as well (e.g. ``{$MACRO}``)
-- zabbix_hostmacro - ``macro_value`` is no longer required when ``state=absent``
-- zabbix_proxy - ``interface`` sub-options ``type`` and ``main`` are now deprecated and will be removed in community.general 3.0.0. Also, the values passed to ``interface`` are now checked for correct types and unexpected keys.
-- zabbix_proxy - added option proxy_address for comma-delimited list of IP/CIDR addresses or DNS names to accept active proxy requests from
-- zabbix_template - add new option omit_date to remove date from exported/dumped template (https://github.com/ansible/ansible/pull/67302)
-- zabbix_template - adding new update rule templateLinkage.deleteMissing for newer zabbix versions (https://github.com/ansible/ansible/pull/66747).
-- zabbix_template_info - add new option omit_date to remove date from exported/dumped template (https://github.com/ansible/ansible/pull/67302)
 - zypper - Added ``allow_vendor_change`` and ``replacefiles`` zypper options (https://github.com/ansible-collections/community.general/issues/381)
 
 Breaking Changes / Porting Guide
@@ -326,7 +315,6 @@ Deprecated Features
 - redfish_config - the ``bios_attribute_name`` and ``bios_attribute_value`` options will be removed. To maintain the existing behavior use the ``bios_attributes`` option instead.
 - redfish_config and redfish_command - the behavior to select the first System, Manager, or Chassis resource to modify when multiple are present will be removed. Use the new ``resource_id`` option to specify target resource to modify.
 - redfish_config, redfish_command - Behavior to modify the first System, Mananger, or Chassis resource when multiple are present is deprecated. Use the new ``resource_id`` option to specify target resource to modify.
-- zabbix_proxy - deprecates ``interface`` sub-options ``type`` and ``main`` when proxy type is set to passive via ``status=passive``. Make sure these suboptions are removed from your playbook as they were never supported by Zabbix in the first place.
 
 Removed Features (previously deprecated)
 ----------------------------------------
@@ -494,13 +482,6 @@ Bugfixes
 - terraform module - fixes usage for providers not supporting workspaces
 - yarn - Return correct values when running yarn in check mode (https://github.com/ansible-collections/community.general/pull/153).
 - yarn - handle no version when installing module by name (https://github.com/ansible/ansible/issues/55097)
-- zabbix_action - arguments ``event_source`` and ``esc_period`` no longer required when ``state=absent``
-- zabbix_host - fixed inventory_mode key error, which occurs with Zabbix 4.4.1 or more (https://github.com/ansible/ansible/issues/65304).
-- zabbix_host - was not possible to update a host where visible_name was not set in zabbix
-- zabbix_mediatype - Fixed to support zabbix 4.4 or more and python3 (https://github.com/ansible/ansible/pull/67693)
-- zabbix_template - fixed error when providing empty ``link_templates`` to the module (see https://github.com/ansible/ansible/issues/66417)
-- zabbix_template - fixed invalid (non-importable) output provided by exporting XML (see https://github.com/ansible/ansible/issues/66466)
-- zabbix_user - Fixed an issue where module failed with zabbix 4.4 or above (see https://github.com/ansible/ansible/pull/67475)
 - zfs_delegate_admin - add missing choices diff/hold/release to the permissions parameter (https://github.com/ansible-collections/community.general/pull/278)
 
 New Plugins
