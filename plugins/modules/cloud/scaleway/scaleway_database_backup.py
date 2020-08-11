@@ -16,8 +16,7 @@ module: scaleway_database_backup
 short_description: Scaleway database backups management module
 author: Guillaume Rodriguez (@guillaume_ro_fr)
 description:
-    - This module manages database backups on Scaleway account
-      U(https://developer.scaleway.com)
+    - This module manages database backups on Scaleway account U(https://developer.scaleway.com).
 extends_documentation_fragment:
     - community.general.scaleway
 options:
@@ -34,7 +33,7 @@ options:
 
   region:
     description:
-        - Scaleway region to use (for example fr-par).
+        - Scaleway region to use (for example C(fr-par)).
     type: str
     required: true
     choices:
@@ -44,34 +43,33 @@ options:
   id:
     description:
         - UUID used to identify the database backup.
-        - Required for C(absent), C(exported) and C(restored) states
+        - Required for C(absent), C(exported) and C(restored) states.
     type: str
-    required: false
 
   name:
     description:
         - Name used to identify the database backup.
-        - Required for C(present) state
+        - Required for C(present) state.
     type: str
     required: false
 
   database_name:
     description:
         - Name used to identify the database.
-        - Required for C(present) and C(restored) states
+        - Required for C(present) and C(restored) states.
     type: str
     required: false
 
   instance_id:
     description:
-        - UUID of the instance associated to the database backup
-        - Required for C(present) and C(restored) states
+        - UUID of the instance associated to the database backup.
+        - Required for C(present) and C(restored) states.
     type: str
     required: false
 
   expires_at:
     description:
-        - Expiration datetime of the database backup (ISO 8601 format)
+        - Expiration datetime of the database backup (ISO 8601 format).
     type: str
     required: false
 
@@ -83,14 +81,14 @@ options:
 
   wait_timeout:
     description:
-        - Time to wait for the backup to reach the expected state
+        - Time to wait for the backup to reach the expected state.
     type: int
     required: false
     default: 300
 
   wait_sleep_time:
     description:
-        - Time to wait before every attempt to check the state of the backup
+        - Time to wait before every attempt to check the state of the backup.
     type: int
     required: false
     default: 3
@@ -98,7 +96,7 @@ options:
 
 EXAMPLES = '''
   - name: Create a backup
-    scaleway_database_backup:
+    community.general.scaleway_database_backup:
         name: 'my_backup'
         state: present
         region: 'fr-par'
@@ -106,23 +104,26 @@ EXAMPLES = '''
         instance_id: '50968a80-2909-4e5c-b1af-a2e19860dddb'
 
   - name: Export a backup
-    scaleway_database_backup:
+    community.general.scaleway_database_backup:
         id: '6ef1125a-037e-494f-a911-6d9c49a51691'
         state: exported
         region: 'fr-par'
 
-  - name: Restore backup
-    scaleway_database_backup:
+  - name: Restore a backup
+    community.general.scaleway_database_backup:
         id: '6ef1125a-037e-494f-a911-6d9c49a51691'
         state: restored
         region: 'fr-par'
         database_name: 'my-new-database'
         instance_id: '50968a80-2909-4e5c-b1af-a2e19860dddb'
+    
+    - name: Remove a backup
+      ...
 '''
 
 RETURN = '''
 data:
-    description: This is only present when C(state=present)
+    description: Backup metadata.
     returned: when C(state=present)
     type: dict
     sample: {
@@ -149,8 +150,10 @@ import time
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.scaleway import (
-    Scaleway, scaleway_argument_spec,
-    SCALEWAY_REGIONS)
+    Scaleway,
+    scaleway_argument_spec,
+    SCALEWAY_REGIONS,
+)
 
 stable_states = (
     'ready',
@@ -326,7 +329,7 @@ def main():
         state=dict(default='present', choices=['absent', 'present', 'exported', 'restored']),
         region=dict(required=True, choices=SCALEWAY_REGIONS),
         id=dict(),
-        name=dict(required=False),
+        name=dict(type='str'),
         database_name=dict(required=False),
         instance_id=dict(required=False),
         expires_at=dict(),
