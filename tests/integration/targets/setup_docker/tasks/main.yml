@@ -36,7 +36,7 @@
     - name: Limit docker pypi package version to < 4.3.0
       set_fact:
         docker_pip_package_limit: '<4.3.0'
-      when: docker_api_version_stdout is version('1.39', '<')
+      when: (docker_api_version_stdout.stdout | default('0.0')) is version('1.39', '<')
 
     - name: Install Python requirements
       pip:
