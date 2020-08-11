@@ -54,7 +54,7 @@
     that:
       - '"-h +1" in shutdown_result["shutdown_command"]'
       - '"-h +0" in shutdown_result_minus["shutdown_command"]'
-  when: ansible_system in ['Void', 'MacOSX', 'OpenBSD']
+  when: ansible_system in ['Void', 'Darwin', 'OpenBSD']
 
 - name: Verify shutdown delay is present in seconds in FreeBSD
   assert:
@@ -77,7 +77,7 @@
       - '"-d 0" in shutdown_result_minus["shutdown_command"]'
   when: ansible_system == 'VMKernel'
 
-- name: Remove systemd_sysv in ubuntu 18 in case it has been installed in test
+- name: Remove systemd-sysv in ubuntu 18 in case it has been installed in test
   apt:
     name: systemd-sysv
     state: absent
