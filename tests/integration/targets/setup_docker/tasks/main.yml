@@ -41,16 +41,8 @@
     - name: Install Python requirements
       pip:
         state: present
-        name: "{{ docker_pip_package }}{{ docker_pip_package_limit }}"
+        name: "{{ [docker_pip_package ~ docker_pip_package_limit] + docker_pip_extra_packages }}"
         extra_args: "-c {{ remote_constraints }}"
-      notify: cleanup docker
-
-    - name: Install Python requirements
-      pip:
-        state: present
-        name: "{{ docker_pip_extra_packages }}"
-        extra_args: "-c {{ remote_constraints }}"
-      when: docker_pip_extra_packages | length > 0
       notify: cleanup docker
 
     # Detect docker CLI, API and docker-py versions
