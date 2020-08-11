@@ -1,7 +1,7 @@
 - name: remove pip packages
   pip:
     state: present
-    name: "{{ docker_pip_packages | union(docker_pip_extra_packages) }}"
+    name: "{{ [docker_pip_package] | union(docker_pip_extra_packages) }}"
   listen: cleanup docker
   when: not docker_skip_cleanup | bool
 
