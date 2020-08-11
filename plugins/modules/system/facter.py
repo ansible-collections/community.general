@@ -20,7 +20,6 @@ options:
         description:
             - Specifies arguments for facter.
         type: list
-        elements: str
         required: no
 requirements:
     - facter
