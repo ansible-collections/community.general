@@ -347,6 +347,15 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
+        required_together=[
+            ['database_name', 'instance_id'],
+        ],
+        required_if=[
+            ['state', 'present', ['name', 'database_name', 'instance_id']],
+            ['state', 'absent', ['id']],
+            ['state', 'exported', ['id']],
+            ['state', 'restored', ['id', 'database_name', 'instance_id']],
+        ],
     )
 
     core(module)
