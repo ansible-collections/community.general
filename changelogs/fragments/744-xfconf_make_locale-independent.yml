@@ -1,0 +1,5 @@
+minor_changes:
+    - xfconf - add support for ``double`` type (https://github.com/ansible-collections/community.general/pull/744).
+bugfixes:
+    - xfconf - make it work in non-english locales (https://github.com/ansible-collections/community.general/pull/744).
+        
