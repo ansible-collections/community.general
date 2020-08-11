@@ -1,2 +1,2 @@
 bugfixes:
-  - homebrew_cask - fixed issue where a cask with `@` in the name is incorrectly reported as invalid (https://github.com/ansible-collections/community.general/issues/733).
+  - homebrew_cask - fixed issue where a cask with ``@`` in the name is incorrectly reported as invalid (https://github.com/ansible-collections/community.general/issues/733).
