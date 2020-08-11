@@ -1,4 +1,11 @@
 ---
+- name: Install systemd-sysv on ubuntu 18
+  apt:
+    name: systemd-sysv
+    state: present
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')
+  register: systemd_sysv_install
+
 - name: Execute shutdown with custom message and delay
   community.general.shutdown:
     delay: 100
@@ -69,3 +76,9 @@
       - '"-d 100" in shutdown_result["shutdown_command"]'
       - '"-d 0" in shutdown_result_minus["shutdown_command"]'
   when: ansible_system == 'VMKernel'
+
+- name: Remove systemd_sysv in ubuntu 18 in case it has been installed in test
+  apt:
+    name: systemd-sysv
+    state: absent
+  when: systemd_sysv_install is changed and ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')
