@@ -105,6 +105,8 @@ files:
   $inventories/scaleway.py:
     maintainers: $team_scaleway
     labels: cloud scaleway
+  $inventories/yc_compute.py:
+    maintainers: $team_yandex
   $lookups/:
     labels: lookups
   $lookups/onepass:
@@ -1335,3 +1337,4 @@ macros:
   team_solaris: bcoca fishman jasperla jpdasma mator scathatheworm troy2914 xen0l
   team_suse: commel dcermak evrardjp lrupp toabctl
   team_virt: joshainglis karmab Aversiste
+  team_yandex: st8f
