@@ -391,6 +391,21 @@ def format_disk_size(size_bytes, unit):
     return round(output, precision), unit
 
 
+def convert_to_bytes(size_str, unit):
+    size = float(size_str)
+    multiplier = 1.0
+    if unit in units_si:
+        multiplier = 1000.0 ** units_si.index(unit)
+    elif unit in units_iec:
+        multiplier = 1024.0 ** (units_iec.index(unit) + 1)
+    elif unit in ['', 'compact', 'cyl', 'chs']:
+        # As per format_disk_size, default to compact, which defaults to megabytes
+        multiplier = 1000.0 ** units_si.index("MB")
+
+    output = size * multiplier
+    return int(output)
+
+
 def get_unlabeled_device_info(device, unit):
     """
     Fetches device information directly from the kernel and it is used when
@@ -649,6 +664,27 @@ def main():
         # Set the unit of the run
         if unit and script:
             script = "unit %s %s" % (unit, script)
+
+        # If partition exists, try to resize
+        if part_exists(current_parts, 'num', number):
+            # Ensure new end is same/larger than current
+            partition = [p for p in current_parts if p['num'] == number][0]
+            current_part_end = convert_to_bytes(partition['end'], unit)
+
+            size, parsed_unit = parse_unit(part_end, unit)
+            if parsed_unit == "%":
+                size = int((int(current_device['generic']['size']) * size) / 100)
+                parsed_unit = unit
+
+            desired_part_end = convert_to_bytes(size, parsed_unit)
+
+            if current_part_end > desired_part_end:
+                module.fail_json(msg="Given partition end smaller than current value. Aborting.")
+            elif current_part_end < desired_part_end:
+                script += "resizepart %s %s " % (
+                    number,
+                    part_end
+                )
 
         # Execute the script and update the data structure.
         # This will create the partition for the next steps
