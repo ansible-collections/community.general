@@ -70,7 +70,7 @@ EXAMPLES = '''
       username: 'admin'
       password: 'smartvm'
       validate_certs: False
-      
+
 - name: Create new tags for a provider in ManageIQ
   community.general.manageiq_tags:
     resource_id: 23000000790497
