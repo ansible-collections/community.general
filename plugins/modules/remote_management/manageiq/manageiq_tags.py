@@ -46,11 +46,13 @@ options:
     type: str
     description:
       - the relevant resource name in manageiq
-    required: only if resource_id is not set, mutually exclusive
+      - only required if I(resource_id) is not set, mutually exclusive
+    required: false
   resource_id:
-    description
+    description:
       - the relevant resource id in manageiq
-    required: only if resource_name is not set, mutually exclusive
+      - only if I(resource_name) is not set, mutually exclusive
+    required: false
 '''
 
 EXAMPLES = '''
@@ -262,7 +264,7 @@ def main():
         tags=dict(type='list'),
         resource_id=dict(required=False, type='int'),
         resource_name=dict(required=False, type='str'),
-        resource_type=dict(required=False, type='str',
+        resource_type=dict(required=True, type='str',
                            choices=list(manageiq_entities().keys())),
         state=dict(required=False, type='str',
                    choices=['present', 'absent', 'list'], default='present'),
