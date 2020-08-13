@@ -13,6 +13,7 @@
     dependencies:
       - notreal<1
       - pip>1
+      - ansible[azure]>2.9.0
   register: dep_info
 
 - name: ensure python_requirements_info returns desired info
