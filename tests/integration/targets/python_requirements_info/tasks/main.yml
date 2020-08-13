@@ -13,7 +13,8 @@
     dependencies:
       - notreal<1
       - pip>1
-      - ansible[azure]>2.9.0
+      - notreal[nothingreal]<1
+      - ansible[azuree]>2.8.0
   register: dep_info
 
 - name: ensure python_requirements_info returns desired info
@@ -21,3 +22,5 @@
     that:
       - "'installed' in dep_info.valid.pip"
       - "'notreal' in dep_info.not_found"
+      - "'notreal[nothingreal]' in dep_info.not_found"
+      - "'ansible[azuree]' in dep_info.not_found"

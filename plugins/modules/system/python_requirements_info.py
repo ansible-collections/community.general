@@ -121,7 +121,7 @@ def main():
             python_version=sys.version,
             python_system_path=sys.path,
         )
-    pkg_dep_re = re.compile(r'(^[a-zA-Z][a-zA-Z0-9_-]+)(==|[><]=?)?([0-9.]+)?$')
+    pkg_dep_re = re.compile(r'(^[a-zA-Z][a-zA-Z0-9_-]+)(\[[a-zA-Z]+\])?(==|[><]=?)?([0-9.]+)?$')
 
     results = dict(
         not_found=[],
@@ -133,15 +133,22 @@ def main():
         match = pkg_dep_re.match(dep)
         if match is None:
             module.fail_json(msg="Failed to parse version requirement '{0}'. Must be formatted like 'ansible>2.6'".format(dep))
-        pkg, op, version = match.groups()
+        pkg, extra, op, version = match.groups()
         if op is not None and op not in operations:
             module.fail_json(msg="Failed to parse version requirement '{0}'. Operator must be one of >, <, <=, >=, or ==".format(dep))
-        try:
-            existing = pkg_resources.get_distribution(pkg).version
-        except pkg_resources.DistributionNotFound:
-            # not there
-            results['not_found'].append(pkg)
-            continue
+        if extra is not None:
+            try:
+                pkg_resources.require(pkg + extra)
+            except (pkg_resources.DistributionNotFound, pkg_resources.UnknownExtra):
+                results['not_found'].append(pkg + extra)
+                continue
+        else:
+            try:
+                existing = pkg_resources.get_distribution(pkg).version
+            except pkg_resources.DistributionNotFound:
+                # not there
+                results['not_found'].append(pkg)
+                continue
         if op is None and version is None:
             results['valid'][pkg] = {
                 'installed': existing,
