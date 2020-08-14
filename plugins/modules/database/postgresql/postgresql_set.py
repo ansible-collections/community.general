@@ -314,10 +314,10 @@ def main():
             if value[:-2].isdigit() and unit in value[-2:]:
                 value = value.upper()
 
-    if value and reset:
+    if value is not None and reset:
         module.fail_json(msg="%s: value and reset params are mutually exclusive" % name)
 
-    if not value and not reset:
+    if value is None and not reset:
         module.fail_json(msg="%s: at least one of value or reset param must be specified" % name)
 
     conn_params = get_conn_params(module, module.params, warn_db_default=False)
@@ -388,8 +388,8 @@ def main():
         kw['restart_required'] = restart_required
         module.exit_json(**kw)
 
-    # Set param:
-    if value and value != current_value:
+    # Set param (value can be an empty string):
+    if value is not None and value != current_value:
         changed = param_set(cursor, module, name, value, context)
 
         kw['value_pretty'] = value
