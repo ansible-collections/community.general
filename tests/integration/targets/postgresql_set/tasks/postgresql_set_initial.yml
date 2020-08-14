@@ -327,7 +327,7 @@
   - name: postgresql_set - turn on archive mode
     <<: *task_parameters
     postgresql_set:
-    <<: *pg_parameters
+      <<: *pg_parameters
       name: archive_mode
       value: 'on'
 
