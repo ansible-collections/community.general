@@ -314,7 +314,8 @@ def main():
             if value[:-2].isdigit() and unit in value[-2:]:
                 value = value.upper()
 
-    if value and reset:
+    # value can be an empty string but can't be None
+    if (value or value == '') and reset:
         module.fail_json(msg="%s: value and reset params are mutually exclusive" % name)
 
     conn_params = get_conn_params(module, module.params, warn_db_default=False)
