@@ -1,2 +1,2 @@
 minor_changes:
-  - Added new parameter 'resource_id' to modules manage_tags and manageiq_policies. Parameter 'resource_id' can be used instead of parameter 'resource_name'.
+  - manageiq_tags and manageiq_policies - added new parameter ``resource_id``. This parameter can be used instead of parameter ``resource_name`` (https://github.com/ansible-collections/community.general/pull/719).
