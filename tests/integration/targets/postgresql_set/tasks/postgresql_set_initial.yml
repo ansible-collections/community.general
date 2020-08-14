@@ -327,33 +327,15 @@
   - name: postgresql_set - turn on archive mode
     <<: *task_parameters
     postgresql_set:
-      <<: *pg_parameters
+    <<: *pg_parameters
       name: archive_mode
       value: 'on'
 
-  # To avoid CI timeouts
-  - name: Kill all postgres processes
-    shell: 'pkill -u {{ pg_user }}'
-    become: yes
-    when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
-    ignore_errors: yes
-
-  - name: Stop PostgreSQL
+  - name: Restart PostgreSQL
     become: yes
     service:
       name: "{{ postgresql_service }}"
-      state: stopped
-    when: (ansible_facts.distribution_major_version != '8' and ansible_facts.distribution == 'CentOS') or ansible_facts.distribution != 'CentOS'
-
-  - name: Pause between stop and start PosgreSQL
-    pause:
-      seconds: 5
-
-  - name: Start PostgreSQL
-    become: yes
-    service:
-      name: "{{ postgresql_service }}"
-      state: started
+      state: restarted
 
   - name: postgresql_set - set empty string as value
     <<: *task_parameters
