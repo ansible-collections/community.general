@@ -1,4 +1,3 @@
-plugins/action/iptables_state.py action-plugin-docs
 plugins/callback/hipchat.py pylint:blacklisted-name
 plugins/connection/lxc.py pylint:blacklisted-name
 plugins/module_utils/compat/ipaddress.py no-assert
