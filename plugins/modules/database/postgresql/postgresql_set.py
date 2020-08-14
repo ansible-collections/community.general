@@ -317,9 +317,6 @@ def main():
     if value and reset:
         module.fail_json(msg="%s: value and reset params are mutually exclusive" % name)
 
-    if not value and not reset:
-        module.fail_json(msg="%s: at least one of value or reset param must be specified" % name)
-
     conn_params = get_conn_params(module, module.params, warn_db_default=False)
     db_connection = connect_to_db(module, conn_params, autocommit=True)
     cursor = db_connection.cursor(cursor_factory=DictCursor)
@@ -388,8 +385,8 @@ def main():
         kw['restart_required'] = restart_required
         module.exit_json(**kw)
 
-    # Set param:
-    if value and value != current_value:
+    # Set param (value can be an empty string):
+    if (value or value == '') and value != current_value:
         changed = param_set(cursor, module, name, value, context)
 
         kw['value_pretty'] = value

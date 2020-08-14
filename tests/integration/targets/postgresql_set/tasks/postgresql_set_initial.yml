@@ -321,3 +321,41 @@
       that:
       - result is failed
       - result.msg is search('is potentially dangerous')
+
+  ###############################################################################
+  # Bugfix of https://github.com/ansible-collections/community.general/issues/775
+  - name: postgresql_set - turn on archive mode
+    <<: *task_parameters
+    postgresql_set:
+      <<: *pg_parameters
+      name: archive_mode
+      value: 'on'
+
+  - name: postgresql_set - restart service
+    service:
+      name: postgresql
+      state: restarted
+
+  - name: postgresql_set - set empty string as value
+    <<: *task_parameters
+    postgresql_set:
+      <<: *pg_parameters
+      name: archive_command
+      value: ''
+    register: result
+
+  - assert:
+      that:
+      - result is changed
+
+  - name: postgresql_set - set empty string as value again
+    <<: *task_parameters
+    postgresql_set:
+      <<: *pg_parameters
+      name: archive_command
+      value: ''
+    register: result
+
+  - assert:
+      that:
+      - result is not changed
