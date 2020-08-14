@@ -12,7 +12,7 @@ DOCUMENTATION = r'''
 ---
 module: iptables_state
 short_description: Save iptables state into a file or restore it from a file
-version_added: '1.0.0'
+version_added: '1.1.0'
 author: quidame (@quidame)
 description:
   - C(iptables) is used to set up, maintain, and inspect the tables of IP
@@ -40,7 +40,7 @@ options:
   counters:
     description:
       - Save or restore the values of all packet and byte counters.
-      - When C(True), the module is not idempotent.
+      - When C(true), the module is not idempotent.
     type: bool
     default: false
   ip_version:
@@ -59,8 +59,8 @@ options:
   noflush:
     description:
       - For I(state=restored), ignored otherwise.
-      - If C(False), restoring iptables rules from a file flushes (deletes)
-        all previous contents of the respective table(s). If C(True), the
+      - If C(false), restoring iptables rules from a file flushes (deletes)
+        all previous contents of the respective table(s). If C(true), the
         previous rules are left untouched (but policies are updated anyway,
         for all built-in chains).
     type: bool
@@ -137,7 +137,7 @@ EXAMPLES = r'''
   register: iptables_state
 
 - name: show current state of the firewall
-  debug:
+  ansible.builtin.debug:
     var: iptables_state.initial_state
 '''
 
