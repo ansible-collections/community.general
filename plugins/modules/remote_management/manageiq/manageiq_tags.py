@@ -37,7 +37,7 @@ options:
   resource_type:
     type: str
     description:
-      - the relevant resource type in manageiq
+      - The relevant resource type in manageiq.
     required: true
     choices: ['provider', 'host', 'vm', 'blueprint', 'category', 'cluster',
         'data store', 'group', 'resource pool', 'service', 'service template',
@@ -45,14 +45,14 @@ options:
   resource_name:
     type: str
     description:
-      - the relevant resource name in manageiq
-      - only required if I(resource_id) is not set, mutually exclusive
-    required: false
+      - The name of the resource at which tags will be controlled.
+      - Must be specified if I(resource_id) is not set. Both options are mutually exclusive.
+    type: str
   resource_id:
     description:
-      - the relevant resource id in manageiq
-      - only if I(resource_name) is not set, mutually exclusive
-    required: false
+      - The ID of the resource at which tags will be controlled.
+      - Must be specified if I(resource_name) is not set. Both options are mutually exclusive.
+    type: int
 '''
 
 EXAMPLES = '''

@@ -37,7 +37,7 @@ options:
   resource_type:
     type: str
     description:
-      - the type of the resource to which the profile should be [un]assigned
+      - The type of the resource to which the profile should be [un]assigned.
     required: true
     choices: ['provider', 'host', 'vm', 'blueprint', 'category', 'cluster',
         'data store', 'group', 'resource pool', 'service', 'service template',
@@ -45,14 +45,16 @@ options:
   resource_name:
     type: str
     description:
-      - the name of the resource to which the profile should be [un]assigned
-      - only if I(resource_id) is not set, mutually exclusive
+      - The name of the resource to which the profile should be [un]assigned.
+      - Must be specified if I(resource_id) is not set. Both options are mutually exclusive.
     required: false
+    type: str
   resource_id:
     description:
-      - the id of the resource to which the profile should be [un]assigned
-      - only if I(resource_name) is not set, mutually exclusive
-    required: false
+      - The ID of the resource to which the profile should be [un]assigned.
+      - Must be specified if I(resource_name) is not set. Both options are mutually exclusive.
+    type: int
+    version_added: 1.1.0
 '''
 
 EXAMPLES = '''
