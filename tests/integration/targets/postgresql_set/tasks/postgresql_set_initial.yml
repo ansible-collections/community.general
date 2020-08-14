@@ -336,6 +336,9 @@
       name: postgresql
       state: restarted
 
+  - pause:
+      seconds: 5
+
   - name: postgresql_set - set empty string as value
     <<: *task_parameters
     postgresql_set:
