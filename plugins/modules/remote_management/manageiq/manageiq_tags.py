@@ -295,7 +295,7 @@ def main():
     manageiq = ManageIQ(module)
 
     # query resource id, fail if resource does not exist
-    if not resource_id:
+    if resource_id is None:
         resource_id = query_resource_id(manageiq, resource_type, resource_name)
 
     manageiq_tags = ManageIQTags(manageiq, resource_type, resource_id)

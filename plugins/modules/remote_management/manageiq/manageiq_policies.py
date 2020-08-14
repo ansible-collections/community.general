@@ -337,7 +337,7 @@ def main():
     manageiq = ManageIQ(module)
 
     # query resource id, fail if resource does not exist
-    if not resource_id:
+    if resource_id is None:
         resource_id = manageiq.find_collection_resource_or_fail(resource_type, name=resource_name)['id']
 
     manageiq_policies = ManageIQPolicies(manageiq, resource_type, resource_id)
