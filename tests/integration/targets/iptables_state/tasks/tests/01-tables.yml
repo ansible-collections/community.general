@@ -1,0 +1,299 @@
+---
+- name: "ensure our next rule is not there (iptables)"
+  iptables:
+    table: nat
+    chain: INPUT
+    jump: ACCEPT
+    state: absent
+
+- name: "get state (table filter)"
+  iptables_state:
+    table: filter
+    state: saved
+    path: "{{ iptables_saved }}"
+  register: iptables_state
+  changed_when: false
+  check_mode: yes
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - "'*filter' in iptables_state.initial_state"
+      - iptables_state.tables.filter is defined
+      - iptables_state.tables.nat is undefined
+    quiet: yes
+
+
+
+- name: "get state (table nat)"
+  iptables_state:
+    table: nat
+    state: saved
+    path: "{{ iptables_saved }}"
+  register: iptables_state
+  changed_when: false
+  check_mode: yes
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - "'*nat' in iptables_state.initial_state"
+      - "'*filter' in iptables_state.initial_state"
+      - iptables_state.tables.nat is defined
+      - iptables_state.tables.filter is undefined
+    quiet: yes
+
+
+
+- name: "save state (table filter)"
+  iptables_state:
+    path: "{{ iptables_saved }}"
+    state: saved
+    table: filter
+  register: iptables_state
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - "'*filter' in iptables_state.initial_state"
+      - "'*filter' in iptables_state.saved"
+      - "'*nat' in iptables_state.initial_state"
+      - "'*nat' not in iptables_state.saved"
+      - iptables_state.tables.filter is defined
+      - iptables_state.tables.nat is undefined
+    quiet: yes
+
+
+
+- name: "save state (table nat)"
+  iptables_state:
+    path: "{{ iptables_saved }}"
+    state: saved
+    table: nat
+  register: iptables_state
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - iptables_state is changed
+      - "'*nat' in iptables_state.initial_state"
+      - "'*nat' in iptables_state.saved"
+      - "'*filter' in iptables_state.initial_state"
+      - "'*filter' not in iptables_state.saved"
+      - iptables_state.tables.nat is defined
+      - iptables_state.tables.filter is undefined
+    quiet: yes
+
+
+
+- name: "save state (any table)"
+  iptables_state:
+    path: "{{ iptables_saved }}"
+    state: saved
+  register: iptables_state
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - iptables_state is changed
+      - "'*filter' in iptables_state.initial_state"
+      - "'*filter' in iptables_state.saved"
+      - "'*nat' in iptables_state.initial_state"
+      - "'*nat' in iptables_state.saved"
+      - iptables_state.tables.filter is defined
+      - iptables_state.tables.nat is defined
+    quiet: yes
+
+
+
+- name: "restore state (table nat, must NOT report a change, no warning)"
+  iptables_state:
+    path: "{{ iptables_saved }}"
+    state: restored
+    table: nat
+  register: iptables_state
+  async: "{{ ansible_timeout }}"
+  poll: 0
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - "'*nat' in iptables_state.initial_state"
+      - "'*nat' in iptables_state.restored"
+      - "'*filter' in iptables_state.initial_state"
+      - "'*filter' not in iptables_state.restored"
+      - iptables_state.tables.nat is defined
+      - iptables_state.tables.filter is undefined
+      - iptables_state is not changed
+    quiet: yes
+
+
+
+- name: "change NAT table (iptables)"
+  iptables:
+    table: nat
+    chain: INPUT
+    jump: ACCEPT
+    state: present
+
+
+
+- name: "restore state (table nat, must report a change, no warning)"
+  iptables_state:
+    path: "{{ iptables_saved }}"
+    state: restored
+    table: nat
+  register: iptables_state
+  async: "{{ ansible_timeout }}"
+  poll: 0
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - "'*nat' in iptables_state.initial_state"
+      - "'*nat' in iptables_state.restored"
+      - "'*filter' in iptables_state.initial_state"
+      - "'*filter' not in iptables_state.restored"
+      - iptables_state.tables.nat is defined
+      - "'-A INPUT -j ACCEPT' in iptables_state.tables.nat"
+      - "'-A INPUT -j ACCEPT' not in iptables_state.restored"
+      - iptables_state.tables.filter is undefined
+      - iptables_state is changed
+    quiet: yes
+
+
+
+- name: "get security, raw and mangle tables states"
+  iptables_state:
+    path: "{{ iptables_saved }}"
+    state: saved
+    table: "{{ item }}"
+  loop:
+    - security
+    - raw
+    - mangle
+  changed_when: false
+  check_mode: yes
+
+
+
+- name: "save state (any table)"
+  iptables_state:
+    path: "{{ iptables_saved }}"
+    state: saved
+  register: iptables_state
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - "'filter' in iptables_state.tables"
+      - "'*filter' in iptables_state.saved"
+      - "'mangle' in iptables_state.tables"
+      - "'*mangle' in iptables_state.saved"
+      - "'nat' in iptables_state.tables"
+      - "'*nat' in iptables_state.saved"
+      - "'raw' in iptables_state.tables"
+      - "'*raw' in iptables_state.saved"
+      - "'security' in iptables_state.tables"
+      - "'*security' in iptables_state.saved"
+    quiet: yes
+
+
+
+- name: "save filter table into a test file"
+  iptables_state:
+    path: "{{ iptables_tests }}"
+    table: filter
+    state: saved
+
+- name: "add a table header in comments (# *mangle)"
+  lineinfile:
+    path: "{{ iptables_tests }}"
+    line: "# *mangle"
+
+
+
+- name: "restore state (table filter, must NOT report a change, no warning)"
+  iptables_state:
+    path: "{{ iptables_tests }}"
+    table: filter
+    state: restored
+  register: iptables_state
+  async: "{{ ansible_timeout }}"
+  poll: 0
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - "'*filter' in iptables_state.initial_state"
+      - "'*mangle' in iptables_state.initial_state"
+      - "'*nat' in iptables_state.initial_state"
+      - "'*raw' in iptables_state.initial_state"
+      - "'*security' in iptables_state.initial_state"
+      - "'filter' in iptables_state.tables"
+      - "'mangle' not in iptables_state.tables"
+      - "'nat' not in iptables_state.tables"
+      - "'raw' not in iptables_state.tables"
+      - "'security' not in iptables_state.tables"
+      - "'*filter' in iptables_state.restored"
+      - "'*mangle' not in iptables_state.restored"
+      - "'*nat' not in iptables_state.restored"
+      - "'*raw' not in iptables_state.restored"
+      - "'*security' not in iptables_state.restored"
+      - iptables_state is not changed
+    quiet: yes
+
+
+
+- name: "restore state (any table, must NOT report a change, no warning)"
+  iptables_state:
+    path: "{{ iptables_tests }}"
+    state: restored
+  register: iptables_state
+  async: "{{ ansible_timeout }}"
+  poll: 0
+
+- name: "assert that results are as expected"
+  assert:
+    that:
+      - "'*filter' in iptables_state.initial_state"
+      - "'*mangle' in iptables_state.initial_state"
+      - "'*nat' in iptables_state.initial_state"
+      - "'*raw' in iptables_state.initial_state"
+      - "'*security' in iptables_state.initial_state"
+      - "'filter' in iptables_state.tables"
+      - "'mangle' in iptables_state.tables"
+      - "'nat' in iptables_state.tables"
+      - "'raw' in iptables_state.tables"
+      - "'security' in iptables_state.tables"
+      - "'*filter' in iptables_state.restored"
+      - "'*mangle' in iptables_state.restored"
+      - "'*nat' in iptables_state.restored"
+      - "'*raw' in iptables_state.restored"
+      - "'*security' in iptables_state.restored"
+      - iptables_state is not changed
+    quiet: yes
+
+
+
+- name: "restore state (table mangle, must fail, no warning)"
+  iptables_state:
+    path: "{{ iptables_tests }}"
+    table: mangle
+    state: restored
+  register: iptables_state
+  async: "{{ ansible_timeout }}"
+  poll: 0
+  ignore_errors: yes
+
+- name: "explain expected failure"
+  assert:
+    that:
+      - iptables_state is failed
+      - "iptables_state.msg == 'Table mangle to restore not defined in {{ iptables_tests }}'"
+    success_msg: >-
+      The previous error has been triggered by trying to restore a table
+      that is missing in the file provided to iptables-restore.
+    fail_msg: >-
+      The previous task should have failed due to a missing table (mangle)
+      in the file to restore iptables state from.
