@@ -1,0 +1,2 @@
+minor_changes:
+  - infoblox.py - infoblox inventory script: Use stderr, and allow use of environment for config (https://github.com/ansible-collections/community.general/pull/436)
