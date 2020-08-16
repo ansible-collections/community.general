@@ -1,0 +1,2 @@
+bugfixes:
+- proxmox_kvm - adapt to PVE 6 version scheme (fixes https://github.com/swayf/proxmoxer/issues/79).

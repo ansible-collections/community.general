@@ -681,7 +681,7 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
     kwargs.update(dict([k, int(v)] for k, v in kwargs.items() if isinstance(v, bool)))
 
     # The features work only on PVE 4
-    if PVE_MAJOR_VERSION < 4:
+    if PVE_VERSION < '4':
         for p in only_v4:
             if p in kwargs:
                 del kwargs[p]
@@ -899,8 +899,8 @@ def main():
     try:
         proxmox = ProxmoxAPI(api_host, user=api_user, password=api_password, verify_ssl=validate_certs)
         global VZ_TYPE
-        global PVE_MAJOR_VERSION
-        PVE_MAJOR_VERSION = 3 if proxmox_version(proxmox) < LooseVersion('4.0') else 4
+        global PVE_VERSION
+        PVE_VERSION = proxmox_version(proxmox)
     except Exception as e:
         module.fail_json(msg='authorization on proxmox cluster failed with exception: %s' % e)
 
