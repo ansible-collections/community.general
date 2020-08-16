@@ -16,15 +16,16 @@ DOCUMENTATION = '''
 module: pacman_key
 author:
 - George Rawlinson (@grawlinson) <george@rawlinson.net.nz>
-version_added: "2.10"
+version_added: "1.1.0"
 short_description: Manage pacman's list of trusted keys
 description:
 - Add or remove gpg keys from the pacman keyring.
 notes:
-- Use full key id (16 characters) and fingerprint (40 characters) to avoid key collisions.
+- Use full key ID (16 characters) and fingerprint (40 characters) to avoid key collisions.
 - If you specify both the key id and the URL with C(state=present), the task can verify or add the key as needed.
 - By default, keys will be locally signed after being imported into the keyring.
 - If the specified key id exists in the keyring, the key will not be added.
+- data, file, and url are mutually exclusive.
 requirements:
 - gpg
 - pacman-key
