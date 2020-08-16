@@ -25,7 +25,7 @@ notes:
 - If you specify both the key id and the URL with C(state=present), the task can verify or add the key as needed.
 - By default, keys will be locally signed after being imported into the keyring.
 - If the specified key id exists in the keyring, the key will not be added.
-- data, file, and url are mutually exclusive.
+- I(data), I(file), and I(url) are mutually exclusive.
 requirements:
 - gpg
 - pacman-key
