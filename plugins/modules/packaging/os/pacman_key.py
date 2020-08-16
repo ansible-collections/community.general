@@ -143,6 +143,15 @@ class PacmanKey(object):
             fingerprint = self.sanitise_fingerprint(fingerprint)
         key_present = self.key_in_keyring(keyid, keyring)
 
+        if (
+            state == "present"
+            and data is None
+            and file is None
+            and url is None
+            and keyserver is None
+        ):
+            module.fail_json(msg="expected one of: data, file, url, keyserver. got none")
+
         if module.check_mode:
             if state == "present":
                 if (key_present and force_update) or not key_present:
@@ -172,8 +181,6 @@ class PacmanKey(object):
             elif keyserver:
                 self.recv_key(keyid, keyserver, keyring)
                 module.exit_json(changed=True)
-            else:
-                module.fail_json(msg="expected one of: data, file, url, keyserver. got none")
         elif state == "absent":
             if key_present:
                 self.remove_key(keyid)
