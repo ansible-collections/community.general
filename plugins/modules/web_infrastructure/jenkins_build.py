@@ -180,14 +180,14 @@ class JenkinsBuild:
             else:
                 self.server.build_job(self.name, self.args)
         except Exception as e:
-            self.module.fail_json(msg='Unable to create build, %s for %s' % (to_native(e), self.jenkins_url),
+            self.module.fail_json(msg='Unable to create build for %s: %s' % (self.jenkins_url, to_native(e)),
                                   exception=traceback.format_exc())
 
     def absent_build(self):
         try:
             self.server.delete_build(self.name, self.build_number)
         except Exception as e:
-            self.module.fail_json(msg='Unable to delete build, %s for %s' % (to_native(e), self.jenkins_url),
+            self.module.fail_json(msg='Unable to delete build for %s: %s' % (self.jenkins_url, to_native(e)),
                                   exception=traceback.format_exc())
 
     def get_result(self):

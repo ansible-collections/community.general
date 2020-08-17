@@ -7,7 +7,7 @@ from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible.module_utils import basic
 from ansible.module_utils._text import to_bytes
-import ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build as module
+from ansible_collections.community.general.plugins.modules.web_infrastructure import jenkins_build
 
 import json
 
@@ -41,6 +41,28 @@ def fail_json(*args, **kwargs):
     raise AnsibleFailJson(kwargs)
 
 
+class JenkinsMock():
+
+    def get_job_info(self, name):
+        return {
+            "nextBuildNumber": 1234
+        }
+
+    def get_build_info(self, name, build_number):
+        return {
+            "result": "SUCCESS"
+        }
+
+    def get_build_status(self):
+        pass
+
+    def build_job(self, *args):
+        return None
+
+    def delete_build(self, name, build_number):
+        return None
+
+
 class TestJenkinsBuild(unittest.TestCase):
 
     def setUp(self):
@@ -50,25 +72,39 @@ class TestJenkinsBuild(unittest.TestCase):
         self.mock_module_helper.start()
         self.addCleanup(self.mock_module_helper.stop)
 
-    def test_module_fail_when_required_args_missing(self):
+    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
+    def test_module_fail_when_required_args_missing(self, test_deps):
+        test_deps.return_value = None
         with self.assertRaises(AnsibleFailJson):
             set_module_args({})
-            module.main()
+            jenkins_build.main()
 
-    def test_module_create_build(self):
+    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
+    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.JenkinsBuild.get_jenkins_connection')
+    def test_module_create_build(self, jenkins_connection, test_deps):
+        test_deps.return_value = None
+        jenkins_connection.return_value = JenkinsMock()
+
         with self.assertRaises(AnsibleExitJson):
             set_module_args({
                 "name": "host-check",
+                "user": "abc",
                 "token": "xyz"
             })
-            module.main()
+            jenkins_build.main()
 
-    def test_module_delete_build(self):
+    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.test_dependencies')
+    @patch('ansible_collections.community.general.plugins.modules.web_infrastructure.jenkins_build.JenkinsBuild.get_jenkins_connection')
+    def test_module_delete_build(self, jenkins_connection, test_deps):
+        test_deps.return_value = None
+        jenkins_connection.return_value = JenkinsMock()
+
         with self.assertRaises(AnsibleExitJson):
             set_module_args({
                 "name": "host-check",
                 "build_number": "1234",
                 "state": "absent",
+                "user": "abc",
                 "token": "xyz"
             })
-            module.main()
+            jenkins_build.main()
