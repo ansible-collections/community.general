@@ -82,7 +82,7 @@ options:
     description:
       - Specify CPU weight for a VM.
       - You can disable fair-scheduler configuration by setting this to 0
-    default: 1000
+    default: 1024
   delete:
     description:
       - Specify a list of settings you want to delete.
@@ -803,7 +803,7 @@ def main():
             cores=dict(type='int', default=1),
             cpu=dict(type='str', default='kvm64'),
             cpulimit=dict(type='int'),
-            cpuunits=dict(type='int', default=1000),
+            cpuunits=dict(type='int', default=1024),
             delete=dict(type='str', default=None),
             description=dict(type='str'),
             digest=dict(type='str'),
