@@ -53,7 +53,7 @@ class TestJenkinsBuild(unittest.TestCase):
     def test_module_fail_when_required_args_missing(self):
         with self.assertRaises(AnsibleFailJson):
             set_module_args({})
-            self.module.main()
+            module.main()
 
     def test_module_create_build(self):
         with self.assertRaises(AnsibleExitJson):
@@ -61,7 +61,7 @@ class TestJenkinsBuild(unittest.TestCase):
                 "name": "host-check",
                 "token": "xyz"
             })
-            self.module.main()
+            module.main()
 
     def test_module_delete_build(self):
         with self.assertRaises(AnsibleExitJson):
@@ -70,4 +70,4 @@ class TestJenkinsBuild(unittest.TestCase):
                 "state": "absent",
                 "token": "xyz"
             })
-            self.module.main()
+            module.main()
