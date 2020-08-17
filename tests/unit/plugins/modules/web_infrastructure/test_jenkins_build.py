@@ -66,6 +66,7 @@ class TestJenkinsBuild(unittest.TestCase):
     def test_module_delete_build(self):
         with self.assertRaises(AnsibleExitJson):
             set_module_args({
+                "name": "host-check",
                 "build_number": "1234",
                 "state": "absent",
                 "token": "xyz"
