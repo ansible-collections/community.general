@@ -46,12 +46,12 @@ def get_hosts(host=None):
     data = json.loads(p.communicate()[0])
     returned['multipass'] = set()
 
-    for hostname, hostinfo in data.get('info',{}).items():
+    for hostname, hostinfo in data.get('info', {}).items():
         hostvars[hostname] = {}
         hostvars[hostname]['ansible_ssh_host'] = hostinfo['ipv4'][0].strip()
         returned['multipass'].add(hostname)
         if not host:
-          returned['all'].add(hostname)
+            returned['all'].add(hostname)
 
     if not host:
         returned['_metadata']['hostvars'] = hostvars
