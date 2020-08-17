@@ -11,7 +11,7 @@ from ansible.errors import AnsibleError, AnsibleParserError
 from ansible_collections.community.general.plugins.inventory.proxmox import InventoryModule
 
 
-@pytest.fixture(scope="Module")
+@pytest.fixture
 def inventory():
     return InventoryModule()
 
