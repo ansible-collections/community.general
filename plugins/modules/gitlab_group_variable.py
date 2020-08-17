@@ -163,8 +163,8 @@ class GitlabGroupVariabless(object):
         if self._module.check_mode:
             return
         return self.group.variables.create({"key": key, "value": value,
-                                              "masked": masked, "protected": protected,
-                                              "variable_type": variable_type})
+                                            "masked": masked, "protected": protected,
+                                            "variable_type": variable_type})
 
     def update_variable(self, key, var, value, masked, protected, variable_type):
         if var.value == value and var.protected == protected and var.masked == masked and var.variable_type == variable_type:
