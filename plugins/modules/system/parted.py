@@ -102,6 +102,12 @@ options:
      - Parameter optional, but see notes below about negative negative C(part_start) values.
     type: str
     version_added: '0.2.0'
+  resize:
+    description:
+      - Call 'resizepart' on existing partitions to match the size specified by part_end
+    type: bool
+    default: False
+
 notes:
   - When fetching information about a new disk and when the version of parted
     installed on the system is before version 3.1, the module queries the kernel
@@ -206,6 +212,13 @@ EXAMPLES = r'''
     number: '{{ item.num }}'
     state: absent
   loop: '{{ sdb_info.partitions }}'
+
+- name: Extend an existing partition to fill all available space
+  community.general.parted:
+    decice: /dev/sdb
+    number: "{{ sdb_info.partitions | length }}"
+    part_end: "100%"
+    resize: True
 '''
 
 
@@ -600,6 +613,9 @@ def main():
 
             # rm/mkpart command
             state=dict(type='str', default='info', choices=['absent', 'info', 'present']),
+
+            # resize part
+            resize=dict(type='bool', default=False)
         ),
         required_if=[
             ['state', 'present', ['number']],
@@ -622,6 +638,7 @@ def main():
     state = module.params['state']
     flags = module.params['flags']
     fs_type = module.params['fs_type']
+    resize = module.params['resize']
 
     # Parted executable
     parted_exec = module.get_bin_path('parted', True)
@@ -666,8 +683,8 @@ def main():
             script = "unit %s %s" % (unit, script)
 
         # If partition exists, try to resize
-        if part_exists(current_parts, 'num', number):
-            # Ensure new end is same/larger than current
+        if part_exists(current_parts, 'num', number) and resize:
+            # Ensure new end is different to current
             partition = [p for p in current_parts if p['num'] == number][0]
             current_part_end = convert_to_bytes(partition['end'], unit)
 
@@ -678,9 +695,7 @@ def main():
 
             desired_part_end = convert_to_bytes(size, parsed_unit)
 
-            if current_part_end > desired_part_end:
-                module.fail_json(msg="Given partition end smaller than current value. Aborting.")
-            elif current_part_end < desired_part_end:
+            if current_part_end != desired_part_end:
                 script += "resizepart %s %s " % (
                     number,
                     part_end
