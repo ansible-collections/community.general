@@ -1,0 +1,2 @@
+bugfixes:
+  - "Fix gem module get_installed_versions: correctly parse ``default`` version (#782)."
