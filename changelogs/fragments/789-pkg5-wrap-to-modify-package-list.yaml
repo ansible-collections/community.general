@@ -1,0 +1,2 @@
+bugfixes:
+  - "The `pkg5` module now works when Python 3 is used on the target."
