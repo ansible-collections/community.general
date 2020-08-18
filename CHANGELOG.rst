@@ -5,6 +5,51 @@ Community General Release Notes
 .. contents:: Topics
 
 
+v1.1.0
+======
+
+Release Summary
+---------------
+
+Release for Ansible 2.10.0.
+
+
+Minor Changes
+-------------
+
+- The collection dependencies where adjusted so that ``community.kubernetes`` and ``google.cloud`` are required to be of version 1.0.0 or newer (https://github.com/ansible-collections/community.general/pull/774).
+- jc - new filter to convert the output of many shell commands and file-types to JSON. Uses the jc library at https://github.com/kellyjonbrazil/jc. For example, filtering the STDOUT output of ``uname -a`` via ``{{ result.stdout | community.general.jc('uname') }}``. Requires Python 3.6+ (https://github.com/ansible-collections/community.general/pull/750).
+- xfconf - add support for ``double`` type (https://github.com/ansible-collections/community.general/pull/744).
+
+Bugfixes
+--------
+
+- cobbler inventory plugin - ``name`` needed FQCN (https://github.com/ansible-collections/community.general/pull/722).
+- dsv lookup - use correct dict usage (https://github.com/ansible-collections/community.general/pull/743).
+- inventory plugins - allow FQCN in ``plugin`` option (https://github.com/ansible-collections/community.general/pull/722).
+- ipa_hostgroup - fix an issue with load-balanced ipa and cookie handling with Python 3 (https://github.com/ansible-collections/community.general/issues/737).
+- oc connection plugin - ``transport`` needed FQCN (https://github.com/ansible-collections/community.general/pull/722).
+- postgresql_set - allow to pass an empty string to the ``value`` parameter (https://github.com/ansible-collections/community.general/issues/775).
+- xfconf - make it work in non-english locales (https://github.com/ansible-collections/community.general/pull/744).
+
+New Modules
+-----------
+
+Cloud
+~~~~~
+
+docker
+^^^^^^
+
+- docker_stack_task_info - Return information of the tasks on a docker stack
+
+System
+~~~~~~
+
+- iptables_state - Save iptables state into a file or restore it from a file
+- shutdown - Shut down a machine
+- sysupgrade - Manage OpenBSD system upgrades
+
 v1.0.0
 ======
 
