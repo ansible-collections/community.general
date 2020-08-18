@@ -89,6 +89,29 @@ options:
     description:
       - Enable booting from specified disk. C((ide|sata|scsi|virtio)\d+)
     type: str
+  cicustom:
+    description:
+      - 'cloud-init: Specify custom files to replace the automatically generated ones at start.'
+    type: str
+    version_added: 1.3.0
+  cipassword:
+    description:
+      - 'cloud-init: password of default user to create.'
+    type: str
+    version_added: 1.3.0
+  citype:
+    description:
+      - 'cloud-init: Specifies the cloud-init configuration format.'
+      - The default depends on the configured operating system type (C(ostype)).
+      - We use the C(nocloud) format for Linux, and C(configdrive2) for Windows.
+    type: str
+    choices: ['nocloud', 'configdrive2']
+    version_added: 1.3.0
+  ciuser:
+    description:
+      - 'cloud-init: username of default user to create.'
+    type: str
+    version_added: 1.3.0
   clone:
     description:
       - Name of VM to be cloned. If C(vmid) is setted, C(clone) can take arbitrary value but required for initiating the clone.
@@ -195,6 +218,19 @@ options:
       - C(size) is the size of the disk in GB.
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
     type: dict
+  ipconfig:
+    description:
+      - 'cloud-init: Set the IP configuration.'
+      - A hash/dictionary of network ip configurations. C(ipconfig='{"key":"value", "key":"value"}').
+      - Keys allowed are - C(ipconfig[n]) where 0 ≤ n ≤ network interfaces.
+      - Values allowed are -  C("[gw=<GatewayIPv4>] [,gw6=<GatewayIPv6>] [,ip=<IPv4Format/CIDR>] [,ip6=<IPv6Format/CIDR>]").
+      - 'cloud-init: Specify IP addresses and gateways for the corresponding interface.'
+      - IP addresses use CIDR notation, gateways are optional but they should be in the same subnet of specified IP address.
+      - The special string 'dhcp' can be used for IP addresses to use DHCP, in which case no explicit gateway should be provided.
+      - For IPv6 the special string 'auto' can be used to use stateless autoconfiguration.
+      - If cloud-init is enabled and neither an IPv4 nor an IPv6 address is specified, it defaults to using dhcp on IPv4.
+    type: dict
+    version_added: 1.3.0
   keyboard:
     description:
       - Sets the keyboard layout for VNC server.
@@ -242,6 +278,13 @@ options:
       - Specifies the VM name. Only used on the configuration web interface.
       - Required only for C(state=present).
     type: str
+  nameservers:
+    description:
+      - 'cloud-init: DNS server IP address(es).'
+      - If unset, PVE host settings are used.
+    type: list
+    elements: str
+    version_added: 1.3.0
   net:
     description:
       - A hash/dictionary of network interfaces for the VM. C(net='{"key":"value", "key":"value"}').
@@ -339,6 +382,13 @@ options:
       - Specifies the SCSI controller model.
     type: str
     choices: ['lsi', 'lsi53c810', 'virtio-scsi-pci', 'virtio-scsi-single', 'megasas', 'pvscsi']
+  searchdomains:
+    description:
+      - 'cloud-init: Sets DNS search domain(s).'
+      - If unset, PVE host settings are used.
+    type: list
+    elements: str
+    version_added: 1.3.0
   serial:
     description:
       - A hash/dictionary of serial device to create inside the VM. C('{"key":"value", "key":"value"}').
@@ -373,6 +423,11 @@ options:
         option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
         changes in community.general 4.0.0.
     type: int
+  sshkeys:
+    description:
+      - 'cloud-init: SSH key to assign to the default user. NOT TESTED with multiple keys but a multi-line value should work.'
+    type: str
+    version_added: 1.3.0
   startdate:
     description:
       - Sets the initial date of the real time clock.
@@ -572,7 +627,7 @@ EXAMPLES = '''
     format: raw
     timeout: 300
 
-- name: Create new VM and lock it for snapashot
+- name: Create new VM and lock it for snapshot
   community.general.proxmox_kvm:
     api_user: root@pam
     api_password: secret
@@ -589,6 +644,37 @@ EXAMPLES = '''
     name: spynal
     node: sabrewulf
     protection: yes
+
+- name: Create new VM using cloud-init with a username and password
+  community.general.proxmox_kvm:
+    node: sabrewulf
+    api_user: root@pam
+    api_password: secret
+    api_host: helldorado
+    name: spynal
+    ide: '{ "ide2": "local:cloudinit,format=qcow2"}'
+    ciuser: mylinuxuser
+    cipassword: supersecret
+    searchdomains: "mydomain.internal"
+    nameservers: 1.1.1.1
+    net: '{"net0":"virtio,bridge=vmbr1,tag=77"}'
+    ipconfig:
+      ipconfig0: "ip=192.168.1.1/24,gw=192.168.1.1"
+
+- name: Create new VM using Cloud-Init with an ssh key
+  community.general.proxmox_kvm:
+    node: sabrewulf
+    api_user: root@pam
+    api_password: secret
+    api_host: helldorado
+    name: spynal
+    ide: '{ "ide2": "local:cloudinit,format=qcow2"}'
+    sshkeys: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILJkVm98B71lD5XHfihwcYHE9TVpsJmK1vR1JcaU82L+'
+    searchdomains: 'mydomain.internal'
+    nameservers: ['1.1.1.1', '8.8.8.8']
+    net: '{"net0":"virtio,bridge=vmbr1,tag=77"}'
+    ipconfig:
+      ipconfig0: "ip=192.168.1.1/24"
 
 - name: Start VM
   community.general.proxmox_kvm:
@@ -720,6 +806,7 @@ import re
 import time
 import traceback
 from distutils.version import LooseVersion
+from ansible.module_utils.six.moves.urllib.parse import quote
 
 try:
     from proxmoxer import ProxmoxAPI
@@ -823,6 +910,7 @@ def wait_for_task(module, proxmox, node, taskid):
 def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sockets, update, **kwargs):
     # Available only in PVE 4
     only_v4 = ['force', 'protection', 'skiplock']
+    only_v6 = ['ciuser', 'cipassword', 'sshkeys', 'ipconfig']
 
     # valide clone parameters
     valid_clone_params = ['format', 'full', 'pool', 'snapname', 'storage', 'target']
@@ -836,11 +924,22 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
     kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
     kwargs.update(dict([k, int(v)] for k, v in kwargs.items() if isinstance(v, bool)))
 
-    # The features work only on PVE 4
+    # The features work only on PVE 4+
     if PVE_MAJOR_VERSION < 4:
         for p in only_v4:
             if p in kwargs:
                 del kwargs[p]
+
+    # The features work only on PVE 6
+    if PVE_MAJOR_VERSION < 6:
+        for p in only_v6:
+            if p in kwargs:
+                del kwargs[p]
+
+    # 'sshkeys' param expects an urlencoded string
+    if 'sshkeys' in kwargs:
+        urlencoded_ssh_keys = quote(kwargs['sshkeys'], safe='')
+        kwargs['sshkeys'] = str(urlencoded_ssh_keys)
 
     # If update, don't update disk (virtio, ide, sata, scsi) and network interface
     # pool parameter not supported by qemu/<vmid>/config endpoint on "update" (PVE 6.2) - only with "create"
@@ -860,16 +959,26 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
         if 'pool' in kwargs:
             del kwargs['pool']
 
-    # Convert all dict in kwargs to elements. For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n]
+    # Convert all dict in kwargs to elements. For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
     for k in list(kwargs.keys()):
         if isinstance(kwargs[k], dict):
             kwargs.update(kwargs[k])
             del kwargs[k]
 
-    # Rename numa_enabled  to numa. According the API documentation
+    # Rename numa_enabled to numa. According the API documentation
     if 'numa_enabled' in kwargs:
         kwargs['numa'] = kwargs['numa_enabled']
         del kwargs['numa_enabled']
+
+    # PVE api expects strings for the following params
+    if 'nameservers' in module.params:
+        nameservers = module.params.pop('nameservers')
+        if nameservers:
+            kwargs['nameserver'] = ' '.join(nameservers)
+    if 'searchdomains' in module.params:
+        searchdomains = module.params.pop('searchdomains')
+        if searchdomains:
+            kwargs['searchdomain'] = ' '.join(searchdomains)
 
     # -args and skiplock require root@pam user
     if module.params['api_user'] == "root@pam" and module.params['args'] is None:
@@ -947,6 +1056,10 @@ def main():
             bios=dict(choices=['seabios', 'ovmf']),
             boot=dict(type='str'),
             bootdisk=dict(type='str'),
+            cicustom=dict(type='str'),
+            cipassword=dict(type='str', no_log=True),
+            citype=dict(type='str', choices=['nocloud', 'configdrive2']),
+            ciuser=dict(type='str'),
             clone=dict(type='str', default=None),
             cores=dict(type='int'),
             cpu=dict(type='str'),
@@ -963,6 +1076,7 @@ def main():
             hotplug=dict(type='str'),
             hugepages=dict(choices=['any', '2', '1024']),
             ide=dict(type='dict'),
+            ipconfig=dict(type='dict'),
             keyboard=dict(type='str'),
             kvm=dict(type='bool'),
             localtime=dict(type='bool'),
@@ -972,6 +1086,7 @@ def main():
             migrate_downtime=dict(type='int'),
             migrate_speed=dict(type='int'),
             name=dict(type='str'),
+            nameservers=dict(type='list', elements='str'),
             net=dict(type='dict'),
             newid=dict(type='int', default=None),
             node=dict(),
@@ -988,11 +1103,13 @@ def main():
             scsi=dict(type='dict'),
             scsihw=dict(choices=['lsi', 'lsi53c810', 'virtio-scsi-pci', 'virtio-scsi-single', 'megasas', 'pvscsi']),
             serial=dict(type='dict'),
+            searchdomains=dict(type='list', elements='str'),
             shares=dict(type='int'),
             skiplock=dict(type='bool'),
             smbios=dict(type='str'),
             snapname=dict(type='str'),
             sockets=dict(type='int'),
+            sshkeys=dict(type='str'),
             startdate=dict(type='str'),
             startup=dict(),
             state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'current']),
@@ -1078,7 +1195,7 @@ def main():
         if not api_password:
             try:
                 api_password = os.environ['PROXMOX_PASSWORD']
-            except KeyError as e:
+            except KeyError:
                 module.fail_json(msg='You should set api_password param or use PROXMOX_PASSWORD environment variable')
         auth_args['password'] = api_password
     else:
@@ -1088,7 +1205,7 @@ def main():
     try:
         proxmox = ProxmoxAPI(api_host, verify_ssl=validate_certs, **auth_args)
         global PVE_MAJOR_VERSION
-        PVE_MAJOR_VERSION = 3 if proxmox_version(proxmox) < LooseVersion('4.0') else 4
+        PVE_MAJOR_VERSION = 3 if proxmox_version(proxmox) < LooseVersion('4.0') else proxmox_version(proxmox).version[0]
     except Exception as e:
         module.fail_json(msg='authorization on proxmox cluster failed with exception: %s' % e)
 
@@ -1098,13 +1215,13 @@ def main():
         if state == 'present' and not update and not clone and not delete and not revert:
             try:
                 vmid = get_nextvmid(module, proxmox)
-            except Exception as e:
+            except Exception:
                 module.fail_json(msg="Can't get the next vmid for VM {0} automatically. Ensure your cluster state is good".format(name))
         else:
             clone_target = clone or name
             try:
                 vmid = get_vmid(proxmox, clone_target)[0]
-            except Exception as e:
+            except Exception:
                 vmid = -1
 
     if clone is not None:
@@ -1112,7 +1229,7 @@ def main():
         if not newid:
             try:
                 newid = get_nextvmid(module, proxmox)
-            except Exception as e:
+            except Exception:
                 module.fail_json(msg="Can't get the next vmid for VM {0} automatically. Ensure your cluster state is good".format(name))
 
         # Ensure source VM name exists when cloning
@@ -1164,6 +1281,10 @@ def main():
                       bios=module.params['bios'],
                       boot=module.params['boot'],
                       bootdisk=module.params['bootdisk'],
+                      cicustom=module.params['cicustom'],
+                      cipassword=module.params['cipassword'],
+                      citype=module.params['citype'],
+                      ciuser=module.params['ciuser'],
                       cpulimit=module.params['cpulimit'],
                       cpuunits=module.params['cpuunits'],
                       description=module.params['description'],
@@ -1174,6 +1295,7 @@ def main():
                       hotplug=module.params['hotplug'],
                       hugepages=module.params['hugepages'],
                       ide=module.params['ide'],
+                      ipconfig=module.params['ipconfig'],
                       keyboard=module.params['keyboard'],
                       kvm=module.params['kvm'],
                       localtime=module.params['localtime'],
@@ -1198,6 +1320,7 @@ def main():
                       skiplock=module.params['skiplock'],
                       smbios1=module.params['smbios'],
                       snapname=module.params['snapname'],
+                      sshkeys=module.params['sshkeys'],
                       startdate=module.params['startdate'],
                       startup=module.params['startup'],
                       tablet=module.params['tablet'],
