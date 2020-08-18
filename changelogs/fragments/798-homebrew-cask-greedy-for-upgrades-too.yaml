@@ -1,0 +1,2 @@
+minor_changes:
+  - homebrew_cask - consider `greedy` option for upgrade_all, too (https://github.com/ansible-collections/community.general/pull/798)
