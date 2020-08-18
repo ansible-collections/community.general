@@ -540,6 +540,9 @@ class HomebrewCask(object):
             [self.brew_path, 'cask', 'upgrade']
         )
 
+        if self.greedy:
+            opts.append('--greedy')
+
         cmd = [opt for opt in opts if opt]
 
         rc, out, err = '', '', ''
