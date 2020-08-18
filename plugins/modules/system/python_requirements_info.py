@@ -142,6 +142,8 @@ def main():
             except (pkg_resources.DistributionNotFound, pkg_resources.UnknownExtra):
                 results['not_found'].append(pkg + extra)
                 continue
+            else:
+                existing = pkg_resources.get_distribution(pkg).version
         else:
             try:
                 existing = pkg_resources.get_distribution(pkg).version
