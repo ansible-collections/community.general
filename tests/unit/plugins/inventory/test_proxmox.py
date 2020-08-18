@@ -16,10 +16,5 @@ def inventory():
     return InventoryModule()
 
 
-def test_init_cache(inventory):
-    inventory._init_cache()
-    assert inventory._cache[inventory.cache_key] == {}
-
-
 def test_verify_file_bad_config(inventory):
     assert inventory.verify_file('foobar.proxmox.yml') is False
