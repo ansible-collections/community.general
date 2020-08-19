@@ -1,2 +1,2 @@
 bugfixes:
-  - "The ``pkg5`` module now works when Python 3 is used on the target."
+  - "pkg5 - now works when Python 3 is used on the target (https://github.com/ansible-collections/community.general/pull/789)."
