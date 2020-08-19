@@ -49,7 +49,7 @@ def get_pools():
 
 def get_lxc_per_node(node):
     return [{"cpus": 1,
-             "name": "test",
+             "name": "test-lxc",
              "cpu": 0.01,
              "diskwrite": 0,
              "lock": "",
@@ -175,3 +175,17 @@ def test_populate(inventory, mocker):
     inventory._get_vm_status = mocker.MagicMock(side_effect=get_vm_status)
     inventory.get_option = mocker.MagicMock(side_effect=get_option)
     inventory._populate()
+
+    # get different hosts
+    host_qemu = inventory.inventory.get_host('test-qemu')
+    host_lxc = inventory.inventory.get_host('test-lxc')
+    host_node = inventory.inventory.get_host('testnode')
+
+    # check if qemu-test is in the proxmox_pool_test group
+    assert 'proxmox_pool_test' in inventory.inventory.groups
+    group_qemu = inventory.inventory.groups['proxmox_pool_test']
+    assert group_qemu.hosts == [host_qemu]
+
+    # check if lxc-test has been discovered correctly
+    group_lxc = inventory.inventory.groups['proxmox_all_lxc']
+    assert group_lxc.hosts == [host_lxc]
