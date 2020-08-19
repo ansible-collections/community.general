@@ -40,8 +40,7 @@ def get_nodes():
              "disk": 1000,
              "maxmem": 1000,
              "uptime": 10000,
-             "level": ""
-             }]
+             "level": ""}]
 
 
 def get_pools():
@@ -68,8 +67,8 @@ def get_lxc_per_node(node):
              "status": "running",
              "vmid": "100",
              "disk": "1000",
-             "uptime": 1000
-            }]
+             "uptime": 1000}]
+
 
 def get_qemu_per_node(node):
     return [{"name": "test-qemu",
@@ -87,8 +86,7 @@ def get_qemu_per_node(node):
              "vmid": "101",
              "uptime": 1000,
              "disk": 0,
-             "status": "running"
-            }]
+             "status": "running"}]
 
 
 def get_members_per_pool(pool):
@@ -109,45 +107,44 @@ def get_members_per_pool(pool):
              "type": "qemu",
              "maxdisk": 1000,
              "disk": 0,
-             "diskread": 1000
-            }]
+             "diskread": 1000}]
 
 
 def get_node_ip(node):
-    return [{"families":["inet"],
-             "priority":3,
-             "active":1,
-             "cidr":"10.1.1.2/24",
-             "iface":"eth0",
-             "method":"static",
-             "exists":1,
-             "type":"eth",
-             "netmask":"24",
-             "gateway":"10.1.1.1",
-             "address":"10.1.1.2",
-             "method6":"manual",
-             "autostart":1},
-            {"method6":"manual",
-             "autostart":1,
-             "type":"OVSPort",
-             "exists":1,
-             "method":"manual",
-             "iface":"eth1",
-             "ovs_bridge":"vmbr0",
-             "active":1,
-             "families":["inet"],
-             "priority":5,
-             "ovs_type":"OVSPort"},
-            {"type":"OVSBridge",
-             "method":"manual",
-             "iface":"vmbr0",
-             "families":["inet"],
-             "priority":4,
-             "ovs_ports":"eth1",
-             "ovs_type":"OVSBridge",
-             "method6":"manual",
-             "autostart":1,
-             "active":1}]
+    return [{"families": ["inet"],
+             "priority": 3,
+             "active": 1,
+             "cidr": "10.1.1.2/24",
+             "iface": "eth0",
+             "method": "static",
+             "exists": 1,
+             "type": "eth",
+             "netmask": "24",
+             "gateway": "10.1.1.1",
+             "address": "10.1.1.2",
+             "method6": "manual",
+             "autostart": 1},
+            {"method6": "manual",
+             "autostart": 1,
+             "type": "OVSPort",
+             "exists": 1,
+             "method": "manual",
+             "iface": "eth1",
+             "ovs_bridge": "vmbr0",
+             "active": 1,
+             "families": ["inet"],
+             "priority": 5,
+             "ovs_type": "OVSPort"},
+            {"type": "OVSBridge",
+             "method": "manual",
+             "iface": "vmbr0",
+             "families": ["inet"],
+             "priority": 4,
+             "ovs_ports": "eth1",
+             "ovs_type": "OVSBridge",
+             "method6": "manual",
+             "autostart": 1,
+             "active": 1}]
 
 
 def get_vm_status(node, vmtype, vmid, name):
