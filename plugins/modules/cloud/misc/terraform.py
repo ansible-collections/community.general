@@ -375,6 +375,8 @@ def main():
                 msg="Failure when executing Terraform command. Exited {0}.\nstdout: {1}\nstderr: {2}".format(rc, out, err),
                 command=' '.join(command)
             )
+    else:
+        changed = needs_application
 
     outputs_command = [command[0], 'output', '-no-color', '-json'] + _state_args(state_file)
     rc, outputs_text, outputs_err = module.run_command(outputs_command, cwd=project_path)
