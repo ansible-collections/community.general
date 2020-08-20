@@ -27,125 +27,123 @@ def test_verify_file_bad_config(inventory):
 def get_auth():
     return True
 
-
-def get_nodes():
-    return [{"type": "node",
-             "cpu": 0.01,
-             "maxdisk": 500,
-             "mem": 500,
-             "node": "testnode",
-             "id": "node/testnode",
-             "maxcpu": 1,
-             "status": "online",
-             "ssl_fingerprint": "xx",
-             "disk": 1000,
-             "maxmem": 1000,
-             "uptime": 10000,
-             "level": ""}]
-
-
-def get_pools():
-    return [{"poolid": "test"}]
-
-
-def get_lxc_per_node(node):
-    return [{"cpus": 1,
-             "name": "test-lxc",
-             "cpu": 0.01,
-             "diskwrite": 0,
-             "lock": "",
-             "maxmem": 1000,
-             "template": "",
-             "diskread": 0,
-             "mem": 1000,
-             "swap": 0,
-             "type": "lxc",
-             "maxswap": 0,
-             "maxdisk": "1000",
-             "netout": 1000,
-             "pid": "1000",
-             "netin": 1000,
-             "status": "running",
-             "vmid": "100",
-             "disk": "1000",
-             "uptime": 1000}]
-
-
-def get_qemu_per_node(node):
-    return [{"name": "test-qemu",
-             "cpus": 1,
-             "mem": 1000,
-             "template": "",
-             "diskread": 0,
-             "cpu": 0.01,
-             "maxmem": 1000,
-             "diskwrite": 0,
-             "netout": 1000,
-             "pid": "1001",
-             "netin": 1000,
-             "maxdisk": 1000,
-             "vmid": "101",
-             "uptime": 1000,
-             "disk": 0,
-             "status": "running"}]
-
-
-def get_members_per_pool(pool):
-    return [{"uptime": 1000,
-             "template": 0,
-             "id": "qemu/101",
-             "mem": 1000,
-             "status": "running",
-             "cpu": 0.01,
-             "maxmem": 1000,
-             "diskwrite": 1000,
-             "name": "test-qemu",
-             "netout": 1000,
-             "netin": 1000,
-             "vmid": 101,
-             "node": "testnode",
-             "maxcpu": 1,
-             "type": "qemu",
-             "maxdisk": 1000,
-             "disk": 0,
-             "diskread": 1000}]
-
-
-def get_node_ip(node):
-    return [{"families": ["inet"],
-             "priority": 3,
-             "active": 1,
-             "cidr": "10.1.1.2/24",
-             "iface": "eth0",
-             "method": "static",
-             "exists": 1,
-             "type": "eth",
-             "netmask": "24",
-             "gateway": "10.1.1.1",
-             "address": "10.1.1.2",
-             "method6": "manual",
-             "autostart": 1},
-            {"method6": "manual",
-             "autostart": 1,
-             "type": "OVSPort",
-             "exists": 1,
-             "method": "manual",
-             "iface": "eth1",
-             "ovs_bridge": "vmbr0",
-             "active": 1,
-             "families": ["inet"],
-             "priority": 5,
-             "ovs_type": "OVSPort"},
-            {"type": "OVSBridge",
-             "method": "manual",
-             "iface": "vmbr0",
-             "families": ["inet"],
-             "priority": 4,
-             "ovs_ports": "eth1",
-             "ovs_type": "OVSBridge",
-             "method6": "manual",
-             "autostart": 1,
-             "active": 1}]
+# NOTE: when updating/adding replies to this function,
+# be sure to only add only the _contents_ of the 'data' dict in the API reply
+def get_json(url):
+    if url == "https://localhost:8006/api2/json/nodes":
+    # _get_nodes
+        return [{"type": "node",
+                 "cpu": 0.01,
+                 "maxdisk": 500,
+                 "mem": 500,
+                 "node": "testnode",
+                 "id": "node/testnode",
+                 "maxcpu": 1,
+                 "status": "online",
+                 "ssl_fingerprint": "xx",
+                 "disk": 1000,
+                 "maxmem": 1000,
+                 "uptime": 10000,
+                 "level": ""}]
+    elif url == "https://localhost:8006/api2/json/pools":
+    # _get_pools
+        return [{"poolid": "test"}]
+    elif url == "https://localhost:8006/api2/json/nodes/testnode/lxc":
+    # _get_lxc_per_node
+        return [{"cpus": 1,
+                 "name": "test-lxc",
+                 "cpu": 0.01,
+                 "diskwrite": 0,
+                 "lock": "",
+                 "maxmem": 1000,
+                 "template": "",
+                 "diskread": 0,
+                 "mem": 1000,
+                 "swap": 0,
+                 "type": "lxc",
+                 "maxswap": 0,
+                 "maxdisk": "1000",
+                 "netout": 1000,
+                 "pid": "1000",
+                 "netin": 1000,
+                 "status": "running",
+                 "vmid": "100",
+                 "disk": "1000",
+                 "uptime": 1000}]
+    elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu":
+    # _get_qemu_per_node
+        return [{"name": "test-qemu",
+                "cpus": 1,
+                 "mem": 1000,
+                 "template": "",
+                 "diskread": 0,
+                 "cpu": 0.01,
+                 "maxmem": 1000,
+                 "diskwrite": 0,
+                 "netout": 1000,
+                 "pid": "1001",
+                 "netin": 1000,
+                 "maxdisk": 1000,
+                 "vmid": "101",
+                 "uptime": 1000,
+                 "disk": 0,
+                 "status": "running"}]
+    elif url == "https://localhost:8006/api2/json/pools/test":
+    # _get_members_per_pool
+        return {"members":[{"uptime": 1000,
+                 "template": 0,
+                 "id": "qemu/101",
+                 "mem": 1000,
+                 "status": "running",
+                 "cpu": 0.01,
+                 "maxmem": 1000,
+                 "diskwrite": 1000,
+                 "name": "test-qemu",
+                 "netout": 1000,
+                 "netin": 1000,
+                 "vmid": 101,
+                 "node": "testnode",
+                 "maxcpu": 1,
+                 "type": "qemu",
+                 "maxdisk": 1000,
+                 "disk": 0,
+                 "diskread": 1000}]}
+    elif url == "https://localhost:8006/api2/json/nodes/testnode/network":
+    # _get_node_ip
+        return [{"families": ["inet"],
+                 "priority": 3,
+                 "active": 1,
+                 "cidr": "10.1.1.2/24",
+                 "iface": "eth0",
+                 "method": "static",
+                 "exists": 1,
+                 "type": "eth",
+                 "netmask": "24",
+                 "gateway": "10.1.1.1",
+                 "address": "10.1.1.2",
+                 "method6": "manual",
+                 "autostart": 1},
+                {"method6": "manual",
+                 "autostart": 1,
+                 "type": "OVSPort",
+                 "exists": 1,
+                 "method": "manual",
+                 "iface": "eth1",
+                 "ovs_bridge": "vmbr0",
+                 "active": 1,
+                 "families": ["inet"],
+                 "priority": 5,
+                 "ovs_type": "OVSPort"},
+                {"type": "OVSBridge",
+                 "method": "manual",
+                 "iface": "vmbr0",
+                 "families": ["inet"],
+                 "priority": 4,
+                 "ovs_ports": "eth1",
+                 "ovs_type": "OVSBridge",
+                 "method6": "manual",
+                 "autostart": 1,
+                 "active": 1}]
 
 
 def get_vm_status(node, vmtype, vmid, name):
@@ -167,12 +165,7 @@ def test_populate(inventory, mocker):
 
     # bypass authentication and API fetch calls
     inventory._get_auth = mocker.MagicMock(side_effect=get_auth)
-    inventory._get_nodes = mocker.MagicMock(side_effect=get_nodes)
-    inventory._get_pools = mocker.MagicMock(side_effect=get_pools)
-    inventory._get_lxc_per_node = mocker.MagicMock(side_effect=get_lxc_per_node)
-    inventory._get_qemu_per_node = mocker.MagicMock(side_effect=get_qemu_per_node)
-    inventory._get_members_per_pool = mocker.MagicMock(side_effect=get_members_per_pool)
-    inventory._get_node_ip = mocker.MagicMock(side_effect=get_node_ip)
+    inventory._get_json = mocker.MagicMock(side_effect=get_json)
     inventory._get_vm_status = mocker.MagicMock(side_effect=get_vm_status)
     inventory.get_option = mocker.MagicMock(side_effect=get_option)
     inventory._populate()
