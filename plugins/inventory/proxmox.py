@@ -16,14 +16,14 @@ DOCUMENTATION = '''
         - requests >= 1.1
     description:
         - Get inventory hosts from a Proxmox PVE cluster.
-        - "Uses a configuration file as an inventory source, it must end in ``.proxmox.yml`` or ``.proxmox.yaml``"
+        - "Uses a configuration file as an inventory source, it must end in C(.proxmox.yml) or C(.proxmox.yaml)"
         - Will retrieve the first network interface with an IP for Proxmox nodes.
         - Can retrieve LXC/QEMU configuration as facts.
     extends_documentation_fragment:
         - inventory_cache
     options:
       plugin:
-        description: The name of this plugin, it should always be set to 'community.general.proxmox' for this plugin to recognize it as it's own.
+        description: The name of this plugin, it should always be set to C(community.general.proxmox) for this plugin to recognize it as it's own.
         required: yes
         choices: ['community.general.proxmox']
         type: str
@@ -42,7 +42,7 @@ DOCUMENTATION = '''
       validate_certs:
         description: Verify SSL certificate if using HTTPS.
         type: boolean
-        default: no
+        default: yes
       group_prefix:
         description: Prefix to apply to Proxmox groups.
         default: proxmox_
@@ -230,12 +230,9 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/status/current" % (self.proxmox_url, node, vmtype, vmid))
 
         status = ret['status']
-
-        # if we want the facts, then set it
-        if self.get_option('want_facts'):
-            status_key = 'status'
-            status_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), status_key.lower()))
-            self.inventory.set_variable(name, status_key, status)
+        status_key = 'status'
+        status_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), status_key.lower()))
+        self.inventory.set_variable(name, status_key, status)
 
     def to_safe(self, word):
         '''Converts 'bad' characters in a string to underscores so they can be used as Ansible groups
@@ -287,12 +284,13 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     self.inventory.add_child(lxc_group, lxc['name'])
                     self.inventory.add_child(node_lxc_group, lxc['name'])
 
-                    # get LXC status
-                    self._get_vm_status(node['node'], lxc['vmid'], 'lxc', lxc['name'])
-                    if lxc['status'] == 'stopped':
-                        self.inventory.add_child(stopped_group, lxc['name'])
-                    elif lxc['status'] == 'running':
-                        self.inventory.add_child(running_group, lxc['name'])
+                    # get LXC status when want_facts == True
+                    if self.get_option('want_facts'):
+                        self._get_vm_status(node['node'], lxc['vmid'], 'lxc', lxc['name'])
+                        if lxc['status'] == 'stopped':
+                            self.inventory.add_child(stopped_group, lxc['name'])
+                        elif lxc['status'] == 'running':
+                            self.inventory.add_child(running_group, lxc['name'])
 
                     # get LXC config for facts
                     if self.get_option('want_facts'):
