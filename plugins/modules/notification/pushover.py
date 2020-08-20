@@ -43,6 +43,7 @@ options:
     description:
       - A device the message should be sent to. Multiple devices can be specified, separated by a comma.
     required: false
+    version_added: 1.2.0
 
 author:
   - "Jim Richardson (@weaselkeeper)"
