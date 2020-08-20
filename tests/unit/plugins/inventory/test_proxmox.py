@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2020, Robert Kaussow <mail@thegeeklab.de>
+# Copyright (c) 2020, Jeffrey van Pelt <jeff@vanpelt.one>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+#
 # The API responses used in these tests were recorded from PVE version 6.2.
 
 from __future__ import (absolute_import, division, print_function)
@@ -27,11 +28,12 @@ def test_verify_file_bad_config(inventory):
 def get_auth():
     return True
 
+
 # NOTE: when updating/adding replies to this function,
 # be sure to only add only the _contents_ of the 'data' dict in the API reply
 def get_json(url):
     if url == "https://localhost:8006/api2/json/nodes":
-    # _get_nodes
+        # _get_nodes
         return [{"type": "node",
                  "cpu": 0.01,
                  "maxdisk": 500,
@@ -46,10 +48,10 @@ def get_json(url):
                  "uptime": 10000,
                  "level": ""}]
     elif url == "https://localhost:8006/api2/json/pools":
-    # _get_pools
+        # _get_pools
         return [{"poolid": "test"}]
     elif url == "https://localhost:8006/api2/json/nodes/testnode/lxc":
-    # _get_lxc_per_node
+        # _get_lxc_per_node
         return [{"cpus": 1,
                  "name": "test-lxc",
                  "cpu": 0.01,
@@ -71,7 +73,7 @@ def get_json(url):
                  "disk": "1000",
                  "uptime": 1000}]
     elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu":
-    # _get_qemu_per_node
+        # _get_qemu_per_node
         return [{"name": "test-qemu",
                 "cpus": 1,
                  "mem": 1000,
@@ -89,27 +91,27 @@ def get_json(url):
                  "disk": 0,
                  "status": "running"}]
     elif url == "https://localhost:8006/api2/json/pools/test":
-    # _get_members_per_pool
-        return {"members":[{"uptime": 1000,
-                 "template": 0,
-                 "id": "qemu/101",
-                 "mem": 1000,
-                 "status": "running",
-                 "cpu": 0.01,
-                 "maxmem": 1000,
-                 "diskwrite": 1000,
-                 "name": "test-qemu",
-                 "netout": 1000,
-                 "netin": 1000,
-                 "vmid": 101,
-                 "node": "testnode",
-                 "maxcpu": 1,
-                 "type": "qemu",
-                 "maxdisk": 1000,
-                 "disk": 0,
-                 "diskread": 1000}]}
+        # _get_members_per_pool
+        return {"members": [{"uptime": 1000,
+                            "template": 0,
+                             "id": "qemu/101",
+                             "mem": 1000,
+                             "status": "running",
+                             "cpu": 0.01,
+                             "maxmem": 1000,
+                             "diskwrite": 1000,
+                             "name": "test-qemu",
+                             "netout": 1000,
+                             "netin": 1000,
+                             "vmid": 101,
+                             "node": "testnode",
+                             "maxcpu": 1,
+                             "type": "qemu",
+                             "maxdisk": 1000,
+                             "disk": 0,
+                             "diskread": 1000}]}
     elif url == "https://localhost:8006/api2/json/nodes/testnode/network":
-    # _get_node_ip
+        # _get_node_ip
         return [{"families": ["inet"],
                  "priority": 3,
                  "active": 1,
