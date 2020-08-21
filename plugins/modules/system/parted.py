@@ -241,7 +241,7 @@ def parse_unit(size_str, unit=''):
     """
     Parses a string containing a size or boundary information
     """
-    matches = re.search(r'^(-?[\d.]+)([\w%]+)?$', size_str)
+    matches = re.search(r'^(-?[\d.]+) *([\w%]+)?$', size_str)
     if matches is None:
         # "<cylinder>,<head>,<sector>" format
         matches = re.search(r'^(\d+),(\d+),(\d+)$', size_str)
@@ -516,7 +516,7 @@ def parted_version():
     if len(lines) == 0:
         module.fail_json(msg="Failed to get parted version.", rc=0, out=out)
 
-    matches = re.search(r'^parted.+(\d+)\.(\d+)(?:\.(\d+))?$', lines[0])
+    matches = re.search(r'^parted.+(\d+)\.(\d+)(?:\.(\d+))?.+$', lines[0])
     if matches is None:
         module.fail_json(msg="Failed to get parted version.", rc=0, out=out)
 
