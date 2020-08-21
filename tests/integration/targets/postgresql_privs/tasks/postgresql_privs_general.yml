@@ -59,11 +59,11 @@
     - result is changed
 
 - name: Create schema with hyphen in the name
-  postgresql_schema: 
+  postgresql_schema:
      login_user: "{{ pg_user }}"
      login_password: password
      db: "{{ db_name_with_hyphens }}"
-     name: "{{ db_schema_with_hyphens }}" 
+     name: "{{ db_schema_with_hyphens }}"
      state: present
   register: result
 
@@ -71,12 +71,12 @@
     that:
     - result is changed
 
-- name: Set table default privs on the schema with hyphen in the name 
+- name: Set table default privs on the schema with hyphen in the name
   postgresql_privs:
      login_user: "{{ pg_user }}"
      password: password
      db: "{{ db_name_with_hyphens }}"
-     schema: "{{ db_schema_with_hyphens }}" 
+     schema: "{{ db_schema_with_hyphens }}"
      role: "{{ db_user_with_hyphens }}"
      type: default_privs
      obj: TABLES
@@ -683,6 +683,135 @@
     - result.rowcount == 0
   when: postgres_version_resp.stdout is version('10', '>=')
 
+# Test
+- name: Grant execute with grant option on pg_create_restore_point function
+  postgresql_privs:
+    privs: EXECUTE
+    type: function
+    schema: pg_catalog
+    obj: pg_create_restore_point(text)
+    db: "{{ db_name }}"
+    roles: "{{ db_user2 }}"
+    login_user: "{{ pg_user }}"
+    grant_option: yes
+    state: present
+  become: yes
+  become_user: "{{ pg_user }}"
+  register: result
+
+# Checks
+- assert:
+    that: result is changed
+
+- name: Check that user has GRANT privilege on the function
+  postgresql_query:
+    query: SELECT proacl FROM pg_proc WHERE proname='pg_create_restore_point'
+    db: "{{ db_name }}"
+    login_user: "{{ db_user2 }}"
+    login_password: password
+  become: yes
+  become_user: "{{ pg_user }}"
+  register: result
+
+- assert:
+    that: "'{{ db_user2 }}=X*/{{ pg_user }}' in result.query_result[0].proacl"
+
+# Test
+- name: Grant execute without specifying grant_option to check idempotence
+  postgresql_privs:
+    privs: EXECUTE
+    type: function
+    schema: pg_catalog
+    obj: pg_create_restore_point(text)
+    db: "{{ db_name }}"
+    roles: "{{ db_user2 }}"
+    login_user: "{{ pg_user }}"
+    state: present
+  become: yes
+  become_user: "{{ pg_user }}"
+  register: result
+
+# Checks
+- assert:
+    that: result is not changed
+
+- name: Check that user has GRANT privilege on the function
+  postgresql_query:
+    query: SELECT proacl FROM pg_proc WHERE proname='pg_create_restore_point'
+    db: "{{ db_name }}"
+    login_user: "{{ db_user2 }}"
+    login_password: password
+  become: yes
+  become_user: "{{ pg_user }}"
+  register: result
+
+- assert:
+    that: "'{{ db_user2 }}=X*/{{ pg_user }}' in result.query_result[0].proacl"
+
+# Test
+- name: Revoke grant option on pg_create_restore_point function
+  postgresql_privs:
+    privs: EXECUTE
+    type: function
+    schema: pg_catalog
+    obj: pg_create_restore_point(text)
+    db: "{{ db_name }}"
+    roles: "{{ db_user2 }}"
+    login_user: "{{ pg_user }}"
+    grant_option: no
+    state: present
+  become: yes
+  become_user: "{{ pg_user }}"
+  register: result
+
+# Checks
+- assert:
+    that: result is changed
+
+- name: Check that user does not have GRANT privilege on the function
+  postgresql_query:
+    query: SELECT proacl FROM pg_proc WHERE proname='pg_create_restore_point'
+    db: "{{ db_name }}"
+    login_user: "{{ db_user2 }}"
+    login_password: password
+  become: yes
+  become_user: "{{ pg_user }}"
+  register: result
+
+- assert:
+    that: "'{{ db_user2 }}=X/{{ pg_user }}' in result.query_result[0].proacl"
+
+# Test
+- name: Revoke execute on pg_create_restore_point function
+  postgresql_privs:
+    privs: EXECUTE
+    type: function
+    schema: pg_catalog
+    obj: pg_create_restore_point(text)
+    db: "{{ db_name }}"
+    roles: "{{ db_user2 }}"
+    login_user: "{{ pg_user }}"
+    state: absent
+  become: yes
+  become_user: "{{ pg_user }}"
+  register: result
+
+# Checks
+- assert:
+    that: result is changed
+
+- name: Check that user does not have EXECUTE privilege on the function
+  postgresql_query:
+    query: SELECT proacl FROM pg_proc WHERE proname='pg_create_restore_point'
+    db: "{{ db_name }}"
+    login_user: "{{ db_user2 }}"
+    login_password: password
+  become: yes
+  become_user: "{{ pg_user }}"
+  register: result
+
+- assert:
+    that: "'{{ db_user2 }}' not in result.query_result[0].proacl"
 
 # Test
 - name: Grant execute to all tables
@@ -934,7 +1063,7 @@
     that:
       - "'{{ db_user2 }}' in typ_result.query_result[0].typacl"
   when: postgres_version_resp.stdout is version('10', '>=')
-  
+
 - name: Revoke type privileges in check_mode
   become: yes
   become_user: "{{ pg_user }}"
