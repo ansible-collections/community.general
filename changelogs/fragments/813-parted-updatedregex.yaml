@@ -1,0 +1,2 @@
+bugfixes:
+  - parted.py - Change the regex that decodes the partition size  to better support different formats that parted uses. Change the regex that validate partted's version string.
