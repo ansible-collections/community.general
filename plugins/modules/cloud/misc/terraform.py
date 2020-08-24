@@ -313,6 +313,7 @@ def main():
     force_init = module.params.get('force_init')
     backend_config = module.params.get('backend_config')
     backend_config_files = module.params.get('backend_config_files')
+    init_extra_args = module.params.get('init_extra_args')
 
     if bin_path is not None:
         command = [bin_path]
