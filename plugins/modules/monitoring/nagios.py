@@ -358,7 +358,7 @@ class Nagios(object):
         self.comment = kwargs['comment']
         self.host = kwargs['host']
         self.servicegroup = kwargs['servicegroup']
-        self.start = int(kwargs['start'])
+        self.start = kwargs['start']
         self.minutes = kwargs['minutes']
         self.cmdfile = kwargs['cmdfile']
         self.command = kwargs['command']
