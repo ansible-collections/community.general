@@ -60,7 +60,7 @@ options:
     description:
       - When downtime should start, in time_t format (epoch seconds).
     version_added: '0.2.0'
-      minutes:
+  minutes:
     description:
       - Minutes to schedule downtime for.
       - Only usable with the C(downtime) action.
@@ -109,7 +109,7 @@ EXAMPLES = '''
     minutes: 60
     service: host
     host: '{{ inventory_hostname }}'
-    
+
 - name: Schedule an hour of HOST downtime, with a comment describing the reason
   community.general.nagios:
     action: downtime
