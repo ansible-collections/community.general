@@ -52,7 +52,6 @@ options:
        Only usable with the C(downtime) and C(acknowledge) action.
     default: Ansible
   comment:
-    version_added: "2.0"
     description:
      - Comment for C(downtime) and C(acknowledge)action.
     default: Scheduling downtime
