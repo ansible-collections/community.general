@@ -93,6 +93,12 @@ options:
     type: list
     elements: path
     version_added: '0.2.0'
+  init_extra_args:
+    description:
+      - Allow extra options to be given to terraform init command.
+    required: false
+    type: list
+    version_added: '1.2.0'
 notes:
    - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]
@@ -189,7 +195,7 @@ def _state_args(state_file):
     return []
 
 
-def init_plugins(bin_path, project_path, backend_config, backend_config_files):
+def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_extra_args):
     command = [bin_path, 'init', '-input=false']
     if backend_config:
         for key, val in backend_config.items():
@@ -200,6 +206,8 @@ def init_plugins(bin_path, project_path, backend_config, backend_config_files):
     if backend_config_files:
         for f in backend_config_files:
             command.extend(['-backend-config', f])
+    if init_extra_args:
+        command.extend(init_extra_args)
     rc, out, err = module.run_command(command, cwd=project_path)
     if rc != 0:
         module.fail_json(msg="Failed to initialize Terraform modules:\r\n{0}".format(err))
@@ -287,6 +295,7 @@ def main():
             force_init=dict(type='bool', default=False),
             backend_config=dict(type='dict', default=None),
             backend_config_files=dict(type='list', elements='path', default=None),
+            init_extra_args=dict(required=False, type='list', default=[]),
         ),
         required_if=[('state', 'planned', ['plan_file'])],
         supports_check_mode=True,
@@ -311,7 +320,7 @@ def main():
         command = [module.get_bin_path('terraform', required=True)]
 
     if force_init:
-        init_plugins(command[0], project_path, backend_config, backend_config_files)
+        init_plugins(command[0], project_path, backend_config, backend_config_files, init_extra_args)
 
     workspace_ctx = get_workspace_context(command[0], project_path)
     if workspace_ctx["current"] != workspace:
