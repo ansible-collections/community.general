@@ -290,6 +290,12 @@ def main():
     f.close()
     nf.flush()
 
+    with open(limits_conf, 'r') as content:
+        content_current = content.read()
+
+    with open(nf.name, 'r') as content:
+        content_new = content.read()
+
     if not module.check_mode:
         # Copy tempfile to newfile
         module.atomic_move(nf.name, limits_conf)
@@ -300,7 +306,9 @@ def main():
         pass
 
     res_args = dict(
-        changed=changed, msg=message
+        changed=changed,
+        msg=message,
+        diff=dict(before=content_current, after=content_new),
     )
 
     if backup:
