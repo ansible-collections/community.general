@@ -1,0 +1,2 @@
+minor_changes:
+  - pam_limits - adds check mode (https://github.com/ansible-collections/community.general/issues/827).
