@@ -1,3 +1,3 @@
 minor_changes:
-- nagios - add the ``acknowledge`` parameter (https://github.com/ansible-collections/community.general/pull/820).
-- nagios - add the ``service_check`` parameter (https://github.com/ansible-collections/community.general/pull/820).
+- nagios - add the ``acknowledge`` action (https://github.com/ansible-collections/community.general/pull/820).
+- nagios - add the ``service_check`` action (https://github.com/ansible-collections/community.general/pull/820).
