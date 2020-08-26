@@ -24,6 +24,7 @@ options:
   state:
     description:
         - Indicate desired state of the database backup.
+        - C(present) creates a backup, C(absent) deletes the backup, C(exported) creates a download link for the backup, C(restored) restores the backup to a new database
     type: str
     default: present
     choices:
