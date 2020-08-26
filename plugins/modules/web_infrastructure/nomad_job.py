@@ -66,7 +66,6 @@ options:
     source_hcl:
       description:
         - source of hcl nomad job
-extends_documentation_fragment: nomad
 '''
 
 EXAMPLES = '''
