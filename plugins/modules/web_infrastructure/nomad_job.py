@@ -25,7 +25,7 @@ description:
 options:
     host:
       description:
-        - fqdn of nomad server.
+        - FQDN of nomad server.
       required: True
     secure:
       description:
