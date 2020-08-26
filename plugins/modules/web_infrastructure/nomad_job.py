@@ -114,7 +114,7 @@ def run():
     module = AnsibleModule(
         argument_spec = dict(
             host=dict(required=True, type='str'),
-            state=dict(required=True, choices=['created', 'started', 'stopped'),
+            state=dict(required=True, choices=['created', 'started', 'stopped']),
             secure=dict(type='bool', default=False),
             timeout=dict(type='int', default=5),
             validate_certs=dict(type='bool', default=True),
