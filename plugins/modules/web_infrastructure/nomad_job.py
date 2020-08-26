@@ -55,7 +55,7 @@ options:
     state:
       description:
         - type of request
-      choices: ["create", "stop", "get", "list"]
+      choices: ["created", "started", "stopped"]
       required: True
     source:
       description:
