@@ -106,7 +106,7 @@ from ansible.module_utils.basic import *
 try:
     import nomad
     import_nomad = True
-except:
+except ImportError:
     import_nomad = False
 
 
@@ -213,9 +213,8 @@ def run():
     module.exit_json(changed=changed, result=result)
 
 def main():
-    run()
 
+    run()
 
 if __name__ == "__main__":
     main()
-
