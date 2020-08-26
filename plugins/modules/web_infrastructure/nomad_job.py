@@ -26,7 +26,8 @@ options:
     host:
       description:
         - FQDN of nomad server.
-      required: True
+      required: true
+      type: ...
     secure:
       description:
         - ssl connection.
