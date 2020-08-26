@@ -16,7 +16,7 @@ ANSIBLE_METADATA = {'metadata_version': '1.1',
 DOCUMENTATION = '''
 ---
 module: nomad_jobs
-author: "FERREIRA Christophe"
+author: "FERREIRA Christophe (@chris93111)"
 version_added: "2.10"
 short_description: Launch an Nomad Job.
 description:
@@ -235,4 +235,3 @@ def main():
     run()
 if __name__ == "__main__":
     main()
-
