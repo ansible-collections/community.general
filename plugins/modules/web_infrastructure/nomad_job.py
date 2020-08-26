@@ -17,7 +17,7 @@ DOCUMENTATION = '''
 ---
 module: nomad_jobs
 author: "FERREIRA Christophe (@chris93111)"
-version_added: "2.10"
+version_added: "1.2.0"
 short_description: Launch an Nomad Job.
 description:
     - Launch an Nomad job. See
