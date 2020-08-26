@@ -34,7 +34,7 @@ options:
     timeout:
       description:
         - timeout of request nomad.
-    verify:
+    validate_certs:
       description:
         - skip validation cert.
     cert:
@@ -117,7 +117,7 @@ def run():
             state=dict(required=True, choices=['create', 'start', 'stop', 'status', 'list']),
             secure=dict(type='bool', default=False),
             timeout=dict(type='int', default=5),
-            verify=dict(type='bool', default=False),
+            verify=dict(type='bool', default=True),
             cert=dict(type='path', default=None),
             key=dict(type='path', default=None),
             namespace=dict(type='str', default=None),
