@@ -60,11 +60,12 @@ options:
     source:
       description:
         - path of json or hcl for create job
-    source_type:
+    source_json:
       description:
-        - source type hcl or json
-      choices: ["hcl", "json"]
-      default: "json"
+        - source of json nomad job
+    source_hcl:
+      description:
+        - source of hcl nomad job
 extends_documentation_fragment: nomad
 '''
 
@@ -114,10 +115,10 @@ def run():
     module = AnsibleModule(
         argument_spec = dict(
             host=dict(required=True, type='str'),
-            state=dict(required=True, choices=['create', 'start', 'stop', 'status', 'list']),
+            state=dict(required=True, choices=['created', 'started', 'stopped'),
             secure=dict(type='bool', default=False),
             timeout=dict(type='int', default=5),
-            verify=dict(type='bool', default=True),
+            validate_certs=dict(type='bool', default=True),
             cert=dict(type='path', default=None),
             key=dict(type='path', default=None),
             namespace=dict(type='str', default=None),
@@ -128,15 +129,15 @@ def run():
         ),
         mutually_exclusive = [["name", "source_json", "source_hcl"], ["source_json", "source_hcl"]],
         required_if = [
-          ["state", "start", ["name"]],
-          ["state", "stop", ["name"]]
+          ["state", "started", ["name"]],
+          ["state", "stopped", ["name"]]
         ]
     )
 
     if not import_nomad:
         module.fail_json(msg='python-nomad is required for nomad_job ')
 
-    if module.params.get('state') == 'create' and module.params.get('source_json') == None and module.params.get('source_hcl') == None:
+    if module.params.get('state') == 'created' and module.params.get('source_json') == None and module.params.get('source_hcl') == None:
        module.fail_json(msg='source hcl or json must be set ')
 
     certificate_ssl = (module.params.get('cert'), module.params.get('key'))
@@ -145,13 +146,13 @@ def run():
         host=module.params.get('host'), 
         secure=module.params.get('secure'),
         timeout=module.params.get('timeout'),
-        verify=module.params.get('verify'),
+        verify=module.params.get('validate_certs'),
         cert=certificate_ssl,
         namespace=module.params.get('namespace'),
         token=module.params.get('token')
         )
     
-    if module.params.get('state') == "create":
+    if module.params.get('state') == "created":
 
         if not module.params.get('source_json') == None:
             job_json = module.params.get('source_json')
@@ -179,24 +180,8 @@ def run():
                 changed = True
             except Exception as e:
                 module.fail_json(msg=str(e))
-    
-    if module.params.get('state') == "list":
-
-        try:
-            result = nomad_client.jobs.get_jobs()
-            changed = False
-        except Exception as e:
-            module.fail_json(msg=str(e))
-    
-    if module.params.get('state') == "status":
-
-        try:
-            result = nomad_client.job.get_job(module.params.get('name'))
-            changed = False
-        except Exception as e:
-            module.fail_json(msg=str(e))
-    
-    if module.params.get('state') == "stop":
+        
+    if module.params.get('state') == "stopped":
 
         try:
             job_json = nomad_client.job.get_job(module.params.get('name'))
@@ -209,7 +194,7 @@ def run():
         except Exception as e:
             module.fail_json(msg=str(e))
 
-    if module.params.get('state') == "start":
+    if module.params.get('state') == "started":
     
         try:
             job = dict()
@@ -228,9 +213,6 @@ def run():
 
 
     module.exit_json(changed=changed, result=result)
-        
-             
-
 
 def main():
     run()
