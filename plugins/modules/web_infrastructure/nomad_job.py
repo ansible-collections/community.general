@@ -101,7 +101,7 @@ EXAMPLES = '''
 import os
 import json
 
-from ansible.module_utils.basic import *
+from ansible.module_utils.basic import AnsibleModule
 
 try:
     import nomad
