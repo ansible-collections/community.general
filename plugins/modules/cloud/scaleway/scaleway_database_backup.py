@@ -14,6 +14,7 @@ DOCUMENTATION = '''
 ---
 module: scaleway_database_backup
 short_description: Scaleway database backups management module
+version_added: 1.1.0
 author: Guillaume Rodriguez (@guillaume_ro_fr)
 description:
     - This module manages database backups on Scaleway account U(https://developer.scaleway.com).
