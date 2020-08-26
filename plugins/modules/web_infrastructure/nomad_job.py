@@ -212,9 +212,11 @@ def run():
 
     module.exit_json(changed=changed, result=result)
 
+
 def main():
 
     run()
+
 
 if __name__ == "__main__":
     main()
