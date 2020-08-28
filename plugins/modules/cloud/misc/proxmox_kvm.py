@@ -818,20 +818,24 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
     return True
 
 
-def start_vm(module, proxmox, vm, vmid):
-    taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.start.post()
+def start_vm(module, proxmox, vm):
+    vmid = vm[0]['vmid']
+    proxmox_node = proxmox.nodes(vm[0]['node'])
+    taskid = getattr(proxmox_node, VZ_TYPE)(vmid).status.start.post()
     if not wait_for_task(module, proxmox, vm[0]['node'], taskid):
         module.fail_json(msg='Reached timeout while waiting for starting VM. Last line in task before timeout: %s' %
-                         proxmox.nodes(vm[0]['node']).tasks(taskid).log.get()[:1])
+                         proxmox_node.tasks(taskid).log.get()[:1])
         return False
     return True
 
 
-def stop_vm(module, proxmox, vm, vmid, force):
-    taskid = proxmox.nodes(vm[0]['node']).qemu(vmid).status.shutdown.post(forceStop=(1 if force else 0))
+def stop_vm(module, proxmox, vm, force):
+    vmid = vm[0]['vmid']
+    proxmox_node = proxmox.nodes(vm[0]['node'])
+    taskid = proxmox_node.qemu(vmid).status.shutdown.post(forceStop=(1 if force else 0))
     if not wait_for_task(module, proxmox, vm[0]['node'], taskid):
         module.fail_json(msg='Reached timeout while waiting for stopping VM. Last line in task before timeout: %s' %
-                         proxmox.nodes(vm[0]['node']).tasks(taskid).log.get()[:1])
+                         proxmox_node.tasks(taskid).log.get()[:1])
         return False
     return True
 
@@ -1107,7 +1111,7 @@ def main():
             if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'running':
                 module.exit_json(changed=False, msg="VM %s is already running" % vmid)
 
-            if start_vm(module, proxmox, vm, vmid):
+            if start_vm(module, proxmox, vm):
                 module.exit_json(changed=True, msg="VM %s started" % vmid)
         except Exception as e:
             module.fail_json(msg="starting of VM %s failed with exception: %s" % (vmid, e))
@@ -1124,7 +1128,7 @@ def main():
             if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'stopped':
                 module.exit_json(changed=False, msg="VM %s is already stopped" % vmid)
 
-            if stop_vm(module, proxmox, vm, vmid, force=module.params['force']):
+            if stop_vm(module, proxmox, vm, force=module.params['force']):
                 module.exit_json(changed=True, msg="VM %s is shutting down" % vmid)
         except Exception as e:
             module.fail_json(msg="stopping of VM %s failed with exception: %s" % (vmid, e))
@@ -1140,7 +1144,7 @@ def main():
             if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'stopped':
                 module.exit_json(changed=False, msg="VM %s is not running" % vmid)
 
-            if stop_vm(module, proxmox, vm, vmid, force=module.params['force']) and start_vm(module, proxmox, vm, vmid):
+            if stop_vm(module, proxmox, vm, force=module.params['force']) and start_vm(module, proxmox, vm):
                 module.exit_json(changed=True, msg="VM %s is restarted" % vmid)
         except Exception as e:
             module.fail_json(msg="restarting of VM %s failed with exception: %s" % (vmid, e))
