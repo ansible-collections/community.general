@@ -1,3 +1,4 @@
 shippable/posix/group2
 skip/python3
 skip/aix
+disabled  # tests use bitbucket, which dropped mercurial support on 2020-08-26 (https://bitbucket.org/blog/sunsetting-mercurial-support-in-bitbucket)
