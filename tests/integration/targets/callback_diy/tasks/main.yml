@@ -263,7 +263,11 @@
           "\u001b[0;32mok: [testhost] => (item=sample item 3) => {\u001b[0m",
           "\u001b[0;32m    \"msg\": \"sample debug msg sample item 3\"\u001b[0m",
           "\u001b[0;32m}\u001b[0m",
-          "\u001b[0;31mfatal: [testhost]: FAILED! => {\"msg\": \"All items completed\"}\u001b[0m",
+          [
+            # Apparently a bug was fixed in Ansible, as before it ran through with "All items completed"
+            "\u001b[0;31mfatal: [testhost]: FAILED! => {\"msg\": \"All items completed\"}\u001b[0m",
+            "\u001b[0;31mfatal: [testhost]: FAILED! => {\"msg\": \"One or more items failed\"}\u001b[0m",
+          ],
           "\u001b[0;36m...ignoring\u001b[0m",
           "",
           "PLAY RECAP *********************************************************************",
@@ -491,7 +495,7 @@
 
 - name: Assert test output equals expected output
   assert:
-    that: result.output.got == result.output.expected
+    that: result.output.differences | length == 0
   loop: "{{ results }}"
   loop_control:
     loop_var: result
@@ -504,13 +508,22 @@
       {%-   set differences = []                                                                     -%}
       {%-   for i in range([result.test.expected_output | count, result.stdout_lines | count] | max) -%}
       {%-     set line = "line_%s" | format(i+1)                                                     -%}
-      {%-     set expected_line = result.test.expected_output[i] | default(none)                     -%}
       {%-     set test_line = result.stdout_lines[i] | default(none)                                 -%}
-      {%-     if expected_line != test_line                                                          -%}
-      {{-       differences.append({
-                  line: {
-                    'expected': expected_line,
-                    'got': test_line }})                                                             -}}
+      {%-     set expected_lines = result.test.expected_output[i] | default(none)                    -%}
+      {%-     if expected_lines is not string                                                        -%}
+      {%-       if test_line not in expected_lines                                                   -%}
+      {{-         differences.append({
+                    line: {
+                      'expected_one_of': expected_lines,
+                      'got': test_line }})                                                           -}}
+      {%-       endif                                                                                -%}
+      {%-     else                                                                                   -%}
+      {%-       if expected_lines != test_line                                                       -%}
+      {{-         differences.append({
+                    line: {
+                      'expected': expected_line,
+                      'got': test_line }})                                                           -}}
+      {%-       endif                                                                                -%}
       {%-     endif                                                                                  -%}
       {%-   endfor                                                                                   -%}
       {{-   results.append({
