@@ -645,9 +645,6 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
 
-VZ_TYPE = 'qemu'
-
-
 def get_nextvmid(module, proxmox):
     try:
         vmid = proxmox.cluster.nextid.get()
@@ -715,7 +712,7 @@ def settings(module, proxmox, vmid, node, name, **kwargs):
     # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
     kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
 
-    if getattr(proxmox_node, VZ_TYPE)(vmid).config.set(**kwargs) is None:
+    if proxmox_node.qemu(vmid).config.set(**kwargs) is None:
         return True
     else:
         return False
@@ -798,7 +795,7 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
         module.fail_json(msg='skiplock parameter require root@pam user. ')
 
     if update:
-        if getattr(proxmox_node, VZ_TYPE)(vmid).config.set(name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs) is None:
+        if proxmox_node.qemu(vmid).config.set(name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs) is None:
             return True
         else:
             return False
@@ -809,7 +806,7 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
         clone_params.update(dict([k, int(v)] for k, v in clone_params.items() if isinstance(v, bool)))
         taskid = proxmox_node.qemu(vmid).clone.post(newid=newid, name=name, **clone_params)
     else:
-        taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs)
+        taskid = proxmox_node.qemu.create(vmid=vmid, name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs)
 
     if not wait_for_task(module, proxmox, node, taskid):
         module.fail_json(msg='Reached timeout while waiting for creating VM. Last line in task before timeout: %s' %
@@ -821,7 +818,7 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
 def start_vm(module, proxmox, vm):
     vmid = vm[0]['vmid']
     proxmox_node = proxmox.nodes(vm[0]['node'])
-    taskid = getattr(proxmox_node, VZ_TYPE)(vmid).status.start.post()
+    taskid = proxmox_node.qemu(vmid).status.start.post()
     if not wait_for_task(module, proxmox, vm[0]['node'], taskid):
         module.fail_json(msg='Reached timeout while waiting for starting VM. Last line in task before timeout: %s' %
                          proxmox_node.tasks(taskid).log.get()[:1])
@@ -957,7 +954,6 @@ def main():
 
     try:
         proxmox = ProxmoxAPI(api_host, user=api_user, password=api_password, verify_ssl=validate_certs)
-        global VZ_TYPE
         global PVE_MAJOR_VERSION
         PVE_MAJOR_VERSION = 3 if proxmox_version(proxmox) < LooseVersion('4.0') else 4
     except Exception as e:
@@ -1099,7 +1095,7 @@ def main():
             elif clone is not None:
                 module.fail_json(msg="Unable to clone vm {0} from vmid {1}=".format(name, vmid) + str(e))
             else:
-                module.fail_json(msg="creation of %s VM %s with vmid %s failed with exception=%s" % (VZ_TYPE, name, vmid, e))
+                module.fail_json(msg="creation of qemu VM %s with vmid %s failed with exception=%s" % (name, vmid, e))
 
     elif state == 'started':
         try:
@@ -1161,7 +1157,7 @@ def main():
                     stop_vm(module, proxmox, vm, True)
                 else:
                     module.exit_json(changed=False, msg="VM %s is running. Stop it before deletion or use force=yes." % vmid)
-            taskid = getattr(proxmox_node, VZ_TYPE).delete(vmid)
+            taskid = proxmox_node.qemu.delete(vmid)
             if not wait_for_task(module, proxmox, vm[0]['node'], taskid):
                 module.fail_json(msg='Reached timeout while waiting for removing VM. Last line in task before timeout: %s' %
                                  proxmox_node.tasks(taskid).log.get()[:1])
@@ -1177,7 +1173,7 @@ def main():
         vm = get_vm(proxmox, vmid)
         if not vm:
             module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
-        current = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status']
+        current = proxmox.nodes(vm[0]['node']).qemu(vmid).status.current.get()['status']
         status['status'] = current
         if status:
             module.exit_json(changed=False, msg="VM %s with vmid = %s is %s" % (name, vmid, current), **status)
