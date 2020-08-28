@@ -1108,7 +1108,7 @@ def main():
             vm = get_vm(proxmox, vmid)
             if not vm:
                 module.fail_json(msg='VM with vmid <%s> does not exist in cluster' % vmid)
-            if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'running':
+            if vm[0]['status'] == 'running':
                 module.exit_json(changed=False, msg="VM %s is already running" % vmid)
 
             if start_vm(module, proxmox, vm):
@@ -1125,7 +1125,7 @@ def main():
             if not vm:
                 module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
 
-            if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'stopped':
+            if vm[0]['status'] == 'stopped':
                 module.exit_json(changed=False, msg="VM %s is already stopped" % vmid)
 
             if stop_vm(module, proxmox, vm, force=module.params['force']):
@@ -1141,7 +1141,7 @@ def main():
             vm = get_vm(proxmox, vmid)
             if not vm:
                 module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
-            if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'stopped':
+            if vm[0]['status'] == 'stopped':
                 module.exit_json(changed=False, msg="VM %s is not running" % vmid)
 
             if stop_vm(module, proxmox, vm, force=module.params['force']) and start_vm(module, proxmox, vm):
@@ -1156,9 +1156,9 @@ def main():
                 module.exit_json(changed=False)
 
             proxmox_node = proxmox.nodes(vm[0]['node'])
-            if getattr(proxmox_node, VZ_TYPE)(vmid).status.current.get()['status'] == 'running':
+            if vm[0]['status'] == 'running':
                 if module.params['force']:
-                    stop_vm(module, proxmox, vm, vmid, True)
+                    stop_vm(module, proxmox, vm, True)
                 else:
                     module.exit_json(changed=False, msg="VM %s is running. Stop it before deletion or use force=yes." % vmid)
             taskid = getattr(proxmox_node, VZ_TYPE).delete(vmid)
