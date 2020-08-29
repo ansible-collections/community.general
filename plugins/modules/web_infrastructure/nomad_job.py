@@ -38,42 +38,42 @@ options:
       default: true
     cert:
       description:
-        - path of certificate ssl.
+        - Path of certificate TLS/SSL.
       type: path
     key:
       description:
-        - path of certificate key ssl.
+        - Path of certificate key TLS/SSL.
       type: path
     namespace:
       description:
-        - namespace for nomad.
+        - Namespace for nomad.
       type: str
     token:
       description:
-        - acl token for authentification.
+        - ACL token for authentification.
       type: str
     name:
       description:
-        - name of job for delete or stop job without source.
+        - Name of job for delete,stop and start job without source.
       type: str
     state:
       description:
-        - type of request
+        - Deploy or remove job
       choices: ["present", "absent"]
       required: True
       type: str
     force_start:
       description:
-        - force job to started
+        - Force job to started
       type: bool
       default: false
     source_json:
       description:
-        - source of json nomad job
+        - Source of json nomad job
       type: json
     source_hcl:
       description:
-        - source of hcl nomad job
+        - Source of hcl nomad job
       type: str
 '''
 
