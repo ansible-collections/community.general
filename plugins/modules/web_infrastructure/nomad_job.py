@@ -142,8 +142,7 @@ def run():
     )
 
     if not import_nomad:
-        module.fail_json(msg=missing_required_lib("python-nomad"),
-                     exception=import_nomad_err)
+        module.fail_json(msg=missing_required_lib("python-nomad"), exception=import_nomad_err)
 
     certificate_ssl = (module.params.get('cert'), module.params.get('key'))
 
