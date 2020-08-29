@@ -61,6 +61,10 @@ options:
     description:
       - Optional. Timestamp of parent message to thread this message. https://api.slack.com/docs/message-threading
     type: str
+  ts:
+    description:
+      - Optional. Message ID to edit. https://api.slack.com/messaging/modifying
+    type: str
   username:
     description:
       - This is the sender of the message.
@@ -251,7 +255,7 @@ def recursive_escape_quotes(obj, keys):
 
 
 def build_payload_for_slack(module, text, channel, thread_id, username, icon_url, icon_emoji, link_names,
-                            parse, color, attachments, blocks):
+                            parse, color, attachments, blocks, ts):
     payload = {}
     if color == "normal" and text is not None:
         payload = dict(text=escape_quotes(text))
@@ -275,6 +279,8 @@ def build_payload_for_slack(module, text, channel, thread_id, username, icon_url
         payload['link_names'] = link_names
     if parse is not None:
         payload['parse'] = parse
+    if ts is not None:
+        payload['ts'] = ts
 
     if attachments is not None:
         if 'attachments' not in payload:
@@ -363,6 +369,7 @@ def main():
             color=dict(type='str', default='normal'),
             attachments=dict(type='list', required=False, default=None),
             blocks=dict(type='list', elements='dict'),
+            ts=dict(type='str', default=None),
         )
     )
 
@@ -379,6 +386,7 @@ def main():
     color = module.params['color']
     attachments = module.params['attachments']
     blocks = module.params['blocks']
+    ts = module.params['ts']
 
     color_choices = ['normal', 'good', 'warning', 'danger']
     if color not in color_choices and not is_valid_hex_color(color):
@@ -386,7 +394,7 @@ def main():
                              "or any valid hex value with length 3 or 6." % color_choices)
 
     payload = build_payload_for_slack(module, text, channel, thread_id, username, icon_url, icon_emoji, link_names,
-                                      parse, color, attachments, blocks)
+                                      parse, color, attachments, blocks, ts)
     slack_response = do_notify_slack(module, domain, token, payload)
 
     if 'ok' in slack_response:
