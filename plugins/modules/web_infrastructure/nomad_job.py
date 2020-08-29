@@ -5,13 +5,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-__metaclass__ = type
-
-
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 
 DOCUMENTATION = '''
 ---
@@ -30,17 +23,17 @@ options:
       type: str
     secure:
       description:
-        - ssl connection.
+        - TLS/SSL connection.
       type: bool
       default: false
     timeout:
       description:
-        - timeout of request nomad.
+        - Timeout (in seconds) for the request to nomad.
       type: int
       default: 5
     validate_certs:
       description:
-        - skip validation cert.
+        - Enable TLS/SSL certificate validation.
       type: bool
       default: true
     cert:
@@ -86,20 +79,20 @@ options:
 
 EXAMPLES = '''
 - name: create job
-  nomad_job:
+  community.general.nomad_job:
     host: localhost
     state: present
-    source_hcl: "{{ lookup('file', 'job.hcl') }}"
+    source_hcl: "{{ lookup('ansible.builtin.file', 'job.hcl') }}"
     timeout: 120
 
 - name: stop job
-  nomad_job:
+  community.general.nomad_job:
     host: localhost
     state: absent
     name: api
 
 - name: force job to start
-  nomad_job:
+  community.general.nomad_job:
     host: localhost
     state: present
     name: api
@@ -111,13 +104,15 @@ EXAMPLES = '''
 import os
 import json
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
+import_nomad = None
 try:
     import nomad
     import_nomad = True
 except ImportError:
     import_nomad = False
+    import_nomad_err = traceback.format_exc()
 
 
 def run():
@@ -147,7 +142,8 @@ def run():
     )
 
     if not import_nomad:
-        module.fail_json(msg='python-nomad is required for nomad_job ')
+        module.fail_json(msg=missing_required_lib("python-nomad"),
+                     exception=import_nomad_err)
 
     certificate_ssl = (module.params.get('cert'), module.params.get('key'))
 
