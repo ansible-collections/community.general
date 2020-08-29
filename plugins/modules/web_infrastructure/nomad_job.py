@@ -5,6 +5,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+__metaclass__ = type
 
 DOCUMENTATION = '''
 ---
@@ -112,8 +113,6 @@ try:
     import_nomad = True
 except ImportError:
     import_nomad = False
-    import_nomad_err = traceback.format_exc()
-
 
 def run():
     module = AnsibleModule(
@@ -142,7 +141,7 @@ def run():
     )
 
     if not import_nomad:
-        module.fail_json(msg=missing_required_lib("python-nomad"), exception=import_nomad_err)
+        module.fail_json(msg=missing_required_lib("python-nomad"))
 
     certificate_ssl = (module.params.get('cert'), module.params.get('key'))
 
