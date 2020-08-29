@@ -114,6 +114,7 @@ try:
 except ImportError:
     import_nomad = False
 
+
 def run():
     module = AnsibleModule(
         argument_spec=dict(
