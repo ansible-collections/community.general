@@ -65,6 +65,7 @@ options:
     description:
       - Optional. Message ID to edit. https://api.slack.com/messaging/modifying
     type: str
+    version_added: 1.2.0
   username:
     description:
       - This is the sender of the message.
