@@ -18,15 +18,18 @@ options:
   api_host:
     description:
       - the host of the Proxmox VE cluster
+    type: str
     required: true
   api_user:
     description:
       - the user to authenticate with
+    type: str
     required: true
   api_password:
     description:
       - the password to authenticate with
       - you can use PROXMOX_PASSWORD environment variable
+    type: str
   validate_certs:
     description:
       - enable / disable https certificate verification
@@ -35,29 +38,35 @@ options:
   node:
     description:
       - Proxmox VE node, when you will operate with template
+    type: str
     required: true
   src:
     description:
       - path to uploaded file
       - required only for C(state=present)
+    type: path
     aliases: ['path']
   template:
     description:
       - the template name
       - required only for states C(absent), C(info)
+    type: str
   content_type:
     description:
       - content type
       - required only for C(state=present)
+    type: str
     default: 'vztmpl'
     choices: ['vztmpl', 'iso']
   storage:
     description:
       - target storage
+    type: str
     default: 'local'
   timeout:
     description:
       - timeout for operations
+    type: int
     default: 30
   force:
     description:
@@ -67,6 +76,7 @@ options:
   state:
     description:
      - Indicate desired state of the template
+    type: str
     choices: ['present', 'absent']
     default: present
 notes:
@@ -168,7 +178,7 @@ def main():
             api_password=dict(no_log=True),
             validate_certs=dict(type='bool', default=False),
             node=dict(),
-            src=dict(type='path'),
+            src=dict(type='path', aliases=['path']),
             template=dict(),
             content_type=dict(default='vztmpl', choices=['vztmpl', 'iso']),
             storage=dict(default='local'),

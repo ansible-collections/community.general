@@ -16,20 +16,24 @@ options:
   api_host:
     description:
       - the host of the Proxmox VE cluster
+    type: str
     required: true
   api_user:
     description:
       - the user to authenticate with
+    type: str
     required: true
   api_password:
     description:
       - the password to authenticate with
       - you can use PROXMOX_PASSWORD environment variable
+    type: str
   vmid:
     description:
       - the instance id
       - if not set, the next available VM ID will be fetched from ProxmoxAPI.
       - if not set, will be fetched from PromoxAPI based on the hostname
+    type: str
   validate_certs:
     description:
       - enable / disable https certificate verification
@@ -40,73 +44,92 @@ options:
       - Proxmox VE node, when new VM will be created
       - required only for C(state=present)
       - for another states will be autodiscovered
+    type: str
   pool:
     description:
       - Proxmox VE resource pool
+    type: str
   password:
     description:
       - the instance root password
       - required only for C(state=present)
+    type: str
   hostname:
     description:
       - the instance hostname
       - required only for C(state=present)
       - must be unique if vmid is not passed
+    type: str
   ostemplate:
     description:
       - the template for VM creating
       - required only for C(state=present)
+    type: str
   disk:
     description:
       - hard disk size in GB for instance
+    type: str
     default: 3
   cores:
     description:
       - Specify number of cores per socket.
+    type: int
     default: 1
   cpus:
     description:
       - numbers of allocated cpus for instance
+    type: int
     default: 1
   memory:
     description:
       - memory size in MB for instance
+    type: int
     default: 512
   swap:
     description:
       - swap memory size in MB for instance
+    type: int
     default: 0
   netif:
     description:
       - specifies network interfaces for the container. As a hash/dictionary defining interfaces.
+    type: dict
   mounts:
     description:
       - specifies additional mounts (separate disks) for the container. As a hash/dictionary defining mount points
+    type: dict
   ip_address:
     description:
       - specifies the address the container will be assigned
+    type: str
   onboot:
     description:
       - specifies whether a VM will be started during system bootup
+    type: str
     type: bool
     default: 'no'
   storage:
     description:
       - target storage
+    type: str
     default: 'local'
   cpuunits:
     description:
       - CPU weight for a VM
+    type: int
     default: 1000
   nameserver:
     description:
       - sets DNS server IP address for a container
+    type: str
   searchdomain:
     description:
       - sets DNS search domain for a container
+    type: str
   timeout:
     description:
       - timeout for operations
+    type: int
     default: 30
   force:
     description:
@@ -119,11 +142,13 @@ options:
   state:
     description:
      - Indicate desired state of the instance
+    type: str
     choices: ['present', 'started', 'absent', 'stopped', 'restarted']
     default: present
   pubkey:
     description:
       - Public key to add to /root/.ssh/authorized_keys. This was added on Proxmox 4.2, it is ignored for earlier versions
+    type: str
   unprivileged:
     description:
       - Indicate if the container should be unprivileged
