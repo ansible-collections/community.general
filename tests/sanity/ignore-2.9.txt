@@ -156,7 +156,6 @@ plugins/modules/cloud/misc/ovirt.py validate-modules:invalid-documentation
 plugins/modules/cloud/misc/proxmox_kvm.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/misc/proxmox_kvm.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/misc/proxmox_kvm.py validate-modules:undocumented-parameter
-plugins/modules/cloud/misc/proxmox_template.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/oneandone/oneandone_firewall_policy.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/oneandone/oneandone_load_balancer.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/oneandone/oneandone_load_balancer.py validate-modules:doc-missing-type
