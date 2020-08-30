@@ -217,7 +217,6 @@ plugins/modules/cloud/memset/memset_zone.py validate-modules:parameter-type-not-
 plugins/modules/cloud/memset/memset_zone_domain.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/memset/memset_zone_record.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/misc/proxmox_kvm.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/cloud/misc/proxmox_kvm.py validate-modules:doc-missing-type
 plugins/modules/cloud/misc/proxmox_kvm.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/misc/proxmox_kvm.py validate-modules:undocumented-parameter
 plugins/modules/cloud/misc/proxmox_template.py validate-modules:doc-required-mismatch
