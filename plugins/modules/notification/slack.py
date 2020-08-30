@@ -219,6 +219,7 @@ from ansible.module_utils.urls import fetch_url
 OLD_SLACK_INCOMING_WEBHOOK = 'https://%s/services/hooks/incoming-webhook?token=%s'
 SLACK_INCOMING_WEBHOOK = 'https://hooks.slack.com/services/%s'
 SLACK_POSTMESSAGE_WEBAPI = 'https://slack.com/api/chat.postMessage'
+SLACK_UPDATEMESSAGE_WEBAPI = 'https://slack.com/api/chat.update'
 
 # Escaping quotes and apostrophes to avoid ending string prematurely in ansible call.
 # We do not escape other characters used as Slack metacharacters (e.g. &, <, >).
@@ -322,7 +323,7 @@ def do_notify_slack(module, domain, token, payload):
         # New style webhook token
         slack_uri = SLACK_INCOMING_WEBHOOK % (token)
     elif re.match(r'^xox[abp]-\S+$', token):
-        slack_uri = SLACK_POSTMESSAGE_WEBAPI
+        slack_uri = SLACK_UPDATEMESSAGE_WEBAPI if 'ts' in payload else SLACK_POSTMESSAGE_WEBAPI
         use_webapi = True
     else:
         if not domain:
