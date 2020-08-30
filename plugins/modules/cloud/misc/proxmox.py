@@ -105,7 +105,6 @@ options:
   onboot:
     description:
       - specifies whether a VM will be started during system bootup
-    type: str
     type: bool
     default: 'no'
   storage:
