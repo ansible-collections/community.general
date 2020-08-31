@@ -45,7 +45,6 @@ options:
       - path to uploaded file
       - required only for C(state=present)
     type: path
-    aliases: ['path']
   template:
     description:
       - the template name
@@ -178,7 +177,7 @@ def main():
             api_password=dict(no_log=True),
             validate_certs=dict(type='bool', default=False),
             node=dict(),
-            src=dict(type='path', aliases=['path']),
+            src=dict(type='path'),
             template=dict(),
             content_type=dict(default='vztmpl', choices=['vztmpl', 'iso']),
             storage=dict(default='local'),
