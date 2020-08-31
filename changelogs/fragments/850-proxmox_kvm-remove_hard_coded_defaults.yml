@@ -1,0 +1,3 @@
+breaking_changes:
+- proxmox - remove hard_coded defaults which are different from proxmox or will be changed later by proxmox (https://github.com/ansible-collections/community.general/pull/850).
+- proxmox_kvm - remove hard_coded defaults which are different from proxmox or will be changed later by proxmox (https://github.com/ansible-collections/community.general/pull/850).
