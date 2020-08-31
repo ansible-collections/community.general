@@ -69,22 +69,18 @@ options:
     description:
       - hard disk size in GB for instance
     type: str
-    default: 3
   cores:
     description:
       - Specify number of cores per socket.
     type: int
-    default: 1
   cpus:
     description:
       - numbers of allocated cpus for instance
     type: int
-    default: 1
   memory:
     description:
       - memory size in MB for instance
     type: int
-    default: 512
   swap:
     description:
       - swap memory size in MB for instance
@@ -116,7 +112,6 @@ options:
     description:
       - CPU weight for a VM
     type: int
-    default: 1000
   nameserver:
     description:
       - sets DNS server IP address for a container
