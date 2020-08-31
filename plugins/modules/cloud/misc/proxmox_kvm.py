@@ -235,6 +235,7 @@ options:
     description:
       - Specifies whether a VM will be started during system bootup.
     type: bool
+    default: yes
   ostype:
     description:
       - Specifies guest operating system. This is used to enable special optimization/features for specific operating systems.
@@ -887,7 +888,7 @@ def main():
             node=dict(),
             numa=dict(type='dict'),
             numa_enabled=dict(type='bool'),
-            onboot=dict(type='bool'),
+            onboot=dict(type='bool', default=True),
             ostype=dict(choices=['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'l24', 'l26', 'solaris']),
             parallel=dict(type='dict'),
             pool=dict(type='str'),
