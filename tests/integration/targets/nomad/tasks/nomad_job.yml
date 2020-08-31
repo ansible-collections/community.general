@@ -9,4 +9,3 @@
 - assert:
     that:
       - deploy_job is changed
-

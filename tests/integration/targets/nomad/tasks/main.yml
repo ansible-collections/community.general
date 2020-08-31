@@ -1,8 +1,8 @@
 - name: Install Nomad and test
   vars:
-    consul_version: 0.12.3
-    consul_uri: https://releases.hashicorp.com/nomad/0.12.3/nomad_{{ nomad_version }}_{{ ansible_system | lower }}_{{ nomad_arch }}.zip
-    consul_cmd: '{{ output_dir }}/nomad'
+    nomad_version: 0.12.3
+    nomad_uri: https://releases.hashicorp.com/nomad/0.12.3/nomad_{{ nomad_version }}_{{ ansible_system | lower }}_{{ nomad_arch }}.zip
+    nomad_cmd: '{{ output_dir }}/nomad'
   block:
   - name: register pyOpenSSL version
     command: '{{ ansible_python_interpreter }} -c ''import OpenSSL; print(OpenSSL.__version__)'''
@@ -46,10 +46,10 @@
   - assert:
       that: ansible_architecture in ['i386', 'x86_64', 'amd64']
   - set_fact:
-      consul_arch: '386'
+      nomad_arch: '386'
     when: ansible_architecture == 'i386'
   - set_fact:
-      consul_arch: amd64
+      nomad_arch: amd64
     when: ansible_architecture in ['x86_64', 'amd64']
   - name: Download nomad binary
     unarchive:
@@ -63,10 +63,6 @@
     block:
     - command: echo {{ output_dir }}
       register: echo_output_dir
-    - name: Create configuration file
-      template:
-        src: consul_config.hcl.j2
-        dest: '{{ output_dir }}/consul_config.hcl'
     - name: Start nomad (dev mode enabled)
       shell: nohup {{ consul_cmd }} agent -dev </dev/null >/dev/null 2>&1 &
     - import_tasks: nomad_job.yml
