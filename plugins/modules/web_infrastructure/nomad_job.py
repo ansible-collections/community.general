@@ -7,15 +7,9 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
-module: nomad_jobs
+module: nomad_job
 author: "FERREIRA Christophe (@chris93111)"
 version_added: "1.2.0"
 short_description: Launch an Nomad Job.
@@ -27,94 +21,105 @@ options:
       description:
         - FQDN of nomad server.
       required: true
-      type: ...
+      type: str
     secure:
       description:
-        - ssl connection.
+        - TLS/SSL connection.
+      type: bool
+      default: false
     timeout:
       description:
-        - timeout of request nomad.
+        - Timeout (in seconds) for the request to nomad.
+      type: int
+      default: 5
     validate_certs:
       description:
-        - skip validation cert.
+        - Enable TLS/SSL certificate validation.
+      type: bool
+      default: true
     cert:
       description:
-        - path of certificate ssl.
+        - Path of certificate TLS/SSL.
+      type: path
     key:
       description:
-        - path of certificate key ssl.
+        - Path of certificate key TLS/SSL.
+      type: path
     namespace:
       description:
-        - namespace for nomad.
+        - Namespace for nomad.
+      type: str
     token:
       description:
-        - acl token for authentification.
+        - ACL token for authentification.
+      type: str
     name:
       description:
-        - name of job for get|stop.
+        - Name of job for delete,stop and start job without source.
+      type: str
     state:
       description:
-        - type of request
-      choices: ["created", "started", "stopped"]
+        - Deploy or remove job
+      choices: ["present", "absent"]
       required: True
-    source:
+      type: str
+    force_start:
       description:
-        - path of json or hcl for create job
+        - Force job to started
+      type: bool
+      default: false
     source_json:
       description:
-        - source of json nomad job
+        - Source of json nomad job
+      type: json
     source_hcl:
       description:
-        - source of hcl nomad job
+        - Source of hcl nomad job
+      type: str
 '''
 
 EXAMPLES = '''
-# List jobs
-- name: list jobs nomad
-  nomad_job:
-    nomad_server: localhost
-    state: list
-  register: jobs
-
 - name: create job
-  nomad_job:
-    nomad_server: localhost
-    state: create
-    source: api.hcl
-    source_type: hcl
+  community.general.nomad_job:
+    host: localhost
+    state: present
+    source_hcl: "{{ lookup('ansible.builtin.file', 'job.hcl') }}"
     timeout: 120
 
 - name: stop job
-  nomad_job:
-    nomad_server: localhost
-    state: stop
+  community.general.nomad_job:
+    host: localhost
+    state: absent
     name: api
 
-- name: get job
-  nomad_job:
-    nomad_server: localhost
-    state: status
+- name: force job to start
+  community.general.nomad_job:
+    host: localhost
+    state: present
     name: api
+    timeout: 120
+    force_start: true
 '''
 
 
 import os
 import json
 
-from ansible.module_utils.basic import *
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
+import_nomad = None
 try:
     import nomad
     import_nomad = True
-except:
+except ImportError:
     import_nomad = False
 
 
 def run():
     module = AnsibleModule(
-        argument_spec = dict(
+        argument_spec=dict(
             host=dict(required=True, type='str'),
-            state=dict(required=True, choices=['created', 'started', 'stopped'),
+            state=dict(required=True, choices=['present', 'absent']),
             secure=dict(type='bool', default=False),
             timeout=dict(type='int', default=5),
             validate_certs=dict(type='bool', default=True),
@@ -124,38 +129,45 @@ def run():
             name=dict(type='str', default=None),
             source_json=dict(type='json', default=None),
             source_hcl=dict(type='str', default=None),
+            force_start=dict(type='bool', default=False),
             token=dict(type='str', default=None, no_log=True)
         ),
-        mutually_exclusive = [["name", "source_json", "source_hcl"], ["source_json", "source_hcl"]],
-        required_if = [
-          ["state", "started", ["name"]],
-          ["state", "stopped", ["name"]]
+        mutually_exclusive=[
+            ["name", "source_json", "source_hcl"],
+            ["source_json", "source_hcl"]
+        ],
+        required_one_of=[
+            ['name', 'source_json', 'source_hcl']
         ]
     )
 
     if not import_nomad:
-        module.fail_json(msg='python-nomad is required for nomad_job ')
-
-    if module.params.get('state') == 'created' and module.params.get('source_json') == None and module.params.get('source_hcl') == None:
-       module.fail_json(msg='source hcl or json must be set ')
+        module.fail_json(msg=missing_required_lib("python-nomad"))
 
     certificate_ssl = (module.params.get('cert'), module.params.get('key'))
 
-    nomad_client =  nomad.Nomad(
-        host=module.params.get('host'), 
+    nomad_client = nomad.Nomad(
+        host=module.params.get('host'),
         secure=module.params.get('secure'),
         timeout=module.params.get('timeout'),
         verify=module.params.get('validate_certs'),
         cert=certificate_ssl,
         namespace=module.params.get('namespace'),
         token=module.params.get('token')
-        )
-    
-    if module.params.get('state') == "created":
+    )
 
-        if not module.params.get('source_json') == None:
+    if module.params.get('state') == "present":
+
+        if module.params.get('name') and not module.params.get('force_start'):
+            module.fail_json(msg='for start job with name, force_start is needed')
+
+        changed = False
+        if not module.params.get('source_json') is None:
             job_json = module.params.get('source_json')
-            job_json = json.loads(job_json)
+            try:
+                job_json = json.loads(job_json)
+            except ValueError as e:
+                module.fail_json(msg=str(e))
             job = dict()
             job['job'] = job_json
             try:
@@ -164,7 +176,7 @@ def run():
             except Exception as e:
                 module.fail_json(msg=str(e))
 
-        if not module.params.get('source_hcl') == None:
+        if not module.params.get('source_hcl') is None:
 
             try:
                 job_hcl = module.params.get('source_hcl')
@@ -179,41 +191,55 @@ def run():
                 changed = True
             except Exception as e:
                 module.fail_json(msg=str(e))
-        
-    if module.params.get('state') == "stopped":
+
+        if module.params.get('force_start'):
+
+            try:
+                job = dict()
+                if module.params.get('name'):
+                    job_name = module.params.get('name')
+                else:
+                    job_name = job_json['Name']
+                job_json = nomad_client.job.get_job(job_name)
+                if job_json['Status'] == 'running':
+                    result = job_json
+                else:
+                    job_json['Status'] = 'running'
+                    job_json['Stop'] = False
+                    job['job'] = job_json
+                    result = nomad_client.jobs.register_job(job)
+                    changed = True
+            except Exception as e:
+                module.fail_json(msg=str(e))
+
+    if module.params.get('state') == "absent":
 
         try:
-            job_json = nomad_client.job.get_job(module.params.get('name'))
-            if job_json['Status'] == 'dead':
+            if not module.params.get('name') is None:
+                job_name = module.params.get('name')
+            if not module.params.get('source_hcl') is None:
+                job_json = nomad_client.jobs.parse(job_hcl)
+                job_name = job_json['Name']
+            if not module.params.get('source_json') is None:
+                job_json = module.params.get('source_json')
+                job_name = job_json['Name']
+            job = nomad_client.job.get_job(job_name)
+            if job['Status'] == 'dead':
                 changed = False
-                result = job_json
+                result = job
             else:
-                result = nomad_client.job.deregister_job(module.params.get('name'))
+                result = nomad_client.job.deregister_job(job_name)
                 changed = True
         except Exception as e:
             module.fail_json(msg=str(e))
-
-    if module.params.get('state') == "started":
-    
-        try:
-            job = dict()
-            job_json = nomad_client.job.get_job(module.params.get('name'))
-            if job_json['Status'] == 'running':
-                changed = False
-                result = job_json
-            else:
-                job_json['Status'] = 'running'
-                job_json['Stop'] = False
-                job['job'] = job_json
-                result = nomad_client.jobs.register_job(job)
-                changed = True
-        except Exception as e:
-            module.fail_json(msg=str(e))
-
 
     module.exit_json(changed=changed, result=result)
 
+
 def main():
+
     run()
+
+
 if __name__ == "__main__":
     main()
