@@ -19,7 +19,6 @@ options:
     description:
       - Specify if ACPI should be enabled/disabled.
     type: bool
-    default: 'yes'
   agent:
     description:
       - Specify if the QEMU Guest Agent should be enabled/disabled.
@@ -49,13 +48,11 @@ options:
     description:
       - Specify if the VM should be automatically restarted after crash (currently ignored in PVE API).
     type: bool
-    default: 'no'
   balloon:
     description:
       - Specify the amount of RAM for the VM in MB.
       - Using zero disables the balloon driver.
     type: int
-    default: 0
   bios:
     description:
       - Specify the BIOS implementation.
@@ -66,7 +63,6 @@ options:
       - Specify the boot order -> boot on floppy C(a), hard disk C(c), CD-ROM C(d), or network C(n).
       - You can combine to set order.
     type: str
-    default: cnd
   bootdisk:
     description:
       - Enable booting from specified disk. C((ide|sata|scsi|virtio)\d+)
@@ -79,12 +75,10 @@ options:
     description:
       - Specify number of cores per socket.
     type: int
-    default: 1
   cpu:
     description:
       - Specify emulated CPU type.
     type: str
-    default: kvm64
   cpulimit:
     description:
       - Specify if CPU usage will be limited. Value 0 indicates no CPU limit.
@@ -95,7 +89,6 @@ options:
       - Specify CPU weight for a VM.
       - You can disable fair-scheduler configuration by setting this to 0
     type: int
-    default: 1000
   delete:
     description:
       - Specify a list of settings you want to delete.
@@ -173,7 +166,6 @@ options:
     description:
       - Enable/disable KVM hardware virtualization.
     type: bool
-    default: 'yes'
   localtime:
     description:
       - Sets the real time clock to local time.
@@ -193,7 +185,6 @@ options:
     description:
       - Memory size in MB for instance.
     type: int
-    default: 512
   migrate_downtime:
     description:
       - Sets maximum tolerated downtime (in seconds) for migrations.
@@ -244,14 +235,12 @@ options:
     description:
       - Specifies whether a VM will be started during system bootup.
     type: bool
-    default: 'yes'
   ostype:
     description:
       - Specifies guest operating system. This is used to enable special optimization/features for specific operating systems.
       - The l26 is Linux 2.6/3.X Kernel.
     type: str
     choices: ['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'l24', 'l26', 'solaris']
-    default: l26
   parallel:
     description:
       - A hash/dictionary of map host parallel devices. C(parallel='{"key":"value", "key":"value"}').
@@ -328,7 +317,6 @@ options:
     description:
       - Sets the number of CPU sockets. (1 - N).
     type: int
-    default: 1
   startdate:
     description:
       - Sets the initial date of the real time clock.
@@ -355,7 +343,6 @@ options:
     description:
       - Enables/disables the USB tablet device.
     type: bool
-    default: 'no'
   target:
     description:
       - Target node. Only allowed if the original VM is on shared storage.
@@ -369,7 +356,6 @@ options:
     description:
       - Enables/disables the template.
     type: bool
-    default: 'no'
   timeout:
     description:
       - Timeout for operations.
@@ -396,7 +382,6 @@ options:
       - Select VGA type. If you want to use high resolution modes (>= 1280x1024x16) then you should use option 'std' or 'vmware'.
     type: str
     choices: ['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']
-    default: std
   virtio:
     description:
       - A hash/dictionary of volume used as VIRTIO hard disk. C(virtio='{"key":"value", "key":"value"}').
