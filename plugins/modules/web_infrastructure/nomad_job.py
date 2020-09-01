@@ -74,7 +74,7 @@ options:
       type: json
     source_hcl:
       description:
-        - Source of hcl nomad job
+        - Source of hcl nomad job.
       type: str
 '''
 
