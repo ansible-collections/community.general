@@ -39,6 +39,7 @@ options:
       - A list of specific functions to deploy.
       - If this is not provided, all functions in the service will be deployed.
     type: list
+    elements: str
     default: []
   region:
     description:
@@ -166,7 +167,7 @@ def main():
         argument_spec=dict(
             service_path=dict(type='path', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
-            functions=dict(type='list'),
+            functions=dict(type='list', elements='str'),
             region=dict(type='str', default=''),
             stage=dict(type='str', default=''),
             deploy=dict(type='bool', default=True),
