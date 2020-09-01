@@ -79,7 +79,7 @@ options:
 '''
 
 EXAMPLES = '''
-- name: create job
+- name: Create job
   community.general.nomad_job:
     host: localhost
     state: present
