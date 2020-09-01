@@ -61,7 +61,7 @@ options:
       description:
         - Deploy or remove job.
       choices: ["present", "absent"]
-      required: True
+      required: true
       type: str
     force_start:
       description:
