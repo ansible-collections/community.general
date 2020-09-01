@@ -59,7 +59,7 @@ options:
       type: str
     state:
       description:
-        - Deploy or remove job
+        - Deploy or remove job.
       choices: ["present", "absent"]
       required: True
       type: str
