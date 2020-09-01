@@ -167,7 +167,7 @@ def run():
             try:
                 job_json = json.loads(job_json)
             except ValueError as e:
-                module.fail_json(msg=str(e))
+                module.fail_json(msg=to_native(e))
             job = dict()
             job['job'] = job_json
             try:
