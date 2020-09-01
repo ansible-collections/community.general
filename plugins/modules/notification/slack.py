@@ -209,6 +209,17 @@ EXAMPLES = """
     thread_id: "{{ slack_response['ts'] }}"
     color: good
     msg: 'And this is my threaded response!'
+
+- name: Send a message to be edited later on
+  community.general.slack:
+    token: thetoken/generatedby/slack
+    msg: Deploying something...
+  register: slack_response
+- name: Edit message
+  community.general.slack:
+    token: thetoken/generatedby/slack
+    msg: Deployment complete!
+    ts: "{{ slack_response.ts }}"
 """
 
 import re
