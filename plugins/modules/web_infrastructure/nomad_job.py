@@ -231,7 +231,7 @@ def run():
                 result = nomad_client.job.deregister_job(job_name)
                 changed = True
         except Exception as e:
-            module.fail_json(msg=str(e))
+            module.fail_json(msg=to_native(e))
 
     module.exit_json(changed=changed, result=result)
 
