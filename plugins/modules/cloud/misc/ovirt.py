@@ -23,116 +23,148 @@ options:
   user:
     description:
      - The user to authenticate with.
+    type: str
     required: true
   url:
     description:
      - The url of the oVirt instance.
+    type: str
     required: true
   instance_name:
     description:
      - The name of the instance to use.
+    type: str
     required: true
     aliases: [ vmname ]
   password:
     description:
      - Password of the user to authenticate with.
+    type: str
     required: true
   image:
     description:
      - The template to use for the instance.
+    type: str
   resource_type:
     description:
      - Whether you want to deploy an image or create an instance from scratch.
+    type: str
     choices: [ new, template ]
   zone:
     description:
      - Deploy the image to this oVirt cluster.
+    type: str
   instance_disksize:
     description:
      - Size of the instance's disk in GB.
+    type: str
     aliases: [ vm_disksize]
   instance_cpus:
     description:
      - The instance's number of CPUs.
+    type: str
     default: 1
     aliases: [ vmcpus ]
   instance_nic:
     description:
      - The name of the network interface in oVirt/RHEV.
+    type: str
     aliases: [ vmnic  ]
   instance_network:
     description:
      - The logical network the machine should belong to.
+    type: str
     default: rhevm
     aliases: [ vmnetwork ]
   instance_mem:
     description:
      - The instance's amount of memory in MB.
+    type: str
     aliases: [ vmmem ]
   instance_type:
     description:
      - Define whether the instance is a server, desktop or high_performance.
      - I(high_performance) is supported since Ansible 2.5 and oVirt/RHV 4.2.
+    type: str
     choices: [ desktop, server, high_performance ]
     default: server
     aliases: [ vmtype ]
   disk_alloc:
     description:
      - Define whether disk is thin or preallocated.
+    type: str
     choices: [ preallocated, thin ]
     default: thin
   disk_int:
     description:
      - Interface type of the disk.
+    type: str
     choices: [ ide, virtio ]
     default: virtio
   instance_os:
     description:
      - Type of Operating System.
+    type: str
     aliases: [ vmos ]
   instance_cores:
     description:
      - Define the instance's number of cores.
+    type: str
     default: 1
     aliases: [ vmcores ]
   sdomain:
     description:
      - The Storage Domain where you want to create the instance's disk on.
+    type: str
   region:
     description:
      - The oVirt/RHEV datacenter where you want to deploy to.
+    type: str
   instance_dns:
     description:
      - Define the instance's Primary DNS server.
+    type: str
     aliases: [ dns ]
   instance_domain:
     description:
      - Define the instance's Domain.
+    type: str
     aliases: [ domain ]
   instance_hostname:
     description:
      - Define the instance's Hostname.
+    type: str
     aliases: [ hostname ]
   instance_ip:
     description:
      - Define the instance's IP.
+    type: str
     aliases: [ ip ]
   instance_netmask:
     description:
      - Define the instance's Netmask.
+    type: str
     aliases: [ netmask ]
+  instance_gateway:
+    description:
+     - Define the instance's Gateway.
+    type: str
+    aliases: [ gateway ]
   instance_rootpw:
     description:
      - Define the instance's Root password.
+    type: str
     aliases: [ rootpw ]
   instance_key:
     description:
      - Define the instance's Authorized key.
+    type: str
     aliases: [ key ]
   state:
     description:
      - Create, terminate or remove instances.
-    choices: [ absent, present, restarted, shutdown, started ]
+    type: str
+    choices: [ absent, present, restart, shutdown, started ]
     default: present
 requirements:
   - ovirt-engine-sdk-python
