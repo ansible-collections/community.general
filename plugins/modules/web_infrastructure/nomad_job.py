@@ -174,7 +174,7 @@ def run():
                 result = nomad_client.jobs.register_job(job)
                 changed = True
             except Exception as e:
-                module.fail_json(msg=str(e))
+                module.fail_json(msg=to_native(e))
 
         if not module.params.get('source_hcl') is None:
 
