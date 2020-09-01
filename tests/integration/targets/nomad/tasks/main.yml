@@ -78,6 +78,6 @@
       register: echo_output_dir
 
     - name: Start nomad (dev mode enabled)
-      shell: nohup {{ consul_cmd }} agent -dev </dev/null >/dev/null 2>&1 &
+      shell: nohup {{ nomad_cmd }} agent -dev </dev/null >/dev/null 2>&1 &
 
     - import_tasks: nomad_job.yml
