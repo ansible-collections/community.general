@@ -1291,6 +1291,5 @@ plugins/modules/web_infrastructure/taiga_issue.py validate-modules:parameter-typ
 scripts/inventory/gce.py pylint:blacklisted-name
 tests/unit/plugins/modules/cloud/google/test_gcp_forwarding_rule.py future-import-boilerplate
 tests/unit/plugins/modules/cloud/google/test_gcp_forwarding_rule.py metaclass-boilerplate
-tests/unit/plugins/modules/system/interfaces_file/test_interfaces_file.py pylint:blacklisted-name
 tests/utils/shippable/check_matrix.py replace-urlopen
 tests/utils/shippable/timing.py shebang
