@@ -185,7 +185,7 @@ def run():
                 job['job'] = job_json
             except nomad.api.exceptions.BadRequestNomadException as err:
                 msg = str(err.nomad_resp.reason) + " " + str(err.nomad_resp.text)
-                module.fail_json(msg=msg)
+                module.fail_json(msg=to_native(msg))
             try:
                 result = nomad_client.jobs.register_job(job)
                 changed = True
