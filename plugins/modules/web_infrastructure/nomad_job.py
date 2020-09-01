@@ -65,7 +65,7 @@ options:
       type: str
     force_start:
       description:
-        - Force job to started
+        - Force job to started.
       type: bool
       default: false
     source_json:
