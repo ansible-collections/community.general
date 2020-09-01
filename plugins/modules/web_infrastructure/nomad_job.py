@@ -70,7 +70,7 @@ options:
       default: false
     source_json:
       description:
-        - Source of json nomad job
+        - Source of json nomad job.
       type: json
     source_hcl:
       description:
