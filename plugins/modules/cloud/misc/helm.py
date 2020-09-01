@@ -25,30 +25,37 @@ options:
   host:
     description:
       - Tiller's server host.
+    type: str
     default: "localhost"
   port:
     description:
       - Tiller's server port.
+    type: int
     default: 44134
   namespace:
     description:
       - Kubernetes namespace where the chart should be installed.
+    type: str
     default: "default"
   name:
     description:
       - Release name to manage.
+    type: str
   state:
     description:
       - Whether to install C(present), remove C(absent), or purge C(purged) a package.
     choices: ['absent', 'purged', 'present']
+    type: str
     default: "present"
   chart:
-    description: |
-      A map describing the chart to install. See examples for available options.
+    description:
+      - A map describing the chart to install. See examples for available options.
+    type: dict
     default: {}
   values:
     description:
       - A map of value options for the chart.
+    type: dict
     default: {}
   disable_hooks:
     description:
