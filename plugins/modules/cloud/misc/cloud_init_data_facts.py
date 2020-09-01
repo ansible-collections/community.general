@@ -19,6 +19,7 @@ options:
   filter:
     description:
       - Filter facts
+    type: str
     choices: [ status, result ]
 notes:
   - See http://cloudinit.readthedocs.io/ for more information about cloud-init.
