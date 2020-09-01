@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 module: nomad_job
 author: "FERREIRA Christophe (@chris93111)"
 version_added: "1.2.0"
-short_description: Launch an Nomad Job.
+short_description: Launch an Nomad Job
 description:
     - Launch an Nomad job. See
       U(https://www.nomadproject.io/api-docs/jobs/) for an overview.
