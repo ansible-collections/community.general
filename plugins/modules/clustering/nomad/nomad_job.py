@@ -222,7 +222,7 @@ def run():
         try:
             if not module.params.get('name') is None:
                 job_name = module.params.get('name')
-            else:       
+            else:
                 if module.params.get('content_format') == 'hcl':
                     job_json = nomad_client.jobs.parse(module.params.get('content'))
                     job_name = job_json['Name']
