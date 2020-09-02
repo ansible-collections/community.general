@@ -128,17 +128,16 @@ def run():
             key=dict(type='path', default=None),
             namespace=dict(type='str', default=None),
             name=dict(type='str', default=None),
-            source_json=dict(type='json', default=None),
-            source_hcl=dict(type='str', default=None),
+            content_format=dict(choices=['hcl', 'json'], default='hcl'),
+            content=dict(type='str', default=None),
             force_start=dict(type='bool', default=False),
             token=dict(type='str', default=None, no_log=True)
         ),
         mutually_exclusive=[
-            ["name", "source_json", "source_hcl"],
-            ["source_json", "source_hcl"]
+            ["name", "content"]
         ],
         required_one_of=[
-            ['name', 'source_json', 'source_hcl']
+            ['name', 'content']
         ]
     )
 
@@ -163,35 +162,38 @@ def run():
             module.fail_json(msg='for start job with name, force_start is needed')
 
         changed = False
-        if not module.params.get('source_json') is None:
-            job_json = module.params.get('source_json')
-            try:
-                job_json = json.loads(job_json)
-            except ValueError as e:
-                module.fail_json(msg=to_native(e))
-            job = dict()
-            job['job'] = job_json
-            try:
-                result = nomad_client.jobs.register_job(job)
-                changed = True
-            except Exception as e:
-                module.fail_json(msg=to_native(e))
+        if module.params.get('content'):
 
-        if not module.params.get('source_hcl') is None:
+            if module.params.get('content_format') == 'json':
 
-            try:
-                job_hcl = module.params.get('source_hcl')
-                job_json = nomad_client.jobs.parse(job_hcl)
+                job_json = module.params.get('content')
+                try:
+                    job_json = json.loads(job_json)
+                except ValueError as e:
+                    module.fail_json(msg=to_native(e))
                 job = dict()
                 job['job'] = job_json
-            except nomad.api.exceptions.BadRequestNomadException as err:
-                msg = str(err.nomad_resp.reason) + " " + str(err.nomad_resp.text)
-                module.fail_json(msg=to_native(msg))
-            try:
-                result = nomad_client.jobs.register_job(job)
-                changed = True
-            except Exception as e:
-                module.fail_json(msg=to_native(e))
+                try:
+                    result = nomad_client.jobs.register_job(job)
+                    changed = True
+                except Exception as e:
+                    module.fail_json(msg=to_native(e))
+
+            if module.params.get('content_format') == 'hcl':
+
+                try:
+                    job_hcl = module.params.get('content')
+                    job_json = nomad_client.jobs.parse(job_hcl)
+                    job = dict()
+                    job['job'] = job_json
+                except nomad.api.exceptions.BadRequestNomadException as err:
+                    msg = str(err.nomad_resp.reason) + " " + str(err.nomad_resp.text)
+                    module.fail_json(msg=to_native(msg))
+                try:
+                    result = nomad_client.jobs.register_job(job)
+                    changed = True
+                except Exception as e:
+                    module.fail_json(msg=to_native(e))
 
         if module.params.get('force_start'):
 
@@ -218,12 +220,13 @@ def run():
         try:
             if not module.params.get('name') is None:
                 job_name = module.params.get('name')
-            if not module.params.get('source_hcl') is None:
-                job_json = nomad_client.jobs.parse(job_hcl)
-                job_name = job_json['Name']
-            if not module.params.get('source_json') is None:
-                job_json = module.params.get('source_json')
-                job_name = job_json['Name']
+            else:       
+                if module.params.get('content_format') == 'hcl':
+                    job_json = nomad_client.jobs.parse(module.params.get('content'))
+                    job_name = job_json['Name']
+                if module.params.get('content_format') == 'json':
+                    job_json = module.params.get('content')
+                    job_name = job_json['Name']
             job = nomad_client.job.get_job(job_name)
             if job['Status'] == 'dead':
                 changed = False
