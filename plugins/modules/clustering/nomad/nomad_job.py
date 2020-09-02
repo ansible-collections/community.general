@@ -85,7 +85,7 @@ EXAMPLES = '''
   community.general.nomad_job:
     host: localhost
     state: present
-    source_hcl: "{{ lookup('ansible.builtin.file', 'job.hcl') }}"
+    content: "{{ lookup('ansible.builtin.file', 'job.hcl') }}"
     timeout: 120
 
 - name: stop job
