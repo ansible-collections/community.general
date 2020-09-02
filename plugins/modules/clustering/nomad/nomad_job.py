@@ -71,7 +71,7 @@ options:
     content:
       description:
         - Content of nomad job.
-      type: json
+      type: str
     content_type:
       description:
         - Type of content of nomad job.
