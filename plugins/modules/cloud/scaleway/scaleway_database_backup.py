@@ -14,7 +14,7 @@ DOCUMENTATION = '''
 ---
 module: scaleway_database_backup
 short_description: Scaleway database backups management module
-version_added: 1.1.0
+version_added: 1.2.0
 author: Guillaume Rodriguez (@guillaume_ro_fr)
 description:
     - This module manages database backups on Scaleway account U(https://developer.scaleway.com).
@@ -24,7 +24,10 @@ options:
   state:
     description:
         - Indicate desired state of the database backup.
-        - C(present) creates a backup, C(absent) deletes the backup, C(exported) creates a download link for the backup, C(restored) restores the backup to a new database
+        - C(present) creates a backup.
+        - C(absent) deletes the backup.
+        - C(exported) creates a download link for the backup.
+        - C(restored) restores the backup to a new database.
     type: str
     default: present
     choices:
