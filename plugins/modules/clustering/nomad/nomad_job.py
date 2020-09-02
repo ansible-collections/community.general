@@ -68,13 +68,15 @@ options:
         - Force job to started.
       type: bool
       default: false
-    source_json:
+    content:
       description:
-        - Source of json nomad job.
+        - Content of nomad job.
       type: json
-    source_hcl:
+    content_type:
       description:
-        - Source of hcl nomad job.
+        - Type of content of nomad job.
+      choices: ["hcl", "json"]
+      default: hcl
       type: str
 '''
 
