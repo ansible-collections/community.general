@@ -2,7 +2,7 @@
   nomad_job:
     host: localhost
     state: present
-    source_hcl: "{{ lookup('file', 'job.hcl') }}"
+    content: "{{ lookup('file', 'job.hcl') }}"
     timeout: 120
   register: deploy_job
 
