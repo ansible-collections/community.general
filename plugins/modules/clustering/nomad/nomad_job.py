@@ -72,7 +72,7 @@ options:
       description:
         - Content of nomad job.
       type: str
-    content_type:
+    content_format:
       description:
         - Type of content of nomad job.
       choices: ["hcl", "json"]
