@@ -482,72 +482,62 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg="Unable to delete group %s: %s" % (groupid, str(e)))
 
-     def get_realm_by_name(self, realm):
-         """ Get a top-level realm representation for a named realm
+    def get_realm_by_name(self, realm):
+        """ Get a top-level realm representation for a named realm
 
-         :param name: name of the realm
-         :return: Realm representation as a dict
-         """
-         url = URL_REALM.format(url=self.baseurl, realm=realm)
+        :param name: name of the realm
+        :return: Realm representation as a dict
+        """
+        url = URL_REALM.format(url=self.baseurl, realm=realm)
 
-         try:
-             return json.load(open_url(url, method='GET', headers=self.restheaders,
-                                       validate_certs=self.validate_certs))
+        try:
+            return json.load(open_url(url, method='GET', headers=self.restheaders, validate_certs=self.validate_certs))
+        except HTTPError as e:
+            if e.code == 404:
+                return None
+            else:
+                self.module.fail_json(msg='Could not obtain realm representation for realm %s: %s' % (realm, str(e)))
+        except ValueError as e:
+            self.module.fail_json(msg='API returned incorrect JSON when trying to obtain realm representation for realm %s: %s' % (realm, to_native(e)))
+        except Exception as e:
+            self.module.fail_json(msg='Could not obtain realm representation for realm %s: %s' % (realm, to_native(e)))
 
-         except HTTPError as e:
-             if e.code == 404:
-                 return None
-             else:
-                 self.module.fail_json(msg='Could not obtain realm representation for realm %s: %s' % (realm, str(e)))
-         except ValueError as e:
-             self.module.fail_json(msg='API returned incorrect JSON when trying to obtain realm representation for realm %s: %s'
-                                       % (realm, to_native(e)))
-         except Exception as e:
-             self.module.fail_json(msg='Could not obtain realm representation for realm %s: %s'
-                                       % (realm, to_native(e)))
-    # from https://github.com/ansible/ansible/pull/35844
-     def create_realm(self, realmrep):
-         """ Create a realm in keycloak
-         :param realmrep: Realm representation for realm to be created
-         :param realm: Realm name for realm to be created
-         :return: HTTPResponse object on success
-         """
-         url = URL_REALMS.format(url=self.baseurl)
+    def create_realm(self, realmrep):
+        """ Create a realm in keycloak
+        :param realmrep: Realm representation for realm to be created
+        :param realm: Realm name for realm to be created
+        :return: HTTPResponse object on success
+        """
+        url = URL_REALMS.format(url=self.baseurl)
 
-         try:
-             return open_url(url, method='POST', headers=self.restheaders,
-                             data=json.dumps(realmrep), validate_certs=self.validate_certs)
-         except Exception as e:
-             self.module.fail_json(msg='Could not create realm: %s'
-                                       % to_native(e))
+        try:
+            return open_url(url, method='POST', headers=self.restheaders, data=json.dumps(realmrep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create realm: %s' % to_native(e))
 
-     def update_realm(self, realmrep, realm):
-         """ Update an existing realm
+    def update_realm(self, realmrep, realm):
+        """ Update an existing realm
 
-         :param realmrep: realm representation with updates
-         :param realm: realm to be updated
-         :return: HTTPResponse object on success
-         """
-         url = URL_REALM.format(url=self.baseurl, realm=realm)
+        :param realmrep: realm representation with updates
+        :param realm: realm to be updated
+        :return: HTTPResponse object on success
+        """
+        url = URL_REALM.format(url=self.baseurl, realm=realm)
 
-         try:
-             return open_url(url, method='PUT', headers=self.restheaders,
-                             data=json.dumps(realmrep), validate_certs=self.validate_certs)
-         except Exception as e:
-             self.module.fail_json(msg='Could not update realm %s: %s'
-                                       % (realm, to_native(e)))
+        try:
+            return open_url(url, method='PUT', headers=self.restheaders, data=json.dumps(realmrep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not update realm %s: %s' % (realm, to_native(e)))
 
-     def delete_realm(self, realm):
-         """ Delete a realm from Keycloak
+    def delete_realm(self, realm):
+        """ Delete a realm from Keycloak
 
-         :param realm: realm to be deleted
-         :return: HTTPResponse object on success
-         """
-         url = URL_REALM.format(url=self.baseurl, realm=realm)
+        :param realm: realm to be deleted
+        :return: HTTPResponse object on success
+        """
+        url = URL_REALM.format(url=self.baseurl, realm=realm)
 
-         try:
-             return open_url(url, method='DELETE', headers=self.restheaders,
-                             validate_certs=self.validate_certs)
-         except Exception as e:
-             self.module.fail_json(msg='Could not delete realm %s: %s'
-                                       % (realm, to_native(e)))
+        try:
+            return open_url(url, method='DELETE', headers=self.restheaders, validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not delete realm %s: %s' % (realm, to_native(e)))
