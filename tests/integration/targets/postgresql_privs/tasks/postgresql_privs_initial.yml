@@ -343,6 +343,22 @@
     target_roles: "{{ db_user_with_dots2 }}"
     trust_input: no
 
+- name: Test
+  become_user: "{{ pg_user }}"
+  become: yes
+  postgresql_privs:
+    db: "{{ db_name }}"
+    login_user: "{{ pg_user }}"
+    type: 'database'
+    privs: 'connect'
+    role: 'public'
+  register: result
+
+- assert:
+    that:
+    - result is changed
+    - result.queries == ["GRANT CONNECT ON database \"{{ db_name }}\" TO PUBLIC;"]
+
 #
 # Cleanup
 #
