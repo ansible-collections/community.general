@@ -7,12 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: keycloak_realm
@@ -732,8 +726,7 @@ author:
 
 EXAMPLES = '''
 - name: Create a new Keycloak Realm named my-test-realm
-  local_action:
-    module: keycloak_realm
+  community.general.keycloak_realm:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -743,8 +736,7 @@ EXAMPLES = '''
     realm: my-test-realm
 
 - name: Rename a Keycloak realm from my-test-realm to my-new-test-realm
-  local_action:
-    module: keycloak_realm
+  community.general.keycloak_realm:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -754,8 +746,7 @@ EXAMPLES = '''
     realm: my-new-test-realm
 
 - name: Delete a Keycloak realm
-  local_action:
-    module: keycloak_realm
+  community.general.keycloak_realm:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -765,8 +756,7 @@ EXAMPLES = '''
     realm: my-new-test-realm
 
 - name: Create/update a Keycloak realm with some options set
-  local_action:
-    module: keycloak_realm
+  community.general.keycloak_realm:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
