@@ -106,7 +106,8 @@ options:
     description:
       - Call 'resizepart' on existing partitions to match the size specified by part_end
     type: bool
-    default: False
+    default: false
+    version_added: '1.2.0'
 
 notes:
   - When fetching information about a new disk and when the version of parted
