@@ -33,61 +33,72 @@ options:
             - On C(present), the realm will be created (or updated if it exists already).
             - On C(absent), the realm will be removed if it exists
         choices: ['present', 'absent']
+        type: str
         default: 'present'
 
     name:
+        type: str
         description:
             - Name of the realm to be acted on. Either this or I(realm) is required. If both are
               given, I(name) specifies the current name of the realm, while I(realm) specifies the
               new name thereof.
 
     realm:
+        type: str
         description:
             - Name of the realm. Either this or I(name) is required.
 
     access_code_lifespan:
+        type: int
         description:
             - Client login timeout in seconds.
         aliases:
             - accessCodeLifespan
 
     access_code_lifespan_login:
+        type: int
         description:
             - Login timeout in seconds.
         aliases:
             - accessCodeLifespanLogin
 
     access_code_lifespan_user_action:
+        type: int
         description:
             - User-initiated action lifespan in seconds.
         aliases:
             - accessCodeLifespanUserAction
 
     access_token_lifespan:
+        type: int
         description:
             - Access token lifespan in seconds.
         aliases:
             - accessTokenLifespan
 
     access_token_lifespan_for_implicit_flow:
+        type: int
         description:
             - Access token lifespan for implicit flow in seconds.
         aliases:
             - accessTokenLifespanForImplicitFlow
 
     account_theme:
+        type: str
         description:
             - Theme for user account management pages. Keycloak ships with C(base) and C(keycloak).
         aliases:
             - accountTheme
 
     action_token_generated_by_admin_lifespan:
+        type: int
         description:
             - Default admin-initiated action lifespan in seconds.
         aliases:
             - actionTokenGeneratedByAdminLifespan
 
     action_token_generated_by_user_lifespan:
+        type: int
         description:
             - User-initiated action lifespan in seconds.
         aliases:
@@ -108,33 +119,41 @@ options:
             - adminEventsEnabled
 
     admin_theme:
+        type: str
         description:
             - Theme for admin console. Keycloak ships with C(base) and C(keycloak).
         aliases:
             - adminTheme
 
     attributes:
+        type: dict
         description:
             - A freeform dict used by Keycloak and extensions to save further attributes for a realm.
               A non-exhaustive list of options is given below. Some of these are duplications of
               other API keys -- as noted via references below.
         suboptions:
             _browser_header.contentSecurityPolicy:
+                type: str
                 description:
                     - See I(browser_security_headers).
             _browser_header.strictTransportSecurity:
+                type: str
                 description:
                     - See I(browser_security_headers).
             _browser_header.xContentTypeOptions:
+                type: str
                 description:
                     - See I(browser_security_headers).
             _browser_header.xFrameOptions:
+                type: str
                 description:
                     - See I(browser_security_headers).
             _browser_header.xRobotsTag:
+                type: str
                 description:
                     - See I(browser_security_headers).
             _browser_header.xXSSProtection:
+                type: str
                 description:
                     - See I(browser_security_headers).
             actionTokenGeneratedByAdminLifespan:
@@ -185,12 +204,14 @@ options:
                     - See I(wait_increment_seconds)
 
     browser_flow:
+        type: str
         description:
             - Authentication flow binding for browser flow.
         aliases:
             - browserFlow
 
     browser_security_headers:
+        type: dict
         description:
             - Browser security headers for this realm.
         aliases:
@@ -224,48 +245,56 @@ options:
         type: bool
 
     client_authentication_flow:
+        type: str
         description:
             - Authentication flow binding for client authentication flow.
         aliases:
             - clientAuthenticationFlow
 
     default_groups:
+        type: list
         description:
             - List of default groups for this realm. Usually with a prepended path, i.e. C(/test) for group C(test).
         aliases:
             - defaultGroups
 
     default_locale:
+        type: str
         description:
             - Default locale for this realm; usually a two-letter country code.
         aliases:
             - defaultLocale
 
     default_roles:
+        type: list
         description:
             - List of default roles for users of this realm
         aliases:
             - defaultRoles
 
     direct_grant_flow:
+        type: str
         description:
             - Authentication flow binding for direct grant flow.
         aliases:
             - directGrantFlow
 
     display_name:
+        type: str
         description:
             - Displayed name of this realm (regular text).
         aliases:
             - displayName
 
     display_name_html:
+        type: str
         description:
             - Displayed name of this realm (HTML)
         aliases:
             - displayNameHtml
 
     docker_authentication_flow:
+        type: str
         description:
             - Authentication flow binding for docker authentication flow.
         aliases:
@@ -286,6 +315,7 @@ options:
             - editUsernameAllowed
 
     email_theme:
+        type: str
         description:
             - Theme for mails sent by Keycloak. Keycloak ships with C(base) and C(keycloak).
         aliases:
@@ -297,6 +327,7 @@ options:
         type: bool
 
     enabled_event_types:
+        type: list
         description:
             - List of event types to be saved. This list may be extensible through SPIs in Keycloak.
               Keycloak (3.4) ships the following listed types by default
@@ -395,6 +426,7 @@ options:
             - eventsEnabled
 
     events_expiration:
+        type: int
         description:
             - If I(events_enabled) is True, this specifies the time after which events are expired
               automatically, in seconds.
@@ -402,18 +434,21 @@ options:
             - eventsExpiration
 
     events_listeners:
+        type: list
         description:
             - List of listeners which receive events for this realm. Keycloak ships with C(jboss-logging) and C(email).
         aliases:
             - eventsListeners
 
     failure_factor:
+        type: int
         description:
             - For brute force detection, how many failures are allowed before a wait is triggered.
         aliases:
             - failureFactor
 
     id:
+        type: str
         description:
             - Internal id of this realm. When a realm is created, this should be the same as I(realm) (and indeed
               if you do not specify this parameter it will be set to I(realm) when creating a realm).
@@ -426,6 +461,7 @@ options:
             - internationalizationEnabled
 
     login_theme:
+        type: str
         description:
             - Theme for the login screen. Keycloak ships with C(base) and C(keycloak).
         aliases:
@@ -439,24 +475,28 @@ options:
             - loginWithEmailAllowed
 
     max_delta_time_seconds:
+        type: int
         description:
             - For brute force detection, failure reset time in seconds.
         aliases:
             - maxDeltaTimeSeconds
 
     max_failure_wait_seconds:
+        type: int
         description:
             - For brute force detection, max wait time in seconds.
         aliases:
             - maxFailureWaitSeconds
 
     minimum_quick_login_wait_seconds:
+        type: int
         description:
             - For brute force detection, minimum wait after quick login in seconds.
         aliases:
             - minimumQuickLoginWaitSeconds
 
     not_before:
+        type: int
         description:
             - Unix timestamp specifying a cut-off for tokens and sessions; any tokens issued before
               this time are revoked.
@@ -464,12 +504,14 @@ options:
             - notBefore
 
     offline_session_idle_timeout:
+        type: int
         description:
             - Time an offline session is allowed to idle before logout, in seconds.
         aliases:
             - offlineSessionIdleTimeout
 
     otp_policy_algorithm:
+        type: str
         description:
             - One time password hash algorithm
         choices:
@@ -480,6 +522,7 @@ options:
             - otpPolicyAlgorithm
 
     otp_policy_digits:
+        type: int
         description:
             - One time password amount of digits
         choices:
@@ -489,24 +532,28 @@ options:
             - otpPolicyDigits
 
     otp_policy_initial_counter:
+        type: int
         description:
             - Initial counter value for tokens when I(otp_policy_type) is set to C(hotp).
         aliases:
             - otpPolicyInitialCounter
 
     otp_policy_look_ahead_window:
+        type: int
         description:
             - One time password lookahead window (in case server and client are out of sync time-wise).
         aliases:
             - otpPolicyLookAheadWindow
 
     otp_policy_period:
+        type: int
         description:
             - One time password token period.
         aliases:
             - otpPolicyPeriod
 
     otp_policy_type:
+        type: str
         description:
             - Type of one time password algorithm
         choices:
@@ -516,6 +563,7 @@ options:
             - otpPolicyType
 
     password_policy:
+        type: str
         description:
             - String representing the password policy for this realm. An example would be
               C(lowerCase(1) and specialChars(1)). Built-in password policy checkers are
@@ -543,6 +591,7 @@ options:
             - permanentLockout
 
     quick_login_check_milli_seconds:
+        type: int
         description:
             - For brute force detection, if failures happen concurrently within this time in
               milliseconds, lock out the user.
@@ -550,6 +599,7 @@ options:
             - quickLoginCheckMilliSeconds
 
     refresh_token_max_reuse:
+        type: int
         description:
             - Maximum number of times a refresh token can be reused when I(revoke_refresh_token) is set to C(True).
         aliases:
@@ -570,6 +620,7 @@ options:
             - registrationEmailAsUsername
 
     registration_flow:
+        type: str
         description:
             - Authentication flow binding for registration flow.
         aliases:
@@ -584,12 +635,14 @@ options:
             - rememberMe
 
     required_credentials:
+        type: list
         description:
             - A list of required credentials for this realm. By default it just containst C(password).
         aliases:
             - requiredCredentials
 
     reset_credentials_flow:
+        type: str
         description:
             - Authentication flow binding for reset credentials flow.
         aliases:
@@ -611,6 +664,7 @@ options:
             - revokeRefreshToken
 
     smtp_server:
+        type: dict
         description:
             - SMTP server configuration details for sending mails from Keycloak
         aliases:
@@ -659,6 +713,7 @@ options:
                     - If I(auth) is set to C(True), username for the SMTP server.
 
     ssl_required:
+        type: str
         description:
             - Specifies whether HTTPS is enforced and for what addresses.
             - C(none) doesn't enforce HTTPS.
@@ -672,18 +727,21 @@ options:
             - sslRequired
 
     sso_session_idle_timeout:
+        type: int
         description:
             - Time an SSO session is allowed to idle before it expires, in seconds.
         aliases:
             - ssoSessionIdleTimeout
 
     sso_session_max_lifespan:
+        type: int
         description:
             - Maximum lifetime for an SSO session, in seconds.
         aliases:
             - ssoSessionMaxLifespan
 
     supported_locales:
+        type: list
         description:
             - List of supported locales for this realm. Keycloak (3.4) ships with C(ca), C(de),
               C(en), C(es), C(fr), C(it), C(ja), C(lt), C(nl), C(no), c(pt-BR), c(ru), c(sv), and
@@ -699,6 +757,7 @@ options:
             - verifyEmail
 
     wait_increment_seconds:
+        type: int
         description:
             - For brute force detection, wait increment in seconds per failure.
         aliases:
