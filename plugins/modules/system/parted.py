@@ -516,7 +516,7 @@ def parted_version():
     if len(lines) == 0:
         module.fail_json(msg="Failed to get parted version.", rc=0, out=out)
 
-    matches = re.search(r'^parted.+(\d+)\.(\d+)(?:\.(\d+))?.+$', lines[0])
+    matches = re.search(r'^parted.+(\d+)\.(\d+)(?:\.(\d+))?.?$', lines[0])
     if matches is None:
         module.fail_json(msg="Failed to get parted version.", rc=0, out=out)
 
