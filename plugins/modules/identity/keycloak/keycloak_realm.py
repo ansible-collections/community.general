@@ -218,22 +218,28 @@ options:
             - browserSecurityHeaders
         suboptions:
             contentSecurityPolicy:
+                type: str
                 description:
                     - Content-Security-Policy (CSP) browser header for this realm.
             xContentTypeOptions:
+                type: str
                 description:
                     - X-Content-Type-Options browser header for this realm.
             xFrameOptions:
+                type: str
                 description:
                     - X-Frame-Options browser header for this realm.
             xRobotsTag:
+                type: str
                 description:
                     - X-Robots-Tag browser header for this realm (see U(https://developers.google.com/search/reference/robots_meta_tag))
                     - C(none) for no header.
             xXSSProtection:
+                type: str
                 description:
                     - X-XSS-Protection browser header for this realm.
             strictTransportSecurity:
+                type: str
                 description:
                     - Strict-Transport-Security (HSTS) browser header for this realm.
 
@@ -253,6 +259,7 @@ options:
 
     default_groups:
         type: list
+        elements: str
         description:
             - List of default groups for this realm. Usually with a prepended path, i.e. C(/test) for group C(test).
         aliases:
@@ -269,6 +276,7 @@ options:
         type: list
         description:
             - List of default roles for users of this realm
+        elements: str
         aliases:
             - defaultRoles
 
@@ -328,6 +336,7 @@ options:
 
     enabled_event_types:
         type: list
+        elements: str
         description:
             - List of event types to be saved. This list may be extensible through SPIs in Keycloak.
               Keycloak (3.4) ships the following listed types by default
@@ -435,6 +444,7 @@ options:
 
     events_listeners:
         type: list
+        elements: str
         description:
             - List of listeners which receive events for this realm. Keycloak ships with C(jboss-logging) and C(email).
         aliases:
@@ -636,6 +646,7 @@ options:
 
     required_credentials:
         type: list
+        elements: str
         description:
             - A list of required credentials for this realm. By default it just containst C(password).
         aliases:
@@ -675,29 +686,37 @@ options:
                     - Specifies whether SMTP auth is used.
                 type: bool
             envelopeFrom:
+                type: str
                 description:
                     - Envelope from email address.
             from:
+                type: str
                 description:
                     - From email address.
                 required: True
             fromDisplayName:
+                type: str
                 description:
                     - Displayed name for the from email address.
             host:
+                type: str
                 description:
                     - Hostname of the SMTP server.
                 required: True
             password:
+                type: str
                 description:
                     - If I(auth) is set to C(True), password for the SMTP server.
             port:
+                type: int
                 description:
                     - Port of the SMTP server.
             replyTo:
+                type: str
                 description:
                     - Reply-to email address.
             replyToDisplayName:
+                type: str
                 description:
                     - Reply-to email address displayed name.
             ssl:
@@ -709,6 +728,7 @@ options:
                     - Specifies whether to use STARTTLS when connecting to the SMTP server.
                 type: bool
             user:
+                type: str
                 description:
                     - If I(auth) is set to C(True), username for the SMTP server.
 
@@ -742,6 +762,7 @@ options:
 
     supported_locales:
         type: list
+        elements: str
         description:
             - List of supported locales for this realm. Keycloak (3.4) ships with C(ca), C(de),
               C(en), C(es), C(fr), C(it), C(ja), C(lt), C(nl), C(no), c(pt-BR), c(ru), c(sv), and
