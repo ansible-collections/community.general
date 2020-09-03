@@ -1,0 +1,2 @@
+bugfix:
+- postgresql_privs - allow to pass ``PUBLIC`` role written in lowercase letters (https://github.com/ansible-collections/community.general/issues/857).
