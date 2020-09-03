@@ -1,0 +1,5 @@
+---
+scaleway_name: scaleway_database_backup_test
+scaleway_region: fr-par
+scaleway_database_name: scaleway_database_test
+scaleway_instance_id: 
