@@ -343,7 +343,8 @@
     target_roles: "{{ db_user_with_dots2 }}"
     trust_input: no
 
-- name: Test
+# Bugfix for https://github.com/ansible-collections/community.general/issues/857
+- name: Test passing lowercase PUBLIC role
   become_user: "{{ pg_user }}"
   become: yes
   postgresql_privs:
