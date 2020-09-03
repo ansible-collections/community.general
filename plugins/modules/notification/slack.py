@@ -61,9 +61,10 @@ options:
     description:
       - Optional. Timestamp of parent message to thread this message. https://api.slack.com/docs/message-threading
     type: str
-  ts:
+  message_id:
     description:
-      - Optional. Message ID to edit. https://api.slack.com/messaging/modifying
+      - Optional. Message ID to edit, instead of posting a new message.
+        Corresponds to 'ts' in the Slack API. https://api.slack.com/messaging/modifying
     type: str
     version_added: 1.2.0
   username:
@@ -219,7 +220,7 @@ EXAMPLES = """
   community.general.slack:
     token: thetoken/generatedby/slack
     msg: Deployment complete!
-    ts: "{{ slack_response.ts }}"
+    message_id: "{{ slack_response.ts }}"
 """
 
 import re
@@ -269,7 +270,7 @@ def recursive_escape_quotes(obj, keys):
 
 
 def build_payload_for_slack(module, text, channel, thread_id, username, icon_url, icon_emoji, link_names,
-                            parse, color, attachments, blocks, ts):
+                            parse, color, attachments, blocks, message_id):
     payload = {}
     if color == "normal" and text is not None:
         payload = dict(text=escape_quotes(text))
@@ -293,8 +294,8 @@ def build_payload_for_slack(module, text, channel, thread_id, username, icon_url
         payload['link_names'] = link_names
     if parse is not None:
         payload['parse'] = parse
-    if ts is not None:
-        payload['ts'] = ts
+    if message_id is not None:
+        payload['ts'] = message_id
 
     if attachments is not None:
         if 'attachments' not in payload:
@@ -406,7 +407,7 @@ def main():
             color=dict(type='str', default='normal'),
             attachments=dict(type='list', required=False, default=None),
             blocks=dict(type='list', elements='dict'),
-            ts=dict(type='str', default=None),
+            message_id=dict(type='str', default=None),
         ),
         supports_check_mode=True,
     )
@@ -424,7 +425,7 @@ def main():
     color = module.params['color']
     attachments = module.params['attachments']
     blocks = module.params['blocks']
-    ts = module.params['ts']
+    message_id = module.params['message_id']
 
     color_choices = ['normal', 'good', 'warning', 'danger']
     if color not in color_choices and not is_valid_hex_color(color):
@@ -434,9 +435,9 @@ def main():
     changed = True
 
     # if updating an existing message, we can check if there's anything to update
-    if ts is not None:
+    if message_id is not None:
         changed = False
-        msg = get_slack_message(module, domain, channel, ts)
+        msg = get_slack_message(module, domain, channel, message_id)
         for key in ('icon_url', 'icon_emoji', 'link_names', 'color', 'attachments', 'blocks'):
             if msg.get(key) != module.params.get(key):
                 changed = True
@@ -449,7 +450,7 @@ def main():
         module.exit_json(changed=True)
 
     payload = build_payload_for_slack(module, text, channel, thread_id, username, icon_url, icon_emoji, link_names,
-                                      parse, color, attachments, blocks, ts)
+                                      parse, color, attachments, blocks, message_id)
     slack_response = do_notify_slack(module, domain, token, payload)
 
     if 'ok' in slack_response:
