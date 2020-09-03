@@ -447,7 +447,7 @@ def main():
         if module.check_mode or not changed:
             module.exit_json(changed=changed)
     elif module.check_mode:
-        module.exit_json(changed=True)
+        module.exit_json(changed=changed)
 
     payload = build_payload_for_slack(module, text, channel, thread_id, username, icon_url, icon_emoji, link_names,
                                       parse, color, attachments, blocks, message_id)
@@ -456,7 +456,7 @@ def main():
     if 'ok' in slack_response:
         # Evaluate WebAPI response
         if slack_response['ok']:
-            module.exit_json(changed=True, ts=slack_response['ts'], channel=slack_response['channel'],
+            module.exit_json(changed=changed, ts=slack_response['ts'], channel=slack_response['channel'],
                              api=slack_response, payload=payload)
         else:
             module.fail_json(msg="Slack API error", error=slack_response['error'])
