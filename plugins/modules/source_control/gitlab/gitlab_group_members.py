@@ -2,23 +2,18 @@
 # -*- coding: utf-8 -*-
 
 # Copyright: (c) 2020, Zainab Alsaffar <Zainab.Alsaffar@mail.rit.edu>
-
-ANSIBLE_METADATA = {'metadata_version': '1.0',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 DOCUMENTATION = '''
 ---
 module: gitlab_group_members
 short_description: Manage group members on GitLab Server
 description:
-    - This is a custom module built to manage the addition of members to a group on GitLab when state is defined as present. 
-    - And the removal of a user when state is defined as absent.
-version_added: '1.0'
+    - This module allows to add and remove members to/from a group, or change a member's access level in a group on GitLab.
+version_added: '1.2.0'
 author: 'Zainab Alsaffar (@zanssa)'
 requirments:
-    - 'python >= 2.6'
-    - 'python-gitlab' python module <= 1.15.0
+    - python-gitlab python module <= 1.15.0
     - administrator rights on the GitLab server
 options:
     server_url:
@@ -28,7 +23,7 @@ options:
         type: str
     access_token:
         description:
-            - A personal access token to authenticate with the GitLab API
+            - A personal access token to authenticate with the GitLab API.
         required: true
         type: str
     gitlab_group:
@@ -46,7 +41,7 @@ options:
             - The access level for the user.
             - Required if I(state=present), user state is set to present.
         type: str
-        choices: ['guest','reporter','developer','maintainer','owner']
+        choices: ['guest', 'reporter', 'developer', 'maintainer', 'owner']
     state:
         description:
             - State of the member in the group.
@@ -55,12 +50,12 @@ options:
         choices: ['present', 'absent']
         default: 'present'
         type: str
-notes: supports_check_mode is allowed in this module 
+notes: Supports C(check_mode).
 '''
 
 EXAMPLES = '''
 - name: Add a user to a GitLab Group
-  gitlab_group_members:
+  community.general.gitlab_group_members:
     server_url: 'https://gitlab.example.com'
     access_token: 'Your-Private-Token'
     gitlab_group: groupname
@@ -69,7 +64,7 @@ EXAMPLES = '''
     state: present
 
 - name: Remove a user from a GitLab Group
-  gitlab_group_members:
+  community.general.gitlab_group_members:
     server_url: 'https://gitlab.example.com'
     access_token: 'Your-Private-Token'
     gitlab_group: groupname
@@ -113,19 +108,21 @@ class GitLabGroup(object):
         return False
 
     # add user to a group
-    def add_member_to_group(self, gitlab_user_id, gitlab_group_id,access_level):
+    def add_member_to_group(self, gitlab_user_id, gitlab_group_id, access_level):
         try:
             if self._module.check_mode:
                 self._module.exit_json(changed=True)
-            
+
             group = self._gitlab.groups.get(gitlab_group_id)
-            add_member = group.members.create({'user_id': gitlab_user_id, 'access_level': access_level})
-            
+            add_member = group.members.create(
+                {'user_id': gitlab_user_id, 'access_level': access_level})
+
             if add_member:
                 return add_member.username
 
         except (gitlab.exceptions.GitlabCreateError) as e:
-            self._module.fail_json(msg="Failed to add member to the GitLab Group, Group ID %s: %s" % (gitlab_group_id, e))
+            self._module.fail_json(
+                msg="Failed to add member to the Group, Group ID %s: %s" % (gitlab_group_id, e))
 
     # remove user from a group
     def remove_user_from_group(self, gitlab_user_id, gitlab_group_id):
@@ -137,7 +134,9 @@ class GitLabGroup(object):
             group.members.delete(gitlab_user_id)
 
         except (gitlab.exceptions.GitlabDeleteError) as e:
-            self._module.fail_json(msg="Failed to remove member from the GitLab group, Group ID %s: %s" % (gitlab_group_id, e))
+            self._module.fail_json(
+                msg="Failed to remove member from GitLab group, ID %s: %s" % (gitlab_group_id, e))
+
 
 def main():
     module = AnsibleModule(
@@ -147,7 +146,7 @@ def main():
             gitlab_group=dict(type='str', required=True),
             gitlab_user=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['present', 'absent']),
-            access_level=dict(typr='str', required=False, choices=['guest','reporter','developer','maintainer','owner'])
+            access_level=dict(typr='str', required=False, choices=['guest', 'reporter', 'developer', 'maintainer', 'owner'])
         ),
         supports_check_mode=True
     )
@@ -162,65 +161,67 @@ def main():
     state = module.params['state']
     access_level = module.params['access_level']
 
-    # convert access level string input to int 
+    # convert access level string input to int
     if access_level:
         access_level_int = {
             'guest': gitlab.GUEST_ACCESS,
             'reporter': gitlab.REPORTER_ACCESS,
             'developer': gitlab.DEVELOPER_ACCESS,
             'maintainer': gitlab.MAINTAINER_ACCESS,
-            'owner': gitlab.OWNER_ACCESS }
-    
+            'owner': gitlab.OWNER_ACCESS
+        }
+
         access_level = access_level_int[access_level]
 
-    gl = None
     # connect to gitlab server
     try:
         gl = gitlab.Gitlab(server_url, private_token=access_token)
     except (gitlab.exceptions.GitlabAuthenticationError, gitlab.exceptions.GitlabGetError) as e:
         module.fail_json(msg="Failed to authenticate to GitLab Server: %s: %s" % (server_url, e))
-        
+
     group = GitLabGroup(module, gl)
 
     user_exists = group.does_user_exist(gitlab_user)
     group_exists = group.does_group_exist(gitlab_group)
 
+    # group doesn't exist
+    if not group_exists:
+        module.fail_json(msg="group '%s' not found." % gitlab_group)
+
+    # user doesn't exist
+    if not user_exists:
+        module.fail_json(msg="user '%s' not found." % gitlab_user)
+
     if group_exists:
         # get group id
         gitlab_group_id = group_exists.id
-        
+
         if user_exists:
             #get user id
             gitlab_user_id = user_exists.id
             is_user_a_member = group.is_user_a_member(gitlab_group_id, gitlab_user_id)
-            
+
             # check if the user is a member in the group
             if not is_user_a_member:
                 if state == 'present':
                     if not access_level:
-                        module.fail_json(msg="An access level must be entered for adding member to GitLab group '%s'." % gitlab_user)
-                    
+                        module.fail_json(msg="Access level must be entered for adding member to GitLab group '%s'." % gitlab_user)
+
                     # add user to the group
-                    group.add_member_to_group(gitlab_user_id,gitlab_group_id,access_level)
+                    group.add_member_to_group(gitlab_user_id, gitlab_group_id, access_level)
                     module.exit_json(changed=True, result="Successfully added user to the group '%s'." % gitlab_user)
 
                 else:
-                    module.exit_json(changed=False, result="User is not a member in the group. No change to report '%s'." % gitlab_user)
+                    module.exit_json(changed=False, result="User is not a member in the group. No change to report '%s'" % gitlab_user)
             # in case that a user is a member
             else:
                 if state == 'present':
-                    module.exit_json(changed=False, result="User is already a member in the group. No change to report '%s'." % gitlab_user)
+                    module.exit_json(changed=False, result="User is already a member in the group. No change to report '%s'" % gitlab_user)
                 else:
                     # remove the user from the group
-                    group.remove_user_from_group(gitlab_user_id,gitlab_group_id)
-                    module.exit_json(changed=True, result="Successfully removed user from the group '%s'." % gitlab_user)
-        # user doesn't exist
-        else:
-            module.fail_json(msg="user not found '%s'." % gitlab_user)
+                    group.remove_user_from_group(gitlab_user_id, gitlab_group_id)
+                    module.exit_json(changed=True, result="Successfully removed user from the group '%s'" % gitlab_user)
 
-    # group doesn't exist
-    else:
-        module.fail_json(msg="group not found  '%s'." % gitlab_group)
 
 if __name__ == '__main__':
     main()
