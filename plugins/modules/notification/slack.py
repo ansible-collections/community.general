@@ -338,13 +338,8 @@ def get_slack_message(module, domain, token, channel, ts):
         'Accept': 'application/json',
         'Authorization': 'Bearer ' + token
     }
-    params = {
-        'channel': channel,
-        'latest': ts,
-        'limit': 1,
-        'inclusive': True,
-    }
-    response, info = fetch_url(module=module, url=SLACK_CONVERSATION_HISTORY_WEBAPI, headers=headers, method='GET', params=params)
+    url = SLACK_CONVERSATIONS_HISTORY_WEBAPI + '?channel=%s&ts=%s&limit=1&inclusive=true' % (channel, ts)
+    response, info = fetch_url(module=module, url=url, headers=headers, method='GET')
     if info['status'] != 200:
         module.fail_json(msg="failed to get slack message")
     data = module.from_json(response.read())
