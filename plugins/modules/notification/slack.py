@@ -434,7 +434,7 @@ def main():
     # if updating an existing message, we can check if there's anything to update
     if message_id is not None:
         changed = False
-        msg = get_slack_message(module, domain, channel, message_id)
+        msg = get_slack_message(module, domain, token, channel, message_id)
         for key in ('icon_url', 'icon_emoji', 'link_names', 'color', 'attachments', 'blocks'):
             if msg.get(key) != module.params.get(key):
                 changed = True
