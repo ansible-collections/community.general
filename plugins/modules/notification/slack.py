@@ -314,7 +314,7 @@ def do_notify_slack(module, domain, token, payload):
     if token.count('/') >= 2:
         # New style webhook token
         slack_uri = SLACK_INCOMING_WEBHOOK % (token)
-    elif re.match(r'^xox[abp]-\w+-\w+$', token):
+    elif re.match(r'^xox[abp]-\S+$', token):
         slack_uri = SLACK_POSTMESSAGE_WEBAPI
         use_webapi = True
     else:
