@@ -113,7 +113,8 @@ options:
   force:
     description:
       - Allow to force stop VM.
-      - Can be used only with states C(stopped), C(restarted).
+      - Can be used with states C(stopped) and C(restarted).
+    default: no
     type: bool
   format:
     description:
@@ -754,6 +755,8 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
             del kwargs['ide']
         if 'net' in kwargs:
             del kwargs['net']
+        if 'force' in kwargs:
+            del kwargs['force']
 
     # Convert all dict in kwargs to elements. For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n]
     for k in list(kwargs.keys()):
@@ -863,7 +866,7 @@ def main():
             delete=dict(type='str', default=None),
             description=dict(type='str'),
             digest=dict(type='str'),
-            force=dict(type='bool', default=None),
+            force=dict(type='bool', default=False),
             format=dict(type='str', default='qcow2', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk']),
             freeze=dict(type='bool'),
             full=dict(type='bool', default=True),
@@ -960,42 +963,44 @@ def main():
     except Exception as e:
         module.fail_json(msg='authorization on proxmox cluster failed with exception: %s' % e)
 
-    # If vmid not set get the Next VM id from ProxmoxAPI
-    # If vm name is set get the VM id from ProxmoxAPI
+    # If vmid is not defined then retrieve its value from the vm name,
+    # the cloned vm name or retrieve the next free VM id from ProxmoxAPI.
     if not vmid:
-        if state == 'present' and (not update and not clone) and (not delete and not revert):
+        if state == 'present' and not update and not clone and not delete and not revert:
             try:
                 vmid = get_nextvmid(module, proxmox)
             except Exception as e:
                 module.fail_json(msg="Can't get the next vmid for VM {0} automatically. Ensure your cluster state is good".format(name))
         else:
+            clone_target = name if not clone else clone
             try:
-                if not clone:
-                    vmid = get_vmid(proxmox, name)[0]
-                else:
-                    vmid = get_vmid(proxmox, clone)[0]
+                vmid = get_vmid(proxmox, clone_target)[0]
             except Exception as e:
-                if not clone:
-                    module.fail_json(msg="VM {0} does not exist in cluster.".format(name))
-                else:
-                    module.fail_json(msg="VM {0} does not exist in cluster.".format(clone))
+                vmid = -1
 
     if clone is not None:
-        if get_vmid(proxmox, name):
-            module.exit_json(changed=False, msg="VM with name <%s> already exists" % name)
-        if vmid is not None:
-            vm = get_vm(proxmox, vmid)
-            if not vm:
-                module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
+        # If newid is not defined then retrieve the next free id from ProxmoxAPI
         if not newid:
             try:
                 newid = get_nextvmid(module, proxmox)
             except Exception as e:
                 module.fail_json(msg="Can't get the next vmid for VM {0} automatically. Ensure your cluster state is good".format(name))
-        else:
-            vm = get_vm(proxmox, newid)
-            if vm:
-                module.exit_json(changed=False, msg="vmid %s with VM name %s already exists" % (newid, name))
+
+        # Ensure source VM name exists when cloning
+        if -1 == vmid:
+            module.fail_json(msg='VM with name = %s does not exist in cluster' % clone)
+
+        # Ensure source VM id exists when cloning
+        if not get_vm(proxmox, vmid):
+            module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
+
+        # Ensure the choosen VM name doesn't already exist when cloning
+        if get_vmid(proxmox, name):
+            module.exit_json(changed=False, msg="VM with name <%s> already exists" % name)
+
+        # Ensure the choosen VM id doesn't already exist when cloning
+        if get_vm(proxmox, newid):
+            module.exit_json(changed=False, msg="vmid %s with VM name %s already exists" % (newid, name))
 
     if delete is not None:
         try:
@@ -1003,7 +1008,8 @@ def main():
             module.exit_json(changed=True, msg="Settings has deleted on VM {0} with vmid {1}".format(name, vmid))
         except Exception as e:
             module.fail_json(msg='Unable to delete settings on VM {0} with vmid {1}: '.format(name, vmid) + str(e))
-    elif revert is not None:
+
+    if revert is not None:
         try:
             settings(module, proxmox, vmid, node, name, timeout, revert=revert)
             module.exit_json(changed=True, msg="Settings has reverted on VM {0} with vmid {1}".format(name, vmid))
@@ -1097,6 +1103,8 @@ def main():
 
     elif state == 'started':
         try:
+            if -1 == vmid:
+                module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
             vm = get_vm(proxmox, vmid)
             if not vm:
                 module.fail_json(msg='VM with vmid <%s> does not exist in cluster' % vmid)
@@ -1110,6 +1118,9 @@ def main():
 
     elif state == 'stopped':
         try:
+            if -1 == vmid:
+                module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
+
             vm = get_vm(proxmox, vmid)
             if not vm:
                 module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
@@ -1124,6 +1135,9 @@ def main():
 
     elif state == 'restarted':
         try:
+            if -1 == vmid:
+                module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
+
             vm = get_vm(proxmox, vmid)
             if not vm:
                 module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
@@ -1139,7 +1153,7 @@ def main():
         try:
             vm = get_vm(proxmox, vmid)
             if not vm:
-                module.exit_json(changed=False, msg="VM %s does not exist" % vmid)
+                module.exit_json(changed=False)
 
             if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'running':
                 module.exit_json(changed=False, msg="VM %s is running. Stop it before deletion." % vmid)
@@ -1160,16 +1174,15 @@ def main():
 
     elif state == 'current':
         status = {}
-        try:
-            vm = get_vm(proxmox, vmid)
-            if not vm:
-                module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
-            current = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status']
-            status['status'] = current
-            if status:
-                module.exit_json(changed=False, msg="VM %s with vmid = %s is %s" % (name, vmid, current), **status)
-        except Exception as e:
-            module.fail_json(msg="Unable to get vm {0} with vmid = {1} status: ".format(name, vmid) + str(e))
+        if -1 == vmid:
+            module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
+        vm = get_vm(proxmox, vmid)
+        if not vm:
+            module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
+        current = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status']
+        status['status'] = current
+        if status:
+            module.exit_json(changed=False, msg="VM %s with vmid = %s is %s" % (name, vmid, current), **status)
 
 
 if __name__ == '__main__':
