@@ -234,7 +234,7 @@ OLD_SLACK_INCOMING_WEBHOOK = 'https://%s/services/hooks/incoming-webhook?token=%
 SLACK_INCOMING_WEBHOOK = 'https://hooks.slack.com/services/%s'
 SLACK_POSTMESSAGE_WEBAPI = 'https://slack.com/api/chat.postMessage'
 SLACK_UPDATEMESSAGE_WEBAPI = 'https://slack.com/api/chat.update'
-SLACK_CONVERSATION_HISTORY_WEBAPI = 'https://slack.com/api/conversation.history'
+SLACK_CONVERSATIONS_HISTORY_WEBAPI = 'https://slack.com/api/conversations.history'
 
 # Escaping quotes and apostrophes to avoid ending string prematurely in ansible call.
 # We do not escape other characters used as Slack metacharacters (e.g. &, <, >).
