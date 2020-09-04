@@ -80,4 +80,11 @@
     - name: Start nomad (dev mode enabled)
       shell: nohup {{ nomad_cmd }} agent -dev </dev/null >/dev/null 2>&1 &
 
+    - name: wait nomad up
+      wait_for:
+        host: localhost
+        port: 4646
+        delay: 10
+        timeout: 60
+
     - import_tasks: nomad_job.yml
