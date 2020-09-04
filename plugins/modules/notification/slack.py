@@ -214,11 +214,13 @@ EXAMPLES = """
 - name: Send a message to be edited later on
   community.general.slack:
     token: thetoken/generatedby/slack
+    channel: '#ansible'
     msg: Deploying something...
   register: slack_response
 - name: Edit message
   community.general.slack:
     token: thetoken/generatedby/slack
+    channel: "{{ slack_response.channel }}"
     msg: Deployment complete!
     message_id: "{{ slack_response.ts }}"
 """
