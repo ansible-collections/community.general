@@ -64,7 +64,7 @@ options:
   message_id:
     description:
       - Optional. Message ID to edit, instead of posting a new message.
-        Corresponds to 'ts' in the Slack API. https://api.slack.com/messaging/modifying
+        Corresponds to C(ts) in the Slack API (U(https://api.slack.com/messaging/modifying)).
     type: str
     version_added: 1.2.0
   username:
