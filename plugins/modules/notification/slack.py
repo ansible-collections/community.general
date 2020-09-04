@@ -442,7 +442,7 @@ def main():
         # if check mode is active, we shouldn't do anything regardless.
         # if changed=False, we don't need to do anything, so don't do it.
         if module.check_mode or not changed:
-            module.exit_json(changed=changed)
+            module.exit_json(changed=changed, ts=msg['ts'], channel=msg['channel'])
     elif module.check_mode:
         module.exit_json(changed=changed)
 
