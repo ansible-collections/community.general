@@ -4,6 +4,9 @@
 # Copyright: (c) 2020, Zainab Alsaffar <Zainab.Alsaffar@mail.rit.edu>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
 DOCUMENTATION = '''
 ---
 module: gitlab_group_members
@@ -12,7 +15,7 @@ description:
     - This module allows to add and remove members to/from a group, or change a member's access level in a group on GitLab.
 version_added: '1.2.0'
 author: 'Zainab Alsaffar (@zanssa)'
-requirments:
+requirements:
     - python-gitlab python module <= 1.15.0
     - administrator rights on the GitLab server
 options:
@@ -50,7 +53,8 @@ options:
         choices: ['present', 'absent']
         default: 'present'
         type: str
-notes: Supports C(check_mode).
+notes: 
+    - Supports C(check_mode).
 '''
 
 EXAMPLES = '''
@@ -84,6 +88,7 @@ try:
 except ImportError:
     GITLAB_IMP_ERR = traceback.format_exc()
     HAS_PY_GITLAB = False
+
 
 class GitLabGroup(object):
     def __init__(self, module, gl):
@@ -146,7 +151,7 @@ def main():
             gitlab_group=dict(type='str', required=True),
             gitlab_user=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['present', 'absent']),
-            access_level=dict(typr='str', required=False, choices=['guest', 'reporter', 'developer', 'maintainer', 'owner'])
+            access_level=dict(type='str', required=False, choices=['guest', 'reporter', 'developer', 'maintainer', 'owner'])
         ),
         supports_check_mode=True
     )
@@ -197,7 +202,7 @@ def main():
         gitlab_group_id = group_exists.id
 
         if user_exists:
-            #get user id
+            # get user id
             gitlab_user_id = user_exists.id
             is_user_a_member = group.is_user_a_member(gitlab_group_id, gitlab_user_id)
 
