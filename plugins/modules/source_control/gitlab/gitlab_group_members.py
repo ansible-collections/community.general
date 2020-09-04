@@ -53,7 +53,7 @@ options:
         choices: ['present', 'absent']
         default: 'present'
         type: str
-notes: 
+notes:
     - Supports C(check_mode).
 '''
 
