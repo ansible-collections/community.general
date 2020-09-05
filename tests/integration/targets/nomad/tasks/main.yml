@@ -1,3 +1,7 @@
+- name: Skip unsupported platforms
+  meta: end_play
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version is not version('7', '>='))
+
 - name: Install Nomad and test
   vars:
     nomad_version: 0.12.3
