@@ -9,6 +9,7 @@
 # For more information and examples on the "job" stanza, please see
 # the online documentation at:
 #
+#
 #     https://www.nomadproject.io/docs/job-specification/job.html
 #
 job "example" {
