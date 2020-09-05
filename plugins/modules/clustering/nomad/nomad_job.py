@@ -87,13 +87,11 @@ EXAMPLES = '''
     state: present
     content: "{{ lookup('ansible.builtin.file', 'job.hcl') }}"
     timeout: 120
-
 - name: stop job
   community.general.nomad_job:
     host: localhost
     state: absent
     name: api
-
 - name: force job to start
   community.general.nomad_job:
     host: localhost
