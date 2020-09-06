@@ -227,8 +227,8 @@ EXAMPLES = """
 
 import re
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url
-
 
 OLD_SLACK_INCOMING_WEBHOOK = 'https://%s/services/hooks/incoming-webhook?token=%s'
 SLACK_INCOMING_WEBHOOK = 'https://hooks.slack.com/services/%s'
@@ -338,7 +338,13 @@ def get_slack_message(module, domain, token, channel, ts):
         'Accept': 'application/json',
         'Authorization': 'Bearer ' + token
     }
-    url = SLACK_CONVERSATIONS_HISTORY_WEBAPI + '?channel=%s&ts=%s&limit=1&inclusive=true' % (channel, ts)
+    qs = urlencode({
+        'channel': channel,
+        'ts': ts,
+        'limit': 1,
+        'inclusive': 'true',
+    })
+    url = SLACK_CONVERSATIONS_HISTORY_WEBAPI + '?' + qs
     response, info = fetch_url(module=module, url=url, headers=headers, method='GET')
     if info['status'] != 200:
         module.fail_json(msg="failed to get slack message")
