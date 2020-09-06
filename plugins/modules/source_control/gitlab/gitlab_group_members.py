@@ -189,7 +189,10 @@ def main():
 
     # user doesn't exist
     if not user_exists:
-        module.fail_json(msg="user '%s' not found." % gitlab_user)
+        if state == 'absent':
+            module.exit_json(changed=False, result="user '%s' not found, and thus also not part of the group" % gitlab_user)
+        else:
+            module.fail_json(msg="user '%s' not found." % gitlab_user)
 
     # get group id
     gitlab_group_id = group_exists[0].id
@@ -201,25 +204,26 @@ def main():
     # check if the user is a member in the group
     if not is_user_a_member:
         if state == 'present':
+
             if not access_level:
-                module.fail_json(msg="Access level must be entered for adding member to GitLab group '%s'." % gitlab_user)
+                module.fail_json(msg="Access level must be entered for adding the member, '%s', to the GitLab group, '%s'." % (gitlab_user, gitlab_group))
 
             # add user to the group
-            group.add_member_to_group(gitlab_user_id, gitlab_group_id, access_level)
             if not module.check_mode:
-                module.exit_json(changed=True, result="Successfully added user to the group '%s'." % gitlab_user)
+                group.add_member_to_group(gitlab_user_id, gitlab_group_id, access_level)
+                module.exit_json(changed=True, result="Successfully added user '%s' to the group." % gitlab_user)
         # state as absent
         else:
-            module.exit_json(changed=False, result="User is not a member in the group. No change to report '%s'" % gitlab_user)
+            module.exit_json(changed=False, result="User, '%s', is not a member in the group. No change to report" % gitlab_user)
     # in case that a user is a member
     else:
         if state == 'present':
-            module.exit_json(changed=False, result="User is already a member in the group. No change to report '%s'" % gitlab_user)
+            module.exit_json(changed=False, result="User, '%s', is already a member in the group. No change to report" % gitlab_user)
         else:
             # remove the user from the group
-            group.remove_user_from_group(gitlab_user_id, gitlab_group_id)
             if not module.check_mode:
-                module.exit_json(changed=True, result="Successfully removed user from the group '%s'" % gitlab_user)
+                group.remove_user_from_group(gitlab_user_id, gitlab_group_id)
+                module.exit_json(changed=True, result="Successfully removed user, '%s', from the group" % gitlab_user)
 
 
 if __name__ == '__main__':
