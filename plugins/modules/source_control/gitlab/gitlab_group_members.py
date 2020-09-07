@@ -14,7 +14,7 @@ short_description: Manage group members on GitLab Server
 description:
     - This module allows to add and remove members to/from a group, or change a member's access level in a group on GitLab.
 version_added: '1.2.0'
-author: 'Zainab Alsaffar (@zanssa)'
+author: Zainab Alsaffar (@zanssa)
 requirements:
     - python-gitlab python module <= 1.15.0
     - administrator rights on the GitLab server
@@ -31,12 +31,12 @@ options:
         type: str
     gitlab_group:
         description:
-            - The name of the GitLab group you want to add a member to, resp. remove from.
+            - The name of the GitLab group the member is added to/removed from.
         required: true
         type: str
     gitlab_user:
         description:
-            - The username of the member you want to add to/remove from the GitLab group.
+            - The username of the member to add to/remove from the GitLab group.
         required: true
         type: str
     access_level:
@@ -48,8 +48,8 @@ options:
     state:
         description:
             - State of the member in the group.
-            - On C(present), it will add a user to a GitLab group.
-            - On C(absent), will remove a user from a GitLab group.
+            - On C(present), it adds a user to a GitLab group.
+            - On C(absent), it removes a user from a GitLab group.
         choices: ['present', 'absent']
         default: 'present'
         type: str
@@ -211,7 +211,7 @@ def main():
             # add user to the group
             if not module.check_mode:
                 group.add_member_to_group(gitlab_user_id, gitlab_group_id, access_level)
-                module.exit_json(changed=True, result="Successfully added user '%s' to the group." % gitlab_user)
+            module.exit_json(changed=True, result="Successfully added user '%s' to the group." % gitlab_user)
         # state as absent
         else:
             module.exit_json(changed=False, result="User, '%s', is not a member in the group. No change to report" % gitlab_user)
@@ -223,7 +223,7 @@ def main():
             # remove the user from the group
             if not module.check_mode:
                 group.remove_user_from_group(gitlab_user_id, gitlab_group_id)
-                module.exit_json(changed=True, result="Successfully removed user, '%s', from the group" % gitlab_user)
+            module.exit_json(changed=True, result="Successfully removed user, '%s', from the group" % gitlab_user)
 
 
 if __name__ == '__main__':
