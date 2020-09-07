@@ -186,7 +186,7 @@ def run():
                         result = nomad_client.jobs.register_job(job)
                     else:
                         result = nomad_client.validate.validate_job(job)
-                        if not result.status_code is 200:
+                        if result.status_code is not 200:
                             module.fail_json(msg=to_native(result.text))
                         result = json.loads(result.text)
                     changed = True
@@ -208,7 +208,7 @@ def run():
                         result = nomad_client.jobs.register_job(job)
                     else:
                         result = nomad_client.validate.validate_job(job)
-                        if not result.status_code is 200:
+                        if result.status_code is not 200:
                             module.fail_json(msg=to_native(result.text))
                         result = json.loads(result.text)
                     changed = True
@@ -234,7 +234,7 @@ def run():
                         result = nomad_client.jobs.register_job(job)
                     else:
                         result = nomad_client.validate.validate_job(job)
-                        if not result.status_code is 200:
+                        if result.status_code is not 200:
                             module.fail_json(msg=to_native(result.text))
                         result = json.loads(result.text)
                     changed = True
