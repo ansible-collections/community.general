@@ -19,17 +19,17 @@ description:
 options:
     host:
       description:
-        - FQDN of nomad server.
+        - FQDN of Nomad server.
       required: true
       type: str
-    secure:
+    use_ssl:
       description:
-        - TLS/SSL connection.
+        - Use TLS/SSL connection.
       type: bool
       default: false
     timeout:
       description:
-        - Timeout (in seconds) for the request to nomad.
+        - Timeout (in seconds) for the request to Nomad.
       type: int
       default: 5
     validate_certs:
@@ -37,17 +37,17 @@ options:
         - Enable TLS/SSL certificate validation.
       type: bool
       default: true
-    cert:
+    client_cert:
       description:
-        - Path of certificate TLS/SSL.
+        - Path of certificate for TLS/SSL.
       type: path
-    key:
+    client_key:
       description:
-        - Path of certificate key TLS/SSL.
+        - Path of certificate's private key for TLS/SSL.
       type: path
     namespace:
       description:
-        - Namespace for nomad.
+        - Namespace for Nomad.
       type: str
     token:
       description:
@@ -56,6 +56,8 @@ options:
     name:
       description:
         - Name of job for delete,stop and start job without source.
+        - Name of job for delete, stop and start job without source.
+        - Either this or I(content) must be specified.
       type: str
     state:
       description:
@@ -70,11 +72,12 @@ options:
       default: false
     content:
       description:
-        - Content of nomad job.
+        - Content of Nomad job.
+        - Either this or I(name) must be specified.
       type: str
     content_format:
       description:
-        - Type of content of nomad job.
+        - Type of content of Nomad job.
       choices: ["hcl", "json"]
       default: hcl
       type: str
@@ -87,12 +90,12 @@ EXAMPLES = '''
     state: present
     content: "{{ lookup('ansible.builtin.file', 'job.hcl') }}"
     timeout: 120
-- name: stop job
+- name: Stop job
   community.general.nomad_job:
     host: localhost
     state: absent
     name: api
-- name: force job to start
+- name: Force job to start
   community.general.nomad_job:
     host: localhost
     state: present
@@ -121,11 +124,11 @@ def run():
         argument_spec=dict(
             host=dict(required=True, type='str'),
             state=dict(required=True, choices=['present', 'absent']),
-            secure=dict(type='bool', default=False),
+            use_ssl=dict(type='bool', default=False),
             timeout=dict(type='int', default=5),
             validate_certs=dict(type='bool', default=True),
-            cert=dict(type='path', default=None),
-            key=dict(type='path', default=None),
+            client_cert=dict(type='path', default=None),
+            client_key=dict(type='path', default=None),
             namespace=dict(type='str', default=None),
             name=dict(type='str', default=None),
             content_format=dict(choices=['hcl', 'json'], default='hcl'),
@@ -144,11 +147,11 @@ def run():
     if not import_nomad:
         module.fail_json(msg=missing_required_lib("python-nomad"))
 
-    certificate_ssl = (module.params.get('cert'), module.params.get('key'))
+    certificate_ssl = (module.params.get('client_cert'), module.params.get('client_key'))
 
     nomad_client = nomad.Nomad(
         host=module.params.get('host'),
-        secure=module.params.get('secure'),
+        secure=module.params.get('use_ssl'),
         timeout=module.params.get('timeout'),
         verify=module.params.get('validate_certs'),
         cert=certificate_ssl,
