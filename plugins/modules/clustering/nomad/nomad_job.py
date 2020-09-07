@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 module: nomad_job
 author: FERREIRA Christophe (@chris93111)
 version_added: "1.2.0"
-short_description: Launch an Nomad Job
+short_description: Launch a Nomad Job
 description:
     - Launch a Nomad job. See
       (https://www.nomadproject.io/api-docs/jobs/) for an overview.
@@ -186,7 +186,7 @@ def run():
                         result = nomad_client.jobs.register_job(job)
                     else:
                         result = nomad_client.validate.validate_job(job)
-                        if result.status_code is not 200:
+                        if not result.status_code == 200:
                             module.fail_json(msg=to_native(result.text))
                         result = json.loads(result.text)
                     changed = True
@@ -208,7 +208,7 @@ def run():
                         result = nomad_client.jobs.register_job(job)
                     else:
                         result = nomad_client.validate.validate_job(job)
-                        if result.status_code is not 200:
+                        if not result.status_code == 200:
                             module.fail_json(msg=to_native(result.text))
                         result = json.loads(result.text)
                     changed = True
@@ -234,7 +234,7 @@ def run():
                         result = nomad_client.jobs.register_job(job)
                     else:
                         result = nomad_client.validate.validate_job(job)
-                        if result.status_code is not 200:
+                        if not result.status_code == 200:
                             module.fail_json(msg=to_native(result.text))
                         result = json.loads(result.text)
                     changed = True
