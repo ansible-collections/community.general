@@ -113,7 +113,7 @@ options:
   force:
     description:
       - Allow to force stop VM.
-      - Can be used with states C(stopped) and C(restarted).
+      - Can be used with states C(stopped), C(restarted) and C(absent).
     default: no
     type: bool
   format:
@@ -1156,7 +1156,10 @@ def main():
                 module.exit_json(changed=False)
 
             if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'running':
-                module.exit_json(changed=False, msg="VM %s is running. Stop it before deletion." % vmid)
+                if module.params['force']:
+                    stop_vm(module, proxmox, vm, vmid, timeout, True)
+                else:
+                    module.exit_json(changed=False, msg="VM %s is running. Stop it before deletion or use force=yes." % vmid)
 
             taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE).delete(vmid)
             while timeout:
