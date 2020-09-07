@@ -10,12 +10,14 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: nomad_job
-author: "FERREIRA Christophe (@chris93111)"
+author: FERREIRA Christophe (@chris93111)
 version_added: "1.2.0"
 short_description: Launch an Nomad Job
 description:
-    - Launch an Nomad job. See
-      U(https://www.nomadproject.io/api-docs/jobs/) for an overview.
+    - Launch a Nomad job. See
+      (https://www.nomadproject.io/api-docs/jobs/) for an overview.
+requirements:
+  - python-nomad
 options:
     host:
       description:
@@ -90,11 +92,13 @@ EXAMPLES = '''
     state: present
     content: "{{ lookup('ansible.builtin.file', 'job.hcl') }}"
     timeout: 120
+
 - name: Stop job
   community.general.nomad_job:
     host: localhost
     state: absent
     name: api
+
 - name: Force job to start
   community.general.nomad_job:
     host: localhost
@@ -136,6 +140,7 @@ def run():
             force_start=dict(type='bool', default=False),
             token=dict(type='str', default=None, no_log=True)
         ),
+        supports_check_mode=True,
         mutually_exclusive=[
             ["name", "content"]
         ],
@@ -162,7 +167,7 @@ def run():
     if module.params.get('state') == "present":
 
         if module.params.get('name') and not module.params.get('force_start'):
-            module.fail_json(msg='for start job with name, force_start is needed')
+            module.fail_json(msg='For start job with name, force_start is needed')
 
         changed = False
         if module.params.get('content'):
@@ -177,7 +182,13 @@ def run():
                 job = dict()
                 job['job'] = job_json
                 try:
-                    result = nomad_client.jobs.register_job(job)
+                    if not module.check_mode:
+                        result = nomad_client.jobs.register_job(job)
+                    else:
+                        result = nomad_client.validate.validate_job(job)
+                        if not result.status_code is 200:
+                            module.fail_json(msg=to_native(result.text))
+                        result = json.loads(result.text)
                     changed = True
                 except Exception as e:
                     module.fail_json(msg=to_native(e))
@@ -193,7 +204,13 @@ def run():
                     msg = str(err.nomad_resp.reason) + " " + str(err.nomad_resp.text)
                     module.fail_json(msg=to_native(msg))
                 try:
-                    result = nomad_client.jobs.register_job(job)
+                    if not module.check_mode:
+                        result = nomad_client.jobs.register_job(job)
+                    else:
+                        result = nomad_client.validate.validate_job(job)
+                        if not result.status_code is 200:
+                            module.fail_json(msg=to_native(result.text))
+                        result = json.loads(result.text)
                     changed = True
                 except Exception as e:
                     module.fail_json(msg=to_native(e))
@@ -213,7 +230,13 @@ def run():
                     job_json['Status'] = 'running'
                     job_json['Stop'] = False
                     job['job'] = job_json
-                    result = nomad_client.jobs.register_job(job)
+                    if not module.check_mode:
+                        result = nomad_client.jobs.register_job(job)
+                    else:
+                        result = nomad_client.validate.validate_job(job)
+                        if not result.status_code is 200:
+                            module.fail_json(msg=to_native(result.text))
+                        result = json.loads(result.text)
                     changed = True
             except Exception as e:
                 module.fail_json(msg=to_native(e))
@@ -235,7 +258,8 @@ def run():
                 changed = False
                 result = job
             else:
-                result = nomad_client.job.deregister_job(job_name)
+                if not module.check_mode:
+                    result = nomad_client.job.deregister_job(job_name)
                 changed = True
         except Exception as e:
             module.fail_json(msg=to_native(e))
