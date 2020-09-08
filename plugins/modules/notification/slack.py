@@ -61,6 +61,12 @@ options:
     description:
       - Optional. Timestamp of parent message to thread this message. https://api.slack.com/docs/message-threading
     type: str
+  message_id:
+    description:
+      - Optional. Message ID to edit, instead of posting a new message.
+        Corresponds to C(ts) in the Slack API (U(https://api.slack.com/messaging/modifying)).
+    type: str
+    version_added: 1.2.0
   username:
     description:
       - This is the sender of the message.
@@ -204,16 +210,31 @@ EXAMPLES = """
     thread_id: "{{ slack_response['ts'] }}"
     color: good
     msg: 'And this is my threaded response!'
+
+- name: Send a message to be edited later on
+  community.general.slack:
+    token: thetoken/generatedby/slack
+    channel: '#ansible'
+    msg: Deploying something...
+  register: slack_response
+- name: Edit message
+  community.general.slack:
+    token: thetoken/generatedby/slack
+    channel: "{{ slack_response.channel }}"
+    msg: Deployment complete!
+    message_id: "{{ slack_response.ts }}"
 """
 
 import re
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url
-
 
 OLD_SLACK_INCOMING_WEBHOOK = 'https://%s/services/hooks/incoming-webhook?token=%s'
 SLACK_INCOMING_WEBHOOK = 'https://hooks.slack.com/services/%s'
 SLACK_POSTMESSAGE_WEBAPI = 'https://slack.com/api/chat.postMessage'
+SLACK_UPDATEMESSAGE_WEBAPI = 'https://slack.com/api/chat.update'
+SLACK_CONVERSATIONS_HISTORY_WEBAPI = 'https://slack.com/api/conversations.history'
 
 # Escaping quotes and apostrophes to avoid ending string prematurely in ansible call.
 # We do not escape other characters used as Slack metacharacters (e.g. &, <, >).
@@ -251,7 +272,7 @@ def recursive_escape_quotes(obj, keys):
 
 
 def build_payload_for_slack(module, text, channel, thread_id, username, icon_url, icon_emoji, link_names,
-                            parse, color, attachments, blocks):
+                            parse, color, attachments, blocks, message_id):
     payload = {}
     if color == "normal" and text is not None:
         payload = dict(text=escape_quotes(text))
@@ -259,7 +280,7 @@ def build_payload_for_slack(module, text, channel, thread_id, username, icon_url
         # With a custom color we have to set the message as attachment, and explicitly turn markdown parsing on for it.
         payload = dict(attachments=[dict(text=escape_quotes(text), color=color, mrkdwn_in=["text"])])
     if channel is not None:
-        if (channel[0] == '#') or (channel[0] == '@'):
+        if channel.startswith(('#', '@', 'C0')):
             payload['channel'] = channel
         else:
             payload['channel'] = '#' + channel
@@ -275,6 +296,8 @@ def build_payload_for_slack(module, text, channel, thread_id, username, icon_url
         payload['link_names'] = link_names
     if parse is not None:
         payload['parse'] = parse
+    if message_id is not None:
+        payload['ts'] = message_id
 
     if attachments is not None:
         if 'attachments' not in payload:
@@ -309,13 +332,37 @@ def build_payload_for_slack(module, text, channel, thread_id, username, icon_url
     return payload
 
 
+def get_slack_message(module, domain, token, channel, ts):
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer ' + token
+    }
+    qs = urlencode({
+        'channel': channel,
+        'ts': ts,
+        'limit': 1,
+        'inclusive': 'true',
+    })
+    url = SLACK_CONVERSATIONS_HISTORY_WEBAPI + '?' + qs
+    response, info = fetch_url(module=module, url=url, headers=headers, method='GET')
+    if info['status'] != 200:
+        module.fail_json(msg="failed to get slack message")
+    data = module.from_json(response.read())
+    if len(data['messages']) < 1:
+        module.fail_json(msg="no messages matching ts: %s" % ts)
+    if len(data['messages']) > 1:
+        module.fail_json(msg="more than 1 message matching ts: %s" % ts)
+    return data['messages'][0]
+
+
 def do_notify_slack(module, domain, token, payload):
     use_webapi = False
     if token.count('/') >= 2:
         # New style webhook token
         slack_uri = SLACK_INCOMING_WEBHOOK % (token)
     elif re.match(r'^xox[abp]-\S+$', token):
-        slack_uri = SLACK_POSTMESSAGE_WEBAPI
+        slack_uri = SLACK_UPDATEMESSAGE_WEBAPI if 'ts' in payload else SLACK_POSTMESSAGE_WEBAPI
         use_webapi = True
     else:
         if not domain:
@@ -363,7 +410,9 @@ def main():
             color=dict(type='str', default='normal'),
             attachments=dict(type='list', required=False, default=None),
             blocks=dict(type='list', elements='dict'),
-        )
+            message_id=dict(type='str', default=None),
+        ),
+        supports_check_mode=True,
     )
 
     domain = module.params['domain']
@@ -379,20 +428,38 @@ def main():
     color = module.params['color']
     attachments = module.params['attachments']
     blocks = module.params['blocks']
+    message_id = module.params['message_id']
 
     color_choices = ['normal', 'good', 'warning', 'danger']
     if color not in color_choices and not is_valid_hex_color(color):
         module.fail_json(msg="Color value specified should be either one of %r "
                              "or any valid hex value with length 3 or 6." % color_choices)
 
+    changed = True
+
+    # if updating an existing message, we can check if there's anything to update
+    if message_id is not None:
+        changed = False
+        msg = get_slack_message(module, domain, token, channel, message_id)
+        for key in ('icon_url', 'icon_emoji', 'link_names', 'color', 'attachments', 'blocks'):
+            if msg.get(key) != module.params.get(key):
+                changed = True
+                break
+        # if check mode is active, we shouldn't do anything regardless.
+        # if changed=False, we don't need to do anything, so don't do it.
+        if module.check_mode or not changed:
+            module.exit_json(changed=changed, ts=msg['ts'], channel=msg['channel'])
+    elif module.check_mode:
+        module.exit_json(changed=changed)
+
     payload = build_payload_for_slack(module, text, channel, thread_id, username, icon_url, icon_emoji, link_names,
-                                      parse, color, attachments, blocks)
+                                      parse, color, attachments, blocks, message_id)
     slack_response = do_notify_slack(module, domain, token, payload)
 
     if 'ok' in slack_response:
         # Evaluate WebAPI response
         if slack_response['ok']:
-            module.exit_json(changed=True, ts=slack_response['ts'], channel=slack_response['channel'],
+            module.exit_json(changed=changed, ts=slack_response['ts'], channel=slack_response['channel'],
                              api=slack_response, payload=payload)
         else:
             module.fail_json(msg="Slack API error", error=slack_response['error'])
