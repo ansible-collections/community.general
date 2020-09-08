@@ -1485,6 +1485,7 @@ macros:
   team_scaleway: QuentinBrosse abarbare jerome-quere kindermoumoute remyleone
   team_solaris: bcoca fishman jasperla jpdasma mator scathatheworm troy2914 xen0l
   team_suse: commel dcermak evrardjp lrupp toabctl
+<<<<<<< HEAD
   team_virt: joshainglis karmab
 <<<<<<< HEAD
   team_vultr: Spredzy resmo
@@ -1495,3 +1496,6 @@ macros:
 >>>>>>> 24405289fe (removing zabbix modules and their references due to migration to a dedicated collection (#11))
 =======
 >>>>>>> 6ccf3682ac (vultr migrated to dedicated collection ngine_io.vultr (#172))
+=======
+  team_virt: joshainglis karmab Aversiste
+>>>>>>> 10fb2ffe5d (BOTMETA.yml: add a new team member to team_virt (#871))
