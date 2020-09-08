@@ -39,14 +39,14 @@ options:
     - Set the user's password, before 1.4 this was required.
     - Password can be passed unhashed or hashed (MD5-hashed).
     - Unhashed password is automatically hashed when saved into the
-      database if C(encrypted) option is set, otherwise it's saved in
+      database if I(encrypted) option is set, otherwise it's saved in
       plain text format.
     - When passing an MD5-hashed password, you must generate it with the format
       C('str["md5"] + md5[ password + username ]'), resulting in a total of
       35 characters. An easy way to do this is C(echo "md5$(echo -n
       'verysecretpasswordJOE' | md5sum | awk '{print $1}')").
     - Note that if the provided password string is already in MD5-hashed
-      format, then it is used as-is, regardless of C(encrypted) option.
+      format, then it is used as-is, regardless of I(encrypted) option.
     type: str
   db:
     description:
