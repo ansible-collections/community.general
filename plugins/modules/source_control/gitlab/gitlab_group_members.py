@@ -7,7 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: gitlab_group_members
 short_description: Manage group members on GitLab Server
@@ -24,7 +24,7 @@ options:
             - URL of a GitLab server.
         required: true
         type: str
-    access_token:
+    api_token:
         description:
             - A personal access token to authenticate with the GitLab API.
         required: true
@@ -57,11 +57,11 @@ notes:
     - Supports C(check_mode).
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Add a user to a GitLab Group
   community.general.gitlab_group_members:
     server_url: 'https://gitlab.example.com'
-    access_token: 'Your-Private-Token'
+    api_token: 'Your-Private-Token'
     gitlab_group: groupname
     gitlab_user: username
     access_level: developer
@@ -70,14 +70,13 @@ EXAMPLES = '''
 - name: Remove a user from a GitLab Group
   community.general.gitlab_group_members:
     server_url: 'https://gitlab.example.com'
-    access_token: 'Your-Private-Token'
+    api_token: 'Your-Private-Token'
     gitlab_group: groupname
     gitlab_user: username
     state: absent
 '''
 
-RETURN = '''
-'''
+RETURN = r''' # '''
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 import traceback
@@ -95,13 +94,17 @@ class GitLabGroup(object):
         self._module = module
         self._gitlab = gl
 
-    # check if user exists
-    def does_user_exist(self, gitlab_user):
-        return self._gitlab.users.list(username=gitlab_user)
+    # get user id if the user exists
+    def get_user_id(self, gitlab_user):
+        user_exists = self._gitlab.users.list(username=gitlab_user)
+        if user_exists:
+            return user_exists[0].id
 
-    # check if group exists
-    def does_group_exist(self, gitlab_group):
-        return self._gitlab.groups.list(search=gitlab_group)
+    # get group id if group exists
+    def get_group_id(self, gitlab_group):
+        group_exists = self._gitlab.groups.list(search=gitlab_group)
+        if group_exists:
+            return group_exists[0].id
 
     # check if the user is a member of the group
     def is_user_a_member(self, gitlab_group_id, gitlab_user_id):
@@ -141,7 +144,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             server_url=dict(type='str', required=True),
-            access_token=dict(type='str', required=True, no_log=True),
+            api_token=dict(type='str', required=True, no_log=True),
             gitlab_group=dict(type='str', required=True),
             gitlab_user=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['present', 'absent']),
@@ -154,7 +157,7 @@ def main():
         module.fail_json(msg=missing_required_lib('python-gitlab', url='https://python-gitlab.readthedocs.io/en/stable/'), exception=GITLAB_IMP_ERR)
 
     server_url = module.params['server_url']
-    access_token = module.params['access_token']
+    api_token = module.params['api_token']
     gitlab_group = module.params['gitlab_group']
     gitlab_user = module.params['gitlab_user']
     state = module.params['state']
@@ -174,31 +177,26 @@ def main():
 
     # connect to gitlab server
     try:
-        gl = gitlab.Gitlab(server_url, private_token=access_token)
+        gl = gitlab.Gitlab(server_url, private_token=api_token)
     except (gitlab.exceptions.GitlabAuthenticationError, gitlab.exceptions.GitlabGetError) as e:
         module.fail_json(msg="Failed to authenticate to GitLab Server: %s: %s" % (server_url, e))
 
     group = GitLabGroup(module, gl)
 
-    user_exists = group.does_user_exist(gitlab_user)
-    group_exists = group.does_group_exist(gitlab_group)
+    gitlab_user_id = group.get_user_id(gitlab_user)
+    gitlab_group_id = group.get_group_id(gitlab_group)
 
     # group doesn't exist
-    if not group_exists:
+    if not gitlab_group_id:
         module.fail_json(msg="group '%s' not found." % gitlab_group)
 
     # user doesn't exist
-    if not user_exists:
+    if not gitlab_user_id:
         if state == 'absent':
             module.exit_json(changed=False, result="user '%s' not found, and thus also not part of the group" % gitlab_user)
         else:
             module.fail_json(msg="user '%s' not found." % gitlab_user)
 
-    # get group id
-    gitlab_group_id = group_exists[0].id
-
-    # get user id
-    gitlab_user_id = user_exists[0].id
     is_user_a_member = group.is_user_a_member(gitlab_group_id, gitlab_user_id)
 
     # check if the user is a member in the group
