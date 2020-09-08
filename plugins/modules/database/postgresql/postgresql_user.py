@@ -156,7 +156,9 @@ notes:
 - If you specify PUBLIC as the user (role), then the privilege changes will apply to all users (roles).
   You may not specify password or role_attr_flags when the PUBLIC user is specified.
 - SCRAM-SHA-256-hashed passwords (SASL Authentication) require PostgreSQL version 10 or newer.
-  On the previous versions the whole hashed string will be used as a password.
+  On the previous versions the whole hashed string is used as a password.
+- 'Working with SCRAM-SHA-256-hashed passwords, be sure you use the I(environment:) variable
+  C(PGOPTIONS: "-c password_encryption=scram-sha-256") (see the provided example).'
 seealso:
 - module: community.general.postgresql_privs
 - module: community.general.postgresql_membership
