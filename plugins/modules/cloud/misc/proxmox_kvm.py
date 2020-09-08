@@ -709,7 +709,7 @@ def get_vminfo(module, proxmox, node, vmid, **kwargs):
     results['vmid'] = int(vmid)
 
 
-def settings(module, proxmox, vmid, node, name, timeout, **kwargs):
+def settings(module, proxmox, vmid, node, name, **kwargs):
     proxmox_node = proxmox.nodes(node)
 
     # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
@@ -721,7 +721,23 @@ def settings(module, proxmox, vmid, node, name, timeout, **kwargs):
         return False
 
 
-def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sockets, timeout, update, **kwargs):
+def wait_for_task(module, proxmox, node, taskid):
+    timeout = module.params['timeout']
+
+    while timeout:
+        task = proxmox.nodes(node).tasks(taskid).status.get()
+        if task['status'] == 'stopped' and task['exitstatus'] == 'OK':
+            # Wait an extra second as the API can be a ahead of the hypervisor
+            time.sleep(1)
+            return True
+        timeout = timeout - 1
+        if timeout == 0:
+            break
+        time.sleep(1)
+    return False
+
+
+def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sockets, update, **kwargs):
     # Available only in PVE 4
     only_v4 = ['force', 'protection', 'skiplock']
 
@@ -795,48 +811,29 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
     else:
         taskid = getattr(proxmox_node, VZ_TYPE).create(vmid=vmid, name=name, memory=memory, cpu=cpu, cores=cores, sockets=sockets, **kwargs)
 
-    while timeout:
-        if (proxmox_node.tasks(taskid).status.get()['status'] == 'stopped' and
-                proxmox_node.tasks(taskid).status.get()['exitstatus'] == 'OK'):
-            return True
-        timeout = timeout - 1
-        if timeout == 0:
-            module.fail_json(msg='Reached timeout while waiting for creating VM. Last line in task before timeout: %s' %
-                                 proxmox_node.tasks(taskid).log.get()[:1])
-        time.sleep(1)
-    return False
+    if not wait_for_task(module, proxmox, node, taskid):
+        module.fail_json(msg='Reached timeout while waiting for creating VM. Last line in task before timeout: %s' %
+                         proxmox_node.tasks(taskid).log.get()[:1])
+        return False
+    return True
 
 
-def start_vm(module, proxmox, vm, vmid, timeout):
+def start_vm(module, proxmox, vm, vmid):
     taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.start.post()
-    while timeout:
-        if (proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['status'] == 'stopped' and
-                proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
-            return True
-        timeout -= 1
-        if timeout == 0:
-            module.fail_json(msg='Reached timeout while waiting for starting VM. Last line in task before timeout: %s'
-                             % proxmox.nodes(vm[0]['node']).tasks(taskid).log.get()[:1])
-
-        time.sleep(1)
-    return False
+    if not wait_for_task(module, proxmox, vm[0]['node'], taskid):
+        module.fail_json(msg='Reached timeout while waiting for starting VM. Last line in task before timeout: %s' %
+                         proxmox.nodes(vm[0]['node']).tasks(taskid).log.get()[:1])
+        return False
+    return True
 
 
-def stop_vm(module, proxmox, vm, vmid, timeout, force):
-    if force:
-        taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.shutdown.post(forceStop=1)
-    else:
-        taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.shutdown.post()
-    while timeout:
-        if (proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['status'] == 'stopped' and
-                proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
-            return True
-        timeout -= 1
-        if timeout == 0:
-            module.fail_json(msg='Reached timeout while waiting for stopping VM. Last line in task before timeout: %s'
-                             % proxmox.nodes(vm[0]['node']).tasks(taskid).log.get()[:1])
-        time.sleep(1)
-    return False
+def stop_vm(module, proxmox, vm, vmid, force):
+    taskid = proxmox.nodes(vm[0]['node']).qemu(vmid).status.shutdown.post(forceStop=(1 if force else 0))
+    if not wait_for_task(module, proxmox, vm[0]['node'], taskid):
+        module.fail_json(msg='Reached timeout while waiting for stopping VM. Last line in task before timeout: %s' %
+                         proxmox.nodes(vm[0]['node']).tasks(taskid).log.get()[:1])
+        return False
+    return True
 
 
 def proxmox_version(proxmox):
@@ -943,7 +940,6 @@ def main():
     revert = module.params['revert']
     sockets = module.params['sockets']
     state = module.params['state']
-    timeout = module.params['timeout']
     update = bool(module.params['update'])
     vmid = module.params['vmid']
     validate_certs = module.params['validate_certs']
@@ -1004,14 +1000,14 @@ def main():
 
     if delete is not None:
         try:
-            settings(module, proxmox, vmid, node, name, timeout, delete=delete)
+            settings(module, proxmox, vmid, node, name, delete=delete)
             module.exit_json(changed=True, msg="Settings has deleted on VM {0} with vmid {1}".format(name, vmid))
         except Exception as e:
             module.fail_json(msg='Unable to delete settings on VM {0} with vmid {1}: '.format(name, vmid) + str(e))
 
     if revert is not None:
         try:
-            settings(module, proxmox, vmid, node, name, timeout, revert=revert)
+            settings(module, proxmox, vmid, node, name, revert=revert)
             module.exit_json(changed=True, msg="Settings has reverted on VM {0} with vmid {1}".format(name, vmid))
         except Exception as e:
             module.fail_json(msg='Unable to revert settings on VM {0} with vmid {1}: Maybe is not a pending task...   '.format(name, vmid) + str(e))
@@ -1027,7 +1023,7 @@ def main():
             elif not node_check(proxmox, node):
                 module.fail_json(msg="node '%s' does not exist in cluster" % node)
 
-            create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sockets, timeout, update,
+            create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sockets, update,
                       acpi=module.params['acpi'],
                       agent=module.params['agent'],
                       autostart=module.params['autostart'],
@@ -1111,7 +1107,7 @@ def main():
             if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'running':
                 module.exit_json(changed=False, msg="VM %s is already running" % vmid)
 
-            if start_vm(module, proxmox, vm, vmid, timeout):
+            if start_vm(module, proxmox, vm, vmid):
                 module.exit_json(changed=True, msg="VM %s started" % vmid)
         except Exception as e:
             module.fail_json(msg="starting of VM %s failed with exception: %s" % (vmid, e))
@@ -1128,7 +1124,7 @@ def main():
             if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'stopped':
                 module.exit_json(changed=False, msg="VM %s is already stopped" % vmid)
 
-            if stop_vm(module, proxmox, vm, vmid, timeout, force=module.params['force']):
+            if stop_vm(module, proxmox, vm, vmid, force=module.params['force']):
                 module.exit_json(changed=True, msg="VM %s is shutting down" % vmid)
         except Exception as e:
             module.fail_json(msg="stopping of VM %s failed with exception: %s" % (vmid, e))
@@ -1144,7 +1140,7 @@ def main():
             if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'stopped':
                 module.exit_json(changed=False, msg="VM %s is not running" % vmid)
 
-            if stop_vm(module, proxmox, vm, vmid, timeout, force=module.params['force']) and start_vm(module, proxmox, vm, vmid, timeout):
+            if stop_vm(module, proxmox, vm, vmid, force=module.params['force']) and start_vm(module, proxmox, vm, vmid):
                 module.exit_json(changed=True, msg="VM %s is restarted" % vmid)
         except Exception as e:
             module.fail_json(msg="restarting of VM %s failed with exception: %s" % (vmid, e))
@@ -1155,20 +1151,15 @@ def main():
             if not vm:
                 module.exit_json(changed=False)
 
-            if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'running':
-                module.exit_json(changed=False, msg="VM %s is running. Stop it before deletion." % vmid)
-
-            taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE).delete(vmid)
-            while timeout:
-                if (proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['status'] == 'stopped' and
-                        proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
-                    module.exit_json(changed=True, msg="VM %s removed" % vmid)
-                timeout -= 1
-                if timeout == 0:
-                    module.fail_json(msg='Reached timeout while waiting for removing VM. Last line in task before timeout: %s'
-                                     % proxmox.nodes(vm[0]['node']).tasks(taskid).log.get()[:1])
-
-                time.sleep(1)
+            proxmox_node = proxmox.nodes(vm[0]['node'])
+            if getattr(proxmox_node, VZ_TYPE)(vmid).status.current.get()['status'] == 'running':
+              module.exit_json(changed=False, msg="VM %s is running. Stop it before deletion or use force=yes." % vmid)
+            taskid = getattr(proxmox_node, VZ_TYPE).delete(vmid)
+            if not wait_for_task(module, proxmox, vm[0]['node'], taskid):
+                module.fail_json(msg='Reached timeout while waiting for removing VM. Last line in task before timeout: %s' %
+                                 proxmox_node.tasks(taskid).log.get()[:1])
+            else:
+                module.exit_json(changed=True, msg="VM %s removed" % vmid)
         except Exception as e:
             module.fail_json(msg="deletion of VM %s failed with exception: %s" % (vmid, e))
 
