@@ -29,6 +29,18 @@ options:
     description:
     - A description of this auto member rule.
     type: str
+  exclusive_regex:
+    description:
+    - List of dictionaries containing the attribute and expression.
+    type: list
+    elements: dict
+    aliases: ["automemberinclusiveregex"]
+  inclusive_regex:
+    description:
+    - List of dictionaries containing the attribute and expression.
+    type: list
+    elements: dict
+    aliases: ["automemberinclusiveregex"]
   type:
     description:
     - Grouping to which the rule applies
@@ -61,6 +73,12 @@ EXAMPLES = r'''
     name: ipaservers
     type: hostgroup
     description: Example host group rule
+    exclusive_regex:
+      - key: uid
+        expression: '^1234'
+    inclusive_regex:
+      - key: mail
+        expression: 'example\.com$'
     community.general.ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
@@ -217,9 +235,9 @@ def main():
     argument_spec.update(description=dict(type='str'),
                          cn=dict(type='str', required=True, aliases=['name']),
                          type=dict(type='str', choices=['group', 'hostgroup']),
-                         inclusive_regex=dict(type='list', aliases=[
+                         inclusive_regex=dict(type='list', elements='dict', aliases=[
                                               'automemberinclusiveregex']),
-                         exclusive_regex=dict(type='list', aliases=[
+                         exclusive_regex=dict(type='list', elements='dict', aliases=[
                                               'automemberexclusiveregex']),
                          state=dict(type='str', default='present', choices=['present', 'absent']))
 
