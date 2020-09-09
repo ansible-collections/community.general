@@ -3,13 +3,6 @@
 # Copyright: (c) 2017, Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import, division, print_function
-from ansible.module_utils._text import to_native
-from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec
-from ansible.module_utils.basic import AnsibleModule
-import traceback
-__metaclass__ = type
-
 DOCUMENTATION = r'''
 ---
 module: ipa_automember
@@ -45,7 +38,14 @@ options:
     description:
     - Grouping to which the rule applies
     required: true
+    type: str
     choices: ["group", "hostgroup"]
+  state:
+    description: State to ensure
+    required: false
+    default: present
+    choices: ["absent", "present"]
+    type: str
 extends_documentation_fragment:
 - community.general.ipa.documentation
 
@@ -109,6 +109,12 @@ automember:
   type: dict
 '''
 
+from __future__ import absolute_import, division, print_function
+from ansible.module_utils._text import to_native
+from ansible_collections.community.general.plugins.module_utils.ipa import IPAClient, ipa_argument_spec
+from ansible.module_utils.basic import AnsibleModule
+import traceback
+__metaclass__ = type
 
 class AutoMemberIPAClient(IPAClient):
     def __init__(self, module, host, port, protocol):
@@ -234,7 +240,7 @@ def main():
     argument_spec = ipa_argument_spec()
     argument_spec.update(description=dict(type='str'),
                          cn=dict(type='str', required=True, aliases=['name']),
-                         type=dict(type='str', choices=['group', 'hostgroup']),
+                         type=dict(type='str', required=True, choices=['group', 'hostgroup']),
                          inclusive_regex=dict(type='list', elements='dict', aliases=[
                                               'automemberinclusiveregex']),
                          exclusive_regex=dict(type='list', elements='dict', aliases=[
@@ -260,4 +266,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
