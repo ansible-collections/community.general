@@ -120,7 +120,7 @@ class AutoMemberIPAClient(IPAClient):
     def automember_add(self, name, rule):
         return self._post_json(method='automember_add', name=name, item=rule)
 
-    def automember_mod(self, name, member_type, rule):
+    def automember_mod(self, name, rule):
         return self._post_json(method='automember_mod', name=name, item=rule)
 
     def automember_del(self, name, member_type):
@@ -219,11 +219,11 @@ def ensure(module, client):
             if not module.check_mode:
                 client.automember_del(name=name, member_type=member_type)
 
-    if inclusive_regex is not None:
+    if inclusive_regex:
         changed = automember_condition_changed(
-            module, client, ipa_automember, exclusive_regex, 'automemberinclusiveregex') or changed
+            module, client, ipa_automember, inclusive_regex, 'automemberinclusiveregex') or changed
 
-    if exclusive_regex is not None:
+    if exclusive_regex:
         changed = automember_condition_changed(
             module, client, ipa_automember, exclusive_regex, 'automemberexclusiveregex') or changed
 
