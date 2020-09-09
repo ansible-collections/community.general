@@ -45,6 +45,13 @@ EXAMPLES = r'''
     name: admins
     type: group
     description: Example user group rule
+    exclusive_regex:
+      - key: uid
+        expression: '^1234'
+    inclusive_regex:
+      - key: mail
+        expression: 'example\.com$'
+
     community.general.ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
@@ -95,11 +102,17 @@ class AutoMemberIPAClient(IPAClient):
     def automember_add(self, name, rule):
         return self._post_json(method='automember_add', name=name, item=rule)
 
-    def automember_mod(self, name, rule):
+    def automember_mod(self, name, member_type, rule):
         return self._post_json(method='automember_mod', name=name, item=rule)
 
     def automember_del(self, name, member_type):
         return self._post_json(method='automember_del', name=name, item={'type': member_type})
+
+    def automember_add_condition(self, name, condition):
+        return self._post_json(method='automember_add_condition', name=name, item=condition)
+
+    def automember_remove_condition(self, name, condition):
+        return self._post_json(method='automember_remove_condition', name=name, item=condition)
 
 
 def get_automember_dict(member_type, description=None):
@@ -111,11 +124,45 @@ def get_automember_dict(member_type, description=None):
 
 
 def get_automember_diff(client, ipa_automember, module_automember):
-    non_updateable_keys = ['cn', 'dn', 'automembertargetgroup']
+    non_updateable_keys = ['cn', 'dn', 'automembertargetgroup',
+                           'automemberinclusiveregex', 'automemberexclusiveregex', 'type']
     for key in non_updateable_keys:
         if key in module_automember:
             del module_automember[key]
     return client.get_diff(ipa_data=ipa_automember, module_data=module_automember)
+
+
+def parse_list(regex):
+    regex_list = []
+    for k in regex:
+        regex_list.append('='.join(str(x) for x in k.values()))
+    return regex_list
+
+
+def automember_condition_changed(module, client, ipa_automember, regex, regex_type):
+    name = module.params['cn']
+    member_type = module.params['type']
+    ipa_list = ipa_automember.get(regex_type, [])
+    module_list = parse_list(regex)
+    changed = False
+    diff = set(list(ipa_list)) - set(list(module_list))
+    if len(diff) > 0:
+        changed = True
+        if not module.check_mode:
+            for item in diff:
+                key, val = item.split("=")
+                client.automember_remove_condition(
+                    name, condition={'type': member_type, 'key': key, regex_type: val})
+    diff = set(list(module_list)) - set(list(ipa_list))
+    if len(diff) > 0:
+        changed = True
+        if not module.check_mode:
+            for item in diff:
+                key, val = item.split("=")
+                client.automember_add_condition(
+                    name, condition={'type': member_type, 'key': key, regex_type: val})
+
+    return changed
 
 
 def ensure(module, client):
@@ -123,12 +170,15 @@ def ensure(module, client):
     state = module.params['state']
     description = module.params['description']
     member_type = module.params['type']
+    inclusive_regex = module.params['inclusive_regex']
+    exclusive_regex = module.params['exclusive_regex']
 
     module_automember = get_automember_dict(description=description,
                                             member_type=member_type)
     ipa_automember = client.automember_find(name=name, member_type=member_type)
     changed = False
     diff = None
+
     if state == 'present':
         if not ipa_automember:
             changed = True
@@ -144,12 +194,20 @@ def ensure(module, client):
                     data = {}
                     for key in diff:
                         data[key] = module_automember.get(key)
-                    return changed, client.automember_mod(name=name, rule=data)
+                    client.automember_mod(name=name, rule=data)
     else:
         if ipa_automember:
             changed = True
             if not module.check_mode:
                 client.automember_del(name=name, member_type=member_type)
+
+    if inclusive_regex is not None:
+        changed = automember_condition_changed(
+            module, client, ipa_automember, exclusive_regex, 'automemberinclusiveregex') or changed
+
+    if exclusive_regex is not None:
+        changed = automember_condition_changed(
+            module, client, ipa_automember, exclusive_regex, 'automemberexclusiveregex') or changed
 
     return changed, client.automember_find(name=name, member_type=member_type)
 
@@ -159,7 +217,11 @@ def main():
     argument_spec.update(description=dict(type='str'),
                          cn=dict(type='str', required=True, aliases=['name']),
                          type=dict(type='str', choices=['group', 'hostgroup']),
-                         state=dict(type='str', default='present', choices=['present', 'absent', 'enabled', 'disabled']))
+                         inclusive_regex=dict(type='list', aliases=[
+                                              'automemberinclusiveregex']),
+                         exclusive_regex=dict(type='list', aliases=[
+                                              'automemberexclusiveregex']),
+                         state=dict(type='str', default='present', choices=['present', 'absent']))
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True)
@@ -180,3 +242,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
