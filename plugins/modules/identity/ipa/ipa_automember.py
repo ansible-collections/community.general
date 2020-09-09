@@ -34,7 +34,7 @@ options:
     - List of dictionaries containing the attribute and expression.
     type: list
     elements: dict
-    aliases: ["automemberinclusiveregex"]
+    aliases: ["automemberexclusiveregex"]
   inclusive_regex:
     description:
     - List of dictionaries containing the attribute and expression.
