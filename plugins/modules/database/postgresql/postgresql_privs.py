@@ -169,6 +169,7 @@ notes:
   C(present) and I(grant_option) to C(no) (see examples).
 - Note that when revoking privileges from a role R, this role  may still have
   access via privileges granted to any role R is a member of including C(PUBLIC).
+- Note that when you use C(PUBLIC) role, the module always reports that the state has been changed.
 - Note that when revoking privileges from a role R, you do so as the user
   specified via I(login). If R has been granted the same privileges by
   another user also, R can still access database objects via these privileges.
@@ -783,6 +784,9 @@ class Connection(object):
 
         executed_queries.append(query)
         self.cursor.execute(query)
+        if roles == 'PUBLIC':
+            return True
+
         status_after = get_status(objs)
 
         def nonesorted(e):
@@ -1053,7 +1057,7 @@ def main():
                 objs = [obj.replace(':', ',') for obj in objs]
 
         # roles
-        if p.roles == 'PUBLIC':
+        if p.roles.upper() == 'PUBLIC':
             roles = 'PUBLIC'
         else:
             roles = p.roles.split(',')
