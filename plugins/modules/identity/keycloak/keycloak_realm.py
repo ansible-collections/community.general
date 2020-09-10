@@ -669,7 +669,7 @@ options:
     revoke_refresh_token:
         description:
             - Specifies whether a refresh token is revoked upon use.
-            - Also see I(refresh_token_max_reuse)
+            - Also see I(refresh_token_max_reuse).
         type: bool
         aliases:
             - revokeRefreshToken
