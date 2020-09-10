@@ -33,7 +33,7 @@ options:
         description:
             - State of the realm once this module has run.
             - On C(present), the realm will be created (or updated if it exists already).
-            - On C(absent), the realm will be removed if it exists
+            - On C(absent), the realm will be removed if it exists.
         choices: ['present', 'absent']
         type: str
         default: 'present'
