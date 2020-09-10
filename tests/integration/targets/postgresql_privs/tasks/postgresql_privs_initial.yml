@@ -343,6 +343,23 @@
     target_roles: "{{ db_user_with_dots2 }}"
     trust_input: no
 
+# Bugfix for https://github.com/ansible-collections/community.general/issues/857
+- name: Test passing lowercase PUBLIC role
+  become_user: "{{ pg_user }}"
+  become: yes
+  postgresql_privs:
+    db: "{{ db_name }}"
+    login_user: "{{ pg_user }}"
+    type: 'database'
+    privs: 'connect'
+    role: 'public'
+  register: result
+
+- assert:
+    that:
+    - result is changed
+    - result.queries == ["GRANT CONNECT ON database \"{{ db_name }}\" TO PUBLIC;"]
+
 #
 # Cleanup
 #
