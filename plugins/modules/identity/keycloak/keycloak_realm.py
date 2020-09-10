@@ -887,7 +887,7 @@ existing:
     sample: {}
 
 end_state:
-    description: realm representation of realm after module execution (sample is truncated)
+    description: Realm representation of realm after module execution (sample is truncated).
     returned: always
     type: dict
     sample: {
