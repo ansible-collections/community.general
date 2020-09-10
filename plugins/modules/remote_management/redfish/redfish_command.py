@@ -238,6 +238,21 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
 
+  - name: Set persistent boot device override
+    community.general.redfish_command:
+      category: Systems
+      command: EnableContinuousBootOverride
+      resource_id: 437XR1138R2
+      bootdevice: "{{ bootdevice }}"
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+  - name: Disable persistent boot device override
+    community.general.redfish_command:
+      category: Systems
+      command: DisableBootOverride
+
   - name: Set chassis indicator LED to blink
     community.general.redfish_command:
       category: Chassis
@@ -442,7 +457,7 @@ from ansible.module_utils._text import to_native
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["PowerOn", "PowerForceOff", "PowerForceRestart", "PowerGracefulRestart",
-                "PowerGracefulShutdown", "PowerReboot", "SetOneTimeBoot"],
+                "PowerGracefulShutdown", "PowerReboot", "SetOneTimeBoot", "EnableContinuousBootOverride", "DisableBootOverride"],
     "Chassis": ["IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"],
     "Accounts": ["AddUser", "EnableUser", "DeleteUser", "DisableUser",
                  "UpdateUserRole", "UpdateUserPassword", "UpdateUserName",
@@ -530,6 +545,13 @@ def main():
         'update_creds': module.params['update_creds']
     }
 
+    # Boot override options
+    boot_opts = {
+        'bootdevice': module.params['bootdevice'],
+        'uefi_target': module.params['uefi_target'],
+        'boot_next': module.params['boot_next']
+    }
+
     # VirtualMedia options
     virtual_media = module.params['virtual_media']
 
@@ -579,10 +601,14 @@ def main():
             if "Power" in command:
                 result = rf_utils.manage_system_power(command)
             elif command == "SetOneTimeBoot":
-                result = rf_utils.set_one_time_boot_device(
-                    module.params['bootdevice'],
-                    module.params['uefi_target'],
-                    module.params['boot_next'])
+                boot_opts['override_enabled'] = 'Once'
+                result = rf_utils.set_boot_override(boot_opts)
+            elif command == "EnableContinuousBootOverride":
+                boot_opts['override_enabled'] = 'Continuous'
+                result = rf_utils.set_boot_override(boot_opts)
+            elif command == "DisableBootOverride":
+                boot_opts['override_enabled'] = 'Disabled'
+                result = rf_utils.set_boot_override(boot_opts)
 
     elif category == "Chassis":
         result = rf_utils._find_chassis_resource()
