@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: keycloak_realm
 
-short_description: Allows administration of Keycloak realms via Keycloak API
+short_description: Allows administration of Keycloak realms through Keycloak API
 
 version_added: 1.2.0
 
