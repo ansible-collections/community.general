@@ -437,7 +437,7 @@ options:
     events_expiration:
         type: int
         description:
-            - If I(events_enabled) is True, this specifies the time after which events are expired
+            - If I(events_enabled) is C(True), this specifies the time after which events are expired
               automatically, in seconds.
         aliases:
             - eventsExpiration
