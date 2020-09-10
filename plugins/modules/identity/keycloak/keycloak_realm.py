@@ -17,8 +17,8 @@ version_added: 1.2.0
 
 
 description:
-    - This module allows the administration of Keycloak realms via the Keycloak REST API. It
-      requires access to the REST API via OpenID Connect; the user connecting and the client being
+    - This module allows the administration of Keycloak realms through the Keycloak REST API. It
+      requires access to the REST API through OpenID Connect; the user connecting and the client being
       used must have the requisite access rights. In a default Keycloak installation, admin-cli
       and an admin user would work, as would a separate client definition with the scope tailored
       to your needs and a user having the expected roles.
