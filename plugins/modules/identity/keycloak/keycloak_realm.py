@@ -461,7 +461,7 @@ options:
         type: str
         description:
             - Internal id of this realm. When a realm is created, this should be the same as I(realm) (and indeed
-              if you do not specify this parameter it will be set to I(realm) when creating a realm).
+              if you do not specify this parameter, it is set to I(realm) when creating a realm).
 
     internationalization_enabled:
         description:
