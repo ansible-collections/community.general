@@ -881,7 +881,7 @@ proposed:
     }
 
 existing:
-    description: realm representation of existing realm (sample is truncated)
+    description: Realm representation of existing realm (sample is truncated).
     returned: always
     type: dict
     sample: {}
