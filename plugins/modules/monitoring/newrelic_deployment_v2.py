@@ -29,13 +29,13 @@ options:
     type: str
   app_name:
     description:
-      - (one of app_name or application_id are required)
+      - (one of app_name or application_id is required)
         The value of app_name in the newrelic.yml file used by the application
     required: false
     type: str
   application_id:
     description:
-      - (one of app_name or application_id are required)
+      - (one of app_name or application_id is required)
         (see https://rpm.newrelic.com/api/explore/applications/list)
     required: false
     type: str
@@ -52,7 +52,7 @@ options:
   revision:
     description:
       - A revision number (e.g., git commit SHA)
-    required: false
+    required: true
     type: str
   user:
     description:
@@ -66,7 +66,6 @@ options:
     required: false
     default: 'yes'
     type: bool
-    version_added: 2.5.3
 '''
 
 EXAMPLES = \
