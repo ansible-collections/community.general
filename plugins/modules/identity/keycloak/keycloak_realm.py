@@ -465,7 +465,7 @@ options:
 
     internationalization_enabled:
         description:
-            - Specifies whether internationalization features are enabled for this realm.
+            - Enable internationalization features for this realm.
         type: bool
         aliases:
             - internationalizationEnabled
