@@ -873,7 +873,7 @@ msg:
   sample: Realm my-test-realm has been created.
 
 proposed:
-    description: realm representation of proposed changes to realm
+    description: Realm representation of proposed changes to realm.
     returned: always
     type: dict
     sample: {
