@@ -15,7 +15,7 @@ DOCUMENTATION = \
     '''
 ---
 module: newrelic_deployment_v2
-version_added: "0.1"
+version_added: "1.2.0"
 author: "Davinder Pal (@116davinder)"
 short_description: Notify newrelic about app deployments using newrelic v2 api
 description:
@@ -26,32 +26,39 @@ options:
     description:
       - API token, to place in the x-api-key header.
     required: true
+    type: str
   app_name:
     description:
       - (one of app_name or application_id are required)
         The value of app_name in the newrelic.yml file used by the application
     required: false
+    type: str
   application_id:
     description:
       - (one of app_name or application_id are required)
         (see https://rpm.newrelic.com/api/explore/applications/list)
     required: false
+    type: str
   changelog:
     description:
       - A list of changes for this deployment
     required: false
+    type: str
   description:
     description:
       - Text annotation for the deployment - notes for you
     required: false
+    type: str
   revision:
     description:
       - A revision number (e.g., git commit SHA)
     required: false
+    type: str
   user:
     description:
       - The name of the user/process that triggered this deployment
     required: false
+    type: str
   validate_certs:
     description:
       - If C(no), SSL certificates will not be validated.
