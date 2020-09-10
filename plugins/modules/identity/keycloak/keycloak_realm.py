@@ -785,6 +785,7 @@ options:
             - waitIncrementSeconds
 
 notes:
+    - Supports I(check_mode).
     - In the API, a realm representation has further fields which are not covered in this module
       since they have their own API endpoints and (hopefully) their own Ansible modules. Sorted by
       ansible_module, they are
