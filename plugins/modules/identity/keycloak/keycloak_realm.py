@@ -677,7 +677,7 @@ options:
     smtp_server:
         type: dict
         description:
-            - SMTP server configuration details for sending mails from Keycloak
+            - SMTP server configuration details for sending mails from Keycloak.
         aliases:
             - smtpServer
         suboptions:
