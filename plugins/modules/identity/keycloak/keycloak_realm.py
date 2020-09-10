@@ -1064,7 +1064,7 @@ def main():
     result['existing'] = before_realm
 
     # If the realm does not exist yet, before_realm is still empty
-    if before_realm == dict():
+    if not before_realm:
         if state == 'absent':
             # do nothing and exit
             if module._diff:
