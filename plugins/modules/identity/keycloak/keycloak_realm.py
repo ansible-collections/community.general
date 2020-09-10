@@ -867,7 +867,7 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-  description: Message as to what action was taken
+  description: Message as to what action was taken.
   returned: always
   type: str
   sample: Realm my-test-realm has been created.
