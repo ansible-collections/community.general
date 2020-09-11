@@ -109,7 +109,7 @@ options:
     type: str
   no_password_changes:
     description:
-    - If C(yes), doesn't inspect the database for password changes. Effective when
+    - If C(yes), does not inspect the database for password changes. Effective when
       C(pg_authid) is not accessible (such as in AWS RDS). Otherwise, makes
       password changes as necessary.
     default: no
