@@ -97,7 +97,7 @@ options:
     - Whether the password is stored hashed in the database.
     - You can pass the password that is already hashed or unhashed, and PostgreSQL
       ensures the stored password is hashed when I(encrypted=yes) is set.
-    - "Note: Postgresql 10 and newer doesn't support unhashed passwords."
+    - "Note: Postgresql 10 and newer does not support unhashed passwords."
     - Previous to Ansible 2.6, this was C(no) by default.
     default: yes
     type: bool
