@@ -10,22 +10,17 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: postgresql_user
-short_description: Add or remove a user (role) from a PostgreSQL server instance
+short_description: Create, alter, or remove a user (role) from a PostgreSQL server instance
 description:
-- Adds to or removes a user (role) from a PostgreSQL server instance
+- Creates, alters, or removes a user (role) from a PostgreSQL server instance
   ("cluster" in PostgreSQL terminology) and, optionally,
   grants the user access to an existing database or tables.
 - A user is a role with login privilege.
-- The fundamental function of the module is to create, or delete, users on
-  a PostgreSQL instance. Privilege assignment, or removal, is an optional
-  step, which works on one database at a time. This allows you to
-  call the module several times in the same playbook to modify the permissions on
-  different databases, or to grant permissions to already existing users.
-- You cannot remove a user until all the privileges have been stripped from it.
-  In such situation, if the module tries to remove the user, it fails.
-  To avoid this, the I(fail_on_user) option signals
-  the module to try to remove the user, but if not possible keep going; the
-  module reports if changes happened and separately if the user has been removed or not.
+- You can also use it to grant or revoke user's privileges in a particular database.
+- You cannot remove a user while it still has any privileges granted to it in any database.
+- Set I(fail_on_user) to C(no) to make the module ignore failures when trying to remove a user.
+  In this case, the module reports if changes happened as usual and separately reports
+  whether the user has been removed or not.
 options:
   name:
     description:
@@ -38,8 +33,8 @@ options:
     description:
     - Set the user's password, before 1.4 this was required.
     - Password can be passed unhashed or hashed (MD5-hashed).
-    - Unhashed password is automatically hashed when saved into the
-      database if I(encrypted) option is set, otherwise it is saved in
+    - An unhashed password is automatically hashed when saved into the
+      database if I(encrypted) is set, otherwise it is saved in
       plain text format.
     - When passing an MD5-hashed password, you must generate it with the format
       C('str["md5"] + md5[ password + username ]'), resulting in a total of
@@ -50,13 +45,13 @@ options:
     type: str
   db:
     description:
-    - Name of database to connect to and where user's permissions is granted.
+    - Name of database to connect to and where user's permissions are granted.
     type: str
     aliases:
     - login_db
   fail_on_user:
     description:
-    - If C(yes), fails when cannot remove the user (role). Otherwise just log and continue.
+    - If C(yes), fails when the user (role) cannot be removed. Otherwise just log and continue.
     default: yes
     type: bool
     aliases:
@@ -64,7 +59,7 @@ options:
   priv:
     description:
     - "Slash-separated PostgreSQL privileges string: C(priv1/priv2), where
-      you can define user's privileges for the database ( allowed options - 'CREATE',
+      you can define the user's privileges for the database ( allowed options - 'CREATE',
       'CONNECT', 'TEMPORARY', 'TEMP', 'ALL'. For example C(CONNECT) ) or
       for table ( allowed options - 'SELECT', 'INSERT', 'UPDATE', 'DELETE',
       'TRUNCATE', 'REFERENCES', 'TRIGGER', 'ALL'. For example
@@ -81,7 +76,7 @@ options:
                '[NO]INHERIT', '[NO]LOGIN', '[NO]REPLICATION', '[NO]BYPASSRLS' ]
   session_role:
     description:
-    - Switch to s session role after connecting.
+    - Switch to session role after connecting.
     - The specified session role must be a role that the current login_user is a member of.
     - Permissions checking for SQL commands is carried out as though the session role
       were the one that had logged in originally.
@@ -95,8 +90,10 @@ options:
   encrypted:
     description:
     - Whether the password is stored hashed in the database.
-    - You can pass the password that is already hashed or unhashed, and PostgreSQL
-      ensures the stored password is hashed when I(encrypted=yes) is set.
+    - You can specify an unhashed password, and PostgreSQL ensures
+      the stored password is hashed when I(encrypted=yes) is set.
+      If you specify a hashed password, the module uses it as-is,
+      regardless of the setting of I(encrypted).
     - "Note: Postgresql 10 and newer does not support unhashed passwords."
     - Previous to Ansible 2.6, this was C(no) by default.
     default: yes
@@ -109,9 +106,9 @@ options:
     type: str
   no_password_changes:
     description:
-    - If C(yes), does not inspect the database for password changes. Effective when
-      C(pg_authid) is not accessible (such as in AWS RDS). Otherwise, makes
-      password changes as necessary.
+    - If C(yes), does not inspect the database for password changes.
+      Useful when C(pg_authid) is not accessible (such as in AWS RDS).
+      Otherwise, makes password changes as necessary.
     default: no
     type: bool
   conn_limit:
@@ -120,7 +117,7 @@ options:
     type: int
   ssl_mode:
     description:
-      - Determines whether or with what priority a secure SSL TCP/IP connection is negotiated with the server.
+      - Determines how an SSL session is negotiated with the server.
       - See U(https://www.postgresql.org/docs/current/static/libpq-ssl.html) for more information on the modes.
       - Default of C(prefer) matches libpq default.
     type: str
@@ -139,7 +136,7 @@ options:
     elements: str
   comment:
     description:
-    - Adds a comment on the user (equal to the C(COMMENT ON ROLE) statement result).
+    - Adds a comment on the user (equivalent to the C(COMMENT ON ROLE) statement).
     type: str
     version_added: '0.2.0'
   trust_input:
@@ -159,7 +156,7 @@ notes:
   On the previous versions the whole hashed string is used as a password.
 - 'Working with SCRAM-SHA-256-hashed passwords, be sure you use the I(environment:) variable
   C(PGOPTIONS: "-c password_encryption=scram-sha-256") (see the provided example).'
-- Supports the check mode.
+- Supports check mode.
 seealso:
 - module: community.general.postgresql_privs
 - module: community.general.postgresql_membership
