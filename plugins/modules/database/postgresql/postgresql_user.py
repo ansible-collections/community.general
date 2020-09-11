@@ -156,7 +156,7 @@ notes:
   On the previous versions the whole hashed string is used as a password.
 - 'Working with SCRAM-SHA-256-hashed passwords, be sure you use the I(environment:) variable
   C(PGOPTIONS: "-c password_encryption=scram-sha-256") (see the provided example).'
-- Supports check mode.
+- Supports ``check_mode``.
 seealso:
 - module: community.general.postgresql_privs
 - module: community.general.postgresql_membership
