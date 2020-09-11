@@ -160,7 +160,7 @@ options:
                     - See I(browser_security_headers).
             actionTokenGeneratedByAdminLifespan:
                 description:
-                    - See I(action_token_generated_by_admin_lifespan)
+                    - See I(action_token_generated_by_admin_lifespan).
             actionTokenGeneratedByUserLifespan:
                 description:
                     - See I(action_token_generated_by_user_lifespan)
