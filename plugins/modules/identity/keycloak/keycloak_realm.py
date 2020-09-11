@@ -178,7 +178,7 @@ options:
                     - Override user-initiated action lifespan for execute actions, in seconds.
             bruteForceProtected:
                 description:
-                    - See I(brute_force_protected)
+                    - See I(brute_force_protected).
                 type: bool
             displayName:
                 description:
@@ -234,7 +234,7 @@ options:
             xRobotsTag:
                 type: str
                 description:
-                    - X-Robots-Tag browser header for this realm (see U(https://developers.google.com/search/reference/robots_meta_tag))
+                    - X-Robots-Tag browser header for this realm (see U(https://developers.google.com/search/reference/robots_meta_tag)).
                     - C(none) for no header.
             xXSSProtection:
                 type: str
@@ -263,7 +263,7 @@ options:
         type: list
         elements: str
         description:
-            - List of default groups for this realm. Usually with a prepended path, i.e. C(/test) for group C(test).
+            - List of default groups for this realm. Usually with a prepended path, in other words, C(/test) for group C(test).
         aliases:
             - defaultGroups
 
@@ -277,7 +277,7 @@ options:
     default_roles:
         type: list
         description:
-            - List of default roles for users of this realm
+            - List of default roles for users of this realm.
         elements: str
         aliases:
             - defaultRoles
@@ -299,7 +299,7 @@ options:
     display_name_html:
         type: str
         description:
-            - Displayed name of this realm (HTML)
+            - Displayed name of this realm (HTML).
         aliases:
             - displayNameHtml
 
@@ -312,7 +312,7 @@ options:
 
     duplicate_emails_allowed:
         description:
-            - Specifies whether multiple users are allowed to have the same email address.
+            - Allow multiple users to have the same email address.
         type: bool
         aliases:
             - duplicateEmailsAllowed
