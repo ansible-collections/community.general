@@ -333,7 +333,7 @@ options:
 
     enabled:
         description:
-            - Specifies whether this realm is enabled.
+            - Enable this realm.
         type: bool
 
     enabled_event_types:
