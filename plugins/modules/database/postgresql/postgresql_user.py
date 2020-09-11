@@ -39,7 +39,7 @@ options:
     - Set the user's password, before 1.4 this was required.
     - Password can be passed unhashed or hashed (MD5-hashed).
     - Unhashed password is automatically hashed when saved into the
-      database if I(encrypted) option is set, otherwise it's saved in
+      database if I(encrypted) option is set, otherwise it is saved in
       plain text format.
     - When passing an MD5-hashed password, you must generate it with the format
       C('str["md5"] + md5[ password + username ]'), resulting in a total of
