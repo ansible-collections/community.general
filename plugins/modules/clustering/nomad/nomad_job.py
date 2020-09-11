@@ -14,8 +14,9 @@ author: FERREIRA Christophe (@chris93111)
 version_added: "1.2.0"
 short_description: Launch a Nomad Job
 description:
-    - Launch a Nomad job. See
-      (https://www.nomadproject.io/api-docs/jobs/) for an overview.
+    - Launch a Nomad job.
+    - Stop a Nomad job.
+    - Force start a Nomad job
 requirements:
   - python-nomad
 options:
@@ -83,6 +84,12 @@ options:
       choices: ["hcl", "json"]
       default: hcl
       type: str
+notes:
+  - check_mode is supported
+seealso:
+  - name: Nomad jobs documentation
+    description: Complete documentation for Nomad api jobs.
+    link: https://www.nomadproject.io/api-docs/jobs/
 '''
 
 EXAMPLES = '''
