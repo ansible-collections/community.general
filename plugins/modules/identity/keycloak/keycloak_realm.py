@@ -132,7 +132,7 @@ options:
         description:
             - A freeform dict used by Keycloak and extensions to save further attributes for a realm.
               A non-exhaustive list of options is given below. Some of these are duplications of
-              other API keys -- as noted via references below.
+              other API keys -- as noted by references below.
         suboptions:
             _browser_header.contentSecurityPolicy:
                 type: str
