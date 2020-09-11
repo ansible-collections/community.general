@@ -149,7 +149,7 @@ options:
     version_added: '0.2.0'
 notes:
 - The module creates a user (role) with login privilege by default.
-  Use C(NOLOGIN) role_attr_flags to change this behaviour.
+  Use C(NOLOGIN) I(role_attr_flags) to change this behaviour.
 - If you specify C(PUBLIC) as the user (role), then the privilege changes apply to all users (roles).
   You may not specify password or role_attr_flags when the C(PUBLIC) user is specified.
 - SCRAM-SHA-256-hashed passwords (SASL Authentication) require PostgreSQL version 10 or newer.
