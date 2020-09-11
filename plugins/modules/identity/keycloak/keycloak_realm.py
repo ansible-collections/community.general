@@ -431,7 +431,7 @@ options:
 
     events_enabled:
         description:
-            - Specifies whether to save events or not.
+            - Save events.
         type: bool
         aliases:
             - eventsEnabled
