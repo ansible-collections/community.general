@@ -79,6 +79,7 @@ RETURN = """
   _raw:
     description:
       - value(s) stored in Credstash
+    type: str
 """
 
 import os

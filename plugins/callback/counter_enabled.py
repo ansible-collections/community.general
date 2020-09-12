@@ -6,11 +6,6 @@
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
-from ansible import constants as C
-from ansible.plugins.callback import CallbackBase
-from ansible.utils.color import colorize, hostcolor
-from ansible.template import Templar
-from ansible.playbook.task_include import TaskInclude
 
 DOCUMENTATION = '''
     callback: counter_enabled
@@ -25,6 +20,12 @@ DOCUMENTATION = '''
     requirements:
       - set as stdout callback in ansible.cfg  (stdout_callback = counter_enabled)
 '''
+
+from ansible import constants as C
+from ansible.plugins.callback import CallbackBase
+from ansible.utils.color import colorize, hostcolor
+from ansible.template import Templar
+from ansible.playbook.task_include import TaskInclude
 
 
 class CallbackModule(CallbackBase):

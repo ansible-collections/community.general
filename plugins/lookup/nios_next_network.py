@@ -74,7 +74,6 @@ RETURN = """
 _list:
   description:
     - The list of next network addresses available
-  returned: always
   type: list
 """
 
