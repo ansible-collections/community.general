@@ -59,13 +59,6 @@ options:
       - The name of the user/process that triggered this deployment
     required: false
     type: str
-  validate_certs:
-    description:
-      - If C(no), SSL certificates will not be validated.
-        This should only be used for personal self-signed certificates.
-    required: false
-    default: 'yes'
-    type: bool
 '''
 
 EXAMPLES = \
@@ -97,7 +90,6 @@ def main():
             description=dict(required=False),
             revision=dict(required=True),
             user=dict(required=False),
-            validate_certs=dict(default='True', type='bool'),
         ),
         required_one_of=[['app_name', 'application_id']]
     )
