@@ -58,7 +58,7 @@ options:
       type: str
     name:
       description:
-        - Name of job for delete,stop and start job without source.
+        - Name of job for delete, stop and start job without source.
         - Name of job for delete, stop and start job without source.
         - Either this or I(content) must be specified.
       type: str
