@@ -152,6 +152,7 @@ branches:
   except:
     - "*-patch-*"
     - "revert-*-*"
+    - "patchback/backports/*"
 
 build:
   ci:
