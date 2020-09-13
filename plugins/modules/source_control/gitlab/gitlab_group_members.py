@@ -18,8 +18,9 @@ author: Zainab Alsaffar (@zanssa)
 requirements:
     - python-gitlab python module <= 1.15.0
     - administrator rights on the GitLab server
+extends_documentation_fragment: community.general.auth_basic
 options:
-    server_url:
+    api_url:
         description:
             - URL of a GitLab server.
         required: true
@@ -60,7 +61,7 @@ notes:
 EXAMPLES = r'''
 - name: Add a user to a GitLab Group
   community.general.gitlab_group_members:
-    server_url: 'https://gitlab.example.com'
+    api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
     gitlab_group: groupname
     gitlab_user: username
@@ -69,7 +70,7 @@ EXAMPLES = r'''
 
 - name: Remove a user from a GitLab Group
   community.general.gitlab_group_members:
-    server_url: 'https://gitlab.example.com'
+    api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
     gitlab_group: groupname
     gitlab_user: username
@@ -78,7 +79,11 @@ EXAMPLES = r'''
 
 RETURN = r''' # '''
 
+from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+
+from ansible_collections.community.general.plugins.module_utils.gitlab import gitlabAuthentication
+
 import traceback
 
 try:
@@ -141,22 +146,33 @@ class GitLabGroup(object):
 
 
 def main():
+    argument_spec = basic_auth_argument_spec()
+    argument_spec.update(dict(
+        api_token=dict(type='str', required=True, no_log=True),
+        gitlab_group=dict(type='str', required=True),
+        gitlab_user=dict(type='str', required=True),
+        state=dict(type='str', default='present', choices=['present', 'absent']),
+        access_level=dict(type='str', required=False, choices=['guest', 'reporter', 'developer', 'maintainer', 'owner'])
+    ))
+
     module = AnsibleModule(
-        argument_spec=dict(
-            server_url=dict(type='str', required=True),
-            api_token=dict(type='str', required=True, no_log=True),
-            gitlab_group=dict(type='str', required=True),
-            gitlab_user=dict(type='str', required=True),
-            state=dict(type='str', default='present', choices=['present', 'absent']),
-            access_level=dict(type='str', required=False, choices=['guest', 'reporter', 'developer', 'maintainer', 'owner'])
-        ),
-        supports_check_mode=True
+        argument_spec=argument_spec,
+        mutually_exclusive=[
+            ['api_username', 'api_token'],
+            ['api_password', 'api_token'],
+        ],
+        required_together=[
+            ['api_username', 'api_password'],
+        ],
+        required_one_of=[
+            ['api_username', 'api_token']
+        ],
+        supports_check_mode=True,
     )
 
     if not HAS_PY_GITLAB:
         module.fail_json(msg=missing_required_lib('python-gitlab', url='https://python-gitlab.readthedocs.io/en/stable/'), exception=GITLAB_IMP_ERR)
 
-    server_url = module.params['server_url']
     api_token = module.params['api_token']
     gitlab_group = module.params['gitlab_group']
     gitlab_user = module.params['gitlab_user']
@@ -176,10 +192,7 @@ def main():
         access_level = access_level_int[access_level]
 
     # connect to gitlab server
-    try:
-        gl = gitlab.Gitlab(server_url, private_token=api_token)
-    except (gitlab.exceptions.GitlabAuthenticationError, gitlab.exceptions.GitlabGetError) as e:
-        module.fail_json(msg="Failed to authenticate to GitLab Server: %s: %s" % (server_url, e))
+    gl = gitlabAuthentication(module)
 
     group = GitLabGroup(module, gl)
 

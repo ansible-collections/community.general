@@ -9,7 +9,7 @@
 
 - name: Add a User to A GitLab Group
   gitlab_group_members:  
-    server_url: '{{ gitlab_server_url }}'
+    api_url: '{{ gitlab_server_url }}'
     api_token: '{{ gitlab_api_access_token }}'
     gitlab_group: '{{ gitlab_group_name }}'
     gitlab_user: '{{ username }}'
@@ -18,7 +18,7 @@
 
 - name: Remove a User from A GitLab Group
   gitlab_group_members:
-    server_url: '{{ gitlab_server_url }}'
+    api_url: '{{ gitlab_server_url }}'
     api_token: '{{ gitlab_api_access_token }}'
     gitlab_group: '{{ gitlab_group_name }}'
     gitlab_user: '{{ username }}'
