@@ -20,11 +20,6 @@ requirements:
     - administrator rights on the GitLab server
 extends_documentation_fragment: community.general.auth_basic
 options:
-    api_url:
-        description:
-            - URL of a GitLab server.
-        required: true
-        type: str
     api_token:
         description:
             - A personal access token to authenticate with the GitLab API.
