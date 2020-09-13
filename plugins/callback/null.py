@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     callback: 'null'
-    type: stdout
+    callback_type: stdout
     requirements:
       - set as main display callback
     short_description: Don't display stuff to screen

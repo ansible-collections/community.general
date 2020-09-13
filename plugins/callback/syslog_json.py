@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     callback: syslog_json
-    type: notification
+    callback_type: notification
     requirements:
       - whitelist in configuration
     short_description: sends JSON events to syslog

@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
   callback: diy
-  type: stdout
+  callback_type: stdout
   short_description: Customize the output
   version_added: 0.2.0
   description:

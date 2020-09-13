@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     callback: hipchat
-    type: notification
+    callback_type: notification
     requirements:
       - whitelist in configuration.
       - prettytable (python lib)

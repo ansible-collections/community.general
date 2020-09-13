@@ -6,7 +6,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     callback: logdna
-    type: aggregate
+    callback_type: aggregate
     short_description: Sends playbook logs to LogDNA
     description:
       - This callback will report logs from playbook actions, tasks, and events to LogDNA (https://app.logdna.com)

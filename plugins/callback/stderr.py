@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     callback: stderr
-    type: stdout
+    callback_type: stdout
     requirements:
       - set as main display callback
     short_description: Splits output, sending failed tasks to stderr
