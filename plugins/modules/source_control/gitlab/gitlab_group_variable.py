@@ -29,7 +29,6 @@ options:
   state:
     description:
       - Create or delete group variable.
-      - Possible values are present and absent.
     default: present
     type: str
     choices: ["present", "absent"]
@@ -132,7 +131,6 @@ group_variable:
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_native
 from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.six import string_types
 from ansible.module_utils.six import integer_types
@@ -212,7 +210,7 @@ def native_python_main(this_gitlab, purge, var_list, state, module):
             protected = var_list[key].get('protected', False)
             variable_type = var_list[key].get('variable_type', 'env_var')
         else:
-            module.fail_json(msg="value must be of type string, integer or dict")
+            module.fail_json(msg="Value of %s variable must be of type string, integer or dict, passed %s" % (key, var_list[key].__class__.__name__))
 
         if key in existing_variables:
             index = existing_variables.index(key)
@@ -288,9 +286,9 @@ def main():
 
     this_gitlab = GitlabGroupVariables(module=module, gitlab_instance=gitlab_instance)
 
-    change, return_value = native_python_main(this_gitlab, purge, var_list, state, module)
+    changed, return_value = native_python_main(this_gitlab, purge, var_list, state, module)
 
-    module.exit_json(changed=change, group_variable=return_value)
+    module.exit_json(changed=changed, group_variable=return_value)
 
 
 if __name__ == '__main__':
