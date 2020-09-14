@@ -8,7 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 module: gitlab_group_variable
 short_description: Creates, updates, or deletes GitLab groups variables
 version_added: 1.2.0
