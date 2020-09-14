@@ -13,7 +13,7 @@ module: gitlab_group_variable
 short_description: Creates, updates, or deletes GitLab groups variables
 version_added: 1.2.0
 description:
-  - When a group variable does not exist, it will be created.
+  - Creates a group variable if it does not exist.
   - When a group variable does exist, its value will be updated when the values are different.
   - Variables which are untouched in the playbook, but are not untouched in the GitLab group,
     they stay untouched (I(purge) is C(false)) or will be deleted (I(purge) is C(true)).
