@@ -8,8 +8,14 @@
       - "'python' in basic_info"
       - "'python_version' in basic_info"
 
+- name: uninstall enum34 to avoid AttributeError
+  pip: 
+    name: enum34
+    state: absent
+
 - name: install sampleprojectpy2 to test extras
-  shell: pip uninstall -y enum34 && pip install --user sampleprojectpy2[test]
+  pip:
+    name: sampleprojectpy2[test]
 
 - name: run python_requirements_info module
   python_requirements_info:
