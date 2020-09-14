@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: gitlab_group_variable
-short_description: Creates/updates/deletes GitLab Groups Variables
+short_description: Creates, updates, or deletes GitLab groups variables
 version_added: 1.2.0
 description:
   - When a group variable does not exist, it will be created.
