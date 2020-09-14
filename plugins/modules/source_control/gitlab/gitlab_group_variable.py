@@ -18,7 +18,7 @@ description:
   - Variables which are untouched in the playbook, but are not untouched in the GitLab group,
     they stay untouched (I(purge) is C(false)) or will be deleted (I(purge) is C(true)).
 author:
-  - "Florent Madiot (@scodeman)"
+  - Florent Madiot (@scodeman)
 requirements:
   - python >= 2.7
   - python-gitlab python module
