@@ -83,7 +83,7 @@
     - result is not changed
     - result.query == "\nSELECT story FROM test_table\nWHERE id = 1 OR story = 'Данные'"
     - result.query_result[0].story == 'first'
-    - result.query_all_results[0][0].version == 'PostgreSQL 10.14 (Ubuntu 10.14-0ubuntu0.18.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit'
+    - result.query_all_results[0][0].version is search('PostgreSQL')
     - result.query_all_results[1][0].story == 'first'
     - result.rowcount == 2
     - result.statusmessage == 'SELECT 1' or result.statusmessage == 'SELECT'
