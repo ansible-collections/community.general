@@ -45,12 +45,12 @@ options:
     type: str
   purge:
     description:
-      - When set to true, all variables which are not untouched in the task will be deleted.
+      - When set to C(true), delete all variables which are not untouched in the task.
     default: false
     type: bool
   vars:
     description:
-      - When the list element is a simple key-value pair, masked and protected will be set to false.
+      - When the list element is a simple key-value pair, set masked and protected to false.
       - When the list element is a dict with the keys I(value), I(masked) and I(protected), the user can
         have full control about whether a value should be masked, protected or both.
       - Support for protected values requires GitLab >= 9.3.
@@ -58,7 +58,7 @@ options:
       - A I(value) must be a string or a number.
       - Field I(variable_type) must be a string with either C(env_var), which is the default, or C(file).
       - When a value is masked, it must be in Base64 and have a length of at least 8 characters.
-        See GitLab documentation on acceptable values for a masked variable (https://docs.gitlab.com/ce/ci/variables/#masked-variables).
+        See GitLab documentation on acceptable values for a masked variable (U(https://docs.gitlab.com/ce/ci/variables/#masked-variables)).
     default: {}
     type: dict
   note:
@@ -66,7 +66,7 @@ options:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Set or update some CI/CD variables
   community.general.gitlab_group_variable:
     api_url: https://gitlab.com
@@ -101,7 +101,7 @@ EXAMPLES = '''
       ACCESS_KEY_ID: abc123
 '''
 
-RETURN = '''
+RETURN = r'''
 group_variable:
   description: Four lists of the variablenames which were added, updated, removed or exist.
   returned: always
