@@ -168,7 +168,6 @@ def main():
     if not HAS_PY_GITLAB:
         module.fail_json(msg=missing_required_lib('python-gitlab', url='https://python-gitlab.readthedocs.io/en/stable/'), exception=GITLAB_IMP_ERR)
 
-    api_token = module.params['api_token']
     gitlab_group = module.params['gitlab_group']
     gitlab_user = module.params['gitlab_user']
     state = module.params['state']
