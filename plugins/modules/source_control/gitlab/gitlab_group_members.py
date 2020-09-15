@@ -106,10 +106,13 @@ class GitLabGroup(object):
         if group_exists:
             return group_exists[0].id
 
-    # check if the user is a member of the group
-    def is_user_a_member(self, gitlab_group_id, gitlab_user_id):
+    # get all members in a group
+    def get_members_in_a_group(self, gitlab_group_id):
         group = self._gitlab.groups.get(gitlab_group_id)
-        members = group.members.list()
+        return group.members.list()
+
+    # check if the user is a member of the group
+    def is_user_a_member(self, members, gitlab_user_id):
         for member in members:
             if member.id == gitlab_user_id:
                 return True
@@ -139,6 +142,23 @@ class GitLabGroup(object):
             self._module.fail_json(
                 msg="Failed to remove member from GitLab group, ID %s: %s" % (gitlab_group_id, e))
 
+    # get user's access level
+    def get_user_access_level(self, members, gitlab_user_id):
+        for member in members:
+            if member.id == gitlab_user_id:
+                return member.access_level
+
+    # update user's access level in a group
+    def update_user_access_level(self, members, gitlab_user_id, access_level):
+        for member in members:
+            if member.id == gitlab_user_id:
+                try:
+                    member.access_level = access_level
+                    member.save()
+                except (gitlab.exceptions.GitlabCreateError) as e:
+                    self._module.fail_json(
+                        msg="Failed to update the access level for the member, %s: %s" % (gitlab_user_id, e))
+
 
 def main():
     argument_spec = basic_auth_argument_spec()
@@ -160,7 +180,10 @@ def main():
             ['api_username', 'api_password'],
         ],
         required_one_of=[
-            ['api_username', 'api_token']
+            ['api_username', 'api_token'],
+        ],
+        required_if=[
+            ['state', 'present', ['access_level']],
         ],
         supports_check_mode=True,
     )
@@ -204,7 +227,8 @@ def main():
         else:
             module.fail_json(msg="user '%s' not found." % gitlab_user)
 
-    is_user_a_member = group.is_user_a_member(gitlab_group_id, gitlab_user_id)
+    members = group.get_members_in_a_group(gitlab_group_id)
+    is_user_a_member = group.is_user_a_member(members, gitlab_user_id)
 
     # check if the user is a member in the group
     if not is_user_a_member:
@@ -223,7 +247,15 @@ def main():
     # in case that a user is a member
     else:
         if state == 'present':
-            module.exit_json(changed=False, result="User, '%s', is already a member in the group. No change to report" % gitlab_user)
+            # compare the access level
+            user_access_level = group.get_user_access_level(members, gitlab_user_id)
+            if user_access_level == access_level:
+                module.exit_json(changed=False, result="User, '%s', is already a member in the group. No change to report" % gitlab_user)
+            else:
+                # update the access level for the user
+                if not module.check_mode:
+                    group.update_user_access_level(members, gitlab_user_id, access_level)
+                module.exit_json(changed=True, result="Successfully updated the access level for the user, '%s'" % gitlab_user)
         else:
             # remove the user from the group
             if not module.check_mode:
