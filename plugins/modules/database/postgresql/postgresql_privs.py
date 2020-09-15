@@ -1102,7 +1102,7 @@ def main():
         conn.rollback()
         module.fail_json(msg=to_native(e.message))
 
-    if module.check_mode:
+    if module.check_mode or not changed:
         conn.rollback()
     else:
         conn.commit()
