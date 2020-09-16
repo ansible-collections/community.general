@@ -27,7 +27,7 @@
     name:
       - pyOpenSSL
       # Yanked version which older versions of pip will still install:
-      - cffi!=1.14.3
+      - cffi>=1.14.2,!=1.14.3
   when: ansible_os_family == 'Darwin'
 
 - name: register pyOpenSSL version
