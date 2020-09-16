@@ -52,7 +52,7 @@ options:
     ini:
         - section: callback_mail
           key: bcc
-note:
+notes:
 - "TODO: expand configuration options now that plugins can leverage Ansible's configuration"
 '''
 

@@ -241,6 +241,8 @@ RETURN = """
 _raw:
   description:
     - secrets(s) requested
+  type: list
+  elements: dict
 """
 
 import os

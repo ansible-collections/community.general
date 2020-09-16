@@ -83,7 +83,6 @@ RETURN = """
 obj_type:
   description:
     - The object type specified in the terms argument
-  returned: always
   type: complex
   contains:
     obj_field:
