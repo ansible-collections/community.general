@@ -1,0 +1,2 @@
+bugfixes:
+- packet_net.py - fixed failure by changing object to use ``__dict__`` method.
