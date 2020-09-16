@@ -29,6 +29,8 @@ EXAMPLES = """
 RETURN = """
 _list:
   description: value(s) of key(s) in shelve file(s)
+  type: list
+  elements: str
 """
 import shelve
 

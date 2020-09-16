@@ -70,6 +70,8 @@ _list:
     description:
         - One or more JSON responses to C(GET /secrets/{path}).
         - See U(https://dsv.thycotic.com/api/index.html#operation/getSecret).
+    type: list
+    elements: dict
 """
 
 EXAMPLES = r"""

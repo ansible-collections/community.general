@@ -18,7 +18,7 @@ DOCUMENTATION = '''
             description:
                 - The list of keys to lookup on the Puppetmaster
             type: list
-            element_type: string
+            elements: string
             required: True
       _bin_file:
             description:
@@ -55,7 +55,8 @@ RETURN = """
     _raw:
         description:
             - a value associated with input key
-        type: strings
+        type: list
+        elements: str
 """
 
 import os

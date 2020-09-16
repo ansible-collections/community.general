@@ -14,7 +14,7 @@ DOCUMENTATION = '''
         become_user:
             description:
                 - User you 'become' to execute the task
-                - This plugin ignores this setting as pfexec uses it's own ``exec_attr`` to figure this out,
+                - This plugin ignores this setting as pfexec uses it's own C(exec_attr) to figure this out,
                   but it is supplied here for Ansible to make decisions needed for the task execution, like file permissions.
             default: root
             ini:
@@ -80,8 +80,8 @@ DOCUMENTATION = '''
               - name: ansible_pfexec_wrap_execution
             env:
               - name: ANSIBLE_PFEXEC_WRAP_EXECUTION
-    note:
-      - This plugin ignores ``become_user`` as pfexec uses it's own ``exec_attr`` to figure this out.
+    notes:
+      - This plugin ignores I(become_user) as pfexec uses it's own C(exec_attr) to figure this out.
 '''
 
 from ansible.plugins.become import BecomeBase

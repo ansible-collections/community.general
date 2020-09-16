@@ -78,7 +78,8 @@ EXAMPLES = """
 RETURN = """
   _raw:
     description:
-      - value(s) stored in Credstash
+      - Value(s) stored in Credstash.
+    type: str
 """
 
 import os

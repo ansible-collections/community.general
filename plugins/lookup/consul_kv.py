@@ -98,6 +98,7 @@ RETURN = """
   _raw:
     description:
       - Value(s) stored in consul.
+    type: dict
 """
 
 import os

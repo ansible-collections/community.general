@@ -34,7 +34,9 @@ EXAMPLES = """
 RETURN = """
   _raw:
     description:
-      - The value from the databag
+      - The value from the databag.
+    type: list
+    elements: dict
 """
 
 from ansible.errors import AnsibleError

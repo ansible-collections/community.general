@@ -40,6 +40,8 @@ RETURN = '''
 _raw:
     description:
         - base64 encoded file content
+    type: list
+    elements: str
 '''
 
 import base64
