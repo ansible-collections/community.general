@@ -233,10 +233,6 @@ def main():
     # check if the user is a member in the group
     if not is_user_a_member:
         if state == 'present':
-
-            if not access_level:
-                module.fail_json(msg="Access level must be entered for adding the member, '%s', to the GitLab group, '%s'." % (gitlab_user, gitlab_group))
-
             # add user to the group
             if not module.check_mode:
                 group.add_member_to_group(gitlab_user_id, gitlab_group_id, access_level)
