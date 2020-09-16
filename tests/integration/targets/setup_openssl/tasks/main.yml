@@ -24,10 +24,8 @@
 - name: Install pyOpenSSL (Darwin)
   become: True
   pip:
-    name:
-      - pyOpenSSL
-      # Yanked version which older versions of pip will still install:
-      - cffi>=1.14.2,!=1.14.3
+    name: pyOpenSSL
+    extra_args: "-c {{ remote_constraints }}"
   when: ansible_os_family == 'Darwin'
 
 - name: register pyOpenSSL version
