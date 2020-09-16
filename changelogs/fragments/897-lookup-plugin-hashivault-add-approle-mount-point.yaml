@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - hashi_vault - add missing ``mount_point`` parameter for approle auth
