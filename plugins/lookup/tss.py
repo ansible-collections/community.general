@@ -66,6 +66,8 @@ _list:
     description:
         - The JSON responses to C(GET /secrets/{id}).
         - See U(https://updates.thycotic.net/secretserver/restapiguide/TokenAuth/#operation--secrets--id--get).
+    type: list
+    elements: dict
 """
 
 EXAMPLES = r"""

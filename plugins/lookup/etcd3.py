@@ -94,6 +94,7 @@ DOCUMENTATION = '''
     seealso:
     - module: community.general.etcd3
     - ref: etcd_lookup
+      description: The etcd v2 lookup.
 
     requirements:
     - "etcd3 >= 0.10"

@@ -48,6 +48,8 @@ EXAMPLES = """
 RETURN = """
 _raw:
   description: value(s) stored in LMDB
+  type: list
+  elements: raw
 """
 
 
