@@ -441,7 +441,7 @@ class Migrations:
         for node in self._nodes:
             try:
                 cluster_key.add(self._info_cmd_helper(cmd, node))
-            except aerospike.exception.ServerError as e: # unstable-cluster is returned in form of Exception
+            except aerospike.exception.ServerError as e:  # unstable-cluster is returned in form of Exception
                 if 'unstable-cluster' in e.msg:
                     return False
                 raise e
