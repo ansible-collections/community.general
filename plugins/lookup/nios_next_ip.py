@@ -64,7 +64,6 @@ RETURN = """
 _list:
   description:
     - The list of next IP addresses available
-  returned: always
   type: list
 """
 

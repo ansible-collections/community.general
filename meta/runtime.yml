@@ -740,3 +740,16 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: The mysql module_utils has been moved to the community.mysql collection.
       redirect: community.mysql.mysql
+  callback:
+    actionable:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    full_skip:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    stderr:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details

@@ -67,6 +67,8 @@ EXAMPLES = """
 RETURN = """
 _raw:
   description: value(s) stored in Redis
+  type: list
+  elements: str
 """
 
 import os
