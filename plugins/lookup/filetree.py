@@ -103,10 +103,10 @@ RETURN = r"""
           type: int
         mtime:
           description: Time of last modification.
-          type: int
+          type: float
         ctime:
           description: Time of last metadata update or creation (depends on OS).
-          type: int
+          type: float
 """
 import os
 import pwd
