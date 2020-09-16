@@ -25,6 +25,7 @@
   become: True
   pip:
     name: pyOpenSSL
+    extra_args: "-c {{ remote_constraints }}"
   when: ansible_os_family == 'Darwin'
 
 - name: register pyOpenSSL version
