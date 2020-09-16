@@ -10,8 +10,8 @@ __metaclass__ = type
 DOCUMENTATION = '''
     name: gitlab_runners
     plugin_type: inventory
-    authors:
-      - Stefan Heitmüller (stefan.heitmueller@gmx.com)
+    author:
+      - Stefan Heitmüller (@morph027) <stefan.heitmueller@gmx.com>
     short_description: Ansible dynamic inventory plugin for GitLab runners.
     requirements:
         - python >= 2.7
