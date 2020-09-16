@@ -29,7 +29,7 @@ EXAMPLES = """
 
 RETURN = """
   _raw:
-    description: secrets stored
+    description: Secrets stored.
     type: list
     elements: str
 """

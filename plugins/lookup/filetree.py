@@ -53,20 +53,20 @@ EXAMPLES = r"""
 
 RETURN = r"""
   _raw:
-    description: list of dictionaries with file information
+    description: List of dictionaries with file information.
     type: list
     elements: dict
     contains:
         src:
           description:
-          - full path to file.
-          - not returned when C(item.state) is set to C(directory).
+          - Full path to file.
+          - Not returned when I(item.state) is set to C(directory).
           type: path
         root:
-          description: allows filtering by original location.
+          description: Allows filtering by original location.
           type: path
         path:
-          description: contains the relative path to root.
+          description: Contains the relative path to root.
           type: path
         mode:
           description: The permissions the resulting file or directory.
