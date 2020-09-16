@@ -1,0 +1,2 @@
+bugfixes:
+- launchd - fix for user-level services (https://github.com/ansible-collections/community.general/issues/896).
