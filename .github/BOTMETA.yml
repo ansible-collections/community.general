@@ -987,8 +987,9 @@ files:
   $modules/remote_management/oneview/oneview_fcoe_network.py:
     authors: fgbulsoni
   $modules/remote_management/redfish/:
-    authors: jose-delarosa
+    authors: jose-delarosa billdodd
     maintainers: $team_redfish
+    ignore: jose-delarosa
   $modules/remote_management/stacki/stacki_host.py:
     authors: bbyhuy
     maintainers: bsanders
