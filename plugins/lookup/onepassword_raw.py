@@ -62,6 +62,8 @@ EXAMPLES = """
 RETURN = """
   _raw:
     description: field data requested
+    type: list
+    elements: dict
 """
 
 import json

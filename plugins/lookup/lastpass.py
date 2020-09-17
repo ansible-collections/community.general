@@ -32,6 +32,8 @@ EXAMPLES = """
 RETURN = """
   _raw:
     description: secrets stored
+    type: list
+    elements: str
 """
 
 from subprocess import Popen, PIPE
