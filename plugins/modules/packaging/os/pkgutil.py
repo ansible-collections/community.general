@@ -30,7 +30,7 @@ options:
     - When using C(state=latest), this can be C('*'), which updates all installed packages managed by pkgutil.
     type: list
     required: true
-    type: str
+    elements: str
   site:
     description:
     - The repository path to install the package from.
@@ -189,7 +189,7 @@ def package_uninstall(module, pkgs):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='list', required=True, aliases=['pkg']),
+            name=dict(type='list', elements='str', required=True, aliases=['pkg']),
             state=dict(type='str', default='present', choices=['absent', 'installed', 'latest', 'present', 'removed']),
             site=dict(type='str'),
             update_catalog=dict(type='bool', default=False),
