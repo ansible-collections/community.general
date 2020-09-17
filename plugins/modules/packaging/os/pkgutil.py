@@ -46,13 +46,13 @@ options:
     default: present
   update_catalog:
     description:
-    - If you want to refresh your catalog from the mirror, set this to (C(yes)).
+    - If you want to refresh your catalog from the mirror, set this to C(yes).
     type: bool
     default: no
   force:
     description:
-    - Allows the update process to downgrade packages to what is present in the repostory set this to (C(yes)).
-    - It is useful as a rollback to stable from testing, and similar operations.
+    - To allow the update process to downgrade packages to match what is present in the repository, set this to C(yes).
+    - It is useful for rolling back to stable from testing, and similar operations.
     type: bool
 '''
 
