@@ -1,0 +1,4 @@
+bugfixes:
+  - terraform - fix incorrectly reporting a status of unchanged when
+    number of resources added or destroyed are multiples of 10
+    (https://github.com/ansible-collections/community.general/issues/561).
