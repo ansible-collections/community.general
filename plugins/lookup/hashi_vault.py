@@ -406,7 +406,7 @@ class HashiVault:
             self.client.auth_ldap(**params)
 
     def auth_approle(self):
-        params = self.get_options('role_id', 'secret_id')
+        params = self.get_options('role_id', 'secret_id', 'mount_point')
         self.client.auth_approle(**params)
 
     def auth_aws_iam_login(self):
