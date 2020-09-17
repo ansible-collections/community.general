@@ -20,7 +20,6 @@ description:
 - These were the native packages on Solaris <= 10 and are available as a legacy feature in Solaris 11.
 - Pkgutil is an advanced packaging system, which resolves dependency on installation.
   It is designed for CSW packages.
-version_added: '1.3'
 author:
 - Alexander Winkler (@dermute)
 - David Ponessa (@scathatheworm)
