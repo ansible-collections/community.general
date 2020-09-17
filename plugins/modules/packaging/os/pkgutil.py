@@ -31,6 +31,7 @@ options:
     type: list
     required: true
     elements: str
+    aliases: [ pkg ]
   site:
     description:
     - The repository path to install the package from.
