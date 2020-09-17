@@ -28,19 +28,23 @@ options:
     description:
       - Pass arbitrary arguments to kvm.
       - This option is for experts only!
+    type: str
     default: "-serial unix:/var/run/qemu-server/VMID.serial,server,nowait"
   api_host:
     description:
       - Specify the target host of the Proxmox VE cluster.
+    type: str
     required: true
   api_user:
     description:
       - Specify the user to authenticate with.
+    type: str
     required: true
   api_password:
     description:
       - Specify the password to authenticate with.
       - You can use C(PROXMOX_PASSWORD) environment variable.
+    type: str
   autostart:
     description:
       - Specify if the VM should be automatically restarted after crash (currently ignored in PVE API).
@@ -50,50 +54,62 @@ options:
     description:
       - Specify the amount of RAM for the VM in MB.
       - Using zero disables the balloon driver.
+    type: int
     default: 0
   bios:
     description:
       - Specify the BIOS implementation.
+    type: str
     choices: ['seabios', 'ovmf']
   boot:
     description:
       - Specify the boot order -> boot on floppy C(a), hard disk C(c), CD-ROM C(d), or network C(n).
       - You can combine to set order.
+    type: str
     default: cnd
   bootdisk:
     description:
       - Enable booting from specified disk. C((ide|sata|scsi|virtio)\d+)
+    type: str
   clone:
     description:
       - Name of VM to be cloned. If C(vmid) is setted, C(clone) can take arbitrary value but required for initiating the clone.
+    type: str
   cores:
     description:
       - Specify number of cores per socket.
+    type: int
     default: 1
   cpu:
     description:
       - Specify emulated CPU type.
+    type: str
     default: kvm64
   cpulimit:
     description:
       - Specify if CPU usage will be limited. Value 0 indicates no CPU limit.
       - If the computer has 2 CPUs, it has total of '2' CPU time
+    type: int
   cpuunits:
     description:
       - Specify CPU weight for a VM.
       - You can disable fair-scheduler configuration by setting this to 0
+    type: int
     default: 1000
   delete:
     description:
       - Specify a list of settings you want to delete.
+    type: str
   description:
     description:
       - Specify the description for the VM. Only used on the configuration web interface.
       - This is saved as comment inside the configuration file.
+    type: str
   digest:
     description:
       - Specify if to prevent changes if current configuration file has different SHA1 digest.
       - This can be used to prevent concurrent modifications.
+    type: str
   force:
     description:
       - Allow to force stop VM.
@@ -104,6 +120,7 @@ options:
     description:
       - Target drive's backing file's data format.
       - Used only with clone
+    type: str
     default: qcow2
     choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk" ]
   freeze:
@@ -127,14 +144,17 @@ options:
       - C(rombar=boolean) I(default=1) Specify whether or not the device's ROM will be visible in the guest's memory map.
       - C(x-vga=boolean) I(default=0) Enable vfio-vga device support.
       - /!\ This option allows direct access to host hardware. So it is no longer possible to migrate such machines - use with special care.
+    type: dict
   hotplug:
     description:
       - Selectively enable hotplug features.
       - This is a comma separated list of hotplug features C('network', 'disk', 'cpu', 'memory' and 'usb').
       - Value 0 disables hotplug completely and value 1 is an alias for the default C('network,disk,usb').
+    type: str
   hugepages:
     description:
       - Enable/disable hugepages memory.
+    type: str
     choices: ['any', '2', '1024']
   ide:
     description:
@@ -144,9 +164,11 @@ options:
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
+    type: dict
   keyboard:
     description:
       - Sets the keyboard layout for VNC server.
+    type: str
   kvm:
     description:
       - Enable/disable KVM hardware virtualization.
@@ -160,26 +182,32 @@ options:
   lock:
     description:
       - Lock/unlock the VM.
+    type: str
     choices: ['migrate', 'backup', 'snapshot', 'rollback']
   machine:
     description:
       - Specifies the Qemu machine type.
       - type => C((pc|pc(-i440fx)?-\d+\.\d+(\.pxe)?|q35|pc-q35-\d+\.\d+(\.pxe)?))
+    type: str
   memory:
     description:
       - Memory size in MB for instance.
+    type: int
     default: 512
   migrate_downtime:
     description:
       - Sets maximum tolerated downtime (in seconds) for migrations.
+    type: int
   migrate_speed:
     description:
       - Sets maximum speed (in MB/s) for migrations.
       - A value of 0 is no limit.
+    type: int
   name:
     description:
       - Specifies the VM name. Only used on the configuration web interface.
       - Required only for C(state=present).
+    type: str
   net:
     description:
       - A hash/dictionary of network interfaces for the VM. C(net='{"key":"value", "key":"value"}').
@@ -190,15 +218,18 @@ options:
       - The C(bridge) parameter can be used to automatically add the interface to a bridge device. The Proxmox VE standard bridge is called 'vmbr0'.
       - Option C(rate) is used to limit traffic bandwidth from and to this interface. It is specified as floating point number, unit is 'Megabytes per second'.
       - If you specify no bridge, we create a kvm 'user' (NATed) network device, which provides DHCP and DNS services.
+    type: dict
   newid:
     description:
       - VMID for the clone. Used only with clone.
       - If newid is not set, the next available VM ID will be fetched from ProxmoxAPI.
+    type: int
   node:
     description:
       - Proxmox VE node, where the new VM will be created.
       - Only required for C(state=present).
       - For other states, it will be autodiscovered.
+    type: str
   numa:
     description:
       - A hash/dictionaries of NUMA topology. C(numa='{"key":"value", "key":"value"}').
@@ -208,6 +239,7 @@ options:
       - C(hostnodes) Host NUMA nodes to use.
       - C(memory) Amount of memory this NUMA node provides.
       - C(policy) NUMA allocation policy.
+    type: dict
   onboot:
     description:
       - Specifies whether a VM will be started during system bootup.
@@ -217,6 +249,7 @@ options:
     description:
       - Specifies guest operating system. This is used to enable special optimization/features for specific operating systems.
       - The l26 is Linux 2.6/3.X Kernel.
+    type: str
     choices: ['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'l24', 'l26', 'solaris']
     default: l26
   parallel:
@@ -224,9 +257,11 @@ options:
       - A hash/dictionary of map host parallel devices. C(parallel='{"key":"value", "key":"value"}').
       - Keys allowed are - (parallel[n]) where 0 ≤ n ≤ 2.
       - Values allowed are - C("/dev/parport\d+|/dev/usb/lp\d+").
+    type: dict
   pool:
     description:
       - Add the new VM to the specified pool.
+    type: str
   protection:
     description:
       - Enable/disable the protection flag of the VM. This will enable/disable the remove VM and remove disk operations.
@@ -238,6 +273,7 @@ options:
   revert:
     description:
       - Revert a pending change.
+    type: str
   sata:
     description:
       - A hash/dictionary of volume used as sata hard disk or CD-ROM. C(sata='{"key":"value", "key":"value"}').
@@ -246,6 +282,7 @@ options:
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
+    type: dict
   scsi:
     description:
       - A hash/dictionary of volume used as SCSI hard disk or CD-ROM. C(scsi='{"key":"value", "key":"value"}').
@@ -254,9 +291,11 @@ options:
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
+    type: dict
   scsihw:
     description:
       - Specifies the SCSI controller model.
+    type: str
     choices: ['lsi', 'lsi53c810', 'virtio-scsi-pci', 'virtio-scsi-single', 'megasas', 'pvscsi']
   serial:
     description:
@@ -264,44 +303,54 @@ options:
       - Keys allowed are - serial[n](str; required) where 0 ≤ n ≤ 3.
       - Values allowed are - C((/dev/.+|socket)).
       - /!\ If you pass through a host serial device, it is no longer possible to migrate such machines - use with special care.
+    type: dict
   shares:
     description:
       - Rets amount of memory shares for auto-ballooning. (0 - 50000).
       - The larger the number is, the more memory this VM gets.
       - The number is relative to weights of all other running VMs.
       - Using 0 disables auto-ballooning, this means no limit.
+    type: int
   skiplock:
     description:
       - Ignore locks
       - Only root is allowed to use this option.
+    type: bool
   smbios:
     description:
       - Specifies SMBIOS type 1 fields.
+    type: str
   snapname:
     description:
       - The name of the snapshot. Used only with clone.
+    type: str
   sockets:
     description:
       - Sets the number of CPU sockets. (1 - N).
+    type: int
     default: 1
   startdate:
     description:
       - Sets the initial date of the real time clock.
       - Valid format for date are C('now') or C('2016-09-25T16:01:21') or C('2016-09-25').
+    type: str
   startup:
     description:
       - Startup and shutdown behavior. C([[order=]\d+] [,up=\d+] [,down=\d+]).
       - Order is a non-negative number defining the general startup order.
       - Shutdown in done with reverse ordering.
+    type: str
   state:
     description:
       - Indicates desired state of the instance.
       - If C(current), the current state of the VM will be fetched. You can access it with C(results.status)
+    type: str
     choices: ['present', 'started', 'absent', 'stopped', 'restarted','current']
     default: present
   storage:
     description:
       - Target storage for full clone.
+    type: str
   tablet:
     description:
       - Enables/disables the USB tablet device.
@@ -311,6 +360,7 @@ options:
     description:
       - Target node. Only allowed if the original VM is on shared storage.
       - Used only with clone
+    type: str
   tdf:
     description:
       - Enables/disables time drift fix.
@@ -323,6 +373,7 @@ options:
   timeout:
     description:
       - Timeout for operations.
+    type: int
     default: 30
   update:
     description:
@@ -339,9 +390,11 @@ options:
   vcpus:
     description:
       - Sets number of hotplugged vcpus.
+    type: int
   vga:
     description:
       - Select VGA type. If you want to use high resolution modes (>= 1280x1024x16) then you should use option 'std' or 'vmware'.
+    type: str
     choices: ['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']
     default: std
   virtio:
@@ -352,13 +405,16 @@ options:
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
+    type: dict
   vmid:
     description:
       - Specifies the VM ID. Instead use I(name) parameter.
       - If vmid is not set, the next available VM ID will be fetched from ProxmoxAPI.
+    type: int
   watchdog:
     description:
       - Creates a virtual hardware watchdog device.
+    type: str
 requirements: [ "proxmoxer", "requests" ]
 '''
 

@@ -20,19 +20,23 @@ options:
     choices: ['planned', 'present', 'absent']
     description:
       - Goal state of given stage/project
+    type: str
     default: present
   binary_path:
     description:
       - The path of a terraform binary to use, relative to the 'service_path'
         unless you supply an absolute path.
+    type: path
   project_path:
     description:
       - The path to the root of the Terraform directory with the
         vars.tf/main.tf/etc to use.
+    type: path
     required: true
   workspace:
     description:
       - The terraform workspace to work with.
+    type: str
     default: default
   purge_workspace:
     description:
@@ -46,11 +50,13 @@ options:
       - The path to an existing Terraform plan file to apply. If this is not
         specified, Ansible will build a new TF plan and execute it.
         Note that this option is required if 'state' has the 'planned' value.
+    type: path
   state_file:
     description:
       - The path to an existing Terraform state file to use when building plan.
         If this is not specified, the default `terraform.tfstate` will be used.
       - This option is ignored when plan is specified.
+    type: path
   variables_files:
     description:
       - The path to a variables file for Terraform to fill into the TF
@@ -63,19 +69,24 @@ options:
     description:
       - A group of key-values to override template variables or those in
         variables files.
+    type: dict
   targets:
     description:
       - A list of specific resources to target in this plan/application. The
         resources selected here will also auto-include any dependencies.
+    type: list
+    elements: str
   lock:
     description:
       - Enable statefile locking, if you use a service that accepts locks (such
         as S3+DynamoDB) to store your statefile.
     type: bool
+    default: true
   lock_timeout:
     description:
       - How long to maintain the lock on the statefile, if you use a service
         that accepts locks (such as S3+DynamoDB).
+    type: int
   force_init:
     description:
       - To avoid duplicating infra, if a state file can't be found this will
@@ -86,6 +97,7 @@ options:
   backend_config:
     description:
       - A group of key-values to provide at init stage to the -backend-config parameter.
+    type: dict
   backend_config_files:
     description:
       - The path to a configuration file to provide at init state to the -backend-config parameter.
@@ -281,7 +293,7 @@ def main():
             variables_files=dict(aliases=['variables_file'], type='list', elements='path', default=None),
             plan_file=dict(type='path'),
             state_file=dict(type='path'),
-            targets=dict(type='list', default=[]),
+            targets=dict(type='list', elements='str', default=[]),
             lock=dict(type='bool', default=True),
             lock_timeout=dict(type='int',),
             force_init=dict(type='bool', default=False),
