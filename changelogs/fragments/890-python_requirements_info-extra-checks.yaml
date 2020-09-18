@@ -1,3 +1,3 @@
 ---
 bugfixes:
-  - python_requirements_info does not parse poject[extra] syntax (https://github.com/ansible-collections/community.general/issues/731)
+  - python_requirements_info - does now parse ``project[extra]`` syntax (https://github.com/ansible-collections/community.general/issues/731).
