@@ -39,6 +39,7 @@ DOCUMENTATION = """
       description: If no token is specified, will try to read the token file from this path.
       env:
         - name: VAULT_TOKEN_PATH
+          version_added: 1.2.0
       ini:
         - section: lookup_hashi_vault
           key: token_path
