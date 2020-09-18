@@ -40,7 +40,7 @@ options:
     type: str
   state:
     description:
-    - Whether to install (C(present)), or remove (C(absent)) packages.
+    - Whether to install (C(present)/C(installed)), or remove (C(absent)/C(removed)) packages.
     - The upgrade (C(latest)) operation will update/install the packages to the latest version available.
     type: str
     choices: [ absent, installed, latest, present, removed ]
