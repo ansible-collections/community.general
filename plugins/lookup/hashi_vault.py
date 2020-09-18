@@ -117,6 +117,9 @@ DOCUMENTATION = """
       default: True
     namespace:
       description: Namespace where secrets reside. Requires HVAC 0.7.0+ and Vault 0.11+.
+      env:
+        - name: VAULT_NAMESPACE
+          version_added: 1.2.0
     aws_profile:
         description: The AWS profile
         type: str
