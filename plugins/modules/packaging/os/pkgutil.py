@@ -43,8 +43,8 @@ options:
     - Whether to install (C(present)/C(installed)), or remove (C(absent)/C(removed)) packages.
     - The upgrade (C(latest)) operation will update/install the packages to the latest version available.
     type: str
+    required: true
     choices: [ absent, installed, latest, present, removed ]
-    default: present
   update_catalog:
     description:
     - If you want to refresh your catalog from the mirror, set this to C(yes).
@@ -192,7 +192,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(type='list', elements='str', required=True, aliases=['pkg']),
-            state=dict(type='str', default='present', choices=['absent', 'installed', 'latest', 'present', 'removed']),
+            state=dict(type='str', required=True, choices=['absent', 'installed', 'latest', 'present', 'removed']),
             site=dict(type='str'),
             update_catalog=dict(type='bool', default=False),
             force=dict(type='bool', default=False),
