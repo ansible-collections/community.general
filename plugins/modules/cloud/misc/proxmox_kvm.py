@@ -968,7 +968,7 @@ def main():
             except Exception as e:
                 module.fail_json(msg="Can't get the next vmid for VM {0} automatically. Ensure your cluster state is good".format(name))
         else:
-            clone_target = name if not clone else clone
+            clone_target = clone or name
             try:
                 vmid = get_vmid(proxmox, clone_target)[0]
             except Exception as e:
