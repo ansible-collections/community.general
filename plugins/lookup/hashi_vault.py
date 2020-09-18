@@ -38,13 +38,17 @@ DOCUMENTATION = """
     token_path:
       description: If no token is specified, will try to read the token file from this path.
       env:
-        - name: HOME
+        - name: VAULT_TOKEN_PATH
+          version_added: 1.2.0
       ini:
         - section: lookup_hashi_vault
           key: token_path
       version_added: '0.2.0'
     token_file:
       description: If no token is specified, will try to read the token from this file in C(token_path).
+      env:
+        - name: VAULT_TOKEN_FILE
+          version_added: 1.2.0
       ini:
         - section: lookup_hashi_vault
           key: token_file
@@ -534,6 +538,11 @@ class LookupModule(LookupBase):
 
     def validate_auth_token(self, auth_method):
         if auth_method == 'token':
+            if not self.get_option('token_path'):
+                # generally we want env vars defined in the spec, but in this case we want
+                # the env var HOME to have lower precedence than any other value source,
+                # including ini, so we're doing it here after all other processing has taken place
+                self.set_option('token_path', os.environ.get('HOME'))
             if not self.get_option('token') and self.get_option('token_path'):
                 token_filename = os.path.join(
                     self.get_option('token_path'),
