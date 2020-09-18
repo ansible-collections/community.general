@@ -1153,7 +1153,7 @@ def main():
 
             proxmox_node = proxmox.nodes(vm[0]['node'])
             if getattr(proxmox_node, VZ_TYPE)(vmid).status.current.get()['status'] == 'running':
-              module.exit_json(changed=False, msg="VM %s is running. Stop it before deletion or use force=yes." % vmid)
+                module.exit_json(changed=False, msg="VM %s is running. Stop it before deletion." % vmid)
             taskid = getattr(proxmox_node, VZ_TYPE).delete(vmid)
             if not wait_for_task(module, proxmox, vm[0]['node'], taskid):
                 module.fail_json(msg='Reached timeout while waiting for removing VM. Last line in task before timeout: %s' %
