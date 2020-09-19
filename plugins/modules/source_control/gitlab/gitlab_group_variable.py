@@ -60,8 +60,8 @@ options:
         See GitLab documentation on acceptable values for a masked variable (U(https://docs.gitlab.com/ce/ci/variables/#masked-variables)).
     default: {}
     type: dict
-  notes:
-  - Supports I(check_mode).
+notes:
+- Supports I(check_mode).
 '''
 
 
