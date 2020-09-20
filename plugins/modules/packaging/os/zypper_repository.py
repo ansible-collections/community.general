@@ -143,7 +143,10 @@ def _parse_repos(module):
     """parses the output of zypper --xmlout repos and return a parse repo dictionary"""
     cmd = _get_cmd('--xmlout', 'repos')
 
-    from xml.dom.minidom import parseString as parseXML
+    try:
+        from xml.dom.minidom import parseString as parseXML
+    except ImportError:
+        module.fail_json(msg="python-xml is a requirement for zypper_repository module")
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     if rc == 0:
         repos = []
