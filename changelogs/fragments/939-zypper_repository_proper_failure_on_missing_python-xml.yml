@@ -1,0 +1,2 @@
+minor_changes:
+  - zypper_repository - proper failure when python-xml is missing (https://github.com/ansible-collections/community.general/pull/939).

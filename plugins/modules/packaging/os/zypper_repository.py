@@ -123,9 +123,19 @@ EXAMPLES = '''
     runrefresh: yes
 '''
 
+import traceback
+
+XML_IMP_ERR = None
+try:
+    from xml.dom.minidom import parseString as parseXML
+    HAS_XML = True
+except ImportError:
+    XML_IMP_ERR = traceback.format_exc()
+    HAS_XML = False
+
 from distutils.version import LooseVersion
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
 REPO_OPTS = ['alias', 'name', 'priority', 'enabled', 'autorefresh', 'gpgcheck']
@@ -143,7 +153,8 @@ def _parse_repos(module):
     """parses the output of zypper --xmlout repos and return a parse repo dictionary"""
     cmd = _get_cmd('--xmlout', 'repos')
 
-    from xml.dom.minidom import parseString as parseXML
+    if not HAS_XML:
+        module.fail_json(msg=missing_required_lib("python-xml"), exception=XML_IMP_ERR)
     rc, stdout, stderr = module.run_command(cmd, check_rc=False)
     if rc == 0:
         repos = []
