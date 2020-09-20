@@ -198,8 +198,12 @@ def native_python_main(this_gitlab, purge, var_list, state, module):
     existing_variables = [x.get_id() for x in gitlab_keys]
 
     for key in var_list:
+        if not isinstance(var_list[key], (string_types,integer_types, float, dict)):
+          module.fail_json(msg="Value of %s variable must be of type string, integer or dict, passed %s" % (key, var_list[key].__class__.__name__))
 
-        if isinstance(var_list[key], string_types) or isinstance(var_list[key], (integer_types, float)):
+    for key in var_list:
+
+        if isinstance(var_list[key], (string_types, integer_types, float)):
             value = var_list[key]
             masked = False
             protected = False
@@ -209,8 +213,6 @@ def native_python_main(this_gitlab, purge, var_list, state, module):
             masked = var_list[key].get('masked', False)
             protected = var_list[key].get('protected', False)
             variable_type = var_list[key].get('variable_type', 'env_var')
-        else:
-            module.fail_json(msg="Value of %s variable must be of type string, integer or dict, passed %s" % (key, var_list[key].__class__.__name__))
 
         if key in existing_variables:
             index = existing_variables.index(key)
