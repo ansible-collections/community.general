@@ -198,7 +198,7 @@ def native_python_main(this_gitlab, purge, var_list, state, module):
     existing_variables = [x.get_id() for x in gitlab_keys]
 
     for key in var_list:
-        if not isinstance(var_list[key], (string_types,integer_types, float, dict)):
+        if not isinstance(var_list[key], (string_types, integer_types, float, dict)):
           module.fail_json(msg="Value of %s variable must be of type string, integer or dict, passed %s" % (key, var_list[key].__class__.__name__))
 
     for key in var_list:
