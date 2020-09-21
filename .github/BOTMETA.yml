@@ -495,36 +495,36 @@ files:
     maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_ext.py:
     authors: Andersson007 andytom dschep strk
-    maintainers: Dorn- amenonsen jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
+    maintainers: Dorn- jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
   $modules/database/postgresql/:
     authors: Andersson007
-    maintainers: Dorn- amenonsen andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
+    maintainers: Dorn- andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
     keywords: database postgres postgresql
   $modules/database/postgresql/postgresql_lang.py:
     authors: andytom jensdepuydt
-    maintainers: Andersson007 Dorn- amenonsen jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
+    maintainers: Andersson007 Dorn- jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
   $modules/database/postgresql/postgresql_pg_hba.py:
     authors: sebasmannem
-    maintainers: Andersson007 Dorn- amenonsen andytom jbscalia kostiantyn-nemchenko matburt nerzhul tcraxs
+    maintainers: Andersson007 Dorn- andytom jbscalia kostiantyn-nemchenko matburt nerzhul tcraxs
   $modules/database/postgresql/postgresql_privs.py:
     authors: b6d tcraxs
-    maintainers: Andersson007 Dorn- amenonsen andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem
+    maintainers: Andersson007 Dorn- andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem
   $modules/database/postgresql/postgresql_publication.py:
     authors: Andersson007 nerzhul
-    maintainers: Dorn- amenonsen andytom jbscalia kostiantyn-nemchenko matburt sebasmannem tcraxs
+    maintainers: Dorn- andytom jbscalia kostiantyn-nemchenko matburt sebasmannem tcraxs
   $modules/database/postgresql/postgresql_query.py:
     authors: Andersson007 archf wrouesnel
   $modules/database/postgresql/postgresql_schema.py:
     authors: Dorn- andytom
-    maintainers: Andersson007 amenonsen jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
+    maintainers: Andersson007 jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
   $modules/database/postgresql/postgresql_sequence.py:
     authors: tcraxs
-    maintainers: Andersson007 Dorn- amenonsen andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem
+    maintainers: Andersson007 Dorn- andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem
   $modules/database/postgresql/postgresql_slot.py:
     authors: Andersson007 jscalia
   $modules/database/postgresql/postgresql_tablespace.py:
     authors: Andersson007 Dorn- antoinell
-    maintainers: amenonsen andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
+    maintainers: andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
   $modules/database/postgresql/postgresql_user.py:
     authors: ansible
     maintainers: $team_postgresql
@@ -1321,7 +1321,7 @@ macros:
   team_netvisor: Qalthos amitsi csharpe-pn pdam preetiparasar
   team_networking: NilashishC Qalthos danielmellado ganeshrn justjais trishnaguha
   team_oracle: manojmeda mross22 nalsaber
-  team_postgresql: Andersson007 Dorn- amenonsen andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
+  team_postgresql: Andersson007 Dorn- andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
   team_purestorage: bannaych dnix101 genegr lionmax opslounge raekins sdodsley sile16
   team_rabbitmq: chrishoffman manuel-sousa
   team_redfish: billdodd mraineri tomasg2012
