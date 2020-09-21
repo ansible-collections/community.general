@@ -5,6 +5,48 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+DOCUMENTATION = '''
+    name: stackpath_compute
+    plugin_type: inventory
+    short_description: StackPath Edge Computing inventory source
+    version_added: 1.2.0
+    requirements:
+        - requests
+    extends_documentation_fragment:
+        - inventory_cache
+        - constructed
+    description:
+        - Get inventory hosts from StackPath Edge Computing.
+        - Uses a YAML configuration file that ends with stackpath_compute.(yml|yaml).
+    options:
+        plugin:
+            description:
+                - A token that ensures this is a source file for the 'stackpath_compute' plugin.
+            required: true
+            choices: ['community.general.stackpath_compute']
+        client_id:
+            description: >
+                An OAuth client ID generated from the API Management section of the StackPath customer portal
+                U(https://control.stackpath.net/api-management)
+            requierd: true
+        client_secret:
+            description: >
+                An OAuth client secret generated from the API Management section of the StackPath customer portal
+                U(https://control.stackpath.net/api-management)
+            required: true
+        stack_ids:
+            description: >
+                A list of Stack IDs to query instances in. If no entry then get instances in all stacks on the account
+                U(https://developer.stackpath.com/docs/en/getting-started/#get-your-stack-id)
+            required: false
+        use_internal_ip:
+            description:
+                - Whether or not to use internal IP addresses, If false, uses external IP addresses, internal otherwise.
+            requiered: false
+            type: bool
+            default: false
+'''
+
 import json
 
 from ansible.errors import AnsibleError
@@ -23,59 +65,18 @@ except ImportError:
         'The stackpath_compute dynamic inventory plugin requires requests.'
     )
 
-DOCUMENTATION = '''
-    name: stackpath_compute
-    plugin_type: inventory
-    short_description: StackPath Edge Computing inventory source
-    requirements:
-        - requests
-    extends_documentation_fragment:
-        - inventory_cache
-        - constructed
-    description:
-        - Get inventory hosts from StackPath Edge Computing.
-        - Uses a YAML configuration file that ends with stackpath_compute.(yml|yaml).
-    options:
-        plugin:
-            description: >
-                A token that ensures this is a source file for the 'stackpath_compute' plugin.
-            required: True
-            choices: ['stackpath_compute']
-        client_id:
-            description: >
-                An OAuth client ID generated from the API Management section of the StackPath customer portal
-                U(https://control.stackpath.net/api-management)
-            requierd: True
-        client_secret:
-            description: >
-                An OAuth client secret generated from the API Management section of the StackPath customer portal
-                U(https://control.stackpath.net/api-management)
-            required: True
-        stack_ids:
-            description: >
-                A list of Stack IDs to query instnaces in. If no entry then get instances in all stacks on the account
-                U(https://developer.stackpath.com/docs/en/getting-started/#get-your-stack-id)
-            required: False
-        use_internal_ip:
-            description: >
-                Whether or not to use internal IP addresses, yes to use internal addresses, no to use external addresses.
-                Defaults to external
-            requiered: False
-            choices: ['yes', 'no']
-'''
 
 EXAMPLES = '''
 
-# example using credentials to fetch all workload instances in a stack.
+# Example using credentials to fetch all workload instances in a stack.
 ---
-plugin: stackpath_compute
+plugin: community.general.stackpath_compute
 client_id: my_client_id
 client_secret: my_client_secret
 stack_ids:
 - my_first_stack_id
 - my_other_stack_id
-use_internal_ip: no
-
+use_internal_ip: false
 '''
 
 display = Display()
@@ -94,8 +95,15 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.stack_id = None
         self.api_host = "https://gateway.stackpath.com"
         self.group_keys = [
-            "stackId", "workloadId", "cityCode",
-            "countryCode", "continent", "target", "name", "workloadSlug"]
+            "stackId",
+            "workloadId",
+            "cityCode",
+            "countryCode",
+            "continent",
+            "target",
+            "name",
+            "workloadSlug"
+        ]
 
     def _set_credentials(self):
         '''
@@ -115,7 +123,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             {
                 "client_id": self.client_id,
                 "client_secret": self.client_secret,
-                "grant_type": "client_credentials"
+                "grant_type": "client_credentials",
             }
         )
         headers = {
