@@ -146,7 +146,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 raise AnsibleError("Failed to get workloads from the StackPath API: %s" % traceback.format_exc())
             for workload in workloads:
                 try:
-                    workload_instances = self._stackpath_query_get_list(self.api_host + '/workload/v1/stacks/' + stack_slug + '/workloads/' + workload["id"] + '/instances')
+                    workload_instances = self._stackpath_query_get_list(
+                        self.api_host + '/workload/v1/stacks/' + stack_slug + '/workloads/' + workload["id"] + '/instances'
+                    )
                 except Exception:
                     raise AnsibleError("Failed to get workload instances from the StackPath API: %s" % traceback.format_exc())
                 for instance in workload_instances:
