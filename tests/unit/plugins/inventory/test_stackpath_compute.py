@@ -53,8 +53,9 @@ def test_get_stack_slugs(inventory):
             'accountId': 'XXXX'
         }
     ]
-    assert len(inventory._get_stack_slugs(stacks)) == 4
-    assert inventory._get_stack_slugs(stacks) == [
+    inventory._get_stack_slugs(stacks)
+    assert len(inventory.stack_slugs) == 4
+    assert inventory.stack_slugs == [
         "test1",
         "test2",
         "test3",
