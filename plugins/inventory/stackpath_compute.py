@@ -35,14 +35,15 @@ DOCUMENTATION = '''
                 U(https://control.stackpath.net/api-management)
             required: true
             type: string
-        stack_names:
+        stack_slugs:
             description:
-                - A list of Stack names to query instances in. If no entry then get instances in all stacks on the account
+                - A list of Stack slugs to query instances in. If no entry then get instances in all stacks on the account
             required: false
             type: list
         use_internal_ip:
-            description:
-                - Whether or not to use internal IP addresses, If false, uses external IP addresses, internal otherwise.
+            description: >
+                Whether or not to use internal IP addresses, If false, uses external IP addresses, internal otherwise.
+                If an instance doesn't have an external IP it will not be returned when this option is set to false.
             requiered: false
             type: bool
             default: false
@@ -54,9 +55,9 @@ EXAMPLES = '''
 plugin: community.general.stackpath_compute
 client_id: my_client_id
 client_secret: my_client_secret
-stack_names:
-- my_first_stack_name
-- my_other_stack_name
+stack_slugs:
+- my_first_stack_slug
+- my_other_stack_slug
 use_internal_ip: false
 '''
 
@@ -73,7 +74,6 @@ from ansible.plugins.inventory import (
 from ansible.utils.display import Display
 
 
-
 display = Display()
 
 
@@ -87,10 +87,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         # credentials
         self.client_id = None
         self.client_secret = None
-        self.stack_id = None
+        self.stack_slug = None
         self.api_host = "https://gateway.stackpath.com"
         self.group_keys = [
-            "stackId",
+            "stackSlug",
             "workloadId",
             "cityCode",
             "countryCode",
@@ -137,47 +137,32 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _query(self):
         results = []
+        workloads = []
         self._authenticate()
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + self.auth_token
-        }
-        for stack_id in self.stack_ids:
+        for stack_slug in self.stack_slugs:
             try:
-                resp = open_url(
-                    self.api_host + '/workload/v1/stacks/' + stack_id + '/workloads',
-                    headers=headers,
-                    method="GET"
-                )
-                status_code = resp.code
-                if status_code == 200:
-                    body = resp.read()
-                workloads = json.loads(body)["results"]
-            except Exception as e:
+                workloads = self._stackpath_query_get_list(self.api_host + '/workload/v1/stacks/' + stack_slug + '/workloads')
+            except Exception:
                 raise AnsibleError("Failed to get workloads from the StackPath API: %s" % traceback.format_exc())
             for workload in workloads:
                 try:
-                    resp = open_url(
-                        self.api_host + '/workload/v1/stacks/' + stack_id + '/workloads/' + workload["id"] + '/instances',
-                        headers=headers,
-                        method="GET"
-                    )
-                    status_code = resp.code
-                    if status_code == 200:
-                        body = resp.read()
-                    workload_instances = json.loads(body)["results"]
-                except Exception as e:
+                    workload_instances = self._stackpath_query_get_list(self.api_host + '/workload/v1/stacks/' + stack_slug + '/workloads/' + workload["id"] + '/instances')
+                except Exception:
                     raise AnsibleError("Failed to get workload instances from the StackPath API: %s" % traceback.format_exc())
                 for instance in workload_instances:
                     if instance["phase"] == "RUNNING":
-                        instance["stackId"] = stack_id
+                        instance["stackSlug"] = stack_slug
                         instance["workloadId"] = workload["id"]
                         instance["workloadSlug"] = workload["slug"]
                         instance["cityCode"] = instance["location"]["cityCode"]
                         instance["countryCode"] = instance["location"]["countryCode"]
                         instance["continent"] = instance["location"]["continent"]
                         instance["target"] = instance["metadata"]["labels"]["workload.platform.stackpath.net/target-name"]
-                        results.append(instance)
+                        try:
+                            ip = instance[self.hostname_key]
+                            results.append(instance)
+                        except KeyError:
+                            pass
         return results
 
     def _populate(self, instances):
@@ -189,23 +174,34 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 self.inventory.add_host(instance[self.hostname_key],
                                         group=group)
 
-    def _get_stack_ids(self):
+    def _stackpath_query_get_list(self, url):
         self._authenticate()
         headers = {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + self.auth_token
         }
-        resp = open_url(
-            self.api_host + '/stack/v1/stacks',
-            headers=headers,
-            method="GET"
-        )
-        status_code = resp.code
-        if status_code == 200:
-            body = resp.read()
-        stacks = json.loads(body)["results"]
-        print(stacks)
-        self.stack_ids = [stack["id"] for stack in stacks]
+        next_page = True
+        result = []
+        cursor = '-1'
+        while next_page:
+            resp = open_url(
+                url + '?page_request.first=10&page_request.after=%s' % cursor,
+                headers=headers,
+                method="GET"
+            )
+            status_code = resp.code
+            if status_code == 200:
+                body = resp.read()
+            body_json = json.loads(body)
+            result.extend(body_json["results"])
+            next_page = body_json["pageInfo"]["hasNextPage"]
+            if next_page:
+                cursor = body_json["pageInfo"]["endCursor"]
+        return result
+
+    def _get_stack_slugs(self):
+        stacks = self._stackpath_query_get_list(self.api_host + '/stack/v1/stacks')
+        self.stack_slugs = [stack["slug"] for stack in stacks]
 
     def verify_file(self, path):
         '''
@@ -237,11 +233,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         else:
             self.hostname_key = "externalIpAddress"
 
-        self.stack_ids = self.get_option('stack_ids')
-        if not self.stack_ids:
+        self.stack_slugs = self.get_option('stack_slugs')
+        if not self.stack_slugs:
             try:
-                self._get_stack_ids()
-            except Exception as e:
+                self._get_stack_slugs()
+            except Exception:
                 raise AnsibleError("Failed to get stack IDs from the Stackpath API: %s" % traceback.format_exc())
 
         cache_key = self.get_cache_key(path)
@@ -267,5 +263,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         # If the cache has expired/doesn't exist or
         # if refresh_inventory/flush cache is used
         # when the user is using caching, update the cached inventory
-        if cache_needs_update or (not cache and self.get_option('cache')):
-            self._cache[cache_key] = results
+        try:
+            if cache_needs_update or (not cache and self.get_option('cache')):
+                self._cache[cache_key] = results
+        except Exception:
+            raise AnsibleError("Failed to populate data: %s" % traceback.format_exc())
