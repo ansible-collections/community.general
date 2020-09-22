@@ -199,8 +199,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 cursor = body_json["pageInfo"]["endCursor"]
         return result
 
-    def _get_stack_slugs(self):
-        stacks = self._stackpath_query_get_list(self.api_host + '/stack/v1/stacks')
+    def _get_stack_slugs(self, stacks):
         self.stack_slugs = [stack["slug"] for stack in stacks]
 
     def verify_file(self, path):
@@ -236,7 +235,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self.stack_slugs = self.get_option('stack_slugs')
         if not self.stack_slugs:
             try:
-                self._get_stack_slugs()
+                stacks = self._stackpath_query_get_list(self.api_host + '/stack/v1/stacks')
+                self._get_stack_slugs(stacks)
             except Exception:
                 raise AnsibleError("Failed to get stack IDs from the Stackpath API: %s" % traceback.format_exc())
 
