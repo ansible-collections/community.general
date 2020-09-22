@@ -28,15 +28,18 @@ DOCUMENTATION = '''
                 An OAuth client ID generated from the API Management section of the StackPath customer portal
                 U(https://control.stackpath.net/api-management)
             requierd: true
+            type: string
         client_secret:
             description: >
                 An OAuth client secret generated from the API Management section of the StackPath customer portal
                 U(https://control.stackpath.net/api-management)
             required: true
-        stack_ids:
+            type: string
+        stack_names:
             description:
-                - A list of Stack slugs or IDs to query instances in. If no entry then get instances in all stacks on the account
+                - A list of Stack names to query instances in. If no entry then get instances in all stacks on the account
             required: false
+            type: list
         use_internal_ip:
             description:
                 - Whether or not to use internal IP addresses, If false, uses external IP addresses, internal otherwise.
@@ -51,9 +54,9 @@ EXAMPLES = '''
 plugin: community.general.stackpath_compute
 client_id: my_client_id
 client_secret: my_client_secret
-stack_ids:
-- my_first_stack_id
-- my_other_stack_id
+stack_names:
+- my_first_stack_name
+- my_other_stack_name
 use_internal_ip: false
 '''
 
