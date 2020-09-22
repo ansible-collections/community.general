@@ -1,4 +1,5 @@
-# Copyright (c) 2017 Ansible Project
+# Copyright (c) 2020 Shay Rybak <shay.rybak@stackpath.com>
+# Copyright (c) 2020 Ansible Project
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -10,8 +11,6 @@ DOCUMENTATION = '''
     plugin_type: inventory
     short_description: StackPath Edge Computing inventory source
     version_added: 1.2.0
-    requirements:
-        - requests
     extends_documentation_fragment:
         - inventory_cache
         - constructed
@@ -35,9 +34,8 @@ DOCUMENTATION = '''
                 U(https://control.stackpath.net/api-management)
             required: true
         stack_ids:
-            description: >
-                A list of Stack IDs to query instances in. If no entry then get instances in all stacks on the account
-                U(https://developer.stackpath.com/docs/en/getting-started/#get-your-stack-id)
+            description:
+                - A list of Stack slugs or IDs to query instances in. If no entry then get instances in all stacks on the account
             required: false
         use_internal_ip:
             description:
@@ -47,27 +45,7 @@ DOCUMENTATION = '''
             default: false
 '''
 
-import json
-
-from ansible.errors import AnsibleError
-from ansible.module_utils._text import to_native, to_text
-from ansible.plugins.inventory import (
-    BaseInventoryPlugin,
-    Constructable,
-    Cacheable
-)
-from ansible.utils.display import Display
-
-try:
-    import requests
-except ImportError:
-    raise AnsibleError(
-        'The stackpath_compute dynamic inventory plugin requires requests.'
-    )
-
-
 EXAMPLES = '''
-
 # Example using credentials to fetch all workload instances in a stack.
 ---
 plugin: community.general.stackpath_compute
@@ -79,12 +57,26 @@ stack_ids:
 use_internal_ip: false
 '''
 
+import traceback
+import json
+
+from ansible.errors import AnsibleError
+from ansible.module_utils.urls import open_url
+from ansible.plugins.inventory import (
+    BaseInventoryPlugin,
+    Constructable,
+    Cacheable
+)
+from ansible.utils.display import Display
+
+
+
 display = Display()
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
-    NAME = 'stackpath_compute'
+    NAME = 'community.general.stackpath_compute'
 
     def __init__(self):
         super(InventoryModule, self).__init__()
@@ -129,9 +121,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         headers = {
             "Content-Type": "application/json"
         }
-        self.auth_token = requests.post(
+        resp = open_url(
             self.api_host + '/identity/v1/oauth2/token',
-            headers=headers, data=payload).json()["access_token"]
+            headers=headers,
+            data=payload,
+            method="POST"
+        )
+        status_code = resp.code
+        if status_code == 200:
+            body = resp.read()
+        self.auth_token = json.loads(body)["access_token"]
 
     def _query(self):
         results = []
@@ -142,19 +141,30 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         }
         for stack_id in self.stack_ids:
             try:
-                workloads = requests.get(self.api_host + '/workload/v1/stacks/' +
-                                         stack_id + '/workloads',
-                                         headers=headers).json()["results"]
+                resp = open_url(
+                    self.api_host + '/workload/v1/stacks/' + stack_id + '/workloads',
+                    headers=headers,
+                    method="GET"
+                )
+                status_code = resp.code
+                if status_code == 200:
+                    body = resp.read()
+                workloads = json.loads(body)["results"]
             except Exception as e:
-                raise AnsibleError("Failed to get workloads from the StackPath API: %s" % to_native(e))
+                raise AnsibleError("Failed to get workloads from the StackPath API: %s" % traceback.format_exc())
             for workload in workloads:
                 try:
-                    workload_instances = requests.get(
-                        self.api_host + '/workload/v1/stacks/' + stack_id +
-                        '/workloads/' + workload["id"] + '/instances',
-                        headers=headers).json()["results"]
+                    resp = open_url(
+                        self.api_host + '/workload/v1/stacks/' + stack_id + '/workloads/' + workload["id"] + '/instances',
+                        headers=headers,
+                        method="GET"
+                    )
+                    status_code = resp.code
+                    if status_code == 200:
+                        body = resp.read()
+                    workload_instances = json.loads(body)["results"]
                 except Exception as e:
-                    raise AnsibleError("Failed to get workload instances from the StackPath API: %s" % to_native(e))
+                    raise AnsibleError("Failed to get workload instances from the StackPath API: %s" % traceback.format_exc())
                 for instance in workload_instances:
                     if instance["phase"] == "RUNNING":
                         instance["stackId"] = stack_id
@@ -182,8 +192,16 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             "Content-Type": "application/json",
             "Authorization": "Bearer " + self.auth_token
         }
-        stacks = requests.get(self.api_host + '/stack/v1/stacks',
-                              headers=headers).json()["results"]
+        resp = open_url(
+            self.api_host + '/stack/v1/stacks',
+            headers=headers,
+            method="GET"
+        )
+        status_code = resp.code
+        if status_code == 200:
+            body = resp.read()
+        stacks = json.loads(body)["results"]
+        print(stacks)
         self.stack_ids = [stack["id"] for stack in stacks]
 
     def verify_file(self, path):
@@ -221,7 +239,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             try:
                 self._get_stack_ids()
             except Exception as e:
-                raise AnsibleError("Failed to get stack IDs from the Stackpath API: %s" % to_native(e))
+                raise AnsibleError("Failed to get stack IDs from the Stackpath API: %s" % traceback.format_exc())
 
         cache_key = self.get_cache_key(path)
         # false when refresh_cache or --flush-cache is used
