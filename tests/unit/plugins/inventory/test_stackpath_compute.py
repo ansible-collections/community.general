@@ -17,7 +17,7 @@ def inventory():
     return InventoryModule()
 
 
-def _get_stack_slugs(inventory):
+def test_get_stack_slugs(inventory):
     stacks = [
         {
             'status': 'ACTIVE',
