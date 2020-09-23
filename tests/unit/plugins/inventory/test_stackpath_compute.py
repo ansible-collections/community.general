@@ -142,7 +142,7 @@ def test_populate(inventory):
         {
             "name": "instance3",
             "countryCode": "SE",
-            "workloadSlug": "wokrload3",
+            "workloadSlug": "workload3",
             "continent": "Europe",
             "workloadId": "id3",
             "cityCode": "ARN",
@@ -154,7 +154,7 @@ def test_populate(inventory):
         {
             "name": "instance4",
             "countryCode": "US",
-            "workloadSlug": "wokrload3",
+            "workloadSlug": "workload3",
             "continent": "America",
             "workloadId": "id4",
             "cityCode": "JFK",
