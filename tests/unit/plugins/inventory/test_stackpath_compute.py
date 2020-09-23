@@ -9,12 +9,14 @@ __metaclass__ = type
 import pytest
 
 from ansible.errors import AnsibleError
-from ansible_collections.community.general.plugins.inventory.stackpath_compute import InventoryModule
+from ansible_collections.community.general.plugins.inventory.stackpath_compute import InventoryModule, InventoryData
 
 
 @pytest.fixture(scope="module")
 def inventory():
-    return InventoryModule()
+    r = InventoryModule()
+    r.inventory = InventoryData()
+    return r
 
 
 def test_get_stack_slugs(inventory):
@@ -67,7 +69,7 @@ def test_authenticate(inventory):
     inventory.client_id = "abcdefg"
     inventory.client_secret = "bcdefgh"
     with pytest.raises(AnsibleError) as error_message:
-        inventory._build_client()
+        inventory._authenticate()
         assert 'HTTP Error 404' in error_message
 
 

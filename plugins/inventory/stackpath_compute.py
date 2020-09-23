@@ -103,14 +103,18 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _validate_config(self, config):
         if config['plugin'] != 'community.general.stackpath_compute':
             raise AnsibleError("plugin doesn't match this plugin")
-        if not config['client_id']:
+        try:
+            client_id = config['client_id']
+            if client_id != 32:
+                raise AnsibleError("client_id must be 32 characters long")
+        except KeyError:
             raise AnsibleError("config missing client_id, a required paramter")
-        if len(config['client_id']) != 32:
-            raise AnsibleError("client_id must be 32 characters long")
-        if not config['client_secret']:
-            raise AnsibleError("config missing client_secret, a required paramter")
-        if len(config['client_secret']) != 64:
-            raise AnsibleError("client_secret must be 64 characters long")
+        try:
+            client_secret = config['client_secret']
+            if client_secret != 64:
+                raise AnsibleError("client_secret must be 64 characters long")
+        except KeyError:
+            raise AnsibleError("config missing client_id, a required paramter")
         return True
 
     def _set_credentials(self):
@@ -175,7 +179,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return results
 
     def _populate(self, instances):
-        instances
         for instance in instances:
             for group_key in self.group_keys:
                 group = group_key + "_" + instance[group_key]
