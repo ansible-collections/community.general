@@ -187,7 +187,7 @@ def test_populate(inventory):
     group_target_target1 = inventory.inventory.groups['target_target1']
     assert 'workloadslug_workload3' in inventory.inventory.groups
     group_workloadslug_workload3 = inventory.inventory.groups['workloadslug_workload3']
-    assert 'workloadslug_workload3' in inventory.inventory.groups
+    assert 'workloadid_id1' in inventory.inventory.groups
     group_workloadid_id1 = inventory.inventory.groups['workloadid_id1']
 
     assert group_citycode_arn.hosts == [host1, host3]
