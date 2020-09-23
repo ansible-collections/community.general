@@ -66,14 +66,6 @@ def test_get_stack_slugs(inventory):
     ]
 
 
-def test_authenticate(inventory):
-    inventory.client_id = "abcdefg"
-    inventory.client_secret = "bcdefgh"
-    with pytest.raises(AnsibleError) as error_message:
-        inventory._authenticate()
-        assert 'HTTP Error 404' in error_message
-
-
 def test_verify_file_bad_config(inventory):
     assert inventory.verify_file('foobar.stackpath_compute.yml') is False
 
@@ -82,7 +74,7 @@ def test_validate_config(inventory):
     config = {
         "client_secret": "short_client_secret",
         "use_internal_ip": False,
-        "stack_slugs": ["waf-ec-c20059"],
+        "stack_slugs": ["test1"],
         "client_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
         "plugin": "community.general.stackpath_compute"
     }
@@ -92,16 +84,8 @@ def test_validate_config(inventory):
 
     config = {
         "client_secret": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-        "use_internal_ip": False,
-        "stack_slugs": ["waf-ec-c20059"],
-        "client_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-        "plugin": "community.general.stackpath_compute"
-    }
-    assert inventory._validate_config(config) is True
-    config = {
-        "client_secret": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-        "use_internal_ip": False,
-        "stack_slugs": ["waf-ec-c20059"],
+        "use_internal_ip": True,
+        "stack_slugs": ["test1"],
         "client_id": "short_client_id",
         "plugin": "community.general.stackpath_compute"
     }
@@ -110,8 +94,8 @@ def test_validate_config(inventory):
         assert "client_id must be 32 characters long" in error_message
 
     config = {
-        "use_internal_ip": False,
-        "stack_slugs": ["waf-ec-c20059"],
+        "use_internal_ip": True,
+        "stack_slugs": ["test1"],
         "client_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
         "plugin": "community.general.stackpath_compute"
     }
@@ -180,6 +164,7 @@ def test_populate(inventory):
             "ipAddress": "10.0.0.4"
         },
     ]
+    inventory.hostname_key = "externalIpAddress"
     inventory._populate(instances)
     # get different hosts
     host1 = inventory.inventory.get_host('20.0.0.1')
