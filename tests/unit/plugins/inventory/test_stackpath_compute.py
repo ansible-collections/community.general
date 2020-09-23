@@ -196,6 +196,5 @@ def test_populate(inventory):
     assert group_name_instance1.hosts == [host1]
     assert group_stackslug_stack1.hosts == [host1, host2]
     assert group_target_target1.hosts == [host1, host3]
-    print(group_workloadslug_workload3)
-    assert group_workloadslug_workload3 == [host3, host4]
-    assert group_workloadid_id1 == [host1]
+    assert group_workloadslug_workload3.hosts == [host3, host4]
+    assert group_workloadid_id1.hosts == [host1]
