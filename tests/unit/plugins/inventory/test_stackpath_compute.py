@@ -9,7 +9,8 @@ __metaclass__ = type
 import pytest
 
 from ansible.errors import AnsibleError
-from ansible_collections.community.general.plugins.inventory.stackpath_compute import InventoryModule, InventoryData
+from ansible.inventory.data import InventoryData
+from ansible_collections.community.general.plugins.inventory.stackpath_compute import InventoryModule
 
 
 @pytest.fixture(scope="module")
