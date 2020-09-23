@@ -100,18 +100,25 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             "workloadSlug"
         ]
 
+    def _validate_config(self, config):
+        if config['plugin'] != 'community.general.stackpath_compute':
+            raise AnsibleError("plugin doesn't match this plugin")
+        if not config['client_id']:
+            raise AnsibleError("config missing client_id, a required paramter")
+        if len(config['client_id']) != 32:
+            raise AnsibleError("client_id must be 32 characters long")
+        if not config['client_secret']:
+            raise AnsibleError("config missing client_secret, a required paramter")
+        if len(config['client_secret']) != 64:
+            raise AnsibleError("client_secret must be 64 characters long")
+        return True
+
     def _set_credentials(self):
         '''
             :param config_data: contents of the inventory config file
         '''
-
         self.client_id = self.get_option('client_id')
         self.client_secret = self.get_option('client_secret')
-
-        if not self.client_id or not self.client_secret:
-            raise AnsibleError("Insufficient credentials found."
-                               "Please provide them in your inventory"
-                               " configuration file.")
 
     def _authenticate(self):
         payload = json.dumps(
@@ -168,6 +175,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return results
 
     def _populate(self, instances):
+        instances
         for instance in instances:
             for group_key in self.group_keys:
                 group = group_key + "_" + instance[group_key]
@@ -223,8 +231,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         super(InventoryModule, self).parse(inventory, loader, path)
 
-        self._read_config_data(path)
-
+        config = self._read_config_data(path)
+        self._validate_config(config)
         self._set_credentials()
 
         # get user specifications
