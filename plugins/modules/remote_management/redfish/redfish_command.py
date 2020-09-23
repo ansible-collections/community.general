@@ -206,6 +206,36 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
 
+  - name: Turn system power off
+    community.general.redfish_command:
+      category: Systems
+      command: PowerForceOff
+      resource_id: 437XR1138R2
+
+  - name: Restart system power forcefully
+    community.general.redfish_command:
+      category: Systems
+      command: PowerForceRestart
+      resource_id: 437XR1138R2
+
+  - name: Shutdown system power gracefully
+    community.general.redfish_command:
+      category: Systems
+      command: PowerGracefulShutdown
+      resource_id: 437XR1138R2
+
+  - name: Turn system power on
+    community.general.redfish_command:
+      category: Systems
+      command: PowerOn
+      resource_id: 437XR1138R2
+
+  - name: Reboot system power
+    community.general.redfish_command:
+      category: Systems
+      command: PowerReboot
+      resource_id: 437XR1138R2
+
   - name: Set one-time boot device to {{ bootdevice }}
     community.general.redfish_command:
       category: Systems
@@ -439,6 +469,51 @@ EXAMPLES = '''
       virtual_media:
         image_url: 'http://example.com/images/SomeLinux-current.iso'
       resource_id: BMC
+
+  - name: Restart manager power gracefully
+    community.general.redfish_command:
+      category: Manager
+      command: GracefulRestart
+      resource_id: BMC
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+  - name: Restart manager power gracefully
+    community.general.redfish_command:
+      category: Manager
+      command: PowerGracefulRestart
+      resource_id: BMC
+
+  - name: Turn manager power off
+    community.general.redfish_command:
+      category: Manager
+      command: PowerForceOff
+      resource_id: BMC
+
+  - name: Restart manager power forcefully
+    community.general.redfish_command:
+      category: Manager
+      command: PowerForceRestart
+      resource_id: BMC
+
+  - name: Shutdown manager power gracefully
+    community.general.redfish_command:
+      category: Manager
+      command: PowerGracefulShutdown
+      resource_id: BMC
+
+  - name: Turn manager power on
+    community.general.redfish_command:
+      category: Manager
+      command: PowerOn
+      resource_id: BMC
+
+  - name: Reboot manager power
+    community.general.redfish_command:
+      category: Manager
+      command: PowerReboot
+      resource_id: BMC
 '''
 
 RETURN = '''
@@ -464,7 +539,8 @@ CATEGORY_COMMANDS_ALL = {
                  "UpdateAccountServiceProperties"],
     "Sessions": ["ClearSessions"],
     "Manager": ["GracefulRestart", "ClearLogs", "VirtualMediaInsert",
-                "VirtualMediaEject"],
+                "VirtualMediaEject", "PowerOn", "PowerForceOff", "PowerForceRestart",
+                "PowerGracefulRestart", "PowerGracefulShutdown", "PowerReboot"],
     "Update": ["SimpleUpdate"]
 }
 
@@ -598,7 +674,7 @@ def main():
             module.fail_json(msg=to_native(result['msg']))
 
         for command in command_list:
-            if "Power" in command:
+            if command.startswith('Power'):
                 result = rf_utils.manage_system_power(command)
             elif command == "SetOneTimeBoot":
                 boot_opts['override_enabled'] = 'Once'
@@ -643,8 +719,13 @@ def main():
             module.fail_json(msg=to_native(result['msg']))
 
         for command in command_list:
+            # standardize on the Power* commands, but allow the the legacy
+            # GracefulRestart command
             if command == 'GracefulRestart':
-                result = rf_utils.restart_manager_gracefully()
+                command = 'PowerGracefulRestart'
+
+            if command.startswith('Power'):
+                result = rf_utils.manage_manager_power(command)
             elif command == 'ClearLogs':
                 result = rf_utils.clear_logs()
             elif command == 'VirtualMediaInsert':
