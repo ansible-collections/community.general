@@ -1,4 +1,9 @@
 ---
+- name: Import GPG key
+  rpm_key:
+    key: https://download.docker.com/linux/fedora/gpg
+    state: present
+
 - name: Add repository
   yum_repository:
     file: docker-ce
@@ -7,7 +12,6 @@
     baseurl: https://download.docker.com/linux/fedora/{{ 31 if ansible_facts.distribution_major_version|int > 31 else '$releasever' }}/$basearch/stable
     enabled: yes
     gpgcheck: yes
-    gpgkey: https://download.docker.com/linux/fedora/gpg
 
 - name: Update cache
   command: dnf makecache
