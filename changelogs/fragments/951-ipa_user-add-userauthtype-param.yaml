@@ -1,3 +1,3 @@
 ---
 minor_changes:
-  - "ipa_user - add ``userauthtype`` param (https://github.com/ansible-collections/community.general/pull/951)."
+  - "ipa_user - add ``userauthtype`` option (https://github.com/ansible-collections/community.general/pull/951)."
