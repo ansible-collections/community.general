@@ -26,18 +26,18 @@ DOCUMENTATION = '''
         client_id:
             description:
                 - An OAuth client ID generated from the API Management section of the StackPath customer portal
-                - U(https://control.stackpath.net/api-management)
+                - U(https://control.stackpath.net/api-management).
             requierd: true
             type: str
         client_secret:
             description:
                 - An OAuth client secret generated from the API Management section of the StackPath customer portal
-                - U(https://control.stackpath.net/api-management)
+                - U(https://control.stackpath.net/api-management).
             required: true
             type: str
         stack_slugs:
             description:
-                - A list of Stack slugs to query instances in. If no entry then get instances in all stacks on the account
+                - A list of Stack slugs to query instances in. If no entry then get instances in all stacks on the account.
             type: list
             elements: str
         use_internal_ip:
