@@ -71,6 +71,7 @@
     that:
     - result is changed
 
+# Also covers https://github.com/ansible-collections/community.general/issues/884
 - name: Set table default privs on the schema with hyphen in the name
   postgresql_privs:
      login_user: "{{ pg_user }}"
@@ -82,11 +83,34 @@
      obj: TABLES
      privs: all
      state: present
+     usage_on_types: yes
+  register: result
+  check_mode: yes
+
+- assert:
+    that:
+    - result is changed
+    - result.queries is search('ON TYPES')
+
+# Also covers https://github.com/ansible-collections/community.general/issues/884
+- name: Set table default privs on the schema with hyphen in the name
+  postgresql_privs:
+     login_user: "{{ pg_user }}"
+     password: password
+     db: "{{ db_name_with_hyphens }}"
+     schema: "{{ db_schema_with_hyphens }}"
+     role: "{{ db_user_with_hyphens }}"
+     type: default_privs
+     obj: TABLES
+     privs: all
+     state: present
+     usage_on_types: no
   register: result
 
 - assert:
     that:
     - result is changed
+    - result.queries is not search('ON TYPES')
 
 - name: Delete table default privs on the schema with hyphen in the name
   postgresql_privs:
