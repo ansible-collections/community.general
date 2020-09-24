@@ -161,6 +161,15 @@ options:
     type: bool
     default: yes
     version_added: '0.2.0'
+  usage_on_types:
+    description:
+    - When adding default privileges, the module always implicitly adds ``USAGE ON TYPES``.
+    - To avoid this behavior, set I(usage_on_types) to C(no).
+    - Added to save backwards compatibility.
+    - Used only when adding default privileges, ignored otherwise.
+    type: bool
+    default: yes
+    version_added: '1.2.0'
 
 notes:
 - Parameters that accept comma separated lists (I(privs), I(objs), I(roles))
@@ -658,7 +667,7 @@ class Connection(object):
     # Manipulating privileges
 
     def manipulate_privs(self, obj_type, privs, objs, roles, target_roles,
-                         state, grant_option, schema_qualifier=None, fail_on_role=True):
+                         state, grant_option, schema_qualifier=None, fail_on_role=True, usage_on_types=True):
         """Manipulate database object privileges.
 
         :param obj_type: Type of database object to grant/revoke
@@ -780,6 +789,7 @@ class Connection(object):
             .for_schema(schema_qualifier) \
             .set_what(set_what) \
             .for_objs(objs) \
+            .usage_on_types(usage_on_types) \
             .build()
 
         executed_queries.append(query)
@@ -811,6 +821,7 @@ class QueryBuilder(object):
         self._state = state
         self._schema = None
         self._objs = None
+        self._usage_on_types = None
         self.query = []
 
     def for_objs(self, objs):
@@ -827,6 +838,10 @@ class QueryBuilder(object):
 
     def for_whom(self, who):
         self._for_whom = who
+        return self
+
+    def usage_on_types(self, usage_on_types):
+        self._usage_on_types = usage_on_types
         return self
 
     def as_who(self, target_roles):
@@ -893,14 +908,16 @@ class QueryBuilder(object):
                                                                                             obj,
                                                                                             self._for_whom))
             self.add_grant_option()
-        if self._as_who:
-            self.query.append(
-                'ALTER DEFAULT PRIVILEGES FOR ROLE {0} IN SCHEMA {1} GRANT USAGE ON TYPES TO {2}'.format(self._as_who,
-                                                                                                         self._schema,
-                                                                                                         self._for_whom))
-        else:
-            self.query.append(
-                'ALTER DEFAULT PRIVILEGES IN SCHEMA {0} GRANT USAGE ON TYPES TO {1}'.format(self._schema, self._for_whom))
+
+        if self._usage_on_types:
+            if self._as_who:
+                self.query.append(
+                    'ALTER DEFAULT PRIVILEGES FOR ROLE {0} IN SCHEMA {1} GRANT USAGE ON TYPES TO {2}'.format(self._as_who,
+                                                                                                             self._schema,
+                                                                                                             self._for_whom))
+            else:
+                self.query.append(
+                    'ALTER DEFAULT PRIVILEGES IN SCHEMA {0} GRANT USAGE ON TYPES TO {1}'.format(self._schema, self._for_whom))
         self.add_grant_option()
 
     def build_present(self):
@@ -960,6 +977,7 @@ def main():
         password=dict(default='', aliases=['login_password'], no_log=True),
         fail_on_role=dict(type='bool', default=True),
         trust_input=dict(type='bool', default=True),
+        usage_on_types=dict(type='bool', default=True),
     )
 
     module = AnsibleModule(
@@ -968,6 +986,7 @@ def main():
     )
 
     fail_on_role = module.params['fail_on_role']
+    usage_on_types = module.params['usage_on_types']
 
     # Create type object as namespace for module params
     p = type('Params', (), module.params)
@@ -1092,6 +1111,7 @@ def main():
             grant_option=p.grant_option,
             schema_qualifier=p.schema,
             fail_on_role=fail_on_role,
+            usage_on_types=usage_on_types,
         )
 
     except Error as e:
