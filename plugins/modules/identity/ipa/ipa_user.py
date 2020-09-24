@@ -95,6 +95,7 @@ options:
     - The authentication type to use for the user.
     choices: ["password", "radius", "otp", "pkinit", "hardened"]
     type: str
+    version_added: '1.2.0'
 extends_documentation_fragment:
 - community.general.ipa.documentation
 
