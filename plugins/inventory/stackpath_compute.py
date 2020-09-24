@@ -20,33 +20,31 @@ DOCUMENTATION = '''
     options:
         plugin:
             description:
-                - A token that ensures this is a source file for the 'stackpath_compute' plugin.
+                - A token that ensures this is a source file for the plugin.
             required: true
             choices: ['community.general.stackpath_compute']
         client_id:
-            description: >
-                An OAuth client ID generated from the API Management section of the StackPath customer portal
-                U(https://control.stackpath.net/api-management)
+            description:
+                - An OAuth client ID generated from the API Management section of the StackPath customer portal
+                - U(https://control.stackpath.net/api-management)
             requierd: true
-            type: string
+            type: str
         client_secret:
-            description: >
-                An OAuth client secret generated from the API Management section of the StackPath customer portal
-                U(https://control.stackpath.net/api-management)
+            description:
+                - An OAuth client secret generated from the API Management section of the StackPath customer portal
+                - U(https://control.stackpath.net/api-management)
             required: true
-            type: string
+            type: str
         stack_slugs:
             description:
                 - A list of Stack slugs to query instances in. If no entry then get instances in all stacks on the account
-            required: false
             type: list
+            elements: str
         use_internal_ip:
-            description: >
-                Whether or not to use internal IP addresses, If false, uses external IP addresses, internal otherwise.
-                If an instance doesn't have an external IP it will not be returned when this option is set to false.
-            requiered: false
+            description:
+                - Whether or not to use internal IP addresses, If false, uses external IP addresses, internal otherwise.
+                - If an instance doesn't have an external IP it will not be returned when this option is set to false.
             type: bool
-            default: false
 '''
 
 EXAMPLES = '''
@@ -133,7 +131,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             }
         )
         headers = {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
         resp = open_url(
             self.api_host + '/identity/v1/oauth2/token',
@@ -191,7 +189,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         self._authenticate()
         headers = {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + self.auth_token
+            "Authorization": "Bearer " + self.auth_token,
         }
         next_page = True
         result = []

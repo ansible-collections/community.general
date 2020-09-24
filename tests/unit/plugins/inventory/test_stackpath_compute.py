@@ -29,7 +29,7 @@ def test_get_stack_slugs(inventory):
             'updatedAt': '2020-07-08T01:00:00.000000Z',
             'slug': 'test1',
             'createdAt': '2020-07-08T00:00:00.000000Z',
-            'accountId': 'XXXX'
+            'accountId': 'XXXX',
         }, {
             'status': 'ACTIVE',
             'name': 'test2',
@@ -37,7 +37,7 @@ def test_get_stack_slugs(inventory):
             'updatedAt': '2019-10-22T18:00:00.000000Z',
             'slug': 'test2',
             'createdAt': '2019-10-22T18:00:00.000000Z',
-            'accountId': 'XXXX'
+            'accountId': 'XXXX',
         }, {
             'status': 'DISABLED',
             'name': 'test3',
@@ -45,7 +45,7 @@ def test_get_stack_slugs(inventory):
             'updatedAt': '2020-01-16T20:00:00.000000Z',
             'slug': 'test3',
             'createdAt': '2019-10-15T13:00:00.000000Z',
-            'accountId': 'XXXX'
+            'accountId': 'XXXX',
         }, {
             'status': 'ACTIVE',
             'name': 'test4',
@@ -53,7 +53,7 @@ def test_get_stack_slugs(inventory):
             'updatedAt': '2019-11-20T22:00:00.000000Z',
             'slug': 'test4',
             'createdAt': '2019-11-20T22:00:00.000000Z',
-            'accountId': 'XXXX'
+            'accountId': 'XXXX',
         }
     ]
     inventory._get_stack_slugs(stacks)
@@ -76,7 +76,7 @@ def test_validate_config(inventory):
         "use_internal_ip": False,
         "stack_slugs": ["test1"],
         "client_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-        "plugin": "community.general.stackpath_compute"
+        "plugin": "community.general.stackpath_compute",
     }
     with pytest.raises(AnsibleError) as error_message:
         inventory._validate_config(config)
@@ -87,7 +87,7 @@ def test_validate_config(inventory):
         "use_internal_ip": True,
         "stack_slugs": ["test1"],
         "client_id": "short_client_id",
-        "plugin": "community.general.stackpath_compute"
+        "plugin": "community.general.stackpath_compute",
     }
     with pytest.raises(AnsibleError) as error_message:
         inventory._validate_config(config)
@@ -97,7 +97,7 @@ def test_validate_config(inventory):
         "use_internal_ip": True,
         "stack_slugs": ["test1"],
         "client_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-        "plugin": "community.general.stackpath_compute"
+        "plugin": "community.general.stackpath_compute",
     }
     with pytest.raises(AnsibleError) as error_message:
         inventory._validate_config(config)
@@ -106,7 +106,7 @@ def test_validate_config(inventory):
     config = {
         "client_secret": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
         "use_internal_ip": False,
-        "plugin": "community.general.stackpath_compute"
+        "plugin": "community.general.stackpath_compute",
     }
     with pytest.raises(AnsibleError) as error_message:
         inventory._validate_config(config)
@@ -125,7 +125,7 @@ def test_populate(inventory):
             "externalIpAddress": "20.0.0.1",
             "target": "target1",
             "stackSlug": "stack1",
-            "ipAddress": "10.0.0.1"
+            "ipAddress": "10.0.0.1",
         },
         {
             "name": "instance2",
@@ -137,7 +137,7 @@ def test_populate(inventory):
             "externalIpAddress": "20.0.0.2",
             "target": "target2",
             "stackSlug": "stack1",
-            "ipAddress": "10.0.0.2"
+            "ipAddress": "10.0.0.2",
         },
         {
             "name": "instance3",
@@ -149,7 +149,7 @@ def test_populate(inventory):
             "externalIpAddress": "20.0.0.3",
             "target": "target1",
             "stackSlug": "stack2",
-            "ipAddress": "10.0.0.3"
+            "ipAddress": "10.0.0.3",
         },
         {
             "name": "instance4",
@@ -161,7 +161,7 @@ def test_populate(inventory):
             "externalIpAddress": "20.0.0.4",
             "target": "target2",
             "stackSlug": "stack2",
-            "ipAddress": "10.0.0.4"
+            "ipAddress": "10.0.0.4",
         },
     ]
     inventory.hostname_key = "externalIpAddress"
