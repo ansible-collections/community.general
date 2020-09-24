@@ -1,3 +1,8 @@
+####################################################################
+# These are designed specifically for Ansible tests                #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # (c) 2016, Dag Wieers <dag@wieers.com>
 
 # This file is part of Ansible

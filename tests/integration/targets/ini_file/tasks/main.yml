@@ -1,4 +1,9 @@
 ---
+####################################################################
+# These are designed specifically for Ansible tests                #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # test code for ini_file plugins
 # (c) 2017 Red Hat Inc.
 

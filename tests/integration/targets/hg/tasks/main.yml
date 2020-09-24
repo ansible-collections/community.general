@@ -1,3 +1,8 @@
+####################################################################
+# These are designed specifically for Ansible tests                #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # test code for the hg module
 # (c) 2014, James Tanner <tanner.jc@gmail.com>
 

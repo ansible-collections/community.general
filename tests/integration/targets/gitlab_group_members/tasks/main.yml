@@ -1,3 +1,8 @@
+####################################################################
+# These are designed specifically for Ansible tests                #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # Test code for gitlab_group_members module
 #
 # Copyright: (c) 2020, Zainab Alsaffar <Zainab.Alsaffar@mail.rit.edu>

@@ -1,1 +1,6 @@
+####################################################################
+# These are designed specifically for Ansible tests                #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 - include: nios_zone_idempotence.yml

@@ -1,3 +1,8 @@
+####################################################################
+# These are designed specifically for Ansible tests                #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # Because hwclock usually isn't available inside Docker containers in Shippable
 # these tasks will detect if hwclock works and only run hwclock tests if it is
 # supported. That is why it is recommended to run these tests locally with

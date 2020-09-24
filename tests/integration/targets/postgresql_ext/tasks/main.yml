@@ -1,3 +1,8 @@
+####################################################################
+# These are designed specifically for Ansible tests                #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 - import_tasks: postgresql_ext_session_role.yml
 
 # Initial CI tests of postgresql_ext module.

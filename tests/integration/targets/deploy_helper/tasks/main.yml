@@ -1,4 +1,9 @@
 ---
+####################################################################
+# These are designed specifically for Ansible tests                #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 - name: record the output directory
   set_fact: deploy_helper_test_root={{output_dir}}/deploy_helper_test_root
 

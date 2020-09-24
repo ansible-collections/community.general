@@ -1,4 +1,9 @@
 ---
+####################################################################
+# These are designed specifically for Ansible tests                #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 - name: delete a disk
   hwc_evs_disk:
     availability_zone: "cn-north-1a"

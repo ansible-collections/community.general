@@ -1,4 +1,9 @@
 ---
+####################################################################
+# These are designed specifically for Ansible tests                #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 - name: Include OS-specific variables
   include_vars: '{{ ansible_os_family }}.yml'
   when: not ansible_os_family == "Darwin"

@@ -1,4 +1,9 @@
 ---
+####################################################################
+# These are designed specifically for Ansible tests                #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # Generated certificate with: https://github.com/michaelklishin/tls-gen
 # ~/tls-gen/basic# make PASSWORD=bunnies CN=ansible.tls.tests
 # verify with: make info

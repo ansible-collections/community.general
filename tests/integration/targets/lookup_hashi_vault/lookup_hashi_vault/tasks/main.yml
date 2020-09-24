@@ -1,4 +1,9 @@
 ---
+####################################################################
+# These are designed specifically for Ansible tests                #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 - name: Install Hashi Vault on controlled node and test
   vars:
     vault_version: '0.11.0'
