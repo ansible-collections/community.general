@@ -14,12 +14,11 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: pkgutil
-short_description: Manage CSW-Packages on Solaris
+short_description: OpenCSW package management on Solaris
 description:
-- Manages CSW packages (SVR4 format) on Solaris 10 and 11.
-- These were the native packages on Solaris <= 10 and are available as a legacy feature in Solaris 11.
-- Pkgutil is an advanced packaging system, which resolves dependency on installation.
-  It is designed for CSW packages.
+- This module installs, updates and removes packages from the OpenCSW project for Solaris.
+- Unlike the M(svr4pkg) module, it will resolve and download dependencies.
+- See U(https://www.opencsw.org/) for more information about the project.
 author:
 - Alexander Winkler (@dermute)
 - David Ponessa (@scathatheworm)
@@ -35,7 +34,7 @@ options:
   site:
     description:
     - The repository path to install the package from.
-    - Its global definition is done in C(/etc/opt/csw/pkgutil.conf).
+    - Its global definition is in C(/etc/opt/csw/pkgutil.conf).
     required: false
     type: str
   state:
@@ -47,15 +46,17 @@ options:
     choices: [ absent, installed, latest, present, removed ]
   update_catalog:
     description:
-    - If you want to refresh your catalog from the mirror, set this to C(yes).
+    - If you always want to refresh your catalog from the mirror, even when it's not stale, set this to C(yes).
     type: bool
     default: no
   force:
     description:
     - To allow the update process to downgrade packages to match what is present in the repository, set this to C(yes).
-    - It is useful for rolling back to stable from testing, and similar operations.
+    - This is useful for rolling back to stable from testing, or similar operations.
     type: bool
     version_added: 1.2.0
+notes:
+- In order to check the availability of packages, the catalog cache under C(/var/opt/csw/pkgutil) may be refreshed even in check mode.
 '''
 
 EXAMPLES = r'''
