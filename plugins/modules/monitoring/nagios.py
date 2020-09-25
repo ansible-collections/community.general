@@ -395,7 +395,7 @@ class Nagios(object):
         self.comment = kwargs['comment']
         self.host = kwargs['host']
         self.servicegroup = kwargs['servicegroup']
-       if kwargs['start'] is not None:
+        if kwargs['start'] is not None:
             self.start = int(kwargs['start'])
         else:
             self.start = None
