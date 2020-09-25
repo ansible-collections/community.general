@@ -1,3 +1,8 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # Yarn package manager integration tests
 # (c) 2018 David Gunter, <david.gunter@tivix.com>
 
