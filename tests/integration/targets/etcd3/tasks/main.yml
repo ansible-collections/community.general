@@ -1,4 +1,9 @@
 ---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # test code for the etcd3 module
 # (c) 2017,  Jean-Philippe Evrard <jean-philippe@evrard.me>
 
