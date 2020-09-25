@@ -395,7 +395,10 @@ class Nagios(object):
         self.comment = kwargs['comment']
         self.host = kwargs['host']
         self.servicegroup = kwargs['servicegroup']
-        self.start = kwargs['start']
+       if not kwargs['start'] == None:
+            self.start = int(kwargs['start'])
+        else:
+            self.start = None
         self.minutes = kwargs['minutes']
         self.cmdfile = kwargs['cmdfile']
         self.command = kwargs['command']
