@@ -1,3 +1,8 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # test code for the zyppe module
 #
 # (c) 2015, Guido Günther <agx@sigxcpu.org>

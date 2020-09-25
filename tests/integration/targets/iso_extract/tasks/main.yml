@@ -1,3 +1,8 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # Test code for the iso_extract module.
 # (c) 2017, James Tanner <tanner.jc@gmail.com>
 # (c) 2017, Dag Wieers <dag@wieers.com>

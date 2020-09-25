@@ -1,4 +1,9 @@
 ---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # lookup_etcd3 integration tests
 # 2020, SCC France, Eric Belhomme <ebelhomme@fr.scc.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)

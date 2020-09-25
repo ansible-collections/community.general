@@ -1,4 +1,9 @@
 ---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 - name: Create random names
   set_fact:
     cname: "{{ 'ansible-container-%0x' % ((2**32) | random) }}"

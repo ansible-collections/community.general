@@ -1,4 +1,9 @@
 ---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # Create random name prefix (for containers, networks, ...)
 - name: Create random container name prefix
   set_fact:

@@ -1,4 +1,9 @@
 ---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 - include_tasks: test_docker_swarm_service_info.yml
   when: docker_py_version is version('2.0.0', '>=') and docker_api_version is version('1.24', '>=')
 
