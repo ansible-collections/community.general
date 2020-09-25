@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - aerospike_migrations - handle exception when unstable-cluster is returned (https://github.com/ansible-collections/community.general/pull/900).
