@@ -1,3 +1,8 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # (c) 2014, James Tanner <tanner.jc@gmail.com>
 
 # This file is part of Ansible

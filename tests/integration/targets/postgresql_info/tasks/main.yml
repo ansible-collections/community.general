@@ -1,3 +1,8 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # For testing getting publication and subscription info
 - import_tasks: setup_publication.yml
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_major_version >= '18'
