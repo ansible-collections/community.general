@@ -1,3 +1,8 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # TODO: Our current implementation does not handle SMTP authentication
 
 # NOTE: If the system does not support smtpd-tls (python 2.6 and older) we do basic tests

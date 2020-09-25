@@ -1,4 +1,9 @@
 ---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # Run the tests
 - block:
   - include_tasks: test_node.yml
