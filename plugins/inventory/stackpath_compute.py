@@ -27,7 +27,7 @@ DOCUMENTATION = '''
             description:
                 - An OAuth client ID generated from the API Management section of the StackPath customer portal
                 - U(https://control.stackpath.net/api-management).
-            requierd: true
+            required: true
             type: str
         client_secret:
             description:
