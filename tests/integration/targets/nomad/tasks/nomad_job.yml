@@ -3,6 +3,7 @@
     host: localhost
     state: present
     content: "{{ lookup('file', 'job.hcl') }}"
+    use_ssl: false
     timeout: 120
   register: deploy_job
 
