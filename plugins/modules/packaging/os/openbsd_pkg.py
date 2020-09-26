@@ -42,6 +42,12 @@ options:
             not already installed.
         type: bool
         default: no
+    snapshot:
+        description:
+          - Force `%c` and `%m` to expand to `snapshots`, even on a release
+            kernel.
+        type: bool
+        default: no
     ports_dir:
         description:
           - When used in combination with the C(build) option, allows overriding
@@ -166,6 +172,7 @@ def get_package_state(names, pkg_spec, module):
 # Function used to make sure a package is present.
 def package_present(names, pkg_spec, module):
     build = module.params['build']
+    snapshot = module.params['snapshot']
 
     for name in names:
         # It is possible package_present() has been called from package_latest().
@@ -196,6 +203,9 @@ def package_present(names, pkg_spec, module):
                     module.fail_json(msg="the port source directory %s does not exist" % (port_dir))
             else:
                 install_cmd = 'pkg_add -Im'
+
+        if snapshot is True:
+            install_cmd += ' -Dsnap '
 
         if pkg_spec[name]['installed_state'] is False:
 
@@ -268,6 +278,9 @@ def package_latest(names, pkg_spec, module):
 
     if module.params['quick']:
         upgrade_cmd += 'q'
+
+    if module.params['snapshot']:
+        upgrade_cmd += ' -Dsnap '
 
     for name in names:
         if pkg_spec[name]['installed_state'] is True:
@@ -489,6 +502,9 @@ def upgrade_packages(pkg_spec, module):
     else:
         upgrade_cmd = 'pkg_add -Imu'
 
+    if module.params['snapshot']:
+        upgrade_cmd += ' -Dsnap '
+
     # Create a minimal pkg_spec entry for '*' to store return values.
     pkg_spec['*'] = {}
 
@@ -520,6 +536,7 @@ def main():
             name=dict(type='list', elements='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'installed', 'latest', 'present', 'removed']),
             build=dict(type='bool', default=False),
+            snapshot=dict(type='bool', default=False),
             ports_dir=dict(type='path', default='/usr/ports'),
             quick=dict(type='bool', default=False),
             clean=dict(type='bool', default=False),
