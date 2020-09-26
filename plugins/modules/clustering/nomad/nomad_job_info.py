@@ -104,6 +104,7 @@ def run():
             client_cert=dict(type='path', default=None),
             client_key=dict(type='path', default=None),
             namespace=dict(type='str', default=None),
+            token=dict(type='str', default=None, no_log=True),
             name=dict(type='str', default=None)
         ),
         supports_check_mode=True
