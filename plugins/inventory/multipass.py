@@ -107,9 +107,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 # Extract IP
                 ip = None
                 if len(hostinfo['ipv4']):
-                  ip = hostinfo['ipv4'][0].strip();
+                    ip = hostinfo['ipv4'][0].strip()
 
-                #Set inventory
+                # Set inventory
                 self.inventory.add_host(host)
                 self.inventory.add_child(group, host)
                 self.inventory.set_variable(host, 'ip', ip)
