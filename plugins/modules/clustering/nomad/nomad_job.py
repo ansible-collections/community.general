@@ -29,7 +29,7 @@ options:
       description:
         - Use TLS/SSL connection.
       type: bool
-      default: false
+      default: true
     timeout:
       description:
         - Timeout (in seconds) for the request to Nomad.
@@ -85,10 +85,10 @@ options:
       default: hcl
       type: str
 notes:
-  - check_mode is supported
+  - C(check_mode) is supported
 seealso:
   - name: Nomad jobs documentation
-    description: Complete documentation for Nomad api jobs.
+    description: Complete documentation for Nomad API jobs.
     link: https://www.nomadproject.io/api-docs/jobs/
 '''
 
@@ -135,7 +135,7 @@ def run():
         argument_spec=dict(
             host=dict(required=True, type='str'),
             state=dict(required=True, choices=['present', 'absent']),
-            use_ssl=dict(type='bool', default=False),
+            use_ssl=dict(type='bool', default=True),
             timeout=dict(type='int', default=5),
             validate_certs=dict(type='bool', default=True),
             client_cert=dict(type='path', default=None),
