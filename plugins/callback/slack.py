@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     callback: slack
-    callback_type: notification
+    type: notification
     requirements:
       - whitelist in configuration
       - prettytable (python library)

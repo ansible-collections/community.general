@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     callback: cgroup_memory_recap
-    callback_type: aggregate
+    type: aggregate
     requirements:
       - whitelist in configuration
       - cgroups

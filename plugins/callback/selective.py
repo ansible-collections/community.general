@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     callback: selective
-    callback_type: stdout
+    type: stdout
     requirements:
       - set as main display callback
     short_description: only print certain tasks
