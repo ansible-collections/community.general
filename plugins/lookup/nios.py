@@ -22,6 +22,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
+author: Unknown (!UNKNOWN)
 lookup: nios
 short_description: Query Infoblox NIOS objects
 description:
