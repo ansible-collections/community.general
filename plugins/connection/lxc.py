@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    author: Joerg Thalheim <joerg@higgsboson.tk>
+    author: Joerg Thalheim (!UNKNOWN) <joerg@higgsboson.tk>
     connection: lxc
     short_description: Run tasks in lxc containers via lxc python library
     description:
