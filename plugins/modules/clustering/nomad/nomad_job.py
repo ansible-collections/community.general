@@ -189,14 +189,16 @@ def run():
                 job = dict()
                 job['job'] = job_json
                 try:
-                    if not module.check_mode:
-                        result = nomad_client.jobs.register_job(job)
+                    job_id = job_json.get('ID')
+                    plan = nomad_client.job.plan_job(job_id, job, diff=True)
+                    if not plan['Diff'].get('Type') == "None":
+                        changed = True
+                        if not module.check_mode:
+                            result = nomad_client.jobs.register_job(job)
+                        else:
+                            result = plan
                     else:
-                        result = nomad_client.validate.validate_job(job)
-                        if not result.status_code == 200:
-                            module.fail_json(msg=to_native(result.text))
-                        result = json.loads(result.text)
-                    changed = True
+                        result = plan
                 except Exception as e:
                     module.fail_json(msg=to_native(e))
 
@@ -211,14 +213,16 @@ def run():
                     msg = str(err.nomad_resp.reason) + " " + str(err.nomad_resp.text)
                     module.fail_json(msg=to_native(msg))
                 try:
-                    if not module.check_mode:
-                        result = nomad_client.jobs.register_job(job)
+                    job_id = job_json.get('ID')
+                    plan = nomad_client.job.plan_job(job_id, job, diff=True)
+                    if not plan['Diff'].get('Type') == "None":
+                        changed = True
+                        if not module.check_mode:
+                            result = nomad_client.jobs.register_job(job)
+                        else:
+                            result = plan
                     else:
-                        result = nomad_client.validate.validate_job(job)
-                        if not result.status_code == 200:
-                            module.fail_json(msg=to_native(result.text))
-                        result = json.loads(result.text)
-                    changed = True
+                        result = plan
                 except Exception as e:
                     module.fail_json(msg=to_native(e))
 
