@@ -48,7 +48,7 @@ class ActionModule(ActionBase):
         # At least one iteration is required, even if timeout is 0.
         for i in range(max(1, timeout)):
             async_result = self._execute_module(
-                module_name='async_status',
+                module_name='ansible.builtin.async_status',
                 module_args=module_args,
                 task_vars=task_vars,
                 wrap_async=False)
@@ -177,7 +177,7 @@ class ActionModule(ActionBase):
 
                 async_status_args['mode'] = 'cleanup'
                 garbage = self._execute_module(
-                    module_name='async_status',
+                    module_name='ansible.builtin.async_status',
                     module_args=async_status_args,
                     task_vars=task_vars,
                     wrap_async=False)
