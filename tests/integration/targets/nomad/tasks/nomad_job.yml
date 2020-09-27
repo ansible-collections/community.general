@@ -87,4 +87,4 @@
       - job_deployed_idempotence is not changed
       - job_deleted_check is changed
       - job_deleted is changed
-      - get_job_delete.result.Status == "dead"
+      - get_job_delete.result.Stop
