@@ -148,6 +148,7 @@ class GitlabProjectVariables(object):
 
     def __init__(self, module, gitlab_instance):
         self.repo = gitlab_instance
+        self.repo.per_page = 100
         self.project = self.get_project(module.params['project'])
         self._module = module
 

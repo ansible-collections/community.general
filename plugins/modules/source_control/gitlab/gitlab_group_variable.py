@@ -151,6 +151,7 @@ class GitlabGroupVariables(object):
 
     def __init__(self, module, gitlab_instance):
         self.repo = gitlab_instance
+        self.group.per_page = 100
         self.group = self.get_group(module.params['group'])
         self._module = module
 
