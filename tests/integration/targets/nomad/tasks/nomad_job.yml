@@ -15,6 +15,7 @@
     state: present
     use_ssl: false
     content: "{{ lookup('file', 'job.hcl') }}"
+    force_start: true
   register: job_deployed
 
 - name: get nomad job deployed
