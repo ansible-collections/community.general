@@ -48,6 +48,7 @@ options:
             kernel.
         type: bool
         default: no
+        version_added: 1.2.0
     ports_dir:
         description:
           - When used in combination with the C(build) option, allows overriding
