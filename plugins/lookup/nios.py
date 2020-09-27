@@ -84,7 +84,7 @@ RETURN = """
 obj_type:
   description:
     - The object type specified in the terms argument
-  type: complex
+  type: dictionary
   contains:
     obj_field:
       description:

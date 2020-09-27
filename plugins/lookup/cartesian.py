@@ -37,7 +37,8 @@ RETURN = """
   _list:
     description:
       - list of lists composed of elements of the input lists
-    type: lists
+    type: list
+    elements: list
 """
 
 from itertools import product
