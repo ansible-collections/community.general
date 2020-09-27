@@ -154,7 +154,7 @@ class Plist:
         """Finds the plist file associated with a service"""
 
         launchd_paths = [
-            '~/Library/LaunchAgents',
+            os.path.expanduser('~/Library/LaunchAgents'),
             '/Library/LaunchAgents',
             '/Library/LaunchDaemons',
             '/System/Library/LaunchAgents',
@@ -163,7 +163,7 @@ class Plist:
 
         for path in launchd_paths:
             try:
-                files = os.listdir(os.path.expanduser(path))
+                files = os.listdir(path)
             except OSError:
                 continue
 
