@@ -5,7 +5,7 @@
 - name: Install Nomad and test
   vars:
     nomad_version: 0.12.4
-    nomad_uri: https://releases.hashicorp.com/nomad/0.12.3/nomad_{{ nomad_version }}_{{ ansible_system | lower }}_{{ nomad_arch }}.zip
+    nomad_uri: https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_{{ ansible_system | lower }}_{{ nomad_arch }}.zip
     nomad_cmd: '{{ output_dir }}/nomad'
   block:
 
