@@ -56,8 +56,36 @@
     content: "{{ lookup('file', 'job.hcl') }}"
   register: job_deployed_idempotence
 
+- name: run check delete nomad job
+  nomad_job:
+    host: localhost
+    state: absent
+    use_ssl: false
+    content: "{{ lookup('file', 'job.hcl') }}"
+  register: job_deleted_check
+  check_mode: true
+
+- name: run delete nomad job
+  nomad_job:
+    host: localhost
+    state: absent
+    use_ssl: false
+    content: "{{ lookup('file', 'job.hcl') }}"
+  register: job_deleted
+
+- name: get job deleted
+  nomad_job_info:
+    host: localhost
+    use_ssl: false
+    name: example
+  register: get_job_delete
+
 - name: assert idempotence
   assert:
     that:
       - job_check_deployed_idempotence is not changed
       - job_deployed_idempotence is not changed
+      - job_deleted_check is changed
+      - job_deleted is changed
+      - get_job_delete.result.Status == "dead"
+
