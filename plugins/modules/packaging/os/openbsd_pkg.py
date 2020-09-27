@@ -44,7 +44,7 @@ options:
         default: no
     snapshot:
         description:
-          - Force `%c` and `%m` to expand to `snapshots`, even on a release
+          - Force C(%c) and C(%m) to expand to C(snapshots), even on a release
             kernel.
         type: bool
         default: no
