@@ -190,6 +190,8 @@ def run():
                 job['job'] = job_json
                 try:
                     job_id = job_json.get('ID')
+                    if job_id is None:
+                        module.fail_json(msg="Can't revover job ID")
                     plan = nomad_client.job.plan_job(job_id, job, diff=True)
                     if not plan['Diff'].get('Type') == "None":
                         changed = True
