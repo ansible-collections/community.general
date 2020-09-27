@@ -36,7 +36,7 @@
     that:
       - job_check_deployed is changed
       - job_deployed is changed
-      - get_nomad_job.result.Status == "pending"
+      - not get_nomad_job.result.Status == "dead"
       - get_nomad_job.result.ID == "example"
       - list_nomad_jobs.result | length == 1
 
