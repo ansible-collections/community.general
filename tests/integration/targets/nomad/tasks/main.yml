@@ -92,3 +92,6 @@
         timeout: 60
 
     - import_tasks: nomad_job.yml
+    
+    - name: kill nomad
+      shell: pkill nomad
