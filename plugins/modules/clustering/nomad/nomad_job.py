@@ -273,6 +273,8 @@ def run():
             else:
                 if not module.check_mode:
                     result = nomad_client.job.deregister_job(job_name)
+                else:
+                    result = job
                 changed = True
         except Exception as e:
             module.fail_json(msg=to_native(e))
