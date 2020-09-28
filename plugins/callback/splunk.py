@@ -21,7 +21,7 @@ DOCUMENTATION = '''
     callback: splunk
     type: aggregate
     short_description: Sends task result events to Splunk HTTP Event Collector
-    author: "Stuart Hirst <support@convergingdata.com>"
+    author: "Stuart Hirst (!UNKNOWN) <support@convergingdata.com>"
     description:
       - This callback plugin will send task results as JSON formatted events to a Splunk HTTP collector.
       - The companion Splunk Monitoring & Diagnostics App is available here "https://splunkbase.splunk.com/app/4023/"

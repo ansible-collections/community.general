@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
+    author: Unknown (!UNKNOWN)
     lookup: consul_kv
     short_description: Fetch metadata from a Consul key value store.
     description:

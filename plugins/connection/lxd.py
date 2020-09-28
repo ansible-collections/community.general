@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    author: Matt Clay <matt@mystile.com>
+    author: Matt Clay (@mattclay) <matt@mystile.com>
     connection: lxd
     short_description: Run tasks in lxc containers via lxc CLI
     description:

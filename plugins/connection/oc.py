@@ -22,7 +22,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author:
-        - xuxinkun
+        - xuxinkun (!UNKNOWN)
 
     connection: oc
 

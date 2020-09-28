@@ -7,8 +7,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
+    author: Unknown (!UNKNOWN)
     callback: stderr
-    callback_type: stdout
+    type: stdout
     requirements:
       - set as main display callback
     short_description: Splits output, sending failed tasks to stderr

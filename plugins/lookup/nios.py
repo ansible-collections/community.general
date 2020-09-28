@@ -22,6 +22,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
+author: Unknown (!UNKNOWN)
 lookup: nios
 short_description: Query Infoblox NIOS objects
 description:
@@ -83,7 +84,7 @@ RETURN = """
 obj_type:
   description:
     - The object type specified in the terms argument
-  type: complex
+  type: dictionary
   contains:
     obj_field:
       description:

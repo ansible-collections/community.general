@@ -71,7 +71,7 @@ RETURN = '''
         description:
             - list of values associated with input keys
         type: list
-        elements: strings
+        elements: string
 '''
 
 import json
