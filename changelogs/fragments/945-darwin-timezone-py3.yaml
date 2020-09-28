@@ -1,0 +1,2 @@
+bugfixes:
+- timezone - support Python3 on macos/darwin (https://github.com/ansible-collections/community.general/pull/945).
