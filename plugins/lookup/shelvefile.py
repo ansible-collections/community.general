@@ -6,7 +6,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     lookup: shelvefile
-    author: Alejandro Guirao <lekumberri@gmail.com>
+    author: Alejandro Guirao (!UNKNOWN) <lekumberri@gmail.com>
     short_description: read keys from Python shelve file
     description:
       - Read keys from Python shelve file.

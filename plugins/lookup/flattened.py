@@ -6,7 +6,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     lookup: flattened
-    author: Serge van Ginderachter <serge@vanginderachter.be>
+    author: Serge van Ginderachter (!UNKNOWN) <serge@vanginderachter.be>
     short_description: return single list completely flattened
     description:
       - given one or more lists, this lookup will flatten any list elements found recursively until only 1 list is left.

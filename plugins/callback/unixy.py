@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
     callback: unixy
     type: stdout
-    author: Allyson Bowles <@akatch>
+    author: Allyson Bowles (@akatch)
     short_description: condensed Ansible output
     description:
       - Consolidated Ansible output in the style of LINUX/UNIX startup logs.

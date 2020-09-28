@@ -6,6 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
+    author: Unknown (!UNKNOWN)
     callback: log_plays
     type: notification
     short_description: write playbook output to log file

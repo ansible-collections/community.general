@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
+    author: Unknown (!UNKNOWN)
     lookup: cartesian
     short_description: returns the cartesian product of lists
     description:
@@ -36,7 +37,8 @@ RETURN = """
   _list:
     description:
       - list of lists composed of elements of the input lists
-    type: lists
+    type: list
+    elements: list
 """
 
 from itertools import product

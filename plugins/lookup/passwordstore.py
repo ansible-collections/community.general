@@ -8,7 +8,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
     lookup: passwordstore
     author:
-      - Patrick Deelman <patrick@patrickdeelman.nl>
+      - Patrick Deelman (!UNKNOWN) <patrick@patrickdeelman.nl>
     short_description: manage passwords with passwordstore.org's pass utility
     description:
       - Enables Ansible to retrieve, create or update passwords from the passwordstore.org pass utility.

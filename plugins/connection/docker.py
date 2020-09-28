@@ -11,8 +11,8 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author:
-        - Lorin Hochestein
-        - Leendert Brouwer
+        - Lorin Hochestein (!UNKNOWN)
+        - Leendert Brouwer (!UNKNOWN)
     connection: docker
     short_description: Run tasks in docker containers
     description:
