@@ -2400,7 +2400,7 @@ class Container(DockerBaseClass):
         return shlex.split(self.parameters.entrypoint)
 
     def _get_expected_ports(self):
-        if not self.parameters.published_ports:
+        if self.parameters.published_ports is None:
             return None
         expected_bound_ports = {}
         for container_port, config in self.parameters.published_ports.items():
