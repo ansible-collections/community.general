@@ -1226,7 +1226,7 @@ files:
     authors: ramondelafuente
   $modules/web_infrastructure/django_manage.py:
     authors: tastychutney
-    maintainers: scottanderson42
+    maintainers: scottanderson42 russoz m-khvoinitsky
     labels: django_manage
   $modules/web_infrastructure/ejabberd_user.py:
     authors: privateip
