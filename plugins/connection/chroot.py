@@ -9,7 +9,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    author: Maykel Moya <mmoya@speedyrails.com>
+    author: Maykel Moya (!UNKNOWN) <mmoya@speedyrails.com>
     connection: chroot
     short_description: Interact with local chroot
     description:
