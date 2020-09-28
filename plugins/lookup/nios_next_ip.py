@@ -22,6 +22,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
+author: Unknown (!UNKNOWN)
 lookup: nios_next_ip
 short_description: Return the next available IP address for a network
 description:

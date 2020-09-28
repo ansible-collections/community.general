@@ -6,8 +6,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
+    author: Unknown (!UNKNOWN)
     callback: syslog_json
-    callback_type: notification
+    type: notification
     requirements:
       - whitelist in configuration
     short_description: sends JSON events to syslog

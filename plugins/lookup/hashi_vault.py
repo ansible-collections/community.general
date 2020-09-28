@@ -9,7 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = """
   lookup: hashi_vault
   author:
-    - Jonathan Davila <jdavila(at)ansible.com>
+    - Jonathan Davila (!UNKNOWN) <jdavila(at)ansible.com>
     - Brian Scholer (@briantist)
   short_description: Retrieve secrets from HashiCorp's vault
   requirements:
