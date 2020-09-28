@@ -9,7 +9,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    author: Stephan Lohse <dev-github@ploek.org>
+    author: Stephan Lohse (!UNKNOWN) <dev-github@ploek.org>
     connection: iocage
     short_description: Run tasks in iocage jails
     description:

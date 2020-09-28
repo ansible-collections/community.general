@@ -9,7 +9,7 @@ lookup: gcp_storage_file
 description:
   - This lookup returns the contents from a file residing on Google Cloud Storage
 short_description: Return GC Storage content
-author: Eric Anderson <eanderson@avinetworks.com>
+author: Eric Anderson (!UNKNOWN) <eanderson@avinetworks.com>
 requirements:
   - python >= 2.6
   - requests >= 2.18.4

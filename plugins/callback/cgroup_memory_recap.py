@@ -7,8 +7,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
+    author: Unknown (!UNKNOWN)
     callback: cgroup_memory_recap
-    callback_type: aggregate
+    type: aggregate
     requirements:
       - whitelist in configuration
       - cgroups
