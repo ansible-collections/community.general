@@ -634,11 +634,12 @@ def main():
     if state == 'present':
 
         # Assign label if required
-        if current_device['generic'].get('table', None) != label:
+        mklabel_needed = current_device['generic'].get('table', None) != label
+        if mklabel_needed:
             script += "mklabel %s " % label
 
         # Create partition if required
-        if part_type and not part_exists(current_parts, 'num', number):
+        if part_type and (mklabel_needed or not part_exists(current_parts, 'num', number)):
             script += "mkpart %s %s%s %s " % (
                 part_type,
                 '%s ' % fs_type if fs_type is not None else '',
