@@ -613,6 +613,7 @@ files:
     labels: monit
   $modules/monitoring/nagios.py:
     authors: tbielawa
+    maintainers: tgoetheyn
   $modules/monitoring/newrelic_deployment.py:
     authors: mcodd
   $modules/monitoring/pagerduty.py:
