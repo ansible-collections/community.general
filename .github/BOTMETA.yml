@@ -495,36 +495,38 @@ files:
     maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_ext.py:
     authors: Andersson007 andytom dschep strk
-    maintainers: Dorn- jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
+    maintainers: $team_postgresql
   $modules/database/postgresql/:
     authors: Andersson007
-    maintainers: Dorn- andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
     keywords: database postgres postgresql
+    maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_lang.py:
     authors: andytom jensdepuydt
-    maintainers: Andersson007 Dorn- jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
+    maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_pg_hba.py:
     authors: sebasmannem
-    maintainers: Andersson007 Dorn- andytom jbscalia kostiantyn-nemchenko matburt nerzhul tcraxs
+    maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_privs.py:
     authors: b6d tcraxs
-    maintainers: Andersson007 Dorn- andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem
+    maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_publication.py:
     authors: Andersson007 nerzhul
-    maintainers: Dorn- andytom jbscalia kostiantyn-nemchenko matburt sebasmannem tcraxs
+    maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_query.py:
     authors: Andersson007 archf wrouesnel
+    maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_schema.py:
     authors: Dorn- andytom
-    maintainers: Andersson007 jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
+    maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_sequence.py:
     authors: tcraxs
-    maintainers: Andersson007 Dorn- andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem
+    maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_slot.py:
     authors: Andersson007 jscalia
+    maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_tablespace.py:
     authors: Andersson007 Dorn- antoinell
-    maintainers: andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs
+    maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_user.py:
     authors: ansible
     maintainers: $team_postgresql
