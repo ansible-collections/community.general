@@ -663,7 +663,7 @@
   when: postgres_version_resp.stdout is version('11', '>=')
 
 # Issue https://github.com/ansible-collections/community.general/issues/994
-- name: Try to run module agains a procedure, not function
+- name: Try to run module against a procedure, not function
   postgresql_privs:
     type: function
     state: present

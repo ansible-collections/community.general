@@ -562,16 +562,15 @@ class Connection(object):
     def get_all_functions_in_schema(self, schema):
         if not self.schema_exists(schema):
             raise Error('Schema "%s" does not exist.' % schema)
+
+        query = ("SELECT p.proname, oidvectortypes(p.proargtypes) "
+                 "FROM pg_catalog.pg_proc p "
+                 "JOIN pg_namespace n ON n.oid = p.pronamespace "
+                 "WHERE nspname = %s")
+
         if self.pg_version >= 110000:
-            query = ("SELECT p.proname, oidvectortypes(p.proargtypes) "
-                     "FROM pg_catalog.pg_proc p "
-                     "JOIN pg_namespace n ON n.oid = p.pronamespace "
-                     "WHERE nspname = %s and p.prokind = 'f'")
-        else:
-            query = ("SELECT p.proname, oidvectortypes(p.proargtypes) "
-                     "FROM pg_catalog.pg_proc p "
-                     "JOIN pg_namespace n ON n.oid = p.pronamespace "
-                     "WHERE nspname = %s")
+            query += " and p.prokind = 'f'"
+
         self.cursor.execute(query, (schema,))
         return ["%s(%s)" % (t[0], t[1]) for t in self.cursor.fetchall()]
 
