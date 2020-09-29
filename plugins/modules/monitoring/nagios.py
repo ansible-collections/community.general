@@ -33,11 +33,11 @@ options:
       - Action to take.
       - servicegroup options were added in 2.0.
       - delete_downtime options were added in 2.2.
-      - The C(acknowledge) and C(service_check) actions were added in community.general 1.2.0.
+      - The C(acknowledge) and C(forced_check) actions were added in community.general 1.2.0.
     required: true
     choices: [ "downtime", "delete_downtime", "enable_alerts", "disable_alerts", "silence", "unsilence",
                "silence_nagios", "unsilence_nagios", "command", "servicegroup_service_downtime",
-               "servicegroup_host_downtime", "acknowledge", "service_check" ]
+               "servicegroup_host_downtime", "acknowledge", "forced_check" ]
   host:
     description:
       - Host to operate on in Nagios.
@@ -69,7 +69,7 @@ options:
     description:
       - What to manage downtime/alerts for. Separate multiple services with commas.
         C(service) is an alias for C(services).
-        B(Required) option when using the C(downtime), C(acknowledge), C(service_check), C(enable_alerts), and C(disable_alerts) actions.
+        B(Required) option when using the C(downtime), C(acknowledge), C(forced_check), C(enable_alerts), and C(disable_alerts) actions.
     aliases: [ "service" ]
     required: true
   servicegroup:
@@ -157,26 +157,43 @@ EXAMPLES = '''
     service: host
     comment: Planned maintenance
 
-- name: acknowledge an HOST with a particular comment
+- name: Acknowledge an HOST with a particular comment
   community.general.nagios:
     action: acknowledge
     service: host
     host: '{{ inventory_hostname }}'
     comment: 'power outage - see casenr 12345'
 
-- name: acknowledge an active service problem for the httpd service with a particular comment
+- name: Acknowledge an active service problem for the httpd service with a particular comment
   community.general.nagios:
     action: acknowledge
     service: httpd
     host: '{{ inventory_hostname }}'
     comment: 'service crashed - see casenr 12345'
 
-- name: acknowledge an passive service problem for snmp trap with a particular comment
+- name: Reset a passive service check for snmp trap
   community.general.nagios:
-    action: service_check
+    action: forced_check
     service: snmp
     host: '{{ inventory_hostname }}'
-    comment: 'switch problem - see casenr 12345'
+
+- name: Force an active service check for the httpd service
+  community.general.nagios:
+    action: forced_check
+    service: httpd
+    host: '{{ inventory_hostname }}'
+
+- name: Force an active service check for all services of a particular host
+  community.general.nagios:
+    action: forced_check
+    service: all
+    host: '{{ inventory_hostname }}'
+
+- name: Force an active service check for a particular host
+  community.general.nagios:
+    action: forced_check
+    service: host
+    host: '{{ inventory_hostname }}'
 
 - name: Enable SMART disk alerts
   community.general.nagios:
@@ -279,7 +296,7 @@ def main():
         'servicegroup_host_downtime',
         'servicegroup_service_downtime',
         'acknowledge',
-        'service_check',
+        'forced_check',
     ]
 
     module = AnsibleModule(
@@ -354,7 +371,7 @@ def main():
             module.fail_json(msg='no service selected to acknowledge')
 
     ##################################################################
-    if action == 'service_check':
+    if action == 'forced_check':
         # Make sure there's an actual service selected
         if not services:
             module.fail_json(msg='no service selected to check')
@@ -569,7 +586,7 @@ class Nagios(object):
 
     def _fmt_chk_str(self, cmd, host, svc=None, start=None):
         """
-        Format an external-command downtime deletion string.
+        Format an external-command forced host or service check string.
 
         cmd - Nagios command ID
         host - Host to check service from
@@ -585,7 +602,10 @@ class Nagios(object):
         if start is None:
             start = entry_time + 3
 
-        chk_args = [svc, str(start)]
+        if svc is None:
+            chk_args = [str(start)]
+        else:
+            chk_args = [svc, str(start)]
 
         chk_arg_str = ";".join(chk_args)
         chk_str = hdr + chk_arg_str + "\n"
@@ -692,12 +712,35 @@ class Nagios(object):
         ack_cmd_str = self._fmt_ack_str(cmd, host)
         self._write_command(ack_cmd_str)
 
+    def schedule_forced_host_check(self, host):
+        """
+        This command schedules a forced active check for a particular host.
+
+        Syntax: SCHEDULE_FORCED_HOST_CHECK;<host_name>;<check_time>
+        """
+
+        cmd = "SCHEDULE_FORCED_HOST_CHECK"
+
+        chk_cmd_str = self._fmt_chk_str(cmd, host, svc=None)
+        self._write_command(chk_cmd_str)
+
+    def schedule_forced_host_svc_check(self, host):
+        """
+        This command schedules a forced active check for all services
+        associated with a particular host.
+
+        Syntax: SCHEDULE_FORCED_HOST_SVC_CHECKS;<host_name>;<check_time>
+        """
+
+        cmd = "SCHEDULE_FORCED_HOST_SVC_CHECKS"
+
+        chk_cmd_str = self._fmt_chk_str(cmd, host, svc=None)
+        self._write_command(chk_cmd_str)
+
     def schedule_forced_svc_check(self, host, services=None):
         """
-        This command is used to check a particular
-        service .
-
-        Schedules a forced active check of a particular service
+        This command schedules a forced active check for a particular
+        service.
 
         Syntax: SCHEDULE_FORCED_SVC_CHECK;<host_name>;<service_description>;<check_time>
         """
@@ -1193,8 +1236,13 @@ class Nagios(object):
             else:
                 self.delete_host_downtime(self.host, services=self.services)
 
-        elif self.action == 'service_check':
-            self.schedule_forced_svc_check(self.host, services=self.services)
+        elif self.action == 'forced_check':
+            if self.services == 'host':
+                self.schedule_forced_host_check(self.host)
+            elif self.services == 'all':
+                self.schedule_forced_host_svc_check(self.host)
+            else:
+                self.schedule_forced_svc_check(self.host, services=self.services)
 
         elif self.action == "servicegroup_host_downtime":
             if self.servicegroup:
