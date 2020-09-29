@@ -8,11 +8,150 @@ matrix:
   exclude:
     - env: T=none
   include:
+    - env: T=devel/sanity/1
+    - env: T=devel/sanity/2
+    - env: T=devel/sanity/3
+    - env: T=devel/sanity/4
+    - env: T=devel/sanity/extra
+
+    - env: T=2.10/sanity/1
+    - env: T=2.10/sanity/2
+    - env: T=2.10/sanity/3
+    - env: T=2.10/sanity/4
+
+    - env: T=2.9/sanity/1
+    - env: T=2.9/sanity/2
+    - env: T=2.9/sanity/3
+    - env: T=2.9/sanity/4
+
+    - env: T=devel/units/2.6/1
+    - env: T=devel/units/2.7/1
+    - env: T=devel/units/3.5/1
+    - env: T=devel/units/3.6/1
+    - env: T=devel/units/3.7/1
+    - env: T=devel/units/3.8/1
+    - env: T=devel/units/3.9/1
+
+    - env: T=2.10/units/2.6/1
+    - env: T=2.10/units/2.7/1
+    - env: T=2.10/units/3.5/1
+    - env: T=2.10/units/3.6/1
+    - env: T=2.10/units/3.7/1
+    - env: T=2.10/units/3.8/1
+    - env: T=2.10/units/3.9/1
+
+    - env: T=2.9/units/2.6/1
+    - env: T=2.9/units/2.7/1
+    - env: T=2.9/units/3.5/1
+    - env: T=2.9/units/3.6/1
+    - env: T=2.9/units/3.7/1
+    - env: T=2.9/units/3.8/1
+
+    #- env: T=devel/aix/7.2/1
+    - env: T=devel/osx/10.11/1
     - env: T=devel/macos/10.15/1
+    - env: T=devel/rhel/7.8/1
+    - env: T=devel/rhel/8.2/1
+    - env: T=devel/freebsd/11.1/1
+    - env: T=devel/freebsd/12.1/1
+    - env: T=devel/linux/centos6/1
+    - env: T=devel/linux/centos7/1
+    - env: T=devel/linux/centos8/1
+    - env: T=devel/linux/fedora31/1
+    - env: T=devel/linux/fedora32/1
+    - env: T=devel/linux/opensuse15py2/1
+    - env: T=devel/linux/opensuse15/1
+    - env: T=devel/linux/ubuntu1604/1
+    - env: T=devel/linux/ubuntu1804/1
+
+    #- env: T=devel/aix/7.2/2
+    - env: T=devel/osx/10.11/2
     - env: T=devel/macos/10.15/2
+    - env: T=devel/rhel/7.8/2
+    - env: T=devel/rhel/8.2/2
+    - env: T=devel/freebsd/11.1/2
+    - env: T=devel/freebsd/12.1/2
+    - env: T=devel/linux/centos6/2
+    - env: T=devel/linux/centos7/2
+    - env: T=devel/linux/centos8/2
+    - env: T=devel/linux/fedora31/2
+    - env: T=devel/linux/fedora32/2
+    - env: T=devel/linux/opensuse15py2/2
+    - env: T=devel/linux/opensuse15/2
+    - env: T=devel/linux/ubuntu1604/2
+    - env: T=devel/linux/ubuntu1804/2
+
+    #- env: T=devel/aix/7.2/3
+    - env: T=devel/osx/10.11/3
     - env: T=devel/macos/10.15/3
+    - env: T=devel/rhel/7.8/3
+    - env: T=devel/rhel/8.2/3
+    - env: T=devel/freebsd/11.1/3
+    - env: T=devel/freebsd/12.1/3
+    - env: T=devel/linux/centos6/3
+    - env: T=devel/linux/centos7/3
+    - env: T=devel/linux/centos8/3
+    - env: T=devel/linux/fedora31/3
+    - env: T=devel/linux/fedora32/3
+    - env: T=devel/linux/opensuse15py2/3
+    - env: T=devel/linux/opensuse15/3
+    - env: T=devel/linux/ubuntu1604/3
+    - env: T=devel/linux/ubuntu1804/3
+
+    #- env: T=devel/aix/7.2/4
+    - env: T=devel/osx/10.11/4
     - env: T=devel/macos/10.15/4
+    - env: T=devel/rhel/7.8/4
+    - env: T=devel/rhel/8.2/4
+    - env: T=devel/freebsd/11.1/4
+    - env: T=devel/freebsd/12.1/4
+    - env: T=devel/linux/centos6/4
+    - env: T=devel/linux/centos7/4
+    - env: T=devel/linux/centos8/4
+    - env: T=devel/linux/fedora31/4
+    - env: T=devel/linux/fedora32/4
+    - env: T=devel/linux/opensuse15py2/4
+    - env: T=devel/linux/opensuse15/4
+    - env: T=devel/linux/ubuntu1604/4
+    - env: T=devel/linux/ubuntu1804/4
+
+    #- env: T=devel/aix/7.2/5
+    - env: T=devel/osx/10.11/5
     - env: T=devel/macos/10.15/5
+    - env: T=devel/rhel/7.8/5
+    - env: T=devel/rhel/8.2/5
+    - env: T=devel/freebsd/11.1/5
+    - env: T=devel/freebsd/12.1/5
+    - env: T=devel/linux/centos6/5
+    - env: T=devel/linux/centos7/5
+    - env: T=devel/linux/centos8/5
+    - env: T=devel/linux/fedora31/5
+    - env: T=devel/linux/fedora32/5
+    - env: T=devel/linux/opensuse15py2/5
+    - env: T=devel/linux/opensuse15/5
+    - env: T=devel/linux/ubuntu1604/5
+    - env: T=devel/linux/ubuntu1804/5
+
+    - env: T=devel/cloud/2.7/1
+    - env: T=devel/cloud/3.6/1
+
+    - env: T=2.10/osx/10.11/1
+    - env: T=2.10/rhel/8.2/1
+    - env: T=2.10/freebsd/12.1/2
+    - env: T=2.10/linux/centos8/2
+    - env: T=2.10/linux/fedora32/3
+    - env: T=2.10/linux/opensuse15/3
+    - env: T=2.10/linux/ubuntu1804/4
+    - env: T=2.10/cloud/3.6/1
+
+    #- env: T=2.9/osx/10.11/1
+    - env: T=2.9/rhel/8.2/1
+    - env: T=2.9/freebsd/12.0/2
+    - env: T=2.9/linux/centos8/2
+    - env: T=2.9/linux/fedora31/3
+    - env: T=2.9/linux/opensuse15/3
+    - env: T=2.9/linux/ubuntu1804/4
+    - env: T=2.9/cloud/3.6/1
 
 branches:
   except:
