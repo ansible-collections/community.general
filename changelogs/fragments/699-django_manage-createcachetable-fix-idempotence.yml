@@ -1,0 +1,2 @@
+bugfixes:
+  - django_manage - fix idempotence for ``createcachetable`` (https://github.com/ansible-collections/community.general/pull/699).

@@ -164,8 +164,8 @@ def _ensure_virtualenv(module):
     os.environ["VIRTUAL_ENV"] = venv_param
 
 
-def createcachetable_filter_output(line):
-    return "Already exists" not in line
+def createcachetable_check_changed(output):
+    return "already exists" not in output
 
 
 def flush_filter_output(line):
@@ -282,7 +282,7 @@ def main():
     rc, out, err = module.run_command(cmd, cwd=app_path)
     if rc != 0:
         if command == 'createcachetable' and 'table' in err and 'already exists' in err:
-            out = 'Already exists.'
+            out = 'already exists.'
         else:
             if "Unknown command:" in err:
                 _fail(module, cmd, err, "Unknown django command: %s" % command)
@@ -296,6 +296,9 @@ def main():
         filtered_output = list(filter(filt, lines))
         if len(filtered_output):
             changed = True
+    check_changed = globals().get("{0}_check_changed".format(command), None)
+    if check_changed:
+        changed = check_changed(out)
 
     module.exit_json(changed=changed, out=out, cmd=cmd, app_path=app_path, virtualenv=virtualenv,
                      settings=module.params['settings'], pythonpath=module.params['pythonpath'])
