@@ -1,0 +1,2 @@
+minor_changes:
+  - xml - Fixed issue were changed was returned when removing non-existent xpath
