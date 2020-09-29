@@ -145,6 +145,15 @@ EXAMPLES = r'''
     ipa_user: admin
     ipa_pass: topsecret
     update_password: on_create
+
+- name: Ensure pinky is present and using one time password authentication
+  community.general.ipa_user:
+    name: pinky
+    state: present
+    userauthtype: otp
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: topsecret
 '''
 
 RETURN = r'''
