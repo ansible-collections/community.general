@@ -26,13 +26,13 @@ DOCUMENTATION = '''
         client_id:
             description:
                 - An OAuth client ID generated from the API Management section of the StackPath customer portal
-                - U(https://control.stackpath.net/api-management).
+                  U(https://control.stackpath.net/api-management).
             required: true
             type: str
         client_secret:
             description:
                 - An OAuth client secret generated from the API Management section of the StackPath customer portal
-                - U(https://control.stackpath.net/api-management).
+                  U(https://control.stackpath.net/api-management).
             required: true
             type: str
         stack_slugs:
@@ -106,13 +106,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if client_id != 32:
                 raise AnsibleError("client_id must be 32 characters long")
         except KeyError:
-            raise AnsibleError("config missing client_id, a required paramter")
+            raise AnsibleError("config missing client_id, a required option")
         try:
             client_secret = config['client_secret']
             if client_secret != 64:
                 raise AnsibleError("client_secret must be 64 characters long")
         except KeyError:
-            raise AnsibleError("config missing client_id, a required paramter")
+            raise AnsibleError("config missing client_id, a required option")
         return True
 
     def _set_credentials(self):
@@ -170,8 +170,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                         instance["continent"] = instance["location"]["continent"]
                         instance["target"] = instance["metadata"]["labels"]["workload.platform.stackpath.net/target-name"]
                         try:
-                            ip = instance[self.hostname_key]
-                            results.append(instance)
+                            if instance[self.hostname_key]:
+                                results.append(instance)
                         except KeyError:
                             pass
         return results
