@@ -5,6 +5,93 @@ Community General Release Notes
 .. contents:: Topics
 
 
+v1.2.0
+======
+
+Release Summary
+---------------
+
+Regular bimonthly minor release.
+
+Minor Changes
+-------------
+
+- hashi_vault - support ``VAULT_NAMESPACE`` environment variable for namespaced lookups against Vault Enterprise (in addition to the ``namespace=`` flag supported today) (https://github.com/ansible-collections/community.general/pull/929).
+- hashi_vault lookup - add ``VAULT_TOKEN_FILE`` as env option to specify ``token_file`` param (https://github.com/ansible-collections/community.general/issues/373).
+- hashi_vault lookup - add ``VAULT_TOKEN_PATH`` as env option to specify ``token_path`` param (https://github.com/ansible-collections/community.general/issues/373).
+- ipa_user - add ``userauthtype`` option (https://github.com/ansible-collections/community.general/pull/951).
+- iptables_state - use FQCN when calling a module from action plugin (https://github.com/ansible-collections/community.general/pull/967).
+- nagios - add the ``acknowledge`` action (https://github.com/ansible-collections/community.general/pull/820).
+- nagios - add the ``host`` and ``all`` values for the ``forced_check`` action (https://github.com/ansible-collections/community.general/pull/998).
+- nagios - add the ``service_check`` action (https://github.com/ansible-collections/community.general/pull/820).
+- nagios - rename the ``service_check`` action to ``forced_check`` since we now are able to check both a particular service, all services of a particular host and the host itself (https://github.com/ansible-collections/community.general/pull/998).
+- pkgutil - module can now accept a list of packages (https://github.com/ansible-collections/community.general/pull/799).
+- pkgutil - module has a new option, ``force``, equivalent to the ``-f`` option to the `pkgutil <http://pkgutil.net/>`_ command (https://github.com/ansible-collections/community.general/pull/799).
+- pkgutil - module now supports check mode (https://github.com/ansible-collections/community.general/pull/799).
+- postgresql_privs - add the ``usage_on_types`` option (https://github.com/ansible-collections/community.general/issues/884).
+- proxmox_kvm - improve code readability (https://github.com/ansible-collections/community.general/pull/934).
+- pushover - add device parameter (https://github.com/ansible-collections/community.general/pull/802).
+- redfish_command - add sub-command for ``EnableContinuousBootOverride`` and ``DisableBootOverride`` to allow setting BootSourceOverrideEnabled Redfish property (https://github.com/ansible-collections/community.general/issues/824).
+- redfish_command - support same reset actions on Managers as on Systems (https://github.com/ansible-collections/community.general/issues/901).
+- slack - add support for updating messages (https://github.com/ansible-collections/community.general/issues/304).
+- xml - fixed issue were changed was returned when removing non-existent xpath (https://github.com/ansible-collections/community.general/pull/1007).
+- zypper_repository - proper failure when python-xml is missing (https://github.com/ansible-collections/community.general/pull/939).
+
+Bugfixes
+--------
+
+- aerospike_migrations - handle exception when unstable-cluster is returned (https://github.com/ansible-collections/community.general/pull/900).
+- django_manage - fix idempotence for ``createcachetable`` (https://github.com/ansible-collections/community.general/pull/699).
+- docker_container - fix idempotency problem with ``published_ports`` when strict comparison is used and list is empty (https://github.com/ansible-collections/community.general/issues/978).
+- gem - fix get_installed_versions: correctly parse ``default`` version (https://github.com/ansible-collections/community.general/pull/783).
+- hashi_vault - add missing ``mount_point`` parameter for approle auth (https://github.com/ansible-collections/community.general/pull/897).
+- hashi_vault lookup - ``token_path`` in config file overridden by env ``HOME`` (https://github.com/ansible-collections/community.general/issues/373).
+- homebrew_cask - fixed issue where a cask with ``@`` in the name is incorrectly reported as invalid (https://github.com/ansible-collections/community.general/issues/733).
+- interfaces_file - escape regular expression characters in old value (https://github.com/ansible-collections/community.general/issues/777).
+- launchd - fix for user-level services (https://github.com/ansible-collections/community.general/issues/896).
+- nmcli - set ``C`` locale when executing ``nmcli`` (https://github.com/ansible-collections/community.general/issues/989).
+- parted - fix creating partition when label is changed (https://github.com/ansible-collections/community.general/issues/522).
+- pkg5 - now works when Python 3 is used on the target (https://github.com/ansible-collections/community.general/pull/789).
+- postgresql_privs - allow to pass ``PUBLIC`` role written in lowercase letters (https://github.com/ansible-collections/community.general/issues/857).
+- postgresql_privs - fix the module mistakes a procedure for a function (https://github.com/ansible-collections/community.general/issues/994).
+- postgresql_privs - rollback if nothing changed (https://github.com/ansible-collections/community.general/issues/885).
+- postgresql_privs - the module was attempting to revoke grant options even though ``grant_option`` was not specified (https://github.com/ansible-collections/community.general/pull/796).
+- proxmox_kvm - defer error-checking for non-existent VMs in order to fix idempotency of tasks using ``state=absent`` and properly recognize a success (https://github.com/ansible-collections/community.general/pull/811).
+- proxmox_kvm - improve handling of long-running tasks by creating a dedicated function (https://github.com/ansible-collections/community.general/pull/831).
+- slack - fix ``xox[abp]`` token identification to capture everything after ``xox[abp]``, as the token is the only thing that should be in this argument (https://github.com/ansible-collections/community.general/issues/862).
+- terraform - fix incorrectly reporting a status of unchanged when number of resources added or destroyed are multiples of 10 (https://github.com/ansible-collections/community.general/issues/561).
+- timezone - support Python3 on macos/darwin (https://github.com/ansible-collections/community.general/pull/945).
+- zfs - fixed ``invalid character '@' in pool name"`` error when working with snapshots on a root zvol (https://github.com/ansible-collections/community.general/issues/932).
+
+New Plugins
+-----------
+
+Inventory
+~~~~~~~~~
+
+- proxmox - Proxmox inventory source
+- stackpath_compute - StackPath Edge Computing inventory source
+
+New Modules
+-----------
+
+Cloud
+~~~~~
+
+scaleway
+^^^^^^^^
+
+- scaleway_database_backup - Scaleway database backups management module
+
+Source Control
+~~~~~~~~~~~~~~
+
+gitlab
+^^^^^^
+
+- gitlab_group_members - Manage group members on GitLab Server
+- gitlab_group_variable - Creates, updates, or deletes GitLab groups variables
+
 v1.1.0
 ======
 
