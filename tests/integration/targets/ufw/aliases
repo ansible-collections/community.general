@@ -1,6 +1,7 @@
 shippable/posix/group2
 skip/aix
 skip/osx
+skip/macos
 skip/freebsd
 skip/rhel8.0
 skip/rhel8.0b

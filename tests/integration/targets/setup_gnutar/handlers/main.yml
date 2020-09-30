@@ -1,0 +1,7 @@
+---
+- name: uninstall gnu-tar
+  community.general.homebrew:
+    name: gnu-tar
+    state: absent
+  become: yes
+  become_user: "{{ brew_stat.stat.pw_name }}"

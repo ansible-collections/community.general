@@ -2,6 +2,7 @@ disabled
 shippable/posix/group2
 skip/aix
 skip/osx
+skip/macos
 skip/freebsd
 destructive
 skip/docker  # We need SSH access to the VM and need to be able to let
