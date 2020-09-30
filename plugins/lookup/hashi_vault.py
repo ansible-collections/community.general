@@ -119,6 +119,12 @@ DOCUMENTATION = """
       description: Controls verification and validation of SSL certificates, mostly you only want to turn off with self signed ones.
       type: boolean
       default: True
+    skip_certificate_validation:
+      description: Controls verification and validation of SSL certificates, mostly you only want to turn off with self signed ones. This takes precedence over validate_certs
+      type: boolean
+      env:
+        - name: VAULT_SKIP_VERIFY
+          version_added: 1.2.1
     namespace:
       description: Namespace where secrets reside. Requires HVAC 0.7.0+ and Vault 0.11+.
       env:
@@ -486,7 +492,13 @@ class LookupModule(LookupBase):
         #
         '''' return a bool or cacert '''
         ca_cert = self.get_option('ca_cert')
-        validate_certs = self.get_option('validate_certs')
+
+        skip_certificate_validation = self.get_option('skip_certificate_validation')
+        
+        if skip_certificate_validation != None:
+          validate_certs = not skip_certificate_validation
+        else:
+          validate_certs = self.get_option('validate_certs')
 
         if not (validate_certs and ca_cert):
             self.set_option('ca_cert', validate_certs)
