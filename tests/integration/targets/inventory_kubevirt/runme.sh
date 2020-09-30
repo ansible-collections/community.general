@@ -9,6 +9,8 @@ fi
 set -eux
 
 source virtualenv.sh
+python --version
+pip --version
 pip install openshift -c constraints.txt
 
 ./server.py &
