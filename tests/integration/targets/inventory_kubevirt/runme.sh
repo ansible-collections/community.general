@@ -11,6 +11,7 @@ set -eux
 source virtualenv.sh
 python --version
 pip --version
+pip install --upgrade setuptools -c constraints.txt
 pip install openshift -c constraints.txt
 
 ./server.py &
