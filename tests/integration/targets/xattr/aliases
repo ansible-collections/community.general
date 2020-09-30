@@ -3,4 +3,5 @@ skip/aix
 skip/docker
 skip/freebsd
 skip/osx
+skip/macos
 destructive
