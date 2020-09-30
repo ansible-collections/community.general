@@ -119,7 +119,7 @@ files:
   $lookups/dig.py:
     maintainers: jpmens
     labels: dig
-  $lookups/dss.py:
+  $lookups/tss.py:
     authors: amigus
   $lookups/dsv.py:
     authors: amigus
