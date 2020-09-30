@@ -3,4 +3,5 @@ needs/root
 shippable/posix/group1
 skip/aix
 skip/osx
+skip/macos
 skip/freebsd
