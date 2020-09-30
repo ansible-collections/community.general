@@ -4,3 +4,4 @@ needs/root
 skip/aix
 skip/freebsd
 skip/osx
+skip/macos
