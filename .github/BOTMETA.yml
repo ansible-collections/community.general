@@ -9,6 +9,8 @@ files:
   $actions/ironware.py:
     maintainers: paulquack
     labels: ironware networking
+  $actions/shutdown.py:
+    authors: nitzmahone samdoran aminvakil
   $becomes/:
     labels: become
   $callbacks/:
@@ -71,6 +73,10 @@ files:
   $doc_fragments/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
+  $filters/time.py:
+    authors: resmo
+  $filters/jc.py:
+    authors: kellyjonbrazil
   $httpapis/:
     maintainers: $team_networking
     labels: networking
@@ -113,6 +119,10 @@ files:
   $lookups/dig.py:
     maintainers: jpmens
     labels: dig
+  $lookups/tss.py:
+    authors: amigus
+  $lookups/dsv.py:
+    authors: amigus
   $lookups/hashi_vault.py:
     labels: hashi_vault
   $lookups/manifold.py:
@@ -237,6 +247,9 @@ files:
   $modules/cloud/docker/docker_stack.py:
     authors: dariko
     maintainers: DBendit WojciechowskiPiotr akshay196 danihodovic felixfontein jwitko kassiansun tbouvet
+  $modules/cloud/docker/docker_stack_task_info.py:
+    authors: imjoseangel
+    maintainers: $team_docker
   $modules/cloud/docker/docker_swarm.py:
     authors: WojciechowskiPiotr tbouvet
     maintainers: DBendit akshay196 danihodovic dariko felixfontein jwitko kassiansun
@@ -396,6 +409,9 @@ files:
   $modules/cloud/scaleway/:
     authors: sieben
     maintainers: $team_scaleway
+  $modules/cloud/scaleway/scaleway_database_backup.py:
+    authors: guillaume_ro_fr
+    maintainers: $team_scaleway
   $modules/cloud/scaleway/scaleway_image_info.py:
     authors: Spredzy sieben
   $modules/cloud/scaleway/scaleway_ip_info.py:
@@ -482,6 +498,8 @@ files:
     authors: ThePixelDeveloper samdoran
   $modules/database/misc/kibana_plugin.py:
     authors: barryib
+  $modules/database/misc/odbc.py:
+    authors: john-westcott-iv
   $modules/database/misc/redis.py:
     authors: slok
   $modules/database/misc/riak.py:
@@ -673,6 +691,9 @@ files:
     authors: jtyr
   $modules/net_tools/ldap/ldap_passwd.py:
     authors: KellerFuchs
+    maintainers: jtyr
+  $modules/net_tools/ldap/ldap_search.py:
+    authors: eryx12o45
     maintainers: jtyr
   $modules/net_tools/lldp.py:
     authors: andyhky
@@ -1022,23 +1043,29 @@ files:
   $modules/source_control/gitlab/:
     notify: jlozadad
     authors: Lunik marwatk
-    maintainers: Shaps dj-wasabi waheedi
+    maintainers: $team_gitlab
     keywords: gitlab source_control
   $modules/source_control/gitlab/gitlab_group.py:
     authors: Lunik dj-wasabi
-    maintainers: Shaps marwatk waheedi
+    maintainers: $team_gitlab
+  $modules/source_control/gitlab/gitlab_group_members.py:
+    authors: zanssa
+    maintainers: $team_gitlab
+  $modules/source_control/gitlab/gitlab_group_variable.py:
+    authors: scodeman
+    maintainers: $team_gitlab
   $modules/source_control/gitlab/gitlab_project.py:
     authors: Lunik dj-wasabi
-    maintainers: Shaps marwatk waheedi
+    maintainers: $team_gitlab
   $modules/source_control/gitlab/gitlab_project_variable.py:
     authors: markuman
     maintainers: $team_gitlab
   $modules/source_control/gitlab/gitlab_runner.py:
     authors: Lunik SamyCoenen
-    maintainers: Shaps dj-wasabi marwatk waheedi
+    maintainers: $team_gitlab
   $modules/source_control/gitlab/gitlab_user.py:
     authors: Lunik dj-wasabi
-    maintainers: Shaps marwatk waheedi
+    maintainers: $team_gitlab
   $modules/source_control/hg.py:
     authors: yeukhon
   $modules/storage/emc/emc_vnx_sg_member.py:
@@ -1112,6 +1139,8 @@ files:
     authors: groks
   $modules/system/dconf.py:
     authors: azaghal
+  $modules/system/dpkg_divert.py:
+    authors: quidame
   $modules/system/facter.py:
     authors: ansible
     labels: facter
@@ -1127,12 +1156,16 @@ files:
     authors: hryamzik
     maintainers: obourdon
     labels: interfaces_file
+  $modules/system/iptables_state.py:
+    authors: quidame
   $modules/system/java_cert.py:
     authors: haad
   $modules/system/java_keystore.py:
     authors: Mogztter
   $modules/system/kernel_blacklist.py:
     authors: matze
+  $modules/system/launchd.py:
+    authors: martinm82
   $modules/system/lbu.py:
     authors: kunkku
   $modules/system/listen_ports_facts.py:
@@ -1203,6 +1236,8 @@ files:
   $modules/system/svc.py:
     authors: bcoca
   $modules/system/syspatch.py:
+    authors: precurse
+  $modules/system/sysupgrade.py:
     authors: precurse
   $modules/system/timezone.py:
     authors: indrajitr jasperla tmshn
