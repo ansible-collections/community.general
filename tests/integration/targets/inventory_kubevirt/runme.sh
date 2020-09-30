@@ -8,6 +8,9 @@ fi
 
 set -eux
 
+uname
+uname -o
+uname -a
 source virtualenv.sh
 python --version
 pip --version
