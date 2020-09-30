@@ -16,7 +16,7 @@ if [[ $(uname -a) =~ FreeBSD\ 12\.0-RELEASE ]]
     # the venv leaks into the venv (https://github.com/pypa/pip/issues/6264).
     # Since it is not fixed in latest pip (which is available in the venv), we
     # need to upgrade setuptools outside the venv.
-    pip36 install --upgrade setuptools
+    pip3 install --upgrade setuptools
 fi
 
 source virtualenv.sh
