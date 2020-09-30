@@ -10,10 +10,11 @@
         path: "{{ brew_which.stdout }}"
       register: brew_stat
 
-    - command: brew install gnu-tar
+    - name: MACOS | Install gnu-tar
+      community.general.homebrew:
+        name: gnu-tar
+        state: present
       become: yes
       become_user: "{{ brew_stat.stat.pw_name }}"
-      environment:
-        HOMEBREW_NO_AUTO_UPDATE: True
       notify:
         - uninstall gnu-tar
