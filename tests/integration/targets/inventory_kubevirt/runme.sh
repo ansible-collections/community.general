@@ -8,7 +8,21 @@ fi
 
 set -eux
 
+uname -a
+if [[ $(uname -a) =~ FreeBSD\ 12\.0-RELEASE ]]
+  then
+    # On FreeBSD 12.0 images, upgrade setuptools to avoid error with multidict
+    # This is a bug in pip, which happens because the old setuptools from outside
+    # the venv leaks into the venv (https://github.com/pypa/pip/issues/6264).
+    # Since it is not fixed in latest pip (which is available in the venv), we
+    # need to upgrade setuptools outside the venv.
+    pip3 install --upgrade setuptools
+fi
+
 source virtualenv.sh
+python --version
+pip --version
+pip show setuptools
 pip install openshift -c constraints.txt
 
 ./server.py &
