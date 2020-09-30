@@ -3,3 +3,4 @@ shippable/posix/group4
 postgresql_db
 skip/aix
 skip/osx
+skip/macos
