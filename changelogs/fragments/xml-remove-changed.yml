@@ -1,0 +1,2 @@
+minor_changes:
+  - xml - fixed issue were changed was returned when removing non-existent xpath (https://github.com/ansible-collections/community.general/pull/1007).
