@@ -411,8 +411,10 @@ def xpath_matches(tree, xpath, namespaces):
 
 def delete_xpath_target(module, tree, xpath, namespaces):
     """ Delete an attribute or element from a tree """
+    changed = False
     try:
         for result in tree.xpath(xpath, namespaces=namespaces):
+            changed = True
             # Get the xpath for this result
             if is_attribute(tree, xpath, namespaces):
                 # Delete an attribute
@@ -429,7 +431,7 @@ def delete_xpath_target(module, tree, xpath, namespaces):
     except Exception as e:
         module.fail_json(msg="Couldn't delete xpath target: %s (%s)" % (xpath, e))
     else:
-        finish(module, tree, xpath, namespaces, changed=True)
+        finish(module, tree, xpath, namespaces, changed=changed)
 
 
 def replace_children_of(children, match):
