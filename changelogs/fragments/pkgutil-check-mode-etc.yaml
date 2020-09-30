@@ -1,0 +1,4 @@
+minor_changes:
+  - pkgutil - module now supports check mode (https://github.com/ansible-collections/community.general/pull/799).
+  - pkgutil - module can now accept a list of packages (https://github.com/ansible-collections/community.general/pull/799).
+  - pkgutil - module has a new option, ``force``, equivalent to the ``-f`` option to the `pkgutil <http://pkgutil.net/>`_ command (https://github.com/ansible-collections/community.general/pull/799).
