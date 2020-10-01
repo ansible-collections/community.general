@@ -396,6 +396,7 @@ actions:
   type: list
   sample: ["create", "start"]
 '''
+import copy
 import datetime
 import os
 import time
@@ -492,6 +493,7 @@ class LXDContainerManagement(object):
             self.module.fail_json(msg=e.msg)
         self.trust_password = self.module.params.get('trust_password', None)
         self.actions = []
+        self.diff = {'before': {}, 'after': {}}
 
     def _build_config(self):
         self.config = {}
@@ -525,7 +527,8 @@ class LXDContainerManagement(object):
         body_json = {'action': action, 'timeout': self.timeout}
         if force_stop:
             body_json['force'] = True
-        return self.client.do('PUT', url, body_json=body_json)
+        if not self.module.check_mode:
+            return self.client.do('PUT', url, body_json=body_json)
 
     def _create_instance(self):
         url = self.api_endpoint
@@ -538,7 +541,8 @@ class LXDContainerManagement(object):
             url = '{0}?{1}'.format(url, urlencode(url_params))
         config = self.config.copy()
         config['name'] = self.name
-        self.client.do('POST', url, config, wait_for_container=self.wait_for_container)
+        if not self.module.check_mode:
+            self.client.do('POST', url, config, wait_for_container=self.wait_for_container)
         self.actions.append('create')
 
     def _start_instance(self):
@@ -557,7 +561,8 @@ class LXDContainerManagement(object):
         url = '{0}/{1}'.format(self.api_endpoint, self.name)
         if self.project:
             url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
-        self.client.do('DELETE', url)
+        if not self.module.check_mode:
+            self.client.do('DELETE', url)
         self.actions.append('delete')
 
     def _freeze_instance(self):
@@ -687,7 +692,7 @@ class LXDContainerManagement(object):
         return False
 
     def _apply_instance_configs(self):
-        old_metadata = self.old_instance_json['metadata']
+        old_metadata = copy.deepcopy(self.old_instance_json['metadata'])
         body_json = {}
         for param in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS):
             if param in old_metadata:
@@ -699,11 +704,12 @@ class LXDContainerManagement(object):
                         body_json['config'][k] = v
                 else:
                     body_json[param] = self.config[param]
-
+        self.diff['after']['instance'] = body_json
         url = '{0}/{1}'.format(self.api_endpoint, self.name)
         if self.project:
             url = '{0}?{1}'.format(url, urlencode(dict(project=self.project)))
-        self.client.do('PUT', url, body_json=body_json)
+        if not self.module.check_mode:
+            self.client.do('PUT', url, body_json=body_json)
         self.actions.append('apply_instance_configs')
 
     def run(self):
@@ -714,8 +720,17 @@ class LXDContainerManagement(object):
                 self.client.authenticate(self.trust_password)
             self.ignore_volatile_options = self.module.params.get('ignore_volatile_options')
 
-            self.old_instance_json = self._get_instance_json()
-            self.old_state = self._instance_json_to_module_state(self.old_instance_json)
+            self.diff['before']['state'] = self.old_state
+            self.diff['after']['state'] = self.state
+
+            old_sections = dict((k, v) for k, v in self.old_container_json['metadata'].items() if k in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS))
+            self.diff['before']['instance'] = dict(
+                (section, content) if not isinstance(content, dict)
+                else (section, dict((k, v) for k, v in content.items()
+                                    if not (self.ignore_volatile_options and k.startswith('volatile.'))))
+                for section, content in old_sections.items()
+            )
+
             action = getattr(self, LXD_ANSIBLE_STATES[self.state])
             action()
 
@@ -724,7 +739,8 @@ class LXDContainerManagement(object):
                 'log_verbosity': self.module._verbosity,
                 'changed': state_changed,
                 'old_state': self.old_state,
-                'actions': self.actions
+                'actions': self.actions,
+                'diff': self.diff
             }
             if self.client.debug:
                 result_json['logs'] = self.client.logs
@@ -736,7 +752,8 @@ class LXDContainerManagement(object):
             fail_params = {
                 'msg': e.msg,
                 'changed': state_changed,
-                'actions': self.actions
+                'actions': self.actions,
+                'diff': self.diff
             }
             if self.client.debug:
                 fail_params['logs'] = e.kwargs['logs']
@@ -824,7 +841,7 @@ def main():
             ),
             trust_password=dict(type='str', no_log=True)
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     lxd_manage = LXDContainerManagement(module=module)
