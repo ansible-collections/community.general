@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: nomad_job
 author: FERREIRA Christophe (@chris93111)
-version_added: "1.2.0"
+version_added: "1.3.0"
 short_description: Launch a Nomad Job
 description:
     - Launch a Nomad job.
@@ -115,8 +115,6 @@ EXAMPLES = '''
     force_start: true
 '''
 
-
-import os
 import json
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -191,7 +189,7 @@ def run():
                 try:
                     job_id = job_json.get('ID')
                     if job_id is None:
-                        module.fail_json(msg="Can't revover job ID")
+                        module.fail_json(msg="Cannot retrieve job with ID None")
                     plan = nomad_client.job.plan_job(job_id, job, diff=True)
                     if not plan['Diff'].get('Type') == "None":
                         changed = True
