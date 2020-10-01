@@ -116,7 +116,9 @@ DOCUMENTATION = """
       description: Path to certificate to use for authentication.
       aliases: [ cacert ]
     validate_certs:
-      description: Controls verification and validation of SSL certificates, mostly you only want to turn off with self signed ones. Will be populated with the inverse of VAULT_SKIP_VERIFY if it is set.
+      description:
+        - Controls verification and validation of SSL certificates, mostly you only want to turn off with self signed ones.
+        - Will be populated with the inverse of VAULT_SKIP_VERIFY if it is set (added in community.general 1.3.0).
       type: boolean
       default: True
     namespace:
@@ -489,18 +491,18 @@ class LookupModule(LookupBase):
         ca_cert = self.get_option('ca_cert')
 
         vault_skip_verify = os.environ.get('VAULT_SKIP_VERIFY')
-        
-        if vault_skip_verify != None:
-          try:
-            # Check that we have a boolean value
-            vault_skip_verify = boolean(vault_skip_verify)
-            # Use the inverse of VAULT_SKIP_VERIFY 
-            validate_certs = not vault_skip_verify
-          except TypeError:
-            # Not a boolean value fallback to validate_certs option
-            validate_certs = self.get_option('validate_certs')
+
+        if vault_skip_verify is not None:
+            try:
+                # Check that we have a boolean value
+                vault_skip_verify = boolean(vault_skip_verify)
+                # Use the inverse of VAULT_SKIP_VERIFY
+                validate_certs = not vault_skip_verify
+            except TypeError:
+                # Not a boolean value fallback to validate_certs option
+                validate_certs = self.get_option('validate_certs')
         else:
-          validate_certs = self.get_option('validate_certs')
+            validate_certs = self.get_option('validate_certs')
 
         if not (validate_certs and ca_cert):
             self.set_option('ca_cert', validate_certs)
