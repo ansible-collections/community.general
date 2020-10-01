@@ -143,6 +143,12 @@ options:
           - If trust_password is set, this module send a request for
             authentication before sending any requests.
         required: false
+    instances_endpoint:
+        description:
+          - The REST API endpoint to use. Newer LXD versions use /instances,
+            set to /containers for older versions.
+        required: false
+        default: /instances
 notes:
   - Containers must have a unique name. If you attempt to create a container
     with a name that already existed in the users namespace the module will
@@ -393,7 +399,9 @@ class LXDContainerManagement(object):
         except LXDClientException as e:
             self.module.fail_json(msg=e.msg)
         self.trust_password = self.module.params.get('trust_password', None)
+        self.endpoint = "/1.0" + self.module.params['instances_endpoint']
         self.actions = []
+        self.diff = {'before': {}, 'after': {}}
 
     def _build_config(self):
         self.config = {}
@@ -404,13 +412,13 @@ class LXDContainerManagement(object):
 
     def _get_container_json(self):
         return self.client.do(
-            'GET', '/1.0/instances/{0}'.format(self.name),
+            'GET', self.endpoint + '/{0}'.format(self.name),
             ok_error_codes=[404]
         )
 
     def _get_container_state_json(self):
         return self.client.do(
-            'GET', '/1.0/instances/{0}/state'.format(self.name),
+            'GET', self.endpoint + '/{0}/state'.format(self.name),
             ok_error_codes=[404]
         )
 
@@ -424,15 +432,17 @@ class LXDContainerManagement(object):
         body_json = {'action': action, 'timeout': self.timeout}
         if force_stop:
             body_json['force'] = True
-        return self.client.do('PUT', '/1.0/instances/{0}/state'.format(self.name), body_json=body_json)
+        if not self.module.check_mode:
+            return self.client.do('PUT', self.endpoint + '/{0}/state'.format(self.name), body_json=body_json)
 
     def _create_container(self):
         config = self.config.copy()
         config['name'] = self.name
-        if self.target:
-            self.client.do('POST', '/1.0/containers?' + urlencode(dict(target=self.target)), config)
-        else:
-            self.client.do('POST', '/1.0/containers', config)
+        if not self.module.check_mode:
+            if self.target:
+                self.client.do('POST', self.endpoint + '?' + urlencode(dict(target=self.target)), config)
+            else:
+                self.client.do('POST', self.endpoint, config)
         self.actions.append('create')
 
     def _start_container(self):
@@ -448,7 +458,8 @@ class LXDContainerManagement(object):
         self.actions.append('restart')
 
     def _delete_container(self):
-        self.client.do('DELETE', '/1.0/instances/{0}'.format(self.name))
+        if not self.module.check_mode:
+            self.client.do('DELETE', self.endpoint + '/{0}'.format(self.name))
         self.actions.append('delete')
 
     def _freeze_container(self):
@@ -571,6 +582,7 @@ class LXDContainerManagement(object):
 
     def _apply_container_configs(self):
         old_metadata = self.old_container_json['metadata']
+
         body_json = {}
         for param in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS):
             if param in old_metadata:
@@ -582,8 +594,9 @@ class LXDContainerManagement(object):
                         body_json['config'][k] = v
                 else:
                     body_json[param] = self.config[param]
-
-        self.client.do('PUT', '/1.0/instances/{0}'.format(self.name), body_json=body_json)
+        self.diff['after']['instance'] = body_json
+        if not self.module.check_mode:
+            self.client.do('PUT', self.endpoint + '/{0}'.format(self.name), body_json=body_json)
         self.actions.append('apply_container_configs')
 
     def run(self):
@@ -595,6 +608,18 @@ class LXDContainerManagement(object):
 
             self.old_container_json = self._get_container_json()
             self.old_state = self._container_json_to_module_state(self.old_container_json)
+
+            self.diff['before']['state'] = self.old_state
+            self.diff['after']['state'] = self.state
+
+            old_sections = dict((k, v) for k, v in self.old_container_json['metadata'].items() if k in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS))
+            self.diff['before']['instance'] = dict(
+                (section, content) if not isinstance(section, dict)
+                else (section, dict((k, v) for k, v in content.items()
+                                    if not k.startswith('volatile.')))
+                for section, content in old_sections.items()
+            )
+
             action = getattr(self, LXD_ANSIBLE_STATES[self.state])
             action()
 
@@ -603,7 +628,8 @@ class LXDContainerManagement(object):
                 'log_verbosity': self.module._verbosity,
                 'changed': state_changed,
                 'old_state': self.old_state,
-                'actions': self.actions
+                'actions': self.actions,
+                'diff': self.diff
             }
             if self.client.debug:
                 result_json['logs'] = self.client.logs
@@ -615,7 +641,8 @@ class LXDContainerManagement(object):
             fail_params = {
                 'msg': e.msg,
                 'changed': state_changed,
-                'actions': self.actions
+                'actions': self.actions,
+                'diff': self.diff
             }
             if self.client.debug:
                 fail_params['logs'] = e.kwargs['logs']
@@ -690,9 +717,10 @@ def main():
                 default='{0}/.config/lxc/client.crt'.format(os.environ['HOME']),
                 aliases=['cert_file']
             ),
-            trust_password=dict(type='str', no_log=True)
+            trust_password=dict(type='str', no_log=True),
+            instances_endpoint=dict(type='str', default='/instances')
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
 
     lxd_manage = LXDContainerManagement(module=module)
