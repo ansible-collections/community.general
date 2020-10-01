@@ -116,15 +116,9 @@ DOCUMENTATION = """
       description: Path to certificate to use for authentication.
       aliases: [ cacert ]
     validate_certs:
-      description: Controls verification and validation of SSL certificates, mostly you only want to turn off with self signed ones.
+      description: Controls verification and validation of SSL certificates, mostly you only want to turn off with self signed ones. Will be populated with the inverse of VAULT_SKIP_VERIFY if it is set.
       type: boolean
       default: True
-    skip_certificate_validation:
-      description: Controls verification and validation of SSL certificates, mostly you only want to turn off with self signed ones. This takes precedence over validate_certs
-      type: boolean
-      env:
-        - name: VAULT_SKIP_VERIFY
-          version_added: 1.2.1
     namespace:
       description: Namespace where secrets reside. Requires HVAC 0.7.0+ and Vault 0.11+.
       env:
@@ -263,6 +257,7 @@ import os
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
+from ansible.module_utils.parsing.convert_bool import boolean
 
 HAS_HVAC = False
 try:
@@ -493,10 +488,17 @@ class LookupModule(LookupBase):
         '''' return a bool or cacert '''
         ca_cert = self.get_option('ca_cert')
 
-        skip_certificate_validation = self.get_option('skip_certificate_validation')
+        vault_skip_verify = os.environ.get('VAULT_SKIP_VERIFY')
         
-        if skip_certificate_validation != None:
-          validate_certs = not skip_certificate_validation
+        if vault_skip_verify != None:
+          try:
+            # Check that we have a boolean value
+            vault_skip_verify = boolean(vault_skip_verify)
+            # Use the inverse of VAULT_SKIP_VERIFY 
+            validate_certs = not vault_skip_verify
+          except TypeError:
+            # Not a boolean value fallback to validate_certs option
+            validate_certs = self.get_option('validate_certs')
         else:
           validate_certs = self.get_option('validate_certs')
 
