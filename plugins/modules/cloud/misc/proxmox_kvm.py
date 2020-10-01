@@ -120,10 +120,10 @@ options:
     description:
       - Target drive's backing file's data format.
       - Used only with clone
-      - Use format: null and full: no for linked clone
+      - Use I(format=unspecified) and I(full=false) for linked clone.
     type: str
     default: qcow2
-    choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", null ]
+    choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", "unspecified" ]
   freeze:
     description:
       - Specify if PVE should freeze CPU at startup (use 'c' monitor command to start execution).
@@ -486,7 +486,7 @@ EXAMPLES = '''
     node: sabrewulf
     storage: VMs
     full: no
-    format: null
+    format: unspecified
     timeout: 500
 
 - name: Clone VM with source vmid and target newid and raw format
@@ -818,7 +818,7 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
             return False
     elif module.params['clone'] is not None:
         for param in valid_clone_params:
-            if module.params[param] is not None:
+            if module.params[param] is not None and module.params[param] != 'unspecified':
                 clone_params[param] = module.params[param]
         clone_params.update(dict([k, int(v)] for k, v in clone_params.items() if isinstance(v, bool)))
         taskid = proxmox_node.qemu(vmid).clone.post(newid=newid, name=name, **clone_params)
@@ -882,7 +882,7 @@ def main():
             description=dict(type='str'),
             digest=dict(type='str'),
             force=dict(type='bool', default=False),
-            format=dict(type='str', default='qcow2', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk', None]),
+            format=dict(type='str', default='qcow2', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk', 'unspecified']),
             freeze=dict(type='bool'),
             full=dict(type='bool', default=True),
             hostpci=dict(type='dict'),
