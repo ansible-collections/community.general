@@ -85,7 +85,7 @@ options:
       default: hcl
       type: str
 notes:
-  - C(check_mode) is supported
+  - C(check_mode) is supported.
 seealso:
   - name: Nomad jobs documentation
     description: Complete documentation for Nomad API jobs.
