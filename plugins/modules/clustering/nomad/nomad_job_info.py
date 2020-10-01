@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: nomad_job_info
 author: FERREIRA Christophe (@chris93111)
-version_added: "1.2.0"
+version_added: "1.3.0"
 short_description: Get Nomad Jobs info
 description:
     - Get info for one Nomad job.
@@ -58,9 +58,10 @@ options:
     name:
       description:
         - Name of job for Get info.
+        - If not specified, lists all jobs.
       type: str
 notes:
-  - C(check_mode) is supported
+  - C(check_mode) is supported.
 seealso:
   - name: Nomad jobs documentation
     description: Complete documentation for Nomad API jobs.
@@ -72,16 +73,15 @@ EXAMPLES = '''
   community.general.nomad_job:
     host: localhost
     name: awx
+  register: result
 
 - name: List Nomad jobs
   community.general.nomad_job:
     host: localhost
+  register: result
 
 '''
 
-
-import os
-import json
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
