@@ -492,7 +492,7 @@ class LookupModule(LookupBase):
 
         validate_certs = self.get_option('validate_certs')
 
-        if validate_certs is not None:
+        if validate_certs is None:
             # Validate certs option was not explicitly set
 
             # Check if VAULT_SKIP_VERIFY is set
