@@ -412,20 +412,20 @@ class LXDContainerManagement(object):
             if param_val is not None:
                 self.config[attr] = param_val
 
-    def _get_container_json(self):
+    def _get_instance_json(self):
         return self.client.do(
             'GET', self.endpoint + '/{0}'.format(self.name),
             ok_error_codes=[404]
         )
 
-    def _get_container_state_json(self):
+    def _get_instance_state_json(self):
         return self.client.do(
             'GET', self.endpoint + '/{0}/state'.format(self.name),
             ok_error_codes=[404]
         )
 
     @staticmethod
-    def _container_json_to_module_state(resp_json):
+    def _instance_json_to_module_state(resp_json):
         if resp_json['type'] == 'error':
             return 'absent'
         return ANSIBLE_LXD_STATES[resp_json['metadata']['status']]
@@ -437,7 +437,7 @@ class LXDContainerManagement(object):
         if not self.module.check_mode:
             return self.client.do('PUT', self.endpoint + '/{0}/state'.format(self.name), body_json=body_json)
 
-    def _create_container(self):
+    def _create_instance(self):
         config = self.config.copy()
         config['name'] = self.name
         if not self.module.check_mode:
@@ -447,35 +447,35 @@ class LXDContainerManagement(object):
                 self.client.do('POST', self.endpoint, config)
         self.actions.append('create')
 
-    def _start_container(self):
+    def _start_instance(self):
         self._change_state('start')
         self.actions.append('start')
 
-    def _stop_container(self):
+    def _stop_instance(self):
         self._change_state('stop', self.force_stop)
         self.actions.append('stop')
 
-    def _restart_container(self):
+    def _restart_instance(self):
         self._change_state('restart', self.force_stop)
         self.actions.append('restart')
 
-    def _delete_container(self):
+    def _delete_instance(self):
         if not self.module.check_mode:
             self.client.do('DELETE', self.endpoint + '/{0}'.format(self.name))
         self.actions.append('delete')
 
-    def _freeze_container(self):
+    def _freeze_instance(self):
         self._change_state('freeze')
         self.actions.append('freeze')
 
-    def _unfreeze_container(self):
+    def _unfreeze_instance(self):
         self._change_state('unfreeze')
         self.actions.append('unfreez')
 
-    def _container_ipv4_addresses(self, ignore_devices=None):
+    def _instance_ipv4_addresses(self, ignore_devices=None):
         ignore_devices = ['lo'] if ignore_devices is None else ignore_devices
 
-        resp_json = self._get_container_state_json()
+        resp_json = self._get_instance_state_json()
         network = resp_json['metadata']['network'] or {}
         network = dict((k, v) for k, v in network.items() if k not in ignore_devices) or {}
         addresses = dict((k, [a['address'] for a in v['addresses'] if a['family'] == 'inet']) for k, v in network.items()) or {}
@@ -490,7 +490,7 @@ class LXDContainerManagement(object):
             due = datetime.datetime.now() + datetime.timedelta(seconds=self.timeout)
             while datetime.datetime.now() < due:
                 time.sleep(1)
-                addresses = self._container_ipv4_addresses()
+                addresses = self._instance_ipv4_addresses()
                 if self._has_all_ipv4_addresses(addresses):
                     self.addresses = addresses
                     return
@@ -500,72 +500,72 @@ class LXDContainerManagement(object):
 
     def _started(self):
         if self.old_state == 'absent':
-            self._create_container()
-            self._start_container()
+            self._create_instance()
+            self._start_instance()
         else:
             if self.old_state == 'frozen':
-                self._unfreeze_container()
+                self._unfreeze_instance()
             elif self.old_state == 'stopped':
-                self._start_container()
-            if self._needs_to_apply_container_configs():
-                self._apply_container_configs()
+                self._start_instance()
+            if self._needs_to_apply_instance_configs():
+                self._apply_instance_configs()
         if self.wait_for_ipv4_addresses:
             self._get_addresses()
 
     def _stopped(self):
         if self.old_state == 'absent':
-            self._create_container()
+            self._create_instance()
         else:
             if self.old_state == 'stopped':
-                if self._needs_to_apply_container_configs():
-                    self._start_container()
-                    self._apply_container_configs()
-                    self._stop_container()
+                if self._needs_to_apply_instance_configs():
+                    self._start_instance()
+                    self._apply_instance_configs()
+                    self._stop_instance()
             else:
                 if self.old_state == 'frozen':
-                    self._unfreeze_container()
-                if self._needs_to_apply_container_configs():
-                    self._apply_container_configs()
-                self._stop_container()
+                    self._unfreeze_instance()
+                if self._needs_to_apply_instance_configs():
+                    self._apply_instance_configs()
+                self._stop_instance()
 
     def _restarted(self):
         if self.old_state == 'absent':
-            self._create_container()
-            self._start_container()
+            self._create_instance()
+            self._start_instance()
         else:
             if self.old_state == 'frozen':
-                self._unfreeze_container()
-            if self._needs_to_apply_container_configs():
-                self._apply_container_configs()
-            self._restart_container()
+                self._unfreeze_instance()
+            if self._needs_to_apply_instance_configs():
+                self._apply_instance_configs()
+            self._restart_instance()
         if self.wait_for_ipv4_addresses:
             self._get_addresses()
 
     def _destroyed(self):
         if self.old_state != 'absent':
             if self.old_state == 'frozen':
-                self._unfreeze_container()
+                self._unfreeze_instance()
             if self.old_state != 'stopped':
-                self._stop_container()
-            self._delete_container()
+                self._stop_instance()
+            self._delete_instance()
 
     def _frozen(self):
         if self.old_state == 'absent':
-            self._create_container()
-            self._start_container()
-            self._freeze_container()
+            self._create_instance()
+            self._start_instance()
+            self._freeze_instance()
         else:
             if self.old_state == 'stopped':
-                self._start_container()
-            if self._needs_to_apply_container_configs():
-                self._apply_container_configs()
-            self._freeze_container()
+                self._start_instance()
+            if self._needs_to_apply_instance_configs():
+                self._apply_instance_configs()
+            self._freeze_instance()
 
-    def _needs_to_change_container_config(self, key):
+    def _needs_to_change_instance_config(self, key):
         if key not in self.config:
             return False
         if key == 'config':
-            old_configs = dict((k, v) for k, v in self.old_container_json['metadata'][key].items() if not k.startswith('volatile.'))
+            old_configs = dict((k, v) for k, v in self.old_instance_json['metadata'][key].items() if not k.startswith('volatile.'))
             for k, v in self.config['config'].items():
                 if k not in old_configs:
                     return True
@@ -573,24 +573,24 @@ class LXDContainerManagement(object):
                     return True
             return False
         else:
-            old_configs = self.old_container_json['metadata'][key]
+            old_configs = self.old_instance_json['metadata'][key]
             return self.config[key] != old_configs
 
-    def _needs_to_apply_container_configs(self):
+    def _needs_to_apply_instance_configs(self):
         for param in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS):
-            if self._needs_to_change_container_config(param):
+            if self._needs_to_change_instance_config(param):
                 return True
         return False
 
-    def _apply_container_configs(self):
-        old_metadata = self.old_container_json['metadata']
+    def _apply_instance_configs(self):
+        old_metadata = self.old_instance_json['metadata']
 
         body_json = {}
         for param in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS):
             if param in old_metadata:
                 body_json[param] = old_metadata[param]
 
-            if self._needs_to_change_container_config(param):
+            if self._needs_to_change_instance_config(param):
                 if param == 'config':
                     for k, v in self.config['config'].items():
                         body_json['config'][k] = v
@@ -599,7 +599,7 @@ class LXDContainerManagement(object):
         self.diff['after']['instance'] = body_json
         if not self.module.check_mode:
             self.client.do('PUT', self.endpoint + '/{0}'.format(self.name), body_json=body_json)
-        self.actions.append('apply_container_configs')
+        self.actions.append('apply_instance_configs')
 
     def run(self):
         """Run the main method."""
@@ -608,13 +608,13 @@ class LXDContainerManagement(object):
             if self.trust_password is not None:
                 self.client.authenticate(self.trust_password)
 
-            self.old_container_json = self._get_container_json()
-            self.old_state = self._container_json_to_module_state(self.old_container_json)
+            self.old_instance_json = self._get_instance_json()
+            self.old_state = self._instance_json_to_module_state(self.old_instance_json)
 
             self.diff['before']['state'] = self.old_state
             self.diff['after']['state'] = self.state
 
-            old_sections = dict((k, v) for k, v in self.old_container_json['metadata'].items() if k in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS))
+            old_sections = dict((k, v) for k, v in self.old_instance_json['metadata'].items() if k in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS))
             self.diff['before']['instance'] = dict(
                 (section, content) if not isinstance(section, dict)
                 else (section, dict((k, v) for k, v in content.items()
