@@ -7,7 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION= r'''
+DOCUMENTATION = r'''
 ---
 module: pagerduty_user
 short_description: Manage a user account on PagerDuty
@@ -139,7 +139,7 @@ class PagerDutyUser(object):
     # delete a user account from PD
     def delete_user(self, pd_user_id, pd_name):
         try:
-            user_path=path.join('/users/',pd_user_id)
+            user_path = path.join('/users/', pd_user_id)
             self._apisession.rdelete(user_path)
 
         except PDClientError as e:
@@ -152,8 +152,7 @@ class PagerDutyUser(object):
             if e.response.status_code == 401:
                 # print out the list of incidents
                 pd_incidents = self.get_incidents_assigned_to_user(pd_user_id)
-                self._module.fail_json(
-                    msg="Failed to remove %s as user has assigned incidents %s: %s" % (pd_name, pd_incidents, e))
+                self._module.fail_json(msg="Failed to remove %s as user has assigned incidents %s : %s" % (pd_name, pd_incidents, e))
             if e.response.status_code == 429:
                 self._module.fail_json(
                     msg="Failed to remove %s due to reaching the limit of making requests %s" % (pd_name, e))
@@ -174,9 +173,9 @@ class PagerDutyUser(object):
 
     # add a user to a team/teams
     def add_user_to_teams(self, pd_user_id, pd_team, pd_role):
-        updated_team= None
+        updated_team = None
         for team in pd_team:
-            team_info= self._apisession.find('teams', team, attribute='name')
+            team_info = self._apisession.find('teams', team, attribute='name')
             if team_info is not None:
                 try:
                     updated_team = self._apisession.rput('/teams/'+team_info['id']+'/users/'+pd_user_id, json={
@@ -185,6 +184,7 @@ class PagerDutyUser(object):
                 except PDClientError:
                     updated_team = None
         return updated_team
+
 
 def main():
     module = AnsibleModule(
@@ -195,8 +195,9 @@ def main():
             state=dict(type='str', default='present', choices=['present', 'absent']),
             pd_role=dict(type='str', default='responder', required=False, choices=['global admin', 'manager', 'responder', 'observer', 'stakeholder', 'limited skateholder', 'restricted access']),
             pd_team=dict(type='list', required=False)
-            ),
-        required_if=[['state', 'present', ['pd_team']],
+        ),
+        required_if=[
+            ['state', 'present', ['pd_team']],
         ],
         supports_check_mode=True,
     )
@@ -258,9 +259,8 @@ def main():
                 pd_user_id = user.does_user_exist(pd_email)
                 # add a user to the team/s
                 user.add_user_to_teams(pd_user_id, pd_team, pd_role)
-            module.exit_json(changed=True,
-                result="Successfully created & added user %s to team %s" % (pd_user, pd_team))
+            module.exit_json(changed=True, result="Successfully created & added user %s to team %s" % (pd_user, pd_team))
 
 
-if __name__== "__main__":
+if __name__ == "__main__":
     main()
