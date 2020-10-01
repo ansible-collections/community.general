@@ -39,8 +39,28 @@
       args:
         apply:
           vars:
-            conn_params: 'validate_certs=True' # Here we are testing that VAULT_SKIP_VERIFY takes precedence
+            conn_params: 'validate_certs=True ' # VAULT_SKIP_VERIFY should take precedence
+          environment:
+            VAULT_ADDR: 'https://localhost:8201'
+            VAULT_SKIP_VERIFY: 1
+
+    - name: 'test {{ auth_type }} auth with certs (validation using env VAR, lookup parameters)'
+      include_tasks: '{{ auth_type }}_test.yml'
+      args:
+        apply:
+          vars:
+            conn_params: 'validate_certs=True ' # VAULT_SKIP_VERIFY should take precedence
           environment:
             VAULT_ADDR: 'https://localhost:8201'
             VAULT_SKIP_VERIFY: True
+
+    - name: 'test {{ auth_type }} auth with certs (validation using env VAR, lookup parameters)'
+      include_tasks: '{{ auth_type }}_test.yml'
+      args:
+        apply:
+          vars:
+            conn_params: 'validate_certs=True ' # VAULT_SKIP_VERIFY should take precedence
+          environment:
+            VAULT_ADDR: 'https://localhost:8201'
+            VAULT_SKIP_VERIFY: y
       
