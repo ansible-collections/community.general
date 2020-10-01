@@ -11,54 +11,56 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: lxd_container
-short_description: Manage LXD Containers
+short_description: Manage LXD Instances
 description:
-  - Management of LXD containers
-author: "Hiroaki Nakamura (@hnakamur)"
+  - Management of LXD instances
+author:
+  - "Hiroaki Nakamura (@hnakamur)"
+  - "Prawn (@InsanePrawn)"
 options:
     name:
         description:
-          - Name of a container.
+          - Name of the instance.
         required: true
     architecture:
         description:
-          - The architecture for the container (e.g. "x86_64" or "i686").
-            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)
+          - The architecture for the instance (e.g. "x86_64" or "i686").
+            See U(https://github.com/lxc/lxd/blob/lxd-4.6/doc/rest-api.md#post-optional-targetmember)
         required: false
     config:
         description:
-          - 'The config for the container (e.g. {"limits.cpu": "2"}).
-            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)'
-          - If the container already exists and its "config" value in metadata
+          - 'The config for the instance (e.g. {"limits.cpu": "2"}).
+            See U(https://github.com/lxc/lxd/blob/lxd-4.6/doc/rest-api.md#put-etag-supported-2)'
+          - If the instance already exists and its "config" entry in metadata
             obtained from
             GET /1.0/instances/<name>
-            U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#10containersname)
-            are different, they this module tries to apply the configurations.
-          - The key starts with 'volatile.' are ignored for this comparison.
-          - Not all config values are supported to apply the existing container.
-            Maybe you need to delete and recreate a container.
+            U(https://github.com/lxc/lxd/blob/lxd-4.6/doc/rest-api.md#10instancesname)
+            is different, this module tries to apply the configuration values.
+          - Keys starting with 'volatile.' are ignored for this comparison.
+          - Not all config items can be applied to existing or running instances.
+            You may need to restart or delete and recreate the instance.
         required: false
     devices:
         description:
-          - 'The devices for the container
-            (e.g. { "rootfs": { "path": "/dev/kvm", "type": "unix-char" }).
-            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)'
+          - 'The devices for the instance
+            (e.g. { "kvmpassthrough": { "path": "/dev/kvm", "type": "unix-char" }).
+            See U(https://github.com/lxc/lxd/blob/lxd-4.6/doc/rest-api.md#post-optional-targetmember)'
         required: false
     ephemeral:
         description:
-          - Whether or not the container is ephemeral (e.g. true or false).
-            See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)
+          - Whether or not the instance is ephemeral (e.g. true or false).
+            See U(https://github.com/lxc/lxd/blob/lxd-4.6/doc/rest-api.md#post-optional-targetmember)
         required: false
         type: bool
     source:
         description:
-          - 'The source for the container
+          - 'The source for the instance
             (e.g. { "type": "image",
                     "mode": "pull",
                     "server": "https://images.linuxcontainers.org",
-                    "protocol": "lxd",
+                    "protocol": "simplestreams",
                     "alias": "ubuntu/xenial/amd64" }).'
-          - 'See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1) for complete API documentation.'
+          - 'See U(https://github.com/lxc/lxd/blob/lxd-4.6/doc/rest-api.md#post-optional-targetmember) for complete API documentation.'
           - 'Note that C(protocol) accepts two choices: C(lxd) or C(simplestreams)'
         required: false
     type:
@@ -77,37 +79,37 @@ options:
           - absent
           - frozen
         description:
-          - Define the state of a container.
+          - Define the state of the instance.
         required: false
         default: started
     target:
         description:
-          - For cluster deployments. Will attempt to create a container on a target node.
-            If container exists elsewhere in a cluster, then container will not be replaced or moved.
-            The name should respond to same name of the node you see in C(lxc cluster list).
+          - For cluster deployments. Will attempt to create an instance on a target node.
+            If the instance exists elsewhere in a cluster, then the instance will not be replaced or moved.
+            The node name should be same you see in C(lxc cluster list).
         type: str
         required: false
         version_added: 1.0.0
     timeout:
         description:
-          - A timeout for changing the state of the container.
+          - A timeout for changing the state of the instance.
           - This is also used as a timeout for waiting until IPv4 addresses
-            are set to the all network interfaces in the container after
+            are set to the all network interfaces in the instance after
             starting or restarting.
         required: false
         default: 30
     wait_for_ipv4_addresses:
         description:
-          - If this is true, the C(lxd_container) waits until IPv4 addresses
-            are set to the all network interfaces in the container after
+          - If this is true, C(lxd_container) waits until IPv4 addresses
+            are set to the all network interfaces in the instance after
             starting or restarting.
         required: false
         default: false
         type: bool
     force_stop:
         description:
-          - If this is true, the C(lxd_container) forces to stop the container
-            when it stops or restarts the container.
+          - If this is true, C(lxd_container) forces to stop the instance
+            when it stops or restarts the instance.
         required: false
         default: false
         type: bool
@@ -150,23 +152,23 @@ options:
         required: false
         default: /instances
 notes:
-  - Containers must have a unique name. If you attempt to create a container
+  - Instances must have a unique name. If you attempt to create a instance
     with a name that already existed in the users namespace the module will
     simply return as "unchanged".
-  - There are two ways to run commands in containers, using the command
+  - There are two ways to run commands in instances, using the command
     module or using the ansible lxd connection plugin bundled in Ansible >=
-    2.1, the later requires python to be installed in the container which can
+    2.1, the later requires python to be installed in the instance which can
     be done with the command module.
-  - You can copy a file from the host to the container
+  - You can copy a file from the host to the instance
     with the Ansible M(ansible.builtin.copy) and M(ansible.builtin.template) module and the `lxd` connection plugin.
     See the example below.
-  - You can copy a file in the created container to the localhost
-    with `command=lxc file pull container_name/dir/filename filename`.
+  - You can copy a file in the created instance to the localhost
+    with `command=lxc file pull instance_name/dir/filename filename`.
     See the first example below.
 '''
 
 EXAMPLES = '''
-# An example for creating a Ubuntu container and install python
+# An example for creating a Ubuntu container and installing python
 - hosts: localhost
   connection: local
   tasks:
@@ -178,7 +180,7 @@ EXAMPLES = '''
           type: image
           mode: pull
           server: https://images.linuxcontainers.org
-          protocol: lxd # if you get a 404, try setting protocol: simplestreams
+          protocol: simplestreams # also accepts "lxd"
           alias: ubuntu/xenial/amd64
         type: container # optional, set to virtual-machine for a qemu VM
         profiles: ["default"]
@@ -200,7 +202,7 @@ EXAMPLES = '''
 # An example for creating an Ubuntu 14.04 container using an image fingerprint.
 # This requires changing 'server' and 'protocol' key values, replacing the
 # 'alias' key with with 'fingerprint' and supplying an appropriate value that
-# matches the container image you wish to use.
+# matches the image you wish to use.
 - hosts: localhost
   connection: local
   tasks:
@@ -221,29 +223,29 @@ EXAMPLES = '''
         wait_for_ipv4_addresses: true
         timeout: 600
 
-# An example for deleting a container
+# An example for deleting an instance
 - hosts: localhost
   connection: local
   tasks:
-    - name: Delete a container
+    - name: Delete an instance
       community.general.lxd_container:
         name: mycontainer
         state: absent
 
-# An example for restarting a container
+# An example for restarting an instance
 - hosts: localhost
   connection: local
   tasks:
-    - name: Restart a container
+    - name: Restart  an instance
       community.general.lxd_container:
         name: mycontainer
         state: restarted
 
-# An example for restarting a container using https to connect to the LXD server
+# An example for restarting an instance using https to connect to the LXD server
 - hosts: localhost
   connection: local
   tasks:
-    - name: Restart a container
+    - name: Restart an instance
       community.general.lxd_container:
         url: https://127.0.0.1:8443
         # These client_cert and client_key values are equal to the default values.
@@ -253,30 +255,30 @@ EXAMPLES = '''
         name: mycontainer
         state: restarted
 
-# Note your container must be in the inventory for the below example.
+# Note: Your instance must be in the inventory for the below example.
 #
-# [containers]
+# [lxd_instances]
 # mycontainer ansible_connection=lxd
 #
 - hosts:
     - mycontainer
   tasks:
-    - name: Copy /etc/hosts in the created container to localhost with name "mycontainer-hosts"
+    - name: Copy /etc/hosts in the created instance to localhost with name "mycontainer-hosts"
       ansible.builtin.fetch:
         src: /etc/hosts
         dest: /tmp/mycontainer-hosts
         flat: true
 
-# An example for LXD cluster deployments. This example will create two new container on specific
+# An example for LXD cluster deployments. This example will create two new instances on specific
 # nodes - 'node01' and 'node02'. In 'target:', 'node01' and 'node02' are names of LXD cluster
 # members that LXD cluster recognizes, not ansible inventory names, see: 'lxc cluster list'.
 # LXD API calls can be made to any LXD member, in this example, we send API requests to
 #'node01.example.com', which matches ansible inventory name.
 - hosts: node01.example.com
   tasks:
-    - name: Create LXD container
+    - name: Create LXD instance
       community.general.lxd_container:
-        name: new-container-1
+        name: new-instance-1
         state: started
         source:
           type: image
@@ -284,9 +286,9 @@ EXAMPLES = '''
           alias: ubuntu/xenial/amd64
         target: node01
 
-    - name: Create container on another node
+    - name: Create instance on another node
       community.general.lxd_container:
-        name: new-container-2
+        name: new-instance-2
         state: started
         source:
           type: image
@@ -297,12 +299,12 @@ EXAMPLES = '''
 
 RETURN = '''
 addresses:
-  description: Mapping from the network device name to a list of IPv4 addresses in the container
+  description: Mapping from the network device name to a list of IPv4 addresses in the instance
   returned: when state is started or restarted
   type: dict
   sample: {"eth0": ["10.155.92.191"]}
 old_state:
-  description: The old state of the container
+  description: The old state of the instance
   returned: when state is started or restarted
   type: str
   sample: "stopped"
@@ -312,7 +314,7 @@ logs:
   type: list
   sample: "(too long to be placed here)"
 actions:
-  description: List of actions performed for the container.
+  description: List of actions performed for the instance.
   returned: success
   type: list
   sample: '["create", "start"]'
@@ -335,7 +337,7 @@ LXD_ANSIBLE_STATES = {
     'frozen': '_frozen'
 }
 
-# ANSIBLE_LXD_STATES is a map of states of lxd containers to the Ansible
+# ANSIBLE_LXD_STATES is a map of states of lxd instances to the Ansible
 # lxc_container module state parameter value.
 ANSIBLE_LXD_STATES = {
     'Running': 'started',
@@ -360,7 +362,7 @@ CONFIG_CREATION_PARAMS = ['source', 'type']
 
 class LXDContainerManagement(object):
     def __init__(self, module):
-        """Management of LXC containers via Ansible.
+        """Management of LXC instances via Ansible.
 
         :param module: Processed Ansible Module.
         :type module: ``object``
