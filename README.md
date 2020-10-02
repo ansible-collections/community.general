@@ -1,8 +1,11 @@
 # Community General Collection
 
-[![Run Status](https://api.shippable.com/projects/5e664a167c32620006c9fa50/badge?branch=main)](https://app.shippable.com/github/ansible-collections/community.general/dashboard) [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
+[![Run Status](https://api.shippable.com/projects/5e664a167c32620006c9fa50/badge?branch=main)](https://app.shippable.com/github/ansible-collections/community.general/dashboard)
+[![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
 
 This repo contains the `community.general` Ansible Collection. The collection includes many modules and plugins supported by Ansible community which are not part of more specialized community collections.
+
+You can find [documentation for this collection on the Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/general/).
 
 ## Tested with Ansible
 
@@ -14,7 +17,7 @@ Some modules and plugins require external libraries. Please check the requiremen
 
 ## Included content
 
-Please check the included content on the [Ansible Galaxy page for this collection](https://galaxy.ansible.com/community/general).
+Please check the included content on the [Ansible Galaxy page for this collection](https://galaxy.ansible.com/community/general) or the [documentation on the Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/general/).
 
 ## Using this collection
 
