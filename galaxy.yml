@@ -14,7 +14,7 @@ dependencies:
   community.kubernetes: '>=1.0.0'
   google.cloud: '>=1.0.0'
 repository: https://github.com/ansible-collections/community.general
-#documentation: https://github.com/ansible-collection-migration/community.general/tree/main/docs
+documentation: https://docs.ansible.com/ansible/latest/collections/community/general/
 homepage: https://github.com/ansible-collections/community.general
 issues: https://github.com/ansible-collections/community.general/issues
 #type: flatmap
