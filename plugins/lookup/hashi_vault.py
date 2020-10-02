@@ -118,7 +118,7 @@ DOCUMENTATION = """
     validate_certs:
       description:
         - Controls verification and validation of SSL certificates, mostly you only want to turn off with self signed ones.
-        - Will be populated with the inverse of VAULT_SKIP_VERIFY if it is set (added in community.general 1.3.0).
+        - Will be populated with the inverse of C(VAULT_SKIP_VERIFY) if that is set and `validate_certs` is not explicitly provided (added in community.general 1.3.0).
         - Will default to C(true) if neither I(validate_certs) or C(VAULT_SKIP_VERIFY) are set.
       type: boolean
     namespace:
