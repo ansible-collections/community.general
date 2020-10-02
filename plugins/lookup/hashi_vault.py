@@ -119,7 +119,7 @@ DOCUMENTATION = """
       description:
         - Controls verification and validation of SSL certificates, mostly you only want to turn off with self signed ones.
         - Will be populated with the inverse of VAULT_SKIP_VERIFY if it is set (added in community.general 1.3.0).
-        - Will default to True if neither validate_certs or VAULT_SKIP_VERIFY are set.
+        - Will default to C(true) if neither I(validate_certs) or C(VAULT_SKIP_VERIFY) are set.
       type: boolean
     namespace:
       description: Namespace where secrets reside. Requires HVAC 0.7.0+ and Vault 0.11+.
