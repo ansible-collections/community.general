@@ -100,7 +100,7 @@ EXAMPLES = r'''
     - "08:00:27:E3:B1:2D"
     - "52:54:00:BD:97:1E"
     state: present
-    community.general.ipa_host: ipa.example.com
+    ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
 
@@ -110,7 +110,7 @@ EXAMPLES = r'''
     description: Example host
     ip_address: 192.168.0.123
     state: present
-    community.general.ipa_host: ipa.example.com
+    ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
     validate_certs: False
@@ -120,7 +120,7 @@ EXAMPLES = r'''
   community.general.ipa_host:
     name: host01.example.com
     state: disabled
-    community.general.ipa_host: ipa.example.com
+    ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
 
@@ -128,7 +128,7 @@ EXAMPLES = r'''
   community.general.ipa_host:
     name: host01.example.com
     user_certificate: []
-    community.general.ipa_host: ipa.example.com
+    ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
 
@@ -136,7 +136,7 @@ EXAMPLES = r'''
   community.general.ipa_host:
     name: host01.example.com
     state: absent
-    community.general.ipa_host: ipa.example.com
+    ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
 
@@ -144,7 +144,7 @@ EXAMPLES = r'''
   community.general.ipa_host:
     name: host01.example.com
     state: absent
-    community.general.ipa_host: ipa.example.com
+    ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
     update_dns: True
