@@ -1,4 +1,4 @@
 ---
 bugfixes:
   - gitlab_project_variable - workaround unsupported GitLab pagination limitation by setting GitLab ``per_page`` property to max 100 elements (https://github.com/ansible-collections/community.general/pull/968).
-  - gitlab_group_variable - workaround unsupported gitlab pagination limitation by setting gitlab ``per_page`` property to max 100 (https://github.com/ansible-collections/community.general/pull/968)
+  - gitlab_group_variable - workaround unsupported GitLab pagination limitation by setting GitLab ``per_page`` property to max 100 elements (https://github.com/ansible-collections/community.general/pull/968).
