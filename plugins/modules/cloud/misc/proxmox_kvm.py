@@ -120,7 +120,7 @@ options:
     description:
       - Target drive's backing file's data format.
       - Used only with clone
-      - Use I(format=unspecified) and I(full=false) for linked clone.
+      - Use I(format=unspecified) and I(full=false) for a linked clone.
     type: str
     default: qcow2
     choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", "unspecified" ]
