@@ -818,7 +818,7 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
             return False
     elif module.params['clone'] is not None:
         for param in valid_clone_params:
-            if module.params[param] is not None and module.params[param] != 'unspecified':
+            if module.params[param] is not None:
                 clone_params[param] = module.params[param]
         clone_params.update(dict([k, int(v)] for k, v in clone_params.items() if isinstance(v, bool)))
         taskid = proxmox_node.qemu(vmid).clone.post(newid=newid, name=name, **clone_params)
@@ -961,6 +961,9 @@ def main():
     update = bool(module.params['update'])
     vmid = module.params['vmid']
     validate_certs = module.params['validate_certs']
+
+    if module.params['format'] == 'unspecified':
+        module.params['format'] = None
 
     # If password not set get it from PROXMOX_PASSWORD env
     if not api_password:
