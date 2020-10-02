@@ -38,27 +38,32 @@ options:
     choices: [ "downtime", "delete_downtime", "enable_alerts", "disable_alerts", "silence", "unsilence",
                "silence_nagios", "unsilence_nagios", "command", "servicegroup_service_downtime",
                "servicegroup_host_downtime", "acknowledge", "forced_check" ]
+    type: str
   host:
     description:
       - Host to operate on in Nagios.
+    type: str
   cmdfile:
     description:
       - Path to the nagios I(command file) (FIFO pipe).
         Only required if auto-detection fails.
-    default: auto-detected
+    type: str
   author:
     description:
      - Author to leave downtime comments as.
        Only usable with the C(downtime) and C(acknowledge) action.
+    type: str
     default: Ansible
   comment:
     description:
      - Comment for C(downtime) and C(acknowledge)action.
+    type: str
     default: Scheduling downtime
   start:
     description:
       - When downtime should start, in time_t format (epoch seconds).
     version_added: '0.2.0'
+    type: str
   minutes:
     description:
       - Minutes to schedule downtime for.
@@ -71,17 +76,18 @@ options:
         C(service) is an alias for C(services).
         B(Required) option when using the C(downtime), C(acknowledge), C(forced_check), C(enable_alerts), and C(disable_alerts) actions.
     aliases: [ "service" ]
-    required: true
+    type: str
   servicegroup:
     description:
       - The Servicegroup we want to set downtimes/alerts for.
         B(Required) option when using the C(servicegroup_service_downtime) amd C(servicegroup_host_downtime).
+    type: str
   command:
     description:
       - The raw command to send to nagios, which
         should not include the submitted time header or the line-feed
         B(Required) option when using the C(command) action.
-    required: true
+    type: str
 
 author: "Tim Bielawa (@tbielawa)"
 '''
@@ -301,7 +307,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            action=dict(required=True, default=None, choices=ACTION_CHOICES),
+            action=dict(required=True, choices=ACTION_CHOICES),
             author=dict(default='Ansible'),
             comment=dict(default='Scheduling downtime'),
             host=dict(required=False, default=None),
