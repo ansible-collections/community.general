@@ -27,7 +27,7 @@ DOCUMENTATION = '''
             required: true
             choices: [ community.general.multipass ]
         running_only:
-            description: toggles showing all vms vs only those currently running
+            description: Toggles showing all VMs vs only those currently running.
             type: boolean
             default: False
 '''
