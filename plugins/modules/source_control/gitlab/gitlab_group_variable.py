@@ -167,7 +167,6 @@ class GitlabGroupVariables(object):
             vars_page = self.group.variables.list(page=page_nb)
         return variables
 
-
     def create_variable(self, key, value, masked, protected, variable_type):
         if self._module.check_mode:
             return
