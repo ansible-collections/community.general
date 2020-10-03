@@ -24,7 +24,7 @@ DOCUMENTATION = '''
     options:
         plugin:
             description: Token that ensures this is a source file for the C(community.general.multipass) plugin.
-            required: True
+            required: true
             choices: [ community.general.multipass ]
         running_only:
             description: toggles showing all vms vs only those currently running
