@@ -23,7 +23,7 @@ DOCUMENTATION = '''
       - multipass CLI installed
     options:
         plugin:
-            description: token that ensures this is a source file for the 'multipass' plugin.
+            description: Token that ensures this is a source file for the C(community.general.multipass) plugin.
             required: True
             choices: [ community.general.multipass ]
         running_only:
