@@ -8,6 +8,9 @@ __metaclass__ = type
 DOCUMENTATION = '''
     name: multipass
     plugin_type: inventory
+    author: 
+      - Florent Madiot (@scodeman)
+    version_added: 1.2.0
     short_description: canonical/multipass inventory source
     description:
         - Get inventory hosts from the local multipass installation.
