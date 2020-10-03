@@ -26,6 +26,7 @@ options:
     state:
         description:
             - Define whether or not the monitor should be running or paused.
+            - created and absent are added in version 1.2.0
         required: true
         choices: [ "started", "paused", "created", "absent", "present" ]
     url:
@@ -52,8 +53,7 @@ options:
             - Uptime Robot API key.
         required: true
 notes:
-    - Support for further functionalities, which the api provides has not yet been implemented.
-    - created and absent are added in version 2.10
+    - Support for further functionalities, which the API provides has not yet been implemented.
 '''
 
 EXAMPLES = '''
