@@ -18,7 +18,7 @@ DOCUMENTATION = '''
         - The C(inventory_hostname) is always the 'Name' of the multipass instance.
     extends_documentation_fragment:
       - ansible.builtin.constructed
-      - inventory_cache
+      - ansible.builtin.inventory_cache
     requirements:
       - multipass CLI installed
     options:
