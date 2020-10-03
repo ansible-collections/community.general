@@ -15,7 +15,7 @@ DOCUMENTATION = '''
     description:
         - Get inventory hosts from the local multipass installation.
         - Uses a YAML configuration file with a valid YAML extension.
-        - The inventory_hostname is always the 'Name' of the multipass instance.
+        - The C(inventory_hostname) is always the 'Name' of the multipass instance.
     extends_documentation_fragment:
       - constructed
       - inventory_cache
