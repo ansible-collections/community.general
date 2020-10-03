@@ -32,6 +32,14 @@ DOCUMENTATION = '''
         ini:
           - key: fact_caching_prefix
             section: defaults
+      _cache_keys_name:
+        description: User defined name for ansible cache key name
+        default: ansible_cache_keys
+        env:
+          - name: ANSIBLE_CACHE_KEYS_NAME
+        ini:
+          - key: fact_caching_keys_name
+            section: defaults
       _timeout:
         default: 86400
         description: Expiration timeout in seconds for the cache plugin data. Set to 0 to never expire
@@ -78,6 +86,7 @@ class CacheModule(BaseCacheModule):
                 uri = self.get_option('_uri')
             self._timeout = float(self.get_option('_timeout'))
             self._prefix = self.get_option('_prefix')
+            self._keys_set = self.get_option('_cache_keys_name')
         except KeyError:
             display.deprecated('Rather than importing CacheModules directly, '
                                'use ansible.plugins.loader.cache_loader',
@@ -86,6 +95,7 @@ class CacheModule(BaseCacheModule):
                 uri = C.CACHE_PLUGIN_CONNECTION
             self._timeout = float(C.CACHE_PLUGIN_TIMEOUT)
             self._prefix = C.CACHE_PLUGIN_PREFIX
+            self._keys_set = 'ansible_cache_keys'
 
         self._cache = {}
         kw = {}
@@ -96,7 +106,6 @@ class CacheModule(BaseCacheModule):
 
         connection = uri.split(':')
         self._db = StrictRedis(*connection, **kw)
-        self._keys_set = 'ansible_cache_keys'
 
     def _make_key(self, key):
         return self._prefix + key
