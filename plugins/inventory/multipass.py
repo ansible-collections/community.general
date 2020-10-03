@@ -17,7 +17,7 @@ DOCUMENTATION = '''
         - Uses a YAML configuration file with a valid YAML extension.
         - The C(inventory_hostname) is always the 'Name' of the multipass instance.
     extends_documentation_fragment:
-      - constructed
+      - ansible.builtin.constructed
       - inventory_cache
     requirements:
       - multipass CLI installed
