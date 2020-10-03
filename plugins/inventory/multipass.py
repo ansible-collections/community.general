@@ -29,7 +29,7 @@ DOCUMENTATION = '''
         running_only:
             description: Toggles showing all VMs vs only those currently running.
             type: boolean
-            default: False
+            default: false
 '''
 EXAMPLES = '''
 # inventory config file in YAML format
