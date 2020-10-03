@@ -8,7 +8,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
     name: multipass
     plugin_type: inventory
-    author: 
+    author:
       - Florent Madiot (@scodeman)
     version_added: 1.2.0
     short_description: canonical/multipass inventory source
