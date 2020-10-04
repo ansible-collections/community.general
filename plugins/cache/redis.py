@@ -32,13 +32,13 @@ DOCUMENTATION = '''
         ini:
           - key: fact_caching_prefix
             section: defaults
-      _cache_keys_name:
-        description: User defined name for ansible cache key name
+      _keyset_name:
+        description: User defined name for cache keyset name.
         default: ansible_cache_keys
         env:
-          - name: ANSIBLE_CACHE_KEYS_NAME
+          - name: ANSIBLE_CACHE_REDIS_KEYSET_NAME
         ini:
-          - key: fact_caching_keys_name
+          - key: fact_caching_redis_keyset_name
             section: defaults
       _timeout:
         default: 86400
@@ -86,7 +86,7 @@ class CacheModule(BaseCacheModule):
                 uri = self.get_option('_uri')
             self._timeout = float(self.get_option('_timeout'))
             self._prefix = self.get_option('_prefix')
-            self._keys_set = self.get_option('_cache_keys_name')
+            self._keys_set = self.get_option('_keyset_name')
         except KeyError:
             display.deprecated('Rather than importing CacheModules directly, '
                                'use ansible.plugins.loader.cache_loader',
