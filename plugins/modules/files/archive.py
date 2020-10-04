@@ -23,6 +23,7 @@ options:
     description:
       - Remote absolute path, glob, or list of paths or globs for the file or files to compress or archive.
     type: list
+    elements: str
     required: true
   format:
     description:
@@ -40,6 +41,7 @@ options:
     description:
       - Remote absolute path, glob, or list of paths or globs for the file or files to exclude from I(path) list and glob expansion.
     type: list
+    elements: str
   force_archive:
     description:
       - Allow you to force the module to treat this as an archive even if only a single file is specified.
@@ -187,10 +189,10 @@ else:
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            path=dict(type='list', required=True),
+            path=dict(type='list', elements='str', required=True),
             format=dict(type='str', default='gz', choices=['bz2', 'gz', 'tar', 'xz', 'zip']),
             dest=dict(type='path'),
-            exclude_path=dict(type='list'),
+            exclude_path=dict(type='list', elements='str'),
             force_archive=dict(type='bool', default=False),
             remove=dict(type='bool', default=False),
         ),
