@@ -18,6 +18,7 @@ DOCUMENTATION = '''
           - A colon separated string of connection information for Redis.
           - The format is C(host:port:db:password), for example C(localhost:6379:0:changeme).
           - To use encryption in transit, prefix the connection with C(tls://), as in C(tls://localhost:6379:0:changeme).
+          - To use redis sentinel, use sepparator C(;), for example C(localhost:26379;localhost:26379;0:changeme). Requires redis>=2.9.0
         required: True
         env:
           - name: ANSIBLE_CACHE_PLUGIN_CONNECTION
@@ -39,6 +40,14 @@ DOCUMENTATION = '''
           - name: ANSIBLE_CACHE_REDIS_KEYSET_NAME
         ini:
           - key: fact_caching_redis_keyset_name
+            section: defaults
+        version_added: 1.3.0
+      _sentinel_service_name:
+        description: the redis sentinel service name (or referenced as cluster name)
+        env:
+          - name: ANSIBLE_CACHE_REDIS_SENTINEL
+        ini:
+          - key: fact_caching_redis_sentinel
             section: defaults
         version_added: 1.3.0
       _timeout:
@@ -88,6 +97,7 @@ class CacheModule(BaseCacheModule):
             self._timeout = float(self.get_option('_timeout'))
             self._prefix = self.get_option('_prefix')
             self._keys_set = self.get_option('_keyset_name')
+            self._sentinel_service_name = self.get_option('_sentinel_service_name')
         except KeyError:
             display.deprecated('Rather than importing CacheModules directly, '
                                'use ansible.plugins.loader.cache_loader',
@@ -100,13 +110,53 @@ class CacheModule(BaseCacheModule):
 
         self._cache = {}
         kw = {}
+
+        # tls connection
         tlsprefix = 'tls://'
         if uri.startswith(tlsprefix):
             kw['ssl'] = True
             uri = uri[len(tlsprefix):]
 
-        connection = uri.split(':')
-        self._db = StrictRedis(*connection, **kw)
+        # redis sentinel connection
+        if self._sentinel_service_name:
+            self._db = self._get_sentinel_connection(uri, kw)
+        # normal connection
+        else:
+            connection = uri.split(':')
+            self._db = StrictRedis(*connection, **kw)
+        
+        display.vv('Redis connection: %s' % self._db)
+
+    def _get_sentinel_connection(self, uri, kw):
+        """
+        get sentinel connection details from _uri
+        """
+        try:
+            from redis.sentinel import Sentinel
+        except ImportError:
+            raise AnsibleError("The 'redis' python module (version 2.9.0 or newer) is required to use redis sentinel.")
+
+        if not ';' in uri:
+            raise AnsibleError('_uri does not have sentinel syntax.')
+
+        # format: "localhost:26379;localhost2:26379;0:changeme"
+        connections = uri.split(';')
+        connection_args = connections.pop(-1)
+        if len(connection_args) > 0:  # hanle if no db nr is given
+            connection_args = connection_args.split(':')
+            kw['db'] = connection_args.pop(0)
+            try:
+                kw['password'] = connection_args.pop(0)
+            except IndexError:
+                pass  # password is optional               
+        
+        sentinels = [ tuple(shost.split(':')) for shost in connections ]
+        display.vv('\nUsing redis sentinel: %s with %s' % (sentinels, kw))
+        scon = Sentinel(sentinels, **kw)
+        try:
+            return scon.master_for(self._sentinel_service_name, socket_timeout=0.2)
+        except Exception as exc:
+            raise AnsibleError('Could not connect to redis sentinel: %s' % exc)
 
     def _make_key(self, key):
         return self._prefix + key
