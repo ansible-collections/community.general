@@ -256,6 +256,29 @@
 - name: remove our xz
   file: path="{{ output_dir }}/archive_02.xz" state=absent
 
+- name: archive multiple files as list
+  archive:
+    path:
+      - "{{ output_dir }}/empty.txt"
+      - "{{ output_dir }}/foo.txt"
+      - "{{ output_dir }}/bar.txt"
+    dest: "{{ output_dir }}/archive_list.gz"
+    format: gz
+  register: archive_gz_list_result
+
+- name: verify that the files archived
+  file: path={{output_dir}}/archive_list.gz state=file
+
+- name: check if gz file exists and includes all text files
+  assert:
+    that:
+      - "{{ archive_gz_list_result.changed }}"
+      - "{{ 'archived' in archive_gz_list_result }}"
+      - "{{ archive_gz_list_result['archived'] | length }} == 3"
+
+- name: remove our gz
+  file: path="{{ output_dir }}/archive_list.gz" state=absent
+
 - name: test that gz archive that contains non-ascii filenames
   archive:
     path: "{{ output_dir }}/*.txt"
