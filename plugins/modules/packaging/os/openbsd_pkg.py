@@ -209,7 +209,7 @@ def package_present(names, pkg_spec, module):
             if build is True:
                 module.fail_json(msg="the combination of build=%s and snapshot is not supported" % module.params['build'])
             else:
-                install_cmd += '-Dsnap '
+                install_cmd += ' -Dsnap'
 
         if pkg_spec[name]['installed_state'] is False:
 
@@ -284,7 +284,7 @@ def package_latest(names, pkg_spec, module):
         upgrade_cmd += 'q'
 
     if module.params['snapshot']:
-        upgrade_cmd += '-Dsnap '
+        upgrade_cmd += ' -Dsnap'
 
     for name in names:
         if pkg_spec[name]['installed_state'] is True:
@@ -507,7 +507,7 @@ def upgrade_packages(pkg_spec, module):
         upgrade_cmd = 'pkg_add -Imu'
 
     if module.params['snapshot']:
-        upgrade_cmd += ' -Dsnap '
+        upgrade_cmd += ' -Dsnap'
 
     # Create a minimal pkg_spec entry for '*' to store return values.
     pkg_spec['*'] = {}
