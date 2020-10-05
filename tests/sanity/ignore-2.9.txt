@@ -507,7 +507,6 @@ plugins/modules/database/vertica/vertica_schema.py validate-modules:doc-missing-
 plugins/modules/database/vertica/vertica_schema.py validate-modules:undocumented-parameter
 plugins/modules/database/vertica/vertica_user.py validate-modules:doc-missing-type
 plugins/modules/database/vertica/vertica_user.py validate-modules:undocumented-parameter
-plugins/modules/files/archive.py use-argspec-type-path # fix needed
 plugins/modules/files/iso_extract.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/identity/keycloak/keycloak_client.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/identity/keycloak/keycloak_client.py validate-modules:doc-missing-type
