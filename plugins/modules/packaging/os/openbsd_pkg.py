@@ -206,7 +206,10 @@ def package_present(names, pkg_spec, module):
                 install_cmd = 'pkg_add -Im'
 
         if snapshot is True:
-            install_cmd += '-Dsnap '
+            if build is True:
+                module.fail_json(msg="the combination of build=%s and snapshot is not supported" % module.params['build'])
+            else:
+                install_cmd += '-Dsnap '
 
         if pkg_spec[name]['installed_state'] is False:
 
