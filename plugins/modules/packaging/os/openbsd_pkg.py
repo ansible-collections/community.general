@@ -206,7 +206,7 @@ def package_present(names, pkg_spec, module):
                 install_cmd = 'pkg_add -Im'
 
         if snapshot is True:
-            install_cmd += ' -Dsnap '
+            install_cmd += '-Dsnap '
 
         if pkg_spec[name]['installed_state'] is False:
 
@@ -281,7 +281,7 @@ def package_latest(names, pkg_spec, module):
         upgrade_cmd += 'q'
 
     if module.params['snapshot']:
-        upgrade_cmd += ' -Dsnap '
+        upgrade_cmd += '-Dsnap '
 
     for name in names:
         if pkg_spec[name]['installed_state'] is True:
