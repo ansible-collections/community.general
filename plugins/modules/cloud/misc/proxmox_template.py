@@ -48,7 +48,8 @@ options:
   template:
     description:
       - the template name
-      - required only for states C(absent), C(info)
+      - required for state C(absent) to delete a template
+      - required for state C(present) to download an appliance container template (pveam)
     type: str
   content_type:
     description:
@@ -121,6 +122,16 @@ EXAMPLES = '''
     api_host: node1
     template: ubuntu-14.04-x86_64.tar.gz
     state: absent
+
+- name: Download proxmox appliance container template
+  community.general.proxmox_template:
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    storage: local
+    content_type: vztmpl
+    template: ubuntu-20.04-standard_20.04-1_amd64.tar.gz
 '''
 
 import os
@@ -140,19 +151,32 @@ def get_template(proxmox, node, storage, content_type, template):
             if tmpl['volid'] == '%s:%s/%s' % (storage, content_type, template)]
 
 
-def upload_template(module, proxmox, api_host, node, storage, content_type, realpath, timeout):
-    taskid = proxmox.nodes(node).storage(storage).upload.post(content=content_type, filename=open(realpath, 'rb'))
+def task_status(module, proxmox, node, taskid, timeout):
+    """
+    Check the task status and wait until the task is completed or the timeout is reached.
+    """
     while timeout:
-        task_status = proxmox.nodes(api_host.split('.')[0]).tasks(taskid).status.get()
+        module.log("timeout")
+        task_status = proxmox.nodes(node).tasks(taskid).status.get()
         if task_status['status'] == 'stopped' and task_status['exitstatus'] == 'OK':
             return True
         timeout = timeout - 1
         if timeout == 0:
-            module.fail_json(msg='Reached timeout while waiting for uploading template. Last line in task before timeout: %s'
-                             % proxmox.node(node).tasks(taskid).log.get()[:1])
+            module.fail_json(msg='Reached timeout while waiting for uploading/downloading template. Last line in task before timeout: %s'
+                                 % proxmox.node(node).tasks(taskid).log.get()[:1])
 
         time.sleep(1)
     return False
+
+
+def upload_template(module, proxmox, node, storage, content_type, realpath, timeout):
+    taskid = proxmox.nodes(node).storage(storage).upload.post(content=content_type, filename=open(realpath, 'rb'))
+    return task_status(module, proxmox, node, taskid, timeout)
+
+
+def download_template(module, proxmox, node, storage, template, timeout):
+    taskid = proxmox.nodes(node).aplinfo.post(storage=storage, template=template)
+    return task_status(module, proxmox, node, taskid, timeout)
 
 
 def delete_template(module, proxmox, node, storage, content_type, template, timeout):
@@ -216,6 +240,19 @@ def main():
             content_type = module.params['content_type']
             src = module.params['src']
 
+            # download appliance template
+            if content_type == 'vztmpl' and not src:
+                template = module.params['template']
+
+                if not template:
+                    module.fail_json(msg='template param to downloading appliance template is mandatory')
+
+                if get_template(proxmox, node, storage, content_type, template) and not module.params['force']:
+                    module.exit_json(changed=False, msg='template with volid=%s:%s/%s is already exists' % (storage, content_type, template))
+
+                if download_template(module, proxmox, node, storage, template, timeout):
+                    module.exit_json(changed=True, msg='template with volid=%s:%s/%s downloaded' % (storage, content_type, template))
+
             template = os.path.basename(src)
             if get_template(proxmox, node, storage, content_type, template) and not module.params['force']:
                 module.exit_json(changed=False, msg='template with volid=%s:%s/%s is already exists' % (storage, content_type, template))
@@ -224,10 +261,10 @@ def main():
             elif not (os.path.exists(src) and os.path.isfile(src)):
                 module.fail_json(msg='template file on path %s not exists' % src)
 
-            if upload_template(module, proxmox, api_host, node, storage, content_type, src, timeout):
+            if upload_template(module, proxmox, node, storage, content_type, src, timeout):
                 module.exit_json(changed=True, msg='template with volid=%s:%s/%s uploaded' % (storage, content_type, template))
         except Exception as e:
-            module.fail_json(msg="uploading of template %s failed with exception: %s" % (template, e))
+            module.fail_json(msg="uploading/downloading of template %s failed with exception: %s" % (template, e))
 
     elif state == 'absent':
         try:
