@@ -590,7 +590,7 @@ class Connection(object):
 
     def get_all_procedures_in_schema(self, schema):
         if self.pg_version < 110000:
-            self.module.fail_json(msg="PostgreSQL verion must be >= 11 for type=procedure. Exit")
+            raise Error("PostgreSQL verion must be >= 11 for type=procedure. Exit")
 
         if not self.schema_exists(schema):
             raise Error('Schema "%s" does not exist.' % schema)
