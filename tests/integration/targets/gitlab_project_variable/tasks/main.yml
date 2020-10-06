@@ -577,7 +577,7 @@
 - name: check that no variables are untouched state must be changed
   assert:
     that:
-      - not gitlab_project_variable_state.changed
+      - gitlab_project_variable_state.changed
       - gitlab_project_variable_state.project_variable.added|length == 0
       - gitlab_project_variable_state.project_variable.untouched|length == 0
       - gitlab_project_variable_state.project_variable.removed|length == 40
