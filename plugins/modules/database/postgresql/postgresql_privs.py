@@ -60,8 +60,8 @@ options:
     - C(procedure) is supported since PostgreSQL 11 and M(community.general) collection 1.3.0.
     - If I(type) is C(database), this parameter can be omitted, in which case
       privileges are set for the database specified via I(database).
-    - 'If I(type) is I(function) or I(procedure), colons (":") in object names will be
-      replaced with commas (needed to specify signatures, see examples)'
+    - If I(type) is I(function) or I(procedure), colons (":") in object names will be
+      replaced with commas (needed to specify signatures, see examples).
     type: str
     aliases:
     - obj
