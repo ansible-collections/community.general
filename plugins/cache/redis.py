@@ -87,6 +87,8 @@ class CacheModule(BaseCacheModule):
     to expire keys. This mechanism is used or a pattern matched 'scan' for
     performance.
     """
+    _sentinel_service_name = None
+
     def __init__(self, *args, **kwargs):
         uri = ''
 
@@ -124,7 +126,7 @@ class CacheModule(BaseCacheModule):
         else:
             connection = uri.split(':')
             self._db = StrictRedis(*connection, **kw)
-        
+
         display.vv('Redis connection: %s' % self._db)
 
     def _get_sentinel_connection(self, uri, kw):
@@ -136,7 +138,7 @@ class CacheModule(BaseCacheModule):
         except ImportError:
             raise AnsibleError("The 'redis' python module (version 2.9.0 or newer) is required to use redis sentinel.")
 
-        if not ';' in uri:
+        if ';' not in uri:
             raise AnsibleError('_uri does not have sentinel syntax.')
 
         # format: "localhost:26379;localhost2:26379;0:changeme"
@@ -148,9 +150,9 @@ class CacheModule(BaseCacheModule):
             try:
                 kw['password'] = connection_args.pop(0)
             except IndexError:
-                pass  # password is optional               
-        
-        sentinels = [ tuple(shost.split(':')) for shost in connections ]
+                pass  # password is optional
+
+        sentinels = [tuple(shost.split(':')) for shost in connections]
         display.vv('\nUsing redis sentinel: %s with %s' % (sentinels, kw))
         scon = Sentinel(sentinels, **kw)
         try:
