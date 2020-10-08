@@ -1403,14 +1403,14 @@
     login_user: "{{ pg_user }}"
     login_db: "{{ db_name }}"
     roles: "test-role"
-    objs: "postgres"
+    objs: "{{ pg_user }}"
     type: "group"
   register: result
 
 - assert:
     that:
     - result is changed
-    - result.queries == ["GRANT \"postgres\" TO \"test-role\";"]
+    - result.queries == ["GRANT \"{{ pg_user }}\" TO \"test-role\";"]
 
 - name: Test community.general/issue/1058 REVOKE
   become: yes
@@ -1419,7 +1419,7 @@
     login_user: "{{ pg_user }}"
     login_db: "{{ db_name }}"
     roles: "test-role"
-    objs: "postgres"
+    objs: "{{ pg_user }}"
     type: "group"
     state: absent
   register: result
@@ -1427,7 +1427,7 @@
 - assert:
     that:
     - result is changed
-    - result.queries == ["REVOKE \"postgres\" FROM \"test-role\";"]
+    - result.queries == ["REVOKE \"{{ pg_user }}\" FROM \"test-role\";"]
 
 - name: Test community.general/issue/1058 GRANT without hyphen
   become: yes
@@ -1436,14 +1436,14 @@
     login_user: "{{ pg_user }}"
     login_db: "{{ db_name }}"
     roles: "{{ db_user3 }}"
-    objs: "postgres"
+    objs: "{{ pg_user }}"
     type: "group"
   register: result
 
 - assert:
     that:
     - result is changed
-    - result.queries == ["GRANT \"postgres\" TO \"{{ db_user3 }}\";"]
+    - result.queries == ["GRANT \"{{ pg_user }}\" TO \"{{ db_user3 }}\";"]
 
 - name: Test community.general/issue/1058 GRANT with hyphen as an object
   become: yes
