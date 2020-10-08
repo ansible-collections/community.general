@@ -387,6 +387,7 @@ files:
     authors: Spredzy sieben
   $modules/cloud/scaleway/scaleway_security_group.py:
     authors: abarbare
+    maintainers: DenBeke
   $modules/cloud/scaleway/scaleway_security_group_info.py:
     authors: Spredzy sieben
   $modules/cloud/scaleway/scaleway_security_group_rule.py:
