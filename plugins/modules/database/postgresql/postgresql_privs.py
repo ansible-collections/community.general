@@ -42,31 +42,33 @@ options:
     description:
     - Type of database object to set privileges on.
     - The C(default_privs) choice is available starting at version 2.7.
-    - The C(foreign_data_wrapper) and C(foreign_server) object types are available since Ansible version '2.8'.
-    - The C(type) choice is available since Ansible version '2.10'.
+    - The C(foreign_data_wrapper) and C(foreign_server) object types are available since Ansible version 2.8.
+    - The C(type) choice is available since Ansible version 2.10.
+    - The C(procedure) is supported since collection version 1.3.0 and PostgreSQL 11.
     type: str
     default: table
     choices: [ database, default_privs, foreign_data_wrapper, foreign_server, function,
-               group, language, table, tablespace, schema, sequence, type ]
+               group, language, table, tablespace, schema, sequence, type , procedure]
   objs:
     description:
     - Comma separated list of database objects to set privileges on.
-    - If I(type) is C(table), C(partition table), C(sequence) or C(function),
+    - If I(type) is C(table), C(partition table), C(sequence), C(function) or C(procedure),
       the special valueC(ALL_IN_SCHEMA) can be provided instead to specify all
       database objects of type I(type) in the schema specified via I(schema).
       (This also works with PostgreSQL < 9.0.) (C(ALL_IN_SCHEMA) is available
        for C(function) and C(partition table) since Ansible 2.8)
+    - C(procedure) is supported since PostgreSQL 11 and M(community.general) collection 1.3.0.
     - If I(type) is C(database), this parameter can be omitted, in which case
       privileges are set for the database specified via I(database).
-    - 'If I(type) is I(function), colons (":") in object names will be
-      replaced with commas (needed to specify function signatures, see examples)'
+    - If I(type) is I(function) or I(procedure), colons (":") in object names will be
+      replaced with commas (needed to specify signatures, see examples).
     type: str
     aliases:
     - obj
   schema:
     description:
     - Schema that contains the database objects specified via I(objs).
-    - May only be provided if I(type) is C(table), C(sequence), C(function), C(type),
+    - May only be provided if I(type) is C(table), C(sequence), C(function), C(procedure), C(type),
       or C(default_privs). Defaults to C(public) in these cases.
     - Pay attention, for embedded types when I(type=type)
       I(schema) can be C(pg_catalog) or C(information_schema) respectively.
@@ -369,7 +371,19 @@ EXAMPLES = r'''
     objs: ALL_IN_SCHEMA
     schema: common
 
-# Available since Ansible 2.8
+# Available since collection version 1.3.0
+# Grant 'execute' permissions on all procedures in schema 'common' to role 'caller'
+# Needs PostreSQL 11 or higher and community.general 1.3.0 or higher
+- name: GRANT EXECUTE ON ALL PROCEDURES IN SCHEMA common TO caller
+  community.general.postgresql_privs:
+    type: prucedure
+    state: present
+    privs: EXECUTE
+    roles: caller
+    objs: ALL_IN_SCHEMA
+    schema: common
+
+# Available since version 2.8
 # ALTER DEFAULT PRIVILEGES FOR ROLE librarian IN SCHEMA library GRANT SELECT ON TABLES TO reader
 # GRANT SELECT privileges for new TABLES objects created by librarian as
 # default to the role reader.
@@ -574,6 +588,21 @@ class Connection(object):
         self.cursor.execute(query, (schema,))
         return ["%s(%s)" % (t[0], t[1]) for t in self.cursor.fetchall()]
 
+    def get_all_procedures_in_schema(self, schema):
+        if self.pg_version < 110000:
+            raise Error("PostgreSQL verion must be >= 11 for type=procedure. Exit")
+
+        if not self.schema_exists(schema):
+            raise Error('Schema "%s" does not exist.' % schema)
+
+        query = ("SELECT p.proname, oidvectortypes(p.proargtypes) "
+                 "FROM pg_catalog.pg_proc p "
+                 "JOIN pg_namespace n ON n.oid = p.pronamespace "
+                 "WHERE nspname = %s and p.prokind = 'p'")
+
+        self.cursor.execute(query, (schema,))
+        return ["%s(%s)" % (t[0], t[1]) for t in self.cursor.fetchall()]
+
     # Methods for getting access control lists and group membership info
 
     # To determine whether anything has changed after granting/revoking
@@ -699,7 +728,7 @@ class Connection(object):
             get_status = partial(self.get_table_acls, schema_qualifier)
         elif obj_type == 'sequence':
             get_status = partial(self.get_sequence_acls, schema_qualifier)
-        elif obj_type == 'function':
+        elif obj_type in ('function', 'procedure'):
             get_status = partial(self.get_function_acls, schema_qualifier)
         elif obj_type == 'schema':
             get_status = self.get_schema_acls
@@ -727,13 +756,13 @@ class Connection(object):
             return False
 
         # obj_ids: quoted db object identifiers (sometimes schema-qualified)
-        if obj_type == 'function':
+        if obj_type in ('function', 'procedure'):
             obj_ids = []
             for obj in objs:
                 try:
                     f, args = obj.split('(', 1)
                 except Exception:
-                    raise Error('Illegal function signature: "%s".' % obj)
+                    raise Error('Illegal function / procedure signature: "%s".' % obj)
                 obj_ids.append('"%s"."%s"(%s' % (schema_qualifier, f, args))
         elif obj_type in ['table', 'sequence', 'type']:
             obj_ids = ['"%s"."%s"' % (schema_qualifier, o) for o in objs]
@@ -749,7 +778,7 @@ class Connection(object):
             set_what = ','.join(privs)
         else:
             # function types are already quoted above
-            if obj_type != 'function':
+            if obj_type not in ('function', 'procedure'):
                 obj_ids = [pg_quote_identifier(i, 'table') for i in obj_ids]
             # Note: obj_type has been checked against a set of string literals
             # and privs was escaped when it was parsed
@@ -961,6 +990,7 @@ def main():
                   choices=['table',
                            'sequence',
                            'function',
+                           'procedure',
                            'database',
                            'schema',
                            'language',
@@ -997,7 +1027,7 @@ def main():
     # Create type object as namespace for module params
     p = type('Params', (), module.params)
     # param "schema": default, allowed depends on param "type"
-    if p.type in ['table', 'sequence', 'function', 'type', 'default_privs']:
+    if p.type in ['table', 'sequence', 'function', 'procedure', 'type', 'default_privs']:
         p.schema = p.schema or 'public'
     elif p.schema:
         module.fail_json(msg='Argument "schema" is not allowed '
@@ -1060,6 +1090,8 @@ def main():
             objs = conn.get_all_sequences_in_schema(p.schema)
         elif p.type == 'function' and p.objs == 'ALL_IN_SCHEMA':
             objs = conn.get_all_functions_in_schema(p.schema)
+        elif p.type == 'procedure' and p.objs == 'ALL_IN_SCHEMA':
+            objs = conn.get_all_procedures_in_schema(p.schema)
         elif p.type == 'default_privs':
             if p.objs == 'ALL_DEFAULT':
                 objs = frozenset(VALID_DEFAULT_OBJS.keys())
@@ -1078,7 +1110,7 @@ def main():
             objs = p.objs.split(',')
 
             # function signatures are encoded using ':' to separate args
-            if p.type == 'function':
+            if p.type in ('function', 'procedure'):
                 objs = [obj.replace(':', ',') for obj in objs]
 
         # roles
