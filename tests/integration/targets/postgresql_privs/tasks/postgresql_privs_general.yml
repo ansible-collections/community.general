@@ -1445,6 +1445,22 @@
     - result is changed
     - result.queries == ["GRANT \"postgres\" TO \"{{ db_user3 }}\";"]
 
+- name: Test community.general/issue/1058 GRANT with hyphen as an object
+  become: yes
+  become_user: "{{ pg_user }}"
+  postgresql_privs:
+    login_user: "{{ pg_user }}"
+    login_db: "{{ db_name }}"
+    roles: "{{ db_user3 }}"
+    objs: "test-role"
+    type: "group"
+  register: result
+
+- assert:
+    that:
+    - result is changed
+    - result.queries == ["GRANT \"test-role\" TO \"{{ db_user3 }}\";"]
+
 # Cleanup
 - name: Remove privs
   become: yes
