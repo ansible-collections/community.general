@@ -1396,7 +1396,7 @@
     name: "test-role"
     role_attr_flags: "NOLOGIN,NOSUPERUSER,INHERIT,NOCREATEDB,NOCREATEROLE,NOREPLICATION"
 
-- name: Test community.general/issue/1058 GRANT
+- name: Test community.general/issue/1058 GRANT with hyphen
   become: yes
   become_user: "{{ pg_user }}"
   postgresql_privs:
@@ -1428,6 +1428,22 @@
     that:
     - result is changed
     - result.queries == ["REVOKE \"postgres\" FROM \"test-role\";"]
+
+- name: Test community.general/issue/1058 GRANT without hyphen
+  become: yes
+  become_user: "{{ pg_user }}"
+  postgresql_privs:
+    login_user: "{{ pg_user }}"
+    login_db: "{{ db_name }}"
+    roles: "{{ db_user3 }}"
+    objs: "postgres"
+    type: "group"
+  register: result
+
+- assert:
+    that:
+    - result is changed
+    - result.queries == ["GRANT \"postgres\" TO \"{{ db_user3 }}\";"]
 
 # Cleanup
 - name: Remove privs

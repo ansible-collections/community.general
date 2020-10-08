@@ -772,7 +772,7 @@ class Connection(object):
         # set_what: SQL-fragment specifying what to set for the target roles:
         # Either group membership or privileges on objects of a certain type
         if obj_type == 'group':
-            set_what = ','.join(pg_quote_identifier(i, 'role') for i in obj_ids)
+            set_what = ','.join(obj_ids)
         elif obj_type == 'default_privs':
             # We don't want privs to be quoted here
             set_what = ','.join(privs)
