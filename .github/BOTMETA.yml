@@ -207,73 +207,33 @@ files:
   $modules/cloud/dimensiondata/dimensiondata_vlan.py:
     authors: tintoy
   $modules/cloud/docker/:
-    authors: chouseknecht
     maintainers: $team_docker
     ignore: cove
     supershipit: felixfontein
   $modules/cloud/docker/docker_compose.py:
-    maintainers: $team_docker sluther
+    maintainers: sluther
     labels: docker_compose
   $modules/cloud/docker/docker_config.py:
     authors: chouseknecht ushuz
-    maintainers: $team_docker
   $modules/cloud/docker/docker_container.py:
     authors: ThomasSteinbach chouseknecht cove dusdanig felixfontein kassiansun softzilla zfil
-    maintainers: $team_docker
     ignore: ThomasSteinbach cove joshuaconner
-  $modules/cloud/docker/docker_container_info.py:
-    authors: felixfontein
-    maintainers: $team_docker
-  $modules/cloud/docker/docker_host_info.py:
-    authors: WojciechowskiPiotr
-    maintainers: $team_docker
   $modules/cloud/docker/docker_image.py:
     authors: chouseknecht softzilla ssbarnea
-    maintainers: $team_docker
   $modules/cloud/docker/docker_login.py:
     authors: chouseknecht olsaki
-    maintainers: $team_docker
   $modules/cloud/docker/docker_network.py:
     authors: DBendit chouseknecht keitwb
-    maintainers: $team_docker
     labels: docker_network
-  $modules/cloud/docker/docker_network_info.py:
-    authors: DBendit
-    maintainers: WojciechowskiPiotr akshay196 danihodovic dariko felixfontein jwitko kassiansun tbouvet
-  $modules/cloud/docker/docker_node.py:
-    authors: WojciechowskiPiotr tbouvet
-    maintainers: $team_docker
-  $modules/cloud/docker/docker_node_info.py:
-    authors: WojciechowskiPiotr
-    maintainers: $team_docker
-  $modules/cloud/docker/docker_prune.py:
-    authors: felixfontein
-    maintainers: $team_docker
-  $modules/cloud/docker/docker_stack.py:
-    authors: dariko
-    maintainers: $team_docker
   $modules/cloud/docker/docker_stack_task_info.py:
     authors: imjoseangel
-    maintainers: $team_docker
-  $modules/cloud/docker/docker_swarm.py:
-    authors: WojciechowskiPiotr tbouvet
-    maintainers: $team_docker
-  $modules/cloud/docker/docker_swarm_info.py:
-    authors: WojciechowskiPiotr
-    maintainers: $team_docker
   $modules/cloud/docker/docker_swarm_service.py:
     authors: dariko hannseman jwitko
-    maintainers: $team_docker
     labels: docker_swarm_service
   $modules/cloud/docker/docker_swarm_service_info.py:
     authors: hannseman
-    maintainers: $team_docker
   $modules/cloud/docker/docker_volume.py:
     authors: agronholm
-    maintainers: $team_docker
-  $modules/cloud/docker/docker_volume_info.py:
-    authors: felixfontein
-    maintainers: $team_docker
   $modules/cloud/google/:
     authors: supertom
     maintainers: $team_google
@@ -289,12 +249,12 @@ files:
     authors: kubevirt
     maintainers: $team_kubevirt
     keywords: kubevirt
+  $modules/cloud/linode/:
+    maintainers: $team_linode
   $modules/cloud/linode/linode.py:
     authors: zbal
-    maintainers: $team_linode
   $modules/cloud/linode/linode_v4.py:
     authors: decentral1se
-    maintainers: $team_linode
   $modules/cloud/lxc/lxc_container.py:
     authors: cloudnull
   $modules/cloud/lxd/:
@@ -419,58 +379,39 @@ files:
     maintainers: $team_scaleway
   $modules/cloud/scaleway/scaleway_database_backup.py:
     authors: guillaume_ro_fr
-    maintainers: $team_scaleway
   $modules/cloud/scaleway/scaleway_image_info.py:
     authors: Spredzy sieben
-    maintainers: $team_scaleway
   $modules/cloud/scaleway/scaleway_ip_info.py:
     authors: Spredzy sieben
-    maintainers: $team_scaleway
   $modules/cloud/scaleway/scaleway_organization_info.py:
     authors: Spredzy sieben
-    maintainers: $team_scaleway
   $modules/cloud/scaleway/scaleway_security_group.py:
     authors: abarbare
-    maintainers: DenBeke QuentinBrosse jerome-quere kindermoumoute remyleone
   $modules/cloud/scaleway/scaleway_security_group_info.py:
     authors: Spredzy sieben
-    maintainers: $team_scaleway
   $modules/cloud/scaleway/scaleway_security_group_rule.py:
     authors: abarbare
-    maintainers: DenBeke $team_scaleway
+    maintainers: DenBeke
   $modules/cloud/scaleway/scaleway_volume.py:
     authors: hekonsek
-    maintainers: $team_scaleway
     labels: scaleway_volume
     ignore: hekonsek
   $modules/cloud/scaleway/scaleway_volume_info.py:
     authors: Spredzy sieben
-    maintainers: $team_scaleway
+  $modules/cloud/smartos/:
+    maintainers: $team_solaris
+    labels: solaris
+    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/cloud/smartos/smartos_image_facts.py:
     authors: xen0l
-    maintainers: $team_solaris
-    labels: solaris
-    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/cloud/smartos/imgadm.py:
     authors: jasperla
-    maintainers: $team_solaris
-    labels: solaris
-    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/cloud/smartos/nictagadm.py:
     authors: SmithX10
-    maintainers: $team_solaris
-    labels: solaris
-    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/cloud/smartos/smartos_image_info.py:
     authors: xen0l
-    maintainers: $team_solaris
-    labels: solaris
-    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/cloud/smartos/vmadm.py:
     authors: jasperla
-    maintainers: $team_solaris
-    labels: solaris
-    keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/cloud/softlayer/sl_vm.py:
     authors: mcltn
   $modules/cloud/spotinst/spotinst_aws_elastigroup.py:
@@ -481,12 +422,8 @@ files:
     authors: quentinsf
   $modules/cloud/xenserver/:
     authors: bvitnik
-  $modules/clustering/consul/consul.py:
-    authors: sgargan
   $modules/clustering/consul/:
     maintainers: $team_consul
-  $modules/clustering/consul/consul_session.py:
-    authors: sgargan
   $modules/clustering/etcd3.py:
     authors: evrardjp vfauth
   $modules/clustering/pacemaker_cluster.py:
@@ -522,46 +459,20 @@ files:
     authors: vedit
     maintainers: Jmainguy kenichi-ogawa-1988
     labels: mssql_db
-  $modules/database/postgresql/postgresql_db.py:
-    authors: ansible
+  $modules/database/postgresql/:
+    keywords: database postgres postgresql
+    labels: postgres postgresql
     maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_ext.py:
     authors: Andersson007 andytom dschep strk
-    maintainers: $team_postgresql
-  $modules/database/postgresql/:
-    authors: Andersson007
-    keywords: database postgres postgresql
-    maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_lang.py:
     authors: andytom jensdepuydt
-    maintainers: $team_postgresql
-  $modules/database/postgresql/postgresql_pg_hba.py:
-    authors: sebasmannem
-    maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_privs.py:
     authors: b6d tcraxs
-    maintainers: $team_postgresql
-  $modules/database/postgresql/postgresql_publication.py:
-    authors: Andersson007 nerzhul
-    maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_query.py:
     authors: Andersson007 archf wrouesnel
-    maintainers: $team_postgresql
-  $modules/database/postgresql/postgresql_schema.py:
-    authors: Dorn- andytom
-    maintainers: $team_postgresql
-  $modules/database/postgresql/postgresql_sequence.py:
-    authors: tcraxs
-    maintainers: $team_postgresql
-  $modules/database/postgresql/postgresql_slot.py:
-    authors: Andersson007 jscalia
-    maintainers: $team_postgresql
   $modules/database/postgresql/postgresql_tablespace.py:
     authors: Andersson007 Dorn- antoinell
-    maintainers: $team_postgresql
-  $modules/database/postgresql/postgresql_user.py:
-    authors: ansible
-    maintainers: $team_postgresql
   $modules/database/vertica/:
     authors: dareko
   $modules/files/archive.py:
@@ -582,32 +493,16 @@ files:
     ignore: magnus919
   $modules/identity/onepassword_facts.py:
     authors: Rylon
-  $modules/identity/ipa/ipa_config.py:
-    authors: fxfitz
-    maintainers: $team_ipa
-  $modules/identity/ipa/ipa_dnsrecord.py:
-    authors: Akasurde
-    maintainers: $team_ipa
-  $modules/identity/ipa/ipa_dnszone.py:
-    authors: fxfitz
-    maintainers: $team_ipa
   $modules/identity/ipa/:
-    authors: Nosmoht
     maintainers: $team_ipa
   $modules/identity/ipa/ipa_service.py:
     authors: cprh
-    maintainers: $team_ipa
-  $modules/identity/ipa/ipa_subca.py:
-    authors: Akasurde
-    maintainers: $team_ipa
   $modules/identity/ipa/ipa_vault.py:
     authors: jparrill
-    maintainers: $team_ipa
   $modules/identity/keycloak/:
     maintainers: $team_keycloak
   $modules/identity/keycloak/keycloak_group.py:
     authors: adamgoossens
-    maintainers: $team_keycloak
   $modules/identity/onepassword_info.py:
     authors: Rylon
   $modules/identity/opendj/opendj_backendprop.py:
@@ -865,9 +760,9 @@ files:
   $modules/packaging/os/apt_rpm.py:
     authors: evgkrsk
   $modules/packaging/os/flatpak.py:
-    authors: JayKayy oolongbrothers
+    authors: $team_flatpak
   $modules/packaging/os/flatpak_remote.py:
-    authors: JayKayy oolongbrothers
+    authors: $team_flatpak
   $modules/packaging/os/pkg5:
     authors: mavit
     maintainers: $team_solaris
@@ -1021,13 +916,7 @@ files:
   $modules/remote_management/lxca/:
     authors: navalkp prabhosa
   $modules/remote_management/manageiq/:
-    authors: dkorn
-    maintainers: $team_manageiq
-  $modules/remote_management/manageiq/manageiq_group.py:
-    authors: evertmulder
-    maintainers: $team_manageiq
-  $modules/remote_management/manageiq/manageiq_tenant.py:
-    authors: evertmulder
+    labels: manageiq
     maintainers: $team_manageiq
   $modules/remote_management/oneview/oneview_datacenter_facts.py:
     authors: aalexmonteiro madhav-bharadwaj ricardogpsf soodpr
@@ -1373,8 +1262,9 @@ macros:
   team_bsd: JoergFiedler MacLemon bcoca dch jasperla mekanix opoplawski overhacked tuxillo
   team_consul: colin-nolan sgargan
   team_cyberark_conjur: jvanderhoof ryanprior
-  team_docker: DBendit WojciechowskiPiotr akshay196 danihodovic dariko felixfontein jwitko kassiansun tbouvet
+  team_docker: DBendit WojciechowskiPiotr akshay196 danihodovic dariko felixfontein jwitko kassiansun tbouvet chouseknecht
   team_e_spirit: MatrixCrawler getjack
+  team_flatpak: JayKayy oolongbrothers 
   team_gitlab: Lunik Shaps dj-wasabi marwatk waheedi zanssa scodeman
   team_google: erjohnso rambleraptor
   team_hpux: bcoca davx8342
@@ -1385,7 +1275,7 @@ macros:
   team_kubevirt: machacekondra mmazur pkliczewski
   team_linode: InTheCloudDan decentral1se displague rmcintosh
   team_macos: Akasurde kyleabenson martinm82
-  team_manageiq: abellotti cben gtanzillo yaacov zgalor
+  team_manageiq: abellotti cben gtanzillo yaacov zgalor dkorn evertmulder
   team_netapp: amit0701 carchi8py hulquest lmprice lonico ndswartz schmots1
   team_networking: NilashishC Qalthos danielmellado ganeshrn justjais trishnaguha
   team_oracle: manojmeda mross22 nalsaber
