@@ -682,6 +682,150 @@
     - result is not changed
   when: postgres_version_resp.stdout is version('11', '>=')
 
+###########################
+# Test for procedure type #
+###########################
+- name: Create another procedure for tests
+  postgresql_query:
+    query: "CREATE PROCEDURE mock_procedure1(int, int) LANGUAGE SQL AS $$ SELECT 1; $$;"
+    db: "{{ db_name }}"
+    login_user: "{{ db_user3 }}"
+    login_password: password
+  when: postgres_version_resp.stdout is version('11', '>=')
+
+- name: Grant privs on procedure
+  postgresql_privs:
+    type: procedure
+    state: present
+    privs: EXECUTE
+    roles: "{{ db_user2 }}"
+    objs: 'mock_procedure1(int:int)'
+    schema: public
+    db: "{{ db_name }}"
+    login_user: "{{ db_user3 }}"
+    login_password: password
+  register: result
+  when: postgres_version_resp.stdout is version('11', '>=')
+
+- assert:
+    that:
+    - result is changed
+  when: postgres_version_resp.stdout is version('11', '>=')
+
+- name: Grant privs on procedure again
+  postgresql_privs:
+    type: procedure
+    state: present
+    privs: EXECUTE
+    roles: "{{ db_user2 }}"
+    objs: 'mock_procedure1(int:int)'
+    schema: public
+    db: "{{ db_name }}"
+    login_user: "{{ db_user3 }}"
+    login_password: password
+  register: result
+  when: postgres_version_resp.stdout is version('11', '>=')
+
+- assert:
+    that:
+    - result is not changed
+  when: postgres_version_resp.stdout is version('11', '>=')
+
+- name: Revoke procedure privs
+  postgresql_privs:
+    type: procedure
+    state: absent
+    privs: EXECUTE
+    roles: "{{ db_user2 }}"
+    objs: 'mock_procedure1(int:int)'
+    schema: public
+    db: "{{ db_name }}"
+    login_user: "{{ db_user3 }}"
+    login_password: password
+  register: result
+  when: postgres_version_resp.stdout is version('11', '>=')
+
+- assert:
+    that:
+    - result is changed
+  when: postgres_version_resp.stdout is version('11', '>=')
+
+- name: Revoke procedure privs again
+  postgresql_privs:
+    type: procedure
+    state: absent
+    privs: EXECUTE
+    roles: "{{ db_user2 }}"
+    objs: 'mock_procedure1(int:int)'
+    schema: public
+    db: "{{ db_name }}"
+    login_user: "{{ db_user3 }}"
+    login_password: password
+  register: result
+  when: postgres_version_resp.stdout is version('11', '>=')
+
+- assert:
+    that:
+    - result is not changed
+  when: postgres_version_resp.stdout is version('11', '>=')
+
+- name: Grant procedure privs for all object in schema
+  postgresql_privs:
+    type: procedure
+    state: present
+    privs: ALL
+    roles: "{{ db_user2 }}"
+    objs: ALL_IN_SCHEMA
+    schema: public
+    db: "{{ db_name }}"
+    login_user: "{{ db_user3 }}"
+    login_password: password
+  register: result
+  when: postgres_version_resp.stdout is version('11', '>=')
+
+- assert:
+    that:
+    - result is changed
+  when: postgres_version_resp.stdout is version('11', '>=')
+
+- name: Grant procedure privs for all object in schema again
+  postgresql_privs:
+    type: procedure
+    state: present
+    privs: ALL
+    roles: "{{ db_user2 }}"
+    objs: ALL_IN_SCHEMA
+    schema: public
+    db: "{{ db_name }}"
+    login_user: "{{ db_user3 }}"
+    login_password: password
+  register: result
+  when: postgres_version_resp.stdout is version('11', '>=')
+
+- assert:
+    that:
+    - result is not changed
+  when: postgres_version_resp.stdout is version('11', '>=')
+
+- name: Revoke procedure privs for all object in schema
+  postgresql_privs:
+    type: procedure
+    state: absent
+    privs: ALL
+    roles: "{{ db_user2 }}"
+    objs: ALL_IN_SCHEMA
+    schema: public
+    db: "{{ db_name }}"
+    login_user: "{{ db_user3 }}"
+    login_password: password
+  register: result
+  when: postgres_version_resp.stdout is version('11', '>=')
+
+- assert:
+    that:
+    - result is changed
+  when: postgres_version_resp.stdout is version('11', '>=')
+
 #################################################
 # Test ALL_IN_SCHEMA for 'partioned tables type #
 #################################################
