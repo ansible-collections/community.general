@@ -48,8 +48,8 @@ options:
   template:
     description:
       - the template name
-      - required for state C(absent) to delete a template
-      - required for state C(present) to download an appliance container template (pveam)
+      - Required for state C(absent) to delete a template.
+      - Required for state C(present) to download an appliance container template (pveam).
     type: str
   content_type:
     description:
