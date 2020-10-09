@@ -396,17 +396,16 @@ def check_packages(module, pacman_path, packages, state):
 def expand_package_groups(module, pacman_path, pkgs):
     expanded = []
 
+    __, stdout, __ = module.run_command([pacman_path, "--sync", "--groups", "--quiet"], check_rc=True)
+    available_groups = stdout.splitlines()
+
     for pkg in pkgs:
         if pkg:  # avoid empty strings
-            cmd = "%s --sync --groups --quiet %s" % (pacman_path, pkg)
-            rc, stdout, stderr = module.run_command(cmd, check_rc=False)
-
-            if rc == 0:
-                # A group was found matching the name, so expand it
-                for name in stdout.split('\n'):
-                    name = name.strip()
-                    if name:
-                        expanded.append(name)
+            if pkg in available_groups:
+                # A group was found matching the package name: expand it
+                cmd = [pacman_path, "--sync", "--groups", "--quiet", pkg]
+                rc, stdout, stderr = module.run_command(cmd, check_rc=True)
+                expanded.extend([name.strip() for name in stdout.splitlines()])
             else:
                 expanded.append(pkg)
 
