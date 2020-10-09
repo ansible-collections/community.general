@@ -1,0 +1,3 @@
+minor_changes:
+- logstash callback - migrate to python3-logstash (https://github.com/ansible-collections/community.general/pull/641).
+- logstash callback - improve logstash message structure (https://github.com/ansible-collections/community.general/pull/641).
