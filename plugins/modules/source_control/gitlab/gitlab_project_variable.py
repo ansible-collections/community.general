@@ -155,7 +155,14 @@ class GitlabProjectVariables(object):
         return self.repo.projects.get(project_name)
 
     def list_all_project_variables(self):
-        return self.project.variables.list()
+        page_nb = 1
+        variables = []
+        vars_page = self.project.variables.list(page=page_nb)
+        while len(vars_page) > 0:
+            variables += vars_page
+            page_nb += 1
+            vars_page = self.project.variables.list(page=page_nb)
+        return variables
 
     def create_variable(self, key, value, masked, protected, variable_type):
         if self._module.check_mode:
