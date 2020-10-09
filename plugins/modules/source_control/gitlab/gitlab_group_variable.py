@@ -158,7 +158,14 @@ class GitlabGroupVariables(object):
         return self.repo.groups.get(group_name)
 
     def list_all_group_variables(self):
-        return self.group.variables.list()
+        page_nb = 1
+        variables = []
+        vars_page = self.group.variables.list(page=page_nb)
+        while len(vars_page) > 0:
+            variables += vars_page
+            page_nb += 1
+            vars_page = self.group.variables.list(page=page_nb)
+        return variables
 
     def create_variable(self, key, value, masked, protected, variable_type):
         if self._module.check_mode:
