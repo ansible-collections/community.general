@@ -494,6 +494,8 @@ class LXDContainerManagement(object):
         self.trust_password = self.module.params.get('trust_password', None)
         self.actions = []
         self.diff = {'before': {}, 'after': {}}
+        self.old_instance_json = {}
+        self.old_sections = {}
 
     def _build_config(self):
         self.config = {}
@@ -575,11 +577,9 @@ class LXDContainerManagement(object):
 
     def _instance_ipv4_addresses(self, ignore_devices=None):
         ignore_devices = ['lo'] if ignore_devices is None else ignore_devices
-
-        resp_json = self._get_instance_state_json()
-        network = resp_json['metadata']['network'] or {}
-        network = dict((k, v) for k, v in network.items() if k not in ignore_devices) or {}
-        addresses = dict((k, [a['address'] for a in v['addresses'] if a['family'] == 'inet']) for k, v in network.items()) or {}
+        data = (self._get_instance_state_json() or {}).get('metadata', None) or {}
+        network = dict((k, v) for k, v in (data.get('network', None) or {}).items() if k not in ignore_devices)
+        addresses = dict((k, [a['address'] for a in v['addresses'] if a['family'] == 'inet']) for k, v in network.items())
         return addresses
 
     @staticmethod
@@ -592,7 +592,7 @@ class LXDContainerManagement(object):
             while datetime.datetime.now() < due:
                 time.sleep(1)
                 addresses = self._instance_ipv4_addresses()
-                if self._has_all_ipv4_addresses(addresses):
+                if self._has_all_ipv4_addresses(addresses) or self.module.check_mode:
                     self.addresses = addresses
                     return
         except LXDClientException as e:
@@ -665,8 +665,9 @@ class LXDContainerManagement(object):
     def _needs_to_change_instance_config(self, key):
         if key not in self.config:
             return False
+
         if key == 'config' and self.ignore_volatile_options:  # the old behavior is to ignore configurations by keyword "volatile"
-            old_configs = dict((k, v) for k, v in self.old_instance_json['metadata'][key].items() if not k.startswith('volatile.'))
+            old_configs = dict((k, v) for k, v in self.old_sections.get(key, {}).items() if not k.startswith('volatile.'))
             for k, v in self.config['config'].items():
                 if k not in old_configs:
                     return True
@@ -674,7 +675,7 @@ class LXDContainerManagement(object):
                     return True
             return False
         elif key == 'config':  # next default behavior
-            old_configs = dict((k, v) for k, v in self.old_instance_json['metadata'][key].items())
+            old_configs = dict((k, v) for k, v in self.old_sections.get(key, {}).items())
             for k, v in self.config['config'].items():
                 if k not in old_configs:
                     return True
@@ -682,7 +683,7 @@ class LXDContainerManagement(object):
                     return True
             return False
         else:
-            old_configs = self.old_instance_json['metadata'][key]
+            old_configs = self.old_sections.get(key, {})
             return self.config[key] != old_configs
 
     def _needs_to_apply_instance_configs(self):
@@ -692,7 +693,7 @@ class LXDContainerManagement(object):
         return False
 
     def _apply_instance_configs(self):
-        old_metadata = copy.deepcopy(self.old_instance_json['metadata'])
+        old_metadata = copy.deepcopy(self.old_instance_json).get('metadata', None) or {}
         body_json = {}
         for param in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS):
             if param in old_metadata:
@@ -700,6 +701,7 @@ class LXDContainerManagement(object):
 
             if self._needs_to_change_instance_config(param):
                 if param == 'config':
+                    body_json['config'] = body_json.get('config', None) or {}
                     for k, v in self.config['config'].items():
                         body_json['config'][k] = v
                 else:
@@ -720,16 +722,22 @@ class LXDContainerManagement(object):
                 self.client.authenticate(self.trust_password)
             self.ignore_volatile_options = self.module.params.get('ignore_volatile_options')
 
-            self.diff['before']['state'] = self.old_state
-            self.diff['after']['state'] = self.state
-
-            old_sections = dict((k, v) for k, v in self.old_container_json['metadata'].items() if k in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS))
-            self.diff['before']['instance'] = dict(
+            self.old_instance_json = self._get_instance_json()
+            self.old_sections = dict(
                 (section, content) if not isinstance(content, dict)
                 else (section, dict((k, v) for k, v in content.items()
                                     if not (self.ignore_volatile_options and k.startswith('volatile.'))))
-                for section, content in old_sections.items()
+                for section, content in (self.old_instance_json.get('metadata', None) or {}).items()
+                if section in set(CONFIG_PARAMS) - set(CONFIG_CREATION_PARAMS)
             )
+
+            self.diff['before']['instance'] = self.old_sections
+            # preliminary, will be overwritten in _apply_instance_configs() if called
+            self.diff['after']['instance'] = self.config
+
+            self.old_state = self._instance_json_to_module_state(self.old_instance_json)
+            self.diff['before']['state'] = self.old_state
+            self.diff['after']['state'] = self.state
 
             action = getattr(self, LXD_ANSIBLE_STATES[self.state])
             action()
