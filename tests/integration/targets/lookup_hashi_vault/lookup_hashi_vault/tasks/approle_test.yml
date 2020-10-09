@@ -30,7 +30,7 @@
 
     - name: 'Failure expected when inexistent secret is read'
       vars:
-          secret_inexistent: "{{ lookup('community.general.:qhashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/secret4 auth_method=approle secret_id=' ~ secret_id ~ ' role_id=' ~ role_id) }}"
+          secret_inexistent: "{{ lookup('community.general.hashi_vault', conn_params ~ 'secret=' ~ vault_kv2_path ~ '/non_existent_secret4 auth_method=approle secret_id=' ~ secret_id ~ ' role_id=' ~ role_id) }}"
       debug:
         msg: 'Failure is expected ({{ secret_inexistent }})'
       register: test_inexistent

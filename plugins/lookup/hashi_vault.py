@@ -116,9 +116,12 @@ DOCUMENTATION = """
       description: Path to certificate to use for authentication.
       aliases: [ cacert ]
     validate_certs:
-      description: Controls verification and validation of SSL certificates, mostly you only want to turn off with self signed ones.
+      description:
+        - Controls verification and validation of SSL certificates, mostly you only want to turn off with self signed ones.
+        - Will be populated with the inverse of C(VAULT_SKIP_VERIFY) if that is set and I(validate_certs) is not explicitly
+          provided (added in community.general 1.3.0).
+        - Will default to C(true) if neither I(validate_certs) or C(VAULT_SKIP_VERIFY) are set.
       type: boolean
-      default: True
     namespace:
       description: Namespace where secrets reside. Requires HVAC 0.7.0+ and Vault 0.11+.
       env:
@@ -257,6 +260,7 @@ import os
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
+from ansible.module_utils.parsing.convert_bool import boolean
 
 HAS_HVAC = False
 try:
@@ -486,7 +490,27 @@ class LookupModule(LookupBase):
         #
         '''' return a bool or cacert '''
         ca_cert = self.get_option('ca_cert')
+
         validate_certs = self.get_option('validate_certs')
+
+        if validate_certs is None:
+            # Validate certs option was not explicitly set
+
+            # Check if VAULT_SKIP_VERIFY is set
+            vault_skip_verify = os.environ.get('VAULT_SKIP_VERIFY')
+
+            if vault_skip_verify is not None:
+                # VAULT_SKIP_VERIFY is set
+                try:
+                    # Check that we have a boolean value
+                    vault_skip_verify = boolean(vault_skip_verify)
+                    # Use the inverse of VAULT_SKIP_VERIFY
+                    validate_certs = not vault_skip_verify
+                except TypeError:
+                    # Not a boolean value fallback to default value (True)
+                    validate_certs = True
+            else:
+                validate_certs = True
 
         if not (validate_certs and ca_cert):
             self.set_option('ca_cert', validate_certs)
