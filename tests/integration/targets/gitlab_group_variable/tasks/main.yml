@@ -495,6 +495,78 @@
       - gitlab_group_variable_state.group_variable.updated|length == 0
       - gitlab_group_variable_state.group_variable.removed[0] == "my_test_var"
 
+- name: set complete page and purge existing ones
+  gitlab_group_variable:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    group: "{{ gitlab_group_name }}"
+    vars:
+      page1_var01: value
+      page1_var02: value
+      page1_var03: value
+      page1_var04: value
+      page1_var05: value
+      page1_var06: value
+      page1_var07: value
+      page1_var08: value
+      page1_var09: value
+      page1_var10: value
+      page1_var11: value
+      page1_var12: value
+      page1_var13: value
+      page1_var14: value
+      page1_var15: value
+      page1_var16: value
+      page1_var17: value
+      page1_var18: value
+      page1_var19: value
+      page1_var20: value
+    purge: True
+  register: gitlab_group_variable_state
+
+- name: complete page added state must be changed
+  assert:
+    that:
+      - gitlab_group_variable_state is changed
+      - gitlab_group_variable_state.group_variable.added|length == 20
+      - gitlab_group_variable_state.group_variable.untouched|length == 0
+
+- name: set complete page and keep existing ones
+  gitlab_group_variable:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    group: "{{ gitlab_group_name }}"
+    vars:
+      page2_var01: value
+      page2_var02: value
+      page2_var03: value
+      page2_var04: value
+      page2_var05: value
+      page2_var06: value
+      page2_var07: value
+      page2_var08: value
+      page2_var09: value
+      page2_var10: value
+      page2_var11: value
+      page2_var12: value
+      page2_var13: value
+      page2_var14: value
+      page2_var15: value
+      page2_var16: value
+      page2_var17: value
+      page2_var18: value
+      page2_var19: value
+      page2_var20: value
+    purge: False
+  register: gitlab_group_variable_state
+
+- name: existing page untouched state must be changed
+  assert:
+    that:
+      - gitlab_group_variable_state is changed
+      - gitlab_group_variable_state.group_variable.added|length == 20
+      - gitlab_group_variable_state.group_variable.untouched|length == 20
+
 - name: check that no variables are left
   gitlab_group_variable:
     api_url: "{{ gitlab_host }}"
@@ -503,11 +575,11 @@
     purge: True
   register: gitlab_group_variable_state
 
-- name: check that no variables are untoucheded state must be changed
+- name: check that no variables are untouched state must be changed
   assert:
     that:
-      - not gitlab_group_variable_state.changed
+      - gitlab_group_variable_state.changed
       - gitlab_group_variable_state.group_variable.added|length == 0
       - gitlab_group_variable_state.group_variable.untouched|length == 0
-      - gitlab_group_variable_state.group_variable.removed|length == 0
+      - gitlab_group_variable_state.group_variable.removed|length == 40
       - gitlab_group_variable_state.group_variable.updated|length == 0
