@@ -245,7 +245,7 @@ def main():
                 template = module.params['template']
 
                 if not template:
-                    module.fail_json(msg='template param to downloading appliance template is mandatory')
+                    module.fail_json(msg='template param for downloading appliance template is mandatory')
 
                 if get_template(proxmox, node, storage, content_type, template) and not module.params['force']:
                     module.exit_json(changed=False, msg='template with volid=%s:%s/%s already exists' % (storage, content_type, template))
