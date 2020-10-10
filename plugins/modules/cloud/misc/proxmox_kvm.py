@@ -120,9 +120,10 @@ options:
     description:
       - Target drive's backing file's data format.
       - Used only with clone
+      - Use I(format=unspecified) and I(full=false) for a linked clone.
     type: str
     default: qcow2
-    choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk" ]
+    choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", "unspecified" ]
   freeze:
     description:
       - Specify if PVE should freeze CPU at startup (use 'c' monitor command to start execution).
@@ -470,6 +471,22 @@ EXAMPLES = '''
     node: sabrewulf
     storage: VMs
     format: qcow2
+    timeout: 500
+
+- name: >
+    Create linked clone VM with only source VM name.
+    The VM source is spynal.
+    The target VM name is zavala
+  community.general.proxmox_kvm:
+    api_user: root@pam
+    api_password: secret
+    api_host: helldorado
+    clone: spynal
+    name: zavala
+    node: sabrewulf
+    storage: VMs
+    full: no
+    format: unspecified
     timeout: 500
 
 - name: Clone VM with source vmid and target newid and raw format
@@ -865,7 +882,7 @@ def main():
             description=dict(type='str'),
             digest=dict(type='str'),
             force=dict(type='bool', default=False),
-            format=dict(type='str', default='qcow2', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk']),
+            format=dict(type='str', default='qcow2', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk', 'unspecified']),
             freeze=dict(type='bool'),
             full=dict(type='bool', default=True),
             hostpci=dict(type='dict'),
@@ -944,6 +961,9 @@ def main():
     update = bool(module.params['update'])
     vmid = module.params['vmid']
     validate_certs = module.params['validate_certs']
+
+    if module.params['format'] == 'unspecified':
+        module.params['format'] = None
 
     # If password not set get it from PROXMOX_PASSWORD env
     if not api_password:
