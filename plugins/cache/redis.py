@@ -40,6 +40,7 @@ DOCUMENTATION = '''
         ini:
           - key: fact_caching_redis_keyset_name
             section: defaults
+        version_added: 1.3.0
       _timeout:
         default: 86400
         description: Expiration timeout in seconds for the cache plugin data. Set to 0 to never expire
