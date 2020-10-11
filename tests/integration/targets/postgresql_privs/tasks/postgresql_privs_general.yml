@@ -1385,6 +1385,97 @@
       - "'{{ db_user2 }}' in typ_result.query_result[0].typacl"
   when: postgres_version_resp.stdout is version('10', '>=')
 
+######################################################################
+# https://github.com/ansible-collections/community.general/issues/1058
+- name: Create user for test
+  become: yes
+  become_user: "{{ pg_user }}"
+  postgresql_user:
+    login_user: "{{ pg_user }}"
+    login_db: "{{ db_name }}"
+    name: "test-role"
+    role_attr_flags: "NOLOGIN,NOSUPERUSER,INHERIT,NOCREATEDB,NOCREATEROLE,NOREPLICATION"
+
+- name: Test community.general/issue/1058 GRANT with hyphen
+  become: yes
+  become_user: "{{ pg_user }}"
+  postgresql_privs:
+    login_user: "{{ pg_user }}"
+    login_db: "{{ db_name }}"
+    roles: "test-role"
+    objs: "{{ pg_user }}"
+    type: "group"
+  register: result
+
+- assert:
+    that:
+    - result is changed
+    - result.queries == ["GRANT \"{{ pg_user }}\" TO \"test-role\";"]
+
+- name: Test community.general/issue/1058 REVOKE
+  become: yes
+  become_user: "{{ pg_user }}"
+  postgresql_privs:
+    login_user: "{{ pg_user }}"
+    login_db: "{{ db_name }}"
+    roles: "test-role"
+    objs: "{{ pg_user }}"
+    type: "group"
+    state: absent
+  register: result
+
+- assert:
+    that:
+    - result is changed
+    - result.queries == ["REVOKE \"{{ pg_user }}\" FROM \"test-role\";"]
+
+- name: Test community.general/issue/1058 GRANT without hyphen
+  become: yes
+  become_user: "{{ pg_user }}"
+  postgresql_privs:
+    login_user: "{{ pg_user }}"
+    login_db: "{{ db_name }}"
+    roles: "{{ db_user3 }}"
+    objs: "{{ pg_user }}"
+    type: "group"
+  register: result
+
+- assert:
+    that:
+    - result is changed
+    - result.queries == ["GRANT \"{{ pg_user }}\" TO \"{{ db_user3 }}\";"]
+
+- name: Test community.general/issue/1058 GRANT with hyphen as an object
+  become: yes
+  become_user: "{{ pg_user }}"
+  postgresql_privs:
+    login_user: "{{ pg_user }}"
+    login_db: "{{ db_name }}"
+    roles: "{{ db_user3 }}"
+    objs: "test-role,{{ db_user2 }}"
+    type: "group"
+  register: result
+
+- assert:
+    that:
+    - result is changed
+    - result.queries == ["GRANT \"test-role\",\"{{ db_user2 }}\" TO \"{{ db_user3 }}\";"]
+
+- name: Test community.general/issue/1058 GRANT with hyphen as an object
+  become: yes
+  become_user: "{{ pg_user }}"
+  postgresql_privs:
+    login_user: "{{ pg_user }}"
+    login_db: "{{ db_name }}"
+    roles: "{{ db_user3 }}"
+    objs: "test-role"
+    type: "group"
+  register: result
+
+- assert:
+    that:
+    - result is not changed
+
 # Cleanup
 - name: Remove privs
   become: yes
@@ -1425,10 +1516,13 @@
   become: yes
   become_user: "{{ pg_user }}"
   postgresql_user:
-    name: "{{ db_user3 }}"
+    name: "{{ item }}"
     state: absent
     db: "{{ db_name }}"
     login_user: "{{ pg_user }}"
+  loop:
+  - '{{ db_user3 }}'
+  - 'test-role'
 
 - name: Destroy DB
   become_user: "{{ pg_user }}"
