@@ -113,7 +113,7 @@ class CapabilitiesModule(object):
         if rc != 0 or stderr != "":
             self.module.fail_json(msg="Unable to get capabilities of %s" % path, stdout=stdout.strip(), stderr=stderr)
         if stdout.strip() != path:
-            if stdout.count(' ='):
+            if ' =' in stdout:
                 # process output of an older version of libcap
                 caps = stdout.split(' =')[1].strip().split()
             else:
