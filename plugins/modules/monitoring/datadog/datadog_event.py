@@ -61,6 +61,10 @@ options:
               on personally controlled sites using self-signed certificates.
         type: bool
         default: 'yes'
+    site:
+        description: ["The Datadog site."]
+        default: us
+        choices: ['us', 'eu']
 '''
 
 EXAMPLES = '''
@@ -79,6 +83,14 @@ EXAMPLES = '''
     api_key: 9775a026f1ca7d1c6c5af9d94d9595a4
     app_key: j4JyCYfefWHhgFgiZUqRm63AXHNZQyPGBfJtAzmN
     tags: 'aa,bb,#host:{{ inventory_hostname }}'
+
+- name: Post an event using an eu site
+  community.general.datadog_event:
+    title: Testing from ansible
+    text: Test
+    api_key: 9775a026f1ca7d1c6c5af9d94d9595a4
+    app_key: j4JyCYfefWHhgFgiZUqRm63AXHNZQyPGBfJtAzmN
+    site: eu
 '''
 
 import platform
@@ -116,6 +128,10 @@ def main():
             ),
             aggregation_key=dict(required=False, default=None),
             validate_certs=dict(default=True, type='bool'),
+            site=dict(
+                required=False, default='us',
+                choices=['us', 'eu']
+            ),
         )
     )
 
@@ -124,6 +140,7 @@ def main():
         module.fail_json(msg=missing_required_lib('datadogpy'), exception=DATADOG_IMP_ERR)
 
     options = {
+        'site': module.params['site'],
         'api_key': module.params['api_key'],
         'app_key': module.params['app_key']
     }
