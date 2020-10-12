@@ -3,6 +3,7 @@ __metaclass__ = type
 
 import pytest
 
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock
 
 from ansible_collections.community.kubernetes.plugins.module_utils.common import K8sAnsibleMixin
@@ -52,9 +53,9 @@ def fail_json(*args, **kwargs):
 @pytest.fixture()
 def base_fixture(monkeypatch):
     monkeypatch.setattr(
-        KubernetesRawModule, "exit_json", exit_json)
+        AnsibleModule, "exit_json", exit_json)
     monkeypatch.setattr(
-        KubernetesRawModule, "fail_json", fail_json)
+        AnsibleModule, "fail_json", fail_json)
     # Create mock methods in Resource directly, otherwise dyn client
     # tries binding those to corresponding methods in DynamicClient
     # (with partial()), which is more problematic to intercept
