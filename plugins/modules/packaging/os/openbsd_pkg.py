@@ -175,6 +175,9 @@ def package_present(names, pkg_spec, module):
     build = module.params['build']
     snapshot = module.params['snapshot']
 
+    if snapshot is True and build is True:
+        module.fail_json(msg="the combination of build=%s and snapshot is not supported" % module.params['build'])
+
     for name in names:
         # It is possible package_present() has been called from package_latest().
         # In that case we do not want to operate on the whole list of names,
@@ -206,10 +209,7 @@ def package_present(names, pkg_spec, module):
                 install_cmd = 'pkg_add -Im'
 
         if snapshot is True:
-            if build is True:
-                module.fail_json(msg="the combination of build=%s and snapshot is not supported" % module.params['build'])
-            else:
-                install_cmd += ' -Dsnap'
+            install_cmd += ' -Dsnap'
 
         if pkg_spec[name]['installed_state'] is False:
 
