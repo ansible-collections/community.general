@@ -295,7 +295,7 @@ def ext_get_versions(cursor, ext):
     if current_version == '0':
         current_version = False
 
-    return (current_version, available_versions)
+    return (current_version, sorted(available_versions, key=lambda v: LooseVersion(v)))
 
 # ===========================================
 # Module execution.
