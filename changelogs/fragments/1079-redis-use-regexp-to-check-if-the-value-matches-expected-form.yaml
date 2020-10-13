@@ -1,0 +1,2 @@
+bugfixes:
+  - Fixes redis parsing of config values which should not be converted to bytes
