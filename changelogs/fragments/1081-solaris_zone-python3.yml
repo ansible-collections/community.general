@@ -1,3 +1,3 @@
 ---
 bugfixes:
-  - solaris_zone - fixed issue trying to configure zone in python3 (https://github.com/ansible-collections/community.general/issues/1081)
+  - solaris_zone - fixed issue trying to configure zone in Python 3 (https://github.com/ansible-collections/community.general/issues/1081).
