@@ -115,7 +115,7 @@ options:
       - Used only with clone
       - Use I(format=unspecified) and I(full=false) for a linked clone.
     type: str
-    choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk" ]
+    choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", "unspecified" ]
   freeze:
     description:
       - Specify if PVE should freeze CPU at startup (use 'c' monitor command to start execution).
@@ -867,7 +867,7 @@ def main():
             description=dict(type='str'),
             digest=dict(type='str'),
             force=dict(type='bool', default=False),
-            format=dict(type='str', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk']),
+            format=dict(type='str', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk', 'unspecified']),
             freeze=dict(type='bool'),
             full=dict(type='bool', default=True),
             hostpci=dict(type='dict'),
