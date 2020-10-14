@@ -193,7 +193,7 @@ class Zone(object):
             self.module.fail_json(msg='Missing required argument: path')
 
         if not self.module.check_mode:
-            t = tempfile.NamedTemporaryFile(delete=False)
+            t = tempfile.NamedTemporaryFile(delete=False, mode='wt')
 
             if self.sparse:
                 t.write('create %s\n' % self.create_options)
