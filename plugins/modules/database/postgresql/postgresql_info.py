@@ -18,7 +18,7 @@ options:
     description:
     - Limit the collected information by comma separated string or YAML list.
     - Allowable values are C(version),
-      C(databases), C(settings), C(tablespaces), C(roles),
+      C(databases), C(in_recovery), C(settings), C(tablespaces), C(roles),
       C(replications), C(repl_slots).
     - By default, collects all subsets.
     - You can use shell-style (fnmatch) wildcard to pass groups of values (see Examples).
@@ -117,6 +117,11 @@ version:
       returned: always
       type: int
       sample: 1
+in_recovery:
+  description: Indicates if the service is in recovery mode or not.
+  returned: always
+  type: bool
+  sample: false
 databases:
   description: Information about databases.
   returned: always
@@ -550,6 +555,7 @@ class PgClusterInfo(object):
         self.cursor = db_conn_obj.connect()
         self.pg_info = {
             "version": {},
+            "in_recovery": None,
             "tablespaces": {},
             "databases": {},
             "replications": {},
@@ -563,6 +569,7 @@ class PgClusterInfo(object):
         """Collect information based on 'filter' option."""
         subset_map = {
             "version": self.get_pg_version,
+            "in_recovery": self.get_recovery_state,
             "tablespaces": self.get_tablespaces,
             "databases": self.get_db_info,
             "replications": self.get_repl_info,
@@ -921,6 +928,10 @@ class PgClusterInfo(object):
             major=int(raw[0]),
             minor=int(raw[1]),
         )
+
+    def get_recovery_state(self):
+        """Get if the service is in recovery mode."""
+        self.pg_info["in_recovery"] = self.__exec_sql("SELECT pg_is_in_recovery()")[0][0]
 
     def get_db_info(self):
         """Get information about the current database."""
