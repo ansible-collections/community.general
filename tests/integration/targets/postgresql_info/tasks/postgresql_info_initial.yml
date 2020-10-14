@@ -63,6 +63,7 @@
   - assert:
       that:
       - result.version != {}
+      - result.in_recovery == false
       - result.databases.{{ db_default }}.collate
       - result.databases.{{ db_default }}.languages
       - result.databases.{{ db_default }}.namespaces
@@ -81,11 +82,13 @@
       filter:
         - ver*
         - rol*
+        - in_recov*
 
   - assert:
       that:
       - result.version != {}
       - result.roles
+      - result.in_recovery == false
       - result.databases == {}
       - result.repl_slots == {}
       - result.replications == {}
@@ -126,10 +129,12 @@
       filter:
       - "!ver*"
       - "!rol*"
+      - "!in_rec*"
 
   - assert:
       that:
       - result.version == {}
+      - result.in_recovery == None
       - result.roles == {}
       - result.databases
 
@@ -144,6 +149,7 @@
   - assert:
       that:
       - result.version != {}
+      - result.in_recovery == false
       - result.databases.{{ db_default }}.collate
       - result.databases.{{ db_default }}.languages
       - result.databases.{{ db_default }}.namespaces
