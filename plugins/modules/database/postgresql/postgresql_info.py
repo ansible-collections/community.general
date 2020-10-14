@@ -121,7 +121,6 @@ in_recovery:
   description: Indicates if the service is in recovery mode or not.
   returned: always
   type: bool
-  returned: always
   sample: false
 databases:
   description: Information about databases.
