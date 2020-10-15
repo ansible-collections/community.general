@@ -17,22 +17,17 @@ from ansible_collections.community.general.plugins.modules.database.postgresql.p
         (
             '2.0.0',
             [{'version': '3.1.0dev'}, {'version': '3.1.0devnext'}, {'version': 'unpackaged'}],
-            ['3.1.0dev', '3.1.0devnext', 'unpackaged'],
+            ['3.1.0dev', '3.1.0devnext'],
         ),
         (
             '2.0.0',
             [{'version': 'unpackaged'}, {'version': '3.1.0dev'}, {'version': '3.1.0devnext'}],
-            ['unpackaged', '3.1.0dev', '3.1.0devnext'],
+            ['3.1.0dev', '3.1.0devnext'],
         ),
         (
             '2.0.1',
             [{'version': 'unpackaged'}, {'version': '2.0.0'}, {'version': '2.1.0dev'}],
-            ['unpackaged', '2.1.0dev'],
-        ),
-        (
-            '10.1',
-            [{'version': 'blahblah'}, {'version': '8.5'}, {'version': '10.0'}, {'version': '10.2'}, {'version': '10.3'}],
-            ['blahblah', '10.2', '10.3'],
+            ['2.1.0dev'],
         ),
     ]
 )

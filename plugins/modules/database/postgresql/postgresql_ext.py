@@ -106,6 +106,7 @@ notes:
   then PostgreSQL must also be installed on the remote host.
 - For Ubuntu-based systems, install the C(postgresql), C(libpq-dev),
   and C(python-psycopg2) packages on the remote host before using this module.
+- Incomparable versions, for example PostGIS ``unpackaged``, cannot be installed.
 requirements: [ psycopg2 ]
 author:
 - Daniel Schep (@dschep)
@@ -291,31 +292,35 @@ def ext_get_versions(cursor, ext):
     if current_version == '0':
         current_version = False
 
-    return (current_version, sorted(available_versions, key=LooseVersion))
+    return (current_version, available_versions)
 
 
-def parse_ext_versions(current_ver, ext_ver_list):
+def parse_ext_versions(current_version, ext_ver_list):
     """Parse ext versions.
 
     Args:
-      current_ver (str) -- version to compare elements of ext_ver_list with
+      current_version (str) -- version to compare elements of ext_ver_list with
       ext_ver_list (list) -- list containing dicts with versions
 
-    Return a list with versions that are higher than current_ver.
+    Return a sorted list with versions that are higher than current_version.
 
-    Note: Uncomparable versions (e.g., postgis version "unpackaged") are attached as is.
+    Note: Incomparable versions (e.g., postgis version "unpackaged") are skipped.
     """
     available_versions = []
 
     for line in ext_ver_list:
-        try:
-            if LooseVersion(line['version']) > LooseVersion(current_ver):
-                available_versions.append(line['version'])
-        except TypeError:
-            # When a version cannot be compared, append it as is
-            available_versions.append(line['version'])
+        if line['version'] == 'unpackaged':
+            continue
 
-    return available_versions
+        try:
+            if LooseVersion(line['version']) > LooseVersion(current_version):
+                available_versions.append(line['version'])
+        except Exception:
+            # When a version cannot be compared, skip it
+            # (there's a note in the documentation)
+            continue
+
+    return sorted(available_versions, key=LooseVersion)
 
 # ===========================================
 # Module execution.
