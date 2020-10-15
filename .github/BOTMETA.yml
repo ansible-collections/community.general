@@ -218,6 +218,10 @@ files:
   $modules/cloud/docker/docker_container.py:
     authors: ThomasSteinbach chouseknecht cove dusdanig felixfontein kassiansun softzilla zfil
     ignore: ThomasSteinbach cove joshuaconner
+  $modules/cloud/docker/docker_container_info.py:
+    authors: felixfontein
+  $modules/cloud/docker/docker_host_info.py:
+    authors: WojciechowskiPiotr
   $modules/cloud/docker/docker_image.py:
     authors: chouseknecht softzilla ssbarnea
   $modules/cloud/docker/docker_login.py:
@@ -225,8 +229,22 @@ files:
   $modules/cloud/docker/docker_network.py:
     authors: DBendit chouseknecht keitwb
     labels: docker_network
+  $modules/cloud/docker/docker_network_info.py:
+    authors: DBendit
+  $modules/cloud/docker/docker_node.py:
+    authors: WojciechowskiPiotr tbouvet
+  $modules/cloud/docker/docker_node_info.py:
+    authors: WojciechowskiPiotr
+  $modules/cloud/docker/docker_prune.py:
+    authors: felixfontein
+  $modules/cloud/docker/docker_stack.py:
+    authors: dariko
   $modules/cloud/docker/docker_stack_task_info.py:
     authors: imjoseangel
+  $modules/cloud/docker/docker_swarm.py:
+    authors: WojciechowskiPiotr tbouvet
+  $modules/cloud/docker/docker_swarm_info.py:
+    authors: WojciechowskiPiotr
   $modules/cloud/docker/docker_swarm_service.py:
     authors: dariko hannseman jwitko
     labels: docker_swarm_service
@@ -234,6 +252,8 @@ files:
     authors: hannseman
   $modules/cloud/docker/docker_volume.py:
     authors: agronholm
+  $modules/cloud/docker/docker_volume_info.py:
+    authors: felixfontein
   $modules/cloud/google/:
     authors: supertom
     maintainers: $team_google
@@ -425,6 +445,8 @@ files:
     authors: bvitnik
   $modules/clustering/consul/:
     maintainers: $team_consul
+  $modules/clustering/consul/consul.py:
+    authors: sgargan
   $modules/clustering/etcd3.py:
     authors: evrardjp vfauth
   $modules/clustering/pacemaker_cluster.py:
@@ -468,10 +490,20 @@ files:
     authors: Andersson007 andytom dschep strk
   $modules/database/postgresql/postgresql_lang.py:
     authors: andytom jensdepuydt
+  $modules/database/postgresql/postgresql_pg_hba.py:
+    authors: sebasmannem
   $modules/database/postgresql/postgresql_privs.py:
     authors: b6d tcraxs
+  $modules/database/postgresql/postgresql_publication.py:
+    authors: Andersson007 nerzhul
   $modules/database/postgresql/postgresql_query.py:
     authors: Andersson007 archf wrouesnel
+  $modules/database/postgresql/postgresql_schema.py:
+    authors: Dorn- andytom
+  $modules/database/postgresql/postgresql_sequence.py:
+    authors: tcraxs
+  $modules/database/postgresql/postgresql_slot.py:
+    authors: Andersson007 jscalia
   $modules/database/postgresql/postgresql_tablespace.py:
     authors: Andersson007 Dorn- antoinell
   $modules/database/vertica/:
@@ -498,6 +530,8 @@ files:
     maintainers: $team_ipa
   $modules/identity/ipa/ipa_service.py:
     authors: cprh
+  $modules/identity/ipa/ipa_subca.py:
+    authors: Akasurde
   $modules/identity/ipa/ipa_vault.py:
     authors: jparrill
   $modules/identity/keycloak/:
@@ -919,6 +953,10 @@ files:
   $modules/remote_management/manageiq/:
     labels: manageiq
     maintainers: $team_manageiq
+  $modules/remote_management/manageiq/manageiq_group.py:
+    authors: evertmulder
+  $modules/remote_management/manageiq/manageiq_tenant.py:
+    authors: evertmulder
   $modules/remote_management/oneview/oneview_datacenter_facts.py:
     authors: aalexmonteiro madhav-bharadwaj ricardogpsf soodpr
   $modules/remote_management/oneview/:
