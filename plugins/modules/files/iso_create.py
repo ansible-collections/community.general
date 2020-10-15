@@ -8,7 +8,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: iso_create
 short_description: Generate ISO file with specified files or folders
@@ -16,7 +16,9 @@ description:
     - This module is used to generate ISO file with specified path of files.
 author:
     - Diane Wang (@Tomorrow9) <dianew@vmware.com>
-requirements: ["pycdlib", "python >= 2.7"]
+requirements:
+- "pycdlib"
+- "python >= 2.7"
 version_added: '0.2.0'
 
 options:
@@ -52,20 +54,22 @@ options:
    rock_ridge:
      description:
      - Whether to make this ISO have the Rock Ridge extensions or not.
-     - 'Valid values are C(1.09), C(1.10) or C(1.12), means adding the specified Rock Ridge version to the ISO. If
-       unsure, set C(1.09) to ensure maximum compatibility.'
+     - Valid values are C(1.09), C(1.10) or C(1.12), means adding the specified Rock Ridge version to the ISO.
+     - If unsure, set C(1.09) to ensure maximum compatibility.
      - If not specified, then not add Rock Ridge extension to the ISO.
      type: str
      choices: ['1.09', '1.10', '1.12']
    joliet:
      description:
-     - Support levels and valid values are C(1), C(2), or C(3). Level C(3) is by far the most common.
+     - Support levels and valid values are C(1), C(2), or C(3).
+     - Level C(3) is by far the most common.
      - If not specified, then no Joliet support is added.
      type: int
      choices: [1, 2, 3]
    udf:
      description:
-     - Whether to add UDF support to this ISO. If set to C(True), then version 2.60 of the UDF spec is used.
+     - Whether to add UDF support to this ISO.
+     - If set to C(True), then version 2.60 of the UDF spec is used.
      - If not specified or set to C(False), then no UDF support is added.
      type: bool
      default: False
@@ -87,6 +91,15 @@ EXAMPLES = r'''
       - /root/testfolder
     dest_iso: /tmp/test.iso
     rock_ridge: 1.09
+
+- name: Create an ISO file with Joliet support
+  community.general.iso_create:
+    src_files:
+      - ./windows_config/Autounattend.xml
+    dest_iso: ./test.iso
+    interchange_level: 3
+    joliet: 3
+    vol_ident: WIN_AUTOINSTALL
 '''
 
 RETURN = r'''
@@ -129,14 +142,17 @@ udf:
 '''
 
 import os
-HAS_PYCDLIB = False
+import traceback
+
+PYCDLIB_IMP_ERR = None
 try:
     import pycdlib
     HAS_PYCDLIB = True
 except ImportError:
-    pass
+    PYCDLIB_IMP_ERR = traceback.format_exc()
+    HAS_PYCDLIB = False
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
 
 
@@ -160,7 +176,7 @@ def add_file(module, iso_file=None, src_file=None, file_path=None, rock_ridge=No
     try:
         iso_file.add_file(src_file, iso_path=file_in_iso_path, rr_name=rr_name, joliet_path=joliet_path, udf_path=udf_path)
     except Exception as err:
-        module.fail_json(msg="Add file %s to ISO file failed due to %s" % (src_file, to_native(err)))
+        module.fail_json(msg="Failed to add file %s to ISO file due to %s" % (src_file, to_native(err)))
 
 
 def add_directory(module, iso_file=None, dir_path=None, rock_ridge=None, use_joliet=None, use_udf=None):
@@ -177,7 +193,7 @@ def add_directory(module, iso_file=None, dir_path=None, rock_ridge=None, use_jol
     try:
         iso_file.add_directory(iso_path=iso_dir_path, rr_name=rr_name, joliet_path=joliet_path, udf_path=udf_path)
     except Exception as err:
-        module.fail_json(msg="Add directory %s to ISO file failed due to %s" % (dir_path, to_native(err)))
+        module.fail_json(msg="Failed to directory %s to ISO file due to %s" % (dir_path, to_native(err)))
 
 
 def main():
@@ -194,6 +210,9 @@ def main():
         argument_spec=argument_spec,
         supports_check_mode=True,
     )
+    if not HAS_PYCDLIB:
+        module.fail_json(missing_required_lib('pycdlib'), exception=PYCDLIB_IMP_ERR)
+
     src_file_list = module.params.get('src_files')
     if src_file_list and len(src_file_list) == 0:
         module.fail_json(msg='Please specify source file and/or directory list using src_files parameter.')
