@@ -528,6 +528,12 @@ files:
     authors: Rylon
   $modules/identity/ipa/:
     maintainers: $team_ipa
+  $modules/identity/ipa/ipa_config.py:
+    authors: fxfitz
+  $modules/identity/ipa/ipa_dnsrecord.py:
+    authors: Akasurde
+  $modules/identity/ipa/ipa_dnszone.py:
+    authors: fxfitz
   $modules/identity/ipa/ipa_service.py:
     authors: cprh
   $modules/identity/ipa/ipa_subca.py:
