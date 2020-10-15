@@ -6,22 +6,14 @@ __metaclass__ = type
 import mock
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.modules.monitoring import monit
-
-
-class AnsibleExitJson(Exception):
-    """Exception class to be raised by module.exit_json and caught by the test case"""
-    pass
-
-
-class AnsibleFailJson(Exception):
-    """Exception class to be raised by module.fail_json and caught by the test case"""
-    pass
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
 
 
 class MonitTest(unittest.TestCase):
     def setUp(self):
         self.module = mock.MagicMock()
-        self.module.exit_json.side_effect = AnsibleExitJson(Exception)
+        self.module.exit_json.side_effect = AnsibleExitJson
+        self.module.fail_json.side_effect = AnsibleFailJson
         self.monit = monit.Monit(self.module, 'monit', 'processX', 1)
 
     def patch_status(self, side_effect):
@@ -29,8 +21,8 @@ class MonitTest(unittest.TestCase):
 
     def test_min_version(self):
         with mock.patch.object(self.monit, 'monit_version', return_value=(5, 20)):
-            self.monit.check_version()
-        self.module.fail_json.assert_called_once()
+            with self.assertRaises(AnsibleFailJson):
+                self.monit.check_version()
 
     def test_change_state_success(self):
         with self.patch_status(['not monitored']):
@@ -41,8 +33,8 @@ class MonitTest(unittest.TestCase):
 
     def test_change_state_fail(self):
         with self.patch_status(['monitored']):
-            self.monit.stop()
-        self.module.fail_json.assert_called_once()
+            with self.assertRaises(AnsibleFailJson):
+                self.monit.stop()
 
     def test_reload_fail(self):
         self.module.run_command.return_value = (1, 'stdout', 'stderr')
@@ -64,8 +56,8 @@ class MonitTest(unittest.TestCase):
 
     def test_monitor_fail(self):
         with self.patch_status(['not monitored']):
-            self.monit.monitor()
-        self.module.fail_json.assert_called_once()
+            with self.assertRaises(AnsibleFailJson):
+                self.monit.monitor()
 
     def test_timeout(self):
         self.monit.timeout = 0
