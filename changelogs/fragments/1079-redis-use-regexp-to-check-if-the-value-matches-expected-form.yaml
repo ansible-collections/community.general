@@ -1,2 +1,2 @@
 bugfixes:
-  - Fixes redis parsing of config values which should not be converted to bytes
+  - redis - fixes parsing of config values which should not be converted to bytes (https://github.com/ansible-collections/community.general/pull/1079).
