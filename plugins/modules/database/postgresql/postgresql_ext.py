@@ -286,16 +286,36 @@ def ext_get_versions(cursor, ext):
     cursor.execute(query, {'ext': ext})
     res = cursor.fetchall()
 
-    available_versions = [
-        line['version']
-        for line in res
-        if LooseVersion(line['version']) > LooseVersion(current_version)
-    ]
+    available_versions = parse_ext_versions(current_version, res)
 
     if current_version == '0':
         current_version = False
 
     return (current_version, sorted(available_versions, key=LooseVersion))
+
+
+def parse_ext_versions(current_ver, ext_ver_list):
+    """Parse ext versions.
+
+    Args:
+      current_ver (str) -- version to compare elements of ext_ver_list with
+      ext_ver_list (list) -- list containing dicts with versions
+
+    Return a list with versions that are higher than current_ver.
+
+    Note: Uncomparable versions (e.g., postgis version "unpackaged") are attached as is.
+    """
+    available_versions = []
+
+    for line in ext_ver_list:
+        try:
+            if LooseVersion(line['version']) > LooseVersion(current_ver):
+                available_versions.append(line['version'])
+        except TypeError:
+            # When a version cannot be compared, append it as is
+            available_versions.append(line['version'])
+
+    return available_versions
 
 # ===========================================
 # Module execution.
