@@ -25,14 +25,14 @@ class MonitTest(unittest.TestCase):
         self.module = MagicMock()
         self.module.exit_json.side_effect = AnsibleExitJson(Exception)
         self.monit = monit.Monit(self.module, 'monit', 'processX', 1)
-        self.version_patch = mock.patch.object(self.monit, "is_version_higher_than_5_18", return_value=True)
-        self.version_patch.start()
-
-    def tearDown(self):
-        self.version_patch.stop()
 
     def patch_status(self, side_effect):
         return mock.patch.object(self.monit, 'get_status', side_effect=side_effect)
+
+    def test_min_version(self):
+        with mock.patch.object(self.monit, 'monit_version', return_value=(5, 20)):
+            self.monit.check_version()
+        self.module.fail_json.assert_called()
 
     def test_change_state_success(self):
         with self.patch_status(['not monitored']), self.assertRaises(AnsibleExitJson):

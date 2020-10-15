@@ -54,6 +54,8 @@ STATE_COMMAND_MAP = {
     'restarted': 'restart'
 }
 
+MIN_VERSION = (5, 21)
+
 
 class Monit(object):
     def __init__(self, module, monit_bin_path, service_name, timeout):
@@ -74,26 +76,12 @@ class Monit(object):
             self._monit_version = int(version[0]), int(version[1])
         return self._monit_version
 
-    def is_version_higher_than_5_18(self):
-        return self.monit_version() > (5, 18)
-
-    @property
-    def summary_command(self):
-        return 'summary -B' if self.is_version_higher_than_5_18() else 'summary'
+    def check_version(self):
+        if self.monit_version() < MIN_VERSION:
+            min_version = '.'.join(str(v) for v in MIN_VERSION)
+            self.module.fail_json(msg='Monit version not compatible with module. Install version >= %s' % min_version)
 
     def parse(self, parts):
-        if self.is_version_higher_than_5_18():
-            return self.parse_current(parts)
-        else:
-            return self.parse_older_versions(parts)
-
-    def parse_older_versions(self, parts):
-        if len(parts) > 2 and parts[0].lower() == 'process' and parts[1] == "'%s'" % self.process_name:
-            return ' '.join(parts[2:]).lower()
-        else:
-            return ''
-
-    def parse_current(self, parts):
         if len(parts) > 2 and parts[2].lower() == 'process' and parts[0] == self.process_name:
             return ''.join(parts[1]).lower()
         else:
@@ -101,7 +89,7 @@ class Monit(object):
 
     def get_status(self):
         """Return the status of the process in monit, or the empty string if not present."""
-        rc, out, err = self.module.run_command('%s %s' % (self.monit_bin_path, self.summary_command), check_rc=True)
+        rc, out, err = self.module.run_command('%s %s' % (self.monit_bin_path, 'summary -B'), check_rc=True)
         for line in out.split('\n'):
             # Sample output lines:
             # Process 'name'    Running
@@ -193,6 +181,7 @@ def main():
     timeout = module.params['timeout']
 
     monit = Monit(module, module.get_bin_path('monit', True), name, timeout)
+    monit.check_version()
 
     def exit_if_check_mode():
         if module.check_mode:
