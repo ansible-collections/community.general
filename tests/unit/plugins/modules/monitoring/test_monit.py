@@ -3,9 +3,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from unittest import mock
-from unittest.mock import MagicMock
-
+import mock
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.plugins.modules.monitoring import monit
 
@@ -22,7 +20,7 @@ class AnsibleFailJson(Exception):
 
 class MonitTest(unittest.TestCase):
     def setUp(self):
-        self.module = MagicMock()
+        self.module = mock.MagicMock()
         self.module.exit_json.side_effect = AnsibleExitJson(Exception)
         self.monit = monit.Monit(self.module, 'monit', 'processX', 1)
 
@@ -32,18 +30,19 @@ class MonitTest(unittest.TestCase):
     def test_min_version(self):
         with mock.patch.object(self.monit, 'monit_version', return_value=(5, 20)):
             self.monit.check_version()
-        self.module.fail_json.assert_called()
+        self.module.fail_json.assert_called_once()
 
     def test_change_state_success(self):
-        with self.patch_status(['not monitored']), self.assertRaises(AnsibleExitJson):
-            self.monit.stop()
+        with self.patch_status(['not monitored']):
+            with self.assertRaises(AnsibleExitJson):
+                self.monit.stop()
         self.module.fail_json.assert_not_called()
         self.module.run_command.assert_called_with('monit stop processX', check_rc=True)
 
     def test_change_state_fail(self):
         with self.patch_status(['monitored']):
             self.monit.stop()
-        self.module.fail_json.assert_called()
+        self.module.fail_json.assert_called_once()
 
     def test_reload_fail(self):
         self.module.run_command.return_value = (1, 'stdout', 'stderr')
@@ -54,20 +53,23 @@ class MonitTest(unittest.TestCase):
     def test_reload(self):
         self.module.run_command.return_value = (0, '', '')
         self.monit._sleep_time = 0
-        with self.patch_status(['', 'pending', 'running']), self.assertRaises(AnsibleExitJson):
-            self.monit.reload()
+        with self.patch_status(['', 'pending', 'running']):
+            with self.assertRaises(AnsibleExitJson):
+                self.monit.reload()
 
     def test_monitor(self):
-        with self.patch_status(['not monitored - start pending']), self.assertRaises(AnsibleExitJson):
-            self.monit.monitor()
+        with self.patch_status(['not monitored - start pending']):
+            with self.assertRaises(AnsibleExitJson):
+                self.monit.monitor()
 
     def test_monitor_fail(self):
         with self.patch_status(['not monitored']):
             self.monit.monitor()
-        self.module.fail_json.assert_called()
+        self.module.fail_json.assert_called_once()
 
     def test_timeout(self):
         self.monit.timeout = 0
         self.module.fail_json.side_effect = AnsibleFailJson(Exception)
-        with self.patch_status(['stop pending']), self.assertRaises(AnsibleFailJson):
-            self.monit.wait_for_monit_to_stop_pending('stopped')
+        with self.patch_status(['stop pending']):
+            with self.assertRaises(AnsibleFailJson):
+                self.monit.wait_for_monit_to_stop_pending('stopped')
