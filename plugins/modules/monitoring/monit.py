@@ -7,6 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+from collections import namedtuple
 
 DOCUMENTATION = '''
 ---
@@ -45,7 +46,6 @@ import re
 
 from ansible.module_utils.basic import AnsibleModule
 
-
 STATE_COMMAND_MAP = {
     'stopped': 'stop',
     'started': 'start',
@@ -55,6 +55,36 @@ STATE_COMMAND_MAP = {
 }
 
 MIN_VERSION = (5, 21)
+
+ALL_STATUS = [
+    'missing', 'ok', 'not_monitored', 'initializing', 'does_not_exist'
+]
+
+
+class StatusValue(namedtuple("Status", "status, is_pending")):
+    MISSING = 0
+    OK = 1
+    NOT_MONITORED = 2
+    INITIALIZING = 3
+    DOES_NOT_EXIST = 4
+
+    def __new__(cls, status, is_pending=False):
+        return super(StatusValue, cls).__new__(cls, status, is_pending)
+
+    def pending(self):
+        return StatusValue(self.status, True)
+
+    def __getattr__(self, item):
+        if item in ('is_%s' % status for status in ALL_STATUS):
+            return self.status == getattr(self, item[3:].upper())
+
+
+class Status(object):
+    MISSING = StatusValue(StatusValue.MISSING)
+    OK = StatusValue(StatusValue.OK)
+    NOT_MONITORED = StatusValue(StatusValue.NOT_MONITORED)
+    INITIALIZING = StatusValue(StatusValue.INITIALIZING)
+    DOES_NOT_EXIST = StatusValue(StatusValue.DOES_NOT_EXIST)
 
 
 class Monit(object):
@@ -81,30 +111,40 @@ class Monit(object):
             min_version = '.'.join(str(v) for v in MIN_VERSION)
             self.module.fail_json(msg='Monit version not compatible with module. Install version >= %s' % min_version)
 
-    def parse(self, parts):
-        if len(parts) > 2 and parts[2].lower() == 'process' and parts[0] == self.process_name:
-            return ''.join(parts[1]).lower()
-        else:
-            return ''
-
     def get_status(self):
-        """Return the status of the process in monit, or the empty string if not present."""
-        rc, out, err = self.module.run_command('%s %s' % (self.monit_bin_path, 'summary -B'), check_rc=True)
-        for line in out.split('\n'):
-            # Sample output lines:
-            # Process 'name'    Running
-            # Process 'name'    Running - restart pending
-            parts = self.parse(line.split())
-            if parts != '':
-                return parts
+        """Return the status of the process in monit."""
+        command = '%s status %s -B' % (self.monit_bin_path, self.process_name)
+        rc, out, err = self.module.run_command(command, check_rc=True)
+        return self._parse_status(out)
 
-        return ''
+    def _parse_status(self, output):
+        if "Process '%s'" % self.process_name not in output:
+            return Status.MISSING
+
+        status_val = re.findall(r"^\s*status\s*([\w\- ]+)", output, re.MULTILINE)
+        if status_val:
+            status_val = status_val[0].strip().upper()
+            if ' - ' not in status_val:
+                status_val.replace(' ', '_')
+                return getattr(Status, status_val)
+            else:
+                status_val, substatus = status_val.split(' - ')
+                action, state = substatus.split()
+                if action in ['START', 'INITIALIZING', 'RESTART', 'MONITOR']:
+                    status = Status.OK
+                else:
+                    status = Status.NOT_MONITORED
+
+                if state == 'pending':
+                    status = status.pending()
+                return status
 
     def is_process_present(self):
-        return self.get_status() != ''
+        rc, out, err = self.module.run_command('%s summary -B' % (self.monit_bin_path), check_rc=True)
+        return bool(re.findall(r'\b%s\b' % self.process_name, out))
 
     def is_process_running(self):
-        return 'running' in self.get_status()
+        return self.get_status().is_ok
 
     def run_command(self, command):
         """Runs a monit command, and returns the new status."""
@@ -115,7 +155,7 @@ class Monit(object):
         timeout_time = time.time() + self.timeout
 
         running_status = self.get_status()
-        while running_status == '' or 'pending' in running_status or 'initializing' in running_status:
+        while running_status.is_missing or running_status.is_pending or running_status.is_initializing:
             if time.time() >= timeout_time:
                 self.module.fail_json(
                     msg='waited too long for "pending", or "initiating" status to go away ({0})'.format(
@@ -141,30 +181,30 @@ class Monit(object):
             self.wait_for_monit_to_stop_pending('present')
         self.module.exit_json(changed=True, name=self.process_name, state='present')
 
-    def change_state(self, state, expected_status, status_contains=None, invert_expected=None):
+    def change_state(self, state, expected_status, invert_expected=None):
         self.run_command(STATE_COMMAND_MAP[state])
         status = self.get_status()
-        status_match = status in expected_status
+        status_match = status.status == expected_status.status
         if invert_expected:
             status_match = not status_match
-        if status_match or (status_contains and status_contains in status):
+        if status_match:
             self.module.exit_json(changed=True, name=self.process_name, state=state)
         self.module.fail_json(msg='%s process not %s' % (self.process_name, state), status=status)
 
     def stop(self):
-        self.change_state('stopped', ['not monitored'], 'stop pending')
+        self.change_state('stopped', Status.NOT_MONITORED)
 
     def unmonitor(self):
-        self.change_state('unmonitored', ['not monitored'], 'unmonitor pending')
+        self.change_state('unmonitored', Status.NOT_MONITORED)
 
     def restart(self):
-        self.change_state('restarted', ['initializing', 'running'], 'restart pending')
+        self.change_state('restarted', Status.OK)
 
     def start(self):
-        self.change_state('started', ['initializing', 'running'], 'start pending')
+        self.change_state('started', Status.OK)
 
     def monitor(self):
-        self.change_state('monitored', ['not monitored'], invert_expected=True)
+        self.change_state('monitored', Status.NOT_MONITORED, invert_expected=True)
 
 
 def main():
