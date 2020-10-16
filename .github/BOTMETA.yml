@@ -331,7 +331,6 @@ files:
     keywords: kvm libvirt proxmox qemu
   $modules/cloud/misc/xenserver_facts.py:
     authors: andyhky caphrim007 cheese
-    maintainers: $team_virt
     labels: xenserver_facts
     ignore: andyhky
   $modules/cloud/oneandone/:
