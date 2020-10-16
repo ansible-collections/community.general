@@ -2,6 +2,7 @@
 http://www.jejik.com/files/examples/daemon3x.py
 """
 from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 import atexit
 import os
