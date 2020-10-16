@@ -56,17 +56,16 @@ STATE_COMMAND_MAP = {
 
 MIN_VERSION = (5, 21)
 
-ALL_STATUS = [
-    'missing', 'ok', 'not_monitored', 'initializing', 'does_not_exist'
-]
-
 
 class StatusValue(namedtuple("Status", "value, is_pending")):
-    MISSING = 0
-    OK = 1
-    NOT_MONITORED = 2
-    INITIALIZING = 3
-    DOES_NOT_EXIST = 4
+    MISSING = 'missing'
+    OK = 'ok'
+    NOT_MONITORED = 'not_monitored'
+    INITIALIZING = 'initializing'
+    DOES_NOT_EXIST = 'does_not_exist'
+    ALL_STATUS = [
+        MISSING, OK, NOT_MONITORED, INITIALIZING, DOES_NOT_EXIST
+    ]
 
     def __new__(cls, value, is_pending=False):
         return super(StatusValue, cls).__new__(cls, value, is_pending)
@@ -75,7 +74,7 @@ class StatusValue(namedtuple("Status", "value, is_pending")):
         return StatusValue(self.value, True)
 
     def __getattr__(self, item):
-        if item in ('is_%s' % status for status in ALL_STATUS):
+        if item in ('is_%s' % status for status in self.ALL_STATUS):
             return self.value == getattr(self, item[3:].upper())
         raise AttributeError(item)
 

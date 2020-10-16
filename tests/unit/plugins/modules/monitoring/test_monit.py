@@ -89,17 +89,17 @@ class MonitTest(unittest.TestCase):
                 self.monit.wait_for_monit_to_stop_pending('stopped')
 
 
-@pytest.mark.parametrize('status_name', [name for name in monit.ALL_STATUS])
+@pytest.mark.parametrize('status_name', [name for name in monit.StatusValue.ALL_STATUS])
 def test_status_value(status_name):
     value = getattr(monit.StatusValue, status_name.upper())
     status = monit.StatusValue(value)
     assert getattr(status, 'is_%s' % status_name)
-    assert not all(getattr(status, 'is_%s' % name) for name in monit.ALL_STATUS if name != status_name)
+    assert not all(getattr(status, 'is_%s' % name) for name in monit.StatusValue.ALL_STATUS if name != status_name)
 
 
 BASIC_OUTPUT_CASES = [
     (TEST_OUTPUT % ('processX', name), getattr(monit.Status, name.upper()))
-    for name in monit.ALL_STATUS
+    for name in monit.StatusValue.ALL_STATUS
 ]
 
 
