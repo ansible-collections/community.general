@@ -12,7 +12,7 @@ short_description: management of instances in Proxmox VE cluster
 description:
   - allows you to create/delete/stop instances in Proxmox VE cluster
   - Starting in Ansible 2.1, it automatically detects containerization type (lxc for PVE 4, openvz for older)
-  - From community.general 2.0.0 on, there will be no default values, see I(container_default_behavior).
+  - From community.general 2.0.0 on, there will be no default values, see I(proxmox_default_behavior).
 options:
   api_host:
     description:
@@ -70,31 +70,36 @@ options:
     description:
       - hard disk size in GB for instance
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(3).
+        option has a default of C(3). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 2.0.0.
     type: str
   cores:
     description:
       - Specify number of cores per socket.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(1).
+        option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 2.0.0.
     type: int
   cpus:
     description:
       - numbers of allocated cpus for instance
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(1).
+        option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 2.0.0.
     type: int
   memory:
     description:
       - memory size in MB for instance
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(512).
+        option has a default of C(512). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 2.0.0.
     type: int
   swap:
     description:
       - swap memory size in MB for instance
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(0).
+        option has a default of C(0). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 2.0.0.
     type: int
   netif:
     description:
@@ -112,7 +117,8 @@ options:
     description:
       - specifies whether a VM will be started during system bootup
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(no).
+        option has a default of C(no). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 2.0.0.
     type: bool
   storage:
     description:
@@ -123,7 +129,8 @@ options:
     description:
       - CPU weight for a VM
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(1000).
+        option has a default of C(1000). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 2.0.0.
     type: int
   nameserver:
     description:
