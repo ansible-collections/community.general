@@ -77,6 +77,7 @@ class StatusValue(namedtuple("Status", "value, is_pending")):
     def __getattr__(self, item):
         if item in ('is_%s' % status for status in ALL_STATUS):
             return self.value == getattr(self, item[3:].upper())
+        raise AttributeError(item)
 
 
 class Status(object):
