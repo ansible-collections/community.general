@@ -110,10 +110,10 @@ files:
     labels: onepassword
   $lookups/conjur_variable.py:
     notify: cyberark-bizdev
+    maintainers: $team_cyberark_conjur
     labels: conjur_variable
   $lookups/cyberarkpassword.py:
     notify: cyberark-bizdev
-    maintainers: $team_cyberark_conjur
     labels: cyberarkpassword
   $lookups/dig.py:
     maintainers: jpmens
