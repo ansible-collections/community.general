@@ -18,7 +18,7 @@ DOCUMENTATION = '''
           - A colon separated string of connection information for Redis.
           - The format is C(host:port:db:password), for example C(localhost:6379:0:changeme).
           - To use encryption in transit, prefix the connection with C(tls://), as in C(tls://localhost:6379:0:changeme).
-          - To use redis sentinel, use sepparator C(;), for example C(localhost:26379;localhost:26379;0:changeme). Requires redis>=2.9.0
+          - To use redis sentinel, use sepparator C(;), for example C(localhost:26379;localhost:26379;0:changeme). Requires redis>=2.9.0.
         required: True
         env:
           - name: ANSIBLE_CACHE_PLUGIN_CONNECTION
@@ -43,7 +43,7 @@ DOCUMENTATION = '''
             section: defaults
         version_added: 1.3.0
       _sentinel_service_name:
-        description: the redis sentinel service name (or referenced as cluster name)
+        description: The redis sentinel service name (or referenced as cluster name).
         env:
           - name: ANSIBLE_CACHE_REDIS_SENTINEL
         ini:
@@ -158,7 +158,7 @@ class CacheModule(BaseCacheModule):
         try:
             return scon.master_for(self._sentinel_service_name, socket_timeout=0.2)
         except Exception as exc:
-            raise AnsibleError('Could not connect to redis sentinel: %s' % exc)
+            raise AnsibleError('Could not connect to redis sentinel: %s' % to_native(exc))
 
     def _make_key(self, key):
         return self._prefix + key
