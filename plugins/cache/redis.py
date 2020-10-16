@@ -66,6 +66,7 @@ import json
 
 from ansible import constants as C
 from ansible.errors import AnsibleError
+from ansible.module_utils._text import to_native
 from ansible.parsing.ajson import AnsibleJSONEncoder, AnsibleJSONDecoder
 from ansible.plugins.cache import BaseCacheModule
 from ansible.utils.display import Display
