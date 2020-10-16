@@ -948,7 +948,7 @@ def main():
             node=dict(),
             numa=dict(type='dict'),
             numa_enabled=dict(type='bool'),
-            onboot=dict(type='bool', default=True),
+            onboot=dict(type='bool'),
             ostype=dict(choices=['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'l24', 'l26', 'solaris']),
             parallel=dict(type='dict'),
             pool=dict(type='str'),
@@ -1008,14 +1008,14 @@ def main():
     vmid = module.params['vmid']
     validate_certs = module.params['validate_certs']
 
-    if self.module.params['proxmox_default_behavior'] is None:
-        self.module.params['proxmox_default_behavior'] = 'compatibility'
-        self.module.deprecate(
+    if module.params['proxmox_default_behavior'] is None:
+        module.params['proxmox_default_behavior'] = 'compatibility'
+        module.deprecate(
             'The proxmox_default_behavior option will change its default value from "compatibility" to '
             '"no_defaults" in community.general 2.0.0. To remove this warning, please specify an explicit value for it now',
-            version='2.0.0'
+            version='2.0.0', collection_name='community.general'
         )
-    if self.module.params['proxmox_default_behavior'] == 'compatibility':
+    if module.params['proxmox_default_behavior'] == 'compatibility':
         old_default_values = dict(
             acpi=True,
             args=None,
@@ -1039,8 +1039,8 @@ def main():
             virtio=None,
         )
         for param, value in old_default_values.items():
-            if self.module.params[param] is None:
-                self.module.params[param] = value
+            if module.params[param] is None:
+                module.params[param] = value
 
     if module.params['format'] == 'unspecified':
         module.params['format'] = None

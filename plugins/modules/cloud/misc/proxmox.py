@@ -542,14 +542,14 @@ def main():
         template_store = module.params['ostemplate'].split(":")[0]
     timeout = module.params['timeout']
 
-    if self.module.params['proxmox_default_behavior'] is None:
-        self.module.params['proxmox_default_behavior'] = 'compatibility'
-        self.module.deprecate(
+    if module.params['proxmox_default_behavior'] is None:
+        module.params['proxmox_default_behavior'] = 'compatibility'
+        module.deprecate(
             'The proxmox_default_behavior option will change its default value from "compatibility" to '
             '"no_defaults" in community.general 2.0.0. To remove this warning, please specify an explicit value for it now',
-            version='2.0.0'
+            version='2.0.0', collection_name='community.general'
         )
-    if self.module.params['proxmox_default_behavior'] == 'compatibility':
+    if module.params['proxmox_default_behavior'] == 'compatibility':
         old_default_values = dict(
             disk="3",
             cores=1,
@@ -560,8 +560,8 @@ def main():
             cpuunits=1000,
         )
         for param, value in old_default_values.items():
-            if self.module.params[param] is None:
-                self.module.params[param] = value
+            if module.params[param] is None:
+                module.params[param] = value
 
     # If password not set get it from PROXMOX_PASSWORD env
     if not api_password:
