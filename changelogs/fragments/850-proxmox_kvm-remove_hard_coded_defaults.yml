@@ -1,3 +1,6 @@
-breaking_changes:
-- proxmox - remove hard-coded defaults which are different from proxmox or could be changed later by proxmox. The defaults removed were ``disks=3``, ``cores=1``, ``cpus=1``, ``cpuunits=1``, ``memory=512``, ``onboot=false``, ``swap=0``. Not specified values are set to their proxmox defaults by proxmox itself (https://github.com/ansible-collections/community.general/pull/850).
-- proxmox_kvm - remove hard-coded defaults which are different from proxmox or could be changed later by proxmox. The defaults removed were ``acpi=True``, ``args=None``, ``autostart=false``, ``ballon=0``, ``boot=cnd``, ``cores=1``, ``cpu='kvm64'``, ``cpuunits=1000``, ``format='qcow2'``, ``ide=none``, ``kvm=true``, ``memory=512``, ``ostype='l26'``, ``revert=none``, ``sockets=1``, ``tablet=false``, ``template=false``, ``vcpus=none``, ``vga='std'``, ``virtio=none``. Not specified values are set to their proxmox defaults by proxmox itself (https://github.com/ansible-collections/community.general/pull/850).
+minor_changes:
+  - proxmox - add new ``proxmox_default_behavior`` option (https://github.com/ansible-collections/community.general/pull/850).
+  - proxmox_kvm - add new ``proxmox_default_behavior`` option (https://github.com/ansible-collections/community.general/pull/850).
+deprecated_features:
+  - proxmox - the default of ``proxmox_default_behavior`` will change from ``compatibility`` to ``no_defaults`` in community.general 2.0.0. Set the option to an explicit value to avoid a deprecation warning.
+  - proxmox_kvm - the default of ``proxmox_default_behavior`` will change from ``compatibility`` to ``no_defaults`` in community.general 2.0.0. Set the option to an explicit value to avoid a deprecation warning.
