@@ -459,8 +459,10 @@ def main():
     if 'ok' in slack_response:
         # Evaluate WebAPI response
         if slack_response['ok']:
+            # return payload as a string for backwards compatibility
+            payload_json = module.jsonify(payload)
             module.exit_json(changed=changed, ts=slack_response['ts'], channel=slack_response['channel'],
-                             api=slack_response, payload=payload)
+                             api=slack_response, payload=payload_json)
         else:
             module.fail_json(msg="Slack API error", error=slack_response['error'])
     else:
