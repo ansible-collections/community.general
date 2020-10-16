@@ -330,6 +330,23 @@
       - result.failed == true
       - result.msg == "Extension non_existent is not installed"
 
+  ######################################################################
+  # https://github.com/ansible-collections/community.general/issues/1095
+  - name: Install postgis
+    package:
+      name: postgis
+
+  - name: Create postgis extension
+    <<: *task_parameters
+    postgresql_ext:
+      <<: *pg_parameters
+      name: postgis
+      version: latest
+
+  - assert:
+      that:
+      - result is changed
+
   # Cleanup:
   - name: postgresql_ext_version - drop the extension
     <<: *task_parameters
