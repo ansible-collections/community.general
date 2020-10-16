@@ -7,8 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from collections import namedtuple
-
 DOCUMENTATION = '''
 ---
 module: monit
@@ -43,6 +41,8 @@ EXAMPLES = '''
 
 import time
 import re
+
+from collections import namedtuple
 
 from ansible.module_utils.basic import AnsibleModule
 
