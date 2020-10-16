@@ -55,16 +55,21 @@ class MonitTest(unittest.TestCase):
 
     def test_reload(self):
         self.module.run_command.return_value = (0, '', '')
+        with self.patch_status(monit.Status.OK) as get_status:
+            with self.assertRaises(AnsibleExitJson):
+                self.monit.reload()
+
+    def test_wait_for_status(self):
         self.monit._sleep_time = 0
         status = [
             monit.Status.MISSING,
+            monit.Status.DOES_NOT_EXIST,
             monit.Status.INITIALIZING,
             monit.Status.OK.pending(),
             monit.Status.OK
         ]
         with self.patch_status(status) as get_status:
-            with self.assertRaises(AnsibleExitJson):
-                self.monit.reload()
+            self.monit.wait_for_monit_to_stop_pending('ok')
             self.assertEqual(get_status.call_count, len(status))
 
     def test_monitor(self):
@@ -105,6 +110,8 @@ BASIC_OUTPUT_CASES = [
     (TEST_OUTPUT % ('processX', 'Monitored - stop pending'), monit.Status.NOT_MONITORED),
     (TEST_OUTPUT % ('processX', 'Monitored - restart pending'), monit.Status.OK),
     (TEST_OUTPUT % ('processX', 'Not Monitored - monitor pending'), monit.Status.OK),
+    (TEST_OUTPUT % ('processX', 'Does not exist'), monit.Status.DOES_NOT_EXIST),
+    (TEST_OUTPUT % ('processX', 'Not monitored'), monit.Status.NOT_MONITORED),
 ])
 def test_parse_status(output, expected):
     status = monit.Monit(None, '', 'processX', 0)._parse_status(output)

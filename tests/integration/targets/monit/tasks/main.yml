@@ -1,0 +1,53 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- block:
+  - name: install monit
+    become: yes
+    package:
+      name: monit
+      state: present
+
+  - name: monit config
+    become: yes
+    template:
+      src: "monitrc.j2"
+      dest: "/etc/monit/monitrc"
+
+  - name: process monit config
+    become: yes
+    template:
+      src: "httpd_echo.j2"
+      dest: "/etc/monit/conf.d/httpd_echo"
+
+  - name: copy process file
+    become: yes
+    copy:
+      src: "{{item}}"
+      dest: "/opt/{{item}}"
+    loop:
+      - daemon.py
+      - httpd_echo.py
+
+  - name: restart monit
+    become: yes
+    service:
+      name: monit
+      state: restarted
+
+  - include_tasks: test.yml
+
+  always:
+  - name: stop monit
+    become: yes
+    service:
+      name: monit
+      state: stopped
+
+  - name: uninstall monit
+    become: yes
+    package:
+      name: monit
+      state: absent

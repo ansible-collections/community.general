@@ -1,0 +1,51 @@
+- name: verify initial state (up)
+  command: "curl -sf http://localhost:8082/hello"
+  args:
+    warn: false
+  when: initial_state == 'up'
+
+- name: verify initial state (down)
+  command: "curl -sf http://localhost:8082/hello"
+  args:
+    warn: false
+  register: curl_result
+  failed_when: curl_result == 0
+  when: initial_state == 'down'
+
+- name: change httpd_echo process state to {{ state }}
+  monit:
+    name: httpd_echo
+    state: "{{ state }}"
+  register: result
+
+- name: check that state changed
+  assert:
+    that:
+      - result is success
+      - result is changed
+
+- name: check that service is {{ state }} (expected 'up')
+  command: "curl -sf http://localhost:8082/hello"
+  args:
+    warn: false
+  when: expected_state == 'up'
+
+- name: check that service is {{ state }} (expected 'down')
+  command: "curl -sf http://localhost:8082/hello"
+  args:
+    warn: false
+  register: curl_result
+  failed_when: curl_result == 0
+  when: expected_state == 'down'
+
+- name: try change state again to {{ state }}
+  monit:
+    name: httpd_echo
+    state: "{{ state }}"
+  register: result
+
+- name: check that state is not changed
+  assert:
+    that:
+      - result is success
+      - result is not changed

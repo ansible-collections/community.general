@@ -1,0 +1,4 @@
+check process httpd_echo with pidfile /tmp/httpd_echo.pid
+    start program = "{{ansible_python.executable}} /opt/httpd_echo.py start"
+    stop program = "{{ansible_python.executable}} /opt/httpd_echo.py stop"
+    if failed host localhost port 8082 then restart

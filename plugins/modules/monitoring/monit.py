@@ -61,22 +61,22 @@ ALL_STATUS = [
 ]
 
 
-class StatusValue(namedtuple("Status", "status, is_pending")):
+class StatusValue(namedtuple("Status", "value, is_pending")):
     MISSING = 0
     OK = 1
     NOT_MONITORED = 2
     INITIALIZING = 3
     DOES_NOT_EXIST = 4
 
-    def __new__(cls, status, is_pending=False):
-        return super(StatusValue, cls).__new__(cls, status, is_pending)
+    def __new__(cls, value, is_pending=False):
+        return super(StatusValue, cls).__new__(cls, value, is_pending)
 
     def pending(self):
-        return StatusValue(self.status, True)
+        return StatusValue(self.value, True)
 
     def __getattr__(self, item):
         if item in ('is_%s' % status for status in ALL_STATUS):
-            return self.status == getattr(self, item[3:].upper())
+            return self.value == getattr(self, item[3:].upper())
 
 
 class Status(object):
@@ -122,22 +122,24 @@ class Monit(object):
             return Status.MISSING
 
         status_val = re.findall(r"^\s*status\s*([\w\- ]+)", output, re.MULTILINE)
-        if status_val:
-            status_val = status_val[0].strip().upper()
-            if ' - ' not in status_val:
-                status_val.replace(' ', '_')
-                return getattr(Status, status_val)
-            else:
-                status_val, substatus = status_val.split(' - ')
-                action, state = substatus.split()
-                if action in ['START', 'INITIALIZING', 'RESTART', 'MONITOR']:
-                    status = Status.OK
-                else:
-                    status = Status.NOT_MONITORED
+        if not status_val:
+            self.module.fail_json(msg="Unable to find process status")
 
-                if state == 'pending':
-                    status = status.pending()
-                return status
+        status_val = status_val[0].strip().upper()
+        if ' - ' not in status_val:
+            status_val = status_val.replace(' ', '_')
+            return getattr(Status, status_val)
+        else:
+            status_val, substatus = status_val.split(' - ')
+            action, state = substatus.split()
+            if action in ['START', 'INITIALIZING', 'RESTART', 'MONITOR']:
+                status = Status.OK
+            else:
+                status = Status.NOT_MONITORED
+
+            if state == 'pending':
+                status = status.pending()
+            return status
 
     def is_process_present(self):
         rc, out, err = self.module.run_command('%s summary -B' % (self.monit_bin_path), check_rc=True)
@@ -155,7 +157,12 @@ class Monit(object):
         timeout_time = time.time() + self.timeout
 
         running_status = self.get_status()
-        while running_status.is_missing or running_status.is_pending or running_status.is_initializing:
+        waiting_status = [
+            StatusValue.MISSING,
+            StatusValue.INITIALIZING,
+            StatusValue.DOES_NOT_EXIST,
+        ]
+        while running_status.is_pending or (running_status.value in waiting_status):
             if time.time() >= timeout_time:
                 self.module.fail_json(
                     msg='waited too long for "pending", or "initiating" status to go away ({0})'.format(
@@ -184,12 +191,12 @@ class Monit(object):
     def change_state(self, state, expected_status, invert_expected=None):
         self.run_command(STATE_COMMAND_MAP[state])
         status = self.get_status()
-        status_match = status.status == expected_status.status
+        status_match = status.value == expected_status.value
         if invert_expected:
             status_match = not status_match
         if status_match:
             self.module.exit_json(changed=True, name=self.process_name, state=state)
-        self.module.fail_json(msg='%s process not %s' % (self.process_name, state), status=status)
+        self.module.fail_json(msg='%s process not %s' % (self.process_name, state), status=repr(status))
 
     def stop(self):
         self.change_state('stopped', Status.NOT_MONITORED)
