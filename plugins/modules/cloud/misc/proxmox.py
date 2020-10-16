@@ -12,7 +12,7 @@ short_description: management of instances in Proxmox VE cluster
 description:
   - allows you to create/delete/stop instances in Proxmox VE cluster
   - Starting in Ansible 2.1, it automatically detects containerization type (lxc for PVE 4, openvz for older)
-  - From community.general 2.0.0 on, there will be no default values, see I(proxmox_default_behavior).
+  - From community.general 4.0.0 on, there will be no default values, see I(proxmox_default_behavior).
 options:
   api_host:
     description:
@@ -71,35 +71,35 @@ options:
       - hard disk size in GB for instance
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(3). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: str
   cores:
     description:
       - Specify number of cores per socket.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: int
   cpus:
     description:
       - numbers of allocated cpus for instance
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: int
   memory:
     description:
       - memory size in MB for instance
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(512). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: int
   swap:
     description:
       - swap memory size in MB for instance
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(0). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: int
   netif:
     description:
@@ -118,7 +118,7 @@ options:
       - specifies whether a VM will be started during system bootup
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(no). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: bool
   storage:
     description:
@@ -130,7 +130,7 @@ options:
       - CPU weight for a VM
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(1000). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: int
   nameserver:
     description:
@@ -186,7 +186,7 @@ options:
         problems when they have been set.
       - The default value is C(compatibility), which will ensure that the default values
         are used when the values are not explicitly specified by the user.
-      - From community.general 2.0.0 on, the default value will switch to C(no_defaults). To avoid
+      - From community.general 4.0.0 on, the default value will switch to C(no_defaults). To avoid
         deprecation warnings, please set I(proxmox_default_behavior) to an explicit
         value.
       - This affects the I(disk), I(cores), I(cpus), I(memory), I(onboot), I(swap) options.
@@ -553,8 +553,8 @@ def main():
         module.params['proxmox_default_behavior'] = 'compatibility'
         module.deprecate(
             'The proxmox_default_behavior option will change its default value from "compatibility" to '
-            '"no_defaults" in community.general 2.0.0. To remove this warning, please specify an explicit value for it now',
-            version='2.0.0', collection_name='community.general'
+            '"no_defaults" in community.general 4.0.0. To remove this warning, please specify an explicit value for it now',
+            version='4.0.0', collection_name='community.general'
         )
     if module.params['proxmox_default_behavior'] == 'compatibility':
         old_default_values = dict(

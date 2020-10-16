@@ -13,7 +13,7 @@ module: proxmox_kvm
 short_description: Management of Qemu(KVM) Virtual Machines in Proxmox VE cluster.
 description:
   - Allows you to create/delete/stop Qemu(KVM) Virtual Machines in Proxmox VE cluster.
-  - From community.general 2.0.0 on, there will be no default values, see I(proxmox_default_behavior).
+  - From community.general 4.0.0 on, there will be no default values, see I(proxmox_default_behavior).
 author: "Abdoul Bah (@helldorado) <bahabdoul at gmail.com>"
 options:
   acpi:
@@ -21,7 +21,7 @@ options:
       - Specify if ACPI should be enabled/disabled.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(yes). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: bool
   agent:
     description:
@@ -33,7 +33,7 @@ options:
       - This option is for experts only!
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(yes). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: str
   api_host:
     description:
@@ -55,7 +55,7 @@ options:
       - Specify if the VM should be automatically restarted after crash (currently ignored in PVE API).
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(no). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: bool
   balloon:
     description:
@@ -63,7 +63,7 @@ options:
       - Using zero disables the balloon driver.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(0). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: int
   bios:
     description:
@@ -76,7 +76,7 @@ options:
       - You can combine to set order.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(cnd). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: str
   bootdisk:
     description:
@@ -91,14 +91,14 @@ options:
       - Specify number of cores per socket.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: int
   cpu:
     description:
       - Specify emulated CPU type.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(kvm64). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: str
   cpulimit:
     description:
@@ -111,7 +111,7 @@ options:
       - You can disable fair-scheduler configuration by setting this to 0
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(1000). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: int
   delete:
     description:
@@ -140,7 +140,7 @@ options:
       - Use I(format=unspecified) and I(full=false) for a linked clone.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(qcow2). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: str
     choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", "unspecified" ]
   freeze:
@@ -186,7 +186,7 @@ options:
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(none). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: dict
   keyboard:
     description:
@@ -197,7 +197,7 @@ options:
       - Enable/disable KVM hardware virtualization.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(yes). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: bool
   localtime:
     description:
@@ -219,7 +219,7 @@ options:
       - Memory size in MB for instance.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(512). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: int
   migrate_downtime:
     description:
@@ -272,7 +272,7 @@ options:
       - Specifies whether a VM will be started during system bootup.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(yes). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: bool
   ostype:
     description:
@@ -280,7 +280,7 @@ options:
       - The l26 is Linux 2.6/3.X Kernel.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(l26). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: str
     choices: ['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'l24', 'l26', 'solaris']
   parallel:
@@ -306,7 +306,7 @@ options:
       - Revert a pending change.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(none). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: str
   sata:
     description:
@@ -363,7 +363,7 @@ options:
       - Sets the number of CPU sockets. (1 - N).
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: int
   startdate:
     description:
@@ -392,7 +392,7 @@ options:
       - Enables/disables the USB tablet device.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(no). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: bool
   target:
     description:
@@ -408,7 +408,7 @@ options:
       - Enables/disables the template.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(no). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: bool
   timeout:
     description:
@@ -432,14 +432,14 @@ options:
       - Sets number of hotplugged vcpus.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(none). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: int
   vga:
     description:
       - Select VGA type. If you want to use high resolution modes (>= 1280x1024x16) then you should use option 'std' or 'vmware'.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(std). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: str
     choices: ['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']
   virtio:
@@ -452,7 +452,7 @@ options:
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(none). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 2.0.0.
+        changes in community.general 4.0.0.
     type: dict
   vmid:
     description:
@@ -470,7 +470,7 @@ options:
         problems when they have been set.
       - The default value is C(compatibility), which will ensure that the default values
         are used when the values are not explicitly specified by the user.
-      - From community.general 2.0.0 on, the default value will switch to C(no_defaults). To avoid
+      - From community.general 4.0.0 on, the default value will switch to C(no_defaults). To avoid
         deprecation warnings, please set I(proxmox_default_behavior) to an explicit
         value.
       - This affects the I(acpi), I(args), I(autostart), I(balloon), I(boot), I(cores), I(cpu),
@@ -1033,8 +1033,8 @@ def main():
         module.params['proxmox_default_behavior'] = 'compatibility'
         module.deprecate(
             'The proxmox_default_behavior option will change its default value from "compatibility" to '
-            '"no_defaults" in community.general 2.0.0. To remove this warning, please specify an explicit value for it now',
-            version='2.0.0', collection_name='community.general'
+            '"no_defaults" in community.general 4.0.0. To remove this warning, please specify an explicit value for it now',
+            version='4.0.0', collection_name='community.general'
         )
     if module.params['proxmox_default_behavior'] == 'compatibility':
         old_default_values = dict(
