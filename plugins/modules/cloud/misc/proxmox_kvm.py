@@ -32,7 +32,7 @@ options:
       - Pass arbitrary arguments to kvm.
       - This option is for experts only!
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(yes). Note that the default value of I(proxmox_default_behavior)
+        option has a default of C(none). Note that the default value of I(proxmox_default_behavior)
         changes in community.general 4.0.0.
     type: str
   api_host:
@@ -474,8 +474,8 @@ options:
         deprecation warnings, please set I(proxmox_default_behavior) to an explicit
         value.
       - This affects the I(acpi), I(args), I(autostart), I(balloon), I(boot), I(cores), I(cpu),
-        I(cpuunits), I(format), I(ide), I(kvm), I(memory), I(ostype), I(revert), I(sockets) I(tablet),
-        I(template), I(vcpus), I(vga), I(virtio) options.
+        I(cpuunits), I(format), I(ide), I(kvm), I(memory), I(onboot), I(ostype), I(revert), I(sockets),
+        I(tablet), I(template), I(vcpus), I(vga), I(virtio) options.
     type: str
     choices:
       - compatibility

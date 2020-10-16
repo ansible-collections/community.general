@@ -189,7 +189,7 @@ options:
       - From community.general 4.0.0 on, the default value will switch to C(no_defaults). To avoid
         deprecation warnings, please set I(proxmox_default_behavior) to an explicit
         value.
-      - This affects the I(disk), I(cores), I(cpus), I(memory), I(onboot), I(swap) options.
+      - This affects the I(disk), I(cores), I(cpus), I(memory), I(onboot), I(swap), I(cpuunits) options.
     type: str
     choices:
       - compatibility
