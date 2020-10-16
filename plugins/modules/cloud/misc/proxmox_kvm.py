@@ -980,6 +980,7 @@ def main():
             virtio=dict(type='dict'),
             vmid=dict(type='int', default=None),
             watchdog=dict(),
+            proxmox_default_behavior=dict(type='str', choices=['compatibility', 'no_defaults']),
         ),
         mutually_exclusive=[('delete', 'revert'), ('delete', 'update'), ('revert', 'update'), ('clone', 'update'), ('clone', 'delete'), ('clone', 'revert')],
         required_one_of=[('name', 'vmid',)],
@@ -1015,7 +1016,6 @@ def main():
             version='2.0.0'
         )
     if self.module.params['proxmox_default_behavior'] == 'compatibility':
-      - This affects the I(disks), I(cores), I(cpus), I(memory), I(onboot), I(swap) options.
         old_default_values = dict(
             acpi=True,
             args=None,

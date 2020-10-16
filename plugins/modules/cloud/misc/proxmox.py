@@ -518,6 +518,7 @@ def main():
             unprivileged=dict(type='bool', default=False),
             description=dict(type='str'),
             hookscript=dict(type='str'),
+            proxmox_default_behavior=dict(type='str', choices=['compatibility', 'no_defaults']),
         )
     )
 
