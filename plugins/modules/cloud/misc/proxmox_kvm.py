@@ -136,7 +136,8 @@ options:
       - Used only with clone
       - Use I(format=unspecified) and I(full=false) for a linked clone.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(qcow2) and C(no_defaults) (new default value) is equivalent to C(unspecified).
+        option has a default of C(qcow2). If I(proxmox_default_behavior) is set to C(no_defaults),
+        not specifying this option is equivalent to setting it to C(unspecified).
         Note that the default value of I(proxmox_default_behavior) changes in community.general 4.0.0.
     type: str
     choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", "unspecified" ]
