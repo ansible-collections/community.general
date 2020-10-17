@@ -346,8 +346,6 @@ def mocker_set(mocker,
     """
     Common mocker object
     """
-    mocker.patch('ansible_collections.community.general.plugins.modules.net_tools.nmcli.HAVE_DBUS', True)
-    mocker.patch('ansible_collections.community.general.plugins.modules.net_tools.nmcli.HAVE_NM_CLIENT', True)
     get_bin_path = mocker.patch('ansible.module_utils.basic.AnsibleModule.get_bin_path')
     get_bin_path.return_value = '/usr/bin/nmcli'
     connection = mocker.patch.object(nmcli.Nmcli, 'connection_exists')

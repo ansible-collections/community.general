@@ -15,21 +15,13 @@ author:
 - Chris Long (@alcamie101)
 short_description: Manage Networking
 requirements:
-- dbus
-- NetworkManager-libnm (or NetworkManager-glib on older systems)
 - nmcli
 description:
-    - Manage the network devices. Create, modify and manage various connection and device type e.g., ethernet, teams, bonds, vlans etc.
-    - 'On CentOS 8 and Fedora >=29 like systems, the requirements can be met by installing the following packages: NetworkManager-libnm,
-      python3-libsemanage, python3-policycoreutils.'
-    - 'On CentOS 7 and Fedora <=28 like systems, the requirements can be met by installing the following packages: NetworkManager-glib,
-      libnm-qt-devel.x86_64, nm-connection-editor.x86_64, python-libsemanage, python-policycoreutils.'
-    - 'On Ubuntu and Debian like systems, the requirements can be met by installing the following packages: network-manager,
-      python-dbus (or python3-dbus, depending on the Python version in use), libnm-dev.'
-    - 'On older Ubuntu and Debian like systems, the requirements can be met by installing the following packages: network-manager,
-      python-dbus (or python3-dbus, depending on the Python version in use), libnm-glib-dev.'
-    - 'On openSUSE, the requirements can be met by installing the following packages: NetworkManager, python2-dbus-python (or
-      python3-dbus-python), typelib-1_0-NMClient-1_0 and typelib-1_0-NetworkManager-1_0.'
+    - 'Manage the network devices. Create, modify and manage various connection and device type e.g., ethernet, teams, bonds, vlans etc.'
+    - 'On CentOS 8 and Fedora >=29 like systems, the requirements can be met by installing the following packages: NetworkManager.'
+    - 'On CentOS 7 and Fedora <=28 like systems, the requirements can be met by installing the following packages: NetworkManager-tui.'
+    - 'On Ubuntu and Debian like systems, the requirements can be met by installing the following packages: network-manager'
+    - 'On openSUSE, the requirements can be met by installing the following packages: NetworkManager.'
 options:
     state:
         description:
@@ -545,34 +537,8 @@ EXAMPLES = r'''
 RETURN = r"""#
 """
 
-import traceback
-
-DBUS_IMP_ERR = None
-try:
-    import dbus
-    HAVE_DBUS = True
-except ImportError:
-    DBUS_IMP_ERR = traceback.format_exc()
-    HAVE_DBUS = False
-
-NM_CLIENT_IMP_ERR = None
-HAVE_NM_CLIENT = True
-try:
-    import gi
-    gi.require_version('NM', '1.0')
-    from gi.repository import NM
-except (ImportError, ValueError):
-    try:
-        import gi
-        gi.require_version('NMClient', '1.0')
-        gi.require_version('NetworkManager', '1.0')
-        from gi.repository import NetworkManager, NMClient
-    except (ImportError, ValueError):
-        NM_CLIENT_IMP_ERR = traceback.format_exc()
-        HAVE_NM_CLIENT = False
-
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils._text import to_native, to_text
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils._text import to_text
 import re
 
 
@@ -595,42 +561,6 @@ class Nmcli(object):
 
     platform = 'Generic'
     distribution = None
-    if HAVE_DBUS:
-        bus = dbus.SystemBus()
-    # The following is going to be used in dbus code
-    DEVTYPES = {
-        1: "Ethernet",
-        2: "Wi-Fi",
-        5: "Bluetooth",
-        6: "OLPC",
-        7: "WiMAX",
-        8: "Modem",
-        9: "InfiniBand",
-        10: "Bond",
-        11: "VLAN",
-        12: "ADSL",
-        13: "Bridge",
-        14: "Generic",
-        15: "Team",
-        16: "VxLan",
-        17: "ipip",
-        18: "sit",
-    }
-    STATES = {
-        0: "Unknown",
-        10: "Unmanaged",
-        20: "Unavailable",
-        30: "Disconnected",
-        40: "Prepare",
-        50: "Config",
-        60: "Need Auth",
-        70: "IP Config",
-        80: "IP Check",
-        90: "Secondaries",
-        100: "Activated",
-        110: "Deactivating",
-        120: "Failed"
-    }
 
     def __init__(self, module):
         self.module = module
@@ -700,49 +630,6 @@ class Nmcli(object):
         else:
             cmd = to_text(cmd)
         return self.module.run_command(cmd, use_unsafe_shell=use_unsafe_shell, data=data)
-
-    def merge_secrets(self, proxy, config, setting_name):
-        try:
-            # returns a dict of dicts mapping name::setting, where setting is a dict
-            # mapping key::value.  Each member of the 'setting' dict is a secret
-            secrets = proxy.GetSecrets(setting_name)
-
-            # Copy the secrets into our connection config
-            for setting in secrets:
-                for key in secrets[setting]:
-                    config[setting_name][key] = secrets[setting][key]
-        except Exception:
-            pass
-
-    def dict_to_string(self, d):
-        # Try to trivially translate a dictionary's elements into nice string
-        # formatting.
-        dstr = ""
-        for key in d:
-            val = d[key]
-            str_val = ""
-            add_string = True
-            if isinstance(val, dbus.Array):
-                for elt in val:
-                    if isinstance(elt, dbus.Byte):
-                        str_val += "%s " % int(elt)
-                    elif isinstance(elt, dbus.String):
-                        str_val += "%s" % elt
-            elif isinstance(val, dbus.Dictionary):
-                dstr += self.dict_to_string(val)
-                add_string = False
-            else:
-                str_val = val
-            if add_string:
-                dstr += "%s: %s\n" % (key, str_val)
-        return dstr
-
-    def connection_to_string(self, config):
-        # dump a connection configuration to use in list_connection_info
-        setting_list = []
-        for setting_name in config:
-            setting_list.append(self.dict_to_string(config[setting_name]))
-        return setting_list
 
     def connection_options(self, detect_change=False):
         # Options common to multiple connection types.
@@ -928,53 +815,15 @@ class Nmcli(object):
             return list
         return None
 
-    def list_connection_info(self):
-        # Ask the settings service for the list of connections it provides
-        bus = dbus.SystemBus()
-
-        service_name = "org.freedesktop.NetworkManager"
-        settings = None
-        try:
-            proxy = bus.get_object(service_name, "/org/freedesktop/NetworkManager/Settings")
-            settings = dbus.Interface(proxy, "org.freedesktop.NetworkManager.Settings")
-        except dbus.exceptions.DBusException as e:
-            self.module.fail_json(msg="Unable to read Network Manager settings from DBus system bus: %s" % to_native(e),
-                                  details="Please check if NetworkManager is installed and"
-                                          "service network-manager is started.")
-        connection_paths = settings.ListConnections()
-        connection_list = []
-        # List each connection's name, UUID, and type
-        for path in connection_paths:
-            con_proxy = bus.get_object(service_name, path)
-            settings_connection = dbus.Interface(con_proxy, "org.freedesktop.NetworkManager.Settings.Connection")
-            config = settings_connection.GetSettings()
-
-            # Now get secrets too; we grab the secrets for each type of connection
-            # (since there isn't a "get all secrets" call because most of the time
-            # you only need 'wifi' secrets or '802.1x' secrets, not everything) and
-            # merge that into the configuration data - To use at a later stage
-            self.merge_secrets(settings_connection, config, '802-11-wireless')
-            self.merge_secrets(settings_connection, config, '802-11-wireless-security')
-            self.merge_secrets(settings_connection, config, '802-1x')
-            self.merge_secrets(settings_connection, config, 'gsm')
-            self.merge_secrets(settings_connection, config, 'cdma')
-            self.merge_secrets(settings_connection, config, 'ppp')
-
-            # Get the details of the 'connection' setting
-            s_con = config['connection']
-            connection_list.append(s_con['id'])
-            connection_list.append(s_con['uuid'])
-            connection_list.append(s_con['type'])
-            connection_list.append(self.connection_to_string(config))
-        return connection_list
-
     def connection_exists(self):
-        # we are going to use name and type in this instance to find if that connection exists and is of type x
-        connections = self.list_connection_info()
-
-        for con_item in connections:
-            if self.conn_name == con_item:
-                return True
+        cmd = [self.nmcli_bin, 'con', 'show', self.conn_name]
+        (rc, out, err) = self.execute_command(cmd)
+        if rc == 0:
+            return True
+        elif rc == 10:
+            return False
+        else:
+            raise NmcliModuleError(err)
 
     def down_connection(self):
         cmd = [self.nmcli_bin, 'con', 'down', self.conn_name]
@@ -1199,12 +1048,6 @@ def main():
         supports_check_mode=True,
     )
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
-
-    if not HAVE_DBUS:
-        module.fail_json(msg=missing_required_lib('dbus'), exception=DBUS_IMP_ERR)
-
-    if not HAVE_NM_CLIENT:
-        module.fail_json(msg=missing_required_lib('NetworkManager glib API'), exception=NM_CLIENT_IMP_ERR)
 
     nmcli = Nmcli(module)
 

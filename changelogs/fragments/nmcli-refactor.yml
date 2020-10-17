@@ -5,3 +5,4 @@ bugfixes:
 minor_changes:
   - nmcli - Refactor internal methods for simplicity and enhance reuse to support existing and future connection types.
   - nmcli - The `dns4`, `dns4_search`, `dns6`, and `dns6_search` arguments are retained internally as lists.
+  - nmcli - Remove Python DBus and GTK Object library dependencies (https://github.com/ansible-collections/community.general/issues/1112).
