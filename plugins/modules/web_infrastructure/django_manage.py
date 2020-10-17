@@ -57,7 +57,7 @@ options:
     type: bool
   database:
     description:
-      - The database to target. Used by the 'createcachetable', 'flush', 'loaddata', and 'syncdb' commands.
+      - The database to target. Used by the C(createcachetable), C(flush), C(loaddata), C(syncdb), and C(migrate) I(command).
     required: false
   failfast:
     description:
