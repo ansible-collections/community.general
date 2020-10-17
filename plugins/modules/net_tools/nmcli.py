@@ -30,6 +30,8 @@ description:
       python-dbus (or python3-dbus, depending on the Python version in use), libnm-glib-dev.'
     - 'On openSUSE, the requirements can be met by installing the following packages: NetworkManager, python2-dbus-python (or
       python3-dbus-python), typelib-1_0-NMClient-1_0 and typelib-1_0-NetworkManager-1_0.'
+    - 'On Arch Linux, the requirements can be met by installing the following packages: networkmanager, libnm, libnm-glib, python-dbus, python-gobject'
+
 options:
     state:
         description:
