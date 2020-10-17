@@ -238,7 +238,7 @@ TESTCASE_VXLAN = [
 
 TESTCASE_VXLAN_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
-connection.interface-name:              existent_nw_device
+connection.interface-name:              vxlan-existent_nw_device
 connection.autoconnect:                 yes
 vxlan.id:                               11
 vxlan.local:                            192.168.225.5
@@ -306,6 +306,7 @@ TESTCASE_ETHERNET_DHCP_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
 connection.interface-name:              ethernet_non_existant
 connection.autoconnect:                 yes
+802-3-ethernet.mtu:                     auto
 ipv4.method:                            auto
 ipv4.dhcp-client-id:                    00:11:22:AA:BB:CC:DD
 ipv6.method:                            auto
@@ -328,6 +329,7 @@ TESTCASE_ETHERNET_STATIC_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
 connection.interface-name:              ethernet_non_existant
 connection.autoconnect:                 yes
+802-3-ethernet.mtu:                     auto
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
@@ -336,7 +338,11 @@ ipv6.method:                            auto
 """
 
 
-def mocker_set(mocker, connection_exists=False):
+def mocker_set(mocker,
+               connection_exists=False,
+               execute_return=(0, "", ""),
+               execute_side_effect=None,
+               changed_return=None):
     """
     Common mocker object
     """
@@ -346,140 +352,126 @@ def mocker_set(mocker, connection_exists=False):
     get_bin_path.return_value = '/usr/bin/nmcli'
     connection = mocker.patch.object(nmcli.Nmcli, 'connection_exists')
     connection.return_value = connection_exists
-    return connection
+    execute_command = mocker.patch.object(nmcli.Nmcli, 'execute_command')
+    if execute_return:
+        execute_command.return_value = execute_return
+    if execute_side_effect:
+        execute_command.side_effect = execute_side_effect
+    if changed_return:
+        is_connection_changed = mocker.patch.object(nmcli.Nmcli, 'is_connection_changed')
+        is_connection_changed.return_value = changed_return
 
 
 @pytest.fixture
 def mocked_generic_connection_create(mocker):
     mocker_set(mocker)
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.return_value = (0, "", "")
-    return command_result
 
 
 @pytest.fixture
 def mocked_connection_exists(mocker):
-    connection = mocker_set(mocker, connection_exists=True)
-    return connection
+    mocker_set(mocker, connection_exists=True)
 
 
 @pytest.fixture
 def mocked_generic_connection_modify(mocker):
-    mocker_set(mocker, connection_exists=True)
-    connection_changed = mocker.patch.object(
-        nmcli.Nmcli, 'is_connection_changed')
-    connection_changed.return_value = (True, dict())
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.return_value = (0, "", "")
-    return command_result
+    mocker_set(mocker,
+               connection_exists=True,
+               changed_return=(True, dict()))
 
 
 @pytest.fixture
 def mocked_generic_connection_unchanged(mocker):
-    mocker_set(mocker, connection_exists=True)
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.return_value = (0, TESTCASE_GENERIC_SHOW_OUTPUT, "")
-    return command_result
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_GENERIC_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
 def mocked_generic_connection_dns_search_unchanged(mocker):
-    mocker_set(mocker, connection_exists=True)
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.return_value = (
-        0, TESTCASE_GENERIC_DNS4_SEARCH_SHOW_OUTPUT, "")
-    return command_result
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_GENERIC_DNS4_SEARCH_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
 def mocked_bond_connection_unchanged(mocker):
-    mocker_set(mocker, connection_exists=True)
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.return_value = (0, TESTCASE_BOND_SHOW_OUTPUT, "")
-    return command_result
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_BOND_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
 def mocked_bridge_connection_unchanged(mocker):
-    mocker_set(mocker, connection_exists=True)
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.return_value = (0, TESTCASE_BRIDGE_SHOW_OUTPUT, "")
-    return command_result
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_BRIDGE_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
 def mocked_bridge_slave_unchanged(mocker):
-    mocker_set(mocker, connection_exists=True)
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.return_value = (0, TESTCASE_BRIDGE_SLAVE_SHOW_OUTPUT, "")
-    return command_result
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_BRIDGE_SLAVE_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
 def mocked_vlan_connection_unchanged(mocker):
-    mocker_set(mocker, connection_exists=True)
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.return_value = (0, TESTCASE_VLAN_SHOW_OUTPUT, "")
-    return command_result
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_VLAN_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
 def mocked_vxlan_connection_unchanged(mocker):
-    mocker_set(mocker, connection_exists=True)
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.return_value = (0, TESTCASE_VXLAN_SHOW_OUTPUT, "")
-    return command_result
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_VXLAN_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
 def mocked_ipip_connection_unchanged(mocker):
-    mocker_set(mocker, connection_exists=True)
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.return_value = (0, TESTCASE_IPIP_SHOW_OUTPUT, "")
-    return command_result
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_IPIP_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
 def mocked_sit_connection_unchanged(mocker):
-    mocker_set(mocker, connection_exists=True)
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.return_value = (0, TESTCASE_SIT_SHOW_OUTPUT, "")
-    return command_result
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_SIT_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
 def mocked_ethernet_connection_unchanged(mocker):
-    mocker_set(mocker, connection_exists=True)
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.return_value = (0, TESTCASE_ETHERNET_DHCP, "")
-    return command_result
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_ETHERNET_DHCP, ""))
 
 
 @pytest.fixture
 def mocked_ethernet_connection_dhcp_unchanged(mocker):
-    mocker_set(mocker, connection_exists=True)
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.return_value = (0, TESTCASE_ETHERNET_DHCP_SHOW_OUTPUT, "")
-    return command_result
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_ETHERNET_DHCP_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
 def mocked_ethernet_connection_static_unchanged(mocker):
-    mocker_set(mocker, connection_exists=True)
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.return_value = (0, TESTCASE_ETHERNET_STATIC_SHOW_OUTPUT, "")
-    return command_result
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_ETHERNET_STATIC_SHOW_OUTPUT, ""))
 
 
 @pytest.fixture
 def mocked_ethernet_connection_dhcp_to_static(mocker):
-    mocker_set(mocker, connection_exists=True)
-    command_result = mocker.patch.object(nmcli.Nmcli, 'execute_command')
-    command_result.side_effect = [
-        (0, TESTCASE_ETHERNET_DHCP_SHOW_OUTPUT, ""),
-        (0, "", ""),
-    ]
-    return command_result
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=None,
+               execute_side_effect=(
+                   (0, TESTCASE_ETHERNET_DHCP_SHOW_OUTPUT, ""),
+                   (0, "", ""),
+               ))
 
 
 @pytest.mark.parametrize('patch_ansible_module', TESTCASE_BOND, indirect=['patch_ansible_module'])
@@ -501,10 +493,10 @@ def test_bond_connection_create(mocked_generic_connection_create, capfd):
     assert args[0][4] == 'bond'
     assert args[0][5] == 'con-name'
     assert args[0][6] == 'non_existent_nw_device'
-    assert args[0][7] == 'ifname'
-    assert args[0][8] == 'bond_non_existant'
 
-    for param in ['gw4', 'primary', 'autoconnect', 'mode', 'active-backup', 'ip4']:
+    for param in ['ipv4.gateway', 'primary', 'connection.autoconnect',
+                  'connection.interface-name', 'bond_non_existant',
+                  'mode', 'active-backup', 'ipv4.addresses']:
         assert param in args[0]
 
     out, err = capfd.readouterr()
@@ -547,7 +539,7 @@ def test_generic_connection_create(mocked_generic_connection_create, capfd):
     assert args[0][5] == 'con-name'
     assert args[0][6] == 'non_existent_nw_device'
 
-    for param in ['autoconnect', 'gw4', 'ip4']:
+    for param in ['connection.autoconnect', 'ipv4.gateway', 'ipv4.addresses']:
         assert param in args[0]
 
     out, err = capfd.readouterr()
@@ -570,10 +562,10 @@ def test_generic_connection_modify(mocked_generic_connection_modify, capfd):
 
     assert args[0][0] == '/usr/bin/nmcli'
     assert args[0][1] == 'con'
-    assert args[0][2] == 'mod'
+    assert args[0][2] == 'modify'
     assert args[0][3] == 'non_existent_nw_device'
 
-    for param in ['ipv4.gateway', 'ipv4.address']:
+    for param in ['ipv4.gateway', 'ipv4.addresses']:
         assert param in args[0]
 
     out, err = capfd.readouterr()
@@ -686,8 +678,9 @@ def test_create_bridge(mocked_generic_connection_create, capfd):
     assert args[0][5] == 'con-name'
     assert args[0][6] == 'non_existent_nw_device'
 
-    for param in ['ip4', '10.10.10.10/24', 'gw4', '10.10.10.1', 'bridge.max-age', '100', 'bridge.stp', 'yes']:
-        assert param in map(to_text, args[0])
+    args_text = list(map(to_text, args[0]))
+    for param in ['ipv4.addresses', '10.10.10.10/24', 'ipv4.gateway', '10.10.10.1', 'bridge.max-age', '100', 'bridge.stp', 'yes']:
+        assert param in args_text
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -710,10 +703,12 @@ def test_mod_bridge(mocked_generic_connection_modify, capfd):
 
     assert args[0][0] == '/usr/bin/nmcli'
     assert args[0][1] == 'con'
-    assert args[0][2] == 'mod'
+    assert args[0][2] == 'modify'
     assert args[0][3] == 'non_existent_nw_device'
-    for param in ['ipv4.address', '10.10.10.10/24', 'ipv4.gateway', '10.10.10.1', 'bridge.max-age', '100', 'bridge.stp', 'yes']:
-        assert param in map(to_text, args[0])
+
+    args_text = list(map(to_text, args[0]))
+    for param in ['ipv4.addresses', '10.10.10.10/24', 'ipv4.gateway', '10.10.10.1', 'bridge.max-age', '100', 'bridge.stp', 'yes']:
+        assert param in args_text
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -756,8 +751,9 @@ def test_create_bridge_slave(mocked_generic_connection_create, capfd):
     assert args[0][5] == 'con-name'
     assert args[0][6] == 'non_existent_nw_device'
 
+    args_text = list(map(to_text, args[0]))
     for param in ['bridge-port.path-cost', '100']:
-        assert param in map(to_text, args[0])
+        assert param in args_text
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -780,11 +776,12 @@ def test_mod_bridge_slave(mocked_generic_connection_modify, capfd):
 
     assert args[0][0] == '/usr/bin/nmcli'
     assert args[0][1] == 'con'
-    assert args[0][2] == 'mod'
+    assert args[0][2] == 'modify'
     assert args[0][3] == 'non_existent_nw_device'
 
+    args_text = list(map(to_text, args[0]))
     for param in ['bridge-port.path-cost', '100']:
-        assert param in map(to_text, args[0])
+        assert param in args_text
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -827,8 +824,9 @@ def test_create_vlan_con(mocked_generic_connection_create, capfd):
     assert args[0][5] == 'con-name'
     assert args[0][6] == 'non_existent_nw_device'
 
-    for param in ['ip4', '10.10.10.10/24', 'gw4', '10.10.10.1', 'id', '10']:
-        assert param in map(to_text, args[0])
+    args_text = list(map(to_text, args[0]))
+    for param in ['ipv4.addresses', '10.10.10.10/24', 'ipv4.gateway', '10.10.10.1', 'vlan.id', '10']:
+        assert param in args_text
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -851,11 +849,12 @@ def test_mod_vlan_conn(mocked_generic_connection_modify, capfd):
 
     assert args[0][0] == '/usr/bin/nmcli'
     assert args[0][1] == 'con'
-    assert args[0][2] == 'mod'
+    assert args[0][2] == 'modify'
     assert args[0][3] == 'non_existent_nw_device'
 
-    for param in ['ipv4.address', '10.10.10.10/24', 'ipv4.gateway', '10.10.10.1', 'vlan.id', '10']:
-        assert param in map(to_text, args[0])
+    args_text = list(map(to_text, args[0]))
+    for param in ['ipv4.addresses', '10.10.10.10/24', 'ipv4.gateway', '10.10.10.1', 'vlan.id', '10']:
+        assert param in args_text
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -896,10 +895,11 @@ def test_create_vxlan(mocked_generic_connection_create, capfd):
     assert args[0][4] == 'vxlan'
     assert args[0][5] == 'con-name'
     assert args[0][6] == 'non_existent_nw_device'
-    assert args[0][7] == 'ifname'
 
-    for param in ['vxlan.local', '192.168.225.5', 'vxlan.remote', '192.168.225.6', 'vxlan.id', '11']:
-        assert param in map(to_text, args[0])
+    args_text = list(map(to_text, args[0]))
+    for param in ['connection.interface-name', 'vxlan-existent_nw_device',
+                  'vxlan.local', '192.168.225.5', 'vxlan.remote', '192.168.225.6', 'vxlan.id', '11']:
+        assert param in args_text
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -921,11 +921,12 @@ def test_vxlan_mod(mocked_generic_connection_modify, capfd):
 
     assert args[0][0] == '/usr/bin/nmcli'
     assert args[0][1] == 'con'
-    assert args[0][2] == 'mod'
+    assert args[0][2] == 'modify'
     assert args[0][3] == 'non_existent_nw_device'
 
+    args_text = list(map(to_text, args[0]))
     for param in ['vxlan.local', '192.168.225.5', 'vxlan.remote', '192.168.225.6', 'vxlan.id', '11']:
-        assert param in map(to_text, args[0])
+        assert param in args_text
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -964,17 +965,16 @@ def test_create_ipip(mocked_generic_connection_create, capfd):
     assert args[0][2] == 'add'
     assert args[0][3] == 'type'
     assert args[0][4] == 'ip-tunnel'
-    assert args[0][5] == 'mode'
-    assert args[0][6] == 'ipip'
-    assert args[0][7] == 'con-name'
-    assert args[0][8] == 'non_existent_nw_device'
-    assert args[0][9] == 'ifname'
-    assert args[0][10] == 'ipip-existent_nw_device'
-    assert args[0][11] == 'dev'
-    assert args[0][12] == 'non_existent_ipip_device'
+    assert args[0][5] == 'con-name'
+    assert args[0][6] == 'non_existent_nw_device'
 
-    for param in ['ip-tunnel.local', '192.168.225.5', 'ip-tunnel.remote', '192.168.225.6']:
-        assert param in map(to_text, args[0])
+    args_text = list(map(to_text, args[0]))
+    for param in ['connection.interface-name', 'ipip-existent_nw_device',
+                  'ip-tunnel.local', '192.168.225.5',
+                  'ip-tunnel.mode', 'ipip',
+                  'ip-tunnel.parent', 'non_existent_ipip_device',
+                  'ip-tunnel.remote', '192.168.225.6']:
+        assert param in args_text
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -996,11 +996,12 @@ def test_ipip_mod(mocked_generic_connection_modify, capfd):
 
     assert args[0][0] == '/usr/bin/nmcli'
     assert args[0][1] == 'con'
-    assert args[0][2] == 'mod'
+    assert args[0][2] == 'modify'
     assert args[0][3] == 'non_existent_nw_device'
 
+    args_text = list(map(to_text, args[0]))
     for param in ['ip-tunnel.local', '192.168.225.5', 'ip-tunnel.remote', '192.168.225.6']:
-        assert param in map(to_text, args[0])
+        assert param in args_text
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -1039,17 +1040,16 @@ def test_create_sit(mocked_generic_connection_create, capfd):
     assert args[0][2] == 'add'
     assert args[0][3] == 'type'
     assert args[0][4] == 'ip-tunnel'
-    assert args[0][5] == 'mode'
-    assert args[0][6] == 'sit'
-    assert args[0][7] == 'con-name'
-    assert args[0][8] == 'non_existent_nw_device'
-    assert args[0][9] == 'ifname'
-    assert args[0][10] == 'sit-existent_nw_device'
-    assert args[0][11] == 'dev'
-    assert args[0][12] == 'non_existent_sit_device'
+    assert args[0][5] == 'con-name'
+    assert args[0][6] == 'non_existent_nw_device'
 
-    for param in ['ip-tunnel.local', '192.168.225.5', 'ip-tunnel.remote', '192.168.225.6']:
-        assert param in map(to_text, args[0])
+    args_text = list(map(to_text, args[0]))
+    for param in ['connection.interface-name', 'sit-existent_nw_device',
+                  'ip-tunnel.local', '192.168.225.5',
+                  'ip-tunnel.mode', 'sit',
+                  'ip-tunnel.parent', 'non_existent_sit_device',
+                  'ip-tunnel.remote', '192.168.225.6']:
+        assert param in args_text
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -1071,11 +1071,12 @@ def test_sit_mod(mocked_generic_connection_modify, capfd):
 
     assert args[0][0] == '/usr/bin/nmcli'
     assert args[0][1] == 'con'
-    assert args[0][2] == 'mod'
+    assert args[0][2] == 'modify'
     assert args[0][3] == 'non_existent_nw_device'
 
+    args_text = list(map(to_text, args[0]))
     for param in ['ip-tunnel.local', '192.168.225.5', 'ip-tunnel.remote', '192.168.225.6']:
-        assert param in map(to_text, args[0])
+        assert param in args_text
 
     out, err = capfd.readouterr()
     results = json.loads(out)
@@ -1145,10 +1146,10 @@ def test_modify_ethernet_dhcp_to_static(mocked_ethernet_connection_dhcp_to_stati
 
     assert args[0][0] == '/usr/bin/nmcli'
     assert args[0][1] == 'con'
-    assert args[0][2] == 'mod'
+    assert args[0][2] == 'modify'
     assert args[0][3] == 'non_existent_nw_device'
 
-    for param in ['ipv4.method', 'ipv4.gateway', 'ipv4.address']:
+    for param in ['ipv4.method', 'ipv4.gateway', 'ipv4.addresses']:
         assert param in args[0]
 
     out, err = capfd.readouterr()
@@ -1166,10 +1167,9 @@ def test_create_ethernet_static(mocked_generic_connection_create, capfd):
     with pytest.raises(SystemExit):
         nmcli.main()
 
-    assert nmcli.Nmcli.execute_command.call_count == 3
+    assert nmcli.Nmcli.execute_command.call_count == 2
     arg_list = nmcli.Nmcli.execute_command.call_args_list
     add_args, add_kw = arg_list[0]
-    mod_args, mod_kw = arg_list[1]
 
     assert add_args[0][0] == '/usr/bin/nmcli'
     assert add_args[0][1] == 'con'
@@ -1178,19 +1178,19 @@ def test_create_ethernet_static(mocked_generic_connection_create, capfd):
     assert add_args[0][4] == 'ethernet'
     assert add_args[0][5] == 'con-name'
     assert add_args[0][6] == 'non_existent_nw_device'
-    assert add_args[0][7] == 'ifname'
-    assert add_args[0][8] == 'ethernet_non_existant'
 
-    for param in ['ip4', '10.10.10.10/24', 'gw4', '10.10.10.1']:
-        assert param in map(to_text, add_args[0])
+    add_args_text = list(map(to_text, add_args[0]))
+    for param in ['connection.interface-name', 'ethernet_non_existant',
+                  'ipv4.addresses', '10.10.10.10/24',
+                  'ipv4.gateway', '10.10.10.1',
+                  'ipv4.dns', '1.1.1.1,8.8.8.8']:
+        assert param in add_args_text
 
-    assert mod_args[0][0] == '/usr/bin/nmcli'
-    assert mod_args[0][1] == 'con'
-    assert mod_args[0][2] == 'mod'
-    assert mod_args[0][3] == 'non_existent_nw_device'
-
-    for param in ['ipv4.dns', '1.1.1.1 8.8.8.8']:
-        assert param in map(to_text, mod_args[0])
+    up_args, up_kw = arg_list[1]
+    assert up_args[0][0] == '/usr/bin/nmcli'
+    assert up_args[0][1] == 'con'
+    assert up_args[0][2] == 'up'
+    assert up_args[0][3] == 'non_existent_nw_device'
 
     out, err = capfd.readouterr()
     results = json.loads(out)
