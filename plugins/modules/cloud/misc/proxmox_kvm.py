@@ -31,9 +31,6 @@ options:
     description:
       - Pass arbitrary arguments to kvm.
       - This option is for experts only!
-      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(none). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 4.0.0.
     type: str
   api_host:
     description:
@@ -139,8 +136,8 @@ options:
       - Used only with clone
       - Use I(format=unspecified) and I(full=false) for a linked clone.
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(qcow2). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 4.0.0.
+        option has a default of C(qcow2) and C(no_defaults) (new default value) is equivalent to C(unspecified).
+        Note that the default value of I(proxmox_default_behavior) changes in community.general 4.0.0.
     type: str
     choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", "unspecified" ]
   freeze:
@@ -184,9 +181,6 @@ options:
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
-      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(none). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 4.0.0.
     type: dict
   keyboard:
     description:
@@ -304,9 +298,6 @@ options:
   revert:
     description:
       - Revert a pending change.
-      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(none). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 4.0.0.
     type: str
   sata:
     description:
@@ -430,9 +421,6 @@ options:
   vcpus:
     description:
       - Sets number of hotplugged vcpus.
-      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(none). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 4.0.0.
     type: int
   vga:
     description:
@@ -450,9 +438,6 @@ options:
       - C(storage) is the storage identifier where to create the disk.
       - C(size) is the size of the disk in GB.
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
-      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(none). Note that the default value of I(proxmox_default_behavior)
-        changes in community.general 4.0.0.
     type: dict
   vmid:
     description:
@@ -473,9 +458,9 @@ options:
       - From community.general 4.0.0 on, the default value will switch to C(no_defaults). To avoid
         deprecation warnings, please set I(proxmox_default_behavior) to an explicit
         value.
-      - This affects the I(acpi), I(args), I(autostart), I(balloon), I(boot), I(cores), I(cpu),
-        I(cpuunits), I(format), I(ide), I(kvm), I(memory), I(onboot), I(ostype), I(revert), I(sockets),
-        I(tablet), I(template), I(vcpus), I(vga), I(virtio) options.
+      - This affects the I(acpi), I(autostart), I(balloon), I(boot), I(cores), I(cpu),
+        I(cpuunits), I(format), I(kvm), I(memory), I(onboot), I(ostype), I(sockets),
+        I(tablet), I(template), I(vga), options.
     type: str
     choices:
       - compatibility
@@ -1039,7 +1024,6 @@ def main():
     if module.params['proxmox_default_behavior'] == 'compatibility':
         old_default_values = dict(
             acpi=True,
-            args=None,
             autostart=False,
             balloon=0,
             boot='cnd',
@@ -1047,17 +1031,13 @@ def main():
             cpu='kvm64',
             cpuunits=1000,
             format='qcow2',
-            ide=None,
             kvm=True,
             memory=512,
             ostype='l26',
-            revert=None,
             sockets=1,
             tablet=False,
             template=False,
-            vcpus=None,
             vga='std',
-            virtio=None,
         )
         for param, value in old_default_values.items():
             if module.params[param] is None:
