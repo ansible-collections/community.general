@@ -154,7 +154,7 @@ class CacheModule(BaseCacheModule):
                 pass  # password is optional
 
         sentinels = [tuple(shost.split(':')) for shost in connections]
-        display.vv('\nUsing redis sentinel: %s with %s' % (sentinels, kw))
+        display.vv('\nUsing redis sentinels: %s' % sentinels)
         scon = Sentinel(sentinels, **kw)
         try:
             return scon.master_for(self._sentinel_service_name, socket_timeout=0.2)
