@@ -15,7 +15,6 @@ description:
 author:
 - "Nate Kingsley (@nate-kingsley)"
 - "Ninjiner (@Ninjiner)"
-version_added: "1.9"
 requirements:
     - Valid Uptime Robot API Key
 options:
