@@ -1,10 +1,11 @@
+---
 - name: "Make sure all images are removed"
   docker_image:
     name: "{{ item }}"
     state: absent
-  with_items: "{{ inames }}"
+  with_items: "{{ docker_registry_setup_inames }}"
 - name: "Get registry logs"
-  command: "docker logs {{ registry_name }}"
+  command: "docker logs {{ docker_registry_container_name_registry }}"
   register: registry_logs
   no_log: yes
   ignore_errors: yes
@@ -13,7 +14,7 @@
     var: registry_logs.stdout_lines
   when: registry_logs is not failed
 - name: "Get nginx logs"
-  command: "docker logs {{ nginx_name }}"
+  command: "docker logs {{ docker_registry_container_name_nginx }}"
   register: nginx_logs
   no_log: yes
   ignore_errors: yes
@@ -26,12 +27,12 @@
     name: "{{ item }}"
     state: absent
     force_kill: yes
-  with_items: "{{ cnames }}"
+  with_items: "{{ docker_registry_setup_cnames }}"
   register: result
   retries: 3
   delay: 3
   until: result is success
 - name: "Make sure all volumes are removed"
   command: "docker rm -f {{ item }}"
-  with_items: "{{ vnames }}"
+  with_items: "{{ docker_registry_setup_vnames }}"
   ignore_errors: yes
