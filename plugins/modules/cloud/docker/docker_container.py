@@ -212,6 +212,42 @@ options:
         - "Must be a positive integer."
         type: int
         required: yes
+  device_requests:
+    description:
+      - Allows to request additional resources, such as GPUs.
+    type: list
+    elements: dict
+    suboptions:
+      capabilities:
+        description:
+          - List of lists of strings to request capabilities.
+          - The top-level list entries are combined by OR, and for every list entry,
+            the entries in the list it contains are combined by AND.
+          - The driver will try to satisfy one of the sub-lists.
+          - Available capabilities for the C(nvidia) driver can be found at
+            U(https://github.com/NVIDIA/nvidia-container-runtime).
+        type: list
+        elements: list
+      count:
+        description:
+          - Number or devices to request.
+          - Set to C(-1) to request all available devices.
+        type: int
+      device_ids:
+        description:
+          - List of device IDs.
+        type: list
+        elements: str
+      driver:
+        description:
+          - Which driver to use for this device.
+        type: str
+      options:
+        description:
+          - Driver-specific options.
+        type: dict
+)),
+
   dns_opts:
     description:
       - List of DNS options.
@@ -1230,6 +1266,7 @@ class TaskParameters(DockerBaseClass):
         self.device_write_bps = None
         self.device_read_iops = None
         self.device_write_iops = None
+        self.device_requests = None
         self.dns_servers = None
         self.dns_opts = None
         self.dns_search_domains = None
@@ -1390,6 +1427,22 @@ class TaskParameters(DockerBaseClass):
         for param_name in ["device_read_iops", "device_write_iops"]:
             if client.module.params.get(param_name):
                 self._process_rate_iops(option=param_name)
+
+        if self.device_requests:
+            for dr_index, dr in enumerate(self.device_requests):
+                # Make sure that capabilities are lists of lists of strings
+                if dr['capabilities']:
+                    for or_index, or_list in enumerate(dr['capabilities']):
+                        for and_index, and_list in enumerate(or_list):
+                            for term_index, term in enumerate(and_list):
+                                if not isinstance(term, string_types):
+                                    self.fail(
+                                        "device_requests[{0}].capabilities[{1}][{2}][{3}] is not a string".format(
+                                            dr_index, or_index, and_index, term_index))
+                                and_list[term_index] = to_native(term)
+                # Make sure that options is a dictionary mapping strings to strings
+                if dr['options']:
+                    dr['options'] = clean_dict_booleans_for_docker_api(dr['options'])
 
     def fail(self, msg):
         self.client.fail(msg)
@@ -1593,6 +1646,9 @@ class TaskParameters(DockerBaseClass):
 
         if 'mounts' in params:
             params['mounts'] = self.mounts_opt
+
+        if self.device_requests is not None:
+            params['device_requests'] = [dict((k, v) for k, v in dr.items() if v is not None) for dr in self.device_requests]
 
         return self.client.create_host_config(**params)
 
@@ -1990,6 +2046,7 @@ class Container(DockerBaseClass):
         self.parameters.expected_sysctls = None
         self.parameters.expected_etc_hosts = None
         self.parameters.expected_env = None
+        self.parameters.expected_device_requests = None
         self.parameters_map = dict()
         self.parameters_map['expected_links'] = 'links'
         self.parameters_map['expected_ports'] = 'expected_ports'
@@ -2005,6 +2062,7 @@ class Container(DockerBaseClass):
         self.parameters_map['expected_devices'] = 'devices'
         self.parameters_map['expected_healthcheck'] = 'healthcheck'
         self.parameters_map['expected_mounts'] = 'mounts'
+        self.parameters_map['expected_device_requests'] = 'device_requests'
 
     def fail(self, msg):
         self.parameters.client.fail(msg)
@@ -2078,6 +2136,7 @@ class Container(DockerBaseClass):
         self.parameters.expected_cmd = self._get_expected_cmd()
         self.parameters.expected_devices = self._get_expected_devices()
         self.parameters.expected_healthcheck = self._get_expected_healthcheck()
+        self.parameters.expected_device_requests = self._get_expected_device_requests()
 
         if not self.container.get('HostConfig'):
             self.fail("has_config_diff: Error parsing container properties. HostConfig missing.")
@@ -2155,6 +2214,7 @@ class Container(DockerBaseClass):
             device_write_bps=host_config.get('BlkioDeviceWriteBps'),
             device_read_iops=host_config.get('BlkioDeviceReadIOps'),
             device_write_iops=host_config.get('BlkioDeviceWriteIOps'),
+            expected_device_requests=host_config.get('DeviceRequests'),
             pids_limit=host_config.get('PidsLimit'),
             # According to https://github.com/moby/moby/, support for HostConfig.Mounts
             # has been included at least since v17.03.0-ce, which has API version 1.26.
@@ -2453,6 +2513,20 @@ class Container(DockerBaseClass):
         self.log("expected_binds:")
         self.log(result, pretty_print=True)
         return result
+
+    def _get_expected_device_requests(self):
+        if self.parameters.device_requests is None:
+            return None
+        device_requests = []
+        for dr in self.parameters.device_requests:
+            device_requests.append({
+                'Driver': dr['driver'],
+                'Count': dr['count'],
+                'DeviceIDs': dr['device_ids'],
+                'Capabilities': dr['capabilities'],
+                'Options': dr['options'],
+            })
+        return device_requests
 
     def _get_image_binds(self, volumes):
         '''
@@ -3089,6 +3163,7 @@ class AnsibleDockerClientContainer(AnsibleDockerClient):
         explicit_types = dict(
             command='list',
             devices='set(dict)',
+            device_requests='set(dict)',
             dns_search_domains='list',
             dns_servers='list',
             env='set',
@@ -3222,6 +3297,7 @@ class AnsibleDockerClientContainer(AnsibleDockerClient):
             device_read_iops=dict(docker_py_version='1.9.0', docker_api_version='1.22'),
             device_write_bps=dict(docker_py_version='1.9.0', docker_api_version='1.22'),
             device_write_iops=dict(docker_py_version='1.9.0', docker_api_version='1.22'),
+            device_requests=dict(docker_py_version='4.3.0', docker_api_version='1.40'),
             dns_opts=dict(docker_api_version='1.21', docker_py_version='1.10.0'),
             ipc_mode=dict(docker_api_version='1.25'),
             mac_address=dict(docker_api_version='1.25'),
@@ -3319,6 +3395,13 @@ def main():
         device_write_iops=dict(type='list', elements='dict', options=dict(
             path=dict(required=True, type='str'),
             rate=dict(required=True, type='int'),
+        )),
+        device_requests=dict(type='list', elements='dict', options=dict(
+            capabilities=dict(type='list', elements='list'),
+            count=dict(type='int'),
+            device_ids=dict(type='list', elements='str'),
+            driver=dict(type='str'),
+            options=dict(type='dict'),
         )),
         dns_servers=dict(type='list', elements='str'),
         dns_opts=dict(type='list', elements='str'),
