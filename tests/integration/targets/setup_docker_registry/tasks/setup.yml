@@ -2,6 +2,11 @@
 - name: Register registry cleanup
   command: 'true'
   notify: Remove test registry
+- name: Setup Docker
+  # Please note that we do setup_docker here and not via meta/main.yml to avoid the problem that
+  # our cleanup is called **after** setup_docker's cleanup has been called!
+  include_role:
+    name: setup_docker
 - name: Create random name prefix and test registry name
   set_fact:
     docker_registry_container_name_registry: '{{ ''ansible-test-registry-%0x'' % ((2**32) | random) }}'
