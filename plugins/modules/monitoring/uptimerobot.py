@@ -9,9 +9,9 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: uptimerobot
-short_description: Create, remove, pause and start monitors in Uptimerobot
+short_description: Create, remove, pause and start monitors in Uptime Robot
 description:
-    - This module lets you create, remove, pause and start monitors in Uptimerobot
+    - This module lets you create, remove, pause and start monitors in Uptime Robot.
 author:
 - "Nate Kingsley (@nate-kingsley)"
 - "Ninjiner (@Ninjiner)"
@@ -21,7 +21,7 @@ options:
     state:
         description:
             - Define whether or not the monitor should be running or paused.
-            - created and absent are added in version 1.2.0
+            - Created and Absent were added in community.general 1.3.0.
         required: true
         choices: [ "started", "paused", "created", "absent", "present" ]
     url:
