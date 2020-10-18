@@ -36,10 +36,8 @@
     that:
       - job_check_deployed is changed
       - job_deployed is changed
-      - '"example" in get_nomad_job.result | json_query(query)'
+      - get_nomad_job.result[0].ID == "example"
       - list_nomad_jobs.result | length == 1
-  vars:
-    query: "[*].ID"
 
 - name: run check deploy job idempotence
   nomad_job:
@@ -89,6 +87,4 @@
       - job_deployed_idempotence is not changed
       - job_deleted_check is changed
       - job_deleted is changed
-      - get_job_delete.result | json_query(query)
-  vars:
-    query: "[0].Stop"
+      - get_job_delete.result[0].Stop
