@@ -932,7 +932,7 @@
     - device_requests_1 is failed
     - |
       (('version is ' ~ docker_py_version ~ ' ') in device_requests_1.msg and 'Minimum version required is 4.3.0 ' in device_requests_1.msg) or
-      (('version is ' ~ docker_api_version ~ ' ') in device_requests_1.msg and 'Minimum version required is 1.40 ' in device_requests_1.msg)
+      (('API version is ' ~ docker_api_version ~ '.') in device_requests_1.msg and 'Minimum version required is 1.40 ' in device_requests_1.msg)
   when: docker_py_version is version('4.3.0', '<') or docker_api_version is version('1.40', '<')
 
 ####################################################################
