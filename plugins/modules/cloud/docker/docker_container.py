@@ -246,8 +246,6 @@ options:
         description:
           - Driver-specific options.
         type: dict
-)),
-
   dns_opts:
     description:
       - List of DNS options.
