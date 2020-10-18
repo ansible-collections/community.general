@@ -26,6 +26,12 @@
     register: result
     until: result is success
 
+  - name: Install jmespath
+    pip:
+      name: jmespath
+    register: result
+    until: result is success
+
   - when: pyopenssl_version.stdout is version('0.15', '>=')
     block:
     - name: Generate privatekey
