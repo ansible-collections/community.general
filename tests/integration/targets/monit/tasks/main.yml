@@ -31,6 +31,15 @@
       - daemon.py
       - httpd_echo.py
 
+  - name: make monit dir
+    become: yes
+    file:
+      path: "{{ item }}"
+      state: directory
+    loop:
+      - /var/lib/monit
+      - /var/run/monit
+
   - name: restart monit
     become: yes
     service:
