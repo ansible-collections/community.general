@@ -1,0 +1,6 @@
+shippable/posix/group2
+nomad_job_info
+destructive
+skip/aix
+skip/centos6
+skip/freebsd
