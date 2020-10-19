@@ -1,7 +1,7 @@
 ---
 bugfixes:
   - nmcli - Use consistent autoconnect parameters (https://github.com/ansible-collections/community.general/issues/459).
-  - nmcli - Cannot modify `ifname` after connection creation (https://github.com/ansible-collections/community.general/issues/1089).
+  - nmcli - Cannot modify ``ifname`` after connection creation (https://github.com/ansible-collections/community.general/issues/1089).
 minor_changes:
   - nmcli - Refactor internal methods for simplicity and enhance reuse to support existing and future connection types (https://github.com/ansible-collections/community.general/pull/1113).
   - nmcli - The ``dns4``, ``dns4_search``, ``dns6``, and ``dns6_search`` arguments are retained internally as lists (https://github.com/ansible-collections/community.general/pull/1113).
