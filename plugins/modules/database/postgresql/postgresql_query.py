@@ -213,7 +213,10 @@ query_all_results:
     elements: list
     sample: [[{"Column": "Value1"},{"Column": "Value2"}], [{"Column": "Value1"},{"Column": "Value2"}]]
 rowcount:
-    description: Total number of produced or affected rows.
+    description:
+    - Number of produced or affected rows.
+    - When using a script with multiple queries,
+      it contains a total number of produced or affected rows.
     returned: changed
     type: int
     sample: 5
