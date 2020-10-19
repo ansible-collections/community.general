@@ -66,6 +66,8 @@ files:
   $doc_fragments/hwc.py:
     maintainers: $team_huawei
     labels: hwc
+  $doc_fragments/nomad.py:
+    maintainers: chris93111
   $doc_fragments/postgres.py:
     maintainers: $team_postgresql
     labels: postgres postgresql
@@ -448,6 +450,8 @@ files:
     authors: sgargan
   $modules/clustering/etcd3.py:
     authors: evrardjp vfauth
+  $modules/clustering/nomad/:
+    maintainers: chris93111
   $modules/clustering/pacemaker_cluster.py:
     authors: matbu
   $modules/clustering/znode.py:
