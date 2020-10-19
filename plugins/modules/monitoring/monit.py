@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 module: monit
 short_description: Manage the state of a program monitored via Monit
 description:
-     - Manage the state of a program monitored via I(Monit)
+    - Manage the state of a program monitored via I(Monit)
 options:
   name:
     description:
@@ -30,7 +30,9 @@ options:
         Ansible will sleep for five seconds between each check.
     default: 300
     type: int
-author: "Darryl Stoflet (@dstoflet)"
+author:
+    - Darryl Stoflet (@dstoflet)
+    - Simon Kelly (@snopoke)
 '''
 
 EXAMPLES = '''
