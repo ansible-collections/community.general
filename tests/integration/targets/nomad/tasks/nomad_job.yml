@@ -1,0 +1,90 @@
+---
+
+- name: run check deploy nomad job
+  nomad_job:
+    host: localhost
+    state: present
+    use_ssl: false
+    content: "{{ lookup('file', 'job.hcl') }}"
+  register: job_check_deployed
+  check_mode: true
+
+- name: run create nomad job
+  nomad_job:
+    host: localhost
+    state: present
+    use_ssl: false
+    content: "{{ lookup('file', 'job.hcl') }}"
+    force_start: true
+  register: job_deployed
+
+- name: get nomad job deployed
+  nomad_job_info:
+    host: localhost
+    use_ssl: false
+    name: example
+  register: get_nomad_job
+
+- name: get list of nomad jobs
+  nomad_job_info:
+    host: localhost
+    use_ssl: false
+  register: list_nomad_jobs
+
+- name: assert job is deployed and tasks is changed
+  assert:
+    that:
+      - job_check_deployed is changed
+      - job_deployed is changed
+      - get_nomad_job.result[0].ID == "example"
+      - list_nomad_jobs.result | length == 1
+
+- name: run check deploy job idempotence
+  nomad_job:
+    host: localhost
+    state: present
+    use_ssl: false
+    content: "{{ lookup('file', 'job.hcl') }}"
+  register: job_check_deployed_idempotence
+  check_mode: true
+
+- name: run create nomad job idempotence
+  nomad_job:
+    host: localhost
+    state: present
+    use_ssl: false
+    content: "{{ lookup('file', 'job.hcl') }}"
+  register: job_deployed_idempotence
+
+- name: run check delete nomad job
+  nomad_job:
+    host: localhost
+    state: absent
+    use_ssl: false
+    content: "{{ lookup('file', 'job.hcl') }}"
+  register: job_deleted_check
+  check_mode: true
+
+- name: run delete nomad job
+  nomad_job:
+    host: localhost
+    state: absent
+    use_ssl: false
+    content: "{{ lookup('file', 'job.hcl') }}"
+  register: job_deleted
+
+- name: get job deleted
+  nomad_job_info:
+    host: localhost
+    use_ssl: false
+    name: example
+  register: get_job_delete
+
+- name: assert idempotence
+  assert:
+    that:
+      - job_check_deployed_idempotence is not changed
+      - job_deployed_idempotence is not changed
+      - job_deleted_check is changed
+      - job_deleted is changed
+      - get_job_delete.result[0].Stop

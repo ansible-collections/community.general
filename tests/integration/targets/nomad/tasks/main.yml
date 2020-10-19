@@ -1,0 +1,106 @@
+- name: Skip unsupported platforms
+  meta: end_play
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version is not version('7', '>=')
+
+- name: Install Nomad and test
+  vars:
+    nomad_version: 0.12.4
+    nomad_uri: https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_{{ ansible_system | lower }}_{{ nomad_arch }}.zip
+    nomad_cmd: '{{ output_dir }}/nomad'
+  block:
+
+  - name: register pyOpenSSL version
+    command: '{{ ansible_python_interpreter }} -c ''import OpenSSL; print(OpenSSL.__version__)'''
+    register: pyopenssl_version
+
+  - name: Install requests<2.20 (CentOS/RHEL 6)
+    pip:
+      name: requests<2.20
+    register: result
+    until: result is success
+    when: ansible_distribution_file_variety|default() == 'RedHat' and ansible_distribution_major_version is version('6', '<=')
+
+  - name: Install python-nomad
+    pip:
+      name: python-nomad
+    register: result
+    until: result is success
+
+  - name: Install jmespath
+    pip:
+      name: jmespath
+    register: result
+    until: result is success
+
+  - when: pyopenssl_version.stdout is version('0.15', '>=')
+    block:
+    - name: Generate privatekey
+      community.crypto.openssl_privatekey:
+        path: '{{ output_dir }}/privatekey.pem'
+
+    - name: Generate CSR
+      community.crypto.openssl_csr:
+        path: '{{ output_dir }}/csr.csr'
+        privatekey_path: '{{ output_dir }}/privatekey.pem'
+        subject:
+          commonName: localhost
+
+    - name: Generate selfsigned certificate
+      register: selfsigned_certificate
+      community.crypto.openssl_certificate:
+        path: '{{ output_dir }}/cert.pem'
+        csr_path: '{{ output_dir }}/csr.csr'
+        privatekey_path: '{{ output_dir }}/privatekey.pem'
+        provider: selfsigned
+        selfsigned_digest: sha256
+
+  - name: Install unzip
+    package:
+      name: unzip
+    register: result
+    until: result is success
+    when: ansible_distribution != "MacOSX"
+
+  - assert:
+      that: ansible_architecture in ['i386', 'x86_64', 'amd64']
+
+  - set_fact:
+      nomad_arch: '386'
+    when: ansible_architecture == 'i386'
+
+  - set_fact:
+      nomad_arch: amd64
+    when: ansible_architecture in ['x86_64', 'amd64']
+
+  - name: Download nomad binary
+    unarchive:
+      src: '{{ nomad_uri }}'
+      dest: '{{ output_dir }}'
+      remote_src: true
+    register: result
+    until: result is success
+
+  - vars:
+      remote_dir: '{{ echo_output_dir.stdout }}'
+    block:
+
+    - command: echo {{ output_dir }}
+      register: echo_output_dir
+
+    - name: Run tests integration
+      block:
+        - name: Start nomad (dev mode enabled)
+          shell: nohup {{ nomad_cmd }} agent -dev </dev/null >/dev/null 2>&1 &
+
+        - name: wait nomad up
+          wait_for:
+            host: localhost
+            port: 4646
+            delay: 10
+            timeout: 60
+
+        - import_tasks: nomad_job.yml
+      always:
+
+        - name: kill nomad
+          shell: pkill nomad
