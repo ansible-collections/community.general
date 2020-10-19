@@ -18,11 +18,13 @@ options:
     description:
       - The name of the I(monit) program/process to manage
     required: true
+    type: str
   state:
     description:
       - The state of service
     required: true
     choices: [ "present", "started", "stopped", "restarted", "monitored", "unmonitored", "reloaded" ]
+    type: str
   timeout:
     description:
       - If there are pending actions for the service monitored by monit, then Ansible will check
