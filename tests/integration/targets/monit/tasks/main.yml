@@ -10,17 +10,17 @@
       name: monit
       state: present
 
+  - include_vars: '{{ item }}'
+    with_first_found:
+      - files:
+          - '{{ ansible_os_family }}.yml'
+          - 'defaults.yml'
+
   - name: monit config
     become: yes
     template:
       src: "monitrc.j2"
-      dest: "/etc/monit/monitrc"
-
-  - name: process monit config
-    become: yes
-    template:
-      src: "httpd_echo.j2"
-      dest: "/etc/monit/conf.d/httpd_echo"
+      dest: "{{ monitrc }}"
 
   - name: copy process file
     become: yes
