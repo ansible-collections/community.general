@@ -177,7 +177,7 @@ RETURN = r'''
 query:
     description:
     - Executed query.
-    - When reading several queries from a file, it contains the last one.
+    - When reading several queries from a file, it contains only the last one.
     returned: always
     type: str
     sample: 'SELECT * FROM bar'
