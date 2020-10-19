@@ -328,7 +328,6 @@ def build_payload_for_slack(module, text, channel, thread_id, username, icon_url
         ]
         payload['blocks'] = recursive_escape_quotes(blocks, block_keys_to_escape)
 
-    payload = module.jsonify(payload)
     return payload
 
 
@@ -377,14 +376,15 @@ def do_notify_slack(module, domain, token, payload):
     if use_webapi:
         headers['Authorization'] = 'Bearer ' + token
 
-    response, info = fetch_url(module=module, url=slack_uri, headers=headers, method='POST', data=payload)
+    data = module.jsonify(payload)
+    response, info = fetch_url(module=module, url=slack_uri, headers=headers, method='POST', data=data)
 
     if info['status'] != 200:
         if use_webapi:
             obscured_incoming_webhook = slack_uri
         else:
             obscured_incoming_webhook = SLACK_INCOMING_WEBHOOK % ('[obscured]')
-        module.fail_json(msg=" failed to send %s to %s: %s" % (payload, obscured_incoming_webhook, info['msg']))
+        module.fail_json(msg=" failed to send %s to %s: %s" % (data, obscured_incoming_webhook, info['msg']))
 
     # each API requires different handling
     if use_webapi:
@@ -459,8 +459,10 @@ def main():
     if 'ok' in slack_response:
         # Evaluate WebAPI response
         if slack_response['ok']:
+            # return payload as a string for backwards compatibility
+            payload_json = module.jsonify(payload)
             module.exit_json(changed=changed, ts=slack_response['ts'], channel=slack_response['channel'],
-                             api=slack_response, payload=payload)
+                             api=slack_response, payload=payload_json)
         else:
             module.fail_json(msg="Slack API error", error=slack_response['error'])
     else:
