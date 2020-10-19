@@ -38,7 +38,7 @@ options:
     type: dict
   path_to_script:
     description:
-    - Path to an SQL script on the target machine.
+    - Path to a SQL script on the target machine.
     - If the script contains several queries, they must be semicolon-separated.
     - Mutually exclusive with I(query).
     type: path
@@ -177,7 +177,7 @@ RETURN = r'''
 query:
     description:
     - Executed query.
-    - When reading several queries from a file, it contains the last one.
+    - When reading several queries from a file, it contains only the last one.
     returned: always
     type: str
     sample: 'SELECT * FROM bar'
