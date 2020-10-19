@@ -715,7 +715,7 @@ class Nmcli(object):
         for setting, value in options.items():
             setting_type = self.settings_type(setting)
             type_cast = None
-            if setting_type == bool:
+            if setting_type is bool:
                 # Convert all bool options to yes/no.
                 type_cast = self.bool_to_string
             if detect_change:
@@ -725,7 +725,7 @@ class Nmcli(object):
                 elif setting == self.mtu_setting:
                     # MTU is 'auto' by default when detecting changes.
                     type_cast = self.mtu_to_string
-            elif setting_type == list:
+            elif setting_type is list:
                 # Convert lists to strings for nmcli create/modify commands.
                 type_cast = self.list_to_string
 
