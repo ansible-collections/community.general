@@ -4,6 +4,10 @@
 ####################################################################
 
 - block:
+  - name: Install EPEL repository (RHEL only)
+    include_role:
+      name: setup_epel
+
   - name: install monit
     become: yes
     package:

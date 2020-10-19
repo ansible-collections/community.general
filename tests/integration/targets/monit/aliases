@@ -1,4 +1,5 @@
 destructive
+needs/target/setup_epel
 shippable/posix/group2
 skip/osx
 skip/macos
