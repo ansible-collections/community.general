@@ -29,6 +29,7 @@ options:
         for up to this many seconds to verify the requested action has been performed.
         Ansible will sleep for five seconds between each check.
     default: 300
+    type: int
 author: "Darryl Stoflet (@dstoflet)"
 '''
 
