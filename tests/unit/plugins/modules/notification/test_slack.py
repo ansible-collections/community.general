@@ -5,7 +5,7 @@ __metaclass__ = type
 
 import json
 import pytest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.general.tests.unit.compat.mock import Mock, patch
 from ansible_collections.community.general.plugins.modules.notification import slack
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
@@ -87,6 +87,45 @@ class TestSlackModule(ModuleTestCase):
             assert call_data['text'] == "test"
             assert call_data['thread_ts'] == '100.00'
             assert fetch_url_mock.call_args[1]['url'] == "https://hooks.slack.com/services/XXXX/YYYY/ZZZZ"
+
+    # https://github.com/ansible-collections/community.general/issues/1097
+    def test_ts_in_message_does_not_cause_edit(self):
+        set_module_args({
+            'token': 'xoxa-123456789abcdef',
+            'msg': 'test with ts'
+        })
+
+        with patch.object(slack, "fetch_url") as fetch_url_mock:
+            mock_response = Mock()
+            mock_response.read.return_value = '{"fake":"data"}'
+            fetch_url_mock.return_value = (mock_response, {"status": 200})
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
+
+            self.assertTrue(fetch_url_mock.call_count, 1)
+            self.assertEquals(fetch_url_mock.call_args[1]['url'], "https://slack.com/api/chat.postMessage")
+
+    def test_edit_message(self):
+        set_module_args({
+            'token': 'xoxa-123456789abcdef',
+            'msg': 'test2',
+            'message_id': '12345'
+        })
+
+        with patch.object(slack, "fetch_url") as fetch_url_mock:
+            mock_response = Mock()
+            mock_response.read.return_value = '{"messages":[{"ts":"12345","msg":"test1"}]}'
+            fetch_url_mock.side_effect = [
+                (mock_response, {"status": 200}),
+                (mock_response, {"status": 200}),
+            ]
+            with self.assertRaises(AnsibleExitJson):
+                self.module.main()
+
+            self.assertTrue(fetch_url_mock.call_count, 2)
+            self.assertEquals(fetch_url_mock.call_args[1]['url'], "https://slack.com/api/chat.update")
+            call_data = json.loads(fetch_url_mock.call_args[1]['data'])
+            self.assertEquals(call_data['ts'], "12345")
 
     def test_message_with_blocks(self):
         """tests sending a message with blocks"""
