@@ -65,3 +65,9 @@
     package:
       name: monit
       state: absent
+
+  - name: uninstall EPEL
+    yum:
+      name: epel-release
+      state: absent
+    when: ansible_facts.distribution in ['RedHat', 'CentOS']
