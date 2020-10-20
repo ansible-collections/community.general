@@ -223,7 +223,7 @@ options:
           - List of lists of strings to request capabilities.
           - The top-level list entries are combined by OR, and for every list entry,
             the entries in the list it contains are combined by AND.
-          - The driver will try to satisfy one of the sub-lists.
+          - The driver tries to satisfy one of the sub-lists.
           - Available capabilities for the C(nvidia) driver can be found at
             U(https://github.com/NVIDIA/nvidia-container-runtime).
         type: list
