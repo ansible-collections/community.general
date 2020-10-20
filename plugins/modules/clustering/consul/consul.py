@@ -159,7 +159,7 @@ EXAMPLES = '''
     interval: 60s
 
 - name: register nginx with a tcp check
-  consul:
+  community.general.consul:
     service_name: nginx
     service_port: 80
     interval: 60s
