@@ -28,7 +28,7 @@ options:
       - you can use PROXMOX_PASSWORD environment variable
     type: str
   hostname:
-    description
+    description:
       - the instance name
     type: str
   vmid:
