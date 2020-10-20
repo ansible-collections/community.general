@@ -86,7 +86,7 @@ class StatusValue(namedtuple("Status", "value, is_pending")):
         raise AttributeError(item)
 
     def __str__(self):
-        return "{}{}".format(self.value, " (pending)" if self.is_pending else "")
+        return "%s%s" % (self.value, " (pending)" if self.is_pending else "")
 
 
 class Status(object):
