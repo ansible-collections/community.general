@@ -1163,10 +1163,8 @@ files:
     authors: agaffney
   $modules/system/osx_defaults.py:
     notify: chris-short
-    authors: frenck
     maintainers: $team_macos
     labels: macos osx_defaults
-    ignore: frenck
     keywords: brew cask darwin homebrew macosx macports osx
   $modules/system/pam_limits.py:
     authors: usawa
