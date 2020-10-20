@@ -38,6 +38,7 @@ options:
         - Default is true to support legacy module behavior.
       type: bool
       default: yes
+      version_added: 1.3.0
 requirements:
   - "python >= 2.6"
   - "pyodbc"
