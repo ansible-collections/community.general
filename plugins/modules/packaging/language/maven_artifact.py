@@ -98,13 +98,13 @@ options:
     client_cert:
         description:
             - PEM formatted certificate chain file to be used for SSL client authentication.
-            - This file can also include the key as well, and if the key is included, C(client_key) is not required.
+            - This file can also include the key as well, and if the key is included, I(client_key) is not required.
         type: path
         version_added: '1.3.0'
     client_key:
         description:
             - PEM formatted file that contains your private key to be used for SSL client authentication.
-            - If C(client_cert) contains both the certificate and key, this option is not required.
+            - If I(client_cert) contains both the certificate and key, this option is not required.
         type: path
         version_added: '1.3.0'
     keep_name:
@@ -573,8 +573,8 @@ def main():
             timeout=dict(default=10, type='int'),
             dest=dict(type="path", required=True),
             validate_certs=dict(required=False, default=True, type='bool'),
-            client_certs=dict(type="path", required=False),
-            client_keys=dict(type="path", required=False),
+            client_cert=dict(type="path", required=False),
+            client_key=dict(type="path", required=False),
             keep_name=dict(required=False, default=False, type='bool'),
             verify_checksum=dict(required=False, default='download', choices=['never', 'download', 'change', 'always']),
             directory_mode=dict(type='str'),  # Used since https://github.com/ansible/ansible/pull/24965, not sure
