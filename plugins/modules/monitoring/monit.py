@@ -62,6 +62,7 @@ STATE_COMMAND_MAP = {
     'restarted': 'restart'
 }
 
+
 @python_2_unicode_compatible
 class StatusValue(namedtuple("Status", "value, is_pending")):
     MISSING = 'missing'
