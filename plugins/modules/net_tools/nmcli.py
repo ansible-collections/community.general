@@ -780,7 +780,6 @@ class Nmcli(object):
         return self.type in (
             'bond-slave',
             'bridge-slave',
-            'ethernet',
             'team-slave',
         )
 
