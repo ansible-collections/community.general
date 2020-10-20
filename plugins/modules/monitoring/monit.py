@@ -59,8 +59,6 @@ STATE_COMMAND_MAP = {
     'restarted': 'restart'
 }
 
-MIN_VERSION = (5, 21)
-
 
 class StatusValue(namedtuple("Status", "value, is_pending")):
     MISSING = 'missing'
@@ -87,6 +85,7 @@ class StatusValue(namedtuple("Status", "value, is_pending")):
 class Status(object):
     MISSING = StatusValue(StatusValue.MISSING)
     OK = StatusValue(StatusValue.OK)
+    RUNNING = StatusValue(StatusValue.OK)
     NOT_MONITORED = StatusValue(StatusValue.NOT_MONITORED)
     INITIALIZING = StatusValue(StatusValue.INITIALIZING)
     DOES_NOT_EXIST = StatusValue(StatusValue.DOES_NOT_EXIST)
@@ -111,24 +110,27 @@ class Monit(object):
             self._monit_version = int(version[0]), int(version[1])
         return self._monit_version
 
-    def check_version(self):
-        if self.monit_version() < MIN_VERSION:
-            min_version = '.'.join(str(v) for v in MIN_VERSION)
-            self.module.fail_json(msg='Monit version not compatible with module. Install version >= %s' % min_version)
+    @property
+    def summary_command(self):
+        return "summary -B" if self.monit_version() > (5, 18) else "summary"
+
+    @property
+    def status_command(self):
+        return "status -B" if self.monit_version() > (5, 18) else "status"
 
     def get_status(self):
         """Return the status of the process in monit."""
-        command = '%s status %s -B' % (self.monit_bin_path, self.process_name)
+        command = '%s %s %s' % (self.monit_bin_path, self.status_command, self.process_name)
         rc, out, err = self.module.run_command(command, check_rc=True)
-        return self._parse_status(out)
+        return self._parse_status(out, err)
 
-    def _parse_status(self, output):
+    def _parse_status(self, output, err):
         if "Process '%s'" % self.process_name not in output:
             return Status.MISSING
 
         status_val = re.findall(r"^\s*status\s*([\w\- ]+)", output, re.MULTILINE)
         if not status_val:
-            self.module.fail_json(msg="Unable to find process status")
+            self.module.fail_json(msg="Unable to find process status", stdout=output, stderr=err)
 
         status_val = status_val[0].strip().upper()
         if ' - ' not in status_val:
@@ -147,7 +149,7 @@ class Monit(object):
             return status
 
     def is_process_present(self):
-        rc, out, err = self.module.run_command('%s summary -B' % (self.monit_bin_path), check_rc=True)
+        rc, out, err = self.module.run_command('%s %s' % (self.monit_bin_path, self.summary_command), check_rc=True)
         return bool(re.findall(r'\b%s\b' % self.process_name, out))
 
     def is_process_running(self):
@@ -233,7 +235,6 @@ def main():
     timeout = module.params['timeout']
 
     monit = Monit(module, module.get_bin_path('monit', True), name, timeout)
-    monit.check_version()
 
     def exit_if_check_mode():
         if module.check_mode:

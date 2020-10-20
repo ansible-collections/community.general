@@ -112,7 +112,8 @@ BASIC_OUTPUT_CASES = [
     (TEST_OUTPUT % ('processX', 'Not Monitored - monitor pending'), monit.Status.OK),
     (TEST_OUTPUT % ('processX', 'Does not exist'), monit.Status.DOES_NOT_EXIST),
     (TEST_OUTPUT % ('processX', 'Not monitored'), monit.Status.NOT_MONITORED),
+    (TEST_OUTPUT % ('processX', 'Running'), monit.Status.OK),
 ])
 def test_parse_status(output, expected):
-    status = monit.Monit(None, '', 'processX', 0)._parse_status(output)
+    status = monit.Monit(None, '', 'processX', 0)._parse_status(output, '')
     assert status == expected
