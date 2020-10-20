@@ -66,8 +66,9 @@ class StatusValue(namedtuple("Status", "value, is_pending")):
     NOT_MONITORED = 'not_monitored'
     INITIALIZING = 'initializing'
     DOES_NOT_EXIST = 'does_not_exist'
+    EXECUTION_FAILED = 'execution_failed'
     ALL_STATUS = [
-        MISSING, OK, NOT_MONITORED, INITIALIZING, DOES_NOT_EXIST
+        MISSING, OK, NOT_MONITORED, INITIALIZING, DOES_NOT_EXIST, EXECUTION_FAILED
     ]
 
     def __new__(cls, value, is_pending=False):
@@ -89,6 +90,7 @@ class Status(object):
     NOT_MONITORED = StatusValue(StatusValue.NOT_MONITORED)
     INITIALIZING = StatusValue(StatusValue.INITIALIZING)
     DOES_NOT_EXIST = StatusValue(StatusValue.DOES_NOT_EXIST)
+    EXECUTION_FAILED = StatusValue(StatusValue.EXECUTION_FAILED)
 
 
 class Monit(object):
@@ -133,6 +135,8 @@ class Monit(object):
             self.module.fail_json(msg="Unable to find process status", stdout=output, stderr=err)
 
         status_val = status_val[0].strip().upper()
+        if ' | ' in status_val:
+            status_val = status_val.split(' | ')[0]
         if ' - ' not in status_val:
             status_val = status_val.replace(' ', '_')
             return getattr(Status, status_val)
@@ -161,7 +165,7 @@ class Monit(object):
 
     def wait_for_status_change(self, current_status):
         running_status = self.get_status()
-        if running_status.value != current_status.value:
+        if running_status.value != current_status.value or current_status.value == StatusValue.EXECUTION_FAILED:
             return running_status
 
         loop_count = 0
