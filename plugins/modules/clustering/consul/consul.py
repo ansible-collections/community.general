@@ -495,7 +495,7 @@ class ConsulCheck(object):
         if tcp:
             if interval is None:
                 raise Exception('tcp check must specify interval')
-            
+
             if ':' not in tcp:
                 raise Exception('tcp check must contain port')
 
