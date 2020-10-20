@@ -94,7 +94,7 @@ def main():
             dsn=dict(type='str', required=True, no_log=True),
             query=dict(type='str', required=True),
             params=dict(type='list', elements='str'),
-            commit=dict(type='bool', deailt=True),
+            commit=dict(type='bool', default=True),
         ),
     )
 
