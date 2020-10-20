@@ -131,6 +131,7 @@ else:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.formatters import human_to_bytes
 from ansible.module_utils._text import to_native
+import re
 
 
 # Redis module specific support methods.
@@ -277,7 +278,10 @@ def main():
         name = module.params['name']
 
         try:  # try to parse the value as if it were the memory size
-            value = str(human_to_bytes(module.params['value'].upper()))
+            if re.match(r'^\s*(\d*\.?\d*)\s*([A-Za-z]+)?\s*$', module.params['value'].upper()):
+                value = str(human_to_bytes(module.params['value'].upper()))
+            else:
+                value = module.params['value']
         except ValueError:
             value = module.params['value']
 
