@@ -711,26 +711,26 @@ class Nmcli(object):
                 'vxlan.remote': self.vxlan_remote,
             })
 
-        # Typecast settings values based on the situation.
+        # Convert settings values based on the situation.
         for setting, value in options.items():
             setting_type = self.settings_type(setting)
-            type_cast = None
+            convert_func = None
             if setting_type is bool:
                 # Convert all bool options to yes/no.
-                type_cast = self.bool_to_string
+                convert_func = self.bool_to_string
             if detect_change:
                 if setting in ('vlan.id', 'vxlan.id'):
                     # Convert VLAN/VXLAN IDs to text when detecting changes.
-                    type_cast = to_text
+                    convert_func = to_text
                 elif setting == self.mtu_setting:
                     # MTU is 'auto' by default when detecting changes.
-                    type_cast = self.mtu_to_string
+                    convert_func = self.mtu_to_string
             elif setting_type is list:
                 # Convert lists to strings for nmcli create/modify commands.
-                type_cast = self.list_to_string
+                convert_func = self.list_to_string
 
-            if callable(type_cast):
-                options[setting] = type_cast(options[setting])
+            if callable(convert_func):
+                options[setting] = convert_func(options[setting])
 
         return options
 
@@ -813,7 +813,7 @@ class Nmcli(object):
                          'ipv6.dns',
                          'ipv6.dns-search'):
             return list
-        return None
+        return str
 
     def connection_exists(self):
         cmd = [self.nmcli_bin, 'con', 'show', self.conn_name]
