@@ -56,7 +56,7 @@ EXAMPLES = '''
     query: "Select * from table_a where column1 = ?"
     params:
       - "value1"
-    commit: False
+    commit: false
   changed_when: no
 '''
 
