@@ -553,14 +553,15 @@ def main():
     else:
         # Let time enough to the plugin to retrieve async status of the module
         # in case of bad option type/value and the like.
-        b_starter = to_bytes('%s.starter' % _back, errors='surrogate_or_strict')
-        while True:
-            if os.path.exists(b_starter):
-                os.remove(b_starter)
-                break
-            else:
-                time.sleep(0.01)
-                continue
+        if _back is not None:
+            b_starter = to_bytes('%s.starter' % _back, errors='surrogate_or_strict')
+            while True:
+                if os.path.exists(b_starter):
+                    os.remove(b_starter)
+                    break
+                else:
+                    time.sleep(0.01)
+                    continue
 
         (rc, stdout, stderr) = module.run_command(MAINCOMMAND)
         if 'Another app is currently holding the xtables lock' in stderr:
