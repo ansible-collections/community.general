@@ -35,7 +35,7 @@ options:
       description:
         - Perform a commit after the execution of the SQL query.
         - Some databases will allow a commit after a select whereas others will raise an exception.
-        - Default is true to support legacy module behavior.
+        - Default is C(true) to support legacy module behavior.
       type: bool
       default: yes
       version_added: 1.3.0
