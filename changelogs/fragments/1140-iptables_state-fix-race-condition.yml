@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - iptables_state - fix race condition between module and its action plugin
+    (https://github.com/ansible-collections/community.general/issues/1136).
