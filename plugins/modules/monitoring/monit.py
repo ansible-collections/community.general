@@ -99,7 +99,7 @@ class Monit(object):
         self.timeout = timeout
 
         self._monit_version = None
-        self._sleep_time = 5
+        self._status_change_retry_count = 6
 
     def monit_version(self):
         if self._monit_version is None:
@@ -159,45 +159,66 @@ class Monit(object):
         """Runs a monit command, and returns the new status."""
         return self.module.run_command('%s %s %s' % (self.monit_bin_path, command, self.process_name), check_rc=True)
 
-    def wait_for_monit_to_stop_pending(self, state):
+    def wait_for_status_change(self, current_status):
+        running_status = self.get_status()
+        if running_status.value != current_status.value:
+            return running_status
+
+        loop_count = 0
+        while running_status.value == current_status.value:
+            if loop_count >= self._status_change_retry_count:
+                self.module.fail_json(
+                    msg='waited too long for monit to change state from "{}"'.format(
+                        current_status
+                    ),
+                )
+
+            loop_count += 1
+            time.sleep(0.5)
+            running_status = self.get_status()
+        return running_status
+
+    def wait_for_monit_to_stop_pending(self, current_status=None):
         """Fails this run if there is no status or it's pending/initializing for timeout"""
         timeout_time = time.time() + self.timeout
 
-        running_status = self.get_status()
+        if not current_status:
+            current_status = self.get_status()
         waiting_status = [
             StatusValue.MISSING,
             StatusValue.INITIALIZING,
             StatusValue.DOES_NOT_EXIST,
         ]
-        while running_status.is_pending or (running_status.value in waiting_status):
+        while current_status.is_pending or (current_status.value in waiting_status):
             if time.time() >= timeout_time:
                 self.module.fail_json(
                     msg='waited too long for "pending", or "initiating" status to go away ({0})'.format(
-                        running_status
-                    ),
-                    state=state
+                        current_status
+                    )
                 )
 
-            if self._sleep_time:
-                time.sleep(self._sleep_time)
-            running_status = self.get_status()
+            time.sleep(5)
+            current_status = self.get_status()
+        return current_status
 
     def reload(self):
         rc, out, err = self.module.run_command('%s reload' % self.monit_bin_path)
         if rc != 0:
             self.module.fail_json(msg='monit reload failed', stdout=out, stderr=err)
-        self.wait_for_monit_to_stop_pending('reloaded')
+        self.wait_for_monit_to_stop_pending()
         self.module.exit_json(changed=True, name=self.process_name, state='reloaded')
 
     def present(self):
         self.run_command('reload')
         if not self.is_process_present():
-            self.wait_for_monit_to_stop_pending('present')
+            self.wait_for_monit_to_stop_pending()
         self.module.exit_json(changed=True, name=self.process_name, state='present')
 
     def change_state(self, state, expected_status, invert_expected=None):
+        current_status = self.get_status()
         self.run_command(STATE_COMMAND_MAP[state])
-        status = self.get_status()
+        status = self.wait_for_status_change(current_status)
+        status = self.wait_for_monit_to_stop_pending(status)
         status_match = status.value == expected_status.value
         if invert_expected:
             status_match = not status_match
@@ -255,7 +276,7 @@ def main():
         exit_if_check_mode()
         monit.present()
 
-    monit.wait_for_monit_to_stop_pending(state)
+    monit.wait_for_monit_to_stop_pending()
     running = monit.is_process_running()
 
     if running and state in ['started', 'monitored']:
