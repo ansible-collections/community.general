@@ -58,9 +58,11 @@
     that:
     - result is changed
     - result.query == 'ANALYZE test_table'
+    - result.query_list == ['ANALYZE test_table']
     - result.rowcount == 0
     - result.statusmessage == 'ANALYZE'
     - result.query_result == {}
+    - result.query_all_results == [{}]
 
 - name: postgresql_query - run queries from SQL script
   become_user: '{{ pg_user }}'
@@ -79,10 +81,12 @@
 - assert:
     that:
     - result is not changed
-    - result.query == "SELECT version();\nSELECT story FROM test_table\nWHERE id = 1 OR story = 'Данные';\n"
-    - result.rowcount == 1
-    - result.statusmessage == 'SELECT 1' or result.statusmessage == 'SELECT'
+    - result.query == "\nSELECT story FROM test_table\nWHERE id = 1 OR story = 'Данные'"
     - result.query_result[0].story == 'first'
+    - result.query_all_results[0][0].version is search('PostgreSQL')
+    - result.query_all_results[1][0].story == 'first'
+    - result.rowcount == 2
+    - result.statusmessage == 'SELECT 1' or result.statusmessage == 'SELECT'
   when: sql_file_created
 
 - name: postgresql_query - simple select query to test_table

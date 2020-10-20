@@ -38,8 +38,8 @@ options:
     type: dict
   path_to_script:
     description:
-    - Path to SQL script on the remote host.
-    - Returns result of the last query in the script.
+    - Path to a SQL script on the target machine.
+    - If the script contains several queries, they must be semicolon-separated.
     - Mutually exclusive with I(query).
     type: path
   session_role:
@@ -175,23 +175,48 @@ EXAMPLES = r'''
 
 RETURN = r'''
 query:
-    description: Query that was tried to be executed.
+    description:
+    - Executed query.
+    - When reading several queries from a file, it contains only the last one.
     returned: always
     type: str
     sample: 'SELECT * FROM bar'
 statusmessage:
-    description: Attribute containing the message returned by the command.
+    description:
+    - Attribute containing the message returned by the command.
+    - When reading several queries from a file, it contains a message of the last one.
     returned: always
     type: str
     sample: 'INSERT 0 1'
 query_result:
     description:
     - List of dictionaries in column:value form representing returned rows.
-    returned: changed
+    - When running queries from a file, returns result of the last query.
+    returned: always
     type: list
+    elements: dict
     sample: [{"Column": "Value1"},{"Column": "Value2"}]
+query_list:
+    description:
+    - List of executed queries.
+      Useful when reading several queries from a file.
+    returned: always
+    type: list
+    elements: str
+    sample: ['SELECT * FROM foo', 'SELECT * FROM bar']
+query_all_results:
+    description:
+    - List containing results of all queries executed (one sublist for every query).
+      Useful when reading several queries from a file.
+    returned: always
+    type: list
+    elements: list
+    sample: [[{"Column": "Value1"},{"Column": "Value2"}], [{"Column": "Value1"},{"Column": "Value2"}]]
 rowcount:
-    description: Number of affected rows.
+    description:
+    - Number of produced or affected rows.
+    - When using a script with multiple queries,
+      it contains a total number of produced or affected rows.
     returned: changed
     type: int
     sample: 5
@@ -318,12 +343,19 @@ def main():
     elif named_args:
         named_args = convert_elements_to_pg_arrays(named_args)
 
+    query_list = []
     if path_to_script:
         try:
             with open(path_to_script, 'rb') as f:
                 query = to_native(f.read())
+                if ';' in query:
+                    query_list = [q for q in query.split(';') if q != '\n']
+                else:
+                    query_list.append(query)
         except Exception as e:
             module.fail_json(msg="Cannot read file '%s' : %s" % (path_to_script, to_native(e)))
+    else:
+        query_list.append(query)
 
     conn_params = get_conn_params(module, module.params)
     db_connection = connect_to_db(module, conn_params, autocommit=autocommit)
@@ -345,45 +377,54 @@ def main():
     # Set defaults:
     changed = False
 
+    query_all_results = []
+    rowcount = 0
+    statusmessage = ''
+
     # Execute query:
-    try:
-        cursor.execute(query, arguments)
-    except Exception as e:
-        if not autocommit:
-            db_connection.rollback()
+    for query in query_list:
+        try:
+            cursor.execute(query, arguments)
+            statusmessage = cursor.statusmessage
+            if cursor.rowcount > 0:
+                rowcount += cursor.rowcount
 
-        cursor.close()
-        db_connection.close()
-        module.fail_json(msg="Cannot execute SQL '%s' %s: %s" % (query, arguments, to_native(e)))
+            try:
+                query_result = [dict(row) for row in cursor.fetchall()]
 
-    statusmessage = cursor.statusmessage
-    rowcount = cursor.rowcount
+            except Psycopg2ProgrammingError as e:
+                if to_native(e) == 'no results to fetch':
+                    query_result = {}
 
-    try:
-        query_result = [dict(row) for row in cursor.fetchall()]
-    except Psycopg2ProgrammingError as e:
-        if to_native(e) == 'no results to fetch':
-            query_result = {}
+            except Exception as e:
+                module.fail_json(msg="Cannot fetch rows from cursor: %s" % to_native(e))
 
-    except Exception as e:
-        module.fail_json(msg="Cannot fetch rows from cursor: %s" % to_native(e))
+            query_all_results.append(query_result)
 
-    if 'SELECT' not in statusmessage:
-        if 'UPDATE' in statusmessage or 'INSERT' in statusmessage or 'DELETE' in statusmessage:
-            s = statusmessage.split()
-            if len(s) == 3:
-                if statusmessage.split()[2] != '0':
+            if 'SELECT' not in statusmessage:
+                if 'UPDATE' in statusmessage or 'INSERT' in statusmessage or 'DELETE' in statusmessage:
+                    s = statusmessage.split()
+                    if len(s) == 3:
+                        if s[2] != '0':
+                            changed = True
+
+                    elif len(s) == 2:
+                        if s[1] != '0':
+                            changed = True
+
+                    else:
+                        changed = True
+
+                else:
                     changed = True
 
-            elif len(s) == 2:
-                if statusmessage.split()[1] != '0':
-                    changed = True
+        except Exception as e:
+            if not autocommit:
+                db_connection.rollback()
 
-            else:
-                changed = True
-
-        else:
-            changed = True
+            cursor.close()
+            db_connection.close()
+            module.fail_json(msg="Cannot execute SQL '%s' %s: %s, query list: %s" % (query, arguments, to_native(e), query_list))
 
     if module.check_mode:
         db_connection.rollback()
@@ -394,9 +435,11 @@ def main():
     kw = dict(
         changed=changed,
         query=cursor.query,
+        query_list=query_list,
         statusmessage=statusmessage,
         query_result=query_result,
-        rowcount=rowcount if rowcount >= 0 else 0,
+        query_all_results=query_all_results,
+        rowcount=rowcount,
     )
 
     cursor.close()

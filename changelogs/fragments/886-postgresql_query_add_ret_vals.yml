@@ -1,0 +1,2 @@
+minor_changes:
+- postgresql_query - add ``query_list`` and ``query_all_results`` return values (https://github.com/ansible-collections/community.general/issues/838).
