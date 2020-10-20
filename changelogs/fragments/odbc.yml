@@ -1,0 +1,2 @@
+minor_changes:
+- "odbc - Added a parameter 'commit' which allows users to subvery the explicit commit after the execute call"
