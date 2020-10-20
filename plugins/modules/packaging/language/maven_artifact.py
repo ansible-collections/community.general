@@ -95,6 +95,18 @@ options:
             - If C(no), SSL certificates will not be validated. This should only be set to C(no) when no other option exists.
         type: bool
         default: 'yes'
+    client_cert:
+        description:
+            - PEM formatted certificate chain file to be used for SSL client authentication.
+            - This file can also include the key as well, and if the key is included, I(client_key) is not required.
+        type: path
+        version_added: '1.3.0'
+    client_key:
+        description:
+            - PEM formatted file that contains your private key to be used for SSL client authentication.
+            - If I(client_cert) contains both the certificate and key, this option is not required.
+        type: path
+        version_added: '1.3.0'
     keep_name:
         description:
             - If C(yes), the downloaded artifact's name is preserved, i.e the version number remains part of it.
@@ -141,6 +153,15 @@ EXAMPLES = '''
     repository_url: 'https://repo.company.com/maven'
     username: user
     password: pass
+    dest: /tmp/library-name-latest.jar
+
+- name: Download an artifact from a private repository requiring certificate authentication
+  community.general.maven_artifact:
+    group_id: com.company
+    artifact_id: library-name
+    repository_url: 'https://repo.company.com/maven'
+    client_cert: /path/to/cert.pem
+    client_key: /path/to/key.pem
     dest: /tmp/library-name-latest.jar
 
 - name: Download a WAR File to the Tomcat webapps directory to be deployed
@@ -552,6 +573,8 @@ def main():
             timeout=dict(default=10, type='int'),
             dest=dict(type="path", required=True),
             validate_certs=dict(required=False, default=True, type='bool'),
+            client_cert=dict(type="path", required=False),
+            client_key=dict(type="path", required=False),
             keep_name=dict(required=False, default=False, type='bool'),
             verify_checksum=dict(required=False, default='download', choices=['never', 'download', 'change', 'always']),
             directory_mode=dict(type='str'),  # Used since https://github.com/ansible/ansible/pull/24965, not sure
