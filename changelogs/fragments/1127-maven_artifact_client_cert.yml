@@ -1,2 +1,2 @@
 minor_changes:
-  - maven_artifact - Added client_cert and client_key parameters to rhe maven_artifact module. (https://github.com/ansible-collections/community.general/issues/1123)
+  - maven_artifact - added ``client_cert`` and ``client_key`` parameters to the maven_artifact module (https://github.com/ansible-collections/community.general/issues/1123).
