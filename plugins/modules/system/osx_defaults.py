@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2014, GeekChimp - Franck Nijhof <franck@geekchimp.com>
+# Copyright: (c) 2014, GeekChimp - Franck Nijhof <franck@geekchimp.com> (DO NOT CONTACT)!
 # Copyright: (c) 2019, Ansible project
 # Copyright: (c) 2019, Abhijeet Kasurde <akasurde@redhat.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -13,7 +13,7 @@ DOCUMENTATION = r'''
 ---
 module: osx_defaults
 author:
-- Franck Nijhof (@frenck)
+- Franck Nijhof (!UNKNOWN)
 short_description: Manage macOS user defaults
 description:
   - osx_defaults allows users to read, write, and delete macOS user defaults from Ansible scripts.
