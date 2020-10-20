@@ -168,10 +168,10 @@ class BE(object):
                     check = line.split()
                     if(check == []):
                         continue
-                    full_name = check[0].split('/');
+                    full_name = check[0].split('/')
                     if(full_name == []):
                         continue
-                    check[0] = full_name[len(full_name)-1]
+                    check[0] = full_name[len(full_name) - 1]
                     if check[0] == self.name:
                         return check
                 else:
