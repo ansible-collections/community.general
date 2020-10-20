@@ -11,7 +11,7 @@ DOCUMENTATION = '''
     requirements:
       - whitelist in configuration
     short_description: Adds play duration to InfluxDB
-    version_added: "2.10"
+    version_added: "1.3.0"
     description:
         - This callback captures the total play duration and submits it to InfluxDB.
     options:
@@ -74,7 +74,7 @@ import os
 from ansible import context
 from datetime import datetime
 
-from ansible.module_utils._text import to_text
+from ansible.module_utils._text import to_text, to_native
 from ansible.plugins.callback import CallbackBase
 from ansible.module_utils.urls import open_url
 
@@ -117,27 +117,10 @@ class CallbackModule(CallbackBase):
                                   'the `INFLUXDB_DB` environment '
                                   'variable. Telemetry data not captured.')
 
-        if str(self.influxdb_tls).lower() == 'true':
-            self.influx_constructed_url = 'https://%s/write?db=%s' % (self.influxdb_addr, self.influxdb_db)
+        self.influx_constructed_url = 'https://%s/write?db=%s' % (self.influxdb_addr, self.influxdb_db)
 
-        elif str(self.influxdb_tls).lower() == 'false':
+        if not self.influxdb_tls:
             self.influx_constructed_url = 'http://%s/write?db=%s' % (self.influxdb_addr, self.influxdb_db)
-
-        elif str(self.influxdb_tls).lower() != 'true' or self.influxdb_tls is None:
-            self._display.warning(u'Environment variable INFLUXDB_TLS is not set or is '
-                                  'invalid. Proceeding using TLS')
-            self.influx_constructed_url = 'https://%s/write?db=%s' % (self.influxdb_addr, self.influxdb_db)
-
-        if str(self.validate_certs).lower() == 'true':
-            self.validate_certs = True
-
-        elif str(self.validate_certs).lower() == 'false':
-            self.validate_certs = False
-
-        elif str(self.validate_certs).lower() != 'true' or self.validate_certs is None:
-            self._display.warning(u'Environment variable INFLUXDB_VALIDATE_CERT is not set or is '
-                                  'invalid. Proceeding using TLS')
-            self.validate_certs = True
 
     def send_msg(self, role_name, duration):
         payload = 'role_duration,role=%s duration=%s' % (self.playbook_name, duration)
@@ -153,7 +136,7 @@ class CallbackModule(CallbackBase):
             response = open_url(self.influx_constructed_url, data=payload, validate_certs=self.validate_certs)
             return response.read()
         except Exception as e:
-            self._display.warning(u'Could not submit telemetry data to InfluxDB: %s' % to_text(e))
+            self._display.warning(u'Could not submit telemetry data to InfluxDB: %s' % to_native(e))
 
     def playbook_on_stats(self, stats):
         self.v2_playbook_on_stats(stats)
