@@ -1,0 +1,58 @@
+- name: reload monit when process is missing
+  monit:
+    name: httpd_echo
+    state: reloaded
+  register: result
+
+- name: check that state is changed
+  assert:
+    that:
+      - result is success
+      - result is changed
+
+- name: test process not present
+  monit:
+    name: httpd_echo
+    state: present
+  register: result
+  failed_when: result is not skip and result is success
+
+- name: test monitor missing process
+  monit:
+    name: httpd_echo
+    state: monitored
+  register: result
+  failed_when: result is not skip and result is success
+
+- name: add process config
+  blockinfile:
+    path: "{{ monitrc }}"
+    block: |
+      check process httpd_echo with pidfile /tmp/httpd_echo.pid
+          start program = "{{ansible_python.executable}} /opt/httpd_echo.py start"
+          stop program = "{{ansible_python.executable}} /opt/httpd_echo.py stop"
+          if failed host localhost port 8082 then restart
+
+- name: test process present (implicit reload)
+  monit:
+    name: httpd_echo
+    state: present
+  register: result
+
+- name: check that state is changed
+  assert:
+    that:
+      - result is success
+      - result is changed
+
+- name: test process present again
+  monit:
+    name: httpd_echo
+    state: present
+  register: result
+
+- name: check that state is unchanged
+  assert:
+    that:
+      - result is success
+      - result is not changed

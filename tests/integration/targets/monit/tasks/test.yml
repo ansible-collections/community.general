@@ -1,4 +1,6 @@
 # order is important
+- import_tasks: test_reload_present.yml
+
 - import_tasks: test_state.yml
   vars:
     state: stopped
