@@ -35,7 +35,7 @@ options:
     description:
       - the instance id
       - if not set, will be fetched from PromoxAPI based on the hostname
-    type: int
+    type: str
   validate_certs:
     description:
       - enable / disable https certificate verification
