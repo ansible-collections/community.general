@@ -230,8 +230,14 @@ class Monit(object):
 
     def present(self):
         self.run_command('reload')
-        if not self.is_process_present():
-            self.wait_for_monit_to_stop_pending()
+
+        timeout_time = time.time() + self.timeout
+        while not self.is_process_present():
+            if time.time() >= timeout_time:
+                self.exit_fail('waited too long for process to become "present"')
+
+            time.sleep(5)
+
         self.exit_success(state='present')
 
     def change_state(self, state, expected_status, invert_expected=None):

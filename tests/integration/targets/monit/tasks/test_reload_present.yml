@@ -14,6 +14,7 @@
   monit:
     name: httpd_echo
     state: present
+    timeout: 5
   register: result
   failed_when: result is not skip and result is success
 
