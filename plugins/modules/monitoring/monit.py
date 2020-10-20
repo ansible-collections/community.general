@@ -111,16 +111,16 @@ class Monit(object):
         return self._monit_version
 
     @property
-    def summary_command(self):
-        return "summary -B" if self.monit_version() > (5, 18) else "summary"
+    def command_args(self):
+        return "-B" if self.monit_version() > (5, 18) else ""
 
-    @property
-    def status_command(self):
-        return "status -B" if self.monit_version() > (5, 18) else "status"
+    def get_status(self, validate=False):
+        """Return the status of the process in monit.
 
-    def get_status(self):
-        """Return the status of the process in monit."""
-        command = '%s %s %s' % (self.monit_bin_path, self.status_command, self.process_name)
+        :@param validate: Force monit to re-check the status of the process
+        """
+        monit_command = "validate" if validate else "status"
+        command = ' '.join([self.monit_bin_path, monit_command, self.command_args, self.process_name])
         rc, out, err = self.module.run_command(command, check_rc=True)
         return self._parse_status(out, err)
 
@@ -149,7 +149,7 @@ class Monit(object):
             return status
 
     def is_process_present(self):
-        rc, out, err = self.module.run_command('%s %s' % (self.monit_bin_path, self.summary_command), check_rc=True)
+        rc, out, err = self.module.run_command('%s summary %s' % (self.monit_bin_path, self.command_args), check_rc=True)
         return bool(re.findall(r'\b%s\b' % self.process_name, out))
 
     def is_process_running(self):
@@ -175,7 +175,8 @@ class Monit(object):
 
             loop_count += 1
             time.sleep(0.5)
-            running_status = self.get_status()
+            validate = loop_count % 2 == 0  # force recheck of status every second try
+            running_status = self.get_status(validate)
         return running_status
 
     def wait_for_monit_to_stop_pending(self, current_status=None):
@@ -198,7 +199,7 @@ class Monit(object):
                 )
 
             time.sleep(5)
-            current_status = self.get_status()
+            current_status = self.get_status(validate=True)
         return current_status
 
     def reload(self):
