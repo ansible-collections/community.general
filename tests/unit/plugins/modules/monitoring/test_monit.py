@@ -126,3 +126,15 @@ BASIC_OUTPUT_CASES = [
 def test_parse_status(output, expected):
     status = monit.Monit(None, '', 'processX', 0)._parse_status(output, '')
     assert status == expected
+
+
+@pytest.mark.parametrize('output, expected', [
+    ('This is monit version 5.18.1', '5.18.1'),
+    ('This is monit version 12.18', '12.18'),
+    ('This is monit version 5.1.12', '5.1.12'),
+])
+def test_parse_version(output, expected):
+    module = mock.MagicMock()
+    module.run_command.return_value = (0, output, '')
+    raw_version, version_tuple = monit.Monit(module, '', 'processX', 0)._get_monit_version()
+    assert raw_version == expected

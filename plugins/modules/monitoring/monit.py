@@ -107,16 +107,32 @@ class Monit(object):
         self.timeout = timeout
 
         self._monit_version = None
+        self._raw_version = None
         self._status_change_retry_count = 6
 
     def monit_version(self):
         if self._monit_version is None:
-            rc, out, err = self.module.run_command('%s -V' % self.monit_bin_path, check_rc=True)
-            version_line = out.split('\n')[0]
-            version = re.search(r"[0-9]+\.[0-9]+", version_line).group().split('.')
+            self._raw_version, version = self._get_monit_version()
             # Use only major and minor even if there are more these should be enough
-            self._monit_version = int(version[0]), int(version[1])
+            self._monit_version = version[0], version[1]
         return self._monit_version
+
+    def _get_monit_version(self):
+        rc, out, err = self.module.run_command('%s -V' % self.monit_bin_path, check_rc=True)
+        version_line = out.split('\n')[0]
+        raw_version = re.search(r"([0-9]+\.){1,2}([0-9]+)?", version_line).group()
+        return raw_version, tuple(map(int, raw_version.split('.')))
+
+    def exit_fail(self, msg, status=None, **kwargs):
+        kwargs.update({
+            'msg': msg,
+            'monit_version': self._raw_version,
+            'process_status': str(status) if status else None,
+        })
+        self.module.fail_json(**kwargs)
+
+    def exit_success(self, state):
+        self.module.exit_json(changed=True, name=self.process_name, state=state)
 
     @property
     def command_args(self):
@@ -138,7 +154,7 @@ class Monit(object):
 
         status_val = re.findall(r"^\s*status\s*([\w\- ]+)", output, re.MULTILINE)
         if not status_val:
-            self.module.fail_json(msg="Unable to find process status", stdout=output, stderr=err)
+            self.exit_fail("Unable to find process status", stdout=output, stderr=err)
 
         status_val = status_val[0].strip().upper()
         if ' | ' in status_val:
@@ -177,7 +193,7 @@ class Monit(object):
         loop_count = 0
         while running_status.value == current_status.value:
             if loop_count >= self._status_change_retry_count:
-                self.module.fail_json(msg='waited too long for monit to change state', status=str(running_status))
+                self.exit_fail('waited too long for monit to change state', running_status)
 
             loop_count += 1
             time.sleep(0.5)
@@ -198,9 +214,7 @@ class Monit(object):
         ]
         while current_status.is_pending or (current_status.value in waiting_status):
             if time.time() >= timeout_time:
-                self.module.fail_json(
-                    msg='waited too long for "pending", or "initiating" status to go away', status=str(current_status)
-                )
+                self.exit_fail('waited too long for "pending", or "initiating" status to go away', current_status)
 
             time.sleep(5)
             current_status = self.get_status(validate=True)
@@ -209,15 +223,15 @@ class Monit(object):
     def reload(self):
         rc, out, err = self.module.run_command('%s reload' % self.monit_bin_path)
         if rc != 0:
-            self.module.fail_json(msg='monit reload failed', stdout=out, stderr=err)
+            self.exit_fail('monit reload failed', stdout=out, stderr=err)
         self.wait_for_monit_to_stop_pending()
-        self.module.exit_json(changed=True, name=self.process_name, state='reloaded')
+        self.exit_success(state='reloaded')
 
     def present(self):
         self.run_command('reload')
         if not self.is_process_present():
             self.wait_for_monit_to_stop_pending()
-        self.module.exit_json(changed=True, name=self.process_name, state='present')
+        self.exit_success(state='present')
 
     def change_state(self, state, expected_status, invert_expected=None):
         current_status = self.get_status()
@@ -228,8 +242,8 @@ class Monit(object):
         if invert_expected:
             status_match = not status_match
         if status_match:
-            self.module.exit_json(changed=True, name=self.process_name, state=state)
-        self.module.fail_json(msg='%s process not %s' % (self.process_name, state), status=str(status))
+            self.exit_success(state=state)
+        self.exit_fail('%s process not %s' % (self.process_name, state), status)
 
     def stop(self):
         self.change_state('stopped', Status.NOT_MONITORED)
@@ -273,7 +287,7 @@ def main():
     present = monit.is_process_present()
 
     if not present and not state == 'present':
-        module.fail_json(msg='%s process not presently configured with monit' % name, name=name, state=state)
+        module.fail_json(msg='%s process not presently configured with monit' % name, name=name)
 
     if state == 'present':
         if present:
