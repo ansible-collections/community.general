@@ -232,6 +232,7 @@ try:
 except ImportError:
     python_consul_installed = False
 
+import re
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -497,11 +498,13 @@ class ConsulCheck(object):
             if interval is None:
                 raise Exception('tcp check must specify interval')
 
-            if ':' not in tcp:
-                raise Exception('tcp check must contain port')
+            regex = r"(?P<host>.*)(?::)(?P<port>(?:[0-9]+))$"
+            match = re.match(regex, tcp)
 
-            tcpParsedList = tcp.split(':')
-            self.check = consul.Check.tcp(tcpParsedList[0], int(tcpParsedList[1]), self.interval)
+            if match is None:
+                raise Exception('tcp check must be in host:port format')
+
+            self.check = consul.Check.tcp(match.group('host'), int(match.group('port')), self.interval)
 
     def validate_duration(self, name, duration):
         if duration:
