@@ -225,7 +225,6 @@ class Monit(object):
         rc, out, err = self.module.run_command('%s reload' % self.monit_bin_path)
         if rc != 0:
             self.exit_fail('monit reload failed', stdout=out, stderr=err)
-        self.wait_for_monit_to_stop_pending()
         self.exit_success(state='reloaded')
 
     def present(self):
