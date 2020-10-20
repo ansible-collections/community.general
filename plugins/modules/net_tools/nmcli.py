@@ -814,15 +814,15 @@ class Nmcli(object):
             return list
         return str
 
-    def connection_exists(self):
-        cmd = [self.nmcli_bin, 'con', 'show', self.conn_name]
+    def list_connection_info(self):
+        cmd = [self.nmcli_bin, '--fields', 'name', '--terse', 'con', 'show']
         (rc, out, err) = self.execute_command(cmd)
-        if rc == 0:
-            return True
-        elif rc == 10:
-            return False
-        else:
+        if rc != 0:
             raise NmcliModuleError(err)
+        return out.splitlines()
+
+    def connection_exists(self):
+        return self.conn_name in self.list_connection_info()
 
     def down_connection(self):
         cmd = [self.nmcli_bin, 'con', 'down', self.conn_name]
