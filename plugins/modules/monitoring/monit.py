@@ -7,6 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+
 DOCUMENTATION = '''
 ---
 module: monit
@@ -50,6 +51,8 @@ import re
 from collections import namedtuple
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.six import python_2_unicode_compatible
+
 
 STATE_COMMAND_MAP = {
     'stopped': 'stop',
@@ -59,7 +62,7 @@ STATE_COMMAND_MAP = {
     'restarted': 'restart'
 }
 
-
+@python_2_unicode_compatible
 class StatusValue(namedtuple("Status", "value, is_pending")):
     MISSING = 'missing'
     OK = 'ok'
@@ -81,6 +84,9 @@ class StatusValue(namedtuple("Status", "value, is_pending")):
         if item in ('is_%s' % status for status in self.ALL_STATUS):
             return self.value == getattr(self, item[3:].upper())
         raise AttributeError(item)
+
+    def __str__(self):
+        return "{}{}".format(self.value, " (pending)" if self.is_pending else "")
 
 
 class Status(object):
@@ -171,11 +177,7 @@ class Monit(object):
         loop_count = 0
         while running_status.value == current_status.value:
             if loop_count >= self._status_change_retry_count:
-                self.module.fail_json(
-                    msg='waited too long for monit to change state from "{}"'.format(
-                        current_status
-                    ),
-                )
+                self.module.fail_json(msg='waited too long for monit to change state', status=str(running_status))
 
             loop_count += 1
             time.sleep(0.5)
@@ -197,9 +199,7 @@ class Monit(object):
         while current_status.is_pending or (current_status.value in waiting_status):
             if time.time() >= timeout_time:
                 self.module.fail_json(
-                    msg='waited too long for "pending", or "initiating" status to go away ({0})'.format(
-                        current_status
-                    )
+                    msg='waited too long for "pending", or "initiating" status to go away', status=str(current_status)
                 )
 
             time.sleep(5)
@@ -229,7 +229,7 @@ class Monit(object):
             status_match = not status_match
         if status_match:
             self.module.exit_json(changed=True, name=self.process_name, state=state)
-        self.module.fail_json(msg='%s process not %s' % (self.process_name, state), status=repr(status))
+        self.module.fail_json(msg='%s process not %s' % (self.process_name, state), status=str(status))
 
     def stop(self):
         self.change_state('stopped', Status.NOT_MONITORED)
