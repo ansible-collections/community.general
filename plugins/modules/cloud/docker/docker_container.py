@@ -1081,6 +1081,26 @@ EXAMPLES = '''
       # Limit read rate for /dev/sdb to 300 IO per second
       - path: /dev/sdb
         rate: 300
+
+- name: Start container with GPUs
+  community.general.docker_container:
+    name: test
+    image: ubuntu:18.04
+    state: started
+    device_requests:
+      - # Add some specific devices to this container
+        device_ids:
+          - '0'
+          - 'GPU-3a23c669-1f69-c64e-cf85-44e9b07e7a2a'
+      - # Add nVidia GPUs to this container
+        driver: nvidia
+        count: -1  # this means we want all
+        capabilities:
+          # We have one OR condition: 'gpu' AND 'utility'
+          - - gpu
+            - utility
+          # See https://github.com/NVIDIA/nvidia-container-runtime#supported-driver-capabilities
+          # for a list of capabilities supported by the nvidia driver
 '''
 
 RETURN = '''
