@@ -123,9 +123,10 @@ options:
     tcp:
         type: str
         description:
-          - checks can be registered with a TCP port. This means that consul
-            will check if the connection attempt to that port is successful (ie - the port is currently accepting connections).
-            I(Interval) must also be provided with this option.
+          - Checks can be registered with a TCP port. This means that consul
+            will check if the connection attempt to that port is successful (that is, - the port is currently accepting connections).
+            The format is C(host:port), for example C(localhost:80)
+            I(interval) must also be provided with this option.
         version_added: '1.3.0'
     http:
         type: str
