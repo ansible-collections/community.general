@@ -31,16 +31,16 @@ class EchoServer(BaseHTTPRequestHandler):
 
 
 def run_webserver():
-        webServer = HTTPServer((hostname, server_port), EchoServer)
-        print("Server started http://%s:%s" % (hostname, server_port))
+    webServer = HTTPServer((hostname, server_port), EchoServer)
+    print("Server started http://%s:%s" % (hostname, server_port))
 
-        try:
-            webServer.serve_forever()
-        except KeyboardInterrupt:
-            pass
+    try:
+        webServer.serve_forever()
+    except KeyboardInterrupt:
+        pass
 
-        webServer.server_close()
-        print("Server stopped.")
+    webServer.server_close()
+    print("Server stopped.")
 
 
 if __name__ == "__main__":
