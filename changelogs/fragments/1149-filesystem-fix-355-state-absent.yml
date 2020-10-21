@@ -1,4 +1,4 @@
 ---
 bugfixes:
-  - filesystem - add option ``state`` with default ``present``. When set to ``absent``, filesystem signatures are removed
+  - filesystem - add option ``state`` with default ``present``. When set to ``absent``, first 128kB of device/file are erased
     (https://github.com/ansible-collections/community.general/issues/355).

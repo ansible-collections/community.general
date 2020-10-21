@@ -166,7 +166,7 @@ class Filesystem(object):
         # wipefs comes with util-linux package, and may not work with vfat (at
         # least on CentOS 6). So we use the good old dd instead, in all cases.
         dd = self.module.get_bin_path('dd', required=True)
-        cmd = [dd, "if=/dev/zero", "of=%s" % dev, "bs=512", "count=256"]
+        cmd = [dd, "if=/dev/zero", "of=%s" % dev, "bs=512", "count=256", "conv=notrunc"]
         self.module.run_command(cmd, check_rc=True)
 
     def grow_cmd(self, dev):
