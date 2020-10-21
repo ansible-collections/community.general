@@ -124,8 +124,8 @@ options:
         type: str
         description:
           - Checks can be registered with a TCP port. This means that consul
-            will check if the connection attempt to that port is successful (that is, - the port is currently accepting connections).
-            The format is C(host:port), for example C(localhost:80)
+            will check if the connection attempt to that port is successful (that is, the port is currently accepting connections).
+            The format is C(host:port), for example C(localhost:80).
             I(interval) must also be provided with this option.
         version_added: '1.3.0'
     http:
@@ -504,7 +504,7 @@ class ConsulCheck(object):
             if match is None:
                 raise Exception('tcp check must be in host:port format')
 
-            self.check = consul.Check.tcp(match.group('host'), int(match.group('port')), self.interval)
+            self.check = consul.Check.tcp(match.group('host').strip('[]'), int(match.group('port')), self.interval)
 
     def validate_duration(self, name, duration):
         if duration:
