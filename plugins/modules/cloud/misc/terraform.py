@@ -96,7 +96,7 @@ options:
   check_destroy:
     description:
       - Check and apply only when there are no resource destruction. Note that it only prevents "destroy" actions,
-      but allows "destroy and then create replacement" actions. This option will be ignored if state=absent.
+        but allows "destroy and then create replacement" actions. This option will be ignored if I(state=absent).
     type: bool
     default: false
     version_added: '1.2.0'
