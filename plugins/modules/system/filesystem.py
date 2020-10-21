@@ -28,7 +28,8 @@ options:
   fstype:
     choices: [ btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap ]
     description:
-    - Filesystem type to be created.
+    - Filesystem type to be created. This option is required with
+      C(state=present) (or if I(state) is omitted).
     - reiserfs support was added in 2.2.
     - lvm support was added in 2.5.
     - since 2.5, I(dev) can be an image file.
@@ -36,7 +37,6 @@ options:
     - ocfs2 support was added in 2.6
     - f2fs support was added in 2.7
     - swap support was added in 2.8
-    required: yes
     aliases: [type]
   dev:
     description:
