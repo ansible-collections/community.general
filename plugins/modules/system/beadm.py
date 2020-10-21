@@ -176,7 +176,7 @@ class BE(object):
                         return check
                 else:
                     check = line.split(';')
-                    if check[1] == self.name:
+                    if check[0] == self.name:
                         return check
         else:
             for line in out.splitlines():
@@ -186,7 +186,7 @@ class BE(object):
                         return check
                 else:
                     check = line.split(';')
-                    if check[1] == self.name:
+                    if check[0] == self.name:
                         return check
         return None
 
