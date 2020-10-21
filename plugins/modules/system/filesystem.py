@@ -161,10 +161,9 @@ class Filesystem(object):
 
     def wipefs(self, dev):
         wipefs = self.module.get_bin_path('wipefs', required=True)
+        cmd = list([wipefs, "--all", dev])
         if self.module.check_mode:
-            cmd = "%s --no-act --all '%s'" % (wipefs, dev)
-        else:
-            cmd = "%s --all '%s'" % (wipefs, dev)
+            cmd.insert(1, "--no-act")
         self.module.run_command(cmd, check_rc=True)
 
     def grow_cmd(self, dev):
@@ -457,12 +456,11 @@ def main():
         filesystem.create(opts, dev)
         changed = True
 
-    else:
+    elif fs:
         # wipe fs signatures
         filesystem = Filesystem(module)
         filesystem.wipefs(dev)
-        if fs:
-            changed = True
+        changed = True
 
     module.exit_json(changed=changed)
 
