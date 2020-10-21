@@ -1,0 +1,3 @@
+process_root: /opt/httpd_echo
+process_file: "{{ process_root }}/httpd_echo.py"
+process_venv: "{{ process_root }}/venv"

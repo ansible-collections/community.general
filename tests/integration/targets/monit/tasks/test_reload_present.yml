@@ -30,7 +30,7 @@
     path: "{{ monitrc }}"
     block: |
       check process httpd_echo with matching "httpd_echo"
-          start program = "/opt/venv/bin/python /opt/httpd_echo.py"
+          start program = "{{ process_venv }}/bin/python {{ process_file }}"
           stop program = "/bin/sh -c 'kill `pgrep -f httpd_echo`'"
           if failed host localhost port 8082 then restart
 

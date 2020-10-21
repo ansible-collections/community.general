@@ -8,6 +8,16 @@
     include_role:
       name: setup_epel
 
+  - name: create required directories
+    become: yes
+    file:
+      path: "{{ item }}"
+      state: directory
+    loop:
+      - /var/lib/monit
+      - /var/run/monit
+      - "{{ process_root }}"
+
   - name: install monit
     become: yes
     package:
@@ -31,24 +41,15 @@
     become: yes
     copy:
       src: httpd_echo.py
-      dest: "/opt/httpd_echo.py"
+      dest: "{{ process_file }}"
 
   - name: install dependencies
     pip:
       name: "{{ item }}"
-      virtualenv: /opt/venv
+      virtualenv: "{{ process_venv }}"
     loop:
       - setuptools==44
       - python-daemon
-
-  - name: make monit dir
-    become: yes
-    file:
-      path: "{{ item }}"
-      state: directory
-    loop:
-      - /var/lib/monit
-      - /var/run/monit
 
   - name: restart monit
     become: yes
@@ -69,4 +70,9 @@
     become: yes
     package:
       name: monit
+      state: absent
+
+  - name: remove process files
+    file:
+      path: "{{ process_root }}"
       state: absent
