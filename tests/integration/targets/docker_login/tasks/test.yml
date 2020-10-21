@@ -1,3 +1,4 @@
+---
 - block:
   - include_tasks: run-test.yml
     with_fileglob:
