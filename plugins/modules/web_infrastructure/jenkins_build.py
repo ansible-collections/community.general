@@ -226,7 +226,7 @@ def main():
             state=dict(required=False, choices=['present', 'absent'], default="present"),
             token=dict(required=False, no_log=True),
             url=dict(required=False, default="http://localhost:8080"),
-            user=dict(required=False)
+            user=dict(required=False),
         ),
         mutually_exclusive=[
             ['password', 'token'],
