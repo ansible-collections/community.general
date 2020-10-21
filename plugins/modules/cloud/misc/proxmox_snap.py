@@ -62,7 +62,6 @@ options:
       - Specify the description for the snapshot. Only used on the configuration web interface.
       - This is saved as a comment inside the configuration file.
     type: str
-    version_added: '0.2.0'
   timeout:
     description:
       - timeout for operations
@@ -73,7 +72,6 @@ options:
       - Name of the snapshot that has to be created
     default: 'ansible_snap'
     type: str
-    version_added: '0.2.0'
 
 notes:
   - Requires proxmoxer and requests modules on host. This modules can be installed with pip.
@@ -129,7 +127,6 @@ EXAMPLES = r'''
 import os
 import time
 import traceback
-from distutils.version import LooseVersion
 
 try:
     from proxmoxer import ProxmoxAPI
@@ -149,12 +146,7 @@ def get_vmid(proxmox, hostname):
 
 
 def get_instance(proxmox, vmid):
-    return [vm for vm in proxmox.cluster.resources.get(type='vm') if vm['vmid'] == int(vmid)]
-
-
-def proxmox_version(proxmox):
-    apireturn = proxmox.version.get()
-    return LooseVersion(apireturn['version'])
+    return [vm for vm in proxmox.cluster.resources.get(type='vm') if int(vm['vmid']) == int(vmid)]
 
 
 def snapshot_create(module, proxmox, vm, vmid, timeout, snapname, description, vmstate):
@@ -189,6 +181,9 @@ def snapshot_remove(module, proxmox, vm, vmid, timeout, snapname, force):
         time.sleep(1)
     return False
 
+def setup_api(api_host, api_user, api_password, validate_certs):
+    api = ProxmoxAPI(api_host, user=api_user, password=api_password, verify_ssl=validate_certs)
+    return api
 
 def main():
     module = AnsibleModule(
@@ -232,7 +227,7 @@ def main():
             module.fail_json(msg='You should set api_password param or use PROXMOX_PASSWORD environment variable')
 
     try:
-        proxmox = ProxmoxAPI(api_host, user=api_user, password=api_password, verify_ssl=validate_certs)
+        proxmox = setup_api(api_host, api_user, api_password, validate_certs)
 
     except Exception as e:
         module.fail_json(msg='authorization on proxmox cluster failed with exception: %s' % e)
@@ -247,6 +242,7 @@ def main():
         module.exit_json(changed=False, msg="Vmid could not be fetched for the following action: %s" % state)
 
     vm = get_instance(proxmox, vmid)
+
     global VZ_TYPE
     VZ_TYPE = vm[0]['type']
 
