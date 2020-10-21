@@ -1,0 +1,96 @@
+---
+# We assume 'create_fs' tests have passed.
+
+- name: filesystem creation
+  filesystem:
+    dev: '{{ dev }}'
+    fstype: '{{ fstype }}'
+
+- name: get filesystem TYPE with 'blkid'
+  command:
+    cmd: 'blkid -c /dev/null -o value -s TYPE {{ dev }}'
+  changed_when: false
+  register: blkid
+
+- name: Assert that the filesystem exists with the requested type
+  assert:
+    that:
+      - blkid.stdout == fstype
+
+
+# Test check_mode first
+- name: filesystem removal (check mode)
+  filesystem:
+    dev: '{{ dev }}'
+    state: absent
+  register: wipefs
+  check_mode: yes
+
+- name: get filesystem TYPE with 'blkid' (should remain the same)
+  command:
+    cmd: 'blkid -c /dev/null -o value -s TYPE {{ dev }}'
+  changed_when: false
+  register: blkid
+
+- name: Assert that the state changed but the filesystem still exists
+  assert:
+    that:
+      - wipefs is changed
+      - blkid.stdout == fstype
+
+# Do it
+- name: filesystem removal
+  filesystem:
+    dev: '{{ dev }}'
+    state: absent
+  register: wipefs
+
+- name: get filesystem TYPE with 'blkid' (should be empty)
+  command:
+    cmd: 'blkid -c /dev/null -o value -s TYPE {{ dev }}'
+  changed_when: false
+  register: blkid
+
+- name: Assert that the state changed and the device has no filesystem
+  assert:
+    that:
+      - wipefs is changed
+      - blkid.stdout | length == 0
+
+# Do it again
+- name: filesystem removal (idempotency)
+  filesystem:
+    dev: '{{ dev }}'
+    state: absent
+  register: wipefs
+
+- name: Assert that the state did not change
+  assert:
+    that:
+      - wipefs is not changed
+
+# and again
+- name: filesystem removal (idempotency, check mode)
+  filesystem:
+    dev: '{{ dev }}'
+    state: absent
+  register: wipefs
+  check_mode: yes
+
+- name: Assert that the state did not change
+  assert:
+    that:
+      - wipefs is not changed
+
+
+# By the way, test removal of a filesystem on unexistent device
+- name: filesystem removal (unexistent device)
+  filesystem:
+    dev: '/dev/unexistent_device'
+    state: absent
+  register: wipefs
+
+- name: Assert that the state did not change
+  assert:
+    that:
+      - wipefs is not changed
