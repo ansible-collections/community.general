@@ -314,6 +314,8 @@ files:
   $modules/cloud/misc/:
     authors: ryansb
     ignore: ryansb
+  $modules/cloud/misc/terraform.py:
+    maintainers: m-yosefpor
   $modules/cloud/misc/virt.py:
     authors: ansible skvidal
     maintainers: $team_virt
