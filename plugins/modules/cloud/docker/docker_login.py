@@ -257,14 +257,13 @@ class DockerFileStore(object):
         auth = to_text(b64auth)
 
         # build up the auth structure
-        new_auth = dict(
-            auths=dict()
-        )
-        new_auth['auths'][server] = dict(
+        if 'auths' not in self._config:
+            self._config['auths'] = dict()
+
+        self._config['auths'][server] = dict(
             auth=auth
         )
 
-        self._config.update(new_auth)
         self._write()
 
     def erase(self, server):
@@ -272,8 +271,9 @@ class DockerFileStore(object):
         Remove credentials for the given server from the configuration.
         '''
 
-        self._config['auths'].pop(server)
-        self._write()
+        if 'auths' in self._config and server in self._config['auths']:
+            self._config['auths'].pop(server)
+            self._write()
 
 
 class LoginManager(DockerBaseClass):
