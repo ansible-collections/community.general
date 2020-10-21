@@ -20,7 +20,8 @@ options:
     description:
     - If C(state=present), the filesystem is created if it doesn't already
       exist, that is the default behaviour if I(state) is omitted.
-    - If C(state=absent), all filesystem signatures on I(dev) are wiped.
+    - If C(state=absent), first 128kB of I(dev) are wiped if it contains a
+      filesystem (as known by C(blkid)).
     - When C(state=absent), all other options but I(dev) are ignored, and the
       module doesn't fail if the device I(dev) doesn't actually exist.
     choices: [ present, absent ]
@@ -65,6 +66,7 @@ requirements:
 notes:
   - Potential filesystem on I(dev) are checked using C(blkid), in case C(blkid) isn't able to detect an existing filesystem,
     this filesystem is overwritten even if I(force) is C(no).
+  - This module supports I(check_mode).
 '''
 
 EXAMPLES = '''
@@ -79,7 +81,7 @@ EXAMPLES = '''
     dev: /dev/sdb1
     opts: -cc
 
-- name: Blank filesystem signatures on /dev/sdb1
+- name: Blank filesystem header on /dev/sdb1
   community.general.filesystem:
     dev: /dev/sdb1
     state: absent
