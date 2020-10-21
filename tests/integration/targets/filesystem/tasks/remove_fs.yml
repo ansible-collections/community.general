@@ -49,6 +49,7 @@
   command:
     cmd: 'blkid -c /dev/null -o value -s TYPE {{ dev }}'
   changed_when: false
+  failed_when: false
   register: blkid
 
 - name: Assert that the state changed and the device has no filesystem
@@ -56,6 +57,7 @@
     that:
       - wipefs is changed
       - blkid.stdout | length == 0
+      - blkid.rc == 2
 
 # Do it again
 - name: filesystem removal (idempotency)
