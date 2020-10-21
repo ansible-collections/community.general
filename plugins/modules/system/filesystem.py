@@ -25,6 +25,7 @@ options:
       module doesn't fail if the device I(dev) doesn't actually exist.
     choices: [ present, absent ]
     default: present
+    version_added: 1.3.0
   fstype:
     choices: [ btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap ]
     description:
