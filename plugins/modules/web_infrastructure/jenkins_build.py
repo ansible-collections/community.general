@@ -153,7 +153,7 @@ class JenkinsBuild:
             else:
                 return jenkins.Jenkins(self.jenkins_url)
         except Exception as e:
-            self.module.fail_json(msg='Unable to connect to Jenkins server, %s' % to_native(e), exception=traceback.format_exc())
+            self.module.fail_json(msg='Unable to connect to Jenkins server, %s' % to_native(e))
 
     def get_next_build(self):
         try:
