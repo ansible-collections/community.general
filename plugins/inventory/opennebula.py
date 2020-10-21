@@ -10,16 +10,16 @@ DOCUMENTATION = r'''
     name: opennebula
     plugin_type: inventory
     author:
-        - Kristian Feldsam
+        - Kristian Feldsam (@feldsam)
     short_description: OpenNebula inventory source
-    version_added: "2.10"
+    version_added: "1.3.0"
     extends_documentation_fragment:
         - constructed
     description:
         - Get inventory hosts from OpenNebula cloud.
         - Uses an YAML configuration file ending with either I(opennebula.yml), I(opennebula.yaml), I(one.yml)
         - or I(one.yaml) to set parameter values.
-        - Uses I(api_authfile), I(~/.one/one_auth), or C(ONE_AUTH) pointing to a OpenNebula credentials file
+        - Uses I(api_authfile), I(~/.one/one_auth), or C(ONE_AUTH) pointing to a OpenNebula credentials file.
     options:
         plugin:
             description: Token that ensures this is a source file for the 'opennebula' plugin.
@@ -30,7 +30,7 @@ DOCUMENTATION = r'''
             description:
               - URL of the OpenNebula RPC server.
               - It is recommended to use HTTPS so that the username/password are not
-              - transferred over the network unencrypted.
+                transferred over the network unencrypted.
               - If not set then the value of the C(ONE_URL) environment variable is used.
             env:
               - name: ONE_URL
@@ -42,12 +42,11 @@ DOCUMENTATION = r'''
               - then the value of the C(ONE_USERNAME) environment variable is used.
             env:
               - name: ONE_USERNAME
-            required: False
             type: string
         api_password:
             description:
-              - Password of the user to login into OpenNebula RPC server. If not set
-              - then the value of the C(ONE_PASSWORD) environment variable is used.
+              - Password of the user to login into OpenNebula RPC server.
+              - If not set, the value of the C(ONE_PASSWORD) environment variable is used.
             env:
               - name: ONE_PASSWORD
             required: False
@@ -150,7 +149,7 @@ def _retrieve_servers(one_client, label_filter=None):
     try:
         vm_pool = one_client.vmpool.infoextended(-2, -1, -1, 3)
     except Exception as e:
-        raise AnsibleError("Something happened durring XML-RPC call, this was original exception: {e}".format(e=to_native(e)))
+        raise AnsibleError("Something happened during XML-RPC call, this was original exception: {e}".format(e=to_native(e)))
 
     result = []
 
@@ -224,4 +223,3 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
             if server.get('SSH_PORT'):
                 self.inventory.set_variable(server['name'], 'ansible_port', server['SSH_PORT'])
-
