@@ -15,7 +15,7 @@ description:
     - Manage Jenkins builds with Jenkins REST API.
 requirements:
   - "python-jenkins >= 0.4.12"
-author: "Brett Milford (@brettmilford)"
+author: Brett Milford (@brettmilford)
 options:
   args:
     description:
