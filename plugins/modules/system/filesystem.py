@@ -16,6 +16,15 @@ short_description: Makes a filesystem
 description:
   - This module creates a filesystem.
 options:
+  state:
+    description:
+    - If C(state=present), the filesystem is created if it doesn't already
+      exist, that is the default behaviour if I(state) is omitted.
+    - If C(state=absent), all filesystem signatures on I(dev) are wiped.
+    - When C(state=absent), all other options but I(dev) are ignored, and the
+      module doesn't fail if the device I(dev) doesn't actually exist.
+    choices: [ present, absent ]
+    default: present
   fstype:
     choices: [ btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap ]
     description:
@@ -68,6 +77,11 @@ EXAMPLES = '''
     fstype: ext4
     dev: /dev/sdb1
     opts: -cc
+
+- name: Blank filesystem signatures on /dev/sdb1
+  community.general.filesystem:
+    dev: /dev/sdb1
+    state: absent
 '''
 
 from distutils.version import LooseVersion
@@ -142,6 +156,14 @@ class Filesystem(object):
             cmd = "%s %s '%s'" % (mkfs, self.MKFS_FORCE_FLAGS, dev)
         else:
             cmd = "%s %s %s '%s'" % (mkfs, self.MKFS_FORCE_FLAGS, opts, dev)
+        self.module.run_command(cmd, check_rc=True)
+
+    def wipefs(self, dev):
+        wipefs = self.module.get_bin_path('wipefs', required=True)
+        if self.module.check_mode:
+            cmd = "%s --no-act --all '%s'" % (wipefs, dev)
+        else:
+            cmd = "%s --all '%s'" % (wipefs, dev)
         self.module.run_command(cmd, check_rc=True)
 
     def grow_cmd(self, dev):
@@ -369,34 +391,35 @@ def main():
     # There is no "single command" to manipulate filesystems, so we map them all out and their options
     module = AnsibleModule(
         argument_spec=dict(
-            fstype=dict(required=True, aliases=['type'],
-                        choices=list(fstypes)),
+            state=dict(default='present', choices=['present', 'absent']),
+            fstype=dict(aliases=['type'], choices=list(fstypes)),
             dev=dict(required=True, aliases=['device']),
             opts=dict(),
             force=dict(type='bool', default=False),
             resizefs=dict(type='bool', default=False),
         ),
+        required_if=[
+            ('state', 'present', ['fstype'])
+        ],
         supports_check_mode=True,
     )
 
+    state = module.params['state']
     dev = module.params['dev']
     fstype = module.params['fstype']
     opts = module.params['opts']
     force = module.params['force']
     resizefs = module.params['resizefs']
 
-    if fstype in friendly_names:
-        fstype = friendly_names[fstype]
-
     changed = False
 
-    try:
-        klass = FILESYSTEMS[fstype]
-    except KeyError:
-        module.fail_json(changed=False, msg="module does not support this filesystem (%s) yet." % fstype)
-
     if not os.path.exists(dev):
-        module.fail_json(msg="Device %s not found." % dev)
+        msg = "Device %s not found." % dev
+        if state == "present":
+            module.fail_json(msg=msg)
+        else:
+            module.exit_json(msg=msg)
+
     dev = Device(module, dev)
 
     cmd = module.get_bin_path('blkid', required=True)
@@ -405,24 +428,40 @@ def main():
     # then this existing filesystem would be overwritten even if force isn't enabled.
     fs = raw_fs.strip()
 
-    filesystem = klass(module)
+    if state == "present":
+        if fstype in friendly_names:
+            fstype = friendly_names[fstype]
 
-    same_fs = fs and FILESYSTEMS.get(fs) == FILESYSTEMS[fstype]
-    if same_fs and not resizefs and not force:
-        module.exit_json(changed=False)
-    elif same_fs and resizefs:
-        if not filesystem.GROW:
-            module.fail_json(changed=False, msg="module does not support resizing %s filesystem yet." % fstype)
+        try:
+            klass = FILESYSTEMS[fstype]
+        except KeyError:
+            module.fail_json(changed=False, msg="module does not support this filesystem (%s) yet." % fstype)
 
-        out = filesystem.grow(dev)
+        filesystem = klass(module)
 
-        module.exit_json(changed=True, msg=out)
-    elif fs and not force:
-        module.fail_json(msg="'%s' is already used as %s, use force=yes to overwrite" % (dev, fs), rc=rc, err=err)
+        same_fs = fs and FILESYSTEMS.get(fs) == FILESYSTEMS[fstype]
+        if same_fs and not resizefs and not force:
+            module.exit_json(changed=False)
+        elif same_fs and resizefs:
+            if not filesystem.GROW:
+                module.fail_json(changed=False, msg="module does not support resizing %s filesystem yet." % fstype)
 
-    # create fs
-    filesystem.create(opts, dev)
-    changed = True
+            out = filesystem.grow(dev)
+
+            module.exit_json(changed=True, msg=out)
+        elif fs and not force:
+            module.fail_json(msg="'%s' is already used as %s, use force=yes to overwrite" % (dev, fs), rc=rc, err=err)
+
+        # create fs
+        filesystem.create(opts, dev)
+        changed = True
+
+    else:
+        # wipe fs signatures
+        filesystem = Filesystem(module)
+        filesystem.wipefs(dev)
+        if fs:
+            changed = True
 
     module.exit_json(changed=changed)
 
