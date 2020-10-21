@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - filesystem - add option 'state' to remove filesystem signatures when
+    'state=absent'. No breaking changes ('state=present' can be omitted).
+    (https://github.com/ansible-collections/community.general/issues/355).
