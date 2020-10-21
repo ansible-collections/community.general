@@ -99,7 +99,7 @@ options:
       but allows "destroy and then create replacement" actions. This option will be ignored if state=absent.
     type: bool
     default: false
-    version_added: '1.0.0'
+    version_added: '1.2.0'
 notes:
    - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]
