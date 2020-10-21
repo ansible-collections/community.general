@@ -1,0 +1,2 @@
+minor_changes:
+- terraform - add '-reconfigure' flag support for terraform init (Backend reconfiguration)
