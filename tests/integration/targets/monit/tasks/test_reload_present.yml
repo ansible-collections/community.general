@@ -29,9 +29,9 @@
   blockinfile:
     path: "{{ monitrc }}"
     block: |
-      check process httpd_echo with pidfile /tmp/httpd_echo.pid
-          start program = "{{ansible_python.executable}} /opt/httpd_echo.py start"
-          stop program = "{{ansible_python.executable}} /opt/httpd_echo.py stop"
+      check process httpd_echo with matching "httpd_echo"
+          start program = "/opt/venv/bin/python /opt/httpd_echo.py"
+          stop program = "/bin/sh -c 'kill `pgrep -f httpd_echo`'"
           if failed host localhost port 8082 then restart
 
 - name: test process present (implicit reload)

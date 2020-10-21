@@ -30,11 +30,16 @@
   - name: copy process file
     become: yes
     copy:
-      src: "{{item}}"
-      dest: "/opt/{{item}}"
+      src: httpd_echo.py
+      dest: "/opt/httpd_echo.py"
+
+  - name: install dependencies
+    pip:
+      name: "{{ item }}"
+      virtualenv: /opt/venv
     loop:
-      - daemon.py
-      - httpd_echo.py
+      - setuptools==44
+      - python-daemon
 
   - name: make monit dir
     become: yes
