@@ -6,17 +6,16 @@
     dev: '{{ dev }}'
     fstype: '{{ fstype }}'
 
-- name: get filesystem TYPE with 'blkid'
+- name: get filesystem UUID with 'blkid'
   command:
-    cmd: 'blkid -c /dev/null -o value -s TYPE {{ dev }}'
+    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
   changed_when: false
-  register: blkid
+  register: blkid_ref
 
-- name: Assert that the filesystem exists with the requested type
+- name: Assert that a filesystem exists on top of the device
   assert:
     that:
-      - ( blkid.stdout == fstype ) or
-        ( blkid.stdout == 'ext4' and fstype == 'ext4dev' )
+      - blkid_ref.stdout | length > 0
 
 
 # Test check_mode first
@@ -27,9 +26,9 @@
   register: wipefs
   check_mode: yes
 
-- name: get filesystem TYPE with 'blkid' (should remain the same)
+- name: get filesystem UUID with 'blkid' (should remain the same)
   command:
-    cmd: 'blkid -c /dev/null -o value -s TYPE {{ dev }}'
+    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
   changed_when: false
   register: blkid
 
@@ -37,8 +36,7 @@
   assert:
     that:
       - wipefs is changed
-      - ( blkid.stdout == fstype ) or
-        ( blkid.stdout == 'ext4' and fstype == 'ext4dev' )
+      - blkid.stdout == blkid_ref.stdout
 
 # Do it
 - name: filesystem removal
@@ -47,9 +45,9 @@
     state: absent
   register: wipefs
 
-- name: get filesystem TYPE with 'blkid' (should be empty)
+- name: get filesystem UUID with 'blkid' (should be empty)
   command:
-    cmd: 'blkid -c /dev/null -o value -s TYPE {{ dev }}'
+    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
   changed_when: false
   failed_when: false
   register: blkid
