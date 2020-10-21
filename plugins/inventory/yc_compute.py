@@ -75,7 +75,7 @@ DOCUMENTATION = r'''
 '''
 
 EXAMPLES = r'''
-plugin: yc_compute
+plugin: community.general.yc_compute
 folders:  # List inventory hosts from these folders.
   - <your_folder_id>
 filters:
