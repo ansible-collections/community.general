@@ -166,7 +166,7 @@ class Filesystem(object):
         try:
             # wipefs comes with util-linux package
             wipefs = self.module.get_bin_path('wipefs', required=True)
-            cmd = [wipefs, "--all", dev]
+            cmd = [wipefs, "--all", "%s" % dev]
         except ValueError:
             # No such 'wipefs' tool on FreeBSD (and more), so we'll blindly
             # blank the first 128kB, since xfs signature is at offset 0 and
