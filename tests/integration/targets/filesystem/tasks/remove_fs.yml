@@ -15,7 +15,8 @@
 - name: Assert that the filesystem exists with the requested type
   assert:
     that:
-      - blkid.stdout == fstype
+      - ( blkid.stdout == fstype ) or
+        ( blkid.stdout == 'ext4' and fstype == 'ext4dev' )
 
 
 # Test check_mode first
@@ -36,7 +37,8 @@
   assert:
     that:
       - wipefs is changed
-      - blkid.stdout == fstype
+      - ( blkid.stdout == fstype ) or
+        ( blkid.stdout == 'ext4' and fstype == 'ext4dev' )
 
 # Do it
 - name: filesystem removal
