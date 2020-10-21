@@ -163,16 +163,10 @@ class Filesystem(object):
         if self.module.check_mode:
             return
 
-        try:
-            # wipefs comes with util-linux package
-            wipefs = self.module.get_bin_path('wipefs', required=True)
-            cmd = [wipefs, "--all", "%s" % dev]
-        except ValueError:
-            # No such 'wipefs' tool on FreeBSD (and more), so we'll blindly
-            # blank the first 128kB, since xfs signature is at offset 0 and
-            # reiserfs & btrfs signatures are near after the first 64kB.
-            dd = self.module.get_bin_path('dd', required=True)
-            cmd = [dd, "if=/dev/zero", "of=%s" % dev, "bs=512", "count=256"]
+        # wipefs comes with util-linux package, and may not work with vfat (at
+        # least on CentOS 6). So we use the good old dd instead, in all cases.
+        dd = self.module.get_bin_path('dd', required=True)
+        cmd = [dd, "if=/dev/zero", "of=%s" % dev, "bs=512", "count=256"]
         self.module.run_command(cmd, check_rc=True)
 
     def grow_cmd(self, dev):
