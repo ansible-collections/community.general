@@ -206,8 +206,10 @@ class BE(object):
 
         if rc == 0:
             line = self._find_be_by_name(out)
+            if line is None:
+                return False
             if self.is_freebsd:
-                if line is not None and 'R' in line[1]:
+                if 'R' in line[1]:
                     return True
             else:
                 if 'R' in line[2]:
@@ -259,6 +261,8 @@ class BE(object):
 
         if rc == 0:
             line = self._find_be_by_name(out)
+            if line is None:
+                return False
             if self.is_freebsd:
                 # On FreeBSD, we exclude currently mounted BE on /, as it is
                 # special and can be activated even if it is mounted. That is not
