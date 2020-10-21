@@ -1,16 +1,7 @@
-- name: verify initial state (up)
-  command: "curl -sf http://localhost:8082/hello"
-  args:
-    warn: false
-  when: initial_state == 'up'
-
-- name: verify initial state (down)
-  command: "curl -sf http://localhost:8082/hello"
-  args:
-    warn: false
-  register: curl_result
-  failed_when: curl_result == 0
-  when: initial_state == 'down'
+- import_tasks: check_state.yml
+  vars:
+    reason: verify initial service state
+    service_state: "{{ initial_state }}"
 
 - name: change httpd_echo process state to {{ state }}
   monit:
@@ -24,19 +15,10 @@
       - result is success
       - result is changed
 
-- name: check that service is {{ state }} (expected 'up')
-  command: "curl -sf http://localhost:8082/hello"
-  args:
-    warn: false
-  when: expected_state == 'up'
-
-- name: check that service is {{ state }} (expected 'down')
-  command: "curl -sf http://localhost:8082/hello"
-  args:
-    warn: false
-  register: curl_result
-  failed_when: curl_result == 0
-  when: expected_state == 'down'
+- import_tasks: check_state.yml
+  vars:
+    reason: check service state after action
+    service_state: "{{ expected_state }}"
 
 - name: try change state again to {{ state }}
   monit:
