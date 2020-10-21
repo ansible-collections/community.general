@@ -21,6 +21,7 @@ DOCUMENTATION = r'''
       auth_kind:
         description: The type of credential used.
         required: True
+        type: string
         choices: ['oauth', 'serviceaccountfile']
         env:
           - name: YC_ANSIBLE_AUTH_KIND
@@ -106,25 +107,22 @@ groups:
   ssd: labels['disk_type'] == 'ssd'
 '''
 
-import json
-
-import grpc
-from yandex.cloud.compute.v1.instance_service_pb2 import ListInstancesRequest
-from yandex.cloud.compute.v1.instance_service_pb2_grpc import InstanceServiceStub
-import yandexcloud
-import json
-import grpc
-import yandexcloud
-
-from google.protobuf.json_format import MessageToDict
-from yandex.cloud.compute.v1.instance_service_pb2 import ListInstancesRequest
-from yandex.cloud.compute.v1.instance_service_pb2_grpc import InstanceServiceStub
-
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
-from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.parsing.convert_bool import boolean
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils._text import to_native
+
+try:
+    import yandexcloud
+    from yandex.cloud.compute.v1.instance_service_pb2 import ListInstancesRequest
+    from yandex.cloud.compute.v1.instance_service_pb2_grpc import InstanceServiceStub
+except ImportError:
+    raise AnsibleError('Import error for yandex.cloud SDK. '
+                       'Please install "yandexcloud" package to your environment.')
+
+import json
+import grpc
+from google.protobuf.json_format import MessageToDict
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
