@@ -32,6 +32,10 @@ DOCUMENTATION = '''
         description: Overwrite the password if it does already exist.
         type: bool
         default: 'no'
+      umask:
+        description: Sets the umask for the created .gpg files.
+        env:
+          - name: PASSWORD_STORE_UMASK
       returnall:
         description: Return all the content of the password, not only the first line.
         type: bool
