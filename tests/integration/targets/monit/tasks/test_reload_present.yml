@@ -46,7 +46,11 @@
   monit:
     name: httpd_echo
     state: present
+    timeout: 30
   register: result
+  until: not result.failed
+  retries: 5
+  delay: 1
 
 - name: check that state is changed
   assert:
