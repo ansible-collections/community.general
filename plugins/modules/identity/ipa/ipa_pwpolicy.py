@@ -114,6 +114,18 @@ pwpolicy:
     description: Password policy as returned by IPA API
     returned: always
     type: dict
+    sample:
+        cn: ['admins']
+        cospriority: ['10']
+        dn: 'cn=admins,cn=EXAMPLE.COM,cn=kerberos,dc=example,dc=com'
+        krbmaxpwdlife: ['60']
+        krbminpwdlife: ['24']
+        krbpwdfailurecountinterval: ['600']
+        krbpwdhistorylength: ['16']
+        krbpwdlockoutduration: ['1200']
+        krbpwdmaxfailure: ['4']
+        krbpwdmindiffchars: ['4']
+        objectclass: ['top', 'nscontainer', 'krbpwdpolicy']
 '''
 
 import traceback
