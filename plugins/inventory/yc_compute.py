@@ -18,6 +18,11 @@ DOCUMENTATION = r'''
       - Uses a YAML configuration file that ends with yc_compute.(yml|yaml) or yc.(yml|yaml).
     version_added: "1.3.0"
     options:
+      plugin:
+        description: The name of this plugin, it should always be set to C(community.general.yc_compute) for this plugin to recognize it as it's own.
+        required: yes
+        choices: ['community.general.yc_compute']
+        type: str
       auth_kind:
         description: The type of credential used.
         required: true
