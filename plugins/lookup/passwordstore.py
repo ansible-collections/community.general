@@ -190,7 +190,6 @@ class LookupModule(LookupBase):
             if self.paramvals['umask']:
                 os.environ['PASSWORD_STORE_UMASK'] = self.paramvals['umask']
 
-
     def check_pass(self):
         try:
             self.passoutput = to_text(
