@@ -20,7 +20,7 @@ DOCUMENTATION = r'''
     options:
       auth_kind:
         description: The type of credential used.
-        required: True
+        required: true
         type: string
         choices: ['oauth', 'serviceaccountfile']
         env:
