@@ -165,6 +165,11 @@ class Filesystem(object):
         if self.module.check_mode:
             return
 
+        mountpoint = dev.get_mountpoint()
+        if mountpoint:
+            msg = "operation forbidden while filesystem %s is mounted (over %s)." % (dev, mountpoint)
+            self.module.fail_json(changed=False, msg=msg)
+
         # wipefs comes with util-linux package, and may not work with vfat (at
         # least on CentOS 6). So we use the good old dd instead, in all cases.
         dd = self.module.get_bin_path('dd', required=True)
