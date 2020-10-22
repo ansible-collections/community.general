@@ -20,7 +20,6 @@ options:
   args:
     description:
       - A list of parameters to pass to the build.
-    required: false
     type: dict
   name:
     description:
@@ -30,35 +29,29 @@ options:
   build_number:
     description:
       - An integer which specifies a build of a job. Is required to remove a build from the queue.
-    required: false
     type: int
   password:
     description:
       - Password to authenticate with the Jenkins server.
-    required: false
     type: str
   state:
     description:
       - Attribute that specifies if the build is to be created or deleted.
-    required: false
     default: present
     choices: ['present', 'absent']
     type: str
   token:
     description:
       - API token used to authenticate with the Jenkins server.
-    required: false
     type: str
   url:
     description:
       - URL of the Jenkins server.
-    required: false
     default: http://localhost:8080
     type: str
   user:
     description:
        - User to authenticate with the Jenkins server.
-    required: false
     type: str
 '''
 
@@ -219,19 +212,18 @@ def test_dependencies(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            args=dict(required=False, type='dict'),
-            build_number=dict(required=False, type='int'),
-            name=dict(required=True),
-            password=dict(required=False, no_log=True),
-            state=dict(required=False, choices=['present', 'absent'], default="present"),
-            token=dict(required=False, no_log=True),
-            url=dict(required=False, default="http://localhost:8080"),
-            user=dict(required=False),
+            args=dict(type='dict'),
+            build_number=dict(type='int'),
+            name=dict(),
+            password=dict(no_log=True),
+            state=dict(choices=['present', 'absent'], default="present"),
+            token=dict(no_log=True),
+            url=dict(default="http://localhost:8080"),
+            user=dict(),
         ),
         mutually_exclusive=[
             ['password', 'token'],
         ],
-        supports_check_mode=True,
     )
 
     test_dependencies(module)
