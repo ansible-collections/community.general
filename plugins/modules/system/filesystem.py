@@ -24,7 +24,7 @@ options:
       contains a filesystem (as known by C(blkid)).
     - When C(state=absent), all other options but I(dev) are ignored, and the
       module doesn't fail if the device I(dev) doesn't actually exist.
-    - C(state=absent) is not supported and has no effect on FreeBSD systems.
+    - C(state=absent) is not supported and will fail on FreeBSD systems.
     type: str
     choices: [ present, absent ]
     default: present
@@ -171,7 +171,7 @@ class Filesystem(object):
     def wipefs(self, dev):
         if platform.system() == 'FreeBSD':
             msg = "module param state=absent is currently not supported on this OS (FreeBSD)."
-            self.module.exit_json(msg=msg)
+            self.module.fail_json(msg=msg)
 
         if self.module.check_mode:
             return
