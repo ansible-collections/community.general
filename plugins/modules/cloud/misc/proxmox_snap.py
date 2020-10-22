@@ -181,9 +181,11 @@ def snapshot_remove(module, proxmox, vm, vmid, timeout, snapname, force):
         time.sleep(1)
     return False
 
+
 def setup_api(api_host, api_user, api_password, validate_certs):
     api = ProxmoxAPI(api_host, user=api_user, password=api_password, verify_ssl=validate_certs)
     return api
+
 
 def main():
     module = AnsibleModule(
