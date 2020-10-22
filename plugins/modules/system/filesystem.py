@@ -25,6 +25,7 @@ options:
     - When C(state=absent), all other options but I(dev) are ignored, and the
       module doesn't fail if the device I(dev) doesn't actually exist.
     - C(state=absent) is not supported and has no effect on FreeBSD systems.
+    type: str
     choices: [ present, absent ]
     default: present
     version_added: 1.3.0
@@ -40,10 +41,12 @@ options:
     - ocfs2 support was added in 2.6
     - f2fs support was added in 2.7
     - swap support was added in 2.8
+    type: str
     aliases: [type]
   dev:
     description:
     - Target path to device or image file.
+    type: path
     required: yes
     aliases: [device]
   force:
@@ -64,6 +67,7 @@ options:
   opts:
     description:
     - List of options to be passed to mkfs command.
+    type: str
 requirements:
   - Uses tools related to the I(fstype) (C(mkfs)) and C(blkid) command. When I(resizefs) is enabled, C(blockdev) command is required too.
 notes:
@@ -405,10 +409,10 @@ def main():
     # There is no "single command" to manipulate filesystems, so we map them all out and their options
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'absent']),
-            fstype=dict(aliases=['type'], choices=list(fstypes)),
-            dev=dict(required=True, aliases=['device']),
-            opts=dict(),
+            state=dict(type='str', default='present', choices=['present', 'absent']),
+            fstype=dict(type='str', aliases=['type'], choices=list(fstypes)),
+            dev=dict(type='path', required=True, aliases=['device']),
+            opts=dict(type='str'),
             force=dict(type='bool', default=False),
             resizefs=dict(type='bool', default=False),
         ),
