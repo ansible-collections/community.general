@@ -60,10 +60,10 @@
         name: monit
         state: restarted
     - name: test process present (final attempt)
-        monit:
-          name: httpd_echo
-          state: present
-          timeout: 30
+      monit:
+        name: httpd_echo
+        state: present
+        timeout: 30
 
 - name: check that state is changed
   assert:
