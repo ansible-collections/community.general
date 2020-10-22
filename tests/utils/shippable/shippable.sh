@@ -68,11 +68,17 @@ cd "${TEST_DIR}"
 
 # START: HACK install dependencies
 retry ansible-galaxy -vvv collection install ansible.netcommon
-retry ansible-galaxy -vvv collection install ansible.posix
-retry ansible-galaxy -vvv collection install community.crypto
-retry ansible-galaxy -vvv collection install community.internal_test_tools
 retry ansible-galaxy -vvv collection install community.kubernetes
 retry ansible-galaxy -vvv collection install google.cloud
+
+if [ "${script}" != "sanity" ] || [ "${test}" == "sanity/extra" ]; then
+    retry ansible-galaxy -vvv collection install community.internal_test_tools
+fi
+
+if [ "${script}" != "sanity" ] && [ "${script}" != "units" ]; then
+    retry ansible-galaxy -vvv collection install ansible.posix
+    retry ansible-galaxy -vvv collection install community.crypto
+fi
 
 # END: HACK
 
