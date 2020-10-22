@@ -42,15 +42,28 @@
           stop program = "/bin/sh -c 'kill `pgrep -f httpd_echo`'"
           if failed host localhost port 8082 then restart
 
-- name: test process present (implicit reload)
-  monit:
-    name: httpd_echo
-    state: present
-    timeout: 30
-  register: result
-  until: not result.failed
-  retries: 5
-  delay: 1
+- block:
+  # in automated builds this task fails periodically because the monit daemon gets
+  # stuck in the 'initializing' state. Hence the rescue section
+  - name: test process present (implicit reload)
+    monit:
+      name: httpd_echo
+      state: present
+      timeout: 30
+    register: result
+    until: not result.failed
+    retries: 2
+    delay: 10
+  rescue:
+    - name: restart monit
+      service:
+        name: monit
+        state: restarted
+    - name: test process present (final attempt)
+        monit:
+          name: httpd_echo
+          state: present
+          timeout: 30
 
 - name: check that state is changed
   assert:
