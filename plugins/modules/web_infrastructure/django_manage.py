@@ -13,16 +13,16 @@ DOCUMENTATION = '''
 module: django_manage
 short_description: Manages a Django application.
 description:
-    - Manages a Django application using the I(manage.py) application frontend to I(django-admin). With the I(virtualenv) parameter, all
-      management commands will be executed by the given I(virtualenv) installation.
+    - Manages a Django application using the C(manage.py) application frontend to C(django-admin). With the
+      C(virtualenv) parameter, all management commands will be executed by the given C(virtualenv) installation.
 options:
   command:
-    choices: [ 'cleanup', 'collectstatic', 'flush', 'loaddata', 'migrate', 'runfcgi', 'syncdb', 'test', 'validate', ]
+    choices: [ 'cleanup', 'collectstatic', 'flush', 'loaddata', 'migrate', 'runfcgi', 'syncdb', 'test', 'validate' ]
     description:
-      - The name of the Django management command to run. Built in commands are cleanup, collectstatic, flush, loaddata, migrate, runfcgi, syncdb,
-        test, and validate.
-      - Other commands can be entered, but will fail if they're unknown to Django.  Other commands that may prompt for user input should be run
-        with the I(--noinput) flag.
+      - The name of the Django management command to run. Built in commands are C(cleanup), C(collectstatic),
+        C(flush), C(loaddata), C(migrate), C(runfcgi), C(syncdb), C(test), and C(validate).
+      - Other commands can be entered, but will fail if they're unknown to Django.  Other commands that may
+        prompt for user input should be run with the I(--noinput) flag.
     required: true
   app_path:
     description:
@@ -30,23 +30,24 @@ options:
     required: true
   settings:
     description:
-      - The Python path to the application's settings module, such as 'myapp.settings'.
+      - The Python path to the application's settings module, such as C(myapp.settings).
     required: false
   pythonpath:
     description:
-      - A directory to add to the Python path. Typically used to include the settings module if it is located external to the application directory.
+      - A directory to add to the Python path. Typically used to include the settings module if it is located
+        external to the application directory.
     required: false
   virtualenv:
     description:
       - An optional path to a I(virtualenv) installation to use while running the manage application.
-    aliases: [virtualenv]
+    aliases: [virtual_env]
   apps:
     description:
-      - A list of space-delimited apps to target. Used by the 'test' command.
+      - A list of space-delimited apps to target. Used by the C(test) command.
     required: false
   cache_table:
     description:
-      - The name of the table used for database-backed caching. Used by the 'createcachetable' command.
+      - The name of the table used for database-backed caching. Used by the C(createcachetable) command.
     required: false
   clear:
     description:
@@ -57,41 +58,48 @@ options:
     type: bool
   database:
     description:
-      - The database to target. Used by the C(createcachetable), C(flush), C(loaddata), C(syncdb), and C(migrate) I(command).
+      - The database to target. Used by the C(createcachetable), C(flush), C(loaddata), C(syncdb),
+        and C(migrate) commands.
     required: false
   failfast:
     description:
-      - Fail the command immediately if a test fails. Used by the 'test' command.
+      - Fail the command immediately if a test fails. Used by the C(test) command.
     required: false
     default: "no"
     type: bool
   fixtures:
     description:
-      - A space-delimited list of fixture file names to load in the database. B(Required) by the 'loaddata' command.
+      - A space-delimited list of fixture file names to load in the database. B(Required) by the C(loaddata) command.
     required: false
   skip:
     description:
-     - Will skip over out-of-order missing migrations, you can only use this parameter with I(migrate)
+     - Will skip over out-of-order missing migrations, you can only use this parameter with C(migrate) command.
     required: false
     type: bool
   merge:
     description:
-     - Will run out-of-order or missing migrations as they are not rollback migrations, you can only use this parameter with 'migrate' command
+     - Will run out-of-order or missing migrations as they are not rollback migrations, you can only use this
+       parameter with C(migrate) command
     required: false
     type: bool
   link:
     description:
-     - Will create links to the files instead of copying them, you can only use this parameter with 'collectstatic' command
+     - Will create links to the files instead of copying them, you can only use this parameter with
+       C(collectstatic) command
     required: false
     type: bool
 notes:
-  - I(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the virtualenv parameter is specified.
-  - This module will create a virtualenv if the virtualenv parameter is specified and a virtualenv does not already exist at the given location.
-  - This module assumes English error messages for the 'createcachetable' command to detect table existence, unfortunately.
-  - To be able to use the migrate command with django versions < 1.7, you must have south installed and added as an app in your settings.
-  - To be able to use the collectstatic command, you must have enabled staticfiles in your settings.
-  - As of ansible 2.x, your I(manage.py) application must be executable (rwxr-xr-x), and must have a valid I(shebang), i.e. "#!/usr/bin/env python",
-    for invoking the appropriate Python interpreter.
+  - C(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the virtualenv parameter
+    is specified.
+  - This module will create a virtualenv if the virtualenv parameter is specified and a virtualenv does not already
+    exist at the given location.
+  - This module assumes English error messages for the C(createcachetable) command to detect table existence,
+    unfortunately.
+  - To be able to use the C(migrate) command with django versions < 1.7, you must have C(south) installed and added
+    as an app in your settings.
+  - To be able to use the C(collectstatic) command, you must have enabled staticfiles in your settings.
+  - As of ansible 2.x, your C(manage.py) application must be executable (rwxr-xr-x), and must have a valid I(shebang),
+    i.e. C(#!/usr/bin/env python), for invoking the appropriate Python interpreter.
 requirements: [ "virtualenv", "django" ]
 author: "Scott Anderson (@tastychutney)"
 '''
@@ -154,7 +162,6 @@ def _ensure_virtualenv(module):
 
     if not os.path.exists(activate):
         virtualenv = module.get_bin_path('virtualenv', True)
-        vcmd = '%s %s' % (virtualenv, venv_param)
         vcmd = [virtualenv, venv_param]
         rc, out_venv, err_venv = module.run_command(vcmd)
         if rc != 0:
@@ -177,11 +184,14 @@ def loaddata_filter_output(line):
 
 
 def syncdb_filter_output(line):
-    return ("Creating table " in line) or ("Installed" in line and "Installed 0 object" not in line)
+    return ("Creating table " in line) \
+        or ("Installed" in line and "Installed 0 object" not in line)
 
 
 def migrate_filter_output(line):
-    return ("Migrating forwards " in line) or ("Installed" in line and "Installed 0 object" not in line) or ("Applying" in line)
+    return ("Migrating forwards " in line) \
+        or ("Installed" in line and "Installed 0 object" not in line) \
+        or ("Applying" in line)
 
 
 def collectstatic_filter_output(line):
