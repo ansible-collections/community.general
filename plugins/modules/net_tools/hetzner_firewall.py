@@ -146,7 +146,7 @@ EXAMPLES = r'''
     hetzner_user: foo
     hetzner_password: bar
     server_ip: 1.2.3.4
-    status: active
+    state: present
     whitelist_hos: yes
     rules:
       input:
