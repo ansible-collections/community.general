@@ -271,6 +271,7 @@ class LookupModule(LookupBase):
             'subkey': 'password',
             'directory': variables.get('passwordstore'),
             'create': False,
+            'umask': '077',
             'returnall': False,
             'overwrite': False,
             'nosymbols': False,
