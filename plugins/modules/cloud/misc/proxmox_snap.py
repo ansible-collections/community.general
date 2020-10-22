@@ -7,55 +7,55 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: proxmox_snap
-short_description: snapshot management of instances in Proxmox VE cluster
+module: community.general.proxmox_snap
+short_description: Snapshot management of instances in Proxmox VE cluster.
 description:
-  - allows you to create/delete snapshots from instances in Proxmox VE cluster
+  - Allows you to create/delete snapshots from instances in Proxmox VE cluster.
 options:
   api_host:
     description:
-      - the host of the Proxmox VE cluster
+      - The host of the Proxmox VE cluster.
     required: true
     type: str
   api_user:
     description:
-      - the user to authenticate with
+      - The user to authenticate with.
     required: true
     type: str
   api_password:
     description:
-      - the password to authenticate with
-      - you can use PROXMOX_PASSWORD environment variable
+      - The password to authenticate with.
+      - You can use PROXMOX_PASSWORD environment variable.
     type: str
   hostname:
     description:
-      - the instance name
+      - The instance name.
     type: str
   vmid:
     description:
-      - the instance id
-      - if not set, will be fetched from PromoxAPI based on the hostname
+      - The instance id.
+      - If not set, will be fetched from PromoxAPI based on the hostname.
     type: str
   validate_certs:
     description:
-      - enable / disable https certificate verification
+      - Enable / disable https certificate verification.
     type: bool
-    default: 'no'
+    default: no
   state:
     description:
-     - Indicate desired state of the instance snapshot
+     - Indicate desired state of the instance snapshot.
     choices: ['present', 'absent']
     default: present
     type: str
   force:
     description:
       - For removal from config file, even if removing disk snapshot fails.
-    default: 'no'
+    default: no
     type: bool
   vmstate:
     description:
-      - Snapshot includes RAM
-    default: 'no'
+      - Snapshot includes RAM.
+    default: no
     type: bool
   description:
     description:
@@ -64,12 +64,12 @@ options:
     type: str
   timeout:
     description:
-      - timeout for operations
+      - Timeout for operations.
     default: 30
     type: int
   snapname:
     description:
-      - Name of the snapshot that has to be created
+      - Name of the snapshot that has to be created.
     default: 'ansible_snap'
     type: str
 
@@ -81,7 +81,7 @@ author: Jeffrey van Pelt (@Thulium-Drake)
 
 EXAMPLES = r'''
 - name: Create new container snapshot
-  proxmox_snap:
+  community.general.proxmox_snap:
     api_user: root@pam
     api_password: 1q2w3e
     api_host: node1
@@ -90,7 +90,7 @@ EXAMPLES = r'''
     snapname: pre-updates
 
 - name: Remove container snapshot
-  proxmox:
+  community.general.proxmox_snap:
     api_user: root@pam
     api_password: 1q2w3e
     api_host: node1
@@ -103,7 +103,7 @@ EXAMPLES = r'''
   gather_facts: false
   tasks:
     - name: make snapshots using the vmid
-      proxmox_snap:
+      community.general.proxmox_snap:
         api_user: root@pam
         api_password: 1q2w3e
         api_host: node1
@@ -113,7 +113,7 @@ EXAMPLES = r'''
         vmstate: true
       delegate_to: localhost
     - name: remove snapshots using the inventory hostname
-      proxmox_snap:
+      community.general.proxmox_snap:
         api_user: root@pam
         api_password: 1q2w3e
         api_host: node1
