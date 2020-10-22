@@ -18,14 +18,14 @@ DOCUMENTATION = r'''
     description:
         - Get inventory hosts from OpenNebula cloud.
         - Uses an YAML configuration file ending with either I(opennebula.yml), I(opennebula.yaml), I(one.yml)
-        - or I(one.yaml) to set parameter values.
+          or I(one.yaml) to set parameter values.
         - Uses I(api_authfile), I(~/.one/one_auth), or C(ONE_AUTH) pointing to a OpenNebula credentials file.
     options:
         plugin:
             description: Token that ensures this is a source file for the 'opennebula' plugin.
             type: string
-            required: True
-            choices: [ opennebula ]
+            required: true
+            choices: [ community.general.opennebula ]
         api_url:
             description:
               - URL of the OpenNebula RPC server.
@@ -39,7 +39,7 @@ DOCUMENTATION = r'''
         api_username:
             description:
               - Name of the user to login into the OpenNebula RPC server. If not set
-              - then the value of the C(ONE_USERNAME) environment variable is used.
+                then the value of the C(ONE_USERNAME) environment variable is used.
             env:
               - name: ONE_USERNAME
             type: string
@@ -53,8 +53,8 @@ DOCUMENTATION = r'''
             type: string
         api_authfile:
             description:
-              - if both I(api_username) or I(api_password) are not set, then it will try
-              - authenticate with ONE auth file. Default path is "~/.one/one_auth".
+              - If both I(api_username) or I(api_password) are not set, then it will try
+              - authenticate with ONE auth file. Default path is C(~/.one/one_auth).
               - Set environment variable C(ONE_AUTH) to override this path.
             env:
               - name: ONE_AUTH
@@ -78,7 +78,7 @@ EXAMPLES = r'''
 # Example command line: ansible-inventory --list -i inventory_one.yml
 
 # Pass a label filter to the API
-plugin: opennebula
+plugin: community.general.opennebula
 api_url: https://opennebula:2633/RPC2
 filter_by_label: Cache
 '''
@@ -177,7 +177,7 @@ def _retrieve_servers(one_client, label_filter=None):
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable):
-    NAME = 'opennebula'
+    NAME = 'community.general.opennebula'
 
     def verify_file(self, path):
         valid = False
