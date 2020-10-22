@@ -17,8 +17,8 @@ DOCUMENTATION = r'''
         - constructed
     description:
         - Get inventory hosts from OpenNebula cloud.
-        - Uses an YAML configuration file ending with either I(opennebula.yml), I(opennebula.yaml), I(one.yml)
-          or I(one.yaml) to set parameter values.
+        - Uses an YAML configuration file ending with either I(opennebula.yml), I(opennebula.yaml)
+          to set parameter values.
         - Uses I(api_authfile), I(~/.one/one_auth), or C(ONE_AUTH) pointing to a OpenNebula credentials file.
     options:
         plugin:
@@ -74,8 +74,8 @@ DOCUMENTATION = r'''
 '''
 
 EXAMPLES = r'''
-# inventory_one.yml file in YAML format
-# Example command line: ansible-inventory --list -i inventory_one.yml
+# inventory_opennebula.yml file in YAML format
+# Example command line: ansible-inventory --list -i inventory_opennebula.yml
 
 # Pass a label filter to the API
 plugin: community.general.opennebula
@@ -182,7 +182,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
     def verify_file(self, path):
         valid = False
         if super(InventoryModule, self).verify_file(path):
-            if path.endswith(('opennebula.yaml', 'opennebula.yml', 'one.yaml', 'one.yml')):
+            if path.endswith(('opennebula.yaml', 'opennebula.yml')):
                 valid = True
         return valid
 
