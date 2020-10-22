@@ -139,6 +139,7 @@ options:
           - Whether notifications from this monitor automatically inserts its triggering tags into the title.
         type: bool
         default: yes
+        version_added: 1.3.0
 '''
 
 EXAMPLES = '''
