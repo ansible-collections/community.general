@@ -20,10 +20,11 @@ options:
     description:
     - If C(state=present), the filesystem is created if it doesn't already
       exist, that is the default behaviour if I(state) is omitted.
-    - If C(state=absent), first 128kB of I(dev) are wiped if it contains a
-      filesystem (as known by C(blkid)).
+    - If C(state=absent), filesystem signatures on I(dev) are wiped if it
+      contains a filesystem (as known by C(blkid)).
     - When C(state=absent), all other options but I(dev) are ignored, and the
       module doesn't fail if the device I(dev) doesn't actually exist.
+    - C(state=absent) is not supported and has no effect on FreeBSD systems.
     choices: [ present, absent ]
     default: present
     version_added: 1.3.0
@@ -54,7 +55,9 @@ options:
     description:
     - If C(yes), if the block device and filesystem size differ, grow the filesystem into the space.
     - Supported for C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(vfat), C(swap) filesystems.
-    - XFS Will only grow if mounted.
+    - XFS Will only grow if mounted. Currently, the module is based on commands
+      from C(util-linux) package to perform operations, so resizing of XFS is
+      not supported on FreeBSD systems.
     - vFAT will likely fail if fatresize < 1.04.
     type: bool
     default: 'no'
@@ -81,7 +84,7 @@ EXAMPLES = '''
     dev: /dev/sdb1
     opts: -cc
 
-- name: Blank filesystem header on /dev/sdb1
+- name: Blank filesystem signature on /dev/sdb1
   community.general.filesystem:
     dev: /dev/sdb1
     state: absent
@@ -162,18 +165,19 @@ class Filesystem(object):
         self.module.run_command(cmd, check_rc=True)
 
     def wipefs(self, dev):
+        if platform.system() == 'FreeBSD':
+            msg = "module param state=absent is currently not supported on this OS (FreeBSD)."
+            self.module.exit_json(msg=msg)
+
         if self.module.check_mode:
             return
 
-        mountpoint = dev.get_mountpoint()
-        if mountpoint:
-            msg = "operation forbidden while filesystem %s is mounted (over %s)." % (dev, mountpoint)
-            self.module.fail_json(changed=False, msg=msg)
-
-        # wipefs comes with util-linux package, and may not work with vfat (at
-        # least on CentOS 6). So we use the good old dd instead, in all cases.
-        dd = self.module.get_bin_path('dd', required=True)
-        cmd = [dd, "if=/dev/zero", "of=%s" % dev, "bs=512", "count=256", "conv=notrunc"]
+        # wipefs comes with util-linux package (as 'blockdev' & 'findmnt' above)
+        # so it is not supported on FreeBSD. Even the use of dd as a fallback is
+        # not doable here if it needs get_mountpoint() (to prevent corruption of
+        # a mounted filesystem), since 'findmnt' is not available on FreeBSD.
+        wipefs = self.module.get_bin_path('wipefs', required=True)
+        cmd = [wipefs, "--all", dev.__str__()]
         self.module.run_command(cmd, check_rc=True)
 
     def grow_cmd(self, dev):
