@@ -126,7 +126,7 @@ from google.protobuf.json_format import MessageToDict
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
-    NAME = 'yc_compute'
+    NAME = 'community.general.yc_compute'
 
     def __init__(self):
         super(InventoryModule, self).__init__()
