@@ -59,6 +59,8 @@
       service:
         name: monit
         state: restarted
+      register: restart_result
+
     - name: test process present (final attempt)
       monit:
         name: httpd_echo
@@ -70,6 +72,8 @@
     that:
       - result is success
       - result is changed
+  # ignore this test if we had to rescue the 'test process present'
+  when: restart_result is not defined
 
 - name: test process present again
   monit:
