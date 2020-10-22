@@ -214,7 +214,7 @@ def main():
         argument_spec=dict(
             args=dict(type='dict'),
             build_number=dict(type='int'),
-            name=dict(),
+            name=dict(required=True),
             password=dict(no_log=True),
             state=dict(choices=['present', 'absent'], default="present"),
             token=dict(no_log=True),
