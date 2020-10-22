@@ -17,9 +17,9 @@ DOCUMENTATION = r'''
         - constructed
     description:
         - Get inventory hosts from OpenNebula cloud.
-        - Uses an YAML configuration file ending with either I(opennebula.yml), I(opennebula.yaml)
+        - Uses an YAML configuration file ending with either I(opennebula.yml) or I(opennebula.yaml)
           to set parameter values.
-        - Uses I(api_authfile), I(~/.one/one_auth), or C(ONE_AUTH) pointing to a OpenNebula credentials file.
+        - Uses I(api_authfile), C(~/.one/one_auth), or C(ONE_AUTH) pointing to a OpenNebula credentials file.
     options:
         plugin:
             description: Token that ensures this is a source file for the 'opennebula' plugin.
@@ -54,14 +54,14 @@ DOCUMENTATION = r'''
         api_authfile:
             description:
               - If both I(api_username) or I(api_password) are not set, then it will try
-              - authenticate with ONE auth file. Default path is C(~/.one/one_auth).
+                authenticate with ONE auth file. Default path is C(~/.one/one_auth).
               - Set environment variable C(ONE_AUTH) to override this path.
             env:
               - name: ONE_AUTH
             required: False
             type: string
         hostname:
-            description: Field to match the hostname. Note v4_first_ip corresponds to the first IPv4 found on VM.
+            description: Field to match the hostname. Note C(v4_first_ip) corresponds to the first IPv4 found on VM.
             type: string
             default: v4_first_ip
             choices:
@@ -69,7 +69,7 @@ DOCUMENTATION = r'''
                 - v6_first_ip
                 - name
         filter_by_label:
-            description: Only return servers filtered by this label
+            description: Only return servers filtered by this label.
             type: string
 '''
 
