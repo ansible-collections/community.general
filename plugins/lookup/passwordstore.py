@@ -182,6 +182,11 @@ class LookupModule(LookupBase):
                 else:
                     raise AnsibleError('Passwordstore directory \'{0}\' does not exist'.format(self.paramvals['directory']))
 
+            # Set PASSWORD_STORE_UMASK if umask is set
+            if self.paramvals['umask']:
+                os.environ['PASSWORD_STORE_UMASK'] = self.paramvals['umask']
+
+
     def check_pass(self):
         try:
             self.passoutput = to_text(
