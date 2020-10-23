@@ -1,0 +1,78 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- block:
+  - name: Install EPEL repository (RHEL only)
+    include_role:
+      name: setup_epel
+
+  - name: create required directories
+    become: yes
+    file:
+      path: "{{ item }}"
+      state: directory
+    loop:
+      - /var/lib/monit
+      - /var/run/monit
+      - "{{ process_root }}"
+
+  - name: install monit
+    become: yes
+    package:
+      name: monit
+      state: present
+
+  - include_vars: '{{ item }}'
+    with_first_found:
+      - files:
+          - "{{ ansible_facts.distribution }}-{{ ansible_facts.distribution_major_version }}.yml"
+          - '{{ ansible_os_family }}.yml'
+          - 'defaults.yml'
+
+  - name: monit config
+    become: yes
+    template:
+      src: "monitrc.j2"
+      dest: "{{ monitrc }}"
+
+  - name: copy process file
+    become: yes
+    copy:
+      src: httpd_echo.py
+      dest: "{{ process_file }}"
+
+  - name: install dependencies
+    pip:
+      name: "{{ item }}"
+      virtualenv: "{{ process_venv }}"
+    loop:
+      - setuptools==44
+      - python-daemon
+
+  - name: restart monit
+    become: yes
+    service:
+      name: monit
+      state: restarted
+
+  - include_tasks: test.yml
+
+  always:
+  - name: stop monit
+    become: yes
+    service:
+      name: monit
+      state: stopped
+
+  - name: uninstall monit
+    become: yes
+    package:
+      name: monit
+      state: absent
+
+  - name: remove process files
+    file:
+      path: "{{ process_root }}"
+      state: absent
