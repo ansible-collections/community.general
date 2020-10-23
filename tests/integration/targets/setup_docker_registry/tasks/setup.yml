@@ -51,171 +51,21 @@
       registry_address: localhost:{{ registry_container.container.NetworkSettings.Ports['5000/tcp'].0.HostPort }}
 
   # Set up first nginx frontend for registry
-  - name: Start nginx frontend for registry
-    docker_volume:
-      name: '{{ docker_registry_container_name_nginx }}'
-      state: present
-
-  - name: Create container for nginx frontend for registry
-    docker_container:
-      state: stopped
-      name: '{{ docker_registry_container_name_nginx }}'
-      image: nginx:alpine
-      ports: 5000
-      links:
-      - '{{ docker_registry_container_name_registry }}:real-registry'
-      volumes:
-      - '{{ docker_registry_container_name_nginx }}:/etc/nginx/'
-    register: nginx_container
-
-  - name: Copy static files into volume
-    command: docker cp {{ role_path }}/files/{{ item }} {{ docker_registry_container_name_nginx }}:/etc/nginx/{{ item }}
-    loop:
-    - nginx.conf
-    - nginx.htpasswd
-    register: can_copy_files
-    ignore_errors: yes
-
-  - when: can_copy_files is not failed
-    block:
-
-    - name: Create private key for frontend certificate
-      community.crypto.openssl_privatekey:
-        path: '{{ output_dir }}/cert.key'
-        type: ECC
-        curve: secp256r1
-
-    - name: Create CSR for frontend certificate
-      community.crypto.openssl_csr:
-        path: '{{ output_dir }}/cert.csr'
-        privatekey_path: '{{ output_dir }}/cert.key'
-        subject_alt_name:
-        - DNS:test-registry.ansible.com
-
-    - name: Create frontend certificate
-      community.crypto.openssl_certificate:
-        path: '{{ output_dir }}/cert.pem'
-        csr_path: '{{ output_dir }}/cert.csr'
-        privatekey_path: '{{ output_dir }}/cert.key'
-        provider: selfsigned
-
-    - name: Copy dynamic files into volume
-      command: docker cp {{ output_dir }}/{{ item }} {{ docker_registry_container_name_nginx }}:/etc/nginx/{{ item }}
-      loop:
-      - cert.pem
-      - cert.key
-
-    - name: Start nginx frontend for registry
-      docker_container:
-        name: '{{ docker_registry_container_name_nginx }}'
-        state: started
-      register: nginx_container
-
-    - name: Output nginx container network settings
-      debug:
-        var: nginx_container.container.NetworkSettings
-
-    - name: Wait for registry frontend
-      uri:
-        url: https://{{ nginx_container.container.NetworkSettings.IPAddress }}:5000/v2/
-        url_username: testuser
-        url_password: hunter2
-        validate_certs: false
-      register: result
-      until: result is success
-      retries: 5
-      delay: 1
-
-    - name: Get registry URL
-      set_fact:
-        registry_frontend_address: localhost:{{ nginx_container.container.NetworkSettings.Ports['5000/tcp'].0.HostPort }}
+  - include_tasks: setup-frontend.yml
+    vars:
+      docker_registry_container_name_frontend: '{{ docker_registry_container_name_nginx }}'
 
   - set_fact:
-      registry_frontend_address: 'n/a'
-    when: can_copy_files is failed
+      registry_frontend_address: '{{ docker_registry_frontend_address }}'
 
   # Set up second nginx frontend for registry
-  - name: Start nginx frontend for registry
-    docker_volume:
-      name: '{{ docker_registry_container_name_nginx2 }}'
-      state: present
-
-  - name: Create container for nginx frontend for registry
-    docker_container:
-      state: stopped
-      name: '{{ docker_registry_container_name_nginx2 }}'
-      image: nginx:alpine
-      ports: 5000
-      links:
-      - '{{ docker_registry_container_name_registry }}:real-registry'
-      volumes:
-      - '{{ docker_registry_container_name_nginx2 }}:/etc/nginx/'
-    register: nginx_container
-
-  - name: Copy static files into volume
-    command: docker cp {{ role_path }}/files/{{ item }} {{ docker_registry_container_name_nginx2 }}:/etc/nginx/{{ item }}
-    loop:
-    - nginx.conf
-    - nginx.htpasswd
-    register: can_copy_files
-    ignore_errors: yes
-
-  - when: can_copy_files is not failed
-    block:
-
-    - name: Create private key for frontend certificate
-      community.crypto.openssl_privatekey:
-        path: '{{ output_dir }}/cert.key'
-        type: ECC
-        curve: secp256r1
-
-    - name: Create CSR for frontend certificate
-      community.crypto.openssl_csr:
-        path: '{{ output_dir }}/cert.csr'
-        privatekey_path: '{{ output_dir }}/cert.key'
-        subject_alt_name:
-        - DNS:test-registry.ansible.com
-
-    - name: Create frontend certificate
-      community.crypto.openssl_certificate:
-        path: '{{ output_dir }}/cert.pem'
-        csr_path: '{{ output_dir }}/cert.csr'
-        privatekey_path: '{{ output_dir }}/cert.key'
-        provider: selfsigned
-
-    - name: Copy dynamic files into volume
-      command: docker cp {{ output_dir }}/{{ item }} {{ docker_registry_container_name_nginx2 }}:/etc/nginx/{{ item }}
-      loop:
-      - cert.pem
-      - cert.key
-
-    - name: Start nginx frontend for registry
-      docker_container:
-        name: '{{ docker_registry_container_name_nginx2 }}'
-        state: started
-      register: nginx_container
-
-    - name: Output nginx container network settings
-      debug:
-        var: nginx_container.container.NetworkSettings
-
-    - name: Wait for registry frontend
-      uri:
-        url: https://{{ nginx_container.container.NetworkSettings.IPAddress }}:5000/v2/
-        url_username: testuser
-        url_password: hunter2
-        validate_certs: false
-      register: result
-      until: result is success
-      retries: 5
-      delay: 1
-
-    - name: Get registry URL
-      set_fact:
-        registry_frontend2_address: localhost:{{ nginx_container.container.NetworkSettings.Ports['5000/tcp'].0.HostPort }}
+  - include_tasks: setup-frontend.yml
+    vars:
+      docker_registry_container_name_frontend: '{{ docker_registry_container_name_nginx2 }}'
 
   - set_fact:
-      registry_frontend2_address: 'n/a'
-    when: can_copy_files is failed
+      registry_frontend2_address: '{{ docker_registry_frontend_address }}'
 
-  - debug: msg="Registry available under {{ registry_address }}, NGINX frontends available under {{ registry_frontend_address }} and {{ registry_frontend2_address }}"
+  # Print addresses for registry and frontends
+  - debug:
+      msg: "Registry available under {{ registry_address }}, NGINX frontends available under {{ registry_frontend_address }} and {{ registry_frontend2_address }}"
