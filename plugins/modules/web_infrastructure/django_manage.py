@@ -22,7 +22,7 @@ options:
       - The name of the Django management command to run. Built in commands are C(cleanup), C(collectstatic),
         C(flush), C(loaddata), C(migrate), C(runfcgi), C(syncdb), C(test), and C(validate).
       - Other commands can be entered, but will fail if they're unknown to Django.  Other commands that may
-        prompt for user input should be run with the I(--noinput) flag.
+        prompt for user input should be run with the C(--noinput) flag.
     required: true
   app_path:
     description:
