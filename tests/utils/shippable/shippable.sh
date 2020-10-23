@@ -72,10 +72,13 @@ retry ansible-galaxy -vvv collection install community.kubernetes
 retry ansible-galaxy -vvv collection install google.cloud
 
 if [ "${script}" != "sanity" ] || [ "${test}" == "sanity/extra" ]; then
+    # Nothing further should be added to this list.
+    # This is to prevent modules or plugins in this collection having a runtime dependency on other collections.
     retry ansible-galaxy -vvv collection install community.internal_test_tools
 fi
 
 if [ "${script}" != "sanity" ] && [ "${script}" != "units" ]; then
+    # To prevent Python dependencies on other collections only install other collections for integration tests
     retry ansible-galaxy -vvv collection install ansible.posix
     retry ansible-galaxy -vvv collection install community.crypto
 fi
