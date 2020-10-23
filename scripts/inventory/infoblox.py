@@ -30,7 +30,7 @@ from ansible_collections.community.general.plugins.module_utils.net_tools.nios.a
 
 
 CONFIG_FILES = [
-    os.environ.get('INFOBLOX_CONFIG_FILE', None),
+    os.environ.get('INFOBLOX_CONFIG_FILE', ''),
     '/etc/ansible/infoblox.yaml',
     '/etc/ansible/infoblox.yml'
 ]
