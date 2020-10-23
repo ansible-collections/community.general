@@ -1,0 +1,33 @@
+- import_tasks: check_state.yml
+  vars:
+    reason: verify initial service state
+    service_state: "{{ initial_state }}"
+
+- name: change httpd_echo process state to {{ state }}
+  monit:
+    name: httpd_echo
+    state: "{{ state }}"
+  register: result
+
+- name: check that state changed
+  assert:
+    that:
+      - result is success
+      - result is changed
+
+- import_tasks: check_state.yml
+  vars:
+    reason: check service state after action
+    service_state: "{{ expected_state }}"
+
+- name: try change state again to {{ state }}
+  monit:
+    name: httpd_echo
+    state: "{{ state }}"
+  register: result
+
+- name: check that state is not changed
+  assert:
+    that:
+      - result is success
+      - result is not changed
