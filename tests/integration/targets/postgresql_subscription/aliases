@@ -5,3 +5,4 @@ skip/osx
 skip/macos
 skip/freebsd
 skip/rhel
+disabled  # tests already running in community.postgresql
