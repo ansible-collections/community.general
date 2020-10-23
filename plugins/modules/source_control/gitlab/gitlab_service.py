@@ -11,12 +11,13 @@ DOCUMENTATION = '''
 ---
 module: gitlab_service
 short_description: Creates, updates or deletes GitLab services (aka "integrations").
+version_added: '1.3.0'
 description:
   - Setup or delete GitLab integration services.
 author:
   - Raphaël Droz (@drzraf)
 requirements:
-  - python >= 2.7
+  - python >= 2.6
   - python-gitlab python module
 extends_documentation_fragment:
 - community.general.auth_basic
@@ -176,6 +177,8 @@ state:
 
 import traceback
 
+from ansible.module_utils.six import iteritems
+
 GITLAB_IMP_ERR = None
 try:
     import gitlab
@@ -312,7 +315,13 @@ class GitLabServices(object):
             supported_events = RAW_SERVICES_DEFINITIONS[self.name]['_events']
         except KeyError:
             supported_events = None
-        return {value + '_events': bool(value in events) for value in self.HOOK_EVENTS if supported_events is None or value in supported_events}
+        # ret = {value + '_events': bool(value in events) for value in self.HOOK_EVENTS if supported_events is None or value in supported_events}
+        # python2.6 remove-me:
+        ret = {}
+        for value in iteritems(self.HOOK_EVENTS):
+            if supported_events is None or value in supported_events:
+                ret[value + '_events'] = bool(value in events)
+        return ret
 
     def eventsEqual(self, obj, events):
         return all((k in obj and obj[k] == v) for k, v in events.items())
@@ -321,7 +330,13 @@ class GitLabServices(object):
         return ('password' in attr and attr['password']) or ('token' in attr and attr['token']) or ('api_key' in attr and attr['api_key'])
 
     def equals(self, prev_attr, active, params, events):
-        filtered_params = {k: v for k, v in params.items() if k not in self.credentialParams}
+        # filtered_params = {k: v for k, v in params.items() if k not in self.credentialParams}
+        # python2.6 remove-me:
+        filtered_params = {}
+        for k, v in iteritems(params):
+            if k not in self.credentialParams:
+                filtered_params[k] = v
+
         if prev_attr['active'] != active:
             self._module.debug("active status differs")
             return False
@@ -379,7 +394,13 @@ def main():
     state = stub_init.params['state']
     if state == 'present':
         # since we know the service (which has been validated), recreate a module_specs to validate suboptions
-        sub_arg_specs = {i: definitions[service][i] for i in definitions[service] if i != '_events'}
+        # sub_arg_specs = {i: definitions[service][i] for i in definitions[service] if i != '_events'}
+        # python2.6 remove-me:
+        sub_arg_specs = {}
+        for i in iteritems(definitions[service]):
+            if i != '_events':
+                sub_arg_specs[i] = definitions[service][i]
+
         base_specs['argument_spec']['params'] = dict(required=False, type='dict', options=sub_arg_specs)
         if '_events' in definitions[service]:
             base_specs['argument_spec']['events'] = dict(required=True, type='list', elements='str', choices=definitions[service]['_events'])
