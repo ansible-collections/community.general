@@ -1,0 +1,6 @@
+- name: Check an error occurs when wrong process name is used
+  monit:
+    name: missing
+    state: started
+  register: result
+  failed_when: result is not skip and (result is success or result is not failed)

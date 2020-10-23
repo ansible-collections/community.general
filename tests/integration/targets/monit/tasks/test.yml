@@ -1,0 +1,28 @@
+# order is important
+- import_tasks: test_reload_present.yml
+
+- import_tasks: test_state.yml
+  vars:
+    state: stopped
+    initial_state: up
+    expected_state: down
+
+- import_tasks: test_state.yml
+  vars:
+    state: started
+    initial_state: down
+    expected_state: up
+
+- import_tasks: test_state.yml
+  vars:
+    state: unmonitored
+    initial_state: up
+    expected_state: down
+
+- import_tasks: test_state.yml
+  vars:
+    state: monitored
+    initial_state: down
+    expected_state: up
+
+- import_tasks: test_errors.yml
