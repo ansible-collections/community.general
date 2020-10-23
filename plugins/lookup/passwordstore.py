@@ -36,6 +36,7 @@ DOCUMENTATION = '''
         description: Sets the umask for the created .gpg files.
         env:
           - name: PASSWORD_STORE_UMASK
+        version_added: 1.3.0
       returnall:
         description: Return all the content of the password, not only the first line.
         type: bool
