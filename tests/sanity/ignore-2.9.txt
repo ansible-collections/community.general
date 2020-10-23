@@ -652,7 +652,6 @@ plugins/modules/net_tools/nios/nios_zone.py validate-modules:doc-default-does-no
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:doc-missing-type
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:undocumented-parameter
-plugins/modules/net_tools/nmcli.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nsupdate.py validate-modules:parameter-type-not-in-doc
 plugins/modules/notification/bearychat.py validate-modules:parameter-type-not-in-doc
 plugins/modules/notification/campfire.py validate-modules:doc-missing-type
