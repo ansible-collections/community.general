@@ -583,7 +583,7 @@ files:
     authors: nerzhul
   $modules/monitoring/monit.py:
     authors: dstoflet
-    maintainers: brian-brazil
+    maintainers: brian-brazil snopoke
     labels: monit
   $modules/monitoring/nagios.py:
     authors: tbielawa
