@@ -1,0 +1,8 @@
+destructive
+needs/target/setup_epel
+shippable/posix/group2
+skip/osx
+skip/macos
+skip/freebsd
+skip/aix
+skip/python2.6  # python-daemon package used in integration tests requires >=2.7

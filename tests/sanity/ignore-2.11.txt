@@ -675,8 +675,6 @@ plugins/modules/monitoring/logentries.py validate-modules:undocumented-parameter
 plugins/modules/monitoring/logstash_plugin.py validate-modules:doc-missing-type
 plugins/modules/monitoring/logstash_plugin.py validate-modules:invalid-ansiblemodule-schema
 plugins/modules/monitoring/logstash_plugin.py validate-modules:parameter-type-not-in-doc
-plugins/modules/monitoring/monit.py validate-modules:doc-missing-type
-plugins/modules/monitoring/monit.py validate-modules:parameter-type-not-in-doc
 plugins/modules/monitoring/newrelic_deployment.py validate-modules:doc-missing-type
 plugins/modules/monitoring/pagerduty.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/monitoring/pagerduty.py validate-modules:doc-missing-type
