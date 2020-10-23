@@ -23,33 +23,37 @@
     - emptypids.pids == [] 
 
 - name: "Picking a random process name"
-  command: "echo 'some-random-long-name-{{ 99999999 | random }}'"
-  register: random_name
+  set_fact:
+    random_name: some-random-long-name-{{ 99999999 | random }}
 
 - name: "finding the 'sleep' binary"
   command: which sleep
   register: find_sleep
 
-- name: "copying 'sleep' binary"
+- name: "Copying 'sleep' binary"
   copy:
     src: "{{ find_sleep.stdout }}"
-    dest: "{{ output_dir }}/{{ random_name.stdout }}"
+    dest: "{{ output_dir }}/{{ random_name }}"
     mode: "0777"
 
 - name: "Running the copy of 'sleep' binary"
-  command: "sh {{ role_path }}/files/obtainpid.sh '{{ output_dir }}/{{ random_name.stdout }}' '{{ output_dir }}/obtainpid.txt'"
+  command: "sh {{ role_path }}/files/obtainpid.sh '{{ output_dir }}/{{ random_name }}' '{{ output_dir }}/obtainpid.txt'"
 
   async: 100
   poll: 0
 
+- name: "Wait for one second to make sure that the sleep copy has actually been started"
+  pause:
+    seconds: 1
+
 - name: "Checking the process IDs (PIDs) of sleep binary"
   pids:
-    name: "{{ random_name.stdout }}"
+    name: "{{ random_name }}"
   register: pids
 
 - name: "Checking that exact non-substring matches are required"
   pids:
-    name: "{{ random_name.stdout[0:5] }}"
+    name: "{{ random_name[0:5] }}"
   register: exactpidmatch
 
 - name: "Reading pid from the file"
