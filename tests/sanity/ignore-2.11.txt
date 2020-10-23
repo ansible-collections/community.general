@@ -840,8 +840,6 @@ plugins/modules/net_tools/nios/nios_zone.py validate-modules:invalid-ansiblemodu
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:parameter-alias-self
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:undocumented-parameter
-plugins/modules/net_tools/nmcli.py validate-modules:parameter-list-no-elements
-plugins/modules/net_tools/nmcli.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nsupdate.py validate-modules:parameter-list-no-elements
 plugins/modules/net_tools/nsupdate.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/omapi_host.py validate-modules:parameter-list-no-elements
