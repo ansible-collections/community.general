@@ -1,0 +1,13 @@
+set daemon 2
+set logfile /var/log/monit.log
+set idfile /var/lib/monit/id
+set statefile /var/lib/monit/state
+set pidfile /var/run/monit.pid
+
+set eventqueue
+    basedir /var/lib/monit/events
+    slots 100
+
+set httpd port 2812 and
+    use address localhost
+    allow localhost
