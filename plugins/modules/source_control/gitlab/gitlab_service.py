@@ -23,10 +23,6 @@ extends_documentation_fragment:
 - community.general.auth_basic
 
 options:
-  api_token:
-    description:
-      - GitLab token for logging in.
-    type: str
   project:
     description:
       - The ID or path of the project (urlencoded or not)
@@ -81,7 +77,7 @@ options:
     type: dict
   events:
     description:
-      - The events that trigger the service (required state is present)
+      - The events that trigger the service (required if C(state=present))
     choices: ["push", "issues", "confidential_issues", "merge_requests", "tag_push", "note", "confidential_note", "job", "pipeline", "wiki_page"]
     default: ["push", "issues", "confidential_issues", "merge_requests", "tag_push", "note", "confidential_note", "job", "pipeline", "wiki_page"]
     type: list
@@ -188,6 +184,7 @@ except ImportError:
     GITLAB_IMP_ERR = traceback.format_exc()
     HAS_GITLAB_PACKAGE = False
 
+from ansible.module_utils.api import basic_auth_argument_spec
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
 
@@ -359,20 +356,17 @@ class GitLabServices(object):
 def main():
     definitions = init_definitions()
 
-    base_specs = dict(
-        argument_spec=dict(
-            api_url=dict(required=True),
-            validate_certs=dict(required=False, default=True, type='bool'),
-            api_username=dict(required=False, no_log=True),
-            api_password=dict(required=False, no_log=True),
-            api_token=dict(required=False, no_log=True),
+    base_spec = basic_auth_argument_spec()
+    base_spec.update(dict(
             project=dict(required=True),
             service=dict(required=False, type='str', choices=list(definitions.keys())),
             active=dict(required=False, default=True, type='bool', choices=[True]),
             params=dict(required=False, type='dict'),
             events=dict(required=False, type='list', elements='str', default=GitLabServices.HOOK_EVENTS, choices=GitLabServices.HOOK_EVENTS),
             state=dict(default='present', choices=['present', 'absent']),
-        ),
+    ))
+
+    constraints = dict(
         mutually_exclusive=[
             ['api_username', 'api_token'],
             ['api_password', 'api_token']
@@ -389,7 +383,7 @@ def main():
         supports_check_mode=True
     )
 
-    stub_init = AnsibleModule(**base_specs)
+    stub_init = AnsibleModule(argument_spec=base_spec, **constraints)
     service = stub_init.params['service']
     state = stub_init.params['state']
     if state == 'present':
@@ -401,10 +395,10 @@ def main():
             if i != '_events':
                 sub_arg_specs[i] = definitions[service][i]
 
-        base_specs['argument_spec']['params'] = dict(required=False, type='dict', options=sub_arg_specs)
+        base_specs['params'] = dict(required=False, type='dict', options=sub_arg_specs)
         if '_events' in definitions[service]:
-            base_specs['argument_spec']['events'] = dict(required=True, type='list', elements='str', choices=definitions[service]['_events'])
-        module = AnsibleModule(**base_specs)
+            base_specs['events'] = dict(required=True, type='list', elements='str', choices=definitions[service]['_events'])
+        module = AnsibleModule(argument_spec=base_spec, **constraints)
     else:
         module = stub_init
 
