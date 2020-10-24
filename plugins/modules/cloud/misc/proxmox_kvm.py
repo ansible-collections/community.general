@@ -128,7 +128,6 @@ options:
     description:
       - Allow to force stop VM.
       - Can be used with states C(stopped), C(restarted) and C(absent).
-    default: no
     type: bool
   format:
     description:
@@ -460,7 +459,7 @@ options:
         deprecation warnings, please set I(proxmox_default_behavior) to an explicit
         value.
       - This affects the I(acpi), I(autostart), I(balloon), I(boot), I(cores), I(cpu),
-        I(cpuunits), I(format), I(kvm), I(memory), I(onboot), I(ostype), I(sockets),
+        I(cpuunits), I(force), I(format), I(kvm), I(memory), I(onboot), I(ostype), I(sockets),
         I(tablet), I(template), I(vga), options.
     type: str
     choices:
@@ -933,7 +932,7 @@ def main():
             delete=dict(type='str', default=None),
             description=dict(type='str'),
             digest=dict(type='str'),
-            force=dict(type='bool', default=False),
+            force=dict(type='bool'),
             format=dict(type='str', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk', 'unspecified']),
             freeze=dict(type='bool'),
             full=dict(type='bool', default=True),
@@ -1031,6 +1030,7 @@ def main():
             cores=1,
             cpu='kvm64',
             cpuunits=1000,
+            force=False,
             format='qcow2',
             kvm=True,
             memory=512,
