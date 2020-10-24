@@ -113,6 +113,12 @@ options:
     choices: [ "web", "yes", "no" ]
     type: str
 
+  getbinpkgonly:
+    description:
+      - Merge only packages specified at PORTAGE_BINHOST in make.conf
+    type: bool
+    default: no
+
   getbinpkg:
     description:
       - Prefer packages specified at PORTAGE_BINHOST in make.conf
@@ -310,6 +316,7 @@ def emerge_packages(module, packages):
         'onlydeps': '--onlydeps',
         'quiet': '--quiet',
         'verbose': '--verbose',
+        'getbinpkgonly': '--getbinpkgonly',
         'getbinpkg': '--getbinpkg',
         'usepkgonly': '--usepkgonly',
         'usepkg': '--usepkg',
@@ -323,6 +330,9 @@ def emerge_packages(module, packages):
 
     if p['state'] and p['state'] == 'latest':
         args.append("--update")
+
+    if p['getbinpkg'] and p['getbinpkgonly']:
+        module.fail_json(msg='Use only one of getbinpkg, getbinpkgonly')
 
     if p['usepkg'] and p['usepkgonly']:
         module.fail_json(msg='Use only one of usepkg, usepkgonly')
@@ -356,7 +366,7 @@ def emerge_packages(module, packages):
 
     # Check for SSH error with PORTAGE_BINHOST, since rc is still 0 despite
     #   this error
-    if (p['usepkgonly'] or p['getbinpkg']) \
+    if (p['usepkgonly'] or p['getbinpkg'] or p['getbinpkgonly']) \
             and 'Permission denied (publickey).' in err:
         module.fail_json(
             cmd=cmd, rc=rc, stdout=out, stderr=err,
@@ -480,6 +490,7 @@ def main():
             quiet=dict(default=False, type='bool'),
             verbose=dict(default=False, type='bool'),
             sync=dict(default=None, choices=['yes', 'web', 'no']),
+            getbinpkgonly=dict(default=False, type='bool'),
             getbinpkg=dict(default=False, type='bool'),
             usepkgonly=dict(default=False, type='bool'),
             usepkg=dict(default=False, type='bool'),
