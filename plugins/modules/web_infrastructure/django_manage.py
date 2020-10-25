@@ -22,7 +22,7 @@ options:
         C(flush), C(loaddata), C(migrate), C(syncdb), C(test), and C(validate).
       - Other commands can be entered, but will fail if they're unknown to Django.  Other commands that may
         prompt for user input should be run with the C(--noinput) flag.
-      - The module will perform some basic parameter validation (when applicable) to the commands C(cleanup)',
+      - The module will perform some basic parameter validation (when applicable) to the commands C(cleanup),
         C(collectstatic), C(createcachetable), C(flush), C(loaddata), C(migrate), C(syncdb), C(test), and C(validate).
     type: str
     required: true
