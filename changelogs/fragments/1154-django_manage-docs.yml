@@ -1,2 +1,2 @@
 deprecated_features:
-  - django_manage - The parameter C(liveserver) relates to a no longer maintained third-party module for django. It is being deprecated now, due to remove in version 3.0.0.
+  - django_manage - the parameter ``liveserver`` relates to a no longer maintained third-party module for django. It is now deprecated, and will be remove in community.general 3.0.0 (https://github.com/ansible-collections/community.general/pull/1154).
