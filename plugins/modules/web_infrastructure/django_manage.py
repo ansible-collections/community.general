@@ -17,37 +17,46 @@ description:
       C(virtualenv) parameter, all management commands will be executed by the given C(virtualenv) installation.
 options:
   command:
-    choices: [ 'cleanup', 'collectstatic', 'flush', 'loaddata', 'migrate', 'runfcgi', 'syncdb', 'test', 'validate' ]
     description:
       - The name of the Django management command to run. Built in commands are C(cleanup), C(collectstatic),
-        C(flush), C(loaddata), C(migrate), C(runfcgi), C(syncdb), C(test), and C(validate).
+        C(flush), C(loaddata), C(migrate), C(syncdb), C(test), and C(validate).
       - Other commands can be entered, but will fail if they're unknown to Django.  Other commands that may
         prompt for user input should be run with the C(--noinput) flag.
+      - The module will perform some basic parameter validation (when applicable) to the commands C(cleanup)',
+        C(collectstatic), C(createcachetable), C(flush), C(loaddata), C(migrate), C(syncdb), C(test), and C(validate).
+    type: str
     required: true
   app_path:
     description:
       - The path to the root of the Django application where B(manage.py) lives.
+    type: path
     required: true
   settings:
     description:
       - The Python path to the application's settings module, such as C(myapp.settings).
+    type: path
     required: false
   pythonpath:
     description:
       - A directory to add to the Python path. Typically used to include the settings module if it is located
         external to the application directory.
+    type: path
     required: false
+    aliases: [python_path]
   virtualenv:
     description:
       - An optional path to a I(virtualenv) installation to use while running the manage application.
+    type: path
     aliases: [virtual_env]
   apps:
     description:
       - A list of space-delimited apps to target. Used by the C(test) command.
+    type: str
     required: false
   cache_table:
     description:
       - The name of the table used for database-backed caching. Used by the C(createcachetable) command.
+    type: str
     required: false
   clear:
     description:
@@ -60,16 +69,19 @@ options:
     description:
       - The database to target. Used by the C(createcachetable), C(flush), C(loaddata), C(syncdb),
         and C(migrate) commands.
+    type: str
     required: false
   failfast:
     description:
       - Fail the command immediately if a test fails. Used by the C(test) command.
     required: false
-    default: "no"
+    default: false
     type: bool
+    aliases: [fail_fast]
   fixtures:
     description:
       - A space-delimited list of fixture file names to load in the database. B(Required) by the C(loaddata) command.
+    type: str
     required: false
   skip:
     description:
@@ -88,6 +100,21 @@ options:
        C(collectstatic) command
     required: false
     type: bool
+  liveserver:
+    description:
+      - This parameter was implemented a long time ago in a galaxy far way. It probably relates to the
+        django-liveserver package, which is no longer updated.
+      - Hence, it will be considered DEPRECATED and should be removed in a future release.
+    type: str
+    required: false
+    aliases: [live_server]
+  testrunner:
+    description:
+      - "From the Django docs: Controls the test runner class that is used to execute tests"
+      - This parameter is passed as-is to C(manage.py)
+    type: str
+    required: false
+    aliases: [test_runner]
 notes:
   - C(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the virtualenv parameter
     is specified.
@@ -234,20 +261,21 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            command=dict(default=None, required=True),
-            app_path=dict(default=None, required=True, type='path'),
-            settings=dict(default=None, required=False),
-            pythonpath=dict(default=None, required=False, aliases=['python_path']),
+            command=dict(required=True, type='str'),
+            app_path=dict(required=True, type='path'),
+            settings=dict(default=None, required=False, type='path'),
+            pythonpath=dict(default=None, required=False, type='path', aliases=['python_path']),
             virtualenv=dict(default=None, required=False, type='path', aliases=['virtual_env']),
 
             apps=dict(default=None, required=False),
-            cache_table=dict(default=None, required=False),
+            cache_table=dict(default=None, required=False, type='str'),
             clear=dict(default=None, required=False, type='bool'),
-            database=dict(default=None, required=False),
+            database=dict(default=None, required=False, type='str'),
             failfast=dict(default=False, required=False, type='bool', aliases=['fail_fast']),
-            fixtures=dict(default=None, required=False),
-            liveserver=dict(default=None, required=False, aliases=['live_server']),
-            testrunner=dict(default=None, required=False, aliases=['test_runner']),
+            fixtures=dict(default=None, required=False, type='str'),
+            liveserver=dict(default=None, required=False, type='str', aliases=['live_server'],
+                            removed_in_verison='3.0.0'),
+            testrunner=dict(default=None, required=False, type='str', aliases=['test_runner']),
             skip=dict(default=None, required=False, type='bool'),
             merge=dict(default=None, required=False, type='bool'),
             link=dict(default=None, required=False, type='bool'),

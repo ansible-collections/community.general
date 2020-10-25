@@ -1235,11 +1235,6 @@ plugins/modules/web_infrastructure/apache2_module.py validate-modules:parameter-
 plugins/modules/web_infrastructure/deploy_helper.py validate-modules:doc-missing-type
 plugins/modules/web_infrastructure/deploy_helper.py validate-modules:parameter-type-not-in-doc
 plugins/modules/web_infrastructure/deploy_helper.py validate-modules:undocumented-parameter
-plugins/modules/web_infrastructure/django_manage.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/web_infrastructure/django_manage.py validate-modules:doc-missing-type
-plugins/modules/web_infrastructure/django_manage.py validate-modules:no-default-for-required-parameter
-plugins/modules/web_infrastructure/django_manage.py validate-modules:parameter-type-not-in-doc
-plugins/modules/web_infrastructure/django_manage.py validate-modules:undocumented-parameter
 plugins/modules/web_infrastructure/ejabberd_user.py validate-modules:doc-missing-type
 plugins/modules/web_infrastructure/ejabberd_user.py validate-modules:doc-required-mismatch
 plugins/modules/web_infrastructure/ejabberd_user.py validate-modules:parameter-type-not-in-doc
