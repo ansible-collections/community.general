@@ -91,7 +91,7 @@ options:
   merge:
     description:
      - Will run out-of-order or missing migrations as they are not rollback migrations, you can only use this
-       parameter with C(migrate) command
+       parameter with C(migrate) command.
     required: false
     type: bool
   link:
