@@ -118,6 +118,7 @@ options:
       - Merge only packages specified at PORTAGE_BINHOST in make.conf
     type: bool
     default: no
+    version_added: 1.3.0
 
   getbinpkg:
     description:
