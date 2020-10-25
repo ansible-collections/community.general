@@ -111,7 +111,7 @@ options:
   testrunner:
     description:
       - "From the Django docs: Controls the test runner class that is used to execute tests"
-      - This parameter is passed as-is to C(manage.py)
+      - This parameter is passed as-is to C(manage.py).
     type: str
     required: false
     aliases: [test_runner]
