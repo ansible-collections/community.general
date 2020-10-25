@@ -125,7 +125,7 @@ notes:
   - To be able to use the C(migrate) command with django versions < 1.7, you must have C(south) installed and added
     as an app in your settings.
   - To be able to use the C(collectstatic) command, you must have enabled staticfiles in your settings.
-  - As of ansible 2.x, your C(manage.py) application must be executable (rwxr-xr-x), and must have a valid I(shebang),
+  - Your C(manage.py) application must be executable (rwxr-xr-x), and must have a valid C(shebang),
     i.e. C(#!/usr/bin/env python), for invoking the appropriate Python interpreter.
 requirements: [ "virtualenv", "django" ]
 author: "Scott Anderson (@tastychutney)"
