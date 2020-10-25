@@ -1,0 +1,4 @@
+minor_changes:
+  - django_manage - Fixed a number of inconsistencies and missing details in the documentation. Cleared list of ignored sanity validations.
+deprecated_features:
+  - django_manage - The parameter C(liveserver) relates to a no longer maintained third-party module for django. It is being deprecated now, due to remove in version 3.0.0.
