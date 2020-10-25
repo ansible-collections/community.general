@@ -97,7 +97,7 @@ options:
   link:
     description:
      - Will create links to the files instead of copying them, you can only use this parameter with
-       C(collectstatic) command
+       C(collectstatic) command.
     required: false
     type: bool
   liveserver:
