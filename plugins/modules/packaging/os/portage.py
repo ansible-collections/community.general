@@ -115,26 +115,26 @@ options:
 
   getbinpkgonly:
     description:
-      - Merge only packages specified at PORTAGE_BINHOST in make.conf
+      - Merge only packages specified at C(PORTAGE_BINHOST) in C(make.conf). Mutually exclusive with getbinpkg.
     type: bool
     default: no
     version_added: 1.3.0
 
   getbinpkg:
     description:
-      - Prefer packages specified at PORTAGE_BINHOST in make.conf
+      - Prefer packages specified at C(PORTAGE_BINHOST) in C(make.conf). Mutually exclusive with getbinpkgonly.
     type: bool
     default: no
 
   usepkgonly:
     description:
-      - Merge only binaries (no compiling). This sets getbinpkg=yes.
+      - Merge only binaries (no compiling). Mutually exclusive with usepkg.
     type: bool
     default: no
 
   usepkg:
     description:
-      - Tries to use the binary package(s) in the locally available packages directory.
+      - Tries to use the binary package(s) in the locally available packages directory. Mutually exclusive with usepkgonly.
     type: bool
     default: no
 
