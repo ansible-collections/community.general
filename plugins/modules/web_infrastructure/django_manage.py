@@ -274,7 +274,7 @@ def main():
             failfast=dict(default=False, required=False, type='bool', aliases=['fail_fast']),
             fixtures=dict(default=None, required=False, type='str'),
             liveserver=dict(default=None, required=False, type='str', aliases=['live_server'],
-                            removed_in_verison='3.0.0'),
+                            removed_in_version='3.0.0'),
             testrunner=dict(default=None, required=False, type='str', aliases=['test_runner']),
             skip=dict(default=None, required=False, type='bool'),
             merge=dict(default=None, required=False, type='bool'),
