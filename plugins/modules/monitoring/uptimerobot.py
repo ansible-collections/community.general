@@ -21,7 +21,7 @@ options:
     state:
         description:
             - Define whether or not the monitor should be running or paused.
-            - Created and Absent were added in community.general 1.3.0.
+            - C(created) and C(absent) were added in community.general 1.3.0.
         required: true
         choices: [ "started", "paused", "created", "absent", "present" ]
     url:
