@@ -47,7 +47,7 @@ options:
           - Force C(%c) and C(%m) to expand to C(snapshots), even on a release kernel.
         type: bool
         default: no
-        version_added: 1.2.0
+        version_added: 1.3.0
     ports_dir:
         description:
           - When used in combination with the C(build) option, allows overriding
