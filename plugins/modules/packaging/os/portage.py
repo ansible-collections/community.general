@@ -113,15 +113,22 @@ options:
     choices: [ "web", "yes", "no" ]
     type: str
 
+  getbinpkgonly:
+    description:
+      - Merge only packages specified at C(PORTAGE_BINHOST) in C(make.conf).
+    type: bool
+    default: no
+    version_added: 1.3.0
+
   getbinpkg:
     description:
-      - Prefer packages specified at PORTAGE_BINHOST in make.conf
+      - Prefer packages specified at C(PORTAGE_BINHOST) in C(make.conf).
     type: bool
     default: no
 
   usepkgonly:
     description:
-      - Merge only binaries (no compiling). This sets getbinpkg=yes.
+      - Merge only binaries (no compiling).
     type: bool
     default: no
 
@@ -310,6 +317,7 @@ def emerge_packages(module, packages):
         'onlydeps': '--onlydeps',
         'quiet': '--quiet',
         'verbose': '--verbose',
+        'getbinpkgonly': '--getbinpkgonly',
         'getbinpkg': '--getbinpkg',
         'usepkgonly': '--usepkgonly',
         'usepkg': '--usepkg',
@@ -323,9 +331,6 @@ def emerge_packages(module, packages):
 
     if p['state'] and p['state'] == 'latest':
         args.append("--update")
-
-    if p['usepkg'] and p['usepkgonly']:
-        module.fail_json(msg='Use only one of usepkg, usepkgonly')
 
     emerge_flags = {
         'jobs': '--jobs',
@@ -356,7 +361,7 @@ def emerge_packages(module, packages):
 
     # Check for SSH error with PORTAGE_BINHOST, since rc is still 0 despite
     #   this error
-    if (p['usepkgonly'] or p['getbinpkg']) \
+    if (p['usepkgonly'] or p['getbinpkg'] or p['getbinpkgonly']) \
             and 'Permission denied (publickey).' in err:
         module.fail_json(
             cmd=cmd, rc=rc, stdout=out, stderr=err,
@@ -480,6 +485,7 @@ def main():
             quiet=dict(default=False, type='bool'),
             verbose=dict(default=False, type='bool'),
             sync=dict(default=None, choices=['yes', 'web', 'no']),
+            getbinpkgonly=dict(default=False, type='bool'),
             getbinpkg=dict(default=False, type='bool'),
             usepkgonly=dict(default=False, type='bool'),
             usepkg=dict(default=False, type='bool'),
