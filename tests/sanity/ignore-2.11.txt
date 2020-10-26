@@ -1169,7 +1169,6 @@ plugins/modules/system/dconf.py pylint:blacklisted-name
 plugins/modules/system/dconf.py validate-modules:doc-missing-type
 plugins/modules/system/dconf.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/filesystem.py pylint:blacklisted-name
-plugins/modules/system/filesystem.py validate-modules:doc-missing-type
 plugins/modules/system/gconftool2.py pylint:blacklisted-name
 plugins/modules/system/gconftool2.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/gconftool2.py validate-modules:parameter-type-not-in-doc
