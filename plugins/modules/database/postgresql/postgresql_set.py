@@ -56,7 +56,7 @@ options:
   trust_input:
     description:
     - If C(no), check whether values of parameters are potentially dangerous.
-    - It does make sense to use C(yes) only when SQL injections are possible.
+    - It makes sense to use C(no) only when SQL injections are possible.
     type: bool
     default: yes
     version_added: '0.2.0'
