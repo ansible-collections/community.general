@@ -69,7 +69,7 @@ options:
     description:
     - If C(no), check whether values of parameters I(name), I(tables), I(owner),
       I(session_role), I(params) are potentially dangerous.
-    - It makes sense to use C(yes) only when SQL injections via the parameters are possible.
+    - It makes sense to use C(no) only when SQL injections via the parameters are possible.
     type: bool
     default: yes
     version_added: '0.2.0'
