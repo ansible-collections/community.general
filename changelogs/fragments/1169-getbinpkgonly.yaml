@@ -1,3 +1,3 @@
 ---
 minor_changes:
-  - portage - add ``getbinpkgonly`` option (https://github.com/ansible-collections/community.general/pull/1169).
+  - portage - add ``getbinpkgonly`` option, remove unnecessary note on internal portage behaviour (getbinpkg=yes), and remove the undocumented exclusiveness of the pkg options as portage makes no such restriction (https://github.com/ansible-collections/community.general/pull/1169).

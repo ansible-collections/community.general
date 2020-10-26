@@ -115,26 +115,26 @@ options:
 
   getbinpkgonly:
     description:
-      - Merge only packages specified at C(PORTAGE_BINHOST) in C(make.conf). Mutually exclusive with I(getbinpkg).
+      - Merge only packages specified at C(PORTAGE_BINHOST) in C(make.conf).
     type: bool
     default: no
     version_added: 1.3.0
 
   getbinpkg:
     description:
-      - Prefer packages specified at C(PORTAGE_BINHOST) in C(make.conf). Mutually exclusive with I(getbinpkgonly).
+      - Prefer packages specified at C(PORTAGE_BINHOST) in C(make.conf).
     type: bool
     default: no
 
   usepkgonly:
     description:
-      - Merge only binaries (no compiling). Mutually exclusive with I(usepkg).
+      - Merge only binaries (no compiling).
     type: bool
     default: no
 
   usepkg:
     description:
-      - Tries to use the binary package(s) in the locally available packages directory. Mutually exclusive with I(usepkgonly).
+      - Tries to use the binary package(s) in the locally available packages directory.
     type: bool
     default: no
 
@@ -331,12 +331,6 @@ def emerge_packages(module, packages):
 
     if p['state'] and p['state'] == 'latest':
         args.append("--update")
-
-    if p['getbinpkg'] and p['getbinpkgonly']:
-        module.fail_json(msg='Use only one of getbinpkg, getbinpkgonly')
-
-    if p['usepkg'] and p['usepkgonly']:
-        module.fail_json(msg='Use only one of usepkg, usepkgonly')
 
     emerge_flags = {
         'jobs': '--jobs',
