@@ -143,7 +143,7 @@ options:
     description:
     - If C(no), checks whether values of options I(name), I(password), I(privs), I(expires),
       I(role_attr_flags), I(groups), I(comment), I(session_role) are potentially dangerous.
-    - It makes sense to use C(yes) only when SQL injections through the options are possible.
+    - It makes sense to use C(no) only when SQL injections through the options are possible.
     type: bool
     default: yes
     version_added: '0.2.0'
