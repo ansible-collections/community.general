@@ -20,6 +20,7 @@ from ansible_collections.community.general.plugins.module_utils.net_tools.nios.a
 
 
 CONFIG_FILES = [
+    os.environ.get('INFOBLOX_CONFIG_FILE', ''),
     '/etc/ansible/infoblox.yaml',
     '/etc/ansible/infoblox.yml'
 ]
@@ -44,7 +45,7 @@ def main():
         if os.path.exists(config_file):
             break
     else:
-        sys.stdout.write('unable to locate config file at /etc/ansible/infoblox.yaml\n')
+        sys.stderr.write('unable to locate config file at /etc/ansible/infoblox.yaml\n')
         sys.exit(-1)
 
     try:
@@ -53,7 +54,7 @@ def main():
         provider = config.get('provider') or {}
         wapi = WapiInventory(provider)
     except Exception as exc:
-        sys.stdout.write(to_text(exc))
+        sys.stderr.write(to_text(exc))
         sys.exit(-1)
 
     if args.host:
