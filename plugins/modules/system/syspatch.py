@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright: (c) 2019, Andrew Klaus <andrewklaus@gmail.com>
+# Copyright: (c) 2020, Andrew Klaus <andrewklaus@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
@@ -10,7 +10,7 @@ DOCUMENTATION = r'''
 ---
 module: syspatch
 
-short_description: Manage OpenBSD system patches.
+short_description: Manage OpenBSD system patches
 
 
 description:
@@ -21,6 +21,7 @@ options:
         description:
             - Apply all available system patches.
             - By default, apply all patches.
+            - Deprecated. Will be removed in community.general 3.0.0.
         default: yes
     revert:
         description:
@@ -84,7 +85,7 @@ from ansible.module_utils.basic import AnsibleModule
 def run_module():
     # define available arguments/parameters a user can pass to the module
     module_args = dict(
-        apply=dict(type='bool', default=True),
+        apply=dict(type='bool', default=True, removed_in_version='3.0.0', removed_from_collection='community.general'),
         revert=dict(type='str', choices=['all', 'one'])
     )
 
