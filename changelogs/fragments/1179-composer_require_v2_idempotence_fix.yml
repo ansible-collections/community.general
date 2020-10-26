@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - composer - fix bug in command idempotence with composer v2
+    (https://github.com/ansible-collections/community.general/issues/1179).
