@@ -44,8 +44,7 @@ options:
         default: no
     snapshot:
         description:
-          - Force C(%c) and C(%m) to expand to C(snapshots), even on a release
-            kernel.
+          - Force C(%c) and C(%m) to expand to C(snapshots), even on a release kernel.
         type: bool
         default: no
         version_added: 1.2.0
