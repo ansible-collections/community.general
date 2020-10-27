@@ -1,0 +1,5 @@
+bugfixes:
+- homebrew - fix package name validation for packages containing hypen ``-``
+  (https://github.com/ansible-collections/community.general/issues/1037).
+- homebrew_cask - fix package name validation for casks containing hypen ``-``
+  (https://github.com/ansible-collections/community.general/issues/1037).

@@ -152,7 +152,7 @@ class HomebrewCaskException(Exception):
 
 
 # utils ------------------------------------------------------------------- {{{
-def _create_regex_group(s):
+def _create_regex_group_complement(s):
     lines = (line.strip() for line in s.split('\n') if line.strip())
     chars = filter(None, (line.split('#')[0].strip() for line in lines))
     group = r'[^' + r''.join(chars) + r']'
@@ -170,7 +170,7 @@ class HomebrewCask(object):
         :                   # colons
         {sep}               # the OS-specific path separator
         .                   # dots
-        -                   # dashes
+        \-                  # dashes
     '''.format(sep=os.path.sep)
 
     VALID_BREW_PATH_CHARS = r'''
@@ -178,20 +178,20 @@ class HomebrewCask(object):
         \s                  # spaces
         {sep}               # the OS-specific path separator
         .                   # dots
-        -                   # dashes
+        \-                  # dashes
     '''.format(sep=os.path.sep)
 
     VALID_CASK_CHARS = r'''
         \w                  # alphanumeric characters (i.e., [a-zA-Z0-9_])
         .                   # dots
         /                   # slash (for taps)
-        -                   # dashes
+        \-                  # dashes
         @                   # at symbol
     '''
 
-    INVALID_PATH_REGEX = _create_regex_group(VALID_PATH_CHARS)
-    INVALID_BREW_PATH_REGEX = _create_regex_group(VALID_BREW_PATH_CHARS)
-    INVALID_CASK_REGEX = _create_regex_group(VALID_CASK_CHARS)
+    INVALID_PATH_REGEX = _create_regex_group_complement(VALID_PATH_CHARS)
+    INVALID_BREW_PATH_REGEX = _create_regex_group_complement(VALID_BREW_PATH_CHARS)
+    INVALID_CASK_REGEX = _create_regex_group_complement(VALID_CASK_CHARS)
     # /class regexes ----------------------------------------------- }}}
 
     # class validations -------------------------------------------- {{{
