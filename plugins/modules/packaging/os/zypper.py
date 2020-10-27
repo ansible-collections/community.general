@@ -515,6 +515,8 @@ def main():
         supports_check_mode=True
     )
 
+    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C')
+
     name = module.params['name']
     state = module.params['state']
     update_cache = module.params['update_cache']
