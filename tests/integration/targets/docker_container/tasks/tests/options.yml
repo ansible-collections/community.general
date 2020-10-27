@@ -892,6 +892,50 @@
   when: docker_py_version is version('1.9.0', '<')
 
 ####################################################################
+## device_requests #################################################
+####################################################################
+
+- name: device_requests
+  docker_container:
+    image: alpine:3.8
+    command: '/bin/sh -c "sleep 10m"'
+    name: "{{ cname }}"
+    state: started
+    device_requests: []
+  register: device_requests_1
+  ignore_errors: yes
+
+- name: device_requests (idempotency)
+  docker_container:
+    image: alpine:3.8
+    command: '/bin/sh -c "sleep 10m"'
+    name: "{{ cname }}"
+    state: started
+    device_requests: []
+  register: device_requests_2
+  ignore_errors: yes
+
+- name: cleanup
+  docker_container:
+    name: "{{ cname }}"
+    state: absent
+    force_kill: yes
+  diff: no
+
+- assert:
+    that:
+    - device_requests_1 is changed
+    - device_requests_2 is not changed
+  when: docker_py_version is version('4.3.0', '>=') and docker_api_version is version('1.40', '>=')
+- assert:
+    that:
+    - device_requests_1 is failed
+    - |
+      (('version is ' ~ docker_py_version ~ ' ') in device_requests_1.msg and 'Minimum version required is 4.3.0 ' in device_requests_1.msg) or
+      (('API version is ' ~ docker_api_version ~ '.') in device_requests_1.msg and 'Minimum version required is 1.40 ' in device_requests_1.msg)
+  when: docker_py_version is version('4.3.0', '<') or docker_api_version is version('1.40', '<')
+
+####################################################################
 ## dns_opts ########################################################
 ####################################################################
 
