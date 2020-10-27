@@ -1,0 +1,2 @@
+bugfixes:
+- zypper - force ``LANG=C`` to as zypper is looking in XML output where attribute could be translated (https://github.com/ansible-collections/community.general/issues/1175).
