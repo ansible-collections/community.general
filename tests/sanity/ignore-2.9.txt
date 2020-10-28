@@ -2,6 +2,8 @@ plugins/callback/hipchat.py pylint:blacklisted-name
 plugins/connection/lxc.py pylint:blacklisted-name
 plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
+plugins/module_utils/_mount.py future-import-boilerplate
+plugins/module_utils/_mount.py metaclass-boilerplate
 plugins/modules/cloud/centurylink/clc_aa_policy.py validate-modules:doc-missing-type
 plugins/modules/cloud/centurylink/clc_alert_policy.py validate-modules:doc-missing-type
 plugins/modules/cloud/centurylink/clc_alert_policy.py validate-modules:no-default-for-required-parameter
