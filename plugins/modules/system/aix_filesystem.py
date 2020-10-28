@@ -170,7 +170,7 @@ msg:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.ansible.posix.plugins.module_utils.mount import ismount
+from ansible_collections.community.general.plugins.module_utils._mount import ismount
 import re
 
 

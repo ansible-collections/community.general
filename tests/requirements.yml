@@ -5,7 +5,6 @@ integration_tests_dependencies:
 - community.kubernetes
 unit_tests_dependencies:
 - ansible.netcommon
-- ansible.posix
 - community.internal_test_tools
 - community.kubernetes
 - google.cloud
