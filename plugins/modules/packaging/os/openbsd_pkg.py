@@ -45,6 +45,7 @@ options:
     snapshot:
         description:
           - Force C(%c) and C(%m) to expand to C(snapshots), even on a release kernel.
+          - Mutually exclusive with I(build).
         type: bool
         default: no
         version_added: 1.3.0
