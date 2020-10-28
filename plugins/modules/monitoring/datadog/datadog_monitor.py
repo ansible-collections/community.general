@@ -49,7 +49,7 @@ options:
     type:
         description:
           - The type of the monitor.
-        choices: ['metric alert', 'service check', 'event alert', 'process alert', 'log alert']
+        choices: ['metric alert', 'service check', 'event alert', 'process alert', 'log alert', 'query alert', 'trace-analytics alert', 'rum alert']
         type: str
     query:
         description:
@@ -208,7 +208,9 @@ def main():
             api_host=dict(required=False),
             app_key=dict(required=True, no_log=True),
             state=dict(required=True, choices=['present', 'absent', 'mute', 'unmute']),
-            type=dict(required=False, choices=['metric alert', 'service check', 'event alert', 'process alert', 'log alert']),
+            type=dict(required=False, choices=['metric alert', 'service check', 'event alert',
+                                               'process alert', 'log alert', 'query alert',
+                                               'trace-analytics alert', 'rum alert']),
             name=dict(required=True),
             query=dict(required=False),
             notification_message=dict(required=False, no_log=True, default=None, aliases=['message'],
@@ -348,7 +350,7 @@ def install_monitor(module):
 
     if module.params['type'] == "service check":
         options["thresholds"] = module.params['thresholds'] or {'ok': 1, 'critical': 1, 'warning': 1}
-    if module.params['type'] in ["metric alert", "log alert"] and module.params['thresholds'] is not None:
+    if module.params['type'] in ["metric alert", "log alert", "query alert", "trace-analytics alert", "rum alert"] and module.params['thresholds'] is not None:
         options["thresholds"] = module.params['thresholds']
 
     monitor = _get_monitor(module)
