@@ -1,0 +1,4 @@
+bugfixes:
+  - syspatch - fix bug where not setting ``apply=true`` would result in error (https://github.com/ansible-collections/community.general/pull/360).
+deprecated_features:
+  - syspatch - deprecate the redundant ``apply`` argument (https://github.com/ansible-collections/community.general/pull/360).
