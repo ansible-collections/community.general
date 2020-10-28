@@ -40,6 +40,7 @@ options:
             a binary. Requires that the port source tree is already installed.
             Automatically builds and installs the 'sqlports' package, if it is
             not already installed.
+          - Mutually exclusive with I(snapshot).
         type: bool
         default: no
     snapshot:
@@ -173,10 +174,6 @@ def get_package_state(names, pkg_spec, module):
 # Function used to make sure a package is present.
 def package_present(names, pkg_spec, module):
     build = module.params['build']
-    snapshot = module.params['snapshot']
-
-    if snapshot is True and build is True:
-        module.fail_json(msg="the combination of build=%s and snapshot is not supported" % module.params['build'])
 
     for name in names:
         # It is possible package_present() has been called from package_latest().
@@ -208,7 +205,7 @@ def package_present(names, pkg_spec, module):
             else:
                 install_cmd = 'pkg_add -Im'
 
-        if snapshot is True:
+        if module.params['snapshot'] is True:
             install_cmd += ' -Dsnap'
 
         if pkg_spec[name]['installed_state'] is False:
@@ -269,9 +266,6 @@ def package_present(names, pkg_spec, module):
 
 # Function used to make sure a package is the latest available version.
 def package_latest(names, pkg_spec, module):
-    if module.params['build'] is True:
-        module.fail_json(msg="the combination of build=%s and state=latest is not supported" % module.params['build'])
-
     upgrade_cmd = 'pkg_add -um'
 
     if module.check_mode:
@@ -545,6 +539,7 @@ def main():
             quick=dict(type='bool', default=False),
             clean=dict(type='bool', default=False),
         ),
+        mutually_exclusive=[['snapshot', 'build']],
         supports_check_mode=True
     )
 
