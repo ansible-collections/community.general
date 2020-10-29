@@ -1,4 +1,4 @@
-disabled
+disabled  # tests already running in community.docker
 shippable/posix/group2
 skip/aix
 skip/osx
