@@ -166,6 +166,7 @@ class GitLabGroup(object):
                 'name': name,
                 'path': options['path'],
                 'parent_id': parent_id,
+                'description': options['description'],
                 'visibility': options['visibility']})
             changed = True
         else:
