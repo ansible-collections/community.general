@@ -54,6 +54,7 @@ options:
       - Support for masked values requires GitLab >= 11.10.
       - A I(value) must be a string or a number.
       - Field I(variable_type) must be a string with either C(env_var), which is the default, or C(file).
+      - Field I(environment_scope) must be a string defined by scope environment, whitch is C(*) the default.  
       - When a value is masked, it must be in Base64 and have a length of at least 8 characters.
         See GitLab documentation on acceptable values for a masked variable (https://docs.gitlab.com/ce/ci/variables/#masked-variables).
     default: {}
@@ -85,6 +86,7 @@ EXAMPLES = '''
         masked: true
         protected: true
         variable_type: env_var
+        environment_scope: *
 
 - name: Delete one variable
   community.general.gitlab_project_variable:
@@ -164,27 +166,28 @@ class GitlabProjectVariables(object):
             vars_page = self.project.variables.list(page=page_nb)
         return variables
 
-    def create_variable(self, key, value, masked, protected, variable_type):
+    def create_variable(self, key, value, masked, protected, variable_type, environment_scope):
         if self._module.check_mode:
             return
         return self.project.variables.create({"key": key, "value": value,
                                               "masked": masked, "protected": protected,
-                                              "variable_type": variable_type})
+                                              "variable_type": variable_type,
+                                              "environment_scope": environment_scope})
 
-    def update_variable(self, key, var, value, masked, protected, variable_type):
-        if var.value == value and var.protected == protected and var.masked == masked and var.variable_type == variable_type:
+    def update_variable(self, key, var, value, masked, protected, variable_type, environment_scope):
+        if var.value == value and var.protected == protected and var.masked == masked and var.variable_type == variable_type and var.environment_scope == environment_scope:
             return False
 
         if self._module.check_mode:
             return True
 
-        if var.protected == protected and var.masked == masked and var.variable_type == variable_type:
+        if var.protected == protected and var.masked == masked and var.variable_type == variable_type and var.environment_scope == environment_scope:
             var.value = value
             var.save()
             return True
 
         self.delete_variable(key)
-        self.create_variable(key, value, masked, protected, variable_type)
+        self.create_variable(key, value, masked, protected, variable_type, environment_scope)
         return True
 
     def delete_variable(self, key):
@@ -208,11 +211,13 @@ def native_python_main(this_gitlab, purge, var_list, state, module):
             masked = False
             protected = False
             variable_type = 'env_var'
+            environment_scope = '*'
         elif isinstance(var_list[key], dict):
             value = var_list[key].get('value')
             masked = var_list[key].get('masked', False)
             protected = var_list[key].get('protected', False)
             variable_type = var_list[key].get('variable_type', 'env_var')
+            environment_scope = var_list[key].get('environment_scope', '*')
         else:
             module.fail_json(msg="value must be of type string, integer or dict")
 
@@ -225,7 +230,8 @@ def native_python_main(this_gitlab, purge, var_list, state, module):
                                                             gitlab_keys[index],
                                                             value, masked,
                                                             protected,
-                                                            variable_type)
+                                                            variable_type,
+                                                            environment_scope)
                 change = single_change or change
                 if single_change:
                     return_value['updated'].append(key)
@@ -238,7 +244,7 @@ def native_python_main(this_gitlab, purge, var_list, state, module):
                 return_value['removed'].append(key)
 
         elif key not in existing_variables and state == 'present':
-            this_gitlab.create_variable(key, value, masked, protected, variable_type)
+            this_gitlab.create_variable(key, value, masked, protected, variable_type, environment_scope)
             change = True
             return_value['added'].append(key)
 
