@@ -1,2 +1,2 @@
 bugfixes:
-  - added description parameter to `createGroup()` call. (https://github.com/ansible-collections/community.general/issues/138)
+  - gitlab_group - added description parameter to ``createGroup()`` call (https://github.com/ansible-collections/community.general/issues/138).
