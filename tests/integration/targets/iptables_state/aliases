@@ -1,5 +1,5 @@
 destructive
-shippable/posix/group4
+shippable/posix/group1
 skip/docker             # kernel modules not loadable
 skip/freebsd            # no iptables/netfilter (Linux specific)
 skip/osx                # no iptables/netfilter (Linux specific)
