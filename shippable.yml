@@ -98,39 +98,41 @@ matrix:
     - env: T=devel/linux/ubuntu1604/3
     - env: T=devel/linux/ubuntu1804/3
 
-    #- env: T=devel/aix/7.2/4
-    - env: T=devel/osx/10.11/4
-    - env: T=devel/macos/10.15/4
-    - env: T=devel/rhel/7.8/4
-    - env: T=devel/rhel/8.2/4
-    - env: T=devel/freebsd/11.1/4
-    - env: T=devel/freebsd/12.1/4
-    - env: T=devel/linux/centos6/4
-    - env: T=devel/linux/centos7/4
-    - env: T=devel/linux/centos8/4
-    - env: T=devel/linux/fedora31/4
-    - env: T=devel/linux/fedora32/4
-    - env: T=devel/linux/opensuse15py2/4
-    - env: T=devel/linux/opensuse15/4
-    - env: T=devel/linux/ubuntu1604/4
-    - env: T=devel/linux/ubuntu1804/4
+    # group 4 is only used by docker and postgresql modules
+    ##- env: T=devel/aix/7.2/4
+    #- env: T=devel/osx/10.11/4
+    #- env: T=devel/macos/10.15/4
+    #- env: T=devel/rhel/7.8/4
+    #- env: T=devel/rhel/8.2/4
+    #- env: T=devel/freebsd/11.1/4
+    #- env: T=devel/freebsd/12.1/4
+    #- env: T=devel/linux/centos6/4
+    #- env: T=devel/linux/centos7/4
+    #- env: T=devel/linux/centos8/4
+    #- env: T=devel/linux/fedora31/4
+    #- env: T=devel/linux/fedora32/4
+    #- env: T=devel/linux/opensuse15py2/4
+    #- env: T=devel/linux/opensuse15/4
+    #- env: T=devel/linux/ubuntu1604/4
+    #- env: T=devel/linux/ubuntu1804/4
 
-    #- env: T=devel/aix/7.2/5
-    - env: T=devel/osx/10.11/5
-    - env: T=devel/macos/10.15/5
-    - env: T=devel/rhel/7.8/5
-    - env: T=devel/rhel/8.2/5
-    - env: T=devel/freebsd/11.1/5
-    - env: T=devel/freebsd/12.1/5
-    - env: T=devel/linux/centos6/5
-    - env: T=devel/linux/centos7/5
-    - env: T=devel/linux/centos8/5
-    - env: T=devel/linux/fedora31/5
-    - env: T=devel/linux/fedora32/5
-    - env: T=devel/linux/opensuse15py2/5
-    - env: T=devel/linux/opensuse15/5
-    - env: T=devel/linux/ubuntu1604/5
-    - env: T=devel/linux/ubuntu1804/5
+    # group 5 is only used by docker and postgresql modules
+    ##- env: T=devel/aix/7.2/5
+    #- env: T=devel/osx/10.11/5
+    #- env: T=devel/macos/10.15/5
+    #- env: T=devel/rhel/7.8/5
+    #- env: T=devel/rhel/8.2/5
+    #- env: T=devel/freebsd/11.1/5
+    #- env: T=devel/freebsd/12.1/5
+    #- env: T=devel/linux/centos6/5
+    #- env: T=devel/linux/centos7/5
+    #- env: T=devel/linux/centos8/5
+    #- env: T=devel/linux/fedora31/5
+    #- env: T=devel/linux/fedora32/5
+    #- env: T=devel/linux/opensuse15py2/5
+    #- env: T=devel/linux/opensuse15/5
+    #- env: T=devel/linux/ubuntu1604/5
+    #- env: T=devel/linux/ubuntu1804/5
 
     - env: T=devel/cloud/2.7/1
     - env: T=devel/cloud/3.6/1
@@ -141,7 +143,7 @@ matrix:
     - env: T=2.10/linux/centos8/2
     - env: T=2.10/linux/fedora32/3
     - env: T=2.10/linux/opensuse15/3
-    - env: T=2.10/linux/ubuntu1804/4
+    #- env: T=2.10/linux/ubuntu1804/4
     - env: T=2.10/cloud/3.6/1
 
     #- env: T=2.9/osx/10.11/1
@@ -150,7 +152,7 @@ matrix:
     - env: T=2.9/linux/centos8/2
     - env: T=2.9/linux/fedora31/3
     - env: T=2.9/linux/opensuse15/3
-    - env: T=2.9/linux/ubuntu1804/4
+    #- env: T=2.9/linux/ubuntu1804/4
     - env: T=2.9/cloud/3.6/1
 
 branches:
