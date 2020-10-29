@@ -54,7 +54,7 @@ options:
       - Support for masked values requires GitLab >= 11.10.
       - A I(value) must be a string or a number.
       - Field I(variable_type) must be a string with either C(env_var), which is the default, or C(file).
-      - Field I(environment_scope) must be a string defined by scope environment, whitch is C(*) the default.  
+      - Field I(environment_scope) must be a string defined by scope environment, whitch is C(*) the default.
       - When a value is masked, it must be in Base64 and have a length of at least 8 characters.
         See GitLab documentation on acceptable values for a masked variable (https://docs.gitlab.com/ce/ci/variables/#masked-variables).
     default: {}
@@ -86,7 +86,7 @@ EXAMPLES = '''
         masked: true
         protected: true
         variable_type: env_var
-        environment_scope: *
+        environment_scope: '*'
 
 - name: Delete one variable
   community.general.gitlab_project_variable:
@@ -175,13 +175,15 @@ class GitlabProjectVariables(object):
                                               "environment_scope": environment_scope})
 
     def update_variable(self, key, var, value, masked, protected, variable_type, environment_scope):
-        if var.value == value and var.protected == protected and var.masked == masked and var.variable_type == variable_type and var.environment_scope == environment_scope:
+        if (var.value == value and var.protected == protected and var.masked == masked
+                and var.variable_type == variable_type and var.environment_scope == environment_scope):
             return False
 
         if self._module.check_mode:
             return True
 
-        if var.protected == protected and var.masked == masked and var.variable_type == variable_type and var.environment_scope == environment_scope:
+        if (var.protected == protected and var.masked == masked
+                and var.variable_type == variable_type and var.environment_scope == environment_scope):
             var.value = value
             var.save()
             return True
