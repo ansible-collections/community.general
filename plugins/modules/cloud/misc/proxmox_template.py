@@ -156,7 +156,6 @@ def task_status(module, proxmox, node, taskid, timeout):
     Check the task status and wait until the task is completed or the timeout is reached.
     """
     while timeout:
-        module.log("timeout")
         task_status = proxmox.nodes(node).tasks(taskid).status.get()
         if task_status['status'] == 'stopped' and task_status['exitstatus'] == 'OK':
             return True
