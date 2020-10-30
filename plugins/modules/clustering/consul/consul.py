@@ -120,6 +120,14 @@ options:
             Similar to the interval this is a number with a s or m suffix to
             signify the units of seconds or minutes e.g C(15s) or C(1m). If no suffix
             is supplied, C(m) will be used by default e.g. C(1) will be C(1m)
+    tcp:
+        type: str
+        description:
+          - Checks can be registered with a TCP port. This means that consul
+            will check if the connection attempt to that port is successful (that is, the port is currently accepting connections).
+            The format is C(host:port), for example C(localhost:80).
+            I(interval) must also be provided with this option.
+        version_added: '1.3.0'
     http:
         type: str
         description:
@@ -150,6 +158,13 @@ EXAMPLES = '''
     service_port: 80
     script: curl http://localhost
     interval: 60s
+
+- name: register nginx with a tcp check
+  community.general.consul:
+    service_name: nginx
+    service_port: 80
+    interval: 60s
+    tcp: localhost:80
 
 - name: Register nginx with an http check
   community.general.consul:
@@ -217,6 +232,7 @@ try:
 except ImportError:
     python_consul_installed = False
 
+import re
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -274,6 +290,7 @@ def add_check(module, check):
                      script=check.script,
                      interval=check.interval,
                      ttl=check.ttl,
+                     tcp=check.tcp,
                      http=check.http,
                      timeout=check.timeout,
                      service_id=check.service_id)
@@ -346,11 +363,11 @@ def get_service_by_id_or_name(consul_api, service_id_or_name):
 
 
 def parse_check(module):
-    if len([p for p in (module.params.get('script'), module.params.get('ttl'), module.params.get('http')) if p]) > 1:
+    if len([p for p in (module.params.get('script'), module.params.get('ttl'), module.params.get('tcp'), module.params.get('http')) if p]) > 1:
         module.fail_json(
-            msg='checks are either script, http or ttl driven, supplying more than one does not make sense')
+            msg='checks are either script, tcp, http or ttl driven, supplying more than one does not make sense')
 
-    if module.params.get('check_id') or module.params.get('script') or module.params.get('ttl') or module.params.get('http'):
+    if module.params.get('check_id') or module.params.get('script') or module.params.get('ttl') or module.params.get('tcp') or module.params.get('http'):
 
         return ConsulCheck(
             module.params.get('check_id'),
@@ -361,6 +378,7 @@ def parse_check(module):
             module.params.get('interval'),
             module.params.get('ttl'),
             module.params.get('notes'),
+            module.params.get('tcp'),
             module.params.get('http'),
             module.params.get('timeout'),
             module.params.get('service_id'),
@@ -446,7 +464,7 @@ class ConsulService():
 class ConsulCheck(object):
 
     def __init__(self, check_id, name, node=None, host='localhost',
-                 script=None, interval=None, ttl=None, notes=None, http=None, timeout=None, service_id=None):
+                 script=None, interval=None, ttl=None, notes=None, tcp=None, http=None, timeout=None, service_id=None):
         self.check_id = self.name = name
         if check_id:
             self.check_id = check_id
@@ -458,6 +476,7 @@ class ConsulCheck(object):
         self.interval = self.validate_duration('interval', interval)
         self.ttl = self.validate_duration('ttl', ttl)
         self.script = script
+        self.tcp = tcp
         self.http = http
         self.timeout = self.validate_duration('timeout', timeout)
 
@@ -474,6 +493,18 @@ class ConsulCheck(object):
                 raise Exception('http check must specify interval')
 
             self.check = consul.Check.http(http, self.interval, self.timeout)
+
+        if tcp:
+            if interval is None:
+                raise Exception('tcp check must specify interval')
+
+            regex = r"(?P<host>.*)(?::)(?P<port>(?:[0-9]+))$"
+            match = re.match(regex, tcp)
+
+            if match is None:
+                raise Exception('tcp check must be in host:port format')
+
+            self.check = consul.Check.tcp(match.group('host').strip('[]'), int(match.group('port')), self.interval)
 
     def validate_duration(self, name, duration):
         if duration:
@@ -508,6 +539,7 @@ class ConsulCheck(object):
         self._add(data, 'host')
         self._add(data, 'interval')
         self._add(data, 'ttl')
+        self._add(data, 'tcp')
         self._add(data, 'http')
         self._add(data, 'timeout')
         self._add(data, 'service_id')
@@ -547,6 +579,7 @@ def main():
             state=dict(default='present', choices=['present', 'absent']),
             interval=dict(required=False, type='str'),
             ttl=dict(required=False, type='str'),
+            tcp=dict(required=False, type='str'),
             http=dict(required=False, type='str'),
             timeout=dict(required=False, type='str'),
             tags=dict(required=False, type='list'),
