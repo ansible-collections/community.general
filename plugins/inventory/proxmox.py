@@ -300,10 +300,12 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 node_qemu_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), ('%s_qemu' % node['node']).lower()))
                 self.inventory.add_group(node_qemu_group)
                 for qemu in self._get_qemu_per_node(node['node']):
-                    if not qemu['template']:
-                        self.inventory.add_host(qemu['name'])
-                        self.inventory.add_child(qemu_group, qemu['name'])
-                        self.inventory.add_child(node_qemu_group, qemu['name'])
+                    if qemu['template']:
+                        continue
+
+                    self.inventory.add_host(qemu['name'])
+                    self.inventory.add_child(qemu_group, qemu['name'])
+                    self.inventory.add_child(node_qemu_group, qemu['name'])
 
                     # get QEMU status
                     self._get_vm_status(node['node'], qemu['vmid'], 'qemu', qemu['name'])
