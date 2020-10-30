@@ -1225,8 +1225,6 @@ plugins/modules/system/vdo.py validate-modules:doc-required-mismatch
 plugins/modules/system/xfconf.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/xfconf.py validate-modules:parameter-type-not-in-doc
 plugins/modules/web_infrastructure/jenkins_plugin.py use-argspec-type-path
-plugins/modules/web_infrastructure/jenkins_plugin.py validate-modules:parameter-type-not-in-doc
-plugins/modules/web_infrastructure/jenkins_plugin.py validate-modules:undocumented-parameter
 plugins/modules/web_infrastructure/rundeck_acl_policy.py pylint:blacklisted-name
 plugins/modules/web_infrastructure/sophos_utm/utm_aaa_group.py validate-modules:doc-elements-mismatch
 plugins/modules/web_infrastructure/sophos_utm/utm_aaa_group_info.py validate-modules:parameter-type-not-in-doc

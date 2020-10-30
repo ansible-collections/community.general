@@ -106,8 +106,6 @@ notes:
   - It is not possible to run the module remotely by changing the I(url)
     parameter to point to the Jenkins server. The module must be used on the
     host where Jenkins runs as it needs direct access to the plugin files.
-  - "The C(params) option was removed in Ansible 2.5 due to circumventing Ansible's
-    option handling"
 extends_documentation_fragment:
   - url
   - files
@@ -709,7 +707,6 @@ def main():
         mode=dict(default='0644', type='raw'),
         name=dict(type='str', required=True),
         owner=dict(type='str', default='jenkins'),
-        params=dict(type='dict'),
         state=dict(
             choices=[
                 'present',
@@ -734,11 +731,6 @@ def main():
         add_file_common_args=True,
         supports_check_mode=True,
     )
-
-    # Params was removed
-    # https://meetbot.fedoraproject.org/ansible-meeting/2017-09-28/ansible_dev_meeting.2017-09-28-15.00.log.html
-    if module.params['params']:
-        module.fail_json(msg="The params option to jenkins_plugin was removed in Ansible 2.5 since it circumvents Ansible's option handling")
 
     # Force basic authentication
     module.params['force_basic_auth'] = True
