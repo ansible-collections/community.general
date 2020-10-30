@@ -12,6 +12,7 @@ short_description: management of instances in Proxmox VE cluster
 description:
   - allows you to create/delete/stop instances in Proxmox VE cluster
   - Starting in Ansible 2.1, it automatically detects containerization type (lxc for PVE 4, openvz for older)
+  - From community.general 4.0.0 on, there will be no default values, see I(proxmox_default_behavior).
 options:
   api_host:
     description:
@@ -68,28 +69,38 @@ options:
   disk:
     description:
       - hard disk size in GB for instance
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(3). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: str
-    default: 3
   cores:
     description:
       - Specify number of cores per socket.
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: int
-    default: 1
   cpus:
     description:
       - numbers of allocated cpus for instance
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: int
-    default: 1
   memory:
     description:
       - memory size in MB for instance
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(512). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: int
-    default: 512
   swap:
     description:
       - swap memory size in MB for instance
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(0). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: int
-    default: 0
   netif:
     description:
       - specifies network interfaces for the container. As a hash/dictionary defining interfaces.
@@ -105,8 +116,10 @@ options:
   onboot:
     description:
       - specifies whether a VM will be started during system bootup
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(no). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: bool
-    default: 'no'
   storage:
     description:
       - target storage
@@ -115,8 +128,10 @@ options:
   cpuunits:
     description:
       - CPU weight for a VM
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(1000). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: int
-    default: 1000
   nameserver:
     description:
       - sets DNS server IP address for a container
@@ -164,6 +179,22 @@ options:
       - Script that will be executed during various steps in the containers lifetime.
     type: str
     version_added: '0.2.0'
+  proxmox_default_behavior:
+    description:
+      - Various module options used to have default values. This cause problems when
+        user expects different behavior from proxmox by default or fill options which cause
+        problems when they have been set.
+      - The default value is C(compatibility), which will ensure that the default values
+        are used when the values are not explicitly specified by the user.
+      - From community.general 4.0.0 on, the default value will switch to C(no_defaults). To avoid
+        deprecation warnings, please set I(proxmox_default_behavior) to an explicit
+        value.
+      - This affects the I(disk), I(cores), I(cpus), I(memory), I(onboot), I(swap), I(cpuunits) options.
+    type: str
+    choices:
+      - compatibility
+      - no_defaults
+    version_added: "1.3.0"
 
 notes:
   - Requires proxmoxer and requests modules on host. This modules can be installed with pip.
@@ -474,17 +505,17 @@ def main():
             password=dict(no_log=True),
             hostname=dict(),
             ostemplate=dict(),
-            disk=dict(type='str', default='3'),
-            cores=dict(type='int', default=1),
-            cpus=dict(type='int', default=1),
-            memory=dict(type='int', default=512),
-            swap=dict(type='int', default=0),
+            disk=dict(type='str'),
+            cores=dict(type='int'),
+            cpus=dict(type='int'),
+            memory=dict(type='int'),
+            swap=dict(type='int'),
             netif=dict(type='dict'),
             mounts=dict(type='dict'),
             ip_address=dict(),
-            onboot=dict(type='bool', default=False),
+            onboot=dict(type='bool'),
             storage=dict(default='local'),
-            cpuunits=dict(type='int', default=1000),
+            cpuunits=dict(type='int'),
             nameserver=dict(),
             searchdomain=dict(),
             timeout=dict(type='int', default=30),
@@ -494,6 +525,7 @@ def main():
             unprivileged=dict(type='bool', default=False),
             description=dict(type='str'),
             hookscript=dict(type='str'),
+            proxmox_default_behavior=dict(type='str', choices=['compatibility', 'no_defaults']),
         )
     )
 
@@ -516,6 +548,27 @@ def main():
     if module.params['ostemplate'] is not None:
         template_store = module.params['ostemplate'].split(":")[0]
     timeout = module.params['timeout']
+
+    if module.params['proxmox_default_behavior'] is None:
+        module.params['proxmox_default_behavior'] = 'compatibility'
+        module.deprecate(
+            'The proxmox_default_behavior option will change its default value from "compatibility" to '
+            '"no_defaults" in community.general 4.0.0. To remove this warning, please specify an explicit value for it now',
+            version='4.0.0', collection_name='community.general'
+        )
+    if module.params['proxmox_default_behavior'] == 'compatibility':
+        old_default_values = dict(
+            disk="3",
+            cores=1,
+            cpus=1,
+            memory=512,
+            swap=0,
+            onboot=False,
+            cpuunits=1000,
+        )
+        for param, value in old_default_values.items():
+            if module.params[param] is None:
+                module.params[param] = value
 
     # If password not set get it from PROXMOX_PASSWORD env
     if not api_password:
