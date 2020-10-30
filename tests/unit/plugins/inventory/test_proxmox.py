@@ -75,7 +75,7 @@ def get_json(url):
     elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu":
         # _get_qemu_per_node
         return [{"name": "test-qemu",
-                "cpus": 1,
+                 "cpus": 1,
                  "mem": 1000,
                  "template": "",
                  "diskread": 0,
@@ -89,7 +89,23 @@ def get_json(url):
                  "vmid": "101",
                  "uptime": 1000,
                  "disk": 0,
-                 "status": "running"}]
+                 "status": "running"},
+                {"name": "test-qemu-template",
+                 "cpus": 1,
+                 "mem": 0,
+                 "template": 1,
+                 "diskread": 0,
+                 "cpu": 0,
+                 "maxmem": 1000,
+                 "diskwrite": 0,
+                 "netout": 0,
+                 "pid": "1001",
+                 "netin": 0,
+                 "maxdisk": 1000,
+                 "vmid": "9001",
+                 "uptime": 0,
+                 "disk": 0,
+                 "status": "stopped"}]
     elif url == "https://localhost:8006/api2/json/pools/test":
         # _get_members_per_pool
         return {"members": [{"uptime": 1000,
@@ -174,6 +190,7 @@ def test_populate(inventory, mocker):
 
     # get different hosts
     host_qemu = inventory.inventory.get_host('test-qemu')
+    host_qemu_template = inventory.inventory.get_host('test-qemu-template')
     host_lxc = inventory.inventory.get_host('test-lxc')
     host_node = inventory.inventory.get_host('testnode')
 
@@ -185,3 +202,6 @@ def test_populate(inventory, mocker):
     # check if lxc-test has been discovered correctly
     group_lxc = inventory.inventory.groups['proxmox_all_lxc']
     assert group_lxc.hosts == [host_lxc]
+
+    # check if qemu template is not present
+    assert host_qemu_template is None
