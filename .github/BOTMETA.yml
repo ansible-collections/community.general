@@ -1217,6 +1217,8 @@ files:
     authors: bgurney-rh
   $modules/system/xfconf.py:
     authors: jbenden
+    maintainers: russoz
+    labels: xfconf
   $modules/system/xfs_quota.py:
     authors: bushvin
   $modules/web_infrastructure/jenkins_job_facts.py:
