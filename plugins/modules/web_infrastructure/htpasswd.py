@@ -42,7 +42,7 @@ options:
         here, you can also use any other hash supported by passlib, such as
         md5_crypt and sha256_crypt, which are linux passwd hashes.  If you
         do so the password file will not be compatible with Apache or Nginx
-      - 'Some of the available choices might be: ["apr_md5_crypt", "des_crypt", "ldap_sha1", "plaintext"]'
+      - 'Some of the available choices might be: C(apr_md5_crypt), C(des_crypt), C(ldap_sha1), C(plaintext)'
   state:
     type: str
     required: false
