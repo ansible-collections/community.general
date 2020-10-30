@@ -127,7 +127,7 @@ options:
   force:
     description:
       - Allow to force stop VM.
-      - Can be used with states C(stopped), C(restarted) and C(absent).
+      - Can be used with states C(stopped) and C(restarted).
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
         option has a default of C(no). Note that the default value of I(proxmox_default_behavior)
         changes in community.general 4.0.0.
