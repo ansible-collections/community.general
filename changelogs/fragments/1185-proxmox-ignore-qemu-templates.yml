@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - proxmox inventory plugin - ignore QEMU templates altogether instead of skipping the creation of the host in the inventory (https://github.com/ansible-collections/community.general/pull/1185).
