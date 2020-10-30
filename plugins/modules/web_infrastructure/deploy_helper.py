@@ -110,6 +110,7 @@ notes:
   - Because of the default behaviour of generating the I(new_release) fact, this module will not be idempotent
     unless you pass your own release name with C(release). Due to the nature of deploying software, this should not
     be much of a problem.
+extends_documentation_fragment: files
 '''
 
 EXAMPLES = '''

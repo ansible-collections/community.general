@@ -110,6 +110,7 @@ notes:
     option handling"
 extends_documentation_fragment:
   - url
+  - files
 '''
 
 EXAMPLES = '''
