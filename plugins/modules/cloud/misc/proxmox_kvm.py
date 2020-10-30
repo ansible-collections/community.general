@@ -13,13 +13,16 @@ module: proxmox_kvm
 short_description: Management of Qemu(KVM) Virtual Machines in Proxmox VE cluster.
 description:
   - Allows you to create/delete/stop Qemu(KVM) Virtual Machines in Proxmox VE cluster.
+  - From community.general 4.0.0 on, there will be no default values, see I(proxmox_default_behavior).
 author: "Abdoul Bah (@helldorado) <bahabdoul at gmail.com>"
 options:
   acpi:
     description:
       - Specify if ACPI should be enabled/disabled.
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(yes). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: bool
-    default: 'yes'
   agent:
     description:
       - Specify if the QEMU Guest Agent should be enabled/disabled.
@@ -29,7 +32,6 @@ options:
       - Pass arbitrary arguments to kvm.
       - This option is for experts only!
     type: str
-    default: "-serial unix:/var/run/qemu-server/VMID.serial,server,nowait"
   api_host:
     description:
       - Specify the target host of the Proxmox VE cluster.
@@ -48,14 +50,18 @@ options:
   autostart:
     description:
       - Specify if the VM should be automatically restarted after crash (currently ignored in PVE API).
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(no). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: bool
-    default: 'no'
   balloon:
     description:
       - Specify the amount of RAM for the VM in MB.
       - Using zero disables the balloon driver.
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(0). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: int
-    default: 0
   bios:
     description:
       - Specify the BIOS implementation.
@@ -65,8 +71,10 @@ options:
     description:
       - Specify the boot order -> boot on floppy C(a), hard disk C(c), CD-ROM C(d), or network C(n).
       - You can combine to set order.
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(cnd). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: str
-    default: cnd
   bootdisk:
     description:
       - Enable booting from specified disk. C((ide|sata|scsi|virtio)\d+)
@@ -78,13 +86,17 @@ options:
   cores:
     description:
       - Specify number of cores per socket.
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: int
-    default: 1
   cpu:
     description:
       - Specify emulated CPU type.
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(kvm64). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: str
-    default: kvm64
   cpulimit:
     description:
       - Specify if CPU usage will be limited. Value 0 indicates no CPU limit.
@@ -94,8 +106,10 @@ options:
     description:
       - Specify CPU weight for a VM.
       - You can disable fair-scheduler configuration by setting this to 0
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(1000). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: int
-    default: 1000
   delete:
     description:
       - Specify a list of settings you want to delete.
@@ -114,15 +128,20 @@ options:
     description:
       - Allow to force stop VM.
       - Can be used with states C(stopped), C(restarted) and C(absent).
-    default: no
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(no). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: bool
   format:
     description:
       - Target drive's backing file's data format.
       - Used only with clone
       - Use I(format=unspecified) and I(full=false) for a linked clone.
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(qcow2). If I(proxmox_default_behavior) is set to C(no_defaults),
+        not specifying this option is equivalent to setting it to C(unspecified).
+        Note that the default value of I(proxmox_default_behavior) changes in community.general 4.0.0.
     type: str
-    default: qcow2
     choices: [ "cloop", "cow", "qcow", "qcow2", "qed", "raw", "vmdk", "unspecified" ]
   freeze:
     description:
@@ -173,8 +192,10 @@ options:
   kvm:
     description:
       - Enable/disable KVM hardware virtualization.
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(yes). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: bool
-    default: 'yes'
   localtime:
     description:
       - Sets the real time clock to local time.
@@ -193,8 +214,10 @@ options:
   memory:
     description:
       - Memory size in MB for instance.
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(512). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: int
-    default: 512
   migrate_downtime:
     description:
       - Sets maximum tolerated downtime (in seconds) for migrations.
@@ -244,15 +267,19 @@ options:
   onboot:
     description:
       - Specifies whether a VM will be started during system bootup.
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(yes). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: bool
-    default: 'yes'
   ostype:
     description:
       - Specifies guest operating system. This is used to enable special optimization/features for specific operating systems.
       - The l26 is Linux 2.6/3.X Kernel.
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(l26). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: str
     choices: ['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'l24', 'l26', 'solaris']
-    default: l26
   parallel:
     description:
       - A hash/dictionary of map host parallel devices. C(parallel='{"key":"value", "key":"value"}').
@@ -328,8 +355,10 @@ options:
   sockets:
     description:
       - Sets the number of CPU sockets. (1 - N).
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: int
-    default: 1
   startdate:
     description:
       - Sets the initial date of the real time clock.
@@ -355,8 +384,10 @@ options:
   tablet:
     description:
       - Enables/disables the USB tablet device.
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(no). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: bool
-    default: 'no'
   target:
     description:
       - Target node. Only allowed if the original VM is on shared storage.
@@ -369,8 +400,10 @@ options:
   template:
     description:
       - Enables/disables the template.
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(no). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: bool
-    default: 'no'
   timeout:
     description:
       - Timeout for operations.
@@ -395,9 +428,11 @@ options:
   vga:
     description:
       - Select VGA type. If you want to use high resolution modes (>= 1280x1024x16) then you should use option 'std' or 'vmware'.
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(std). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: str
     choices: ['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']
-    default: std
   virtio:
     description:
       - A hash/dictionary of volume used as VIRTIO hard disk. C(virtio='{"key":"value", "key":"value"}').
@@ -416,6 +451,25 @@ options:
     description:
       - Creates a virtual hardware watchdog device.
     type: str
+  proxmox_default_behavior:
+    description:
+      - Various module options used to have default values. This cause problems when
+        user expects different behavior from proxmox by default or fill options which cause
+        problems when they have been set.
+      - The default value is C(compatibility), which will ensure that the default values
+        are used when the values are not explicitly specified by the user.
+      - From community.general 4.0.0 on, the default value will switch to C(no_defaults). To avoid
+        deprecation warnings, please set I(proxmox_default_behavior) to an explicit
+        value.
+      - This affects the I(acpi), I(autostart), I(balloon), I(boot), I(cores), I(cpu),
+        I(cpuunits), I(force), I(format), I(kvm), I(memory), I(onboot), I(ostype), I(sockets),
+        I(tablet), I(template), I(vga), options.
+    type: str
+    choices:
+      - compatibility
+      - no_defaults
+    version_added: "1.3.0"
+
 requirements: [ "proxmoxer", "requests" ]
 '''
 
@@ -862,39 +916,39 @@ def proxmox_version(proxmox):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            acpi=dict(type='bool', default=True),
+            acpi=dict(type='bool'),
             agent=dict(type='bool'),
-            args=dict(type='str', default=None),
+            args=dict(type='str'),
             api_host=dict(required=True),
             api_user=dict(required=True),
             api_password=dict(no_log=True),
-            autostart=dict(type='bool', default=False),
-            balloon=dict(type='int', default=0),
+            autostart=dict(type='bool'),
+            balloon=dict(type='int'),
             bios=dict(choices=['seabios', 'ovmf']),
-            boot=dict(type='str', default='cnd'),
+            boot=dict(type='str'),
             bootdisk=dict(type='str'),
             clone=dict(type='str', default=None),
-            cores=dict(type='int', default=1),
-            cpu=dict(type='str', default='kvm64'),
+            cores=dict(type='int'),
+            cpu=dict(type='str'),
             cpulimit=dict(type='int'),
-            cpuunits=dict(type='int', default=1000),
+            cpuunits=dict(type='int'),
             delete=dict(type='str', default=None),
             description=dict(type='str'),
             digest=dict(type='str'),
-            force=dict(type='bool', default=False),
-            format=dict(type='str', default='qcow2', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk', 'unspecified']),
+            force=dict(type='bool'),
+            format=dict(type='str', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk', 'unspecified']),
             freeze=dict(type='bool'),
             full=dict(type='bool', default=True),
             hostpci=dict(type='dict'),
             hotplug=dict(type='str'),
             hugepages=dict(choices=['any', '2', '1024']),
-            ide=dict(type='dict', default=None),
+            ide=dict(type='dict'),
             keyboard=dict(type='str'),
-            kvm=dict(type='bool', default=True),
+            kvm=dict(type='bool'),
             localtime=dict(type='bool'),
             lock=dict(choices=['migrate', 'backup', 'snapshot', 'rollback']),
             machine=dict(type='str'),
-            memory=dict(type='int', default=512),
+            memory=dict(type='int'),
             migrate_downtime=dict(type='int'),
             migrate_speed=dict(type='int'),
             name=dict(type='str'),
@@ -903,13 +957,13 @@ def main():
             node=dict(),
             numa=dict(type='dict'),
             numa_enabled=dict(type='bool'),
-            onboot=dict(type='bool', default=True),
-            ostype=dict(default='l26', choices=['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'l24', 'l26', 'solaris']),
+            onboot=dict(type='bool'),
+            ostype=dict(choices=['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'l24', 'l26', 'solaris']),
             parallel=dict(type='dict'),
             pool=dict(type='str'),
             protection=dict(type='bool'),
             reboot=dict(type='bool'),
-            revert=dict(type='str', default=None),
+            revert=dict(type='str'),
             sata=dict(type='dict'),
             scsi=dict(type='dict'),
             scsihw=dict(choices=['lsi', 'lsi53c810', 'virtio-scsi-pci', 'virtio-scsi-single', 'megasas', 'pvscsi']),
@@ -918,23 +972,24 @@ def main():
             skiplock=dict(type='bool'),
             smbios=dict(type='str'),
             snapname=dict(type='str'),
-            sockets=dict(type='int', default=1),
+            sockets=dict(type='int'),
             startdate=dict(type='str'),
             startup=dict(),
             state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'current']),
             storage=dict(type='str'),
-            tablet=dict(type='bool', default=False),
+            tablet=dict(type='bool'),
             target=dict(type='str'),
             tdf=dict(type='bool'),
-            template=dict(type='bool', default=False),
+            template=dict(type='bool'),
             timeout=dict(type='int', default=30),
             update=dict(type='bool', default=False),
             validate_certs=dict(type='bool', default=False),
-            vcpus=dict(type='int', default=None),
-            vga=dict(default='std', choices=['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']),
-            virtio=dict(type='dict', default=None),
+            vcpus=dict(type='int'),
+            vga=dict(choices=['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']),
+            virtio=dict(type='dict'),
             vmid=dict(type='int', default=None),
             watchdog=dict(),
+            proxmox_default_behavior=dict(type='str', choices=['compatibility', 'no_defaults']),
         ),
         mutually_exclusive=[('delete', 'revert'), ('delete', 'update'), ('revert', 'update'), ('clone', 'update'), ('clone', 'delete'), ('clone', 'revert')],
         required_one_of=[('name', 'vmid',)],
@@ -961,6 +1016,36 @@ def main():
     update = bool(module.params['update'])
     vmid = module.params['vmid']
     validate_certs = module.params['validate_certs']
+
+    if module.params['proxmox_default_behavior'] is None:
+        module.params['proxmox_default_behavior'] = 'compatibility'
+        module.deprecate(
+            'The proxmox_default_behavior option will change its default value from "compatibility" to '
+            '"no_defaults" in community.general 4.0.0. To remove this warning, please specify an explicit value for it now',
+            version='4.0.0', collection_name='community.general'
+        )
+    if module.params['proxmox_default_behavior'] == 'compatibility':
+        old_default_values = dict(
+            acpi=True,
+            autostart=False,
+            balloon=0,
+            boot='cnd',
+            cores=1,
+            cpu='kvm64',
+            cpuunits=1000,
+            force=False,
+            format='qcow2',
+            kvm=True,
+            memory=512,
+            ostype='l26',
+            sockets=1,
+            tablet=False,
+            template=False,
+            vga='std',
+        )
+        for param, value in old_default_values.items():
+            if module.params[param] is None:
+                module.params[param] = value
 
     if module.params['format'] == 'unspecified':
         module.params['format'] = None
