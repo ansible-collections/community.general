@@ -224,7 +224,7 @@ def main():
             color=dict(type='str'),
             password=dict(type='str', no_log=True),
             token=dict(type='str', no_log=True),
-            url=dict(type='str',default="http://localhost:8080"),
+            url=dict(type='str', default="http://localhost:8080"),
             user=dict(type='str'),
             validate_certs=dict(type='bool', default=True),
         ),
