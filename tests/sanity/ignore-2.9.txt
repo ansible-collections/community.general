@@ -959,6 +959,7 @@ plugins/modules/system/xfconf.py validate-modules:parameter-type-not-in-doc
 plugins/modules/web_infrastructure/jenkins_plugin.py use-argspec-type-path
 plugins/modules/web_infrastructure/jenkins_plugin.py validate-modules:parameter-type-not-in-doc
 plugins/modules/web_infrastructure/jenkins_plugin.py validate-modules:undocumented-parameter
+plugins/modules/web_infrastructure/nginx_status_facts.py validate-modules:deprecation-mismatch
 plugins/modules/web_infrastructure/rundeck_acl_policy.py pylint:blacklisted-name
 plugins/modules/web_infrastructure/sophos_utm/utm_aaa_group_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/web_infrastructure/sophos_utm/utm_ca_host_key_cert.py validate-modules:parameter-type-not-in-doc
