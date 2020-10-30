@@ -683,8 +683,7 @@ files:
     ignore: ryansb
     keywords: brew cask darwin homebrew macosx macports osx
   $modules/packaging/os/installp.py:
-    maintainers: kairoaraujo
-    maintainers: $team_aix
+    maintainers: $team_aix kairoaraujo
     labels: aix installp
     keywords: aix efix lpar wpar
   $modules/packaging/os/layman.py:
