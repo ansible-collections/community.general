@@ -36,13 +36,13 @@ options:
   crypt_scheme:
     type: str
     required: false
-    choices: ["apr_md5_crypt", "des_crypt", "ldap_sha1", "plaintext"]
     default: "apr_md5_crypt"
     description:
       - Encryption scheme to be used.  As well as the four choices listed
         here, you can also use any other hash supported by passlib, such as
         md5_crypt and sha256_crypt, which are linux passwd hashes.  If you
         do so the password file will not be compatible with Apache or Nginx
+      - 'Some of the available choices might be: ["apr_md5_crypt", "des_crypt", "ldap_sha1", "plaintext"]'
   state:
     type: str
     required: false
@@ -203,7 +203,7 @@ def main():
         path=dict(type='path', required=True, aliases=["dest", "destfile"]),
         name=dict(type='str', required=True, aliases=["username"]),
         password=dict(type='str', required=False, default=None, no_log=True),
-        crypt_scheme=dict(type='str', required=False, default="apr_md5_crypt", choices=["apr_md5_crypt", "des_crypt", "ldap_sha1", "plaintext"]),
+        crypt_scheme=dict(type='str', required=False, default="apr_md5_crypt"),
         state=dict(type='str', required=False, default="present", choices=["present", "absent"]),
         create=dict(type='bool', default=True),
 
