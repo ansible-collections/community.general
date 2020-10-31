@@ -21,26 +21,30 @@ description:
     python module.
 options:
   balancer_url_suffix:
+    type: str
     description:
       - Suffix of the balancer pool url required to access the balancer pool
         status page (e.g. balancer_vhost[:port]/balancer_url_suffix).
     default: /balancer-manager/
   balancer_vhost:
+    type: str
     description:
       - (ipv4|ipv6|fqdn):port of the Apache httpd 2.4 mod_proxy balancer pool.
     required: true
   member_host:
+    type: str
     description:
       - (ipv4|ipv6|fqdn) of the balancer member to get or to set attributes to.
         Port number is autodetected and should not be specified here.
         If undefined, apache2_mod_proxy module will return a members list of
         dictionaries of all the current balancer pool members' attributes.
   state:
+    type: str
     description:
       - Desired state of the member host.
         (absent|disabled),drained,hot_standby,ignore_errors can be
         simultaneously invoked by separating them with a comma (e.g. state=drained,ignore_errors).
-    choices: ["present", "absent", "enabled", "disabled", "drained", "hot_standby", "ignore_errors"]
+      - 'Accepted state values: ["present", "absent", "enabled", "disabled", "drained", "hot_standby", "ignore_errors"]'
   tls:
     description:
       - Use https to access balancer management page.
@@ -351,7 +355,7 @@ def main():
     """ Initiates module."""
     module = AnsibleModule(
         argument_spec=dict(
-            balancer_vhost=dict(required=True, default=None, type='str'),
+            balancer_vhost=dict(required=True, type='str'),
             balancer_url_suffix=dict(default="/balancer-manager/", type='str'),
             member_host=dict(type='str'),
             state=dict(type='str'),

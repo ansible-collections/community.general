@@ -18,6 +18,7 @@ requirements:
 author: "Sergio Millan Rodriguez (@sermilrod)"
 options:
   config:
+    type: str
     description:
       - config in XML format.
       - Required if job does not yet exist.
@@ -32,29 +33,35 @@ options:
     type: bool
     required: false
   name:
+    type: str
     description:
       - Name of the Jenkins job.
     required: true
   password:
+    type: str
     description:
       - Password to authenticate with the Jenkins server.
     required: false
   state:
+    type: str
     description:
       - Attribute that specifies if the job has to be created or deleted.
     required: false
     default: present
     choices: ['present', 'absent']
   token:
+    type: str
     description:
       - API token used to authenticate alternatively to password.
     required: false
   url:
+    type: str
     description:
       - URL where the Jenkins server is accessible.
     required: false
     default: http://localhost:8080
   user:
+    type: str
     description:
        - User to authenticate with the Jenkins server.
     required: false
@@ -328,14 +335,14 @@ def job_config_to_string(xml_str):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            config=dict(required=False),
-            name=dict(required=True),
-            password=dict(required=False, no_log=True),
-            state=dict(required=False, choices=['present', 'absent'], default="present"),
+            config=dict(type='str', required=False),
+            name=dict(type='str', required=True),
+            password=dict(type='str', required=False, no_log=True),
+            state=dict(type='str', required=False, choices=['present', 'absent'], default="present"),
             enabled=dict(required=False, type='bool'),
-            token=dict(required=False, no_log=True),
-            url=dict(required=False, default="http://localhost:8080"),
-            user=dict(required=False)
+            token=dict(type='str', required=False, no_log=True),
+            url=dict(type='str', required=False, default="http://localhost:8080"),
+            user=dict(type='str', required=False)
         ),
         mutually_exclusive=[
             ['password', 'token'],

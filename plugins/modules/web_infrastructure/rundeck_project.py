@@ -22,24 +22,29 @@ description:
 author: "Loic Blot (@nerzhul)"
 options:
     state:
+        type: str
         description:
             - Create or remove Rundeck project.
         choices: ['present', 'absent']
         default: 'present'
     name:
+        type: str
         description:
             - Sets the project name.
         required: True
     url:
+        type: str
         description:
             - Sets the rundeck instance URL.
         required: True
     api_version:
+        type: int
         description:
             - Sets the API version used by module.
             - API version must be at least 14.
         default: 14
     token:
+        type: str
         description:
             - Sets the token to authenticate against Rundeck API.
         required: True
