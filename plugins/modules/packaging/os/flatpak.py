@@ -122,7 +122,7 @@ command:
   description: The exact flatpak command that was executed
   returned: When a flatpak command has been executed
   type: str
-  sample: "/usr/bin/flatpak install --user -y flathub org.gnome.Calculator"
+  sample: "/usr/bin/flatpak install --user --nontinteractive flathub org.gnome.Calculator"
 msg:
   description: Module error message
   returned: failure
@@ -145,6 +145,8 @@ stdout:
   sample: "org.gnome.Calendar/x86_64/stable\tcurrent\norg.gnome.gitg/x86_64/stable\tcurrent\n"
 '''
 
+from distutils.version import StrictVersion
+
 from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.module_utils.basic import AnsibleModule
 
@@ -154,10 +156,15 @@ OUTDATED_FLATPAK_VERSION_ERROR_MESSAGE = "Unknown option --columns=application"
 def install_flat(module, binary, remote, name, method):
     """Add a new flatpak."""
     global result
-    if name.startswith('http://') or name.startswith('https://'):
-        command = [binary, "install", "--{0}".format(method), "-y", name]
+    flatpak_version = _flatpak_version(module, binary)
+    if StrictVersion(flatpak_version) < StrictVersion('1.1.3'):
+      noninteractive_arg = "-y"
     else:
-        command = [binary, "install", "--{0}".format(method), "-y", remote, name]
+      noninteractive_arg = "--noninteractive"
+    if name.startswith('http://') or name.startswith('https://'):
+        command = [binary, "install", "--{0}".format(method), noninteractive_arg, name]
+    else:
+        command = [binary, "install", "--{0}".format(method), noninteractive_arg, remote, name]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
@@ -165,8 +172,13 @@ def install_flat(module, binary, remote, name, method):
 def uninstall_flat(module, binary, name, method):
     """Remove an existing flatpak."""
     global result
+    flatpak_version = _flatpak_version(module, binary)
+    if StrictVersion(flatpak_version) < StrictVersion('1.1.3'):
+      noninteractive_arg = "-y"
+    else:
+      noninteractive_arg = "--noninteractive"
     installed_flat_name = _match_installed_flat_name(module, binary, name, method)
-    command = [binary, "uninstall", "--{0}".format(method), "-y", name]
+    command = [binary, "uninstall", "--{0}".format(method), noninteractive_arg, name]
     _flatpak_command(module, module.check_mode, command)
     result['changed'] = True
 
@@ -235,6 +247,12 @@ def _parse_flatpak_name(name):
         common_name = name
     return common_name
 
+def _flatpak_version(module, binary):
+    global result
+    command = [binary, "--version"]
+    output = _flatpak_command(module, False, command)
+    version_number = output.split()[1]
+    return version_number
 
 def _flatpak_command(module, noop, command, ignore_failure=False):
     global result
