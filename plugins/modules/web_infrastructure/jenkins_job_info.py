@@ -18,27 +18,34 @@ requirements:
   - "python-jenkins >= 0.4.12"
 options:
   name:
+    type: str
     description:
       - Exact name of the Jenkins job to fetch information about.
   glob:
+    type: str
     description:
       - A shell glob of Jenkins job names to fetch information about.
   color:
+    type: str
     description:
       - Only fetch jobs with the given status color.
   password:
+    type: str
     description:
       - Password to authenticate with the Jenkins server.
       - This is a required parameter, if C(token) is not provided.
   token:
+    type: str
     description:
       - API token used to authenticate with the Jenkins server.
       - This is a required parameter, if C(password) is not provided.
   url:
+    type: str
     description:
       - URL where the Jenkins server is accessible.
     default: http://localhost:8080
   user:
+    type: str
     description:
        - User to authenticate with the Jenkins server.
   validate_certs:
@@ -212,13 +219,13 @@ def get_jobs(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(),
-            glob=dict(),
-            color=dict(),
-            password=dict(no_log=True),
-            token=dict(no_log=True),
-            url=dict(default="http://localhost:8080"),
-            user=dict(),
+            name=dict(type='str'),
+            glob=dict(type='str'),
+            color=dict(type='str'),
+            password=dict(type='str', no_log=True),
+            token=dict(type='str', no_log=True),
+            url=dict(type='str', default="http://localhost:8080"),
+            user=dict(type='str'),
             validate_certs=dict(type='bool', default=True),
         ),
         mutually_exclusive=[

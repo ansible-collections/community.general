@@ -32,6 +32,7 @@ description:
 
 options:
   path:
+    type: path
     required: True
     aliases: ['dest']
     description:
@@ -39,6 +40,7 @@ options:
         Returned in the C(deploy_helper.project_path) fact.
 
   state:
+    type: str
     description:
       - the state of the project.
         C(query) will only gather facts,
@@ -51,18 +53,21 @@ options:
     default: present
 
   release:
+    type: str
     description:
       - the release version that is being deployed. Defaults to a timestamp format %Y%m%d%H%M%S (i.e. '20141119223359').
         This parameter is optional during C(state=present), but needs to be set explicitly for C(state=finalize).
         You can use the generated fact C(release={{ deploy_helper.new_release }}).
 
   releases_path:
+    type: str
     description:
       - the name of the folder that will hold the releases. This can be relative to C(path) or absolute.
         Returned in the C(deploy_helper.releases_path) fact.
     default: releases
 
   shared_path:
+    type: path
     description:
       - the name of the folder that will hold the shared resources. This can be relative to C(path) or absolute.
         If this is set to an empty string, no shared folder will be created.
@@ -70,12 +75,14 @@ options:
     default: shared
 
   current_path:
+    type: path
     description:
       - the name of the symlink that is created when the deploy is finalized. Used in C(finalize) and C(clean).
         Returned in the C(deploy_helper.current_path) fact.
     default: current
 
   unfinished_filename:
+    type: str
     description:
       - the name of the file that indicates a deploy has not finished. All folders in the releases_path that
         contain this file will be deleted on C(state=finalize) with clean=True, or C(state=clean). This file is
@@ -89,6 +96,7 @@ options:
     default: 'yes'
 
   keep_releases:
+    type: int
     description:
       - the number of old releases to keep when cleaning. Used in C(finalize) and C(clean). Any unfinished builds
         will be deleted first, so only correct releases will count. The current version will not count.
@@ -102,6 +110,7 @@ notes:
   - Because of the default behaviour of generating the I(new_release) fact, this module will not be idempotent
     unless you pass your own release name with C(release). Due to the nature of deploying software, this should not
     be much of a problem.
+extends_documentation_fragment: files
 '''
 
 EXAMPLES = '''

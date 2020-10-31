@@ -21,10 +21,12 @@ description:
 author: "René Moser (@resmo)"
 options:
   url:
+    type: str
     description:
       - URL of the nginx status.
     required: true
   timeout:
+    type: int
     description:
       - HTTP connection timeout in seconds.
     required: false
