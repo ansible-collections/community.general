@@ -158,9 +158,9 @@ def install_flat(module, binary, remote, name, method):
     global result
     flatpak_version = _flatpak_version(module, binary)
     if StrictVersion(flatpak_version) < StrictVersion('1.1.3'):
-      noninteractive_arg = "-y"
+        noninteractive_arg = "-y"
     else:
-      noninteractive_arg = "--noninteractive"
+        noninteractive_arg = "--noninteractive"
     if name.startswith('http://') or name.startswith('https://'):
         command = [binary, "install", "--{0}".format(method), noninteractive_arg, name]
     else:
@@ -174,9 +174,9 @@ def uninstall_flat(module, binary, name, method):
     global result
     flatpak_version = _flatpak_version(module, binary)
     if StrictVersion(flatpak_version) < StrictVersion('1.1.3'):
-      noninteractive_arg = "-y"
+        noninteractive_arg = "-y"
     else:
-      noninteractive_arg = "--noninteractive"
+        noninteractive_arg = "--noninteractive"
     installed_flat_name = _match_installed_flat_name(module, binary, name, method)
     command = [binary, "uninstall", "--{0}".format(method), noninteractive_arg, name]
     _flatpak_command(module, module.check_mode, command)
@@ -247,12 +247,14 @@ def _parse_flatpak_name(name):
         common_name = name
     return common_name
 
+
 def _flatpak_version(module, binary):
     global result
     command = [binary, "--version"]
     output = _flatpak_command(module, False, command)
     version_number = output.split()[1]
     return version_number
+
 
 def _flatpak_command(module, noop, command, ignore_failure=False):
     global result
