@@ -20,11 +20,13 @@ description:
 
 options:
   uri:
+    type: str
     required: true
     description:
       - Base URI for the JIRA instance.
 
   operation:
+    type: str
     required: true
     aliases: [ command ]
     choices: [ comment, create, edit, fetch, link, search, transition, update ]
@@ -32,71 +34,86 @@ options:
       - The operation to perform.
 
   username:
+    type: str
     required: true
     description:
       - The username to log-in with.
 
   password:
+    type: str
     required: true
     description:
       - The password to log-in with.
 
   project:
+    type: str
     required: false
     description:
       - The project for this operation. Required for issue creation.
 
   summary:
+    type: str
     required: false
     description:
      - The issue summary, where appropriate.
 
   description:
+    type: str
     required: false
     description:
      - The issue description, where appropriate.
 
   issuetype:
+    type: str
     required: false
     description:
      - The issue type, for issue creation.
 
   issue:
+    type: str
     required: false
     description:
      - An existing issue key to operate on.
+    aliases: ['ticket']
 
   comment:
+    type: str
     required: false
     description:
      - The comment text to add.
 
   status:
+    type: str
     required: false
     description:
      - The desired status; only relevant for the transition operation.
 
   assignee:
+    type: str
     required: false
     description:
      - Sets the assignee on create or transition operations. Note not all transitions will allow this.
 
   linktype:
+    type: str
     required: false
     description:
      - Set type of link, when action 'link' selected.
 
   inwardissue:
+    type: str
     required: false
     description:
      - Set issue from which link will be created.
 
   outwardissue:
+    type: str
     required: false
     description:
      - Set issue to which link will be created.
 
   fields:
+    type: dict
     required: false
     description:
      - This is a free-form data structure that can contain arbitrary data. This is passed directly to the JIRA REST API
@@ -119,6 +136,7 @@ options:
     version_added: '0.2.0'
 
   timeout:
+    type: float
     required: false
     description:
       - Set timeout, in seconds, on requests to JIRA API.
@@ -472,24 +490,24 @@ def main():
     global module
     module = AnsibleModule(
         argument_spec=dict(
-            uri=dict(required=True),
-            operation=dict(choices=['create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search'],
+            uri=dict(type='str', required=True),
+            operation=dict(type='str', choices=['create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search'],
                            aliases=['command'], required=True),
-            username=dict(required=True),
-            password=dict(required=True, no_log=True),
-            project=dict(),
-            summary=dict(),
-            description=dict(),
-            issuetype=dict(),
-            issue=dict(aliases=['ticket']),
-            comment=dict(),
-            status=dict(),
-            assignee=dict(),
+            username=dict(type='str', required=True),
+            password=dict(type='str', required=True, no_log=True),
+            project=dict(type='str', ),
+            summary=dict(type='str', ),
+            description=dict(type='str', ),
+            issuetype=dict(type='str', ),
+            issue=dict(type='str', aliases=['ticket']),
+            comment=dict(type='str', ),
+            status=dict(type='str', ),
+            assignee=dict(type='str', ),
             fields=dict(default={}, type='dict'),
-            linktype=dict(),
-            inwardissue=dict(),
-            outwardissue=dict(),
-            jql=dict(),
+            linktype=dict(type='str', ),
+            inwardissue=dict(type='str', ),
+            outwardissue=dict(type='str', ),
+            jql=dict(type='str', ),
             maxresults=dict(type='int'),
             timeout=dict(type='float', default=10),
             validate_certs=dict(default=True, type='bool'),
