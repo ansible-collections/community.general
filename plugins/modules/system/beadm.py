@@ -165,20 +165,29 @@ class BE(object):
         if '@' in self.name:
             for line in out.splitlines():
                 if self.is_freebsd:
-                    check = re.match(r'.+/({0})\s+\-'.format(self.name), line)
-                    if check:
+                    check = line.split()
+                    if(check == []):
+                        continue
+                    full_name = check[0].split('/')
+                    if(full_name == []):
+                        continue
+                    check[0] = full_name[len(full_name) - 1]
+                    if check[0] == self.name:
                         return check
                 else:
                     check = line.split(';')
-                    if check[1] == self.name:
+                    if check[0] == self.name:
                         return check
         else:
-            splitter = '\t' if self.is_freebsd else ';'
             for line in out.splitlines():
-                check = line.split(splitter)
-                if check[0] == self.name:
-                    return check
-
+                if self.is_freebsd:
+                    check = line.split()
+                    if check[0] == self.name:
+                        return check
+                else:
+                    check = line.split(';')
+                    if check[0] == self.name:
+                        return check
         return None
 
     def exists(self):
@@ -197,11 +206,13 @@ class BE(object):
 
         if rc == 0:
             line = self._find_be_by_name(out)
+            if line is None:
+                return False
             if self.is_freebsd:
-                if line is not None and 'R' in line.split('\t')[1]:
+                if 'R' in line[1]:
                     return True
             else:
-                if 'R' in line.split(';')[2]:
+                if 'R' in line[2]:
                     return True
 
         return False
@@ -250,15 +261,16 @@ class BE(object):
 
         if rc == 0:
             line = self._find_be_by_name(out)
+            if line is None:
+                return False
             if self.is_freebsd:
                 # On FreeBSD, we exclude currently mounted BE on /, as it is
                 # special and can be activated even if it is mounted. That is not
                 # possible with non-root BEs.
-                if line.split('\t')[2] != '-' and \
-                        line.split('\t')[2] != '/':
+                if line[2] != '-' and line[2] != '/':
                     return True
             else:
-                if line.split(';')[3]:
+                if line[3]:
                     return True
 
         return False
