@@ -20,32 +20,39 @@ description:
 author: "Loic Blot (@nerzhul)"
 options:
     state:
+        type: str
         description:
             - Create or remove Rundeck project.
         choices: ['present', 'absent']
         default: 'present'
     name:
+        type: str
         description:
             - Sets the project name.
         required: True
     url:
+        type: str
         description:
             - Sets the rundeck instance URL.
         required: True
     api_version:
+        type: int
         description:
             - Sets the API version used by module.
             - API version must be at least 14.
         default: 14
     token:
+        type: str
         description:
             - Sets the token to authenticate against Rundeck API.
         required: True
     project:
+        type: str
         description:
             - Sets the project which receive the ACL policy.
             - If unset, it's a system ACL policy.
     policy:
+        type: str
         description:
             - Sets the ACL policy content.
             - ACL policy content is a YAML object as described in http://rundeck.org/docs/man5/aclpolicy.html.

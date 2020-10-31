@@ -19,14 +19,17 @@ description:
     - This module provides user management for ejabberd servers
 options:
     username:
+        type: str
         description:
             - the name of the user to manage
         required: true
     host:
+        type: str
         description:
             - the ejabberd host associated with this username
         required: true
     password:
+        type: str
         description:
             - the password to assign to the username
         required: false
@@ -37,6 +40,7 @@ options:
         default: false
         type: bool
     state:
+        type: str
         description:
             - describe the desired state of the user to be managed
         required: false
@@ -168,8 +172,8 @@ class EjabberdUser(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            host=dict(default=None, type='str'),
-            username=dict(default=None, type='str'),
+            host=dict(required=True, type='str'),
+            username=dict(required=True, type='str'),
             password=dict(default=None, type='str', no_log=True),
             state=dict(default='present', choices=['present', 'absent']),
             logging=dict(default=False, type='bool')
