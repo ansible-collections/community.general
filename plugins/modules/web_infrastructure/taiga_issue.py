@@ -18,49 +18,62 @@ description:
   - This module implements the creation or deletion of issues (not the update).
 options:
   taiga_host:
+    type: str
     description:
       - The hostname of the Taiga instance.
     default: https://api.taiga.io
   project:
+    type: str
     description:
       - Name of the project containing the issue. Must exist previously.
     required: True
   subject:
+    type: str
     description:
       - The issue subject.
     required: True
   issue_type:
+    type: str
     description:
       - The issue type. Must exist previously.
     required: True
   priority:
+    type: str
     description:
       - The issue priority. Must exist previously.
     default: Normal
   status:
+    type: str
     description:
       - The issue status. Must exist previously.
     default: New
   severity:
+    type: str
     description:
       - The issue severity. Must exist previously.
     default: Normal
   description:
+    type: str
     description:
       - The issue description.
     default: ""
   attachment:
+    type: path
     description:
       - Path to a file to be attached to the issue.
   attachment_description:
+    type: str
     description:
       - A string describing the file to be attached to the issue.
     default: ""
   tags:
+    type: list
+    elements: str
     description:
       - A lists of tags to be assigned to the issue.
     default: []
   state:
+    type: str
     description:
       - Whether the issue should be present or not.
     choices: ["present", "absent"]
@@ -233,18 +246,18 @@ def manage_issue(module, taiga_host, project_name, issue_subject, issue_priority
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            taiga_host=dict(required=False, default="https://api.taiga.io"),
-            project=dict(required=True),
-            subject=dict(required=True),
-            issue_type=dict(required=True),
-            priority=dict(required=False, default="Normal"),
-            status=dict(required=False, default="New"),
-            severity=dict(required=False, default="Normal"),
-            description=dict(required=False, default=""),
-            attachment=dict(required=False, default=None),
-            attachment_description=dict(required=False, default=""),
-            tags=dict(required=False, default=[], type='list'),
-            state=dict(required=False, choices=['present', 'absent'],
+            taiga_host=dict(type='str', required=False, default="https://api.taiga.io"),
+            project=dict(type='str', required=True),
+            subject=dict(type='str', required=True),
+            issue_type=dict(type='str', required=True),
+            priority=dict(type='str', required=False, default="Normal"),
+            status=dict(type='str', required=False, default="New"),
+            severity=dict(type='str', required=False, default="Normal"),
+            description=dict(type='str', required=False, default=""),
+            attachment=dict(type='path', required=False, default=None),
+            attachment_description=dict(type='str', required=False, default=""),
+            tags=dict(required=False, default=[], type='list', elements='str'),
+            state=dict(type='str', required=False, choices=['present', 'absent'],
                        default='present'),
         ),
         supports_check_mode=True
