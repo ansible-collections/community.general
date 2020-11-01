@@ -227,7 +227,7 @@ files:
   $modules/cloud/docker/docker_stack_task_info.py:
     maintainers: imjoseangel
   $modules/cloud/docker/docker_swarm_service.py:
-    maintainers: dariko hannseman jwitko
+    maintainers: hannseman
     labels: docker_swarm_service
   $modules/cloud/docker/docker_swarm_service_info.py:
     maintainers: hannseman
@@ -708,7 +708,7 @@ files:
     labels: pacman
     ignore: elasticdog
   $modules/packaging/os/pkgin.py:
-    maintainers: $team_solaris  L2G jasperla szinck
+    maintainers: $team_solaris L2G jasperla szinck
     labels: pkgin solaris
   $modules/packaging/os/pkgng.py:
     maintainers: $team_bsd bleader
