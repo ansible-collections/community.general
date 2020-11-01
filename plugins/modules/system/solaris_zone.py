@@ -34,7 +34,6 @@ options:
     type: str
     choices: [ absent, attached, configured, detached, installed, present, running, started, stopped ]
     default: present
-    required: true
   name:
     description:
       - Zone name.
