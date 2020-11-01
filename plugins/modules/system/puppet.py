@@ -66,6 +66,7 @@ options:
     description:
       - A list of puppet tags to be used.
     type: list
+    elements: str
   execute:
     description:
       - Execute a specific piece of Puppet code.
@@ -87,6 +88,11 @@ options:
     description:
       - Enable full debugging.
     type: bool
+  show_diff:
+    type: bool
+    description:
+      - Internal code, do not use
+    aliases: ['show-diff']
 requirements:
 - puppet
 author:
@@ -177,7 +183,7 @@ def main():
             facter_basename=dict(type='str', default='ansible'),
             environment=dict(type='str'),
             certname=dict(type='str'),
-            tags=dict(type='list'),
+            tags=dict(type='list', elements='str'),
             execute=dict(type='str'),
             summarize=dict(type='bool', default=False),
             debug=dict(type='bool', default=False),
