@@ -48,6 +48,7 @@ options:
     type: bool
     default: "yes"
   name:
+    type: str
     description:
       - Backup name
     required: true
@@ -63,6 +64,7 @@ options:
     type: bool
     default: "no"
   storage_path:
+    type: path
     description:
       - Storage path where the mksysb will stored.
     required: true
@@ -107,10 +109,10 @@ def main():
             exclude_files=dict(type='bool', default=False),
             exclude_wpar_files=dict(type='bool', default=False),
             extended_attrs=dict(type='bool', default=True),
-            name=dict(required=True),
+            name=dict(type='str', required=True),
             new_image_data=dict(type='bool', default=True),
             software_packing=dict(type='bool', default=False),
-            storage_path=dict(required=True),
+            storage_path=dict(type='path', required=True),
             use_snapshot=dict(type='bool', default=False)
         ),
         supports_check_mode=True,
