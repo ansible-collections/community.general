@@ -84,6 +84,7 @@ DOCUMENTATION = """
         - Authentication method to be used.
         - C(userpass) is added in Ansible 2.8.
         - C(aws_iam_login) is added in community.general 0.2.0.
+        - C(jwt) is added in community.general 1.3.0.
       env:
         - name: VAULT_AUTH_METHOD
       ini:
@@ -114,9 +115,10 @@ DOCUMENTATION = """
     mount_point:
       description: Vault mount point, only required if you have a custom mount point. Does not apply to token authentication.
     jwt:
-      description: The JSON Web Token (JWT) to use for authentication to Vault.
+      description: The JSON Web Token (JWT) to use for JWT authentication to Vault.
       env:
-        - name: VAULT_JWT
+        - name: ANSIBLE_HASHI_VAULT_JWT
+      version_added: 1.3.0
     ca_cert:
       description: Path to certificate to use for authentication.
       aliases: [ cacert ]
@@ -130,7 +132,8 @@ DOCUMENTATION = """
     namespace:
       description:
         - Vault namespace where secrets reside. This option requires HVAC 0.7.0+ and Vault 0.11+.
-        - Optionally, this may be achieved by prefixing the authentication mount point and/or secret path with the namespace (e.g C(mynamespace/secret/mysecret)).
+        - Optionally, this may be achieved by prefixing the authentication mount point and/or secret path with the namespace
+          (e.g C(mynamespace/secret/mysecret)).
       env:
         - name: VAULT_NAMESPACE
           version_added: 1.2.0
@@ -205,10 +208,6 @@ EXAMPLES = """
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello:value auth_method=approle role_id=myroleid secret_id=mysecretid') }}"
 
-- name: Authenticate with a JWT
-  debug:
-      msg: "{{ lookup('hashi_vault', 'secret=secret/hello:value auth_method=jwt role_id=myroleid jwt=myjwt url=https://myvault:8200')}}"
-
 - name: Return all secrets from a path in a namespace
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello token=c975b780-d1be-8016-866b-01d0f9b688a5 namespace=teama/admins') }}"
@@ -255,7 +254,13 @@ EXAMPLES = """
 
 - name: authenticate with aws_iam_login
   ansible.builtin.debug:
-    msg: "{{ lookup('community.general.hashi_vault', 'secret/hello:value', auth_method='aws_iam_login' role_id='myroleid', profile=my_boto_profile) }}"
+    msg: "{{ lookup('community.general.hashi_vault', 'secret/hello:value', auth_method='aws_iam_login', role_id='myroleid', profile=my_boto_profile) }}"
+
+# The following examples work in collection releases after community.general 1.3.0
+
+- name: Authenticate with a JWT
+  ansible.builtin.debug:
+      msg: "{{ lookup('community.general.hashi_vault', 'secret/hello:value', auth_method='jwt', role_id='myroleid', jwt='myjwt', url='https://myvault:8200')}}"
 """
 
 RETURN = """
@@ -439,21 +444,16 @@ class HashiVault:
             Display().warning("HVAC should be updated to version 0.9.3 or higher. Deprecated method 'auth_aws_iam' will be used.")
             self.client.auth_aws_iam(**params)
 
-    def auth_jwt(self, **kwargs):
-        role_id = kwargs.get('role_id', os.environ.get('VAULT_ROLE_ID', None))
-        if role_id is None:
-            raise AnsibleError("Authentication method jwt requires a role_id")
-
-        jwt = kwargs.get('jwt', os.environ.get('VAULT_JWT', None))
-        if jwt is None:
-            raise AnsibleError("Authentication method jwt requires parameter jwt to be set")
-
-        mount_point = kwargs.get('mount_point')
-        if mount_point is None:
-            mount_point = 'jwt'
-
-        # The GCP (and Azure, Kubernetes) auth methods just implement JWT
-        self.client.auth.gcp.login(role=role_id, jwt=jwt, mount_point=mount_point)
+    def auth_jwt(self):
+        params = self.get_options('role_id', 'jwt', 'mount_point')
+        params['role'] = params.pop('role_id')
+        if self.hvac_has_auth_methods and hasattr(self.client.auth, 'jwt') and hasattr(self.client.auth.jwt, 'jwt_login'):
+            response = self.client.auth.jwt.jwt_login(**params)
+            # must manually set the client token with JWT login
+            # see https://github.com/hvac/hvac/issues/644
+            self.client.token = response['auth']['client_token']
+        else:
+            raise AnsibleError("JWT authentication requires HVAC version 0.10.5 or higher.")
 
     # end auth implementation methods
 
@@ -643,5 +643,8 @@ class LookupModule(LookupBase):
                 params['session_token'] = session_credentials.token
 
         self.set_option('iam_login_credentials', params)
+
+    def validate_auth_jwt(self, auth_method):
+        self.validate_by_required_fields(auth_method, 'role_id', 'jwt')
 
     # end auth method validators
