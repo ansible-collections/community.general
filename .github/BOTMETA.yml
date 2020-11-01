@@ -889,7 +889,7 @@ files:
   $modules/system/awall.py:
     maintainers: tdtrask
   $modules/system/beadm.py:
-    maintainers: $team_solaris
+    maintainers: $team_solaris Peter2121
     labels: beadm solaris
     keywords: beadm dladm illumos ipadm nexenta omnios openindiana pfexec smartos solaris sunos zfs zpool
   $modules/system/capabilities.py:
