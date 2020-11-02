@@ -28,7 +28,7 @@ options:
         choices: [ absent, present ]
         default: present
     blacklist_file:
-        type: path
+        type: str
         description:
             - If specified, use this blacklist file instead of
               C(/etc/modprobe.d/blacklist-ansible.conf).
@@ -117,7 +117,7 @@ def main():
         argument_spec=dict(
             name=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
-            blacklist_file=dict(type='path')
+            blacklist_file=dict(type='str')
         ),
         supports_check_mode=True,
     )
