@@ -84,7 +84,7 @@ options:
     type: bool
     default: "no"
   dest:
-    type: path
+    type: str
     description:
       - Modify the limits.conf path.
     required: false
@@ -158,7 +158,7 @@ def main():
             use_max=dict(default=False, type='bool'),
             use_min=dict(default=False, type='bool'),
             backup=dict(default=False, type='bool'),
-            dest=dict(default=limits_conf, type='path'),
+            dest=dict(default=limits_conf, type='str'),
             comment=dict(required=False, default='', type='str')
         )
     )
