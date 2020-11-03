@@ -1156,6 +1156,7 @@ plugins/modules/storage/zfs/zfs_facts.py validate-modules:nonexistent-parameter-
 plugins/modules/storage/zfs/zfs_facts.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/zfs/zpool_facts.py validate-modules:nonexistent-parameter-documented
 plugins/modules/storage/zfs/zpool_facts.py validate-modules:parameter-type-not-in-doc
+plugins/modules/system/aix_devices.py validate-modules:doc-required-mismatch
 plugins/modules/system/alternatives.py pylint:blacklisted-name
 plugins/modules/system/beadm.py pylint:blacklisted-name
 plugins/modules/system/cronvar.py pylint:blacklisted-name

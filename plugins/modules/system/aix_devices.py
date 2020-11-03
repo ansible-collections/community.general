@@ -294,7 +294,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             attributes=dict(type='dict'),
-            device=dict(type='str', required=True),
+            device=dict(type='str'),
             force=dict(type='bool', default=False),
             recursive=dict(type='bool', default=False),
             state=dict(type='str', default='available', choices=['available', 'defined', 'removed']),
