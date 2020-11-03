@@ -88,11 +88,6 @@ options:
     description:
       - Enable full debugging.
     type: bool
-  show_diff:
-    type: bool
-    description:
-      - Internal code, do not use
-    aliases: ['show-diff']
 requirements:
 - puppet
 author:
