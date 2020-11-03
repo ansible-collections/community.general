@@ -35,7 +35,6 @@ options:
     type: str
     description:
       - SELinux user name
-    required: true
   selevel:
     type: str
     aliases: [ serange ]
@@ -211,7 +210,7 @@ def main():
         argument_spec=dict(
             ignore_selinux_state=dict(type='bool', default=False),
             login=dict(type='str', required=True),
-            seuser=dict(type='str', required=True),
+            seuser=dict(type='str'),
             selevel=dict(type='str', aliases=['serange'], default='s0'),
             state=dict(type='str', default='present', choices=['absent', 'present']),
             reload=dict(type='bool', default=True),
