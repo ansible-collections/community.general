@@ -1176,6 +1176,9 @@ plugins/modules/system/puppet.py use-argspec-type-path
 plugins/modules/system/puppet.py validate-modules:parameter-invalid
 plugins/modules/system/puppet.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/puppet.py validate-modules:undocumented-parameter
+plugins/modules/system/runit.py validate-modules:doc-default-does-not-match-spec
+plugins/modules/system/runit.py validate-modules:parameter-type-not-in-doc
+plugins/modules/system/runit.py validate-modules:undocumented-parameter
 plugins/modules/system/timezone.py pylint:blacklisted-name
 plugins/modules/system/xfconf.py validate-modules:parameter-state-invalid-choice
 plugins/modules/web_infrastructure/jenkins_plugin.py use-argspec-type-path
