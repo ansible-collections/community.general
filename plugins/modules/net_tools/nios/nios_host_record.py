@@ -295,7 +295,7 @@ def main():
 
     ipv6addr_spec = dict(
         ipv6addr=dict(required=True, aliases=['address'], ib_req=True),
-        configure_for_dhcp=dict(type='bool', required=False, aliases=['configure_for_dhcp'], ib_req=True),
+        configure_for_dhcp=dict(type='bool', required=False, ib_req=True),
         mac=dict(required=False, ib_req=True)
     )
 
