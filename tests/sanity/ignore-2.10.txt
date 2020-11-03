@@ -766,7 +766,6 @@ plugins/modules/net_tools/nios/nios_host_record.py validate-modules:doc-missing-
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:doc-required-mismatch
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:invalid-ansiblemodule-schema
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:nonexistent-parameter-documented
-plugins/modules/net_tools/nios/nios_host_record.py validate-modules:parameter-alias-self
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:parameter-list-no-elements
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:undocumented-parameter
