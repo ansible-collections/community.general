@@ -89,6 +89,7 @@ options:
   flags:
     description: A list of the flags that has to be set on the partition.
     type: list
+    elements: str
   state:
     description:
     - Whether to create or delete a partition.
@@ -581,7 +582,7 @@ def main():
             name=dict(type='str'),
 
             # set <partition> <flag> <state> command
-            flags=dict(type='list'),
+            flags=dict(type='list', elements='str'),
 
             # rm/mkpart command
             state=dict(type='str', default='info', choices=['absent', 'info', 'present']),

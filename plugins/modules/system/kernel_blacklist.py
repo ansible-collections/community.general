@@ -17,15 +17,18 @@ description:
     - Add or remove kernel modules from blacklist.
 options:
     name:
+        type: str
         description:
             - Name of kernel module to black- or whitelist.
         required: true
     state:
+        type: str
         description:
             - Whether the module should be present in the blacklist or absent.
         choices: [ absent, present ]
         default: present
     blacklist_file:
+        type: str
         description:
             - If specified, use this blacklist file instead of
               C(/etc/modprobe.d/blacklist-ansible.conf).

@@ -19,19 +19,24 @@ description:
      - Read information about interfaces from interfaces-styled files
 options:
   dest:
+    type: path
     description:
       - Path to the interfaces file
     default: /etc/network/interfaces
   iface:
+    type: str
     description:
       - Name of the interface, required for value changes or option remove
   address_family:
+    type: str
     description:
       - Address family of the interface, useful if same interface name is used for both inet and inet6
   option:
+    type: str
     description:
       - Name of the option, required for value changes or option remove
   value:
+    type: str
     description:
       - If I(option) is not presented for the I(interface) and I(state) is C(present) option will be added.
         If I(option) already exists and is not C(pre-up), C(up), C(post-up) or C(down), it's value will be updated.
@@ -44,6 +49,7 @@ options:
     type: bool
     default: 'no'
   state:
+    type: str
     description:
       - If set to C(absent) the option or section will be removed if present instead of created.
     default: "present"
