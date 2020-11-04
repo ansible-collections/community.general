@@ -267,8 +267,7 @@ def main():
             show_nodes=dict(type='bool', default=False),
         ),
 
-        required_together=[['discover_user', 'discover_pass'],
-                           ['node_user', 'node_pass']],
+        required_together=[['node_user', 'node_pass']],
         supports_check_mode=True,
     )
 

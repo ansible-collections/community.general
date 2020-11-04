@@ -19,15 +19,18 @@ description:
     - Load or unload kernel modules.
 options:
     name:
+        type: str
         required: true
         description:
             - Name of kernel module to manage.
     state:
+        type: str
         description:
             - Whether the module should be present or absent.
         choices: [ absent, present ]
         default: present
     params:
+        type: str
         description:
             - Modules parameters.
         default: ''

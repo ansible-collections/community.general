@@ -18,12 +18,16 @@ description:
   - This module creates, removes or resizes logical volumes.
 options:
   vg:
+    type: str
+    required: true
     description:
     - The volume group this logical volume is part of.
   lv:
+    type: str
     description:
     - The name of the logical volume.
   size:
+    type: str
     description:
     - The size of the logical volume, according to lvcreate(8) --size, by
       default in megabytes or optionally with one of [bBsSkKmMgGtTpPeE] units; or
@@ -31,6 +35,7 @@ options:
       Float values must begin with a digit.
       Resizing using percentage values was not supported prior to 2.1.
   state:
+    type: str
     description:
     - Control if the logical volume exists. If C(present) and the
       volume does not already exist then the C(size) option is required.
@@ -48,15 +53,19 @@ options:
     type: bool
     default: 'no'
   opts:
+    type: str
     description:
     - Free-form options to be passed to the lvcreate command.
   snapshot:
+    type: str
     description:
     - The name of the snapshot volume
   pvs:
+    type: str
     description:
     - Comma separated list of physical volumes (e.g. /dev/sda,/dev/sdb).
   thinpool:
+    type: str
     description:
     - The thin pool volume name. When you want to create a thin provisioned volume, specify a thin pool volume name.
   shrink:

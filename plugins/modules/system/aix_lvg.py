@@ -31,6 +31,7 @@ options:
     - Required when creating or extending (C(present) state) the volume group.
     - If not informed reducing (C(absent) state) the volume group will be removed.
     type: list
+    elements: str
   state:
     description:
     - Control if the volume group exists and volume group AIX state varyonvg C(varyon) or varyoffvg C(varyoff).
@@ -315,7 +316,7 @@ def main():
         argument_spec=dict(
             force=dict(type='bool', default=False),
             pp_size=dict(type='int'),
-            pvs=dict(type='list'),
+            pvs=dict(type='list', elements='str'),
             state=dict(type='str', default='present', choices=['absent', 'present', 'varyoff', 'varyon']),
             vg=dict(type='str', required=True),
             vg_type=dict(type='str', default='normal', choices=['big', 'normal', 'scalable'])

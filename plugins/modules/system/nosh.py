@@ -19,10 +19,12 @@ description:
     - BSD and Linux systems are supported.
 options:
     name:
+        type: str
         required: true
         description:
             - Name of the service to manage.
     state:
+        type: str
         required: false
         choices: [ started, stopped, reset, restarted, reloaded ]
         description:
@@ -488,8 +490,8 @@ def handle_state(module, result, service_path):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True),
-            state=dict(choices=['started', 'stopped', 'reset', 'restarted', 'reloaded'], type='str'),
+            name=dict(type='str', required=True),
+            state=dict(type='str', choices=['started', 'stopped', 'reset', 'restarted', 'reloaded']),
             enabled=dict(type='bool'),
             preset=dict(type='bool'),
             user=dict(type='bool', default=False),

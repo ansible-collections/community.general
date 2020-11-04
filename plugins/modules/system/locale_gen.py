@@ -16,10 +16,12 @@ author:
 - Augustus Kling (@AugustusKling)
 options:
     name:
+        type: str
         description:
              - Name and encoding of the locale, such as "en_GB.UTF-8".
         required: true
     state:
+      type: str
       description:
            - Whether the locale shall be present.
       choices: [ absent, present ]

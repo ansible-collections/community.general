@@ -20,15 +20,18 @@ description:
        limits.conf).
 options:
   domain:
+    type: str
     description:
       - A username, @groupname, wildcard, uid/gid range.
     required: true
   limit_type:
+    type: str
     description:
       - Limit type, see C(man 5 limits.conf) for an explanation
     required: true
     choices: [ "hard", "soft", "-" ]
   limit_item:
+    type: str
     description:
       - The limit to be set
     required: true
@@ -53,6 +56,7 @@ options:
         - "rtprio"
         - "chroot"
   value:
+    type: str
     description:
       - The value of the limit.
     required: true
@@ -80,11 +84,13 @@ options:
     type: bool
     default: "no"
   dest:
+    type: str
     description:
       - Modify the limits.conf path.
     required: false
     default: "/etc/security/limits.conf"
   comment:
+    type: str
     description:
       - Comment associated with the limit.
     required: false
