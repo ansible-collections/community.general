@@ -18,25 +18,30 @@ description:
     gconftool-2.  Please see the gconftool-2(1) man pages for more details.
 options:
   key:
+    type: str
     description:
     - A GConf preference key is an element in the GConf repository
       that corresponds to an application preference. See man gconftool-2(1)
     required: yes
   value:
+    type: str
     description:
     - Preference keys typically have simple values such as strings,
       integers, or lists of strings and integers. This is ignored if the state
       is "get". See man gconftool-2(1)
   value_type:
+    type: str
     description:
     - The type of value being set. This is ignored if the state is "get".
     choices: [ bool, float, int, string ]
   state:
+    type: str
     description:
     - The action to take upon the key/value.
     required: yes
     choices: [ absent, get, present ]
   config_source:
+    type: str
     description:
     - Specify a configuration source to use rather than the default path.
       See man gconftool-2(1)
