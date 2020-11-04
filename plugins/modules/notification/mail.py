@@ -28,11 +28,12 @@ description:
   one or more people in a team that a specific action has been
   (successfully) taken.
 options:
-  from:
+  sender:
     description:
     - The email-address the mail is sent from. May contain address and phrase.
     type: str
     default: root
+    aliases: [ from ]
   to:
     description:
     - The email-address(es) the mail is being sent to.
@@ -55,11 +56,11 @@ options:
     - The subject of the email being sent.
     required: yes
     type: str
+    aliases: [ msg ] 
   body:
     description:
     - The body of the email being sent.
     type: str
-    default: $subject
   username:
     description:
     - If SMTP requires username.
