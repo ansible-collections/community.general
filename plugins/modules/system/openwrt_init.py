@@ -16,11 +16,13 @@ description:
     - Controls OpenWrt services on remote hosts.
 options:
     name:
+        type: str
         description:
             - Name of the service.
         required: true
         aliases: ['service']
     state:
+        type: str
         description:
             - C(started)/C(stopped) are idempotent actions that will not run commands unless necessary.
               C(restarted) will always bounce the service. C(reloaded) will always reload.
@@ -30,6 +32,7 @@ options:
             - Whether the service should start on boot. B(At least one of state and enabled are required.)
         type: bool
     pattern:
+        type: str
         description:
         - If the service does not respond to the 'running' command, name a
           substring to look for as would be found in the output of the I(ps)
@@ -93,9 +96,9 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True, type='str', aliases=['service']),
-            state=dict(choices=['started', 'stopped', 'restarted', 'reloaded'], type='str'),
+            state=dict(type='str', choices=['started', 'stopped', 'restarted', 'reloaded']),
             enabled=dict(type='bool'),
-            pattern=dict(required=False, default=None),
+            pattern=dict(type='str', required=False, default=None),
         ),
         supports_check_mode=True,
         required_one_of=[['state', 'enabled']],

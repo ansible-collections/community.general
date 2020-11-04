@@ -46,6 +46,7 @@ options:
     elements: str
     choices: [ int, uint, bool, float, double, string ]
   state:
+    type: str
     description:
     - The action to take upon the property/value.
     choices: [ get, present, absent ]

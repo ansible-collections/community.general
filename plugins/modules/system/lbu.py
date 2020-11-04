@@ -26,10 +26,12 @@ options:
     description:
     - List of paths to exclude.
     type: list
+    elements: str
   include:
     description:
     - List of paths to include.
     type: list
+    elements: str
 
 author:
 - Kaarle Ritvanen (@kunkku)
