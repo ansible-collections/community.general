@@ -31,7 +31,6 @@ options:
     description:
     - Action what the init has to do with this entry.
     type: str
-    required: yes
     choices:
     - boot
     - bootwait
@@ -237,7 +236,7 @@ def main():
                     [rmitab, module.params['name']])
                 if rc != 0:
                     module.fail_json(
-                        msg="could not remove entry grom inittab)", rc=rc, err=err)
+                        msg="could not remove entry from inittab)", rc=rc, err=err)
             result['msg'] = "removed inittab entry" + " " + current_entry['name']
             result['changed'] = True
 

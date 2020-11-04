@@ -41,7 +41,6 @@ options:
               "absent" VDO volume does not exist, it will not be
               removed.
         type: str
-        required: true
         choices: [ absent, present ]
         default: present
     activated:

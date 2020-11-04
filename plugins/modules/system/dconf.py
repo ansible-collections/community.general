@@ -45,10 +45,12 @@ notes:
     /path/to/dir/) or C(dconf read /path/to/key).
 options:
   key:
+    type: str
     required: true
     description:
       - A dconf key to modify or read from the dconf database.
   value:
+    type: str
     required: false
     description:
       - Value to set for the specified dconf key. Value should be specified in
@@ -56,6 +58,7 @@ options:
         look at existing values in the dconf database. Required for
         C(state=present).
   state:
+    type: str
     required: false
     default: present
     choices:

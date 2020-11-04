@@ -13,6 +13,8 @@ description:
     - This module was called C(python_requirements_facts) before Ansible 2.9. The usage did not change.
 options:
   dependencies:
+    type: list
+    elements: str
     description: >
       A list of version-likes or module names to check for installation.
       Supported operators: <, >, <=, >=, or ==. The bare module name like
@@ -107,7 +109,7 @@ operations = {
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            dependencies=dict(type='list')
+            dependencies=dict(type='list', elements='str')
         ),
         supports_check_mode=True,
     )
