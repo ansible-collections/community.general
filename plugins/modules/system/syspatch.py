@@ -18,6 +18,7 @@ description:
 
 options:
     apply:
+        type: bool
         description:
             - Apply all available system patches.
             - By default, apply all patches.

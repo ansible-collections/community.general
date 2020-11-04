@@ -67,6 +67,7 @@ options:
     - Furthermore, if the module argument takes a value denoted by C(=),
       the value will be changed to that specified in module_arguments.
     type: list
+    elements: str
   state:
     description:
     - The default of C(updated) will modify an existing rule if type,
@@ -770,7 +771,7 @@ def main():
             new_type=dict(type='str', choices=VALID_TYPES),
             new_control=dict(type='str'),
             new_module_path=dict(type='str'),
-            module_arguments=dict(type='list'),
+            module_arguments=dict(type='list', elements='str'),
             state=dict(type='str', default='updated', choices=['absent', 'after', 'args_absent', 'args_present', 'before', 'updated']),
             path=dict(type='path', default='/etc/pam.d'),
             backup=dict(type='bool', default=False),

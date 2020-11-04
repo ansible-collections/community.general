@@ -250,7 +250,7 @@ def main():
         argument_spec=dict(
             ignore_selinux_state=dict(type='bool', default=False),
             target=dict(type='str', required=True, aliases=['path']),
-            ftype=dict(type='str', default='a', choices=option_to_file_type_str.keys()),
+            ftype=dict(type='str', default='a', choices=list(option_to_file_type_str.keys())),
             setype=dict(type='str', required=True),
             seuser=dict(type='str'),
             selevel=dict(type='str', aliases=['serange']),

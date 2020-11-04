@@ -65,6 +65,7 @@ options:
     description:
     - A list of physical volumes e.g. C(hdisk1,hdisk2).
     type: list
+    elements: str
 '''
 
 EXAMPLES = r'''
@@ -214,7 +215,7 @@ def main():
             copies=dict(type='int', default=1),
             state=dict(type='str', default='present', choices=['absent', 'present']),
             policy=dict(type='str', default='maximum', choices=['maximum', 'minimum']),
-            pvs=dict(type='list', default=list())
+            pvs=dict(type='list', elements='str', default=list())
         ),
         supports_check_mode=True,
     )

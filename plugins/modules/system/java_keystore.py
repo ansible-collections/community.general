@@ -16,14 +16,17 @@ description:
      - Create or delete a Java keystore in JKS format for a given certificate.
 options:
     name:
+        type: str
         description:
           - Name of the certificate.
         required: true
     certificate:
+        type: str
         description:
           - Certificate that should be used to create the key store.
         required: true
     private_key:
+        type: str
         description:
           - Private key that should be used to create the key store.
         required: true
@@ -34,10 +37,12 @@ options:
         required: false
         version_added: '0.2.0'
     password:
+        type: str
         description:
           - Password that should be used to secure the key store.
         required: true
     dest:
+        type: path
         description:
           - Absolute path where the jks should be generated.
         required: true
@@ -61,6 +66,9 @@ options:
         default: 'no'
 requirements: [openssl, keytool]
 author: Guillaume Grossetie (@Mogztter)
+extends_documentation_fragment:
+- files
+
 '''
 
 EXAMPLES = '''
@@ -286,7 +294,7 @@ class ArgumentSpec(object):
             certificate=dict(required=True, no_log=True),
             private_key=dict(required=True, no_log=True),
             password=dict(required=True, no_log=True),
-            dest=dict(required=True),
+            dest=dict(required=True, type='path'),
             force=dict(required=False, default=False, type='bool'),
             private_key_passphrase=dict(required=False, no_log=True, type='str')
         )

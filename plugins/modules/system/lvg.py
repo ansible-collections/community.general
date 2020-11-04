@@ -28,6 +28,7 @@ options:
     - Required when creating or resizing volume group.
     - The module will take care of running pvcreate if needed.
     type: list
+    elements: str
   pesize:
     description:
     - "The size of the physical extent. I(pesize) must be a power of 2 of at least 1 sector
@@ -149,7 +150,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             vg=dict(type='str', required=True),
-            pvs=dict(type='list'),
+            pvs=dict(type='list', elements='str'),
             pesize=dict(type='str', default='4'),
             pv_options=dict(type='str', default=''),
             pvresize=dict(type='bool', default=False),

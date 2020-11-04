@@ -19,6 +19,7 @@ options:
       - Ports or port ranges.
       - Can be a list (since 2.6) or comma separated string.
     type: list
+    elements: str
     required: true
   proto:
     description:
@@ -258,7 +259,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             ignore_selinux_state=dict(type='bool', default=False),
-            ports=dict(type='list', required=True),
+            ports=dict(type='list', elements='str', required=True),
             proto=dict(type='str', required=True, choices=['tcp', 'udp']),
             setype=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
