@@ -22,6 +22,7 @@ options:
     description:
       - One or more policy names.
     type: list
+    elements: str
   state:
     description:
       - Whether the policies should be enabled or disabled.
@@ -122,7 +123,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(type='str', default='enabled', choices=['disabled', 'enabled']),
-            name=dict(type='list'),
+            name=dict(type='list', elements='str'),
             activate=dict(type='bool', default=False),
         ),
         required_one_of=[['name', 'activate']],
