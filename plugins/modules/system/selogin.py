@@ -27,27 +27,30 @@ description:
      - Manages linux user to SELinux user mapping
 options:
   login:
+    type: str
     description:
       - a Linux user
     required: true
   seuser:
+    type: str
     description:
       - SELinux user name
-    required: true
   selevel:
+    type: str
     aliases: [ serange ]
     description:
       - MLS/MCS Security Range (MLS/MCS Systems only) SELinux Range for SELinux login mapping defaults to the SELinux user record range.
     default: s0
   state:
+    type: str
     description:
       - Desired mapping value.
-    required: true
     default: present
     choices: [ 'present', 'absent' ]
   reload:
     description:
       - Reload SELinux policy after commit.
+    type: bool
     default: yes
   ignore_selinux_state:
     description:
