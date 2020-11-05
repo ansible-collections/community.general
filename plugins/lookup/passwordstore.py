@@ -33,7 +33,7 @@ DOCUMENTATION = '''
         type: bool
         default: 'no'
       umask:
-        description: Sets the umask for the created .gpg files. The first octed must be greater than 3 (user readable). 
+        description: Sets the umask for the created .gpg files. The first octed must be greater than 3 (user readable).
         default: '077'
         env:
           - name: PASSWORD_STORE_UMASK
