@@ -16,45 +16,57 @@ description:
    - Send a message to an IRC channel or a nick. This is a very simplistic implementation.
 options:
   server:
+    type: str
     description:
       - IRC server name/address
     default: localhost
   port:
+    type: int
     description:
       - IRC server port number
     default: 6667
   nick:
+    type: str
     description:
       - Nickname to send the message from. May be shortened, depending on server's NICKLEN setting.
     default: ansible
   msg:
+    type: str
     description:
       - The message body.
     required: true
   topic:
+    type: str
     description:
       - Set the channel topic
   color:
+    type: str
     description:
       - Text color for the message. ("none" is a valid option in 1.6 or later, in 1.6 and prior, the default color is black, not "none").
         Added 11 more colors in version 2.0.
     default: "none"
     choices: [ "none", "white", "black", "blue", "green", "red", "brown", "purple", "orange", "yellow", "light_green", "teal", "light_cyan",
                "light_blue", "pink", "gray", "light_gray"]
+    aliases: [colour]
   channel:
+    type: str
     description:
       - Channel name.  One of nick_to or channel needs to be set.  When both are set, the message will be sent to both of them.
-    required: true
   nick_to:
+    type: list
+    elements: str
     description:
       - A list of nicknames to send the message to. One of nick_to or channel needs to be set.  When both are defined, the message will be sent to both of them.
   key:
+    type: str
     description:
       - Channel key
   passwd:
+    type: str
     description:
       - Server password
   timeout:
+    type: int
     description:
       - Timeout to use while waiting for successful registration and join
         messages, this is to prevent an endless loop
@@ -71,9 +83,11 @@ options:
     type: bool
     default: 'yes'
   style:
+    type: str
     description:
       - Text style for the message. Note italic does not work on some clients
-    choices: [ "bold", "underline", "reverse", "italic" ]
+    choices: [ "bold", "underline", "reverse", "italic", "none" ]
+    default: none
 
 # informational: requirements for nodes
 requirements: [ socket ]
@@ -238,7 +252,7 @@ def main():
             server=dict(default='localhost'),
             port=dict(type='int', default=6667),
             nick=dict(default='ansible'),
-            nick_to=dict(required=False, type='list'),
+            nick_to=dict(required=False, type='list', elements='str'),
             msg=dict(required=True),
             color=dict(default="none", aliases=['colour'], choices=["white", "black", "blue",
                                                                     "green", "red", "brown",

@@ -16,37 +16,45 @@ description:
    - Publish a message on an MQTT topic.
 options:
   server:
+    type: str
     description:
       - MQTT broker address/name
     default: localhost
   port:
+    type: int
     description:
       - MQTT broker port number
     default: 1883
   username:
+    type: str
     description:
       - Username to authenticate against the broker.
   password:
+    type: str
     description:
       - Password for C(username) to authenticate against the broker.
   client_id:
+    type: str
     description:
       - MQTT client identifier
-    default: hostname + pid
+      - If not specified, a value C(hostname + pid) will be used.
   topic:
+    type: str
     description:
       - MQTT topic name
     required: true
   payload:
+    type: str
     description:
       - Payload. The special string C("None") may be used to send a NULL
         (i.e. empty) payload which is useful to simply notify with the I(topic)
         or to clear previously retained messages.
     required: true
   qos:
+    type: str
     description:
       - QoS (Quality of Service)
-    default: 0
+    default: "0"
     choices: [ "0", "1", "2" ]
   retain:
     description:
@@ -56,6 +64,7 @@ options:
     type: bool
     default: 'no'
   ca_cert:
+    type: path
     description:
       - The path to the Certificate Authority certificate files that are to be
         treated as trusted by this client. If this is the only option given
@@ -67,12 +76,14 @@ options:
         is configured.
     aliases: [ ca_certs ]
   client_cert:
+    type: path
     description:
       - The path pointing to the PEM encoded client certificate. If this is not
         None it will be used as client information for TLS based
         authentication. Support for this feature is broker dependent.
     aliases: [ certfile ]
   client_key:
+    type: path
     description:
       - The path pointing to the PEM encoded client private key. If this is not
         None it will be used as client information for TLS based

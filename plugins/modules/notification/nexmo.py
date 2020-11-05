@@ -16,22 +16,27 @@ description:
 author: "Matt Martz (@sivel)"
 options:
   api_key:
+    type: str
     description:
       - Nexmo API Key
     required: true
   api_secret:
+    type: str
     description:
       - Nexmo API Secret
     required: true
   src:
+    type: int
     description:
        - Nexmo Number to send from
     required: true
   dest:
+    type: list
     description:
       - Phone number(s) to send SMS message to
     required: true
   msg:
+    type: str
     description:
       - Message to text to send. Messages longer than 160 characters will be
         split into multiple messages

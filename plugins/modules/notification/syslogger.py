@@ -13,15 +13,18 @@ description:
     - Uses syslog to add log entries to the host.
 options:
     msg:
+        type: str
         description:
             - This is the message to place in syslog.
         required: True
     priority:
+        type: str
         description:
             - Set the log priority.
         choices: [ "emerg", "alert", "crit", "err", "warning", "notice", "info", "debug" ]
         default: "info"
     facility:
+        type: str
         description:
             - Set the log facility.
         choices: [ "kern", "user", "mail", "daemon", "auth", "lpr", "news",
