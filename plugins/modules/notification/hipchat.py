@@ -16,28 +16,35 @@ description:
    - Send a message to a Hipchat room, with options to control the formatting.
 options:
   token:
+    type: str
     description:
       - API token.
     required: true
   room:
+    type: str
     description:
       - ID or name of the room.
     required: true
-  from:
+  msg_from:
+    type: str
     description:
       - Name the message will appear to be sent from. Max length is 15
         characters - above this it will be truncated.
     default: Ansible
+    aliases: [from]
   msg:
+    type: str
     description:
       - The message body.
     required: true
   color:
+    type: str
     description:
       - Background color for the message.
     default: yellow
     choices: [ "yellow", "red", "green", "purple", "gray", "random" ]
   msg_format:
+    type: str
     description:
       - Message format.
     default: text
@@ -54,6 +61,7 @@ options:
     type: bool
     default: 'yes'
   api:
+    type: str
     description:
       - API url if using a self-hosted hipchat server. For Hipchat API version
         2 use the default URI with C(/v2) instead of C(/v1).

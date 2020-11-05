@@ -17,51 +17,63 @@ description:
    - Send a message to a flowdock team inbox or chat using the push API (see https://www.flowdock.com/api/team-inbox and https://www.flowdock.com/api/chat)
 options:
   token:
+    type: str
     description:
       - API token.
     required: true
   type:
+    type: str
     description:
       - Whether to post to 'inbox' or 'chat'
     required: true
     choices: [ "inbox", "chat" ]
   msg:
+    type: str
     description:
       - Content of the message
     required: true
   tags:
+    type: str
     description:
       - tags of the message, separated by commas
     required: false
   external_user_name:
+    type: str
     description:
       - (chat only - required) Name of the "user" sending the message
     required: false
   from_address:
+    type: str
     description:
       - (inbox only - required) Email address of the message sender
     required: false
   source:
+    type: str
     description:
       - (inbox only - required) Human readable identifier of the application that uses the Flowdock API
     required: false
   subject:
+    type: str
     description:
       - (inbox only - required) Subject line of the message
     required: false
   from_name:
+    type: str
     description:
       - (inbox only) Name of the message sender
     required: false
   reply_to:
+    type: str
     description:
       - (inbox only) Email address for replies
     required: false
   project:
+    type: str
     description:
       - (inbox only) Human readable identifier for more detailed message categorization
     required: false
   link:
+    type: str
     description:
       - (inbox only) Link associated with the message. This will be used to link the message subject in Team Inbox.
     required: false
