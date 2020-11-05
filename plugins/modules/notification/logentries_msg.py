@@ -18,18 +18,22 @@ requirements:
   - "python >= 2.6"
 options:
   token:
+    type: str
     description:
       - Log token.
     required: true
   msg:
+    type: str
     description:
       - The message body.
     required: true
   api:
+    type: str
     description:
       - API endpoint
     default: data.logentries.com
   port:
+    type: int
     description:
       - API endpoint port
     default: 80

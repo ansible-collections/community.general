@@ -21,10 +21,12 @@ notes:
     - You will require a telegram account and create telegram bot to use this module.
 options:
   msg:
+    type: str
     description:
       - What message you wish to send.
     required: true
   msg_format:
+    type: str
     description:
       - Message format. Formatting options `markdown` and `html` described in
         Telegram API docs (https://core.telegram.org/bots/api#formatting-options).
@@ -32,10 +34,12 @@ options:
     default: plain
     choices: [ "plain", "markdown", "html" ]
   token:
+    type: str
     description:
       - Token identifying your telegram bot.
     required: true
   chat_id:
+    type: str
     description:
       - Telegram group or user chat_id
     required: true

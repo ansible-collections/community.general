@@ -20,10 +20,12 @@ notes:
    - A list of available voices, with language, can be found by running C(say -v ?) on a OSX host and C(espeak --voices) on a Linux host.
 options:
   msg:
+    type: str
     description:
       What to say
     required: true
   voice:
+    type: str
     description:
       What voice to use
     required: false
