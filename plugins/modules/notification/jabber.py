@@ -16,29 +16,36 @@ description:
    - Send a message to jabber
 options:
   user:
+    type: str
     description:
       - User as which to connect
     required: true
   password:
+    type: str
     description:
       - password for user to connect
     required: true
   to:
+    type: str
     description:
       - user ID or name of the room, when using room use a slash to indicate your nick.
     required: true
   msg:
+    type: str
     description:
       - The message body.
     required: true
   host:
+    type: str
     description:
       - host to connect, overrides user info
   port:
+    type: int
     description:
       - port to connect to, overrides default
     default: 5222
   encoding:
+    type: str
     description:
       - message encoding
 
