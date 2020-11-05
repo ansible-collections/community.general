@@ -19,30 +19,37 @@ notes:
     there will be two Connector Cards created
 options:
   webhook:
+    type: str
     description:
       - The webhook URL is given to you when you create a new Connector.
     required: true
   summary:
+    type: str
     description:
       - A string used for summarizing card content.
       - This will be shown as the message subject.
       - This is required if the text parameter isn't populated.
   color:
+    type: str
     description:
       - Accent color used for branding or indicating status in the card.
   title:
+    type: str
     description:
       - A title for the Connector message. Shown at the top of the message.
   text:
+    type: str
     description:
       - The main text of the card.
       - This will be rendered below the sender information and optional title,
       - and above any sections or actions present.
   actions:
+    type: list
     description:
       - This array of objects will power the action links
       - found at the bottom of the card.
   sections:
+    type: list
     description:
       - Contains a list of sections to display in the card.
       - For more information see https://dev.outlook.com/Connectors/reference.

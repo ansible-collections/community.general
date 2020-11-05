@@ -18,29 +18,37 @@ description:
      - Allows notifications to be sent using sms / mms via the catapult bandwidth api.
 options:
   src:
+    type: str
     description:
       - One of your catapult telephone numbers the message should come from (must be in E.164 format, like C(+19195551212)).
     required: true
   dest:
+    type: list
+    elements: str
     description:
       - The phone number or numbers the message should be sent to (must be in E.164 format, like C(+19195551212)).
     required: true
   msg:
+    type: str
     description:
       - The contents of the text message (must be 2048 characters or less).
     required: true
   media:
+    type: str
     description:
       - For MMS messages, a media url to the location of the media to be sent with the message.
   user_id:
+    type: str
     description:
       - User Id from Api account page.
     required: true
   api_token:
+    type: str
     description:
       - Api Token from Api account page.
     required: true
   api_secret:
+    type: str
     description:
       - Api Secret from Api account page.
     required: true
@@ -114,7 +122,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             src=dict(required=True),
-            dest=dict(required=True, type='list'),
+            dest=dict(required=True, type='list', elements='str'),
             msg=dict(required=True),
             user_id=dict(required=True),
             api_token=dict(required=True, no_log=True),
