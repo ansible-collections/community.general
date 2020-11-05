@@ -28,38 +28,48 @@ requirements:
   - sendgrid python library
 options:
   username:
+    type: str
     description:
       - username for logging into the SendGrid account.
       - Since 2.2 it is only required if api_key is not supplied.
   password:
+    type: str
     description:
       - password that corresponds to the username
       - Since 2.2 it is only required if api_key is not supplied.
   from_address:
+    type: str
     description:
       - the address in the "from" field for the email
     required: true
   to_addresses:
+    type: list
     description:
       - a list with one or more recipient email addresses
     required: true
   subject:
+    type: str
     description:
       - the desired subject for the email
     required: true
   api_key:
+    type: str
     description:
       - sendgrid API key to use instead of username/password
   cc:
+    type: list
     description:
       - a list of email addresses to cc
   bcc:
+    type: list
     description:
       - a list of email addresses to bcc
   attachments:
+    type: list
     description:
       - a list of relative or explicit paths of files you want to attach (7MB limit as per SendGrid docs)
   from_name:
+    type: str
     description:
       - the name you want to appear in the from field, i.e 'John Doe'
   html_body:
@@ -68,8 +78,14 @@ options:
     type: bool
     default: 'no'
   headers:
+    type: dict
     description:
       - a dict to pass on as headers
+  body:
+    type: str
+    description:
+      - the e-mail body content
+    required: yes
 author: "Matt Makai (@makaimc)"
 '''
 
