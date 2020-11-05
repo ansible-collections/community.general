@@ -182,7 +182,7 @@ class LookupModule(LookupBase):
                     raise AnsibleError("{0} is not a correct value for length".format(self.paramvals['length']))
 
             # Collect pass environment variables from the plugin's parameters.
-            self.env = {}
+            self.env = os.environ.copy()
 
             # Set PASSWORD_STORE_DIR if directory is set
             if self.paramvals['directory']:
