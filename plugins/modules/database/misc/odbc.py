@@ -31,7 +31,14 @@ options:
         - Parameters to pass to the SQL query.
       type: list
       elements: str
-
+    commit:
+      description:
+        - Perform a commit after the execution of the SQL query.
+        - Some databases allow a commit after a select whereas others raise an exception.
+        - Default is C(true) to support legacy module behavior.
+      type: bool
+      default: yes
+      version_added: 1.3.0
 requirements:
   - "python >= 2.6"
   - "pyodbc"
@@ -49,6 +56,7 @@ EXAMPLES = '''
     query: "Select * from table_a where column1 = ?"
     params:
       - "value1"
+    commit: false
   changed_when: no
 '''
 
@@ -86,12 +94,14 @@ def main():
             dsn=dict(type='str', required=True, no_log=True),
             query=dict(type='str', required=True),
             params=dict(type='list', elements='str'),
+            commit=dict(type='bool', default=True),
         ),
     )
 
     dsn = module.params.get('dsn')
     query = module.params.get('query')
     params = module.params.get('params')
+    commit = module.params.get('commit')
 
     if not HAS_PYODBC:
         module.fail_json(msg=missing_required_lib('pyodbc'))
@@ -117,7 +127,8 @@ def main():
             cursor.execute(query, params)
         else:
             cursor.execute(query)
-        cursor.commit()
+        if commit:
+            cursor.commit()
         try:
             # Get the rows out into an 2d array
             for row in cursor.fetchall():
