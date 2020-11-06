@@ -9,6 +9,7 @@ __metaclass__ = type
 import traceback
 
 from ansible.module_utils.basic import missing_required_lib
+from distutils.version import LooseVersion
 
 REQUESTS_IMP_ERR = None
 try:
@@ -69,7 +70,6 @@ class InfluxDb():
         args = dict(
             host=self.hostname,
             port=self.port,
-            path=self.path,
             username=self.username,
             password=self.password,
             database=self.database_name,
@@ -80,9 +80,13 @@ class InfluxDb():
             udp_port=self.params['udp_port'],
             proxies=self.params['proxies'],
         )
-        influxdb_api_version = tuple(influxdb_version.split("."))
-        if influxdb_api_version >= ('4', '1', '0'):
+        influxdb_api_version = LooseVersion(influxdb_version)
+        if influxdb_api_version >= LooseVersion('4.1.0'):
             # retries option is added in version 4.1.0
             args.update(retries=self.params['retries'])
+
+        if influxdb_api_version >= LooseVersion('5.1.0'):
+            # path argument is added in version 5.1.0
+            args.update(path=self.path)
 
         return InfluxDBClient(**args)

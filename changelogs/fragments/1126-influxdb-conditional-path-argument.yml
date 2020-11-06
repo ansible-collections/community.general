@@ -1,0 +1,4 @@
+---
+bugfixes:
+  - influxdb - fix usage of path for older version of
+    python-influxdb (https://github.com/ansible-collections/community.general/issues/997).

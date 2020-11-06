@@ -40,6 +40,7 @@ options:
   path:
     description:
     - The path on which InfluxDB server is accessible
+    - Only available when using python-influxdb >= 5.1.0
     type: str
     version_added: '0.2.0'
   validate_certs:
@@ -60,6 +61,7 @@ options:
     description:
     - Number of retries client will try before aborting.
     - C(0) indicates try until success.
+    - Only available when using python-influxdb >= 4.1.0
     type: int
     default: 3
   use_udp:
