@@ -421,6 +421,11 @@ def main():
         else:
             dir_arg = "--rootdir %s" % (p["rootdir"])
 
+    if p["ignoreosver"]:
+        old_pkgng = pkgng_older_than(module, pkgng_path, [1, 11, 0])
+        if old_pkgng:
+            module.fail_json(msg="To use option 'ignoreosver' pkg version must be 1.11 or greater")
+
     if p["chroot"] != "":
         dir_arg = '--chroot %s' % (p["chroot"])
 
