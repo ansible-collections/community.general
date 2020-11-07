@@ -250,7 +250,7 @@ def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, sta
         if old_pkgng:
             rc, out, err = module.run_command("%s %s update" % (pkgsite, pkgng_path))
         else:
-            rc, out, err = module.run_command("%s %s update" % (pkgng_path, dir_arg))
+            rc, out, err = module.run_command("%s %s %s update" % (batch_var, pkgng_path, dir_arg))
         stdout += out
         stderr += err
         if rc != 0:
