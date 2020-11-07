@@ -217,7 +217,7 @@ def remove_packages(module, pkgng_path, packages, dir_arg):
     return (False, "package(s) already absent", stdout, stderr)
 
 
-def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, state):
+def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, state, ignoreosver):
     install_c = 0
     stdout = ""
     stderr = ""
@@ -443,7 +443,9 @@ def main():
     # Operate on named packages
     named_packages = [pkg for pkg in pkgs if pkg != '*']
     if p["state"] in ("present", "latest") and named_packages:
-        _changed, _msg, _out, _err = install_packages(module, pkgng_path, named_packages, p["cached"], p["pkgsite"], dir_arg, p["state"])
+        _changed, _msg, _out, _err = install_packages(module, pkgng_path, named_packages, \
+                                                      p["cached"], p["pkgsite"], dir_arg, \
+                                                      p["state"], p["ignoreosver"])
         stdout += _out
         stderr += _err
         changed = changed or _changed
