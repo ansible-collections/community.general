@@ -391,6 +391,7 @@ def main():
             state=dict(default="present", choices=["present", "latest", "absent"], required=False),
             name=dict(aliases=["pkg"], required=True, type='list', elements='str'),
             cached=dict(default=False, type='bool'),
+            ignoreosver=dict(default=False, type='bool'),
             annotation=dict(default="", required=False),
             pkgsite=dict(default="", required=False),
             rootdir=dict(default="", required=False, type='path'),
