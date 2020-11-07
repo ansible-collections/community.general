@@ -148,6 +148,8 @@ options:
     container_config:
         description:
           - list of 'key=value' options to use when configuring a container.
+        type: list
+        elements: str
 requirements:
   - 'lxc >= 1.0 # OS package'
   - 'python >= 2.6 # OS Package'
