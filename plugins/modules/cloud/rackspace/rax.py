@@ -754,13 +754,6 @@ def cloudservers(module, state=None, name=None, flavor=None, image=None,
                 'name': '^%s$' % name,
                 'flavor': flavor
             }
-            servers = [
-                server
-                for server in cs.servers.list(search_opts=search_opts)
-                if (server.status != 'DELETED')
-                and rax_find_server_image(module, server, image, boot_volume)
-                and meta == server.metadata
-            ]
             for server in cs.servers.list(search_opts=search_opts):
                 # Ignore DELETED servers
                 if server.status == 'DELETED':
