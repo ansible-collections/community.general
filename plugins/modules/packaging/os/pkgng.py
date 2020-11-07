@@ -144,7 +144,7 @@ def query_update(module, pkgng_path, name, dir_arg, old_pkgng, pkgsite):
 
     # Ignore FreeBSD OS version check,
     #   useful on -STABLE and -CURRENT branches.
-    ignoreosver_var = "env IGNORE_OSVERSION=yes"
+    ignoreosver_var = 'env IGNORE_OSVERSION=yes'
 
     # Check to see if a package upgrade is available.
     # rc = 0, no updates available or package not installed
