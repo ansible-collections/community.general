@@ -142,10 +142,6 @@ def query_package(module, pkgng_path, name, dir_arg):
 
 def query_update(module, pkgng_path, name, dir_arg, old_pkgng, pkgsite):
 
-    # Ignore FreeBSD OS version check,
-    #   useful on -STABLE and -CURRENT branches.
-    ignoreosver_var = 'env IGNORE_OSVERSION=yes'
-
     # Check to see if a package upgrade is available.
     # rc = 0, no updates available or package not installed
     # rc = 1, updates available
@@ -238,6 +234,11 @@ def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, sta
     # This environment variable skips mid-install prompts,
     # setting them to their default values.
     batch_var = 'env BATCH=yes'
+
+    if ignoreosver:
+        # Ignore FreeBSD OS version check,
+        #   useful on -STABLE and -CURRENT branches.
+        batch_var = batch_var + ' IGNORE_OSVERSION=yes'
 
     if not module.check_mode and not cached:
         if old_pkgng:
