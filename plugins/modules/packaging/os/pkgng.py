@@ -93,6 +93,7 @@ options:
     ignoreosver:
         description:
             - Ignore FreeBSD OS version check, useful on -STABLE and -CURRENT branches.
+            - Defines the C(IGNORE_OSVERSION) environment variable.
         required: false
         type: bool
         default: no
