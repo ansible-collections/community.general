@@ -90,6 +90,12 @@ options:
         required: false
         type: bool
         default: no
+    ignoreosver:
+        description:
+            - Ignore FreeBSD OS version check, useful on -STABLE and -CURRENT branches.
+        required: false
+        type: bool
+        default: no
 author: "bleader (@bleader)"
 notes:
   - When using pkgsite, be careful that already in cache packages won't be downloaded again.
