@@ -142,6 +142,8 @@ def query_package(module, pkgng_path, name, dir_arg):
 
 def query_update(module, pkgng_path, name, dir_arg, old_pkgng, pkgsite):
 
+    ignoreosver_var = "env IGNORE_OSVERSION=yes"
+
     # Check to see if a package upgrade is available.
     # rc = 0, no updates available or package not installed
     # rc = 1, updates available
