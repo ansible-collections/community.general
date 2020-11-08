@@ -14,13 +14,16 @@ description:
      - Create a keypair for use with Rackspace Cloud Servers
 options:
   name:
+    type: str
     description:
       - Name of keypair
     required: true
   public_key:
+    type: str
     description:
       - Public Key string to upload. Can be a file path or string
   state:
+    type: str
     description:
       - Indicate desired state of the resource
     choices:
