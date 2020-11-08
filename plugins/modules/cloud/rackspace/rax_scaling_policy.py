@@ -14,25 +14,31 @@ description:
     - Manipulate Rackspace Cloud Autoscale Scaling Policy
 options:
   at:
+    type: str
     description:
       - The UTC time when this policy will be executed. The time must be
         formatted according to C(yyyy-MM-dd'T'HH:mm:ss.SSS) such as
         C(2013-05-19T08:07:08Z)
   change:
+    type: int
     description:
       - The change, either as a number of servers or as a percentage, to make
         in the scaling group. If this is a percentage, you must set
         I(is_percent) to C(true) also.
   cron:
+    type: str
     description:
       - The time when the policy will be executed, as a cron entry. For
         example, if this is parameter is set to C(1 0 * * *)
   cooldown:
+    type: int
     description:
       - The period of time, in seconds, that must pass before any scaling can
         occur after the previous scaling. Must be an integer between 0 and
         86400 (24 hrs).
+    default: 300
   desired_capacity:
+    type: int
     description:
       - The desired server capacity of the scaling the group; that is, how
         many servers should be in the scaling group.
@@ -42,10 +48,12 @@ options:
     default: false
     type: bool
   name:
+    type: str
     description:
       - Name to give the policy
     required: true
   policy_type:
+    type: str
     description:
       - The type of policy that will be executed for the current release.
     choices:
@@ -53,10 +61,12 @@ options:
       - schedule
     required: true
   scaling_group:
+    type: str
     description:
       - Name of the scaling group that this policy will be added to
     required: true
   state:
+    type: str
     description:
       - Indicate desired state of the resource
     choices:

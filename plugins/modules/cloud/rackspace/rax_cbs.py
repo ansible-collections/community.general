@@ -14,49 +14,55 @@ description:
      - Manipulate Rackspace Cloud Block Storage Volumes
 options:
   description:
+    type: str
     description:
       - Description to give the volume being created
   image:
+    type: str
     description:
       - image to use for bootable volumes. Can be an C(id), C(human_id) or
         C(name). This option requires C(pyrax>=1.9.3)
   meta:
+    type: dict
     description:
       - A hash of metadata to associate with the volume
   name:
+    type: str
     description:
       - Name to give the volume being created
     required: true
   size:
+    type: int
     description:
       - Size of the volume to create in Gigabytes
     default: 100
-    required: true
   snapshot_id:
+    type: str
     description:
       - The id of the snapshot to create the volume from
   state:
+    type: str
     description:
       - Indicate desired state of the resource
     choices:
       - present
       - absent
     default: present
-    required: true
   volume_type:
+    type: str
     description:
       - Type of the volume being created
     choices:
       - SATA
       - SSD
     default: SATA
-    required: true
   wait:
     description:
       - wait for the volume to be in state 'available' before returning
     type: bool
     default: 'no'
   wait_timeout:
+    type: int
     description:
       - how long before wait gives up, in seconds
     default: 300

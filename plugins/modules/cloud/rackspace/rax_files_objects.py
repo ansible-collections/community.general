@@ -21,22 +21,27 @@ options:
     type: bool
     default: 'no'
   container:
+    type: str
     description:
       - The container to use for file object operations.
     required: true
   dest:
+    type: str
     description:
       - The destination of a "get" operation; i.e. a local directory, "/home/user/myfolder".
         Used to specify the destination of an operation on a remote object; i.e. a file name,
         "file1", or a comma-separated list of remote objects, "file1,file2,file17"
   expires:
+    type: int
     description:
       - Used to set an expiration on a file or folder uploaded to Cloud Files.
         Requires an integer, specifying expiration in seconds
   meta:
+    type: dict
     description:
       - A hash of items to set as metadata values on an uploaded file or folder
   method:
+    type: str
     description:
       - The method of operation to be performed.  For example, put to upload files
         to Cloud Files, get to download files from Cloud Files or delete to delete
@@ -47,6 +52,7 @@ options:
       - delete
     default: get
   src:
+    type: str
     description:
       - Source from which to upload files.  Used to specify a remote object as a source for
         an operation, i.e. a file name, "file1", or a comma-separated list of remote objects,
@@ -58,12 +64,8 @@ options:
         flat directory
     type: bool
     default: 'yes'
-  state:
-    description:
-      - Indicate desired state of the resource
-    choices: ['present', 'absent']
-    default: present
   type:
+    type: str
     description:
       - Type of object to do work on
       - Metadata object or a file object

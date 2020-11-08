@@ -14,31 +14,35 @@ description:
      - Manipulate Rackspace Cloud Block Storage Volume Attachments
 options:
   device:
+    type: str
     description:
       - The device path to attach the volume to, e.g. /dev/xvde.
       - Before 2.4 this was a required field. Now it can be left to null to auto assign the device name.
   volume:
+    type: str
     description:
       - Name or id of the volume to attach/detach
     required: true
   server:
+    type: str
     description:
       - Name or id of the server to attach/detach
     required: true
   state:
+    type: str
     description:
       - Indicate desired state of the resource
     choices:
       - present
       - absent
     default: present
-    required: true
   wait:
     description:
       - wait for the volume to be in 'in-use'/'available' state before returning
     type: bool
     default: 'no'
   wait_timeout:
+    type: int
     description:
       - how long before wait gives up, in seconds
     default: 300
