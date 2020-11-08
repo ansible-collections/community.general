@@ -20,71 +20,61 @@ description:
   rax_mon_alarm
 options:
   state:
-    type: str
     description:
     - Ensure that a check with this C(label) exists or does not exist.
     choices: ["present", "absent"]
-    default: present
   entity_id:
-    type: str
     description:
     - ID of the rax_mon_entity to target with this check.
     required: true
   label:
-    type: str
     description:
     - Defines a label for this check, between 1 and 64 characters long.
     required: true
   check_type:
-    type: str
     description:
     - The type of check to create. C(remote.) checks may be created on any
       rax_mon_entity. C(agent.) checks may only be created on rax_mon_entities
       that have a non-null C(agent_id).
-    - |
-        Choices for this option are:
-        - remote.dns
-        - remote.ftp-banner
-        - remote.http
-        - remote.imap-banner
-        - remote.mssql-banner
-        - remote.mysql-banner
-        - remote.ping
-        - remote.pop3-banner
-        - remote.postgresql-banner
-        - remote.smtp-banner
-        - remote.smtp
-        - remote.ssh
-        - remote.tcp
-        - remote.telnet-banner
-        - agent.filesystem
-        - agent.memory
-        - agent.load_average
-        - agent.cpu
-        - agent.disk
-        - agent.network
-        - agent.plugin
+    choices:
+    - C(remote.dns)
+    - C(remote.ftp-banner)
+    - C(remote.http)
+    - C(remote.imap-banner)
+    - C(remote.mssql-banner)
+    - C(remote.mysql-banner)
+    - C(remote.ping)
+    - C(remote.pop3-banner)
+    - C(remote.postgresql-banner)
+    - C(remote.smtp-banner)
+    - C(remote.smtp)
+    - C(remote.ssh)
+    - C(remote.tcp)
+    - C(remote.telnet-banner)
+    - C(agent.filesystem)
+    - C(agent.memory)
+    - C(agent.load_average)
+    - C(agent.cpu)
+    - C(agent.disk)
+    - C(agent.network)
+    - C(agent.plugin)
     required: true
   monitoring_zones_poll:
-    type: str
     description:
     - Comma-separated list of the names of the monitoring zones the check should
       run from. Available monitoring zones include mzdfw, mzhkg, mziad, mzlon,
       mzord and mzsyd. Required for remote.* checks; prohibited for agent.* checks.
   target_hostname:
-    type: str
     description:
     - One of `target_hostname` and `target_alias` is required for remote.* checks,
       but prohibited for agent.* checks. The hostname this check should target.
       Must be a valid IPv4, IPv6, or FQDN.
   target_alias:
-    type: str
     description:
     - One of `target_alias` and `target_hostname` is required for remote.* checks,
       but prohibited for agent.* checks. Use the corresponding key in the entity's
       `ip_addresses` hash to resolve an IP address to target.
   details:
-    type: dict
     description:
     - Additional details specific to the check type. Must be a hash of strings
       between 1 and 255 characters long, or an array or object containing 0 to
@@ -94,17 +84,14 @@ options:
     - If "yes", ensure the check is created, but don't actually use it yet.
     type: bool
   metadata:
-    type: dict
     description:
     - Hash of arbitrary key-value pairs to accompany this check if it fires.
       Keys and values must be strings between 1 and 255 characters long.
   period:
-    type: int
     description:
     - The number of seconds between each time the check is performed. Must be
       greater than the minimum period set on your account.
   timeout:
-    type: int
     description:
     - The number of seconds this check will wait when attempting to collect
       results. Must be less than the period.
