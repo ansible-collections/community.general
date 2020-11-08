@@ -1,0 +1,2 @@
+minor_changes:
+  - django_manage - renamed parameter app_path to project_path, adding app_path and chdir as aliases (https://github.com/ansible-collections/community.general/issues/1044).
