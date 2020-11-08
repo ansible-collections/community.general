@@ -17,20 +17,25 @@ description:
   *rax_mon_notification* -> rax_mon_notification_plan -> rax_mon_alarm
 options:
   state:
+    type: str
     description:
     - Ensure that the notification with this C(label) exists or does not exist.
     choices: ['present', 'absent']
+    default: present
   label:
+    type: str
     description:
     - Defines a friendly name for this notification. String between 1 and 255
       characters long.
     required: true
   notification_type:
+    type: str
     description:
     - A supported notification type.
     choices: ["webhook", "email", "pagerduty"]
     required: true
   details:
+    type: dict
     description:
     - Dictionary of key-value pairs used to initialize the notification.
       Required keys and meanings vary with notification type. See

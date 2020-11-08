@@ -14,9 +14,11 @@ description:
      - creates / deletes a Rackspace Public Cloud queue.
 options:
   name:
+    type: str
     description:
       - Name to give the queue
   state:
+    type: str
     description:
       - Indicate desired state of the resource
     choices:

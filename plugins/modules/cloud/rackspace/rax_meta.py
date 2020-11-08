@@ -14,16 +14,20 @@ description:
      - Manipulate metadata for Rackspace Cloud Servers
 options:
   address:
+    type: str
     description:
       - Server IP address to modify metadata for, will match any IP assigned to
         the server
   id:
+    type: str
     description:
       - Server ID to modify metadata for
   name:
+    type: str
     description:
       - Server name to modify metadata for
   meta:
+    type: dict
     description:
       - A hash of metadata to associate with the instance
 author: "Matt Martz (@sivel)"

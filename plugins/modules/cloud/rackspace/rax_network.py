@@ -14,6 +14,7 @@ description:
      - creates / deletes a Rackspace Public Cloud isolated network.
 options:
   state:
+    type: str
     description:
      - Indicate desired state of the resource
     choices:
@@ -21,14 +22,17 @@ options:
       - absent
     default: present
   label:
+    type: str
     description:
-     - Label (name) to give the network
+      - Label (name) to give the network
+    required: yes
   cidr:
+    type: str
     description:
-     - cidr of the network being created
+      - cidr of the network being created
 author:
-    - "Christopher H. Laco (@claco)"
-    - "Jesse Keating (@omgjlk)"
+  - "Christopher H. Laco (@claco)"
+  - "Jesse Keating (@omgjlk)"
 extends_documentation_fragment:
 - community.general.rackspace.openstack
 

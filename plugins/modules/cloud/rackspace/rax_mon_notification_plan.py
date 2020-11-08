@@ -18,24 +18,30 @@ description:
   rax_mon_notification -> *rax_mon_notification_plan* -> rax_mon_alarm
 options:
   state:
+    type: str
     description:
     - Ensure that the notification plan with this C(label) exists or does not
       exist.
     choices: ['present', 'absent']
+    default: present
   label:
+    type: str
     description:
     - Defines a friendly name for this notification plan. String between 1 and
       255 characters long.
     required: true
   critical_state:
+    type: list
     description:
     - Notification list to use when the alarm state is CRITICAL. Must be an
       array of valid rax_mon_notification ids.
   warning_state:
+    type: list
     description:
     - Notification list to use when the alarm state is WARNING. Must be an array
       of valid rax_mon_notification ids.
   ok_state:
+    type: list
     description:
     - Notification list to use when the alarm state is OK. Must be an array of
       valid rax_mon_notification ids.

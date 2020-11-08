@@ -13,20 +13,27 @@ description:
   - create / delete a database in the Cloud Databases.
 options:
   cdb_id:
+    type: str
     description:
       - The databases server UUID
+    required: yes
   name:
+    type: str
     description:
       - Name to give to the database
+    required: yes
   character_set:
+    type: str
     description:
       - Set of symbols and encodings
     default: 'utf8'
   collate:
+    type: str
     description:
       - Set of rules for comparing characters in a character set
     default: 'utf8_general_ci'
   state:
+    type: str
     description:
       - Indicate desired state of the resource
     choices: ['present', 'absent']

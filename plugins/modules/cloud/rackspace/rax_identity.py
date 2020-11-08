@@ -14,9 +14,10 @@ description:
      - Verifies Rackspace Cloud credentials and returns identity information
 options:
   state:
+    type: str
     description:
       - Indicate desired state of the resource
-    choices: ['present', 'absent']
+    choices: ['present']
     default: present
     required: false
 author:

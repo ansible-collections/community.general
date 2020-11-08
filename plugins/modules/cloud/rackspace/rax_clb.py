@@ -14,6 +14,7 @@ description:
      - creates / deletes a Rackspace Public Cloud load balancer.
 options:
   algorithm:
+    type: str
     description:
       - algorithm for the balancer being created
     choices:
@@ -24,16 +25,21 @@ options:
       - WEIGHTED_ROUND_ROBIN
     default: LEAST_CONNECTIONS
   meta:
+    type: dict
     description:
       - A hash of metadata to associate with the instance
   name:
+    type: str
     description:
       - Name to give the load balancer
+    required: yes
   port:
+    type: int
     description:
       - Port for the balancer being created
     default: 80
   protocol:
+    type: str
     description:
       - Protocol for the balancer being created
     choices:
@@ -57,6 +63,7 @@ options:
       - SFTP
     default: HTTP
   state:
+    type: str
     description:
       - Indicate desired state of the resource
     choices:
@@ -64,10 +71,12 @@ options:
       - absent
     default: present
   timeout:
+    type: int
     description:
       - timeout for communication between the balancer and the node
     default: 30
   type:
+    type: str
     description:
       - type of interface for the balancer being created
     choices:
@@ -75,6 +84,7 @@ options:
       - SERVICENET
     default: PUBLIC
   vip_id:
+    type: str
     description:
       - Virtual IP ID to use when creating the load balancer for purposes of
         sharing an IP with another load balancer of another protocol
@@ -84,6 +94,7 @@ options:
     type: bool
     default: 'no'
   wait_timeout:
+    type: int
     description:
       - how long before wait gives up, in seconds
     default: 300
