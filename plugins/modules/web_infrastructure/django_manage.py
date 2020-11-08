@@ -26,11 +26,12 @@ options:
         C(collectstatic), C(createcachetable), C(flush), C(loaddata), C(migrate), C(syncdb), C(test), and C(validate).
     type: str
     required: true
-  app_path:
+  project_path:
     description:
       - The path to the root of the Django application where B(manage.py) lives.
     type: path
     required: true
+    aliases: [app_path, chdir]
   settings:
     description:
       - The Python path to the application's settings module, such as C(myapp.settings).
@@ -135,18 +136,18 @@ EXAMPLES = """
 - name: Run cleanup on the application installed in django_dir
   community.general.django_manage:
     command: cleanup
-    app_path: "{{ django_dir }}"
+    project_path: "{{ django_dir }}"
 
 - name: Load the initial_data fixture into the application
   community.general.django_manage:
     command: loaddata
-    app_path: "{{ django_dir }}"
+    project_path: "{{ django_dir }}"
     fixtures: "{{ initial_data }}"
 
 - name: Run syncdb on the application
   community.general.django_manage:
     command: syncdb
-    app_path: "{{ django_dir }}"
+    project_path: "{{ django_dir }}"
     settings: "{{ settings_app_name }}"
     pythonpath: "{{ settings_dir }}"
     virtualenv: "{{ virtualenv_dir }}"
@@ -154,13 +155,13 @@ EXAMPLES = """
 - name: Run the SmokeTest test case from the main app. Useful for testing deploys
   community.general.django_manage:
     command: test
-    app_path: "{{ django_dir }}"
+    project_path: "{{ django_dir }}"
     apps: main.SmokeTest
 
 - name: Create an initial superuser
   community.general.django_manage:
     command: "createsuperuser --noinput --username=admin --email=admin@example.com"
-    app_path: "{{ django_dir }}"
+    project_path: "{{ django_dir }}"
 """
 
 import os
@@ -262,7 +263,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             command=dict(required=True, type='str'),
-            app_path=dict(required=True, type='path'),
+            project_path=dict(required=True, type='path', aliases=['app_path', 'chdir']),
             settings=dict(default=None, required=False, type='path'),
             pythonpath=dict(default=None, required=False, type='path', aliases=['python_path']),
             virtualenv=dict(default=None, required=False, type='path', aliases=['virtual_env']),
@@ -283,7 +284,7 @@ def main():
     )
 
     command = module.params['command']
-    app_path = module.params['app_path']
+    project_path = module.params['project_path']
     virtualenv = module.params['virtualenv']
 
     for param in specific_params:
@@ -317,7 +318,7 @@ def main():
         if module.params[param]:
             cmd = '%s %s' % (cmd, module.params[param])
 
-    rc, out, err = module.run_command(cmd, cwd=app_path)
+    rc, out, err = module.run_command(cmd, cwd=project_path)
     if rc != 0:
         if command == 'createcachetable' and 'table' in err and 'already exists' in err:
             out = 'already exists.'
@@ -338,8 +339,8 @@ def main():
     if check_changed:
         changed = check_changed(out)
 
-    module.exit_json(changed=changed, out=out, cmd=cmd, app_path=app_path, virtualenv=virtualenv,
-                     settings=module.params['settings'], pythonpath=module.params['pythonpath'])
+    module.exit_json(changed=changed, out=out, cmd=cmd, app_path=project_path, project_path=project_path,
+                     virtualenv=virtualenv, settings=module.params['settings'], pythonpath=module.params['pythonpath'])
 
 
 if __name__ == '__main__':
