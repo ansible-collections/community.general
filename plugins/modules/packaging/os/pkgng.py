@@ -97,6 +97,7 @@ options:
         required: false
         type: bool
         default: no
+        version_added: 1.3.0
 author: "bleader (@bleader)"
 notes:
   - When using pkgsite, be careful that already in cache packages won't be downloaded again.
