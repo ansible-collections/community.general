@@ -1,0 +1,2 @@
+minor_changes:
+  - pkgng - present the ignore_osver option to pkg (https://github.com/ansible-collections/community.general/pull/1243)
