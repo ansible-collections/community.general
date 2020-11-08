@@ -1,0 +1,2 @@
+bugfixes:
+  - lxc_container - fix the type of the ``container_config`` parameter. It is now processed as a list and not a string (https://github.com/ansible-collections/community.general/pull/216).
