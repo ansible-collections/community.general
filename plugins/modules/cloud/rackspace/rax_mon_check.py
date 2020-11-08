@@ -36,28 +36,29 @@ options:
     - The type of check to create. C(remote.) checks may be created on any
       rax_mon_entity. C(agent.) checks may only be created on rax_mon_entities
       that have a non-null C(agent_id).
-    choices:
-    - C(remote.dns)
-    - C(remote.ftp-banner)
-    - C(remote.http)
-    - C(remote.imap-banner)
-    - C(remote.mssql-banner)
-    - C(remote.mysql-banner)
-    - C(remote.ping)
-    - C(remote.pop3-banner)
-    - C(remote.postgresql-banner)
-    - C(remote.smtp-banner)
-    - C(remote.smtp)
-    - C(remote.ssh)
-    - C(remote.tcp)
-    - C(remote.telnet-banner)
-    - C(agent.filesystem)
-    - C(agent.memory)
-    - C(agent.load_average)
-    - C(agent.cpu)
-    - C(agent.disk)
-    - C(agent.network)
-    - C(agent.plugin)
+    - |
+        Choices for this option are:
+        - C(remote.dns)
+        - C(remote.ftp-banner)
+        - C(remote.http)
+        - C(remote.imap-banner)
+        - C(remote.mssql-banner)
+        - C(remote.mysql-banner)
+        - C(remote.ping)
+        - C(remote.pop3-banner)
+        - C(remote.postgresql-banner)
+        - C(remote.smtp-banner)
+        - C(remote.smtp)
+        - C(remote.ssh)
+        - C(remote.tcp)
+        - C(remote.telnet-banner)
+        - C(agent.filesystem)
+        - C(agent.memory)
+        - C(agent.load_average)
+        - C(agent.cpu)
+        - C(agent.disk)
+        - C(agent.network)
+        - C(agent.plugin)
     required: true
   monitoring_zones_poll:
     description:
