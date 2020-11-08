@@ -186,14 +186,14 @@ class LookupModule(LookupBase):
             self.env = os.environ.copy()
 
             # Set PASSWORD_STORE_DIR if directory is set
-            if self.paramvals['directory']:
+            if 'directory' in self.paramvals:
                 if os.path.isdir(self.paramvals['directory']):
                     self.env['PASSWORD_STORE_DIR'] = self.paramvals['directory']
                 else:
                     raise AnsibleError('Passwordstore directory \'{0}\' does not exist'.format(self.paramvals['directory']))
 
             # Set PASSWORD_STORE_UMASK if umask is set
-            if self.paramvals['umask']:
+            if 'umask' in self.paramvals:
                 if len(self.paramvals['umask']) != 3:
                     raise AnsibleError('Passwordstore umask must have a length of 3.')
                 elif int(self.paramvals['umask'][0]) > 3:
