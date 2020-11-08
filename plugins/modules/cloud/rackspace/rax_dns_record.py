@@ -14,21 +14,26 @@ description:
      - Manage DNS records on Rackspace Cloud DNS
 options:
   comment:
+    type: str
     description:
       - Brief description of the domain. Maximum length of 160 characters
   data:
+    type: str
     description:
       - IP address for A/AAAA record, FQDN for CNAME/MX/NS, or text data for
         SRV/TXT
     required: True
   domain:
+    type: str
     description:
       - Domain name to create the record in. This is an invalid option when
         type=PTR
   loadbalancer:
+    type: str
     description:
       - Load Balancer ID to create a PTR record for. Only used with type=PTR
   name:
+    type: str
     description:
       - FQDN record name to create
     required: True
@@ -40,13 +45,16 @@ options:
     default: true
     type: bool
   priority:
+    type: int
     description:
       - Required for MX and SRV records, but forbidden for other record types.
         If specified, must be an integer from 0 to 65535.
   server:
+    type: str
     description:
       - Server ID to create a PTR record for. Only used with type=PTR
   state:
+    type: str
     description:
       - Indicate desired state of the resource
     choices:
@@ -54,10 +62,12 @@ options:
       - absent
     default: present
   ttl:
+    type: int
     description:
       - Time to live of record in seconds
     default: 3600
   type:
+    type: str
     description:
       - DNS record type
     choices:

@@ -13,10 +13,12 @@ description:
 - Set up, reconfigure, or remove SSL termination for an existing load balancer.
 options:
   loadbalancer:
+    type: str
     description:
     - Name or ID of the load balancer on which to manage SSL termination.
     required: true
   state:
+    type: str
     description:
     - If set to "present", SSL termination will be added to this load balancer.
     - If "absent", SSL termination will be removed instead.
@@ -31,16 +33,20 @@ options:
     default: true
     type: bool
   private_key:
+    type: str
     description:
     - The private SSL key as a string in PEM format.
   certificate:
+    type: str
     description:
     - The public SSL certificates as a string in PEM format.
   intermediate_certificate:
+    type: str
     description:
     - One or more intermediate certificate authorities as a string in PEM
     - format, concatenated into a single string.
   secure_port:
+    type: int
     description:
     - The port to listen for secure traffic.
     default: 443
@@ -61,6 +67,7 @@ options:
     default: false
     type: bool
   wait_timeout:
+    type: int
     description:
     - How long before "wait" gives up, in seconds.
     default: 300

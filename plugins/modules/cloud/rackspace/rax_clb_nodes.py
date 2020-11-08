@@ -14,10 +14,12 @@ description:
   - Adds, modifies and removes nodes from a Rackspace Cloud Load Balancer
 options:
   address:
+    type: str
     required: false
     description:
       - IP address or domain name of the node
   condition:
+    type: str
     required: false
     choices:
       - enabled
@@ -27,18 +29,22 @@ options:
       - Condition for the node, which determines its role within the load
         balancer
   load_balancer_id:
+    type: int
     required: true
     description:
       - Load balancer id
   node_id:
+    type: int
     required: false
     description:
       - Node id
   port:
+    type: int
     required: false
     description:
       - Port number of the load balanced service on the node
   state:
+    type: str
     required: false
     default: "present"
     choices:
@@ -47,6 +53,7 @@ options:
     description:
       - Indicate desired state of the node
   type:
+    type: str
     required: false
     choices:
       - primary
@@ -60,14 +67,20 @@ options:
     description:
       - Wait for the load balancer to become active before returning
   wait_timeout:
+    type: int
     required: false
     default: 30
     description:
       - How long to wait before giving up and returning an error
   weight:
+    type: int
     required: false
     description:
       - Weight of node
+  virtualenv:
+    type: path
+    description:
+      - Virtualenv to execute this module in
 author: "Lukasz Kawczynski (@neuroid)"
 extends_documentation_fragment:
 - community.general.rackspace

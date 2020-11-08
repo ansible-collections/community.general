@@ -14,13 +14,16 @@ description:
      - Gather facts for Rackspace Cloud Servers.
 options:
   address:
+    type: str
     description:
       - Server IP address to retrieve facts for, will match any IP assigned to
         the server
   id:
+    type: str
     description:
       - Server ID to retrieve facts for
   name:
+    type: str
     description:
       - Server name to retrieve facts for
 author: "Matt Martz (@sivel)"
