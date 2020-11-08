@@ -1,0 +1,2 @@
+bugfixes:
+  - lxc_container - fix the type of the container_config parameter
