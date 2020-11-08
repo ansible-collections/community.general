@@ -1,0 +1,2 @@
+bugfixes:
+- flatpak - add the use of the --non-interactive argument instead of -y when possible.
