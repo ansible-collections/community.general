@@ -236,6 +236,9 @@ class SecretManager(DockerBaseClass):
             if attrs.get('Labels', {}).get('ansible_key'):
                 if attrs['Labels']['ansible_key'] != self.data_key:
                     data_changed = True
+            else:
+                if not self.force:
+                    self.client.module.warn("'ansible_key' label not found. Secret will not be changed unless the force parameter is set to 'yes'")
             labels_changed = not compare_generic(self.labels, attrs.get('Labels'), 'allow_more_present', 'dict')
             if data_changed or labels_changed or self.force:
                 # if something changed or force, delete and re-create the secret
