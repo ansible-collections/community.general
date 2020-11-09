@@ -25,12 +25,14 @@
     name: ansible_test_group
     path: ansible_test_group
     state: present
+    description: My Test Group
   register: gitlab_group_state
 
 - name: Test group created
   assert:
     that:
       - gitlab_group_state is changed
+      - gitlab_group_state.group.description == "My Test Group"
 
 
 - name: Create GitLab Group ( Idempotency test )
