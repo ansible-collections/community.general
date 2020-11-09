@@ -1,2 +1,2 @@
 bugfixes:
-- flatpak - add the use of the --non-interactive argument instead of -y when possible.
+- flatpak - use of the ``--non-interactive`` argument instead of ``-y`` when possible (https://github.com/ansible-collections/community.general/pull/1246).
