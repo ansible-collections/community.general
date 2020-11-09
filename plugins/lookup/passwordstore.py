@@ -186,7 +186,7 @@ class LookupModule(LookupBase):
             self.env = os.environ.copy()
 
             # Set PASSWORD_STORE_DIR if directory is set
-            if 'directory' in self.paramvals:
+            if self.paramvals['directory']:
                 if os.path.isdir(self.paramvals['directory']):
                     self.env['PASSWORD_STORE_DIR'] = self.paramvals['directory']
                 else:
