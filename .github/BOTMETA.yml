@@ -26,6 +26,8 @@ files:
   $callbacks/sumologic.py:
     maintainers: ryancurrah
     labels: sumologic
+  $callbacks/syslog_json.py:
+    maintainers: imjoseangel
   $callbacks/unixy.py:
     maintainers: akatch
     labels: unixy
