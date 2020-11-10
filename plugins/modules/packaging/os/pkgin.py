@@ -178,8 +178,7 @@ def query_package(module, name):
             # Grab matched string
             pkgname_without_version = pkg_search_obj.group(1)
 
-            if name != pkgname_with_version and \
-               name != pkgname_without_version:
+            if name not in (pkgname_with_version, pkgname_without_version):
                 continue
 
             # The package was found; now return its state
