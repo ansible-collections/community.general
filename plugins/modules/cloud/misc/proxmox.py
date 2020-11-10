@@ -115,6 +115,12 @@ options:
     description:
       - specifies network interfaces for the container. As a hash/dictionary defining interfaces.
     type: dict
+  features:
+    description:
+      - Specifies a list of features to be enabled. For valid options, see U(https://pve.proxmox.com/wiki/Linux_Container#pct_options).
+    type: list
+    elements: str
+    version_added: 2.0.0
   mounts:
     description:
       - specifies additional mounts (separate disks) for the container. As a hash/dictionary defining mount points
@@ -316,6 +322,21 @@ EXAMPLES = r'''
     hostname: example.org
     ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     cores: 2
+
+- name: Create a new container with nesting enabled and allows the use of CIFS/NFS inside the container.
+  community.general.proxmox:
+    vmid: 100
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    password: 123456
+    hostname: example.org
+    ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
+    features:
+     - nesting=1
+     - mount=cifs,nfs
+
 
 - name: Start container
   community.general.proxmox:
@@ -526,6 +547,7 @@ def main():
             mounts=dict(type='dict'),
             ip_address=dict(),
             onboot=dict(type='bool'),
+            features=dict(type='list', elements='str'),
             storage=dict(default='local'),
             cpuunits=dict(type='int'),
             nameserver=dict(),
@@ -646,6 +668,7 @@ def main():
                             searchdomain=module.params['searchdomain'],
                             force=int(module.params['force']),
                             pubkey=module.params['pubkey'],
+                            features=",".join(module.params['features']),
                             unprivileged=int(module.params['unprivileged']),
                             description=module.params['description'],
                             hookscript=module.params['hookscript'])

@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox - add features option to LXC (https://github.com/ansible-collections/community.general/pull/1413).
