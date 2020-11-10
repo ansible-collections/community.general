@@ -28,17 +28,17 @@ options:
         description:
             - URL to be checked.
         required: true
-        version_added: '1.2.0'
+        version_added: '1.3.0'
     name:
         description:
             - The friendly name of the monitor.
         required: true
-        version_added: '1.2.0'
+        version_added: '1.3.0'
     check_type:
         description:
             - The kind of check, that will be performed on the url.
         choices: [ "http", "ping" ]
-        version_added: '1.2.0'
+        version_added: '1.3.0'
     monitorid:
         description:
             - ID of the monitor to check.
