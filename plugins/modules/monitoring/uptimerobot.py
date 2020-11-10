@@ -27,11 +27,13 @@ options:
     url:
         description:
             - URL to be checked.
+        type: str
         required: true
         version_added: '1.3.0'
     name:
         description:
             - The friendly name of the monitor.
+        type: str
         required: true
         version_added: '1.3.0'
     check_type:
@@ -42,10 +44,12 @@ options:
     monitorid:
         description:
             - ID of the monitor to check.
+        type: int
         required: false
     apikey:
         description:
             - Uptime Robot API key.
+        type: str
         required: true
 notes:
     - Support for further functionalities, which the API provides has not yet been implemented.
@@ -150,12 +154,12 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True),
-            url=dict(required=True),
+            name=dict(type='str', required=True),
+            url=dict(type='str', required=True),
             check_type=dict(required=False, choices=['http', 'ping']),
             state=dict(required=True, choices=['started', 'paused', 'absent', 'created', 'present']),
-            apikey=dict(required=True, no_log=True),
-            monitorid=dict(required=False)
+            apikey=dict(type='str', required=True, no_log=True),
+            monitorid=dict(type='int', required=False)
         ),
         supports_check_mode=SUPPORTS_CHECK_MODE
     )
