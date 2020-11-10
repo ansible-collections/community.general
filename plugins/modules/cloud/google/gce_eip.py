@@ -56,7 +56,7 @@ options:
   service_account_permissions:
     type: list
     description:
-      - service account email
+      - service account permissions
 '''
 
 EXAMPLES = '''
