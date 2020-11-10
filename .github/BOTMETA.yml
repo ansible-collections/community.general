@@ -1122,7 +1122,7 @@ files:
   $modules/system/pamd.py:
     maintainers: kevensen
   $modules/system/parted.py:
-    maintainers: ColOfAbRiX
+    maintainers: ColOfAbRiX rosowiecki
   $modules/system/pids.py:
     maintainers: saranyasridharan
   $modules/system/puppet.py:
