@@ -29,10 +29,12 @@ author:
   - "Tom Melendez (@supertom) <tom@supertom.com>"
 options:
   backend_service_name:
+    type: str
     description:
        - Name of the Backend Service.
     required: true
   backends:
+    type: list
     description:
        - List of backends that make up the backend service. A backend is made up of
          an instance group and optionally several other parameters.  See
@@ -40,6 +42,7 @@ options:
          for details.
     required: true
   healthchecks:
+    type: list
     description:
        - List of healthchecks. Only one healthcheck is supported.
     required: true
@@ -48,29 +51,46 @@ options:
        - If true, enable Cloud CDN for this Backend Service.
     type: bool
   port_name:
+    type: str
     description:
       - Name of the port on the managed instance group (MIG) that backend
         services can forward data to. Required for external load balancing.
   protocol:
+    type: str
     description:
        - The protocol this Backend Service uses to communicate with backends.
-         Possible values are HTTP, HTTPS, TCP, and SSL. The default is HTTP.
+         Possible values are HTTP, HTTPS, TCP, and SSL. The default is TCP.
+    choices: [HTTP, HTTPS, TCP, SSL]
+    default: TCP
     required: false
   timeout:
+    type: int
     description:
        - How many seconds to wait for the backend before considering it a failed
          request. Default is 30 seconds. Valid range is 1-86400.
     required: false
   service_account_email:
+    type: str
     description:
       - Service account email
+  service_account_permissions:
+    type: list
+    description:
+      - service account permissions
   credentials_file:
+    type: str
     description:
       - Path to the JSON file associated with the service account email.
+  pem_file:
+    type: str
+    description:
+      - Path to the PEM file associated with the service account email.
   project_id:
+    type: str
     description:
       - GCE project ID.
   state:
+    type: str
     description:
       - Desired state of the resource
     default: "present"
