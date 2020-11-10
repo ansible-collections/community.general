@@ -10,18 +10,18 @@
 
 - name: Cleanup GitLab Group
   gitlab_group:
-    server_url: "{{ gitlab_host }}"
+    api_url: "{{ gitlab_host }}"
     validate_certs: false
-    login_token: "{{ gitlab_login_token }}"
+    api_token: "{{ gitlab_login_token }}"
     name: ansible_test_group
     path: ansible_test_group
     state: absent
 
 - name: Create GitLab Group
   gitlab_group:
-    server_url: "{{ gitlab_host }}"
+    api_url: "{{ gitlab_host }}"
     validate_certs: false
-    login_token: "{{ gitlab_login_token }}"
+    api_token: "{{ gitlab_login_token }}"
     name: ansible_test_group
     path: ansible_test_group
     state: present
@@ -35,9 +35,9 @@
 
 - name: Create GitLab Group ( Idempotency test )
   gitlab_group:
-    server_url: "{{ gitlab_host }}"
+    api_url: "{{ gitlab_host }}"
     validate_certs: false
-    login_token: "{{ gitlab_login_token }}"
+    api_token: "{{ gitlab_login_token }}"
     name: ansible_test_group
     path: ansible_test_group
     state: present
@@ -50,18 +50,18 @@
 
 - name: Cleanup GitLab Group for Description Test
   gitlab_group:
-    server_url: "{{ gitlab_host }}"
+    api_url: "{{ gitlab_host }}"
     validate_certs: false
-    login_token: "{{ gitlab_login_token }}"
+    api_token: "{{ gitlab_login_token }}"
     name: ansible_test_group
     path: ansible_test_group
     state: absent
 
 - name: Create GitLab Group for Description Test
   gitlab_group:
-    server_url: "{{ gitlab_host }}"
+    api_url: "{{ gitlab_host }}"
     validate_certs: false
-    login_token: "{{ gitlab_login_token }}"
+    api_token: "{{ gitlab_login_token }}"
     name: ansible_test_group
     path: ansible_test_group
     description: My Test Group
