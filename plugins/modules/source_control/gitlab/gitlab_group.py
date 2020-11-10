@@ -162,12 +162,16 @@ class GitLabGroup(object):
         if self.groupObject is None:
             parent_id = self.getGroupId(parent)
 
-            group = self.createGroup({
+            payload = {
                 'name': name,
                 'path': options['path'],
                 'parent_id': parent_id,
                 'description': options['description'],
-                'visibility': options['visibility']})
+                'visibility': options['visibility']
+            }
+            if options.get('description'):
+                payload['description'] = options['description']
+            group = self.createGroup(payload)
             changed = True
         else:
             changed, group = self.updateGroup(self.groupObject, {
