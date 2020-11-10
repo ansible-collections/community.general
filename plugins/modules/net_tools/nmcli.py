@@ -53,7 +53,7 @@ options:
             - This is the type of device or network connection that you wish to create or modify.
             - Type C(generic) is added in Ansible 2.5.
         type: str
-        choices: [ bond, bond-slave, bridge, bridge-slave, ethernet, generic, ipip, sit, team, team-slave, vlan, vxlan ]
+        choices: [ bond, bond-slave, bridge, bridge-slave, ethernet, generic, infiniband, ipip, sit, team, team-slave, vlan, vxlan ]
     mode:
         description:
             - This is the type of device or network connection that you wish to create for a bond, team or bridge.
@@ -742,6 +742,7 @@ class Nmcli(object):
             'bridge-slave',
             'ethernet',
             'generic',
+            'infiniband',
             'team',
             'vlan',
         )
@@ -761,6 +762,7 @@ class Nmcli(object):
     def mtu_conn_type(self):
         return self.type in (
             'ethernet',
+            'infiniband',
             'team-slave',
         )
 
@@ -873,7 +875,7 @@ class Nmcli(object):
 
     @property
     def create_connection_up(self):
-        if self.type in ('bond', 'ethernet'):
+        if self.type in ('bond', 'ethernet', 'infiniband'):
             if (self.mtu is not None) or (self.dns4 is not None) or (self.dns6 is not None):
                 return True
         elif self.type == 'team':
@@ -997,7 +999,7 @@ def main():
             master=dict(type='str'),
             ifname=dict(type='str'),
             type=dict(type='str',
-                      choices=['bond', 'bond-slave', 'bridge', 'bridge-slave', 'ethernet', 'generic', 'ipip', 'sit', 'team', 'team-slave', 'vlan', 'vxlan']),
+                      choices=['bond', 'bond-slave', 'bridge', 'bridge-slave', 'ethernet', 'generic', 'infiniband', 'ipip', 'sit', 'team', 'team-slave', 'vlan', 'vxlan']),
             ip4=dict(type='str'),
             gw4=dict(type='str'),
             dns4=dict(type='list', elements='str'),
