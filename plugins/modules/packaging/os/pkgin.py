@@ -77,6 +77,11 @@ EXAMPLES = '''
     name: foo
     state: present
 
+- name: Install specific version of foo package
+  community.general.pkgin:
+    name: foo-2.0.1
+    state: present
+
 - name: Update cache and install foo package
   community.general.pkgin:
     name: foo
