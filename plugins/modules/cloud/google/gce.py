@@ -101,7 +101,6 @@ options:
     description:
       - name of the subnetwork in which the instance should be created
   persistent_boot_disk:
-    type: str
     description:
       - if set, create the instance with a persistent boot disk
     type: bool
