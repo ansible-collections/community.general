@@ -121,18 +121,20 @@ EXAMPLES = '''
 
 
 import re
+from enum import Flag, auto
 
 from ansible.module_utils.basic import AnsibleModule
 
 
-def query_package(module, name):
-    """Search for the package by name.
+class PackageState(Flag):
+    PRESENT = auto()
+    NOT_INSTALLED = auto()
+    OUTDATED = auto()
+    NOT_FOUND = auto()
+    INSTALLED = PRESENT | OUTDATED
 
-    Possible return values:
-    * "present"  - installed, no upgrade needed
-    * "outdated" - installed, but can be upgraded
-    * False      - not installed
-    * None       - not found
+def query_package(module, name):
+    """Search for the package by name and return state of the package.
     """
 
     # test whether '-p' (parsable) flag is supported.
@@ -183,19 +185,19 @@ def query_package(module, name):
 
             # The package was found; now return its state
             if raw_state == '<':
-                return 'outdated'
+                return PackageState.OUTDATED
             elif raw_state == '=' or raw_state == '>':
-                return 'present'
+                return PackageState.PRESENT
             else:
                 # Package found but not installed
-                return False
+                return PackageState.NOT_INSTALLED
             # no fall-through
 
         # No packages were matched, so return None
-        return None
+        return PackageState.NOT_FOUND
 
-    # Search failed, so return None
-    return None
+    # Search failed
+    return PackageState.NOT_FOUND
 
 
 def format_action_message(module, action, count):
@@ -243,13 +245,13 @@ def remove_packages(module, packages):
     # Using a for loop in case of error, we can report the package that failed
     for package in packages:
         # Query the package first, to see if we even need to remove
-        if not query_package(module, package):
+        if query_package(module, package) in [PackageState.NOT_INSTALLED, PackageState.NOT_FOUND] :
             continue
 
         rc, out, err = module.run_command(
             format_pkgin_command(module, "remove", package))
 
-        if not module.check_mode and query_package(module, package):
+        if not module.check_mode and query_package(module, package) == PackageState.INSTALLED:
             module.fail_json(msg="failed to remove %s: %s" % (package, out))
 
         remove_c += 1
@@ -266,15 +268,15 @@ def install_packages(module, packages):
 
     for package in packages:
         query_result = query_package(module, package)
-        if query_result:
+        if query_result is PackageState.INSTALLED:
             continue
-        elif query_result is None:
+        elif query_result is PackageState.NOT_FOUND:
             module.fail_json(msg="failed to find package %s for installation" % package)
 
         rc, out, err = module.run_command(
             format_pkgin_command(module, "install", package))
 
-        if not module.check_mode and not query_package(module, package):
+        if not module.check_mode and not query_package(module, package) is PackageState.INSTALLED:
             module.fail_json(msg="failed to install %s: %s" % (package, out))
 
         install_c += 1
