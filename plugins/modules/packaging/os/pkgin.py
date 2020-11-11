@@ -121,16 +121,16 @@ EXAMPLES = '''
 
 
 import re
-from enum import Flag, auto
+from enum import IntEnum
 
 from ansible.module_utils.basic import AnsibleModule
 
 
-class PackageState(Flag):
-    PRESENT = auto()
-    NOT_INSTALLED = auto()
-    OUTDATED = auto()
-    NOT_FOUND = auto()
+class PackageState(IntEnum):
+    PRESENT = 1
+    NOT_INSTALLED = 2
+    OUTDATED = 4
+    NOT_FOUND = 8
     INSTALLED = PRESENT | OUTDATED
 
 def query_package(module, name):
