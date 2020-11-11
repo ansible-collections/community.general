@@ -121,12 +121,11 @@ EXAMPLES = '''
 
 
 import re
-from enum import IntEnum
 
 from ansible.module_utils.basic import AnsibleModule
 
 
-class PackageState(IntEnum):
+class PackageState(object):
     PRESENT = 1
     NOT_INSTALLED = 2
     OUTDATED = 4
