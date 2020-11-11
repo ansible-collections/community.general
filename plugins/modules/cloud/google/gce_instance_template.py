@@ -119,7 +119,6 @@ options:
     description:
       - a comma-separated list of tags to associate with the instance
   metadata:
-    type: dict
     description:
       - a hash/dictionary of custom data for the instance;
         '{"key":"value", ...}'

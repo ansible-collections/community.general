@@ -49,6 +49,7 @@ plugins/modules/cloud/google/gce.py validate-modules:missing-main-call
 plugins/modules/cloud/google/gce_eip.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_img.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_instance_template.py pylint:blacklisted-name
+plugins/modules/cloud/google/gce_instance_template.py validate-modules:doc-missing-type
 plugins/modules/cloud/google/gce_lb.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_mig.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_net.py pylint:blacklisted-name

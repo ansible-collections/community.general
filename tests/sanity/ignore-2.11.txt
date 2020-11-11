@@ -59,8 +59,8 @@ plugins/modules/cloud/google/gce_eip.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_eip.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gce_img.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_instance_template.py pylint:blacklisted-name
+plugins/modules/cloud/google/gce_instance_template.py validate-modules:doc-missing-type
 plugins/modules/cloud/google/gce_instance_template.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gce_instance_template.py validate-modules:implied-parameter-type-mismatch
 plugins/modules/cloud/google/gce_labels.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gce_lb.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_lb.py validate-modules:parameter-list-no-elements
