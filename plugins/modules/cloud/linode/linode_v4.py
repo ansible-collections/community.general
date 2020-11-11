@@ -27,21 +27,21 @@ options:
     description:
       - The region of the instance. This is a required parameter only when
         creating Linode instances. See
-        U(https://developers.linode.com/api/v4#tag/Regions).
+        U(https://www.linode.com/docs/api/regions/).
     required: false
     type: str
   image:
     description:
       - The image of the instance. This is a required parameter only when
         creating Linode instances. See
-        U(https://developers.linode.com/api/v4#tag/Images).
+        U(https://www.linode.com/docs/api/images/).
     type: str
     required: false
   type:
     description:
       - The type of the instance. This is a required parameter only when
         creating Linode instances. See
-        U(https://developers.linode.com/api/v4#tag/Linode-Types).
+        U(https://www.linode.com/docs/api/linode-types/).
     type: str
     required: false
   label:
@@ -60,7 +60,7 @@ options:
   tags:
     description:
       - The tags that the instance should be marked under. See
-        U(https://developers.linode.com/api/v4#tag/Tags).
+        U(https://www.linode.com/docs/api/tags/).
     required: false
     type: list
   root_pass:
@@ -87,8 +87,22 @@ options:
     description:
       - The Linode API v4 access token. It may also be specified by exposing
         the C(LINODE_ACCESS_TOKEN) environment variable. See
-        U(https://developers.linode.com/api/v4#section/Access-and-Authentication).
+        U(https://www.linode.com/docs/api#access-and-authentication).
     required: true
+  stackscript_id:
+    description:
+      - The numeric ID of the StackScript to use when creating the instance.
+        See U(https://www.linode.com/docs/api/stackscripts/).
+    type: int
+    required: false
+  stackscript_data:
+    description:
+      - An object containing arguments to any User Defined Fields present in
+        the StackScript used when creating the instance.
+        Only valid when a stackscript_id is provided.
+        See U(https://www.linode.com/docs/api/stackscripts/).
+    type: dict
+    required: false
 '''
 
 EXAMPLES = """
@@ -229,6 +243,8 @@ def initialise_module():
             root_pass=dict(type='str', required=False, no_log=True),
             tags=dict(type='list', required=False),
             type=dict(type='str', required=False),
+            stackscript_id=dict(type='int', required=False),
+            stackscript_data=dict(type='dict', required=False),
         ),
         supports_check_mode=False,
         required_one_of=(
@@ -272,6 +288,8 @@ def main():
             root_pass=module.params['root_pass'],
             tags=module.params['tags'],
             ltype=module.params['type'],
+            stackscript=module.params['stackscript_id'],
+            stackscript_data=module.params['stackscript_data'],
         )
         module.exit_json(changed=True, instance=instance_json)
 
