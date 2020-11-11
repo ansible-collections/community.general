@@ -99,11 +99,11 @@ options:
         U(https://cloud.google.com/sdk/gcloud/reference/compute/instances/create),
         --scopes section for detailed information)
       - >
-        Available choices are: [
+        Available choices are:
         C(bigquery), C(cloud-platform), C(compute-ro), C(compute-rw),
         C(useraccounts-ro), C(useraccounts-rw), C(datastore), C(logging-write),
         C(monitoring), C(sql-admin), C(storage-full), C(storage-ro),
-        C(storage-rw), C(taskqueue), C(userinfo-email) ]
+        C(storage-rw), C(taskqueue), C(userinfo-email).
   automatic_restart:
     description:
       - Defines whether the instance should be
