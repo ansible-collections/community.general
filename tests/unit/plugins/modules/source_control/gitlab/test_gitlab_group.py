@@ -66,11 +66,14 @@ class TestGitlabGroup(GitlabModuleTestCase):
 
     @with_httmock(resp_create_group)
     def test_create_group(self):
-        group = self.moduleUtil.createGroup({'name': "Foobar Group", 'path': "foo-bar"})
+        group = self.moduleUtil.createGroup({'name': "Foobar Group",
+                                             'path': "foo-bar",
+                                             'description': "An interesting group"})
 
         self.assertEqual(type(group), Group)
         self.assertEqual(group.name, "Foobar Group")
         self.assertEqual(group.path, "foo-bar")
+        self.assertEqual(group.description, "An interesting group")
         self.assertEqual(group.id, 1)
 
     @with_httmock(resp_create_subgroup)
