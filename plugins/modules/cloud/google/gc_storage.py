@@ -35,12 +35,12 @@ options:
     type: path
     description:
       - The destination file path when downloading an object/key with a GET operation.
-  force:
+  overwrite:
     description:
       - Forces an overwrite either locally on the filesystem or remotely with the object/key. Used with PUT and GET operations.
     type: bool
     default: 'yes'
-    aliases: [ 'overwrite' ]
+    aliases: [ 'force' ]
   permission:
     type: str
     description:
