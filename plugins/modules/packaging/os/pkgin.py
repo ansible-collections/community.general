@@ -133,6 +133,7 @@ class PackageState(IntEnum):
     NOT_FOUND = 8
     INSTALLED = PRESENT | OUTDATED
 
+
 def query_package(module, name):
     """Search for the package by name and return state of the package.
     """
@@ -245,7 +246,7 @@ def remove_packages(module, packages):
     # Using a for loop in case of error, we can report the package that failed
     for package in packages:
         # Query the package first, to see if we even need to remove
-        if query_package(module, package) in [PackageState.NOT_INSTALLED, PackageState.NOT_FOUND] :
+        if query_package(module, package) in [PackageState.NOT_INSTALLED, PackageState.NOT_FOUND]:
             continue
 
         rc, out, err = module.run_command(
