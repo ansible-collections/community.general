@@ -20,31 +20,41 @@ description:
 
 options:
   state:
+    type: str
     description:
       - absent - provider should not exist, present - provider should be present, refresh - provider will be refreshed
     choices: ['absent', 'present', 'refresh']
     default: 'present'
   name:
+    type: str
     description: The provider's name.
     required: true
   type:
+    type: str
     description: The provider's type.
     required: true
     choices: ['Openshift', 'Amazon', 'oVirt', 'VMware', 'Azure', 'Director', 'OpenStack', 'GCE']
   zone:
+    type: str
     description: The ManageIQ zone name that will manage the provider.
     default: 'default'
   provider_region:
+    type: str
     description: The provider region name to connect to (e.g. AWS region for Amazon).
   host_default_vnc_port_start:
+    type: str
     description: The first port in the host VNC range. defaults to None.
   host_default_vnc_port_end:
+    type: str
     description: The last port in the host VNC range. defaults to None.
   subscription:
+    type: str
     description: Microsoft Azure subscription ID. defaults to None.
   project:
+    type: str
     description: Google Compute Engine Project ID. defaults to None.
   azure_tenant_id:
+    type: str
     description: Tenant ID. defaults to None.
     aliases: [ keystone_v3_domain_id ]
   tenant_mapping_enabled:
@@ -52,6 +62,7 @@ options:
     default: 'no'
     description: Whether to enable mapping of existing tenants. defaults to False.
   api_version:
+    type: str
     description: The OpenStack Keystone API version. defaults to None.
     choices: ['v2', 'v3']
 
@@ -59,50 +70,65 @@ options:
     description: Default endpoint connection information, required if state is true.
     suboptions:
       hostname:
+        type: str
         description: The provider's api hostname.
         required: true
       port:
+        type: int
         description: The provider's api port.
       userid:
+        type: str
         description: Provider's api endpoint authentication userid. defaults to None.
       password:
+        type: str
         description: Provider's api endpoint authentication password. defaults to None.
       auth_key:
+        type: str
         description: Provider's api endpoint authentication bearer token. defaults to None.
       validate_certs:
         description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
         type: bool
         default: 'yes'
       security_protocol:
+        type: str
         description: How SSL certificates should be used for HTTPS requests. defaults to None.
         choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation','non-ssl']
       certificate_authority:
+        type: str
         description: The CA bundle string with custom certificates. defaults to None.
 
   metrics:
     description: Metrics endpoint connection information.
     suboptions:
       hostname:
+        type: str
         description: The provider's api hostname.
         required: true
       port:
+        type: int
         description: The provider's api port.
       userid:
+        type: str
         description: Provider's api endpoint authentication userid. defaults to None.
       password:
+        type: str
         description: Provider's api endpoint authentication password. defaults to None.
       auth_key:
+        type: str
         description: Provider's api endpoint authentication bearer token. defaults to None.
       validate_certs:
         description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
         type: bool
         default: 'yes'
       security_protocol:
+        type: str
         choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation','non-ssl']
         description: How SSL certificates should be used for HTTPS requests. defaults to None.
       certificate_authority:
+        type: str
         description: The CA bundle string with custom certificates. defaults to None.
       path:
+        type: str
         description: Database name for oVirt metrics. Defaults to ovirt_engine_history.
         default: ovirt_engine_history
 
@@ -110,34 +136,45 @@ options:
     description: Alerts endpoint connection information.
     suboptions:
       hostname:
+        type: str
         description: The provider's api hostname.
         required: true
       port:
+        type: int
         description: The provider's api port.
       userid:
+        type: str
         description: Provider's api endpoint authentication userid. defaults to None.
       password:
+        type: str
         description: Provider's api endpoint authentication password. defaults to None.
       auth_key:
+        type: str
         description: Provider's api endpoint authentication bearer token. defaults to None.
       validate_certs:
+        type: bool
         description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
         default: true
       security_protocol:
+        type: str
         choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation']
         description: How SSL certificates should be used for HTTPS requests. defaults to None.
       certificate_authority:
+        type: str
         description: The CA bundle string with custom certificates. defaults to None.
 
   ssh_keypair:
     description: SSH key pair used for SSH connections to all hosts in this provider.
     suboptions:
       hostname:
+        type: str
         description: Director hostname.
         required: true
       userid:
+        type: str
         description: SSH username.
       auth_key:
+        type: str
         description: SSH private key.
 '''
 
