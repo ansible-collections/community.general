@@ -37,32 +37,38 @@ requirements:
 
 options:
   state:
+    type: str
     description:
     - absent - group should not exist, present - group should be.
     choices: ['absent', 'present']
     default: 'present'
   description:
+    type: str
     description:
     - The group description.
     required: true
     default: null
   role_id:
+    type: int
     description:
     - The the group role id
     required: false
     default: null
   role:
+    type: str
     description:
     - The the group role name
     - The C(role_id) has precedence over the C(role) when supplied.
     required: false
     default: null
   tenant_id:
+    type: int
     description:
     - The tenant for the group identified by the tenant id.
     required: false
     default: null
   tenant:
+    type: str
     description:
     - The tenant for the group identified by the tenant name.
     - The C(tenant_id) has precedence over the C(tenant) when supplied.
@@ -75,6 +81,7 @@ options:
     required: false
     default: null
   managed_filters_merge_mode:
+    type: str
     description:
     - In merge mode existing categories are kept or updated, new categories are added.
     - In replace mode all categories will be replaced with the supplied C(managed_filters).
@@ -83,9 +90,11 @@ options:
   belongsto_filters:
     description: A list of strings with a reference to the allowed host, cluster or folder
     type: list
+    elements: str
     required: false
     default: null
   belongsto_filters_merge_mode:
+    type: str
     description:
     - In merge mode existing settings are merged with the supplied C(belongsto_filters).
     - In replace mode current values are replaced with the supplied C(belongsto_filters).

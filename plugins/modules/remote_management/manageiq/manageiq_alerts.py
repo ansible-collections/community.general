@@ -21,6 +21,7 @@ description:
 
 options:
   state:
+    type: str
     description:
       - absent - alert should not exist,
       - present - alert should exist,
@@ -28,20 +29,24 @@ options:
     choices: ['absent', 'present']
     default: 'present'
   description:
+    type: str
     description:
       - The unique alert description in ManageIQ.
       - Required when state is "absent" or "present".
   resource_type:
+    type: str
     description:
       - The entity type for the alert in ManageIQ. Required when state is "present".
     choices: ['Vm', 'ContainerNode', 'MiqServer', 'Host', 'Storage', 'EmsCluster',
               'ExtManagementSystem', 'MiddlewareServer']
   expression_type:
+    type: str
     description:
       - Expression type.
     default: hash
     choices: ["hash", "miq"]
   expression:
+    type: dict
     description:
       - The alert expression for ManageIQ.
       - Can either be in the "Miq Expression" format or the "Hash Expression format".
@@ -51,6 +56,7 @@ options:
       - Enable or disable the alert. Required if state is "present".
     type: bool
   options:
+    type: dict
     description:
       - Additional alert options, such as notification type and frequency
 
