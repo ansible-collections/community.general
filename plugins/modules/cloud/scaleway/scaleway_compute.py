@@ -25,6 +25,7 @@ extends_documentation_fragment:
 options:
 
   public_ip:
+    type: str
     description:
     - Manage public IP on a Scaleway server
     - Could be Scaleway IP address UUID
@@ -39,20 +40,24 @@ options:
     type: bool
 
   image:
+    type: str
     description:
       - Image identifier used to start the instance with
     required: true
 
   name:
+    type: str
     description:
       - Name of the instance
 
   organization:
+    type: str
     description:
       - Organization identifier
     required: true
 
   state:
+    type: str
     description:
      - Indicate desired state of the instance.
     default: present
@@ -64,12 +69,14 @@ options:
       - stopped
 
   tags:
+    type: list
     description:
     - List of tags to apply to the instance (5 max)
     required: false
     default: []
 
   region:
+    type: str
     description:
     - Scaleway compute zone
     required: true
@@ -80,6 +87,7 @@ options:
       - EMEA-FR-PAR1
 
   commercial_type:
+    type: str
     description:
     - Commercial name of the compute node
     required: true
@@ -91,18 +99,21 @@ options:
     default: 'no'
 
   wait_timeout:
+    type: int
     description:
     - Time to wait for the server to reach the expected state
     required: false
     default: 300
 
   wait_sleep_time:
+    type: int
     description:
     - Time to wait before every attempt to check the state of the server
     required: false
     default: 3
 
   security_group:
+    type: str
     description:
     - Security group unique identifier
     - If no value provided, the default security group or current security group will be used
@@ -632,11 +643,11 @@ def main():
     argument_spec.update(dict(
         image=dict(required=True),
         name=dict(),
-        region=dict(required=True, choices=SCALEWAY_LOCATION.keys()),
+        region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
         commercial_type=dict(required=True),
         enable_ipv6=dict(default=False, type="bool"),
         public_ip=dict(default="absent"),
-        state=dict(choices=state_strategy.keys(), default='present'),
+        state=dict(choices=list(state_strategy.keys()), default='present'),
         tags=dict(type="list", default=[]),
         organization=dict(required=True),
         wait=dict(type="bool", default=False),

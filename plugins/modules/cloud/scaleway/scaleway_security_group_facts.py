@@ -22,6 +22,7 @@ author:
   - "Remy Leone (@sieben)"
 options:
   region:
+    type: str
     description:
      - Scaleway region to use (for example par1).
     required: true
@@ -88,7 +89,7 @@ class ScalewaySecurityGroupFacts(Scaleway):
 def main():
     argument_spec = scaleway_argument_spec()
     argument_spec.update(dict(
-        region=dict(required=True, choices=SCALEWAY_LOCATION.keys()),
+        region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,

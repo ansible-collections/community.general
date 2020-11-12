@@ -22,6 +22,7 @@ extends_documentation_fragment:
 
 options:
   state:
+    type: str
     description:
      - Indicate desired state of the IP.
     default: present
@@ -30,11 +31,13 @@ options:
       - absent
 
   organization:
+    type: str
     description:
       - Scaleway organization identifier
     required: true
 
   region:
+    type: str
     description:
      - Scaleway region to use (for example par1).
     required: true
@@ -45,15 +48,18 @@ options:
       - EMEA-FR-PAR1
 
   id:
+    type: str
     description:
     - id of the Scaleway IP (UUID)
 
   server:
+    type: str
     description:
     - id of the server you want to attach an IP to.
     - To unattach an IP don't specify this option
 
   reverse:
+    type: str
     description:
     - Reverse to assign to the IP
 '''
@@ -236,7 +242,7 @@ def main():
         organization=dict(required=True),
         server=dict(),
         reverse=dict(),
-        region=dict(required=True, choices=SCALEWAY_LOCATION.keys()),
+        region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
         id=dict()
     ))
     module = AnsibleModule(
