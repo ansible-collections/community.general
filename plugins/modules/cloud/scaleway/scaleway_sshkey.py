@@ -25,6 +25,7 @@ extends_documentation_fragment:
 
 options:
   state:
+    type: str
     description:
      - Indicate desired state of the SSH key.
     default: present
@@ -32,10 +33,12 @@ options:
       - present
       - absent
   ssh_pub_key:
+    type: str
     description:
      - The public SSH key as a string to add.
     required: true
   api_url:
+    type: str
     description:
       - Scaleway API URL
     default: 'https://account.scaleway.com'

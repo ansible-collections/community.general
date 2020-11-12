@@ -21,6 +21,7 @@ extends_documentation_fragment:
 
 options:
   region:
+    type: str
     description:
       - Scaleway region to use (for example C(par1)).
     required: true
@@ -170,7 +171,7 @@ class ScalewayServerInfo(Scaleway):
 def main():
     argument_spec = scaleway_argument_spec()
     argument_spec.update(dict(
-        region=dict(required=True, choices=SCALEWAY_LOCATION.keys()),
+        region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
     ))
 
     module = AnsibleModule(

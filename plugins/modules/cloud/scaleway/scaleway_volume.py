@@ -24,6 +24,7 @@ extends_documentation_fragment:
 
 options:
   state:
+    type: str
     description:
      - Indicate desired state of the volume.
     default: present
@@ -31,6 +32,7 @@ options:
       - present
       - absent
   region:
+    type: str
     description:
      - Scaleway region to use (for example par1).
     required: true
@@ -40,16 +42,20 @@ options:
       - par1
       - EMEA-FR-PAR1
   name:
+    type: str
     description:
      - Name used to identify the volume.
     required: true
   organization:
+    type: str
     description:
      - ScaleWay organization ID to which volume belongs.
   size:
+    type: int
     description:
      - Size of the volume in bytes.
   volume_type:
+    type: str
     description:
      - Type of the volume (for example 'l_ssd').
 '''
@@ -152,7 +158,7 @@ def main():
         size=dict(type='int'),
         organization=dict(),
         volume_type=dict(),
-        region=dict(required=True, choices=SCALEWAY_LOCATION.keys()),
+        region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,
