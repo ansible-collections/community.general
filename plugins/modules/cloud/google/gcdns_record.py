@@ -28,16 +28,19 @@ deprecated:
     alternative: Use M(google.cloud.gcp_dns_resource_record_set) instead.
 options:
     state:
+        type: str
         description:
             - Whether the given resource record should or should not be present.
         choices: ["present", "absent"]
         default: "present"
     record:
+        type: str
         description:
             - The fully-qualified domain name of the resource record.
         required: true
         aliases: ['name']
     zone:
+        type: str
         description:
             - The DNS domain name of the zone (e.g., example.com).
             - One of either I(zone) or I(zone_id) must be specified as an
@@ -45,6 +48,7 @@ options:
             - If both I(zone) and I(zone_id) are specified, I(zone_id) will be
               used.
     zone_id:
+        type: str
         description:
             - The Google Cloud ID of the zone (e.g., example-com).
             - One of either I(zone) or I(zone_id) must be specified as an
@@ -56,11 +60,13 @@ options:
             - If both I(zone) and I(zone_id) are specified, I(zone_id) will be
               used.
     type:
+        type: str
         description:
             - The type of resource record to add.
         required: true
         choices: [ 'A', 'AAAA', 'CNAME', 'SRV', 'TXT', 'SOA', 'NS', 'MX', 'SPF', 'PTR' ]
     record_data:
+        type: list
         description:
             - The record_data to use for the resource record.
             - I(record_data) must be specified if I(state) is C(present) or
@@ -77,6 +83,7 @@ options:
         required: false
         aliases: ['value']
     ttl:
+        type: int
         description:
             - The amount of time in seconds that a resource record will remain
               cached by a caching resolver.
@@ -99,20 +106,24 @@ options:
         type: bool
         default: 'no'
     service_account_email:
+        type: str
         description:
             - The e-mail address for a service account with access to Google
               Cloud DNS.
     pem_file:
+        type: path
         description:
             - The path to the PEM file associated with the service account
               email.
             - This option is deprecated and may be removed in a future release.
               Use I(credentials_file) instead.
     credentials_file:
+        type: path
         description:
             - The path to the JSON file associated with the service account
               email.
     project_id:
+        type: str
         description:
             - The Google Cloud Platform project ID to use.
 notes:

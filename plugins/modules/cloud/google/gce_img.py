@@ -18,38 +18,48 @@ description:
       disks in any zone. U(https://cloud.google.com/compute/docs/images)
 options:
   name:
+    type: str
     description:
       - the name of the image to create or delete
     required: true
   description:
+    type: str
     description:
       - an optional description
   family:
+    type: str
     description:
       - an optional family name
   source:
+    type: str
     description:
       - the source disk or the Google Cloud Storage URI to create the image from
   state:
+    type: str
     description:
       - desired state of the image
     default: "present"
     choices: ["present", "absent"]
   zone:
+    type: str
     description:
       - the zone of the disk specified by source
     default: "us-central1-a"
   timeout:
+    type: int
     description:
       - timeout for the operation
     default: 180
   service_account_email:
+    type: str
     description:
       - service account email
   pem_file:
+    type: path
     description:
       - path to the pem file associated with the service account email
   project_id:
+    type: str
     description:
       - your GCE project ID
 requirements:
