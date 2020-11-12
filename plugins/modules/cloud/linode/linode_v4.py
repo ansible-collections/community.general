@@ -115,6 +115,9 @@ EXAMPLES = """
     root_pass: passw0rd
     authorized_keys:
       - "ssh-rsa ..."
+    stackscript_id: 1337
+    stackscript_data:
+      variable: value
     state: present
 
 - name: Delete that new Linode.
