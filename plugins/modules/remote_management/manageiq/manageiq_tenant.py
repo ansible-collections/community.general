@@ -36,32 +36,38 @@ requirements:
 - manageiq-client
 options:
   state:
+    type: str
     description:
     - absent - tenant should not exist, present - tenant should be.
     choices: ['absent', 'present']
     default: 'present'
   name:
+    type: str
     description:
       - The tenant name.
     required: true
     default: null
   description:
+    type: str
     description:
     - The tenant description.
     required: true
     default: null
   parent_id:
+    type: int
     description:
     - The id of the parent tenant. If not supplied the root tenant is used.
     - The C(parent_id) takes president over C(parent) when supplied
     required: false
     default: null
   parent:
+    type: str
     description:
     - The name of the parent tenant. If not supplied and no C(parent_id) is supplied the root tenant is used.
     required: false
     default: null
   quotas:
+    type: dict
     description:
     - The tenant quotas.
     - All parameters case sensitive.
