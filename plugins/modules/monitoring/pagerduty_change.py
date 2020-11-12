@@ -83,8 +83,18 @@ EXAMPLES = '''
   community.general.pagerduty_change:
     integration_key: abc123abc123abc123abc123abc123ab
     summary: The application was deployed
+
+- name: Track the deployment as a PagerDuty change event with more details
+  community.general.pagerduty_change:
+    integration_key: abc123abc123abc123abc123abc123ab
+    summary: The application was deployed
+    source: Ansible Deploy
     user: ansible
+    repo: github.com/ansible/ansible
     revision: '4.2'
+    environment: production
+    link_url: https://github.com/ansible-collections/community.general/pull/1269
+    link_text: View changes on GitHub
 '''
 
 from ansible.module_utils.urls import fetch_url
