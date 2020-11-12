@@ -266,6 +266,9 @@ def package_present(names, pkg_spec, module):
 
 # Function used to make sure a package is the latest available version.
 def package_latest(names, pkg_spec, module):
+    if module.params['build'] is True:
+        module.fail_json(msg="the combination of build=%s and state=latest is not supported" % module.params['build'])
+
     upgrade_cmd = 'pkg_add -um'
 
     if module.check_mode:
