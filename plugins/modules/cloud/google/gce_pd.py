@@ -23,59 +23,82 @@ options:
     type: bool
     default: 'no'
   instance_name:
+    type: str
     description:
       - instance name if you wish to attach or detach the disk
   mode:
+    type: str
     description:
       - GCE mount mode of disk, READ_ONLY (default) or READ_WRITE
     default: "READ_ONLY"
     choices: ["READ_WRITE", "READ_ONLY"]
   name:
+    type: str
     description:
       - name of the disk
     required: true
   size_gb:
+    type: str
     description:
       - whole integer size of disk (in GB) to create, default is 10 GB
-    default: 10
+    default: "10"
   image:
+    type: str
     description:
       - the source image to use for the disk
   snapshot:
+    type: str
     description:
       - the source snapshot to use for the disk
   state:
+    type: str
     description:
       - desired state of the persistent disk
+      - "Available choices are: C(active), C(present), C(absent), C(deleted)."
     default: "present"
-    choices: ["active", "present", "absent", "deleted"]
   zone:
+    type: str
     description:
       - zone in which to create the disk
     default: "us-central1-b"
   service_account_email:
+    type: str
     description:
       - service account email
   pem_file:
+    type: path
     description:
       - path to the pem file associated with the service account email
         This option is deprecated. Use 'credentials_file'.
   credentials_file:
+    type: path
     description:
       - path to the JSON file associated with the service account email
   project_id:
+    type: str
     description:
       - your GCE project ID
   disk_type:
+    type: str
     description:
-      - type of disk provisioned
+      - Specify a C(pd-standard) disk or C(pd-ssd) for an SSD disk.
     default: "pd-standard"
-    choices: ["pd-standard", "pd-ssd"]
   delete_on_termination:
     description:
       - If C(yes), deletes the volume when instance is terminated
     type: bool
     default: 'no'
+  image_family:
+    type: str
+    description:
+      - The image family to use to create the instance.
+        If I(image) has been used I(image_family) is ignored.
+        Cannot specify both I(image) and I(source).
+  external_projects:
+    type: list
+    description:
+      - A list of other projects (accessible with the provisioning credentials)
+        to be searched for the image.
 
 requirements:
     - "python >= 2.6"

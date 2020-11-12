@@ -21,18 +21,42 @@ author:
   - "Tom Melendez (@supertom) <tom@supertom.com>"
 options:
   name:
+    type: str
     description:
        - Name of Address.
     required: true
   region:
+    type: str
     description:
        - Region to create the address in. Set to 'global' to create a global address.
     required: true
   state:
+    type: str
     description: The state the address should be in. C(present) or C(absent) are the only valid options.
     default: present
     required: false
     choices: [present, absent]
+  project_id:
+    type: str
+    description:
+      - The Google Cloud Platform project ID to use.
+  pem_file:
+    type: path
+    description:
+      - The path to the PEM file associated with the service account email.
+      - This option is deprecated and may be removed in a future release. Use I(credentials_file) instead.
+  credentials_file:
+    type: path
+    description:
+      - The path to the JSON file associated with the service account email.
+  service_account_email:
+    type: str
+    description:
+      - service account email
+  service_account_permissions:
+    type: list
+    description:
+      - service account permissions
 '''
 
 EXAMPLES = '''

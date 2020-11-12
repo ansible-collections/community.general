@@ -16,34 +16,42 @@ description:
       to/from GCE instances.  Use 'instance_pattern' to update multiple instances in a specify zone.
 options:
   instance_name:
+    type: str
     description:
       - The name of the GCE instance to add/remove tags.
       - Required if C(instance_pattern) is not specified.
   instance_pattern:
+    type: str
     description:
       - The pattern of GCE instance names to match for adding/removing tags.  Full-Python regex is supported.
         See U(https://docs.python.org/2/library/re.html) for details.
       - If C(instance_name) is not specified, this field is required.
   tags:
+    type: list
     description:
       - Comma-separated list of tags to add or remove.
     required: yes
   state:
+    type: str
     description:
       - Desired state of the tags.
     choices: [ absent, present ]
     default: present
   zone:
+    type: str
     description:
       - The zone of the disk specified by source.
     default: us-central1-a
   service_account_email:
+    type: str
     description:
       - Service account email.
   pem_file:
+    type: path
     description:
       - Path to the PEM file associated with the service account email.
   project_id:
+    type: str
     description:
       - Your GCE project ID.
 requirements:

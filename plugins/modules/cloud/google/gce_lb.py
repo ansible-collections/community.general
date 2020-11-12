@@ -23,72 +23,90 @@ description:
       be found in the comments of ansible/test/gce_tests.py.
 options:
   httphealthcheck_name:
+    type: str
     description:
       - the name identifier for the HTTP health check
   httphealthcheck_port:
+    type: int
     description:
       - the TCP port to use for HTTP health checking
     default: 80
   httphealthcheck_path:
+    type: str
     description:
       - the url path to use for HTTP health checking
     default: "/"
   httphealthcheck_interval:
+    type: int
     description:
       - the duration in seconds between each health check request
     default: 5
   httphealthcheck_timeout:
+    type: int
     description:
       - the timeout in seconds before a request is considered a failed check
     default: 5
   httphealthcheck_unhealthy_count:
+    type: int
     description:
       - number of consecutive failed checks before marking a node unhealthy
     default: 2
   httphealthcheck_healthy_count:
+    type: int
     description:
       - number of consecutive successful checks before marking a node healthy
     default: 2
   httphealthcheck_host:
+    type: str
     description:
       - host header to pass through on HTTP check requests
   name:
+    type: str
     description:
       - name of the load-balancer resource
   protocol:
+    type: str
     description:
       - the protocol used for the load-balancer packet forwarding, tcp or udp
+      - "the available choices are: C(tcp) or C(udp)."
     default: "tcp"
-    choices: ['tcp', 'udp']
   region:
+    type: str
     description:
       - the GCE region where the load-balancer is defined
   external_ip:
+    type: str
     description:
       - the external static IPv4 (or auto-assigned) address for the LB
   port_range:
+    type: str
     description:
       - the port (range) to forward, e.g. 80 or 8000-8888 defaults to all ports
   members:
+    type: list
     description:
       - a list of zone/nodename pairs, e.g ['us-central1-a/www-a', ...]
-    aliases: ['nodes']
   state:
+    type: str
     description:
       - desired state of the LB
+      - "the available choices are: C(active), C(present), C(absent), C(deleted)."
     default: "present"
-    choices: ["active", "present", "absent", "deleted"]
   service_account_email:
+    type: str
     description:
       - service account email
   pem_file:
+    type: path
     description:
       - path to the pem file associated with the service account email
         This option is deprecated. Use 'credentials_file'.
   credentials_file:
+    type: path
     description:
       - path to the JSON file associated with the service account email
   project_id:
+    type: str
     description:
       - your GCE project ID
 

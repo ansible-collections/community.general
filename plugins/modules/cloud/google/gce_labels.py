@@ -33,25 +33,57 @@ author:
   - 'Eric Johnson (@erjohnso) <erjohnso@google.com>'
 options:
   labels:
+    type: dict
     description:
        - A list of labels (key/value pairs) to add or remove for the resource.
     required: false
   resource_url:
+    type: str
     description:
        - The 'self_link' for the resource (instance, disk, snapshot, etc)
     required: false
   resource_type:
+    type: str
     description:
        - The type of resource (instances, disks, snapshots, images)
     required: false
   resource_location:
+    type: str
     description:
        - The location of resource (global, us-central1-f, etc.)
     required: false
   resource_name:
+    type: str
     description:
        - The name of resource.
     required: false
+  state:
+    type: str
+    description: The state the labels should be in. C(present) or C(absent) are the only valid options.
+    default: present
+    required: false
+    choices: [present, absent]
+  project_id:
+    type: str
+    description:
+      - The Google Cloud Platform project ID to use.
+  pem_file:
+    type: str
+    description:
+      - The path to the PEM file associated with the service account email.
+      - This option is deprecated and may be removed in a future release. Use I(credentials_file) instead.
+  credentials_file:
+    type: str
+    description:
+      - The path to the JSON file associated with the service account email.
+  service_account_email:
+    type: str
+    description:
+      - service account email
+  service_account_permissions:
+    type: list
+    description:
+      - service account email
 '''
 
 EXAMPLES = '''
