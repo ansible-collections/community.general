@@ -25,17 +25,35 @@ author:
   - "Tom Melendez (@supertom) <tom@supertom.com>"
 options:
   topic:
+    type: str
     description:
        - GCP pubsub topic name.  Only the name, not the full path, is required.
     required: False
   view:
+    type: str
     description:
        - Choices are 'topics' or 'subscriptions'
-    required: True
+    choices: [topics, subscriptions]
+    default: topics
   state:
+    type: str
     description:
        - list is the only valid option.
     required: False
+    choices: [list]
+    default: list
+  project_id:
+    type: str
+    description:
+      - your GCE project ID
+  credentials_file:
+    type: str
+    description:
+      - path to the JSON file associated with the service account email
+  service_account_email:
+    type: str
+    description:
+      - service account email
 '''
 
 EXAMPLES = '''
