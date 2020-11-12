@@ -33,6 +33,7 @@ author:
   - "Tom Melendez (@supertom) <tom@supertom.com>"
 options:
   address:
+    type: str
     description:
        - IPv4 or named IP address. Must be of the same scope (regional, global).
          Reserved addresses can (and probably should) be used for global
@@ -40,32 +41,67 @@ options:
          via the gce_eip module.
     required: false
   forwarding_rule_name:
+    type: str
     description:
        - Name of the Forwarding_Rule.
     required: true
   port_range:
+    type: str
     description:
        - For global forwarding rules, must be set to 80 or 8080 for TargetHttpProxy, and
          443 for TargetHttpsProxy or TargetSslProxy.
     required: false
   protocol:
+    type: str
     description:
        - For global forwarding rules, TCP, UDP, ESP, AH, SCTP or ICMP. Default is TCP.
     required: false
+    choices: [TCP]
+    default: TCP
   region:
+    type: str
     description:
        - The region for this forwarding rule. Currently, only 'global' is supported.
-    required: false
+    required: true
   state:
+    type: str
     description:
        - The state of the Forwarding Rule. 'present' or 'absent'
     required: true
     choices: ["present", "absent"]
   target:
+    type: str
     description:
        - Target resource for forwarding rule. For global proxy, this is a Global
          TargetProxy resource. Required for external load balancing (including Global load balancing)
     required: false
+  project_id:
+    type: str
+    description:
+      - The Google Cloud Platform project ID to use.
+  pem_file:
+    type: str
+    description:
+      - The path to the PEM file associated with the service account email.
+      - This option is deprecated and may be removed in a future release. Use I(credentials_file) instead.
+  credentials_file:
+    type: str
+    description:
+      - The path to the JSON file associated with the service account email.
+  service_account_email:
+    type: str
+    description:
+      - service account email
+  service_account_permissions:
+    type: list
+    description:
+      - service account permissions
+  load_balancing_scheme:
+    type: str
+    choices: [EXTERNAL]
+    default: EXTERNAL
+    description:
+      - Load balancing scheme. At the moment the only choice is EXTERNAL.
 '''
 
 EXAMPLES = '''

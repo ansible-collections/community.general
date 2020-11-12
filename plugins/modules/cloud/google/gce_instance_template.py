@@ -17,35 +17,46 @@ description:
        of Compute Engine of Google Cloud Platform.
 options:
   state:
+    type: str
     description:
       - The desired state for the instance template.
     default: "present"
     choices: ["present", "absent"]
   name:
+    type: str
     description:
       - The name of the GCE instance template.
     required: True
+    aliases: [base_name]
   size:
+    type: str
     description:
       - The desired machine type for the instance template.
     default: "f1-micro"
   source:
+    type: str
     description:
       - A source disk to attach to the instance.
         Cannot specify both I(image) and I(source).
   image:
+    type: str
     description:
       - The image to use to create the instance.
         Cannot specify both both I(image) and I(source).
   image_family:
+    type: str
     description:
       - The image family to use to create the instance.
         If I(image) has been used I(image_family) is ignored.
         Cannot specify both I(image) and I(source).
+    default: debian-8
   disk_type:
+    type: str
     description:
-      - Specify a C(pd-standard) disk or C(pd-ssd)
-        for an SSD disk.
+      - Specify a C(pd-standard) disk or C(pd-ssd) for an SSD disk.
+    choices:
+      - pd-standard
+      - pd-ssd
     default: pd-standard
   disk_auto_delete:
     description:
@@ -54,10 +65,12 @@ options:
     default: true
     type: bool
   network:
+    type: str
     description:
       - The network to associate with the instance.
     default: "default"
   subnetwork:
+    type: str
     description:
       - The Subnetwork resource name for this instance.
   can_ip_forward:
@@ -67,6 +80,7 @@ options:
     type: bool
     default: 'no'
   external_ip:
+    type: str
     description:
       - The external IP address to use.
         If C(ephemeral), a new non-static address will be
@@ -75,19 +89,21 @@ options:
         specify address name.
     default: "ephemeral"
   service_account_email:
+    type: str
     description:
       - service account email
   service_account_permissions:
+    type: list
     description:
       - service account permissions (see
         U(https://cloud.google.com/sdk/gcloud/reference/compute/instances/create),
         --scopes section for detailed information)
-    choices: [
-      "bigquery", "cloud-platform", "compute-ro", "compute-rw",
-      "useraccounts-ro", "useraccounts-rw", "datastore", "logging-write",
-      "monitoring", "sql-admin", "storage-full", "storage-ro",
-      "storage-rw", "taskqueue", "userinfo-email"
-    ]
+      - >
+        Available choices are:
+        C(bigquery), C(cloud-platform), C(compute-ro), C(compute-rw),
+        C(useraccounts-ro), C(useraccounts-rw), C(datastore), C(logging-write),
+        C(monitoring), C(sql-admin), C(storage-full), C(storage-ro),
+        C(storage-rw), C(taskqueue), C(userinfo-email).
   automatic_restart:
     description:
       - Defines whether the instance should be
@@ -99,6 +115,7 @@ options:
       - Defines whether the instance is preemptible.
     type: bool
   tags:
+    type: list
     description:
       - a comma-separated list of tags to associate with the instance
   metadata:
@@ -106,34 +123,42 @@ options:
       - a hash/dictionary of custom data for the instance;
         '{"key":"value", ...}'
   description:
+    type: str
     description:
       - description of instance template
   disks:
+    type: list
     description:
       - a list of persistent disks to attach to the instance; a string value
         gives the name of the disk; alternatively, a dictionary value can
         define 'name' and 'mode' ('READ_ONLY' or 'READ_WRITE'). The first entry
         will be the boot disk (which must be READ_WRITE).
   nic_gce_struct:
+    type: list
     description:
       - Support passing in the GCE-specific
         formatted networkInterfaces[] structure.
   disks_gce_struct:
+    type: list
     description:
       - Support passing in the GCE-specific
         formatted formatted disks[] structure. Case sensitive.
         see U(https://cloud.google.com/compute/docs/reference/latest/instanceTemplates#resource) for detailed information
   project_id:
+    type: str
     description:
       - your GCE project ID
   pem_file:
+    type: path
     description:
       - path to the pem file associated with the service account email
         This option is deprecated. Use 'credentials_file'.
   credentials_file:
+    type: path
     description:
       - path to the JSON file associated with the service account email
   subnetwork_region:
+    type: str
     description:
       - Region that subnetwork resides in. (Required for subnetwork to successfully complete)
 requirements:
