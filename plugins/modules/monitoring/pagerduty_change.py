@@ -12,7 +12,8 @@ module: pagerduty_change
 short_description: Track a code or infrastructure change as a PagerDuty change event
 version_added: 1.3.0
 description:
-  - This module will let you create a PagerDuty change event.
+  - This module will let you create a PagerDuty change event each time the module is run.
+  - This is not an idempotent action and a new change event will be created each time it is run.
 author:
   - Adam Vaughan (@adamvaughan)
 requirements:
