@@ -121,10 +121,20 @@ def main():
         supports_check_mode=True
     )
 
-    if module.check_mode:
-        module.exit_json(changed=True)
-
     # API documented at https://developer.pagerduty.com/docs/events-api-v2/send-change-events/
+
+    url = module.params['url']
+    headers = {'Content-Type': 'application/json'}
+
+    if module.check_mode:
+        _response, info = fetch_url(
+            module, url, headers=headers, method='POST')
+
+        if info['status'] == 400:
+            module.exit_json(changed=True)
+        else:
+            module.fail_json(
+                msg='Checking the PagerDuty change event API returned an unexpected response: %d' % (info['status']))
 
     custom_details = {}
 
@@ -165,12 +175,8 @@ def main():
 
         event['links'] = [link]
 
-    url = module.params['url']
-    body = module.jsonify(event)
-    headers = {'Content-Type': 'application/json'}
-
     _response, info = fetch_url(
-        module, url, data=body, headers=headers, method='POST')
+        module, url, data=module.jsonify(event), headers=headers, method='POST')
 
     if info['status'] == 202:
         module.exit_json(changed=True)
