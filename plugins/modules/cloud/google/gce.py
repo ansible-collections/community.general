@@ -21,68 +21,83 @@ deprecated:
     alternative: Use M(google.cloud.gcp_compute_instance) instead.
 options:
   image:
+    type: str
     description:
       - image string to use for the instance (default will follow latest
         stable debian image)
     default: "debian-8"
   image_family:
+    type: str
     description:
       - image family from which to select the image.  The most recent
         non-deprecated image in the family will be used.
   external_projects:
+    type: list
     description:
       - A list of other projects (accessible with the provisioning credentials)
         to be searched for the image.
   instance_names:
+    type: str
     description:
       - a comma-separated list of instance names to create or destroy
   machine_type:
+    type: str
     description:
       - machine type to use for the instance, use 'n1-standard-1' by default
     default: "n1-standard-1"
   metadata:
+    type: str
     description:
       - a hash/dictionary of custom data for the instance;
         '{"key":"value", ...}'
   service_account_email:
+    type: str
     description:
       - service account email
   service_account_permissions:
+    type: list
     description:
       - service account permissions (see
         U(https://cloud.google.com/sdk/gcloud/reference/compute/instances/create),
         --scopes section for detailed information)
-    choices: [
-      "bigquery", "cloud-platform", "compute-ro", "compute-rw",
-      "useraccounts-ro", "useraccounts-rw", "datastore", "logging-write",
-      "monitoring", "sql-admin", "storage-full", "storage-ro",
-      "storage-rw", "taskqueue", "userinfo-email"
-    ]
+      - >
+        Available choices are:
+        C(bigquery), C(cloud-platform), C(compute-ro), C(compute-rw),
+        C(useraccounts-ro), C(useraccounts-rw), C(datastore), C(logging-write),
+        C(monitoring), C(sql-admin), C(storage-full), C(storage-ro),
+        C(storage-rw), C(taskqueue), C(userinfo-email).
   pem_file:
+    type: path
     description:
       - path to the pem file associated with the service account email
         This option is deprecated. Use 'credentials_file'.
   credentials_file:
+    type: path
     description:
       - path to the JSON file associated with the service account email
   project_id:
+    type: str
     description:
       - your GCE project ID
   name:
+    type: str
     description:
       - either a name of a single instance or when used with 'num_instances',
         the base name of a cluster of nodes
     aliases: ['base_name']
   num_instances:
+    type: int
     description:
       - can be used with 'name', specifies
         the number of nodes to provision using 'name'
         as a base name
   network:
+    type: str
     description:
       - name of the network, 'default' will be used if not specified
     default: "default"
   subnetwork:
+    type: str
     description:
       - name of the subnetwork in which the instance should be created
   persistent_boot_disk:
@@ -91,23 +106,26 @@ options:
     type: bool
     default: 'no'
   disks:
+    type: list
     description:
       - a list of persistent disks to attach to the instance; a string value
         gives the name of the disk; alternatively, a dictionary value can
         define 'name' and 'mode' ('READ_ONLY' or 'READ_WRITE'). The first entry
         will be the boot disk (which must be READ_WRITE).
   state:
+    type: str
     description:
       - desired state of the resource
     default: "present"
     choices: ["active", "present", "absent", "deleted", "started", "stopped", "terminated"]
   tags:
+    type: list
     description:
       - a comma-separated list of tags to associate with the instance
   zone:
+    type: str
     description:
       - the GCE zone to use. The list of available zones is at U(https://cloud.google.com/compute/docs/regions-zones/regions-zones#available).
-    required: true
     default: "us-central1-a"
   ip_forward:
     description:
@@ -116,6 +134,7 @@ options:
     type: bool
     default: 'no'
   external_ip:
+    type: str
     description:
       - type of external ip, ephemeral by default; alternatively, a fixed gce ip or ip name can be given. Specify 'none' if no external ip is desired.
     default: "ephemeral"
@@ -131,6 +150,7 @@ options:
     type: bool
     default: 'no'
   disk_size:
+    type: int
     description:
       - The size of the boot disk created for this instance (in GB)
     default: 10
