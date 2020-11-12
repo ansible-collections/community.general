@@ -94,7 +94,7 @@ options:
       - The numeric ID of the StackScript to use when creating the instance.
         See U(https://www.linode.com/docs/api/stackscripts/).
     type: int
-    required: false
+    version_added: 1.3.0
   stackscript_data:
     description:
       - An object containing arguments to any User Defined Fields present in
@@ -102,7 +102,7 @@ options:
         Only valid when a stackscript_id is provided.
         See U(https://www.linode.com/docs/api/stackscripts/).
     type: dict
-    required: false
+    version_added: 1.3.0
 '''
 
 EXAMPLES = """
