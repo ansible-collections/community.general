@@ -26,17 +26,20 @@ extends_documentation_fragment:
 options:
 
   server_id:
+    type: str
     description:
     - Scaleway Compute instance ID of the server
     required: true
 
   user_data:
+    type: dict
     description:
     - User defined data. Typically used with `cloud-init`.
     - Pass your cloud-init script here as a string
     required: false
 
   region:
+    type: str
     description:
     - Scaleway compute zone
     required: true
@@ -148,7 +151,7 @@ def core(module):
 def main():
     argument_spec = scaleway_argument_spec()
     argument_spec.update(dict(
-        region=dict(required=True, choices=SCALEWAY_LOCATION.keys()),
+        region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
         user_data=dict(type="dict"),
         server_id=dict(required=True),
     ))
