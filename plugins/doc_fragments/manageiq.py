@@ -15,14 +15,14 @@ options:
   manageiq_connection:
     description:
       - ManageIQ connection configuration information.
-    required: true
+    required: false
     type: dict
     suboptions:
       url:
         description:
           - ManageIQ environment url. C(MIQ_URL) env var if set. otherwise, it is required to pass it.
         type: str
-        required: true
+        required: false
       username:
         description:
           - ManageIQ username. C(MIQ_USERNAME) env var if set. otherwise, required if no token is passed in.
@@ -44,7 +44,7 @@ options:
       ca_cert:
         description:
           - The path to a CA bundle file or directory with certificates. defaults to None.
-        type: path
+        type: str
         aliases: [ ca_bundle_path ]
 
 requirements:

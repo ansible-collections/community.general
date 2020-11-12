@@ -35,27 +35,34 @@ description:
 
 options:
   state:
+    type: str
     description:
       - absent - user should not exist, present - user should be.
     choices: ['absent', 'present']
     default: 'present'
   userid:
+    type: str
     description:
       - The unique userid in manageiq, often mentioned as username.
     required: true
   name:
+    type: str
     description:
       - The users' full name.
   password:
+    type: str
     description:
       - The users' password.
   group:
+    type: str
     description:
       - The name of the group to which the user belongs.
   email:
+    type: str
     description:
       - The users' E-mail address.
   update_password:
+    type: str
     default: always
     choices: ['always', 'on_create']
     description:
