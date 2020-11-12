@@ -10,6 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: pagerduty_change
 short_description: Track a code or infrastructure change as a PagerDuty change event
+version_added: 1.3.0
 description:
   - This module will let you create a PagerDuty change event.
 author:
@@ -49,7 +50,7 @@ options:
     type: str
   environment:
     description:
-      - The environment name, typically 'production', 'staging', etc.
+      - The environment name, typically C(production), C(staging), etc.
     required: false
     type: str
   link_url:
