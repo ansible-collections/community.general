@@ -22,6 +22,7 @@ description:
 
 options:
   state:
+    type: str
     description:
       - absent - tags should not exist,
       - present - tags should exist,
@@ -29,10 +30,12 @@ options:
     choices: ['absent', 'present', 'list']
     default: 'present'
   tags:
+    type: list
     description:
       - tags - list of dictionaries, each includes 'name' and 'category' keys.
       - required if state is present or absent.
   resource_type:
+    type: str
     description:
       - the relevant resource type in manageiq
     required: true
@@ -40,6 +43,7 @@ options:
         'data store', 'group', 'resource pool', 'service', 'service template',
         'template', 'tenant', 'user']
   resource_name:
+    type: str
     description:
       - the relevant resource name in manageiq
     required: true
@@ -239,7 +243,7 @@ def main():
         tags=dict(type='list'),
         resource_name=dict(required=True, type='str'),
         resource_type=dict(required=True, type='str',
-                           choices=manageiq_entities().keys()),
+                           choices=list(manageiq_entities().keys())),
         state=dict(required=False, type='str',
                    choices=['present', 'absent', 'list'], default='present'),
     )

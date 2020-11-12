@@ -22,6 +22,7 @@ description:
 
 options:
   state:
+    type: str
     description:
       - absent - policy_profiles should not exist,
       - present - policy_profiles should exist,
@@ -29,10 +30,12 @@ options:
     choices: ['absent', 'present', 'list']
     default: 'present'
   policy_profiles:
+    type: list
     description:
       - list of dictionaries, each includes the policy_profile 'name' key.
       - required if state is present or absent.
   resource_type:
+    type: str
     description:
       - the type of the resource to which the profile should be [un]assigned
     required: true
@@ -40,6 +43,7 @@ options:
         'data store', 'group', 'resource pool', 'service', 'service template',
         'template', 'tenant', 'user']
   resource_name:
+    type: str
     description:
       - the name of the resource to which the profile should be [un]assigned
     required: true
@@ -294,7 +298,7 @@ def main():
         policy_profiles=dict(type='list'),
         resource_name=dict(required=True, type='str'),
         resource_type=dict(required=True, type='str',
-                           choices=manageiq_entities().keys()),
+                           choices=list(manageiq_entities().keys())),
         state=dict(required=False, type='str',
                    choices=['present', 'absent', 'list'], default='present'),
     )

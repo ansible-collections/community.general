@@ -21,25 +21,30 @@ description:
 
 options:
   state:
+    type: str
     description:
       - absent - alert profile should not exist,
       - present - alert profile should exist,
     choices: ['absent', 'present']
     default: 'present'
   name:
+    type: str
     description:
       - The unique alert profile name in ManageIQ.
       - Required when state is "absent" or "present".
   resource_type:
+    type: str
     description:
       - The resource type for the alert profile in ManageIQ. Required when state is "present".
     choices: ['Vm', 'ContainerNode', 'MiqServer', 'Host', 'Storage', 'EmsCluster',
               'ExtManagementSystem', 'MiddlewareServer']
   alerts:
+    type: list
     description:
       - List of alert descriptions to assign to this profile.
       - Required if state is "present"
   notes:
+    type: str
     description:
       - Optional notes for this profile
 
