@@ -26,46 +26,70 @@ author:
   - "Tom Melendez (@supertom) <tom@supertom.com>"
 options:
   name:
+    type: str
     description:
        - Name of the Managed Instance Group.
     required: true
   template:
+    type: str
     description:
        - Instance Template to be used in creating the VMs.  See
          U(https://cloud.google.com/compute/docs/instance-templates) to learn more
          about Instance Templates.  Required for creating MIGs.
   size:
+    type: int
     description:
        - Size of Managed Instance Group.  If MIG already exists, it will be
          resized to the number provided here.  Required for creating MIGs.
   service_account_email:
+    type: str
     description:
       - service account email
+  service_account_permissions:
+    type: list
+    description:
+      - service account permissions
+  pem_file:
+    type: path
+    description:
+      - path to the pem file associated with the service account email
+        This option is deprecated. Use 'credentials_file'.
   credentials_file:
+    type: path
     description:
       - Path to the JSON file associated with the service account email
   project_id:
+    type: str
     description:
       - GCE project ID
   state:
+    type: str
     description:
       - desired state of the resource
     default: "present"
     choices: ["absent", "present"]
   zone:
+    type: str
     description:
       - The GCE zone to use for this Managed Instance Group.
     required: true
   autoscaling:
+    type: dict
     description:
       - A dictionary of configuration for the autoscaler. 'enabled (bool)', 'name (str)'
         and policy.max_instances (int) are required fields if autoscaling is used. See
         U(https://cloud.google.com/compute/docs/reference/beta/autoscalers) for more information
         on Autoscaling.
   named_ports:
+    type: list
     description:
       - Define named ports that backend services can forward data to.  Format is a a list of
         name:port dictionaries.
+  recreate_instances:
+    type: bool
+    default: no
+    description:
+      - Recreate MIG instances.
 '''
 
 EXAMPLES = '''

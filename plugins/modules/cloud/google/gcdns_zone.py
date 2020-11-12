@@ -27,11 +27,13 @@ deprecated:
     alternative: Use M(google.cloud.gcp_dns_managed_zone) instead.
 options:
     state:
+        type: str
         description:
             - Whether the given zone should or should not be present.
         choices: ["present", "absent"]
         default: "present"
     zone:
+        type: str
         description:
             - The DNS domain name of the zone.
             - This is NOT the Google Cloud DNS zone ID (e.g., example-com). If
@@ -40,24 +42,29 @@ options:
         required: true
         aliases: ['name']
     description:
+        type: str
         description:
             - An arbitrary text string to use for the zone description.
         default: ""
     service_account_email:
+        type: str
         description:
             - The e-mail address for a service account with access to Google
               Cloud DNS.
     pem_file:
+        type: path
         description:
             - The path to the PEM file associated with the service account
               email.
             - This option is deprecated and may be removed in a future release.
               Use I(credentials_file) instead.
     credentials_file:
+        type: path
         description:
             - The path to the JSON file associated with the service account
               email.
     project_id:
+        type: str
         description:
             - The Google Cloud Platform project ID to use.
 notes:

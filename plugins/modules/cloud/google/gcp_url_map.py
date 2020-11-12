@@ -31,14 +31,17 @@ deprecated:
     alternative: Use M(google.cloud.gcp_compute_url_map) instead.
 options:
   url_map_name:
+    type: str
     description:
        - Name of the Url_Map.
     required: true
   default_service:
+    type: str
     description:
        - Default Backend Service if no host rules match.
     required: true
   host_rules:
+    type: list
     description:
        - The list of HostRules to use against the URL. Contains
          a list of hosts and an associated path_matcher.
@@ -51,6 +54,7 @@ options:
          host portion.
     required: false
   path_matchers:
+    type: list
     description:
        - The list of named PathMatchers to use against the URL. Contains
          path_rules, which is a list of paths and an associated service. A
@@ -66,6 +70,33 @@ options:
          a /. The string fed to the path matcher does not include any text after
          the first ? or #, and those chars are not allowed here.
     required: false
+  project_id:
+    type: str
+    description:
+      - The Google Cloud Platform project ID to use.
+  pem_file:
+    type: str
+    description:
+      - The path to the PEM file associated with the service account email.
+      - This option is deprecated and may be removed in a future release. Use I(credentials_file) instead.
+  credentials_file:
+    type: str
+    description:
+      - The path to the JSON file associated with the service account email.
+  service_account_email:
+    type: str
+    description:
+      - service account email
+  service_account_permissions:
+    type: list
+    description:
+      - service account permissions
+  state:
+    type: str
+    description: The state the URL map should be in. C(present) or C(absent) are the only valid options.
+    default: present
+    required: false
+    choices: [present, absent]
 '''
 
 EXAMPLES = '''
