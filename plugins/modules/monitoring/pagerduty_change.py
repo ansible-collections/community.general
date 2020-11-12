@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 module: pagerduty_change
-short_description: Track a code or infrastructure change as a PagerDuty change event.
+short_description: Track a code or infrastructure change as a PagerDuty change event
 description:
   - This module will let you create a PagerDuty change event.
 author:
@@ -19,7 +19,8 @@ requirements:
 options:
   integration_key:
     description:
-      - The integration key that identifies the service the change was made to. This can be found by adding an integration to a service in PagerDuty.
+      - The integration key that identifies the service the change was made to.
+        This can be found by adding an integration to a service in PagerDuty.
     required: true
     type: str
   summary:
@@ -30,13 +31,11 @@ options:
   source:
     description:
       - The source of the change event.
-    required: false
     default: Ansible
     type: str
   user:
     description:
       - The name of the user or process that triggered this deployment.
-    required: false
     type: str
   repo:
     description:
@@ -76,6 +75,7 @@ options:
     required: false
     default: yes
     type: bool
+notes: Supports C(check_mode).
 '''
 
 EXAMPLES = '''
