@@ -23,6 +23,7 @@ extends_documentation_fragment:
 options:
 
   region:
+    type: str
     description:
       - Scaleway compute zone
     required: true
@@ -102,7 +103,7 @@ class ScalewayImageInfo(Scaleway):
 def main():
     argument_spec = scaleway_argument_spec()
     argument_spec.update(dict(
-        region=dict(required=True, choices=SCALEWAY_LOCATION.keys()),
+        region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,

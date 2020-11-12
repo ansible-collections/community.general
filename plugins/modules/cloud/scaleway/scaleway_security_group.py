@@ -215,7 +215,7 @@ def main():
         organization=dict(type='str', required=True),
         name=dict(type='str', required=True),
         description=dict(type='str'),
-        region=dict(type='str', required=True, choices=SCALEWAY_LOCATION.keys()),
+        region=dict(type='str', required=True, choices=list(SCALEWAY_LOCATION.keys())),
         stateful=dict(type='bool', required=True),
         inbound_default_policy=dict(type='str', choices=['accept', 'drop']),
         outbound_default_policy=dict(type='str', choices=['accept', 'drop']),

@@ -25,6 +25,7 @@ extends_documentation_fragment:
 
 options:
   state:
+    type: str
     description:
       - Indicate desired state of the Security Group Rule.
     default: present
@@ -33,6 +34,7 @@ options:
       - absent
 
   region:
+    type: str
     description:
       - Scaleway region to use (for example C(par1)).
     required: true
@@ -43,6 +45,7 @@ options:
       - EMEA-FR-PAR1
 
   protocol:
+    type: str
     description:
       - Network protocol to use
     choices:
@@ -58,11 +61,13 @@ options:
     type: int
 
   ip_range:
+    type: str
     description:
       - IPV4 CIDR notation to apply to the rule
     default: 0.0.0.0/0
 
   direction:
+    type: str
     description:
       - Rule direction
     choices:
@@ -71,6 +76,7 @@ options:
     required: true
 
   action:
+    type: str
     description:
       - Rule action
     choices:
@@ -79,6 +85,7 @@ options:
     required: true
 
   security_group:
+    type: str
     description:
       - Security Group unique identifier
     required: true
@@ -232,7 +239,7 @@ def main():
     argument_spec = scaleway_argument_spec()
     argument_spec.update(
         state=dict(type='str', default='present', choices=['absent', 'present']),
-        region=dict(type='str', required=True, choices=SCALEWAY_LOCATION.keys()),
+        region=dict(type='str', required=True, choices=list(SCALEWAY_LOCATION.keys())),
         protocol=dict(type='str', required=True, choices=['TCP', 'UDP', 'ICMP']),
         port=dict(type='int', required=True),
         ip_range=dict(type='str', default='0.0.0.0/0'),
