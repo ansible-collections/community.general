@@ -77,7 +77,8 @@ options:
     required: false
     default: yes
     type: bool
-notes: Supports C(check_mode).
+notes:
+  - Supports C(check_mode). Note that check mode simply does nothing except returning C(changed=true) in case the I(url) seems to be correct.
 '''
 
 EXAMPLES = '''
