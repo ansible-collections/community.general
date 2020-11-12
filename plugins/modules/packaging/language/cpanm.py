@@ -16,10 +16,12 @@ description:
   - Manage Perl library dependencies.
 options:
   name:
+    type: str
     description:
       - The name of the Perl library to install. You may use the "full distribution path", e.g.  MIYAGAWA/Plack-0.99_05.tar.gz
     aliases: ["pkg"]
   from_path:
+    type: path
     description:
       - The local directory from where to install
   notest:
