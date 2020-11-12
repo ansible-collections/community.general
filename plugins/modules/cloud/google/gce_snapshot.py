@@ -18,36 +18,40 @@ description:
     volumes, each snapshot will be prepended with the disk name
 options:
   instance_name:
+    type: str
     description:
       - The GCE instance to snapshot
     required: True
   snapshot_name:
+    type: str
     description:
       - The name of the snapshot to manage
+    required: True
   disks:
+    type: list
     description:
       - A list of disks to create snapshots for. If none is provided,
-        all of the volumes will be snapshotted
-    default: all
+        all of the volumes will have snapshots created.
     required: False
   state:
+    type: str
     description:
       - Whether a snapshot should be C(present) or C(absent)
     required: false
     default: present
     choices: [present, absent]
   service_account_email:
+    type: str
     description:
       - GCP service account email for the project where the instance resides
-    required: true
   credentials_file:
+    type: path
     description:
       - The path to the credentials file associated with the service account
-    required: true
   project_id:
+    type: str
     description:
       - The GCP project ID to use
-    required: true
 requirements:
     - "python >= 2.6"
     - "apache-libcloud >= 0.19.0"
