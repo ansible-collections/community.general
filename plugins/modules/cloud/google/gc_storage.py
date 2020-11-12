@@ -19,52 +19,66 @@ description:
 
 options:
   bucket:
+    type: str
     description:
       - Bucket name.
     required: true
   object:
+    type: path
     description:
       - Keyname of the object inside the bucket. Can be also be used to create "virtual directories" (see examples).
   src:
+    type: str
     description:
       - The source file path when performing a PUT operation.
   dest:
+    type: path
     description:
       - The destination file path when downloading an object/key with a GET operation.
-  force:
+  overwrite:
     description:
       - Forces an overwrite either locally on the filesystem or remotely with the object/key. Used with PUT and GET operations.
     type: bool
     default: 'yes'
-    aliases: [ 'overwrite' ]
+    aliases: [ 'force' ]
   permission:
+    type: str
     description:
       - This option let's the user set the canned permissions on the object/bucket that are created. The permissions that can be set are 'private',
         'public-read', 'authenticated-read'.
     default: private
+    choices: ['private', 'public-read', 'authenticated-read']
   headers:
+    type: dict
     description:
       - Headers to attach to object.
     default: {}
   expiration:
+    type: int
+    default: 600
     description:
       - Time limit (in seconds) for the URL generated and returned by GCA when performing a mode=put or mode=get_url operation. This url is only
         available when public-read is the acl for the object.
+    aliases: [expiry]
   mode:
+    type: str
     description:
       - Switches the module behaviour between upload, download, get_url (return download url) , get_str (download object as string), create (bucket) and
         delete (bucket).
     required: true
     choices: [ 'get', 'put', 'get_url', 'get_str', 'delete', 'create' ]
   gs_secret_key:
+    type: str
     description:
       - GS secret key. If not set then the value of the GS_SECRET_ACCESS_KEY environment variable is used.
     required: true
   gs_access_key:
+    type: str
     description:
       - GS access key. If not set then the value of the GS_ACCESS_KEY_ID environment variable is used.
     required: true
   region:
+    type: str
     description:
       - The gs region to use. If not defined then the value 'US' will be used. See U(https://cloud.google.com/storage/docs/bucket-locations)
     default: 'US'

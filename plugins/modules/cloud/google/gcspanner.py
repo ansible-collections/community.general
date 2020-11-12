@@ -28,15 +28,18 @@ author:
   - Tom Melendez (@supertom) <tom@supertom.com>
 options:
   configuration:
+    type: str
     description:
        - Configuration the instance should use.
        - Examples are us-central1, asia-east1 and europe-west1.
     required: yes
   instance_id:
+    type: str
     description:
        - GCP spanner instance name.
     required: yes
   database_name:
+    type: str
     description:
        - Name of database contained on the instance.
   force_instance_delete:
@@ -45,20 +48,35 @@ options:
     type: bool
     default: 'no'
   instance_display_name:
+    type: str
     description:
        - Name of Instance to display.
        - If not specified, instance_id will be used instead.
   node_count:
+    type: int
     description:
        - Number of nodes in the instance.
     default: 1
   state:
+    type: str
     description:
     - State of the instance or database. Applies to the most granular resource.
     - If a C(database_name) is specified we remove it.
     - If only C(instance_id) is specified, that is what is removed.
     choices: [ absent, present ]
     default: present
+  project_id:
+    type: str
+    description:
+      - your GCE project ID
+  credentials_file:
+    type: str
+    description:
+      - path to the JSON file associated with the service account email
+  service_account_email:
+    type: str
+    description:
+      - service account email
 '''
 
 EXAMPLES = '''

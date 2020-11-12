@@ -30,17 +30,47 @@ author:
   - "Tom Melendez (@supertom) <tom@supertom.com>"
 options:
   target_proxy_name:
+    type: str
     description:
        - Name of the Target_Proxy.
     required: true
   target_proxy_type:
+    type: str
     description:
        - Type of Target_Proxy. HTTP, HTTPS or SSL. Only HTTP is currently supported.
     required: true
+    choices: [HTTP]
   url_map_name:
+    type: str
     description:
        - Name of the Url Map.  Required if type is HTTP or HTTPS proxy.
     required: false
+  project_id:
+    type: str
+    description:
+      - your GCE project ID
+  pem_file:
+    type: str
+    description:
+      - path to the pem file associated with the service account email
+        This option is deprecated. Use 'credentials_file'.
+  credentials_file:
+    type: str
+    description:
+      - path to the JSON file associated with the service account email
+  service_account_email:
+    type: str
+    description:
+      - service account email
+  service_account_permissions:
+    type: list
+    description:
+      - service account permissions
+  state:
+    type: str
+    description: The state the target proxy should be in. C(present) or C(absent) are the only valid options.
+    required: true
+    choices: [present, absent]
 '''
 
 EXAMPLES = '''

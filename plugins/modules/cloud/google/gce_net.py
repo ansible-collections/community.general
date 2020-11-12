@@ -21,54 +21,64 @@ description:
       be found in the comments of ansible/test/gce_tests.py.
 options:
   allowed:
+    type: str
     description:
       - the protocol:ports to allow (I(tcp:80) or I(tcp:80,443) or I(tcp:80-800;udp:1-25))
         this parameter is mandatory when creating or updating a firewall rule
   ipv4_range:
+    type: str
     description:
       - the IPv4 address range in CIDR notation for the network
         this parameter is not mandatory when you specified existing network in name parameter,
         but when you create new network, this parameter is mandatory
-    aliases: ['cidr']
   fwname:
+    type: str
     description:
       - name of the firewall rule
-    aliases: ['fwrule']
   name:
+    type: str
     description:
       - name of the network
   src_range:
+    type: list
     description:
       - the source IPv4 address range in CIDR notation
     default: []
-    aliases: ['src_cidr']
   src_tags:
+    type: list
     description:
       - the source instance tags for creating a firewall rule
     default: []
   target_tags:
+    type: list
     description:
       - the target instance tags for creating a firewall rule
     default: []
   state:
+    type: str
     description:
       - desired state of the network or firewall
+      - "Available choices are: C(active), C(present), C(absent), C(deleted)."
     default: "present"
-    choices: ["active", "present", "absent", "deleted"]
   service_account_email:
+    type: str
     description:
       - service account email
   pem_file:
+    type: path
     description:
       - path to the pem file associated with the service account email
         This option is deprecated. Use C(credentials_file).
   credentials_file:
+    type: path
     description:
       - path to the JSON file associated with the service account email
   project_id:
+    type: str
     description:
       - your GCE project ID
   mode:
+    type: str
     description:
       - network mode for Google Cloud
         C(legacy) indicates a network with an IP address range;
@@ -78,12 +88,15 @@ options:
     default: "legacy"
     choices: ["legacy", "auto", "custom"]
   subnet_name:
+    type: str
     description:
       - name of subnet to create
   subnet_region:
+    type: str
     description:
       - region of subnet to create
   subnet_desc:
+    type: str
     description:
       - description of subnet to create
 

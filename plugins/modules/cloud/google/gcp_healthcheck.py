@@ -41,72 +41,85 @@ author:
   - "Tom Melendez (@supertom) <tom@supertom.com>"
 options:
   check_interval:
+    type: int
     description:
        - How often (in seconds) to send a health check.
     default: 5
   healthcheck_name:
+    type: str
     description:
        - Name of the Healthcheck.
     required: true
   healthcheck_type:
+    type: str
     description:
        - Type of Healthcheck.
     required: true
     choices: ["HTTP", "HTTPS"]
   host_header:
+    type: str
     description:
        - The value of the host header in the health check request. If left
          empty, the public IP on behalf of which this health
          check is performed will be used.
-    required: true
     default: ""
   port:
+    type: int
     description:
        - The TCP port number for the health check request. The default value is
          443 for HTTPS and 80 for HTTP.
   request_path:
+    type: str
     description:
        - The request path of the HTTPS health check request.
     required: false
     default: "/"
   state:
+    type: str
     description: State of the Healthcheck.
-    required: true
     choices: ["present", "absent"]
+    default: present
   timeout:
+    type: int
     description:
        - How long (in seconds) to wait for a response before claiming
          failure. It is invalid for timeout
          to have a greater value than check_interval.
     default: 5
   unhealthy_threshold:
+    type: int
     description:
        - A so-far healthy instance will be marked unhealthy after this
          many consecutive failures.
     default: 2
   healthy_threshold:
+    type: int
     description:
        - A so-far unhealthy instance will be marked healthy after this
          many consecutive successes.
     default: 2
   service_account_email:
+    type: str
     description:
       - service account email
   service_account_permissions:
+    type: list
     description:
       - service account permissions (see
         U(https://cloud.google.com/sdk/gcloud/reference/compute/instances/create),
         --scopes section for detailed information)
-    choices: [
-      "bigquery", "cloud-platform", "compute-ro", "compute-rw",
-      "useraccounts-ro", "useraccounts-rw", "datastore", "logging-write",
-      "monitoring", "sql-admin", "storage-full", "storage-ro",
-      "storage-rw", "taskqueue", "userinfo-email"
-    ]
+      - >
+        Available choices are:
+        C(bigquery), C(cloud-platform), C(compute-ro), C(compute-rw),
+        C(useraccounts-ro), C(useraccounts-rw), C(datastore), C(logging-write),
+        C(monitoring), C(sql-admin), C(storage-full), C(storage-ro),
+        C(storage-rw), C(taskqueue), C(userinfo-email).
   credentials_file:
+    type: str
     description:
       - Path to the JSON file associated with the service account email
   project_id:
+    type: str
     description:
       - Your GCP project ID
 '''
