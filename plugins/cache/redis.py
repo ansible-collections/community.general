@@ -73,8 +73,9 @@ from ansible.utils.display import Display
 
 try:
     from redis import StrictRedis, VERSION
+    HAS_REDIS = True
 except ImportError:
-    raise AnsibleError("The 'redis' python module (version 2.4.5 or newer) is required for the redis fact cache, 'pip install redis'")
+    HAS_REDIS = False
 
 display = Display()
 
@@ -110,6 +111,9 @@ class CacheModule(BaseCacheModule):
             self._timeout = float(C.CACHE_PLUGIN_TIMEOUT)
             self._prefix = C.CACHE_PLUGIN_PREFIX
             self._keys_set = 'ansible_cache_keys'
+
+        if not HAS_REDIS:
+            raise AnsibleError("The 'redis' python module (version 2.4.5 or newer) is required for the redis fact cache, 'pip install redis'")
 
         self._cache = {}
         kw = {}
