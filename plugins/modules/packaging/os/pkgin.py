@@ -193,7 +193,7 @@ def query_package(module, name):
                 return PackageState.NOT_INSTALLED
             # no fall-through
 
-        # No packages were matched, so return None
+        # No packages were matched
         return PackageState.NOT_FOUND
 
     # Search failed
