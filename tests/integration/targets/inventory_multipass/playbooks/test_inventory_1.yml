@@ -1,0 +1,37 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Show all groups
+      debug:
+        var: groups
+    - name: Make sure multipass groups are there
+      assert:
+        that:
+          - groups.all | length == 3
+          - groups.multipass | length == 3
+
+- hosts: all
+  connection: local
+  vars:
+    # for some reason, Ansible can't find the Python
+    # interpreter when connecting to the nodes,
+    # which is in fact just localhost in disguise.
+    # That's why we use ansible_playbook_python.
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+  tasks:
+    - name: Check for groups
+      assert:
+        that:
+          - "groups.multipass | length == 3"
+      run_once: true
+
+    - name: List multipass group
+      debug:
+        var: groups.multipass
+      run_once: true
+
+    - name: Print ansible_host per host
+      debug:
+        var: ansible_host

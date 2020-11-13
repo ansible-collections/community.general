@@ -1,0 +1,26 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+  vars:
+    multipass.rsa_public: "{{ lookup('file',lookup('env', 'HOME') + '/.ssh/id_rsa.pub') }}"
+    multipass.rsa_private: "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/id_rsa') }}"
+  tasks:
+    - name: Setup snapd
+      action: '{{ ansible_facts.pkg_mgr }}'
+      args:
+        name: snapd
+        state: present
+    - name: Setup multipass
+      community.general.snap:
+        name: multipass
+        state: present
+    - name: Setup cloud init
+      template:
+        src: "cloud-init.j2"
+        dst: "cloud-init.yml"
+    - name: multipass create and start instance host1
+      command: multipass launch --cloud-init cloud-init.yml -n host1 xenial
+    - name: multipass create and start instance host2
+      command: multipass launch --cloud-init cloud-init.yml -n host2 bionic
+    - name: multipass suspend running instance host2
+      command: multipass suspend host2
