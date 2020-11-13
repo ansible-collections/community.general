@@ -27,7 +27,7 @@ options:
   state:
     description:
       - Indicates the desired package state.
-    choices: [ absent, present ]
+    choices: [ absent, present, installed, removed ]
     default: present
     type: str
   update_cache:
