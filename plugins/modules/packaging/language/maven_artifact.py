@@ -73,7 +73,6 @@ options:
             - The password to authenticate with to the Maven Repository. Use AWS secret access key of the repository is hosted on S3
         aliases: [ "aws_secret_access_key" ]
     headers:
-        type: dict
         description:
             - Add custom HTTP headers to a request in hash/dict format.
         type: dict
