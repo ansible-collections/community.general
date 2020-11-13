@@ -32,7 +32,7 @@ options:
         description:
             - Desired state of the package.
         default: present
-        choices: [ absent, latest, present ]
+        choices: [ absent, latest, present, installed, removed ]
         type: str
 
     force:

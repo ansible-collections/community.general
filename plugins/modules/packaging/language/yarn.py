@@ -21,17 +21,20 @@ author:
   - "Chris Hoffman (@chrishoffman), creator of NPM Ansible module)"
 options:
   name:
+    type: str
     description:
       - The name of a node.js library to install
       - If omitted all packages in package.json are installed.
       - To globally install from local node.js library. Prepend "file:" to the path of the node.js library.
     required: false
   path:
+    type: path
     description:
       - The base path where Node.js libraries will be installed.
       - This is where the node_modules folder lives.
     required: false
   version:
+    type: str
     description:
       - The version of the library to be installed.
       - Must be in semver format. If "latest" is desired, use "state" arg instead
@@ -43,6 +46,7 @@ options:
     default: no
     type: bool
   executable:
+    type: path
     description:
       - The executable location for yarn.
     required: false
@@ -60,10 +64,12 @@ options:
     type: bool
     default: no
   registry:
+    type: str
     description:
       - The registry to install modules from.
     required: false
   state:
+    type: str
     description:
       - Installation state of the named node.js library
       - If absent is selected, a name option must be provided

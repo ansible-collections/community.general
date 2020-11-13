@@ -22,17 +22,21 @@ description:
       them in your project for you.
 options:
     command:
+        type: str
         description:
             - Composer command like "install", "update" and so on.
         default: install
     arguments:
+        type: str
         description:
             - Composer arguments like required package, version and so on.
     executable:
+        type: path
         description:
             - Path to PHP Executable on the remote host, if PHP is not in PATH.
         aliases: [ php_path ]
     working_dir:
+        type: path
         description:
             - Directory of your project (see --working-dir). This is required when
               the command is not run globally.

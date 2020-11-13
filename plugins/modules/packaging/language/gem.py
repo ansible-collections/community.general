@@ -16,16 +16,19 @@ description:
   - Manage installation and uninstallation of Ruby gems.
 options:
   name:
+    type: str
     description:
       - The name of the gem to be managed.
     required: true
   state:
+    type: str
     description:
       - The desired state of the gem. C(latest) ensures that the latest version is installed.
     required: false
     choices: [present, absent, latest]
     default: present
   gem_source:
+    type: path
     description:
       - The path to a local gem used as installation source.
     required: false
@@ -36,6 +39,7 @@ options:
     type: bool
     default: "yes"
   repository:
+    type: str
     description:
       - The repository from which the gem will be installed
     required: false
@@ -47,10 +51,12 @@ options:
     type: bool
     default: "yes"
   executable:
+    type: path
     description:
     - Override the path to the gem executable
     required: false
   install_dir:
+    type: path
     description:
     - Install the gems into a specific directory.
       These gems will be independent from the global installed ones.
@@ -63,6 +69,7 @@ options:
     default: "no"
     type: bool
   version:
+    type: str
     description:
       - Version of the gem to be installed/removed.
     required: false
@@ -79,6 +86,7 @@ options:
     default: "no"
     type: bool
   build_flags:
+    type: str
     description:
       - Allow adding build flags for gem compilation
     required: false

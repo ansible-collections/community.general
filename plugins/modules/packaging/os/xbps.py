@@ -29,7 +29,7 @@ options:
         description:
             - Desired state of the package.
         default: "present"
-        choices: ["present", "absent", "latest"]
+        choices: ["present", "absent", "latest", "installed", "removed"]
         type: str
     recurse:
         description:
