@@ -36,12 +36,12 @@ options:
     type: bool
     default: no
     aliases: ['update-cache']
-  no-recommends:
+  no_recommends:
     description:
       - Corresponds to the C(--no-recommends) option for I(urpmi).
     type: bool
     default: yes
-    aliases: ['no_recommends']
+    aliases: ['no-recommends']
   force:
     description:
       - Assume "yes" is the answer to any question urpmi has to ask.
