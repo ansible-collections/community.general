@@ -485,6 +485,8 @@ files:
     ignore: bpennypacker
   $modules/monitoring/pagerduty_alert.py:
     maintainers: ApsOps
+  $modules/monitoring/pagerduty_change.py:
+    maintainers: adamvaughan
   $modules/monitoring/pingdom.py:
     maintainers: thaumos
   $modules/monitoring/rollbar_deployment.py:
