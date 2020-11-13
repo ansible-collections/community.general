@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - openbsd_pkg - added ``snapshot`` option (https://github.com/ansible-collections/community.general/pull/965).
