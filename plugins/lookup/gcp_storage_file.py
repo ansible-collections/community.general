@@ -48,10 +48,15 @@ import base64
 import json
 import mimetypes
 import os
-import requests
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.display import Display
+
+try:
+    import requests
+    HAS_REQUESTS = True
+except ImportError:
+    HAS_REQUESTS = False
 
 try:
     from ansible_collections.google.cloud.plugins.module_utils.gcp_utils import navigate_hash, GcpSession
@@ -146,4 +151,6 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         if not HAS_GOOGLE_CLOUD_COLLECTION:
             raise AnsibleError("community.general.gcp_storage_file needs a supported version of the google.cloud collection installed")
+        if not HAS_REQUESTS:
+            raise AnsibleError("community.general.gcp_storage_file needs requests installed. Use `pip install requests` to install it")
         return GcpFileLookup().run(terms, variables=variables, **kwargs)
