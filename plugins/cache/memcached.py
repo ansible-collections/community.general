@@ -57,8 +57,9 @@ from ansible.utils.display import Display
 
 try:
     import memcache
+    HAS_MEMCACHE = True
 except ImportError:
-    raise AnsibleError("python-memcached is required for the memcached fact cache")
+    HAS_MEMCACHE = False
 
 display = Display()
 
@@ -186,6 +187,9 @@ class CacheModule(BaseCacheModule):
                 connection = C.CACHE_PLUGIN_CONNECTION.split(',')
             self._timeout = C.CACHE_PLUGIN_TIMEOUT
             self._prefix = C.CACHE_PLUGIN_PREFIX
+
+        if not HAS_MEMCACHE:
+            raise AnsibleError("python-memcached is required for the memcached fact cache")
 
         self._cache = {}
         self._db = ProxyClientPool(connection, debug=0)
