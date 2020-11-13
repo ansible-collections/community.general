@@ -40,8 +40,16 @@ options:
             a binary. Requires that the port source tree is already installed.
             Automatically builds and installs the 'sqlports' package, if it is
             not already installed.
+          - Mutually exclusive with I(snapshot).
         type: bool
         default: no
+    snapshot:
+        description:
+          - Force C(%c) and C(%m) to expand to C(snapshots), even on a release kernel.
+          - Mutually exclusive with I(build).
+        type: bool
+        default: no
+        version_added: 1.3.0
     ports_dir:
         description:
           - When used in combination with the C(build) option, allows overriding
@@ -197,6 +205,9 @@ def package_present(names, pkg_spec, module):
             else:
                 install_cmd = 'pkg_add -Im'
 
+        if module.params['snapshot'] is True:
+            install_cmd += ' -Dsnap'
+
         if pkg_spec[name]['installed_state'] is False:
 
             # Attempt to install the package
@@ -268,6 +279,9 @@ def package_latest(names, pkg_spec, module):
 
     if module.params['quick']:
         upgrade_cmd += 'q'
+
+    if module.params['snapshot']:
+        upgrade_cmd += ' -Dsnap'
 
     for name in names:
         if pkg_spec[name]['installed_state'] is True:
@@ -489,6 +503,9 @@ def upgrade_packages(pkg_spec, module):
     else:
         upgrade_cmd = 'pkg_add -Imu'
 
+    if module.params['snapshot']:
+        upgrade_cmd += ' -Dsnap'
+
     # Create a minimal pkg_spec entry for '*' to store return values.
     pkg_spec['*'] = {}
 
@@ -520,10 +537,12 @@ def main():
             name=dict(type='list', elements='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'installed', 'latest', 'present', 'removed']),
             build=dict(type='bool', default=False),
+            snapshot=dict(type='bool', default=False),
             ports_dir=dict(type='path', default='/usr/ports'),
             quick=dict(type='bool', default=False),
             clean=dict(type='bool', default=False),
         ),
+        mutually_exclusive=[['snapshot', 'build']],
         supports_check_mode=True
     )
 
