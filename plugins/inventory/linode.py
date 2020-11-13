@@ -63,8 +63,9 @@ from ansible.plugins.inventory import BaseInventoryPlugin
 try:
     from linode_api4 import LinodeClient
     from linode_api4.errors import ApiError as LinodeApiError
+    HAS_LINODE = True
 except ImportError:
-    raise AnsibleError('the Linode dynamic inventory plugin requires linode_api4.')
+    HAS_LINODE = False
 
 
 class InventoryModule(BaseInventoryPlugin):
@@ -193,6 +194,9 @@ class InventoryModule(BaseInventoryPlugin):
     def parse(self, inventory, loader, path, cache=True):
         """Dynamically parse Linode the cloud inventory."""
         super(InventoryModule, self).parse(inventory, loader, path)
+
+        if not HAS_LINODE:
+            raise AnsibleError('the Linode dynamic inventory plugin requires linode_api4.')
 
         config_data = self._read_config_data(path)
         self._build_client()
