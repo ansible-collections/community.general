@@ -130,7 +130,6 @@ class PackageState(object):
     NOT_INSTALLED = 2
     OUTDATED = 4
     NOT_FOUND = 8
-    INSTALLED = PRESENT | OUTDATED
 
 
 def query_package(module, name):
@@ -251,7 +250,7 @@ def remove_packages(module, packages):
         rc, out, err = module.run_command(
             format_pkgin_command(module, "remove", package))
 
-        if not module.check_mode and query_package(module, package) == PackageState.INSTALLED:
+        if not module.check_mode and query_package(module, package) in [PackageState.PRESENT, PackageState.OUTDATED]:
             module.fail_json(msg="failed to remove %s: %s" % (package, out))
 
         remove_c += 1
@@ -268,7 +267,7 @@ def install_packages(module, packages):
 
     for package in packages:
         query_result = query_package(module, package)
-        if query_result is PackageState.INSTALLED:
+        if query_result in [PackageState.PRESENT, PackageState.OUTDATED]:
             continue
         elif query_result is PackageState.NOT_FOUND:
             module.fail_json(msg="failed to find package %s for installation" % package)
@@ -276,7 +275,7 @@ def install_packages(module, packages):
         rc, out, err = module.run_command(
             format_pkgin_command(module, "install", package))
 
-        if not module.check_mode and not query_package(module, package) is PackageState.INSTALLED:
+        if not module.check_mode and not query_package(module, package) in [PackageState.PRESENT, PackageState.OUTDATED]:
             module.fail_json(msg="failed to install %s: %s" % (package, out))
 
         install_c += 1

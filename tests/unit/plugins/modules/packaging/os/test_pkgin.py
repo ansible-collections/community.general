@@ -29,7 +29,6 @@ class TestPkginQueryPackage(unittest.TestCase):
 
         # then
         self.assertEquals(command_result, pkgin.PackageState.PRESENT)
-        self.assertTrue(command_result & pkgin.PackageState.INSTALLED)
 
     @mock.patch('ansible_collections.community.general.plugins.modules.packaging.os.pkgin.AnsibleModule')
     def test_package_with_version_is_present(self, mock_module):
@@ -78,7 +77,6 @@ class TestPkginQueryPackage(unittest.TestCase):
 
         # then
         self.assertEquals(command_result, pkgin.PackageState.OUTDATED)
-        self.assertTrue(command_result & pkgin.PackageState.INSTALLED)
 
     @mock.patch('ansible_collections.community.general.plugins.modules.packaging.os.pkgin.AnsibleModule')
     def test_package_with_version_found_outdated(self, mock_module):
@@ -95,7 +93,6 @@ class TestPkginQueryPackage(unittest.TestCase):
 
         # then
         self.assertEquals(command_result, pkgin.PackageState.OUTDATED)
-        self.assertTrue(command_result & pkgin.PackageState.INSTALLED)
 
     @mock.patch('ansible_collections.community.general.plugins.modules.packaging.os.pkgin.AnsibleModule')
     def test_package_not_found(self, mock_module):
@@ -128,7 +125,6 @@ class TestPkginQueryPackage(unittest.TestCase):
 
         # then
         self.assertEquals(command_result, pkgin.PackageState.PRESENT)
-        self.assertTrue(command_result & pkgin.PackageState.INSTALLED)
 
     @mock.patch('ansible_collections.community.general.plugins.modules.packaging.os.pkgin.AnsibleModule')
     def test_with_parseable_flag_not_supported_package_is_present(self, mock_module):
@@ -145,4 +141,3 @@ class TestPkginQueryPackage(unittest.TestCase):
 
         # then
         self.assertEquals(command_result, pkgin.PackageState.PRESENT)
-        self.assertTrue(command_result & pkgin.PackageState.INSTALLED)
