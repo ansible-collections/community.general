@@ -45,11 +45,11 @@ options:
   state:
     description:
       - Indicates the desired package(s) state.
-      - C(present) ensures the package(s) is/are present.
-      - C(absent) ensures the package(s) is/are absent.
+      - C(present) ensures the package(s) is/are present. C(installed) can be used as an alias.
+      - C(absent) ensures the package(s) is/are absent. C(removed) can be used as an alias.
       - C(latest) ensures the package(s) is/are present and the latest version(s).
     default: present
-    choices: [ "present", "absent", "latest" ]
+    choices: [ "present", "absent", "latest", "installed", "removed" ]
     type: str
   update_cache:
     description:
