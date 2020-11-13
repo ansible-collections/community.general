@@ -33,7 +33,7 @@ options:
     state:
         description:
             - state of the package, you can use "installed" as an alias for C(present) and removed as one for C(absent).
-        choices: [ 'present', 'absent', 'latest' ]
+        choices: [ 'present', 'absent', 'latest', 'installed', 'removed' ]
         required: false
         default: present
         type: str

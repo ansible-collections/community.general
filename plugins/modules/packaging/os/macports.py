@@ -35,7 +35,7 @@ options:
     state:
         description:
             - Indicates the desired state of the port.
-        choices: [ 'present', 'absent', 'active', 'inactive' ]
+        choices: [ 'present', 'absent', 'active', 'inactive', 'installed', 'removed']
         default: present
         type: str
     upgrade:

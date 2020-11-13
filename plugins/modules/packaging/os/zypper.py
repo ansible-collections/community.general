@@ -49,7 +49,7 @@ options:
             C(dist-upgrade) will make sure the latest version of all installed packages from all enabled repositories is installed.
           - When using C(dist-upgrade), I(name) should be C('*').
         required: false
-        choices: [ present, latest, absent, dist-upgrade ]
+        choices: [ present, latest, absent, dist-upgrade, installed, removed ]
         default: "present"
         type: str
     type:

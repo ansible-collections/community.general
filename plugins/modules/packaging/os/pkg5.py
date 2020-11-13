@@ -28,7 +28,7 @@ options:
   state:
     description:
       - Whether to install (I(present), I(latest)), or remove (I(absent)) a package.
-    choices: [ absent, latest, present ]
+    choices: [ absent, latest, present, installed, removed, uninstalled ]
     default: present
     type: str
   accept_licenses:
