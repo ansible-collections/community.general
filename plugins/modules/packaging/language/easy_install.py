@@ -16,10 +16,12 @@ description:
      - Installs Python libraries, optionally in a I(virtualenv)
 options:
   name:
+    type: str
     description:
       - A Python library name
     required: true
   virtualenv:
+    type: str
     description:
       - an optional I(virtualenv) directory path to install into. If the
         I(virtualenv) does not exist, it is created automatically
@@ -33,18 +35,22 @@ options:
     type: bool
     default: 'no'
   virtualenv_command:
+    type: str
     description:
       - The command to create the virtual environment with. For example
         C(pyvenv), C(virtualenv), C(virtualenv2).
     default: virtualenv
   executable:
+    type: str
     description:
       - The explicit executable or a pathname to the executable to be used to
         run easy_install for a specific version of Python installed in the
         system. For example C(easy_install-3.3), if there are both Python 2.7
         and 3.3 installations in the system and you want to run easy_install
         for the Python 3.3 installation.
+    default: easy_install
   state:
+    type: str
     description:
       - The desired state of the library. C(latest) ensures that the latest version is installed.
     choices: [present, latest]
