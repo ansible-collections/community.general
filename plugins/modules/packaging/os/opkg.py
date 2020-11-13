@@ -27,7 +27,7 @@ options:
     state:
         description:
             - state of the package
-        choices: [ 'present', 'absent' ]
+        choices: [ 'present', 'absent', 'installed', 'removed' ]
         default: present
         type: str
     force:
@@ -45,7 +45,6 @@ options:
             - "remove"
             - "checksum"
             - "removal-of-dependent-packages"
-        default: absent
         type: str
     update_cache:
         description:

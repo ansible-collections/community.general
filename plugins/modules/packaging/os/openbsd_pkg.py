@@ -31,7 +31,7 @@ options:
           - C(present) will make sure the package is installed.
             C(latest) will make sure the latest version of the package is installed.
             C(absent) will make sure the specified package is not installed.
-        choices: [ absent, latest, present ]
+        choices: [ absent, latest, present, installed, removed ]
         default: present
         type: str
     build:

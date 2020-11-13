@@ -32,6 +32,7 @@ options:
         description:
             - Whether the channel should be present or not, taking action if the state is different from what is stated.
         default: present
+        choices: [ present, absent ]
         type: str
     url:
         description:
