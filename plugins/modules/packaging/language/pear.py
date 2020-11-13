@@ -21,16 +21,19 @@ author:
     - Jonathan Lestrelin (@jle64) <jonathan.lestrelin@gmail.com>
 options:
     name:
+        type: str
         description:
             - Name of the package to install, upgrade, or remove.
         required: true
-
+        aliases: [pkg]
     state:
+        type: str
         description:
             - Desired state of the package.
         default: "present"
-        choices: ["present", "absent", "latest"]
+        choices: ["present", "installed", "latest", "absent", "removed"]
     executable:
+        type: path
         description:
             - Path to the pear executable.
     prompts:

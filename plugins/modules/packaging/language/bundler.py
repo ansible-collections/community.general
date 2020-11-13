@@ -16,19 +16,23 @@ description:
   - Manage installation and Gem version dependencies for Ruby using the Bundler gem
 options:
   executable:
+    type: str
     description:
       - The path to the bundler executable
   state:
+    type: str
     description:
       - The desired state of the Gem bundle. C(latest) updates gems to the most recent, acceptable version
     choices: [present, latest]
     default: present
   chdir:
+    type: path
     description:
       - The directory to execute the bundler commands from. This directory
         needs to contain a valid Gemfile or .bundle/ directory
-    default: temporary working directory
+      - If not specified, it will default to the temporary working directory
   exclude_groups:
+    type: list
     description:
       - A list of Gemfile groups to exclude during operations. This only
         applies when state is C(present). Bundler considers this
@@ -41,9 +45,10 @@ options:
     type: bool
     default: 'no'
   gemfile:
+    type: path
     description:
       - Only applies if state is C(present). The path to the gemfile to use to install gems.
-    default: Gemfile in current directory
+      - If not specified it will default to the Gemfile in current directory
   local:
     description:
       - If set only installs gems from the cache on the target host
@@ -62,12 +67,14 @@ options:
     type: bool
     default: 'yes'
   gem_path:
+    type: path
     description:
       - Only applies if state is C(present). Specifies the directory to
         install the gems into. If C(chdir) is set then this path is relative to
         C(chdir)
-    default: RubyGems gem paths
+      - If not specified the default RubyGems gem paths will be used.
   binstub_directory:
+    type: path
     description:
       - Only applies if state is C(present). Specifies the directory to
         install any gem bins files to. When executed the bin files will run
@@ -75,6 +82,7 @@ options:
         dependencies are not installed. If C(chdir) is set then this path is
         relative to C(chdir)
   extra_args:
+    type: str
     description:
       - A space separated string of additional commands that can be applied to
         the Bundler command. Refer to the Bundler documentation for more
