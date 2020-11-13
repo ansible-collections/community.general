@@ -17,6 +17,7 @@ description:
 author: "Michael Warkentin (@mwarkentin)"
 options:
   name:
+    type: str
     description:
       - The name of a bower package to install
   offline:
@@ -30,18 +31,22 @@ options:
     type: bool
     default: 'no'
   path:
+    type: path
     description:
       - The base path where to install the bower packages
     required: true
   relative_execpath:
+    type: path
     description:
       - Relative path to bower executable from install path
   state:
+    type: str
     description:
       - The state of the bower package
     default: present
     choices: [ "present", "absent", "latest" ]
   version:
+    type: str
     description:
       - The version to be installed
 '''
