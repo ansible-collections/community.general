@@ -908,7 +908,7 @@ files:
     maintainers: ansible
     labels: facter
   $modules/system/filesystem.py:
-    maintainers: pilou- abulimov
+    maintainers: pilou- abulimov quidame
     labels: filesystem
   $modules/system/gconftool2.py:
     maintainers: Akasurde kevensen
