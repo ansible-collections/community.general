@@ -1,0 +1,2 @@
+bugfixes:
+  - proxmox_kvm - ignore unsupported ``pool`` parameter on update (https://github.com/ansible-collections/community.general/pull/1258).
