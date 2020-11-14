@@ -414,6 +414,7 @@ options:
       - If C(yes), the VM will be updated with new value.
       - Cause of the operations of the API and security reasons, I have disabled the update of the following parameters
       - C(net, virtio, ide, sata, scsi). Per example updating C(net) update the MAC address and C(virtio) create always new disk...
+      - Update of C(pool) is disabled. It needs an additional API endpoint not covered by this module.
     type: bool
     default: 'no'
   validate_certs:
@@ -828,6 +829,7 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
                 del kwargs[p]
 
     # If update, don't update disk (virtio, ide, sata, scsi) and network interface
+    # pool parameter not supported by qemu/<vmid>/config endpoint on "update" (PVE 6.2) - only with "create"
     if update:
         if 'virtio' in kwargs:
             del kwargs['virtio']
@@ -841,6 +843,8 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
             del kwargs['net']
         if 'force' in kwargs:
             del kwargs['force']
+        if 'pool' in kwargs:
+            del kwargs['pool']
 
     # Convert all dict in kwargs to elements. For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n]
     for k in list(kwargs.keys()):
