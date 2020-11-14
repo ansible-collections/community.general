@@ -31,11 +31,6 @@ files:
   $callbacks/unixy.py:
     maintainers: akatch
     labels: unixy
-  $connections/docker.py:
-    maintainers: $team_docker
-    labels: cloud docker
-    ignore: cove
-    supershipit: felixfontein
   $connections/:
     labels: connections
   $connections/kubectl.py:
@@ -51,11 +46,6 @@ files:
     labels: saltstack
   $doc_fragments/:
     labels: docs_fragments
-  $doc_fragments/docker.py:
-    maintainers: $team_docker
-    labels: cloud docker
-    ignore: cove
-    supershipit: felixfontein
   $doc_fragments/gcp.py:
     maintainers: $team_google
     labels: gcp
@@ -90,16 +80,6 @@ files:
     keywords: firepower ftd
   $inventories/:
     labels: inventories
-  $inventories/docker_machine.py:
-    maintainers: $team_docker
-    labels: cloud docker
-    ignore: cove
-    supershipit: felixfontein
-  $inventories/docker_swarm.py:
-    maintainers: $team_docker morph027
-    labels: cloud docker docker_swarm
-    ignore: cove
-    supershipit: felixfontein
   $inventories/linode.py:
     maintainers: $team_linode
     labels: cloud linode
@@ -137,11 +117,6 @@ files:
     labels: infoblox networking
   $module_utils/:
     labels: module_utils
-  $module_utils/docker/:
-    maintainers: $team_docker
-    labels: cloud
-    ignore: cove
-    supershipit: felixfontein
   $module_utils/gitlab.py:
     notify: jlozadad
     maintainers: $team_gitlab
@@ -210,34 +185,6 @@ files:
     labels: dimensiondata_network
   $modules/cloud/dimensiondata/dimensiondata_vlan.py:
     maintainers: tintoy
-  $modules/cloud/docker/:
-    maintainers: $team_docker
-    ignore: cove
-    supershipit: felixfontein
-  $modules/cloud/docker/docker_compose.py:
-    maintainers: sluther
-    labels: docker_compose
-  $modules/cloud/docker/docker_config.py:
-    maintainers: ushuz
-  $modules/cloud/docker/docker_container.py:
-    maintainers: dusdanig softzilla zfil
-    ignore: ThomasSteinbach cove joshuaconner
-  $modules/cloud/docker/docker_image.py:
-    maintainers: softzilla ssbarnea
-  $modules/cloud/docker/docker_login.py:
-    maintainers: olsaki
-  $modules/cloud/docker/docker_network.py:
-    maintainers: keitwb
-    labels: docker_network
-  $modules/cloud/docker/docker_stack_task_info.py:
-    maintainers: imjoseangel
-  $modules/cloud/docker/docker_swarm_service.py:
-    maintainers: hannseman
-    labels: docker_swarm_service
-  $modules/cloud/docker/docker_swarm_service_info.py:
-    maintainers: hannseman
-  $modules/cloud/docker/docker_volume.py:
-    maintainers: agronholm
   $modules/cloud/google/:
     maintainers: $team_google
     ignore: supertom
@@ -1094,7 +1041,6 @@ macros:
   team_bsd: JoergFiedler MacLemon bcoca dch jasperla mekanix opoplawski overhacked tuxillo
   team_consul: colin-nolan sgargan
   team_cyberark_conjur: jvanderhoof ryanprior
-  team_docker: DBendit WojciechowskiPiotr akshay196 danihodovic dariko felixfontein jwitko kassiansun tbouvet chouseknecht
   team_e_spirit: MatrixCrawler getjack
   team_flatpak: JayKayy oolongbrothers
   team_gitlab: Lunik Shaps dj-wasabi marwatk waheedi zanssa scodeman
