@@ -29,7 +29,6 @@ plugins/modules/cloud/centurylink/clc_server.py validate-modules:parameter-type-
 plugins/modules/cloud/centurylink/clc_server_snapshot.py validate-modules:doc-missing-type
 plugins/modules/cloud/centurylink/clc_server_snapshot.py validate-modules:implied-parameter-type-mismatch
 plugins/modules/cloud/centurylink/clc_server_snapshot.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/docker/docker_container.py use-argspec-type-path # uses colon-separated paths, can't use type=path
 plugins/modules/cloud/google/gcdns_record.py validate-modules:deprecation-mismatch
 plugins/modules/cloud/google/gcdns_record.py validate-modules:invalid-documentation
 plugins/modules/cloud/google/gcdns_record.py validate-modules:missing-main-call
