@@ -57,6 +57,9 @@ action_groups:
   - ovirt_vm_facts
   - ovirt_vmpool_facts
 plugin_routing:
+  connection:
+    docker:
+      redirect: community.docker.docker
   lookup:
     conjur_variable:
       redirect: cyberark.conjur.conjur_variable
@@ -238,14 +241,60 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: The digital_ocean_volume_info module has been moved to the community.digitalocean collection.
       redirect: community.digitalocean.digital_ocean_volume_info
+    docker_compose:
+      redirect: community.docker.docker_compose
+    docker_config:
+      redirect: community.docker.docker_config
+    docker_container:
+      redirect: community.docker.docker_container
+    docker_container_info:
+      redirect: community.docker.docker_container_info
+    docker_host_info:
+      redirect: community.docker.docker_host_info
+    docker_image:
+      redirect: community.docker.docker_image
     docker_image_facts:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.docker.docker_image_info instead.
+    docker_image_info:
+      redirect: community.docker.docker_image_info
+    docker_login:
+      redirect: community.docker.docker_login
+    docker_network:
+      redirect: community.docker.docker_network
+    docker_network_info:
+      redirect: community.docker.docker_network_info
+    docker_node:
+      redirect: community.docker.docker_node
+    docker_node_info:
+      redirect: community.docker.docker_node_info
+    docker_prune:
+      redirect: community.docker.docker_prune
+    docker_secret:
+      redirect: community.docker.docker_secret
     docker_service:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.docker.docker_compose instead.
+    docker_stack:
+      redirect: community.docker.docker_stack
+    docker_stack_info:
+      redirect: community.docker.docker_stack_info
+    docker_stack_task_info:
+      redirect: community.docker.docker_stack_task_info
+    docker_swarm:
+      redirect: community.docker.docker_swarm
+    docker_swarm_info:
+      redirect: community.docker.docker_swarm_info
+    docker_swarm_service:
+      redirect: community.docker.docker_swarm_service
+    docker_swarm_service_info:
+      redirect: community.docker.docker_swarm_service_info
+    docker_volume:
+      redirect: community.docker.docker_volume
+    docker_volume_info:
+      redirect: community.docker.docker_volume_info
     firewalld:
       deprecation:
         removal_version: 2.0.0
@@ -704,6 +753,8 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: The digital_ocean docs_fragment has been moved to the community.digitalocean collection.
       redirect: community.digitalocean.digital_ocean
+    docker:
+      redirect: community.docker.docker
     infinibox:
       redirect: infinidat.infinibox.infinibox
       deprecation:
@@ -725,6 +776,10 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: The digital_ocean module_utils has been moved to the community.digitalocean collection.
       redirect: community.digitalocean.digital_ocean
+    docker.common:
+      redirect: community.docker.common
+    docker.swarm:
+      redirect: community.docker.swarm
     firewalld:
       deprecation:
         removal_version: 2.0.0
@@ -753,3 +808,8 @@ plugin_routing:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
+  inventory:
+    docker_machine:
+      redirect: community.docker.docker_machine
+    docker_swarm:
+      redirect: community.docker.docker_swarm
