@@ -106,8 +106,7 @@ options:
     description:
       - Call 'resizepart' on existing partitions to match the size specified by part_end.
     type: bool
-    default: false
-    version_added: '1.2.0'
+    version_added: '1.3.0'
 
 notes:
   - When fetching information about a new disk and when the version of parted
@@ -616,7 +615,7 @@ def main():
             state=dict(type='str', default='info', choices=['absent', 'info', 'present']),
 
             # resize part
-            resize=dict(type='bool', default=False)
+            resize=dict(type='bool', default=False),
         ),
         required_if=[
             ['state', 'present', ['number']],
