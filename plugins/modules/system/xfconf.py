@@ -268,38 +268,34 @@ def main():
 
     state = module.params['state']
 
-    try:
-        # Create a Xfconf preference
-        xfconf = XFConfProperty(module)
-        xfconf.sanitize()
+    # Create a Xfconf preference
+    xfconf = XFConfProperty(module)
+    xfconf.sanitize()
 
-        previous_value = xfconf.get()
-        facts = {
-            facts_name: dict(
-                channel=xfconf.channel,
-                property=xfconf.property,
-                value_type=xfconf.value_type,
-                value=previous_value,
-            )
-        }
+    previous_value = xfconf.previous_value
+    facts = {
+        facts_name: dict(
+            channel=xfconf.channel,
+            property=xfconf.property,
+            value_type=xfconf.value_type,
+            value=previous_value,
+        )
+    }
 
-        if state == XFConfProperty.GET \
-                or (previous_value is not None
-                    and (state, set(previous_value)) == (XFConfProperty.SET, set(xfconf.value))):
-            module.exit_json(changed=False, ansible_facts=facts)
-            return
+    if state == XFConfProperty.GET \
+            or (previous_value is not None
+                and (state, set(previous_value)) == (XFConfProperty.SET, set(xfconf.value))):
+        module.exit_json(changed=False, ansible_facts=facts)
+        return
 
-        # If check mode, we know a change would have occurred.
-        if module.check_mode:
-            new_value = xfconf.value
-        else:
-            new_value = xfconf.call(state)
+    # If check mode, we know a change would have occurred.
+    if module.check_mode:
+        new_value = xfconf.value
+    else:
+        new_value = xfconf.call(state)
 
-        facts[facts_name].update(value=new_value, previous_value=previous_value)
-        module.exit_json(changed=True, ansible_facts=facts)
-
-    except Exception as e:
-        module.fail_json(msg="Failed with exception: {0}".format(e))
+    facts[facts_name].update(value=new_value, previous_value=previous_value)
+    module.exit_json(changed=True, ansible_facts=facts)
 
 
 if __name__ == '__main__':
