@@ -66,24 +66,27 @@ options:
         C(latest) is specified.
     default: 86400
   updates_url:
-    type: str
+    type: list
+    elements: str
     description:
-      - URL of the Update Centre.
-      - Used as the base URL to download the plugins and the
-        I(update-center.json) JSON file.
-    default: https://updates.jenkins.io
+      - URLs of the Update Centre.
+      - Used as the base URLs to download the I(update-center.json) JSON file.
+      - Tries all URLs on failure
+    default: ['https://updates.jenkins.io', 'http://mirrors.jenkins.io/updates/']
   latest_plugins_url:
-    type: str
+    type: list
+    elements: str
     description:
-      - URL of the latest plugins center.
+      - URLs of the latest plugins center.
       - Used as the base URL to download the latest plugins from.
-    default: https://updates.jenkins.io/latest
+    default: ['https://updates.jenkins.io/latest']
   versioned_plugins_url:
-    type: str
+    type: list
+    elements: str
     description:
       - URL of the versioned plugins center.
       - Used as the base URL to download versioned(not latest) plugins from.
-    default: https://updates.jenkins.io/download/plugins
+    default: ['https://updates.jenkins.io/download/plugins', 'http://mirrors.jenkins.io/plugins/']
   url:
     type: str
     description:
@@ -342,6 +345,20 @@ class JenkinsPlugin(object):
 
         return json_data
 
+    def _get_urls_data(self, urls, what=None, msg_status=None, msg_exception=None, **kwargs):
+        is_success = False
+        errors = []
+        for url in urls:
+            try:
+                r = self._get_url_data(url, what, msg_status, msg_exception, **kwargs)
+                is_success = True
+                return r
+            except Exception as e:
+                errors.append(e)
+                continue
+        if not is_success:
+            self.module.fail_json(msg=msg_exception, details=errors)
+
     def _get_url_data(
             self, url, what=None, msg_status=None, msg_exception=None,
             **kwargs):
@@ -461,25 +478,23 @@ class JenkinsPlugin(object):
 
             if self.params['version'] in [None, 'latest']:
                 # Take latest version
-                plugin_url = (
-                      "%s/%s.hpi" % (
-                          self.params['latest_plugins_url'],
-                          self.params['name']))
+                plugin_urls = [("%s/%s.hpi" % (
+                          url,
+                          self.params['name'])) for url in self.params['latest_plugins_url']]
             else:
                 # Take specific version
-                plugin_url = (
+                plugin_urls = [(
                     "{0}/{1}/{2}/{1}.hpi".format(
-                        self.params['versioned_plugins_url'],
+                        url,
                         self.params['name'],
-                        self.params['version']))
-
+                        self.params['version'])) for url in self.params['versioned_plugins_url']]
             if (
                     self.params['updates_expiration'] == 0 or
                     self.params['version'] not in [None, 'latest'] or
                     checksum_old is None):
 
                 # Download the plugin file directly
-                r = self._download_plugin(plugin_url)
+                r = self._download_plugin(plugin_urls)
 
                 # Write downloaded plugin into file if checksums don't match
                 if checksum_old is None:
@@ -551,11 +566,11 @@ class JenkinsPlugin(object):
 
         # Download the updates file if needed
         if download_updates:
-            url = "%s/update-center.json" % self.params['updates_url']
+            urls = ["%s/update-center.json" % url for url in self.params['updates_url']]
 
             # Get the data
-            r = self._get_url_data(
-                url,
+            r = self._get_urls_data(
+                urls,
                 msg_status="Remote updates not found.",
                 msg_exception="Updates download failed.")
 
@@ -613,10 +628,10 @@ class JenkinsPlugin(object):
 
         return data['plugins'][self.params['name']]
 
-    def _download_plugin(self, plugin_url):
+    def _download_plugin(self, plugin_urls):
         # Download the plugin
-        r = self._get_url_data(
-            plugin_url,
+        r = self._get_urls_data(
+            plugin_urls,
             msg_status="Plugin not found.",
             msg_exception="Plugin download failed.")
 
@@ -732,9 +747,10 @@ def main():
             default='present'),
         timeout=dict(default=30, type="int"),
         updates_expiration=dict(default=86400, type="int"),
-        updates_url=dict(default='https://updates.jenkins.io'),
-        latest_plugins_url=dict(default='https://updates.jenkins.io/latest'),
-        versioned_plugins_url=dict(default='https://updates.jenkins.io/download/plugins'),
+        updates_url=dict(default=['https://updates.jenkins.io', 'http://mirrors.jenkins.io/updates/']),
+        latest_plugins_url=dict(default=['https://updates.jenkins.io/latest']),
+        versioned_plugins_url=dict(default=['https://updates.jenkins.io/download/plugins',
+                                            'http://mirrors.jenkins.io/plugins/']),
         url=dict(default='http://localhost:8080'),
         url_password=dict(no_log=True),
         version=dict(),
@@ -769,6 +785,16 @@ def main():
 
     # Initial change state of the task
     changed = False
+
+    # keep backward compatibility for urls
+    if isinstance(module.params['updates_url'], str):
+        module.params['updates_url'] = [module.params['updates_url']]
+
+    if isinstance(module.params['latest_plugins_url'], str):
+        module.params['latest_plugins_url'] = [module.params['latest_plugins_url']]
+
+    if isinstance(module.params['versioned_plugins_url'], str):
+        module.params['versioned_plugins_url'] = [module.params['versioned_plugins_url']]
 
     # Instantiate the JenkinsPlugin object
     jp = JenkinsPlugin(module)
