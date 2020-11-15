@@ -1,0 +1,4 @@
+minor_changes:
+  - xfconf - added unit tests (https://github.com/ansible-collections/community.general/issues/695).
+  - xfconf - removed unnecessary second execution of ``xfconf-query``.
+  - xfconf - removed unnecessary catch-all try/except block in ``main``.
