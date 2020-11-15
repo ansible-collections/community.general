@@ -400,6 +400,12 @@ image:
     returned: success
     type: dict
     sample: {}
+stdout:
+    description: Docker build output when building an image.
+    returned: success
+    type: str
+    sample: ""
+    version_added: 1.3.0
 '''
 
 import errno
@@ -506,7 +512,8 @@ class ImageManager(DockerBaseClass):
                 self.results['actions'].append("Built image %s from %s" % (image_name, self.build_path))
                 self.results['changed'] = True
                 if not self.check_mode:
-                    self.results['image'] = self.build_image()
+                    self.results.update(self.build_image())
+
             elif self.source == 'load':
                 # Load the image from an archive
                 if not os.path.isfile(self.load_path):
@@ -713,7 +720,7 @@ class ImageManager(DockerBaseClass):
         )
         if self.client.docker_py_version < LooseVersion('3.0.0'):
             params['stream'] = True
-        build_output = []
+
         if self.tag:
             params['tag'] = "%s:%s" % (self.name, self.tag)
         if self.container_limits:
@@ -737,11 +744,14 @@ class ImageManager(DockerBaseClass):
         if self.target:
             params['target'] = self.target
 
+        build_output = []
         for line in self.client.build(**params):
             # line = json.loads(line)
             self.log(line, pretty_print=True)
-            if "stream" in line:
-                build_output.append(line["stream"])
+            if "stream" in line or "status" in line:
+                build_line = line.get("stream") or line.get("status")
+                build_output.append(build_line)
+
             if line.get('error'):
                 if line.get('errorDetail'):
                     errorDetail = line.get('errorDetail')
@@ -754,7 +764,9 @@ class ImageManager(DockerBaseClass):
                 else:
                     self.fail("Error building %s - message: %s, logs: %s" % (
                         self.name, line.get('error'), build_output))
-        return self.client.find_image(name=self.name, tag=self.tag)
+
+        return {"stdout": "\n".join(build_output),
+                "image": self.client.find_image(name=self.name, tag=self.tag)}
 
     def load_image(self):
         '''
