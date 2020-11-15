@@ -136,11 +136,6 @@
     - repository_1 is changed
     - repository_2 is not changed
 
-# Uncomment in community.docker
-# - assert:
-#     that:
-#       - 'FROM busybox' in repository_1.stdout
-
 - name: Get facts of image
   docker_image_info:
     name: "{{ test_image_base }}:latest"

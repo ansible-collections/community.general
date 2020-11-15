@@ -130,6 +130,7 @@
 - assert:
     that:
     - dockerfile_1 is changed
+    - "'FROM alpine:3.7' in dockerfile_1.stdout"
     - dockerfile_1['image']['Config']['WorkingDir'] == '/newdata'
 
 ####################################################################
