@@ -346,18 +346,29 @@ class JenkinsPlugin(object):
         return json_data
 
     def _get_urls_data(self, urls, what=None, msg_status=None, msg_exception=None, **kwargs):
-        is_success = False
-        errors = []
+        # Compose default messages
+        if msg_status is None:
+            msg_status = "Cannot get %s" % what
+
+        if msg_exception is None:
+            msg_exception = "Retrieval of %s failed." % what
+
+        errors = {}
         for url in urls:
             try:
-                r = self._get_url_data(url, what, msg_status, msg_exception, **kwargs)
-                is_success = True
-                return r
+                response, info = fetch_url(
+                    self.module, url, timeout=self.timeout, cookies=self.cookies,
+                    headers=self.crumb, **kwargs)
+
+                if info['status'] == 200:
+                    return response
+                else:
+                    errors[url] = "%s response code is %s" % (msg_status, info['status'])
             except Exception as e:
-                errors.append(e)
-                continue
-        if not is_success:
-            self.module.fail_json(msg=msg_exception, details=errors)
+                errors[url] = str(e)
+
+        # failed on all urls
+        self.module.fail_json(msg=msg_exception, details=errors)
 
     def _get_url_data(
             self, url, what=None, msg_status=None, msg_exception=None,
@@ -524,7 +535,7 @@ class JenkinsPlugin(object):
                 # If the latest version changed, download it
                 if checksum_old != to_bytes(plugin_data['sha1']):
                     if not self.module.check_mode:
-                        r = self._download_plugin(plugin_url)
+                        r = self._download_plugin(plugin_urls)
                         self._write_file(plugin_file, r)
 
                     changed = True
@@ -630,12 +641,11 @@ class JenkinsPlugin(object):
 
     def _download_plugin(self, plugin_urls):
         # Download the plugin
-        r = self._get_urls_data(
+
+        return self._get_urls_data(
             plugin_urls,
             msg_status="Plugin not found.",
             msg_exception="Plugin download failed.")
-
-        return r
 
     def _write_file(self, f, data):
         # Store the plugin into a temp file and then move it
@@ -747,10 +757,11 @@ def main():
             default='present'),
         timeout=dict(default=30, type="int"),
         updates_expiration=dict(default=86400, type="int"),
-        updates_url=dict(default=['https://updates.jenkins.io', 'http://mirrors.jenkins.io/updates/']),
-        latest_plugins_url=dict(default=['https://updates.jenkins.io/latest']),
-        versioned_plugins_url=dict(default=['https://updates.jenkins.io/download/plugins',
-                                            'http://mirrors.jenkins.io/plugins/']),
+        updates_url=dict(type="list", elements="str", default=['https://updates.jenkins.io',
+                                                               'http://mirrors.jenkins.io/updates']),
+        latest_plugins_url=dict(type="list", elements="str", default=['https://updates.jenkins.io/latest']),
+        versioned_plugins_url=dict(type="list", elements="str", default=['https://updates.jenkins.io/download/plugins',
+                                                                         'http://mirrors.jenkins.io/plugins']),
         url=dict(default='http://localhost:8080'),
         url_password=dict(no_log=True),
         version=dict(),
@@ -785,16 +796,6 @@ def main():
 
     # Initial change state of the task
     changed = False
-
-    # keep backward compatibility for urls
-    if isinstance(module.params['updates_url'], str):
-        module.params['updates_url'] = [module.params['updates_url']]
-
-    if isinstance(module.params['latest_plugins_url'], str):
-        module.params['latest_plugins_url'] = [module.params['latest_plugins_url']]
-
-    if isinstance(module.params['versioned_plugins_url'], str):
-        module.params['versioned_plugins_url'] = [module.params['versioned_plugins_url']]
 
     # Instantiate the JenkinsPlugin object
     jp = JenkinsPlugin(module)
