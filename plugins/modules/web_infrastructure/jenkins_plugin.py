@@ -72,6 +72,18 @@ options:
       - Used as the base URL to download the plugins and the
         I(update-center.json) JSON file.
     default: https://updates.jenkins.io
+  latest_plugins_url:
+    type: str
+    description:
+      - URL of the latest plugins center.
+      - Used as the base URL to download the latest plugins from.
+    default: https://updates.jenkins.io/latest
+  versioned_plugins_url:
+    type: str
+    description:
+      - URL of the versioned plugins center.
+      - Used as the base URL to download versioned(not latest) plugins from.
+    default: https://updates.jenkins.io/download/plugins
   url:
     type: str
     description:
@@ -450,15 +462,14 @@ class JenkinsPlugin(object):
             if self.params['version'] in [None, 'latest']:
                 # Take latest version
                 plugin_url = (
-                    "%s/latest/%s.hpi" % (
-                        self.params['updates_url'],
-                        self.params['name']))
+                      "%s/%s.hpi" % (
+                          self.params['latest_plugins_url'],
+                          self.params['name']))
             else:
                 # Take specific version
                 plugin_url = (
-                    "{0}/download/plugins/"
-                    "{1}/{2}/{1}.hpi".format(
-                        self.params['updates_url'],
+                    "{0}/{1}/{2}/{1}.hpi".format(
+                        self.params['versioned_plugins_url'],
                         self.params['name'],
                         self.params['version']))
 
@@ -722,6 +733,8 @@ def main():
         timeout=dict(default=30, type="int"),
         updates_expiration=dict(default=86400, type="int"),
         updates_url=dict(default='https://updates.jenkins.io'),
+        latest_plugins_url=dict(default='https://updates.jenkins.io/latest'),
+        versioned_plugins_url=dict(default='https://updates.jenkins.io/download/plugins'),
         url=dict(default='http://localhost:8080'),
         url_password=dict(no_log=True),
         version=dict(),
