@@ -149,8 +149,6 @@ TEST_CASES = [
         },
     ],
 ]
-
-
 TEST_CASES_IDS = [item[1]['id'] for item in TEST_CASES]
 
 
@@ -193,4 +191,3 @@ def test_xfconf(mocker, capfd, patch_xfconf, testcase):
         print("call args list =\n%s" % call_args_list)
         print("expected args list =\n%s" % expected_call_args_list)
         assert call_args_list == expected_call_args_list
-
