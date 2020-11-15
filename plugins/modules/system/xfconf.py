@@ -116,11 +116,11 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import shlex_quote
 
 
-class XfConfException(Exception):
+class XFConfException(Exception):
     pass
 
 
-class XfConfProperty(object):
+class XFConfProperty(object):
     SET = "present"
     GET = "get"
     RESET = "absent"
@@ -162,12 +162,12 @@ class XfConfProperty(object):
             if err.rstrip() == self.does_not:
                 return None
             if rc or len(err):
-                raise XfConfException('xfconf-query failed with error (rc={0}): {1}'.format(rc, err))
+                raise XFConfException('xfconf-query failed with error (rc={0}): {1}'.format(rc, err))
 
             return out.rstrip()
 
         except OSError as exception:
-            XfConfException('xfconf-query failed with exception: {0}'.format(exception))
+            XFConfException('xfconf-query failed with exception: {0}'.format(exception))
 
     def get(self):
         previous_value = self._execute_xfconf_query()
@@ -216,7 +216,7 @@ class XfConfProperty(object):
         if self.value is None and self.value_type is None:
             return
         if (self.value is None) ^ (self.value_type is None):
-            raise XfConfException('Must set both "value" and "value_type"')
+            raise XFConfException('Must set both "value" and "value_type"')
 
         # stringify all values - in the CLI they will all be happy strings anyway
         # and by doing this here the rest of the code can be agnostic to it
@@ -230,7 +230,7 @@ class XfConfProperty(object):
             self.value_type = self.value_type * values_len
         elif types_len != values_len:
             # or complain if lists' lengths are different
-            raise XfConfException('Same number of "value" and "value_type" needed')
+            raise XFConfException('Same number of "value" and "value_type" needed')
 
         # fix boolean values
         self.value = [self._fix_bool(v[0]) if v[1] == 'bool' else v[0] for v in zip(self.value, self.value_type)]
@@ -247,18 +247,18 @@ def main():
     # Setup the Ansible module
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default=XfConfProperty.SET,
-                       choices=XfConfProperty.VALID_STATES,
+            state=dict(default=XFConfProperty.SET,
+                       choices=XFConfProperty.VALID_STATES,
                        type='str'),
             channel=dict(required=True, type='str'),
             property=dict(required=True, type='str'),
             value_type=dict(required=False, type='list',
-                            elements='str', choices=XfConfProperty.VALID_VALUE_TYPES),
+                            elements='str', choices=XFConfProperty.VALID_VALUE_TYPES),
             value=dict(required=False, type='list', elements='raw'),
             force_array=dict(default=False, type='bool', aliases=['array']),
         ),
         required_if=[
-            ('state', XfConfProperty.SET, ['value', 'value_type'])
+            ('state', XFConfProperty.SET, ['value', 'value_type'])
         ],
         supports_check_mode=True
     )
@@ -270,7 +270,7 @@ def main():
 
     try:
         # Create a Xfconf preference
-        xfconf = XfConfProperty(module)
+        xfconf = XFConfProperty(module)
         xfconf.sanitize()
 
         previous_value = xfconf.get()
@@ -283,9 +283,9 @@ def main():
             )
         }
 
-        if state == XfConfProperty.GET \
+        if state == XFConfProperty.GET \
                 or (previous_value is not None
-                    and (state, set(previous_value)) == (XfConfProperty.SET, set(xfconf.value))):
+                    and (state, set(previous_value)) == (XFConfProperty.SET, set(xfconf.value))):
             module.exit_json(changed=False, ansible_facts=facts)
             return
 
