@@ -1,7 +1,7 @@
 - name: 'Create an approle policy'
-  shell: "echo '{{ policy }}' | {{ vault_cmd }} policy write approle-policy -"
-  vars:
-    policy: |
+  command:
+    cmd: '{{ vault_cmd }} policy write approle-policy -'
+    stdin: |
       path "auth/approle/login" {
        capabilities = [ "create", "read" ]
       }
