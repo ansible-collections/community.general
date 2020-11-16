@@ -29,6 +29,16 @@ options:
       - the password to authenticate with
       - you can use PROXMOX_PASSWORD environment variable
     type: str
+  api_token_id:
+    description:
+      - Specify the token ID.
+    type: str
+    version_added: 1.3.0
+  api_token_secret:
+    description:
+      - Specify the token secret.
+    type: str
+    version_added: 1.3.0
   vmid:
     description:
       - the instance id
@@ -496,8 +506,10 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             api_host=dict(required=True),
-            api_user=dict(required=True),
             api_password=dict(no_log=True),
+            api_token_id=dict(no_log=True),
+            api_token_secret=dict(no_log=True),
+            api_user=dict(required=True),
             vmid=dict(required=False),
             validate_certs=dict(type='bool', default=False),
             node=dict(),
@@ -533,9 +545,11 @@ def main():
         module.fail_json(msg='proxmoxer required for this module')
 
     state = module.params['state']
-    api_user = module.params['api_user']
     api_host = module.params['api_host']
     api_password = module.params['api_password']
+    api_token_id = module.params['api_token_id']
+    api_token_secret = module.params['api_token_secret']
+    api_user = module.params['api_user']
     vmid = module.params['vmid']
     validate_certs = module.params['validate_certs']
     node = module.params['node']
@@ -570,18 +584,23 @@ def main():
             if module.params[param] is None:
                 module.params[param] = value
 
-    # If password not set get it from PROXMOX_PASSWORD env
-    if not api_password:
-        try:
-            api_password = os.environ['PROXMOX_PASSWORD']
-        except KeyError as e:
-            module.fail_json(msg='You should set api_password param or use PROXMOX_PASSWORD environment variable')
+    auth_args = {'user': api_user}
+    if not (api_token_id and api_token_secret):
+        # If password not set get it from PROXMOX_PASSWORD env
+        if not api_password:
+            try:
+                api_password = os.environ['PROXMOX_PASSWORD']
+            except KeyError as e:
+                module.fail_json(msg='You should set api_password param or use PROXMOX_PASSWORD environment variable')
+        auth_args['password'] = api_password
+    else:
+        auth_args['token_name'] = api_token_id
+        auth_args['token_value'] = api_token_secret
 
     try:
-        proxmox = ProxmoxAPI(api_host, user=api_user, password=api_password, verify_ssl=validate_certs)
+        proxmox = ProxmoxAPI(api_host, verify_ssl=validate_certs, **auth_args)
         global VZ_TYPE
         VZ_TYPE = 'openvz' if proxmox_version(proxmox) < LooseVersion('4.0') else 'lxc'
-
     except Exception as e:
         module.fail_json(msg='authorization on proxmox cluster failed with exception: %s' % e)
 
