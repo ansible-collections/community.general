@@ -561,7 +561,7 @@ class LookupModule(LookupBase):
         self.validate_by_required_fields(auth_method, 'username', 'password')
 
     def validate_auth_approle(self, auth_method):
-        self.validate_by_required_fields(auth_method, 'role_id', 'secret_id')
+        self.validate_by_required_fields(auth_method, 'role_id')
 
     def validate_auth_token(self, auth_method):
         if auth_method == 'token':

@@ -146,12 +146,21 @@
               import_tasks: approle_setup.yml
               when: ansible_distribution != 'RedHat' or ansible_distribution_major_version is version('7', '>')
 
+            - name: setup approle secret_id_less auth
+              import_tasks: approle_secret_id_less_setup.yml
+              when: ansible_distribution != 'RedHat' or ansible_distribution_major_version is version('7', '>')
+
             - name: setup token auth
               import_tasks: token_setup.yml
 
         - import_tasks: tests.yml
           vars:
             auth_type: approle
+          when: ansible_distribution != 'RedHat' or ansible_distribution_major_version is version('7', '>')
+
+        - import_tasks: tests.yml
+          vars:
+            auth_type: approle_secret_id_less
           when: ansible_distribution != 'RedHat' or ansible_distribution_major_version is version('7', '>')
 
         - import_tasks: tests.yml
