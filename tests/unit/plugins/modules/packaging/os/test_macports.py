@@ -27,7 +27,7 @@ QUERY_PORT_TEST_CASES = [
 def test_macports_query_port(mocker, run_cmd_return_val, present_expected, active_expected):
     module = mocker.Mock()
     run_command = mocker.Mock()
-    run_command.return_value=(0, run_cmd_return_val, '')
+    run_command.return_value = (0, run_cmd_return_val, '')
     module.run_command = run_command
 
     assert macports.query_port(module, 'port', 'git', state="present") == present_expected
