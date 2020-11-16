@@ -22,7 +22,7 @@ requirements:
   - 'Based on the splunk and sumologic callbacks'
 options:
   url:
-    description: URL to the Scalyr API endpoint
+    description: URL to the Scalyr API endpoint.
     default: https://app.eu.scalyr.com/api/addEvents
     env:
       - name: SCALYR_URL
