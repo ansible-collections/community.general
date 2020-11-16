@@ -4,7 +4,7 @@
       import_role:
         name: setup_openssl
 
-    - name: "RedHat <= 7, select last version compatible with request 2.6.0 (this version doesn't support approle auth)"
+    - name: "RedHat <= 7, select last version compatible with request 2.6.0 (this version doesn't support approle or jwt auth)"
       set_fact:
         hvac_package: 'hvac==0.2.5'
       when: ansible_distribution == 'RedHat' and ansible_distribution_major_version is version('7', '<=')

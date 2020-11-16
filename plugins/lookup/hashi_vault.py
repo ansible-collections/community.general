@@ -11,7 +11,7 @@ DOCUMENTATION = """
   author:
     - Jonathan Davila (!UNKNOWN) <jdavila(at)ansible.com>
     - Brian Scholer (@briantist)
-  short_description: Retrieve secrets from HashiCorp's vault
+  short_description: Retrieve secrets from HashiCorp's Vault
   requirements:
     - hvac (python library)
     - hvac 0.7.0+ (for namespace support)
@@ -19,7 +19,7 @@ DOCUMENTATION = """
     - botocore (only if inferring aws params from boto)
     - boto3 (only if using a boto profile)
   description:
-    - Retrieve secrets from HashiCorp's vault.
+    - Retrieve secrets from HashiCorp's Vault.
   notes:
     - Due to a current limitation in the HVAC library there won't necessarily be an error if a bad endpoint is specified.
     - As of community.general 0.2.0, only the latest version of a secret is returned when specifying a KV v2 path.
@@ -27,7 +27,7 @@ DOCUMENTATION = """
     - As of community.general 0.2.0, when C(secret) is the first option in the term string, C(secret=) is not required (see examples).
   options:
     secret:
-      description: query you are making.
+      description: Vault path to the secret being requested in the format C(path[:field]).
       required: True
     token:
       description:
@@ -55,7 +55,7 @@ DOCUMENTATION = """
       default: '.vault-token'
       version_added: '0.2.0'
     url:
-      description: URL to vault service.
+      description: URL to the Vault service.
       env:
         - name: VAULT_ADDR
       ini:
@@ -76,7 +76,7 @@ DOCUMENTATION = """
           key: role_id
           version_added: '0.2.0'
     secret_id:
-      description: Secret id for a vault AppRole auth.
+      description: Secret ID to be used for Vault AppRole authentication.
       env:
         - name: VAULT_SECRET_ID
     auth_method:
@@ -84,6 +84,7 @@ DOCUMENTATION = """
         - Authentication method to be used.
         - C(userpass) is added in Ansible 2.8.
         - C(aws_iam_login) is added in community.general 0.2.0.
+        - C(jwt) is added in community.general 1.3.0.
       env:
         - name: VAULT_AUTH_METHOD
       ini:
@@ -96,6 +97,7 @@ DOCUMENTATION = """
         - ldap
         - approle
         - aws_iam_login
+        - jwt
       default: token
     return_format:
       description:
@@ -111,7 +113,12 @@ DOCUMENTATION = """
       aliases: [ as ]
       version_added: '0.2.0'
     mount_point:
-      description: Vault mount point, only required if you have a custom mount point.
+      description: Vault mount point, only required if you have a custom mount point. Does not apply to token authentication.
+    jwt:
+      description: The JSON Web Token (JWT) to use for JWT authentication to Vault.
+      env:
+        - name: ANSIBLE_HASHI_VAULT_JWT
+      version_added: 1.3.0
     ca_cert:
       description: Path to certificate to use for authentication.
       aliases: [ cacert ]
@@ -123,7 +130,10 @@ DOCUMENTATION = """
         - Will default to C(true) if neither I(validate_certs) or C(VAULT_SKIP_VERIFY) are set.
       type: boolean
     namespace:
-      description: Namespace where secrets reside. Requires HVAC 0.7.0+ and Vault 0.11+.
+      description:
+        - Vault namespace where secrets reside. This option requires HVAC 0.7.0+ and Vault 0.11+.
+        - Optionally, this may be achieved by prefixing the authentication mount point and/or secret path with the namespace
+          (e.g C(mynamespace/secret/mysecret)).
       env:
         - name: VAULT_NAMESPACE
           version_added: 1.2.0
@@ -186,7 +196,7 @@ EXAMPLES = """
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello:value auth_method=userpass username=myuser password=psw url=http://myvault:8200') }}"
 
-- name: Using an ssl vault
+- name: Connect to Vault using TLS
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hola:value token=c975b780-d1be-8016-866b-01d0f9b688a5 validate_certs=False') }}"
 
@@ -194,7 +204,7 @@ EXAMPLES = """
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.hashi_vault', 'secret/hi:value token=xxxx url=https://myvault:8200 validate_certs=True cacert=/cacert/path/ca.pem') }}"
 
-- name: authenticate with a Vault app role
+- name: Authenticate with a Vault app role
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.hashi_vault', 'secret=secret/hello:value auth_method=approle role_id=myroleid secret_id=mysecretid') }}"
 
@@ -244,7 +254,13 @@ EXAMPLES = """
 
 - name: authenticate with aws_iam_login
   ansible.builtin.debug:
-    msg: "{{ lookup('community.general.hashi_vault', 'secret/hello:value', auth_method='aws_iam_login' role_id='myroleid', profile=my_boto_profile) }}"
+    msg: "{{ lookup('community.general.hashi_vault', 'secret/hello:value', auth_method='aws_iam_login', role_id='myroleid', profile=my_boto_profile) }}"
+
+# The following examples work in collection releases after community.general 1.3.0
+
+- name: Authenticate with a JWT
+  ansible.builtin.debug:
+      msg: "{{ lookup('community.general.hashi_vault', 'secret/hello:value', auth_method='jwt', role_id='myroleid', jwt='myjwt', url='https://myvault:8200')}}"
 """
 
 RETURN = """
@@ -428,6 +444,17 @@ class HashiVault:
             Display().warning("HVAC should be updated to version 0.9.3 or higher. Deprecated method 'auth_aws_iam' will be used.")
             self.client.auth_aws_iam(**params)
 
+    def auth_jwt(self):
+        params = self.get_options('role_id', 'jwt', 'mount_point')
+        params['role'] = params.pop('role_id')
+        if self.hvac_has_auth_methods and hasattr(self.client.auth, 'jwt') and hasattr(self.client.auth.jwt, 'jwt_login'):
+            response = self.client.auth.jwt.jwt_login(**params)
+            # must manually set the client token with JWT login
+            # see https://github.com/hvac/hvac/issues/644
+            self.client.token = response['auth']['client_token']
+        else:
+            raise AnsibleError("JWT authentication requires HVAC version 0.10.5 or higher.")
+
     # end auth implementation methods
 
 
@@ -530,7 +557,7 @@ class LookupModule(LookupBase):
     def auth_methods(self):
         # enforce and set the list of available auth methods
         # TODO: can this be read from the choices: field in documentation?
-        avail_auth_methods = ['token', 'approle', 'userpass', 'ldap', 'aws_iam_login']
+        avail_auth_methods = ['token', 'approle', 'userpass', 'ldap', 'aws_iam_login', 'jwt']
         self.set_option('avail_auth_methods', avail_auth_methods)
         auth_method = self.get_option('auth_method')
 
@@ -616,5 +643,8 @@ class LookupModule(LookupBase):
                 params['session_token'] = session_credentials.token
 
         self.set_option('iam_login_credentials', params)
+
+    def validate_auth_jwt(self, auth_method):
+        self.validate_by_required_fields(auth_method, 'role_id', 'jwt')
 
     # end auth method validators
