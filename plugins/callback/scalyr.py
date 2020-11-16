@@ -16,7 +16,7 @@ version_added: 1.3.0
 description:
   - This callback plugin will send task results as JSON formatted events to Scalyr.
 requirements:
-  - Whitelisting this callback plugin
+  - Whitelisting this callback plugin.
   - 'Create a Log Access Write Key in Scalyr (https://app.eu.scalyr.com/keys)'
   - 'Define the Scalyr API URL and API key in ansible.cfg'
   - 'Based on the splunk and sumologic callbacks'
