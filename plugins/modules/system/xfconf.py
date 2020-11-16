@@ -116,7 +116,6 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import shlex_quote
-from ansible.module_utils._text import to_text
 
 
 class XFConfException(Exception):
