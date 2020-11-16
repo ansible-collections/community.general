@@ -1,6 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 # Copyright: (c) 2020, Martin Migasiewicz <migasiew.nk@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -77,6 +74,7 @@ from ansible.plugins.callback import CallbackBase
 def secondsToNanoSeconds(seconds):
     return seconds * 1000000000
 
+
 class ScalyrLogSource(object):
     def __init__(self):
         self.ansible_check_mode = False
@@ -109,7 +107,7 @@ class ScalyrLogSource(object):
             },
             "events": [
                 {
-                    "ts": str(int(secondsToNanoSeconds(time.time()))) ,
+                    "ts": str(int(secondsToNanoSeconds(time.time()))),
                     "type": 0,
                     "sev": 3,
                     "attrs": {
@@ -177,13 +175,13 @@ class CallbackModule(CallbackBase):
     def v2_playbook_on_play_start(self, play):
         if self.authtoken is None:
             hostvars = play.get_variable_manager()._hostvars
-            if not hostvars or not 'scalyr_authtoken' in hostvars['localhost']:
+            if not hostvars or not hostvars['localhost'].has_key('scalyr_authtoken'):
                 self.disabled = True
                 self._display.warning('Scalyr requires a Log Access Write Key'
-                                    'token. The Scalyr API key can be '
-                                    'provided using the '
-                                    '`SCALYR_AUTHTOKEN` environment variable, '
-                                    'in the ansible.cfg file or as a hostvar.')
+                                      'token. The Scalyr API key can be '
+                                      'provided using the '
+                                      '`SCALYR_AUTHTOKEN` environment variable, '
+                                      'in the ansible.cfg file or as a hostvar.')
 
             self.authtoken = hostvars['localhost']['scalyr_authtoken']
 
