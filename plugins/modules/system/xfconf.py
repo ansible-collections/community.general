@@ -301,7 +301,7 @@ def main():
         module.exit_json(changed=True, ansible_facts=facts)
 
     except Exception as e:
-        module.fail_json(msg="Failed with exception: {0}".format(e), exception=to_text(traceback.format_exc()))
+        module.fail_json(msg="Failed with exception: {0}".format(e), exception=traceback.format_exc())
 
 
 if __name__ == '__main__':
