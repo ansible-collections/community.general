@@ -41,7 +41,7 @@ options:
 '''
 
 EXAMPLES = '''
-examples: >
+examples: |
   To enable, add this to your ansible.cfg file in the defaults block
     [defaults]
     callback_whitelist = community.general.scalyr
@@ -50,10 +50,13 @@ examples: >
     export SCALYR_URL=https://app.eu.scalyr.com/api/addEvents
     export SCALYR_AUTHTOKEN=XXXXXXXXXXXXXXXXXXXXXmlQ0-
 
-  Set the ansible.cfg variable in the callback_scalyr block
+  Or set the ansible.cfg variable in the callback_scalyr block
     [callback_scalyr]
     url = https://app.eu.scalyr.com/api/addEvents
     authtoken = XXXXXXXXXXXXXXXXXXXXXmlQ0-
+
+  Or define a hostvar (supports as well Ansible vault)
+    scalyr_authtoken: XXXXXXXXXXXXXXXXXXXXXmlQ0-
 '''
 
 import getpass
