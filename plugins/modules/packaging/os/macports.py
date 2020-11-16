@@ -157,9 +157,9 @@ def query_port(module, port_path, name, state="present"):
 
     elif state == "active":
 
-        rc, out, err = module.run_command("%s installed %s | grep -q active" % (shlex_quote(port_path), shlex_quote(name)), use_unsafe_shell=True)
+        rc, out, err = module.run_command([port_path, "-q", "installed", name])
 
-        if rc == 0:
+        if rc == 0 and "(active)" in out:
             return True
 
         return False
