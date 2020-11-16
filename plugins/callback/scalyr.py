@@ -18,7 +18,7 @@ description:
 requirements:
   - Whitelisting this callback plugin.
   - 'Create a Log Access Write Key in Scalyr (https://app.eu.scalyr.com/keys)'
-  - 'Define the Scalyr API URL and API key in ansible.cfg'
+  - 'Define the Scalyr API URL and API key as an environment variable, in ansible.cfg or as a hostvar.'
   - 'Based on the splunk and sumologic callbacks'
 options:
   url:
@@ -166,18 +166,23 @@ class CallbackModule(CallbackBase):
             self._display.warning('Scalyr API URL was '
                                   'not provided. The Scalyr API URL '
                                   'can be provided using the '
-                                  '`SCALYR_URL` environment variable or '
-                                  'in the ansible.cfg file.')
+                                  '`SCALYR_URL` environment variable, '
+                                  'in the ansible.cfg file or as a hostvar.')
 
         self.authtoken = self.get_option('authtoken')
 
+    def v2_playbook_on_play_start(self, play):
         if self.authtoken is None:
-            self.disabled = True
-            self._display.warning('Scalyr requires a Log Access Write Key'
-                                  'token. The Scalyr API key can be '
-                                  'provided using the '
-                                  '`SCALYR_AUTHTOKEN` environment variable or '
-                                  'in the ansible.cfg file.')
+            hostvars = play.get_variable_manager()._hostvars
+            if not hostvars or not 'scalyr_authtoken' in hostvars['localhost']:
+                self.disabled = True
+                self._display.warning('Scalyr requires a Log Access Write Key'
+                                    'token. The Scalyr API key can be '
+                                    'provided using the '
+                                    '`SCALYR_AUTHTOKEN` environment variable, '
+                                    'in the ansible.cfg file or as a hostvar.')
+
+            self.authtoken = hostvars['localhost']['scalyr_authtoken']
 
     def v2_playbook_on_start(self, playbook):
         self.scalyr.ansible_playbook = basename(playbook._file_name)
