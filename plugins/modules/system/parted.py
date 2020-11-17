@@ -106,6 +106,7 @@ options:
     description:
       - Call C(resizepart) on existing partitions to match the size specified by I(part_end).
     type: bool
+    default: False
     version_added: '1.3.0'
 
 notes:
@@ -218,7 +219,7 @@ EXAMPLES = r'''
     decice: /dev/sdb
     number: "{{ sdb_info.partitions | length }}"
     part_end: "100%"
-    resize: True
+    resize: true
 '''
 
 
