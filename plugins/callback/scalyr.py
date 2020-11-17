@@ -175,7 +175,7 @@ class CallbackModule(CallbackBase):
     def v2_playbook_on_play_start(self, play):
         if self.authtoken is None:
             hostvars = play.get_variable_manager()._hostvars
-            if not hostvars or not hostvars['localhost'].has_key('scalyr_authtoken'):
+            if not hostvars or 'scalyr_authtoken' not in hostvars['localhost']:
                 self.disabled = True
                 self._display.warning('Scalyr requires a Log Access Write Key'
                                       'token. The Scalyr API key can be '
