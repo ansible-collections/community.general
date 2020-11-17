@@ -90,6 +90,14 @@ options:
         required: false
         type: bool
         default: no
+    ignore_osver:
+        description:
+            - Ignore FreeBSD OS version check, useful on -STABLE and -CURRENT branches.
+            - Defines the C(IGNORE_OSVERSION) environment variable.
+        required: false
+        type: bool
+        default: no
+        version_added: 1.3.0
 author: "bleader (@bleader)"
 notes:
   - When using pkgsite, be careful that already in cache packages won't be downloaded again.
@@ -217,7 +225,7 @@ def remove_packages(module, pkgng_path, packages, dir_arg):
     return (False, "package(s) already absent", stdout, stderr)
 
 
-def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, state):
+def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, state, ignoreosver):
     install_c = 0
     stdout = ""
     stderr = ""
@@ -235,11 +243,16 @@ def install_packages(module, pkgng_path, packages, cached, pkgsite, dir_arg, sta
     # setting them to their default values.
     batch_var = 'env BATCH=yes'
 
+    if ignoreosver:
+        # Ignore FreeBSD OS version check,
+        #   useful on -STABLE and -CURRENT branches.
+        batch_var = batch_var + ' IGNORE_OSVERSION=yes'
+
     if not module.check_mode and not cached:
         if old_pkgng:
             rc, out, err = module.run_command("%s %s update" % (pkgsite, pkgng_path))
         else:
-            rc, out, err = module.run_command("%s %s update" % (pkgng_path, dir_arg))
+            rc, out, err = module.run_command("%s %s %s update" % (batch_var, pkgng_path, dir_arg))
         stdout += out
         stderr += err
         if rc != 0:
@@ -387,6 +400,7 @@ def main():
             state=dict(default="present", choices=["present", "latest", "absent"], required=False),
             name=dict(aliases=["pkg"], required=True, type='list', elements='str'),
             cached=dict(default=False, type='bool'),
+            ignore_osver=dict(default=False, required=False, type='bool'),
             annotation=dict(default="", required=False),
             pkgsite=dict(default="", required=False),
             rootdir=dict(default="", required=False, type='path'),
@@ -415,6 +429,11 @@ def main():
         else:
             dir_arg = "--rootdir %s" % (p["rootdir"])
 
+    if p["ignore_osver"]:
+        old_pkgng = pkgng_older_than(module, pkgng_path, [1, 11, 0])
+        if old_pkgng:
+            module.fail_json(msg="To use option 'ignore_osver' pkg version must be 1.11 or greater")
+
     if p["chroot"] != "":
         dir_arg = '--chroot %s' % (p["chroot"])
 
@@ -432,7 +451,9 @@ def main():
     # Operate on named packages
     named_packages = [pkg for pkg in pkgs if pkg != '*']
     if p["state"] in ("present", "latest") and named_packages:
-        _changed, _msg, _out, _err = install_packages(module, pkgng_path, named_packages, p["cached"], p["pkgsite"], dir_arg, p["state"])
+        _changed, _msg, _out, _err = install_packages(module, pkgng_path, named_packages,
+                                                      p["cached"], p["pkgsite"], dir_arg,
+                                                      p["state"], p["ignore_osver"])
         stdout += _out
         stderr += _err
         changed = changed or _changed
