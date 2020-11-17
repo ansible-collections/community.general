@@ -9,7 +9,6 @@ __metaclass__ = type
 
 import json
 
-from ansible.module_utils import basic
 from ansible_collections.community.general.plugins.modules.system import xfconf
 
 import pytest
@@ -22,7 +21,7 @@ def patch_xfconf(mocker):
     """
     Function used for mocking some parts of redhat_subscribtion module
     """
-    mocker.patch('ansible_collections.community.general.plugins.modules.system.xfconf.AnsibleModule.get_bin_path',
+    mocker.patch('ansible_collections.community.general.plugins.module_utils.module_helper.AnsibleModule.get_bin_path',
                  return_value='/testbin/xfconf-query')
 
 
@@ -41,7 +40,6 @@ def test_without_required_parameters(capfd, patch_xfconf):
 
 
 TEST_CASES = [
-    # Test the case, when the system is already registered
     [
         {'channel': 'xfwm4', 'property': '/general/inactive_opacity', 'state': 'get'},
         {
@@ -49,15 +47,35 @@ TEST_CASES = [
             'run_command.calls': [
                 (
                     # Calling of following command will be asserted
-                    '/testbin/xfconf-query --channel xfwm4 --property /general/inactive_opacity',
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/inactive_opacity'],
                     # Was return code checked?
-                    {'check_rc': False},
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
                     # Mock of returned code, stdout and stderr
-                    (0, '100/n', '',),
+                    (0, '100\n', '',),
                 ),
             ],
             'changed': False,
-            'value': '100'
+            'previous_value': '100',
+            'value': '100',
+        }
+    ],
+    [
+        {'channel': 'xfwm4', 'property': '/general/i_dont_exist', 'state': 'get'},
+        {
+            'id': 'test_simple_property_get_nonexistent',
+            'run_command.calls': [
+                (
+                    # Calling of following command will be asserted
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/i_dont_exist'],
+                    # Was return code checked?
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
+                    # Mock of returned code, stdout and stderr
+                    (1, '', 'Property "/general/i_dont_exist" does not exist on channel "xfwm4".\n',),
+                ),
+            ],
+            'changed': False,
+            'previous_value': None,
+            'value': None,
         }
     ],
     [
@@ -67,15 +85,16 @@ TEST_CASES = [
             'run_command.calls': [
                 (
                     # Calling of following command will be asserted
-                    '/testbin/xfconf-query --channel xfwm4 --property /general/workspace_names',
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/workspace_names'],
                     # Was return code checked?
-                    {'check_rc': False},
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
                     # Mock of returned code, stdout and stderr
                     (0, 'Value is an array with 3 items:\n\nMain\nWork\nTmp\n', '',),
                 ),
             ],
             'changed': False,
-            'value': ['Main', 'Work', 'Tmp']
+            'previous_value': ['Main', 'Work', 'Tmp'],
+            'value': ['Main', 'Work', 'Tmp'],
         },
     ],
     [
@@ -85,15 +104,16 @@ TEST_CASES = [
             'run_command.calls': [
                 (
                     # Calling of following command will be asserted
-                    '/testbin/xfconf-query --channel xfwm4 --property /general/use_compositing',
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/use_compositing'],
                     # Was return code checked?
-                    {'check_rc': False},
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
                     # Mock of returned code, stdout and stderr
                     (0, 'true', '',),
                 ),
             ],
             'changed': False,
-            'value': True
+            'previous_value': 'true',
+            'value': 'true',
         },
     ],
     [
@@ -103,15 +123,84 @@ TEST_CASES = [
             'run_command.calls': [
                 (
                     # Calling of following command will be asserted
-                    '/testbin/xfconf-query --channel xfwm4 --property /general/use_compositing',
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/use_compositing'],
                     # Was return code checked?
-                    {'check_rc': False},
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
                     # Mock of returned code, stdout and stderr
                     (0, 'false', '',),
                 ),
             ],
             'changed': False,
-            'value': False
+            'previous_value': 'false',
+            'value': 'false',
+        },
+    ],
+    [
+        {
+            'channel': 'xfwm4',
+            'property': '/general/inactive_opacity',
+            'state': 'present',
+            'value_type': 'int',
+            'value': 90,
+        },
+        {
+            'id': 'test_property_set_property',
+            'run_command.calls': [
+                (
+                    # Calling of following command will be asserted
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/inactive_opacity'],
+                    # Was return code checked?
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
+                    # Mock of returned code, stdout and stderr
+                    (0, '100\n', '',),
+                ),
+                (
+                    # Calling of following command will be asserted
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/inactive_opacity',
+                     '--create', '--type', 'int', '--set', '90'],
+                    # Was return code checked?
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
+                    # Mock of returned code, stdout and stderr
+                    (0, '', '',),
+                ),
+            ],
+            'changed': True,
+            'previous_value': '100',
+            'value': '90',
+        },
+    ],
+    [
+        {
+            'channel': 'xfwm4',
+            'property': '/general/inactive_opacity',
+            'state': 'present',
+            'value_type': 'int',
+            'value': 90,
+        },
+        {
+            'id': 'test_property_set_property_same_value',
+            'run_command.calls': [
+                (
+                    # Calling of following command will be asserted
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/inactive_opacity'],
+                    # Was return code checked?
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
+                    # Mock of returned code, stdout and stderr
+                    (0, '90\n', '',),
+                ),
+                (
+                    # Calling of following command will be asserted
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/inactive_opacity',
+                     '--create', '--type', 'int', '--set', '90'],
+                    # Was return code checked?
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
+                    # Mock of returned code, stdout and stderr
+                    (0, '', '',),
+                ),
+            ],
+            'changed': False,
+            'previous_value': '90',
+            'value': '90',
         },
     ],
     [
@@ -127,24 +216,60 @@ TEST_CASES = [
             'run_command.calls': [
                 (
                     # Calling of following command will be asserted
-                    '/testbin/xfconf-query --channel xfwm4 --property /general/workspace_names',
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/workspace_names'],
                     # Was return code checked?
-                    {'check_rc': False},
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
                     # Mock of returned code, stdout and stderr
                     (0, 'Value is an array with 3 items:\n\nMain\nWork\nTmp\n', '',),
                 ),
                 (
                     # Calling of following command will be asserted
-                    "/testbin/xfconf-query --channel xfwm4 --property /general/workspace_names --create "
-                    "--force-array --type 'string' --set 'A' --type 'string' --set 'B' --type 'string' --set 'C'",
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/workspace_names',
+                     '--create', '--force-array', '--type', 'string', '--set', 'A', '--type', 'string', '--set', 'B',
+                     '--type', 'string', '--set', 'C'],
                     # Was return code checked?
-                    {'check_rc': False},
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
                     # Mock of returned code, stdout and stderr
                     (0, '', '',),
                 ),
             ],
             'changed': True,
             'previous_value': ['Main', 'Work', 'Tmp'],
+            'value': ['A', 'B', 'C'],
+        },
+    ],
+    [
+        {
+            'channel': 'xfwm4',
+            'property': '/general/workspace_names',
+            'state': 'present',
+            'value_type': 'string',
+            'value': ['A', 'B', 'C'],
+        },
+        {
+            'id': 'test_property_set_array_to_same_value',
+            'run_command.calls': [
+                (
+                    # Calling of following command will be asserted
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/workspace_names'],
+                    # Was return code checked?
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
+                    # Mock of returned code, stdout and stderr
+                    (0, 'Value is an array with 3 items:\n\nA\nB\nC\n', '',),
+                ),
+                (
+                    # Calling of following command will be asserted
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/workspace_names',
+                     '--create', '--force-array', '--type', 'string', '--set', 'A', '--type', 'string', '--set', 'B',
+                     '--type', 'string', '--set', 'C'],
+                    # Was return code checked?
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
+                    # Mock of returned code, stdout and stderr
+                    (0, '', '',),
+                ),
+            ],
+            'changed': False,
+            'previous_value': ['A', 'B', 'C'],
             'value': ['A', 'B', 'C'],
         },
     ],
@@ -165,7 +290,7 @@ def test_xfconf(mocker, capfd, patch_xfconf, testcase):
     # Mock function used for running commands first
     call_results = [item[2] for item in testcase['run_command.calls']]
     mock_run_command = mocker.patch(
-        'ansible_collections.community.general.plugins.modules.system.xfconf.AnsibleModule.run_command',
+        'ansible_collections.community.general.plugins.module_utils.module_helper.AnsibleModule.run_command',
         side_effect=call_results)
 
     # Try to run test case
@@ -174,7 +299,8 @@ def test_xfconf(mocker, capfd, patch_xfconf, testcase):
 
     out, err = capfd.readouterr()
     results = json.loads(out)
-    print("results = %s" % results)
+    print("testcase =\n%s" % testcase)
+    print("results =\n%s" % results)
     assert 'changed' in results
     assert results['changed'] == testcase['changed']
     if 'msg' in results:

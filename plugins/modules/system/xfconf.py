@@ -7,7 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-
 DOCUMENTATION = '''
 module: xfconf
 author:
@@ -112,195 +111,157 @@ RETURN = '''
     sample: "96"
 '''
 
-import traceback
+from ansible_collections.community.general.plugins.module_utils.module_helper import (
+    ModuleHelper, CmdMixin, StateMixin, ArgFormat
+)
 
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves import shlex_quote
+
+def fix_bool(value):
+    vl = value.lower()
+    return vl if vl in ("true", "false") else value
+
+
+@ArgFormat.stars_deco(1)
+def values_fmt(values, value_types):
+    result = []
+    for value, value_type in zip(values, value_types):
+        if value_type == 'bool':
+            value = fix_bool(value)
+        result.append('--type')
+        result.append('{0}'.format(value_type))
+        result.append('--set')
+        result.append('{0}'.format(value))
+    return result
 
 
 class XFConfException(Exception):
     pass
 
 
-class XFConfProperty(object):
+class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
+    facts_name = "xfconf"
     SET = "present"
     GET = "get"
     RESET = "absent"
     VALID_STATES = (SET, GET, RESET)
     VALID_VALUE_TYPES = ('int', 'uint', 'bool', 'float', 'double', 'string')
-    previous_value = None
-    is_array = None
 
-    def __init__(self, module):
-        self.module = module
-        self.channel = module.params['channel']
-        self.property = module.params['property']
-        self.value_type = module.params['value_type']
-        self.value = module.params['value']
-        self.force_array = module.params['force_array']
-
-        self.cmd = "{0} --channel {1} --property {2}".format(
-            module.get_bin_path('xfconf-query', True),
-            shlex_quote(self.channel),
-            shlex_quote(self.property)
-        )
-        self.method_map = dict(zip((self.SET, self.GET, self.RESET),
-                                   (self.set, self.get, self.reset)))
-
-        self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.property, self.channel)
-
-        def run(cmd):
-            return module.run_command(cmd, check_rc=False)
-        self._run = run
-
-    def _execute_xfconf_query(self, args=None):
-        try:
-            cmd = self.cmd
-            if args:
-                cmd = "{0} {1}".format(cmd, args)
-
-            self.module.debug("Running cmd={0}".format(cmd))
-            rc, out, err = self._run(cmd)
-            if err.rstrip() == self.does_not:
-                return None
-            if rc or len(err):
-                raise XFConfException('xfconf-query failed with error (rc={0}): {1}'.format(rc, err))
-
-            return out.rstrip()
-
-        except OSError as exception:
-            XFConfException('xfconf-query failed with exception: {0}'.format(exception))
-
-    def get(self):
-        previous_value = self._execute_xfconf_query()
-        if previous_value is None:
-            return
-
-        if "Value is an array with" in previous_value:
-            previous_value = previous_value.split("\n")
-            previous_value.pop(0)
-            previous_value.pop(0)
-
-        return previous_value
-
-    def reset(self):
-        self._execute_xfconf_query("--reset")
-        return None
-
-    @staticmethod
-    def _fix_bool(value):
-        if value.lower() in ("true", "false"):
-            value = value.lower()
-        return value
-
-    def _make_value_args(self, value, value_type):
-        if value_type == 'bool':
-            value = self._fix_bool(value)
-        return " --type '{1}' --set '{0}'".format(shlex_quote(value), shlex_quote(value_type))
-
-    def set(self):
-        args = "--create"
-        if self.is_array:
-            args += " --force-array"
-            for v in zip(self.value, self.value_type):
-                args += self._make_value_args(*v)
-        else:
-            args += self._make_value_args(self.value, self.value_type)
-        self._execute_xfconf_query(args)
-        return self.value
-
-    def call(self, state):
-        return self.method_map[state]()
-
-    def sanitize(self):
-        self.previous_value = self.get()
-
-        if self.value is None and self.value_type is None:
-            return
-        if (self.value is None) ^ (self.value_type is None):
-            raise XFConfException('Must set both "value" and "value_type"')
-
-        # stringify all values - in the CLI they will all be happy strings anyway
-        # and by doing this here the rest of the code can be agnostic to it
-        self.value = [str(v) for v in self.value]
-
-        values_len = len(self.value)
-        types_len = len(self.value_type)
-
-        if types_len == 1:
-            # use one single type for the entire list
-            self.value_type = self.value_type * values_len
-        elif types_len != values_len:
-            # or complain if lists' lengths are different
-            raise XFConfException('Same number of "value" and "value_type" needed')
-
-        # fix boolean values
-        self.value = [self._fix_bool(v[0]) if v[1] == 'bool' else v[0] for v in zip(self.value, self.value_type)]
-
-        # calculates if it is an array
-        self.is_array = self.force_array or isinstance(self.previous_value, list) or values_len > 1
-        if not self.is_array:
-            self.value = self.value[0]
-            self.value_type = self.value_type[0]
-
-
-def main():
-    facts_name = "xfconf"
-    # Setup the Ansible module
-    module = AnsibleModule(
+    module = dict(
         argument_spec=dict(
-            state=dict(default=XFConfProperty.SET,
-                       choices=XFConfProperty.VALID_STATES,
+            state=dict(default=SET,
+                       choices=VALID_STATES,
                        type='str'),
             channel=dict(required=True, type='str'),
             property=dict(required=True, type='str'),
             value_type=dict(required=False, type='list',
-                            elements='str', choices=XFConfProperty.VALID_VALUE_TYPES),
+                            elements='str', choices=VALID_VALUE_TYPES),
             value=dict(required=False, type='list', elements='raw'),
             force_array=dict(default=False, type='bool', aliases=['array']),
         ),
-        required_if=[
-            ('state', XFConfProperty.SET, ['value', 'value_type'])
-        ],
-        supports_check_mode=True
+        required_if=[('state', SET, ['value', 'value_type'])],
+        required_together=[('value', 'value_type')],
+        supports_check_mode=True,
     )
 
-    # Force language to 'C' to ensure return values are always formatted in english, even in non-english environments
-    module.run_command_environ_update = dict(LANGUAGE='C')
+    default_state = SET
 
-    state = module.params['state']
+    command = 'xfconf-query'
+    command_args_formats = dict(
+        channel=dict(fmt=('--channel', '{0}'),),
+        property=dict(fmt=('--property', '{0}'),),
+        is_array=dict(fmt="--force-array", style=ArgFormat.BOOLEAN),
+        reset=dict(fmt="--reset", style=ArgFormat.BOOLEAN),
+        create=dict(fmt="--create", style=ArgFormat.BOOLEAN),
+        values_and_types=dict(fmt=values_fmt)
+    )
 
-    try:
-        xfconf = XFConfProperty(module)
-        xfconf.sanitize()
+    def update_xfconf_output(self, **kwargs):
+        self.update_output(**kwargs)
+        self.update_facts(**kwargs)
 
-        previous_value = xfconf.previous_value
-        facts = {
-            facts_name: dict(
-                channel=xfconf.channel,
-                property=xfconf.property,
-                value_type=xfconf.value_type,
-                value=previous_value,
-            )
-        }
+    def __init_module__(self):
+        self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.module.params['property'],
+                                                                                 self.module.params['channel'])
+        self.vars.previous_value = self._get()
 
-        if state == XFConfProperty.GET \
-                or (previous_value is not None
-                    and (state, set(previous_value)) == (XFConfProperty.SET, set(xfconf.value))):
-            module.exit_json(changed=False, ansible_facts=facts)
-            return
+    def process_command_output(self, rc, out, err):
+        if err.rstrip() == self.does_not:
+            return None
+        if rc or len(err):
+            raise XFConfException('xfconf-query failed with error (rc={0}): {1}'.format(rc, err))
 
-        # If check mode, we know a change would have occurred.
-        if module.check_mode:
-            new_value = xfconf.value
+        result = out.rstrip()
+        if "Value is an array with" in result:
+            result = result.split("\n")
+            result.pop(0)
+            result.pop(0)
+
+        return result
+
+    def _get(self):
+        return self.run_command(params=('channel', 'property'))
+
+    def state_get(self):
+        self.vars.value = self.vars.previous_value
+
+    def state_absent(self):
+        self.vars.value = None
+        self.run_command(params=('channel', 'property', 'reset'))
+
+    def state_present(self):
+        # stringify all values - in the CLI they will all be happy strings anyway
+        # and by doing this here the rest of the code can be agnostic to it
+        self.vars.value = list([str(v) for v in self.module.params['value']])
+        value_type = self.module.params['value_type']
+
+        values_len = len(self.vars.value)
+        types_len = len(value_type)
+
+        if types_len == 1:
+            # use one single type for the entire list
+            value_type = value_type * values_len
+        elif types_len != values_len:
+            # or complain if lists' lengths are different
+            raise XFConfException('Number of elements in "value" and "value_type" must be the same')
+
+        # fix boolean values
+        self.vars.value = list([fix_bool(v[0]) if v[1] == 'bool' else v[0]
+                                for v in zip(self.vars.value, value_type)])
+
+        # calculates if it is an array
+        self.vars.is_array = \
+            bool(self.module.params['force_array']) or \
+            isinstance(self.vars.previous_value, list) or \
+            values_len > 1
+
+        params = ['channel', 'property', 'create']
+        if self.vars.is_array:
+            params.append('is_array')
+        params.append('values_and_types')
+
+        extra_params = dict(values_and_types=(self.vars.value, value_type))
+        extra_params['create'] = True
+        extra_params['is_array'] = self.vars.is_array
+
+        if not self.module.check_mode:
+            self.run_command(params=params, extra_params=extra_params)
+
+        if not self.vars.is_array:
+            self.vars.value = self.vars.value[0]
+
+    @property
+    def changed(self):
+        if self.vars.previous_value is None:
+            return self.vars.value is not None
+        elif self.vars.value is None:
+            return False
         else:
-            new_value = xfconf.call(state)
+            return set(self.vars.previous_value) != set(self.vars.value)
 
-        facts[facts_name].update(value=new_value, previous_value=previous_value)
-        module.exit_json(changed=True, ansible_facts=facts)
 
-    except Exception as e:
-        module.fail_json(msg="Failed with exception: {0}".format(e), exception=traceback.format_exc())
+def main():
+    xfconf = XFConfProperty()
+    xfconf.run()
 
 
 if __name__ == '__main__':
