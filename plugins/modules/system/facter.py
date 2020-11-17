@@ -33,11 +33,11 @@ EXAMPLES = '''
 # Example command-line invocation
 # ansible www.example.net -m facter
 
-- name: execute facter no arguments
-  facter:
+- name: Execute facter no arguments
+  community.general.facter:
 
-- name: execute facter with arguments
-  facter:
+- name: Execute facter with arguments
+  community.general.facter:
     arguments:
         - -p
         - system_uptime
