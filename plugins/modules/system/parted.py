@@ -104,7 +104,7 @@ options:
     version_added: '0.2.0'
   resize:
     description:
-      - Call 'resizepart' on existing partitions to match the size specified by part_end.
+      - Call C(resizepart) on existing partitions to match the size specified by I(part_end).
     type: bool
     version_added: '1.3.0'
 
