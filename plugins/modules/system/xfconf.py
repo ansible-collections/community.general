@@ -211,7 +211,7 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
     def state_present(self):
         # stringify all values - in the CLI they will all be happy strings anyway
         # and by doing this here the rest of the code can be agnostic to it
-        self.vars.value = list([str(v) for v in self.module.params['value']])
+        self.vars.value = [str(v) for v in self.module.params['value']]
         value_type = self.module.params['value_type']
 
         values_len = len(self.vars.value)
@@ -225,8 +225,7 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
             raise XFConfException('Number of elements in "value" and "value_type" must be the same')
 
         # fix boolean values
-        self.vars.value = list([fix_bool(v[0]) if v[1] == 'bool' else v[0]
-                                for v in zip(self.vars.value, value_type)])
+        self.vars.value = [fix_bool(v[0]) if v[1] == 'bool' else v[0] for v in zip(self.vars.value, value_type)]
 
         # calculates if it is an array
         self.vars.is_array = \

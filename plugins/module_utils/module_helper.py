@@ -23,11 +23,11 @@ class ArgFormat(object):
     def stars_deco(num):
         if num == 1:
             def deco(f):
-                return partial(lambda ff, v: ff(*v), f)
+                return lambda v: f(*v)
             return deco
         elif num == 2:
             def deco(f):
-                return partial(lambda ff, v: ff(**v), f)
+                return lambda v: f(**v)
             return deco
 
         return lambda f: f
