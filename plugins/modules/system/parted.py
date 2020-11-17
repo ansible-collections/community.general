@@ -106,7 +106,7 @@ options:
     description:
       - Call C(resizepart) on existing partitions to match the size specified by I(part_end).
     type: bool
-    default: False
+    default: false
     version_added: '1.3.0'
 
 notes:
@@ -684,7 +684,7 @@ def main():
             script = "unit %s %s" % (unit, script)
 
         # If partition exists, try to resize
-        if part_exists(current_parts, 'num', number) and resize:
+        if resize and part_exists(current_parts, 'num', number):
             # Ensure new end is different to current
             partition = [p for p in current_parts if p['num'] == number][0]
             current_part_end = convert_to_bytes(partition['end'], unit)
