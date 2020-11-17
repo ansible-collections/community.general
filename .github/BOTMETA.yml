@@ -166,6 +166,9 @@ files:
   $module_utils/memset.py:
     maintainers: glitchcrab
     labels: cloud memset
+  $module_utils/module_helper.py:
+    maintainers: russoz
+    labels: module_helper
   $module_utils/net_tools/nios/api.py:
     maintainers: $team_networking sganesh-infoblox
     labels: infoblox networking
@@ -1093,7 +1096,7 @@ macros:
   team_cyberark_conjur: jvanderhoof ryanprior
   team_docker: DBendit WojciechowskiPiotr akshay196 danihodovic dariko felixfontein jwitko kassiansun tbouvet chouseknecht
   team_e_spirit: MatrixCrawler getjack
-  team_flatpak: JayKayy oolongbrothers 
+  team_flatpak: JayKayy oolongbrothers
   team_gitlab: Lunik Shaps dj-wasabi marwatk waheedi zanssa scodeman
   team_google: erjohnso rambleraptor
   team_hpux: bcoca davx8342
