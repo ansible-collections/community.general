@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - nmcli - Add infiniband type support
+  - nmcli - Add ipv4.routes and ipv4.never-default support
