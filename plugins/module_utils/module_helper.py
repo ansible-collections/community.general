@@ -70,8 +70,8 @@ class ArgFormat(object):
         elif hasattr(fmt, '__call__'):
             self.arg_format = fmt
         else:
-            raise ValueError('Parameter fmt must be either: a string, a list/tuple of '
-                             'strings or a function: type={0}, value={1}'.format(type(fmt), fmt))
+            raise TypeError('Parameter fmt must be either: a string, a list/tuple of '
+                            'strings or a function: type={0}, value={1}'.format(type(fmt), fmt))
 
         if stars:
             self.arg_format = (self.stars_deco(stars))(self.arg_format)
@@ -126,7 +126,7 @@ class DependencyCtxMgr(object):
         self.exc_type = exc_type
         self.exc_val = exc_val
         self.exc_tb = exc_tb
-        return self.has_it
+        return not self.has_it
 
     @property
     def text(self):
