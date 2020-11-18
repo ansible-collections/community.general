@@ -1,20 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2020, Andreas Calminder <andreas.calminder@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from ansible.module_utils.basic import AnsibleModule
-import copy
-import hashlib
-import os
-import requests
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 ANSIBLE_METADATA = {
     'metadata_version': '0.1',
     'status': ['preview'],
     'supported_by': 'community'
 }
+
 DOCUMENTATION = '''
 ---
 module: dell_me4_disk_group
@@ -66,7 +64,9 @@ options:
       - offline
     default: online
     description:
-      - disk group creation state, offline will keep disk group offline until the initialization process is complete. During which, zeros are written to all data and parity sectors of the LBA extent of the disk group
+      - disk group creation state, offline will keep disk group offline until the initialization process is complete.
+        During which, zeros are written to all data and parity sectors of the LBA extent of the disk group
+    type: str
   state:
     default: present
     choices:
@@ -96,6 +96,10 @@ options:
     description:
       - the amount of contiguous data, written to a disk-group member before moving to the next member of the group
       - only valid for linear storage, except for linear/adapt where this value is ignored
+    type: str
+  pool:
+    description:
+      - name of the virtual pool where disk group should reside
     type: str
   spare_disks:
     description:
@@ -141,10 +145,11 @@ options:
 '''
 
 EXAMPLES = '''
+---
 - name: add a linear raid10 disk group
-  dell_me4_disk_group:
+  community.general.dell_me4_disk_group:
     username: manage
-    password: !manage
+    password: "!manage"
     hostname: "{{ inventory_hostname }}"
     name: linear_disk_group_01
     raid: r10
@@ -159,9 +164,9 @@ EXAMPLES = '''
       - "0.5"
 
 - name: add disk(s) to a linear disk group
-  dell_me4_disk_group:
+  community.general.dell_me4_disk_group:
     username: manage
-    password: !manage
+    password: "!manage"
     hostname: "{{ inventory_hostname }}"
     name: linear_disk_group_01
     state: present
@@ -172,13 +177,25 @@ EXAMPLES = '''
       - "0.9"
 
 - name: remove disk group
-  dell_me4_disk_group:
+  community.general.dell_me4_disk_group:
     username: manage
-    password: !manage
+    password: "!manage"
     hostname: "{{ inventory_hostname }}"
     name: linear_disk_group_01
     state: absent
 '''
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+import copy
+import hashlib
+import os
+
+try:
+    import requests
+except ImportError:
+    REQUESTS_FOUND = False
+else:
+    REQUESTS_FOUND = True
 
 
 def get_session_key(module):
@@ -205,7 +222,11 @@ def make_request(url, headers, module):
 
     status = ret.get('status', [])[0]
     if not status.get('return-code') == 0:
-        module.fail_json(msg='{0} returned abnormal status, response: {1}, response type: {2}, return code: {3}'.format(url, status.get('response'), status.get('response-type'), status.get('return-code')))
+        module.fail_json(
+            msg='{0} returned abnormal status, response: {1}, response type: {2}, return code: {3}'.format(
+                url, status.get('response'), status.get('response-type'), status.get('return-code')
+            )
+        )
 
     return ret
 
@@ -272,7 +293,7 @@ def create_disk_group(session_key, module):
 
     for disk in spec_disks:
         if disk not in available_disks:
-            module.fail_json(msg='disk {0} is not in available state, available disks: '.format(disk, ', '.format(available_disks)))
+            module.fail_json(msg='disk {0} is not in available state, available disks: {1}'.format(disk, ', '.join(available_disks)))
 
     base_url = 'https://{0}/api/add/disk-group/'.format(module.params['hostname'])
     disks = ','.join(spec_disks)
@@ -355,10 +376,16 @@ def update_disk_group(session_key, disk_group, module):
         expand_disks = [d for d in module.params['disks'] if d not in current_disks]
         if expand_disks:
             if not all([d in available_disks for d in expand_disks]):
-                module.fail_json(msg='disk(s): {0} missing or not in available state'.format(', '.join([d for d in expand_disks if d not in available_disks])))
+                module.fail_json(
+                    msg='disk(s): {0} missing or not in available state'.format(
+                        ', '.join([d for d in expand_disks if d not in available_disks])
+                    )
+                )
             expanded_total = len(expand_disks) + disk_group['diskcount']
             if disk_group['raidtype'].lower() in ['raid0', 'raid3'] and disk_group['storage-type'].lower() != 'linear':
-                module.fail_json(msg='unable to expand disk group {0} with raid type {1} and storage type {2}'.format(module.params['name'], module.params['raid_type'], module.params['storage_type']))
+                module.fail_json(msg='unable to expand disk group {0} with raid type {1} and storage type {2}'.format(
+                    module.params['name'], module.params['raid_type'], module.params['storage_type'])
+                )
             if disk_group['raidtype'].lower() not in ['raid50', 'adapt'] and expanded_total > 16:
                 module.fail_json(msg='{0} cannot have more than 16 disks in disk group {1}'.format(module.params['raid_type'], module.params['name']))
             if disk_group['raidtype'].lower() == 'raid50' and expanded_total > 32:
@@ -447,13 +474,16 @@ def main():
             controller=dict(type='str', choices=['a', 'auto', 'b'], default='auto'),
             chunk_size=dict(type='str', choices=['64k', '128k', '256k', '512k'], default='512k'),
             spare_disks=dict(type='list', default=[]),
-            storage_type=dict(type='str', choices=['linear', 'virtual', 'read-cache'], default='virtual'),
+            storage_type=dict(type='str', choices=['linear', 'virtual', 'read-cache'], default='linear'),
             disks=dict(type='list'),
             pool=dict(type='str'),
             adapt_spare_capacity=dict(type='str', default='default'),
         ),
         supports_check_mode=True
     )
+
+    if not REQUESTS_FOUND:
+        module.fail_json(msg=missing_required_lib('requests'))
 
     if not validate_params(module):
         module.fail_json(msg='parameter validation failed')

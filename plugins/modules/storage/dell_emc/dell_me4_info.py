@@ -1,21 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2020, Andreas Calminder <andreas.calminder@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from ansible.module_utils.basic import AnsibleModule
-import copy
-import hashlib
-import os
-import re
-import requests
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 ANSIBLE_METADATA = {
     'metadata_version': '0.1',
     'status': ['preview'],
     'supported_by': 'community'
 }
+
 DOCUMENTATION = '''
 ---
 module: dell_me4_info
@@ -51,6 +48,18 @@ options:
       - verify certificate(s) when connecting to san management
     type: bool
 '''
+
+EXAMPLES = '''
+---
+- name: collect me4 facts
+  connection: local
+  community.general.dell_me4_info:
+    hostname: me4.fqdn
+    username: monitor
+    password: "!monitor"
+  register: me4_out
+'''
+
 RETURN = '''
 me4_info:
   description: Dictionary containing information about the me4 array
@@ -99,6 +108,19 @@ me4_info:
       type: list
 '''
 
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+import copy
+import hashlib
+import os
+import re
+
+try:
+    import requests
+except ImportError:
+    REQUESTS_FOUND = False
+else:
+    REQUESTS_FOUND = True
+
 
 def get_session_key(module):
     rv = False
@@ -124,7 +146,11 @@ def make_request(url, headers, module):
 
     status = ret.get('status', [])[0]
     if not status.get('return-code') == 0:
-        module.fail_json(msg='{0} returned abnormal status, response: {1}, response type: {2}, return code: {3}'.format(url, status.get('response'), status.get('response-type'), status.get('return-code')))
+        module.fail_json(
+            msg='{0} returned abnormal status, response: {1}, response type: {2}, return code: {3}'.format(
+                url, status.get('response'), status.get('response-type'), status.get('return-code')
+            )
+        )
 
     return ret
 
@@ -223,7 +249,12 @@ def add_me4_info(me4_dict):
 
 
 def gen_me4_info(module):
-    rv = {'disks': [], 'system': {}, 'volumes': [], 'ports': [], 'disk_groups': [], 'pools': [], 'iscsi_parameters': {}, 'users': [], 'host_groups': [], 'initiators': []}
+    rv = {
+        'disks': [], 'system': {}, 'volumes': [],
+        'ports': [], 'disk_groups': [], 'pools': [],
+        'iscsi_parameters': {}, 'users': [], 'host_groups': [],
+        'initiators': []
+    }
     session_key = get_session_key(module)
     disks = get_disks(session_key, module)
     system = get_system(session_key, module)
@@ -309,6 +340,10 @@ def main():
         ),
         supports_check_mode=True
     )
+
+    if not REQUESTS_FOUND:
+        module.fail_json(msg=missing_required_lib('requests'))
+
     me4_info = gen_me4_info(module)
     module.exit_json(changed=False, me4_info=me4_info)
 

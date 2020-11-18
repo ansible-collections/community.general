@@ -1,21 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2020, Andreas Calminder <andreas.calminder@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from ansible.module_utils.basic import AnsibleModule
-import copy
-import hashlib
-import os
-import re
-import requests
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 ANSIBLE_METADATA = {
     'metadata_version': '0.1',
     'status': ['preview'],
     'supported_by': 'community'
 }
+
 DOCUMENTATION = '''
 ---
 module: dell_me4_map_volume
@@ -45,7 +42,7 @@ options:
   lun:
     description:
       - lun id to use
-    type: str
+    type: int
   ports:
     description:
       - controller ports to use
@@ -95,10 +92,10 @@ options:
 
 EXAMPLES = '''
 - name: map volumes to initiator
-  dell_me4_map_volume:
+  community.general.dell_me4_map_volume:
     hostname: me4.fqdn
     username: manage
-    password: !manage
+    password: "!manage"
     initiator: initiator3
     volume: "{{ item }}"
     access: read-write
@@ -107,6 +104,19 @@ EXAMPLES = '''
     - volume2
     - volume3
 '''
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+import copy
+import hashlib
+import os
+import re
+
+try:
+    import requests
+except ImportError:
+    REQUESTS_FOUND = False
+else:
+    REQUESTS_FOUND = True
 
 
 def get_session_key(module):
@@ -133,7 +143,11 @@ def make_request(url, headers, module):
 
     status = ret.get('status', [])[0]
     if not status.get('return-code') == 0:
-        module.fail_json(msg='{0} returned abnormal status, response: {1}, response type: {2}, return code: {3}'.format(url, status.get('response'), status.get('response-type'), status.get('return-code')))
+        module.fail_json(
+            msg='{0} returned abnormal status, response: {1}, response type: {2}, return code: {3}'.format(
+                url, status.get('response'), status.get('response-type'), status.get('return-code')
+            )
+        )
 
     return ret
 
@@ -207,7 +221,9 @@ def guess_lun(session_key, module):
 def map_initiator(session_key, module):
     headers = {'sessionKey': session_key}
     rv = {'changed': False, 'msg': ''}
-    url = 'https://{0}/api/map/volume/{1}/initiator/{2}/access/{3}/'.format(module.params['hostname'], module.params['volume'], module.params['initiator'], module.params['access'])
+    url = 'https://{0}/api/map/volume/{1}/initiator/{2}/access/{3}/'.format(
+        module.params['hostname'], module.params['volume'], module.params['initiator'], module.params['access']
+    )
 
     if module.params['lun']:
         url = os.path.join(url, 'lun', '{0}'.format(module.params['lun']))
@@ -265,7 +281,9 @@ def present(module):
 
     for host_group in initiator_host_groups:
         if host_group['serial'] in current_maps:
-            return changed, diff, 'no change, initiator {0} already mapped via host group {1}, serial: {2}'.format(module.params['initiator'], host_group['name'], host_group['serial'])
+            return changed, diff, 'no change, initiator {0} already mapped via host group {1}, serial: {2}'.format(
+                module.params['initiator'], host_group['name'], host_group['serial']
+            )
 
     if module.params['initiator'] not in current_maps:
         diff['before'][volume_name] = copy.deepcopy(current_maps)
@@ -318,6 +336,9 @@ def main():
         ),
         supports_check_mode=True
     )
+
+    if not REQUESTS_FOUND:
+        module.fail_json(msg=missing_required_lib('requests'))
 
     if module.params['state'] == 'present':
         changed, diff, msg = present(module)

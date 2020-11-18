@@ -1,21 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2020, Andreas Calminder <andreas.calminder@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from ansible.module_utils.basic import AnsibleModule
-import copy
-import hashlib
-import os
-import requests
-import time
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 ANSIBLE_METADATA = {
     'metadata_version': '0.1',
     'status': ['preview'],
     'supported_by': 'community'
 }
+
 DOCUMENTATION = '''
 ---
 module: dell_me4_iscsi_config
@@ -59,6 +56,13 @@ options:
     description:
       - enable or disable jumbo frames
     type: bool
+  speed:
+    description: host port link speed
+    choices:
+      - 1gbps
+      - auto
+    default: auto
+    type: str
   hostname:
     required: True
     description:
@@ -86,9 +90,22 @@ EXAMPLES = '''
   dell_me4_iscsi_config:
     hostname: me4.fqdn
     username: manage
-    password: !manage
+    password: "!manage"
     jumbo_frames: true
 '''
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+import copy
+import hashlib
+import os
+import time
+
+try:
+    import requests
+except ImportError:
+    REQUESTS_FOUND = False
+else:
+    REQUESTS_FOUND = True
 
 
 def get_session_key(module):
@@ -115,7 +132,11 @@ def make_request(url, headers, module):
 
     status = ret.get('status', [])[0]
     if not status.get('return-code') == 0:
-        module.fail_json(msg='{0} returned abnormal status, response: {1}, response type: {2}, return code: {3}'.format(url, status.get('response'), status.get('response-type'), status.get('return-code')))
+        module.fail_json(
+            msg='{0} returned abnormal status, response: {1}, response type: {2}, return code: {3}'.format(
+                url, status.get('response'), status.get('response-type'), status.get('return-code')
+            )
+        )
 
     return ret
 
@@ -217,6 +238,9 @@ def main():
         ),
         supports_check_mode=True
     )
+
+    if not REQUESTS_FOUND:
+        module.fail_json(msg=missing_required_lib('requests'))
 
     changed, diff, iscsi_params, msg = set_iscsi_parameters(module)
     module.exit_json(changed=changed, diff=diff, iscsi_parameters=iscsi_params, msg=msg)

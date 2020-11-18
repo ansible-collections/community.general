@@ -1,22 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2020, Andreas Calminder <andreas.calminder@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from ansible.module_utils.basic import AnsibleModule
-import copy
-import hashlib
-import os
-import re
-import requests
-import time
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 ANSIBLE_METADATA = {
     'metadata_version': '0.1',
     'status': ['preview'],
     'supported_by': 'community'
 }
+
 DOCUMENTATION = '''
 ---
 module: dell_me4_volume
@@ -99,13 +95,11 @@ options:
       - used for volumes in virtual storage type pools
     type: str
   volume_group:
-    default: None
     description:
       - name of a volume group to which to add the volume
       - non-existing volume groups wil be created
     type: str
   reserve_size:
-    default: None
     description:
       - size of the snap pool to create in the disk group
       - used for volumes in linear storage type pools
@@ -162,6 +156,20 @@ EXAMPLES = '''
       disk_group: another-dg
 '''
 
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+import copy
+import hashlib
+import os
+import re
+import time
+
+try:
+    import requests
+except ImportError:
+    REQUESTS_FOUND = False
+else:
+    REQUESTS_FOUND = True
+
 
 def get_session_key(module):
     rv = False
@@ -187,7 +195,11 @@ def make_request(url, headers, module):
 
     status = ret.get('status', [])[0]
     if not status.get('return-code') == 0:
-        module.fail_json(msg='{0} returned abnormal status, response: {1}, response type: {2}, return code: {3}'.format(url, status.get('response'), status.get('response-type'), status.get('return-code')))
+        module.fail_json(
+            msg='{0} returned abnormal status, response: {1}, response type: {2}, return code: {3}'.format(
+                url, status.get('response'), status.get('response-type'), status.get('return-code')
+            )
+        )
 
     return ret
 
@@ -258,7 +270,11 @@ def delete_volume(session_key, module):
 
 
 def suffixed_size_to_bytes(suffixed_size):
-    suffix_map = {'b': 1, 'kb': 1000, 'kib': 1024, 'mb': 1000000, 'mib': 1048576, 'gb': 1000000000, 'gib': 1073741824, 'tb': 1000000000000, 'tib': 1099511627776}
+    suffix_map = {
+        'b': 1, 'kb': 1000, 'kib': 1024,
+        'mb': 1000000, 'mib': 1048576, 'gb': 1000000000,
+        'gib': 1073741824, 'tb': 1000000000000, 'tib': 1099511627776
+    }
     size_rx = re.compile('^([0-9]+)({0})$'.format('|'.join(suffix_map.keys())), re.I)
     size_str, size_unit = size_rx.match(suffixed_size.lower()).groups()
     return int(size_str) * suffix_map[size_unit]
@@ -296,7 +312,11 @@ def create_volume(session_key, module):
     volume_size = suffixed_size_to_bytes(module.params['size'])
 
     if (volume_size > pool_avail_size) and pool['overcommit-numeric'] != 1:
-        module.fail_json(msg='volume size larger ({0} bytes) than available in {1}: {2} bytes and pool does not support overcommit'.format(volume_size, pool['name'], pool_avail_size))
+        module.fail_json(
+            msg='volume size larger ({0} bytes) than available in {1}: {2} bytes and pool does not support overcommit'.format(
+                volume_size, pool['name'], pool_avail_size
+            )
+        )
 
     cmd = os.path.join(
         'size', '{0}b'.format(volume_size),
@@ -360,11 +380,19 @@ def update_volume(session_key, module):
     volume_size = volume['blocksize'] * volume['blocks']
     new_size = suffixed_size_to_bytes(module.params['size'])
     if new_size < volume_size:
-        module.fail_json(msg='size {0} ({1} bytes) is lower than current size, shrinking volumes is not supported'.format(module.params['size'], new_size))
+        module.fail_json(
+            msg='size {0} ({1} bytes) is lower than current size, shrinking volumes is not supported'.format(
+                module.params['size'], new_size
+            )
+        )
 
     if new_size > volume_size:
         if new_size / volume['blocksize'] > pool['total-avail-numeric'] and pool['overcommit-numeric'] != 1:
-            module.fail_json(msg='{0} is larger than available pool/disk group space {1}, {2} type pool/disk group overcommit disabled or n/a'.format(module.params['size'], pool['total-avail'], pool['storage-type']))
+            module.fail_json(
+                msg='{0} is larger than available pool/disk group space {1}, {2} type pool/disk group overcommit disabled or n/a'.format(
+                    module.params['size'], pool['total-avail'], pool['storage-type']
+                )
+            )
         expand_size = new_size - volume_size
 
         if not module.check_mode:
@@ -455,6 +483,9 @@ def main():
         ),
         supports_check_mode=True
     )
+
+    if not REQUESTS_FOUND:
+        module.fail_json(msg=missing_required_lib('requests'))
 
     validate_params(module)
     if module.params['state'] == 'present':
