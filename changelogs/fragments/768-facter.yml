@@ -1,2 +1,2 @@
 minor_changes:
-  - facter - Added option for Arguments on Facter. (https://github.com/ansible-collections/community.general/pull/768).
+  - facter - added option for ``arguments`` (https://github.com/ansible-collections/community.general/pull/768).
