@@ -1,0 +1,10 @@
+---
+minor_changes:
+  - new storage modules for Dell ME4 arrays
+  - dell_me4_disk_group - Manage disk groups in a Dell EMC me4 series SAN
+  - dell_me4_initiator - Manage initiators in a Dell EMC me4 series SAN
+  - dell_me4_map_volume - Manage volume mappings in Dell EMC me4 series SAN
+  - dell_me4_volume - Manage volumes in Dell EMC me4 series SAN
+  - dell_me4_info - Get facts from Dell EMC me4 series SAN
+  - dell_me4_iscsi_config - Manage initiators in a Dell EMC me4 series SAN
+  - dell_me4_ports - Manage ports in a Dell EMC me4 series SAN
