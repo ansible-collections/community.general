@@ -32,7 +32,7 @@ ARG_FORMATS = dict(
                          None, 1, ['a', 'b', 'c'], ["piggies=[a,b,c]"]),
     single_lambda_2star=(single_lambda_2star, None, 2, dict(z='c', x='a', y='b'), ["piggies=[a,b,c]"])
 )
-ARG_FORMATS_IDS = ARG_FORMATS.keys()
+ARG_FORMATS_IDS = sorted(ARG_FORMATS.keys())
 
 
 @pytest.mark.parametrize('fmt, style, stars, value, expected',
@@ -49,7 +49,7 @@ ARG_FORMATS_FAIL = dict(
     int_fmt=(3, None, 0, "", [""]),
     bool_fmt=(True, None, 0, "", [""]),
 )
-ARG_FORMATS_FAIL_IDS = ARG_FORMATS_FAIL.keys()
+ARG_FORMATS_FAIL_IDS = sorted(ARG_FORMATS_FAIL.keys())
 
 
 @pytest.mark.parametrize('fmt, style, stars, value, expected',
