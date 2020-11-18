@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 module: facter
 short_description: Runs the discovery program I(facter) on the remote system
 description:
-    - Runs the I(facter) discovery program
+    - Runs the C(facter) discovery program
       (U(https://github.com/puppetlabs/facter)) on the remote system, returning
       JSON data that can be useful for inventory purposes.
 options:
@@ -62,8 +62,7 @@ def main():
 
     cmd = [facter_path, "--json"]
     if module.params['arguments']:
-        for argument in module.params['arguments']:
-            cmd += [argument.strip()]
+        cmd += module.params['arguments']
 
     rc, out, err = module.run_command(cmd, check_rc=True)
     module.exit_json(**json.loads(out))
