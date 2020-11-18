@@ -41,9 +41,17 @@ class ArgFormat(object):
                              Ignored if arg_format is None or not a str (should be callable).
         :param stars: A int with 0, 1 or 2 value, indicating to formatting the value as: value, *value or **value
         """
+        def printf_fmt(_fmt, v):
+            try:
+                return [_fmt % v]
+            except TypeError as e:
+                if e.args[0] != 'not all arguments converted during string formatting':
+                    raise
+                return [_fmt]
+
         _fmts = {
             ArgFormat.BOOLEAN: lambda _fmt, v: ([_fmt] if bool(v) else []),
-            ArgFormat.PRINTF: lambda _fmt, v: [_fmt % v],
+            ArgFormat.PRINTF: printf_fmt,
             ArgFormat.FORMAT: lambda _fmt, v: [_fmt.format(v)],
         }
 
@@ -59,8 +67,11 @@ class ArgFormat(object):
             self.arg_format = partial(func, fmt)
         elif isinstance(fmt, list) or isinstance(fmt, tuple):
             self.arg_format = lambda v: [_fmts[style](f, v)[0] for f in fmt]
-        else:
+        elif hasattr(fmt, '__call__'):
             self.arg_format = fmt
+        else:
+            raise ValueError('Parameter fmt must be either: a string, a list/tuple of '
+                             'strings or a function: type={0}, value={1}'.format(type(fmt), fmt))
 
         if stars:
             self.arg_format = (self.stars_deco(stars))(self.arg_format)
