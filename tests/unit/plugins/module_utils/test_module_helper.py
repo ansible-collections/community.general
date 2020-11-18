@@ -63,6 +63,19 @@ def test_arg_format_fail(fmt, style, stars, value, expected):
 
 
 def test_dependency_ctxmgr():
-    with DependencyCtxMgr("POTATOES", "Potatoes must be installed") as dep:
+    ctx = DependencyCtxMgr("POTATOES", "Potatoes must be installed")
+    assert ctx.text == "Potatoes must be installed"
+    with ctx:
         import potatoes_that_will_never_be_there
-        assert str(dep) == "Potatoes must be installed"
+    assert not ctx.has_it
+
+    ctx = DependencyCtxMgr("POTATOES2")
+    with ctx:
+        import potatoes_that_will_never_be_there_again
+    assert not ctx.has_it
+    assert ctx.text == "No module named 'potatoes_that_will_never_be_there_again'"
+
+    ctx = DependencyCtxMgr("TYPING")
+    with ctx:
+        import typing
+    assert ctx.has_it
