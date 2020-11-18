@@ -139,32 +139,25 @@ class XFConfException(Exception):
 
 
 class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
-    facts_name = "xfconf"
-    SET = "present"
-    GET = "get"
-    RESET = "absent"
-    VALID_STATES = (SET, GET, RESET)
-    VALID_VALUE_TYPES = ('int', 'uint', 'bool', 'float', 'double', 'string')
-
     module = dict(
         argument_spec=dict(
-            state=dict(default=SET,
-                       choices=VALID_STATES,
+            state=dict(default="present",
+                       choices=("present", "get", "absent"),
                        type='str'),
             channel=dict(required=True, type='str'),
             property=dict(required=True, type='str'),
             value_type=dict(required=False, type='list',
-                            elements='str', choices=VALID_VALUE_TYPES),
+                            elements='str', choices=('int', 'uint', 'bool', 'float', 'double', 'string')),
             value=dict(required=False, type='list', elements='raw'),
             force_array=dict(default=False, type='bool', aliases=['array']),
         ),
-        required_if=[('state', SET, ['value', 'value_type'])],
+        required_if=[('state', 'present', ['value', 'value_type'])],
         required_together=[('value', 'value_type')],
         supports_check_mode=True,
     )
 
-    default_state = SET
-
+    facts_name = "xfconf"
+    default_state = 'present'
     command = 'xfconf-query'
     command_args_formats = dict(
         channel=dict(fmt=('--channel', '{0}'),),
