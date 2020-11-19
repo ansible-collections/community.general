@@ -52,7 +52,6 @@ options:
         description:
             - This is the type of device or network connection that you wish to create or modify.
             - Type C(generic) is added in Ansible 2.5.
-            - Type C(infiniband) is added in community.general 1.3.0.
         type: str
         choices: [ bond, bond-slave, bridge, bridge-slave, ethernet, generic, infiniband, ipip, sit, team, team-slave, vlan, vxlan ]
     mode:
@@ -74,6 +73,16 @@ options:
         description:
             - The IPv4 gateway for this interface.
             - Use the format C(192.0.2.1).
+        type: str
+    routes4:
+        description:
+            - The list of ipv4 routes.
+            - Use the format '192.0.3.0/24 192.0.2.1,192.0.4.0/24 192.0.2.1'
+        type: str
+    never_default4:
+        description:
+            - Set as default route.
+            - Can be 'yes' or 'no'
         type: str
     dns4:
         description:
@@ -573,6 +582,8 @@ class Nmcli(object):
         self.type = module.params['type']
         self.ip4 = module.params['ip4']
         self.gw4 = module.params['gw4']
+        self.routes4 = module.params['routes4']
+        self.never_default4 =  module.params['never_default4']
         self.dns4 = module.params['dns4']
         self.dns4_search = module.params['dns4_search']
         self.ip6 = module.params['ip6']
@@ -646,6 +657,8 @@ class Nmcli(object):
                 'ipv4.dns': self.dns4,
                 'ipv4.dns-search': self.dns4_search,
                 'ipv4.gateway': self.gw4,
+                'ipv4.routes': self.routes4,
+                'ipv4.never-default': self.never_default4,
                 'ipv4.method': self.ipv4_method,
                 'ipv6.addresses': self.ip6,
                 'ipv6.dns': self.dns6,
@@ -1017,6 +1030,8 @@ def main():
                       ]),
             ip4=dict(type='str'),
             gw4=dict(type='str'),
+            routes4=dict(type='str'),
+            never_default4=dict(type='str'),
             dns4=dict(type='list', elements='str'),
             dns4_search=dict(type='list', elements='str'),
             dhcp_client_id=dict(type='str'),
