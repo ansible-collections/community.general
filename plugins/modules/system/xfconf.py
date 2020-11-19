@@ -196,7 +196,7 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
         if self.vars.previous_value is None:
             return self.vars.value is not None
         elif self.vars.value is None:
-            return False
+            return self.vars.previous_value is not None
         else:
             return set(self.vars.previous_value) != set(self.vars.value)
 
@@ -208,7 +208,7 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
 
     def state_absent(self):
         self.vars.value = None
-        self.run_command(params=('channel', 'property', 'reset'))
+        self.run_command(params=('channel', 'property', 'reset'), extra_params={"reset": True})
 
     def state_present(self):
         # stringify all values - in the CLI they will all be happy strings anyway

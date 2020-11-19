@@ -273,6 +273,38 @@ TEST_CASES = [
             'value': ['A', 'B', 'C'],
         },
     ],
+    [
+        {
+            'channel': 'xfwm4',
+            'property': '/general/workspace_names',
+            'state': 'absent',
+        },
+        {
+            'id': 'test_property_reset_value',
+            'run_command.calls': [
+                (
+                    # Calling of following command will be asserted
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/workspace_names'],
+                    # Was return code checked?
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
+                    # Mock of returned code, stdout and stderr
+                    (0, 'Value is an array with 3 items:\n\nA\nB\nC\n', '',),
+                ),
+                (
+                    # Calling of following command will be asserted
+                    ['/testbin/xfconf-query', '--channel', 'xfwm4', '--property', '/general/workspace_names',
+                     '--reset'],
+                    # Was return code checked?
+                    {'env_update': {'LANGUAGE': 'C'}, 'check_rc': False},
+                    # Mock of returned code, stdout and stderr
+                    (0, '', '',),
+                ),
+            ],
+            'changed': True,
+            'previous_value': ['A', 'B', 'C'],
+            'value': None,
+        },
+    ],
 ]
 TEST_CASES_IDS = [item[1]['id'] for item in TEST_CASES]
 
