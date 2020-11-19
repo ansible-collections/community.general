@@ -327,7 +327,7 @@ def main():
             volume=dict(type='str', required=True),
             access=dict(type='str', choices=['no-access', 'read-only', 'read-write'], default='read-write'),
             lun=dict(type='int'),
-            ports=dict(type='list', default=[]),
+            ports=dict(type='list', default=[], elements='str'),
         ),
         supports_check_mode=True
     )

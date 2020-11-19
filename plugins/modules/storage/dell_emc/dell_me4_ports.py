@@ -297,7 +297,7 @@ def main():
             username=dict(type='str', default='manage'),
             password=dict(type='str', required=True, no_log=True),
             fc_mode=dict(type='str', choices=['loop', 'point-to-point', 'auto'], default='point-to-point'),
-            fc_loop_ids=dict(type='list'),
+            fc_loop_ids=dict(type='list', elements='str'),
             port=dict(type='str', required=True, aliases=['name']),
             ip_address=dict(type='str'),
             netmask=dict(type='str', default='255.255.255.0'),

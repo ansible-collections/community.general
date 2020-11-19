@@ -469,7 +469,7 @@ def main():
             large_virtual_extents=dict(type='bool', default=False),
             lun=dict(type='int'),
             pool=dict(type='str', aliases=['disk_group', 'vdisk'], required=True),
-            ports=dict(type='list', default=[]),
+            ports=dict(type='list', default=[], elements='str'),
             snapshot_retention_prio=dict(type='str', choices=['never-delete', 'high', 'medium', 'low'], default='medium'),
             tier_affinity=dict(type='str', choices=['no-affinity', 'archive', 'performance'], default='no-affinity'),
             volume_group=dict(type='str'),
