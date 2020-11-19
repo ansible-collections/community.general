@@ -7,12 +7,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '0.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: dell_me4_initiator
@@ -31,6 +25,7 @@ options:
     description:
       - id of the initiator. fc and sas id is wwpn, for iscsi use iqn
       - required
+    required: True
     type: str
   nickname:
     description:
@@ -49,7 +44,7 @@ options:
       - absent
       - present
     description:
-      - when C(state=absent) give initiator will be deleted
+      - when C(state=absent) given initiator will be deleted
       - when C(state=present) create/update an initiator
     type: str
   hostname:

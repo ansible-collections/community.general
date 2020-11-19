@@ -7,12 +7,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '0.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: dell_me4_map_volume
@@ -47,6 +41,7 @@ options:
     description:
       - controller ports to use
       - must be of same type (fc, iscsi)
+    elements: str
     type: list
   access:
     choices:

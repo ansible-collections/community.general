@@ -7,12 +7,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '0.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: dell_me4_volume
@@ -72,6 +66,7 @@ options:
     description:
       - ports hosts can access the volume, default is all ports
       - specified ports must be of same type, I.E iscsi or fc
+    elements: str
     type: list
   snapshot_retention_prio:
     choices:

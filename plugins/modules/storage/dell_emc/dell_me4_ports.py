@@ -7,12 +7,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '0.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
-
 DOCUMENTATION = '''
 ---
 module: dell_me4_ports
@@ -43,6 +37,7 @@ options:
   fc_loop_ids:
     description:
       - loop ID values to request for host ports when controllers arbitrate during a LIP
+    elements: str
     type: list
   port:
     aliases:

@@ -4,19 +4,14 @@
 # Copyright (C) 2020, Andreas Calminder <andreas.calminder@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
 __metaclass__ = type
-
-ANSIBLE_METADATA = {
-    'metadata_version': '0.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
 
 DOCUMENTATION = '''
 ---
 module: dell_me4_disk_group
 short_description: Manage disk groups in a Dell EMC me4 series SAN
+version_added: 1.3.0
 description:
   - This module is used to add, update, delete disk groups in a Dell EMC ME4 SAN
 requirements:
@@ -35,7 +30,7 @@ options:
       - using r50 require at least 6 disks
       - when creating a new disk group, member disks must be in available state
       - quote disk ids to ensure they're interpreted as strings
-    required: True
+    elements: str
     type: list
   name:
     description:
@@ -104,6 +99,7 @@ options:
   spare_disks:
     description:
       - list of dedicated spare disk ids
+    elements: str
     type: list
   storage_type:
     choices:
