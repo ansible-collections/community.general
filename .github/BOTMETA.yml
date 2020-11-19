@@ -880,12 +880,26 @@ files:
   $modules/system/python_requirements_facts.py:
     maintainers: willthames
     ignore: ryansb
-  $modules/system/:
+  $modules/system/aix_devices.py:
     maintainers: $team_aix
     labels: aix
     keywords: aix efix lpar wpar
+  $modules/system/aix_filesystem.py:
+    maintainers: $team_aix
+    labels: aix
+    keywords: aix jfs
+  $modules/system/aix_inittab.py:
+    maintainers: $team_aix
+    labels: aix
+    keywords: aix inittab
+  $modules/system/aix_lvg.py:
+    maintainers: $team_aix
+    labels: aix
+    keywords: aix lvm
   $modules/system/aix_lvol.py:
-    maintainers: adejoux
+    maintainers: $team_aix
+    labels: aix
+    keywords: aix lvm
   $modules/system/alternatives.py:
     maintainers: mulby
     labels: alternatives
@@ -1093,7 +1107,7 @@ macros:
   team_cyberark_conjur: jvanderhoof ryanprior
   team_docker: DBendit WojciechowskiPiotr akshay196 danihodovic dariko felixfontein jwitko kassiansun tbouvet chouseknecht
   team_e_spirit: MatrixCrawler getjack
-  team_flatpak: JayKayy oolongbrothers 
+  team_flatpak: JayKayy oolongbrothers
   team_gitlab: Lunik Shaps dj-wasabi marwatk waheedi zanssa scodeman
   team_google: erjohnso rambleraptor
   team_hpux: bcoca davx8342
