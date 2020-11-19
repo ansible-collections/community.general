@@ -14,7 +14,7 @@ short_description: Manage Dell EMC me4 series SAN iscsi configuration
 description:
   - This module is used to configure Dell EMC ME4 SAN iscsi parameters
 requirements:
-  - "python >= 3.6"
+  - python >= 2.7
   - requests
 author:
   - Andreas Calminder (@acalm)

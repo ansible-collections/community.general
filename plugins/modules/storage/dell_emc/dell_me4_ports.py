@@ -14,7 +14,7 @@ short_description: Manage ports in a Dell EMC me4 series SAN
 description:
   - Manage ports in Dell EMC PowerVault ME4xxx
 requirements:
-  - "python >= 3.6"
+  - python >= 2.7
   - requests
 author:
   - Andreas Calminder (@acalm)

@@ -15,7 +15,7 @@ version_added: 1.3.0
 description:
   - This module is used to add, update, delete disk groups in a Dell EMC ME4 SAN
 requirements:
-  - "python >= 3.6"
+  - python >= 2.7
   - requests
 author:
   - Andreas Calminder (@acalm)

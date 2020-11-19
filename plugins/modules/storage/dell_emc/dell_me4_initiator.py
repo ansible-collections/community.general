@@ -14,7 +14,7 @@ short_description: Manage initiators in a Dell EMC me4 series SAN
 description:
   - This module is used to add, update, delete initiators in a Dell EMC ME4 SAN
 requirements:
-  - "python >= 3.6"
+  - python >= 2.7
   - requests
 author:
   - Andreas Calminder (@acalm)

@@ -14,7 +14,7 @@ short_description: manage volumes in Dell EMC me4 series SAN
 description:
   - add, remove, expand volumes in a Dell EMC ME4 SAN
 requirements:
-  - "python >= 3.6"
+  - python >= 2.7
   - requests
 author:
   - Andreas Calminder (@acalm)

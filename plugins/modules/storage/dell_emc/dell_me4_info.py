@@ -14,7 +14,7 @@ short_description: Get facts from Dell EMC me4 series SAN
 description:
   - This module gathers facts from Dell EMC ME4 SAN
 requirements:
-  - "python >= 3.6"
+  - python >= 2.7
   - requests
 author:
   - Andreas Calminder (@acalm)
