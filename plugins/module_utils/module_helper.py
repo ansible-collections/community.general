@@ -296,7 +296,7 @@ class CmdMixin(object):
             env_update.update({'LANGUAGE': self.force_lang})
             self.update_output(force_lang=self.force_lang)
         rc, out, err = self.module.run_command(self.vars['cmd_args'],
-                                               env_update=env_update,
+                                               environ_update=env_update,
                                                check_rc=check_rc, *args, **kwargs)
         self.update_output(rc=rc, stdout=out, stderr=err)
         return self.process_command_output(rc, out, err)
