@@ -1,0 +1,123 @@
+---
+- name: archive using gz and remove src files
+  archive:
+    path: "{{ output_dir }}/*.txt"
+    dest: "{{ output_dir }}/archive_remove_01.gz"
+    format: gz
+    remove: yes
+  register: archive_remove_result_01
+
+- debug: msg="{{ archive_remove_result_01 }}"
+
+- name: verify that the files archived
+  file: path={{ output_dir }}/archive_remove_01.gz state=file
+
+- name: check if gz file exists and includes all text files and src files has been removed
+  assert:
+    that:
+      - "{{ archive_remove_result_01.changed }}"
+      - "{{ 'archived' in archive_remove_result_01 }}"
+      - "{{ archive_remove_result_01['archived'] | length }} == 3"
+
+- name: remove our gz
+  file: path="{{ output_dir }}/archive_remove_01.gz" state=absent
+
+- name: check if src files has been removed
+  assert:
+    that:
+      - "'{{ output_dir }}/{{ item }}' is not exists"
+  with_items:
+    - foo.txt
+    - bar.txt
+    - empty.txt
+
+- name: prep our files again
+  copy: src={{ item }} dest={{ output_dir }}/{{ item }}
+  with_items:
+    - foo.txt
+    - bar.txt
+    - empty.txt
+
+- name: create a temporary directory to be check if it will be removed
+  file:
+    path: "{{ output_dir }}/tmpdir"
+    state: directory
+
+- name: prep our files in tmpdir
+  copy: src={{ item }} dest={{ output_dir }}/tmpdir/{{ item }}
+  with_items:
+    - foo.txt
+    - bar.txt
+    - empty.txt
+
+- name: archive using gz and remove src directory
+  archive:
+    path: "{{ output_dir }}/tmpdir"
+    dest: "{{ output_dir }}/archive_remove_02.gz"
+    format: gz
+    remove: yes
+  register: archive_remove_result_02
+
+- debug: msg="{{ archive_remove_result_02 }}"
+
+- name: verify that the files archived
+  file: path={{ output_dir }}/archive_remove_02.gz state=file
+
+- name: check if gz file exists and includes all text files
+  assert:
+    that:
+      - "{{ archive_remove_result_02.changed }}"
+      - "{{ 'archived' in archive_remove_result_02 }}"
+      - "{{ archive_remove_result_02['archived'] | length }} == 3"
+
+- name: remove our gz
+  file: path="{{ output_dir }}/archive_remove_02.gz" state=absent
+
+- name: check if src folder has been removed
+  assert:
+    that:
+      - "'{{ output_dir }}/tmpdir' is not exists"
+
+- name: create temporary directory again
+  file:
+    path: "{{ output_dir }}/tmpdir"
+    state: directory
+
+- name: prep our files in tmpdir again
+  copy: src={{ item }} dest={{ output_dir }}/tmpdir/{{ item }}
+  with_items:
+    - foo.txt
+    - bar.txt
+    - empty.txt
+
+- name: archive using gz and remove src directory excluding one file
+  archive:
+    path: "{{ output_dir }}/tmpdir/*"
+    dest: "{{ output_dir }}/archive_remove_03.gz"
+    format: gz
+    remove: yes
+    exclude_path: "{{ output_dir }}/tmpdir/empty.txt"
+  register: archive_remove_result_03
+
+- debug: msg="{{ archive_remove_result_03 }}"
+
+- name: verify that the files archived
+  file: path={{ output_dir }}/archive_remove_03.gz state=file
+
+- name: check if gz file exists and includes all text files
+  assert:
+    that:
+      - "{{ archive_remove_result_03.changed }}"
+      - "{{ 'archived' in archive_remove_result_03 }}"
+      - "{{ archive_remove_result_03['archived'] | length }} == 2"
+
+- name: remove our gz
+  file: path="{{ output_dir }}/archive_remove_03.gz" state=absent
+
+- name: verify that excluded file is still present
+  file: path={{ output_dir }}/tmpdir/empty.txt state=file
+
+- name: remove temporary directory
+  file:
+    path: "{{ output_dir }}/tmpdir"
+    state: absent

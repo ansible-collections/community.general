@@ -343,3 +343,6 @@
 - name: Remove backports.lzma if previously installed (pip)
   pip: name=backports.lzma state=absent
   when: backports_lzma_pip is changed
+
+- name: import remove tests
+  import_tasks: remove.yml
