@@ -139,9 +139,9 @@ EXAMPLES = '''
 '''
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible_collections.community.general.plugins.module_utils.compat import ipaddress
 import copy
 import hashlib
-import ipaddress
 import os
 
 try:
