@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - archive - remove path folder itself when ``remove`` paramater is true (https://github.com/ansible-collections/community.general/issues/1041).
