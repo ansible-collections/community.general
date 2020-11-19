@@ -191,6 +191,15 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
 
         return result
 
+    @property
+    def changed(self):
+        if self.vars.previous_value is None:
+            return self.vars.value is not None
+        elif self.vars.value is None:
+            return False
+        else:
+            return set(self.vars.previous_value) != set(self.vars.value)
+
     def _get(self):
         return self.run_command(params=('channel', 'property'))
 
@@ -240,15 +249,6 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
 
         if not self.vars.is_array:
             self.vars.value = self.vars.value[0]
-
-    @property
-    def changed(self):
-        if self.vars.previous_value is None:
-            return self.vars.value is not None
-        elif self.vars.value is None:
-            return False
-        else:
-            return set(self.vars.previous_value) != set(self.vars.value)
 
 
 def main():
