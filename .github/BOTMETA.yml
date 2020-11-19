@@ -880,26 +880,12 @@ files:
   $modules/system/python_requirements_facts.py:
     maintainers: willthames
     ignore: ryansb
-  $modules/system/aix_devices.py:
+  $modules/system/aix:
     maintainers: $team_aix
     labels: aix
     keywords: aix efix lpar wpar
-  $modules/system/aix_filesystem.py:
-    maintainers: $team_aix
-    labels: aix
-    keywords: aix jfs
-  $modules/system/aix_inittab.py:
-    maintainers: $team_aix
-    labels: aix
-    keywords: aix inittab
-  $modules/system/aix_lvg.py:
-    maintainers: $team_aix
-    labels: aix
-    keywords: aix lvm
   $modules/system/aix_lvol.py:
-    maintainers: $team_aix
-    labels: aix
-    keywords: aix lvm
+    maintainers: adejoux
   $modules/system/alternatives.py:
     maintainers: mulby
     labels: alternatives
