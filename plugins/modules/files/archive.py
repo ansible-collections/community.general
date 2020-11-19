@@ -453,6 +453,13 @@ def main():
                 except OSError as e:
                     errors.append(to_native(b_path))
 
+            for b_path in b_expanded_paths:
+                try:
+                    if os.path.isdir(b_path):
+                        shutil.rmtree(b_path)
+                except OSError as e:
+                    errors.append(to_native(b_path))
+
             if errors:
                 module.fail_json(dest=dest, msg='Error deleting some source files: ', files=errors)
 
