@@ -507,8 +507,8 @@ class JenkinsPlugin(object):
             if self.params['version'] in [None, 'latest']:
                 # Take latest version
                 plugin_urls = [("%s/%s.hpi" % (
-                      url,
-                      self.params['name'])) for url in self.params['latest_plugins_url']]
+                    url,
+                    self.params['name'])) for url in self.params['latest_plugins_url']]
             else:
                 # Take specific version
                 plugin_urls = [(
