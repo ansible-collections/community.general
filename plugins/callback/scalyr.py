@@ -59,7 +59,6 @@ examples: |
 import getpass
 import json
 import socket
-import time
 import uuid
 
 from datetime import datetime
@@ -71,8 +70,8 @@ from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
 
 
-def secondsToNanoSeconds(seconds):
-    return seconds * 1000000000
+def nanoTime():
+    return int((datetime.utcnow() - datetime(1970, 1, 1)).total_seconds() * 1000000000)
 
 
 class ScalyrLogSource(object):
@@ -107,7 +106,7 @@ class ScalyrLogSource(object):
             },
             "events": [
                 {
-                    "ts": str(int(secondsToNanoSeconds(time.time()))),
+                    "ts": str(nanoTime()),
                     "type": 0,
                     "sev": 3,
                     "attrs": {
