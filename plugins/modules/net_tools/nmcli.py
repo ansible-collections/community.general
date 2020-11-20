@@ -83,8 +83,7 @@ options:
     never_default4:
         description:
             - Set as default route.
-            - Can be 'yes' or 'no'
-        type: str
+        type: bool
     dns4:
         description:
             - A list of up to 3 dns servers.
@@ -584,7 +583,7 @@ class Nmcli(object):
         self.ip4 = module.params['ip4']
         self.gw4 = module.params['gw4']
         self.routes4 = module.params['routes4']
-        self.never_default4 =  module.params['never_default4']
+        self.never_default4 = module.params['never_default4']
         self.dns4 = module.params['dns4']
         self.dns4_search = module.params['dns4_search']
         self.ip6 = module.params['ip6']
@@ -822,10 +821,12 @@ class Nmcli(object):
     def settings_type(setting):
         if setting in ('bridge.stp',
                        'bridge-port.hairpin-mode',
-                       'connection.autoconnect'):
+                       'connection.autoconnect',
+                       'ipv4.never-default'):
             return bool
         elif setting in ('ipv4.dns',
                          'ipv4.dns-search',
+                         'ipv4.routes',
                          'ipv6.dns',
                          'ipv6.dns-search'):
             return list
@@ -968,6 +969,14 @@ class Nmcli(object):
 
             if key in conn_info:
                 current_value = conn_info[key]
+                if key == 'ipv4.routes':
+                    # ipv4.routes has not same input and output
+                    # input: ['10.11.0.0/24 10.10.0.2', '10.12.0.0/24 10.10.0.2']
+                    # output: ['{ ip = 10.11.0.0/24', 'nh = 10.10.0.2 }; { ip = 10.12.0.0/24', 'nh = 10.10.0.2 }']
+                    # Need to convert output to match input format
+                    for r in (("['{ ",""), (" }']",""), ('ip = ',''), ("', 'nh =",''), (" }; { ",',') ):
+                        current_value = str(current_value).replace(*r)
+                    current_value = current_value.split(',')
             elif key in param_alias:
                 real_key = param_alias[key]
                 if real_key in conn_info:
@@ -1031,8 +1040,8 @@ def main():
                       ]),
             ip4=dict(type='str'),
             gw4=dict(type='str'),
-            routes4=dict(type='str'),
-            never_default4=dict(type='str'),
+            routes4=dict(type='list', elements='str'),
+            never_default4=dict(type='bool'),
             dns4=dict(type='list', elements='str'),
             dns4_search=dict(type='list', elements='str'),
             dhcp_client_id=dict(type='str'),
