@@ -372,7 +372,7 @@ class JenkinsPlugin(object):
 
     def _get_url_data(
             self, url, what=None, msg_status=None, msg_exception=None,
-            **kwargs):
+            dont_fail=False, **kwargs):
         # Compose default messages
         if msg_status is None:
             msg_status = "Cannot get %s" % what
@@ -387,9 +387,15 @@ class JenkinsPlugin(object):
                 headers=self.crumb, **kwargs)
 
             if info['status'] != 200:
-                self.module.fail_json(msg=msg_status, details=info['msg'])
+                if dont_fail:
+                    raise FailedInstallingWithPluginManager(info['msg'])
+                else:
+                    self.module.fail_json(msg=msg_status, details=info['msg'])
         except Exception as e:
-            self.module.fail_json(msg=msg_exception, details=to_native(e))
+            if dont_fail:
+                raise FailedInstallingWithPluginManager(e)
+            else:
+                self.module.fail_json(msg=msg_exception, details=to_native(e))
 
         return response
 
@@ -434,6 +440,39 @@ class JenkinsPlugin(object):
 
                 break
 
+    def _install_with_plugin_manager(self):
+        if not self.module.check_mode:
+            # Install the plugin (with dependencies)
+            install_script = (
+                    'd = Jenkins.instance.updateCenter.getPlugin("%s")'
+                    '.deploy(); d.get();' % self.params['name'])
+
+            if self.params['with_dependencies']:
+                install_script = (
+                        'Jenkins.instance.updateCenter.getPlugin("%s")'
+                        '.getNeededDependencies().each{it.deploy()}; %s' % (
+                            self.params['name'], install_script))
+
+            script_data = {
+                'script': install_script
+            }
+            data = urlencode(script_data)
+
+            # Send the installation request
+            r = self._get_url_data(
+                "%s/scriptText" % self.url,
+                msg_status="Cannot install plugin.",
+                msg_exception="Plugin installation has failed.",
+                data=data,
+                dont_fail=True)
+
+            hpi_file = '%s/plugins/%s.hpi' % (
+                self.params['jenkins_home'],
+                self.params['name'])
+
+            if os.path.isfile(hpi_file):
+                os.remove(hpi_file)
+
     def install(self):
         changed = False
         plugin_file = (
@@ -442,39 +481,13 @@ class JenkinsPlugin(object):
                 self.params['name']))
 
         if not self.is_installed and self.params['version'] in [None, 'latest']:
-            if not self.module.check_mode:
-                # Install the plugin (with dependencies)
-                install_script = (
-                    'd = Jenkins.instance.updateCenter.getPlugin("%s")'
-                    '.deploy(); d.get();' % self.params['name'])
+            try:
+                self._install_with_plugin_manager()
+                changed = True
+            except FailedInstallingWithPluginManager:  # Fallback to manually downloading the plugin
+                pass
 
-                if self.params['with_dependencies']:
-                    install_script = (
-                        'Jenkins.instance.updateCenter.getPlugin("%s")'
-                        '.getNeededDependencies().each{it.deploy()}; %s' % (
-                            self.params['name'], install_script))
-
-                script_data = {
-                    'script': install_script
-                }
-                data = urlencode(script_data)
-
-                # Send the installation request
-                r = self._get_url_data(
-                    "%s/scriptText" % self.url,
-                    msg_status="Cannot install plugin.",
-                    msg_exception="Plugin installation has failed.",
-                    data=data)
-
-                hpi_file = '%s/plugins/%s.hpi' % (
-                    self.params['jenkins_home'],
-                    self.params['name'])
-
-                if os.path.isfile(hpi_file):
-                    os.remove(hpi_file)
-
-            changed = True
-        else:
+        if not changed:
             # Check if the plugin directory exists
             if not os.path.isdir(self.params['jenkins_home']):
                 self.module.fail_json(
@@ -820,3 +833,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+class FailedInstallingWithPluginManager(Exception):
+    pass
