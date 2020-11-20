@@ -72,7 +72,7 @@ options:
       - URLs of the Update Centre.
       - Used as the base URLs to download the I(update-center.json) JSON file.
       - Tries all URLs on failure
-    default: ['https://updates.jenkins.io', 'http://mirrors.jenkins.io/updates/']
+    default: ['https://updates.jenkins.io', 'http://mirrors.jenkins.io/updates']
   latest_plugins_url:
     type: list
     elements: str
@@ -86,7 +86,7 @@ options:
     description:
       - URL of the versioned plugins center.
       - Used as the base URL to download versioned(not latest) plugins from.
-    default: ['https://updates.jenkins.io/download/plugins', 'http://mirrors.jenkins.io/plugins/']
+    default: ['https://updates.jenkins.io/download/plugins', 'http://mirrors.jenkins.io/plugins']
   url:
     type: str
     description:
@@ -298,6 +298,10 @@ import tempfile
 import time
 
 
+class FailedInstallingWithPluginManager(Exception):
+    pass
+
+
 class JenkinsPlugin(object):
     def __init__(self, module):
         # To be able to call fail_json
@@ -444,14 +448,14 @@ class JenkinsPlugin(object):
         if not self.module.check_mode:
             # Install the plugin (with dependencies)
             install_script = (
-                    'd = Jenkins.instance.updateCenter.getPlugin("%s")'
-                    '.deploy(); d.get();' % self.params['name'])
+                'd = Jenkins.instance.updateCenter.getPlugin("%s")'
+                '.deploy(); d.get();' % self.params['name'])
 
             if self.params['with_dependencies']:
                 install_script = (
-                        'Jenkins.instance.updateCenter.getPlugin("%s")'
-                        '.getNeededDependencies().each{it.deploy()}; %s' % (
-                            self.params['name'], install_script))
+                    'Jenkins.instance.updateCenter.getPlugin("%s")'
+                    '.getNeededDependencies().each{it.deploy()}; %s' % (
+                        self.params['name'], install_script))
 
             script_data = {
                 'script': install_script
@@ -503,8 +507,8 @@ class JenkinsPlugin(object):
             if self.params['version'] in [None, 'latest']:
                 # Take latest version
                 plugin_urls = [("%s/%s.hpi" % (
-                          url,
-                          self.params['name'])) for url in self.params['latest_plugins_url']]
+                      url,
+                      self.params['name'])) for url in self.params['latest_plugins_url']]
             else:
                 # Take specific version
                 plugin_urls = [(
@@ -833,7 +837,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-class FailedInstallingWithPluginManager(Exception):
-    pass
