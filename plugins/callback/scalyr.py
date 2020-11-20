@@ -161,10 +161,18 @@ class CallbackModule(CallbackBase):
         self.scalyr = ScalyrLogSource()
 
     def _runtime(self, result):
-        return (
+        """Return duration of task result.
+
+        Args:
+            result ([ansible.executor.TaskResult]): [Task result]
+
+        Returns:
+            [int]: [Duration in ms]
+        """
+        return int((
             datetime.utcnow() -
             self.start_datetimes[result._task._uuid]
-        ).total_seconds()
+        ).total_seconds() * 1000)
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
