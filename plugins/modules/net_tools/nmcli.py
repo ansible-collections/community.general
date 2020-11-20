@@ -78,8 +78,9 @@ options:
     routes4:
         description:
             - The list of ipv4 routes.
-            - Use the format '192.0.3.0/24 192.0.2.1,192.0.4.0/24 192.0.2.1'
-        type: str
+            - Use the format '192.0.3.0/24 192.0.2.1'
+        type: list
+        elements: str
     never_default4:
         description:
             - Set as default route.
