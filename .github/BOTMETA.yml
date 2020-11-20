@@ -166,6 +166,9 @@ files:
   $module_utils/memset.py:
     maintainers: glitchcrab
     labels: cloud memset
+  $module_utils/module_helper.py:
+    maintainers: russoz
+    labels: module_helper
   $module_utils/net_tools/nios/api.py:
     maintainers: $team_networking sganesh-infoblox
     labels: infoblox networking
