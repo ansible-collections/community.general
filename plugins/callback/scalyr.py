@@ -99,8 +99,7 @@ class ScalyrLogSource(object):
             "token": str(authtoken),
             "session": str(self.session),
             "sessionInfo": {
-                "serverHost": self.host,
-                "serverIpAddress": self.ip_address,
+                "serverHost": result._host.get_name(),
                 "logfile": "ansible.log",
                 "parser": ""
             },
@@ -114,9 +113,10 @@ class ScalyrLogSource(object):
                         "status": state,
                         "runtime": runtime,
                         "user": self.user,
+                        "ansible_controller_host": self.host,
                         "ansible_version": ansible_version,
                         "ansible_check_mode": self.ansible_check_mode,
-                        "ansible_host": self.host,
+                        "ansible_host": result._host.get_name(),
                         "ansible_playbook": self.ansible_playbook,
                         "ansible_role": ansible_role,
                         "ansible_task": result._task_fields,
