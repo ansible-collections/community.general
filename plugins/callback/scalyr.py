@@ -117,7 +117,6 @@ class ScalyrLogSource(object):
             "events": [
                 {
                     "ts": str(nanoTime()),
-                    "type": 0,
                     "sev": 3,
                     "attrs": {
                         "uuid": result._task._uuid,
