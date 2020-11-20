@@ -1,4 +1,4 @@
 ---
 minor_changes:
-  - nmcli - Add infiniband type support
-  - nmcli - Add ipv4.routes and ipv4.never-default support
+  - nmcli - add infiniband type support (https://github.com/ansible-collections/community.general/pull/1260).
+  - nmcli - add ``ipv4.routes`` and ``ipv4.never-default`` support (https://github.com/ansible-collections/community.general/pull/1260).
