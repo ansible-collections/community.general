@@ -84,6 +84,15 @@ class ScalyrLogSource(object):
         self.user = getpass.getuser()
 
     def send_event(self, url, authtoken, state, result, runtime):
+        """Send the Ansible task result to the Scalyr API.
+
+        Args:
+            url ([string]): Scalyr API URL to where the event will be sent.
+            authtoken ([string]): Log Access Write Key to authenticate against the Scalyr API.
+            state ([string]): State of the task itself.
+            result ([ansible.executor.task_result.TaskResult]): The Ansible task result.
+            runtime ([int]): Duration of the task.
+        """
         if result._task_fields['args'].get('_ansible_check_mode') is True:
             self.ansible_check_mode = True
 
