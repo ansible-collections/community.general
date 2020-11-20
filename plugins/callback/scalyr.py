@@ -14,26 +14,27 @@ description:
   - This callback plugin will send task results as JSON formatted events to Scalyr.
 requirements:
   - Whitelisting this callback plugin.
-  - 'Create a Log Access Write Key in Scalyr (https://app.eu.scalyr.com/keys)'
-  - 'Define the Scalyr API URL and API key as an environment variable, in ansible.cfg or as a hostvar.'
-  - 'Based on the splunk and sumologic callbacks'
+  - Create a Log Access Write Key in Scalyr (https://app.eu.scalyr.com/keys)
+  - Define the Scalyr API URL and API key as an environment variable, in ansible.cfg or as hostvars.
+    - When using the hostvars method the variable(s) need to be present as 'localhost' variables.
+  - Heavily inspired by splunk and sumologic callbacks
 options:
-  url:
+  scalyr_api_url:
     description: URL to the Scalyr API endpoint.
     default: https://app.eu.scalyr.com/api/addEvents
     env:
-      - name: SCALYR_URL
+      - name: SCALYR_API_URL
     ini:
       - section: callback_scalyr
-        key: url
+        key: scalyr_api_url
     type: string
-  authtoken:
-    description: Token to authenticate the connection to Scalyr.
+  scalyr_api_authtoken:
+    description: Token to authenticate the connection to Scalyr (with write access).
     env:
-      - name: SCALYR_AUTHTOKEN
+      - name: SCALYR_API_AUTHTOKEN
     ini:
       - section: callback_scalyr
-        key: authtoken
+        key: scalyr_api_authtoken
     type: string
 '''
 
@@ -44,16 +45,17 @@ examples: |
     callback_whitelist = community.general.scalyr
 
   Set the environment variable
-    export SCALYR_URL=https://app.eu.scalyr.com/api/addEvents
-    export SCALYR_AUTHTOKEN=XXXXXXXXXXXXXXXXXXXXXmlQ0-
+    export SCALYR_API_URL=https://app.eu.scalyr.com/api/addEvents
+    export SCALYR_API_AUTHTOKEN=XXXXXXXXXXXXXXXXXXXXXmlQ0-
 
   Or set the ansible.cfg variable in the callback_scalyr block
     [callback_scalyr]
-    url = https://app.eu.scalyr.com/api/addEvents
-    authtoken = XXXXXXXXXXXXXXXXXXXXXmlQ0-
+    scalry_api_url = https://app.eu.scalyr.com/api/addEvents
+    scalyr_api_authtoken = XXXXXXXXXXXXXXXXXXXXXmlQ0-
 
-  Or define a hostvar (supports as well Ansible vault)
-    scalyr_authtoken: XXXXXXXXXXXXXXXXXXXXXmlQ0-
+  Or define as hostvars (supports as well Ansible vault)
+    scalry_api_url: https://app.eu.scalyr.com/api/addEvents
+    scalyr_api_authtoken: XXXXXXXXXXXXXXXXXXXXXmlQ0-
 '''
 
 import getpass
@@ -168,30 +170,33 @@ class CallbackModule(CallbackBase):
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
-        self.url = self.get_option('url')
-
-        if self.url is None:
-            self.disabled = True
-            self._display.warning('Scalyr API URL was '
-                                  'not provided. The Scalyr API URL '
-                                  'can be provided using the '
-                                  '`SCALYR_URL` environment variable, '
-                                  'in the ansible.cfg file or as a hostvar.')
-
-        self.authtoken = self.get_option('authtoken')
+        self.url = self.get_option('scalyr_api_url')
+        self.authtoken = self.get_option('scalyr_api_authtoken')
 
     def v2_playbook_on_play_start(self, play):
+        hostvars = play.get_variable_manager()._hostvars
+
+        if self.url is None:
+            if not hostvars or 'scalyr_api_url' not in hostvars['localhost']:
+                self.disabled = True
+                self._display.warning('Scalyr API URL was '
+                                      'not provided. The Scalyr API URL '
+                                      'can be provided using the '
+                                      '`SCALYR_API_URL` environment variable, '
+                                      'in the ansible.cfg file or as a hostvar.')
+            else:
+                self.url = hostvars['localhost']['scalyr_api_url']
+
         if self.authtoken is None:
-            hostvars = play.get_variable_manager()._hostvars
-            if not hostvars or 'scalyr_authtoken' not in hostvars['localhost']:
+            if not hostvars or 'scalyr_api_authtoken' not in hostvars['localhost']:
                 self.disabled = True
                 self._display.warning('Scalyr requires a Log Access Write Key'
                                       'token. The Scalyr API key can be '
                                       'provided using the '
-                                      '`SCALYR_AUTHTOKEN` environment variable, '
+                                      '`SCALYR_API_AUTHTOKEN` environment variable, '
                                       'in the ansible.cfg file or as a hostvar.')
-
-            self.authtoken = hostvars['localhost']['scalyr_authtoken']
+            else:
+                self.authtoken = hostvars['localhost']['scalyr_api_authtoken']
 
     def v2_playbook_on_start(self, playbook):
         self.scalyr.ansible_playbook = basename(playbook._file_name)
