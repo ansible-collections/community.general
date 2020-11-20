@@ -81,10 +81,12 @@ options:
             - Use the format '192.0.3.0/24 192.0.2.1'
         type: list
         elements: str
+        version_added: 1.3.0
     never_default4:
         description:
             - Set as default route.
         type: bool
+        version_added: 1.3.0
     dns4:
         description:
             - A list of up to 3 dns servers.
