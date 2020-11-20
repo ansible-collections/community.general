@@ -36,7 +36,6 @@ options:
             - Should a 'down' file exist or not, if it exists it disables auto startup.
               Defaults to no. Downed does not imply stopped.
         type: bool
-        default: no
     enabled:
         description:
             - Whether the service is enabled or not, if disabled it also implies stopped.

@@ -76,11 +76,9 @@ options:
     description:
     - If set C("True") with state as C("absent"), then removes DNS records of the host managed by FreeIPA DNS.
     - This option has no effect for states other than "absent".
-    default: false
     type: bool
   random_password:
     description: Generate a random password to be used in bulk enrollment.
-    default: False
     type: bool
 extends_documentation_fragment:
 - community.general.ipa.documentation

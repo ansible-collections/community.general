@@ -42,6 +42,7 @@ options:
         description:
             - Sets the retention policy as default retention policy.
         type: bool
+        default: false
 extends_documentation_fragment:
 - community.general.influxdb
 
