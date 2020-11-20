@@ -977,7 +977,7 @@ class Nmcli(object):
                     # input: ['10.11.0.0/24 10.10.0.2', '10.12.0.0/24 10.10.0.2']
                     # output: ['{ ip = 10.11.0.0/24', 'nh = 10.10.0.2 }; { ip = 10.12.0.0/24', 'nh = 10.10.0.2 }']
                     # Need to convert output to match input format
-                    for r in (("['{ ",""), (" }']",""), ('ip = ',''), ("', 'nh =",''), (" }; { ",',') ):
+                    for r in (("['{ ", ""), (" }']", ""), ('ip = ', ''), ("', 'nh =", ''), (" }; { ", ',')):
                         current_value = str(current_value).replace(*r)
                     current_value = current_value.split(',')
             elif key in param_alias:
