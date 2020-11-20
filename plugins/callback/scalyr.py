@@ -95,16 +95,16 @@ class ScalyrLogSource(object):
             result ([ansible.executor.task_result.TaskResult]): The Ansible task result.
             runtime ([int]): Duration of the task.
         """
-        if result._task_fields['args'].get('_ansible_check_mode') is True:
-            self.ansible_check_mode = True
+        if 'args' in result._task_fields:
+            if result._task_fields['args'].get('_ansible_check_mode') is True:
+                self.ansible_check_mode = True
+            # Remove uninteresting data
+            del result._task_fields['args']
 
         if result._task._role:
             ansible_role = str(result._task._role)
         else:
             ansible_role = None
-
-        if 'args' in result._task_fields:
-            del result._task_fields['args']
 
         data = {
             "token": str(authtoken),
