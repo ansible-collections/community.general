@@ -206,6 +206,17 @@ class TestParted(ModuleTestCase):
         with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
             self.execute_module(changed=True, script='rm 1')
 
+    def test_resize_partition(self):
+        set_module_args({
+            'device': '/dev/sdb',
+            'number': 3,
+            'state': 'present',
+            'part_end': '100%',
+            'resize': True
+        })
+        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+            self.execute_module(changed=True, script='resizepart 3 100%')
+
     def test_change_flag(self):
         # Flags are set in a second run of parted().
         # Between the two runs, the partition dict is updated.
