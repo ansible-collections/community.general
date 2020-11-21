@@ -284,7 +284,7 @@ def main():
                          mac_address=dict(type='list', aliases=['macaddress'], elements='str'),
                          update_dns=dict(type='bool'),
                          state=dict(type='str', default='present', choices=['present', 'absent', 'enabled', 'disabled']),
-                         random_password=dict(type='bool'),)
+                         random_password=dict(type='bool', no_log=False),)
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True)
