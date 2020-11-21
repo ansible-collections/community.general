@@ -16,42 +16,51 @@ description:
    - Notify BigPanda when deployments start and end (successfully or not). Returns a deployment object containing all the parameters for future module calls.
 options:
   component:
+    type: str
     description:
       - "The name of the component being deployed. Ex: billing"
     required: true
     aliases: ['name']
   version:
+    type: str
     description:
       - The deployment version.
     required: true
   token:
+    type: str
     description:
       - API token.
     required: true
   state:
+    type: str
     description:
       - State of the deployment.
     required: true
     choices: ['started', 'finished', 'failed']
   hosts:
+    type: str
     description:
       - Name of affected host name. Can be a list.
     required: false
     default: machine's hostname
     aliases: ['host']
   env:
+    type: str
     description:
       - The environment name, typically 'production', 'staging', etc.
     required: false
   owner:
+    type: str
     description:
       - The person responsible for the deployment.
     required: false
   description:
+    type: str
     description:
       - Free text description of the deployment.
     required: false
   url:
+    type: str
     description:
       - Base URL of the API server.
     required: False
@@ -64,11 +73,17 @@ options:
     default: 'yes'
     type: bool
   deployment_message:
+    type: str
     description:
     - Message about the deployment.
     - C(message) alias is deprecated in community.general 0.2.0, since it is used internally by Ansible Core Engine.
     aliases: ['message']
     version_added: '0.2.0'
+  source_system:
+    type: str
+    description:
+    - Source system used in the requests to the API
+    default: ansible
 
 # informational: requirements for nodes
 requirements: [ ]
@@ -129,7 +144,7 @@ def main():
             version=dict(required=True),
             token=dict(required=True, no_log=True),
             state=dict(required=True, choices=['started', 'finished', 'failed']),
-            hosts=dict(required=False, default=[socket.gethostname()], aliases=['host']),
+            hosts=dict(required=False, default=[socket.gethostname()], aliases=['host']),  # @FIXME
             env=dict(required=False),
             owner=dict(required=False),
             description=dict(required=False),
