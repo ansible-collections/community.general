@@ -277,9 +277,9 @@ plugin_routing:
         warning_text: The firewalld module has been moved to the ansible.posix collection.
       redirect: ansible.posix.firewalld
     foreman:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use the modules from the theforeman.foreman collection instead.
     gcdns_record:
       deprecation:
         removal_version: 2.0.0
@@ -321,9 +321,9 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
     github_hooks:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.github_webhook and community.general.github_webhook_info instead.
     helm:
       deprecation:
         removal_version: 3.0.0
@@ -371,9 +371,9 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
     katello:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use the modules from the theforeman.foreman collection instead.
     ldap_attr:
       deprecation:
         removal_version: 3.0.0
@@ -425,37 +425,37 @@ plugin_routing:
         warning_text: The mysql_variables module has been moved to the community.mysql collection.
       redirect: community.mysql.mysql_variables
     na_cdot_aggregate:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_aggregate instead.
     na_cdot_license:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_license instead.
     na_cdot_lun:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_lun instead.
     na_cdot_qtree:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_qtree instead.
     na_cdot_svm:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_svm instead.
     na_cdot_user:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_user instead.
     na_cdot_user_role:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_user_role instead.
     na_cdot_volume:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_volume instead.
     na_ontap_gather_facts:
       deprecation:
         removal_version: 3.0.0
@@ -692,25 +692,25 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
     sf_account_manager:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.elementsw.na_elementsw_account instead.
     sf_check_connections:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.elementsw.na_elementsw_check_connections instead.
     sf_snapshot_schedule_manager:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.elementsw.na_elementsw_snapshot_schedule instead.
     sf_volume_access_group_manager:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.elementsw.na_elementsw_access_group instead.
     sf_volume_manager:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.elementsw.na_elementsw_volume instead.
     smartos_image_facts:
       deprecation:
         removal_version: 3.0.0
@@ -773,17 +773,17 @@ plugin_routing:
       redirect: community.mysql.mysql
   callback:
     actionable:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use the 'default' callback plugin with 'display_skipped_hosts = no' and 'display_ok_hosts = no' options.
     full_skip:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use the 'default' callback plugin with 'display_skipped_hosts = no' option.
     stderr:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use the 'default' callback plugin with 'display_failed_stderr = yes' option.
   inventory:
     docker_machine:
       redirect: community.docker.docker_machine
