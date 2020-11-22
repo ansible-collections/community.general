@@ -23,18 +23,23 @@ description:
 
 options:
     name:
+        type: str
         description:
           - The name of the object. Will be used to identify the entry
         required: true
     aaa:
+        type: list
+        elements: str
         description:
           - List of references to utm_aaa objects (allowed users or groups)
         required: true
     basic_prompt:
+        type: str
         description:
           - The message in the basic authentication prompt
         required: true
     backend_mode:
+        type: str
         description:
           - Specifies if the backend server needs authentication ([Basic|None])
         default: None
@@ -50,37 +55,47 @@ options:
           - True
           - False
     backend_user_prefix:
+        type: str
         description:
           - Prefix string to prepend to the username for backend authentication
         default: ""
     backend_user_suffix:
+        type: str
         description:
           - Suffix string to append to the username for backend authentication
         default: ""
     comment:
+        type: str
         description:
           - Optional comment string
         default: ""
     frontend_cookie:
+        type: str
         description:
           - Frontend cookie name
     frontend_cookie_secret:
+        type: str
         description:
           - Frontend cookie secret
     frontend_form:
+        type: str
         description:
           - Frontend authentication form name
     frontend_form_template:
+        type: str
         description:
           - Frontend authentication form template
         default: ""
     frontend_login:
+        type: str
         description:
           - Frontend login name
     frontend_logout:
+        type: str
         description:
           - Frontend logout name
     frontend_mode:
+        type: str
         description:
           - Frontend authentication mode (Form|Basic)
         default: Basic
@@ -88,6 +103,7 @@ options:
           - Basic
           - Form
     frontend_realm:
+        type: str
         description:
           - Frontend authentication realm
     frontend_session_allow_persistency:
@@ -99,6 +115,7 @@ options:
           - True
           - False
     frontend_session_lifetime:
+        type: int
         description:
           - session lifetime
         required: true
@@ -111,6 +128,7 @@ options:
           - True
           - False
     frontend_session_lifetime_scope:
+        type: str
         description:
           - scope for frontend_session_lifetime (days|hours|minutes)
         default: hours
@@ -119,6 +137,7 @@ options:
           - hours
           - minutes
     frontend_session_timeout:
+        type: int
         description:
           - session timeout
         required: true
@@ -131,6 +150,7 @@ options:
           - True
           - False
     frontend_session_timeout_scope:
+        type: str
         description:
           - scope for frontend_session_timeout (days|hours|minutes)
         default: minutes
@@ -139,10 +159,13 @@ options:
           - hours
           - minutes
     logout_delegation_urls:
+        type: list
+        elements: str
         description:
           - List of logout URLs that logouts are delegated to
         default: []
     logout_mode:
+        type: str
         description:
           - Mode of logout (None|Delegation)
         default: None

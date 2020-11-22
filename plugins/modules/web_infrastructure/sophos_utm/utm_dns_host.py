@@ -22,24 +22,30 @@ description:
 
 options:
     name:
+        type: str
         description:
           - The name of the object. Will be used to identify the entry
         required: true
     address:
+        type: str
         description:
           - The IPV4 Address of the entry. Can be left empty for automatic resolving.
         default: 0.0.0.0
     address6:
+        type: str
         description:
           - The IPV6 Address of the entry. Can be left empty for automatic resolving.
         default: "::"
     comment:
+        type: str
         description:
           - An optional comment to add to the dns host object
     hostname:
+        type: str
         description:
           - The hostname for the dns host object
     interface:
+        type: str
         description:
           - The reference name of the interface to use. If not provided the default interface will be used
     resolved:
@@ -53,6 +59,7 @@ options:
         default: False
         type: bool
     timeout:
+        type: int
         description:
           - the timeout for the utm to resolve the ip address for the hostname again
         default: 0
