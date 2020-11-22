@@ -88,6 +88,7 @@ options:
       - URL of the versioned plugins center.
       - Used as the base URL to download versioned(not latest) plugins from.
     default: ['https://updates.jenkins.io/download/plugins', 'http://mirrors.jenkins.io/plugins']
+    version_added: 1.3.0
   url:
     type: str
     description:
