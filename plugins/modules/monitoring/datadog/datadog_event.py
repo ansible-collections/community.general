@@ -24,36 +24,46 @@ author:
 - "Naoya Nakazawa (@n0ts)"
 options:
     api_key:
+        type: str
         description: ["Your DataDog API key."]
         required: true
     app_key:
+        type: str
         description: ["Your DataDog app key."]
         required: true
     title:
+        type: str
         description: ["The event title."]
         required: true
     text:
+        type: str
         description: ["The body of the event."]
         required: true
     date_happened:
+        type: int
         description:
         - POSIX timestamp of the event.
         - Default value is now.
-        default: now
     priority:
+        type: str
         description: ["The priority of the event."]
         default: normal
         choices: [normal, low]
     host:
-        description: ["Host name to associate with the event."]
-        default: "{{ ansible_hostname }}"
+        type: str
+        description: 
+        - Host name to associate with the event.
+        - If not specified, it defaults to the value of C(ansible_hostname).
     tags:
+        type: list
         description: ["Comma separated list of tags to apply to the event."]
     alert_type:
+        type: str
         description: ["Type of alert."]
         default: info
         choices: ['error', 'warning', 'info', 'success']
     aggregation_key:
+        type: str
         description: ["An arbitrary string to use for aggregation."]
     validate_certs:
         description:
