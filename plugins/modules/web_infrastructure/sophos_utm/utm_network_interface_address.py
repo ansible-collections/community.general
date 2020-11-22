@@ -22,24 +22,30 @@ description:
 
 options:
     name:
+        type: str
         description:
           - The name of the object. Will be used to identify the entry
         required: true
     address:
+        type: str
         description:
           - The ip4 address of the network/interface_address object.
         required: true
     address6:
+        type: str
         description:
           - The ip6 address of the network/interface_address object.
         required: false
     comment:
+        type: str
         description:
           - An optional comment to add to the object
     resolved:
+        type: bool
         description:
           - Whether or not the object is resolved
     resolved6:
+        type: bool
         description:
           - Whether or not the object is resolved
 
@@ -114,8 +120,8 @@ def main():
             address=dict(type='str', required=True),
             comment=dict(type='str', required=False, default=""),
             address6=dict(type='str', required=False),
-            resolved=dict(type='boolean', required=False),
-            resolved6=dict(type='boolean', required=False)
+            resolved=dict(type='boolean', required=False),  # @FIXME bool instead of boolean
+            resolved6=dict(type='boolean', required=False),  # @FIXME bool instead of boolean
         )
     )
     try:
