@@ -51,7 +51,7 @@ options:
         choices: [normal, low]
     host:
         type: str
-        description: 
+        description:
         - Host name to associate with the event.
         - If not specified, it defaults to the value of C(ansible_hostname).
     tags:
