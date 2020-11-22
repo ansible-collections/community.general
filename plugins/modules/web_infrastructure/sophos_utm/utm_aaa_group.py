@@ -30,6 +30,7 @@ options:
         description:
           - List of adirectory group strings.
         type: list
+        elements: str
     adirectory_groups_sids:
         description:
           - Dictionary of group sids.
@@ -64,6 +65,7 @@ options:
         description:
           - List of edirectory group strings.
         type: list
+        elements: str
     ipsec_dn:
         description:
           - The ipsec dn string.
@@ -80,6 +82,7 @@ options:
         description:
           - A list of user ref names (aaa/user).
         type: list
+        elements: str
         default: []
     network:
         description:
@@ -90,11 +93,13 @@ options:
         description:
           - A list of radius group strings.
         type: list
+        elements: str
         default: []
     tacacs_groups:
         description:
           - A list of tacacs group strings.
         type: list
+        elements: str
         default: []
 
 extends_documentation_fragment:
