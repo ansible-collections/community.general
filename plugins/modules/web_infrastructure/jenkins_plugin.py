@@ -359,7 +359,9 @@ class JenkinsPlugin(object):
 
         errors = {}
         for url in urls:
+            err_msg = None
             try:
+                self.module.debug("fetching url: %s" % url)
                 response, info = fetch_url(
                     self.module, url, timeout=self.timeout, cookies=self.cookies,
                     headers=self.crumb, **kwargs)
@@ -367,9 +369,15 @@ class JenkinsPlugin(object):
                 if info['status'] == 200:
                     return response
                 else:
-                    errors[url] = "%s response code is %s" % (msg_status, info['status'])
+                    err_msg = ("%s. fetching url %s failed. response code: %s" % (msg_status, url, info['status']))
+                    if info['status'] > 400:  # extend error message
+                        err_msg = "%s. response body: %s" % (err_msg, info['body'])
             except Exception as e:
-                errors[url] = str(e)
+                err_msg = "%s. fetching url %s failed. error msg: %s" % (msg_status, url, str(e))
+            finally:
+                if err_msg is not None:
+                    self.module.debug(err_msg)
+                    errors[url] = err_msg
 
         # failed on all urls
         self.module.fail_json(msg=msg_exception, details=errors)
