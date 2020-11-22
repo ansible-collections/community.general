@@ -53,7 +53,7 @@ options:
         type: str
         description:
         - Host name to associate with the event.
-        - If not specified, it defaults to the value of C(ansible_hostname).
+        - If not specified, it defaults to the remote system's hostname.
     tags:
         type: list
         description: ["Comma separated list of tags to apply to the event."]
