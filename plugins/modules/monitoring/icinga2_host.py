@@ -93,7 +93,7 @@ options:
     type: str
     description:
       - The name used to display the host.
-      - If not specified, it defaults to the value of the C(name) parameter.
+      - If not specified, it defaults to the value of the I(name) parameter.
   ip:
     type: str
     description:
