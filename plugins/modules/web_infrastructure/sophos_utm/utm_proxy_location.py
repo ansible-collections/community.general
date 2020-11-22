@@ -23,6 +23,7 @@ description:
 
 options:
     name:
+        type: str
         description:
           - The name of the object. Will be used to identify the entry
         required: true
@@ -38,21 +39,29 @@ options:
         description:
           - A list of allowed networks
         type: list
+        elements: str
         default: REF_NetworkAny
     auth_profile:
+        type: str
         description:
           - The reference name of the auth profile
     backend:
+        type: list
+        elements: str
         description:
           - A list of backends that are connected with this location declaration
         default: []
     be_path:
+        type: str
         description:
           - The path of the backend
     comment:
+        type: str
         description:
           - The optional comment string
     denied_networks:
+        type: list
+        elements: str
         description:
           - A list of denied network references
         default: []
@@ -62,6 +71,7 @@ options:
         type: bool
         default: False
     path:
+        type: str
         description:
           - The path of the location
         default: "/"
@@ -71,6 +81,7 @@ options:
         type: bool
         default: True
     stickysession_id:
+        type: str
         description:
           - The stickysession id
         default: ROUTEID
