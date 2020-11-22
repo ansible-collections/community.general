@@ -41,11 +41,9 @@ options:
         description:
           - An optional comment to add to the object
     resolved:
-        type: bool
         description:
           - Whether or not the object is resolved
     resolved6:
-        type: bool
         description:
           - Whether or not the object is resolved
 

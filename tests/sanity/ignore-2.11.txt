@@ -857,7 +857,7 @@ plugins/modules/system/timezone.py pylint:blacklisted-name
 plugins/modules/system/xfconf.py validate-modules:parameter-state-invalid-choice
 plugins/modules/web_infrastructure/jenkins_plugin.py use-argspec-type-path
 plugins/modules/web_infrastructure/rundeck_acl_policy.py pylint:blacklisted-name
-plugins/modules/web_infrastructure/sophos_utm/utm_network_interface_address.py validate-modules:doc-type-does-not-match-spec
+plugins/modules/web_infrastructure/sophos_utm/utm_network_interface_address.py validate-modules:parameter-type-not-in-doc
 plugins/modules/web_infrastructure/sophos_utm/utm_proxy_exception.py validate-modules:doc-elements-mismatch
 scripts/inventory/gce.py pylint:blacklisted-name
 tests/unit/plugins/modules/cloud/google/test_gcp_forwarding_rule.py future-import-boilerplate
