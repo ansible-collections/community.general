@@ -80,6 +80,7 @@ options:
       - URLs of the latest plugins center.
       - Used as the base URL to download the latest plugins from.
     default: ['https://updates.jenkins.io/latest']
+    version_added: 1.3.0
   versioned_plugins_url:
     type: list
     elements: str
