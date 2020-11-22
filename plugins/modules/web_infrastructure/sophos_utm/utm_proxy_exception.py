@@ -40,18 +40,21 @@ options:
         description:
             - The paths the exception in the reverse proxy is defined for
         type: list
+        elements: str
         default: []
         required: False
     skip_custom_threats_filters:
         description:
             - A list of threats to be skipped
         type: list
+        elements: str
         default: []
         required: False
     skip_threats_filter_categories:
         description:
             - Define which categories of threats are skipped
         type: list
+        elements: str
         default: []
         required: False
     skipav:
@@ -106,6 +109,7 @@ options:
         description:
             - Define which categories of threats are skipped
         type: list
+        elements: str
         default: []
         required: False
     status:
@@ -157,6 +161,7 @@ result:
             type: str
         comment:
             description: The optional comment string
+            type: str
         op:
             description: The operand to be used with the entries of the path parameter
             type: str
@@ -211,9 +216,9 @@ def main():
         argument_spec=dict(
             name=dict(type='str', required=True),
             op=dict(type='str', required=False, default='AND', choices=['AND', 'OR']),
-            path=dict(type='list', elements='string', required=False, default=[]),
-            skip_custom_threats_filters=dict(type='list', elements='string', required=False, default=[]),
-            skip_threats_filter_categories=dict(type='list', elements='string', required=False, default=[]),
+            path=dict(type='list', elements='string', required=False, default=[]),  # @FIXME: str instead of string
+            skip_custom_threats_filters=dict(type='list', elements='string', required=False, default=[]),  # @FIXME: str instead of string
+            skip_threats_filter_categories=dict(type='list', elements='string', required=False, default=[]),  # @FIXME: str instead of string
             skipav=dict(type='bool', required=False, default=False),
             skipbadclients=dict(type='bool', required=False, default=False),
             skipcookie=dict(type='bool', required=False, default=False),
@@ -222,7 +227,7 @@ def main():
             skiphtmlrewrite=dict(type='bool', required=False, default=False),
             skiptft=dict(type='bool', required=False, default=False),
             skipurl=dict(type='bool', required=False, default=False),
-            source=dict(type='list', elements='string', required=False, default=[]),
+            source=dict(type='list', elements='string', required=False, default=[]),  # @FIXME: str instead of string
             status=dict(type='bool', required=False, default=True),
         )
     )
