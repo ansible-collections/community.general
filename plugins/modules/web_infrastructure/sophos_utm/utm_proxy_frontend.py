@@ -23,6 +23,7 @@ description:
 
 options:
     name:
+        type: str
         description:
           - The name of the object. Will be used to identify the entry
         required: true
@@ -32,18 +33,23 @@ options:
         type: bool
         default: False
     address:
+        type: str
         description:
           - The reference name of the network/interface_address object.
         default: REF_DefaultInternalAddress
     allowed_networks:
+        type: list
+        elements: str
         description:
           - A list of reference names for the allowed networks.
         default: ['REF_NetworkAny']
     certificate:
+        type: str
         description:
           - The reference name of the ca/host_key_cert object.
         default: ""
     comment:
+        type: str
         description:
           - An optional comment to add to the object
         default: ""
@@ -53,9 +59,13 @@ options:
         type: bool
         default: False
     domain:
+        type: list
+        elements: str
         description:
           - A list of domain names for the frontend object
     exceptions:
+        type: list
+        elements: str
         description:
           - A list of exception ref names (reverse_proxy/exception)
         default: []
@@ -75,6 +85,7 @@ options:
         type: bool
         default: False
     lbmethod:
+        type: str
         description:
           - Which loadbalancer method should be used
         choices:
@@ -84,10 +95,13 @@ options:
           - byrequests
         default: bybusyness
     locations:
+        type: list
+        elements: str
         description:
           - A list of location ref names (reverse_proxy/location)
         default: []
     port:
+        type: int
         description:
           - The frontend http port
         default: 80
@@ -97,6 +111,7 @@ options:
         type: bool
         default: False
     profile:
+        type: str
         description:
           - The reference string of the reverse_proxy/profile
         default: ""
@@ -106,6 +121,7 @@ options:
         type: bool
         default: True
     type:
+        type: str
         description:
           - Which protocol should be used
         choices:
