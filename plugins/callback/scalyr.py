@@ -212,7 +212,7 @@ class CallbackModule(CallbackBase):
         self.scalyr.ansible_playbook = basename(playbook._file_name)
         self.scalyr.cli_args = context.CLIARGS
 
-    def v2_playbook_on_task_start(self, task, is_conditional):
+    def v2_playbook_on_task_start(self, task, **kwargs):
         self.start_datetimes[task._uuid] = datetime.utcnow()
 
     def v2_playbook_on_handler_task_start(self, task):
