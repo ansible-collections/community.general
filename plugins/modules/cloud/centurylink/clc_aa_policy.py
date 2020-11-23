@@ -16,14 +16,17 @@ options:
   name:
     description:
       - The name of the Anti Affinity Policy.
+    type: str
     required: True
   location:
     description:
       - Datacenter in which the policy lives/should live.
+    type: str
     required: True
   state:
     description:
       - Whether to create or delete the policy.
+    type: str
     required: False
     default: present
     choices: ['present','absent']
