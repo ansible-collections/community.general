@@ -159,6 +159,7 @@ outputs:
       returned: always
       description: The type of the value (string, int, etc)
     value:
+      type: str
       returned: always
       description: The value of the output as interpolated by Terraform
 stdout:
@@ -176,7 +177,6 @@ command:
 import os
 import json
 import tempfile
-import traceback
 from ansible.module_utils.six.moves import shlex_quote
 
 from ansible.module_utils.basic import AnsibleModule

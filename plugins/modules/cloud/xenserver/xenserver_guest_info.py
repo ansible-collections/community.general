@@ -38,7 +38,6 @@ options:
     - In case of multiple VMs with same name, use C(uuid) to uniquely specify VM to manage.
     - This parameter is case sensitive.
     type: str
-    required: yes
     aliases: [ name_label ]
   uuid:
     description:

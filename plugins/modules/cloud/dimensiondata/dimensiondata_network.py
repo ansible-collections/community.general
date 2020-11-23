@@ -29,21 +29,25 @@ options:
     description:
       - The name of the network domain to create.
     required: true
+    type: str
   description:
     description:
       - Additional description of the network domain.
     required: false
+    type: str
   service_plan:
     description:
       - The service plan, either "ESSENTIALS" or "ADVANCED".
       - MCP 2.0 Only.
     choices: [ESSENTIALS, ADVANCED]
     default: ESSENTIALS
+    type: str
   state:
     description:
       - Should the resource be present or absent.
     choices: [present, absent]
     default: present
+    type: str
 '''
 
 EXAMPLES = '''

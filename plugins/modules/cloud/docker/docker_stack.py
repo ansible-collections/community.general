@@ -36,7 +36,7 @@ options:
         referring to the path of the compose file on the target host
         or the YAML contents of a compose file nested as dictionary.
     type: list
-    # elements: raw
+    elements: raw
     default: []
   prune:
     description:

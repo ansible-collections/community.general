@@ -24,6 +24,7 @@ description:
 options:
     api_key:
         required: true
+        type: str
         description:
             - The API key obtained from the Memset control panel.
     poll:

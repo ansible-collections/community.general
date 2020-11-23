@@ -45,14 +45,12 @@ options:
     state:
         description:
           - State of the container.
-        required: True
         choices: ["absent", "latest", "present", "rollback"]
         default: "latest"
         type: str
     mode:
         description:
           - Define if it is an user or a system container.
-        required: True
         choices: ["user", "system"]
         type: str
     values:
