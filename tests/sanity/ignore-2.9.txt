@@ -368,7 +368,6 @@ plugins/modules/identity/keycloak/keycloak_clienttemplate.py validate-modules:pa
 plugins/modules/identity/opendj/opendj_backendprop.py validate-modules:doc-missing-type
 plugins/modules/identity/opendj/opendj_backendprop.py validate-modules:parameter-type-not-in-doc
 plugins/modules/monitoring/bigpanda.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/monitoring/icinga2_host.py validate-modules:nonexistent-parameter-documented
 plugins/modules/monitoring/icinga2_host.py validate-modules:undocumented-parameter
 plugins/modules/monitoring/statusio_maintenance.py pylint:blacklisted-name
 plugins/modules/net_tools/cloudflare_dns.py validate-modules:parameter-type-not-in-doc

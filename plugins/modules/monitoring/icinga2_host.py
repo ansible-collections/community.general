@@ -103,6 +103,9 @@ options:
     type: dict
     description:
       - List of variables.
+  force:
+    description:
+      - This option is parsed but not used by the module.
 extends_documentation_fragment:
   - url
 '''
@@ -225,8 +228,6 @@ class icinga2_api:
 def main():
     # use the predefined argument spec for url
     argument_spec = url_argument_spec()
-    # remove unnecessary argument 'force'  @TODO why is that?
-    del argument_spec['force']
     # add our own arguments
     argument_spec.update(
         state=dict(default="present", choices=["absent", "present"]),
