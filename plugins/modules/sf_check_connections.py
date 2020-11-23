@@ -1,1 +1,0 @@
-./storage/netapp/sf_check_connections.py
