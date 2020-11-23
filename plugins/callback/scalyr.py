@@ -21,7 +21,6 @@ requirements:
 options:
   scalyr_api_url:
     description: URL to the Scalyr API endpoint.
-    default: https://app.scalyr.com/api
     env:
       - name: SCALYR_API_URL
     ini:
