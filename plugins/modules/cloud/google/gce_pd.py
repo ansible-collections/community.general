@@ -21,7 +21,6 @@ options:
     description:
       - do not destroy the disk, merely detach it from an instance
     type: bool
-    default: 'no'
   instance_name:
     type: str
     description:
@@ -87,7 +86,6 @@ options:
     description:
       - If C(yes), deletes the volume when instance is terminated
     type: bool
-    default: 'no'
   image_family:
     type: str
     description:

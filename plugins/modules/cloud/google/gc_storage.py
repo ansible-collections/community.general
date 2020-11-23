@@ -86,6 +86,7 @@ options:
     description:
       - Whether versioning is enabled or disabled (note that once versioning is enabled, it can only be suspended)
     type: bool
+    default: false
 
 requirements:
     - "python >= 2.6"
