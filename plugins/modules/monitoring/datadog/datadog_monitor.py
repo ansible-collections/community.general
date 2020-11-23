@@ -70,6 +70,7 @@ options:
         type: str
         aliases: [ 'message' ]
     silenced:
+        type: dict
         description:
           - Dictionary of scopes to silence, with timestamps or None.
           - Each scope will be muted until the given POSIX timestamp or forever if the value is None.
@@ -83,7 +84,7 @@ options:
         description:
           - The number of minutes before a monitor will notify when data stops reporting.
           - Must be at least 2x the monitor timeframe for metric alerts or 2 minutes for service checks.
-        default: 2x timeframe for metric, 2 minutes for service
+          - If not specified, it defaults to 2x timeframe for metric, 2 minutes for service.
         type: str
     timeout_h:
         description:
@@ -105,11 +106,12 @@ options:
         type: bool
         default: 'no'
     thresholds:
+        type: dict
         description:
           - A dictionary of thresholds by status.
           - Only available for service checks and metric alerts.
           - Because each of them can have multiple thresholds, we do not define them directly in the query.
-        default: {'ok': 1, 'critical': 1, 'warning': 1}
+          - "If not specified, it defaults to: C({'ok': 1, 'critical': 1, 'warning': 1})."
     locked:
         description:
           - Whether changes to this monitor should be restricted to the creator or admins.

@@ -20,23 +20,28 @@ requirements:
     - "This pingdom python library: https://github.com/mbabineau/pingdom-python"
 options:
     state:
+        type: str
         description:
             - Define whether or not the check should be running or paused.
         required: true
-        choices: [ "running", "paused" ]
+        choices: [ "running", "paused", "started", "stopped" ]
     checkid:
+        type: str
         description:
             - Pingdom ID of the check.
         required: true
     uid:
+        type: str
         description:
             - Pingdom user ID.
         required: true
     passwd:
+        type: str
         description:
             - Pingdom user password.
         required: true
     key:
+        type: str
         description:
             - Pingdom API key.
         required: true

@@ -18,20 +18,25 @@ description:
 author: "Renato Orgito (@orgito)"
 options:
     device:
+        type: str
         aliases: [ host, name ]
         required: true
         description:
             - IP address of the device.
             - If a hostname is given, it will be resolved to the IP address.
     community:
+        type: str
         description:
             - SNMP community used for device discovery.
             - Required when C(state=present).
+        required: true
     landscape:
+        type: str
         required: true
         description:
             - Landscape handle of the SpectroServer to which add or remove the device.
     state:
+        type: str
         required: false
         description:
             - On C(present) creates the device when it does not exist.
@@ -39,16 +44,19 @@ options:
         choices: ['present', 'absent']
         default: 'present'
     url:
+        type: str
         aliases: [ oneclick_url ]
         required: true
         description:
             - HTTP, HTTPS URL of the Oneclick server in the form (http|https)://host.domain[:port]
     url_username:
+        type: str
         aliases: [ oneclick_user ]
         required: true
         description:
             - Oneclick user name.
     url_password:
+        type: str
         aliases: [ oneclick_password ]
         required: true
         description:
@@ -68,6 +76,7 @@ options:
         default: 'yes'
         type: bool
     agentport:
+        type: int
         required: false
         description:
             - UDP port used for SNMP discovery.
@@ -301,7 +310,7 @@ def main():
             device=dict(required=True, aliases=['host', 'name']),
             landscape=dict(required=True),
             state=dict(choices=['present', 'absent'], default='present'),
-            community=dict(required=True, no_log=True),
+            community=dict(required=True, no_log=True),   # @TODO remove the 'required', given the required_if ?
             agentport=dict(type='int', default=161),
             url=dict(required=True, aliases=['oneclick_url']),
             url_username=dict(required=True, aliases=['oneclick_user']),

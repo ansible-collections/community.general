@@ -23,39 +23,49 @@ requirements:
     - PagerDuty API access
 options:
     state:
+        type: str
         description:
             - Create a maintenance window or get a list of ongoing windows.
         required: true
         choices: [ "running", "started", "ongoing", "absent" ]
     name:
+        type: str
         description:
             - PagerDuty unique subdomain. Obsolete. It is not used with PagerDuty REST v2 API.
     user:
+        type: str
         description:
             - PagerDuty user ID. Obsolete. Please, use I(token) for authorization.
     token:
+        type: str
         description:
             - A pagerduty token, generated on the pagerduty site. It is used for authorization.
         required: true
     requester_id:
+        type: str
         description:
             - ID of user making the request. Only needed when creating a maintenance_window.
     service:
+        type: list
         description:
             - A comma separated list of PagerDuty service IDs.
         aliases: [ services ]
     window_id:
+        type: str
         description:
             - ID of maintenance window. Only needed when absent a maintenance_window.
     hours:
+        type: str
         description:
             - Length of maintenance window in hours.
-        default: 1
+        default: '1'
     minutes:
+        type: str
         description:
             - Maintenance window in minutes (this is added to the hours).
-        default: 0
+        default: '0'
     desc:
+        type: str
         description:
             - Short description of maintenance window.
         default: Created by Ansible
@@ -128,11 +138,9 @@ EXAMPLES = '''
 
 import datetime
 import json
-import base64
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
-from ansible.module_utils._text import to_bytes
 
 
 class PagerDutyRequest(object):
@@ -228,8 +236,8 @@ def main():
             service=dict(required=False, type='list', aliases=["services"]),
             window_id=dict(required=False),
             requester_id=dict(required=False),
-            hours=dict(default='1', required=False),
-            minutes=dict(default='0', required=False),
+            hours=dict(default='1', required=False),   # @TODO change to int?
+            minutes=dict(default='0', required=False),   # @TODO change to int?
             desc=dict(default='Created by Ansible', required=False),
             validate_certs=dict(default=True, type='bool'),
         )

@@ -16,35 +16,42 @@ description:
   - 'For more information, refer to the Sensu documentation: U(https://sensuapp.org/docs/latest/reference/handlers.html)'
 options:
   state:
+    type: str
     description:
       - Whether the handler should be present or not
     choices: [ 'present', 'absent' ]
     default: present
   name:
+    type: str
     description:
       - A unique name for the handler. The name cannot contain special characters or spaces.
     required: True
   type:
+    type: str
     description:
       - The handler type
     choices: [ 'pipe', 'tcp', 'udp', 'transport', 'set' ]
-    required: True
   filter:
+    type: str
     description:
       - The Sensu event filter (name) to use when filtering events for the handler.
   filters:
+    type: list
     description:
       - An array of Sensu event filters (names) to use when filtering events for the handler.
       - Each array item must be a string.
   severities:
+    type: list
     description:
       - An array of check result severities the handler will handle.
       - 'NOTE: event resolution bypasses this filtering.'
-    choices: [ 'warning', 'critical', 'unknown' ]
+      - "Example: [ 'warning', 'critical', 'unknown' ]."
   mutator:
+    type: str
     description:
       - The Sensu event mutator (name) to use to mutate event data for the handler.
   timeout:
+    type: int
     description:
       - The handler execution duration timeout in seconds (hard stop).
       - Only used by pipe and tcp handler types.
@@ -60,19 +67,23 @@ options:
     type: bool
     default: 'no'
   command:
+    type: str
     description:
       - The handler command to be executed.
       - The event data is passed to the process via STDIN.
       - 'NOTE: the command attribute is only required for Pipe handlers (i.e. handlers configured with "type": "pipe").'
   socket:
+    type: dict
     description:
       - The socket definition scope, used to configure the TCP/UDP handler socket.
       - 'NOTE: the socket attribute is only required for TCP/UDP handlers (i.e. handlers configured with "type": "tcp" or "type": "udp").'
   pipe:
+    type: dict
     description:
       - The pipe definition scope, used to configure the Sensu transport pipe.
       - 'NOTE: the pipe attribute is only required for Transport handlers (i.e. handlers configured with "type": "transport").'
   handlers:
+    type: list
     description:
       - An array of Sensu event handlers (names) to use for events using the handler set.
       - Each array item must be a string.

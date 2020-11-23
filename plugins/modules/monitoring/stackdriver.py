@@ -16,42 +16,54 @@ description:
 author: "Ben Whaley (@bwhaley)"
 options:
   key:
+    type: str
     description:
       - API key.
     required: true
   event:
+    type: str
     description:
       - The type of event to send, either annotation or deploy
     choices: ['annotation', 'deploy']
+    required: true
   revision_id:
+    type: str
     description:
       - The revision of the code that was deployed. Required for deploy events
   deployed_by:
+    type: str
     description:
       - The person or robot responsible for deploying the code
     default: "Ansible"
   deployed_to:
+    type: str
     description:
       - "The environment code was deployed to. (ie: development, staging, production)"
   repository:
+    type: str
     description:
       - The repository (or project) deployed
   msg:
+    type: str
     description:
       - The contents of the annotation message, in plain text.  Limited to 256 characters. Required for annotation.
   annotated_by:
+    type: str
     description:
       - The person or robot who the annotation should be attributed to.
     default: "Ansible"
   level:
+    type: str
     description:
       - one of INFO/WARN/ERROR, defaults to INFO if not supplied.  May affect display.
     choices: ['INFO', 'WARN', 'ERROR']
     default: 'INFO'
   instance_id:
+    type: str
     description:
       - id of an EC2 instance that this event should be attached to, which will limit the contexts where this event is shown
   event_epoch:
+    type: str
     description:
       - "Unix timestamp of where the event should appear in the timeline, defaults to now. Be careful with this."
 '''
@@ -139,7 +151,7 @@ def do_send_request(module, url, params, key):
 def main():
 
     module = AnsibleModule(
-        argument_spec=dict(
+        argument_spec=dict(  # @TODO add types
             key=dict(required=True),
             event=dict(required=True, choices=['deploy', 'annotation']),
             msg=dict(),
@@ -147,7 +159,7 @@ def main():
             annotated_by=dict(default='Ansible'),
             level=dict(default='INFO', choices=['INFO', 'WARN', 'ERROR']),
             instance_id=dict(),
-            event_epoch=dict(),
+            event_epoch=dict(),  # @TODO int?
             deployed_by=dict(default='Ansible'),
             deployed_to=dict(),
             repository=dict(),
