@@ -17,42 +17,52 @@ options:
   name:
     description:
       - The name of the loadbalancer
+    type: str
     required: True
   description:
     description:
       - A description for the loadbalancer
+    type: str
   alias:
     description:
       - The alias of your CLC Account
+    type: str
     required: True
   location:
     description:
       - The location of the datacenter where the load balancer resides in
+    type: str
     required: True
   method:
     description:
       -The balancing method for the load balancer pool
+    type: str
     choices: ['leastConnection', 'roundRobin']
   persistence:
     description:
       - The persistence method for the load balancer
+    type: str
     choices: ['standard', 'sticky']
   port:
     description:
       - Port to configure on the public-facing side of the load balancer pool
+    type: str
     choices: [80, 443]
   nodes:
     description:
       - A list of nodes that needs to be added to the load balancer pool
+    type: list
     default: []
   status:
     description:
       - The status of the loadbalancer
+    type: str
     default: enabled
     choices: ['enabled', 'disabled']
   state:
     description:
       - Whether to create or delete the load balancer pool
+    type: str
     default: present
     choices: ['present', 'absent', 'port_absent', 'nodes_present', 'nodes_absent']
 requirements:
