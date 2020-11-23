@@ -505,6 +505,8 @@ plugin_routing:
       redirect: community.docker.docker
     hetzner:
       redirect: community.hrobot.robot
+    postgresql:
+      redirect: community.postgresql.postgresql
   module_utils:
     docker.common:
       redirect: community.docker.common
@@ -512,6 +514,8 @@ plugin_routing:
       redirect: community.docker.swarm
     hetzner:
       redirect: community.hrobot.robot
+    postgresql:
+      redirect: community.postgresql.postgresql
   callback:
     actionable:
       tombstone:
