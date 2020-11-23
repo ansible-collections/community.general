@@ -15,13 +15,13 @@ description:
   - Heavily inspired by splunk and sumologic callbacks
 requirements:
   - Whitelisting this callback plugin.
-  - Create a Log Access Write Key in Scalyr (https://app.eu.scalyr.com/keys)
+  - Create a Log Access Write Key in Scalyr (https://app.scalyr.com/keys)
   - Define the Scalyr API URL and API key as an environment variable, in ansible.cfg or as hostvars.
     - When using the hostvars method the variable(s) need to be present as 'localhost' variables.
 options:
   scalyr_api_url:
     description: URL to the Scalyr API endpoint.
-    default: https://app.eu.scalyr.com/api
+    default: https://app.scalyr.com/api
     env:
       - name: SCALYR_API_URL
     ini:
@@ -45,16 +45,16 @@ examples: |
     callback_whitelist = community.general.scalyr
 
   Set the environment variable
-    export SCALYR_API_URL=https://app.eu.scalyr.com/api
+    export SCALYR_API_URL=https://app.scalyr.com/api
     export SCALYR_API_TOKEN=XXXXXXXXXXXXXXXXXXXXXmlQ0-
 
   Or set the ansible.cfg variable in the callback_scalyr block
     [callback_scalyr]
-    scalry_api_url = https://app.eu.scalyr.com/api
+    scalry_api_url = https://app.scalyr.com/api
     scalyr_api_token = XXXXXXXXXXXXXXXXXXXXXmlQ0-
 
   Or define as hostvars (supports as well Ansible vault)
-    scalry_api_url: https://app.eu.scalyr.com/api
+    scalry_api_url: https://app.scalyr.com/api
     scalyr_api_token: XXXXXXXXXXXXXXXXXXXXXmlQ0-
 '''
 
