@@ -65,7 +65,7 @@ options:
       - The instance size name or ID of the server.
         It is required only for 'present' state, and it is mutually exclusive with
         vcore, cores_per_processor, ram, and hdds parameters.
-      - 'The available choices are: I(S), I(M), I(L), I(XL), I(XXL), I(3XL), I(4XL), I(5XL)'
+      - 'The available choices are: C(S), C(M), C(L), C(XL), C(XXL), C(3XL), C(4XL), C(5XL)'
     type: str
   vcore:
     description:
