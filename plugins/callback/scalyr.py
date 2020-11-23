@@ -21,7 +21,7 @@ requirements:
 options:
   scalyr_api_url:
     description: URL to the Scalyr API endpoint.
-    default: https://app.eu.scalyr.com/api/addEvents
+    default: https://app.eu.scalyr.com/api
     env:
       - name: SCALYR_API_URL
     ini:
@@ -45,16 +45,16 @@ examples: |
     callback_whitelist = community.general.scalyr
 
   Set the environment variable
-    export SCALYR_API_URL=https://app.eu.scalyr.com/api/addEvents
+    export SCALYR_API_URL=https://app.eu.scalyr.com/api
     export SCALYR_API_TOKEN=XXXXXXXXXXXXXXXXXXXXXmlQ0-
 
   Or set the ansible.cfg variable in the callback_scalyr block
     [callback_scalyr]
-    scalry_api_url = https://app.eu.scalyr.com/api/addEvents
+    scalry_api_url = https://app.eu.scalyr.com/api
     scalyr_api_token = XXXXXXXXXXXXXXXXXXXXXmlQ0-
 
   Or define as hostvars (supports as well Ansible vault)
-    scalry_api_url: https://app.eu.scalyr.com/api/addEvents
+    scalry_api_url: https://app.eu.scalyr.com/api
     scalyr_api_token: XXXXXXXXXXXXXXXXXXXXXmlQ0-
 '''
 
@@ -67,8 +67,9 @@ from datetime import datetime
 from os.path import basename
 
 from ansible import context
-from ansible.module_utils.urls import open_url
 from ansible.module_utils.ansible_release import __version__ as ansible_version
+from ansible.module_utils.six.moves.urllib.parse import urljoin
+from ansible.module_utils.urls import open_url
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
 
@@ -141,7 +142,7 @@ class ScalyrLogSource(object):
 
         payload = json.dumps(data, cls=AnsibleJSONEncoder, sort_keys=True)
         open_url(
-            url,
+            urljoin(url, "addEvents"),
             data=payload,
             headers={
                 'Content-type': 'application/json'
