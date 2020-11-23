@@ -28,90 +28,99 @@ options:
   state:
     description:
       - Define a load balancer state to create, remove, or update.
+    type: str
     required: false
     default: 'present'
     choices: [ "present", "absent", "update" ]
   auth_token:
     description:
       - Authenticating API token provided by 1&1.
-    required: true
+    type: str
   load_balancer:
     description:
       - The identifier (id or name) of the load balancer used with update state.
-    required: true
+    type: str
   api_url:
     description:
       - Custom API URL. Overrides the
         ONEANDONE_API_URL environment variable.
+    type: str
     required: false
   name:
     description:
       - Load balancer name used with present state. Used as identifier (id or name) when used with absent state.
         maxLength=128
-    required: true
+    type: str
   health_check_test:
     description:
       - Type of the health check. At the moment, HTTP is not allowed.
+    type: str
     choices: [ "NONE", "TCP", "HTTP", "ICMP" ]
-    required: true
   health_check_interval:
     description:
       - Health check period in seconds. minimum=5, maximum=300, multipleOf=1
-    required: true
+    type: str
   health_check_path:
     description:
       - Url to call for checking. Required for HTTP health check. maxLength=1000
+    type: str
     required: false
   health_check_parse:
     description:
       - Regular expression to check. Required for HTTP health check. maxLength=64
+    type: str
     required: false
   persistence:
     description:
       - Persistence.
-    required: true
     type: bool
   persistence_time:
     description:
       - Persistence time in seconds. Required if persistence is enabled. minimum=30, maximum=1200, multipleOf=1
-    required: true
+    type: str
   method:
     description:
       - Balancing procedure.
+    type: str
     choices: [ "ROUND_ROBIN", "LEAST_CONNECTIONS" ]
-    required: true
   datacenter:
     description:
       - ID or country code of the datacenter where the load balancer will be created.
-    default: US
+      - If not specified, it defaults to I(US).
+    type: str
     choices: [ "US", "ES", "DE", "GB" ]
     required: false
   rules:
     description:
       - A list of rule objects that will be set for the load balancer. Each rule must contain protocol,
         port_balancer, and port_server parameters, in addition to source parameter, which is optional.
-    required: true
+    type: list
   description:
     description:
       - Description of the load balancer. maxLength=256
+    type: str
     required: false
   add_server_ips:
     description:
       - A list of server identifiers (id or name) to be assigned to a load balancer.
         Used in combination with update state.
+    type: list
     required: false
   remove_server_ips:
     description:
       - A list of server IP ids to be unassigned from a load balancer. Used in combination with update state.
+    type: list
     required: false
   add_rules:
     description:
       - A list of rules that will be added to an existing load balancer.
         It is syntax is the same as the one used for rules parameter. Used in combination with update state.
+    type: list
     required: false
   remove_rules:
     description:
       - A list of rule ids that will be removed from an existing load balancer. Used in combination with update state.
+    type: list
     required: false
   wait:
     description:
@@ -122,10 +131,12 @@ options:
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
+    type: int
     default: 600
   wait_interval:
     description:
       - Defines the number of seconds to wait when using the _wait_for methods
+    type: int
     default: 5
 
 requirements:
