@@ -80,14 +80,17 @@ options:
     description:
       - Whether to print a transaction summary.
     type: bool
+    default: false
   verbose:
     description:
       - Print extra information.
     type: bool
+    default: false
   debug:
     description:
       - Enable full debugging.
     type: bool
+    default: false
 requirements:
 - puppet
 author:

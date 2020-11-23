@@ -48,6 +48,7 @@ options:
         - "If I(true) all the attributes of the virtual machines should be
            included in the response."
       type: bool
+      default: false
     case_sensitive:
       description:
         - "If I(true) performed search will take case into account."

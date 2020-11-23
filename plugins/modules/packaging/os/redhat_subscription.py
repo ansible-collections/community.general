@@ -75,7 +75,6 @@ options:
             - Upon successful registration, auto-consume available subscriptions
             - Added in favor of deprecated autosubscribe in 2.5.
         type: bool
-        default: no
         aliases: [autosubscribe]
     activationkey:
         description:

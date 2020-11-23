@@ -276,7 +276,7 @@ def main():
             timeout=dict(type='int', default=30),
             type=dict(choices=['PUBLIC', 'SERVICENET'], default='PUBLIC'),
             vip_id=dict(),
-            wait=dict(type='bool'),
+            wait=dict(type='bool', default=False),
             wait_timeout=dict(type='int', default=300),
         )
     )

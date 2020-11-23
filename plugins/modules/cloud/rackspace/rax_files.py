@@ -34,10 +34,12 @@ options:
         Private containers, if previously made public, can have live objects
         available until the TTL on cached objects expires
     type: bool
+    default: false
   public:
     description:
       - Used to set a container as public, available via the Cloud Files CDN
     type: bool
+    default: false
   region:
     type: str
     description:

@@ -68,6 +68,7 @@ options:
     description:
       - Create keystore if it does not exist.
     type: bool
+    default: false
   keystore_type:
     description:
       - Keystore type (JCEKS, JKS).

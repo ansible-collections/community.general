@@ -84,6 +84,7 @@ options:
     description:
       - Log new connections matched to this rule
     type: bool
+    default: false
   from_ip:
     description:
       - Source IP address.
@@ -120,6 +121,7 @@ options:
     description:
       - Delete rule.
     type: bool
+    default: false
   interface:
     description:
       - Specify interface for the rule.  The direction (in or out) used
@@ -149,6 +151,7 @@ options:
     description:
       - Apply the rule to routed/forwarded packets.
     type: bool
+    default: false
   comment:
     description:
       - Add a comment to the rule. Requires UFW version >=0.35.
