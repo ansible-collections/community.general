@@ -6,7 +6,6 @@ plugins/module_utils/_mount.py future-import-boilerplate
 plugins/module_utils/_mount.py metaclass-boilerplate
 plugins/modules/cloud/centurylink/clc_alert_policy.py validate-modules:no-default-for-required-parameter
 plugins/modules/cloud/centurylink/clc_firewall_policy.py validate-modules:no-default-for-required-parameter
-plugins/modules/cloud/docker/docker_container.py use-argspec-type-path # uses colon-separated paths, can't use type=path
 plugins/modules/cloud/google/gcdns_record.py validate-modules:deprecation-mismatch
 plugins/modules/cloud/google/gcdns_record.py validate-modules:invalid-documentation
 plugins/modules/cloud/google/gcdns_record.py validate-modules:missing-main-call

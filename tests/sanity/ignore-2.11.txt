@@ -14,7 +14,6 @@ plugins/modules/cloud/centurylink/clc_modify_server.py validate-modules:paramete
 plugins/modules/cloud/centurylink/clc_publicip.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/centurylink/clc_server.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/centurylink/clc_server_snapshot.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/docker/docker_container.py use-argspec-type-path # uses colon-separated paths, can't use type=path
 plugins/modules/cloud/google/gcdns_record.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gce.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce.py validate-modules:parameter-list-no-elements
