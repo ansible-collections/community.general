@@ -61,6 +61,7 @@ options:
     - If yes, create this alarm, but leave it in an inactive state. Defaults to
       no.
     type: bool
+    default: false
   metadata:
     type: dict
     description:
