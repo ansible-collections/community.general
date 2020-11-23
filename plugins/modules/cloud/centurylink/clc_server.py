@@ -16,6 +16,7 @@ options:
   additional_disks:
     description:
       - The list of additional disks for the server
+    type: list
     default: []
   add_public_ip:
     description:
@@ -25,53 +26,68 @@ options:
   alias:
     description:
       - The account alias to provision the servers under.
+    type: str
   anti_affinity_policy_id:
     description:
       - The anti-affinity policy to assign to the server. This is mutually exclusive with 'anti_affinity_policy_name'.
+    type: str
   anti_affinity_policy_name:
     description:
       - The anti-affinity policy to assign to the server. This is mutually exclusive with 'anti_affinity_policy_id'.
+    type: str
   alert_policy_id:
     description:
       - The alert policy to assign to the server. This is mutually exclusive with 'alert_policy_name'.
+    type: str
   alert_policy_name:
     description:
       - The alert policy to assign to the server. This is mutually exclusive with 'alert_policy_id'.
+    type: str
   count:
     description:
       - The number of servers to build (mutually exclusive with exact_count)
     default: 1
+    type: int
   count_group:
     description:
       - Required when exact_count is specified.  The Server Group use to determine how many servers to deploy.
+    type: str
   cpu:
     description:
       - How many CPUs to provision on the server
     default: 1
+    type: int
   cpu_autoscale_policy_id:
     description:
       - The autoscale policy to assign to the server.
+    type: str
   custom_fields:
     description:
       - The list of custom fields to set on the server.
+    type: list
     default: []
   description:
     description:
       - The description to set for the server.
+    type: str
   exact_count:
     description:
       - Run in idempotent mode.  Will insure that this exact number of servers are running in the provided group,
         creating and deleting them to reach that count.  Requires count_group to be set.
+    type: int
   group:
     description:
       - The Server Group to create servers under.
+    type: str
     default: 'Default Group'
   ip_address:
     description:
       - The IP Address for the server. One is assigned if not provided.
+    type: str
   location:
     description:
       - The Datacenter to create servers in.
+    type: str
   managed_os:
     description:
       - Whether to create the server as 'Managed' or not.
@@ -81,73 +97,91 @@ options:
   memory:
     description:
       - Memory in GB.
+    type: int
     default: 1
   name:
     description:
       - A 1 to 6 character identifier to use for the server. This is required when state is 'present'
+    type: str
   network_id:
     description:
       - The network UUID on which to create servers.
+    type: str
   packages:
     description:
       - The list of blue print packages to run on the server after its created.
+    type: list
     default: []
   password:
     description:
       - Password for the administrator / root user
+    type: str
   primary_dns:
     description:
       - Primary DNS used by the server.
+    type: str
   public_ip_protocol:
     description:
       - The protocol to use for the public ip if add_public_ip is set to True.
+    type: str
     default: 'TCP'
     choices: ['TCP', 'UDP', 'ICMP']
   public_ip_ports:
     description:
       - A list of ports to allow on the firewall to the servers public ip, if add_public_ip is set to True.
+    type: list
     default: []
   secondary_dns:
     description:
       - Secondary DNS used by the server.
+    type: str
   server_ids:
     description:
       - Required for started, stopped, and absent states.
         A list of server Ids to insure are started, stopped, or absent.
+    type: list
     default: []
   source_server_password:
     description:
       - The password for the source server if a clone is specified.
+    type: str
   state:
     description:
       - The state to insure that the provided resources are in.
+    type: str
     default: 'present'
     choices: ['present', 'absent', 'started', 'stopped']
   storage_type:
     description:
       - The type of storage to attach to the server.
+    type: str
     default: 'standard'
     choices: ['standard', 'hyperscale']
   template:
     description:
       - The template to use for server creation.  Will search for a template if a partial string is provided.
         This is required when state is 'present'
+    type: str
   ttl:
     description:
       - The time to live for the server in seconds.  The server will be deleted when this time expires.
+    type: str
   type:
     description:
       - The type of server to create.
+    type: str
     default: 'standard'
     choices: ['standard', 'hyperscale', 'bareMetal']
   configuration_id:
     description:
       -  Only required for bare metal servers.
          Specifies the identifier for the specific configuration type of bare metal server to deploy.
+    type: str
   os_type:
     description:
       - Only required for bare metal servers.
         Specifies the OS to provision with the bare metal server.
+    type: str
     choices: ['redHat6_64Bit', 'centOS6_64Bit', 'windows2012R2Standard_64Bit', 'ubuntu14_64Bit']
   wait:
     description:
