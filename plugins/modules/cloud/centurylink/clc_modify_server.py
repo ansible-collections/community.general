@@ -16,32 +16,40 @@ options:
   server_ids:
     description:
       - A list of server Ids to modify.
+    type: list
     required: True
   cpu:
     description:
       - How many CPUs to update on the server
+    type: str
   memory:
     description:
       - Memory (in GB) to set to the server.
+    type: str
   anti_affinity_policy_id:
     description:
       - The anti affinity policy id to be set for a hyper scale server.
         This is mutually exclusive with 'anti_affinity_policy_name'
+    type: str
   anti_affinity_policy_name:
     description:
       - The anti affinity policy name to be set for a hyper scale server.
         This is mutually exclusive with 'anti_affinity_policy_id'
+    type: str
   alert_policy_id:
     description:
       - The alert policy id to be associated to the server.
         This is mutually exclusive with 'alert_policy_name'
+    type: str
   alert_policy_name:
     description:
       - The alert policy name to be associated to the server.
         This is mutually exclusive with 'alert_policy_id'
+    type: str
   state:
     description:
       - The state to insure that the provided resources are in.
+    type: str
     default: 'present'
     choices: ['present', 'absent']
   wait:
