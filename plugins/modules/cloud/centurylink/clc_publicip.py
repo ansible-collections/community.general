@@ -16,19 +16,23 @@ options:
   protocol:
     description:
       - The protocol that the public IP will listen for.
+    type: str
     default: TCP
     choices: ['TCP', 'UDP', 'ICMP']
   ports:
     description:
       - A list of ports to expose. This is required when state is 'present'
+    type: list
   server_ids:
     description:
       - A list of servers to create public ips on.
+    type: list
     required: True
   state:
     description:
       - Determine whether to create or delete public IPs. If present module will not create a second public ip if one
         already exists.
+    type: str
     default: present
     choices: ['present', 'absent']
   wait:
