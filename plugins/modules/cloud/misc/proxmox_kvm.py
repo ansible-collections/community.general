@@ -274,6 +274,10 @@ options:
       - C(memory) Amount of memory this NUMA node provides.
       - C(policy) NUMA allocation policy.
     type: dict
+  numa_enabled:
+    description:
+      - Enables NUMA.
+    type: bool
   onboot:
     description:
       - Specifies whether a VM will be started during system bootup.

@@ -4,7 +4,6 @@ plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
 plugins/module_utils/_mount.py future-import-boilerplate
 plugins/module_utils/_mount.py metaclass-boilerplate
-plugins/modules/cloud/atomic/atomic_container.py validate-modules:doc-required-mismatch
 plugins/modules/cloud/centurylink/clc_aa_policy.py validate-modules:doc-missing-type
 plugins/modules/cloud/centurylink/clc_aa_policy.py yamllint:unparsable-with-libyaml
 plugins/modules/cloud/centurylink/clc_alert_policy.py validate-modules:doc-missing-type
@@ -42,15 +41,7 @@ plugins/modules/cloud/centurylink/clc_server_snapshot.py validate-modules:doc-mi
 plugins/modules/cloud/centurylink/clc_server_snapshot.py validate-modules:implied-parameter-type-mismatch
 plugins/modules/cloud/centurylink/clc_server_snapshot.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/centurylink/clc_server_snapshot.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/dimensiondata/dimensiondata_network.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/cloud/dimensiondata/dimensiondata_network.py validate-modules:doc-missing-type
-plugins/modules/cloud/dimensiondata/dimensiondata_network.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/dimensiondata/dimensiondata_vlan.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/cloud/dimensiondata/dimensiondata_vlan.py validate-modules:doc-missing-type
-plugins/modules/cloud/dimensiondata/dimensiondata_vlan.py validate-modules:doc-required-mismatch
-plugins/modules/cloud/dimensiondata/dimensiondata_vlan.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/docker/docker_container.py use-argspec-type-path # uses colon-separated paths, can't use type=path
-plugins/modules/cloud/docker/docker_stack.py validate-modules:doc-elements-mismatch
 plugins/modules/cloud/google/gcdns_record.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gce.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce.py validate-modules:parameter-list-no-elements
@@ -84,10 +75,6 @@ plugins/modules/cloud/google/gcp_url_map.py validate-modules:parameter-list-no-e
 plugins/modules/cloud/google/gcpubsub.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gcpubsub_info.py validate-modules:parameter-state-invalid-choice
 plugins/modules/cloud/heroku/heroku_collaborator.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/heroku/heroku_collaborator.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/huawei/hwc_ecs_instance.py validate-modules:doc-elements-mismatch
-plugins/modules/cloud/huawei/hwc_vpc_port.py validate-modules:doc-elements-mismatch
-plugins/modules/cloud/huawei/hwc_vpc_subnet.py validate-modules:doc-elements-mismatch
 plugins/modules/cloud/kubevirt/kubevirt_cdi_upload.py validate-modules:doc-missing-type
 plugins/modules/cloud/kubevirt/kubevirt_cdi_upload.py validate-modules:doc-required-mismatch
 plugins/modules/cloud/kubevirt/kubevirt_cdi_upload.py validate-modules:mutually_exclusive-unknown
@@ -108,12 +95,10 @@ plugins/modules/cloud/kubevirt/kubevirt_template.py validate-modules:parameter-l
 plugins/modules/cloud/kubevirt/kubevirt_vm.py validate-modules:mutually_exclusive-unknown
 plugins/modules/cloud/kubevirt/kubevirt_vm.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/kubevirt/kubevirt_vm.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/linode/linode.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/linode/linode.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/linode/linode.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/linode/linode.py validate-modules:undocumented-parameter
 plugins/modules/cloud/linode/linode_v4.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/linode/linode_v4.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/lxc/lxc_container.py pylint:blacklisted-name
 plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
 plugins/modules/cloud/lxc/lxc_container.py validate-modules:doc-choices-do-not-match-spec
@@ -131,17 +116,7 @@ plugins/modules/cloud/lxd/lxd_container.py validate-modules:undocumented-paramet
 plugins/modules/cloud/lxd/lxd_profile.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/lxd/lxd_profile.py validate-modules:doc-missing-type
 plugins/modules/cloud/lxd/lxd_profile.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/memset/memset_dns_reload.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/memset/memset_memstore_info.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/memset/memset_server_info.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/memset/memset_zone.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/memset/memset_zone_domain.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/memset/memset_zone_record.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/misc/proxmox_kvm.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/misc/proxmox_kvm.py validate-modules:undocumented-parameter
-plugins/modules/cloud/misc/proxmox_template.py validate-modules:doc-required-mismatch
 plugins/modules/cloud/misc/rhevm.py validate-modules:parameter-state-invalid-choice
-plugins/modules/cloud/misc/terraform.py validate-modules:return-syntax-error
 plugins/modules/cloud/oneandone/oneandone_firewall_policy.py validate-modules:doc-required-mismatch
 plugins/modules/cloud/oneandone/oneandone_firewall_policy.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/oneandone/oneandone_firewall_policy.py validate-modules:parameter-type-not-in-doc
@@ -186,11 +161,6 @@ plugins/modules/cloud/opennebula/one_service.py validate-modules:parameter-type-
 plugins/modules/cloud/opennebula/one_vm.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/opennebula/one_vm.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/oracle/oci_vcn.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/oracle/oci_vcn.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/ovh/ovh_ip_failover.py validate-modules:doc-missing-type
-plugins/modules/cloud/ovh/ovh_ip_failover.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/ovh/ovh_ip_loadbalancing_backend.py validate-modules:doc-missing-type
-plugins/modules/cloud/ovh/ovh_ip_loadbalancing_backend.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/ovirt/ovirt_affinity_label_facts.py validate-modules:doc-missing-type
 plugins/modules/cloud/ovirt/ovirt_affinity_label_facts.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/ovirt/ovirt_api_facts.py validate-modules:parameter-list-no-elements
@@ -279,9 +249,7 @@ plugins/modules/cloud/profitbricks/profitbricks_volume_attachments.py validate-m
 plugins/modules/cloud/profitbricks/profitbricks_volume_attachments.py validate-modules:doc-missing-type
 plugins/modules/cloud/profitbricks/profitbricks_volume_attachments.py validate-modules:doc-required-mismatch
 plugins/modules/cloud/profitbricks/profitbricks_volume_attachments.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/pubnub/pubnub_blocks.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/pubnub/pubnub_blocks.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/pubnub/pubnub_blocks.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/rackspace/rax.py use-argspec-type-path # fix needed
 plugins/modules/cloud/rackspace/rax.py validate-modules:doc-missing-type
 plugins/modules/cloud/rackspace/rax.py validate-modules:parameter-list-no-elements
@@ -317,11 +285,7 @@ plugins/modules/cloud/smartos/vmadm.py validate-modules:doc-required-mismatch
 plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/smartos/vmadm.py validate-modules:undocumented-parameter
-plugins/modules/cloud/softlayer/sl_vm.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/cloud/softlayer/sl_vm.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/cloud/softlayer/sl_vm.py validate-modules:doc-required-mismatch
 plugins/modules/cloud/softlayer/sl_vm.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/softlayer/sl_vm.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:doc-missing-type
@@ -363,8 +327,6 @@ plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:doc-required
 plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:missing-suboption-docs
 plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:undocumented-parameter
-plugins/modules/cloud/xenserver/xenserver_guest_info.py validate-modules:doc-required-mismatch
-plugins/modules/cloud/xenserver/xenserver_guest_powerstate.py validate-modules:doc-required-mismatch
 plugins/modules/clustering/consul/consul.py validate-modules:doc-missing-type
 plugins/modules/clustering/consul/consul.py validate-modules:parameter-list-no-elements
 plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parameter
