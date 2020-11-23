@@ -68,7 +68,6 @@ from os.path import basename
 
 from ansible import context
 from ansible.module_utils.ansible_release import __version__ as ansible_version
-from ansible.module_utils.six.moves.urllib.parse import urljoin
 from ansible.module_utils.urls import open_url
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
@@ -142,7 +141,7 @@ class ScalyrLogSource(object):
 
         payload = json.dumps(data, cls=AnsibleJSONEncoder, sort_keys=True)
         open_url(
-            urljoin(url, "addEvents"),
+            url + "/addEvents",
             data=payload,
             headers={
                 'Content-type': 'application/json'
