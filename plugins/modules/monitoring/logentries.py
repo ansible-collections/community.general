@@ -17,23 +17,28 @@ description:
     - Sends logs to LogEntries in realtime
 options:
     path:
+        type: str
         description:
             - path to a log file
         required: true
     state:
+        type: str
         description:
             - following state of the log
-        choices: [ 'present', 'absent' ]
+        choices: [ 'present', 'absent', 'followed', 'unfollowed' ]
         required: false
         default: present
     name:
+        type: str
         description:
             - name of the log
         required: false
     logtype:
+        type: str
         description:
             - type of the log
         required: false
+        aliases: [type]
 
 notes:
     - Requires the LogEntries agent which can be installed following the instructions at logentries.com

@@ -16,25 +16,31 @@ description:
 author: Loic Blot (@nerzhul)
 options:
     name:
+        type: str
         description:
             - Install plugin with that name.
         required: True
     state:
+        type: str
         description:
             - Apply plugin state.
         choices: ["present", "absent"]
         default: present
     plugin_bin:
+        type: path
         description:
             - Specify logstash-plugin to use for plugin management.
         default: /usr/share/logstash/bin/logstash-plugin
     proxy_host:
+        type: str
         description:
             - Proxy host to use during plugin installation.
     proxy_port:
+        type: str
         description:
             - Proxy port to use during plugin installation.
     version:
+        type: str
         description:
             - Specify plugin Version of the plugin to install.
               If plugin exists with previous version, it will NOT be updated.
