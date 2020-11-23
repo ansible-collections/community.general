@@ -103,9 +103,6 @@ options:
     type: dict
     description:
       - List of variables.
-  force:
-    description:
-      - This option is parsed but not used by the module.
 extends_documentation_fragment:
   - url
 '''
