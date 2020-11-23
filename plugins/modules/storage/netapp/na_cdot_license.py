@@ -31,11 +31,13 @@ options:
     description:
     - Remove licenses that have no controller affiliation in the cluster.
     type: bool
+    default: false
 
   remove_expired:
     description:
     - Remove licenses that have expired in the cluster.
     type: bool
+    default: false
 
   serial_number:
     description:
