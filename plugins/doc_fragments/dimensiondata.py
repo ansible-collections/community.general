@@ -19,7 +19,6 @@ options:
   region:
     description:
       - The target region.
-    choices:
       - Regions are defined in Apache libcloud project [libcloud/common/dimensiondata.py]
       - They are also listed in U(https://libcloud.readthedocs.io/en/latest/compute/drivers/dimensiondata.html)
       - Note that the default value "na" stands for "North America".
