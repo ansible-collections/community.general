@@ -28,44 +28,53 @@ options:
   state:
     description:
       - Define a network's state to create, remove, or update.
+    type: str
     required: false
     default: 'present'
     choices: [ "present", "absent", "update" ]
   auth_token:
     description:
       - Authenticating API token provided by 1&1.
-    required: true
+    type: str
   private_network:
     description:
       - The identifier (id or name) of the network used with update state.
-    required: true
+    type: str
   api_url:
     description:
       - Custom API URL. Overrides the
         ONEANDONE_API_URL environment variable.
+    type: str
     required: false
   name:
     description:
       - Private network name used with present state. Used as identifier (id or name) when used with absent state.
-    required: true
+    type: str
   description:
     description:
       - Set a description for the network.
+    type: str
   datacenter:
     description:
       - The identifier of the datacenter where the private network will be created
+    type: str
+    choices: [US, ES, DE, GB]
   network_address:
     description:
       - Set a private network space, i.e. 192.168.1.0
+    type: str
   subnet_mask:
     description:
       - Set the netmask for the private network, i.e. 255.255.255.0
+    type: str
   add_members:
     description:
       - List of server identifiers (name or id) to be added to the private network.
+    type: list
   remove_members:
     description:
       - List of server identifiers (name or id) to be removed from the private network.
+    type: list
   wait:
     description:
       - wait for the instance to be in state 'running' before returning
@@ -75,10 +84,12 @@ options:
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
+    type: int
     default: 600
   wait_interval:
     description:
       - Defines the number of seconds to wait when using the _wait_for methods
+    type: int
     default: 5
 
 requirements:
