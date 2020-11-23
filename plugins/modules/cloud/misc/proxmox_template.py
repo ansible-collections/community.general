@@ -49,7 +49,6 @@ options:
     description:
       - Proxmox VE node, when you will operate with template
     type: str
-    required: true
   src:
     description:
       - path to uploaded file
