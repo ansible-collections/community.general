@@ -28,80 +28,98 @@ options:
   state:
     description:
       - Define a server's state to create, remove, start or stop it.
+    type: str
     default: present
     choices: [ "present", "absent", "running", "stopped" ]
   auth_token:
     description:
       - Authenticating API token provided by 1&1. Overrides the
         ONEANDONE_AUTH_TOKEN environment variable.
-    required: true
+    type: str
   api_url:
     description:
       - Custom API URL. Overrides the
         ONEANDONE_API_URL environment variable.
+    type: str
   datacenter:
     description:
       - The datacenter location.
+    type: str
     default: US
     choices: [ "US", "ES", "DE", "GB" ]
   hostname:
     description:
       - The hostname or ID of the server. Only used when state is 'present'.
+    type: str
   description:
     description:
       - The description of the server.
+    type: str
   appliance:
     description:
       - The operating system name or ID for the server.
         It is required only for 'present' state.
+    type: str
   fixed_instance_size:
     description:
       - The instance size name or ID of the server.
         It is required only for 'present' state, and it is mutually exclusive with
         vcore, cores_per_processor, ram, and hdds parameters.
-    required: true
-    choices: [ "S", "M", "L", "XL", "XXL", "3XL", "4XL", "5XL" ]
+      - 'The available choices are: C(S), C(M), C(L), C(XL), C(XXL), C(3XL), C(4XL), C(5XL)'
+    type: str
   vcore:
     description:
       - The total number of processors.
         It must be provided with cores_per_processor, ram, and hdds parameters.
+    type: int
   cores_per_processor:
     description:
       - The number of cores per processor.
         It must be provided with vcore, ram, and hdds parameters.
+    type: int
   ram:
     description:
       - The amount of RAM memory.
         It must be provided with with vcore, cores_per_processor, and hdds parameters.
+    type: float
   hdds:
     description:
       - A list of hard disks with nested "size" and "is_main" properties.
         It must be provided with vcore, cores_per_processor, and ram parameters.
+    type: list
   private_network:
     description:
       - The private network name or ID.
+    type: str
   firewall_policy:
     description:
       - The firewall policy name or ID.
+    type: str
   load_balancer:
     description:
       - The load balancer name or ID.
+    type: str
   monitoring_policy:
     description:
       - The monitoring policy name or ID.
+    type: str
   server:
     description:
       - Server identifier (ID or hostname). It is required for all states except 'running' and 'present'.
+    type: str
   count:
     description:
       - The number of servers to create.
+    type: int
     default: 1
   ssh_key:
     description:
       - User's public SSH key (contents, not path).
+    type: raw
   server_type:
     description:
       - The type of server to be built.
+    type: str
     default: "cloud"
     choices: [ "cloud", "baremetal", "k8s_node" ]
   wait:
@@ -115,10 +133,12 @@ options:
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
+    type: int
     default: 600
   wait_interval:
     description:
       - Defines the number of seconds to wait when using the wait_for methods
+    type: int
     default: 5
   auto_increment:
     description:
