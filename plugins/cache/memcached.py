@@ -180,13 +180,7 @@ class CacheModule(BaseCacheModule):
             self._timeout = self.get_option('_timeout')
             self._prefix = self.get_option('_prefix')
         except KeyError:
-            display.deprecated('Rather than importing CacheModules directly, '
-                               'use ansible.plugins.loader.cache_loader',
-                               version='2.0.0', collection_name='community.general')  # was Ansible 2.12
-            if C.CACHE_PLUGIN_CONNECTION:
-                connection = C.CACHE_PLUGIN_CONNECTION.split(',')
-            self._timeout = C.CACHE_PLUGIN_TIMEOUT
-            self._prefix = C.CACHE_PLUGIN_PREFIX
+            raise AnsibleError("Do not import CacheModules directly. Use ansible.plugins.loader.cache_loader instead.")
 
         if not HAS_MEMCACHE:
             raise AnsibleError("python-memcached is required for the memcached fact cache")
