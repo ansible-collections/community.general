@@ -18,15 +18,18 @@ requirements:
     - Valid Uptime Robot API Key
 options:
     state:
+        type: str
         description:
             - Define whether or not the monitor should be running or paused.
         required: true
         choices: [ "started", "paused" ]
     monitorid:
+        type: str
         description:
             - ID of the monitor to check.
         required: true
     apikey:
+        type: str
         description:
             - Uptime Robot API key.
         required: true
