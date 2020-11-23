@@ -26,20 +26,24 @@ options:
         default: present
         description:
             - Indicates desired state of resource.
+        type: str
         choices: [ absent, present ]
     api_key:
         required: true
         description:
             - The API key obtained from the Memset control panel.
+        type: str
     domain:
         required: true
         description:
             - The zone domain name. Ensure this value has at most 250 characters.
+        type: str
         aliases: ['name']
     zone:
         required: true
         description:
             - The zone to add the domain to (this must already exist).
+        type: str
 '''
 
 EXAMPLES = '''

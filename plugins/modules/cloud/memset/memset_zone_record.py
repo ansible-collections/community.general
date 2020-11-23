@@ -26,28 +26,34 @@ options:
         default: present
         description:
             - Indicates desired state of resource.
+        type: str
         choices: [ absent, present ]
     api_key:
         required: true
         description:
             - The API key obtained from the Memset control panel.
+        type: str
     address:
         required: true
         description:
             - The address for this record (can be IP or text string depending on record type).
+        type: str
         aliases: [ ip, data ]
     priority:
         description:
             - C(SRV) and C(TXT) record priority, in the range 0 > 999 (inclusive).
+        type: int
     record:
         required: false
         description:
             - The subdomain to create.
+        type: str
     type:
         required: true
         description:
             - The type of DNS record to create.
         choices: [ A, AAAA, CNAME, MX, NS, SRV, TXT ]
+        type: str
     relative:
         type: bool
         description:
@@ -58,10 +64,12 @@ options:
             - The record's TTL in seconds (will inherit zone's TTL if not explicitly set). This must be a
               valid int from U(https://www.memset.com/apidocs/methods_dns.html#dns.zone_record_create).
         choices: [ 0, 300, 600, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400 ]
+        type: int
     zone:
         required: true
         description:
             - The name of the zone to which to add the record to.
+        type: str
 '''
 
 EXAMPLES = '''

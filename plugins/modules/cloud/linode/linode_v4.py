@@ -89,6 +89,7 @@ options:
         the C(LINODE_ACCESS_TOKEN) environment variable. See
         U(https://www.linode.com/docs/api#access-and-authentication).
     required: true
+    type: str
   stackscript_id:
     description:
       - The numeric ID of the StackScript to use when creating the instance.

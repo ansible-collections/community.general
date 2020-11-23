@@ -27,14 +27,17 @@ options:
         description:
             - The IP address to manage (can be a single IP like 1.1.1.1
               or a block like 1.1.1.1/28 )
+        type: str
     service:
         required: true
         description:
             - The name of the OVH service this IP address should be routed
+        type: str
     endpoint:
         required: true
         description:
             - The endpoint to use ( for instance ovh-eu)
+        type: str
     wait_completion:
         required: false
         default: true
@@ -52,24 +55,29 @@ options:
               completion of a previously executed task with
               wait_completion=false. You can execute this module repeatedly on
               a list of failover IPs using wait_completion=false (see examples)
+        type: int
     application_key:
         required: true
         description:
             - The applicationKey to use
+        type: str
     application_secret:
         required: true
         description:
             - The application secret to use
+        type: str
     consumer_key:
         required: true
         description:
             - The consumer key to use
+        type: str
     timeout:
         required: false
         default: 120
         description:
             - The timeout in seconds used to wait for a task to be
               completed. Default is 120 seconds.
+        type: int
 
 '''
 
