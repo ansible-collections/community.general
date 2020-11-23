@@ -21,9 +21,11 @@ requirements:
   - heroku3
 options:
   api_key:
+    type: str
     description:
       - Heroku API key
   apps:
+    type: list
     description:
       - List of Heroku App names
     required: true
@@ -33,10 +35,12 @@ options:
     type: bool
     default: "no"
   user:
+    type: str
     description:
       - User ID or e-mail
     required: true
   state:
+    type: str
     description:
       - Create or remove the heroku collaborator
     choices: ["present", "absent"]

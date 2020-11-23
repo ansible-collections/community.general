@@ -54,6 +54,7 @@ options:
             - Specifies a set of zero or more allowed address pairs.
         required: false
         type: list
+        elements: dict
         suboptions:
             ip_address:
                 description:
@@ -72,6 +73,7 @@ options:
         description:
             - Specifies the extended option of DHCP.
         type: list
+        elements: dict
         required: false
         suboptions:
             name:
@@ -99,6 +101,7 @@ options:
         description:
             - Specifies the ID of the security group.
         type: list
+        elements: str
         required: false
 extends_documentation_fragment:
 - community.general.hwc

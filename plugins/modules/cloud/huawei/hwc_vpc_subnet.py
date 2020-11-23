@@ -90,6 +90,7 @@ options:
             - Specifies the DNS server addresses for subnet. The address
               in the head will be used first.
         type: list
+        elements: str
         required: false
 extends_documentation_fragment:
 - community.general.hwc

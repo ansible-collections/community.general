@@ -17,6 +17,7 @@ description:
 options:
     cidr_block:
         description: The CIDR IP address block of the VCN. Required when creating a VCN with I(state=present).
+        type: str
         required: false
     compartment_id:
         description: The OCID of the compartment to contain the VCN. Required when creating a VCN with I(state=present).
