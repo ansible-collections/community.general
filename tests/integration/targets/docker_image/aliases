@@ -1,7 +1,0 @@
-disabled  # tests already running in community.docker
-shippable/posix/group5
-skip/aix
-skip/osx
-skip/macos
-skip/freebsd
-destructive

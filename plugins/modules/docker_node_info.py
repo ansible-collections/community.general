@@ -1,1 +1,0 @@
-./cloud/docker/docker_node_info.py

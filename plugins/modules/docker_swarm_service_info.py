@@ -1,1 +1,0 @@
-./cloud/docker/docker_swarm_service_info.py
