@@ -41,6 +41,7 @@ plugins/modules/cloud/centurylink/clc_server_snapshot.py validate-modules:doc-mi
 plugins/modules/cloud/centurylink/clc_server_snapshot.py validate-modules:implied-parameter-type-mismatch
 plugins/modules/cloud/centurylink/clc_server_snapshot.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/centurylink/clc_server_snapshot.py validate-modules:parameter-type-not-in-doc
+plugins/modules/cloud/docker/docker_container.py use-argspec-type-path # uses colon-separated paths, can't use type=path
 plugins/modules/cloud/google/gcdns_record.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gce.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce.py validate-modules:parameter-list-no-elements
@@ -326,8 +327,6 @@ plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:doc-required
 plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:missing-suboption-docs
 plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:undocumented-parameter
-plugins/modules/cloud/xenserver/xenserver_guest_info.py validate-modules:doc-required-mismatch
-plugins/modules/cloud/xenserver/xenserver_guest_powerstate.py validate-modules:doc-required-mismatch
 plugins/modules/clustering/consul/consul.py validate-modules:doc-missing-type
 plugins/modules/clustering/consul/consul.py validate-modules:parameter-list-no-elements
 plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parameter
