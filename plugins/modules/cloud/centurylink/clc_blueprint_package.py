@@ -16,26 +16,30 @@ options:
   server_ids:
     description:
       - A list of server Ids to deploy the blue print package.
+    type: list
     required: True
   package_id:
     description:
       - The package id of the blue print.
+    type: str
     required: True
   package_params:
     description:
       - The dictionary of arguments required to deploy the blue print.
+    type: dict
     default: {}
     required: False
   state:
     description:
       - Whether to install or uninstall the package. Currently it supports only "present" for install action.
+    type: str
     required: False
     default: present
     choices: ['present']
   wait:
     description:
       - Whether to wait for the tasks to finish before returning.
-    type: bool
+    type: str
     default: True
     required: False
 requirements:
@@ -163,7 +167,7 @@ class ClcBlueprintPackage:
             server_ids=dict(type='list', required=True),
             package_id=dict(required=True),
             package_params=dict(type='dict', default={}),
-            wait=dict(default=True),
+            wait=dict(default=True),   # @FIXME should be bool?
             state=dict(default='present', choices=['present'])
         )
         return argument_spec
