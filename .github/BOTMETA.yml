@@ -501,6 +501,8 @@ files:
     ignore: andyhky
   $modules/net_tools/netcup_dns.py:
     maintainers: nbuchwitz
+  $modules/net_tools/omapi_host.py:
+    maintainers: amasolov
   $modules/net_tools/nios/:
     maintainers: $team_networking
     labels: infoblox networking
