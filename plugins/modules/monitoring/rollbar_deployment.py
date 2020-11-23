@@ -18,30 +18,37 @@ description:
     (see https://rollbar.com/docs/deploys_other/)
 options:
   token:
+    type: str
     description:
       - Your project access token.
     required: true
   environment:
+    type: str
     description:
       - Name of the environment being deployed, e.g. 'production'.
     required: true
   revision:
+    type: str
     description:
       - Revision number/sha being deployed.
     required: true
   user:
+    type: str
     description:
       - User who deployed.
     required: false
   rollbar_user:
+    type: str
     description:
       - Rollbar username of the user who deployed.
     required: false
   comment:
+    type: str
     description:
       - Deploy comment (e.g. what is being deployed).
     required: false
   url:
+    type: str
     description:
       - Optional URL to submit the notification to.
     required: false

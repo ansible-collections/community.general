@@ -16,16 +16,19 @@ description:
   - Manage which I(sensu channels) a machine should subscribe to
 options:
   name:
+    type: str
     description:
       - The name of the channel
     required: true
   state:
+    type: str
     description:
       - Whether the machine should subscribe or unsubscribe from the channel
     choices: [ 'present', 'absent' ]
     required: false
     default: present
   path:
+    type: str
     description:
       - Path to the subscriptions json file
     required: false

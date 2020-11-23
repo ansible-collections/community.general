@@ -18,12 +18,15 @@ description:
     for subscriptions and checks.
 options:
   check:
+    type: str
     description:
       - Specifies the check which the silence entry applies to.
   creator:
+    type: str
     description:
       - Specifies the entity responsible for this entry.
   expire:
+    type: int
     description:
       - If specified, the silence entry will be automatically cleared
         after this number of seconds.
@@ -33,23 +36,25 @@ options:
         cleared once the condition it is silencing is resolved.
     type: bool
   reason:
+    type: str
     description:
       - If specified, this free-form string is used to provide context or
         rationale for the reason this silence entry was created.
   state:
+    type: str
     description:
       - Specifies to create or clear (delete) a silence entry via the Sensu API
-    required: true
     default: present
     choices: ['present', 'absent']
   subscription:
+    type: str
     description:
       - Specifies the subscription which the silence entry applies to.
       - To create a silence entry for a client prepend C(client:) to client name.
         Example - C(client:server1.example.dev)
     required: true
-    default: []
   url:
+    type: str
     description:
       - Specifies the URL of the Sensu monitoring host server.
     required: false

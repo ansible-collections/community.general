@@ -22,39 +22,48 @@ notes:
 author: Benjamin Copeland (@bhcopeland) <ben@copeland.me.uk>
 options:
     title:
+        type: str
         description:
             - A descriptive title for the maintenance window
         default: "A new maintenance window"
     desc:
+        type: str
         description:
             - Message describing the maintenance window
         default: "Created by Ansible"
     state:
+        type: str
         description:
             - Desired state of the package.
         default: "present"
         choices: ["present", "absent"]
     api_id:
+        type: str
         description:
             - Your unique API ID from status.io
         required: true
     api_key:
+        type: str
         description:
             - Your unique API Key from status.io
         required: true
     statuspage:
+        type: str
         description:
             - Your unique StatusPage ID from status.io
         required: true
     url:
+        type: str
         description:
             - Status.io API URL. A private apiary can be used instead.
         default: "https://api.status.io"
     components:
+        type: list
         description:
             - The given name of your component (server name)
         aliases: ['component']
     containers:
+        type: list
         description:
             - The given name of your container (data center)
         aliases: ['container']
@@ -89,18 +98,22 @@ options:
         type: bool
         default: 'no'
     maintenance_id:
+        type: str
         description:
             - The maintenance id number when deleting a maintenance window
     minutes:
+        type: int
         description:
             - The length of time in UTC that the maintenance will run
               (starting from playbook runtime)
         default: 10
     start_date:
+        type: str
         description:
             - Date maintenance is expected to start (Month/Day/Year) (UTC)
             - End Date is worked out from start_date + minutes
     start_time:
+        type: str
         description:
             - Time maintenance is expected to start (Hour:Minutes) (UTC)
             - End Time is worked out from start_time + minutes
