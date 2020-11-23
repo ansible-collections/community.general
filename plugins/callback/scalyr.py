@@ -66,6 +66,7 @@ import uuid
 from datetime import datetime
 from os.path import basename
 
+from ansible import context
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.ansible_release import __version__ as ansible_version
 from ansible.parsing.ajson import AnsibleJSONEncoder
@@ -84,6 +85,7 @@ class ScalyrLogSource(object):
         self.host = socket.gethostname()
         self.ip_address = socket.gethostbyname(socket.gethostname())
         self.user = getpass.getuser()
+        self.cli_args = {}
 
     def send_event(self, url, authtoken, state, result, runtime):
         """Send the Ansible task result to the Scalyr API.
@@ -130,7 +132,8 @@ class ScalyrLogSource(object):
                         "ansible_playbook": self.ansible_playbook,
                         "ansible_role": ansible_role,
                         "ansible_task": result._task_fields,
-                        "ansible_result": result._result
+                        "ansible_result": result._result,
+                        "ansible_cli_args": self.cli_args
                     }
                 }
             ]
@@ -207,6 +210,7 @@ class CallbackModule(CallbackBase):
 
     def v2_playbook_on_start(self, playbook):
         self.scalyr.ansible_playbook = basename(playbook._file_name)
+        self.scalyr.cli_args = context.CLIARGS
 
     def v2_playbook_on_task_start(self, task, is_conditional):
         self.start_datetimes[task._uuid] = datetime.utcnow()
