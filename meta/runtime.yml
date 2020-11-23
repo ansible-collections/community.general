@@ -36,187 +36,11 @@ plugin_routing:
   connection:
     docker:
       redirect: community.docker.docker
-  lookup:
-    conjur_variable:
-      redirect: cyberark.conjur.conjur_variable
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The conjur_variable lookup has been moved to the cyberark.conjur collection.
   modules:
     ali_instance_facts:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
-    digital_ocean:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean
-    digital_ocean_account_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_account_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_account_facts
-    digital_ocean_account_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_account_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_account_info
-    digital_ocean_block_storage:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_block_storage module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_block_storage
-    digital_ocean_certificate:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_certificate module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_certificate
-    digital_ocean_certificate_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_certificate_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_certificate_facts
-    digital_ocean_certificate_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_certificate_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_certificate_info
-    digital_ocean_domain:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_domain module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_domain
-    digital_ocean_domain_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_domain_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_domain_facts
-    digital_ocean_domain_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_domain_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_domain_info
-    digital_ocean_droplet:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_droplet module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_droplet
-    digital_ocean_firewall_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_firewall_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_firewall_facts
-    digital_ocean_firewall_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_firewall_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_firewall_info
-    digital_ocean_floating_ip:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_floating_ip module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_floating_ip
-    digital_ocean_floating_ip_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_floating_ip_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_floating_ip_facts
-    digital_ocean_floating_ip_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_floating_ip_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_floating_ip_info
-    digital_ocean_image_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_image_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_image_facts
-    digital_ocean_image_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_image_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_image_info
-    digital_ocean_load_balancer_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_load_balancer_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_load_balancer_facts
-    digital_ocean_load_balancer_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_load_balancer_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_load_balancer_info
-    digital_ocean_region_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_region_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_region_facts
-    digital_ocean_region_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_region_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_region_info
-    digital_ocean_size_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_size_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_size_facts
-    digital_ocean_size_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_size_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_size_info
-    digital_ocean_snapshot_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_snapshot_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_snapshot_facts
-    digital_ocean_snapshot_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_snapshot_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_snapshot_info
-    digital_ocean_sshkey:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_sshkey module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_sshkey
-    digital_ocean_sshkey_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_sshkey_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_sshkey_facts
-    digital_ocean_sshkey_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_sshkey_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_sshkey_info
-    digital_ocean_tag:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_tag module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_tag
-    digital_ocean_tag_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_tag_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_tag_facts
-    digital_ocean_tag_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_tag_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_tag_info
-    digital_ocean_volume_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_volume_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_volume_facts
-    digital_ocean_volume_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_volume_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_volume_info
     docker_compose:
       redirect: community.docker.docker_compose
     docker_config:
@@ -271,11 +95,6 @@ plugin_routing:
       redirect: community.docker.docker_volume
     docker_volume_info:
       redirect: community.docker.docker_volume_info
-    firewalld:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The firewalld module has been moved to the ansible.posix collection.
-      redirect: ansible.posix.firewalld
     foreman:
       deprecation:
         removal_version: 2.0.0
@@ -336,36 +155,6 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
-    infini_export:
-      redirect: infinidat.infinibox.infini_export
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infini_export module has been moved to the infinidat collection.
-    infini_export_client:
-      redirect: infinidat.infinibox.infini_export_client
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infini_export_client module has been moved to the infinidat collection.
-    infini_fs:
-      redirect: infinidat.infinibox.infini_fs
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infini_fs module has been moved to the infinidat collection.
-    infini_host:
-      redirect: infinidat.infinibox.infini_host
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infini_host module has been moved to the infinidat collection.
-    infini_pool:
-      redirect: infinidat.infinibox.infini_pool
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infini_pool module has been moved to the infinidat collection.
-    infini_vol:
-      redirect: infinidat.infinibox.infini_vol
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infini_vol module has been moved to the infinidat collection.
     jenkins_job_facts:
       deprecation:
         removal_version: 3.0.0
@@ -394,36 +183,6 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
-    mysql_db:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql_db module has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql_db
-    mysql_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql_info module has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql_info
-    mysql_query:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql_query module has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql_query
-    mysql_replication:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql_replication module has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql_replication
-    mysql_user:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql_user module has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql_user
-    mysql_variables:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql_variables module has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql_variables
     na_cdot_aggregate:
       deprecation:
         removal_version: 2.0.0
@@ -612,41 +371,6 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
-    proxysql_backend_servers:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql_backend_servers module has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql_backend_servers
-    proxysql_global_variables:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql_global_variables module has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql_global_variables
-    proxysql_manage_config:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql_manage_config module has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql_manage_config
-    proxysql_mysql_users:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql_mysql_users module has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql_mysql_users
-    proxysql_query_rules:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql_query_rules module has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql_query_rules
-    proxysql_replication_hostgroups:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql_replication_hostgroups module has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql_replication_hostgroups
-    proxysql_scheduler:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql_scheduler module has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql_scheduler
     purefa_facts:
       deprecation:
         removal_version: 3.0.0
@@ -724,53 +448,13 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
   doc_fragments:
-    digital_ocean:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean docs_fragment has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean
     docker:
       redirect: community.docker.docker
-    infinibox:
-      redirect: infinidat.infinibox.infinibox
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infinibox doc_fragments plugin has been moved to the infinidat.infinibox collection.
-    mysql:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql docs_fragment has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql
-    proxysql:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql docs_fragment has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql
   module_utils:
-    digital_ocean:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean module_utils has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean
     docker.common:
       redirect: community.docker.common
     docker.swarm:
       redirect: community.docker.swarm
-    firewalld:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The firewalld module_utils has been moved to the ansible.posix collection.
-      redirect: ansible.posix.firewalld
-    infinibox:
-      redirect: infinidat.infinibox.infinibox
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infinibox module_utils plugin has been moved to the infinidat.infinibox collection.
-    mysql:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql module_utils has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql
   callback:
     actionable:
       deprecation:
