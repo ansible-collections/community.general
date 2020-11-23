@@ -28,36 +28,43 @@ options:
   state:
     description:
       - Define a public ip state to create, remove, or update.
+    type: str
     required: false
     default: 'present'
     choices: [ "present", "absent", "update" ]
   auth_token:
     description:
       - Authenticating API token provided by 1&1.
-    required: true
+    type: str
   api_url:
     description:
       - Custom API URL. Overrides the
         ONEANDONE_API_URL environment variable.
+    type: str
     required: false
   reverse_dns:
     description:
       - Reverse DNS name. maxLength=256
+    type: str
     required: false
   datacenter:
     description:
       - ID of the datacenter where the IP will be created (only for unassigned IPs).
+    type: str
+    choices: [US, ES, DE, GB]
+    default: US
     required: false
   type:
     description:
       - Type of IP. Currently, only IPV4 is available.
+    type: str
     choices: ["IPV4", "IPV6"]
     default: 'IPV4'
     required: false
   public_ip_id:
     description:
       - The ID of the public IP used with update and delete states.
-    required: true
+    type: str
   wait:
     description:
       - wait for the instance to be in state 'running' before returning
@@ -67,10 +74,12 @@ options:
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
+    type: int
     default: 600
   wait_interval:
     description:
       - Defines the number of seconds to wait when using the _wait_for methods
+    type: int
     default: 5
 
 requirements:
