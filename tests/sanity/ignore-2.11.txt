@@ -433,7 +433,6 @@ plugins/modules/monitoring/bigpanda.py validate-modules:invalid-argument-name
 plugins/modules/monitoring/datadog/datadog_event.py validate-modules:parameter-list-no-elements
 plugins/modules/monitoring/datadog/datadog_monitor.py validate-modules:invalid-argument-name
 plugins/modules/monitoring/datadog/datadog_monitor.py validate-modules:parameter-list-no-elements
-plugins/modules/monitoring/icinga2_host.py validate-modules:nonexistent-parameter-documented
 plugins/modules/monitoring/icinga2_host.py validate-modules:undocumented-parameter
 plugins/modules/monitoring/librato_annotation.py validate-modules:parameter-list-no-elements
 plugins/modules/monitoring/logstash_plugin.py validate-modules:invalid-ansiblemodule-schema
