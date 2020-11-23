@@ -1,1 +1,0 @@
-./cloud/docker/docker_image_info.py
