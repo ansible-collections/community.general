@@ -71,7 +71,6 @@ EXAMPLES = '''
       ansible.builtin.debug:
         var: policy
 
----
 - name: Delete AA Policy
   hosts: localhost
   gather_facts: False

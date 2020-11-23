@@ -97,7 +97,6 @@ EXAMPLES = '''
     - name: Debug
       ansible.builtin.debug: var=policy
 
----
 - name: Delete Alert Policy Example
   hosts: localhost
   gather_facts: False

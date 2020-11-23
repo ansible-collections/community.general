@@ -86,8 +86,6 @@ EXAMPLES = '''
         var: clc
 
 # Delete a Server Group
-
----
 - name: Delete Server Group
   hosts: localhost
   gather_facts: False

@@ -98,7 +98,6 @@ EXAMPLES = '''
         ports: Any
         destination_account_alias: WFAD
 
----
 - name: Delete Firewall Policy
   hosts: localhost
   gather_facts: False
