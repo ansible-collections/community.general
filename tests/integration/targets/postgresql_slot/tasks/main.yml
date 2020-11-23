@@ -1,9 +1,0 @@
-####################################################################
-# WARNING: These are designed specifically for Ansible tests       #
-# and should not be used as examples of how to write Ansible roles #
-####################################################################
-
-# Initial CI tests of postgresql_slot module
-# Physical replication slots are available since PostgreSQL 9.4
-- import_tasks: postgresql_slot_initial.yml
-  when: postgres_version_resp.stdout is version('9.4', '>=')
