@@ -35,7 +35,7 @@ options:
        required: true
     force:
        type: bool
-       default: "false"
+       default: false
        description:
           - Applicable only while removing the nodes from the pool. gluster
             will refuse to detach a node from the pool if any one of the node
@@ -141,7 +141,7 @@ class Peer(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            force=dict(type='bool', required=False),
+            force=dict(type='bool', required=False, default=False),
             nodes=dict(type='list', required=True),
             state=dict(type='str', choices=['absent', 'present'],
                        default='present'),

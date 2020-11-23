@@ -54,6 +54,7 @@ options:
     - To allow the update process to downgrade packages to match what is present in the repository, set this to C(yes).
     - This is useful for rolling back to stable from testing, or similar operations.
     type: bool
+    default: false
     version_added: 1.2.0
 notes:
 - In order to check the availability of packages, the catalog cache under C(/var/opt/csw/pkgutil) may be refreshed even in check mode.

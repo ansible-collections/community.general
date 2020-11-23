@@ -78,6 +78,7 @@ options:
       - If brick is being created in the root partition, module will fail.
         Set force to true to override this behaviour.
     type: bool
+    default: false
 notes:
   - Requires cli tools for GlusterFS on servers.
   - Will add new bricks, but not remove them.

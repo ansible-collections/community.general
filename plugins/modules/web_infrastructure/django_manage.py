@@ -270,7 +270,7 @@ def main():
 
             apps=dict(default=None, required=False),
             cache_table=dict(default=None, required=False, type='str'),
-            clear=dict(default=None, required=False, type='bool'),
+            clear=dict(default=False, required=False, type='bool'),
             database=dict(default=None, required=False, type='str'),
             failfast=dict(default=False, required=False, type='bool', aliases=['fail_fast']),
             fixtures=dict(default=None, required=False, type='str'),

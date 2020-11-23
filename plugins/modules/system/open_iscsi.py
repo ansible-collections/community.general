@@ -65,10 +65,12 @@ options:
           to manual, hence combined with C(auto_node_startup=yes) will always return
           a changed state.
         type: bool
+        default: false
     show_nodes:
         description:
         - Whether the list of nodes in the persistent iSCSI database should be returned by the module.
         type: bool
+        default: false
 '''
 
 EXAMPLES = r'''

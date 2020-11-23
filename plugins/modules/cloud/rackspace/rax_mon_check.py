@@ -93,6 +93,7 @@ options:
     description:
     - If "yes", ensure the check is created, but don't actually use it yet.
     type: bool
+    default: false
   metadata:
     type: dict
     description:

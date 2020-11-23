@@ -19,6 +19,7 @@ options:
               Only the attributes of the current entity. User can configure to fetch other
               attributes of the nested entities by specifying C(nested_attributes).
         type: bool
+        default: false
     nested_attributes:
         description:
             - Specifies list of the attributes which should be fetched from the API.

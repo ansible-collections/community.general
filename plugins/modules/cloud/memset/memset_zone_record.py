@@ -56,6 +56,7 @@ options:
         type: str
     relative:
         type: bool
+        default: false
         description:
             - If set then the current domain is added onto the address field for C(CNAME), C(MX), C(NS)
               and C(SRV)record types.

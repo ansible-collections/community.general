@@ -148,6 +148,7 @@ options:
               a new volume, and cannot be changed for an existing
               volume.
         type: bool
+        default: false
     growphysical:
         description:
             - Specifies whether to attempt to execute a growphysical
