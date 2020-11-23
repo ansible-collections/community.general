@@ -53,6 +53,7 @@ options:
     description:
     - Use https instead of http to connect to InfluxDB server.
     type: bool
+    default: false
   timeout:
     description:
     - Number of seconds Requests will wait for client to establish a connection.
@@ -68,6 +69,7 @@ options:
     description:
     - Use UDP to connect to InfluxDB server.
     type: bool
+    default: false
   udp_port:
     description:
     - UDP port to connect to InfluxDB server.

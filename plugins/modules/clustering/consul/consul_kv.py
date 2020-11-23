@@ -55,7 +55,6 @@ options:
           - If the key represents a prefix, each entry with the prefix can be
             retrieved by setting this to C(yes).
         type: bool
-        default: 'no'
     retrieve:
         description:
             - If the I(state) is C(present) and I(value) is set, perform a

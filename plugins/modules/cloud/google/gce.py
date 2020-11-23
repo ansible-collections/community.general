@@ -148,7 +148,6 @@ options:
       - if set to C(yes), instances will be preemptible and time-limited.
         (requires libcloud >= 0.20.0)
     type: bool
-    default: 'no'
   disk_size:
     type: int
     description:

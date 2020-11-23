@@ -64,6 +64,7 @@ options:
       - Install/Remove category instead of a single package.
     required: false
     type: bool
+    default: false
 '''
 
 EXAMPLES = '''

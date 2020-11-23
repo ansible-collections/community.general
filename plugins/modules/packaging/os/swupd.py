@@ -50,6 +50,7 @@ options:
     description:
       - Updates the OS to the latest version.
     type: bool
+    default: false
   url:
     description:
       - Overrides both I(contenturl) and I(versionurl).
@@ -58,6 +59,7 @@ options:
     description:
       - Verify content for OS version.
     type: bool
+    default: false
   versionurl:
     description:
       - URL for version string download.

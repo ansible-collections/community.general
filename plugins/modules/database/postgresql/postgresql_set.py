@@ -289,7 +289,7 @@ def main():
         name=dict(type='str', required=True),
         db=dict(type='str', aliases=['login_db']),
         value=dict(type='str'),
-        reset=dict(type='bool'),
+        reset=dict(type='bool', default=False),
         session_role=dict(type='str'),
         trust_input=dict(type='bool', default=True),
     )
