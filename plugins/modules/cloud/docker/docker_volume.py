@@ -48,7 +48,6 @@ options:
       - Deprecated. Will be removed in community.general 2.0.0. Set I(recreate) to C(options-changed) instead
         for the same behavior of setting I(force) to C(yes).
     type: bool
-    default: no
 
   recreate:
     description:
