@@ -20,9 +20,6 @@ files:
     maintainers: $team_macos
     labels: macos say
     keywords: brew cask darwin homebrew macosx macports osx
-  $callbacks/stderr.py:
-    maintainers: ysn2233
-    labels: stderr
   $callbacks/sumologic.py:
     maintainers: ryancurrah
     labels: sumologic
@@ -733,8 +730,6 @@ files:
     maintainers: jagadeeshnv
   $modules/remote_management/dellemc/ome_device_info.py:
     maintainers: Sajna-Shetty
-  $modules/remote_management/foreman/:
-    maintainers: ehelms ares ekohl xprazak2
   $modules/remote_management/hpilo/:
     maintainers: haad
     ignore: dagwieers
@@ -776,8 +771,6 @@ files:
     maintainers: andreparames
   $modules/source_control/git_config.py:
     maintainers: djmattyg007 mgedmin
-  $modules/source_control/github/github_hooks.py:
-    maintainers: pcgentry
   $modules/source_control/github/github_deploy_key.py:
     maintainers: bincyber
   $modules/source_control/github/github_issue.py:
