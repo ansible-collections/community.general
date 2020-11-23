@@ -29,37 +29,40 @@ options:
   state:
     description:
       - Define a monitoring policy's state to create, remove, update.
+    type: str
     required: false
     default: present
     choices: [ "present", "absent", "update" ]
   auth_token:
     description:
       - Authenticating API token provided by 1&1.
-    required: true
+    type: str
   api_url:
     description:
       - Custom API URL. Overrides the
         ONEANDONE_API_URL environment variable.
+    type: str
     required: false
   name:
     description:
       - Monitoring policy name used with present state. Used as identifier (id or name) when used with absent state. maxLength=128
-    required: true
+    type: str
   monitoring_policy:
     description:
       - The identifier (id or name) of the monitoring policy used with update state.
-    required: true
+    type: str
   agent:
     description:
       - Set true for using agent.
-    required: true
+    type: str
   email:
     description:
       - User's email. maxLength=128
-    required: true
+    type: str
   description:
     description:
       - Monitoring policy description. maxLength=256
+    type: str
     required: false
   thresholds:
     description:
@@ -67,7 +70,7 @@ options:
         which both have alert and value suboptions. Warning is used to set limits for
         warning alerts, critical is used to set critical alerts. alert enables alert,
         and value is used to advise when the value is exceeded.
-    required: true
+    type: list
     suboptions:
       cpu:
         description:
@@ -92,7 +95,7 @@ options:
   ports:
     description:
       - Array of ports that will be monitoring.
-    required: true
+    type: list
     suboptions:
       protocol:
         description:
@@ -115,7 +118,7 @@ options:
   processes:
     description:
       - Array of processes that will be monitoring.
-    required: true
+    type: list
     suboptions:
       process:
         description:
@@ -129,34 +132,42 @@ options:
   add_ports:
     description:
       - Ports to add to the monitoring policy.
+    type: list
     required: false
   add_processes:
     description:
       - Processes to add to the monitoring policy.
+    type: list
     required: false
   add_servers:
     description:
       - Servers to add to the monitoring policy.
+    type: list
     required: false
   remove_ports:
     description:
       - Ports to remove from the monitoring policy.
+    type: list
     required: false
   remove_processes:
     description:
       - Processes to remove from the monitoring policy.
+    type: list
     required: false
   remove_servers:
     description:
       - Servers to remove from the monitoring policy.
+    type: list
     required: false
   update_ports:
     description:
       - Ports to be updated on the monitoring policy.
+    type: list
     required: false
   update_processes:
     description:
       - Processes to be updated on the monitoring policy.
+    type: list
     required: false
   wait:
     description:
@@ -167,10 +178,12 @@ options:
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
+    type: int
     default: 600
   wait_interval:
     description:
       - Defines the number of seconds to wait when using the _wait_for methods
+    type: int
     default: 5
 
 requirements:

@@ -29,52 +29,60 @@ options:
     description:
       - Define a firewall policy state to create, remove, or update.
     required: false
+    type: str
     default: 'present'
     choices: [ "present", "absent", "update" ]
   auth_token:
     description:
       - Authenticating API token provided by 1&1.
-    required: true
+    type: str
   api_url:
     description:
       - Custom API URL. Overrides the
         ONEANDONE_API_URL environment variable.
+    type: str
     required: false
   name:
     description:
       - Firewall policy name used with present state. Used as identifier (id or name) when used with absent state.
         maxLength=128
-    required: true
+    type: str
   firewall_policy:
     description:
       - The identifier (id or name) of the firewall policy used with update state.
-    required: true
+    type: str
   rules:
     description:
       - A list of rules that will be set for the firewall policy.
         Each rule must contain protocol parameter, in addition to three optional parameters
         (port_from, port_to, and source)
+    type: list
   add_server_ips:
     description:
       - A list of server identifiers (id or name) to be assigned to a firewall policy.
         Used in combination with update state.
+    type: list
     required: false
   remove_server_ips:
     description:
       - A list of server IP ids to be unassigned from a firewall policy. Used in combination with update state.
+    type: list
     required: false
   add_rules:
     description:
       - A list of rules that will be added to an existing firewall policy.
         It is syntax is the same as the one used for rules parameter. Used in combination with update state.
+    type: list
     required: false
   remove_rules:
     description:
       - A list of rule ids that will be removed from an existing firewall policy. Used in combination with update state.
+    type: list
     required: false
   description:
     description:
       - Firewall policy description. maxLength=256
+    type: str
     required: false
   wait:
     description:
@@ -85,10 +93,12 @@ options:
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
+    type: int
     default: 600
   wait_interval:
     description:
       - Defines the number of seconds to wait when using the _wait_for methods
+    type: int
     default: 5
 
 requirements:
