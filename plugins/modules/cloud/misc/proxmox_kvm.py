@@ -568,7 +568,9 @@ EXAMPLES = '''
     api_host: helldorado
     name: spynal
     node: sabrewulf
-    net: '{"net0":"virtio,bridge=vmbr1,rate=200", "net1":"e1000,bridge=vmbr2,"}'
+    net: 
+      net0: 'virtio,bridge=vmbr1,rate=200'
+      net1: 'e1000,bridge=vmbr2'
 
 - name: Create new VM with one network interface, three virto hard disk, 4 cores, and 2 vcpus
   community.general.proxmox_kvm:
@@ -577,8 +579,12 @@ EXAMPLES = '''
     api_host: helldorado
     name: spynal
     node: sabrewulf
-    net: '{"net0":"virtio,bridge=vmbr1,rate=200"}'
-    virtio: '{"virtio0":"VMs_LVM:10", "virtio1":"VMs:2,format=qcow2", "virtio2":"VMs:5,format=raw"}'
+    net:
+      net0: 'virtio,bridge=vmbr1,rate=200'
+    virtio:
+      virtio0: 'VMs_LVM:10'
+      virtio1: 'VMs:2,format=qcow2'
+      virtio2: 'VMs:5,format=raw'
     cores: 4
     vcpus: 2
 
@@ -652,14 +658,16 @@ EXAMPLES = '''
     api_password: secret
     api_host: helldorado
     name: spynal
-    ide: '{ "ide2": "local:cloudinit,format=qcow2"}'
+    ide: 
+      ide2: 'local:cloudinit,format=qcow2'
     ciuser: mylinuxuser
     cipassword: supersecret
-    searchdomains: "mydomain.internal"
+    searchdomains: 'mydomain.internal'
     nameservers: 1.1.1.1
-    net: '{"net0":"virtio,bridge=vmbr1,tag=77"}'
+    net: 
+      net0: 'virtio,bridge=vmbr1,tag=77'
     ipconfig:
-      ipconfig0: "ip=192.168.1.1/24,gw=192.168.1.1"
+      ipconfig0: 'ip=192.168.1.1/24,gw=192.168.1.1'
 
 - name: Create new VM using Cloud-Init with an ssh key
   community.general.proxmox_kvm:
@@ -668,13 +676,17 @@ EXAMPLES = '''
     api_password: secret
     api_host: helldorado
     name: spynal
-    ide: '{ "ide2": "local:cloudinit,format=qcow2"}'
+    ide:
+      ide2: 'local:cloudinit,format=qcow2'
     sshkeys: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILJkVm98B71lD5XHfihwcYHE9TVpsJmK1vR1JcaU82L+'
     searchdomains: 'mydomain.internal'
-    nameservers: ['1.1.1.1', '8.8.8.8']
-    net: '{"net0":"virtio,bridge=vmbr1,tag=77"}'
+    nameservers:
+      - '1.1.1.1'
+      - '8.8.8.8'
+    net:
+      net0: 'virtio,bridge=vmbr1,tag=77'
     ipconfig:
-      ipconfig0: "ip=192.168.1.1/24"
+      ipconfig0: 'ip=192.168.1.1/24'
 
 - name: Start VM
   community.general.proxmox_kvm:
