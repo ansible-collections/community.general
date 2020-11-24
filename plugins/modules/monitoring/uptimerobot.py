@@ -39,6 +39,7 @@ options:
     check_type:
         description:
             - The kind of check, that will be performed on the url.
+            - This option is required to create a new monitor.
         choices: [ "http", "ping" ]
         version_added: '1.3.0'
     monitorid:
