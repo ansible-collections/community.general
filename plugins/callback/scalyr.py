@@ -86,15 +86,15 @@ class ScalyrLogSource(object):
         self.user = getpass.getuser()
         self.cli_args = {}
 
-    def send_event(self, url, authtoken, state, result, runtime):
+    def send_event(self, api_endpoint_url, api_token, state, result, runtime):
         """Send the Ansible task result to the Scalyr API.
 
         Args:
-            url ([string]): Scalyr API URL to where the event will be sent.
-            authtoken ([string]): Log Access Write Key to authenticate against the Scalyr API.
+            api_endpoint_url ([string]): Scalyr API endpoint URL to where the event will be sent.
+            api_token ([string]): Log Access Write Key to authenticate against the Scalyr API.
             state ([string]): State of the task itself.
             result ([ansible.executor.task_result.TaskResult]): The Ansible task result.
-            runtime ([int]): Duration of the task.
+            runtime ([int]): Duration of the task in ms.
         """
         if 'args' in result._task_fields:
             if result._task_fields['args'].get('_ansible_check_mode') is True:
@@ -108,7 +108,7 @@ class ScalyrLogSource(object):
             ansible_role = None
 
         data = {
-            "token": str(authtoken),
+            "token": str(api_token),
             "session": str(self.session),
             "sessionInfo": {
                 "serverHost": result._host.get_name(),
@@ -140,7 +140,7 @@ class ScalyrLogSource(object):
 
         payload = json.dumps(data, cls=AnsibleJSONEncoder, sort_keys=True)
         open_url(
-            url + "/addEvents",
+            api_endpoint_url,
             data=payload,
             headers={
                 'Content-type': 'application/json'
@@ -158,9 +158,16 @@ class CallbackModule(CallbackBase):
     def __init__(self, display=None):
         super(CallbackModule, self).__init__(display=display)
         self.start_datetimes = {}  # Collect task start times
-        self.url = None
-        self.authtoken = None
+        self.api_token = None
+        self.api_endpoint_url = None
         self.scalyr = ScalyrLogSource()
+
+    def _set_api_endpoint(self, base_url):
+        if base_url:
+            self.api_endpoint_url = base_url + "/addEvents"
+
+    def _set_api_token(self, api_token):
+        self.api_token = api_token
 
     def _runtime(self, result):
         """Return duration of task result.
@@ -179,13 +186,13 @@ class CallbackModule(CallbackBase):
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
-        self.url = self.get_option('scalyr_api_url')
-        self.authtoken = self.get_option('scalyr_api_token')
+        self._set_api_endpoint(self.get_option('scalyr_api_url'))
+        self._set_api_token(self.get_option('scalyr_api_token'))
 
     def v2_playbook_on_play_start(self, play):
         hostvars = play.get_variable_manager()._hostvars
 
-        if self.url is None:
+        if self.api_endpoint_url is None:
             if not hostvars or 'scalyr_api_url' not in hostvars['localhost']:
                 self.disabled = True
                 self._display.warning('Scalyr API URL was '
@@ -194,9 +201,9 @@ class CallbackModule(CallbackBase):
                                       '`SCALYR_API_URL` environment variable, '
                                       'in the ansible.cfg file or as a hostvar.')
             else:
-                self.url = hostvars['localhost']['scalyr_api_url']
+                self._set_api_endpoint(hostvars['localhost']['scalyr_api_url'])
 
-        if self.authtoken is None:
+        if self.api_token is None:
             if not hostvars or 'scalyr_api_token' not in hostvars['localhost']:
                 self.disabled = True
                 self._display.warning('Scalyr requires a Log Access Write Key'
@@ -205,7 +212,7 @@ class CallbackModule(CallbackBase):
                                       '`SCALYR_API_TOKEN` environment variable, '
                                       'in the ansible.cfg file or as a hostvar.')
             else:
-                self.authtoken = hostvars['localhost']['scalyr_api_token']
+                self._set_api_token(hostvars['localhost']['scalyr_api_token'])
 
     def v2_playbook_on_start(self, playbook):
         self.scalyr.ansible_playbook = basename(playbook._file_name)
@@ -219,8 +226,8 @@ class CallbackModule(CallbackBase):
 
     def v2_runner_on_ok(self, result, **kwargs):
         self.scalyr.send_event(
-            self.url,
-            self.authtoken,
+            self.api_endpoint_url,
+            self.api_token,
             'OK',
             result,
             self._runtime(result)
@@ -228,8 +235,8 @@ class CallbackModule(CallbackBase):
 
     def v2_runner_on_skipped(self, result, **kwargs):
         self.scalyr.send_event(
-            self.url,
-            self.authtoken,
+            self.api_endpoint_url,
+            self.api_token,
             'SKIPPED',
             result,
             self._runtime(result)
@@ -237,8 +244,8 @@ class CallbackModule(CallbackBase):
 
     def v2_runner_on_failed(self, result, **kwargs):
         self.scalyr.send_event(
-            self.url,
-            self.authtoken,
+            self.api_endpoint_url,
+            self.api_token,
             'FAILED',
             result,
             self._runtime(result)
@@ -246,8 +253,8 @@ class CallbackModule(CallbackBase):
 
     def runner_on_async_failed(self, result, **kwargs):
         self.scalyr.send_event(
-            self.url,
-            self.authtoken,
+            self.api_endpoint_url,
+            self.api_token,
             'FAILED',
             result,
             self._runtime(result)
@@ -255,8 +262,8 @@ class CallbackModule(CallbackBase):
 
     def v2_runner_on_unreachable(self, result, **kwargs):
         self.scalyr.send_event(
-            self.url,
-            self.authtoken,
+            self.api_endpoint_url,
+            self.api_token,
             'UNREACHABLE',
             result,
             self._runtime(result)
