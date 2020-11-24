@@ -1,5 +1,5 @@
 major_changes:
-- >
+- |
   For community.general 2.0.0, the ``docker`` modules and plugins will be moved to the `community.docker <https://galaxy.ansible.com/community/docker>`_ collection.
   A redirection will be inserted so that users using ansible-base 2.10 or newer do not have to change anything.
 
