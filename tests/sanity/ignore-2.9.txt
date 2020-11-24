@@ -246,13 +246,6 @@ plugins/modules/database/misc/riak.py validate-modules:doc-default-does-not-matc
 plugins/modules/database/misc/riak.py validate-modules:doc-missing-type
 plugins/modules/database/misc/riak.py validate-modules:parameter-type-not-in-doc
 plugins/modules/database/mssql/mssql_db.py validate-modules:doc-missing-type
-plugins/modules/database/postgresql/postgresql_db.py use-argspec-type-path
-plugins/modules/database/postgresql/postgresql_db.py validate-modules:parameter-type-not-in-doc
-plugins/modules/database/postgresql/postgresql_db.py validate-modules:use-run-command-not-popen
-plugins/modules/database/postgresql/postgresql_ext.py validate-modules:parameter-type-not-in-doc
-plugins/modules/database/postgresql/postgresql_schema.py validate-modules:parameter-type-not-in-doc
-plugins/modules/database/postgresql/postgresql_user.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/database/postgresql/postgresql_user.py validate-modules:parameter-type-not-in-doc
 plugins/modules/database/vertica/vertica_configuration.py validate-modules:doc-missing-type
 plugins/modules/database/vertica/vertica_info.py validate-modules:doc-missing-type
 plugins/modules/database/vertica/vertica_role.py validate-modules:doc-missing-type

@@ -55,10 +55,6 @@ files:
     labels: hwc
   $doc_fragments/nomad.py:
     maintainers: chris93111
-  $doc_fragments/postgres.py:
-    maintainers: $team_postgresql
-    labels: postgres postgresql
-    keywords: database postgres postgresql
   $doc_fragments/xenserver.py:
     maintainers: bvitnik
     labels: xenserver
@@ -147,10 +143,6 @@ files:
   $module_utils/oracle/oci_utils.py:
     maintainers: $team_oracle
     labels: cloud
-  $module_utils/postgres.py:
-    maintainers: $team_postgresql
-    labels: postgres postgresql
-    keywords: database postgres postgresql
   $module_utils/pure.py:
     maintainers: $team_purestorage
     labels: pure pure_storage
@@ -346,20 +338,6 @@ files:
   $modules/database/mssql/mssql_db.py:
     maintainers: vedit Jmainguy kenichi-ogawa-1988
     labels: mssql_db
-  $modules/database/postgresql/:
-    keywords: database postgres postgresql
-    labels: postgres postgresql
-    maintainers: $team_postgresql
-  $modules/database/postgresql/postgresql_ext.py:
-    maintainers: dschep strk
-  $modules/database/postgresql/postgresql_lang.py:
-    maintainers: jensdepuydt
-  $modules/database/postgresql/postgresql_privs.py:
-    maintainers: b6d
-  $modules/database/postgresql/postgresql_query.py:
-    maintainers: archf wrouesnel
-  $modules/database/postgresql/postgresql_tablespace.py:
-    maintainers: antoinell
   $modules/database/vertica/:
     maintainers: dareko
   $modules/files/archive.py:
@@ -1045,7 +1023,6 @@ macros:
   team_networking: NilashishC Qalthos danielmellado ganeshrn justjais trishnaguha sganesh-infoblox privateip
   team_opennebula: ilicmilan meerkampdvv rsmontero xorel
   team_oracle: manojmeda mross22 nalsaber
-  team_postgresql: Andersson007 Dorn- andytom jbscalia kostiantyn-nemchenko matburt nerzhul sebasmannem tcraxs ilicmilan
   team_purestorage: bannaych dnix101 genegr lionmax opslounge raekins sdodsley sile16
   team_redfish: billdodd mraineri tomasg2012
   team_rhn: FlossWare alikins barnabycourt vritant

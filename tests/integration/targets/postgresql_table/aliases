@@ -1,6 +1,0 @@
-destructive
-shippable/posix/group5
-skip/aix
-skip/osx
-skip/macos
-disabled  # tests already running in community.postgresql
