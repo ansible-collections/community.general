@@ -1,0 +1,10 @@
+removed_features:
+- The deprecated ``gcdns_record`` module has been removed. Use ``google.cloud.gcp_dns_resource_record_set`` instead (https://github.com/ansible-collections/community.general/pull/1370).
+- The deprecated ``gcdns_zone`` module has been removed. Use ``google.cloud.gcp_dns_managed_zone`` instead (https://github.com/ansible-collections/community.general/pull/1370).
+- The deprecated ``gce`` module has been removed. Use ``google.cloud.gcp_compute_instance`` instead (https://github.com/ansible-collections/community.general/pull/1370).
+- The deprecated ``gcp_backend_service`` module has been removed. Use ``google.cloud.gcp_compute_backend_service`` instead (https://github.com/ansible-collections/community.general/pull/1370).
+- The deprecated ``gcp_forwarding_rule`` module has been removed. Use ``google.cloud.gcp_compute_forwarding_rule`` or ``google.cloud.gcp_compute_global_forwarding_rule`` instead (https://github.com/ansible-collections/community.general/pull/1370).
+- The deprecated ``gcp_healthcheck`` module has been removed. Use ``google.cloud.gcp_compute_health_check``, ``google.cloud.gcp_compute_http_health_check`` or ``google.cloud.gcp_compute_https_health_check`` instead (https://github.com/ansible-collections/community.general/pull/1370).
+- The deprecated ``gcp_target_proxy`` module has been removed. Use ``google.cloud.gcp_compute_target_http_proxy`` instead (https://github.com/ansible-collections/community.general/pull/1370).
+- The deprecated ``gcp_url_map`` module has been removed. Use ``google.cloud.gcp_compute_url_map`` instead (https://github.com/ansible-collections/community.general/pull/1370).
+- The deprecated ``gcspanner`` module has been removed. Use ``google.cloud.gcp_spanner_database`` and/or ``google.cloud.gcp_spanner_instance`` instead (https://github.com/ansible-collections/community.general/pull/1370).

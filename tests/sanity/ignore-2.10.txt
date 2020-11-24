@@ -14,10 +14,6 @@ plugins/modules/cloud/centurylink/clc_modify_server.py validate-modules:paramete
 plugins/modules/cloud/centurylink/clc_publicip.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/centurylink/clc_server.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/centurylink/clc_server_snapshot.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gcdns_record.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gce.py pylint:blacklisted-name
-plugins/modules/cloud/google/gce.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gce.py yamllint:unparsable-with-libyaml
 plugins/modules/cloud/google/gce_eip.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_eip.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gce_img.py pylint:blacklisted-name
@@ -37,13 +33,6 @@ plugins/modules/cloud/google/gce_snapshot.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_snapshot.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gce_tag.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_tag.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gcp_backend_service.py pylint:blacklisted-name
-plugins/modules/cloud/google/gcp_backend_service.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gcp_forwarding_rule.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gcp_healthcheck.py pylint:blacklisted-name
-plugins/modules/cloud/google/gcp_healthcheck.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gcp_target_proxy.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gcp_url_map.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gcpubsub.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gcpubsub_info.py validate-modules:parameter-state-invalid-choice
 plugins/modules/cloud/heroku/heroku_collaborator.py validate-modules:parameter-list-no-elements
@@ -682,7 +671,5 @@ plugins/modules/web_infrastructure/rundeck_acl_policy.py pylint:blacklisted-name
 plugins/modules/web_infrastructure/sophos_utm/utm_network_interface_address.py validate-modules:parameter-type-not-in-doc
 plugins/modules/web_infrastructure/sophos_utm/utm_proxy_exception.py validate-modules:doc-elements-mismatch
 scripts/inventory/gce.py pylint:blacklisted-name
-tests/unit/plugins/modules/cloud/google/test_gcp_forwarding_rule.py future-import-boilerplate
-tests/unit/plugins/modules/cloud/google/test_gcp_forwarding_rule.py metaclass-boilerplate
 tests/utils/shippable/check_matrix.py replace-urlopen
 tests/utils/shippable/timing.py shebang
