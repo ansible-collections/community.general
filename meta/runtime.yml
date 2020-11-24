@@ -380,6 +380,50 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
+    postgresql_copy:
+      redirect: community.postgresql.postgresql_copy
+    postgresql_db:
+      redirect: community.postgresql.postgresql_db
+    postgresql_ext:
+      redirect: community.postgresql.postgresql_ext
+    postgresql_idx:
+      redirect: community.postgresql.postgresql_idx
+    postgresql_info:
+      redirect: community.postgresql.postgresql_info
+    postgresql_lang:
+      redirect: community.postgresql.postgresql_lang
+    postgresql_membership:
+      redirect: community.postgresql.postgresql_membership
+    postgresql_owner:
+      redirect: community.postgresql.postgresql_owner
+    postgresql_pg_hba:
+      redirect: community.postgresql.postgresql_pg_hba
+    postgresql_ping:
+      redirect: community.postgresql.postgresql_ping
+    postgresql_privs:
+      redirect: community.postgresql.postgresql_privs
+    postgresql_publication:
+      redirect: community.postgresql.postgresql_publication
+    postgresql_query:
+      redirect: community.postgresql.postgresql_query
+    postgresql_schema:
+      redirect: community.postgresql.postgresql_schema
+    postgresql_sequence:
+      redirect: community.postgresql.postgresql_sequence
+    postgresql_set:
+      redirect: community.postgresql.postgresql_set
+    postgresql_slot:
+      redirect: community.postgresql.postgresql_slot
+    postgresql_subscription:
+      redirect: community.postgresql.postgresql_subscription
+    postgresql_table:
+      redirect: community.postgresql.postgresql_table
+    postgresql_tablespace:
+      redirect: community.postgresql.postgresql_tablespace
+    postgresql_user_obj_stat_info:
+      redirect: community.postgresql.postgresql_user_obj_stat_info
+    postgresql_user:
+      redirect: community.postgresql.postgresql_user
     purefa_facts:
       deprecation:
         removal_version: 3.0.0
@@ -461,6 +505,8 @@ plugin_routing:
       redirect: community.docker.docker
     hetzner:
       redirect: community.hrobot.robot
+    postgresql:
+      redirect: community.postgresql.postgresql
   module_utils:
     docker.common:
       redirect: community.docker.common
@@ -468,6 +514,8 @@ plugin_routing:
       redirect: community.docker.swarm
     hetzner:
       redirect: community.hrobot.robot
+    postgresql:
+      redirect: community.postgresql.postgresql
   callback:
     actionable:
       tombstone:
