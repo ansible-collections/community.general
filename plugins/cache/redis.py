@@ -69,6 +69,7 @@ from ansible.errors import AnsibleError
 from ansible.module_utils._text import to_native
 from ansible.parsing.ajson import AnsibleJSONEncoder, AnsibleJSONDecoder
 from ansible.plugins.cache import BaseCacheModule
+from ansible.release import __version__ as ansible_base_version
 from ansible.utils.display import Display
 
 try:
@@ -103,7 +104,14 @@ class CacheModule(BaseCacheModule):
             self._keys_set = self.get_option('_keyset_name')
             self._sentinel_service_name = self.get_option('_sentinel_service_name')
         except KeyError:
-            raise AnsibleError("Do not import CacheModules directly. Use ansible.plugins.loader.cache_loader instead.")
+            # TODO: remove once we no longer support Ansible 2.9
+            if not ansible_base_version.startswith('2.9.'):
+                raise AnsibleError("Do not import CacheModules directly. Use ansible.plugins.loader.cache_loader instead.")
+            if C.CACHE_PLUGIN_CONNECTION:
+                uri = C.CACHE_PLUGIN_CONNECTION
+            self._timeout = float(C.CACHE_PLUGIN_TIMEOUT)
+            self._prefix = C.CACHE_PLUGIN_PREFIX
+            self._keys_set = 'ansible_cache_keys'
 
         if not HAS_REDIS:
             raise AnsibleError("The 'redis' python module (version 2.4.5 or newer) is required for the redis fact cache, 'pip install redis'")
