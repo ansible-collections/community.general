@@ -47,8 +47,6 @@ files:
     maintainers: $team_google
     labels: gcp
     supershipit: erjohnso rambleraptor
-  $doc_fragments/hetzner.py:
-    labels: hetzner
   $doc_fragments/hpe3par.py:
     maintainers: farhan7500 gautamphegde
     labels: hpe3par
@@ -465,14 +463,6 @@ files:
     maintainers: briceburg
   $modules/net_tools/haproxy.py:
     maintainers: ravibhure
-  $modules/net_tools/hetzner_failover_ip.py:
-    maintainers: felixfontein
-  $modules/net_tools/hetzner_failover_ip_info.py:
-    maintainers: felixfontein
-  $modules/net_tools/hetzner_firewall.py:
-    maintainers: felixfontein
-  $modules/net_tools/hetzner_firewall_info.py:
-    maintainers: felixfontein
   $modules/net_tools/:
     maintainers: nerzhul
   $modules/net_tools/infinity/infinity.py:

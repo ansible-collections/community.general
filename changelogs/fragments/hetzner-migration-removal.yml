@@ -1,0 +1,14 @@
+removed_features:
+- >
+  All ``hetzner`` modules have been removed from this collection.
+  They have been migrated to the `community.hrobot <https://galaxy.ansible.com/community/hrobot>`_ collection.
+  If you use ansible-base 2.10 or newer, redirections have been provided.
+
+  If you use Ansible 2.9 and installed this collection, you need to adjust the FQCNs (``community.general.hetzner_firewall`` → ``community.hrobot.firewall``) and make sure to install the community.hrobot collection.
+breaking_changes:
+- >
+  If you use Ansible 2.9 and the ``hetzner`` modules from this collections, community.general 2.0.0 results in errors when trying to use the hetzner content by FQCN, like ``community.general.hetzner_firewall``.
+  Since Ansible 2.9 is not able to use redirections, you will have to adjust your playbooks and roles manually to use the new FQCNs (``community.hrobot.firewall`` for the previous example) and to make sure that you have ``community.hrobot`` installed.
+
+  If you use ansible-base 2.10 or newer and did not install Ansible 3.0.0, but installed (and/or upgraded) community.general manually, you need to make sure to also install ``community.hrobot`` if you are using any of the ``hetzner`` modules.
+  While ansible-base 2.10 or newer can use the redirects that community.general 2.0.0 adds, the collection they point to (community.hrobot) must be installed for them to work.
