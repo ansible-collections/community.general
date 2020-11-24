@@ -568,7 +568,7 @@ EXAMPLES = '''
     api_host: helldorado
     name: spynal
     node: sabrewulf
-    net: 
+    net:
       net0: 'virtio,bridge=vmbr1,rate=200'
       net1: 'e1000,bridge=vmbr2'
 
@@ -658,13 +658,13 @@ EXAMPLES = '''
     api_password: secret
     api_host: helldorado
     name: spynal
-    ide: 
+    ide:
       ide2: 'local:cloudinit,format=qcow2'
     ciuser: mylinuxuser
     cipassword: supersecret
     searchdomains: 'mydomain.internal'
     nameservers: 1.1.1.1
-    net: 
+    net:
       net0: 'virtio,bridge=vmbr1,tag=77'
     ipconfig:
       ipconfig0: 'ip=192.168.1.1/24,gw=192.168.1.1'
