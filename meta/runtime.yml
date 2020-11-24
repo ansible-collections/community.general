@@ -1,3 +1,4 @@
+---
 requires_ansible: '>=2.9.10'
 action_groups:
   k8s:
@@ -147,6 +148,14 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: The helm module in community.general has been deprecated. Use community.kubernetes.helm instead.
+    hetzner_failover_ip:
+      redirect: community.hrobot.failover_ip
+    hetzner_failover_ip_info:
+      redirect: community.hrobot.failover_ip_info
+    hetzner_firewall:
+      redirect: community.hrobot.firewall
+    hetzner_firewall_info:
+      redirect: community.hrobot.firewall_info
     hpilo_facts:
       deprecation:
         removal_version: 3.0.0
@@ -450,11 +459,15 @@ plugin_routing:
   doc_fragments:
     docker:
       redirect: community.docker.docker
+    hetzner:
+      redirect: community.hrobot.robot
   module_utils:
     docker.common:
       redirect: community.docker.common
     docker.swarm:
       redirect: community.docker.swarm
+    hetzner:
+      redirect: community.hrobot.robot
   callback:
     actionable:
       tombstone:
