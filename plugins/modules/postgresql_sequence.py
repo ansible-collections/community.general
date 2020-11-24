@@ -1,1 +1,0 @@
-./database/postgresql/postgresql_sequence.py
