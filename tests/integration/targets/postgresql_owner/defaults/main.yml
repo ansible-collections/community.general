@@ -1,3 +1,0 @@
-test_tablespace_path: "/ssd"
-
-dangerous_name: 'curious.anonymous"; SELECT * FROM information_schema.tables; --'

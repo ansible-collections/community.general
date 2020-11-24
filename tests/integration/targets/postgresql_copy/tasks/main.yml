@@ -1,8 +1,0 @@
-####################################################################
-# WARNING: These are designed specifically for Ansible tests       #
-# and should not be used as examples of how to write Ansible roles #
-####################################################################
-
-# Initial CI tests of postgresql_copy module
-- import_tasks: postgresql_copy_initial.yml
-  when: postgres_version_resp.stdout is version('9.4', '>=')
