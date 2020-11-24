@@ -21,30 +21,37 @@ notes:
     - Check mode isn't supported.
 options:
     api_key:
+        type: str
         description:
            - Circonus API key
         required: true
     category:
+        type: str
         description:
            - Annotation Category
         required: true
     description:
+        type: str
         description:
             - Description of annotation
         required: true
     title:
+        type: str
         description:
             - Title of annotation
         required: true
     start:
+        type: int
         description:
             - Unix timestamp of event start
-        default: I(now)
+            - If not specified, it defaults to I(now).
     stop:
+        type: int
         description:
             - Unix timestamp of event end
-        default: I(now) + I(duration)
+            - If not specified, it defaults to I(now) + I(duration).
     duration:
+        type: int
         description:
             - Duration in seconds of annotation
         default: 0
