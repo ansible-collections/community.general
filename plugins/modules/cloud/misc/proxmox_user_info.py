@@ -12,6 +12,7 @@ DOCUMENTATION = '''
 ---
 module: proxmox_user_info
 short_description: Retrieve information about one or more Proxmox VE users
+version_added: 1.3.0
 description:
   - Retrieve information about one or more Proxmox VE users
 options:

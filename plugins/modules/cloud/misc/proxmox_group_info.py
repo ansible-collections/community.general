@@ -12,6 +12,7 @@ DOCUMENTATION = '''
 ---
 module: proxmox_group_info
 short_description: Retrieve information about one or more Proxmox VE groups
+version_added: 1.3.0
 description:
   - Retrieve information about one or more Proxmox VE groups
 options:

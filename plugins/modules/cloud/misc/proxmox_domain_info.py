@@ -12,6 +12,7 @@ DOCUMENTATION = '''
 ---
 module: proxmox_domain_info
 short_description: Retrieve information about one or more Proxmox VE domains
+version_added: 1.3.0
 description:
   - Retrieve information about one or more Proxmox VE domains.
 options:
