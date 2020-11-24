@@ -1,0 +1,2 @@
+bugfixes:
+- apache2_module - amend existing module identifier workaround to also apply to updated Shibboleth modules (https://github.com/ansible-collections/community.general/issues/1379)
