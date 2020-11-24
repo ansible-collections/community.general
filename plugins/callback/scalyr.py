@@ -7,15 +7,15 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 callback: scalyr
 type: aggregate
-short_description: Sends task result events to Scalyr
+short_description: Sends Ansible task results to Scalyr.
 author: Martin Migasiewicz (@martinm82)
 version_added: 1.3.0
 description:
-  - This callback plugin will send task results as JSON formatted events to Scalyr.
-  - Heavily inspired by splunk and sumologic callbacks
+  - This callback plugin will send Ansible task results as JSON formatted events to Scalyr.
+  - Heavily inspired by splunk and sumologic callbacks.
 requirements:
   - Whitelisting this callback plugin.
-  - Create a Log Access Write Key in Scalyr (https://app.scalyr.com/keys)
+  - Create a Log Access Write Key in Scalyr (https://app.scalyr.com/keys).
   - Define the Scalyr API URL and API key as an environment variable, in ansible.cfg or as hostvars.
     - When using the hostvars method the variable(s) need to be present as 'localhost' variables.
 options:
