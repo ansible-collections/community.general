@@ -55,13 +55,13 @@ options:
 
 EXAMPLES = '''
 # Pause the monitor with an ID of 12345.
-- uptimerobot:
+- community.general.uptimerobot:
     name: My domain
     url: https://www.my-domain.com
     apikey: 12345-1234512345
     state: paused
 # Create an http checking monitor for https://www.my-domain.com
-- uptimerobot:
+- community.general.uptimerobot:
     state: created
     url: https://www.my-domain.com
     name: My domain
