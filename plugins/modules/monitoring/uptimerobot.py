@@ -51,8 +51,6 @@ options:
             - Uptime Robot API key.
         type: str
         required: true
-notes:
-    - Support for further functionalities, which the API provides has not yet been implemented.
 '''
 
 EXAMPLES = '''
