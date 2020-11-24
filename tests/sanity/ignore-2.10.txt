@@ -324,8 +324,6 @@ plugins/modules/database/vertica/vertica_schema.py validate-modules:doc-missing-
 plugins/modules/database/vertica/vertica_schema.py validate-modules:undocumented-parameter
 plugins/modules/database/vertica/vertica_user.py validate-modules:doc-missing-type
 plugins/modules/database/vertica/vertica_user.py validate-modules:undocumented-parameter
-plugins/modules/files/archive.py use-argspec-type-path # fix needed
-plugins/modules/files/archive.py validate-modules:parameter-list-no-elements
 plugins/modules/files/iso_extract.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/files/xml.py validate-modules:doc-required-mismatch
 plugins/modules/files/xml.py validate-modules:parameter-list-no-elements
