@@ -1,0 +1,111 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright: (c) 2020, Tristan Le Guern <tleguern at bouledef.eu>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: List domains
+  proxmox_domain_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+  register: results
+
+- assert:
+    that:
+    - results is not changed
+    - results.proxmox_domains is defined
+
+- name: Retrieve info about pve
+  proxmox_domain_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+    domain: pve
+  register: results
+
+- assert:
+    that:
+    - results is not changed
+    - results.proxmox_domains is defined
+    - results.proxmox_domains|length == 1
+    - results.proxmox_domains[0].type == 'pve'
+
+- name: List groups
+  proxmox_group_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+  register: results
+  
+- assert:
+    that:
+    - results is not changed
+    - results.proxmox_groups is defined
+
+- name: List users
+  proxmox_user_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+  register: results
+
+- assert:
+    that:
+    - results is not changed
+    - results.proxmox_users is defined
+
+- name: Retrieve info about api_user using name and domain
+  proxmox_user_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+    user: "{{ user }}"
+    domain: "{{ domain }}"
+  register: results_user_domain
+
+- assert:
+    that:
+    - results_user_domain is not changed
+    - results_user_domain.proxmox_users is defined
+    - results_user_domain.proxmox_users|length == 1
+    - results_user_domain.proxmox_users[0].domain == "{{ domain }}"
+    - results_user_domain.proxmox_users[0].user == "{{ user }}"
+    - results_user_domain.proxmox_users[0].userid == "{{ user }}@{{ domain }}"
+
+- name: Retrieve info about api_user using userid
+  proxmox_user_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+    userid: "{{ user }}@{{ domain }}"
+  register: results_userid
+
+- assert:
+    that:
+    - results_userid is not changed
+    - results_userid.proxmox_users is defined
+    - results_userid.proxmox_users|length == 1
+    - results_userid.proxmox_users[0].domain == "{{ domain }}"
+    - results_userid.proxmox_users[0].user == "{{ user }}"
+    - results_userid.proxmox_users[0].userid == "{{ user }}@{{ domain }}"
