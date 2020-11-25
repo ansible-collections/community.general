@@ -1,5 +1,5 @@
 major_changes:
-- >
+- |
   For community.general 2.0.0, the Hetzner Robot modules will be moved to the `community.hrobot <https://galaxy.ansible.com/community/hrobot>`_ collection.
   A redirection will be inserted so that users using ansible-base 2.10 or newer do not have to change anything.
 
