@@ -914,7 +914,7 @@ files:
   $modules/system/dpkg_divert.py:
     maintainers: quidame
   $modules/system/facter.py:
-    maintainers: ansible
+    maintainers: ansible gamethis
     labels: facter
   $modules/system/filesystem.py:
     maintainers: pilou- abulimov quidame
