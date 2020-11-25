@@ -32,31 +32,6 @@ options:
       - Pass arbitrary arguments to kvm.
       - This option is for experts only!
     type: str
-  api_host:
-    description:
-      - Specify the target host of the Proxmox VE cluster.
-    type: str
-    required: true
-  api_user:
-    description:
-      - Specify the user to authenticate with.
-    type: str
-    required: true
-  api_password:
-    description:
-      - Specify the password to authenticate with.
-      - You can use C(PROXMOX_PASSWORD) environment variable.
-    type: str
-  api_token_id:
-    description:
-      - Specify the token ID.
-    type: str
-    version_added: 1.3.0
-  api_token_secret:
-    description:
-      - Specify the token secret.
-    type: str
-    version_added: 1.3.0
   autostart:
     description:
       - Specify if the VM should be automatically restarted after crash (currently ignored in PVE API).
@@ -486,11 +461,6 @@ options:
       - Update of C(pool) is disabled. It needs an additional API endpoint not covered by this module.
     type: bool
     default: 'no'
-  validate_certs:
-    description:
-      - If C(no), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
-    type: bool
-    default: 'no'
   vcpus:
     description:
       - Sets number of hotplugged vcpus.
@@ -539,8 +509,7 @@ options:
       - compatibility
       - no_defaults
     version_added: "1.3.0"
-
-requirements: [ "proxmoxer", "requests" ]
+extends_documentation_fragment: community.general.proxmox.documentation
 '''
 
 EXAMPLES = '''

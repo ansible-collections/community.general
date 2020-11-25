@@ -15,36 +15,6 @@ short_description: management of OS templates in Proxmox VE cluster
 description:
   - allows you to upload/delete templates in Proxmox VE cluster
 options:
-  api_host:
-    description:
-      - the host of the Proxmox VE cluster
-    type: str
-    required: true
-  api_user:
-    description:
-      - the user to authenticate with
-    type: str
-    required: true
-  api_password:
-    description:
-      - the password to authenticate with
-      - you can use PROXMOX_PASSWORD environment variable
-    type: str
-  api_token_id:
-    description:
-      - Specify the token ID.
-    type: str
-    version_added: 1.3.0
-  api_token_secret:
-    description:
-      - Specify the token secret.
-    type: str
-    version_added: 1.3.0
-  validate_certs:
-    description:
-      - enable / disable https certificate verification
-    default: 'no'
-    type: bool
   node:
     description:
       - Proxmox VE node, when you will operate with template
@@ -90,8 +60,8 @@ options:
     default: present
 notes:
   - Requires proxmoxer and requests modules on host. This modules can be installed with pip.
-requirements: [ "proxmoxer", "requests" ]
 author: Sergei Antipov (@UnderGreen)
+extends_documentation_fragment: community.general.proxmox.documentation
 '''
 
 EXAMPLES = '''
