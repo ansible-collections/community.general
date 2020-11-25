@@ -975,7 +975,7 @@ files:
   $modules/system/pamd.py:
     maintainers: kevensen
   $modules/system/parted.py:
-    maintainers: ColOfAbRiX rosowiecki
+    maintainers: ColOfAbRiX rosowiecki jake2184
   $modules/system/pids.py:
     maintainers: saranyasridharan
   $modules/system/puppet.py:
