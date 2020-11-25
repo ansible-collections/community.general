@@ -22,52 +22,63 @@ options:
   name:
     description:
       - The name of the virtual machine.
-    required: true
+    type: str
   image:
     description:
       - The system image ID for creating the virtual machine, e.g. a3eae284-a2fe-11e4-b187-5f1f641608c8.
-    required: true
+    type: str
   image_password:
     description:
       - Password set for the administrative user.
+    type: str
   ssh_keys:
     description:
       - Public SSH keys allowing access to the virtual machine.
+    type: list
   datacenter:
     description:
       - The datacenter to provision this virtual machine.
+    type: str
   cores:
     description:
       - The number of CPU cores to allocate to the virtual machine.
     default: 2
+    type: int
   ram:
     description:
       - The amount of memory to allocate to the virtual machine.
     default: 2048
+    type: int
   cpu_family:
     description:
       - The CPU family type to allocate to the virtual machine.
+    type: str
     default: AMD_OPTERON
     choices: [ "AMD_OPTERON", "INTEL_XEON" ]
   volume_size:
     description:
       - The size in GB of the boot volume.
+    type: int
     default: 10
   bus:
     description:
       - The bus type for the volume.
+    type: str
     default: VIRTIO
     choices: [ "IDE", "VIRTIO"]
   instance_ids:
     description:
       - list of instance ids, currently only used when state='absent' to remove instances.
+    type: list
   count:
     description:
       - The number of virtual machines to create.
+    type: int
     default: 1
   location:
     description:
       - The datacenter location. Use only if you want to create the Datacenter or else this value is ignored.
+    type: str
     default: us/las
     choices: [ "us/las", "de/fra", "de/fkb" ]
   assign_public_ip:
@@ -78,13 +89,16 @@ options:
   lan:
     description:
       - The ID of the LAN you wish to add the servers to.
+    type: int
     default: 1
   subscription_user:
     description:
       - The ProfitBricks username. Overrides the PB_SUBSCRIPTION_ID environment variable.
+    type: str
   subscription_password:
     description:
       - THe ProfitBricks password. Overrides the PB_PASSWORD environment variable.
+    type: str
   wait:
     description:
       - wait for the instance to be in state 'running' before returning
@@ -93,6 +107,7 @@ options:
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
+    type: int
     default: 600
   remove_boot_volume:
     description:
@@ -102,8 +117,15 @@ options:
   state:
     description:
       - create or terminate instances
+      - 'The choices available are: C(running), C(stopped), C(absent), C(present).'
+    type: str
     default: 'present'
-    choices: [ "running", "stopped", "absent", "present" ]
+  disk_type:
+    description:
+      - the type of disk to be allocated.
+    type: str
+    choices: [SSD, HDD]
+    default: HDD
 
 requirements:
      - "profitbricks"

@@ -16,49 +16,56 @@ options:
   datacenter:
     description:
       - The datacenter in which to create the volumes.
-    required: true
+    type: str
   name:
     description:
       - The name of the volumes. You can enumerate the names using auto_increment.
-    required: true
+    type: str
   size:
     description:
       - The size of the volume.
+    type: int
     required: false
     default: 10
   bus:
     description:
       - The bus type.
+    type: str
     required: false
     default: VIRTIO
     choices: [ "IDE", "VIRTIO"]
   image:
     description:
       - The system image ID for the volume, e.g. a3eae284-a2fe-11e4-b187-5f1f641608c8. This can also be a snapshot image ID.
-    required: true
+    type: str
   image_password:
     description:
       - Password set for the administrative user.
+    type: str
     required: false
   ssh_keys:
     description:
       - Public SSH keys allowing access to the virtual machine.
+    type: list
     required: false
   disk_type:
     description:
       - The disk type of the volume.
+    type: str
     required: false
     default: HDD
     choices: [ "HDD", "SSD" ]
   licence_type:
     description:
       - The licence type for the volume. This is used when the image is non-standard.
+      - "The available choices are: C(LINUX), C(WINDOWS), C(UNKNOWN), C(OTHER)."
+    type: str
     required: false
     default: UNKNOWN
-    choices: ["LINUX", "WINDOWS", "UNKNOWN" , "OTHER"]
   count:
     description:
       - The number of volumes you wish to create.
+    type: int
     required: false
     default: 1
   auto_increment:
@@ -69,14 +76,17 @@ options:
   instance_ids:
     description:
       - list of instance ids, currently only used when state='absent' to remove instances.
+    type: list
     required: false
   subscription_user:
     description:
       - The ProfitBricks username. Overrides the PB_SUBSCRIPTION_ID environment variable.
+    type: str
     required: false
   subscription_password:
     description:
       - THe ProfitBricks password. Overrides the PB_PASSWORD environment variable.
+    type: str
     required: false
   wait:
     description:
@@ -87,13 +97,15 @@ options:
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
+    type: int
     default: 600
   state:
     description:
       - create or terminate datacenters
+      - "The available choices are: C(present), C(absent)."
+    type: str
     required: false
     default: 'present'
-    choices: ["present", "absent"]
 
 requirements: [ "profitbricks" ]
 author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
