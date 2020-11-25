@@ -1,2 +1,0 @@
-bugfixes:
-- postgresql_ext - fix the module crashes when available ext versions cannot be compared with current version (https://github.com/ansible-collections/community.general/issues/1095).
