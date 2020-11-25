@@ -719,7 +719,7 @@ files:
     labels: pacman
     ignore: elasticdog
   $modules/packaging/os/pkgin.py:
-    maintainers: $team_solaris L2G jasperla szinck
+    maintainers: $team_solaris L2G jasperla szinck martinm82
     labels: pkgin solaris
   $modules/packaging/os/pkgng.py:
     maintainers: $team_bsd bleader
