@@ -1,2 +1,0 @@
-bugfixes:
-- postgresql_ext - fix version selection when ``version=latest`` (https://github.com/ansible-collections/community.general/pull/1078).
