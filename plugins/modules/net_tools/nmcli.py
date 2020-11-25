@@ -938,6 +938,8 @@ class Nmcli(object):
                             alias_key = alias_pair[0]
                             alias_value = alias_pair[1]
                             conn_info[alias_key] = alias_value
+                elif key == 'ipv4.routes':
+                    conn_info[key] = [s.strip() for s in raw_value.split(';')]
                 elif key_type == list:
                     conn_info[key] = [s.strip() for s in raw_value.split(',')]
                 else:
@@ -973,13 +975,12 @@ class Nmcli(object):
             if key in conn_info:
                 current_value = conn_info[key]
                 if key == 'ipv4.routes':
-                    # ipv4.routes has not same input and output
-                    # input: ['10.11.0.0/24 10.10.0.2', '10.12.0.0/24 10.10.0.2']
-                    # output: ['{ ip = 10.11.0.0/24', 'nh = 10.10.0.2 }; { ip = 10.12.0.0/24', 'nh = 10.10.0.2 }']
-                    # Need to convert output to match input format
-                    for r in (("['{ ", ""), (" }']", ""), ('ip = ', ''), ("', 'nh =", ''), (" }; { ", ',')):
-                        current_value = str(current_value).replace(*r)
-                    current_value = current_value.split(',')
+                    # ipv4.routes do not have same options and show_connection() format
+                    # options: ['10.11.0.0/24 10.10.0.2', '10.12.0.0/24 10.10.0.2']
+                    # show_connection(): ['{ ip = 10.11.0.0/24, nh = 10.10.0.2 }', '{ ip = 10.12.0.0/24, nh = 10.10.0.2 }']
+                    # Need to convert in order to compare both
+                    current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+)\s*}', r'\1 \2', route) for route in current_value]
+            
             elif key in param_alias:
                 real_key = param_alias[key]
                 if real_key in conn_info:
