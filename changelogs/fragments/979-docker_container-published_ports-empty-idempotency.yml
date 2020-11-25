@@ -1,2 +1,0 @@
-bugfixes:
-- "docker_container - fix idempotency problem with ``published_ports`` when strict comparison is used and list is empty (https://github.com/ansible-collections/community.general/issues/978)."
