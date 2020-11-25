@@ -17,24 +17,28 @@ options:
   name:
     description:
       - The name of the virtual datacenter.
-    required: true
+    type: str
   description:
     description:
       - The description of the virtual datacenter.
+    type: str
     required: false
   location:
     description:
       - The datacenter location.
+    type: str
     required: false
     default: us/las
     choices: [ "us/las", "de/fra", "de/fkb" ]
   subscription_user:
     description:
       - The ProfitBricks username. Overrides the PB_SUBSCRIPTION_ID environment variable.
+    type: str
     required: false
   subscription_password:
     description:
       - THe ProfitBricks password. Overrides the PB_PASSWORD environment variable.
+    type: str
     required: false
   wait:
     description:
@@ -45,13 +49,15 @@ options:
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
+    type: int
     default: 600
   state:
     description:
-      - create or terminate datacenters
+      - Create or terminate datacenters.
+      - "The available choices are: C(present), C(absent)."
+    type: str
     required: false
     default: 'present'
-    choices: [ "present", "absent" ]
 
 requirements: [ "profitbricks" ]
 author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
@@ -203,7 +209,7 @@ def main():
             subscription_password=dict(no_log=True),
             wait=dict(type='bool', default=True),
             wait_timeout=dict(default=600, type='int'),
-            state=dict(default='present'),
+            state=dict(default='present'),   # @TODO add choices
         )
     )
     if not HAS_PB_SDK:
