@@ -974,13 +974,12 @@ class Nmcli(object):
 
             if key in conn_info:
                 current_value = conn_info[key]
-                if key == 'ipv4.routes':
+                if key == 'ipv4.routes' and current_value is not None:
                     # ipv4.routes do not have same options and show_connection() format
                     # options: ['10.11.0.0/24 10.10.0.2', '10.12.0.0/24 10.10.0.2']
                     # show_connection(): ['{ ip = 10.11.0.0/24, nh = 10.10.0.2 }', '{ ip = 10.12.0.0/24, nh = 10.10.0.2 }']
                     # Need to convert in order to compare both
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+)\s*}', r'\1 \2', route) for route in current_value]
-            
             elif key in param_alias:
                 real_key = param_alias[key]
                 if real_key in conn_info:
