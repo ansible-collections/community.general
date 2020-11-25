@@ -211,7 +211,7 @@ def main():
             type=dict(required=False, choices=['metric alert', 'service check', 'event alert', 'process alert', 'log alert']),
             name=dict(required=True),
             query=dict(required=False),
-            notification_message=dict(required=False, default=None, aliases=['message'],
+            notification_message=dict(required=False, no_log=True, default=None, aliases=['message'],
                                       deprecated_aliases=[dict(name='message', version='3.0.0',
                                                                collection_name='community.general')]),  # was Ansible 2.14
             silenced=dict(required=False, default=None, type='dict'),
