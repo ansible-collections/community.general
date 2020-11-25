@@ -1,2 +1,0 @@
-bugfixes:
-  - postgresql_privs - the module was attempting to revoke grant options even though ``grant_option`` was not specified (https://github.com/ansible-collections/community.general/pull/796).
