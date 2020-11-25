@@ -1,2 +1,0 @@
-bugfixes:
-- "docker_login - fix internal config file storage to handle credentials for more than one registry (https://github.com/ansible-collections/community.general/issues/1117)."

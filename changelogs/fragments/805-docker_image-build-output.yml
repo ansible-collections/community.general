@@ -1,2 +1,0 @@
-minor_changes:
-  - "docker_image - return docker build output (https://github.com/ansible-collections/community.general/pull/805)."

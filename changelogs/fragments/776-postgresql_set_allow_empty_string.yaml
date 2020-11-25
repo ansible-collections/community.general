@@ -1,2 +1,0 @@
-bugfixes:
-- postgresql_set - allow to pass an empty string to the ``value`` parameter (https://github.com/ansible-collections/community.general/issues/775).
