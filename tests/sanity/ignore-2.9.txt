@@ -137,8 +137,8 @@ plugins/modules/cloud/packet/packet_sshkey.py validate-modules:doc-missing-type
 plugins/modules/cloud/packet/packet_sshkey.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/packet/packet_sshkey.py validate-modules:undocumented-parameter
 plugins/modules/cloud/profitbricks/profitbricks_nic.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/cloud/profitbricks/profitbricks_volume_attachments.py validate-modules:doc-missing-type
-plugins/modules/cloud/profitbricks/profitbricks_volume_attachments.py validate-modules:parameter-type-not-in-doc
+plugins/modules/cloud/profitbricks/profitbricks_volume.py validate-modules:doc-missing-type
+plugins/modules/cloud/profitbricks/profitbricks_volume.py validate-modules:undocumented-parameter
 plugins/modules/cloud/rackspace/rax.py use-argspec-type-path
 plugins/modules/cloud/rackspace/rax.py validate-modules:doc-missing-type
 plugins/modules/cloud/rackspace/rax.py validate-modules:undocumented-parameter
