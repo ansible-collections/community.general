@@ -90,12 +90,6 @@ options:
         description:
             - Blocking locks.
         aliases: [ sambaBlockingLocks ]
-    samba_browseable:
-        default: '1'
-        choices: [ '0', '1' ]
-        description:
-            - Show in Windows network environment.
-        aliases: [ sambaBrowseable ]
     samba_create_mode:
         default: '0744'
         description:
