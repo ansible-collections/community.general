@@ -16,22 +16,24 @@ options:
   datacenter:
     description:
       - The datacenter in which to operate.
-    required: true
+    type: str
   server:
     description:
       - The name of the server you wish to detach or attach the volume.
-    required: true
+    type: str
   volume:
     description:
       - The volume name or ID.
-    required: true
+    type: str
   subscription_user:
     description:
       - The ProfitBricks username. Overrides the PB_SUBSCRIPTION_ID environment variable.
+    type: str
     required: false
   subscription_password:
     description:
       - THe ProfitBricks password. Overrides the PB_PASSWORD environment variable.
+    type: str
     required: false
   wait:
     description:
@@ -42,13 +44,15 @@ options:
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
+    type: int
     default: 600
   state:
     description:
       - Indicate desired state of the resource
+      - "The available choices are: C(present), C(absent)."
+    type: str
     required: false
     default: 'present'
-    choices: ["present", "absent"]
 
 requirements: [ "profitbricks" ]
 author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>

@@ -16,26 +16,28 @@ options:
   datacenter:
     description:
       - The datacenter in which to operate.
-    required: true
+    type: str
   server:
     description:
       - The server name or ID.
-    required: true
+    type: str
   name:
     description:
       - The name or ID of the NIC. This is only required on deletes, but not on create.
-    required: true
+    type: str
   lan:
     description:
       - The LAN to place the NIC on. You can pass a LAN that doesn't exist and it will be created. Required on create.
-    required: true
+    type: str
   subscription_user:
     description:
       - The ProfitBricks username. Overrides the PB_SUBSCRIPTION_ID environment variable.
+    type: str
     required: false
   subscription_password:
     description:
       - THe ProfitBricks password. Overrides the PB_PASSWORD environment variable.
+    type: str
     required: false
   wait:
     description:
@@ -46,13 +48,15 @@ options:
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
+    type: int
     default: 600
   state:
     description:
       - Indicate desired state of the resource
+      - "The available choices are: C(present), C(absent)."
+    type: str
     required: false
     default: 'present'
-    choices: ["present", "absent"]
 
 requirements: [ "profitbricks" ]
 author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
@@ -228,7 +232,7 @@ def main():
         argument_spec=dict(
             datacenter=dict(),
             server=dict(),
-            name=dict(default=str(uuid.uuid4()).replace('-', '')[:10]),
+            name=dict(default=str(uuid.uuid4()).replace('-', '')[:10]),  # @FIXME please do not do that
             lan=dict(),
             subscription_user=dict(),
             subscription_password=dict(no_log=True),
@@ -241,7 +245,7 @@ def main():
     if not HAS_PB_SDK:
         module.fail_json(msg='profitbricks required for this module')
 
-    if not module.params.get('subscription_user'):
+    if not module.params.get('subscription_user'):   # @ FIXME use required in argument_spec, same for lines below
         module.fail_json(msg='subscription_user parameter is required')
     if not module.params.get('subscription_password'):
         module.fail_json(msg='subscription_password parameter is required')
@@ -275,7 +279,7 @@ def main():
 
         try:
             (nic_dict) = create_nic(module, profitbricks)
-            module.exit_json(nics=nic_dict)
+            module.exit_json(nics=nic_dict)  # @FIXME changed not calculated?
         except Exception as e:
             module.fail_json(msg='failed to set nic state: %s' % str(e))
 
