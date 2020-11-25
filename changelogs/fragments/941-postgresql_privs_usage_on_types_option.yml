@@ -1,2 +1,0 @@
-minor_changes:
-- postgresql_privs - add the ``usage_on_types`` option (https://github.com/ansible-collections/community.general/issues/884).

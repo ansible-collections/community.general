@@ -1,2 +1,0 @@
-bugfixes:
-- postgresql_privs - rollback if nothing changed (https://github.com/ansible-collections/community.general/issues/885).

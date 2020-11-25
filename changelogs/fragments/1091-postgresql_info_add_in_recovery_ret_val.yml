@@ -1,2 +1,0 @@
-minor_changes:
-- postgresql_info - add ``in_recovery`` return value to show if a service in recovery mode or not (https://github.com/ansible-collections/community.general/issues/1068).
