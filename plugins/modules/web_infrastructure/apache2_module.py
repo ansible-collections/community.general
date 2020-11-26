@@ -161,6 +161,7 @@ def create_apache_identifier(name):
 
     # a2enmod name replacement to apache2ctl -M names
     text_workarounds = [
+        ('shib', 'mod_shib'),
         ('shib2', 'mod_shib'),
         ('evasive', 'evasive20_module'),
     ]
