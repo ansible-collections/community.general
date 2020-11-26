@@ -1,0 +1,5 @@
+pd_api_access_token: your_api_access_token
+fullname: User Name
+email: user@email.com
+pd_role: observer
+pd_teams: team1
