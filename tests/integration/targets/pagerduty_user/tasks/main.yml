@@ -13,7 +13,7 @@
     pd_user: '{{ fullname }}'
     pd_email: '{{ email }}'
     pd_role: '{{ pd_role }}'
-    pd_team: '{{ pd_team }}'
+    pd_teams: '{{ pd_team }}'
     state: present
 
 - name: Remove a user account from PagerDuty
