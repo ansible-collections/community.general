@@ -38,7 +38,6 @@ options:
             - Specifies which dataset properties should be queried in comma-separated format.
               For more information about dataset properties, check zfs(1M) man page.
         default: all
-        aliases: [ "props" ]
     type:
         description:
             - Specifies which datasets types to display. Multiple values have to be

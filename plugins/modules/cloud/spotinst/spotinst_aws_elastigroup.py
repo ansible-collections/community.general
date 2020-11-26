@@ -144,13 +144,6 @@ options:
         This will not work unless the uniqueness_by field is set to id.
         When this is set, and the uniqueness_by field is set, the group will either be updated or deleted, but not created.
 
-  ignore_changes:
-    choices:
-      - image_id
-      - target
-    description:
-      - (List of Strings) list of fields on which changes should be ignored when updating
-
   image_id:
     description:
       - (String) The image Id used to launch the instance.;
