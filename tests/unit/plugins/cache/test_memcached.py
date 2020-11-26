@@ -28,8 +28,4 @@ from ansible_collections.community.general.plugins.cache.memcached import CacheM
 
 
 def test_memcached_cachemodule():
-    assert isinstance(MemcachedCache(), MemcachedCache)
-
-
-def test_memcached_cachemodule_with_loader():
     assert isinstance(cache_loader.get('community.general.memcached'), MemcachedCache)

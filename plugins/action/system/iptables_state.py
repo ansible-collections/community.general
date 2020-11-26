@@ -98,25 +98,9 @@ class ActionModule(ActionBase):
                             task_async,
                             max_timeout))
 
-                    # BEGIN snippet from async_status action plugin
-                    env_async_dir = [e for e in self._task.environment if
-                                     "ANSIBLE_ASYNC_DIR" in e]
-                    if len(env_async_dir) > 0:
-                        # for backwards compatibility we need to get the dir from
-                        # ANSIBLE_ASYNC_DIR that is defined in the environment. This is
-                        # deprecated and will be removed in favour of shell options
-                        async_dir = env_async_dir[0]['ANSIBLE_ASYNC_DIR']
-
-                        msg = "Setting the async dir from the environment keyword " \
-                              "ANSIBLE_ASYNC_DIR is deprecated. Set the async_dir " \
-                              "shell option instead"
-                        display.deprecated(msg, version='2.0.0',
-                                           collection_name='community.general')  # was Ansible 2.12
-                    else:
-                        # inject the async directory based on the shell option into the
-                        # module args
-                        async_dir = self.get_shell_option('async_dir', default="~/.ansible_async")
-                    # END snippet from async_status action plugin
+                    # inject the async directory based on the shell option into the
+                    # module args
+                    async_dir = self.get_shell_option('async_dir', default="~/.ansible_async")
 
                     # Bind the loop max duration to consistent values on both
                     # remote and local sides (if not the same, make the loop
