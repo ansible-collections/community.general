@@ -5,6 +5,174 @@ Community General Release Notes
 .. contents:: Topics
 
 
+v1.3.0
+======
+
+Release Summary
+---------------
+
+This is the last minor 1.x.0 release. The next releases from the stable-1 branch will be 1.3.y patch releases.
+
+Major Changes
+-------------
+
+- For community.general 2.0.0, the Hetzner Robot modules will be moved to the `community.hrobot <https://galaxy.ansible.com/community/hrobot>`_ collection.
+  A redirection will be inserted so that users using ansible-base 2.10 or newer do not have to change anything.
+
+  If you use Ansible 2.9 and explicitly use Hetzner Robot modules from this collection, you will need to adjust your playbooks and roles to use FQCNs starting with ``community.hrobot.`` instead of ``community.general.hetzner_``,
+  for example replace ``community.general.hetzner_firewall_info`` in a task by ``community.hrobot.firewall_info``.
+
+  If you use ansible-base and installed ``community.general`` manually and rely on the Hetzner Robot modules, you have to make sure to install the ``community.hrobot`` collection as well.
+  If you are using FQCNs, i.e. ``community.general.hetzner_failover_ip`` instead of ``hetzner_failover_ip``, it will continue working, but we still recommend to adjust the FQCNs as well.
+- For community.general 2.0.0, the ``docker`` modules and plugins will be moved to the `community.docker <https://galaxy.ansible.com/community/docker>`_ collection.
+  A redirection will be inserted so that users using ansible-base 2.10 or newer do not have to change anything.
+
+  If you use Ansible 2.9 and explicitly use ``docker`` content from this collection, you will need to adjust your playbooks and roles to use FQCNs starting with ``community.docker.`` instead of ``community.general.``,
+  for example replace ``community.general.docker_container`` in a task by ``community.docker.docker_container``.
+
+  If you use ansible-base and installed ``community.general`` manually and rely on the ``docker`` content, you have to make sure to install the ``community.docker`` collection as well.
+  If you are using FQCNs, i.e. ``community.general.docker_container`` instead of ``docker_container``, it will continue working, but we still recommend to adjust the FQCNs as well.
+- For community.general 2.0.0, the ``postgresql`` modules and plugins will be moved to the `community.postgresql <https://galaxy.ansible.com/community/postgresql>`_ collection.
+  A redirection will be inserted so that users using ansible-base 2.10 or newer do not have to change anything.
+
+  If you use Ansible 2.9 and explicitly use ``postgresql`` content from this collection, you will need to adjust your playbooks and roles to use FQCNs starting with ``community.postgresql.`` instead of ``community.general.``,
+  for example replace ``community.general.postgresql_info`` in a task by ``community.postgresql.postgresql_info``.
+
+  If you use ansible-base and installed ``community.general`` manually and rely on the ``postgresql`` content, you have to make sure to install the ``community.postgresql`` collection as well.
+  If you are using FQCNs, i.e. ``community.general.postgresql_info`` instead of ``postgresql_info``, it will continue working, but we still recommend to adjust the FQCNs as well.
+- The community.general collection no longer depends on the ansible.posix collection (https://github.com/ansible-collections/community.general/pull/1157).
+
+Minor Changes
+-------------
+
+- Add new filter plugin ``dict_kv`` which returns a single key-value pair from two arguments. Useful for generating complex dictionaries without using loops. For example ``'value' | community.general.dict_kv('key'))`` evaluates to ``{'key': 'value'}`` (https://github.com/ansible-collections/community.general/pull/1264).
+- archive - fix paramater types (https://github.com/ansible-collections/community.general/pull/1039).
+- consul - added support for tcp checks (https://github.com/ansible-collections/community.general/issues/1128).
+- datadog - mark ``notification_message`` as ``no_log`` (https://github.com/ansible-collections/community.general/pull/1338).
+- datadog_monitor - add ``include_tags`` option (https://github.com/ansible/ansible/issues/57441).
+- django_manage - renamed parameter ``app_path`` to ``project_path``, adding ``app_path`` and ``chdir`` as aliases (https://github.com/ansible-collections/community.general/issues/1044).
+- docker_container - now supports the ``device_requests`` option, which allows to request additional resources such as GPUs (https://github.com/ansible/ansible/issues/65748, https://github.com/ansible-collections/community.general/pull/1119).
+- docker_image - return docker build output (https://github.com/ansible-collections/community.general/pull/805).
+- docker_secret - add a warning when the secret does not have an ``ansible_key`` label but the ``force`` parameter is not set (https://github.com/ansible-collections/community.docker/issues/30, https://github.com/ansible-collections/community.docker/pull/31).
+- facter - added option for ``arguments`` (https://github.com/ansible-collections/community.general/pull/768).
+- hashi_vault - support ``VAULT_SKIP_VERIFY`` environment variable for determining if to verify certificates (in addition to the ``validate_certs=`` flag supported today) (https://github.com/ansible-collections/community.general/pull/1024).
+- hashi_vault lookup plugin - add support for JWT authentication (https://github.com/ansible-collections/community.general/pull/1213).
+- infoblox inventory script - use stderr for reporting errors, and allow use of environment for configuration (https://github.com/ansible-collections/community.general/pull/436).
+- ipa_host - silence warning about non-secret ``random_password`` option not having ``no_log`` set (https://github.com/ansible-collections/community.general/pull/1339).
+- ipa_user - silence warning about non-secret ``krbpasswordexpiration`` and ``update_password`` options not having ``no_log`` set (https://github.com/ansible-collections/community.general/pull/1339).
+- linode_v4 - added support for Linode StackScript usage when creating instances (https://github.com/ansible-collections/community.general/issues/723).
+- lvol - fix idempotency issue when using lvol with ``%VG`` or ``%PVS`` size options and VG is fully allocated (https://github.com/ansible-collections/community.general/pull/229).
+- maven_artifact - added ``client_cert`` and ``client_key`` parameters to the maven_artifact module (https://github.com/ansible-collections/community.general/issues/1123).
+- module_helper - added ModuleHelper class and a couple of convenience tools for module developers (https://github.com/ansible-collections/community.general/pull/1322).
+- nmcli - refactor internal methods for simplicity and enhance reuse to support existing and future connection types (https://github.com/ansible-collections/community.general/pull/1113).
+- nmcli - remove Python DBus and GTK Object library dependencies (https://github.com/ansible-collections/community.general/issues/1112).
+- nmcli - the ``dns4``, ``dns4_search``, ``dns6``, and ``dns6_search`` arguments are retained internally as lists (https://github.com/ansible-collections/community.general/pull/1113).
+- odbc - added a parameter ``commit`` which allows users to disable the explicit commit after the execute call (https://github.com/ansible-collections/community.general/pull/1139).
+- openbsd_pkg - added ``snapshot`` option (https://github.com/ansible-collections/community.general/pull/965).
+- pacman - improve group expansion speed: query list of pacman groups once (https://github.com/ansible-collections/community.general/pull/349).
+- parted - add ``resize`` option to resize existing partitions (https://github.com/ansible-collections/community.general/pull/773).
+- passwordstore lookup plugin - added ``umask`` option to set the desired file permisions on creation. This is done via the ``PASSWORD_STORE_UMASK`` environment variable (https://github.com/ansible-collections/community.general/pull/1156).
+- pkgin - add support for installation of full versioned package names (https://github.com/ansible-collections/community.general/pull/1256).
+- pkgng - present the ``ignore_osver`` option to pkg (https://github.com/ansible-collections/community.general/pull/1243).
+- portage - add ``getbinpkgonly`` option, remove unnecessary note on internal portage behaviour (getbinpkg=yes), and remove the undocumented exclusiveness of the pkg options as portage makes no such restriction (https://github.com/ansible-collections/community.general/pull/1169).
+- postgresql_info - add ``in_recovery`` return value to show if a service in recovery mode or not (https://github.com/ansible-collections/community.general/issues/1068).
+- postgresql_privs - add ``procedure`` type support (https://github.com/ansible-collections/community.general/issues/1002).
+- postgresql_query - add ``query_list`` and ``query_all_results`` return values (https://github.com/ansible-collections/community.general/issues/838).
+- proxmox - add new ``proxmox_default_behavior`` option (https://github.com/ansible-collections/community.general/pull/850).
+- proxmox - add support for API tokens (https://github.com/ansible-collections/community.general/pull/1206).
+- proxmox - extract common code and documentation (https://github.com/ansible-collections/community.general/pull/1331).
+- proxmox inventory plugin - ignore QEMU templates altogether instead of skipping the creation of the host in the inventory (https://github.com/ansible-collections/community.general/pull/1185).
+- proxmox_kvm - add cloud-init support (new options: ``cicustom``, ``cipassword``, ``citype``, ``ciuser``, ``ipconfig``, ``nameservers``, ``searchdomains``, ``sshkeys``) (https://github.com/ansible-collections/community.general/pull/797).
+- proxmox_kvm - add new ``proxmox_default_behavior`` option (https://github.com/ansible-collections/community.general/pull/850).
+- proxmox_kvm - add support for API tokens (https://github.com/ansible-collections/community.general/pull/1206).
+- proxmox_template - add support for API tokens (https://github.com/ansible-collections/community.general/pull/1206).
+- proxmox_template - download proxmox applicance templates (pveam) (https://github.com/ansible-collections/community.general/pull/1046).
+- redis cache plugin - add redis sentinel functionality to cache plugin (https://github.com/ansible-collections/community.general/pull/1055).
+- redis cache plugin - make the redis cache keyset name configurable (https://github.com/ansible-collections/community.general/pull/1036).
+- terraform - add ``init_reconfigure`` option, which controls the ``-reconfigure`` flag (backend reconfiguration) (https://github.com/ansible-collections/community.general/pull/823).
+- xfconf - removed unnecessary second execution of ``xfconf-query`` (https://github.com/ansible-collections/community.general/pull/1305).
+
+Deprecated Features
+-------------------
+
+- django_manage - the parameter ``liveserver`` relates to a no longer maintained third-party module for django. It is now deprecated, and will be remove in community.general 3.0.0 (https://github.com/ansible-collections/community.general/pull/1154).
+- proxmox - the default of the new ``proxmox_default_behavior`` option will change from ``compatibility`` to ``no_defaults`` in community.general 4.0.0. Set the option to an explicit value to avoid a deprecation warning (https://github.com/ansible-collections/community.general/pull/850).
+- proxmox_kvm - the default of the new ``proxmox_default_behavior`` option will change from ``compatibility`` to ``no_defaults`` in community.general 4.0.0. Set the option to an explicit value to avoid a deprecation warning (https://github.com/ansible-collections/community.general/pull/850).
+- syspatch - deprecate the redundant ``apply`` argument (https://github.com/ansible-collections/community.general/pull/360).
+
+Bugfixes
+--------
+
+- apache2_module - amend existing module identifier workaround to also apply to updated Shibboleth modules (https://github.com/ansible-collections/community.general/issues/1379).
+- beadm - fixed issue "list object has no attribute split" (https://github.com/ansible-collections/community.general/issues/791).
+- capabilities - fix for a newer version of libcap release (https://github.com/ansible-collections/community.general/pull/1061).
+- composer - fix bug in command idempotence with composer v2 (https://github.com/ansible-collections/community.general/issues/1179).
+- docker_login - fix internal config file storage to handle credentials for more than one registry (https://github.com/ansible-collections/community.general/issues/1117).
+- filesystem - add option ``state`` with default ``present``. When set to ``absent``, filesystem signatures are removed (https://github.com/ansible-collections/community.general/issues/355).
+- flatpak - use of the ``--non-interactive`` argument instead of ``-y`` when possible (https://github.com/ansible-collections/community.general/pull/1246).
+- gcp_storage_files lookup plugin - make sure that plugin errors out on initialization if the required library is not found, and not on load-time (https://github.com/ansible-collections/community.general/pull/1297).
+- gitlab_group - added description parameter to ``createGroup()`` call (https://github.com/ansible-collections/community.general/issues/138).
+- gitlab_group_variable - support for GitLab pagination limitation by iterating over GitLab variable pages (https://github.com/ansible-collections/community.general/pull/968).
+- gitlab_project_variable - support for GitLab pagination limitation by iterating over GitLab variable pages (https://github.com/ansible-collections/community.general/pull/968).
+- hashi_vault - fix approle authentication without ``secret_id`` (https://github.com/ansible-collections/community.general/pull/1138).
+- homebrew - fix package name validation for packages containing hypen ``-`` (https://github.com/ansible-collections/community.general/issues/1037).
+- homebrew_cask - fix package name validation for casks containing hypen ``-`` (https://github.com/ansible-collections/community.general/issues/1037).
+- influxdb - fix usage of path for older version of python-influxdb (https://github.com/ansible-collections/community.general/issues/997).
+- iptables_state - fix race condition between module and its action plugin (https://github.com/ansible-collections/community.general/issues/1136).
+- linode inventory plugin - make sure that plugin errors out on initialization if the required library is not found, and not on load-time (https://github.com/ansible-collections/community.general/pull/1297).
+- lxc_container - fix the type of the ``container_config`` parameter. It is now processed as a list and not a string (https://github.com/ansible-collections/community.general/pull/216).
+- macports - fix failure to install a package whose name is contained within an already installed package's name or variant (https://github.com/ansible-collections/community.general/issues/1307).
+- maven_artifact - handle timestamped snapshot version strings properly (https://github.com/ansible-collections/community.general/issues/709).
+- memcached cache plugin - make sure that plugin errors out on initialization if the required library is not found, and not on load-time (https://github.com/ansible-collections/community.general/pull/1297).
+- monit - fix modules ability to determine the current state of the monitored process (https://github.com/ansible-collections/community.general/pull/1107).
+- nios_fixed_address, nios_host_record, nios_zone - removed redundant parameter aliases causing warning messages to incorrectly appear in task output (https://github.com/ansible-collections/community.general/issues/852).
+- nmcli - cannot modify ``ifname`` after connection creation (https://github.com/ansible-collections/community.general/issues/1089).
+- nmcli - use consistent autoconnect parameters (https://github.com/ansible-collections/community.general/issues/459).
+- omapi_host - fix compatibility with Python 3 (https://github.com/ansible-collections/community.general/issues/787).
+- packet_net.py inventory script - fixed failure w.r.t. operating system retrieval by changing array subscription back to attribute access (https://github.com/ansible-collections/community.general/pull/891).
+- postgresql_ext - fix the module crashes when available ext versions cannot be compared with current version (https://github.com/ansible-collections/community.general/issues/1095).
+- postgresql_ext - fix version selection when ``version=latest`` (https://github.com/ansible-collections/community.general/pull/1078).
+- postgresql_pg_hba - fix a crash when a new rule with an 'options' field replaces a rule without or vice versa (https://github.com/ansible-collections/community.general/issues/1108).
+- postgresql_privs - fix module fails when ``type`` group and passing ``objs`` value containing hyphens (https://github.com/ansible-collections/community.general/issues/1058).
+- proxmox_kvm - fix issue causing linked clones not being create by allowing ``format=unspecified`` (https://github.com/ansible-collections/community.general/issues/1027).
+- proxmox_kvm - ignore unsupported ``pool`` parameter on update (https://github.com/ansible-collections/community.general/pull/1258).
+- redis - fixes parsing of config values which should not be converted to bytes (https://github.com/ansible-collections/community.general/pull/1079).
+- redis cache plugin - make sure that plugin errors out on initialization if the required library is not found, and not on load-time (https://github.com/ansible-collections/community.general/pull/1297).
+- slack - avoid trying to update existing message when sending messages that contain the string "ts" (https://github.com/ansible-collections/community.general/issues/1097).
+- solaris_zone - fixed issue trying to configure zone in Python 3 (https://github.com/ansible-collections/community.general/issues/1081).
+- syspatch - fix bug where not setting ``apply=true`` would result in error (https://github.com/ansible-collections/community.general/pull/360).
+- xfconf - parameter ``value`` no longer required for state ``absent`` (https://github.com/ansible-collections/community.general/issues/1329).
+- xfconf - xfconf no longer passing the command args as a string, but rather as a list (https://github.com/ansible-collections/community.general/issues/1328).
+- zypper - force ``LANG=C`` to as zypper is looking in XML output where attribute could be translated (https://github.com/ansible-collections/community.general/issues/1175).
+
+New Modules
+-----------
+
+Cloud
+~~~~~
+
+misc
+^^^^
+
+- proxmox_domain_info - Retrieve information about one or more Proxmox VE domains
+- proxmox_group_info - Retrieve information about one or more Proxmox VE groups
+- proxmox_user_info - Retrieve information about one or more Proxmox VE users
+
+Clustering
+~~~~~~~~~~
+
+nomad
+^^^^^
+
+- nomad_job - Launch a Nomad Job
+- nomad_job_info - Get Nomad Jobs info
+
+Monitoring
+~~~~~~~~~~
+
+- pagerduty_change - Track a code or infrastructure change as a PagerDuty change event
+- pagerduty_user - Manage a user account on PagerDuty
+
 v1.2.0
 ======
 
