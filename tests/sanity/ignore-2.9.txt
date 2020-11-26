@@ -213,7 +213,6 @@ plugins/modules/cloud/smartos/vmadm.py validate-modules:undocumented-parameter
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:doc-missing-type
-plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:nonexistent-parameter-documented
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:undocumented-parameter
 plugins/modules/cloud/univention/udm_dns_record.py validate-modules:doc-choices-do-not-match-spec
@@ -225,9 +224,7 @@ plugins/modules/cloud/univention/udm_group.py validate-modules:doc-default-does-
 plugins/modules/cloud/univention/udm_group.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/univention/udm_share.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/cloud/univention/udm_share.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/cloud/univention/udm_share.py validate-modules:nonexistent-parameter-documented
 plugins/modules/cloud/univention/udm_share.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/univention/udm_share.py validate-modules:undocumented-parameter
 plugins/modules/cloud/univention/udm_user.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/cloud/univention/udm_user.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-type-not-in-doc
@@ -326,7 +323,6 @@ plugins/modules/net_tools/nios/nios_fixed_address.py validate-modules:parameter-
 plugins/modules/net_tools/nios/nios_fixed_address.py validate-modules:undocumented-parameter
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:doc-missing-type
-plugins/modules/net_tools/nios/nios_host_record.py validate-modules:nonexistent-parameter-documented
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:undocumented-parameter
 plugins/modules/net_tools/nios/nios_member.py validate-modules:doc-default-does-not-match-spec
@@ -531,9 +527,7 @@ plugins/modules/storage/purestorage/purefb_facts.py validate-modules:invalid-doc
 plugins/modules/storage/purestorage/purefb_facts.py validate-modules:return-syntax-error
 plugins/modules/storage/zfs/zfs.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/zfs/zfs_delegate_admin.py validate-modules:parameter-type-not-in-doc
-plugins/modules/storage/zfs/zfs_facts.py validate-modules:nonexistent-parameter-documented
 plugins/modules/storage/zfs/zfs_facts.py validate-modules:parameter-type-not-in-doc
-plugins/modules/storage/zfs/zpool_facts.py validate-modules:nonexistent-parameter-documented
 plugins/modules/storage/zfs/zpool_facts.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/alternatives.py pylint:blacklisted-name
 plugins/modules/system/beadm.py pylint:blacklisted-name
