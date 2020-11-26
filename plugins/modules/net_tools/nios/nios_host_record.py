@@ -107,8 +107,6 @@ options:
           - Configure the host_record over DHCP instead of DNS, if user
             changes it to true, user need to mention MAC address to configure
         required: false
-        aliases:
-          - dhcp
   aliases:
     description:
       - Configures an optional list of additional aliases to add to the host
