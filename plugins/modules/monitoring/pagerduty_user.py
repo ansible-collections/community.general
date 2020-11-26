@@ -193,7 +193,7 @@ def main():
             pd_email=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['present', 'absent']),
             pd_role=dict(type='str', default='responder',
-                choices=['global_admin', 'manager', 'responder', 'observer', 'stakeholder', 'limited_stakeholder', 'restricted_access']),
+                        choices=['global_admin', 'manager', 'responder', 'observer', 'stakeholder', 'limited_stakeholder', 'restricted_access']),
             pd_teams=dict(type='list', elements='str', required=False)),
         required_if=[['state', 'present', ['pd_teams']], ],
         supports_check_mode=True,
