@@ -177,12 +177,13 @@ class PagerDutyUser(object):
             team_info = self._apisession.find('teams', team, attribute='name')
             if team_info is not None:
                 try:
-                    updated_team = self._apisession.rput('/teams/'+team_info['id']+'/users/'+pd_user_id, json={
+                    updated_team = self._apisession.rput('/teams/'+ team_info['id']+ '/users/'+ pd_user_id, json={
                         'role': pd_role
                     })
                 except PDClientError:
                     updated_team = None
         return updated_team
+
 
 def main():
     module = AnsibleModule(
@@ -191,11 +192,9 @@ def main():
             pd_user=dict(type='str', required=True),
             pd_email=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['present', 'absent']),
-            pd_role=dict(type='str', default='responder', choices=['global admin', 'manager', 'responder', 'observer', 'stakeholder', 'limited skateholder', 'restricted access']),
-            pd_teams=dict(type='list', elements='str', required=False)
-            ),
-        required_if=[['state', 'present', ['pd_teams']],
-        ],
+            pd_role=dict(type='str', default='responder', choices=['global_admin', 'manager', 'responder', 'observer', 'stakeholder', 'limited_skateholder', 'restricted_access']),
+            pd_teams=dict(type='list', elements='str', required=False)),
+        required_if=[['state', 'present', ['pd_teams']],],
         supports_check_mode=True,
     )
 
@@ -256,8 +255,7 @@ def main():
                 pd_user_id = user.does_user_exist(pd_email)
                 # add a user to the team/s
                 user.add_user_to_teams(pd_user_id, pd_teams, pd_role)
-            module.exit_json(changed=True,
-                result="Successfully created & added user %s to team %s" % (pd_user, pd_teams))
+            module.exit_json(changed=True, result="Successfully created & added user %s to team %s" % (pd_user, pd_teams))
 
 
 if __name__ == "__main__":
