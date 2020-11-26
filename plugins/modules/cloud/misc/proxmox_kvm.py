@@ -276,12 +276,6 @@ options:
       - VMID for the clone. Used only with clone.
       - If newid is not set, the next available VM ID will be fetched from ProxmoxAPI.
     type: int
-  node:
-    description:
-      - Proxmox VE node, where the new VM will be created.
-      - Only required for C(state=present).
-      - For other states, it will be autodiscovered.
-    type: str
   numa:
     description:
       - A hash/dictionaries of NUMA topology. C(numa='{"key":"value", "key":"value"}').
@@ -318,10 +312,6 @@ options:
       - Keys allowed are - (parallel[n]) where 0 ≤ n ≤ 2.
       - Values allowed are - C("/dev/parport\d+|/dev/usb/lp\d+").
     type: dict
-  pool:
-    description:
-      - Add the new VM to the specified pool.
-    type: str
   protection:
     description:
       - Enable/disable the protection flag of the VM. This will enable/disable the remove VM and remove disk operations.
@@ -482,11 +472,6 @@ options:
       - C(size) is the size of the disk in GB.
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
     type: dict
-  vmid:
-    description:
-      - Specifies the VM ID. Instead use I(name) parameter.
-      - If vmid is not set, the next available VM ID will be fetched from ProxmoxAPI.
-    type: int
   watchdog:
     description:
       - Creates a virtual hardware watchdog device.
@@ -509,7 +494,9 @@ options:
       - compatibility
       - no_defaults
     version_added: "1.3.0"
-extends_documentation_fragment: community.general.proxmox.documentation
+extends_documentation_fragment:
+  - community.general.proxmox.documentation
+  - community.general.proxmox.selection
 '''
 
 EXAMPLES = '''
