@@ -177,7 +177,7 @@ class PagerDutyUser(object):
             team_info = self._apisession.find('teams', team, attribute='name')
             if team_info is not None:
                 try:
-                    updated_team = self._apisession.rput('/teams/'+ team_info['id']+ '/users/'+ pd_user_id, json={
+                    updated_team = self._apisession.rput('/teams/' + team_info['id'] + '/users/' + pd_user_id, json={
                         'role': pd_role
                     })
                 except PDClientError:
@@ -194,7 +194,7 @@ def main():
             state=dict(type='str', default='present', choices=['present', 'absent']),
             pd_role=dict(type='str', default='responder', choices=['global_admin', 'manager', 'responder', 'observer', 'stakeholder', 'limited_stakeholder', 'restricted_access']),
             pd_teams=dict(type='list', elements='str', required=False)),
-        required_if=[['state', 'present', ['pd_teams']],],
+        required_if=[['state', 'present', ['pd_teams']], ],
         supports_check_mode=True,
     )
 
