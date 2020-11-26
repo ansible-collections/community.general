@@ -18,7 +18,7 @@ TESTED_MODULE = redhat_subscription.__name__
 @pytest.fixture
 def patch_redhat_subscription(mocker):
     """
-    Function used for mocking some parts of redhat_subscribtion module
+    Function used for mocking some parts of redhat_subscription module
     """
     mocker.patch('ansible_collections.community.general.plugins.modules.packaging.os.redhat_subscription.RegistrationBase.REDHAT_REPO')
     mocker.patch('ansible_collections.community.general.plugins.modules.packaging.os.redhat_subscription.isfile', return_value=False)
@@ -817,7 +817,7 @@ TEST_CASES_IDS = [item[1]['id'] for item in TEST_CASES]
 
 @pytest.mark.parametrize('patch_ansible_module, testcase', TEST_CASES, ids=TEST_CASES_IDS, indirect=['patch_ansible_module'])
 @pytest.mark.usefixtures('patch_ansible_module')
-def test_redhat_subscribtion(mocker, capfd, patch_redhat_subscription, testcase):
+def test_redhat_subscription(mocker, capfd, patch_redhat_subscription, testcase):
     """
     Run unit tests for test cases listen in TEST_CASES
     """
@@ -1173,7 +1173,7 @@ SYSPURPOSE_TEST_CASES_IDS = [item[1]['id'] for item in SYSPURPOSE_TEST_CASES]
 
 @pytest.mark.parametrize('patch_ansible_module, testcase', SYSPURPOSE_TEST_CASES, ids=SYSPURPOSE_TEST_CASES_IDS, indirect=['patch_ansible_module'])
 @pytest.mark.usefixtures('patch_ansible_module')
-def test_redhat_subscribtion_syspurpose(mocker, capfd, patch_redhat_subscription, patch_ansible_module, testcase, tmpdir):
+def test_redhat_subscription_syspurpose(mocker, capfd, patch_redhat_subscription, patch_ansible_module, testcase, tmpdir):
     """
     Run unit tests for test cases listen in SYSPURPOSE_TEST_CASES (syspurpose specific cases)
     """
