@@ -32,12 +32,9 @@ options:
        By default this is retrieved from the credentials path
 
   availability_vs_cost:
-    choices:
-      - availabilityOriented
-      - costOriented
-      - balanced
     description:
       - (String) The strategy orientation.
+      - "The choices available are: C(availabilityOriented), C(costOriented), C(balanced)."
     required: true
 
   availability_zones:
@@ -119,14 +116,9 @@ options:
       - (Integer) Minimal mount of time instance should be unhealthy for us to consider it unhealthy.
 
   health_check_type:
-    choices:
-      - ELB
-      - HCS
-      - TARGET_GROUP
-      - MLB
-      - EC2
     description:
       - (String) The service to use for the health check.
+      - "The choices available are: C(ELB), C(HCS), C(TARGET_GROUP), C(MLB), C(EC2)."
 
   iam_role_name:
     description:
@@ -246,15 +238,9 @@ options:
         should_persist_private_ip (Boolean)
 
   product:
-    choices:
-      - Linux/UNIX
-      - SUSE Linux
-      - Windows
-      - Linux/UNIX (Amazon VPC)
-      - SUSE Linux (Amazon VPC)
-      - Windows
     description:
-      - (String) Operation system type._
+      - (String) Operation system type.
+      - "Available choices are: C(Linux/UNIX), C(SUSE Linux), C(Windows), C(Linux/UNIX (Amazon VPC)), C(SUSE Linux (Amazon VPC))."
     required: true
 
   rancher:
@@ -351,22 +337,18 @@ options:
       - (List of Strings) List of target group arns instances should be registered to
 
   tenancy:
-    choices:
-      - default
-      - dedicated
     description:
-      - (String) dedicated vs shared tenancy
+      - (String) dedicated vs shared tenancy.
+      - "The available choices are: C(default), C(dedicated)."
 
   terminate_at_end_of_billing_hour:
     description:
       - (Boolean) terminate at the end of billing hour
     type: bool
   unit:
-    choices:
-      - instance
-      - weight
     description:
       - (String) The capacity unit to launch instances by.
+      - "The available choices are: C(instance), C(weight)."
     required: true
 
   up_scaling_policies:
