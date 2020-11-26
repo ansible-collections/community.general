@@ -1,0 +1,2 @@
+bugfixes:
+- utm_proxy_exception - four parameters had elements types set as 'string' (invalid), changed to 'str'. (https://github.com/ansible-collections/community.general/pull/1399)
