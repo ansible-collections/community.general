@@ -245,7 +245,6 @@ plugins/modules/cloud/univention/udm_share.py validate-modules:doc-choices-do-no
 plugins/modules/cloud/univention/udm_share.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/univention/udm_share.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/univention/udm_share.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/univention/udm_share.py validate-modules:undocumented-parameter
 plugins/modules/cloud/univention/udm_user.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/cloud/univention/udm_user.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-list-no-elements
