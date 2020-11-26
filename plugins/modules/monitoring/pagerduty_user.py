@@ -38,7 +38,7 @@ options:
     pd_role:
         description:
             - The user's role.
-        choices: ['global admin', 'manager', 'responder', 'observer', 'stakeholder', 'limited skateholder', 'restricted access']
+        choices: ['global_admin', 'manager', 'responder', 'observer', 'stakeholder', 'limited_skateholder', 'restricted_access']
         default: 'responder'
         type: str
     state:
@@ -49,9 +49,10 @@ options:
         choices: ['present', 'absent']
         default: 'present'
         type: str
-    pd_team:
+    pd_teams:
         description:
-            - The team to which the user belongs.
+            - The teams to which the user belongs.
+            - Required if I(state=present)
         type: list
         elements: str
 notes:
@@ -65,15 +66,15 @@ EXAMPLES = r'''
     pd_user: user_full_name
     pd_email: user_email
     pd_role: user_pd_role
-    pd_team: user_pd_team
-    state: present
+    pd_teams: user_pd_teams
+    state: "present"
 
 - name: Remove a user account from PagerDuty
   community.general.pagerduty_user:
     access_token: 'Your_Access_token'
     pd_user: user_full_name
     pd_email: user_email
-    state: absent
+    state: "absent"
 '''
 
 RETURN = r''' # '''
@@ -115,7 +116,7 @@ class PagerDutyUser(object):
                 "name": pd_name,
                 "email": pd_email,
                 "type": "user",
-                "role": pd_role
+                "role": pd_role,
             })
             return user
 
@@ -124,8 +125,7 @@ class PagerDutyUser(object):
                 self._module.fail_json(
                     msg="Failed to add %s due to invalid argument %s" % (pd_name, e))
             if e.response.status_code == 401:
-                self._module.fail_json(
-                    msg="Failed to add %s due to invalid API key %s" % (pd_name, e))
+                self._module.fail_json(msg="Failed to add %s due to invalid API key %s" % (pd_name, e))
             if e.response.status_code == 402:
                 self._module.fail_json(
                     msg="Failed to add %s due to inability to perform the action within the API token %s" % (pd_name, e))
@@ -160,8 +160,7 @@ class PagerDutyUser(object):
     # get incidents assigned to a user
     def get_incidents_assigned_to_user(self, pd_user_id):
         incident_info = {}
-        incidents = self._apisession.list_all('incidents',
-            params={'user_ids[]':[pd_user_id]})
+        incidents = self._apisession.list_all('incidents', params={'user_ids[]': [pd_user_id]})
 
         for incident in incidents:
             incident_info = {
@@ -172,19 +171,18 @@ class PagerDutyUser(object):
         return incident_info
 
     # add a user to a team/teams
-    def add_user_to_teams(self, pd_user_id, pd_team, pd_role):
+    def add_user_to_teams(self, pd_user_id, pd_teams, pd_role):
         updated_team = None
-        for team in pd_team:
+        for team in pd_teams:
             team_info = self._apisession.find('teams', team, attribute='name')
             if team_info is not None:
                 try:
                     updated_team = self._apisession.rput('/teams/'+team_info['id']+'/users/'+pd_user_id, json={
-                        'role':pd_role
+                        'role': pd_role
                     })
                 except PDClientError:
                     updated_team = None
         return updated_team
-
 
 def main():
     module = AnsibleModule(
@@ -193,11 +191,10 @@ def main():
             pd_user=dict(type='str', required=True),
             pd_email=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['present', 'absent']),
-            pd_role=dict(type='str', default='responder', required=False, choices=['global admin', 'manager', 'responder', 'observer', 'stakeholder', 'limited skateholder', 'restricted access']),
-            pd_team=dict(type='list', required=False)
-        ),
-        required_if=[
-            ['state', 'present', ['pd_team']],
+            pd_role=dict(type='str', default='responder', choices=['global admin', 'manager', 'responder', 'observer', 'stakeholder', 'limited skateholder', 'restricted access']),
+            pd_teams=dict(type='list', elements='str', required=False)
+            ),
+        required_if=[['state', 'present', ['pd_teams']],
         ],
         supports_check_mode=True,
     )
@@ -213,17 +210,17 @@ def main():
     pd_email = module.params['pd_email']
     state = module.params['state']
     pd_role = module.params['pd_role']
-    pd_team = module.params['pd_team']
+    pd_teams = module.params['pd_teams']
 
     if pd_role:
         pd_role_gui_value = {
-            'global admin': 'admin',
+            'global_admin': 'admin',
             'manager': 'user',
             'responder': 'limited_user',
             'observer': 'observer',
             'stakeholder': 'read_only_user',
-            'limited stakeholder': 'read_only_limited_user',
-            'restricted access': 'restricted_access'
+            'limited_stakeholder': 'read_only_limited_user',
+            'restricted_access': 'restricted_access'
         }
         pd_role = pd_role_gui_value[pd_role]
 
@@ -258,8 +255,9 @@ def main():
                 # get user's id
                 pd_user_id = user.does_user_exist(pd_email)
                 # add a user to the team/s
-                user.add_user_to_teams(pd_user_id, pd_team, pd_role)
-            module.exit_json(changed=True, result="Successfully created & added user %s to team %s" % (pd_user, pd_team))
+                user.add_user_to_teams(pd_user_id, pd_teams, pd_role)
+            module.exit_json(changed=True,
+                result="Successfully created & added user %s to team %s" % (pd_user, pd_teams))
 
 
 if __name__ == "__main__":
