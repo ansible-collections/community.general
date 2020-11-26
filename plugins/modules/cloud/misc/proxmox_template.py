@@ -17,7 +17,7 @@ description:
 options:
   node:
     description:
-      - Proxmox VE node, when you will operate with template
+      - Proxmox VE node on which to operate.
     type: str
   src:
     description:
