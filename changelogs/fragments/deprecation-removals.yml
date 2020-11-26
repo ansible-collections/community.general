@@ -1,0 +1,5 @@
+removed_features:
+- "iptables_state - the ``ANSIBLE_ASYNC_DIR`` environment is no longer supported, use the ``async_dir`` shell option instead (https://github.com/ansible-collections/community.general/pull/1371)."
+- "memcached cache plugin - do not import ``CacheModule``s directly. Use ``ansible.plugins.loader.cache_loader`` instead (https://github.com/ansible-collections/community.general/pull/1371)."
+- "redis cache plugin - do not import ``CacheModule``s directly. Use ``ansible.plugins.loader.cache_loader`` instead (https://github.com/ansible-collections/community.general/pull/1371)."
+- "xml - when ``content=attribute``, the ``attribute`` option is ignored (https://github.com/ansible-collections/community.general/pull/1371)."
