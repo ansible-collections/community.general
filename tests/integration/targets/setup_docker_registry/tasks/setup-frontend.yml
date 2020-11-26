@@ -9,7 +9,7 @@
   docker_container:
     state: stopped
     name: '{{ docker_registry_container_name_frontend }}'
-    image: nginx:alpine
+    image: "{{ docker_test_image_registry_nginx }}"
     ports: 5000
     links:
     - '{{ docker_registry_container_name_registry }}:real-registry'

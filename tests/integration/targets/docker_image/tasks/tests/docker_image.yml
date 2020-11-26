@@ -22,14 +22,14 @@
     state: absent
     force_absent: yes
 
-- name: Make sure we have hello-world:latest
+- name: Make sure we have {{ docker_test_image_hello_world }}:latest
   docker_image:
-    name: hello-world:latest
+    name: "{{ docker_test_image_hello_world }}:latest"
     source: pull
 
 - name: Push image to test registry
   docker_image:
-    name: "hello-world:latest"
+    name: "{{ docker_test_image_hello_world }}:latest"
     repository: "{{ hello_world_image_base }}"
     push: yes
     source: local
@@ -37,7 +37,7 @@
 
 - name: Push image to test registry (idempotent)
   docker_image:
-    name: "hello-world:latest"
+    name: "{{ docker_test_image_hello_world }}:latest"
     repository: "{{ hello_world_image_base }}"
     push: yes
     source: local
@@ -45,7 +45,7 @@
 
 - name: Push image to test registry (force, still idempotent)
   docker_image:
-    name: "hello-world:latest"
+    name: "{{ docker_test_image_hello_world }}:latest"
     repository: "{{ hello_world_image_base }}"
     push: yes
     source: local
@@ -115,7 +115,7 @@
   docker_image:
     name: "{{ iname }}"
     build:
-      path: "{{ role_path }}/files"
+      path: "{{ output_dir }}/files"
       pull: no
     repository: "{{ test_image_base }}"
     source: build
@@ -125,7 +125,7 @@
   docker_image:
     name: "{{ iname }}"
     build:
-      path: "{{ role_path }}/files"
+      path: "{{ output_dir }}/files"
       pull: no
     repository: "{{ test_image_base }}"
     source: build

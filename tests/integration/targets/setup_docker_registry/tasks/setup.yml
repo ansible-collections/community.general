@@ -42,7 +42,7 @@
   - name: Start test registry
     docker_container:
       name: '{{ docker_registry_container_name_registry }}'
-      image: registry:2.6.1
+      image: "{{ docker_test_image_registry }}"
       ports: 5000
     register: registry_container
 

@@ -17,7 +17,7 @@ service_expected_output:
   healthcheck_disabled: null
   hostname: null
   hosts: null
-  image: busybox
+  image: "{{ docker_test_image_busybox }}"
   labels: null
   limit_cpu: null
   limit_memory: null

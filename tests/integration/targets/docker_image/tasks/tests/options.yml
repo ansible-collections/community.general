@@ -22,7 +22,7 @@
   docker_image:
     name: "{{ iname }}"
     build:
-      path: "{{ role_path }}/files"
+      path: "{{ output_dir }}/files"
       args:
         TEST1: val1
         TEST2: val2
@@ -35,7 +35,7 @@
   docker_image:
     name: "{{ iname }}"
     build:
-      path: "{{ role_path }}/files"
+      path: "{{ output_dir }}/files"
       args:
         TEST1: val1
         TEST2: val2
@@ -70,7 +70,7 @@
   docker_image:
     name: "{{ iname }}"
     build:
-      path: "{{ role_path }}/files"
+      path: "{{ output_dir }}/files"
       container_limits:
         memory: 4000
       pull: no
@@ -82,7 +82,7 @@
   docker_image:
     name: "{{ iname }}"
     build:
-      path: "{{ role_path }}/files"
+      path: "{{ output_dir }}/files"
       container_limits:
         memory: 5000000
         memswap: 7000000
@@ -115,7 +115,7 @@
   docker_image:
     name: "{{ iname }}"
     build:
-      path: "{{ role_path }}/files"
+      path: "{{ output_dir }}/files"
       dockerfile: "MyDockerfile"
       pull: no
     source: build
@@ -130,7 +130,7 @@
 - assert:
     that:
     - dockerfile_1 is changed
-    - "'FROM alpine:3.7' in dockerfile_1.stdout"
+    - "('FROM ' ~ docker_test_image_alpine) in dockerfile_1.stdout"
     - dockerfile_1['image']['Config']['WorkingDir'] == '/newdata'
 
 ####################################################################
@@ -141,7 +141,7 @@
   docker_image:
     name: "{{ iname }}"
     build:
-      path: "{{ role_path }}/files"
+      path: "{{ output_dir }}/files"
       pull: no
     source: build
 
@@ -149,7 +149,7 @@
   docker_image:
     name: "{{ iname }}"
     build:
-      path: "{{ role_path }}/files"
+      path: "{{ output_dir }}/files"
       dockerfile: "MyDockerfile"
       pull: no
     source: build
@@ -160,7 +160,7 @@
   docker_image:
     name: "{{ iname }}"
     build:
-      path: "{{ role_path }}/files"
+      path: "{{ output_dir }}/files"
       dockerfile: "MyDockerfile"
       pull: no
     source: build
@@ -184,27 +184,27 @@
 
 - name: Archive image
   docker_image:
-    name: "hello-world:latest"
+    name: "{{ docker_test_image_hello_world }}:latest"
     archive_path: "{{ output_dir }}/image.tar"
     source: pull
   register: archive_image
 
 - name: remove image
   docker_image:
-    name: "hello-world:latest"
+    name: "{{ docker_test_image_hello_world }}:latest"
     state: absent
     force_absent: yes
 
 - name: load image (changed)
   docker_image:
-    name: "hello-world:latest"
+    name: "{{ docker_test_image_hello_world }}:latest"
     load_path: "{{ output_dir }}/image.tar"
     source: load
   register: load_image
 
 - name: load image (idempotency)
   docker_image:
-    name: "hello-world:latest"
+    name: "{{ docker_test_image_hello_world }}:latest"
     load_path: "{{ output_dir }}/image.tar"
     source: load
   register: load_image_1
@@ -223,7 +223,7 @@
   docker_image:
     name: "{{ iname }}"
     build:
-      path: "{{ role_path }}/files"
+      path: "{{ output_dir }}/files"
       pull: no
     source: build
   register: path_1
@@ -232,7 +232,7 @@
   docker_image:
     name: "{{ iname }}"
     build:
-      path: "{{ role_path }}/files"
+      path: "{{ output_dir }}/files"
       pull: no
     source: build
   register: path_2
@@ -256,7 +256,7 @@
   docker_image:
     name: "{{ iname }}"
     build:
-      path: "{{ role_path }}/files"
+      path: "{{ output_dir }}/files"
       dockerfile: "StagedDockerfile"
       target: first
       pull: no
@@ -282,7 +282,7 @@
   docker_image:
     name: "{{ iname }}"
     build:
-      path: "{{ role_path }}/files"
+      path: "{{ output_dir }}/files"
       dockerfile: "EtcHostsDockerfile"
       pull: no
       etc_hosts:

@@ -45,8 +45,8 @@
       name: test_stack
       absent_retries: 30
 
-  - name: Copy compose files
-    copy:
+  - name: Template compose files
+    template:
       src: "{{item}}"
       dest: "{{output_dir}}/"
     with_items:

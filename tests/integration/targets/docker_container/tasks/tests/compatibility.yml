@@ -13,7 +13,7 @@
 - name: Start container (check)
   docker_container:
     name: "{{ cname }}"
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     state: started
     container_default_behavior: compatibility
@@ -23,7 +23,7 @@
 - name: Start container
   docker_container:
     name: "{{ cname }}"
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     state: started
     container_default_behavior: compatibility
@@ -32,7 +32,7 @@
 - name: Start container (idempotent)
   docker_container:
     name: "{{ cname }}"
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     state: started
     container_default_behavior: compatibility
@@ -41,7 +41,7 @@
 - name: Start container (idempotent check)
   docker_container:
     name: "{{ cname }}"
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     state: started
     container_default_behavior: compatibility
   check_mode: yes
@@ -68,7 +68,7 @@
 - name: Start container (check)
   docker_container:
     name: "{{ cname }}"
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     state: started
     container_default_behavior: no_defaults
@@ -78,7 +78,7 @@
 - name: Start container
   docker_container:
     name: "{{ cname }}"
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     state: started
     container_default_behavior: no_defaults
@@ -87,7 +87,7 @@
 - name: Start container (idempotent)
   docker_container:
     name: "{{ cname }}"
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     state: started
     container_default_behavior: no_defaults
@@ -96,7 +96,7 @@
 - name: Start container (idempotent check)
   docker_container:
     name: "{{ cname }}"
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     state: started
     container_default_behavior: no_defaults

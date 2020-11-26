@@ -12,7 +12,7 @@
 
 - name: Create container (check)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: present
@@ -21,7 +21,7 @@
 
 - name: Create container
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: present
@@ -29,7 +29,7 @@
 
 - name: Create container (idempotent)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: present
@@ -37,7 +37,7 @@
 
 - name: Create container (idempotent check)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: present
@@ -94,7 +94,7 @@
 
 - name: Present check for running container (check)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: present
@@ -103,7 +103,7 @@
 
 - name: Present check for running container
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: present
@@ -126,7 +126,7 @@
 
 - name: Start container from scratch (check)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     stop_timeout: 1
     name: "{{ cname }}"
@@ -136,7 +136,7 @@
 
 - name: Start container from scratch
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     stop_timeout: 1
     name: "{{ cname }}"
@@ -145,7 +145,7 @@
 
 - name: Start container from scratch (idempotent)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     stop_timeout: 1
     name: "{{ cname }}"
@@ -154,7 +154,7 @@
 
 - name: Start container from scratch (idempotent check)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     stop_timeout: 1
     name: "{{ cname }}"
@@ -175,7 +175,7 @@
 
 - name: Recreating container (created)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: present
@@ -184,7 +184,7 @@
 
 - name: Recreating container (created, recreate, check mode)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     recreate: yes
@@ -195,7 +195,7 @@
 
 - name: Recreating container (created, recreate)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     recreate: yes
@@ -205,7 +205,7 @@
 
 - name: Recreating container (started)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started
@@ -214,7 +214,7 @@
 
 - name: Recreating container (started, recreate, check mode)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     recreate: yes
@@ -226,7 +226,7 @@
 
 - name: Recreating container (started, recreate)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     recreate: yes
@@ -266,7 +266,7 @@
 
 - name: Restarting
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started
@@ -277,7 +277,7 @@
 
 - name: Restarting (restart, check mode)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     restart: yes
@@ -289,7 +289,7 @@
 
 - name: Restarting (restart)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     restart: yes
@@ -300,7 +300,7 @@
 
 - name: Restarting (verify volumes)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started
@@ -330,7 +330,7 @@
 
 - name: Stop container (check)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     name: "{{ cname }}"
     state: stopped
     stop_timeout: 1
@@ -339,7 +339,7 @@
 
 - name: Stop container
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     name: "{{ cname }}"
     state: stopped
     stop_timeout: 1
@@ -347,7 +347,7 @@
 
 - name: Stop container (idempotent)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     name: "{{ cname }}"
     state: stopped
     stop_timeout: 1
@@ -355,7 +355,7 @@
 
 - name: Stop container (idempotent check)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     name: "{{ cname }}"
     state: stopped
     stop_timeout: 1
@@ -412,7 +412,7 @@
 
 - name: Start container (setup for removing from running)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started

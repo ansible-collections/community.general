@@ -14,7 +14,7 @@
   # Create objects to be pruned
   - docker_container:
       name: "{{ cname }}"
-      image: hello-world
+      image: "{{ docker_test_image_hello_world }}"
       state: present
     register: container
   - docker_network:

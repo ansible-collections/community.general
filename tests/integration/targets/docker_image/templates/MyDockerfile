@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM {{ docker_test_image_alpine }}
 ENV INSTALL_PATH /newdata
 RUN mkdir -p $INSTALL_PATH
 
