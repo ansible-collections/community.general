@@ -463,6 +463,7 @@ plugins/modules/net_tools/nsupdate.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/omapi_host.py validate-modules:parameter-list-no-elements
 plugins/modules/notification/cisco_webex.py validate-modules:invalid-argument-name
 plugins/modules/notification/grove.py validate-modules:invalid-argument-name
+plugins/modules/notification/grove.py validate-modules:nonexistent-parameter-documented
 plugins/modules/notification/mail.py validate-modules:parameter-list-no-elements
 plugins/modules/notification/nexmo.py validate-modules:parameter-list-no-elements
 plugins/modules/notification/office_365_connector_card.py validate-modules:parameter-list-no-elements
