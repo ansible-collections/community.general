@@ -123,18 +123,18 @@ class PagerDutyUser(object):
         except PDClientError as e:
             if e.response.status_code == 400:
                 self._module.fail_json(
-                    msg="Failed to add %s due to invalid argument %s" % (pd_name, e))
+                    msg="Failed to add %s due to invalid argument" % (pd_name))
             if e.response.status_code == 401:
-                self._module.fail_json(msg="Failed to add %s due to invalid API key %s" % (pd_name, e))
+                self._module.fail_json(msg="Failed to add %s due to invalid API key" % (pd_name))
             if e.response.status_code == 402:
                 self._module.fail_json(
-                    msg="Failed to add %s due to inability to perform the action within the API token %s" % (pd_name, e))
+                    msg="Failed to add %s due to inability to perform the action within the API token" % (pd_name))
             if e.response.status_code == 403:
                 self._module.fail_json(
-                    msg="Failed to add %s due to inability to review the requested resource within the API token %s" % (pd_name, e))
+                    msg="Failed to add %s due to inability to review the requested resource within the API token" % (pd_name))
             if e.response.status_code == 429:
                 self._module.fail_json(
-                    msg="Failed to add %s due to reaching the limit of making requests %s" % (pd_name, e))
+                    msg="Failed to add %s due to reaching the limit of making requests" % (pd_name))
 
     # delete a user account from PD
     def delete_user(self, pd_user_id, pd_name):
@@ -145,17 +145,17 @@ class PagerDutyUser(object):
         except PDClientError as e:
             if e.response.status_code == 404:
                 self._module.fail_json(
-                    msg="Failed to remove %s as user was not found %s" % (pd_name, e))
+                    msg="Failed to remove %s as user was not found" % (pd_name))
             if e.response.status_code == 403:
                 self._module.fail_json(
-                    msg="Failed to remove %s due to inability to review the requested resource within the API token %s" % (pd_name, e))
+                    msg="Failed to remove %s due to inability to review the requested resource within the API token" % (pd_name))
             if e.response.status_code == 401:
                 # print out the list of incidents
                 pd_incidents = self.get_incidents_assigned_to_user(pd_user_id)
-                self._module.fail_json(msg="Failed to remove %s as user has assigned incidents %s : %s" % (pd_name, pd_incidents, e))
+                self._module.fail_json(msg="Failed to remove %s as user has assigned incidents %s" % (pd_name, pd_incidents))
             if e.response.status_code == 429:
                 self._module.fail_json(
-                    msg="Failed to remove %s due to reaching the limit of making requests %s" % (pd_name, e))
+                    msg="Failed to remove %s due to reaching the limit of making requests" % (pd_name))
 
     # get incidents assigned to a user
     def get_incidents_assigned_to_user(self, pd_user_id):
