@@ -492,6 +492,8 @@ files:
     maintainers: ApsOps
   $modules/monitoring/pagerduty_change.py:
     maintainers: adamvaughan
+  $modules/monitoring/pagerduty_user.py:
+    maintainers: zanssa
   $modules/monitoring/pingdom.py:
     maintainers: thaumos
   $modules/monitoring/rollbar_deployment.py:
