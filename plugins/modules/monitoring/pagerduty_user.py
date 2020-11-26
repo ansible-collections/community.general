@@ -52,7 +52,7 @@ options:
     pd_teams:
         description:
             - The teams to which the user belongs.
-            - Required if I(state=present)
+            - Required if I(state=present).
         type: list
         elements: str
 notes:
