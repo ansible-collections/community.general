@@ -19,24 +19,19 @@
       - get_element_attribute.matches[0]['rating'] is defined
       - get_element_attribute.matches[0]['rating']['subjective'] == 'true'
 
-  # TODO: Remove this in 2.0.0 when this incorrect use of attribute is deprecated
-  - name: Get element attributes
+  - name: Get element attributes (should fail)
     xml:
       path: /tmp/ansible-xml-beers.xml
       xpath: /business/rating
       content: attribute
       attribute: subjective
     register: get_element_attribute_wrong
+    ignore_errors: true
 
   - name: Test expected result
     assert:
       that:
-      - get_element_attribute_wrong.changed == false
-      - get_element_attribute_wrong.matches[0]['rating'] is defined
-      - get_element_attribute_wrong.matches[0]['rating']['subjective'] == 'true'
-      - get_element_attribute_wrong.deprecations is defined
-      - get_element_attribute_wrong.deprecations[0].msg == "Parameter 'attribute=subjective' is ignored when using 'content=attribute' only 'xpath' is used. Please remove entry."
-      - get_element_attribute_wrong.deprecations[0].version == '2.0.0'
+      - get_element_attribute_wrong is failed
 
   - name: Get element text
     xml:
