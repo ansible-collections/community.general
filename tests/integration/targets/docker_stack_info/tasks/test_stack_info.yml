@@ -31,8 +31,8 @@
         - 'output.results | type_debug == "list"'
         - 'output.results | length == 0'
 
-  - name: Copy compose files
-    copy:
+  - name: Template compose files
+    template:
       src: "{{ item }}"
       dest: "{{ output_dir }}/"
     with_items:

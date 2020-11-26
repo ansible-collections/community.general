@@ -14,7 +14,7 @@
 - name: build with old-style options
   docker_image:
     name: "{{ iname }}"
-    path: "{{ role_path }}/files"
+    path: "{{ output_dir }}/files"
     dockerfile: Dockerfile
     http_timeout: 60
     nocache: yes

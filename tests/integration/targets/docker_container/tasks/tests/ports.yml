@@ -13,7 +13,7 @@
 
 - name: published_ports -- all
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started
@@ -27,7 +27,7 @@
 
 - name: published_ports -- all (idempotency)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started
@@ -41,7 +41,7 @@
 
 - name: published_ports -- all (writing out 'all')
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started
@@ -56,7 +56,7 @@
 
 - name: published_ports -- all (idempotency 2)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started
@@ -71,7 +71,7 @@
 
 - name: published_ports -- all (switching back to 'all')
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started
@@ -104,7 +104,7 @@
 
 - name: published_ports -- port range
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started
@@ -119,7 +119,7 @@
 
 - name: published_ports -- port range (idempotency)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started
@@ -134,7 +134,7 @@
 
 - name: published_ports -- port range (different range)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started
@@ -166,7 +166,7 @@
 
 - name: published_ports -- one-element container port range
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ item }}"
     state: started
@@ -180,7 +180,7 @@
 
 - name: published_ports -- one-element container port range (idempotency)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ item }}"
     state: started
@@ -194,7 +194,7 @@
 
 - name: published_ports -- one-element container port range (different range)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ item }}"
     state: started
@@ -228,7 +228,7 @@
 
 - name: published_ports -- IPv6
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started
@@ -239,7 +239,7 @@
 
 - name: published_ports -- IPv6 (idempotency)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started
@@ -250,7 +250,7 @@
 
 - name: published_ports -- IPv6 (different IP)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started
@@ -261,7 +261,7 @@
 
 - name: published_ports -- IPv6 (hostname)
   docker_container:
-    image: alpine:3.8
+    image: "{{ docker_test_image_alpine }}"
     command: '/bin/sh -c "sleep 10m"'
     name: "{{ cname }}"
     state: started

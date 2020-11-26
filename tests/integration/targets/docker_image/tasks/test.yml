@@ -10,6 +10,21 @@
 - debug:
     msg: "Using name prefix {{ name_prefix }}"
 
+- name: Create files directory
+  file:
+    path: '{{ output_dir }}/files'
+    state: directory
+
+- name: Template files
+  template:
+    src: '{{ item }}'
+    dest: '{{ output_dir }}/files/{{ item }}'
+  loop:
+    - Dockerfile
+    - EtcHostsDockerfile
+    - MyDockerfile
+    - StagedDockerfile
+
 - block:
   - include_tasks: run-test.yml
     with_fileglob:
