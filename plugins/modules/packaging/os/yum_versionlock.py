@@ -15,7 +15,7 @@ short_description: Locks / Unlocks an installed package(s) from being updated by
 description:
      - This module adds installed packages to yum versionlock to prevent the package from being updated.
 options:
-  pkg:
+  name:
     description:
       - Package name or a list of packages.
     type: list
@@ -42,12 +42,12 @@ EXAMPLES = r'''
 - name: Prevent Apache / httpd from being updated
   community.general.yum_versionlock:
     state: present
-    pkg: httpd
+    name: httpd
 
 - name: Prevent multiple packages from being updated
   community.general.yum_versionlock:
     state: present
-    pkg:
+    name:
     - httpd
     - nginx
     - haproxy
@@ -104,13 +104,13 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(default='present', choices=['present', 'locked', 'unlocked', 'absent']),
-            pkg=dict(required=True, type='list', elements='str'),
+            name=dict(required=True, type='list', elements='str'),
         ),
         supports_check_mode=True
     )
 
     state = module.params['state']
-    packages = module.params['pkg']
+    packages = module.params['name']
     changed = False
 
     yum_v = YumVersionLock(module)
