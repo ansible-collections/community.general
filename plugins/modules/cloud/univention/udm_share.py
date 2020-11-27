@@ -102,7 +102,6 @@ options:
         type: bool
         aliases: [ samba_blocking_locks ]
     sambaBrowseable:
-        default: true
         description:
         - Show in Windows network environment.
         type: bool
