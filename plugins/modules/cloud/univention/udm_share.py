@@ -224,7 +224,7 @@ options:
         description:
             - Create files/directories with permissions of the parent directory.
         type: bool
-        aliases: [ sambaInheritPermissions ]
+        aliases: [ samba_inherit_permissions ]
     sambaInvalidUsers:
         description:
             - Invalid users or groups.
