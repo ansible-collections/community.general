@@ -39,6 +39,8 @@ options:
   grid_primary:
     description:
       - Configures the grid primary servers for this zone.
+    type: list
+    elements: dict
     suboptions:
       name:
         description:
@@ -46,6 +48,8 @@ options:
   grid_secondaries:
     description:
       - Configures the grid secondary servers for this zone.
+    type: list
+    elements: dict
     suboptions:
       name:
         description:

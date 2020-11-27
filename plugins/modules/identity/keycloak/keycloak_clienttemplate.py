@@ -68,6 +68,8 @@ options:
         description:
             - a list of dicts defining protocol mappers for this client template.
               This is 'protocolMappers' in the Keycloak REST API.
+        type: list
+        elements: dict
         suboptions:
             consentRequired:
                 description:

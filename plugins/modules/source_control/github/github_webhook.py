@@ -50,6 +50,8 @@ options:
         U(https://developer.github.com/v3/activity/events/types/). Required
         unless C(state) is C(absent)
     required: false
+    type: list
+    elements: str
   active:
     description:
       - Whether or not the hook is active

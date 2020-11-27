@@ -50,6 +50,8 @@ options:
         accepts a list of values (see suboptions)
     aliases:
       - ipv4
+    type: list
+    elements: dict
     suboptions:
       ipv4addr:
         description:
@@ -95,6 +97,8 @@ options:
         accepts a list of values (see options)
     aliases:
       - ipv6
+    type: list
+    elements: dict
     suboptions:
       ipv6addr:
         description:

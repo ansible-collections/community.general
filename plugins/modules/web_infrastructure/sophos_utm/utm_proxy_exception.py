@@ -216,9 +216,9 @@ def main():
         argument_spec=dict(
             name=dict(type='str', required=True),
             op=dict(type='str', required=False, default='AND', choices=['AND', 'OR']),
-            path=dict(type='list', elements='string', required=False, default=[]),  # @FIXME: str instead of string
-            skip_custom_threats_filters=dict(type='list', elements='string', required=False, default=[]),  # @FIXME: str instead of string
-            skip_threats_filter_categories=dict(type='list', elements='string', required=False, default=[]),  # @FIXME: str instead of string
+            path=dict(type='list', elements='str', required=False, default=[]),
+            skip_custom_threats_filters=dict(type='list', elements='str', required=False, default=[]),
+            skip_threats_filter_categories=dict(type='list', elements='str', required=False, default=[]),
             skipav=dict(type='bool', required=False, default=False),
             skipbadclients=dict(type='bool', required=False, default=False),
             skipcookie=dict(type='bool', required=False, default=False),
@@ -227,7 +227,7 @@ def main():
             skiphtmlrewrite=dict(type='bool', required=False, default=False),
             skiptft=dict(type='bool', required=False, default=False),
             skipurl=dict(type='bool', required=False, default=False),
-            source=dict(type='list', elements='string', required=False, default=[]),  # @FIXME: str instead of string
+            source=dict(type='list', elements='str', required=False, default=[]),
             status=dict(type='bool', required=False, default=True),
         )
     )
