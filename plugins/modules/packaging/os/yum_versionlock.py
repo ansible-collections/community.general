@@ -11,7 +11,7 @@ DOCUMENTATION = r'''
 ---
 module: yum_versionlock
 version_added: 2.0.0
-short_description: Locks / Unlocks an installed package(s) from being updates by yum package manager
+short_description: Locks / Unlocks an installed package(s) from being updated by yum package manager.
 description:
      - This module adds installed packages to yum versionlock to prevent the package from being updated.
      - Please install yum-plugin-versionlock before using this module.
@@ -59,13 +59,12 @@ EXAMPLES = r'''
 
 RETURN = r'''
 packages:
-    description: A list of package in versionlock list.
+    description: A list of package(s) in versionlock list.
     returned: everytime
     type: list
     sample: [ 'httpd' ]
 state:
-    description: State of used package.
-``
+    description: State of package(s).
     returned: everytime
     type: str
     sample: present
