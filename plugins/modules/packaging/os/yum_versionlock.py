@@ -84,7 +84,7 @@ class YumVersionLock:
 
     def get_versionlock_packages(self):
         """ Get an overview of all packages on yum versionlock """
-        rc, out, err = self.module.run_command("%s -q versionlock list" % self.yum_bin)
+        rc, out, err = self.module.run_command("%s versionlock list" % self.yum_bin)
         if rc == 0:
             return out
         elif rc == 1 and 'o such command:' in err:
