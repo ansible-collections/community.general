@@ -157,7 +157,7 @@ options:
         default: true
       security_protocol:
         type: str
-        choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation', 'no-ssl']
+        choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation', 'non-ssl']
         description: How SSL certificates should be used for HTTPS requests. defaults to None.
       certificate_authority:
         type: str
