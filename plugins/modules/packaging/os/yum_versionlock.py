@@ -14,7 +14,6 @@ version_added: 2.0.0
 short_description: Locks / Unlocks an installed package(s) from being updated by yum package manager.
 description:
      - This module adds installed packages to yum versionlock to prevent the package from being updated.
-     - Please install yum-plugin-versionlock before using this module.
 options:
   pkg:
     description:
@@ -29,6 +28,9 @@ options:
     choices: [ 'absent', 'locked', 'present', 'unlocked' ]
     type: str
     default: present
+notes:
+    - Requires yum-plugin-versionlock package on the remote node.
+    - Currently C(check_mode) is not supported.
 requirements:
 - yum
 - yum-versionlock
