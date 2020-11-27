@@ -299,6 +299,8 @@ options:
               This is 'protocolMappers' in the Keycloak REST API.
         aliases:
             - protocolMappers
+        type: list
+        elements: dict
         suboptions:
             consentRequired:
                 description:

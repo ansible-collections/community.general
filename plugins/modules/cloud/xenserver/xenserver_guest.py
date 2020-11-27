@@ -122,6 +122,7 @@ options:
     - ' - C(sr) (string): Storage Repository to create disk on. If not specified, will use default SR. Cannot be used for moving disk to other SR.'
     - ' - C(sr_uuid) (string): UUID of a SR to create disk on. Use if SR name is not unique.'
     type: list
+    elements: dict
     aliases: [ disk ]
   cdrom:
     description:
@@ -151,6 +152,7 @@ options:
     - ' - C(ip6) (string): Static IPv6 address (implies C(type6: static)) with prefix in format <IPv6 address>/<prefix>.'
     - ' - C(gateway6) (string): Static IPv6 gateway.'
     type: list
+    elements: dict
     aliases: [ network ]
   home_server:
     description:
@@ -163,6 +165,7 @@ options:
     - Useful for advanced users familiar with managing VM params trough xe CLI.
     - A custom value object takes two fields C(key) and C(value) (see example below).
     type: list
+    elements: dict
   wait_for_ip_address:
     description:
     - Wait until XenServer detects an IP address for the VM. If C(state) is set to C(absent), this parameter is ignored.
