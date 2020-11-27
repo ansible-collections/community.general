@@ -39,11 +39,11 @@ options:
             - Corresponding DNS zone for this record, e.g. example.com.
     type:
         required: true
-        choices: [ host_record, alias, ptr_record, srv_record, txt_record ]
         description:
             - "Define the record type. C(host_record) is a A or AAAA record,
                C(alias) is a CNAME, C(ptr_record) is a PTR record, C(srv_record)
                is a SRV record and C(txt_record) is a TXT record."
+            - "The available choices are: C(host_record), C(alias), C(ptr_record), C(srv_record), C(txt_record)."
     data:
         required: false
         default: []
