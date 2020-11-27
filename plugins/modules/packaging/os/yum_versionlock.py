@@ -30,7 +30,7 @@ options:
     default: present
 notes:
     - Requires yum-plugin-versionlock package on the remote node.
-    - C(check_mode) is supported.
+    - Supports C(check_mode).
 requirements:
 - yum
 - yum-versionlock
