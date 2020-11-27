@@ -22,6 +22,18 @@ options:
       - Whether or not to add the export distributor to new C(rpm) repositories.
     type: bool
     default: no
+  components:
+    description:
+      - Debian repo components.
+    type: str
+  releases:
+    description:
+      - Debian repo releases.
+    type: str
+  description:
+    description:
+      - User-friendly text describing the repository’s contents.
+    type: str
   feed:
     description:
       - Upstream feed URL to receive updates from.
@@ -117,7 +129,7 @@ options:
     type: str
   repo_type:
     description:
-      - Repo plugin type to use (i.e. C(rpm), C(docker)).
+      - Repo plugin type to use (i.e. C(rpm), C(deb)).
     default: rpm
     type: str
   repoview:
@@ -165,7 +177,7 @@ options:
     type: bool
     default: no
 notes:
-  - This module can currently only create distributors and importers on rpm
+  - This module can currently only create distributors and importers on rpm or deb
     repositories. Contributions to support other repo types are welcome.
 extends_documentation_fragment:
   - url
@@ -194,6 +206,21 @@ EXAMPLES = '''
     name: my_old_repo
     repo_type: rpm
     state: absent
+
+- name: Copy of local internal repo with newer version of ansible for bionic, with legacy http support
+  community.general.pulp_repo:
+    name: ansible-bionic
+    description: 'Ubuntu 18 repo for anisble 2.9.15'
+    repo_type: deb
+    components: main
+    releases: stable
+    feed: http://pulp-server.example.com/pulp/deb/ansible-bionic
+    relative_url: ansible-bionic
+    url_username: admin
+    url_password: admin
+    force_basic_auth: yes
+    serve_http: yes
+    state: present
 '''
 
 RETURN = '''
@@ -265,6 +292,9 @@ class pulp_server(object):
         self,
         repo_id,
         relative_url,
+        components=None,
+        releases=None,
+        description=None,
         feed=None,
         generate_sqlite=False,
         serve_http=False,
@@ -283,6 +313,8 @@ class pulp_server(object):
         data = dict()
         data['id'] = repo_id
         data['distributors'] = []
+        if description:
+            data['description'] = description
 
         if self.repo_type == 'rpm':
             yum_distributor = dict()
@@ -339,6 +371,65 @@ class pulp_server(object):
 
             data['notes'] = {
                 "_repo-type": "rpm-repo"
+            }
+
+        if self.repo_type == 'deb':
+            deb_distributor = dict()
+            deb_distributor['distributor_id'] = "deb_distributor"
+            deb_distributor['distributor_type_id'] = "deb_distributor"
+            deb_distributor['auto_publish'] = True
+            deb_distributor['distributor_config'] = dict()
+            deb_distributor['distributor_config']['http'] = serve_http
+            deb_distributor['distributor_config']['https'] = serve_https
+            deb_distributor['distributor_config']['relative_url'] = relative_url
+            data['distributors'].append(deb_distributor)
+
+            if add_export_distributor:
+                export_distributor = dict()
+                export_distributor['distributor_id'] = "export_distributor"
+                export_distributor['distributor_type_id'] = "export_distributor"
+                export_distributor['auto_publish'] = False
+                export_distributor['distributor_config'] = dict()
+                export_distributor['distributor_config']['http'] = serve_http
+                export_distributor['distributor_config']['https'] = serve_https
+                export_distributor['distributor_config']['relative_url'] = relative_url
+                data['distributors'].append(export_distributor)
+
+            data['importer_type_id'] = "deb_importer"
+            data['importer_config'] = dict()
+
+            if components:
+                data['importer_config']['components'] = components
+
+            if releases:
+                data['importer_config']['releases'] = releases
+
+            if feed:
+                data['importer_config']['feed'] = feed
+
+            if proxy_host:
+                data['importer_config']['proxy_host'] = proxy_host
+
+            if proxy_port:
+                data['importer_config']['proxy_port'] = proxy_port
+
+            if proxy_username:
+                data['importer_config']['proxy_username'] = proxy_username
+
+            if proxy_password:
+                data['importer_config']['proxy_password'] = proxy_password
+
+            if ssl_ca_cert:
+                data['importer_config']['ssl_ca_cert'] = ssl_ca_cert
+
+            if ssl_client_cert:
+                data['importer_config']['ssl_client_cert'] = ssl_client_cert
+
+            if ssl_client_key:
+                data['importer_config']['ssl_client_key'] = ssl_client_key
+
+            data['notes'] = {
+                "_repo-type": "deb-repo"
             }
 
         response, info = fetch_url(
@@ -479,6 +570,9 @@ class pulp_server(object):
         if self.repo_type == 'rpm':
             data['importer_type_id'] = "yum_importer"
 
+        if self.repo_type == 'deb':
+            data['importer_type_id'] = "deb_importer"
+
         response, info = fetch_url(
             self.module,
             url,
@@ -539,6 +633,9 @@ def main():
     argument_spec = url_argument_spec()
     argument_spec.update(
         add_export_distributor=dict(default=False, type='bool'),
+        components=dict(),
+        releases=dict(),
+        description=dict(),
         feed=dict(),
         generate_sqlite=dict(default=False, type='bool'),
         feed_ca_cert=dict(aliases=['importer_ssl_ca_cert', 'ca_cert'],
@@ -567,6 +664,9 @@ def main():
         supports_check_mode=True)
 
     add_export_distributor = module.params['add_export_distributor']
+    components = module.params['components']
+    releases = module.params['releases']
+    description = module.params['description']
     feed = module.params['feed']
     generate_sqlite = module.params['generate_sqlite']
     importer_ssl_ca_cert = module.params['feed_ca_cert']
@@ -666,6 +766,9 @@ def main():
                 server.create_repo(
                     repo_id=repo,
                     relative_url=relative_url,
+                    components=components,
+                    releases=releases,
+                    description=description,
                     feed=feed,
                     generate_sqlite=generate_sqlite,
                     serve_http=serve_http,
@@ -688,6 +791,9 @@ def main():
             # we set the whole config at the same time.
             if not server.compare_repo_importer_config(
                 repo,
+                components=components,
+                releases=releases,
+                description=description,
                 feed=feed,
                 proxy_host=proxy_host,
                 proxy_port=proxy_port,
@@ -701,6 +807,9 @@ def main():
                     server.update_repo_importer_config(
                         repo,
                         feed=feed,
+                        components=components,
+                        releases=releases,
+                        description=description,
                         proxy_host=proxy_host,
                         proxy_port=proxy_port,
                         proxy_username=proxy_username,
