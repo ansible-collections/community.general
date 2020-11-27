@@ -46,6 +46,11 @@ options:
     description:
      - Set value to True to force node into install state if it already exists in stacki.
     type: bool
+  state:
+    description:
+      - Set value to the desired state for the specified host.
+    type: str
+    choices: [ absent, present ]
 author:
 - Hugh Ma (@bbyhuy) <Hugh.Ma@flextronics.com>
 '''
@@ -250,7 +255,7 @@ def main():
                       'prim_intf_ip', 'network', 'prim_intf_mac']:
             if not module.params[param]:
                 missing_params.append(param)
-        if len(missing_params) > 0:
+        if len(missing_params) > 0:   # @FIXME replace with required_if
             module.fail_json(msg="missing required arguments: {0}".format(missing_params))
 
         stacki.stack_add(result)

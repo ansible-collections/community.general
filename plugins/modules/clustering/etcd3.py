@@ -38,6 +38,7 @@ options:
             - the state of the value for the key.
             - can be present or absent
         required: true
+        choices: [ present, absent ]
     user:
         description:
             - The etcd user to authenticate with.
