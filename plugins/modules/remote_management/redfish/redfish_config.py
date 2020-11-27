@@ -72,6 +72,7 @@ options:
       - list of BootOptionReference strings specifying the BootOrder
     default: []
     type: list
+    elements: str
     version_added: '0.2.0'
   network_protocols:
     required: false
