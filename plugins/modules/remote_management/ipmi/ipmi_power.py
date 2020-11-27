@@ -34,13 +34,14 @@ options:
   state:
     description:
       - Whether to ensure that the machine in desired state.
+      - "The choices for state are:
+            - on -- Request system turn on
+            - off -- Request system turn off without waiting for OS to shutdown
+            - shutdown -- Have system request OS proper shutdown
+            - reset -- Request system reset without waiting for OS
+            - boot -- If system is off, then 'on', else 'reset'"
+    choices: ['on', 'off', shutdown, reset, boot]
     required: true
-    choices:
-        - on -- Request system turn on
-        - off -- Request system turn off without waiting for OS to shutdown
-        - shutdown -- Have system request OS proper shutdown
-        - reset -- Request system reset without waiting for OS
-        - boot -- If system is off, then 'on', else 'reset'
   timeout:
     description:
       - Maximum number of seconds before interrupt request.
