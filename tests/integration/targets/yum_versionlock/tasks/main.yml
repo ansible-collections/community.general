@@ -16,42 +16,41 @@
         list: updates
       register: yum_updates
 
-    - name: lock all packages
-      community.general.yum_versionlock:
-        name: "{{ yum_updates.results | map(attribute='name') | list }}"
-        state: locked
-      register: lock_all_packages
-      when: yum_updates.results | length != 0
+    - block:
+        - name: lock all packages
+          community.general.yum_versionlock:
+            name: "{{ yum_updates.results | map(attribute='name') | list }}"
+            state: locked
+          register: lock_all_packages
 
-    - name: update all packages
-      yum:
-        name: '*'
-        state: latest
-      register: update_all_locked_packages
-      when: yum_updates.results | length != 0
+        - name: update all packages
+          command: yum update --setopt=obsoletes=0
+          register: update_all_locked_packages
+          changed_when:
+            - '"No packages marked for update" not in update_all_locked_packages.stdout'
+            - '"Nothing to do" not in update_all_locked_packages.stdout'
 
-    - name: unlock all packages
-      community.general.yum_versionlock:
-        name: "{{ yum_updates.results | map(attribute='name') | list }}"
-        state: unlocked
-      register: unlock_all_packages
-      when: yum_updates.results | length != 0
+        - name: unlock all packages
+          community.general.yum_versionlock:
+            name: "{{ yum_updates.results | map(attribute='name') | list }}"
+            state: unlocked
+          register: unlock_all_packages
 
-    - name: update all packages
-      yum:
-        name: '*'
-        state: latest
-      check_mode: yes
-      register: update_all_packages
-      when: yum_updates.results | length != 0
+        - name: update all packages
+          yum:
+            name: '*'
+            state: latest
+          check_mode: yes
+          register: update_all_packages
+          when: yum_updates.results | length != 0
 
-    - name: assert everything is fine
-      assert:
-        that:
-          - "{{ lock_all_packages.changed }}"
-          - "{{ not update_all_locked_packages.changed }}"
-          - "{{ unlock_all_packages.changed }}"
-          - "{{ update_all_packages.changed }}"
+        - name: assert everything is fine
+          assert:
+            that:
+              - "{{ lock_all_packages.changed }}"
+              - "{{ not update_all_locked_packages.changed }}"
+              - "{{ unlock_all_packages.changed }}"
+              - "{{ update_all_packages.changed }}"
       when: yum_updates.results | length != 0
 
     - name: Remove installed packages in case it was not installed
