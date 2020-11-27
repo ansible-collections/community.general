@@ -19,6 +19,7 @@ options:
     name:
         description:
           - Name of a container.
+        type: str
         required: true
     backing_store:
         choices:
@@ -30,63 +31,80 @@ options:
           - zfs
         description:
           - Backend storage type for the container.
+        type: str
         default: dir
     template:
         description:
           - Name of the template to use within an LXC create.
+        type: str
         default: ubuntu
     template_options:
         description:
           - Template options when building the container.
+        type: str
     config:
         description:
           - Path to the LXC configuration file.
+        type: path
     lv_name:
         description:
           - Name of the logical volume, defaults to the container name.
-        default: $CONTAINER_NAME
+          - If not specified, it defaults to C($CONTAINER_NAME).
+        type: str
     vg_name:
         description:
           - If Backend store is lvm, specify the name of the volume group.
+        type: str
         default: lxc
     thinpool:
         description:
           - Use LVM thin pool called TP.
+        type: str
     fs_type:
         description:
           - Create fstype TYPE.
+        type: str
         default: ext4
     fs_size:
         description:
           - File system Size.
+        type: str
         default: 5G
     directory:
         description:
           - Place rootfs directory under DIR.
+        type: path
     zfs_root:
         description:
           - Create zfs under given zfsroot.
+        type: str
     container_command:
         description:
           - Run a command within a container.
+        type: str
     lxc_path:
         description:
           - Place container under PATH
+        type: path
     container_log:
-        choices:
-          - true
-          - false
         description:
           - Enable a container log for host actions to the container.
         type: bool
         default: 'no'
     container_log_level:
         choices:
+          - Info
+          - info
           - INFO
+          - Error
+          - error
           - ERROR
+          - Debug
+          - debug
           - DEBUG
         description:
           - Set the log level for a container where *container_log* was set.
+        type: str
         required: false
         default: INFO
     clone_name:
@@ -95,9 +113,6 @@ options:
             clone.
         type: str
     clone_snapshot:
-        choices:
-          - true
-          - false
         description:
           - Create a snapshot a container when cloning. This is not supported
             by all container storage backends. Enabling this may fail if the
@@ -105,9 +120,6 @@ options:
         type: bool
         default: 'no'
     archive:
-        choices:
-          - true
-          - false
         description:
           - Create an archive of a container. This will create a tarball of the
             running container.
@@ -117,6 +129,7 @@ options:
         description:
           - Path the save the archived container. If the path does not exist
             the archive method will attempt to create it.
+        type: path
     archive_compression:
         choices:
           - gzip
@@ -125,6 +138,7 @@ options:
         description:
           - Type of compression to use when creating an archive of a running
             container.
+        type: str
         default: gzip
     state:
         choices:
@@ -133,12 +147,14 @@ options:
           - restarted
           - absent
           - frozen
+          - clone
         description:
           - Define the state of a container. If you clone a container using
             `clone_name` the newly cloned container created in a stopped state.
             The running container will be stopped while the clone operation is
             happening and upon completion of the clone the original container
             state will be restored.
+        type: str
         default: started
     container_config:
         description:
@@ -1695,7 +1711,7 @@ def main():
             ),
             container_log=dict(
                 type='bool',
-                default='false'
+                default=False
             ),
             container_log_level=dict(
                 choices=[n for i in LXC_LOGGING_LEVELS.values() for n in i],
@@ -1711,7 +1727,7 @@ def main():
             ),
             archive=dict(
                 type='bool',
-                default='false'
+                default=False
             ),
             archive_path=dict(
                 type='path',
