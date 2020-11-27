@@ -21,21 +21,21 @@
         name: "{{ yum_updates.results | map(attribute='name') | list }}"
         state: locked
       register: lock_all_packages
-      when: yum_updates.results | list != 0
+      when: yum_updates.results | length != 0
 
     - name: update all packages
       yum:
         name: '*'
         state: latest
       register: update_all_locked_packages
-      when: yum_updates.results | list != 0
+      when: yum_updates.results | length != 0
 
     - name: unlock all packages
       community.general.yum_versionlock:
         name: "{{ yum_updates.results | map(attribute='name') | list }}"
         state: unlocked
       register: unlock_all_packages
-      when: yum_updates.results | list != 0
+      when: yum_updates.results | length != 0
 
     - name: update all packages
       yum:
@@ -43,7 +43,7 @@
         state: latest
       check_mode: yes
       register: update_all_packages
-      when: yum_updates.results | list != 0
+      when: yum_updates.results | length != 0
 
     - name: assert everything is fine
       assert:
@@ -52,7 +52,7 @@
           - "{{ not update_all_locked_packages.changed }}"
           - "{{ unlock_all_packages.changed }}"
           - "{{ update_all_packages.changed }}"
-      when: yum_updates.results | list != 0
+      when: yum_updates.results | length != 0
 
     - name: Remove installed packages in case it was not installed
       yum:
