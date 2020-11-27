@@ -34,22 +34,31 @@ options:
   bootdev:
     description:
       - Set boot device to use on next reboot
+      - "The choices for the device are:
+          - network -- Request network boot
+          - floppy -- Boot from floppy
+          - hd -- Boot from hard drive
+          - safe -- Boot from hard drive, requesting 'safe mode'
+          - optical -- boot from CD/DVD/BD drive
+          - setup -- Boot into setup utility
+          - default -- remove any IPMI directed boot device request"
     required: true
     choices:
-      - network -- Request network boot
-      - floppy -- Boot from floppy
-      - hd -- Boot from hard drive
-      - safe -- Boot from hard drive, requesting 'safe mode'
-      - optical -- boot from CD/DVD/BD drive
-      - setup -- Boot into setup utility
-      - default -- remove any IPMI directed boot device request
+      - network
+      - floppy
+      - hd
+      - safe
+      - optical
+      - setup
+      - default
   state:
     description:
       - Whether to ensure that boot devices is desired.
+      - "The choices for the state are:
+            - present -- Request system turn on
+            - absent -- Request system turn on"
     default: present
-    choices:
-        - present -- Request system turn on
-        - absent -- Request system turn on
+    choices: [ present, absent ]
   persistent:
     description:
       - If set, ask that system firmware uses this device beyond next boot.

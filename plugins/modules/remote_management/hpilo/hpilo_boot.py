@@ -33,7 +33,7 @@ options:
   media:
     description:
     - The boot media to boot the system from
-    choices: [ "cdrom", "floppy", "hdd", "network", "normal", "usb" ]
+    choices: [ "cdrom", "floppy", "rbsu", "hdd", "network", "normal", "usb" ]
   image:
     description:
     - The URL of a cdrom, floppy or usb boot media image.

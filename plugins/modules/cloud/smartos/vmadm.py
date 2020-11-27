@@ -207,7 +207,7 @@ options:
         Please note this can be read from the Global Zone.
   state:
     required: true
-    choices: [ present, absent, stopped, restarted ]
+    choices: [ present, running, absent, deleted, stopped, created, restarted, rebooted ]
     description:
       - States for the VM to be in. Please note that C(present), C(stopped) and C(restarted)
         operate on a VM that is currently provisioned. C(present) means that the VM will be

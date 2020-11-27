@@ -27,9 +27,11 @@ options:
     op:
         description:
             - An operation to perform. Mutually exclusive with state.
+        choices: [ get, wait, list ]
     state:
         description:
             - The state to enforce. Mutually exclusive with op.
+        choices: [ present, absent ]
     timeout:
         description:
             - The amount of time to wait for a node to appear.

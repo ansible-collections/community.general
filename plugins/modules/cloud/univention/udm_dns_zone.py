@@ -29,9 +29,9 @@ options:
             - Whether the dns zone is present or not.
     type:
         required: true
-        choices: [ forward_zone, reverse_zone ]
         description:
             - Define if the zone is a forward or reverse DNS zone.
+            - "The available choices are: C(forward_zone), C(reverse_zone)."
     zone:
         required: true
         description:
