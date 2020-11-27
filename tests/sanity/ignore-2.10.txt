@@ -385,6 +385,7 @@ plugins/modules/net_tools/nios/nios_network_view.py validate-modules:doc-require
 plugins/modules/net_tools/nios/nios_network_view.py validate-modules:invalid-ansiblemodule-schema
 plugins/modules/net_tools/nios/nios_network_view.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nios/nios_network_view.py validate-modules:undocumented-parameter
+plugins/modules/net_tools/nios/nios_nsgroup.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/net_tools/nios/nios_nsgroup.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/net_tools/nios/nios_nsgroup.py validate-modules:doc-missing-type
 plugins/modules/net_tools/nios/nios_nsgroup.py validate-modules:doc-required-mismatch
@@ -468,6 +469,7 @@ plugins/modules/remote_management/lxca/lxca_nodes.py validate-modules:doc-missin
 plugins/modules/remote_management/manageiq/manageiq_alert_profiles.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/manageiq/manageiq_policies.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/manageiq/manageiq_policies.py validate-modules:parameter-state-invalid-choice
+plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-missing-type
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-required-mismatch
