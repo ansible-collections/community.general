@@ -59,7 +59,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 packages:
-    description: A list of package in versionlock list
+    description: A list of package in versionlock list.
     returned: everytime
     type: list
     sample: [ 'httpd' ]
