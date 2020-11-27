@@ -64,7 +64,8 @@ packages:
     type: list
     sample: [ 'httpd' ]
 state:
-    description: state of used package
+    description: State of used package.
+``
     returned: everytime
     type: str
     sample: present
