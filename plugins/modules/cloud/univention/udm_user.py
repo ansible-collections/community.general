@@ -209,6 +209,7 @@ options:
                e.g. C(cn=employee,cn=users,ou=school,dc=example,dc=com)."
     update_password:
         default: always
+        choices: [ always, on_create ]
         description:
             - "C(always) will update passwords if they differ.
                C(on_create) will only set the password for newly created users."
