@@ -27,267 +27,298 @@ options:
         choices: [ present, absent ]
         description:
             - Whether the share is present or not.
+        type: str
     name:
         required: true
         description:
             - Name
+        type: str
     host:
         required: false
         description:
             - Host FQDN (server which provides the share), e.g. C({{
               ansible_fqdn }}). Required if C(state=present).
+        type: str
     path:
         required: false
         description:
             - Directory on the providing server, e.g. C(/home). Required if C(state=present).
-    samba_name:
+        type: path
+    sambaName:
         required: false
         description:
             - Windows name. Required if C(state=present).
-        aliases: [ sambaName ]
+        type: str
+        aliases: [ samba_name ]
     ou:
         required: true
         description:
             - Organisational unit, inside the LDAP Base DN.
+        type: str
     owner:
-        default: 0
+        default: '0'
         description:
             - Directory owner of the share's root directory.
+        type: str
     group:
         default: '0'
         description:
             - Directory owner group of the share's root directory.
+        type: str
     directorymode:
         default: '00755'
         description:
             - Permissions for the share's root directory.
+        type: str
     root_squash:
-        default: '1'
-        choices: [ '0', '1' ]
+        default: true
         description:
             - Modify user ID for root user (root squashing).
+        type: bool
     subtree_checking:
-        default: '1'
-        choices: [ '0', '1' ]
+        default: true
         description:
             - Subtree checking.
+        type: bool
     sync:
         default: 'sync'
         description:
             - NFS synchronisation.
+        type: str
     writeable:
-        default: '1'
-        choices: [ '0', '1' ]
+        default: true
         description:
             - NFS write access.
-    samba_block_size:
+        type: bool
+    sambaBlockSize:
         description:
             - Blocking size.
-        aliases: [ sambaBlockSize ]
-    samba_blocking_locks:
-        default: '1'
-        choices: [ '0', '1' ]
+        type: str
+        aliases: [ samba_block_size ]
+    sambaBlockingLocks:
+        default: true
         description:
             - Blocking locks.
-        aliases: [ sambaBlockingLocks ]
-    samba_browseable:
-        default: '1'
-        choices: [ '0', '1' ]
+        type: bool
+        aliases: [ samba_blocking_locks ]
+    sambaBrowseable:
+        default: true
         description:
             - Show in Windows network environment.
-        aliases: [ sambaBrowseable ]
-    samba_create_mode:
+        type: bool
+        aliases: [ samba_browsable ]
+    sambaCreateMode:
         default: '0744'
         description:
             - File mode.
-        aliases: [ sambaCreateMode ]
-    samba_csc_policy:
+        type: str
+        aliases: [ samba_create_mode ]
+    sambaCscPolicy:
         default: 'manual'
         description:
             - Client-side caching policy.
-        aliases: [ sambaCscPolicy ]
-    samba_custom_settings:
+        type: str
+        aliases: [ samba_csc_policy ]
+    sambaCustomSettings:
         default: []
         description:
             - Option name in smb.conf and its value.
-        aliases: [ sambaCustomSettings ]
-    samba_directory_mode:
+        type: list
+        aliases: [ samba_custom_settings ]
+    sambaDirectoryMode:
         default: '0755'
         description:
             - Directory mode.
-        aliases: [ sambaDirectoryMode ]
-    samba_directory_security_mode:
+        type: str
+        aliases: [ samba_directory_mode ]
+    sambaDirectorySecurityMode:
         default: '0777'
         description:
             - Directory security mode.
-        aliases: [ sambaDirectorySecurityMode ]
-    samba_dos_filemode:
-        default: '0'
-        choices: [ '0', '1' ]
+        type: str
+        aliases: [ samba_directory_security_mode ]
+    sambaDosFilemode:
+        default: false
         description:
             - Users with write access may modify permissions.
-        aliases: [ sambaDosFilemode ]
-    samba_fake_oplocks:
-        default: '0'
-        choices: [ '0', '1' ]
+        type: bool
+        aliases: [ samba_dos_filemode ]
+    sambaFakeOplocks:
+        default: false
         description:
             - Fake oplocks.
-        aliases: [ sambaFakeOplocks ]
-    samba_force_create_mode:
-        default: '0'
-        choices: [ '0', '1' ]
+        type: bool
+        aliases: [ samba_fake_oplocks ]
+    sambaForceCreateMode:
+        default: false
         description:
             - Force file mode.
-        aliases: [ sambaForceCreateMode ]
-    samba_force_directory_mode:
-        default: '0'
-        choices: [ '0', '1' ]
+        type: bool
+        aliases: [ samba_force_create_mode ]
+    sambaForceDirectoryMode:
+        default: false
         description:
             - Force directory mode.
-        aliases: [ sambaForceDirectoryMode ]
-    samba_force_directory_security_mode:
-        default: '0'
-        choices: [ '0', '1' ]
+        type: bool
+        aliases: [ samba_force_directory_mode ]
+    sambaForceDirectorySecurityMode:
+        default: false
         description:
             - Force directory security mode.
-        aliases: [ sambaForceDirectorySecurityMode ]
-    samba_force_group:
+        type: bool
+        aliases: [ samba_force_directory_security_mode ]
+    sambaForceGroup:
         description:
             - Force group.
-        aliases: [ sambaForceGroup ]
-    samba_force_security_mode:
-        default: '0'
-        choices: [ '0', '1' ]
+        type: str
+        aliases: [ samba_force_group ]
+    sambaForceSecurityMode:
+        default: false
         description:
             - Force security mode.
-        aliases: [ sambaForceSecurityMode ]
-    samba_force_user:
+        type: bool
+        aliases: [ samba_force_security_mode ]
+    sambaForceUser:
         description:
             - Force user.
-        aliases: [ sambaForceUser ]
-    samba_hide_files:
+        type: str
+        aliases: [ samba_force_user ]
+    sambaHideFiles:
         description:
             - Hide files.
-        aliases: [ sambaHideFiles ]
-    samba_hide_unreadable:
-        default: '0'
-        choices: [ '0', '1' ]
+        type: str
+        aliases: [ samba_hide_files ]
+    sambaHideUnreadable:
+        default: false
         description:
             - Hide unreadable files/directories.
-        aliases: [ sambaHideUnreadable ]
-    samba_hosts_allow:
+        type: bool
+        aliases: [ samba_hide_unreadable ]
+    sambaHostsAllow:
         default: []
         description:
             - Allowed host/network.
-        aliases: [ sambaHostsAllow ]
-    samba_hosts_deny:
+        type: list
+        aliases: [ samba_hosts_allow ]
+    sambaHostsDeny:
         default: []
         description:
             - Denied host/network.
-        aliases: [ sambaHostsDeny ]
-    samba_inherit_acls:
-        default: '1'
-        choices: [ '0', '1' ]
+        type: list
+        aliases: [ samba_hosts_deny ]
+    sambaInheritAcls:
+        default: true
         description:
             - Inherit ACLs.
-        aliases: [ sambaInheritAcls ]
-    samba_inherit_owner:
-        default: '0'
-        choices: [ '0', '1' ]
+        type: bool
+        aliases: [ samba_inherit_acls ]
+    sambaInheritOwner:
+        default: false
         description:
             - Create files/directories with the owner of the parent directory.
-        aliases: [ sambaInheritOwner ]
-    samba_inherit_permissions:
-        default: '0'
-        choices: [ '0', '1' ]
+        type: bool
+        aliases: [ samba_inherit_owner ]
+    sambaInheritPermissions:
+        default: false
         description:
             - Create files/directories with permissions of the parent directory.
+        type: bool
         aliases: [ sambaInheritPermissions ]
-    samba_invalid_users:
+    sambaInvalidUsers:
         description:
             - Invalid users or groups.
-        aliases: [ sambaInvalidUsers ]
-    samba_level_2_oplocks:
-        default: '1'
-        choices: [ '0', '1' ]
+        type: str
+        aliases: [ samba_invalid_users ]
+    sambaLevel2Oplocks:
+        default: true
         description:
             - Level 2 oplocks.
-        aliases: [ sambaLevel2Oplocks ]
-    samba_locking:
-        default: '1'
-        choices: [ '0', '1' ]
+        type: bool
+        aliases: [ samba_level_2_oplocks ]
+    sambaLocking:
+        default: true
         description:
             - Locking.
-        aliases: [ sambaLocking ]
-    samba_msdfs_root:
-        default: '0'
-        choices: [ '0', '1' ]
+        type: bool
+        aliases: [ samba_locking ]
+    sambaMSDFSRoot:
+        default: false
         description:
             - MSDFS root.
-        aliases: [ sambaMSDFSRoot ]
-    samba_nt_acl_support:
-        default: '1'
-        choices: [ '0', '1' ]
+        type: bool
+        aliases: [ samba_msdfs_root ]
+    sambaNtAclSupport:
+        default: true
         description:
             - NT ACL support.
-        aliases: [ sambaNtAclSupport ]
-    samba_oplocks:
-        default: '1'
-        choices: [ '0', '1' ]
+        type: bool
+        aliases: [ samba_nt_acl_support ]
+    sambaOplocks:
+        default: true
         description:
             - Oplocks.
-        aliases: [ sambaOplocks ]
-    samba_postexec:
+        type: bool
+        aliases: [ samba_oplocks ]
+    sambaPostexec:
         description:
             - Postexec script.
-        aliases: [ sambaPostexec ]
-    samba_preexec:
+        type: str
+        aliases: [ samba_postexec ]
+    sambaPreexec:
         description:
             - Preexec script.
-        aliases: [ sambaPreexec ]
-    samba_public:
-        default: '0'
-        choices: [ '0', '1' ]
+        type: str
+        aliases: [ samba_preexec ]
+    sambaPublic:
+        default: false
         description:
             - Allow anonymous read-only access with a guest user.
-        aliases: [ sambaPublic ]
-    samba_security_mode:
+        type: bool
+        aliases: [ samba_public ]
+    sambaSecurityMode:
         default: '0777'
         description:
             - Security mode.
-        aliases: [ sambaSecurityMode ]
-    samba_strict_locking:
+        type: str
+        aliases: [ samba_security_mode ]
+    sambaStrictLocking:
         default: 'Auto'
         description:
             - Strict locking.
-        aliases: [ sambaStrictLocking ]
-    samba_vfs_objects:
+        type: str
+        aliases: [ samba_strict_locking ]
+    sambaVFSObjects:
         description:
             - VFS objects.
-        aliases: [ sambaVFSObjects ]
-    samba_valid_users:
+        type: str
+        aliases: [ samba_vfs_objects ]
+    sambaValidUsers:
         description:
             - Valid users or groups.
-        aliases: [ sambaValidUsers ]
-    samba_write_list:
+        type: str
+        aliases: [ samba_valid_users ]
+    sambaWriteList:
         description:
             - Restrict write access to these users/groups.
-        aliases: [ sambaWriteList ]
-    samba_writeable:
-        default: '1'
-        choices: [ '0', '1' ]
+        type: str
+        aliases: [ samba_write_list ]
+    sambaWriteable:
+        default: true
         description:
             - Samba write access.
-        aliases: [ sambaWriteable ]
+        type: bool
+        aliases: [ samba_writeable ]
     nfs_hosts:
         default: []
         description:
             - Only allow access for this host, IP address or network.
-    nfs_custom_settings:
+        type: list
+    nfsCustomSettings:
         default: []
         description:
             - Option name in exports file.
-        aliases: [ nfsCustomSettings ]
+        type: list
+        aliases: [ nfs_custom_settings ]
 '''
 
 
