@@ -238,7 +238,6 @@ plugins/modules/cloud/webfaction/webfaction_site.py validate-modules:doc-missing
 plugins/modules/cloud/webfaction/webfaction_site.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/webfaction/webfaction_site.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:doc-elements-mismatch
 plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:doc-required-mismatch
 plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:missing-suboption-docs
 plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:parameter-type-not-in-doc
@@ -286,14 +285,11 @@ plugins/modules/database/vertica/vertica_user.py validate-modules:undocumented-p
 plugins/modules/files/iso_extract.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/files/xml.py validate-modules:doc-required-mismatch
 plugins/modules/files/xml.py validate-modules:parameter-list-no-elements
-plugins/modules/identity/ipa/ipa_hbacrule.py validate-modules:doc-elements-mismatch
 plugins/modules/identity/keycloak/keycloak_client.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/identity/keycloak/keycloak_client.py validate-modules:doc-elements-mismatch
 plugins/modules/identity/keycloak/keycloak_client.py validate-modules:doc-missing-type
 plugins/modules/identity/keycloak/keycloak_client.py validate-modules:parameter-list-no-elements
 plugins/modules/identity/keycloak/keycloak_client.py validate-modules:parameter-type-not-in-doc
 plugins/modules/identity/keycloak/keycloak_clienttemplate.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/identity/keycloak/keycloak_clienttemplate.py validate-modules:doc-elements-mismatch
 plugins/modules/identity/keycloak/keycloak_clienttemplate.py validate-modules:doc-missing-type
 plugins/modules/identity/keycloak/keycloak_clienttemplate.py validate-modules:parameter-type-not-in-doc
 plugins/modules/identity/onepassword_info.py validate-modules:parameter-list-no-elements
@@ -355,14 +351,12 @@ plugins/modules/net_tools/nios/nios_dns_view.py validate-modules:invalid-ansible
 plugins/modules/net_tools/nios/nios_dns_view.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nios/nios_dns_view.py validate-modules:undocumented-parameter
 plugins/modules/net_tools/nios/nios_fixed_address.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/net_tools/nios/nios_fixed_address.py validate-modules:doc-elements-mismatch
 plugins/modules/net_tools/nios/nios_fixed_address.py validate-modules:doc-missing-type
 plugins/modules/net_tools/nios/nios_fixed_address.py validate-modules:doc-required-mismatch
 plugins/modules/net_tools/nios/nios_fixed_address.py validate-modules:invalid-ansiblemodule-schema
 plugins/modules/net_tools/nios/nios_fixed_address.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nios/nios_fixed_address.py validate-modules:undocumented-parameter
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/net_tools/nios/nios_host_record.py validate-modules:doc-elements-mismatch
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:doc-missing-type
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:doc-required-mismatch
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:invalid-ansiblemodule-schema
@@ -370,7 +364,6 @@ plugins/modules/net_tools/nios/nios_host_record.py validate-modules:parameter-li
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nios/nios_host_record.py validate-modules:undocumented-parameter
 plugins/modules/net_tools/nios/nios_member.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/net_tools/nios/nios_member.py validate-modules:doc-elements-mismatch
 plugins/modules/net_tools/nios/nios_member.py validate-modules:doc-missing-type
 plugins/modules/net_tools/nios/nios_member.py validate-modules:doc-required-mismatch
 plugins/modules/net_tools/nios/nios_member.py validate-modules:invalid-ansiblemodule-schema
@@ -390,7 +383,6 @@ plugins/modules/net_tools/nios/nios_naptr_record.py validate-modules:invalid-ans
 plugins/modules/net_tools/nios/nios_naptr_record.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nios/nios_naptr_record.py validate-modules:undocumented-parameter
 plugins/modules/net_tools/nios/nios_network.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/net_tools/nios/nios_network.py validate-modules:doc-elements-mismatch
 plugins/modules/net_tools/nios/nios_network.py validate-modules:doc-missing-type
 plugins/modules/net_tools/nios/nios_network.py validate-modules:doc-required-mismatch
 plugins/modules/net_tools/nios/nios_network.py validate-modules:invalid-ansiblemodule-schema
@@ -404,7 +396,6 @@ plugins/modules/net_tools/nios/nios_network_view.py validate-modules:parameter-t
 plugins/modules/net_tools/nios/nios_network_view.py validate-modules:undocumented-parameter
 plugins/modules/net_tools/nios/nios_nsgroup.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/net_tools/nios/nios_nsgroup.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/net_tools/nios/nios_nsgroup.py validate-modules:doc-elements-mismatch
 plugins/modules/net_tools/nios/nios_nsgroup.py validate-modules:doc-missing-type
 plugins/modules/net_tools/nios/nios_nsgroup.py validate-modules:doc-required-mismatch
 plugins/modules/net_tools/nios/nios_nsgroup.py validate-modules:invalid-ansiblemodule-schema
@@ -430,7 +421,6 @@ plugins/modules/net_tools/nios/nios_txt_record.py validate-modules:invalid-ansib
 plugins/modules/net_tools/nios/nios_txt_record.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nios/nios_txt_record.py validate-modules:undocumented-parameter
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/net_tools/nios/nios_zone.py validate-modules:doc-elements-mismatch
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:doc-missing-type
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:doc-required-mismatch
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:invalid-ansiblemodule-schema
@@ -541,7 +531,6 @@ plugins/modules/remote_management/redfish/idrac_redfish_command.py validate-modu
 plugins/modules/remote_management/redfish/idrac_redfish_config.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/redfish/idrac_redfish_info.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/redfish/redfish_command.py validate-modules:parameter-list-no-elements
-plugins/modules/remote_management/redfish/redfish_config.py validate-modules:doc-elements-mismatch
 plugins/modules/remote_management/redfish/redfish_config.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/redfish/redfish_info.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:doc-choices-do-not-match-spec
@@ -561,7 +550,6 @@ plugins/modules/source_control/github/github_issue.py validate-modules:parameter
 plugins/modules/source_control/github/github_key.py validate-modules:doc-missing-type
 plugins/modules/source_control/github/github_release.py validate-modules:doc-missing-type
 plugins/modules/source_control/github/github_release.py validate-modules:parameter-type-not-in-doc
-plugins/modules/source_control/github/github_webhook.py validate-modules:doc-elements-mismatch
 plugins/modules/source_control/github/github_webhook.py validate-modules:parameter-type-not-in-doc
 plugins/modules/source_control/github/github_webhook_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/source_control/gitlab/gitlab_deploy_key.py validate-modules:doc-required-mismatch
@@ -635,7 +623,6 @@ plugins/modules/system/xfconf.py validate-modules:parameter-state-invalid-choice
 plugins/modules/web_infrastructure/jenkins_plugin.py use-argspec-type-path
 plugins/modules/web_infrastructure/rundeck_acl_policy.py pylint:blacklisted-name
 plugins/modules/web_infrastructure/sophos_utm/utm_network_interface_address.py validate-modules:parameter-type-not-in-doc
-plugins/modules/web_infrastructure/sophos_utm/utm_proxy_exception.py validate-modules:doc-elements-mismatch
 scripts/inventory/gce.py pylint:blacklisted-name
 tests/utils/shippable/check_matrix.py replace-urlopen
 tests/utils/shippable/timing.py shebang
