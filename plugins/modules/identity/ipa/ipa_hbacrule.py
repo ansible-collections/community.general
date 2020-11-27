@@ -101,6 +101,7 @@ options:
     - If an empty list if passed all assigned user groups will be removed from the rule.
     - If option is omitted user groups will not be checked or changed.
     type: list
+    elements: str
 extends_documentation_fragment:
 - community.general.ipa.documentation
 

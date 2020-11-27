@@ -31,6 +31,8 @@ options:
     description:
       - This host is to be used as primary server in this nameserver group. It must be a grid member.
         This option is required when setting I(use_external_primaries) to C(false).
+    type: list
+    elements: dict
     suboptions:
       name:
         description:
@@ -56,10 +58,17 @@ options:
           - Configure the external nameserver as stealth server (without NS record) in the zones.
         type: bool
         default: false
+      preferred_primaries:
+        description:
+          - Provide a list of elements like in I(external_primaries) to set the precedence of preferred primary nameservers.
+        type: list
+        elements: dict
   grid_secondaries:
     description:
      - Configures the list of grid member hosts that act as secondary nameservers.
        This option is required when setting I(use_external_primaries) to C(true).
+    type: list
+    elements: dict
     suboptions:
       name:
         description:
@@ -88,6 +97,8 @@ options:
       preferred_primaries:
         description:
           - Provide a list of elements like in I(external_primaries) to set the precedence of preferred primary nameservers.
+        type: list
+        elements: dict
   is_grid_default:
     description:
       - If set to C(True) this nsgroup will become the default nameserver group for new zones.
@@ -105,6 +116,8 @@ options:
     description:
       - Configures a list of external nameservers (non-members of the grid).
         This option is required when setting I(use_external_primaries) to C(true).
+    type: list
+    elements: dict
     suboptions:
       address:
         description:
@@ -134,6 +147,8 @@ options:
   external_secondaries:
     description:
       - Allows to provide a list of external secondary nameservers, that are not members of the grid.
+    type: list
+    elements: dict
     suboptions:
       address:
         description:
