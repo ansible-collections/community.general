@@ -1,0 +1,57 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- block:
+    - name: Install necessary packages to test yum_versionlock
+      yum:
+        name: yum-plugin-versionlock
+        state: present
+      register: yum_versionlock_install
+
+    - name: yum checkupdate
+      yum:
+        list: updates
+      register: yum_updates
+
+    - name: lock all packages
+      community.general.yum_versionlock:
+        name: "{{ yum_updates.results | map(attribute='name') | list }}"
+        state: locked
+      register: lock_all_packages
+
+    - name: update all packages
+      yum:
+        name: '*'
+        state: latest
+      register: update_all_locked_packages
+
+    - name: unlock all packages
+      community.general.yum_versionlock:
+        name: "{{ yum_updates.results | map(attribute='name') | list }}"
+        state: unlocked
+      register: unlock_all_packages
+
+    - name: update all packages
+      yum:
+        name: '*'
+        state: latest
+      check_mode: yes
+      register: update_all_packages
+
+    - name: assert everything is fine
+      assert:
+        that:
+          - "{{ lock_all_packages.changed }}"
+          - "{{ not update_all_locked_packages.changed }}"
+          - "{{ unlock_all_packages.changed }}"
+          - "{{ update_all_packages.changed }}"
+
+    - name: Remove installed packages in case it was not installed
+      yum:
+        name: yum-plugin-versionlock
+        state: absent
+      when: yum_versionlock_install is changed
+  when: ansible_distribution in ['CentOS', 'RedHat', 'Fedora']
