@@ -28,7 +28,6 @@ options:
   vip_setting:
     description:
       - Configures the network settings for the grid member.
-    required: true
     type: list
     elements: dict
     suboptions:
@@ -44,7 +43,6 @@ options:
   ipv6_setting:
     description:
       - Configures the IPv6 settings for the grid member.
-    required: true
     type: list
     elements: dict
     suboptions:

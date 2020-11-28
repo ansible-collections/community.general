@@ -24,7 +24,6 @@ options:
           - Value can also be specified using C(INFOBLOX_HOST) environment
             variable.
         type: str
-        required: true
       username:
         description:
           - Configures the username to use to authenticate the connection to

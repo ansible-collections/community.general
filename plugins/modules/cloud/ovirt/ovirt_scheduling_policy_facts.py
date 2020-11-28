@@ -41,7 +41,6 @@ options:
     id:
         description:
             - "ID of the scheduling policy."
-        required: true
     name:
         description:
             - "Name of the scheduling policy, can be used as glob expression."
@@ -77,7 +76,6 @@ ovirt_scheduling_policies:
 import fnmatch
 import traceback
 
-from ansible.module_utils.common.removed import removed_module
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils._ovirt import (
     check_sdk,

@@ -21,17 +21,20 @@ options:
     description:
       - Account API Key.
     required: true
+    type: str
 
   account_secret:
     description:
       - Account Secret Key.
     required: true
+    type: str
 
   domain:
     description:
       - Domain to work with. Can be the domain name (e.g. "mydomain.com") or the numeric ID of the domain in DNS Made Easy (e.g. "839989") for faster
         resolution
     required: true
+    type: str
 
   sandbox:
     description:
@@ -43,11 +46,13 @@ options:
     description:
       - Record name to get/create/delete/update. If record_name is not specified; all records for the domain will be returned in "result" regardless
         of the state argument.
+    type: str
 
   record_type:
     description:
       - Record type.
     choices: [ 'A', 'AAAA', 'CNAME', 'ANAME', 'HTTPRED', 'MX', 'NS', 'PTR', 'SRV', 'TXT' ]
+    type: str
 
   record_value:
     description:
@@ -57,17 +62,20 @@ options:
       - >
         If record_value is not specified; no changes will be made and the record will be returned in 'result'
         (in other words, this module can be used to fetch a record's current id, type, and ttl)
+    type: str
 
   record_ttl:
     description:
       - record's "Time to live".  Number of seconds the record remains cached in DNS servers.
     default: 1800
+    type: int
 
   state:
     description:
       - whether the record should exist or not
     required: true
     choices: [ 'present', 'absent' ]
+    type: str
 
   validate_certs:
     description:
@@ -85,53 +93,56 @@ options:
   systemDescription:
     description:
       - Description used by the monitor.
-    required: true
     default: ''
+    type: str
 
   maxEmails:
     description:
       - Number of emails sent to the contact list by the monitor.
-    required: true
     default: 1
+    type: int
 
   protocol:
     description:
       - Protocol used by the monitor.
-    required: true
     default: 'HTTP'
     choices: ['TCP', 'UDP', 'HTTP', 'DNS', 'SMTP', 'HTTPS']
+    type: str
 
   port:
     description:
       - Port used by the monitor.
-    required: true
     default: 80
+    type: int
 
   sensitivity:
     description:
       - Number of checks the monitor performs before a failover occurs where Low = 8, Medium = 5,and High = 3.
-    required: true
     default: 'Medium'
     choices: ['Low', 'Medium', 'High']
+    type: str
 
   contactList:
     description:
       - Name or id of the contact list that the monitor will notify.
       - The default C('') means the Account Owner.
-    required: true
     default: ''
+    type: str
 
   httpFqdn:
     description:
       - The fully qualified domain name used by the monitor.
+    type: str
 
   httpFile:
     description:
       - The file at the Fqdn that the monitor queries for HTTP or HTTPS.
+    type: str
 
   httpQueryString:
     description:
       - The string in the httpFile that the monitor queries for HTTP or HTTPS.
+    type: str
 
   failover:
     description:
@@ -150,23 +161,28 @@ options:
     description:
       - Primary IP address for the failover.
       - Required if adding or changing the monitor or failover.
+    type: str
 
   ip2:
     description:
       - Secondary IP address for the failover.
       - Required if adding or changing the failover.
+    type: str
 
   ip3:
     description:
       - Tertiary IP address for the failover.
+    type: str
 
   ip4:
     description:
       - Quaternary IP address for the failover.
+    type: str
 
   ip5:
     description:
       - Quinary IP address for the failover.
+    type: str
 
 notes:
   - The DNS Made Easy service requires that machines interacting with the API have the proper time and timezone set. Be sure you are within a few
