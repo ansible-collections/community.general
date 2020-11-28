@@ -62,13 +62,13 @@ EXAMPLES = r'''
 RETURN = r'''
 packages:
     description: A list of package(s) in versionlock list.
-    returned: always
+    returned: success
     type: list
     elements: str
     sample: [ 'httpd' ]
 state:
     description: State of package(s).
-    returned: always
+    returned: success
     type: str
     sample: present
 '''
