@@ -68,7 +68,7 @@ packages:
     sample: [ 'httpd' ]
 state:
     description: State of package(s).
-    returned: everytime
+    returned: always
     type: str
     sample: present
 '''
