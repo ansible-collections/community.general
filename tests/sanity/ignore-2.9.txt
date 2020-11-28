@@ -171,9 +171,6 @@ plugins/modules/cloud/scaleway/scaleway_volume_info.py validate-modules:return-s
 plugins/modules/cloud/smartos/imgadm.py validate-modules:doc-missing-type
 plugins/modules/cloud/smartos/imgadm.py validate-modules:no-default-for-required-parameter
 plugins/modules/cloud/smartos/smartos_image_info.py validate-modules:doc-missing-type
-plugins/modules/cloud/smartos/vmadm.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/smartos/vmadm.py validate-modules:undocumented-parameter
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:doc-missing-type
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-type-not-in-doc
@@ -201,18 +198,15 @@ plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parame
 plugins/modules/clustering/consul/consul_acl.py validate-modules:doc-missing-type
 plugins/modules/clustering/consul/consul_kv.py validate-modules:parameter-type-not-in-doc
 plugins/modules/clustering/etcd3.py validate-modules:parameter-type-not-in-doc
-plugins/modules/clustering/pacemaker_cluster.py validate-modules:parameter-type-not-in-doc
 plugins/modules/clustering/znode.py validate-modules:doc-missing-type
 plugins/modules/clustering/znode.py validate-modules:parameter-type-not-in-doc
 plugins/modules/database/misc/elasticsearch_plugin.py validate-modules:doc-missing-type
 plugins/modules/database/misc/elasticsearch_plugin.py validate-modules:parameter-type-not-in-doc
 plugins/modules/database/misc/kibana_plugin.py validate-modules:doc-missing-type
 plugins/modules/database/misc/kibana_plugin.py validate-modules:parameter-type-not-in-doc
-plugins/modules/database/misc/redis.py validate-modules:parameter-type-not-in-doc
 plugins/modules/database/misc/riak.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/database/misc/riak.py validate-modules:doc-missing-type
 plugins/modules/database/misc/riak.py validate-modules:parameter-type-not-in-doc
-plugins/modules/database/mssql/mssql_db.py validate-modules:doc-missing-type
 plugins/modules/database/vertica/vertica_configuration.py validate-modules:doc-missing-type
 plugins/modules/database/vertica/vertica_info.py validate-modules:doc-missing-type
 plugins/modules/database/vertica/vertica_role.py validate-modules:doc-missing-type
@@ -234,8 +228,6 @@ plugins/modules/monitoring/bigpanda.py validate-modules:doc-default-does-not-mat
 plugins/modules/monitoring/icinga2_host.py validate-modules:undocumented-parameter
 plugins/modules/monitoring/statusio_maintenance.py pylint:blacklisted-name
 plugins/modules/net_tools/cloudflare_dns.py validate-modules:parameter-type-not-in-doc
-plugins/modules/net_tools/dnsmadeeasy.py validate-modules:doc-missing-type
-plugins/modules/net_tools/dnsmadeeasy.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/ip_netns.py validate-modules:doc-missing-type
 plugins/modules/net_tools/ipinfoio_facts.py validate-modules:doc-missing-type
 plugins/modules/net_tools/ipinfoio_facts.py validate-modules:parameter-type-not-in-doc
@@ -330,8 +322,6 @@ plugins/modules/packaging/os/redhat_subscription.py validate-modules:return-synt
 plugins/modules/packaging/os/slackpkg.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/urpmi.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/xbps.py validate-modules:parameter-invalid
-plugins/modules/remote_management/cobbler/cobbler_sync.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/cobbler/cobbler_system.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/dellemc/idrac_server_config_profile.py validate-modules:doc-missing-type
 plugins/modules/remote_management/dellemc/idrac_server_config_profile.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/hpilo/hpilo_boot.py validate-modules:parameter-type-not-in-doc
@@ -403,7 +393,6 @@ plugins/modules/source_control/hg.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/emc/emc_vnx_sg_member.py validate-modules:doc-missing-type
 plugins/modules/storage/emc/emc_vnx_sg_member.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/glusterfs/gluster_heal_info.py validate-modules:parameter-type-not-in-doc
-plugins/modules/storage/glusterfs/gluster_peer.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/glusterfs/gluster_volume.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/ibm/ibm_sa_domain.py validate-modules:doc-missing-type
 plugins/modules/storage/ibm/ibm_sa_host.py validate-modules:doc-missing-type
