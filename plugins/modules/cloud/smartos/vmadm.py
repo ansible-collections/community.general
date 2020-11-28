@@ -556,13 +556,11 @@ def set_vm_state(module, vm_uuid, vm_state):
 def create_payload(module, uuid):
     # Create the JSON payload (vmdef) and return the filename.
 
-    p = module.params
-
     # Filter out the few options that are not valid VM properties.
     module_options = ['debug', 'force', 'state']
     # @TODO make this a simple {} comprehension as soon as py2 is ditched
     # @TODO {k: v for k, v in p.items() if k not in module_options}
-    vmdef = dict([(k, v) for k, v in p.items() if k not in module_options and v])
+    vmdef = dict([(k, v) for k, v in module.params.items() if k not in module_options and v])
 
     try:
         vmdef_json = json.dumps(vmdef)
