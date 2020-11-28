@@ -97,19 +97,19 @@ RETURN = '''
   value_type:
     description: The type of the value that was changed (None for "get" and "reset" state)
     returned: success
-    type: 'str|list'
+    type: list
     elements: str
     sample: '"int" or ["str", "str", "str"]'
   value:
     description: The value of the preference key after executing the module
     returned: success
-    type: 'str|list'
+    type: list
     elements: str
     sample: '"192" or ["orange", "yellow", "violet"]'
   previous_value:
     description: The value of the preference key before executing the module (None for "get" state)
     returned: success
-    type: 'str|list'
+    type: list
     elements: str
     sample: '"96" or ["red", "blue", "green"]'
 '''
