@@ -348,15 +348,15 @@ def test_xfconf(mocker, capfd, patch_xfconf, testcase):
     assert results['changed'] == testcase['changed']
 
     for test_result in ('channel', 'property'):
-        assert test_result in results, "'{}' not found in {}".format(test_result, results)
+        assert test_result in results, "'{0}' not found in {1}".format(test_result, results)
         assert results[test_result] == results['invocation']['module_args'][test_result], \
-            "'{}': '{}' != '{}'".format(test_result, results[test_result], results['invocation']['module_args'][test_result])
+            "'{0}': '{1}' != '{2}'".format(test_result, results[test_result], results['invocation']['module_args'][test_result])
 
     for conditional_test_result in ('msg', 'value', 'previous_value'):
         if conditional_test_result in testcase:
-            assert conditional_test_result in results, "'{}' not found in {}".format(conditional_test_result, results)
+            assert conditional_test_result in results, "'{0}' not found in {1}".format(conditional_test_result, results)
             assert results[conditional_test_result] == testcase[conditional_test_result], \
-                "'{}': '{}' != '{}'".format(conditional_test_result, results[conditional_test_result], testcase[conditional_test_result])
+                "'{0}': '{1}' != '{2}'".format(conditional_test_result, results[conditional_test_result], testcase[conditional_test_result])
 
     assert mock_run_command.call_count == len(testcase['run_command.calls'])
     if mock_run_command.call_count:
