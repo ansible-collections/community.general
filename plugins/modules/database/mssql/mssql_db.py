@@ -21,28 +21,36 @@ options:
       - name of the database to add or remove
     required: true
     aliases: [ db ]
+    type: str
   login_user:
     description:
       - The username used to authenticate with
+    type: str
   login_password:
     description:
       - The password used to authenticate with
+    type: str
   login_host:
     description:
       - Host running the database
+    type: str
+    required: true
   login_port:
     description:
       - Port of the MSSQL server. Requires login_host be defined as other than localhost if login_port is used
-    default: 1433
+    default: '1433'
+    type: str
   state:
     description:
       - The database state
     default: present
     choices: [ "present", "absent", "import" ]
+    type: str
   target:
     description:
       - Location, on the remote host, of the dump file to read from or write to. Uncompressed SQL
         files (C(.sql)) files are supported.
+    type: str
   autocommit:
     description:
       - Automatically commit the change only if the import succeed. Sometimes it is necessary to use autocommit=true, since some content can't be changed

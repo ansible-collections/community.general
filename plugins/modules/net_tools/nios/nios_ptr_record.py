@@ -37,19 +37,16 @@ options:
   ipv4addr:
     description:
       - The IPv4 Address of the record. Mutually exclusive with the ipv6addr.
-    required: true
     aliases:
       - ipv4
   ipv6addr:
     description:
       - The IPv6 Address of the record. Mutually exclusive with the ipv4addr.
-    required: true
     aliases:
       - ipv6
   ptrdname:
     description:
       - The domain name of the DNS PTR record in FQDN format.
-    required: true
   ttl:
     description:
       - Time To Live (TTL) value for the record.

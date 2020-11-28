@@ -15,6 +15,7 @@ options:
     description:
       - Online OAuth token.
     type: str
+    required: true
     aliases: [ oauth_token ]
   api_url:
     description:

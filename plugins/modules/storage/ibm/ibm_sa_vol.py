@@ -29,7 +29,6 @@ options:
     state:
         description:
             - Volume state.
-        required: true
         default: "present"
         choices: [ "present", "absent" ]
     size:

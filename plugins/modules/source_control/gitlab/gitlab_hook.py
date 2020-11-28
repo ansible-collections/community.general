@@ -44,7 +44,6 @@ options:
     description:
       - When C(present) the hook will be updated to match the input or created if it doesn't exist.
       - When C(absent) hook will be deleted if it exists.
-    required: true
     default: present
     type: str
     choices: [ "present", "absent" ]

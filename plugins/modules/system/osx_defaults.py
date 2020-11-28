@@ -36,7 +36,6 @@ options:
     description:
       - The key of the user preference.
     type: str
-    required: true
   type:
     description:
       - The type of value to write.

@@ -37,7 +37,6 @@ options:
   api_token:
     description:
       - Your private token to interact with the GitLab API.
-    required: True
     type: str
   description:
     description:

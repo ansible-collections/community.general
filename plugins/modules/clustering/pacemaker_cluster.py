@@ -21,15 +21,17 @@ options:
       description:
         - Indicate desired state of the cluster
       choices: [ cleanup, offline, online, restart ]
-      required: yes
+      type: str
     node:
       description:
         - Specify which node of the cluster you want to manage. None == the
           cluster status itself, 'all' == check the status of all nodes.
+      type: str
     timeout:
       description:
         - Timeout when the module should considered that the action has failed
       default: 300
+      type: int
     force:
       description:
         - Force the change of the cluster state

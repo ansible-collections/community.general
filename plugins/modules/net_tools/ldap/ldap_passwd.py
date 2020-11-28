@@ -29,7 +29,6 @@ requirements:
   - python-ldap
 options:
   passwd:
-    required: true
     description:
       - The (plaintext) password to be set for I(dn).
 extends_documentation_fragment:

@@ -23,14 +23,12 @@ options:
     - This file must exist ahead of time.
     - This parameter is required, unless C(xmlstring) is given.
     type: path
-    required: yes
     aliases: [ dest, file ]
   xmlstring:
     description:
     - A string containing XML on which to operate.
     - This parameter is required, unless C(path) is given.
     type: str
-    required: yes
   xpath:
     description:
     - A valid XPath expression describing the item(s) you want to manipulate.

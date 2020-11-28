@@ -29,7 +29,6 @@ options:
     description:
       - Sets the DNS view to associate this tst record with.  The DNS
         view must already be configured on the system
-    required: true
     default: default
     aliases:
       - dns_view
@@ -39,7 +38,6 @@ options:
         per substring, up to a total of 512 bytes. To enter leading,
         trailing, or embedded spaces in the text, add quotes around the
         text to preserve the spaces.
-    required: true
   ttl:
     description:
       - Configures the TTL to be associated with this tst record
