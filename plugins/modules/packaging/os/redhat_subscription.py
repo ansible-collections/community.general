@@ -814,8 +814,6 @@ def main():
         mutually_exclusive=[['activationkey', 'username'],
                             ['activationkey', 'consumer_id'],
                             ['activationkey', 'environment'],
-                            ['activationkey', 'autosubscribe'],
-                            ['force', 'consumer_id'],
                             ['pool', 'pool_ids']],
         required_if=[['state', 'present', ['username', 'activationkey'], True]],
     )

@@ -399,7 +399,6 @@ plugins/modules/packaging/os/homebrew.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/homebrew_cask.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/opkg.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/pacman.py validate-modules:parameter-invalid
-plugins/modules/packaging/os/redhat_subscription.py validate-modules:mutually_exclusive-unknown
 plugins/modules/packaging/os/redhat_subscription.py validate-modules:parameter-list-no-elements
 plugins/modules/packaging/os/redhat_subscription.py validate-modules:return-syntax-error
 plugins/modules/packaging/os/slackpkg.py validate-modules:parameter-invalid
