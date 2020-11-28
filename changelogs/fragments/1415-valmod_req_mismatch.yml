@@ -1,2 +1,2 @@
 bugfixes:
-  - vmadm - removed unused ``debug`` parameter (https://github.com/ansible-collections/community.general/pull/1415).
+  - vmadm - simplification of code (https://github.com/ansible-collections/community.general/pull/1415).
