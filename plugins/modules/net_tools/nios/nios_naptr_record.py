@@ -29,7 +29,6 @@ options:
     description:
       - Sets the DNS view to associate this a record with. The DNS
         view must already be configured on the system
-    required: true
     default: default
     aliases:
       - dns_view
@@ -38,19 +37,16 @@ options:
       - Configures the order (0-65535) for this NAPTR record. This parameter
         specifies the order in which the NAPTR rules are applied when
         multiple rules are present.
-    required: true
   preference:
     description:
       - Configures the preference (0-65535) for this NAPTR record. The
         preference field determines the order NAPTR records are processed
         when multiple records with the same order parameter are present.
-    required: true
   replacement:
     description:
       - Configures the replacement field for this NAPTR record.
         For nonterminal NAPTR records, this field specifies the
         next domain name to look up.
-    required: true
   services:
     description:
       - Configures the services field (128 characters maximum) for this

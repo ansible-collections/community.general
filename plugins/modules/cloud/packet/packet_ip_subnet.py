@@ -48,7 +48,6 @@ options:
   project_id:
     description:
       - UUID of a project of the device to/from which to assign/remove a subnet.
-    required: True
     type: str
 
   device_count:
@@ -63,6 +62,7 @@ options:
       - IPv4 or IPv6 subnet which you want to manage. It must come from a reserved block for your project in the Packet Host.
     aliases: [name]
     type: str
+    required: true
 
   state:
     description:

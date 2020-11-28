@@ -25,7 +25,6 @@ options:
     state:
         description:
             - Pool state.
-        required: true
         default: "present"
         choices: [ "present", "absent" ]
     size:

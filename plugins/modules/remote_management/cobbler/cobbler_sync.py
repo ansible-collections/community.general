@@ -18,18 +18,21 @@ options:
     description:
     - The name or IP address of the Cobbler system.
     default: 127.0.0.1
+    type: str
   port:
     description:
     - Port number to be used for REST connection.
     - The default value depends on parameter C(use_ssl).
+    type: int
   username:
     description:
     - The username to log in to Cobbler.
     default: cobbler
+    type: str
   password:
     description:
     - The password to log in to Cobbler.
-    required: yes
+    type: str
   use_ssl:
     description:
     - If C(no), an HTTP connection will be used instead of the default HTTPS connection.

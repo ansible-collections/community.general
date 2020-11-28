@@ -34,7 +34,6 @@ options:
       - Specifies the name of the network view to assign the configured
         DNS view to.  The network view must already be configured on the
         target system.
-    required: true
     default: default
   extattrs:
     description:

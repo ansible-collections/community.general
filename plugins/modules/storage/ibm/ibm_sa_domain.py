@@ -26,7 +26,6 @@ options:
     state:
         description:
             - The desired state of the domain.
-        required: true
         default: "present"
         choices: [ "present", "absent" ]
     ldap_id:

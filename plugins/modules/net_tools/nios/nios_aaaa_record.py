@@ -29,14 +29,12 @@ options:
     description:
       - Sets the DNS view to associate this AAAA record with.  The DNS
         view must already be configured on the system
-    required: true
     default: default
     aliases:
       - dns_view
   ipv6addr:
     description:
       - Configures the IPv6 address for this AAAA record.
-    required: true
     aliases:
       - ipv6
   ttl:

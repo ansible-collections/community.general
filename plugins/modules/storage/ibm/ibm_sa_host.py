@@ -25,7 +25,6 @@ options:
     state:
         description:
             - Host state.
-        required: true
         default: "present"
         choices: [ "present", "absent" ]
     cluster:

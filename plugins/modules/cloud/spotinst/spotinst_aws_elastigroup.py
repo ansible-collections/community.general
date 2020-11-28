@@ -145,7 +145,6 @@ options:
   key_pair:
     description:
       - (String) Specify a Key Pair to attach to the instances
-    required: true
 
   kubernetes:
     description:
@@ -181,7 +180,6 @@ options:
   monitoring:
     description:
       - (Boolean) Describes whether instance Enhanced Monitoring is enabled
-    required: true
 
   name:
     description:
@@ -214,7 +212,6 @@ options:
   on_demand_instance_type:
     description:
       - (String) On-demand instance type that will be provisioned
-    required: true
 
   opsworks:
     description:
@@ -342,7 +339,6 @@ options:
     description:
       - (String) The capacity unit to launch instances by.
       - "The available choices are: C(instance), C(weight)."
-    required: true
 
   up_scaling_policies:
     description:

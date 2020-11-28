@@ -25,22 +25,23 @@ options:
       - Specifies the fully qualified hostname to add or remove from
         the system
     required: true
+    type: str
   view:
     description:
       - Sets the DNS view to associate this A record with.  The DNS
         view must already be configured on the system
-    required: true
     default: default
     aliases:
       - dns_view
+    type: str
   ipv4addr:
     description:
       - Configures the IPv4 address for this A record. Users can dynamically
         allocate ipv4 address to A record by passing dictionary containing,
         I(nios_next_ip) and I(CIDR network range). See example
-    required: true
     aliases:
       - ipv4
+    type: str
   ttl:
     description:
       - Configures the TTL to be associated with this A record
