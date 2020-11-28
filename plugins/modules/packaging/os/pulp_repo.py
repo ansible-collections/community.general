@@ -26,14 +26,17 @@ options:
     description:
       - Debian repo components.
     type: str
+    version_added: 2.0.0
   releases:
     description:
       - Debian repo releases.
     type: str
+    version_added: 2.0.0
   description:
     description:
-      - User-friendly text describing the repository’s contents.
+      - User-friendly text describing the repository's contents.
     type: str
+    version_added: 2.0.0
   feed:
     description:
       - Upstream feed URL to receive updates from.
@@ -207,10 +210,10 @@ EXAMPLES = '''
     repo_type: rpm
     state: absent
 
-- name: Copy of local internal repo with newer version of ansible for bionic, with legacy http support
+- name: Copy of local internal repo with newer version of Ansible for bionic, with legacy HTTP support
   community.general.pulp_repo:
     name: ansible-bionic
-    description: 'Ubuntu 18 repo for anisble 2.9.15'
+    description: 'Ubuntu 18.04 repo for Ansible 2.9.15'
     repo_type: deb
     components: main
     releases: stable
