@@ -25,7 +25,6 @@ options:
     - The name of the device.
     - C(all) is valid to rescan C(available) all devices (AIX cfgmgr command).
     type: str
-    required: true
   force:
     description:
     - Forces action.

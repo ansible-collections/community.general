@@ -26,7 +26,6 @@ options:
     state:
         description:
             - Host ports state.
-        required: true
         default: "present"
         choices: [ "present", "absent" ]
     iscsi_name:

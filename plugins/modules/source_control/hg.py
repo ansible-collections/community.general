@@ -25,7 +25,6 @@ options:
         description:
             - Absolute path of where the repository should be cloned to.
               This parameter is required, unless clone and update are set to no
-        required: yes
     revision:
         description:
             - Equivalent C(-r) option in hg command which could be the changeset, revision number,

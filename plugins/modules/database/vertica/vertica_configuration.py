@@ -19,28 +19,34 @@ options:
         - Name of the parameter to update.
     required: true
     aliases: [parameter]
+    type: str
   value:
     description:
         - Value of the parameter to be set.
-    required: true
+    type: str
   db:
     description:
         - Name of the Vertica database.
+    type: str
   cluster:
     description:
         - Name of the Vertica cluster.
     default: localhost
+    type: str
   port:
     description:
         - Vertica cluster port to connect to.
-    default: 5433
+    default: '5433'
+    type: str
   login_user:
     description:
         - The username used to authenticate with.
     default: dbadmin
+    type: str
   login_password:
     description:
         - The password used to authenticate with.
+    type: str
 notes:
   - The default authentication assumes that you are either logging in as or sudo'ing
     to the C(dbadmin) account on the host.
