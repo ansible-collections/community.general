@@ -19,7 +19,7 @@ options:
     description:
       - Package name or a list of packages.
     type: list
-    required: True
+    required: true
     elements: str
   state:
     description:
@@ -62,8 +62,9 @@ EXAMPLES = r'''
 RETURN = r'''
 packages:
     description: A list of package(s) in versionlock list.
-    returned: everytime
+    returned: always
     type: list
+    elements: str
     sample: [ 'httpd' ]
 state:
     description: State of package(s).
@@ -84,7 +85,7 @@ class YumVersionLock:
 
     def get_versionlock_packages(self):
         """ Get an overview of all packages on yum versionlock """
-        rc, out, err = self.module.run_command("%s versionlock list" % self.yum_bin)
+        rc, out, err = self.module.run_command([self.yum_bin, "versionlock", "list"])
         if rc == 0:
             return out
         elif rc == 1 and 'o such command:' in err:
