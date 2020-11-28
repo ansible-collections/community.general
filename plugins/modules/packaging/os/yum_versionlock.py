@@ -27,7 +27,7 @@ options:
     - If state is C(absent) or C(unlocked), package(s) will be removed from yum versionlock list.
     choices: [ 'absent', 'locked', 'present', 'unlocked' ]
     type: str
-    default: present
+    default: locked
 notes:
     - Requires yum-plugin-versionlock package on the remote node.
     - Supports C(check_mode).
@@ -41,12 +41,12 @@ author:
 EXAMPLES = r'''
 - name: Prevent Apache / httpd from being updated
   community.general.yum_versionlock:
-    state: present
+    state: locked
     name: httpd
 
 - name: Prevent multiple packages from being updated
   community.general.yum_versionlock:
-    state: present
+    state: locked
     name:
     - httpd
     - nginx
@@ -55,7 +55,7 @@ EXAMPLES = r'''
 
 - name: Unlock Apache / httpd to be updated again
   community.general.yum_versionlock:
-    state: absent
+    state: unlocked
     package: httpd
 '''
 
@@ -70,7 +70,7 @@ state:
     description: State of package(s).
     returned: success
     type: str
-    sample: present
+    sample: locked
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -104,7 +104,7 @@ def main():
     """ start main program to add/remove a package to yum versionlock"""
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default='present', choices=['present', 'locked', 'unlocked', 'absent']),
+            state=dict(default='locked', choices=['present', 'locked', 'unlocked', 'absent']),
             name=dict(required=True, type='list', elements='str'),
         ),
         supports_check_mode=True
