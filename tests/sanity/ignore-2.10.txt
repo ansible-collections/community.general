@@ -188,6 +188,8 @@ plugins/modules/cloud/smartos/imgadm.py validate-modules:doc-missing-type
 plugins/modules/cloud/smartos/imgadm.py validate-modules:no-default-for-required-parameter
 plugins/modules/cloud/smartos/smartos_image_info.py validate-modules:doc-missing-type
 plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-list-no-elements
+plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-type-not-in-doc
+plugins/modules/cloud/smartos/vmadm.py validate-modules:undocumented-parameter
 plugins/modules/cloud/softlayer/sl_vm.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:doc-missing-type

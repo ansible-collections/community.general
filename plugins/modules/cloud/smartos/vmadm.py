@@ -559,7 +559,7 @@ def create_payload(module, uuid):
     p = module.params
 
     # Filter out the few options that are not valid VM properties.
-    module_options = ['force', 'state']
+    module_options = ['debug', 'force', 'state']
     # @TODO make this a simple {} comprehension as soon as py2 is ditched
     # @TODO {k: v for k, v in p.items() if k not in module_options}
     vmdef = dict([(k, v) for k, v in p.items() if k not in module_options])
@@ -659,7 +659,7 @@ def main():
             'zfs_root_compression', 'zpool'
         ],
         'bool': [
-            'archive_on_delete', 'autoboot', 'delegate_dataset',
+            'archive_on_delete', 'autoboot', 'debug', 'delegate_dataset',
             'docker', 'firewall_enabled', 'force', 'indestructible_delegated',
             'indestructible_zoneroot', 'maintain_resolvers', 'nowait'
         ],
