@@ -21,6 +21,7 @@ options:
   mgmt_token:
     description:
       - a management token is required to manipulate the acl lists
+    required: true
   state:
     description:
       - whether the ACL pair should be present or absent

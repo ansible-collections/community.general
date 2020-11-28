@@ -21,22 +21,23 @@ description:
 author: Sachidananda Urs (@sac)
 options:
     state:
-       choices: ["present", "absent"]
-       default: "present"
-       description:
+        choices: ["present", "absent"]
+        default: "present"
+        description:
           - Determines whether the nodes should be attached to the pool or
             removed from the pool. If the state is present, nodes will be
             attached to the pool. If state is absent, nodes will be detached
             from the pool.
-       required: true
+        type: str
     nodes:
-       description:
+        description:
           - List of nodes that have to be probed into the pool.
-       required: true
+        required: true
+        type: list
     force:
-       type: bool
-       default: false
-       description:
+        type: bool
+        default: false
+        description:
           - Applicable only while removing the nodes from the pool. gluster
             will refuse to detach a node from the pool if any one of the node
             is down, in such cases force can be used.

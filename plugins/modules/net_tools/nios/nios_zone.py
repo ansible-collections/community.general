@@ -32,7 +32,6 @@ options:
       - Configures the DNS view name for the configured resource.  The
         specified DNS zone must already exist on the running NIOS instance
         prior to configuring zones.
-    required: true
     default: default
     aliases:
       - dns_view
@@ -45,6 +44,7 @@ options:
       name:
         description:
           - The name of the grid primary server
+        required: true
   grid_secondaries:
     description:
       - Configures the grid secondary servers for this zone.
@@ -54,6 +54,7 @@ options:
       name:
         description:
           - The name of the grid secondary server
+        required: true
   ns_group:
     description:
       - Configures the name server group for this zone. Name server group is

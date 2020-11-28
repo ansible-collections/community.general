@@ -21,6 +21,7 @@ options:
               C(present) will ensure data properties are compliant with OneView.
               C(absent) will remove the resource from OneView, if it exists.
         choices: ['present', 'absent']
+        required: true
     data:
         description:
             - List with the Fibre Channel Network properties.
