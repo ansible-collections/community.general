@@ -29,26 +29,21 @@ options:
     description:
       - Sets the DNS view to associate this a record with.  The DNS
         view must already be configured on the system
-    required: true
     default: default
     aliases:
       - dns_view
   port:
     description:
       - Configures the port (0-65535) of this SRV record.
-    required: true
   priority:
     description:
       - Configures the priority (0-65535) for this SRV record.
-    required: true
   target:
     description:
       - Configures the target FQDN for this SRV record.
-    required: true
   weight:
     description:
       - Configures the weight (0-65535) for this SRV record.
-    required: true
   ttl:
     description:
       - Configures the TTL to be associated with this host record

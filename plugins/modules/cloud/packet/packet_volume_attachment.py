@@ -45,6 +45,7 @@ options:
     description:
       - UUID of the project to which the device and volume belong.
     type: str
+    required: true
 
   volume:
     description:
@@ -52,6 +53,7 @@ options:
       - It can be a UUID, an API-generated volume name, or user-defined description string.
       - 'Example values: 4a347482-b546-4f67-8300-fb5018ef0c5, volume-4a347482, "my volume"'
     type: str
+    required: true
 
   device:
     description:

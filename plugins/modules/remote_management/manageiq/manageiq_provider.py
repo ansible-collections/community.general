@@ -32,7 +32,6 @@ options:
   type:
     type: str
     description: The provider's type.
-    required: true
     choices: ['Openshift', 'Amazon', 'oVirt', 'VMware', 'Azure', 'Director', 'OpenStack', 'GCE']
   zone:
     type: str

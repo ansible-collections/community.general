@@ -25,7 +25,7 @@ options:
     description:
       - Specifies the hostname with which fixed DHCP ip-address is stored
         for respective mac.
-    required: false
+    required: true
   ipaddr:
     description:
       - IPV4/V6 address of the fixed address.
@@ -37,6 +37,7 @@ options:
   network:
     description:
       - Specifies the network range in which ipaddr exists.
+    required: true
   network_view:
     description:
       - Configures the name of the network view to associate with this

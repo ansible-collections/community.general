@@ -53,7 +53,6 @@ options:
     description:
       - When C(present) the deploy key added to the project if it doesn't exist.
       - When C(absent) it will be removed from the project if it exists.
-    required: true
     default: present
     type: str
     choices: [ "present", "absent" ]

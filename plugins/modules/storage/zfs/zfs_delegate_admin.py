@@ -30,7 +30,6 @@ options:
       - Whether to allow (C(present)), or unallow (C(absent)) a permission.
       - When set to C(present), at least one "entity" param of I(users), I(groups), or I(everyone) are required.
       - When set to C(absent), removes permissions from the specified entities, or removes all permissions if no entity params are specified.
-    required: true
     choices: [ absent, present ]
     default: present
   users:

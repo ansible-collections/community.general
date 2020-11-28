@@ -49,7 +49,6 @@ options:
           - The value should be associated with the given key, required if C(state)
             is C(present).
         type: str
-        required: yes
     recurse:
         description:
           - If the key represents a prefix, each entry with the prefix can be

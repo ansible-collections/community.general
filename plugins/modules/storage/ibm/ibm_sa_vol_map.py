@@ -30,7 +30,7 @@ options:
         description:
             - When the state is present the volume is mapped.
                 When the state is absent, the volume is meant to be unmapped.
-        required: true
+
     cluster:
         description:
             - Maps the volume to a cluster.
