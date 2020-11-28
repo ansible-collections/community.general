@@ -562,7 +562,7 @@ def create_payload(module, uuid):
     module_options = ['debug', 'force', 'state']
     # @TODO make this a simple {} comprehension as soon as py2 is ditched
     # @TODO {k: v for k, v in p.items() if k not in module_options}
-    vmdef = dict([(k, v) for k, v in p.items() if k not in module_options])
+    vmdef = dict([(k, v) for k, v in p.items() if k not in module_options and v])
 
     try:
         vmdef_json = json.dumps(vmdef)
