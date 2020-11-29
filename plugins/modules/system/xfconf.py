@@ -95,7 +95,7 @@ RETURN = '''
     type: str
     sample: "/Xft/DPI"
   value_type:
-    description: The type of the value that was changed (None for "get" and "reset" state)
+    description: The type of the value that was changed (C(none) for C(get) and C(reset) state)
     returned: success
     type: list
     elements: str
