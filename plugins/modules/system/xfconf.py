@@ -86,12 +86,12 @@ EXAMPLES = """
 RETURN = '''
   channel:
     description: The channel specified in the module parameters
-    returned: always
+    returned: success
     type: str
     sample: "xsettings"
   property:
     description: The property specified in the module parameters
-    returned: always
+    returned: success
     type: str
     sample: "/Xft/DPI"
   value_type:
