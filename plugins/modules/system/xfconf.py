@@ -95,22 +95,21 @@ RETURN = '''
     type: str
     sample: "/Xft/DPI"
   value_type:
-    description: The type of the value that was changed (C(none) for C(get) and C(reset) state)
+    description: The type of the value that was changed (C(none) for C(get) and C(reset) state). Either a single string value or a list of strings for array types.
     returned: success
-    type: list
-    elements: str
+    type: raw
+    returned: success
+    type: raw
     sample: '"int" or ["str", "str", "str"]'
   value:
-    description: The value of the preference key after executing the module
+    description: The value of the preference key after executing the module. Either a single string value or a list of strings for array types.
     returned: success
-    type: list
-    elements: str
+    type: raw
     sample: '"192" or ["orange", "yellow", "violet"]'
   previous_value:
-    description: The value of the preference key before executing the module (None for "get" state)
+    description: The value of the preference key before executing the module (None for "get" state). Either a single string value or a list of strings for array types.
     returned: success
-    type: list
-    elements: str
+    type: raw
     sample: '"96" or ["red", "blue", "green"]'
 '''
 
