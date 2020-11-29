@@ -1,0 +1,2 @@
+bugfixes:
+  - utm_network_interface_address - changed param type from invalid 'boolean' to valid 'bool' ().
