@@ -107,7 +107,7 @@ RETURN = '''
     type: raw
     sample: '"192" or ["orange", "yellow", "violet"]'
   previous_value:
-    description: The value of the preference key before executing the module (None for "get" state). Either a single string value or a list of strings for array types.
+    description: The value of the preference key before executing the module (C(none) for C(get) state). Either a single string value or a list of strings for array types.
     returned: success
     type: raw
     sample: '"96" or ["red", "blue", "green"]'
