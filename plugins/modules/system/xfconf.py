@@ -99,8 +99,6 @@ RETURN = '''
                  types.
     returned: success
     type: raw
-    returned: success
-    type: raw
     sample: '"int" or ["str", "str", "str"]'
   value:
     description: The value of the preference key after executing the module. Either a single string value or a list of strings for array types.
