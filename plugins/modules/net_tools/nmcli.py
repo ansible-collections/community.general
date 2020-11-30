@@ -74,6 +74,7 @@ options:
         description:
             - The IPv4 gateway for this interface.
             - Use the format C(192.0.2.1).
+            - This parameter is mutually_exclusive with never_default4 parameter.
         type: str
     routes4:
         description:
@@ -82,9 +83,15 @@ options:
         type: list
         elements: str
         version_added: 1.3.0
+    route_metric4:
+        description:
+            - Set metric level of ipv4 routes configured on interface.
+        type: int
+        version_added: 1.3.0
     never_default4:
         description:
             - Set as default route.
+            - This parameter is mutually_exclusive with gw4 parameter.
         type: bool
         version_added: 1.3.0
     dns4:
@@ -586,6 +593,7 @@ class Nmcli(object):
         self.ip4 = module.params['ip4']
         self.gw4 = module.params['gw4']
         self.routes4 = module.params['routes4']
+        self.route_metric4 = module.params['route_metric4']
         self.never_default4 = module.params['never_default4']
         self.dns4 = module.params['dns4']
         self.dns4_search = module.params['dns4_search']
@@ -661,6 +669,7 @@ class Nmcli(object):
                 'ipv4.dns-search': self.dns4_search,
                 'ipv4.gateway': self.gw4,
                 'ipv4.routes': self.routes4,
+                'ipv4.route-metric': self.route_metric4,
                 'ipv4.never-default': self.never_default4,
                 'ipv4.method': self.ipv4_method,
                 'ipv6.addresses': self.ip6,
@@ -830,6 +839,7 @@ class Nmcli(object):
         elif setting in ('ipv4.dns',
                          'ipv4.dns-search',
                          'ipv4.routes',
+                         'ipv4.route-metric'
                          'ipv6.dns',
                          'ipv6.dns-search'):
             return list
@@ -1044,6 +1054,7 @@ def main():
             ip4=dict(type='str'),
             gw4=dict(type='str'),
             routes4=dict(type='list', elements='str'),
+            route_metric4=dict(type='int'),
             never_default4=dict(type='bool'),
             dns4=dict(type='list', elements='str'),
             dns4_search=dict(type='list', elements='str'),
@@ -1089,6 +1100,7 @@ def main():
             ip_tunnel_local=dict(type='str'),
             ip_tunnel_remote=dict(type='str'),
         ),
+        mutually_exclusive=[['never_default4','gw4']],
         supports_check_mode=True,
     )
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
