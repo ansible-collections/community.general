@@ -95,7 +95,6 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
-ipv6.method:                            auto
 """
 
 TESTCASE_GENERIC_DNS4_SEARCH = [
