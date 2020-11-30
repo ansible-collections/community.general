@@ -788,7 +788,6 @@ class Nmcli(object):
     def mtu_conn_type(self):
         return self.type in (
             'ethernet',
-            'infiniband',
             'team-slave',
         )
 
