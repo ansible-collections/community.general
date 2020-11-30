@@ -1100,7 +1100,7 @@ def main():
             ip_tunnel_local=dict(type='str'),
             ip_tunnel_remote=dict(type='str'),
         ),
-        mutually_exclusive=[['never_default4','gw4']],
+        mutually_exclusive=[['never_default4', 'gw4']],
         supports_check_mode=True,
     )
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
