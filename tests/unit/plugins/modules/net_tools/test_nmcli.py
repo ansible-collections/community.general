@@ -95,6 +95,7 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv6.method:                            auto
 """
 
 TESTCASE_GENERIC_DNS4_SEARCH = [
@@ -581,6 +582,9 @@ def test_generic_connection_unchanged(mocked_generic_connection_unchanged, capfd
 
     out, err = capfd.readouterr()
     results = json.loads(out)
+    print('TEST mocked_generic_connection_unchanged')
+    print(out)
+    print(err)
     assert not results.get('failed')
     assert not results['changed']
 
