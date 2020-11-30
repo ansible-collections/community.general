@@ -49,6 +49,11 @@ def proxmox_auth_argument_spec():
     )
 
 
+def ansible_to_proxmox_bool(value):
+    '''Convert Ansible representation of a boolean to be proxmox-friendly'''
+    return 1 if value else 0
+
+
 def proxmox_to_ansible_bool(value):
     '''Convert Proxmox representation of a boolean to be ansible-friendly'''
     return True if value == 1 else False
