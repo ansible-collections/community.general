@@ -93,6 +93,7 @@ options:
             - Set as default route.
             - This parameter is mutually_exclusive with gw4 parameter.
         type: bool
+        default: no
         version_added: 1.3.0
     dns4:
         description:
@@ -1054,7 +1055,7 @@ def main():
             gw4=dict(type='str'),
             routes4=dict(type='list', elements='str'),
             route_metric4=dict(type='int'),
-            never_default4=dict(type='bool'),
+            never_default4=dict(type='bool', default=False),
             dns4=dict(type='list', elements='str'),
             dns4_search=dict(type='list', elements='str'),
             dhcp_client_id=dict(type='str'),
