@@ -58,7 +58,6 @@ options:
       - Set value to the desired state for the specified host.
     type: str
     choices: [ absent, present ]
-    type: str
 author:
 - Hugh Ma (@bbyhuy) <Hugh.Ma@flextronics.com>
 '''

@@ -4,8 +4,6 @@ plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
 plugins/module_utils/_mount.py future-import-boilerplate
 plugins/module_utils/_mount.py metaclass-boilerplate
-plugins/modules/cloud/centurylink/clc_alert_policy.py validate-modules:no-default-for-required-parameter
-plugins/modules/cloud/centurylink/clc_firewall_policy.py validate-modules:no-default-for-required-parameter
 plugins/modules/cloud/google/gce_eip.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_img.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_instance_template.py pylint:blacklisted-name
@@ -337,7 +335,7 @@ plugins/modules/remote_management/stacki/stacki_host.py validate-modules:doc-def
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:no-default-for-required-parameter
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:undocumented-parameter
-lugins/modules/remote_management/wakeonlan.py validate-modules:parameter-type-not-in-doc
+plugins/modules/remote_management/wakeonlan.py validate-modules:parameter-type-not-in-doc
 plugins/modules/source_control/bzr.py validate-modules:parameter-type-not-in-doc
 plugins/modules/source_control/git_config.py validate-modules:doc-missing-type
 plugins/modules/source_control/git_config.py validate-modules:parameter-type-not-in-doc
