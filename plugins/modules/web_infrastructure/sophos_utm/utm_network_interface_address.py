@@ -41,9 +41,11 @@ options:
         description:
           - An optional comment to add to the object
     resolved:
+        type: bool
         description:
           - Whether or not the object is resolved
     resolved6:
+        type: bool
         description:
           - Whether or not the object is resolved
 
@@ -118,8 +120,8 @@ def main():
             address=dict(type='str', required=True),
             comment=dict(type='str', required=False, default=""),
             address6=dict(type='str', required=False),
-            resolved=dict(type='boolean', required=False),  # @FIXME bool instead of boolean
-            resolved6=dict(type='boolean', required=False),  # @FIXME bool instead of boolean
+            resolved=dict(type='bool', required=False),
+            resolved6=dict(type='bool', required=False),
         )
     )
     try:
