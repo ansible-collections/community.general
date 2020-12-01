@@ -253,6 +253,7 @@ def main():
         ignore_scripts=dict(default=False, type='bool'),
         unsafe_perm=dict(default=False, type='bool'),
         ci=dict(default=False, type='bool'),
+        no_optional=dict(default=False, type='bool'),
     )
     arg_spec['global'] = dict(default=False, type='bool')
     module = AnsibleModule(
