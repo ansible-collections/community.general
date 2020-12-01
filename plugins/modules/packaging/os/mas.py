@@ -55,6 +55,13 @@ EXAMPLES = '''
     id: 409183694
     state: present
 
+- name: Install Divvy with command mas installed in /usr/local/bin
+  community.general.mas:
+    id: 413857545
+    state: present
+  environment:
+    PATH: /usr/local/bin:{{ ansible_facts.env.PATH }}
+
 - name: Install a list of apps
   community.general.mas:
     id:
