@@ -52,8 +52,9 @@ options:
         description:
             - This is the type of device or network connection that you wish to create or modify.
             - Type C(generic) is added in Ansible 2.5.
+            - Type C(infiniband) is added in community.general 2.0.0.
         type: str
-        choices: [ bond, bond-slave, bridge, bridge-slave, ethernet, generic, ipip, sit, team, team-slave, vlan, vxlan ]
+        choices: [ bond, bond-slave, bridge, bridge-slave, ethernet, generic, infiniband, ipip, sit, team, team-slave, vlan, vxlan ]
     mode:
         description:
             - This is the type of device or network connection that you wish to create for a bond, team or bridge.
@@ -73,7 +74,27 @@ options:
         description:
             - The IPv4 gateway for this interface.
             - Use the format C(192.0.2.1).
+            - This parameter is mutually_exclusive with never_default4 parameter.
         type: str
+    routes4:
+        description:
+            - The list of ipv4 routes.
+            - Use the format '192.0.3.0/24 192.0.2.1'
+        type: list
+        elements: str
+        version_added: 2.0.0
+    route_metric4:
+        description:
+            - Set metric level of ipv4 routes configured on interface.
+        type: int
+        version_added: 2.0.0
+    never_default4:
+        description:
+            - Set as default route.
+            - This parameter is mutually_exclusive with gw4 parameter.
+        type: bool
+        default: no
+        version_added: 2.0.0
     dns4:
         description:
             - A list of up to 3 dns servers.
@@ -572,6 +593,9 @@ class Nmcli(object):
         self.type = module.params['type']
         self.ip4 = module.params['ip4']
         self.gw4 = module.params['gw4']
+        self.routes4 = module.params['routes4']
+        self.route_metric4 = module.params['route_metric4']
+        self.never_default4 = module.params['never_default4']
         self.dns4 = module.params['dns4']
         self.dns4_search = module.params['dns4_search']
         self.ip6 = module.params['ip6']
@@ -645,6 +669,9 @@ class Nmcli(object):
                 'ipv4.dns': self.dns4,
                 'ipv4.dns-search': self.dns4_search,
                 'ipv4.gateway': self.gw4,
+                'ipv4.routes': self.routes4,
+                'ipv4.route-metric': self.route_metric4,
+                'ipv4.never-default': self.never_default4,
                 'ipv4.method': self.ipv4_method,
                 'ipv6.addresses': self.ip6,
                 'ipv6.dns': self.dns6,
@@ -742,6 +769,7 @@ class Nmcli(object):
             'bridge-slave',
             'ethernet',
             'generic',
+            'infiniband',
             'team',
             'vlan',
         )
@@ -805,10 +833,13 @@ class Nmcli(object):
     def settings_type(setting):
         if setting in ('bridge.stp',
                        'bridge-port.hairpin-mode',
-                       'connection.autoconnect'):
+                       'connection.autoconnect',
+                       'ipv4.never-default'):
             return bool
         elif setting in ('ipv4.dns',
                          'ipv4.dns-search',
+                         'ipv4.routes',
+                         'ipv4.route-metric'
                          'ipv6.dns',
                          'ipv6.dns-search'):
             return list
@@ -873,7 +904,7 @@ class Nmcli(object):
 
     @property
     def create_connection_up(self):
-        if self.type in ('bond', 'ethernet'):
+        if self.type in ('bond', 'ethernet', 'infiniband'):
             if (self.mtu is not None) or (self.dns4 is not None) or (self.dns6 is not None):
                 return True
         elif self.type == 'team':
@@ -917,6 +948,8 @@ class Nmcli(object):
                             alias_key = alias_pair[0]
                             alias_value = alias_pair[1]
                             conn_info[alias_key] = alias_value
+                elif key == 'ipv4.routes':
+                    conn_info[key] = [s.strip() for s in raw_value.split(';')]
                 elif key_type == list:
                     conn_info[key] = [s.strip() for s in raw_value.split(',')]
                 else:
@@ -951,6 +984,14 @@ class Nmcli(object):
 
             if key in conn_info:
                 current_value = conn_info[key]
+                if key == 'ipv4.routes' and current_value is not None:
+                    # ipv4.routes do not have same options and show_connection() format
+                    # options: ['10.11.0.0/24 10.10.0.2', '10.12.0.0/24 10.10.0.2 200']
+                    # show_connection(): ['{ ip = 10.11.0.0/24, nh = 10.10.0.2 }', '{ ip = 10.12.0.0/24, nh = 10.10.0.2, mt = 200 }']
+                    # Need to convert in order to compare both
+                    current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+),\s*mt\s*=\s*([^} ]+)\s*}', r'\1 \2 \3',
+                                     route) for route in current_value]
+                    current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+)\s*}', r'\1 \2', route) for route in current_value]
             elif key in param_alias:
                 real_key = param_alias[key]
                 if real_key in conn_info:
@@ -997,9 +1038,26 @@ def main():
             master=dict(type='str'),
             ifname=dict(type='str'),
             type=dict(type='str',
-                      choices=['bond', 'bond-slave', 'bridge', 'bridge-slave', 'ethernet', 'generic', 'ipip', 'sit', 'team', 'team-slave', 'vlan', 'vxlan']),
+                      choices=[
+                          'bond',
+                          'bond-slave',
+                          'bridge',
+                          'bridge-slave',
+                          'ethernet',
+                          'generic',
+                          'infiniband',
+                          'ipip',
+                          'sit',
+                          'team',
+                          'team-slave',
+                          'vlan',
+                          'vxlan'
+                      ]),
             ip4=dict(type='str'),
             gw4=dict(type='str'),
+            routes4=dict(type='list', elements='str'),
+            route_metric4=dict(type='int'),
+            never_default4=dict(type='bool', default=False),
             dns4=dict(type='list', elements='str'),
             dns4_search=dict(type='list', elements='str'),
             dhcp_client_id=dict(type='str'),
@@ -1044,6 +1102,7 @@ def main():
             ip_tunnel_local=dict(type='str'),
             ip_tunnel_remote=dict(type='str'),
         ),
+        mutually_exclusive=[['never_default4', 'gw4']],
         supports_check_mode=True,
     )
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
