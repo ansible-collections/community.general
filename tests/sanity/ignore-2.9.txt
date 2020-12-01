@@ -335,7 +335,6 @@ plugins/modules/remote_management/stacki/stacki_host.py validate-modules:doc-def
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:no-default-for-required-parameter
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/wakeonlan.py validate-modules:parameter-type-not-in-doc
 plugins/modules/source_control/bzr.py validate-modules:parameter-type-not-in-doc
 plugins/modules/source_control/git_config.py validate-modules:doc-missing-type
 plugins/modules/source_control/git_config.py validate-modules:parameter-type-not-in-doc
