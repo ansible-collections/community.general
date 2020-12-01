@@ -94,7 +94,7 @@ options:
             - This parameter is mutually_exclusive with gw4 parameter.
         type: bool
         default: no
-        version_added: 1.4.0
+        version_added: 2.0.0
     dns4:
         description:
             - A list of up to 3 dns servers.
