@@ -52,7 +52,7 @@ options:
         description:
             - This is the type of device or network connection that you wish to create or modify.
             - Type C(generic) is added in Ansible 2.5.
-            - Type C(infiniband) is added in community.general 1.3.0.
+            - Type C(infiniband) is added in community.general 2.0.0.
         type: str
         choices: [ bond, bond-slave, bridge, bridge-slave, ethernet, generic, infiniband, ipip, sit, team, team-slave, vlan, vxlan ]
     mode:
