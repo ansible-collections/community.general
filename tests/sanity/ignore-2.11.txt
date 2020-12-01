@@ -4,10 +4,8 @@ plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
 plugins/module_utils/_mount.py future-import-boilerplate
 plugins/module_utils/_mount.py metaclass-boilerplate
-plugins/modules/cloud/centurylink/clc_alert_policy.py validate-modules:no-default-for-required-parameter
 plugins/modules/cloud/centurylink/clc_alert_policy.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/centurylink/clc_blueprint_package.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/centurylink/clc_firewall_policy.py validate-modules:no-default-for-required-parameter
 plugins/modules/cloud/centurylink/clc_firewall_policy.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/centurylink/clc_loadbalancer.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/centurylink/clc_modify_server.py validate-modules:parameter-list-no-elements
@@ -64,15 +62,8 @@ plugins/modules/cloud/lxc/lxc_container.py pylint:blacklisted-name
 plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
 plugins/modules/cloud/lxc/lxc_container.py validate-modules:invalid-ansiblemodule-schema
 plugins/modules/cloud/lxc/lxc_container.py validate-modules:use-run-command-not-popen
-plugins/modules/cloud/lxd/lxd_container.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/cloud/lxd/lxd_container.py validate-modules:doc-missing-type
 plugins/modules/cloud/lxd/lxd_container.py validate-modules:invalid-ansiblemodule-schema
 plugins/modules/cloud/lxd/lxd_container.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/lxd/lxd_container.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/lxd/lxd_container.py validate-modules:undocumented-parameter
-plugins/modules/cloud/lxd/lxd_profile.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/cloud/lxd/lxd_profile.py validate-modules:doc-missing-type
-plugins/modules/cloud/lxd/lxd_profile.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/misc/rhevm.py validate-modules:parameter-state-invalid-choice
 plugins/modules/cloud/oneandone/oneandone_firewall_policy.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/oneandone/oneandone_load_balancer.py validate-modules:parameter-list-no-elements
@@ -83,15 +74,9 @@ plugins/modules/cloud/online/online_server_facts.py validate-modules:return-synt
 plugins/modules/cloud/online/online_server_info.py validate-modules:return-syntax-error
 plugins/modules/cloud/online/online_user_facts.py validate-modules:return-syntax-error
 plugins/modules/cloud/online/online_user_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/opennebula/one_host.py validate-modules:doc-missing-type
 plugins/modules/cloud/opennebula/one_host.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/opennebula/one_host.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/opennebula/one_image.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/opennebula/one_image_info.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/opennebula/one_image_info.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/opennebula/one_service.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/opennebula/one_vm.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/opennebula/one_vm.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/oracle/oci_vcn.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/ovirt/ovirt_affinity_label_facts.py validate-modules:doc-missing-type
 plugins/modules/cloud/ovirt/ovirt_affinity_label_facts.py validate-modules:parameter-list-no-elements
@@ -103,8 +88,6 @@ plugins/modules/cloud/ovirt/ovirt_datacenter_facts.py validate-modules:parameter
 plugins/modules/cloud/ovirt/ovirt_disk_facts.py validate-modules:doc-missing-type
 plugins/modules/cloud/ovirt/ovirt_disk_facts.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/ovirt/ovirt_event_facts.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/ovirt/ovirt_external_provider_facts.py validate-modules:doc-missing-type
-plugins/modules/cloud/ovirt/ovirt_external_provider_facts.py validate-modules:no-default-for-required-parameter
 plugins/modules/cloud/ovirt/ovirt_external_provider_facts.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/ovirt/ovirt_external_provider_facts.py validate-modules:undocumented-parameter
 plugins/modules/cloud/ovirt/ovirt_group_facts.py validate-modules:doc-missing-type
@@ -153,7 +136,6 @@ plugins/modules/cloud/packet/packet_sshkey.py validate-modules:parameter-type-no
 plugins/modules/cloud/packet/packet_sshkey.py validate-modules:undocumented-parameter
 plugins/modules/cloud/packet/packet_volume_attachment.py pylint:ansible-bad-function
 plugins/modules/cloud/profitbricks/profitbricks.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/profitbricks/profitbricks_nic.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/profitbricks/profitbricks_volume.py validate-modules:doc-missing-type
 plugins/modules/cloud/profitbricks/profitbricks_volume.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/profitbricks/profitbricks_volume.py validate-modules:undocumented-parameter
@@ -184,15 +166,11 @@ plugins/modules/cloud/scaleway/scaleway_snapshot_facts.py validate-modules:retur
 plugins/modules/cloud/scaleway/scaleway_snapshot_info.py validate-modules:return-syntax-error
 plugins/modules/cloud/scaleway/scaleway_volume_facts.py validate-modules:return-syntax-error
 plugins/modules/cloud/scaleway/scaleway_volume_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/smartos/imgadm.py validate-modules:doc-missing-type
-plugins/modules/cloud/smartos/imgadm.py validate-modules:no-default-for-required-parameter
 plugins/modules/cloud/smartos/smartos_image_info.py validate-modules:doc-missing-type
 plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/smartos/vmadm.py validate-modules:undocumented-parameter
 plugins/modules/cloud/softlayer/sl_vm.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:doc-missing-type
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:undocumented-parameter
@@ -200,12 +178,8 @@ plugins/modules/cloud/univention/udm_dns_record.py validate-modules:parameter-ty
 plugins/modules/cloud/univention/udm_dns_zone.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/univention/udm_dns_zone.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/univention/udm_dns_zone.py validate-modules:undocumented-parameter
-plugins/modules/cloud/univention/udm_group.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/cloud/univention/udm_group.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/univention/udm_share.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/univention/udm_user.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/webfaction/webfaction_app.py validate-modules:doc-missing-type
 plugins/modules/cloud/webfaction/webfaction_db.py validate-modules:doc-missing-type
 plugins/modules/cloud/webfaction/webfaction_domain.py validate-modules:doc-missing-type
@@ -250,17 +224,10 @@ plugins/modules/database/vertica/vertica_user.py validate-modules:doc-missing-ty
 plugins/modules/database/vertica/vertica_user.py validate-modules:undocumented-parameter
 plugins/modules/files/iso_extract.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/files/xml.py validate-modules:parameter-list-no-elements
-plugins/modules/identity/keycloak/keycloak_client.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/identity/keycloak/keycloak_client.py validate-modules:doc-missing-type
 plugins/modules/identity/keycloak/keycloak_client.py validate-modules:parameter-list-no-elements
-plugins/modules/identity/keycloak/keycloak_client.py validate-modules:parameter-type-not-in-doc
-plugins/modules/identity/keycloak/keycloak_clienttemplate.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/identity/keycloak/keycloak_clienttemplate.py validate-modules:doc-missing-type
-plugins/modules/identity/keycloak/keycloak_clienttemplate.py validate-modules:parameter-type-not-in-doc
 plugins/modules/identity/onepassword_info.py validate-modules:parameter-list-no-elements
 plugins/modules/identity/opendj/opendj_backendprop.py validate-modules:doc-missing-type
 plugins/modules/identity/opendj/opendj_backendprop.py validate-modules:parameter-type-not-in-doc
-plugins/modules/monitoring/bigpanda.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/monitoring/bigpanda.py validate-modules:invalid-argument-name
 plugins/modules/monitoring/datadog/datadog_event.py validate-modules:parameter-list-no-elements
 plugins/modules/monitoring/datadog/datadog_monitor.py validate-modules:invalid-argument-name
@@ -274,19 +241,13 @@ plugins/modules/monitoring/sensu/sensu_client.py validate-modules:parameter-list
 plugins/modules/monitoring/sensu/sensu_handler.py validate-modules:parameter-list-no-elements
 plugins/modules/monitoring/statusio_maintenance.py pylint:blacklisted-name
 plugins/modules/monitoring/statusio_maintenance.py validate-modules:parameter-list-no-elements
-plugins/modules/net_tools/cloudflare_dns.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/dnsimple.py validate-modules:parameter-list-no-elements
-plugins/modules/net_tools/ip_netns.py validate-modules:doc-missing-type
-plugins/modules/net_tools/ipinfoio_facts.py validate-modules:doc-missing-type
-plugins/modules/net_tools/ipinfoio_facts.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/ldap/ldap_attr.py validate-modules:parameter-type-not-in-doc  # This triggers when a parameter is undocumented
 plugins/modules/net_tools/ldap/ldap_attr.py validate-modules:undocumented-parameter # Parameter removed but reason for removal is shown by custom code
 plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:doc-missing-type
 plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:undocumented-parameter # Parameter removed but reason for removal is shown by custom code
 plugins/modules/net_tools/ldap/ldap_passwd.py validate-modules:doc-missing-type
-plugins/modules/net_tools/netcup_dns.py validate-modules:doc-missing-type
-plugins/modules/net_tools/netcup_dns.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nios/nios_a_record.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/net_tools/nios/nios_a_record.py validate-modules:doc-missing-type
 plugins/modules/net_tools/nios/nios_a_record.py validate-modules:invalid-ansiblemodule-schema
@@ -384,7 +345,6 @@ plugins/modules/notification/nexmo.py validate-modules:parameter-list-no-element
 plugins/modules/notification/office_365_connector_card.py validate-modules:parameter-list-no-elements
 plugins/modules/notification/pushbullet.py validate-modules:parameter-type-not-in-doc
 plugins/modules/notification/pushbullet.py validate-modules:undocumented-parameter
-plugins/modules/notification/rocketchat.py validate-modules:no-default-for-required-parameter
 plugins/modules/notification/rocketchat.py validate-modules:parameter-list-no-elements
 plugins/modules/notification/sendgrid.py validate-modules:parameter-list-no-elements
 plugins/modules/notification/slack.py validate-modules:parameter-list-no-elements
@@ -421,7 +381,6 @@ plugins/modules/remote_management/manageiq/manageiq_alert_profiles.py validate-m
 plugins/modules/remote_management/manageiq/manageiq_policies.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/manageiq/manageiq_policies.py validate-modules:parameter-state-invalid-choice
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-missing-type
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:invalid-ansiblemodule-schema
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:parameter-type-not-in-doc
@@ -474,7 +433,6 @@ plugins/modules/remote_management/stacki/stacki_host.py validate-modules:doc-def
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:no-default-for-required-parameter
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/wakeonlan.py validate-modules:parameter-type-not-in-doc
 plugins/modules/source_control/bzr.py validate-modules:parameter-type-not-in-doc
 plugins/modules/source_control/git_config.py validate-modules:doc-missing-type
 plugins/modules/source_control/git_config.py validate-modules:parameter-type-not-in-doc
@@ -543,7 +501,6 @@ plugins/modules/system/timezone.py pylint:blacklisted-name
 plugins/modules/system/xfconf.py validate-modules:parameter-state-invalid-choice
 plugins/modules/web_infrastructure/jenkins_plugin.py use-argspec-type-path
 plugins/modules/web_infrastructure/rundeck_acl_policy.py pylint:blacklisted-name
-plugins/modules/web_infrastructure/sophos_utm/utm_network_interface_address.py validate-modules:parameter-type-not-in-doc
 scripts/inventory/gce.py pylint:blacklisted-name
 tests/utils/shippable/check_matrix.py replace-urlopen
 tests/utils/shippable/timing.py shebang
