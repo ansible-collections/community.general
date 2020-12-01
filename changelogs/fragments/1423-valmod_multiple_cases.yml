@@ -2,6 +2,5 @@ bugfixes:
   - utm_network_interface_address - changed param type from invalid 'boolean' to valid 'bool' (https://github.com/ansible-collections/community.general/pull/1423).
   - bigpanda - removed the dynamic default for ``host`` param (https://github.com/ansible-collections/community.general/pull/1423).
   - udm_user - removed the dynamic default for ``userexpiry`` param (https://github.com/ansible-collections/community.general/pull/1423).
-  - spotinst_aws_elasticgroup - removed the dynamic default for ``credentials_path`` param (https://github.com/ansible-collections/community.general/pull/1423).
   - profitbricks_nic - removed the dynamic default for ``name`` param (https://github.com/ansible-collections/community.general/pull/1423).
   - profitbricks_nic - replaced code with ``required`` and ``required_if`` (https://github.com/ansible-collections/community.general/pull/1423).
