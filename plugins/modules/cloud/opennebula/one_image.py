@@ -39,20 +39,25 @@ options:
       - It is recommended to use HTTPS so that the username/password are not
       - transferred over the network unencrypted.
       - If not set then the value of the C(ONE_URL) environment variable is used.
+    type: str
   api_username:
     description:
       - Name of the user to login into the OpenNebula RPC server. If not set
       - then the value of the C(ONE_USERNAME) environment variable is used.
+    type: str
   api_password:
     description:
       - Password of the user to login into OpenNebula RPC server. If not set
       - then the value of the C(ONE_PASSWORD) environment variable is used.
+    type: str
   id:
     description:
       - A C(id) of the image you would like to manage.
+    type: int
   name:
     description:
       - A C(name) of the image you would like to manage.
+    type: str
   state:
     description:
       - C(present) - state that is used to manage the image
@@ -61,6 +66,7 @@ options:
       - C(renamed) - rename the image to the C(new_name)
     choices: ["present", "absent", "cloned", "renamed"]
     default: present
+    type: str
   enabled:
     description:
       - Whether the image should be enabled or disabled.
@@ -69,6 +75,7 @@ options:
     description:
       - A name that will be assigned to the existing or new image.
       - In the case of cloning, by default C(new_name) will take the name of the origin image with the prefix 'Copy of'.
+    type: str
 author:
     - "Milan Ilic (@ilicmilan)"
 '''

@@ -71,6 +71,7 @@ options:
     - Record priority.
     - Required for C(type=MX) and C(type=SRV)
     default: 1
+    type: int
   proto:
     description:
     - Service protocol. Required for C(type=SRV) and C(type=TLSA).
@@ -100,6 +101,7 @@ options:
     description:
     - Record service.
     - Required for C(type=SRV)
+    type: str
   solo:
     description:
     - Whether the record should be the only one for that record type and record name.

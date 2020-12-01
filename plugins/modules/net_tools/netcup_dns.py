@@ -20,32 +20,39 @@ options:
     description:
       - API key for authentication, must be obtained via the netcup CCP (U(https://ccp.netcup.net))
     required: True
+    type: str
   api_password:
     description:
       - API password for authentication, must be obtained via the netcup CCP (https://ccp.netcup.net)
     required: True
+    type: str
   customer_id:
     description:
       - Netcup customer id
     required: True
+    type: int
   domain:
     description:
       - Domainname the records should be added / removed
     required: True
+    type: str
   record:
     description:
       - Record to add or delete, supports wildcard (*). Default is C(@) (e.g. the zone name)
     default: "@"
     aliases: [ name ]
+    type: str
   type:
     description:
       - Record type
     choices: ['A', 'AAAA', 'MX', 'CNAME', 'CAA', 'SRV', 'TXT', 'TLSA', 'NS', 'DS']
     required: True
+    type: str
   value:
     description:
       - Record value
     required: true
+    type: str
   solo:
     type: bool
     default: False
@@ -56,12 +63,14 @@ options:
     description:
       - Record priority. Required for C(type=MX)
     required: False
+    type: int
   state:
     description:
       - Whether the record should exist or not
     required: False
     default: present
     choices: [ 'present', 'absent' ]
+    type: str
 requirements:
   - "nc-dnsapi >= 0.1.3"
 author: "Nicolai Buchwitz (@nbuchwitz)"

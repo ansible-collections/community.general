@@ -128,8 +128,7 @@ options:
         description: The CA bundle string with custom certificates. defaults to None.
       path:
         type: str
-        description: Database name for oVirt metrics. Defaults to ovirt_engine_history.
-        default: ovirt_engine_history
+        description: Database name for oVirt metrics. Defaults to C(ovirt_engine_history).
 
   alerts:
     description: Alerts endpoint connection information.
@@ -175,6 +174,12 @@ options:
       auth_key:
         type: str
         description: SSH private key.
+      validate_certs:
+        description:
+          - Whether certificates should be verified for connections.
+        type: bool
+        default: yes
+        aliases: [ verify_ssl ]
 '''
 
 EXAMPLES = '''

@@ -20,9 +20,11 @@ options:
         description:
           - Name of a profile.
         required: true
+        type: str
     description:
         description:
           - Description of the profile.
+        type: str
     config:
         description:
           - 'The config for the container (e.g. {"limits.memory": "4GB"}).
@@ -35,18 +37,21 @@ options:
           - Not all config values are supported to apply the existing profile.
             Maybe you need to delete and recreate a profile.
         required: false
+        type: dict
     devices:
         description:
           - 'The devices for the profile
             (e.g. {"rootfs": {"path": "/dev/kvm", "type": "unix-char"}).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#patch-3)'
         required: false
+        type: dict
     new_name:
         description:
           - A new name of a profile.
           - If this parameter is specified a profile will be renamed to this name.
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-11)
         required: false
+        type: str
     state:
         choices:
           - present
@@ -55,28 +60,33 @@ options:
           - Define the state of a profile.
         required: false
         default: present
+        type: str
     url:
         description:
           - The unix domain socket path or the https URL for the LXD server.
         required: false
         default: unix:/var/lib/lxd/unix.socket
+        type: str
     snap_url:
         description:
           - The unix domain socket path when LXD is installed by snap package manager.
         required: false
         default: unix:/var/snap/lxd/common/lxd/unix.socket
+        type: str
     client_key:
         description:
           - The client certificate key file path.
+          - If not specified, it defaults to C($HOME/.config/lxc/client.key).
         required: false
-        default: '"{}/.config/lxc/client.key" .format(os.environ["HOME"])'
         aliases: [ key_file ]
+        type: str
     client_cert:
         description:
           - The client certificate file path.
+          - If not specified, it defaults to C($HOME/.config/lxc/client.crt).
         required: false
-        default: '"{}/.config/lxc/client.crt" .format(os.environ["HOME"])'
         aliases: [ cert_file ]
+        type: str
     trust_password:
         description:
           - The client trusted password.
@@ -87,6 +97,7 @@ options:
           - If trust_password is set, this module send a request for
             authentication before sending any requests.
         required: false
+        type: str
 notes:
   - Profiles must have a unique name. If you attempt to create a profile
     with a name that already existed in the users namespace the module will
@@ -201,8 +212,12 @@ class LXDProfileManagement(object):
         self.state = self.module.params['state']
         self.new_name = self.module.params.get('new_name', None)
 
-        self.key_file = self.module.params.get('client_key', None)
-        self.cert_file = self.module.params.get('client_cert', None)
+        self.key_file = self.module.params.get('client_key')
+        if self.key_file is None:
+            self.key_file = '{0}/.config/lxc/client.key'.format(os.environ['HOME'])
+        self.cert_file = self.module.params.get('client_cert')
+        if self.cert_file is None:
+            self.cert_file = '{0}/.config/lxc/client.crt'.format(os.environ['HOME'])
         self.debug = self.module._verbosity >= 4
 
         try:
@@ -370,12 +385,10 @@ def main():
             ),
             client_key=dict(
                 type='str',
-                default='{0}/.config/lxc/client.key'.format(os.environ['HOME']),
                 aliases=['key_file']
             ),
             client_cert=dict(
                 type='str',
-                default='{0}/.config/lxc/client.crt'.format(os.environ['HOME']),
                 aliases=['cert_file']
             ),
             trust_password=dict(type='str', no_log=True)
