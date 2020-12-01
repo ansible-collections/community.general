@@ -150,6 +150,7 @@ class Npm(object):
         self.ignore_scripts = kwargs['ignore_scripts']
         self.unsafe_perm = kwargs['unsafe_perm']
         self.state = kwargs['state']
+        self.no_optional = kwargs['no_optional']
 
         if kwargs['executable']:
             self.executable = kwargs['executable'].split(' ')
@@ -281,7 +282,7 @@ def main():
 
     npm = Npm(module, name=name, path=path, version=version, glbl=glbl, production=production,
               executable=executable, registry=registry, ignore_scripts=ignore_scripts,
-              unsafe_perm=unsafe_perm, state=state)
+              unsafe_perm=unsafe_perm, state=state, no_optional=no_optional)
 
     changed = False
     if ci:
