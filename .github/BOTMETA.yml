@@ -192,9 +192,6 @@ files:
   $connections/lxd.py:
     maintainers: mattclay
     labels: lxd
-  $connections/oc.py:
-    maintainers: chouseknecht fabianvf flaper87 maxamillion
-    labels: oc
   $connections/saltstack.py:
     labels: saltstack
   $doc_fragments/:
