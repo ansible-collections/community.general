@@ -195,7 +195,6 @@ def delete_nic(module, profitbricks):
     name = module.params.get('name')
     if name is None:
         name = _make_default_name()
-    name = module.params.get('name', _make_default_name())
 
     # Locate UUID for Datacenter
     if not (uuid_match.match(datacenter)):
