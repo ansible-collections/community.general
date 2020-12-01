@@ -37,6 +37,8 @@ plugin_routing:
   connection:
     docker:
       redirect: community.docker.docker
+    oc:
+      redirect: community.okd.oc
   modules:
     ali_instance_facts:
       deprecation:
