@@ -95,6 +95,7 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.never-default:                     no
 ipv6.method:                            auto
 """
 
@@ -119,6 +120,7 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.never-default:                     no
 ipv4.dns-search:                        search.redhat.com
 ipv6.dns-search:                        search6.redhat.com
 ipv6.method:                            auto
@@ -145,6 +147,7 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.never-default:                     no
 ipv6.method:                            auto
 bond.options:                           mode=active-backup,primary=non_existent_primary
 """
@@ -170,6 +173,7 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.never-default:                     no
 ipv6.method:                            auto
 bridge.stp:                             yes
 bridge.max-age:                         100
@@ -194,6 +198,7 @@ TESTCASE_BRIDGE_SLAVE_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
 connection.interface-name:              br0_non_existant
 connection.autoconnect:                 yes
+ipv4.never-default:                     no
 bridge-port.path-cost:                  100
 bridge-port.hairpin-mode:               yes
 bridge-port.priority:                   32
@@ -219,6 +224,7 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.never-default:                     no
 ipv6.method:                            auto
 vlan.id:                                10
 """
@@ -309,6 +315,7 @@ connection.autoconnect:                 yes
 802-3-ethernet.mtu:                     auto
 ipv4.method:                            auto
 ipv4.dhcp-client-id:                    00:11:22:AA:BB:CC:DD
+ipv4.never-default:                     no
 ipv6.method:                            auto
 """
 
@@ -333,6 +340,7 @@ connection.autoconnect:                 yes
 ipv4.method:                            manual
 ipv4.addresses:                         10.10.10.10/24
 ipv4.gateway:                           10.10.10.1
+ipv4.never-default:                     no
 ipv4.dns:                               1.1.1.1,8.8.8.8
 ipv6.method:                            auto
 """
