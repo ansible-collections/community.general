@@ -23,11 +23,11 @@ options:
     elements: str
   state:
     description:
-    - If state is C(present) or C(locked), package(s) will be added to yum versionlock list.
-    - If state is C(absent) or C(unlocked), package(s) will be removed from yum versionlock list.
-    choices: [ 'absent', 'locked', 'present', 'unlocked' ]
+    - If state is C(present), package(s) will be added to yum versionlock list.
+    - If state is C(absent), package(s) will be removed from yum versionlock list.
+    choices: [ 'absent', 'present' ]
     type: str
-    default: locked
+    default: present
 notes:
     - Requires yum-plugin-versionlock package on the remote node.
     - Supports C(check_mode).
@@ -41,21 +41,21 @@ author:
 EXAMPLES = r'''
 - name: Prevent Apache / httpd from being updated
   community.general.yum_versionlock:
-    state: locked
+    state: present
     name: httpd
 
 - name: Prevent multiple packages from being updated
   community.general.yum_versionlock:
-    state: locked
+    state: present
     name:
     - httpd
     - nginx
     - haproxy
     - curl
 
-- name: Unlock Apache / httpd to be updated again
+- name: Remove lock from Apache / httpd to be updated again
   community.general.yum_versionlock:
-    state: unlocked
+    state: absent
     package: httpd
 '''
 
@@ -70,7 +70,7 @@ state:
     description: State of package(s).
     returned: success
     type: str
-    sample: locked
+    sample: present
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -104,7 +104,7 @@ def main():
     """ start main program to add/remove a package to yum versionlock"""
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default='locked', choices=['present', 'locked', 'unlocked', 'absent']),
+            state=dict(default='present', choices=['present', 'absent']),
             name=dict(required=True, type='list', elements='str'),
         ),
         supports_check_mode=True
@@ -120,7 +120,7 @@ def main():
     versionlock_packages = yum_v.get_versionlock_packages()
 
     # Ensure versionlock state of packages
-    if state in ('present', 'locked'):
+    if state in ('present'):
         command = 'add'
         for single_pkg in packages:
             if single_pkg not in versionlock_packages:
@@ -128,7 +128,7 @@ def main():
                     changed = True
                     continue
                 changed = yum_v.ensure_state(single_pkg, command)
-    elif state in ('absent', 'unlocked'):
+    elif state in ('absent'):
         command = 'delete'
         for single_pkg in packages:
             if single_pkg in versionlock_packages:
