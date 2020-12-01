@@ -20,7 +20,7 @@
         - name: Lock all packages
           community.general.yum_versionlock:
             name: "{{ yum_updates.results | map(attribute='name') | list }}"
-            state: locked
+            state: present
           register: lock_all_packages
 
         - name: Update all packages
@@ -33,7 +33,7 @@
         - name: Unlock all packages
           community.general.yum_versionlock:
             name: "{{ yum_updates.results | map(attribute='name') | list }}"
-            state: unlocked
+            state: absent
           register: unlock_all_packages
 
         - name: Update all packages
