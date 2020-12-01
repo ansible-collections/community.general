@@ -82,7 +82,7 @@ options:
             - Use the format '192.0.3.0/24 192.0.2.1'
         type: list
         elements: str
-        version_added: 1.4.0
+        version_added: 2.0.0
     route_metric4:
         description:
             - Set metric level of ipv4 routes configured on interface.
