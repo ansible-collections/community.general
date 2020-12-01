@@ -87,7 +87,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
 
-def _load_dist_subclass(cls, *args, **kwargs):
+def _load_dist_subclass(cls, *args, **kwargs):  # @FIXME remove unused function?
     '''
     Used for derivative implementations
     '''
@@ -239,7 +239,7 @@ def main():
             name=dict(type='str', required=True),
             state=dict(type='str', choices=['killed', 'once', 'reloaded', 'restarted', 'started', 'stopped']),
             enabled=dict(type='bool'),
-            dist=dict(type='str', default='runit'),
+            dist=dict(type='str', default='runit'),  # @FIXME unused param?
             service_dir=dict(type='str', default='/var/service'),
             service_src=dict(type='str', default='/etc/sv'),
         ),

@@ -204,18 +204,18 @@ def do_notify_rocketchat(module, domain, token, protocol, payload):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            domain=dict(type='str', required=True, default=None),
+            domain=dict(type='str', required=True),
             token=dict(type='str', required=True, no_log=True),
             protocol=dict(type='str', default='https', choices=['http', 'https']),
-            msg=dict(type='str', required=False, default=None),
-            channel=dict(type='str', default=None),
+            msg=dict(type='str', required=False),
+            channel=dict(type='str'),
             username=dict(type='str', default='Ansible'),
             icon_url=dict(type='str', default='https://www.ansible.com/favicon.ico'),
-            icon_emoji=dict(type='str', default=None),
+            icon_emoji=dict(type='str'),
             link_names=dict(type='int', default=1, choices=[0, 1]),
             validate_certs=dict(default=True, type='bool'),
             color=dict(type='str', default='normal', choices=['normal', 'good', 'warning', 'danger']),
-            attachments=dict(type='list', required=False, default=None)
+            attachments=dict(type='list', required=False)
         )
     )
 

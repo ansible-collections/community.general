@@ -41,8 +41,8 @@ options:
     type: str
     description:
       - Name of affected host name. Can be a list.
+      - If not specified, it defaults to the remote system's hostname.
     required: false
-    default: machine's hostname
     aliases: ['host']
   env:
     type: str
@@ -144,7 +144,7 @@ def main():
             version=dict(required=True),
             token=dict(required=True, no_log=True),
             state=dict(required=True, choices=['started', 'finished', 'failed']),
-            hosts=dict(required=False, default=[socket.gethostname()], aliases=['host']),  # @FIXME
+            hosts=dict(required=False, aliases=['host']),
             env=dict(required=False),
             owner=dict(required=False),
             description=dict(required=False),
@@ -168,6 +168,8 @@ def main():
         v = module.params[k]
         if v is not None:
             body[k] = v
+    if body.get('hosts') is None:
+        body['hosts'] = [socket.gethostname()]
 
     if not isinstance(body['hosts'], list):
         body['hosts'] = [body['hosts']]

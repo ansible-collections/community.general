@@ -37,10 +37,13 @@ options:
             - On C(absent), the client will be removed if it exists
         choices: ['present', 'absent']
         default: 'present'
+        type: str
 
     realm:
         description:
             - The realm to create the client in.
+        type: str
+        default: master
 
     client_id:
         description:
@@ -49,19 +52,23 @@ options:
               This is 'clientId' in the Keycloak REST API.
         aliases:
             - clientId
+        type: str
 
     id:
         description:
             - Id of client to be worked on. This is usually an UUID. Either this or I(client_id)
               is required. If you specify both, this takes precedence.
+        type: str
 
     name:
         description:
             - Name of the client (this is not the same as I(client_id))
+        type: str
 
     description:
         description:
             - Description of the client in Keycloak
+        type: str
 
     root_url:
         description:
@@ -69,6 +76,7 @@ options:
               This is 'rootUrl' in the Keycloak REST API.
         aliases:
             - rootUrl
+        type: str
 
     admin_url:
         description:
@@ -76,6 +84,7 @@ options:
               This is 'adminUrl' in the Keycloak REST API.
         aliases:
             - adminUrl
+        type: str
 
     base_url:
         description:
@@ -83,6 +92,7 @@ options:
               This is 'baseUrl' in the Keycloak REST API.
         aliases:
             - baseUrl
+        type: str
 
     enabled:
         description:
@@ -100,6 +110,7 @@ options:
         choices: ['client-secret', 'client-jwt']
         aliases:
             - clientAuthenticatorType
+        type: str
 
     secret:
         description:
@@ -107,6 +118,7 @@ options:
               specify a secret here (otherwise one will be generated if it does not exit). If
               changing this secret, the module will not register a change currently (but the
               changed secret will be saved).
+        type: str
 
     registration_access_token:
         description:
@@ -115,6 +127,7 @@ options:
               This is 'registrationAccessToken' in the Keycloak REST API.
         aliases:
             - registrationAccessToken
+        type: str
 
     default_roles:
         description:
@@ -123,6 +136,7 @@ options:
               This is 'defaultRoles' in the Keycloak REST API.
         aliases:
             - defaultRoles
+        type: list
 
     redirect_uris:
         description:
@@ -130,6 +144,7 @@ options:
               This is 'redirectUris' in the Keycloak REST API.
         aliases:
             - redirectUris
+        type: list
 
     web_origins:
         description:
@@ -137,11 +152,13 @@ options:
               This is 'webOrigins' in the Keycloak REST API.
         aliases:
             - webOrigins
+        type: list
 
     not_before:
         description:
             - Revoke any tokens issued before this date for this client (this is a UNIX timestamp).
               This is 'notBefore' in the Keycloak REST API.
+        type: int
         aliases:
             - notBefore
 
@@ -220,6 +237,7 @@ options:
     protocol:
         description:
             - Type of client (either C(openid-connect) or C(saml).
+        type: str
         choices: ['openid-connect', 'saml']
 
     full_scope_allowed:
@@ -234,6 +252,7 @@ options:
         description:
             - Cluster node re-registration timeout for this client.
               This is 'nodeReRegistrationTimeout' in the Keycloak REST API.
+        type: int
         aliases:
             - nodeReRegistrationTimeout
 
@@ -242,6 +261,7 @@ options:
             - dict of registered cluster nodes (with C(nodename) as the key and last registration
               time as the value).
               This is 'registeredNodes' in the Keycloak REST API.
+        type: dict
         aliases:
             - registeredNodes
 
@@ -250,6 +270,7 @@ options:
             - Client template to use for this client. If it does not exist this field will silently
               be dropped.
               This is 'clientTemplate' in the Keycloak REST API.
+        type: str
         aliases:
             - clientTemplate
 
@@ -290,6 +311,7 @@ options:
             - a data structure defining the authorization settings for this client. For reference,
               please see the Keycloak API docs at U(https://www.keycloak.org/docs-api/8.0/rest-api/index.html#_resourceserverrepresentation).
               This is 'authorizationSettings' in the Keycloak REST API.
+        type: dict
         aliases:
             - authorizationSettings
 
@@ -305,24 +327,29 @@ options:
             consentRequired:
                 description:
                     - Specifies whether a user needs to provide consent to a client for this mapper to be active.
+                type: bool
 
             consentText:
                 description:
                     - The human-readable name of the consent the user is presented to accept.
+                type: str
 
             id:
                 description:
                     - Usually a UUID specifying the internal ID of this protocol mapper instance.
+                type: str
 
             name:
                 description:
                     - The name of this protocol mapper.
+                type: str
 
             protocol:
                 description:
                     - This is either C(openid-connect) or C(saml), this specifies for which protocol this protocol mapper
                       is active.
                 choices: ['openid-connect', 'saml']
+                type: str
 
             protocolMapper:
                 description:
@@ -354,6 +381,7 @@ options:
                     - An exhaustive list of available mappers on your installation can be obtained on
                       the admin console by going to Server Info -> Providers and looking under
                       'protocol-mapper'.
+                type: str
 
             config:
                 description:
@@ -362,6 +390,7 @@ options:
                       other than by the source of the mappers and its parent class(es). An example is given
                       below. It is easiest to obtain valid config values by dumping an already-existing
                       protocol mapper configuration through check-mode in the I(existing) field.
+                type: dict
 
     attributes:
         description:
@@ -370,6 +399,7 @@ options:
               permissible options is not available; possible options as of Keycloak 3.4 are listed below. The Keycloak
               API does not validate whether a given option is appropriate for the protocol used; if specified
               anyway, Keycloak will simply not use it.
+        type: dict
         suboptions:
             saml.authnstatement:
                 description:

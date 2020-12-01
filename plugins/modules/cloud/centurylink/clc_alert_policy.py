@@ -217,18 +217,18 @@ class ClcAlertPolicy:
         :return: argument spec dictionary
         """
         argument_spec = dict(
-            name=dict(default=None),  # @FIXME default=None is redundant - remove all
-            id=dict(default=None),
-            alias=dict(required=True, default=None),
-            alert_recipients=dict(type='list', default=None),
+            name=dict(),
+            id=dict(),
+            alias=dict(required=True),
+            alert_recipients=dict(type='list'),
             metric=dict(
                 choices=[
                     'cpu',
                     'memory',
                     'disk'],
                 default=None),
-            duration=dict(type='str', default=None),
-            threshold=dict(type='int', default=None),
+            duration=dict(type='str'),
+            threshold=dict(type='int'),
             state=dict(default='present', choices=['present', 'absent'])
         )
         mutually_exclusive = [
