@@ -1,2 +1,2 @@
 bugfixes:
-  - icinga2_host - fix returning error codes
+  - icinga2_host - fix returning error codes (https://github.com/ansible-collections/community.general/pull/335).
