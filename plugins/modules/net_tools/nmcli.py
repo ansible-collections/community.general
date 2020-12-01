@@ -989,7 +989,8 @@ class Nmcli(object):
                     # options: ['10.11.0.0/24 10.10.0.2', '10.12.0.0/24 10.10.0.2 200']
                     # show_connection(): ['{ ip = 10.11.0.0/24, nh = 10.10.0.2 }', '{ ip = 10.12.0.0/24, nh = 10.10.0.2, mt = 200 }']
                     # Need to convert in order to compare both
-                    current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+),\s*mt\s*=\s*([^} ]+)\s*}', r'\1 \2 \3', route) for route in current_value]
+                    current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+),\s*mt\s*=\s*([^} ]+)\s*}', r'\1 \2 \3', \
+                                    route) for route in current_value]
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+)\s*}', r'\1 \2', route) for route in current_value]
             elif key in param_alias:
                 real_key = param_alias[key]
