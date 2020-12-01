@@ -27,27 +27,34 @@ options:
         choices: [ present, absent ]
         description:
             - Whether the group is present or not.
+        type: str
     name:
         required: true
         description:
             - Name of the posix group.
+        type: str
     description:
         required: false
         description:
             - Group description.
+        type: str
     position:
         required: false
         description:
             - define the whole ldap position of the group, e.g.
               C(cn=g123m-1A,cn=classes,cn=schueler,cn=groups,ou=schule,dc=example,dc=com).
+        type: str
     ou:
         required: false
         description:
             - LDAP OU, e.g. school for LDAP OU C(ou=school,dc=example,dc=com).
+        type: str
     subpath:
         required: false
         description:
             - Subpath inside the OU, e.g. C(cn=classes,cn=students,cn=groups).
+        type: str
+        default: "cn=groups"
 '''
 
 
