@@ -87,7 +87,7 @@ options:
         description:
             - Set metric level of ipv4 routes configured on interface.
         type: int
-        version_added: 1.4.0
+        version_added: 2.0.0
     never_default4:
         description:
             - Set as default route.
