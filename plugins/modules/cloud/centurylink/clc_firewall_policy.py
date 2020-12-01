@@ -214,12 +214,12 @@ class ClcFirewallPolicy:
         """
         argument_spec = dict(
             location=dict(required=True),
-            source_account_alias=dict(required=True, default=None),   # @FIXME remove default=None
-            destination_account_alias=dict(default=None),
-            firewall_policy_id=dict(default=None),
-            ports=dict(default=None, type='list'),
-            source=dict(default=None, type='list'),
-            destination=dict(default=None, type='list'),
+            source_account_alias=dict(required=True),
+            destination_account_alias=dict(),
+            firewall_policy_id=dict(),
+            ports=dict(type='list'),
+            source=dict(type='list'),
+            destination=dict(type='list'),
             wait=dict(default=True),   # @FIXME type=bool
             state=dict(default='present', choices=['present', 'absent']),
             enabled=dict(default=True, choices=[True, False])

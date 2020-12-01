@@ -31,12 +31,14 @@ options:
         required: false
         description:
             - Name of the namespace
+        type: str
     state:
         required: false
         default: "present"
         choices: [ present, absent ]
         description:
             - Whether the namespace should exist
+        type: str
 '''
 
 EXAMPLES = '''

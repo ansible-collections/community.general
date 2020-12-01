@@ -40,18 +40,22 @@ options:
       - It is recommended to use HTTPS so that the username/password are not
       - transferred over the network unencrypted.
       - If not set then the value of the C(ONE_URL) environment variable is used.
+    type: str
   api_username:
     description:
       - Name of the user to login into the OpenNebula RPC server. If not set
       - then the value of the C(ONE_USERNAME) environment variable is used.
+    type: str
   api_password:
     description:
       - Password of the user to login into OpenNebula RPC server. If not set
       - then the value of the C(ONE_PASSWORD) environment variable is used.
+    type: str
   ids:
     description:
       - A list of images ids whose facts you want to gather.
     aliases: ['id']
+    type: list
   name:
     description:
       - A C(name) of the image whose facts will be gathered.
@@ -59,6 +63,7 @@ options:
       - which restricts the list of images (whose facts will be returned) whose names match specified regex.
       - Also, if the C(name) begins with '~*' case-insensitive matching will be performed.
       - See examples for more details.
+    type: str
 author:
     - "Milan Ilic (@ilicmilan)"
     - "Jan Meerkamp (@meerkampdvv)"

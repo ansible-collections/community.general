@@ -40,10 +40,12 @@ options:
       - It is recommended to use HTTPS so that the username/password are not
       - transferred over the network unencrypted.
       - If not set then the value of the C(ONE_URL) environment variable is used.
+    type: str
   api_username:
     description:
       - Name of the user to login into the OpenNebula RPC server. If not set
       - then the value of the C(ONE_USERNAME) environment variable is used.
+    type: str
   api_password:
     description:
       - Password of the user to login into OpenNebula RPC server. If not set
@@ -51,20 +53,25 @@ options:
       - if both I(api_username) or I(api_password) are not set, then it will try
       - authenticate with ONE auth file. Default path is "~/.one/one_auth".
       - Set environment variable C(ONE_AUTH) to override this path.
+    type: str
   template_name:
     description:
       - Name of VM template to use to create a new instace
+    type: str
   template_id:
     description:
       - ID of a VM template to use to create a new instance
+    type: int
   vm_start_on_hold:
     description:
       - Set to true to put vm on hold while creating
     default: False
+    type: bool
   instance_ids:
     description:
       - A list of instance ids used for states':' C(absent), C(running), C(rebooted), C(poweredoff)
     aliases: ['ids']
+    type: list
   state:
     description:
       - C(present) - create instances from a template specified with C(template_id)/C(template_name).
@@ -74,6 +81,7 @@ options:
       - C(absent) - terminate instances
     choices: ["present", "absent", "running", "rebooted", "poweredoff"]
     default: present
+    type: str
   hard:
     description:
       - Reboot, power-off or terminate instances C(hard)
@@ -92,6 +100,7 @@ options:
     description:
       - How long before wait gives up, in seconds
     default: 300
+    type: int
   attributes:
     description:
       - A dictionary of key/value attributes to add to new instances, or for
@@ -104,61 +113,75 @@ options:
       - When used with C(count_attributes) and C(exact_count) the module will
       - match the base name without the index part.
     default: {}
+    type: dict
   labels:
     description:
       - A list of labels to associate with new instances, or for setting
       - C(state) of instances with these labels.
     default: []
+    type: list
   count_attributes:
     description:
       - A dictionary of key/value attributes that can only be used with
       - C(exact_count) to determine how many nodes based on a specific
       - attributes criteria should be deployed. This can be expressed in
       - multiple ways and is shown in the EXAMPLES section.
+    type: dict
   count_labels:
     description:
       - A list of labels that can only be used with C(exact_count) to determine
       - how many nodes based on a specific labels criteria should be deployed.
       - This can be expressed in multiple ways and is shown in the EXAMPLES
       - section.
+    type: list
   count:
     description:
       - Number of instances to launch
     default: 1
+    type: int
   exact_count:
     description:
       - Indicates how many instances that match C(count_attributes) and
       - C(count_labels) parameters should be deployed. Instances are either
       - created or terminated based on this value.
       - NOTE':' Instances with the least IDs will be terminated first.
+    type: int
   mode:
     description:
       - Set permission mode of the instance in octet format, e.g. C(600) to give owner C(use) and C(manage) and nothing to group and others.
+    type: str
   owner_id:
     description:
       - ID of the user which will be set as the owner of the instance
+    type: int
   group_id:
     description:
       - ID of the group which will be set as the group of the instance
+    type: int
   memory:
     description:
       - The size of the memory for new instances (in MB, GB, ...)
+    type: str
   disk_size:
     description:
       - The size of the disk created for new instances (in MB, GB, TB,...).
       - NOTE':' If The Template hats Multiple Disks the Order of the Sizes is
       - matched against the order specified in C(template_id)/C(template_name).
+    type: list
   cpu:
     description:
       - Percentage of CPU divided by 100 required for the new instance. Half a
       - processor is written 0.5.
+    type: float
   vcpu:
     description:
       - Number of CPUs (cores) new VM will have.
+    type: int
   networks:
     description:
       - A list of dictionaries with network parameters. See examples for more details.
     default: []
+    type: list
   disk_saveas:
     description:
       - Creates an image from a VM disk.
@@ -167,6 +190,7 @@ options:
       - I(NOTE)':' This operation will only be performed on the first VM (if more than one VM ID is passed)
       - and the VM has to be in the C(poweredoff) state.
       - Also this operation will fail if an image with specified C(name) already exists.
+    type: dict
   persistent:
     description:
       - Create a private persistent copy of the template plus any image defined in DISK, and instantiate that copy.
@@ -177,10 +201,12 @@ options:
     description:
       - Name of Datastore to use to create a new instace
     version_added: '0.2.0'
+    type: int
   datastore_name:
     description:
       - Name of Datastore to use to create a new instace
     version_added: '0.2.0'
+    type: str
 author:
     - "Milan Ilic (@ilicmilan)"
     - "Jan Meerkamp (@meerkampdvv)"

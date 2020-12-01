@@ -19,11 +19,13 @@ options:
     name:
         description:
           - Name of a container.
+        type: str
         required: true
     architecture:
         description:
           - The architecture for the container (e.g. "x86_64" or "i686").
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)
+        type: str
         required: false
     config:
         description:
@@ -37,12 +39,18 @@ options:
           - The key starts with 'volatile.' are ignored for this comparison.
           - Not all config values are supported to apply the existing container.
             Maybe you need to delete and recreate a container.
+        type: dict
         required: false
+    profiles:
+        description:
+          - Profile to be used by the container
+        type: list
     devices:
         description:
           - 'The devices for the container
             (e.g. { "rootfs": { "path": "/dev/kvm", "type": "unix-char" }).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)'
+        type: dict
         required: false
     ephemeral:
         description:
@@ -61,6 +69,7 @@ options:
           - 'See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1) for complete API documentation.'
           - 'Note that C(protocol) accepts two choices: C(lxd) or C(simplestreams)'
         required: false
+        type: dict
     state:
         choices:
           - started
@@ -72,6 +81,7 @@ options:
           - Define the state of a container.
         required: false
         default: started
+        type: str
     target:
         description:
           - For cluster deployments. Will attempt to create a container on a target node.
@@ -88,6 +98,7 @@ options:
             starting or restarting.
         required: false
         default: 30
+        type: int
     wait_for_ipv4_addresses:
         description:
           - If this is true, the C(lxd_container) waits until IPv4 addresses
@@ -108,23 +119,27 @@ options:
           - The unix domain socket path or the https URL for the LXD server.
         required: false
         default: unix:/var/lib/lxd/unix.socket
+        type: str
     snap_url:
         description:
           - The unix domain socket path when LXD is installed by snap package manager.
         required: false
         default: unix:/var/snap/lxd/common/lxd/unix.socket
+        type: str
     client_key:
         description:
           - The client certificate key file path.
+          - If not specified, it defaults to C(${HOME}/.config/lxc/client.key).
         required: false
-        default: '"{}/.config/lxc/client.key" .format(os.environ["HOME"])'
         aliases: [ key_file ]
+        type: str
     client_cert:
         description:
           - The client certificate file path.
+          - If not specified, it defaults to C(${HOME}/.config/lxc/client.crt).
         required: false
-        default: '"{}/.config/lxc/client.crt" .format(os.environ["HOME"])'
         aliases: [ cert_file ]
+        type: str
     trust_password:
         description:
           - The client trusted password.
@@ -135,6 +150,7 @@ options:
           - If trust_password is set, this module send a request for
             authentication before sending any requests.
         required: false
+        type: str
 notes:
   - Containers must have a unique name. If you attempt to create a container
     with a name that already existed in the users namespace the module will
@@ -356,8 +372,12 @@ class LXDContainerManagement(object):
         self.addresses = None
         self.target = self.module.params['target']
 
-        self.key_file = self.module.params.get('client_key', None)
-        self.cert_file = self.module.params.get('client_cert', None)
+        self.key_file = self.module.params.get('client_key')
+        if self.key_file is None:
+            self.key_file = '{0}/.config/lxc/client.key'.format(os.environ['HOME'])
+        self.cert_file = self.module.params.get('client_cert')
+        if self.cert_file is None:
+            self.cert_file = '{0}/.config/lxc/client.crt'.format(os.environ['HOME'])
         self.debug = self.module._verbosity >= 4
 
         try:
@@ -671,12 +691,10 @@ def main():
             ),
             client_key=dict(
                 type='str',
-                default='{0}/.config/lxc/client.key'.format(os.environ['HOME']),
                 aliases=['key_file']
             ),
             client_cert=dict(
                 type='str',
-                default='{0}/.config/lxc/client.crt'.format(os.environ['HOME']),
                 aliases=['cert_file']
             ),
             trust_password=dict(type='str', no_log=True)

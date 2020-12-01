@@ -19,29 +19,36 @@ options:
     description:
      - Name of the host to be added to Stacki.
     required: True
+    type: str
   stacki_user:
     description:
      - Username for authenticating with Stacki API, but if not
        specified, the environment variable C(stacki_user) is used instead.
     required: True
+    type: str
   stacki_password:
     description:
      - Password for authenticating with Stacki API, but if not
        specified, the environment variable C(stacki_password) is used instead.
     required: True
+    type: str
   stacki_endpoint:
     description:
      - URL for the Stacki API Endpoint.
     required: True
+    type: str
   prim_intf_mac:
     description:
      - MAC Address for the primary PXE boot network interface.
+    type: str
   prim_intf_ip:
     description:
      - IP Address for the primary network interface.
+    type: str
   prim_intf:
     description:
      - Name of the primary network interface.
+    type: str
   force_install:
     description:
      - Set value to True to force node into install state if it already exists in stacki.
