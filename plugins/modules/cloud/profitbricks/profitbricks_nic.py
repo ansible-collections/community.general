@@ -140,7 +140,9 @@ def create_nic(module, profitbricks):
     datacenter = module.params.get('datacenter')
     server = module.params.get('server')
     lan = module.params.get('lan')
-    name = module.params.get('name', _make_default_name())
+    name = module.params.get('name')
+    if name is None:
+        name = _make_default_name()
     wait = module.params.get('wait')
     wait_timeout = module.params.get('wait_timeout')
 
@@ -190,6 +192,9 @@ def delete_nic(module, profitbricks):
     """
     datacenter = module.params.get('datacenter')
     server = module.params.get('server')
+    name = module.params.get('name')
+    if name is None:
+        name = _make_default_name()
     name = module.params.get('name', _make_default_name())
 
     # Locate UUID for Datacenter

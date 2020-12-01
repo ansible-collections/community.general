@@ -24,7 +24,7 @@ options:
   credentials_path:
     description:
       - (Path) Optional parameter that allows to set a non-default credentials path.
-      - If not specified it defaults to C(~/.spotinst/credentials).
+    default: ~/.spotinst/credentials
     type: path
 
   account_id:
@@ -1023,7 +1023,7 @@ def retrieve_group_instances(client, module, group_id):
                 healthy_instances = client.get_instance_healthiness(group_id=group_id)
 
                 for healthy_instance in healthy_instances:
-                    if(healthy_instance.get('healthStatus') == 'HEALTHY'):
+                    if healthy_instance.get('healthStatus') == 'HEALTHY':
                         amount_of_fulfilled_instances += 1
                         instances.append(healthy_instance)
 
@@ -1432,7 +1432,7 @@ def main():
         availability_zones=dict(type='list', required=True),
         block_device_mappings=dict(type='list'),
         chef=dict(type='dict'),
-        credentials_path=dict(type='path'),
+        credentials_path=dict(type='path', default="~/.spotinst/credentials"),
         do_not_update=dict(default=[], type='list'),
         down_scaling_policies=dict(type='list'),
         draining_timeout=dict(type='int'),
@@ -1501,8 +1501,7 @@ def main():
     # Retrieve creds file variables
     creds_file_loaded_vars = dict()
 
-    credentials_path = module.params.get('credentials_path',
-                                         os.path.join(os.environ['HOME'], '.spotinst', 'credentials'))
+    credentials_path = module.params.get('credentials_path')
 
     try:
         with open(credentials_path, "r") as creds:

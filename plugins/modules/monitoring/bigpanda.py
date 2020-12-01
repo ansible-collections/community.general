@@ -168,7 +168,7 @@ def main():
         v = module.params[k]
         if v is not None:
             body[k] = v
-    if not body.get('hosts'):
+    if body.get('hosts') is None:
         body['hosts'] = [socket.gethostname()]
 
     if not isinstance(body['hosts'], list):

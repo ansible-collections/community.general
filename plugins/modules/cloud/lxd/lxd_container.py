@@ -372,8 +372,12 @@ class LXDContainerManagement(object):
         self.addresses = None
         self.target = self.module.params['target']
 
-        self.key_file = self.module.params.get('client_key', '{0}/.config/lxc/client.key'.format(os.environ['HOME']))
-        self.cert_file = self.module.params.get('client_cert', '{0}/.config/lxc/client.crt'.format(os.environ['HOME']))
+        self.key_file = self.module.params.get('client_key')
+        if self.key_file is None:
+            self.key_file = '{0}/.config/lxc/client.key'.format(os.environ['HOME'])
+        self.cert_file = self.module.params.get('client_cert')
+        if self.cert_file is None:
+            self.cert_file = '{0}/.config/lxc/client.crt'.format(os.environ['HOME'])
         self.debug = self.module._verbosity >= 4
 
         try:
