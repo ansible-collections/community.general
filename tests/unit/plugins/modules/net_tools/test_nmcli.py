@@ -198,6 +198,7 @@ TESTCASE_BRIDGE_SLAVE_SHOW_OUTPUT = """\
 connection.id:                          non_existent_nw_device
 connection.interface-name:              br0_non_existant
 connection.autoconnect:                 yes
+ipv4.never-default:                     no
 bridge-port.path-cost:                  100
 bridge-port.hairpin-mode:               yes
 bridge-port.priority:                   32
