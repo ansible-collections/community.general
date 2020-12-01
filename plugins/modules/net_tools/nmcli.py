@@ -82,19 +82,19 @@ options:
             - Use the format '192.0.3.0/24 192.0.2.1'
         type: list
         elements: str
-        version_added: 1.3.0
+        version_added: 1.4.0
     route_metric4:
         description:
             - Set metric level of ipv4 routes configured on interface.
         type: int
-        version_added: 1.3.0
+        version_added: 1.4.0
     never_default4:
         description:
             - Set as default route.
             - This parameter is mutually_exclusive with gw4 parameter.
         type: bool
         default: no
-        version_added: 1.3.0
+        version_added: 1.4.0
     dns4:
         description:
             - A list of up to 3 dns servers.
