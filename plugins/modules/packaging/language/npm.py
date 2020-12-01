@@ -76,6 +76,12 @@ options:
     type: str
     default: present
     choices: [ "present", "absent", "latest" ]
+  no_optional:
+    description:
+      - Use the C(--no-optional) flag when installing.
+    type: bool
+    default: no
+    version_added: 2.0.0
 requirements:
     - npm installed in bin path (recommended /usr/local/bin)
 '''
@@ -144,6 +150,7 @@ class Npm(object):
         self.ignore_scripts = kwargs['ignore_scripts']
         self.unsafe_perm = kwargs['unsafe_perm']
         self.state = kwargs['state']
+        self.no_optional = kwargs['no_optional']
 
         if kwargs['executable']:
             self.executable = kwargs['executable'].split(' ')
@@ -172,6 +179,8 @@ class Npm(object):
             if self.registry:
                 cmd.append('--registry')
                 cmd.append(self.registry)
+            if self.no_optional:
+                cmd.append('--no-optional')
 
             # If path is specified, cd into that path and run the command.
             cwd = None
@@ -245,6 +254,7 @@ def main():
         ignore_scripts=dict(default=False, type='bool'),
         unsafe_perm=dict(default=False, type='bool'),
         ci=dict(default=False, type='bool'),
+        no_optional=dict(default=False, type='bool'),
     )
     arg_spec['global'] = dict(default=False, type='bool')
     module = AnsibleModule(
@@ -263,6 +273,7 @@ def main():
     ignore_scripts = module.params['ignore_scripts']
     unsafe_perm = module.params['unsafe_perm']
     ci = module.params['ci']
+    no_optional = module.params['no_optional']
 
     if not path and not glbl:
         module.fail_json(msg='path must be specified when not using global')
@@ -271,7 +282,7 @@ def main():
 
     npm = Npm(module, name=name, path=path, version=version, glbl=glbl, production=production,
               executable=executable, registry=registry, ignore_scripts=ignore_scripts,
-              unsafe_perm=unsafe_perm, state=state)
+              unsafe_perm=unsafe_perm, state=state, no_optional=no_optional)
 
     changed = False
     if ci:
