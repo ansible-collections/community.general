@@ -76,6 +76,12 @@ options:
     type: str
     default: present
     choices: [ "present", "absent", "latest" ]
+  no_optional:
+    description:
+      - Use the C(--no-optional) flag when installing.
+    type: bool
+    default: no
+    version_added: 2.0.0
 requirements:
     - npm installed in bin path (recommended /usr/local/bin)
 '''
@@ -172,6 +178,8 @@ class Npm(object):
             if self.registry:
                 cmd.append('--registry')
                 cmd.append(self.registry)
+            if self.no_optional:
+                cmd.append('--no-optional')
 
             # If path is specified, cd into that path and run the command.
             cwd = None
@@ -263,6 +271,7 @@ def main():
     ignore_scripts = module.params['ignore_scripts']
     unsafe_perm = module.params['unsafe_perm']
     ci = module.params['ci']
+    no_optional = module.params['no_optional']
 
     if not path and not glbl:
         module.fail_json(msg='path must be specified when not using global')
