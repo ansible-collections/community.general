@@ -17,13 +17,16 @@ options:
     description:
       - The datacenter in which to operate.
     type: str
+    required: true
   server:
     description:
       - The server name or ID.
     type: str
+    required: true
   name:
     description:
       - The name or ID of the NIC. This is only required on deletes, but not on create.
+      - If not specified, it defaults to a value based on UUID4.
     type: str
   lan:
     description:
@@ -33,12 +36,12 @@ options:
     description:
       - The ProfitBricks username. Overrides the PB_SUBSCRIPTION_ID environment variable.
     type: str
-    required: false
+    required: true
   subscription_password:
     description:
       - THe ProfitBricks password. Overrides the PB_PASSWORD environment variable.
     type: str
-    required: false
+    required: true
   wait:
     description:
       - wait for the operation to complete before returning
@@ -97,6 +100,10 @@ uuid_match = re.compile(
     r'[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}', re.I)
 
 
+def _make_default_name():
+    return str(uuid.uuid4()).replace('-', '')[:10]
+
+
 def _wait_for_completion(profitbricks, promise, wait_timeout, msg):
     if not promise:
         return
@@ -134,6 +141,8 @@ def create_nic(module, profitbricks):
     server = module.params.get('server')
     lan = module.params.get('lan')
     name = module.params.get('name')
+    if name is None:
+        name = _make_default_name()
     wait = module.params.get('wait')
     wait_timeout = module.params.get('wait_timeout')
 
@@ -184,6 +193,8 @@ def delete_nic(module, profitbricks):
     datacenter = module.params.get('datacenter')
     server = module.params.get('server')
     name = module.params.get('name')
+    if name is None:
+        name = _make_default_name()
 
     # Locate UUID for Datacenter
     if not (uuid_match.match(datacenter)):
@@ -230,29 +241,24 @@ def delete_nic(module, profitbricks):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            datacenter=dict(),
-            server=dict(),
-            name=dict(default=str(uuid.uuid4()).replace('-', '')[:10]),  # @FIXME please do not do that
+            datacenter=dict(required=True),
+            server=dict(required=True),
+            name=dict(),
             lan=dict(),
-            subscription_user=dict(),
-            subscription_password=dict(no_log=True),
+            subscription_user=dict(required=True),
+            subscription_password=dict(required=True, no_log=True),
             wait=dict(type='bool', default=True),
             wait_timeout=dict(type='int', default=600),
             state=dict(default='present'),
+        ),
+        required_if=(
+            ('state', 'absent', ['name']),
+            ('state', 'present', ['lan']),
         )
     )
 
     if not HAS_PB_SDK:
         module.fail_json(msg='profitbricks required for this module')
-
-    if not module.params.get('subscription_user'):   # @ FIXME use required in argument_spec, same for lines below
-        module.fail_json(msg='subscription_user parameter is required')
-    if not module.params.get('subscription_password'):
-        module.fail_json(msg='subscription_password parameter is required')
-    if not module.params.get('datacenter'):
-        module.fail_json(msg='datacenter parameter is required')
-    if not module.params.get('server'):
-        module.fail_json(msg='server parameter is required')
 
     subscription_user = module.params.get('subscription_user')
     subscription_password = module.params.get('subscription_password')
@@ -264,9 +270,6 @@ def main():
     state = module.params.get('state')
 
     if state == 'absent':
-        if not module.params.get('name'):
-            module.fail_json(msg='name parameter is required')
-
         try:
             (changed) = delete_nic(module, profitbricks)
             module.exit_json(changed=changed)
@@ -274,9 +277,6 @@ def main():
             module.fail_json(msg='failed to set nic state: %s' % str(e))
 
     elif state == 'present':
-        if not module.params.get('lan'):
-            module.fail_json(msg='lan parameter is required')
-
         try:
             (nic_dict) = create_nic(module, profitbricks)
             module.exit_json(nics=nic_dict)  # @FIXME changed not calculated?
