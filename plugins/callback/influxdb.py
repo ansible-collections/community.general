@@ -17,7 +17,7 @@ DOCUMENTATION = '''
     options:
       influxdb_addr:
         required: False
-        description: InfluxDB address in the form FQDN, FQDN:PORT, IP, or IP:PORT
+        description: "InfluxDB address in the form FQDN, FQDN:PORT, IP, or IP:PORT."
         env:
           - name: INFLUXDB_ADDR
         ini:
@@ -25,7 +25,7 @@ DOCUMENTATION = '''
             key: influxdb_addr
       influxdb_db:
         required: False
-        description: InfluxDB database name
+        description: InfluxDB database name.
         env:
           - name: INFLUXDB_DB
         ini:
@@ -33,7 +33,7 @@ DOCUMENTATION = '''
             key: influxdb_db
       influxdb_username:
         required: False
-        description: InfluxDB database username name
+        description: InfluxDB database user name.
         env:
           - name: INFLUXDB_USERNAME
         ini:
@@ -41,7 +41,7 @@ DOCUMENTATION = '''
             key: influxdb_username
       influxdb_password:
         required: False
-        description: InfluxDB database password
+        description: InfluxDB database password.
         env:
           - name: INFLUXDB_PASSWORD
         ini:
@@ -49,7 +49,7 @@ DOCUMENTATION = '''
             key: influxdb_password
       influxdb_tls:
         required: False
-        description: use TLS to connect to InfluxDB. (HTTPS)
+        description: Use TLS to connect to InfluxDB (HTTPS).
         env:
           - name: INFLUXDB_TLS
         ini:
@@ -59,7 +59,7 @@ DOCUMENTATION = '''
         type: bool
       influxdb_validate_cert:
         required: False
-        description: validate the TLS certificate of the InfluxDB server. (For HTTPS URLs)
+        description: Validate the TLS certificate of the InfluxDB server (for HTTPS URLs).
         env:
           - name: INFLUXDB_VALIDATE_CERT
         ini:
