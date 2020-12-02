@@ -36,6 +36,7 @@ requirements:
 - yum-versionlock
 author:
     - Florian Paul Hoberg (@florianpaulhoberg)
+    - Amin Vakil (@aminvakil)
 '''
 
 EXAMPLES = r'''
