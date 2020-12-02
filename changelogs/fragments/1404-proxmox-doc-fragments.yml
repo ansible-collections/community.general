@@ -1,0 +1,4 @@
+minor_changes:
+  - proxmox - improve and extract more common documentation (https://github.com/ansible-collections/community.general/pull/1404).
+  - proxmox_kvm - improve and extract more common documentation (https://github.com/ansible-collections/community.general/pull/1404).
+  - proxmox_template - improve documentation (https://github.com/ansible-collections/community.general/pull/1404).
