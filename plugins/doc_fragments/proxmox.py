@@ -43,3 +43,22 @@ options:
     default: no
 requirements: [ "proxmoxer", "requests" ]
 '''
+
+    SELECTION = r'''
+options:
+  vmid:
+    description:
+      - Specifies the instance ID.
+      - If not set the next available ID will be fetched from ProxmoxAPI.
+    type: int
+  node:
+    description:
+      - Proxmox VE node on which to operate.
+      - Only required for I(state=present).
+      - For every other states it will be autodiscovered.
+    type: str
+  pool:
+    description:
+      - Add the new VM to the specified pool.
+    type: str
+'''
