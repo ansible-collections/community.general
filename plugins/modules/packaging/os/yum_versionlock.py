@@ -11,7 +11,7 @@ DOCUMENTATION = r'''
 ---
 module: yum_versionlock
 version_added: 2.0.0
-short_description: Locks / Unlocks an installed package(s) from being updated by yum package manager.
+short_description: Locks / unlocks a installed package(s) from being updated by yum package manager
 description:
      - This module adds installed packages to yum versionlock to prevent the package from being updated.
 options:
