@@ -118,6 +118,7 @@ options:
   features:
     description:
       - Specifies a list of features to be enabled. For valid options, see U(https://pve.proxmox.com/wiki/Linux_Container#pct_options).
+      - Some features can only be turned on privileged or unprivileged containers.
     type: list
     elements: str
     version_added: 2.0.0
