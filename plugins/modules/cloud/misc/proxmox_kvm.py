@@ -32,31 +32,6 @@ options:
       - Pass arbitrary arguments to kvm.
       - This option is for experts only!
     type: str
-  api_host:
-    description:
-      - Specify the target host of the Proxmox VE cluster.
-    type: str
-    required: true
-  api_user:
-    description:
-      - Specify the user to authenticate with.
-    type: str
-    required: true
-  api_password:
-    description:
-      - Specify the password to authenticate with.
-      - You can use C(PROXMOX_PASSWORD) environment variable.
-    type: str
-  api_token_id:
-    description:
-      - Specify the token ID.
-    type: str
-    version_added: 1.3.0
-  api_token_secret:
-    description:
-      - Specify the token secret.
-    type: str
-    version_added: 1.3.0
   autostart:
     description:
       - Specify if the VM should be automatically restarted after crash (currently ignored in PVE API).
@@ -301,12 +276,6 @@ options:
       - VMID for the clone. Used only with clone.
       - If newid is not set, the next available VM ID will be fetched from ProxmoxAPI.
     type: int
-  node:
-    description:
-      - Proxmox VE node, where the new VM will be created.
-      - Only required for C(state=present).
-      - For other states, it will be autodiscovered.
-    type: str
   numa:
     description:
       - A hash/dictionaries of NUMA topology. C(numa='{"key":"value", "key":"value"}').
@@ -343,10 +312,6 @@ options:
       - Keys allowed are - (parallel[n]) where 0 ≤ n ≤ 2.
       - Values allowed are - C("/dev/parport\d+|/dev/usb/lp\d+").
     type: dict
-  pool:
-    description:
-      - Add the new VM to the specified pool.
-    type: str
   protection:
     description:
       - Enable/disable the protection flag of the VM. This will enable/disable the remove VM and remove disk operations.
@@ -486,11 +451,6 @@ options:
       - Update of C(pool) is disabled. It needs an additional API endpoint not covered by this module.
     type: bool
     default: 'no'
-  validate_certs:
-    description:
-      - If C(no), SSL certificates will not be validated. This should only be used on personally controlled sites using self-signed certificates.
-    type: bool
-    default: 'no'
   vcpus:
     description:
       - Sets number of hotplugged vcpus.
@@ -512,11 +472,6 @@ options:
       - C(size) is the size of the disk in GB.
       - C(format) is the drive's backing file's data format. C(qcow2|raw|subvol).
     type: dict
-  vmid:
-    description:
-      - Specifies the VM ID. Instead use I(name) parameter.
-      - If vmid is not set, the next available VM ID will be fetched from ProxmoxAPI.
-    type: int
   watchdog:
     description:
       - Creates a virtual hardware watchdog device.
@@ -539,8 +494,9 @@ options:
       - compatibility
       - no_defaults
     version_added: "1.3.0"
-
-requirements: [ "proxmoxer", "requests" ]
+extends_documentation_fragment:
+  - community.general.proxmox.documentation
+  - community.general.proxmox.selection
 '''
 
 EXAMPLES = '''
