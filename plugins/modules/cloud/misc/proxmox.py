@@ -14,52 +14,6 @@ description:
   - Starting in Ansible 2.1, it automatically detects containerization type (lxc for PVE 4, openvz for older)
   - From community.general 4.0.0 on, there will be no default values, see I(proxmox_default_behavior).
 options:
-  api_host:
-    description:
-      - the host of the Proxmox VE cluster
-    type: str
-    required: true
-  api_user:
-    description:
-      - the user to authenticate with
-    type: str
-    required: true
-  api_password:
-    description:
-      - the password to authenticate with
-      - you can use PROXMOX_PASSWORD environment variable
-    type: str
-  api_token_id:
-    description:
-      - Specify the token ID.
-    type: str
-    version_added: 1.3.0
-  api_token_secret:
-    description:
-      - Specify the token secret.
-    type: str
-    version_added: 1.3.0
-  vmid:
-    description:
-      - the instance id
-      - if not set, the next available VM ID will be fetched from ProxmoxAPI.
-      - if not set, will be fetched from PromoxAPI based on the hostname
-    type: str
-  validate_certs:
-    description:
-      - enable / disable https certificate verification
-    type: bool
-    default: 'no'
-  node:
-    description:
-      - Proxmox VE node, when new VM will be created
-      - required only for C(state=present)
-      - for another states will be autodiscovered
-    type: str
-  pool:
-    description:
-      - Proxmox VE resource pool
-    type: str
   password:
     description:
       - the instance root password
@@ -205,11 +159,10 @@ options:
       - compatibility
       - no_defaults
     version_added: "1.3.0"
-
-notes:
-  - Requires proxmoxer and requests modules on host. This modules can be installed with pip.
-requirements: [ "proxmoxer", "python >= 2.7", "requests" ]
 author: Sergei Antipov (@UnderGreen)
+extends_documentation_fragment:
+  - community.general.proxmox.documentation
+  - community.general.proxmox.selection
 '''
 
 EXAMPLES = r'''
@@ -510,7 +463,7 @@ def main():
             api_token_id=dict(no_log=True),
             api_token_secret=dict(no_log=True),
             api_user=dict(required=True),
-            vmid=dict(required=False),
+            vmid=dict(type='int', required=False),
             validate_certs=dict(type='bool', default=False),
             node=dict(),
             pool=dict(),
