@@ -16,7 +16,6 @@ DOCUMENTATION = '''
         - This callback captures the total play duration and submits it to InfluxDB.
     options:
       influxdb_addr:
-        required: False
         description: "InfluxDB address in the form FQDN, FQDN:PORT, IP, or IP:PORT."
         env:
           - name: INFLUXDB_ADDR
@@ -24,7 +23,6 @@ DOCUMENTATION = '''
           - section: callback_influxdb
             key: influxdb_addr
       influxdb_db:
-        required: False
         description: InfluxDB database name.
         env:
           - name: INFLUXDB_DB
@@ -32,7 +30,6 @@ DOCUMENTATION = '''
           - section: callback_influxdb
             key: influxdb_db
       influxdb_username:
-        required: False
         description: InfluxDB database user name.
         env:
           - name: INFLUXDB_USERNAME
@@ -40,7 +37,6 @@ DOCUMENTATION = '''
           - section: callback_influxdb
             key: influxdb_username
       influxdb_password:
-        required: False
         description: InfluxDB database password.
         env:
           - name: INFLUXDB_PASSWORD
@@ -48,7 +44,6 @@ DOCUMENTATION = '''
           - section: callback_influxdb
             key: influxdb_password
       influxdb_tls:
-        required: False
         description: Use TLS to connect to InfluxDB (HTTPS).
         env:
           - name: INFLUXDB_TLS
@@ -58,7 +53,6 @@ DOCUMENTATION = '''
         default: True
         type: bool
       influxdb_validate_cert:
-        required: False
         description: Validate the TLS certificate of the InfluxDB server (for HTTPS URLs).
         env:
           - name: INFLUXDB_VALIDATE_CERT
@@ -67,8 +61,24 @@ DOCUMENTATION = '''
             key: influxdb_validate_cert
         default: True
         type: bool
-
 '''
+
+EXAMPLES = '''
+examples: >
+  To enable, add this to your ansible.cfg file in the defaults block
+    [defaults]
+    callback_whitelist = community.general.influxdb
+
+  Set the environment variable
+    export INFLUXDB_ADDR=localhost:8086 INFLUXDB_DB=test INFLUXDB_TLS=false
+
+  Set the ansible.cfg variable in the callback_influxdb block
+    [callback_influxdb]
+    INFLUXDB_ADDR = localhost:8086
+    INFLUXDB_DB = test 
+    INFLUXDB_TLS = false
+'''
+
 import os
 
 from ansible import context
