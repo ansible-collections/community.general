@@ -1,0 +1,21 @@
+- name: Create a test directory
+  file:
+    path: "{{ output_dir }}/test"
+    state: directory
+    mode: '0755'
+
+- name: Copy test files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ output_dir }}/test/{{ item }}"
+  loop:
+    - bar.txt
+    - empty.txt
+    - foo.txt
+
+- name: Create an archive in the destination directory
+  archive:
+    path: "{{ output_dir }}/test"
+    dest: "{{ output_dir }}/test/archive.zip"
+    format: zip
+  register: self_archive_result

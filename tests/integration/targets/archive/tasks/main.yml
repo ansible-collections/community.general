@@ -369,3 +369,4 @@
 
 - name: import remove tests
   import_tasks: remove.yml
+- import_tasks: self.yml

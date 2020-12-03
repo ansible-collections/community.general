@@ -1,0 +1,4 @@
+bugfixes:
+  - >
+    archive - properly compare source and destination files to avoid adding
+    the archive to itself (https://github.com/ansible-collections/community.general/issues/1420)
