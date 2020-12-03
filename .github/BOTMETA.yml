@@ -798,8 +798,6 @@ files:
     maintainers: $team_aix
     labels: aix
     keywords: aix efix lpar wpar
-  $modules/system/aix_lvol.py:
-    maintainers: adejoux
   $modules/system/alternatives.py:
     maintainers: mulby
     labels: alternatives
