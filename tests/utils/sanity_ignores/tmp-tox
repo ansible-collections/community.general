@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+basedir=${0%/*}
+
+tox_file=${basedir}/tox.ini
+
+export PATH CHDIR
+PATH=${basedir}:$PATH
+CHDIR=$(pwd)
+
+exec tox -c "$tox_file" --workdir "$(pwd)/.tox" "$@"
+

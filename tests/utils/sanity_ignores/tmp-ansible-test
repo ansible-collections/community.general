@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+self=${0##.*/}
+
+
+msg() {
+  echo "$@" >&2
+}
+
+die() {
+  msg "$@"
+  exit 1
+}
+
+usage() {
+  [[ -n "$1" ]] && msg "$@"
+  cat >&2 <<EOM
+usage: $self [-keep] [<namespace> <collection>] [ansible-test-options]
+EOM
+  exit 1
+}
+
+keep=""
+[[ "$1" == "-keep" ]] && {
+  keep=1
+  shift
+}
+if [[ -r galaxy.yml ]]; then
+  namespace=$(cat galaxy.yml | grep '^namespace:' | awk -F': ' '{ print $2 }')
+  collection=$(cat galaxy.yml | grep '^name:' | awk -F': ' '{ print $2 }')
+else
+  namespace="$1"
+  collection="$2"
+  shift 2
+fi
+[[ -z "$namespace" || -z "$collection" ]] && usage
+
+top_dir=$(mktemp -d /tmp/dev.XXXXX)
+msg top_dir=$top_dir
+collections_dir=$top_dir/ansible_collections
+export COLLECTIONS_PATH=$top_dir:$COLLECTIONS_PATH
+
+coll_dir=$top_dir/ansible_collections/$namespace/$collection
+msg coll_dir=$coll_dir
+
+mkdir -p $coll_dir
+cp -pr * $coll_dir/
+
+cd $coll_dir
+ansible-test "$@"
+rc=$?
+
+[[ -z "$keep" ]] && {
+  msg -e "\nDeleting $top_dir"
+  rm -rf $top_dir
+}
+echo ""
+echo ""
+
+exit $rc
+

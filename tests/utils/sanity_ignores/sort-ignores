@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+sortit() {
+  awk '{ print $2 }' | sort | uniq -c | sort -rn
+}
+
+if [[ -n "$1" ]]; then
+  cat "$@" | sortit
+else
+  sortit
+fi
