@@ -382,7 +382,6 @@ plugins/modules/system/gconftool2.py pylint:blacklisted-name
 plugins/modules/system/interfaces_file.py pylint:blacklisted-name
 plugins/modules/system/iptables_state.py validate-modules:undocumented-parameter
 plugins/modules/system/java_cert.py pylint:blacklisted-name
-plugins/modules/system/launchd.py use-argspec-type-path  # False positive
 plugins/modules/system/lvg.py pylint:blacklisted-name
 plugins/modules/system/lvol.py pylint:blacklisted-name
 plugins/modules/system/parted.py pylint:blacklisted-name

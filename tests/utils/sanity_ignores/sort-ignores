@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 sortit() {
   awk '{ print $2 }' | sort | uniq -c | sort -rn
