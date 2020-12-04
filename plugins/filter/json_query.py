@@ -35,6 +35,9 @@ def json_query(data, expr):
         raise AnsibleError('You need to install "jmespath" prior to running '
                            'json_query filter')
 
+    # Hack to handle Ansible String Types
+    # See issue: https://github.com/ansible-collections/community.general/issues/320
+    jmespath.functions.REVERSE_TYPES_MAP['string'] = jmespath.functions.REVERSE_TYPES_MAP['string'] + ('AnsibleUnicode', 'AnsibleUnsafeText', )
     try:
         return jmespath.search(expr, data)
     except jmespath.exceptions.JMESPathError as e:
