@@ -32,7 +32,7 @@ def lists_mergeby(l1, l2, index):
     for l in (l1, l2):
         for elem in l:
             if not isinstance(elem, Mapping):
-                        raise AnsibleFilterError('Elements of list arguments for lists_mergeby must be dictionaries. Found {0!r}.'.format(elem))
+                raise AnsibleFilterError('Elements of list arguments for lists_mergeby must be dictionaries. Found {0!r}.'.format(elem))
             if index in elem.keys():
                 d[elem[index]].update(elem)
     if d.values():
