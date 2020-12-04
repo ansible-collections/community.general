@@ -7,6 +7,7 @@ __metaclass__ = type
 
 from ansible.errors import AnsibleError, AnsibleFilterError
 from ansible.module_utils.six import string_types
+from ansible.module_utils.common._collections_compat import Mapping, Sequence
 from collections import defaultdict
 from operator import itemgetter
 
