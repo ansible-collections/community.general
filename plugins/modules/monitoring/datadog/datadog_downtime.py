@@ -12,9 +12,10 @@ DOCUMENTATION = """
 ---
 module: datadog_downtime
 short_description: Manages Datadog downtimes
+version_added: 2.0.0
 description:
   - Manages downtimes within Datadog.
-  - Options as described on https://docs.datadoghq.com/api/.
+  - Options as described on U(https://docs.datadoghq.com/api/v1/downtimes/s).
 author:
   - Datadog (@Datadog)
 requirements: [datadog-api-client]
@@ -38,8 +39,8 @@ options:
         type: str
     state:
         description:
-          - The designated state of the monitor.
-        required: true
+          - The designated state of the downtime.
+        required: false
         choices: ["present", "absent"]
         default: present
         type: str
@@ -69,7 +70,6 @@ options:
         description:
           - A message to include with notifications for this downtime.
           - Email notifications can be sent to specific users by using the same "@username" notation as events.
-          - Monitor message template variables can be accessed by using double square brackets, i.e "[[" and "]]".
         type: str
     start:
         type: int
@@ -87,7 +87,7 @@ options:
         description:
           - The C(RRULE) standard for defining recurring events.
           - For example, to have a recurring event on the first day of each month,
-          - select a type of rrule and set the C(FREQ) to C(MONTHLY) and C(BYMONTHDAY) to C(1).
+            select a type of rrule and set the C(FREQ) to C(MONTHLY) and C(BYMONTHDAY) to C(1).
           - Most common rrule options from the iCalendar Spec are supported.
           - Attributes specifying the duration in C(RRULE) are not supported (e.g. C(DTSTART), C(DTEND), C(DURATION)).
         type: str
@@ -106,7 +106,10 @@ EXAMPLES = """
       # Lookup the id in the file and ignore errors if the file doesn't exits, so downtime gets created
       id: "{{ lookup('file', inventory_hostname +'_downtime_id.txt', errors='ignore') }}"
   - name: Save downtime id to file for later updates and idempotence
-    local_action: copy content="{{ downtime_var.downtime.id }}" dest={{ inventory_hostname +'_downtime_id.txt' }}
+    delegate_to: localhost
+    copy:
+      content: "{{ downtime.downtime.id }}"
+      dest: "{{ inventory_hostname +'_downtime_id.txt' }}"
 """
 
 RETURN = """
@@ -164,7 +167,7 @@ def main():
             api_key=dict(required=True, no_log=True),
             api_host=dict(required=False, default="https://api.datadoghq.com"),
             app_key=dict(required=True, no_log=True),
-            state=dict(required=True, choices=["present", "absent"], default="present"),
+            state=dict(required=False, choices=["present", "absent"], default="present"),
             monitor_tags=dict(required=False, type="list", elements="str"),
             scope=dict(required=False, type="list", elements="str"),
             monitor_id=dict(required=False, type="int"),
@@ -189,6 +192,9 @@ def main():
         }
     )
     with ApiClient(configuration) as api_client:
+        api_client.user_agent = "ansible_collection/community_general (module_name datadog_downtime) {0}".format(
+            api_client.user_agent
+        )
         api_instance = DowntimesApi(api_client)
 
         # Validate api and app keys
@@ -201,12 +207,6 @@ def main():
             schedule_downtime(module, api_client)
         elif module.params["state"] == "absent":
             cancel_downtime(module, api_client)
-
-
-def _fix_template_vars(message):
-    if message:
-        return message.replace("[[", "{{").replace("]]", "}}")
-    return message
 
 
 def _get_downtime(module, api_client):
@@ -252,8 +252,6 @@ def _post_downtime(module, api_client):
         module.exit_json(changed=True, downtime=resp.to_dict())
     except ApiException as e:
         module.fail_json(msg="Failed to create downtime: {0}".format(e))
-    except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
 
 def _equal_dicts(a, b, ignore_keys):
@@ -280,8 +278,6 @@ def _update_downtime(module, current_downtime, api_client):
             module.exit_json(changed=True, downtime=resp.to_dict())
     except ApiException as e:
         module.fail_json(msg="Failed to update downtime: {0}".format(e))
-    except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
 
 def schedule_downtime(module, api_client):
@@ -301,8 +297,6 @@ def cancel_downtime(module, api_client):
         api.cancel_downtime(downtime["id"])
     except ApiException as e:
         module.fail_json(msg="Failed to create downtime: {0}".format(e))
-    except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
     module.exit_json(changed=True)
 
