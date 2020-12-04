@@ -38,7 +38,7 @@ def lists_mergeby(l1, l2, index):
     if d.values():
         return sorted(d.values(), key=itemgetter(index))
     else:
-        return d.values()
+        return []
 
 
 class FilterModule(object):
