@@ -1,7 +1,7 @@
 ---
 minor_changes:
   - |
-    A new filter ``lists_mergeby`` to merge two lists by an attribute.
+    A new filter ``lists_mergeby`` to merge two lists of dictionaries by an attribute.
     For example:
 
     .. code-block:: yaml
