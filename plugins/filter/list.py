@@ -17,7 +17,7 @@ def lists_mergeby(l1, l2, index):
         - debug: msg="{{ l1|community.general.lists_mergeby(l2, 'index')|list }}" '''
 
     if not isinstance(l1, Sequence):
-        raise AnsibleFilterError('First argument for lists_mergeby must be list. %s is %s' %
+        raise AnsibleFilterError('First argument for community.general.lists_mergeby must be list. %s is %s' %
                                  (l1, type(l1)))
 
     if not isinstance(l2, Sequence):
