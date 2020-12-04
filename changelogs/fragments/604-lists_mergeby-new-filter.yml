@@ -1,0 +1,23 @@
+---
+minor_changes:
+  - |
+    A new filter ``lists_mergeby`` to merge two lists of dictionaries by an attribute.
+    For example:
+
+    .. code-block:: yaml
+
+        [{'n': 'n1', 'p1': 'A', 'p2': 'F'},
+         {'n': 'n2', 'p2': 'B'}] | community.general.lists_mergeby(
+        [{'n': 'n1', 'p1': 'C'},
+         {'n': 'n2', 'p2': 'D'},
+         {'n': 'n3', 'p3': 'E'}], 'n') | list
+
+    evaluates to
+
+    .. code-block:: yaml
+
+        [{'n': 'n1', 'p1': 'C', 'p2': 'F'},
+         {'n': 'n2', 'p2': 'D'},
+         {'n': 'n3', 'p3': 'E'}]
+
+    (https://github.com/ansible-collections/community.general/pull/604).
