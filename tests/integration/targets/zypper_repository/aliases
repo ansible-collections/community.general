@@ -5,3 +5,4 @@ skip/freebsd
 skip/osx
 skip/macos
 skip/rhel
+disabled  # FIXME
