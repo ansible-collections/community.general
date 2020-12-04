@@ -35,10 +35,7 @@ def lists_mergeby(l1, l2, index):
                 raise AnsibleFilterError('Elements of list arguments for lists_mergeby must be dictionaries. Found {0!r}.'.format(elem))
             if index in elem.keys():
                 d[elem[index]].update(elem)
-    if d.values():
-        return sorted(d.values(), key=itemgetter(index))
-    else:
-        return []
+    return sorted(d.values(), key=itemgetter(index))
 
 
 class FilterModule(object):
