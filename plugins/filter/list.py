@@ -21,7 +21,7 @@ def lists_mergeby(l1, l2, index):
                                  (l1, type(l1)))
 
     if not isinstance(l2, Sequence):
-        raise AnsibleFilterError('Second argument for lists_mergeby must be list. %s is %s' %
+        raise AnsibleFilterError('Second argument for community.general.lists_mergeby must be list. %s is %s' %
                                  (l2, type(l2)))
 
     if not isinstance(index, string_types):
