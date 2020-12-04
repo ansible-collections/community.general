@@ -25,7 +25,7 @@ def lists_mergeby(l1, l2, index):
                                  (l2, type(l2)))
 
     if not isinstance(index, string_types):
-        raise AnsibleFilterError('Third argument for lists_mergeby must be string. %s is %s' %
+        raise AnsibleFilterError('Third argument for community.general.lists_mergeby must be string. %s is %s' %
                                  (index, type(index)))
 
     d = defaultdict(dict)
