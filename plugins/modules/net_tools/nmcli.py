@@ -257,6 +257,12 @@ options:
        description:
             - This is used with IPIP/SIT - IPIP/SIT local IP address.
        type: str
+    zone:
+       description:
+            - The trust level of the connection.
+            - When updating this property on a currently activated connection, the change takes effect immediately.
+       type: str
+       version_added: 2.0.0
 '''
 
 EXAMPLES = r'''
@@ -538,6 +544,13 @@ EXAMPLES = r'''
       ip_tunnel_local: 192.168.1.2
       ip_tunnel_remote: 192.168.1.5
 
+  - name: Add zone
+    community.general.nmcli:
+      type: ethernet
+      conn_name: my-eth1
+      zone: external
+      state: present
+
 # nmcli exits with status 0 if it succeeds and exits with a status greater
 # than zero when there is a failure. The following list of status codes may be
 # returned:
@@ -633,6 +646,7 @@ class Nmcli(object):
         self.ip_tunnel_remote = module.params['ip_tunnel_remote']
         self.nmcli_bin = self.module.get_bin_path('nmcli', True)
         self.dhcp_client_id = module.params['dhcp_client_id']
+        self.zone = module.params['zone']
 
         if self.ip4:
             self.ipv4_method = 'manual'
@@ -659,6 +673,7 @@ class Nmcli(object):
         # Options common to multiple connection types.
         options = {
             'connection.autoconnect': self.autoconnect,
+            'connection.zone': self.zone,
         }
 
         # IP address options.
@@ -972,6 +987,7 @@ class Nmcli(object):
             'mac': self.mac_setting,
             'master': 'connection.master',
             'slave-type': 'connection.slave-type',
+            'zone': 'connection.zone',
         }
 
         changed = False
@@ -1077,6 +1093,7 @@ def main():
             # general usage
             mtu=dict(type='int'),
             mac=dict(type='str'),
+            zone=dict(type='str'),
             # bridge specific vars
             stp=dict(type='bool', default=True),
             priority=dict(type='int', default=128),

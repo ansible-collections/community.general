@@ -126,6 +126,31 @@ ipv6.dns-search:                        search6.redhat.com
 ipv6.method:                            auto
 """
 
+TESTCASE_GENERIC_ZONE = [
+    {
+        'type': 'generic',
+        'conn_name': 'non_existent_nw_device',
+        'ifname': 'generic_non_existant',
+        'ip4': '10.10.10.10/24',
+        'gw4': '10.10.10.1',
+        'state': 'present',
+        'zone': 'external',
+        '_ansible_check_mode': False,
+    }
+]
+
+TESTCASE_GENERIC_ZONE_SHOW_OUTPUT = """\
+connection.id:                          non_existent_nw_device
+connection.interface-name:              generic_non_existant
+connection.autoconnect:                 yes
+connection.zone:                        external
+ipv4.method:                            manual
+ipv4.addresses:                         10.10.10.10/24
+ipv4.gateway:                           10.10.10.1
+ipv4.never-default:                     no
+ipv6.method:                            auto
+"""
+
 TESTCASE_BOND = [
     {
         'type': 'bond',
@@ -400,6 +425,13 @@ def mocked_generic_connection_dns_search_unchanged(mocker):
 
 
 @pytest.fixture
+def mocked_generic_connection_zone_unchanged(mocker):
+    mocker_set(mocker,
+               connection_exists=True,
+               execute_return=(0, TESTCASE_GENERIC_ZONE_SHOW_OUTPUT, ""))
+
+
+@pytest.fixture
 def mocked_bond_connection_unchanged(mocker):
     mocker_set(mocker,
                connection_exists=True,
@@ -654,6 +686,74 @@ def test_generic_connection_dns_search_unchanged(mocked_generic_connection_dns_s
 def test_dns4_none(mocked_connection_exists, capfd):
     """
     Test if DNS4 param is None
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_ZONE, indirect=['patch_ansible_module'])
+def test_generic_connection_create_zone(mocked_generic_connection_create, capfd):
+    """
+    Test : Generic connection created with zone
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert 'connection.zone' in args[0]
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_ZONE, indirect=['patch_ansible_module'])
+def test_generic_connection_modify_zone(mocked_generic_connection_create, capfd):
+    """
+    Test : Generic connection modified with zone
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    assert nmcli.Nmcli.execute_command.call_count == 1
+    arg_list = nmcli.Nmcli.execute_command.call_args_list
+    args, kwargs = arg_list[0]
+
+    assert 'connection.zone' in args[0]
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_GENERIC_ZONE, indirect=['patch_ansible_module'])
+def test_generic_connection_zone_unchanged(mocked_generic_connection_zone_unchanged, capfd):
+    """
+    Test : Generic connection with zone unchanged
+    """
+    with pytest.raises(SystemExit):
+        nmcli.main()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert not results.get('failed')
+    assert not results['changed']
+
+
+@pytest.mark.parametrize('patch_ansible_module', TESTCASE_CONNECTION, indirect=['patch_ansible_module'])
+def test_zone_none(mocked_connection_exists, capfd):
+    """
+    Test if zone param is None
     """
     with pytest.raises(SystemExit):
         nmcli.main()
