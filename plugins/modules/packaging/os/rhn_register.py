@@ -49,6 +49,11 @@ options:
         description:
             - Supply an profilename for use with registration.
         type: str
+    force:
+        description:
+            - Force registration, even if system is already registered.
+        type: bool
+        default: no
     ca_cert:
         description:
             - Supply a custom ssl CA certificate file for use with registration.
@@ -114,6 +119,14 @@ EXAMPLES = r'''
     username: joe_user
     password: somepass
     channels: rhel-x86_64-server-6-foo-1,rhel-x86_64-server-6-bar-1
+
+- name: Force-register as user with password to ensure registration is current on server
+  community.general.rhn_register:
+    state: present
+    username: joe_user
+    password: somepass
+    server_url: https://xmlrpc.my.satellite/XMLRPC
+    force: yes
 '''
 
 RETURN = r'''
@@ -186,6 +199,9 @@ class Rhn(redhat.RegistrationBase):
             xml_data = fd.read()
             fd.close()
 
+            # These imports are here to avoid import issues where XML packages are missing
+            # pylint: disable=import-outside-toplevel
+
             # Ugh, xml parsing time ...
             # First, try parsing with libxml2 ...
             if systemid is None:
@@ -206,6 +222,8 @@ class Rhn(redhat.RegistrationBase):
                     root = etree.fromstring(xml_data)
                     systemid = root.xpath(xpath_str)[0].text
                 except ImportError:
+                    # not raising with 'from' keyword to keep python2.7 support
+                    # pylint: disable=raise-missing-from
                     raise Exception('"libxml2" or "lxml" is required for this module.')
 
             # Strip the 'ID-' prefix
@@ -346,6 +364,7 @@ def main():
             ca_cert=dict(type='path', aliases=['sslcacert']),
             systemorgid=dict(type='str'),
             enable_eus=dict(type='bool', default=False),
+            force=dict(type='bool', default=False),
             nopackages=dict(type='bool', default=False),
             channels=dict(type='list', elements='str', default=[]),
         ),
@@ -365,6 +384,7 @@ def main():
     password = module.params['password']
 
     state = module.params['state']
+    force = module.params['force']
     activationkey = module.params['activationkey']
     profilename = module.params['profilename']
     sslcacert = module.params['ca_cert']
@@ -395,7 +415,7 @@ def main():
             module.fail_json(msg="Missing arguments, If registering without an activationkey, must supply username or password")
 
         # Register system
-        if rhn.is_registered:
+        if rhn.is_registered and not force:
             module.exit_json(changed=False, msg="System already registered.")
 
         try:
