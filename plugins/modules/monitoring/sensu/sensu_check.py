@@ -74,8 +74,8 @@ options:
   handle:
     description:
       - Whether the check should be handled or not
+      - Default is C(false).
     type: bool
-    default: false
   subdue_begin:
     type: str
     description:
@@ -99,14 +99,14 @@ options:
     description:
       - Whether the check should be scheduled by the sensu client or server
       - This option obviates the need for specifying the I(subscribers) option
+      - Default is C(false).
     type: bool
-    default: 'no'
   publish:
     description:
       - Whether the check should be scheduled at all.
       - You can still issue it via the sensu api
+      - Default is C(false).
     type: bool
-    default: false
   occurrences:
     type: int
     description:
@@ -120,8 +120,8 @@ options:
     description:
       - Classifies the check as an aggregate check,
       - making it available via the aggregate API
+      - Default is C(false).
     type: bool
-    default: 'no'
   low_flap_threshold:
     type: int
     description:

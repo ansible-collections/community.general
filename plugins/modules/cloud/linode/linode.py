@@ -107,8 +107,8 @@ options:
   private_ip:
     description:
     - Add private IPv4 address when Linode is created.
+    - Default is C(false).
     type: bool
-    default: "no"
   ssh_pub_key:
     description:
      - SSH public key applied to root user
