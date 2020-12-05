@@ -18,6 +18,8 @@ DOCUMENTATION = r'''
         - Uses a YAML configuration file that ends with linode.(yml|yaml).
         - Linode labels are used by default as the hostnames.
         - The inventory groups are built from groups and not tags.
+    extends_documentation_fragment:
+        - constructed
     options:
         plugin:
             description: marks this as an instance of the 'linode' plugin
@@ -51,13 +53,27 @@ regions:
   - eu-west
 types:
   - g5-standard-2
+
+# Example with keyed_groups, groups, and compose
+plugin: community.general.linode
+access_token: foobar
+keyed_groups:
+  - key: tags
+    separator: ''
+  - key: region
+    prefix: region
+groups:
+  webservers: "'web' in (tags|list)"
+  mailservers: "'mail' in (tags|list)"
+compose:
+  ansible_port: 2222
 '''
 
 import os
 
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.six import string_types
-from ansible.plugins.inventory import BaseInventoryPlugin
+from ansible.plugins.inventory import BaseInventoryPlugin,Constructable
 
 
 try:
@@ -68,7 +84,7 @@ except ImportError:
     HAS_LINODE = False
 
 
-class InventoryModule(BaseInventoryPlugin):
+class InventoryModule(BaseInventoryPlugin,Constructable):
 
     NAME = 'community.general.linode'
 
@@ -203,9 +219,27 @@ class InventoryModule(BaseInventoryPlugin):
 
         self._get_instances_inventory()
 
+        self._strict=self.get_option('strict')
         regions, types = self._get_query_options(config_data)
         self._filter_by_config(regions, types)
 
         self._add_groups()
         self._add_instances_to_groups()
         self._add_hostvars_for_instances()
+        for instance in self.instances:
+            variables=self.inventory.get_host(instance,label).get_vars();
+            self._add_host_to_composed_groups(
+                    self.get_option('groups'),
+                    variables,
+                    instance.label,
+                    strict=self._strict)
+            self._add_host_to_keyed_groups(
+                    self.get_option('keyed_groups'),
+                    variables,
+                    instance.label,
+                    strict=self._strict)
+            self._set_composite_vars(
+                    self.get_option('compose'),
+                    variables,
+                    instance.label,
+                    strict=self._strict)
