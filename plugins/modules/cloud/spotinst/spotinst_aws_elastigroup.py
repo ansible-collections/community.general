@@ -478,6 +478,7 @@ options:
     description:
       - (Boolean) Whether or not the elastigroup creation / update actions should wait for the instances to spin
     type: bool
+    default: false
 
   wait_timeout:
     description:
