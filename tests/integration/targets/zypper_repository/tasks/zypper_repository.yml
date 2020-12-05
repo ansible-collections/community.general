@@ -120,8 +120,8 @@
 
 - name: "Test adding a repo with custom GPG key"
   community.general.zypper_repository:
-    name: "Apache_Modules"
-    repo: "http://download.opensuse.org/repositories/Apache:/Modules/openSUSE_Tumbleweed/"
+    name: "Apache_PHP_Modules"
+    repo: "http://download.opensuse.org/repositories/server:/php:/applications/openSUSE_Tumbleweed/"
     priority: 100
     auto_import_keys: true
     state: "present"
