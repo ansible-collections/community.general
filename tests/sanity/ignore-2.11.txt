@@ -491,6 +491,7 @@ plugins/modules/system/osx_defaults.py validate-modules:parameter-state-invalid-
 plugins/modules/system/parted.py pylint:blacklisted-name
 plugins/modules/system/parted.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/puppet.py use-argspec-type-path
+plugins/modules/system/puppet.py validate-modules:doc-default-does-not-match-spec  # show_diff is not documented
 plugins/modules/system/puppet.py validate-modules:parameter-invalid
 plugins/modules/system/puppet.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/puppet.py validate-modules:undocumented-parameter
