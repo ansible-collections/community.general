@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - add ``zone`` parameter (https://github.com/ansible-collections/community.general/issues/949, https://github.com/ansible-collections/community.general/pull/1426).
