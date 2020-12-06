@@ -16,7 +16,7 @@ short_description: Edit XFCE4 Configurations
 description:
   - This module allows for the manipulation of Xfce 4 Configuration via
     xfconf-query.  Please see the xfconf-query(1) man pages for more details.
-    Note: The setting of facts by this module is deprecated.
+    The setting of facts by this module is deprecated.
 options:
   channel:
     description:
@@ -189,6 +189,18 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
         self.update_xfconf_output(property=self.module.params['property'],
                                   channel=self.module.params['channel'],
                                   previous_value=None)
+
+        deprecation_messages = [
+            {
+                'msg': 'xfconf: Seeting of facts is deprecated. Please use return values going forwad.',
+                'version': '',
+            },
+            {
+                'msg': 'xfconf: The format of return values is deprecated and will change to a new format in a future version.',
+                'version': '',
+            },
+        ]
+        self.update_output(deprecations=deprecation_messages)
 
     def process_command_output(self, rc, out, err):
         if err.rstrip() == self.does_not:
