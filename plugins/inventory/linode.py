@@ -40,6 +40,14 @@ DOCUMENTATION = r'''
           default: []
           type: list
           required: false
+        strict:
+          version_added: 2.0.0
+        compose:
+          version_added: 2.0.0
+        groups:
+          version_added: 2.0.0
+        keyed_groups:
+          version_added: 2.0.0
 '''
 
 EXAMPLES = r'''
