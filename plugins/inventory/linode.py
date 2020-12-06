@@ -219,7 +219,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
         self._get_instances_inventory()
 
-        self._strict = self.get_option('strict')
+        strict = self.get_option('strict')
         regions, types = self._get_query_options(config_data)
         self._filter_by_config(regions, types)
 
@@ -232,14 +232,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 self.get_option('groups'),
                 variables,
                 instance.label,
-                strict=self._strict)
+                strict=strict)
             self._add_host_to_keyed_groups(
                 self.get_option('keyed_groups'),
                 variables,
                 instance.label,
-                strict=self._strict)
+                strict=strict)
             self._set_composite_vars(
                 self.get_option('compose'),
                 variables,
                 instance.label,
-                strict=self._strict)
+                strict=strict)
