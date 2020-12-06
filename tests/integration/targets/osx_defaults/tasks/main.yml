@@ -202,3 +202,46 @@
 - assert:
     that: "{{ item.changed }}"
   with_items: "{{ test_data_types.results }}"
+
+
+- name: Ensure test key does not exist
+  osx_defaults:
+    domain: com.ansible.fake_array_value
+    key: ExampleArrayKey
+    state: absent
+
+- name: add array value for the first time
+  osx_defaults:
+    domain: com.ansible.fake_array_value
+    key: ExampleArrayKey
+    value:
+      - 'Value with spaces'
+    type: array
+    array_add: yes
+  register: test_array_add
+
+- assert:
+    that: test_array_add.changed
+
+- name: add for the second time, should be skipped
+  osx_defaults:
+    domain: com.ansible.fake_array_value
+    key: ExampleArrayKey
+    value:
+      - 'Value with spaces'
+    type: array
+    array_add: yes
+  register: test_array_add
+
+- assert:
+    that: not test_array_add.changed
+
+- name: Clean up test key
+  osx_defaults:
+    domain: com.ansible.fake_array_value
+    key: ExampleArrayKey
+    state: absent
+  register: test_array_add
+
+- assert:
+    that: test_array_add.changed
