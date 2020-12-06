@@ -97,28 +97,26 @@ RETURN = '''
   value_type:
     description:
     - The type of the value that was changed (C(none) for C(get) and C(reset)
-      state). Either a single string value or a list of strings for array
+      state). Either a single string value or a list of strings for array.
+      Deprecated.
       types.
     returned: success
-    type: list
-    elements: str
+    type: string or list of strings
     sample: '"int" or ["str", "str", "str"]'
   value:
     description:
     - The value of the preference key after executing the module. Either a
-      single string value or a list of strings for array types.
+      single string value or a list of strings for array types. Deprecated.
     returned: success
-    type: list
-    elements: str
+    type: string or list of strings
     sample: '"192" or ["orange", "yellow", "violet"]'
   previous_value:
     description:
     - The value of the preference key before executing the module (C(none) for
       C(get) state). Either a single string value or a list of strings for array
-      types.
+      types. Deprecated.
     returned: success
-    type: list
-    elements: str
+    type: string or list of strings
     sample: '"96" or ["red", "blue", "green"]'
 '''
 
