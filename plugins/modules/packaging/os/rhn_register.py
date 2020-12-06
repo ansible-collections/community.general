@@ -200,7 +200,7 @@ class Rhn(redhat.RegistrationBase):
             fd.close()
 
             # These imports are here to avoid import issues where XML packages are missing
-            # pylint: disable=import-outside-toplevel
+            # pylint: disable=bad-option-value,import-outside-toplevel
 
             # Ugh, xml parsing time ...
             # First, try parsing with libxml2 ...
@@ -223,7 +223,7 @@ class Rhn(redhat.RegistrationBase):
                     systemid = root.xpath(xpath_str)[0].text
                 except ImportError:
                     # not raising with 'from' keyword to keep python2.7 support
-                    # pylint: disable=raise-missing-from
+                    # pylint: disable=bad-option-value,raise-missing-from
                     raise Exception('"libxml2" or "lxml" is required for this module.')
 
             # Strip the 'ID-' prefix
