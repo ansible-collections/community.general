@@ -98,8 +98,7 @@ RETURN = '''
   value_type:
     description:
     - The type of the value that was changed (C(none) for C(get) and C(reset)
-      state). Either a single string value or a list of strings for array.
-      Deprecated.
+      state). Either a single string value or a list of strings for array
       types.
     returned: success
     type: string or list of strings
@@ -107,7 +106,7 @@ RETURN = '''
   value:
     description:
     - The value of the preference key after executing the module. Either a
-      single string value or a list of strings for array types. Deprecated.
+      single string value or a list of strings for array types.
     returned: success
     type: string or list of strings
     sample: '"192" or ["orange", "yellow", "violet"]'
@@ -115,7 +114,7 @@ RETURN = '''
     description:
     - The value of the preference key before executing the module (C(none) for
       C(get) state). Either a single string value or a list of strings for array
-      types. Deprecated.
+      types.
     returned: success
     type: string or list of strings
     sample: '"96" or ["red", "blue", "green"]'
@@ -193,10 +192,6 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
         deprecation_messages = [
             {
                 'msg': 'xfconf: Seeting of facts is deprecated. Please use return values going forwad.',
-                'version': '',
-            },
-            {
-                'msg': 'xfconf: The format of return values is deprecated and will change to a new format in a future version.',
                 'version': '',
             },
         ]
