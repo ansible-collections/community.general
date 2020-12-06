@@ -1,4 +1,4 @@
 minor_changes:
-    - community.general.linode - add the standard keyed_groups, groups, and
-      compose options to the linode inventory plugin
+    - linode inventory plugin - add the standard ``keyed_groups``, ``groups``,
+      and ``compose`` options 
       (https://github.com/ansible-collections/community.general/issues/1326)
