@@ -230,7 +230,7 @@ class OSXDefaults(object):
         value.pop(-1)
 
         # Remove spaces at beginning and comma (,) at the end, unquote and unescape double quotes
-        value = [re.sub('^ *"?|"?,?$', '', x.replace('\\"', '"')) for x in value]
+        value = [re.sub('^ *"?|"?,? *$', '', x.replace('\\"', '"')) for x in value]
 
         return value
 
