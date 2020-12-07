@@ -116,7 +116,7 @@ class SplunkHTTPCollectorSource(object):
         data['uuid'] = result._task._uuid
         data['session'] = self.session
         data['status'] = state
-        data['timestamp'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S '
+        data['timestamp'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f '
                                                        '+0000')
         data['host'] = self.host
         data['ip_address'] = self.ip_address
