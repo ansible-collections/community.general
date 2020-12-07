@@ -1,0 +1,2 @@
+deprecated_features:
+- The ``gluster_heal_info``, ``gluster_peer`` and ``gluster_volume`` modules have migrated to the `gluster.gluster <https://galaxy.ansible.com/gluster/gluster>`_ collection. Ansible-base 2.10.1 adjusted the routing target to point to the modules in that collection, so we will remove these modules in community.general 3.0.0. If you use Ansible 2.9, or use FQCNs ``community.general.gluster_*`` in your playbooks and/or roles, please update them to use the modules from ``gluster.gluster`` instead.

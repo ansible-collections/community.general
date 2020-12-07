@@ -351,7 +351,13 @@ plugins/modules/source_control/github/github_webhook_info.py validate-modules:pa
 plugins/modules/source_control/hg.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/emc/emc_vnx_sg_member.py validate-modules:doc-missing-type
 plugins/modules/storage/emc/emc_vnx_sg_member.py validate-modules:parameter-type-not-in-doc
+plugins/modules/storage/glusterfs/gluster_heal_info.py validate-modules:deprecation-mismatch
+plugins/modules/storage/glusterfs/gluster_heal_info.py validate-modules:invalid-documentation
 plugins/modules/storage/glusterfs/gluster_heal_info.py validate-modules:parameter-type-not-in-doc
+plugins/modules/storage/glusterfs/gluster_peer.py validate-modules:deprecation-mismatch
+plugins/modules/storage/glusterfs/gluster_peer.py validate-modules:invalid-documentation
+plugins/modules/storage/glusterfs/gluster_volume.py validate-modules:deprecation-mismatch
+plugins/modules/storage/glusterfs/gluster_volume.py validate-modules:invalid-documentation
 plugins/modules/storage/glusterfs/gluster_volume.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/ibm/ibm_sa_domain.py validate-modules:doc-missing-type
 plugins/modules/storage/ibm/ibm_sa_host.py validate-modules:doc-missing-type
