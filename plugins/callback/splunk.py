@@ -67,6 +67,7 @@ DOCUMENTATION = '''
             key: include_milliseconds
         type: bool
         default: false
+        version_added: 2.0.0
 '''
 
 EXAMPLES = '''
