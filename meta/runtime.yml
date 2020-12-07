@@ -146,6 +146,18 @@ plugin_routing:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use community.general.github_webhook and community.general.github_webhook_info instead.
+    gluster_heal_info:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_heal_info instead.
+    gluster_peer:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_peer instead.
+    gluster_volume:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_volume instead.
     helm:
       deprecation:
         removal_version: 3.0.0
