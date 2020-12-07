@@ -18,7 +18,9 @@ description:
   - Options as described on U(https://docs.datadoghq.com/api/v1/downtimes/s).
 author:
   - Datadog (@Datadog)
-requirements: [datadog-api-client]
+requirements:
+  - datadog-api-client
+  - Python 3.6+
 options:
     api_key:
         description:
