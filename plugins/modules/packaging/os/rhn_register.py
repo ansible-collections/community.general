@@ -54,6 +54,7 @@ options:
             - Force registration, even if system is already registered.
         type: bool
         default: no
+        version_added: 2.0.0
     ca_cert:
         description:
             - Supply a custom ssl CA certificate file for use with registration.
