@@ -10,8 +10,13 @@ from ansible_collections.community.general.tests.unit.compat.mock import MagicMo
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import (
     AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 )
-from datadog_api_client.v1.model.downtime import Downtime
-from datadog_api_client.v1.model.downtime_recurrence import DowntimeRecurrence
+
+from pytest import importorskip
+
+# Skip this test if python 2 so datadog_api_client cannot be installed
+datadog_api_client = importorskip("datadog_api_client")
+Downtime = datadog_api_client.v1.model.downtime.Downtime
+DowntimeRecurrence = datadog_api_client.v1.model.downtime_recurrence.DowntimeRecurrence
 
 
 class TestDatadogDowntime(ModuleTestCase):

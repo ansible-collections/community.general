@@ -98,18 +98,19 @@ EXAMPLES = """
     register: downtime_var
     community.general.datadog_downtime:
       state: present
-      monitor_tags: ["foo:bar"]
+      monitor_tags:
+        - "foo:bar"
       downtime_message: "Downtime for foo:bar"
       scope: "test"
       api_key: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
       app_key: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
       # Lookup the id in the file and ignore errors if the file doesn't exits, so downtime gets created
-      id: "{{ lookup('file', inventory_hostname +'_downtime_id.txt', errors='ignore') }}"
+      id: "{{ lookup('file', inventory_hostname ~ '_downtime_id.txt', errors='ignore') }}"
   - name: Save downtime id to file for later updates and idempotence
     delegate_to: localhost
     copy:
       content: "{{ downtime.downtime.id }}"
-      dest: "{{ inventory_hostname +'_downtime_id.txt' }}"
+      dest: "{{ inventory_hostname ~ '_downtime_id.txt' }}"
 """
 
 RETURN = """

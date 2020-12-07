@@ -23,4 +23,4 @@ lxml
 semantic_version
 
 # requirement for datadog_downtime module
-datadog-api-client >= 1.0.0b3
+datadog-api-client >= 1.0.0b3 ; python_version >= '3.5'
