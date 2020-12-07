@@ -14,6 +14,10 @@ DOCUMENTATION = '''
 ---
 module: gluster_peer
 short_description: Attach/Detach peers to/from the cluster
+deprecated:
+    removed_in: 3.0.0
+    why: The gluster modules have migrated to the gluster.gluster collection.
+    alternative: Use M(gluster.gluster.gluster_peer) instead.
 description:
   - Create or diminish a GlusterFS trusted storage pool. A set of nodes can be
     added into an existing trusted storage pool or a new storage pool can be

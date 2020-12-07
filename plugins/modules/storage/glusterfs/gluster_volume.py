@@ -10,6 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: gluster_volume
 short_description: Manage GlusterFS volumes
+deprecated:
+    removed_in: 3.0.0
+    why: The gluster modules have migrated to the gluster.gluster collection.
+    alternative: Use M(gluster.gluster.gluster_volume) instead.
 description:
   - Create, remove, start, stop and tune GlusterFS volumes
 options:
