@@ -1,2 +1,2 @@
 minor_changes:
-  - splunk - splunk plugin now supports new parameter to add milliseconds to existing timestamp field
+  - splunk - splunk plugin now supports new parameter to add milliseconds to existing timestamp field (https://github.com/ansible-collections/community.general/pull/1462).
