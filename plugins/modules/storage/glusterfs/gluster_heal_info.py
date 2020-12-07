@@ -11,6 +11,10 @@ DOCUMENTATION = '''
 ---
 module: gluster_heal_info
 short_description: Gather information on self-heal or rebalance status
+deprecated:
+    removed_in: 3.0.0
+    why: The gluster modules have migrated to the gluster.gluster collection.
+    alternative: Use M(gluster.gluster.gluster_heal_info) instead.
 author: "Devyani Kota (@devyanikota)"
 description:
   - Gather facts about either self-heal or rebalance status.
