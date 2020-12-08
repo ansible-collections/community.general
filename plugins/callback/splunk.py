@@ -127,12 +127,13 @@ class SplunkHTTPCollectorSource(object):
         data['uuid'] = result._task._uuid
         data['session'] = self.session
         data['status'] = state
+        
         if include_milliseconds:
-            data['timestamp'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f '
-                                                       '+0000')
+            time_format = '%Y-%m-%d %H:%M:%S.%f +0000'
         else:
-            data['timestamp'] = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S '
-                                                       '+0000')
+            time_format = '%Y-%m-%d %H:%M:%S +0000'
+
+        data['timestamp'] = datetime.utcnow().strftime(time_format)
         data['host'] = self.host
         data['ip_address'] = self.ip_address
         data['user'] = self.user

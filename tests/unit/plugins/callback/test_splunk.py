@@ -23,6 +23,7 @@ from datetime import datetime
 
 import json
 
+
 class TestSplunkClient(unittest.TestCase):
     def setUp(self):
         self.splunk = SplunkHTTPCollectorSource()
@@ -32,29 +33,29 @@ class TestSplunkClient(unittest.TestCase):
         self.task_fields = {'args': {}}
         self.mock_host = Mock('MockHost')
         self.mock_host.name = 'myhost'
-      
+
     @patch('ansible_collections.community.general.plugins.callback.splunk.datetime')
     @patch('ansible_collections.community.general.plugins.callback.splunk.open_url')
     def test_timestamp_with_milliseconds(self, open_url_mock, mock_datetime):
-        mock_datetime.utcnow.return_value = datetime(2020,12,1)
-        result = TaskResult(host=self.mock_host,task=self.mock_task,return_data={},task_fields=self.task_fields) 
-        
+        mock_datetime.utcnow.return_value = datetime(2020, 12, 1)
+        result = TaskResult(host=self.mock_host, task=self.mock_task, return_data={}, task_fields=self.task_fields)
+
         self.splunk.send_event(url='endpoint', authtoken='token', validate_certs=False, include_milliseconds=True, state='OK', result=result, runtime=100)
 
         args, kwargs = open_url_mock.call_args
         sent_data = json.loads(args[1])
-        
+
         self.assertEqual(sent_data['event']['timestamp'], '2020-12-01 00:00:00.000000 +0000')
 
     @patch('ansible_collections.community.general.plugins.callback.splunk.datetime')
     @patch('ansible_collections.community.general.plugins.callback.splunk.open_url')
     def test_timestamp_without_milliseconds(self, open_url_mock, mock_datetime):
-        mock_datetime.utcnow.return_value = datetime(2020,12,1)
-        result = TaskResult(host=self.mock_host,task=self.mock_task,return_data={},task_fields=self.task_fields) 
-        
+        mock_datetime.utcnow.return_value = datetime(2020, 12, 1)
+        result = TaskResult(host=self.mock_host, task=self.mock_task, return_data={}, task_fields=self.task_fields)
+
         self.splunk.send_event(url='endpoint', authtoken='token', validate_certs=False, include_milliseconds=False, state='OK', result=result, runtime=100)
 
         args, kwargs = open_url_mock.call_args
         sent_data = json.loads(args[1])
-        
+
         self.assertEqual(sent_data['event']['timestamp'], '2020-12-01 00:00:00 +0000')
