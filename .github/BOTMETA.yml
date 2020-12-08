@@ -57,10 +57,12 @@ files:
     labels: xenserver
   $filters/dict_kv.py:
     maintainers: giner
-  $filters/time.py:
-    maintainers: resmo
   $filters/jc.py:
     maintainers: kellyjonbrazil
+  $filters/list.py:
+    maintainers: vbotka
+  $filters/time.py:
+    maintainers: resmo
   $httpapis/:
     maintainers: $team_networking
     labels: networking
