@@ -1451,13 +1451,12 @@ class TaskParameters(DockerBaseClass):
                 # Make sure that capabilities are lists of lists of strings
                 if dr['capabilities']:
                     for or_index, or_list in enumerate(dr['capabilities']):
-                        for and_index, and_list in enumerate(or_list):
-                            for term_index, term in enumerate(and_list):
-                                if not isinstance(term, string_types):
-                                    self.fail(
-                                        "device_requests[{0}].capabilities[{1}][{2}][{3}] is not a string".format(
-                                            dr_index, or_index, and_index, term_index))
-                                and_list[term_index] = to_native(term)
+                        for and_index, and_term in enumerate(or_list):
+                            if not isinstance(and_term, string_types):
+                                self.fail(
+                                    "device_requests[{0}].capabilities[{1}][{2}] is not a string".format(
+                                        dr_index, or_index, and_index))
+                            or_list[and_index] = to_native(and_term)
                 # Make sure that options is a dictionary mapping strings to strings
                 if dr['options']:
                     dr['options'] = clean_dict_booleans_for_docker_api(dr['options'])
