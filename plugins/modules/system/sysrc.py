@@ -6,14 +6,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-
 __metaclass__ = type
-
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
 
 DOCUMENTATION = r'''
 ---
@@ -21,9 +14,9 @@ author:
     - David Lundgren (@dlundgren)
 module: sysrc
 short_description: Manage FreeBSD using sysrc
-version_added: '2.10'
+version_added: '2.0.0'
 description:
-    - Manages /etc/rc.conf for FreeBSD
+    - Manages C(/etc/rc.conf) for FreeBSD.
 options:
     name:
         description:
@@ -32,9 +25,9 @@ options:
         required: true
     value:
         description:
-            - The value to set when I(state=present)
-            - The value to add when I(state=value_present)
-            - The value to remove when I(state=value_absent)
+            - The value to set when I(state=present).
+            - The value to add when I(state=value_present).
+            - The value to remove when I(state=value_absent).
         type: str
     state:
         description:
@@ -52,62 +45,62 @@ options:
         default: "/etc/rc.conf"
     delim:
         description:
-            - Delimiter to be used insetad of C( )
+            - Delimiter to be used instead of C( ).
             - Only used when I(state=value_present) or I(state=value_absent).
         default: " "
         type: str
     jail:
         description:
-            - Name or ID of the jail to operate on
-        required: false
+            - Name or ID of the jail to operate on.
         type: str
 notes:
-  - The C(name) cannot use . (periods) as sysrc doesn't support OID style names
+  - The C(name) cannot contain periods as sysrc does not support OID style names.
 '''
 
 EXAMPLES = r'''
 ---
 # enable mysql in the /etc/rc.conf
 - name: Configure mysql pid file
-  sysrc:
+  community.general.sysrc:
     name: mysql_pidfile
     value: "/var/run/mysqld/mysqld.pid"
 
 # enable accf_http kld in the boot loader
-- name: enable accf_http kld
-  sysrc:
+- name: Enable accf_http kld
+  community.general.sysrc:
     name: accf_http_load
     state: present
     value: "YES"
     path: /boot/loader.conf
 
 # add gif0 to cloned_interfaces
-- name: add gif0 interface
-  sysrc:
+- name: Add gif0 interface
+  community.general.sysrc:
     name: cloned_interfaces
     state: value_present
     value: "gif0"
 
 # enable nginx on a jail
-- name: add gif0 interface
-  sysrc:
+- name: Enable nginx in test jail
+  community.general.sysrc:
     name: nginx_enable
     value: "YES"
-    jail: www
+    jail: testjail
 '''
 
 RETURN = r'''
 changed:
-  description: Return changed for sysrc actions as true or false.
+  description: Return changed for sysrc actions.
   returned: always
   type: bool
+  sample: true
 '''
 
 from ansible.module_utils.basic import AnsibleModule
 import re
 
 
-class sysrc(object):
+class Sysrc(object):
     def __init__(self, module, name, value, path, delim, jail):
         self.module = module
         self.name = name
@@ -142,7 +135,7 @@ class sysrc(object):
     def create(self):
         if self.module.check_mode:
             self.changed = True
-            return
+            return True
 
         self.module._verbosity = 5
         (rc, out, err) = self.run_sysrc("%s=%s" % (self.name, self.value))
@@ -155,7 +148,7 @@ class sysrc(object):
     def destroy(self):
         if self.module.check_mode:
             self.changed = True
-            return
+            return True
 
         (rc, out, err) = self.run_sysrc('-x', self.name)
         if self.has_unknown_variable(out, err):
@@ -167,7 +160,7 @@ class sysrc(object):
     def value_present(self):
         if self.module.check_mode:
             self.changed = True
-            return
+            return True
 
         setstring = '%s+=%s%s' % (self.name, self.delim, self.value)
         (rc, out, err) = self.run_sysrc(setstring)
@@ -248,27 +241,27 @@ def main():
         jail=jail
     )
 
-    rcValue = sysrc(module, name, value, path, delim, jail)
+    rc_value = Sysrc(module, name, value, path, delim, jail)
 
     if module._verbosity >= 4:
-        result['existed'] = rcValue.exists()
+        result['existed'] = rc_value.exists()
 
     if state == 'present':
-        not rcValue.exists() and rcValue.create()
+        not rc_value.exists() and rc_value.create()
     elif state == 'absent':
-        rcValue.exists() and rcValue.destroy()
+        rc_value.exists() and rc_value.destroy()
     elif state == 'value_present':
-        not rcValue.contains() and rcValue.value_present()
+        not rc_value.contains() and rc_value.value_present()
     elif state == 'value_absent':
-        rcValue.contains() and rcValue.value_absent()
+        rc_value.contains() and rc_value.value_absent()
 
     if module._verbosity > 0:
-        result['command'] = ' '.join(rcValue.cmd)
+        result['command'] = ' '.join(rc_value.cmd)
 
     if module._verbosity >= 4:
-        result['output'] = rcValue.cmd_output
+        result['output'] = rc_value.cmd_output
 
-    result['changed'] = rcValue.changed
+    result['changed'] = rc_value.changed
 
     module.exit_json(**result)
 

@@ -4,26 +4,30 @@
     - ansible_facts.virtualization_type != 'docker'
     - ansible_facts.distribution == 'FreeBSD'
   block:
+    - name: Cache original contents of /etc/rc.conf
+      shell: "cat /etc/rc.conf"
+      register: sysrc_original_content
+
     ##
     ## sysrc - /etc/rc.conf manipulation
     ##
-    - name: add to /etc/rc.conf
+    - name: Add to /etc/rc.conf
       sysrc:
         name: sysrc_test
         value: test
       register: sysrc_test0
 
-    - name: get file content
+    - name: Get file content
       shell: "cat /etc/rc.conf | egrep -v ^\\#"
       register: sysrc_content0
 
-    - name: add to /etc/rc.conf
+    - name: Add to /etc/rc.conf
       sysrc:
         name: sysrc_test
         value: test
       register: sysrc_test0_change
 
-    - name: validate results
+    - name: Validate results
       assert:
         that:
           - "sysrc_test0 is changed"
@@ -36,7 +40,7 @@
         state: absent
       register: sysrc_test1
 
-    - name: get file content
+    - name: Get file content
       shell: "cat /etc/rc.conf | egrep -v ^\\#"
       register: sysrc_content1
 
@@ -46,43 +50,47 @@
         state: absent
       register: sysrc_test1_change
 
-    - name: validate results for key removal
+    - name: Validate results for key removal
       assert:
         that:
           - sysrc_test1 is changed
           - sysrc_test1_change is not changed
           - '"sysrc_test1" not in sysrc_content1.stdout_lines'
-          - '"sysrc_test11" not in sysrc_content1.stdout_lines'
 
     ##
     ## sysrc - append/subtract
     ##
-    - name: append value (creates)
+    - name: Reset /etc/rc.conf
+      copy:
+        content: sysrc_original_content.stdout
+        path: /etc/rc.conf
+
+    - name: Append value (creates)
       sysrc:
         name: sysrc_test_append
         state: value_present
         value: test_a
       register: sysrc_test2_create
 
-    - name: append value (append)
+    - name: Append value (append)
       sysrc:
         name: sysrc_test_append
         state: value_present
         value: test_b
       register: sysrc_test2
 
-    - name: get file content
+    - name: Get file content
       shell: "cat /etc/rc.conf | egrep -v ^\\#"
       register: sysrc_content2
 
-    - name: append same value
+    - name: Append same value
       sysrc:
         name: sysrc_test_append
         state: value_present
         value: test_b
       register: sysrc_test2_change
 
-    - name: validate results for key appending
+    - name: Validate results for key appending
       assert:
         that:
           - sysrc_test2_create is changed
@@ -97,7 +105,7 @@
         value: test_b
       register: sysrc_test3
 
-    - name: get file content
+    - name: Get file content
       shell: "cat /etc/rc.conf | egrep -v ^\\#"
       register: sysrc_content3
 
@@ -108,7 +116,7 @@
         value: test_b
       register: sysrc_test3_change
 
-    - name: validate results for key subtraction
+    - name: Validate results for key subtraction
       assert:
         that:
           - sysrc_test3 is changed
@@ -118,7 +126,7 @@
     ##
     ## sysrc - append/subtract with delimiter
     ##
-    - name: append value (delimiter)
+    - name: Append value (delimiter)
       sysrc:
         name: sysrc_test_append
         state: value_present
@@ -126,11 +134,11 @@
         value: test_b
       register: sysrc_test4
 
-    - name: get file content
+    - name: Get file content
       shell: "cat /etc/rc.conf | egrep -v ^\\#"
       register: sysrc_content4
 
-    - name: append value again (delimiter)
+    - name: Append value again (delimiter)
       sysrc:
         name: sysrc_test_append
         state: value_present
@@ -138,14 +146,14 @@
         value: test_b
       register: sysrc_test4_change
 
-    - name: validate results for key appending
+    - name: Validate results for key appending
       assert:
         that:
           - sysrc_test4 is changed
           - sysrc_test4_change is not changed
           - '"sysrc_test_append=\"test_a,test_b\"" in sysrc_content4.stdout_lines'
 
-    - name: subtract value (delimiter)
+    - name: Subtract value (delimiter)
       sysrc:
         name: sysrc_test_append
         state: value_absent
@@ -153,11 +161,11 @@
         value: test_b
       register: sysrc_test5
 
-    - name: get file content
+    - name: Get file content
       shell: "cat /etc/rc.conf | egrep -v ^\\#"
       register: sysrc_content5
 
-    - name: subtract value again (delimiter)
+    - name: Subtract value again (delimiter)
       sysrc:
         name: sysrc_test_append
         state: value_absent
@@ -165,7 +173,7 @@
         value: test_b
       register: sysrc_test5_change
 
-    - name: validate results for key appending
+    - name: Validate results for key appending
       assert:
         that:
           - sysrc_test5 is changed
@@ -175,26 +183,34 @@
     ##
     ## sysrc - uses alternate file
     ##
-    - name: use alternate file
+    - name: Use alternate file
       sysrc:
         name: sysrc_test
         value: test
         path: /tmp/sysrc_file
       register: sysrc_test6
 
-    - name: assert file exists
+    - name: Assert file exists
       stat:
         path: /tmp/sysrc_file
       register: sysrc_file
 
-    - name: validate file
+    - name: Use alternate file (idempotent)
+      sysrc:
+        name: sysrc_test
+        value: test
+        path: /tmp/sysrc_file
+      register: sysrc_test6_idempotent
+
+    - name: Validate file
       assert:
         that:
-          - sysrc_test6 is changed
           - sysrc_file.stat.exists
+          - sysrc_test6 is changed
+          - sysrc_test6_idempotent is not changed
 
     # OID-like variables should fail
-    - name: oid style names should fail
+    - name: OID style names should fail
       register: sysrc_no_oid
       failed_when: '"Name may only contain alpha-numeric and underscore characters" not in sysrc_no_oid.msg'
       sysrc:
@@ -204,19 +220,19 @@
     ##
     ## sysrc - jail
     ##
-    - name: creates file in jail
+    - name: Creates file in jail
       register: jail_test0
       sysrc:
         name: test_jail
         value: test
         jail: testjail
 
-    - name: jail file exists
+    - name: Jail file exists
       register: jail_file0
       stat:
         path: /usr/jails/testjail/etc/rc.conf
 
-    - name: validate jail works
+    - name: Validate jail file is changed
       assert:
         that:
           - jail_test0 is changed
