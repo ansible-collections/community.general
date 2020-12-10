@@ -188,14 +188,6 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
                                   channel=self.module.params['channel'],
                                   previous_value=None)
 
-        deprecation_messages = [
-            {
-                'msg': 'xfconf: Seeting of facts is deprecated. Please use return values going forwad.',
-                'version': '',
-            },
-        ]
-        self.update_output(deprecations=deprecation_messages)
-
     def process_command_output(self, rc, out, err):
         if err.rstrip() == self.does_not:
             return None
