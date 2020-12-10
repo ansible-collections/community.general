@@ -874,7 +874,7 @@ files:
     maintainers: agaffney
   $modules/system/osx_defaults.py:
     notify: chris-short
-    maintainers: $team_macos
+    maintainers: $team_macos notok
     labels: macos osx_defaults
     keywords: brew cask darwin homebrew macosx macports osx
   $modules/system/pam_limits.py:
