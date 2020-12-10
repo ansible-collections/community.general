@@ -16,7 +16,6 @@ short_description: Edit XFCE4 Configurations
 description:
   - This module allows for the manipulation of Xfce 4 Configuration via
     xfconf-query.  Please see the xfconf-query(1) man pages for more details.
-    The setting of facts by this module is deprecated.
 options:
   channel:
     description:
