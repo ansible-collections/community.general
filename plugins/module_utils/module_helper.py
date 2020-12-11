@@ -11,6 +11,21 @@ import traceback
 from ansible.module_utils.basic import AnsibleModule
 
 
+class ModuleHelperException(Exception):
+    @staticmethod
+    def _get_remove(self, key, kwargs):
+        if key in kwargs:
+            result = kwargs[key]
+            del kwargs[key]
+            return result
+        return None
+
+    def __init__(self, *args, **kwargs):
+        self.msg = self._get_remove('msg', kwargs) or "Module failed with exception: {0}".format(str(self))
+        self.update_output = self._get_remove('update_output', kwargs) or {}
+        super(ModuleHelperException, self).__init__(*args, **kwargs)
+
+
 class ArgFormat(object):
     """
     Argument formatter
@@ -102,6 +117,9 @@ def module_fails_on_exception(func):
             func(self, *args, **kwargs)
         except SystemExit:
             raise
+        except ModuleHelperException as e:
+            if e.update_output:
+                self.update_output(e.update_output)
         except Exception as e:
             self.vars.msg = "Module failed with exception: {0}".format(str(e).strip())
             self.vars.exception = traceback.format_exc()
@@ -213,6 +231,9 @@ class StateMixin(object):
         state = self.module.params.get(self.state_param)
         return self.default_state if state is None else state
 
+    def _method(self, state):
+        return "{0}_{1}".format(self.state_param, state)
+
     def __run__(self):
         state = self._state()
         self.vars.state = state
@@ -224,14 +245,14 @@ class StateMixin(object):
                 state = aliased[0]
                 self.vars.effective_state = state
 
-        method = "state_{0}".format(state)
+        method = self._method(state)
         if not hasattr(self, method):
             return self.__state_fallback__()
         func = getattr(self, method)
         return func()
 
     def __state_fallback__(self):
-        raise ValueError("Cannot find method for state: {0}".format(self._state()))
+        raise ValueError("Cannot find method: {0}".format(self._method(self._state())))
 
 
 class CmdMixin(object):
@@ -239,7 +260,8 @@ class CmdMixin(object):
     Mixin for mapping module options to running a CLI command with its arguments.
     """
     command = None
-    command_args_formats = dict()
+    command_args_formats = {}
+    run_command_fixed_options = {}
     check_rc = False
     force_lang = "C"
 
@@ -266,7 +288,8 @@ class CmdMixin(object):
             return self.custom_formats.get(_param, self.module_formats.get(_param))
 
         extra_params = extra_params or dict()
-        cmd_args = [self.module.get_bin_path(self.command)]
+        cmd_args = list([self.command]) if isinstance(self.command, str) else list(self.command)
+        cmd_args[0] = self.module.get_bin_path(cmd_args[0])
         param_list = params if params else self.module.params.keys()
 
         for param in param_list:
@@ -290,13 +313,14 @@ class CmdMixin(object):
 
     def run_command(self, extra_params=None, params=None, *args, **kwargs):
         self.vars['cmd_args'] = self._calculate_args(extra_params, params)
-        env_update = kwargs.get('environ_update', {})
-        check_rc = kwargs.get('check_rc', self.check_rc)
+        options = dict(self.run_command_fixed_options)
+        env_update = dict(options.get('environ_update', {}))
+        options['check_rc'] = options.get('check_rc', self.check_rc)
         if self.force_lang:
             env_update.update({'LANGUAGE': self.force_lang})
             self.update_output(force_lang=self.force_lang)
-        rc, out, err = self.module.run_command(self.vars['cmd_args'],
-                                               environ_update=env_update,
-                                               check_rc=check_rc, *args, **kwargs)
+            options['environ_update'] = env_update
+        options.update(kwargs)
+        rc, out, err = self.module.run_command(self.vars['cmd_args'], *args, **options)
         self.update_output(rc=rc, stdout=out, stderr=err)
         return self.process_command_output(rc, out, err)
