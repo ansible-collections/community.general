@@ -23,62 +23,42 @@
       - "([] | community.general.lists_mergeby([], 'name') | list |
           difference(list1) | length) == 0"
 
-- block:
-    - name: First argument must be list
-      set_fact:
-        my_list: "{{ {'x': 'y'} | community.general.lists_mergeby(list2, 'name') }}"
-      register: result
-  rescue:
-    - assert:
-        that:
-          - result is failed
-          - '"First argument for community.general.lists_mergeby must be list." in result.msg'
-  always:
-    - assert:
-        that: result is failed
-        fail_msg: Wrong argument not detected by community.general.lists_mergeby.
+- name: First argument must be list
+  set_fact:
+    my_list: "{{ {'x': 'y'} | community.general.lists_mergeby(list2, 'name') }}"
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+      - result is failed
+      - '"First argument for community.general.lists_mergeby must be list." in result.msg'
 
-- block:
-    - name: Second argument must be list
-      set_fact:
-        my_list: "{{ list1 | community.general.lists_mergeby({'x': 'y'}, 'name') }}"
-      register: result
-  rescue:
-    - assert:
-        that:
-          - result is failed
-          - '"Second argument for community.general.lists_mergeby must be list." in result.msg'
-  always:
-    - assert:
-        that: result is failed
-        fail_msg: Wrong argument not detected by community.general.lists_mergeby.
+- name: Second argument must be list
+  set_fact:
+    my_list: "{{ list1 | community.general.lists_mergeby({'x': 'y'}, 'name') }}"
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+      - result is failed
+      - '"Second argument for community.general.lists_mergeby must be list." in result.msg'
 
-- block:
-    - name: Third argument must be string
-      set_fact:
-        my_list: "{{ list1 | community.general.lists_mergeby(list2, {'x': 'y'}) }}"
-      register: result
-  rescue:
-    - assert:
-        that:
-          - result is failed
-          - '"Third argument for community.general.lists_mergeby must be string." in result.msg'
-  always:
-    - assert:
-        that: result is failed
-        fail_msg: Wrong argument not detected by community.general.lists_mergeby.
+- name: Third argument must be string
+  set_fact:
+    my_list: "{{ list1 | community.general.lists_mergeby(list2, {'x': 'y'}) }}"
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+      - result is failed
+      - '"Third argument for community.general.lists_mergeby must be string." in result.msg'
 
-- block:
-    - name: Elements of list must be dictionaries
-      set_fact:
-        my_list: "{{ list4 | community.general.lists_mergeby(list2, 'name') }}"
-      register: result
-  rescue:
-    - assert:
-        that:
-          - result is failed
-          - '"Elements of list arguments for lists_mergeby must be dictionaries." in result.msg'
-  always:
-    - assert:
-        that: result is failed
-        fail_msg: Wrong argument not detected by community.general.lists_mergeby.
+- name: Elements of list must be dictionaries
+  set_fact:
+    my_list: "{{ list4 | community.general.lists_mergeby(list2, 'name') }}"
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+      - result is failed
+      - '"Elements of list arguments for lists_mergeby must be dictionaries." in result.msg'
