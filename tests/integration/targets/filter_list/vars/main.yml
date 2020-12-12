@@ -20,3 +20,8 @@ list3:
     param02: myparam04
   - name: myname03
     param03: myparam03
+
+list4:
+  - name: myname01
+    param01: myparam01
+  - myname02

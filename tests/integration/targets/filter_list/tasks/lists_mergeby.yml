@@ -1,0 +1,64 @@
+---
+- name: Test lists merged by attribute name
+  assert:
+    that:
+      - "(list1 | community.general.lists_mergeby(list2, 'name') | list |
+          difference(list3) | length) == 0"
+
+- name: Test list1 empty
+  assert:
+    that:
+      - "([] | community.general.lists_mergeby(list2, 'name') | list |
+          difference(list2) | length) == 0"
+
+- name: Test list2 empty
+  assert:
+    that:
+      - "(list1 | community.general.lists_mergeby([], 'name') | list |
+          difference(list1) | length) == 0"
+
+- name: Test all lists empty
+  assert:
+    that:
+      - "([] | community.general.lists_mergeby([], 'name') | list |
+          difference(list1) | length) == 0"
+
+- name: First argument must be list
+  set_fact:
+    my_list: "{{ {'x': 'y'} | community.general.lists_mergeby(list2, 'name') }}"
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+      - result is failed
+      - '"First argument for community.general.lists_mergeby must be list." in result.msg'
+
+- name: Second argument must be list
+  set_fact:
+    my_list: "{{ list1 | community.general.lists_mergeby({'x': 'y'}, 'name') }}"
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+      - result is failed
+      - '"Second argument for community.general.lists_mergeby must be list." in result.msg'
+
+- name: Third argument must be string
+  set_fact:
+    my_list: "{{ list1 | community.general.lists_mergeby(list2, {'x': 'y'}) }}"
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+      - result is failed
+      - '"Third argument for community.general.lists_mergeby must be string." in result.msg'
+
+- name: Elements of list must be dictionaries
+  set_fact:
+    my_list: "{{ list4 | community.general.lists_mergeby(list2, 'name') }}"
+  register: result
+  ignore_errors: true
+- assert:
+    that:
+      - result is failed
+      - '"Elements of list arguments for lists_mergeby must be dictionaries." in result.msg'
