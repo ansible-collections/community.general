@@ -95,20 +95,28 @@ RETURN = '''
     type: str
     sample: "/Xft/DPI"
   value_type:
-    description: The type of the value that was changed
+    description:
+    - The type of the value that was changed (C(none) for C(get) and C(reset)
+      state). Either a single string value or a list of strings for array
+      types.
     returned: success
-    type: str
-    sample: "int"
+    type: string or list of strings
+    sample: '"int" or ["str", "str", "str"]'
   value:
-    description: The value of the preference key after executing the module
+    description:
+    - The value of the preference key after executing the module. Either a
+      single string value or a list of strings for array types.
     returned: success
-    type: str
-    sample: "192"
+    type: string or list of strings
+    sample: '"192" or ["orange", "yellow", "violet"]'
   previous_value:
-    description: The value of the preference key before executing the module (None for "get" state).
+    description:
+    - The value of the preference key before executing the module (C(none) for
+      C(get) state). Either a single string value or a list of strings for array
+      types.
     returned: success
-    type: str
-    sample: "96"
+    type: string or list of strings
+    sample: '"96" or ["red", "blue", "green"]'
 '''
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
@@ -176,6 +184,9 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
         self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.module.params['property'],
                                                                                  self.module.params['channel'])
         self.vars.previous_value = self._get()
+        self.update_xfconf_output(property=self.module.params['property'],
+                                  channel=self.module.params['channel'],
+                                  previous_value=None)
 
     def process_command_output(self, rc, out, err):
         if err.rstrip() == self.does_not:
@@ -205,10 +216,13 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
 
     def state_get(self):
         self.vars.value = self.vars.previous_value
+        self.update_xfconf_output(value=self.vars.value)
 
     def state_absent(self):
         self.vars.value = None
         self.run_command(params=('channel', 'property', 'reset'), extra_params={"reset": True})
+        self.update_xfconf_output(previous_value=self.vars.previous_value,
+                                  value=None)
 
     def state_present(self):
         # stringify all values - in the CLI they will all be happy strings anyway
@@ -249,6 +263,11 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
 
         if not self.vars.is_array:
             self.vars.value = self.vars.value[0]
+            value_type = value_type[0]
+
+        self.update_xfconf_output(previous_value=self.vars.previous_value,
+                                  value=self.vars.value,
+                                  type=value_type)
 
 
 def main():
