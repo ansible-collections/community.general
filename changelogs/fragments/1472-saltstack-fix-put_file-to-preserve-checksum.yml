@@ -1,2 +1,2 @@
 bugfixes:
-  - saltstack - Use hashutil.base64_decodefile to ensure that the file checksum is preserved (https://github.com/ansible-collections/community.general/pull/1472).
+  - saltstack connection plugin - use ``hashutil.base64_decodefile`` to ensure that the file checksum is preserved (https://github.com/ansible-collections/community.general/pull/1472).
