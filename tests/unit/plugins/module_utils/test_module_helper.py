@@ -91,4 +91,3 @@ def test_dependency_ctxmgr():
     with ctx:
         import sys
     assert ctx.has_it
-

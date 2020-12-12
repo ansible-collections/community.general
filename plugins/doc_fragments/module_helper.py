@@ -19,4 +19,3 @@ options:
     type: list
     elements: str
 '''
-
