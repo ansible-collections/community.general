@@ -500,6 +500,7 @@ plugins/modules/system/runit.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/runit.py validate-modules:undocumented-parameter
 plugins/modules/system/timezone.py pylint:blacklisted-name
 plugins/modules/system/xfconf.py validate-modules:parameter-state-invalid-choice
+plugins/modules/system/xfconf.py validate-modules:return-syntax-error
 plugins/modules/web_infrastructure/jenkins_plugin.py use-argspec-type-path
 plugins/modules/web_infrastructure/rundeck_acl_policy.py pylint:blacklisted-name
 scripts/inventory/gce.py pylint:blacklisted-name
