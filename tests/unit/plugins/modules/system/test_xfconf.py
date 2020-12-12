@@ -55,7 +55,8 @@ TEST_CASES = [
                 ),
             ],
             'changed': False,
-            'previous_value': '100',
+            'previous_value': None,
+            'value_type': None,
             'value': '100',
         }
     ],
@@ -75,6 +76,7 @@ TEST_CASES = [
             ],
             'changed': False,
             'previous_value': None,
+            'value_type': None,
             'value': None,
         }
     ],
@@ -93,7 +95,8 @@ TEST_CASES = [
                 ),
             ],
             'changed': False,
-            'previous_value': ['Main', 'Work', 'Tmp'],
+            'previous_value': None,
+            'value_type': None,
             'value': ['Main', 'Work', 'Tmp'],
         },
     ],
@@ -112,7 +115,8 @@ TEST_CASES = [
                 ),
             ],
             'changed': False,
-            'previous_value': 'true',
+            'previous_value': None,
+            'value_type': None,
             'value': 'true',
         },
     ],
@@ -131,7 +135,8 @@ TEST_CASES = [
                 ),
             ],
             'changed': False,
-            'previous_value': 'false',
+            'previous_value': None,
+            'value_type': None,
             'value': 'false',
         },
     ],
@@ -166,6 +171,7 @@ TEST_CASES = [
             ],
             'changed': True,
             'previous_value': '100',
+            'value_type': 'int',
             'value': '90',
         },
     ],
@@ -200,6 +206,7 @@ TEST_CASES = [
             ],
             'changed': False,
             'previous_value': '90',
+            'value_type': 'int',
             'value': '90',
         },
     ],
@@ -235,6 +242,7 @@ TEST_CASES = [
             ],
             'changed': True,
             'previous_value': ['Main', 'Work', 'Tmp'],
+            'value_type': ['str', 'str', 'str'],
             'value': ['A', 'B', 'C'],
         },
     ],
@@ -270,6 +278,7 @@ TEST_CASES = [
             ],
             'changed': False,
             'previous_value': ['A', 'B', 'C'],
+            'value_type': ['str', 'str', 'str'],
             'value': ['A', 'B', 'C'],
         },
     ],
@@ -302,6 +311,7 @@ TEST_CASES = [
             ],
             'changed': True,
             'previous_value': ['A', 'B', 'C'],
+            'value_type': None,
             'value': None,
         },
     ],
@@ -333,14 +343,20 @@ def test_xfconf(mocker, capfd, patch_xfconf, testcase):
     results = json.loads(out)
     print("testcase =\n%s" % testcase)
     print("results =\n%s" % results)
+
     assert 'changed' in results
     assert results['changed'] == testcase['changed']
-    if 'msg' in results:
-        assert results.get('msg') == testcase['msg']
-    if 'value' in results:
-        assert results['value'] == testcase['value']
-    if 'previous_value' in results:
-        assert results['previous_value'] == testcase['previous_value']
+
+    for test_result in ('channel', 'property'):
+        assert test_result in results, "'{0}' not found in {1}".format(test_result, results)
+        assert results[test_result] == results['invocation']['module_args'][test_result], \
+            "'{0}': '{1}' != '{2}'".format(test_result, results[test_result], results['invocation']['module_args'][test_result])
+
+    for conditional_test_result in ('msg', 'value', 'previous_value'):
+        if conditional_test_result in testcase:
+            assert conditional_test_result in results, "'{0}' not found in {1}".format(conditional_test_result, results)
+            assert results[conditional_test_result] == testcase[conditional_test_result], \
+                "'{0}': '{1}' != '{2}'".format(conditional_test_result, results[conditional_test_result], testcase[conditional_test_result])
 
     assert mock_run_command.call_count == len(testcase['run_command.calls'])
     if mock_run_command.call_count:
