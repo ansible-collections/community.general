@@ -237,12 +237,12 @@ class ModuleHelper(object):
 
     def ack_named_deprecation(self, name):
         if name not in self.named_deprecations:
-            raise ModuleHelperException("No such named deprecation: {}".format(name))
+            raise ModuleHelperException("No such named deprecation: {0}".format(name))
         self._acked_named_deprecations.add(name)
 
     def trigger_named_deprecation(self, name):
         if name not in self.named_deprecations:
-            raise ModuleHelperException("No such named deprecation: {}".format(name))
+            raise ModuleHelperException("No such named deprecation: {0}".format(name))
         if name in self._triggered_named_deprecations:
             return
         if name in self._acked_named_deprecations:
