@@ -33,6 +33,10 @@
         that:
           - result is failed
           - '"First argument for community.general.lists_mergeby must be list." in result.msg'
+  always:
+    - assert:
+        that: result is failed
+        fail_msg: Wrong argument not detected by community.general.lists_mergeby.
 
 - block:
     - name: Second argument must be list
@@ -44,6 +48,10 @@
         that:
           - result is failed
           - '"Second argument for community.general.lists_mergeby must be list." in result.msg'
+  always:
+    - assert:
+        that: result is failed
+        fail_msg: Wrong argument not detected by community.general.lists_mergeby.
 
 - block:
     - name: Third argument must be string
@@ -55,6 +63,10 @@
         that:
           - result is failed
           - '"Third argument for community.general.lists_mergeby must be string." in result.msg'
+  always:
+    - assert:
+        that: result is failed
+        fail_msg: Wrong argument not detected by community.general.lists_mergeby.
 
 - block:
     - name: Elements of list must be dictionaries
@@ -66,3 +78,7 @@
         that:
           - result is failed
           - '"Elements of list arguments for lists_mergeby must be dictionaries." in result.msg'
+  always:
+    - assert:
+        that: result is failed
+        fail_msg: Wrong argument not detected by community.general.lists_mergeby.
