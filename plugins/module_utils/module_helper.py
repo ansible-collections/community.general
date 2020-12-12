@@ -13,7 +13,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 class ModuleHelperException(Exception):
     @staticmethod
-    def _get_remove(self, key, kwargs):
+    def _get_remove(key, kwargs):
         if key in kwargs:
             result = kwargs[key]
             del kwargs[key]
@@ -155,6 +155,10 @@ class ModuleHelper(object):
     _dependencies = []
     module = {}
     facts_name = None
+    named_deprecations = {}
+    ack_deprecations_module_param = "ack_named_deprecations"
+    _acked_named_deprecations = set()
+    _triggered_named_deprecations = set()
 
     class AttrDict(dict):
         def __getattr__(self, item):
@@ -169,22 +173,25 @@ class ModuleHelper(object):
         if module:
             self.module = module
 
-        if not isinstance(module, AnsibleModule):
+        if isinstance(self.module, dict):
+            if self.named_deprecations:
+                self.module['argument_spec'].update(self.make_ack_named_deprecation_arg_spec())
             self.module = AnsibleModule(**self.module)
 
     def update_output(self, **kwargs):
-        if kwargs:
-            self.output_dict.update(kwargs)
+        self.output_dict.update(kwargs or {})
 
     def update_facts(self, **kwargs):
-        if kwargs:
-            self.facts_dict.update(kwargs)
+        self.facts_dict.update(kwargs or {})
 
     def __init_module__(self):
         pass
 
     def __run__(self):
         raise NotImplementedError()
+
+    def __quit_module__(self):
+        pass
 
     @property
     def changed(self):
@@ -207,6 +214,7 @@ class ModuleHelper(object):
         self.fail_on_missing_deps()
         self.__init_module__()
         self.__run__()
+        self.__quit_module__()
         self.module.exit_json(changed=self.changed, **self.output_dict)
 
     @classmethod
@@ -221,6 +229,40 @@ class ModuleHelper(object):
                                       exception=d.exc_val.__traceback__.format_exc(),
                                       msg=d.text,
                                       **self.output_dict)
+
+    def make_ack_named_deprecation_arg_spec(self):
+        return {
+            self.ack_deprecations_module_param: dict(type='list', elements='str')
+        }
+
+    def ack_named_deprecation(self, name):
+        if name not in self.named_deprecations:
+            raise ModuleHelperException("No such named deprecation: {}".format(name))
+        self._acked_named_deprecations.add(name)
+
+    def trigger_named_deprecation(self, name):
+        if name not in self.named_deprecations:
+            raise ModuleHelperException("No such named deprecation: {}".format(name))
+        if name in self._triggered_named_deprecations:
+            return
+        if name in self._acked_named_deprecations:
+            return
+
+        deprecation = dict(self.named_deprecations[name])
+        msg = (
+            "{0}"
+            "\n\n"
+            "To prevent this message, add the deprecation name '{2}' to the '{1}' module parameter:\n"
+            "  {1}:\n"
+            "    - {2}"
+        ).format(
+            deprecation['msg'],
+            self.ack_deprecations_module_param,
+            name
+        )
+        deprecation.update({'msg': msg})
+        self.module.deprecate(**deprecation)
+        self._triggered_named_deprecations.add(name)
 
 
 class StateMixin(object):
@@ -324,3 +366,15 @@ class CmdMixin(object):
         rc, out, err = self.module.run_command(self.vars['cmd_args'], *args, **options)
         self.update_output(rc=rc, stdout=out, stderr=err)
         return self.process_command_output(rc, out, err)
+
+
+class StateModuleHelper(StateMixin, ModuleHelper):
+    pass
+
+
+class CmdModuleHelper(CmdMixin, ModuleHelper):
+    pass
+
+
+class CmdStateModuleHelper(CmdMixin, StateMixin, ModuleHelper):
+    pass

@@ -18,19 +18,28 @@ def single_lambda_2star(x, y, z):
 
 
 ARG_FORMATS = dict(
-    simple_boolean_true=("--superflag", ArgFormat.BOOLEAN, 0, True, ["--superflag"]),
-    simple_boolean_false=("--superflag", ArgFormat.BOOLEAN, 0, False, []),
-    single_printf=("--param=%s", ArgFormat.PRINTF, 0, "potatoes", ["--param=potatoes"]),
-    single_printf_no_substitution=("--param", ArgFormat.PRINTF, 0, "potatoes", ["--param"]),
-    multiple_printf=(["--param", "free-%s"], ArgFormat.PRINTF, 0, "potatoes", ["--param", "free-potatoes"]),
-    single_format=("--param={0}", ArgFormat.FORMAT, 0, "potatoes", ["--param=potatoes"]),
-    single_format_no_substitution=("--param", ArgFormat.FORMAT, 0, "potatoes", ["--param"]),
-    multiple_format=(["--param", "free-{0}"], ArgFormat.FORMAT, 0, "potatoes", ["--param", "free-potatoes"]),
-    single_lambda_0star=((lambda v: ["piggies=[{0},{1},{2}]".format(v[0], v[1], v[2])]),
-                         None, 0, ['a', 'b', 'c'], ["piggies=[a,b,c]"]),
-    single_lambda_1star=((lambda a, b, c: ["piggies=[{0},{1},{2}]".format(a, b, c)]),
-                         None, 1, ['a', 'b', 'c'], ["piggies=[a,b,c]"]),
-    single_lambda_2star=(single_lambda_2star, None, 2, dict(z='c', x='a', y='b'), ["piggies=[a,b,c]"])
+    simple_boolean_true=("--superflag", ArgFormat.BOOLEAN, 0,
+                         True, ["--superflag"]),
+    simple_boolean_false=("--superflag", ArgFormat.BOOLEAN, 0,
+                          False, []),
+    single_printf=("--param=%s", ArgFormat.PRINTF, 0,
+                   "potatoes", ["--param=potatoes"]),
+    single_printf_no_substitution=("--param", ArgFormat.PRINTF, 0,
+                                   "potatoes", ["--param"]),
+    multiple_printf=(["--param", "free-%s"], ArgFormat.PRINTF, 0,
+                     "potatoes", ["--param", "free-potatoes"]),
+    single_format=("--param={0}", ArgFormat.FORMAT, 0,
+                   "potatoes", ["--param=potatoes"]),
+    single_format_no_substitution=("--param", ArgFormat.FORMAT, 0,
+                                   "potatoes", ["--param"]),
+    multiple_format=(["--param", "free-{0}"], ArgFormat.FORMAT, 0,
+                     "potatoes", ["--param", "free-potatoes"]),
+    single_lambda_0star=((lambda v: ["piggies=[{0},{1},{2}]".format(v[0], v[1], v[2])]), None, 0,
+                         ['a', 'b', 'c'], ["piggies=[a,b,c]"]),
+    single_lambda_1star=((lambda a, b, c: ["piggies=[{0},{1},{2}]".format(a, b, c)]), None, 1,
+                         ['a', 'b', 'c'], ["piggies=[a,b,c]"]),
+    single_lambda_2star=(single_lambda_2star, None, 2,
+                         dict(z='c', x='a', y='b'), ["piggies=[a,b,c]"])
 )
 ARG_FORMATS_IDS = sorted(ARG_FORMATS.keys())
 
@@ -82,3 +91,4 @@ def test_dependency_ctxmgr():
     with ctx:
         import sys
     assert ctx.has_it
+
