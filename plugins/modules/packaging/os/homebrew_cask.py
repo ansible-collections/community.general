@@ -437,8 +437,8 @@ class HomebrewCask(object):
         cask_is_outdated_command = (
             [
                 self.brew_path,
-                'cask',
                 'outdated',
+                '--cask',
             ]
             + (['--greedy'] if self.greedy else [])
             + [self.current_cask]
@@ -456,8 +456,8 @@ class HomebrewCask(object):
 
         cmd = [
             "{brew_path}".format(brew_path=self.brew_path),
-            "cask",
             "list",
+            "--cask",
             self.current_cask
         ]
         rc, out, err = self.module.run_command(cmd)
@@ -538,7 +538,7 @@ class HomebrewCask(object):
             raise HomebrewCaskException(self.message)
 
         opts = (
-            [self.brew_path, 'cask', 'upgrade']
+            [self.brew_path, 'upgrade', '--cask']
         )
 
         cmd = [opt for opt in opts if opt]
@@ -587,7 +587,7 @@ class HomebrewCask(object):
             raise HomebrewCaskException(self.message)
 
         opts = (
-            [self.brew_path, 'cask', 'install', self.current_cask]
+            [self.brew_path, 'install', '--cask', self.current_cask]
             + self.install_options
         )
 
@@ -651,7 +651,7 @@ class HomebrewCask(object):
             raise HomebrewCaskException(self.message)
 
         opts = (
-            [self.brew_path, 'cask', command]
+            [self.brew_path, command, '--cask']
             + self.install_options
             + [self.current_cask]
         )
@@ -704,7 +704,7 @@ class HomebrewCask(object):
             raise HomebrewCaskException(self.message)
 
         opts = (
-            [self.brew_path, 'cask', 'uninstall', self.current_cask]
+            [self.brew_path, 'uninstall', '--cask', self.current_cask]
             + self.install_options
         )
 
