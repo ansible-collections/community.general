@@ -178,6 +178,11 @@ DOCUMENTATION = """
         - name: EC2_REGION
         - name: AWS_REGION
         version_added: '0.2.0'
+    header_value:
+      description: If specificed, will send the value in this field as the X-Vault-AWS-IAM-Server-ID header as part of GetCallerIdentity request.
+      env:
+        - name: VAULT_HEADER_VALUE
+      required: False
 """
 
 EXAMPLES = """
@@ -620,6 +625,9 @@ class LookupModule(LookupBase):
 
         if self.get_option('region'):
             params['region'] = self.get_option('region')
+
+        if self.get_option('header_value'):
+            params['header_value'] = self.get_option('header_value')
 
         if not (params['access_key'] and params['secret_key']):
             profile = self.get_option('aws_profile')
