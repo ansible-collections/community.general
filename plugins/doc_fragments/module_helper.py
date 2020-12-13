@@ -10,7 +10,7 @@ __metaclass__ = type
 
 class ModuleDocFragment(object):
     # Extra parameters when using ModuleHelper classes
-    DOCUMENTATION = r'''
+    ACK_NAMED_DEPRECATIONS = r'''
 options:
   ack_named_deprecations:
     description:
@@ -18,4 +18,5 @@ options:
     - Deprecations listed here will not be triggered.
     type: list
     elements: str
+    version_added: 2.0.0
 '''
