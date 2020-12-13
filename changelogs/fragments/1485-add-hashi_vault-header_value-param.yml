@@ -1,0 +1,2 @@
+minor_changes:
+  - hashi_vault - parse optional header_value parameter as the X-Vault-AWS-IAM-Server-ID header (https://github.com/ansible-collections/community.general/pull/1485).
