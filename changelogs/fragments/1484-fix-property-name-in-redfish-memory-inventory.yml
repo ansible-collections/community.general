@@ -1,2 +1,2 @@
 bugfixes:
-  - redfish_info, redfish_utils - Correct PartNumber property name in Redfish GetMemoryInventory command (https://github.com/ansible-collections/community.general/issues/1483)
+  - redfish_info module, redfish_utils module utils - correct ``PartNumber`` property name in Redfish ``GetMemoryInventory`` command (https://github.com/ansible-collections/community.general/issues/1483).
