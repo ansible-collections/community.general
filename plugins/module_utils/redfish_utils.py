@@ -1886,7 +1886,7 @@ class RedfishUtils(object):
         memory_results = []
         key = "Memory"
         # Get these entries, but does not fail if not found
-        properties = ['SerialNumber', 'MemoryDeviceType', 'PartNuber',
+        properties = ['SerialNumber', 'MemoryDeviceType', 'PartNumber',
                       'MemoryLocation', 'RankCount', 'CapacityMiB', 'OperatingMemoryModes', 'Status', 'Manufacturer', 'Name']
 
         # Search for 'key' entry and extract URI from it
