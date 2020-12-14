@@ -455,6 +455,9 @@ class WapiModule(WapiBase):
                 return False
 
             elif isinstance(proposed_item, list):
+                if key == 'aliases':
+                    if set(current_item) != set(proposed_item):
+                        return False
                 for subitem in proposed_item:
                     if not self.issubset(subitem, current_item):
                         return False
