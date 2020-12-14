@@ -75,6 +75,8 @@ class KeycloakError(Exception):
 
 def get_token(base_url, validate_certs, auth_realm, client_id,
               auth_username, auth_password, client_secret):
+    if not base_url.lower().startswith(('http', 'https')):
+        raise KeycloakError("auth_url '%s' should either start with 'http' or 'https'." % base_url)
     auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
     temp_payload = {
         'grant_type': 'password',
