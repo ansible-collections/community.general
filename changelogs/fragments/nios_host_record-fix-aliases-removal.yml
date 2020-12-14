@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - nios_host_record - fix to remove ``aliases`` (CNAMES) for configuration comparison (https://github.com/ansible-collections/community.general/issues/1335).
