@@ -5,14 +5,14 @@
 
 - name: Make sure image is not there
   docker_image:
-    name: "{{ docker_test_image_hello_world }}:latest"
+    name: "{{ docker_test_image_hello_world }}"
     state: absent
     force_absent: yes
   register: absent_1
 
 - name: Make sure image is not there (idempotency)
   docker_image:
-    name: "{{ docker_test_image_hello_world }}:latest"
+    name: "{{ docker_test_image_hello_world }}"
     state: absent
   register: absent_2
 
@@ -22,14 +22,14 @@
 
 - name: Make sure image is there
   docker_image:
-    name: "{{ docker_test_image_hello_world }}:latest"
+    name: "{{ docker_test_image_hello_world }}"
     state: present
     source: pull
   register: present_1
 
 - name: Make sure image is there (idempotent)
   docker_image:
-    name: "{{ docker_test_image_hello_world }}:latest"
+    name: "{{ docker_test_image_hello_world }}"
     state: present
     source: pull
   register: present_2
@@ -41,28 +41,28 @@
 
 - name: Make sure tag is not there
   docker_image:
-    name: "{{ docker_test_image_hello_world }}:alias"
+    name: "{{ docker_test_image_hello_world_base }}:alias"
     state: absent
 
 - name: Tag image with alias
   docker_image:
     source: local
-    name: "{{ docker_test_image_hello_world }}:latest"
-    repository: "{{ docker_test_image_hello_world }}:alias"
+    name: "{{ docker_test_image_hello_world }}"
+    repository: "{{ docker_test_image_hello_world_base }}:alias"
   register: tag_1
 
 - name: Tag image with alias (idempotent)
   docker_image:
     source: local
-    name: "{{ docker_test_image_hello_world }}:latest"
-    repository: "{{ docker_test_image_hello_world }}:alias"
+    name: "{{ docker_test_image_hello_world }}"
+    repository: "{{ docker_test_image_hello_world_base }}:alias"
   register: tag_2
 
 - name: Tag image with alias (force, still idempotent)
   docker_image:
     source: local
-    name: "{{ docker_test_image_hello_world }}:latest"
-    repository: "{{ docker_test_image_hello_world }}:alias"
+    name: "{{ docker_test_image_hello_world }}"
+    repository: "{{ docker_test_image_hello_world_base }}:alias"
     force_tag: yes
   register: tag_3
 
@@ -74,5 +74,5 @@
 
 - name: Cleanup alias tag
   docker_image:
-    name: "{{ docker_test_image_hello_world }}:alias"
+    name: "{{ docker_test_image_hello_world_base }}:alias"
     state: absent

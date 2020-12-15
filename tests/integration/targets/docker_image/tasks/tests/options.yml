@@ -184,27 +184,27 @@
 
 - name: Archive image
   docker_image:
-    name: "{{ docker_test_image_hello_world }}:latest"
+    name: "{{ docker_test_image_hello_world }}"
     archive_path: "{{ output_dir }}/image.tar"
     source: pull
   register: archive_image
 
 - name: remove image
   docker_image:
-    name: "{{ docker_test_image_hello_world }}:latest"
+    name: "{{ docker_test_image_hello_world }}"
     state: absent
     force_absent: yes
 
 - name: load image (changed)
   docker_image:
-    name: "{{ docker_test_image_hello_world }}:latest"
+    name: "{{ docker_test_image_hello_world }}"
     load_path: "{{ output_dir }}/image.tar"
     source: load
   register: load_image
 
 - name: load image (idempotency)
   docker_image:
-    name: "{{ docker_test_image_hello_world }}:latest"
+    name: "{{ docker_test_image_hello_world }}"
     load_path: "{{ output_dir }}/image.tar"
     source: load
   register: load_image_1

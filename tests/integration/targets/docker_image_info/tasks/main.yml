@@ -25,23 +25,23 @@
       source: pull
       state: present
     loop:
-    - "{{ docker_test_image_hello_world }}:latest"
+    - "{{ docker_test_image_hello_world }}"
     - "{{ docker_test_image_alpine }}"
 
   - name: Inspect an available image
     docker_image_info:
-      name: "{{ docker_test_image_hello_world }}:latest"
+      name: "{{ docker_test_image_hello_world }}"
     register: result
 
   - assert:
       that:
       - "result.images|length == 1"
-      - "(docker_test_image_hello_world ~ ':latest') in result.images[0].RepoTags"
+      - "docker_test_image_hello_world in result.images[0].RepoTags"
 
   - name: Inspect multiple images
     docker_image_info:
       name:
-      - "{{ docker_test_image_hello_world }}:latest"
+      - "{{ docker_test_image_hello_world }}"
       - "{{ docker_test_image_alpine }}"
     register: result
 
@@ -50,7 +50,7 @@
   - assert:
       that:
       - "result.images|length == 2"
-      - "(docker_test_image_hello_world ~ ':latest') in result.images[0].RepoTags"
+      - "docker_test_image_hello_world in result.images[0].RepoTags"
       - "docker_test_image_alpine in result.images[1].RepoTags"
 
   when: docker_py_version is version('1.8.0', '>=') and docker_api_version is version('1.20', '>=')

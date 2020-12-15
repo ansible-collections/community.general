@@ -587,12 +587,6 @@
     #      of hello-world. We don't know why this happens, but it happens
     #      often enough to be annoying. That's why we disable this for now,
     #      and simply test that 'Output' is contained in the result.
-    # NOTE {{ docker_test_image_hello_world }} is no longer necessarily the
-    #      hello-world image, so we potentially have a different output
-    #      anyway. If someone wants to revive this test, it's probably best
-    #      to keep {{ docker_test_image_hello_world }} as some image that
-    #      has 'echo' and execute 'echo "Hello from Docker!"' or something
-    #      like that.
     - "'Output' in detach_no_cleanup.container"
     # - "'Hello from Docker!' in detach_no_cleanup.container.Output"
     - detach_no_cleanup_cleanup is changed

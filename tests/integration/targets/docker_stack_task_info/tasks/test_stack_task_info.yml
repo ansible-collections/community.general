@@ -74,7 +74,7 @@
       that:
         - 'output.results | type_debug == "list"'
         - 'output.results[0].DesiredState == "Running"'
-        - 'output.results[0].Image == docker_test_image_busybox ~ ":latest"'
+        - 'output.results[0].Image == docker_test_image_busybox'
         - 'output.results[0].Name == "test_stack_busybox.1"'
 
   always:
