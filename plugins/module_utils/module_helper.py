@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2018, Ansible Project
+# (c) 2020, Alexei Znamensky <russoz@gmail.com>
+# Copyright: (c) 2020, Ansible Project
 # Simplified BSD License (see licenses/simplified_bsd.txt or https://opensource.org/licenses/BSD-2-Clause)
 
 from __future__ import absolute_import, division, print_function
@@ -151,14 +152,60 @@ class DependencyCtxMgr(object):
         return self.msg or str(self.exc_val)
 
 
+class NamedDeprecation(object):
+    def __init__(self, deprecation):
+        self.name = None
+        self.deprecation = deprecation
+        self._prepared_deprecation = None
+        self.acked = False
+        self.triggered = False
+        self.module = None
+        self.ack_param = None
+
+    def prepare(self, name, module, ack_param):
+        self.name = name
+        self.module = module
+
+        d = list(self.deprecation)
+        d[0] = (
+            "{0}"
+            "\n\n"
+            "To prevent this message, add the deprecation name '{2}' to the '{1}' module parameter:\n"
+            "  {1}:\n"
+            "    - {2}"
+        ).format(d[0], ack_param, name)
+        self._prepared_deprecation = d
+
+    def acknowledge(self):
+        self.acked = True
+
+    def trigger(self):
+        if self.triggered or self.acked:
+            return
+
+        self.module.deprecate(*self._prepared_deprecation)  # pylint: disable=ansible-deprecated-no-version
+        self.triggered = True
+
+    def __str__(self):
+        return "<NamedDeprecation: {0} {1}{2}{3}>".format(
+            self.name,
+            self.deprecation,
+            ' ACK' if self.acked else "",
+            ' TRG' if self.triggered else "",
+        )
+
+
 class ModuleHelper(object):
     _dependencies = []
     module = {}
     facts_name = None
     named_deprecations = {}
     ack_deprecations_module_param = "ack_named_deprecations"
-    _acked_named_deprecations = set()
-    _triggered_named_deprecations = set()
+
+    class PrepareNamedDeprecation(object):
+        @staticmethod
+        def deprecate(msg, version=None, date=None, collection_name=None):
+            return NamedDeprecation([msg, version, date, collection_name])
 
     class AttrDict(dict):
         def __getattr__(self, item):
@@ -177,6 +224,12 @@ class ModuleHelper(object):
             if self.named_deprecations:
                 self.module['argument_spec'].update(self.make_ack_named_deprecation_arg_spec())
             self.module = AnsibleModule(**self.module)
+
+        for name, deprecation in self.named_deprecations.items():
+            deprecation.prepare(name, self.module, self.ack_deprecations_module_param)
+
+        for ack in self.module.params[self.ack_deprecations_module_param] or []:
+            self.ack_named_deprecation(ack)
 
     def update_output(self, **kwargs):
         self.output_dict.update(kwargs or {})
@@ -231,38 +284,19 @@ class ModuleHelper(object):
                                       **self.output_dict)
 
     def make_ack_named_deprecation_arg_spec(self):
-        return {
-            self.ack_deprecations_module_param: dict(type='list', elements='str')
-        }
+        return {self.ack_deprecations_module_param: dict(type='list', elements='str')}
 
     def ack_named_deprecation(self, name):
-        if name not in self.named_deprecations:
-            raise ModuleHelperException("No such named deprecation: {0}".format(name))
-        self._acked_named_deprecations.add(name)
+        try:
+            self.named_deprecations[name].acknowledge()
+        except Exception as e:
+            raise ModuleHelperException("No such named deprecation: {0}\n{1}".format(name, e))
 
     def trigger_named_deprecation(self, name):
-        if name not in self.named_deprecations:
-            raise ModuleHelperException("No such named deprecation: {0}".format(name))
-        if name in self._triggered_named_deprecations:
-            return
-        if name in self._acked_named_deprecations:
-            return
-
-        deprecation = dict(self.named_deprecations[name])
-        msg = (
-            "{0}"
-            "\n\n"
-            "To prevent this message, add the deprecation name '{2}' to the '{1}' module parameter:\n"
-            "  {1}:\n"
-            "    - {2}"
-        ).format(
-            deprecation['msg'],
-            self.ack_deprecations_module_param,
-            name
-        )
-        deprecation.update({'msg': msg})
-        self.module.deprecate(**deprecation)
-        self._triggered_named_deprecations.add(name)
+        try:
+            self.named_deprecations[name].trigger()
+        except Exception as e:
+            raise ModuleHelperException("No such named deprecation: {0}\n{1}".format(name, e))
 
 
 class StateMixin(object):
