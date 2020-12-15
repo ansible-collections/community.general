@@ -11,7 +11,7 @@
     name: "{{ image }}"
     source: pull
   loop:
-    - "{{ docker_test_image_hello_world }}:latest"
+    - "{{ docker_test_image_hello_world }}"
     - "{{ docker_test_image_alpine }}"
   loop_control:
     loop_var: image
@@ -19,7 +19,7 @@
 - name: Get image ID of {{ docker_test_image_hello_world }} and {{ docker_test_image_alpine }} images
   docker_image_info:
     name:
-    - "{{ docker_test_image_hello_world }}:latest"
+    - "{{ docker_test_image_hello_world }}"
     - "{{ docker_test_image_alpine }}"
   register: image_info
 
@@ -103,25 +103,25 @@
       - create_6.container.Image == image_info.images[1].Id
       - create_6.container.Id == create_4.container.Id  # make sure container wasn't recreated
 
-- name: Create container with {{ docker_test_image_hello_world }} image via old digest
+- name: Create container with {{ docker_test_image_digest_base }} image via old digest
   docker_container:
-    image: "{{ docker_test_image_hello_world }}@sha256:{{ docker_test_image_hello_world_digest_v1 }}"
+    image: "{{ docker_test_image_digest_base }}@sha256:{{ docker_test_image_digest_v1 }}"
     name: "{{ cname }}"
     state: present
     force_kill: yes
   register: digest_1
 
-- name: Create container with {{ docker_test_image_hello_world }} image via old digest (idempotent)
+- name: Create container with {{ docker_test_image_digest_base }} image via old digest (idempotent)
   docker_container:
-    image: "{{ docker_test_image_hello_world }}@sha256:{{ docker_test_image_hello_world_digest_v1 }}"
+    image: "{{ docker_test_image_digest_base }}@sha256:{{ docker_test_image_digest_v1 }}"
     name: "{{ cname }}"
     state: present
     force_kill: yes
   register: digest_2
 
-- name: Update container with {{ docker_test_image_hello_world }} image via new digest
+- name: Update container with {{ docker_test_image_digest_base }} image via new digest
   docker_container:
-    image: "{{ docker_test_image_hello_world }}@sha256:{{ docker_test_image_hello_world_digest_v2 }}"
+    image: "{{ docker_test_image_digest_base }}@sha256:{{ docker_test_image_digest_v2 }}"
     name: "{{ cname }}"
     state: present
     force_kill: yes
