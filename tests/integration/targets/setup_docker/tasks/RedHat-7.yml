@@ -42,4 +42,4 @@
   service:
     name: docker
     state: started
-  ignore_errors: "{{ ansible_virtualization_type == 'docker' }}"
+  ignore_errors: "{{ ansible_virtualization_type in ['docker', 'container', 'containerd'] }}"

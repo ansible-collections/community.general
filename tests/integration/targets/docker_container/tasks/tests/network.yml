@@ -23,10 +23,10 @@
   when: docker_py_version is version('1.10.0', '>=')
 
 - set_fact:
-    subnet_ipv4_base: 192.168.{{ 64 + (192 | random) }}
+    subnet_ipv4_base: 10.{{ 16 + (240 | random) }}.{{ 16 + (240 | random) }}
     subnet_ipv6_base: fdb6:feea:{{ '%0.4x:%0.4x' | format(65536 | random, 65536 | random) }}
     # If netaddr would be installed on the controller, one could do:
-    # subnet_ipv4: "192.168.{{ 64 + (192 | random) }}.0/24"
+    # subnet_ipv4: "10.{{ 16 + (240 | random) }}.{{ 16 + (240 | random) }}.0/24"
     # subnet_ipv6: "fdb6:feea:{{ '%0.4x:%0.4x' | format(65536 | random, 65536 | random) }}::/64"
 
 - set_fact:

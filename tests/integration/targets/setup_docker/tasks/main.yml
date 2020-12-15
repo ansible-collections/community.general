@@ -135,3 +135,16 @@
             images: "{{ docker_images.stdout_lines | default([]) }}"
 
       when: docker_cli_version is version('0.0', '>')
+
+    - name: Detect whether we are running inside a container
+      current_container_facts:
+
+    - name: Inspect current container
+      docker_container_info:
+        name: "{{ ansible_module_container_id }}"
+      register: current_container_info
+      when: ansible_module_running_in_container
+
+    - name: Determine network name
+      set_fact:
+        current_container_network_ip: "{{ (current_container_info.container.NetworkSettings.Networks | dictsort)[0].0 | default('') if ansible_module_running_in_container else '' }}"

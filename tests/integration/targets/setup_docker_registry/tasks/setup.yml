@@ -44,6 +44,15 @@
       name: '{{ docker_registry_container_name_registry }}'
       image: "{{ docker_test_image_registry }}"
       ports: 5000
+      network_mode: '{{ current_container_network_ip | default(omit, true) }}'
+      # We need to define the alias `real-registry` here because the global `links`
+      # option for the NGINX containers (see setup-frontend.yml) does not work when
+      # using networks.
+      networks: >-
+        {{
+          [dict([['name', current_container_network_ip], ['aliases', ['real-registry']]])]
+          if current_container_network_ip not in ['', 'bridge'] else omit
+        }}
     register: registry_container
 
   - name: Get registry URL
