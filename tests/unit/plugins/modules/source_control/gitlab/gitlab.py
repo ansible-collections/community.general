@@ -587,7 +587,6 @@ def resp_get_runner(url, request):
 
 @urlmatch(scheme="http", netloc="localhost", path=r'/api/v4/runners$', method="post")
 def resp_create_runner(url, request):
-    
     headers = {'content-type': 'application/json'}
     content = ('{"active": true,"description": "test-1-20150125","id": 1,'
                '"is_shared": false,"ip_address": "127.0.0.1","name": null,'
