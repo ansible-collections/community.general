@@ -116,6 +116,8 @@ EXAMPLES = '''
     state: present
     name: "{{ ansible_fqdn }}"
     ip: "{{ ansible_default_ipv4.address }}"
+    variables:
+      foo: "bar"
   delegate_to: 127.0.0.1
 '''
 
