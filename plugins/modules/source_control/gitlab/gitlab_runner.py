@@ -62,7 +62,7 @@ options:
       - Searches only owned runners when searching for existing, when false admin token required.
     default: no
     type: bool
-    since: 2.0.0
+    version_added: 2.0.0
   active:
     description:
       - Define if the runners is immediately active after creation.
