@@ -59,10 +59,10 @@ options:
     type: str
   owned:
     description:
-      - Will search only owned runners when searching for existing, when false admin token required
-    required: False
+      - Searches only owned runners when searching for existing, when false admin token required.
     default: no
     type: bool
+    since: 2.0.0
   active:
     description:
       - Define if the runners is immediately active after creation.
@@ -119,6 +119,14 @@ EXAMPLES = '''
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     description: Docker Machine t1
+    state: absent
+
+- name: "Delete an owned runner as a non-admin"
+  community.general.gitlab_runner:
+    api_url: https://gitlab.example.com/
+    api_token: "{{ access_token }}"
+    description: Docker Machine t1
+    owned: yes
     state: absent
 '''
 
