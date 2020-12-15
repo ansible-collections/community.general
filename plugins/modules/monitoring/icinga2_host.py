@@ -102,7 +102,7 @@ options:
   variables:
     type: dict
     description:
-      - List of variables.
+      - Dictionary of variables.
 extends_documentation_fragment:
   - url
 '''
