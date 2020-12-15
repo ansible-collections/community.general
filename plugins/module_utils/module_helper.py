@@ -228,7 +228,7 @@ class ModuleHelper(object):
         for name, deprecation in self.named_deprecations.items():
             deprecation.prepare(name, self.module, self.ack_deprecations_module_param)
 
-        for ack in self.module.params[self.ack_deprecations_module_param] or []:
+        for ack in self.module.params.get(self.ack_deprecations_module_param) or []:
             self.ack_named_deprecation(ack)
 
     def update_output(self, **kwargs):
