@@ -21,3 +21,6 @@ openshift ; python_version >= '2.7'
 # requirement for maven_artifact module
 lxml
 semantic_version
+
+# requirement for datadog_downtime module
+datadog-api-client >= 1.0.0b3 ; python_version >= '3.6'
