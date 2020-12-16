@@ -1,0 +1,3 @@
+major_changes:
+  - removed v1 newrelic api 
+  - added support for v2 newrelic api (https://github.com/ansible-collections/community.general/pull/1501).
