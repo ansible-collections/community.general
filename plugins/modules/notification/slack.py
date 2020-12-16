@@ -22,11 +22,13 @@ description:
 author: "Ramon de la Fuente (@ramondelafuente)"
 options:
   domain:
+    type: str
     description:
       - Slack (sub)domain for your environment without protocol. (i.e.
         C(example.slack.com)) In 1.8 and beyond, this is deprecated and may
         be ignored.  See token documentation for information.
   token:
+    type: str
     description:
       - Slack integration token. This authenticates you to the slack service.
         Make sure to use the correct type of token, depending on what method you use.
@@ -50,11 +52,13 @@ options:
         See Slack's documentation (U(https://api.slack.com/docs/token-types)) for more information."
     required: true
   msg:
+    type: str
     description:
       - Message to send. Note that the module does not handle escaping characters.
         Plain-text angle brackets and ampersands should be converted to HTML entities (e.g. & to &amp;) before sending.
         See Slack's documentation (U(https://api.slack.com/docs/message-formatting)) for more.
   channel:
+    type: str
     description:
       - Channel to send the message to. If absent, the message goes to the channel selected for the I(token).
   thread_id:
@@ -68,17 +72,22 @@ options:
     type: str
     version_added: 1.2.0
   username:
+    type: str
     description:
       - This is the sender of the message.
     default: "Ansible"
   icon_url:
+    type: str
     description:
       - Url for the message sender's icon (default C(https://www.ansible.com/favicon.ico))
+    default: https://www.ansible.com/favicon.ico
   icon_emoji:
+    type: str
     description:
       - Emoji for the message sender. See Slack documentation for options.
         (if I(icon_emoji) is set, I(icon_url) will not be used)
   link_names:
+    type: int
     description:
       - Automatically create links for channels and usernames in I(msg).
     default: 1
@@ -86,6 +95,7 @@ options:
       - 1
       - 0
   parse:
+    type: str
     description:
       - Setting for the message parser at Slack
     choices:
@@ -98,12 +108,14 @@ options:
     type: bool
     default: 'yes'
   color:
+    type: str
     description:
       - Allow text to use default colors - use the default of 'normal' to not send a custom color bar at the start of the message.
       - Allowed values for color can be one of 'normal', 'good', 'warning', 'danger', any valid 3 digit or 6 digit hex color value.
       - Specifying value in hex is supported since Ansible 2.8.
     default: 'normal'
   attachments:
+    type: list
     description:
       - Define a list of attachments. This list mirrors the Slack JSON API.
       - For more information, see U(https://api.slack.com/docs/attachments).
@@ -328,7 +340,6 @@ def build_payload_for_slack(module, text, channel, thread_id, username, icon_url
         ]
         payload['blocks'] = recursive_escape_quotes(blocks, block_keys_to_escape)
 
-    payload = module.jsonify(payload)
     return payload
 
 
@@ -377,14 +388,15 @@ def do_notify_slack(module, domain, token, payload):
     if use_webapi:
         headers['Authorization'] = 'Bearer ' + token
 
-    response, info = fetch_url(module=module, url=slack_uri, headers=headers, method='POST', data=payload)
+    data = module.jsonify(payload)
+    response, info = fetch_url(module=module, url=slack_uri, headers=headers, method='POST', data=data)
 
     if info['status'] != 200:
         if use_webapi:
             obscured_incoming_webhook = slack_uri
         else:
             obscured_incoming_webhook = SLACK_INCOMING_WEBHOOK % ('[obscured]')
-        module.fail_json(msg=" failed to send %s to %s: %s" % (payload, obscured_incoming_webhook, info['msg']))
+        module.fail_json(msg=" failed to send %s to %s: %s" % (data, obscured_incoming_webhook, info['msg']))
 
     # each API requires different handling
     if use_webapi:
@@ -459,8 +471,10 @@ def main():
     if 'ok' in slack_response:
         # Evaluate WebAPI response
         if slack_response['ok']:
+            # return payload as a string for backwards compatibility
+            payload_json = module.jsonify(payload)
             module.exit_json(changed=changed, ts=slack_response['ts'], channel=slack_response['channel'],
-                             api=slack_response, payload=payload)
+                             api=slack_response, payload=payload_json)
         else:
             module.fail_json(msg="Slack API error", error=slack_response['error'])
     else:

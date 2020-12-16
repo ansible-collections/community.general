@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2014, GeekChimp - Franck Nijhof <franck@geekchimp.com>
+# Copyright: (c) 2014, GeekChimp - Franck Nijhof <franck@geekchimp.com> (DO NOT CONTACT!)
 # Copyright: (c) 2019, Ansible project
 # Copyright: (c) 2019, Abhijeet Kasurde <akasurde@redhat.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -13,7 +13,8 @@ DOCUMENTATION = r'''
 ---
 module: osx_defaults
 author:
-- Franck Nijhof (@frenck)
+# DO NOT RE-ADD GITHUB HANDLE!
+- Franck Nijhof (!UNKNOWN)
 short_description: Manage macOS user defaults
 description:
   - osx_defaults allows users to read, write, and delete macOS user defaults from Ansible scripts.
@@ -35,7 +36,6 @@ options:
     description:
       - The key of the user preference.
     type: str
-    required: true
   type:
     description:
       - The type of value to write.
@@ -237,8 +237,8 @@ class OSXDefaults(object):
         value.pop(0)
         value.pop(-1)
 
-        # Remove extra spaces and comma (,) at the end of values
-        value = [re.sub(',$', '', x.strip(' ')) for x in value]
+        # Remove spaces at beginning and comma (,) at the end, unquote and unescape double quotes
+        value = [re.sub('^ *"?|"?,? *$', '', x.replace('\\"', '"')) for x in value]
 
         return value
 

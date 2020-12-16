@@ -36,24 +36,31 @@ options:
       - URL of the OpenNebula OneFlow API server.
       - It is recommended to use HTTPS so that the username/password are not transferred over the network unencrypted.
       - If not set then the value of the ONEFLOW_URL environment variable is used.
+    type: str
   api_username:
     description:
       - Name of the user to login into the OpenNebula OneFlow API server. If not set then the value of the C(ONEFLOW_USERNAME) environment variable is used.
+    type: str
   api_password:
     description:
       - Password of the user to login into OpenNebula OneFlow API server. If not set then the value of the C(ONEFLOW_PASSWORD) environment variable is used.
+    type: str
   template_name:
     description:
       - Name of service template to use to create a new instance of a service
+    type: str
   template_id:
     description:
       - ID of a service template to use to create a new instance of a service
+    type: int
   service_id:
     description:
       - ID of a service instance that you would like to manage
+    type: int
   service_name:
     description:
       - Name of a service instance that you would like to manage
+    type: str
   unique:
     description:
       - Setting C(unique=yes) will make sure that there is only one service instance running with a name set with C(service_name) when
@@ -66,15 +73,19 @@ options:
       - C(absent) - terminate an instance of a service specified with C(service_id)/C(service_name).
     choices: ["present", "absent"]
     default: present
+    type: str
   mode:
     description:
       - Set permission mode of a service instance in octet format, e.g. C(600) to give owner C(use) and C(manage) and nothing to group and others.
+    type: str
   owner_id:
     description:
       - ID of the user which will be set as the owner of the service
+    type: int
   group_id:
     description:
       - ID of the group which will be set as the group of the service
+    type: int
   wait:
     description:
       - Wait for the instance to reach RUNNING state after DEPLOYING or COOLDOWN state after SCALING
@@ -84,16 +95,20 @@ options:
     description:
       - How long before wait gives up, in seconds
     default: 300
+    type: int
   custom_attrs:
     description:
       - Dictionary of key/value custom attributes which will be used when instantiating a new service.
     default: {}
+    type: dict
   role:
     description:
       - Name of the role whose cardinality should be changed
+    type: str
   cardinality:
     description:
       - Number of VMs for the specified role
+    type: int
   force:
     description:
       - Force the new cardinality even if it is outside the limits

@@ -1,3 +1,8 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # test code for filters
 # Copyright: (c) 2014, Michael DeHaan <michael.dehaan@gmail.com>
 # Copyright: (c) 2019, Ansible Project

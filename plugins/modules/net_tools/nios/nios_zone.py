@@ -32,24 +32,29 @@ options:
       - Configures the DNS view name for the configured resource.  The
         specified DNS zone must already exist on the running NIOS instance
         prior to configuring zones.
-    required: true
     default: default
     aliases:
       - dns_view
   grid_primary:
     description:
       - Configures the grid primary servers for this zone.
+    type: list
+    elements: dict
     suboptions:
       name:
         description:
           - The name of the grid primary server
+        required: true
   grid_secondaries:
     description:
       - Configures the grid secondary servers for this zone.
+    type: list
+    elements: dict
     suboptions:
       name:
         description:
           - The name of the grid secondary server
+        required: true
   ns_group:
     description:
       - Configures the name server group for this zone. Name server group is
@@ -184,7 +189,7 @@ def main():
 
     ib_spec = dict(
         fqdn=dict(required=True, aliases=['name'], ib_req=True, update=False),
-        zone_format=dict(default='FORWARD', aliases=['zone_format'], ib_req=False),
+        zone_format=dict(default='FORWARD', ib_req=False),
         view=dict(default='default', aliases=['dns_view'], ib_req=True),
 
         grid_primary=dict(type='list', elements='dict', options=grid_spec),

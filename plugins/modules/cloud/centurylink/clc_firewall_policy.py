@@ -16,45 +16,54 @@ options:
   location:
     description:
       - Target datacenter for the firewall policy
+    type: str
     required: True
   state:
     description:
       - Whether to create or delete the firewall policy
+    type: str
     default: present
     choices: ['present', 'absent']
   source:
     description:
       - The list  of source addresses for traffic on the originating firewall.
         This is required when state is 'present'
+    type: list
   destination:
     description:
       - The list of destination addresses for traffic on the terminating firewall.
         This is required when state is 'present'
+    type: list
   ports:
     description:
       - The list of ports associated with the policy.
         TCP and UDP can take in single ports or port ranges.
-    choices: ['any', 'icmp', 'TCP/123', 'UDP/123', 'TCP/123-456', 'UDP/123-456']
+      - "Example: C(['any', 'icmp', 'TCP/123', 'UDP/123', 'TCP/123-456', 'UDP/123-456'])."
+    type: list
   firewall_policy_id:
     description:
       - Id of the firewall policy. This is required to update or delete an existing firewall policy
+    type: str
   source_account_alias:
     description:
       - CLC alias for the source account
+    type: str
     required: True
   destination_account_alias:
     description:
       - CLC alias for the destination account
+    type: str
   wait:
     description:
       - Whether to wait for the provisioning tasks to finish before returning.
-    type: bool
-    default: 'yes'
+    type: str
+    default: 'True'
   enabled:
     description:
       - Whether the firewall policy is enabled or disabled
+    type: str
     choices: [True, False]
-    default: 'yes'
+    default: True
 requirements:
     - python = 2.7
     - requests >= 2.5.0
@@ -89,7 +98,6 @@ EXAMPLES = '''
         ports: Any
         destination_account_alias: WFAD
 
----
 - name: Delete Firewall Policy
   hosts: localhost
   gather_facts: False
@@ -206,13 +214,13 @@ class ClcFirewallPolicy:
         """
         argument_spec = dict(
             location=dict(required=True),
-            source_account_alias=dict(required=True, default=None),
-            destination_account_alias=dict(default=None),
-            firewall_policy_id=dict(default=None),
-            ports=dict(default=None, type='list'),
-            source=dict(default=None, type='list'),
-            destination=dict(default=None, type='list'),
-            wait=dict(default=True),
+            source_account_alias=dict(required=True),
+            destination_account_alias=dict(),
+            firewall_policy_id=dict(),
+            ports=dict(type='list'),
+            source=dict(type='list'),
+            destination=dict(type='list'),
+            wait=dict(default=True),   # @FIXME type=bool
             state=dict(default='present', choices=['present', 'absent']),
             enabled=dict(default=True, choices=[True, False])
         )

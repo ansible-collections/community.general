@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
+    author: Unknown (!UNKNOWN)
     lookup: credstash
     short_description: retrieve secrets from Credstash on AWS
     requirements:
@@ -78,7 +79,8 @@ EXAMPLES = """
 RETURN = """
   _raw:
     description:
-      - value(s) stored in Credstash
+      - Value(s) stored in Credstash.
+    type: str
 """
 
 import os

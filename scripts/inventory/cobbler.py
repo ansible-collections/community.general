@@ -52,7 +52,10 @@ import argparse
 import os
 import re
 from time import time
-import xmlrpclib
+try:  # Python 3
+    from xmlrpc.client import Server
+except ImportError:  # Python 2
+    from xmlrpclib import Server
 
 import json
 
@@ -106,7 +109,7 @@ class CobblerInventory(object):
 
     def _connect(self):
         if not self.conn:
-            self.conn = xmlrpclib.Server(self.cobbler_host, allow_none=True)
+            self.conn = Server(self.cobbler_host, allow_none=True)
             self.token = None
             if self.cobbler_username is not None:
                 self.token = self.conn.login(self.cobbler_username, self.cobbler_password)

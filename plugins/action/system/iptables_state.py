@@ -48,7 +48,7 @@ class ActionModule(ActionBase):
         # At least one iteration is required, even if timeout is 0.
         for i in range(max(1, timeout)):
             async_result = self._execute_module(
-                module_name='async_status',
+                module_name='ansible.builtin.async_status',
                 module_args=module_args,
                 task_vars=task_vars,
                 wrap_async=False)
@@ -98,25 +98,9 @@ class ActionModule(ActionBase):
                             task_async,
                             max_timeout))
 
-                    # BEGIN snippet from async_status action plugin
-                    env_async_dir = [e for e in self._task.environment if
-                                     "ANSIBLE_ASYNC_DIR" in e]
-                    if len(env_async_dir) > 0:
-                        # for backwards compatibility we need to get the dir from
-                        # ANSIBLE_ASYNC_DIR that is defined in the environment. This is
-                        # deprecated and will be removed in favour of shell options
-                        async_dir = env_async_dir[0]['ANSIBLE_ASYNC_DIR']
-
-                        msg = "Setting the async dir from the environment keyword " \
-                              "ANSIBLE_ASYNC_DIR is deprecated. Set the async_dir " \
-                              "shell option instead"
-                        display.deprecated(msg, version='2.0.0',
-                                           collection_name='community.general')  # was Ansible 2.12
-                    else:
-                        # inject the async directory based on the shell option into the
-                        # module args
-                        async_dir = self.get_shell_option('async_dir', default="~/.ansible_async")
-                    # END snippet from async_status action plugin
+                    # inject the async directory based on the shell option into the
+                    # module args
+                    async_dir = self.get_shell_option('async_dir', default="~/.ansible_async")
 
                     # Bind the loop max duration to consistent values on both
                     # remote and local sides (if not the same, make the loop
@@ -125,15 +109,18 @@ class ActionModule(ActionBase):
                     module_args['_back'] = '%s/iptables.state' % async_dir
                     async_status_args = dict(_async_dir=async_dir)
                     confirm_cmd = 'rm -f %s' % module_args['_back']
+                    starter_cmd = 'touch %s.starter' % module_args['_back']
                     remaining_time = max(task_async, max_timeout)
 
             # do work!
             result = merge_hash(result, self._execute_module(module_args=module_args, task_vars=task_vars, wrap_async=wrap_async))
 
             # Then the 3-steps "go ahead or rollback":
-            # - reset connection to ensure a persistent one will not be reused
-            # - confirm the restored state by removing the backup on the remote
-            # - retrieve the results of the asynchronous task to return them
+            # 1. Catch early errors of the module (in asynchronous task) if any.
+            #    Touch a file on the target to signal the module to process now.
+            # 2. Reset connection to ensure a persistent one will not be reused.
+            # 3. Confirm the restored state by removing the backup on the remote.
+            #    Retrieve the results of the asynchronous task to return them.
             if '_back' in module_args:
                 async_status_args['jid'] = result.get('ansible_job_id', None)
                 if async_status_args['jid'] is None:
@@ -143,12 +130,18 @@ class ActionModule(ActionBase):
                 # option type/value, missing required system command, etc.
                 result = merge_hash(result, self._async_result(async_status_args, task_vars, 0))
 
+                # The module is aware to not process the main iptables-restore
+                # command before finding (and deleting) the 'starter' cookie on
+                # the host, so the previous query will not reach ssh timeout.
+                garbage = self._low_level_execute_command(starter_cmd, sudoable=self.DEFAULT_SUDOABLE)
+
+                # As the main command is not yet executed on the target, here
+                # 'finished' means 'failed before main command be executed'.
                 if not result['finished']:
                     try:
                         self._connection.reset()
-                        display.v("%s: reset connection" % (module_name))
                     except AttributeError:
-                        display.warning("Connection plugin does not allow to reset the connection.")
+                        pass
 
                     for x in range(max_timeout):
                         time.sleep(1)
@@ -177,7 +170,7 @@ class ActionModule(ActionBase):
 
                 async_status_args['mode'] = 'cleanup'
                 garbage = self._execute_module(
-                    module_name='async_status',
+                    module_name='ansible.builtin.async_status',
                     module_args=async_status_args,
                     task_vars=task_vars,
                     wrap_async=False)

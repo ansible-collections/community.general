@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
+    author: Unknown (!UNKNOWN)
     lookup: cyberarkpassword
     short_description: get secrets from CyberArk AIM
     requirements:
@@ -30,8 +31,8 @@ DOCUMENTATION = '''
         default: 'password'
       _extra:
         description: for extra_params values please check parameters for clipasswordsdk in CyberArk's "Credential Provider and ASCP Implementation Guide"
-    note:
-      - For Ansible on windows, please change the -parameters (-p, -d, and -o) to /parameters (/p, /d, and /o) and change the location of CLIPasswordSDK.exe
+    notes:
+      - For Ansible on Windows, please change the -parameters (-p, -d, and -o) to /parameters (/p, /d, and /o) and change the location of CLIPasswordSDK.exe.
 '''
 
 EXAMPLES = """

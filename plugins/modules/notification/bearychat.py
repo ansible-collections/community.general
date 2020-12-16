@@ -30,12 +30,14 @@ description:
 author: "Jiangge Zhang (@tonyseek)"
 options:
   url:
+    type: str
     description:
       - BearyChat WebHook URL. This authenticates you to the bearychat
         service. It looks like
         C(https://hook.bearychat.com/=ae2CF/incoming/e61bd5c57b164e04b11ac02e66f47f60).
     required: true
   text:
+    type: str
     description:
       - Message to send.
   markdown:
@@ -44,10 +46,13 @@ options:
     default: 'yes'
     type: bool
   channel:
+    type: str
     description:
       - Channel to send the message to. If absent, the message goes to the
         default channel selected by the I(url).
   attachments:
+    type: list
+    elements: dict
     description:
       - Define a list of attachments. For more information, see
         https://github.com/bearyinnovative/bearychat-tutorial/blob/master/robots/incoming.md#attachments
@@ -154,7 +159,7 @@ def main():
         'text': dict(type='str'),
         'markdown': dict(default=True, type='bool'),
         'channel': dict(type='str'),
-        'attachments': dict(type='list'),
+        'attachments': dict(type='list', elements='dict'),
     })
 
     if not HAS_URLPARSE:

@@ -66,6 +66,7 @@ options:
     description:
       - A list of puppet tags to be used.
     type: list
+    elements: str
   execute:
     description:
       - Execute a specific piece of Puppet code.
@@ -79,14 +80,17 @@ options:
     description:
       - Whether to print a transaction summary.
     type: bool
+    default: false
   verbose:
     description:
       - Print extra information.
     type: bool
+    default: false
   debug:
     description:
       - Enable full debugging.
     type: bool
+    default: false
 requirements:
 - puppet
 author:
@@ -177,7 +181,7 @@ def main():
             facter_basename=dict(type='str', default='ansible'),
             environment=dict(type='str'),
             certname=dict(type='str'),
-            tags=dict(type='list'),
+            tags=dict(type='list', elements='str'),
             execute=dict(type='str'),
             summarize=dict(type='bool', default=False),
             debug=dict(type='bool', default=False),

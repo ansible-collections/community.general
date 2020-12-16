@@ -20,10 +20,12 @@ description:
    - Enables or disables a specified module of the Apache2 webserver.
 options:
    name:
+     type: str
      description:
         - Name of the module to enable/disable as given to C(a2enmod/a2dismod).
      required: true
    identifier:
+     type: str
      description:
          - Identifier of the module as listed by C(apache2ctl -M).
            This is optional and usually determined automatically by the common convention of
@@ -36,6 +38,7 @@ options:
      type: bool
      default: False
    state:
+     type: str
      description:
         - Desired state of the module.
      choices: ['present', 'absent']
@@ -158,6 +161,7 @@ def create_apache_identifier(name):
 
     # a2enmod name replacement to apache2ctl -M names
     text_workarounds = [
+        ('shib', 'mod_shib'),
         ('shib2', 'mod_shib'),
         ('evasive', 'evasive20_module'),
     ]

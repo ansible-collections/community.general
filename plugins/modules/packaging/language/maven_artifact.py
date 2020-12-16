@@ -24,18 +24,22 @@ requirements:
     - boto if using a S3 repository (s3://...)
 options:
     group_id:
+        type: str
         description:
             - The Maven groupId coordinate
         required: true
     artifact_id:
+        type: str
         description:
             - The maven artifactId coordinate
         required: true
     version:
+        type: str
         description:
             - The maven version coordinate
             - Mutually exclusive with I(version_by_spec).
     version_by_spec:
+        type: str
         description:
             - The maven dependency version ranges.
             - See supported version ranges on U(https://cwiki.apache.org/confluence/display/MAVENOLD/Dependency+Mediation+and+Conflict+Resolution)
@@ -43,23 +47,28 @@ options:
             - Mutually exclusive with I(version).
         version_added: '0.2.0'
     classifier:
+        type: str
         description:
             - The maven classifier coordinate
     extension:
+        type: str
         description:
             - The maven type/extension coordinate
         default: jar
     repository_url:
+        type: str
         description:
             - The URL of the Maven Repository to download from.
             - Use s3://... if the repository is hosted on Amazon S3, added in version 2.2.
             - Use file://... if the repository is local, added in version 2.6
         default: https://repo1.maven.org/maven2
     username:
+        type: str
         description:
             - The username to authenticate as to the Maven Repository. Use AWS secret key of the repository is hosted on S3
         aliases: [ "aws_secret_key" ]
     password:
+        type: str
         description:
             - The password to authenticate with to the Maven Repository. Use AWS secret access key of the repository is hosted on S3
         aliases: [ "aws_secret_access_key" ]
@@ -77,16 +86,19 @@ options:
         type: bool
         version_added: '0.2.0'
     dest:
+        type: path
         description:
             - The path where the artifact should be written to
             - If file mode or ownerships are specified and destination path already exists, they affect the downloaded file
         required: true
     state:
+        type: str
         description:
             - The desired state of the artifact
         default: present
         choices: [present,absent]
     timeout:
+        type: int
         description:
             - Specifies a timeout in seconds for the connection attempt
         default: 10
@@ -95,6 +107,18 @@ options:
             - If C(no), SSL certificates will not be validated. This should only be set to C(no) when no other option exists.
         type: bool
         default: 'yes'
+    client_cert:
+        description:
+            - PEM formatted certificate chain file to be used for SSL client authentication.
+            - This file can also include the key as well, and if the key is included, I(client_key) is not required.
+        type: path
+        version_added: '1.3.0'
+    client_key:
+        description:
+            - PEM formatted file that contains your private key to be used for SSL client authentication.
+            - If I(client_cert) contains both the certificate and key, this option is not required.
+        type: path
+        version_added: '1.3.0'
     keep_name:
         description:
             - If C(yes), the downloaded artifact's name is preserved, i.e the version number remains part of it.
@@ -103,6 +127,7 @@ options:
         type: bool
         default: 'no'
     verify_checksum:
+        type: str
         description:
             - If C(never), the md5 checksum will never be downloaded and verified.
             - If C(download), the md5 checksum will be downloaded and verified only after artifact download. This is the default.
@@ -143,6 +168,15 @@ EXAMPLES = '''
     password: pass
     dest: /tmp/library-name-latest.jar
 
+- name: Download an artifact from a private repository requiring certificate authentication
+  community.general.maven_artifact:
+    group_id: com.company
+    artifact_id: library-name
+    repository_url: 'https://repo.company.com/maven'
+    client_cert: /path/to/cert.pem
+    client_key: /path/to/key.pem
+    dest: /tmp/library-name-latest.jar
+
 - name: Download a WAR File to the Tomcat webapps directory to be deployed
   community.general.maven_artifact:
     group_id: com.company
@@ -181,6 +215,7 @@ import shutil
 import io
 import tempfile
 import traceback
+import re
 
 from ansible.module_utils.ansible_release import __version__ as ansible_version
 from re import match
@@ -273,7 +308,11 @@ class Artifact(object):
     def path(self, with_version=True):
         base = posixpath.join(self.group_id.replace(".", "/"), self.artifact_id)
         if with_version and self.version:
-            base = posixpath.join(base, self.version)
+            timestamp_version_match = re.match("^(.*-)?([0-9]{8}\\.[0-9]{6}-[0-9]+)$", self.version)
+            if timestamp_version_match:
+                base = posixpath.join(base, timestamp_version_match.group(1) + "SNAPSHOT")
+            else:
+                base = posixpath.join(base, self.version)
         return base
 
     def _generate_filename(self):
@@ -552,6 +591,8 @@ def main():
             timeout=dict(default=10, type='int'),
             dest=dict(type="path", required=True),
             validate_certs=dict(required=False, default=True, type='bool'),
+            client_cert=dict(type="path", required=False),
+            client_key=dict(type="path", required=False),
             keep_name=dict(required=False, default=False, type='bool'),
             verify_checksum=dict(required=False, default='download', choices=['never', 'download', 'change', 'always']),
             directory_mode=dict(type='str'),  # Used since https://github.com/ansible/ansible/pull/24965, not sure

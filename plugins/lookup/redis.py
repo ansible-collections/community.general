@@ -8,7 +8,7 @@ DOCUMENTATION = '''
     lookup: redis
     author:
       - Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
-      - Ansible Core
+      - Ansible Core Team
     short_description: fetch data from Redis
     description:
       - This lookup returns a list of results from a Redis DB corresponding to a list of items given to it
@@ -67,6 +67,8 @@ EXAMPLES = """
 RETURN = """
 _raw:
   description: value(s) stored in Redis
+  type: list
+  elements: str
 """
 
 import os

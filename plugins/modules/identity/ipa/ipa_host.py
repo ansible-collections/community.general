@@ -76,11 +76,9 @@ options:
     description:
     - If set C("True") with state as C("absent"), then removes DNS records of the host managed by FreeIPA DNS.
     - This option has no effect for states other than "absent".
-    default: false
     type: bool
   random_password:
     description: Generate a random password to be used in bulk enrollment.
-    default: False
     type: bool
 extends_documentation_fragment:
 - community.general.ipa.documentation
@@ -100,7 +98,7 @@ EXAMPLES = r'''
     - "08:00:27:E3:B1:2D"
     - "52:54:00:BD:97:1E"
     state: present
-    community.general.ipa_host: ipa.example.com
+    ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
 
@@ -110,7 +108,7 @@ EXAMPLES = r'''
     description: Example host
     ip_address: 192.168.0.123
     state: present
-    community.general.ipa_host: ipa.example.com
+    ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
     validate_certs: False
@@ -120,7 +118,7 @@ EXAMPLES = r'''
   community.general.ipa_host:
     name: host01.example.com
     state: disabled
-    community.general.ipa_host: ipa.example.com
+    ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
 
@@ -128,7 +126,7 @@ EXAMPLES = r'''
   community.general.ipa_host:
     name: host01.example.com
     user_certificate: []
-    community.general.ipa_host: ipa.example.com
+    ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
 
@@ -136,7 +134,7 @@ EXAMPLES = r'''
   community.general.ipa_host:
     name: host01.example.com
     state: absent
-    community.general.ipa_host: ipa.example.com
+    ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
 
@@ -144,7 +142,7 @@ EXAMPLES = r'''
   community.general.ipa_host:
     name: host01.example.com
     state: absent
-    community.general.ipa_host: ipa.example.com
+    ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
     update_dns: True
@@ -284,7 +282,7 @@ def main():
                          mac_address=dict(type='list', aliases=['macaddress'], elements='str'),
                          update_dns=dict(type='bool'),
                          state=dict(type='str', default='present', choices=['present', 'absent', 'enabled', 'disabled']),
-                         random_password=dict(type='bool'),)
+                         random_password=dict(type='bool', no_log=False),)
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True)

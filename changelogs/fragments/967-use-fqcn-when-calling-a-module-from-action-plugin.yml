@@ -1,0 +1,4 @@
+---
+minor_changes:
+  - iptables_state - use FQCN when calling a module from action plugin
+    (https://github.com/ansible-collections/community.general/pull/967).

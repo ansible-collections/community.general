@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
+    author: Unknown (!UNKNOWN)
     lookup: chef_databag
     short_description: fetches data from a Chef Databag
     description:
@@ -34,7 +35,9 @@ EXAMPLES = """
 RETURN = """
   _raw:
     description:
-      - The value from the databag
+      - The value from the databag.
+    type: list
+    elements: dict
 """
 
 from ansible.errors import AnsibleError

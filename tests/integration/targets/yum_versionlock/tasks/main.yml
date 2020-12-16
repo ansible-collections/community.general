@@ -1,0 +1,62 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- block:
+    - name: Install necessary packages to test yum_versionlock
+      yum:
+        name: yum-plugin-versionlock
+        state: present
+      register: yum_versionlock_install
+
+    - name: Yum checkupdate
+      yum:
+        list: updates
+      register: yum_updates
+
+    - block:
+        - name: Lock all packages
+          community.general.yum_versionlock:
+            name: "{{ yum_updates.results | map(attribute='name') | list }}"
+            state: present
+          register: lock_all_packages
+
+        - name: Update all packages
+          command: yum update --setopt=obsoletes=0
+          register: update_all_locked_packages
+          changed_when:
+            - '"No packages marked for update" not in update_all_locked_packages.stdout'
+            - '"Nothing to do" not in update_all_locked_packages.stdout'
+
+        - name: Unlock all packages
+          community.general.yum_versionlock:
+            name: "{{ yum_updates.results | map(attribute='name') | list }}"
+            state: absent
+          register: unlock_all_packages
+
+        - name: Update all packages
+          yum:
+            name: '*'
+            state: latest
+          check_mode: yes
+          register: update_all_packages
+          when: yum_updates.results | length != 0
+
+        - name: Assert everything is fine
+          assert:
+            that:
+              - "{{ lock_all_packages.changed }}"
+              - "{{ not update_all_locked_packages.changed }}"
+              - "{{ unlock_all_packages.changed }}"
+              - "{{ update_all_packages.changed }}"
+      when: yum_updates.results | length != 0
+
+    - name: Remove installed packages in case it was not installed
+      yum:
+        name: yum-plugin-versionlock
+        state: absent
+      when: yum_versionlock_install is changed
+  when: (ansible_distribution in ['CentOS', 'RedHat'] and ansible_distribution_major_version is version('7', '>=')) or
+        (ansible_distribution == 'Fedora')

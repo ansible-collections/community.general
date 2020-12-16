@@ -8,7 +8,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
     lookup: keyring
     author:
-      - Samuel Boucher <boucher.samuel.c@gmail.com>
+      - Samuel Boucher (!UNKNOWN) <boucher.samuel.c@gmail.com>
     requirements:
       - keyring (python library)
     short_description: grab secrets from the OS keyring
@@ -29,7 +29,9 @@ EXAMPLES = """
 
 RETURN = """
   _raw:
-    description: secrets stored
+    description: Secrets stored.
+    type: list
+    elements: str
 """
 
 HAS_KEYRING = True

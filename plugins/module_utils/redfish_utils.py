@@ -710,24 +710,6 @@ class RedfishUtils(object):
     def get_multi_volume_inventory(self):
         return self.aggregate_systems(self.get_volume_inventory)
 
-    def restart_manager_gracefully(self):
-        result = {}
-        key = "Actions"
-
-        # Search for 'key' entry and extract URI from it
-        response = self.get_request(self.root_uri + self.manager_uri)
-        if response['ret'] is False:
-            return response
-        result['ret'] = True
-        data = response['data']
-        action_uri = data[key]["#Manager.Reset"]["target"]
-
-        payload = {'ResetType': 'GracefulRestart'}
-        response = self.post_request(self.root_uri + action_uri, payload)
-        if response['ret'] is False:
-            return response
-        return {'ret': True}
-
     def manage_indicator_led(self, command):
         result = {}
         key = 'IndicatorLED'
@@ -773,6 +755,14 @@ class RedfishUtils(object):
         return reset_type
 
     def manage_system_power(self, command):
+        return self.manage_power(command, self.systems_uri,
+                                 '#ComputerSystem.Reset')
+
+    def manage_manager_power(self, command):
+        return self.manage_power(command, self.manager_uri,
+                                 '#Manager.Reset')
+
+    def manage_power(self, command, resource_uri, action_name):
         key = "Actions"
         reset_type_values = ['On', 'ForceOff', 'GracefulShutdown',
                              'GracefulRestart', 'ForceRestart', 'Nmi',
@@ -790,8 +780,8 @@ class RedfishUtils(object):
         if reset_type not in reset_type_values:
             return {'ret': False, 'msg': 'Invalid Command (%s)' % command}
 
-        # read the system resource and get the current power state
-        response = self.get_request(self.root_uri + self.systems_uri)
+        # read the resource and get the current power state
+        response = self.get_request(self.root_uri + resource_uri)
         if response['ret'] is False:
             return response
         data = response['data']
@@ -803,13 +793,13 @@ class RedfishUtils(object):
         if power_state == "Off" and reset_type in ['GracefulShutdown', 'ForceOff']:
             return {'ret': True, 'changed': False}
 
-        # get the #ComputerSystem.Reset Action and target URI
-        if key not in data or '#ComputerSystem.Reset' not in data[key]:
-            return {'ret': False, 'msg': 'Action #ComputerSystem.Reset not found'}
-        reset_action = data[key]['#ComputerSystem.Reset']
+        # get the reset Action and target URI
+        if key not in data or action_name not in data[key]:
+            return {'ret': False, 'msg': 'Action %s not found' % action_name}
+        reset_action = data[key][action_name]
         if 'target' not in reset_action:
             return {'ret': False,
-                    'msg': 'target URI missing from Action #ComputerSystem.Reset'}
+                    'msg': 'target URI missing from Action %s' % action_name}
         action_uri = reset_action['target']
 
         # get AllowableValues
@@ -1501,13 +1491,18 @@ class RedfishUtils(object):
             return response
         return {'ret': True, 'changed': True, 'msg': "Set BIOS to default settings"}
 
-    def set_one_time_boot_device(self, bootdevice, uefi_target, boot_next):
+    def set_boot_override(self, boot_opts):
         result = {}
         key = "Boot"
 
-        if not bootdevice:
+        bootdevice = boot_opts.get('bootdevice')
+        uefi_target = boot_opts.get('uefi_target')
+        boot_next = boot_opts.get('boot_next')
+        override_enabled = boot_opts.get('override_enabled')
+
+        if not bootdevice and override_enabled != 'Disabled':
             return {'ret': False,
-                    'msg': "bootdevice option required for SetOneTimeBoot"}
+                    'msg': "bootdevice option required for temporary boot override"}
 
         # Search for 'key' entry and extract URI from it
         response = self.get_request(self.root_uri + self.systems_uri)
@@ -1530,21 +1525,27 @@ class RedfishUtils(object):
                                (bootdevice, allowable_values)}
 
         # read existing values
-        enabled = boot.get('BootSourceOverrideEnabled')
+        cur_enabled = boot.get('BootSourceOverrideEnabled')
         target = boot.get('BootSourceOverrideTarget')
         cur_uefi_target = boot.get('UefiTargetBootSourceOverride')
         cur_boot_next = boot.get('BootNext')
 
-        if bootdevice == 'UefiTarget':
+        if override_enabled == 'Disabled':
+            payload = {
+                'Boot': {
+                    'BootSourceOverrideEnabled': override_enabled
+                }
+            }
+        elif bootdevice == 'UefiTarget':
             if not uefi_target:
                 return {'ret': False,
                         'msg': "uefi_target option required to SetOneTimeBoot for UefiTarget"}
-            if enabled == 'Once' and target == bootdevice and uefi_target == cur_uefi_target:
+            if override_enabled == cur_enabled and target == bootdevice and uefi_target == cur_uefi_target:
                 # If properties are already set, no changes needed
                 return {'ret': True, 'changed': False}
             payload = {
                 'Boot': {
-                    'BootSourceOverrideEnabled': 'Once',
+                    'BootSourceOverrideEnabled': override_enabled,
                     'BootSourceOverrideTarget': bootdevice,
                     'UefiTargetBootSourceOverride': uefi_target
                 }
@@ -1553,23 +1554,23 @@ class RedfishUtils(object):
             if not boot_next:
                 return {'ret': False,
                         'msg': "boot_next option required to SetOneTimeBoot for UefiBootNext"}
-            if enabled == 'Once' and target == bootdevice and boot_next == cur_boot_next:
+            if cur_enabled == override_enabled and target == bootdevice and boot_next == cur_boot_next:
                 # If properties are already set, no changes needed
                 return {'ret': True, 'changed': False}
             payload = {
                 'Boot': {
-                    'BootSourceOverrideEnabled': 'Once',
+                    'BootSourceOverrideEnabled': override_enabled,
                     'BootSourceOverrideTarget': bootdevice,
                     'BootNext': boot_next
                 }
             }
         else:
-            if enabled == 'Once' and target == bootdevice:
+            if cur_enabled == override_enabled and target == bootdevice:
                 # If properties are already set, no changes needed
                 return {'ret': True, 'changed': False}
             payload = {
                 'Boot': {
-                    'BootSourceOverrideEnabled': 'Once',
+                    'BootSourceOverrideEnabled': override_enabled,
                     'BootSourceOverrideTarget': bootdevice
                 }
             }
@@ -1885,7 +1886,7 @@ class RedfishUtils(object):
         memory_results = []
         key = "Memory"
         # Get these entries, but does not fail if not found
-        properties = ['SerialNumber', 'MemoryDeviceType', 'PartNuber',
+        properties = ['SerialNumber', 'MemoryDeviceType', 'PartNumber',
                       'MemoryLocation', 'RankCount', 'CapacityMiB', 'OperatingMemoryModes', 'Status', 'Manufacturer', 'Name']
 
         # Search for 'key' entry and extract URI from it

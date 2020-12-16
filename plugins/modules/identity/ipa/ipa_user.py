@@ -90,6 +90,12 @@ options:
     - Default home directory of the user.
     type: str
     version_added: '0.2.0'
+  userauthtype:
+    description:
+    - The authentication type to use for the user.
+    choices: ["password", "radius", "otp", "pkinit", "hardened"]
+    type: str
+    version_added: '1.2.0'
 extends_documentation_fragment:
 - community.general.ipa.documentation
 
@@ -139,6 +145,15 @@ EXAMPLES = r'''
     ipa_user: admin
     ipa_pass: topsecret
     update_password: on_create
+
+- name: Ensure pinky is present and using one time password authentication
+  community.general.ipa_user:
+    name: pinky
+    state: present
+    userauthtype: otp
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: topsecret
 '''
 
 RETURN = r'''
@@ -182,7 +197,8 @@ class UserIPAClient(IPAClient):
 
 def get_user_dict(displayname=None, givenname=None, krbpasswordexpiration=None, loginshell=None,
                   mail=None, nsaccountlock=False, sn=None, sshpubkey=None, telephonenumber=None,
-                  title=None, userpassword=None, gidnumber=None, uidnumber=None, homedirectory=None):
+                  title=None, userpassword=None, gidnumber=None, uidnumber=None, homedirectory=None,
+                  userauthtype=None):
     user = {}
     if displayname is not None:
         user['displayname'] = displayname
@@ -211,6 +227,8 @@ def get_user_dict(displayname=None, givenname=None, krbpasswordexpiration=None, 
         user['uidnumber'] = uidnumber
     if homedirectory is not None:
         user['homedirectory'] = homedirectory
+    if userauthtype is not None:
+        user['ipauserauthtype'] = userauthtype
 
     return user
 
@@ -293,7 +311,8 @@ def ensure(module, client):
                                 telephonenumber=module.params['telephonenumber'], title=module.params['title'],
                                 userpassword=module.params['password'],
                                 gidnumber=module.params.get('gidnumber'), uidnumber=module.params.get('uidnumber'),
-                                homedirectory=module.params.get('homedirectory'))
+                                homedirectory=module.params.get('homedirectory'),
+                                userauthtype=module.params.get('userauthtype'))
 
     update_password = module.params.get('update_password')
     ipa_user = client.user_find(name=name)
@@ -326,8 +345,9 @@ def main():
     argument_spec.update(displayname=dict(type='str'),
                          givenname=dict(type='str'),
                          update_password=dict(type='str', default="always",
-                                              choices=['always', 'on_create']),
-                         krbpasswordexpiration=dict(type='str'),
+                                              choices=['always', 'on_create'],
+                                              no_log=False),
+                         krbpasswordexpiration=dict(type='str', no_log=False),
                          loginshell=dict(type='str'),
                          mail=dict(type='list', elements='str'),
                          sn=dict(type='str'),
@@ -340,7 +360,9 @@ def main():
                                     choices=['present', 'absent', 'enabled', 'disabled']),
                          telephonenumber=dict(type='list', elements='str'),
                          title=dict(type='str'),
-                         homedirectory=dict(type='str'))
+                         homedirectory=dict(type='str'),
+                         userauthtype=dict(type='str',
+                                           choices=['password', 'radius', 'otp', 'pkinit', 'hardened']))
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True)

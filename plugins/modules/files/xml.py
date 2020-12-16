@@ -23,14 +23,12 @@ options:
     - This file must exist ahead of time.
     - This parameter is required, unless C(xmlstring) is given.
     type: path
-    required: yes
     aliases: [ dest, file ]
   xmlstring:
     description:
     - A string containing XML on which to operate.
     - This parameter is required, unless C(path) is given.
     type: str
-    required: yes
   xpath:
     description:
     - A valid XPath expression describing the item(s) you want to manipulate.
@@ -411,8 +409,10 @@ def xpath_matches(tree, xpath, namespaces):
 
 def delete_xpath_target(module, tree, xpath, namespaces):
     """ Delete an attribute or element from a tree """
+    changed = False
     try:
         for result in tree.xpath(xpath, namespaces=namespaces):
+            changed = True
             # Get the xpath for this result
             if is_attribute(tree, xpath, namespaces):
                 # Delete an attribute
@@ -429,7 +429,7 @@ def delete_xpath_target(module, tree, xpath, namespaces):
     except Exception as e:
         module.fail_json(msg="Couldn't delete xpath target: %s (%s)" % (xpath, e))
     else:
-        finish(module, tree, xpath, namespaces, changed=True)
+        finish(module, tree, xpath, namespaces, changed=changed)
 
 
 def replace_children_of(children, match):
@@ -824,8 +824,7 @@ def main():
         supports_check_mode=True,
         required_by=dict(
             add_children=['xpath'],
-            # TODO: Reinstate this in community.general 2.0.0 when we have deprecated the incorrect use below
-            # attribute=['value'],
+            attribute=['value'],
             content=['xpath'],
             set_children=['xpath'],
             value=['xpath'],
@@ -873,12 +872,6 @@ def main():
         module.fail_json(msg='The xml ansible module requires lxml 2.3.0 or newer installed on the managed machine')
     elif LooseVersion('.'.join(to_native(f) for f in etree.LXML_VERSION)) < LooseVersion('3.0.0'):
         module.warn('Using lxml version lower than 3.0.0 does not guarantee predictable element attribute order.')
-
-    # Report wrongly used attribute parameter when using content=attribute
-    # TODO: Remove this in community.general 2.0.0 (and reinstate strict parameter test above) and remove the integration test example
-    if content == 'attribute' and attribute is not None:
-        module.deprecate("Parameter 'attribute=%s' is ignored when using 'content=attribute' only 'xpath' is used. Please remove entry." % attribute,
-                         version='2.0.0', collection_name='community.general')  # was Ansible 2.12
 
     # Check if the file exists
     if xml_string:

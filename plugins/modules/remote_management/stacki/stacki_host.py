@@ -19,33 +19,45 @@ options:
     description:
      - Name of the host to be added to Stacki.
     required: True
+    type: str
   stacki_user:
     description:
      - Username for authenticating with Stacki API, but if not
        specified, the environment variable C(stacki_user) is used instead.
     required: True
+    type: str
   stacki_password:
     description:
      - Password for authenticating with Stacki API, but if not
        specified, the environment variable C(stacki_password) is used instead.
     required: True
+    type: str
   stacki_endpoint:
     description:
      - URL for the Stacki API Endpoint.
     required: True
+    type: str
   prim_intf_mac:
     description:
      - MAC Address for the primary PXE boot network interface.
+    type: str
   prim_intf_ip:
     description:
      - IP Address for the primary network interface.
+    type: str
   prim_intf:
     description:
      - Name of the primary network interface.
+    type: str
   force_install:
     description:
      - Set value to True to force node into install state if it already exists in stacki.
     type: bool
+  state:
+    description:
+      - Set value to the desired state for the specified host.
+    type: str
+    choices: [ absent, present ]
 author:
 - Hugh Ma (@bbyhuy) <Hugh.Ma@flextronics.com>
 '''
@@ -250,7 +262,7 @@ def main():
                       'prim_intf_ip', 'network', 'prim_intf_mac']:
             if not module.params[param]:
                 missing_params.append(param)
-        if len(missing_params) > 0:
+        if len(missing_params) > 0:   # @FIXME replace with required_if
             module.fail_json(msg="missing required arguments: {0}".format(missing_params))
 
         stacki.stack_add(result)

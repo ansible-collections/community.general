@@ -31,7 +31,6 @@ options:
     description:
       - Sets the DNS view to associate this host record with.  The DNS
         view must already be configured on the system
-    required: true
     default: default
     aliases:
       - dns_view
@@ -50,6 +49,8 @@ options:
         accepts a list of values (see suboptions)
     aliases:
       - ipv4
+    type: list
+    elements: dict
     suboptions:
       ipv4addr:
         description:
@@ -73,8 +74,6 @@ options:
           - Configures the hardware MAC address for the host record. If user makes
             DHCP to true, user need to mention MAC address.
         required: false
-        aliases:
-          - mac
       add:
         description:
           - If user wants to add the ipv4 address to an existing host record.
@@ -82,8 +81,6 @@ options:
             as new IP address is allocated to existing host record. See examples.
         type: bool
         required: false
-        aliases:
-          - add
         version_added: '0.2.0'
       remove:
         description:
@@ -92,8 +89,6 @@ options:
             as IP address is de-allocated from an existing host record. See examples.
         type: bool
         required: false
-        aliases:
-          - remove
         version_added: '0.2.0'
   ipv6addrs:
     description:
@@ -101,6 +96,8 @@ options:
         accepts a list of values (see options)
     aliases:
       - ipv6
+    type: list
+    elements: dict
     suboptions:
       ipv6addr:
         description:
@@ -113,8 +110,6 @@ options:
           - Configure the host_record over DHCP instead of DNS, if user
             changes it to true, user need to mention MAC address to configure
         required: false
-        aliases:
-          - dhcp
   aliases:
     description:
       - Configures an optional list of additional aliases to add to the host
@@ -294,15 +289,15 @@ def main():
     ipv4addr_spec = dict(
         ipv4addr=dict(required=True, aliases=['address'], ib_req=True),
         configure_for_dhcp=dict(type='bool', required=False, aliases=['dhcp'], ib_req=True),
-        mac=dict(required=False, aliases=['mac'], ib_req=True),
-        add=dict(type='bool', aliases=['add'], required=False),
-        remove=dict(type='bool', aliases=['remove'], required=False)
+        mac=dict(required=False, ib_req=True),
+        add=dict(type='bool', required=False),
+        remove=dict(type='bool', required=False)
     )
 
     ipv6addr_spec = dict(
         ipv6addr=dict(required=True, aliases=['address'], ib_req=True),
-        configure_for_dhcp=dict(type='bool', required=False, aliases=['configure_for_dhcp'], ib_req=True),
-        mac=dict(required=False, aliases=['mac'], ib_req=True)
+        configure_for_dhcp=dict(type='bool', required=False, ib_req=True),
+        mac=dict(required=False, ib_req=True)
     )
 
     ib_spec = dict(

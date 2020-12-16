@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author:
-    - Eric Belhomme <ebelhomme@fr.scc.com>
+    - Eric Belhomme (@eric-belhomme) <ebelhomme@fr.scc.com>
     version_added: '0.2.0'
     lookup: etcd3
     short_description: Get key values from etcd3 server
@@ -94,6 +94,7 @@ DOCUMENTATION = '''
     seealso:
     - module: community.general.etcd3
     - ref: etcd_lookup
+      description: The etcd v2 lookup.
 
     requirements:
     - "etcd3 >= 0.10"

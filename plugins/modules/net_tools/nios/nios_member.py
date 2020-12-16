@@ -28,7 +28,8 @@ options:
   vip_setting:
     description:
       - Configures the network settings for the grid member.
-    required: true
+    type: list
+    elements: dict
     suboptions:
       address:
         description:
@@ -42,7 +43,8 @@ options:
   ipv6_setting:
     description:
       - Configures the IPv6 settings for the grid member.
-    required: true
+    type: list
+    elements: dict
     suboptions:
       virtual_ip:
         description:
@@ -77,6 +79,8 @@ options:
   lan2_port_setting:
     description:
       - Settings for the Grid member LAN2 port if 'lan2_enabled' is set to "true".
+    type: list
+    elements: dict
     suboptions:
       enabled:
         description:
@@ -85,6 +89,8 @@ options:
       network_setting:
         description:
           - If the 'enable' field is set to True, this defines IPv4 network settings for LAN2.
+        type: list
+        elements: dict
         suboptions:
           address:
             description:
@@ -98,6 +104,8 @@ options:
       v6_network_setting:
         description:
           - If the 'enable' field is set to True, this defines IPv6 network settings for LAN2.
+        type: list
+        elements: dict
         suboptions:
           virtual_ip:
             description:
@@ -115,10 +123,14 @@ options:
   node_info:
     description:
       - Configures the node information list with detailed status report on the operations of the Grid Member.
+    type: list
+    elements: dict
     suboptions:
       lan2_physical_setting:
         description:
           - Physical port settings for the LAN2 interface.
+        type: list
+        elements: dict
         suboptions:
           auto_port_setting_enabled:
             description:
@@ -133,6 +145,8 @@ options:
       lan_ha_port_setting:
         description:
           - LAN/HA port settings for the node.
+        type: list
+        elements: dict
         suboptions:
           ha_ip_address:
             description:
@@ -140,6 +154,8 @@ options:
           ha_port_setting:
             description:
               - Physical port settings for the HA interface.
+            type: list
+            elements: dict
             suboptions:
               auto_port_setting_enabled:
                 description:
@@ -154,6 +170,8 @@ options:
           lan_port_setting:
             description:
               - Physical port settings for the LAN interface.
+            type: list
+            elements: dict
             suboptions:
               auto_port_setting_enabled:
                 description:
@@ -174,6 +192,8 @@ options:
       mgmt_network_setting:
         description:
           - Network settings for the MGMT port of the node.
+        type: list
+        elements: dict
         suboptions:
           address:
             description:
@@ -187,6 +207,8 @@ options:
       v6_mgmt_network_setting:
         description:
           - The network settings for the IPv6 MGMT port of the node.
+        type: list
+        elements: dict
         suboptions:
           virtual_ip:
             description:
@@ -200,6 +222,8 @@ options:
   mgmt_port_setting:
     description:
       - Settings for the member MGMT port.
+    type: list
+    elements: dict
     suboptions:
       enabled:
         description:
@@ -228,6 +252,8 @@ options:
   syslog_servers:
     description:
       - The list of external syslog servers.
+    type: list
+    elements: dict
     suboptions:
       address:
         description:
@@ -266,10 +292,14 @@ options:
   pre_provisioning:
     description:
       - Pre-provisioning information.
+    type: list
+    elements: dict
     suboptions:
       hardware_info:
         description:
           - An array of structures that describe the hardware being pre-provisioned.
+        type: list
+        elements: dict
         suboptions:
           hwmodel:
             description:

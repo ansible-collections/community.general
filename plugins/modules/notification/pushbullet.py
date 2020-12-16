@@ -18,28 +18,34 @@ description:
    - This module sends push notifications via Pushbullet to channels or devices.
 options:
     api_key:
+        type: str
         description:
             - Push bullet API token
         required: true
     channel:
+        type: str
         description:
             - The channel TAG you wish to broadcast a push notification,
               as seen on the "My Channels" > "Edit your channel" at
               Pushbullet page.
     device:
+        type: str
         description:
             - The device NAME you wish to send a push notification,
               as seen on the Pushbullet main page.
     push_type:
+        type: str
         description:
           - Thing you wish to push.
         default: note
         choices: [ "note", "link" ]
     title:
+        type: str
         description:
           - Title of the notification.
         required: true
     body:
+        type: str
         description:
           - Body of the notification, e.g. Details of the fault you're alerting.
 

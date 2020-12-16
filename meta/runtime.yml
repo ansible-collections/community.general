@@ -1,29 +1,6 @@
+---
 requires_ansible: '>=2.9.10'
 action_groups:
-  docker:
-  - docker_swarm
-  - docker_image_facts
-  - docker_service
-  - docker_compose
-  - docker_config
-  - docker_container
-  - docker_container_info
-  - docker_host_info
-  - docker_image
-  - docker_image_info
-  - docker_login
-  - docker_network
-  - docker_network_info
-  - docker_node
-  - docker_node_info
-  - docker_prune
-  - docker_secret
-  - docker_swarm
-  - docker_swarm_info
-  - docker_swarm_service
-  - docker_swarm_service_info
-  - docker_volume
-  - docker_volume_info
   k8s:
   - kubevirt_cdi_upload
   - kubevirt_preset
@@ -57,252 +34,142 @@ action_groups:
   - ovirt_vm_facts
   - ovirt_vmpool_facts
 plugin_routing:
-  lookup:
-    conjur_variable:
-      redirect: cyberark.conjur.conjur_variable
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The conjur_variable lookup has been moved to the cyberark.conjur collection.
+  connection:
+    docker:
+      redirect: community.docker.docker
+    oc:
+      redirect: community.okd.oc
   modules:
     ali_instance_facts:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
-    digital_ocean:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean
-    digital_ocean_account_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_account_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_account_facts
-    digital_ocean_account_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_account_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_account_info
-    digital_ocean_block_storage:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_block_storage module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_block_storage
-    digital_ocean_certificate:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_certificate module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_certificate
-    digital_ocean_certificate_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_certificate_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_certificate_facts
-    digital_ocean_certificate_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_certificate_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_certificate_info
-    digital_ocean_domain:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_domain module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_domain
-    digital_ocean_domain_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_domain_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_domain_facts
-    digital_ocean_domain_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_domain_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_domain_info
-    digital_ocean_droplet:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_droplet module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_droplet
-    digital_ocean_firewall_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_firewall_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_firewall_facts
-    digital_ocean_firewall_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_firewall_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_firewall_info
-    digital_ocean_floating_ip:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_floating_ip module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_floating_ip
-    digital_ocean_floating_ip_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_floating_ip_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_floating_ip_facts
-    digital_ocean_floating_ip_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_floating_ip_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_floating_ip_info
-    digital_ocean_image_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_image_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_image_facts
-    digital_ocean_image_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_image_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_image_info
-    digital_ocean_load_balancer_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_load_balancer_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_load_balancer_facts
-    digital_ocean_load_balancer_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_load_balancer_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_load_balancer_info
-    digital_ocean_region_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_region_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_region_facts
-    digital_ocean_region_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_region_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_region_info
-    digital_ocean_size_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_size_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_size_facts
-    digital_ocean_size_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_size_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_size_info
-    digital_ocean_snapshot_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_snapshot_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_snapshot_facts
-    digital_ocean_snapshot_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_snapshot_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_snapshot_info
-    digital_ocean_sshkey:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_sshkey module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_sshkey
-    digital_ocean_sshkey_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_sshkey_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_sshkey_facts
-    digital_ocean_sshkey_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_sshkey_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_sshkey_info
-    digital_ocean_tag:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_tag module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_tag
-    digital_ocean_tag_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_tag_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_tag_facts
-    digital_ocean_tag_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_tag_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_tag_info
-    digital_ocean_volume_facts:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_volume_facts module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_volume_facts
-    digital_ocean_volume_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean_volume_info module has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean_volume_info
+    docker_compose:
+      redirect: community.docker.docker_compose
+    docker_config:
+      redirect: community.docker.docker_config
+    docker_container:
+      redirect: community.docker.docker_container
+    docker_container_info:
+      redirect: community.docker.docker_container_info
+    docker_host_info:
+      redirect: community.docker.docker_host_info
+    docker_image:
+      redirect: community.docker.docker_image
     docker_image_facts:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.docker.docker_image_info instead.
+    docker_image_info:
+      redirect: community.docker.docker_image_info
+    docker_login:
+      redirect: community.docker.docker_login
+    docker_network:
+      redirect: community.docker.docker_network
+    docker_network_info:
+      redirect: community.docker.docker_network_info
+    docker_node:
+      redirect: community.docker.docker_node
+    docker_node_info:
+      redirect: community.docker.docker_node_info
+    docker_prune:
+      redirect: community.docker.docker_prune
+    docker_secret:
+      redirect: community.docker.docker_secret
     docker_service:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
-    firewalld:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The firewalld module has been moved to the ansible.posix collection.
-      redirect: ansible.posix.firewalld
+        warning_text: Use community.docker.docker_compose instead.
+    docker_stack:
+      redirect: community.docker.docker_stack
+    docker_stack_info:
+      redirect: community.docker.docker_stack_info
+    docker_stack_task_info:
+      redirect: community.docker.docker_stack_task_info
+    docker_swarm:
+      redirect: community.docker.docker_swarm
+    docker_swarm_info:
+      redirect: community.docker.docker_swarm_info
+    docker_swarm_service:
+      redirect: community.docker.docker_swarm_service
+    docker_swarm_service_info:
+      redirect: community.docker.docker_swarm_service_info
+    docker_volume:
+      redirect: community.docker.docker_volume
+    docker_volume_info:
+      redirect: community.docker.docker_volume_info
     foreman:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use the modules from the theforeman.foreman collection instead.
     gcdns_record:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use google.cloud.gcp_dns_resource_record_set instead.
     gcdns_zone:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use google.cloud.gcp_dns_managed_zone instead.
     gce:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use google.cloud.gcp_compute_instance instead.
     gcp_backend_service:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use google.cloud.gcp_compute_backend_service instead.
     gcp_forwarding_rule:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use google.cloud.gcp_compute_forwarding_rule or google.cloud.gcp_compute_global_forwarding_rule instead.
     gcp_healthcheck:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use google.cloud.gcp_compute_health_check, google.cloud.gcp_compute_http_health_check or google.cloud.gcp_compute_https_health_check instead.
     gcp_target_proxy:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use google.cloud.gcp_compute_target_http_proxy instead.
     gcp_url_map:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use google.cloud.gcp_compute_url_map instead.
     gcpubsub_facts:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
     gcspanner:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use google.cloud.gcp_spanner_database and/or google.cloud.gcp_spanner_instance instead.
     github_hooks:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.github_webhook and community.general.github_webhook_info instead.
+    gluster_heal_info:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_heal_info instead.
+    gluster_peer:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_peer instead.
+    gluster_volume:
+      deprecation:
+        removal_version: 3.0.0
+        warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_volume instead.
     helm:
       deprecation:
         removal_version: 3.0.0
         warning_text: The helm module in community.general has been deprecated. Use community.kubernetes.helm instead.
+    hetzner_failover_ip:
+      redirect: community.hrobot.failover_ip
+    hetzner_failover_ip_info:
+      redirect: community.hrobot.failover_ip_info
+    hetzner_firewall:
+      redirect: community.hrobot.firewall
+    hetzner_firewall_info:
+      redirect: community.hrobot.firewall_info
     hpilo_facts:
       deprecation:
         removal_version: 3.0.0
@@ -311,44 +178,14 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
-    infini_export:
-      redirect: infinidat.infinibox.infini_export
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infini_export module has been moved to the infinidat collection.
-    infini_export_client:
-      redirect: infinidat.infinibox.infini_export_client
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infini_export_client module has been moved to the infinidat collection.
-    infini_fs:
-      redirect: infinidat.infinibox.infini_fs
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infini_fs module has been moved to the infinidat collection.
-    infini_host:
-      redirect: infinidat.infinibox.infini_host
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infini_host module has been moved to the infinidat collection.
-    infini_pool:
-      redirect: infinidat.infinibox.infini_pool
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infini_pool module has been moved to the infinidat collection.
-    infini_vol:
-      redirect: infinidat.infinibox.infini_vol
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infini_vol module has been moved to the infinidat collection.
     jenkins_job_facts:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
     katello:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use the modules from the theforeman.foreman collection instead.
     ldap_attr:
       deprecation:
         removal_version: 3.0.0
@@ -369,68 +206,38 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
-    mysql_db:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql_db module has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql_db
-    mysql_info:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql_info module has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql_info
-    mysql_query:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql_query module has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql_query
-    mysql_replication:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql_replication module has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql_replication
-    mysql_user:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql_user module has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql_user
-    mysql_variables:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql_variables module has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql_variables
     na_cdot_aggregate:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_aggregate instead.
     na_cdot_license:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_license instead.
     na_cdot_lun:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_lun instead.
     na_cdot_qtree:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_qtree instead.
     na_cdot_svm:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_svm instead.
     na_cdot_user:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_user instead.
     na_cdot_user_role:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_user_role instead.
     na_cdot_volume:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_volume instead.
     na_ontap_gather_facts:
       deprecation:
         removal_version: 3.0.0
@@ -587,41 +394,50 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
-    proxysql_backend_servers:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql_backend_servers module has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql_backend_servers
-    proxysql_global_variables:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql_global_variables module has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql_global_variables
-    proxysql_manage_config:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql_manage_config module has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql_manage_config
-    proxysql_mysql_users:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql_mysql_users module has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql_mysql_users
-    proxysql_query_rules:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql_query_rules module has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql_query_rules
-    proxysql_replication_hostgroups:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql_replication_hostgroups module has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql_replication_hostgroups
-    proxysql_scheduler:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql_scheduler module has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql_scheduler
+    postgresql_copy:
+      redirect: community.postgresql.postgresql_copy
+    postgresql_db:
+      redirect: community.postgresql.postgresql_db
+    postgresql_ext:
+      redirect: community.postgresql.postgresql_ext
+    postgresql_idx:
+      redirect: community.postgresql.postgresql_idx
+    postgresql_info:
+      redirect: community.postgresql.postgresql_info
+    postgresql_lang:
+      redirect: community.postgresql.postgresql_lang
+    postgresql_membership:
+      redirect: community.postgresql.postgresql_membership
+    postgresql_owner:
+      redirect: community.postgresql.postgresql_owner
+    postgresql_pg_hba:
+      redirect: community.postgresql.postgresql_pg_hba
+    postgresql_ping:
+      redirect: community.postgresql.postgresql_ping
+    postgresql_privs:
+      redirect: community.postgresql.postgresql_privs
+    postgresql_publication:
+      redirect: community.postgresql.postgresql_publication
+    postgresql_query:
+      redirect: community.postgresql.postgresql_query
+    postgresql_schema:
+      redirect: community.postgresql.postgresql_schema
+    postgresql_sequence:
+      redirect: community.postgresql.postgresql_sequence
+    postgresql_set:
+      redirect: community.postgresql.postgresql_set
+    postgresql_slot:
+      redirect: community.postgresql.postgresql_slot
+    postgresql_subscription:
+      redirect: community.postgresql.postgresql_subscription
+    postgresql_table:
+      redirect: community.postgresql.postgresql_table
+    postgresql_tablespace:
+      redirect: community.postgresql.postgresql_tablespace
+    postgresql_user_obj_stat_info:
+      redirect: community.postgresql.postgresql_user_obj_stat_info
+    postgresql_user:
+      redirect: community.postgresql.postgresql_user
     purefa_facts:
       deprecation:
         removal_version: 3.0.0
@@ -667,25 +483,25 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
     sf_account_manager:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.elementsw.na_elementsw_account instead.
     sf_check_connections:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.elementsw.na_elementsw_check_connections instead.
     sf_snapshot_schedule_manager:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.elementsw.na_elementsw_snapshot_schedule instead.
     sf_volume_access_group_manager:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.elementsw.na_elementsw_access_group instead.
     sf_volume_manager:
-      deprecation:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.elementsw.na_elementsw_volume instead.
     smartos_image_facts:
       deprecation:
         removal_version: 3.0.0
@@ -699,44 +515,36 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
   doc_fragments:
-    digital_ocean:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The digital_ocean docs_fragment has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean
-    infinibox:
-      redirect: infinidat.infinibox.infinibox
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The infinibox doc_fragments plugin has been moved to the infinidat.infinibox collection.
-    mysql:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql docs_fragment has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql
-    proxysql:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The proxysql docs_fragment has been moved to the community.proxysql collection.
-      redirect: community.proxysql.proxysql
+    docker:
+      redirect: community.docker.docker
+    hetzner:
+      redirect: community.hrobot.robot
+    postgresql:
+      redirect: community.postgresql.postgresql
   module_utils:
-    digital_ocean:
-      deprecation:
+    docker.common:
+      redirect: community.docker.common
+    docker.swarm:
+      redirect: community.docker.swarm
+    hetzner:
+      redirect: community.hrobot.robot
+    postgresql:
+      redirect: community.postgresql.postgresql
+  callback:
+    actionable:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: The digital_ocean module_utils has been moved to the community.digitalocean collection.
-      redirect: community.digitalocean.digital_ocean
-    firewalld:
-      deprecation:
+        warning_text: Use the 'default' callback plugin with 'display_skipped_hosts = no' and 'display_ok_hosts = no' options.
+    full_skip:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: The firewalld module_utils has been moved to the ansible.posix collection.
-      redirect: ansible.posix.firewalld
-    infinibox:
-      redirect: infinidat.infinibox.infinibox
-      deprecation:
+        warning_text: Use the 'default' callback plugin with 'display_skipped_hosts = no' option.
+    stderr:
+      tombstone:
         removal_version: 2.0.0
-        warning_text: The infinibox module_utils plugin has been moved to the infinidat.infinibox collection.
-    mysql:
-      deprecation:
-        removal_version: 2.0.0
-        warning_text: The mysql module_utils has been moved to the community.mysql collection.
-      redirect: community.mysql.mysql
+        warning_text: Use the 'default' callback plugin with 'display_failed_stderr = yes' option.
+  inventory:
+    docker_machine:
+      redirect: community.docker.docker_machine
+    docker_swarm:
+      redirect: community.docker.docker_swarm

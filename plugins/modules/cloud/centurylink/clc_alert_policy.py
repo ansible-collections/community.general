@@ -17,34 +17,42 @@ options:
   alias:
     description:
       - The alias of your CLC Account
+    type: str
     required: True
   name:
     description:
       - The name of the alert policy. This is mutually exclusive with id
+    type: str
   id:
     description:
       - The alert policy id. This is mutually exclusive with name
+    type: str
   alert_recipients:
     description:
       - A list of recipient email ids to notify the alert.
         This is required for state 'present'
+    type: list
   metric:
     description:
       - The metric on which to measure the condition that will trigger the alert.
         This is required for state 'present'
+    type: str
     choices: ['cpu','memory','disk']
   duration:
     description:
       - The length of time in minutes that the condition must exceed the threshold.
         This is required for state 'present'
+    type: str
   threshold:
     description:
       - The threshold that will trigger the alert when the metric equals or exceeds it.
         This is required for state 'present'
         This number represents a percentage and must be a value between 5.0 - 95.0 that is a multiple of 5.0
+    type: int
   state:
     description:
       - Whether to create or delete the policy.
+    type: str
     default: present
     choices: ['present','absent']
 requirements:
@@ -89,7 +97,6 @@ EXAMPLES = '''
     - name: Debug
       ansible.builtin.debug: var=policy
 
----
 - name: Delete Alert Policy Example
   hosts: localhost
   gather_facts: False
@@ -210,18 +217,18 @@ class ClcAlertPolicy:
         :return: argument spec dictionary
         """
         argument_spec = dict(
-            name=dict(default=None),
-            id=dict(default=None),
-            alias=dict(required=True, default=None),
-            alert_recipients=dict(type='list', default=None),
+            name=dict(),
+            id=dict(),
+            alias=dict(required=True),
+            alert_recipients=dict(type='list'),
             metric=dict(
                 choices=[
                     'cpu',
                     'memory',
                     'disk'],
                 default=None),
-            duration=dict(type='str', default=None),
-            threshold=dict(type='int', default=None),
+            duration=dict(type='str'),
+            threshold=dict(type='int'),
             state=dict(default='present', choices=['present', 'absent'])
         )
         mutually_exclusive = [

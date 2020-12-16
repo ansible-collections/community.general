@@ -206,6 +206,36 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
 
+  - name: Turn system power off
+    community.general.redfish_command:
+      category: Systems
+      command: PowerForceOff
+      resource_id: 437XR1138R2
+
+  - name: Restart system power forcefully
+    community.general.redfish_command:
+      category: Systems
+      command: PowerForceRestart
+      resource_id: 437XR1138R2
+
+  - name: Shutdown system power gracefully
+    community.general.redfish_command:
+      category: Systems
+      command: PowerGracefulShutdown
+      resource_id: 437XR1138R2
+
+  - name: Turn system power on
+    community.general.redfish_command:
+      category: Systems
+      command: PowerOn
+      resource_id: 437XR1138R2
+
+  - name: Reboot system power
+    community.general.redfish_command:
+      category: Systems
+      command: PowerReboot
+      resource_id: 437XR1138R2
+
   - name: Set one-time boot device to {{ bootdevice }}
     community.general.redfish_command:
       category: Systems
@@ -237,6 +267,21 @@ EXAMPLES = '''
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
+
+  - name: Set persistent boot device override
+    community.general.redfish_command:
+      category: Systems
+      command: EnableContinuousBootOverride
+      resource_id: 437XR1138R2
+      bootdevice: "{{ bootdevice }}"
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+  - name: Disable persistent boot device override
+    community.general.redfish_command:
+      category: Systems
+      command: DisableBootOverride
 
   - name: Set chassis indicator LED to blink
     community.general.redfish_command:
@@ -424,6 +469,51 @@ EXAMPLES = '''
       virtual_media:
         image_url: 'http://example.com/images/SomeLinux-current.iso'
       resource_id: BMC
+
+  - name: Restart manager power gracefully
+    community.general.redfish_command:
+      category: Manager
+      command: GracefulRestart
+      resource_id: BMC
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+  - name: Restart manager power gracefully
+    community.general.redfish_command:
+      category: Manager
+      command: PowerGracefulRestart
+      resource_id: BMC
+
+  - name: Turn manager power off
+    community.general.redfish_command:
+      category: Manager
+      command: PowerForceOff
+      resource_id: BMC
+
+  - name: Restart manager power forcefully
+    community.general.redfish_command:
+      category: Manager
+      command: PowerForceRestart
+      resource_id: BMC
+
+  - name: Shutdown manager power gracefully
+    community.general.redfish_command:
+      category: Manager
+      command: PowerGracefulShutdown
+      resource_id: BMC
+
+  - name: Turn manager power on
+    community.general.redfish_command:
+      category: Manager
+      command: PowerOn
+      resource_id: BMC
+
+  - name: Reboot manager power
+    community.general.redfish_command:
+      category: Manager
+      command: PowerReboot
+      resource_id: BMC
 '''
 
 RETURN = '''
@@ -442,14 +532,15 @@ from ansible.module_utils._text import to_native
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["PowerOn", "PowerForceOff", "PowerForceRestart", "PowerGracefulRestart",
-                "PowerGracefulShutdown", "PowerReboot", "SetOneTimeBoot"],
+                "PowerGracefulShutdown", "PowerReboot", "SetOneTimeBoot", "EnableContinuousBootOverride", "DisableBootOverride"],
     "Chassis": ["IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"],
     "Accounts": ["AddUser", "EnableUser", "DeleteUser", "DisableUser",
                  "UpdateUserRole", "UpdateUserPassword", "UpdateUserName",
                  "UpdateAccountServiceProperties"],
     "Sessions": ["ClearSessions"],
     "Manager": ["GracefulRestart", "ClearLogs", "VirtualMediaInsert",
-                "VirtualMediaEject"],
+                "VirtualMediaEject", "PowerOn", "PowerForceOff", "PowerForceRestart",
+                "PowerGracefulRestart", "PowerGracefulShutdown", "PowerReboot"],
     "Update": ["SimpleUpdate"]
 }
 
@@ -530,6 +621,13 @@ def main():
         'update_creds': module.params['update_creds']
     }
 
+    # Boot override options
+    boot_opts = {
+        'bootdevice': module.params['bootdevice'],
+        'uefi_target': module.params['uefi_target'],
+        'boot_next': module.params['boot_next']
+    }
+
     # VirtualMedia options
     virtual_media = module.params['virtual_media']
 
@@ -576,13 +674,17 @@ def main():
             module.fail_json(msg=to_native(result['msg']))
 
         for command in command_list:
-            if "Power" in command:
+            if command.startswith('Power'):
                 result = rf_utils.manage_system_power(command)
             elif command == "SetOneTimeBoot":
-                result = rf_utils.set_one_time_boot_device(
-                    module.params['bootdevice'],
-                    module.params['uefi_target'],
-                    module.params['boot_next'])
+                boot_opts['override_enabled'] = 'Once'
+                result = rf_utils.set_boot_override(boot_opts)
+            elif command == "EnableContinuousBootOverride":
+                boot_opts['override_enabled'] = 'Continuous'
+                result = rf_utils.set_boot_override(boot_opts)
+            elif command == "DisableBootOverride":
+                boot_opts['override_enabled'] = 'Disabled'
+                result = rf_utils.set_boot_override(boot_opts)
 
     elif category == "Chassis":
         result = rf_utils._find_chassis_resource()
@@ -617,8 +719,13 @@ def main():
             module.fail_json(msg=to_native(result['msg']))
 
         for command in command_list:
+            # standardize on the Power* commands, but allow the the legacy
+            # GracefulRestart command
             if command == 'GracefulRestart':
-                result = rf_utils.restart_manager_gracefully()
+                command = 'PowerGracefulRestart'
+
+            if command.startswith('Power'):
+                result = rf_utils.manage_manager_power(command)
             elif command == 'ClearLogs':
                 result = rf_utils.clear_logs()
             elif command == 'VirtualMediaInsert':

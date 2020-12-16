@@ -35,6 +35,7 @@ options:
       - Continue only after the status changes to 'MAINT'.
       - This overrides the shutdown_sessions option.
     type: bool
+    default: false
   host:
     description:
       - Name of the backend host to change.

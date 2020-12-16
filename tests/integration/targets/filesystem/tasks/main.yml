@@ -1,3 +1,8 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 - debug:
     msg: '{{ role_name }}'
 - debug:
@@ -38,7 +43,12 @@
     - 'not (item.0.key == "f2fs" and ansible_distribution == "Ubuntu" and ansible_distribution_version is version("14.04", "<="))'
     - 'not (item.1 == "overwrite_another_fs" and ansible_system == "FreeBSD")'
 
+    - 'not (item.1 == "remove_fs" and ansible_system == "FreeBSD")' # util-linux not available on FreeBSD
+    # On CentOS 6 shippable containers, wipefs seems unable to remove vfat signatures
+    - 'not (item.1 == "remove_fs" and item.0.key == "vfat" and ansible_distribution == "CentOS" and
+            ansible_distribution_version is version("7.0", "<"))'
+
     # The xfsprogs package on newer versions of OpenSUSE (15+) require Python 3, we skip this on our Python 2 container
     # OpenSUSE 42.3 Python2 and the other py3 containers are not affected so we will continue to run that
     - 'not (item.0.key == "xfs" and ansible_os_family == "Suse" and ansible_python.version.major == 2 and ansible_distribution_major_version|int != 42)'
-  loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'overwrite_another_fs'])|list }}"
+  loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'overwrite_another_fs', 'remove_fs'])|list }}"

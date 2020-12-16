@@ -1,4 +1,9 @@
 ---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 - name: Install Hashi Vault on controlled node and test
   vars:
     vault_version: '0.11.0'
@@ -82,9 +87,9 @@
               command: '{{ vault_cmd }} secrets enable -path=kv2 -version=2 kv'
 
             - name: 'Create a test policy'
-              shell: "echo '{{ policy }}' | {{ vault_cmd }} policy write test-policy -"
-              vars:
-                policy: |
+              command:
+                cmd: '{{ vault_cmd }} policy write test-policy -'
+                stdin: |
                   path "{{ vault_gen_path }}/secret1" {
                     capabilities = ["read"]
                   }
@@ -141,8 +146,16 @@
               import_tasks: approle_setup.yml
               when: ansible_distribution != 'RedHat' or ansible_distribution_major_version is version('7', '>')
 
+            - name: setup approle secret_id_less auth
+              import_tasks: approle_secret_id_less_setup.yml
+              when: ansible_distribution != 'RedHat' or ansible_distribution_major_version is version('7', '>')
+
             - name: setup token auth
               import_tasks: token_setup.yml
+
+            - name: setup jwt auth
+              import_tasks: jwt_setup.yml
+              when: ansible_distribution != 'RedHat' or ansible_distribution_major_version is version('7', '>')
 
         - import_tasks: tests.yml
           vars:
@@ -151,7 +164,17 @@
 
         - import_tasks: tests.yml
           vars:
+            auth_type: approle_secret_id_less
+          when: ansible_distribution != 'RedHat' or ansible_distribution_major_version is version('7', '>')
+
+        - import_tasks: tests.yml
+          vars:
             auth_type: token
+
+        - import_tasks: tests.yml
+          vars:
+            auth_type: jwt
+          when: ansible_distribution != 'RedHat' or ansible_distribution_major_version is version('7', '>')
 
       always:
         - name: 'Kill vault process'

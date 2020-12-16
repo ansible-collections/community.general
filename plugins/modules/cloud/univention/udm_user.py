@@ -27,202 +27,250 @@ options:
         choices: [ present, absent ]
         description:
             - Whether the user is present or not.
+        type: str
     username:
         required: true
         description:
             - User name
         aliases: ['name']
+        type: str
     firstname:
         description:
             - First name. Required if C(state=present).
+        type: str
     lastname:
         description:
             - Last name. Required if C(state=present).
+        type: str
     password:
         description:
             - Password. Required if C(state=present).
+        type: str
     birthday:
         description:
             - Birthday
+        type: str
     city:
         description:
             - City of users business address.
+        type: str
     country:
         description:
             - Country of users business address.
+        type: str
     department_number:
         description:
             - Department number of users business address.
         aliases: [ departmentNumber ]
+        type: str
     description:
         description:
             - Description (not gecos)
+        type: str
     display_name:
         description:
             - Display name (not gecos)
         aliases: [ displayName ]
+        type: str
     email:
-        default: []
+        default: ['']
         description:
             - A list of e-mail addresses.
+        type: list
     employee_number:
         description:
             - Employee number
         aliases: [ employeeNumber ]
+        type: str
     employee_type:
         description:
             - Employee type
         aliases: [ employeeType ]
+        type: str
     gecos:
         description:
             - GECOS
+        type: str
     groups:
         default: []
         description:
             - "POSIX groups, the LDAP DNs of the groups will be found with the
                LDAP filter for each group as $GROUP:
                C((&(objectClass=posixGroup)(cn=$GROUP)))."
+        type: list
     home_share:
         description:
             - "Home NFS share. Must be a LDAP DN, e.g.
                C(cn=home,cn=shares,ou=school,dc=example,dc=com)."
         aliases: [ homeShare ]
+        type: str
     home_share_path:
         description:
             - Path to home NFS share, inside the homeShare.
         aliases: [ homeSharePath ]
+        type: str
     home_telephone_number:
         default: []
         description:
             - List of private telephone numbers.
         aliases: [ homeTelephoneNumber ]
+        type: list
     homedrive:
         description:
             - Windows home drive, e.g. C("H:").
+        type: str
     mail_alternative_address:
         default: []
         description:
             - List of alternative e-mail addresses.
         aliases: [ mailAlternativeAddress ]
+        type: list
     mail_home_server:
         description:
             - FQDN of mail server
         aliases: [ mailHomeServer ]
+        type: str
     mail_primary_address:
         description:
             - Primary e-mail address
         aliases: [ mailPrimaryAddress ]
+        type: str
     mobile_telephone_number:
         default: []
         description:
             - Mobile phone number
         aliases: [ mobileTelephoneNumber ]
+        type: list
     organisation:
         description:
             - Organisation
         aliases: [ organization ]
-    override_pw_history:
+        type: str
+    overridePWHistory:
         type: bool
         default: 'no'
         description:
             - Override password history
-        aliases: [ overridePWHistory ]
-    override_pw_length:
+        aliases: [ override_pw_history ]
+    overridePWLength:
         type: bool
         default: 'no'
         description:
             - Override password check
-        aliases: [ overridePWLength ]
+        aliases: [ override_pw_length ]
     pager_telephonenumber:
         default: []
         description:
             - List of pager telephone numbers.
         aliases: [ pagerTelephonenumber ]
+        type: list
     phone:
         description:
             - List of telephone numbers.
+        type: list
     postcode:
         description:
             - Postal code of users business address.
+        type: str
     primary_group:
-        default: cn=Domain Users,cn=groups,$LDAP_BASE_DN
         description:
             - Primary group. This must be the group LDAP DN.
+            - If not specified, it defaults to C(cn=Domain Users,cn=groups,$LDAP_BASE_DN).
         aliases: [ primaryGroup ]
+        type: str
     profilepath:
         description:
             - Windows profile directory
+        type: str
     pwd_change_next_login:
         choices: [ '0', '1' ]
         description:
             - Change password on next login.
         aliases: [ pwdChangeNextLogin ]
+        type: str
     room_number:
         description:
             - Room number of users business address.
         aliases: [ roomNumber ]
+        type: str
     samba_privileges:
         description:
             - "Samba privilege, like allow printer administration, do domain
                join."
         aliases: [ sambaPrivileges ]
+        type: list
     samba_user_workstations:
         description:
             - Allow the authentication only on this Microsoft Windows host.
         aliases: [ sambaUserWorkstations ]
+        type: list
     sambahome:
         description:
             - Windows home path, e.g. C('\\$FQDN\$USERNAME').
+        type: str
     scriptpath:
         description:
             - Windows logon script.
+        type: str
     secretary:
         default: []
         description:
             - A list of superiors as LDAP DNs.
+        type: list
     serviceprovider:
-        default: []
+        default: ['']
         description:
             - Enable user for the following service providers.
+        type: list
     shell:
         default: '/bin/bash'
         description:
             - Login shell
+        type: str
     street:
         description:
             - Street of users business address.
+        type: str
     title:
         description:
             - Title, e.g. C(Prof.).
+        type: str
     unixhome:
-        default: '/home/$USERNAME'
         description:
             - Unix home directory
+            - If not specified, it defaults to C(/home/$USERNAME).
+        type: str
     userexpiry:
-        default: Today + 1 year
         description:
             - Account expiry date, e.g. C(1999-12-31).
+            - If not specified, it defaults to the current day plus one year.
+        type: str
     position:
         default: ''
         description:
             - "Define the whole position of users object inside the LDAP tree,
                e.g. C(cn=employee,cn=users,ou=school,dc=example,dc=com)."
+        type: str
     update_password:
         default: always
+        choices: [ always, on_create ]
         description:
             - "C(always) will update passwords if they differ.
                C(on_create) will only set the password for newly created users."
+        type: str
     ou:
         default: ''
         description:
             - "Organizational Unit inside the LDAP Base DN, e.g. C(school) for
                LDAP OU C(ou=school,dc=example,dc=com)."
+        type: str
     subpath:
         default: 'cn=users'
         description:
             - "LDAP subpath inside the organizational unit, e.g.
                C(cn=teachers,cn=users) for LDAP container
                C(cn=teachers,cn=users,dc=example,dc=com)."
+        type: str
 '''
 
 
@@ -272,61 +320,44 @@ def main():
     expiry = date.strftime(date.today() + timedelta(days=365), "%Y-%m-%d")
     module = AnsibleModule(
         argument_spec=dict(
-            birthday=dict(default=None,
-                          type='str'),
-            city=dict(default=None,
-                      type='str'),
-            country=dict(default=None,
-                         type='str'),
-            department_number=dict(default=None,
-                                   type='str',
+            birthday=dict(type='str'),
+            city=dict(type='str'),
+            country=dict(type='str'),
+            department_number=dict(type='str',
                                    aliases=['departmentNumber']),
-            description=dict(default=None,
-                             type='str'),
-            display_name=dict(default=None,
-                              type='str',
+            description=dict(type='str'),
+            display_name=dict(type='str',
                               aliases=['displayName']),
             email=dict(default=[''],
                        type='list'),
-            employee_number=dict(default=None,
-                                 type='str',
+            employee_number=dict(type='str',
                                  aliases=['employeeNumber']),
-            employee_type=dict(default=None,
-                               type='str',
+            employee_type=dict(type='str',
                                aliases=['employeeType']),
-            firstname=dict(default=None,
-                           type='str'),
-            gecos=dict(default=None,
-                       type='str'),
+            firstname=dict(type='str'),
+            gecos=dict(type='str'),
             groups=dict(default=[],
                         type='list'),
-            home_share=dict(default=None,
-                            type='str',
+            home_share=dict(type='str',
                             aliases=['homeShare']),
-            home_share_path=dict(default=None,
-                                 type='str',
+            home_share_path=dict(type='str',
                                  aliases=['homeSharePath']),
             home_telephone_number=dict(default=[],
                                        type='list',
                                        aliases=['homeTelephoneNumber']),
-            homedrive=dict(default=None,
-                           type='str'),
-            lastname=dict(default=None,
-                          type='str'),
+            homedrive=dict(type='str'),
+            lastname=dict(type='str'),
             mail_alternative_address=dict(default=[],
                                           type='list',
                                           aliases=['mailAlternativeAddress']),
-            mail_home_server=dict(default=None,
-                                  type='str',
+            mail_home_server=dict(type='str',
                                   aliases=['mailHomeServer']),
-            mail_primary_address=dict(default=None,
-                                      type='str',
+            mail_primary_address=dict(type='str',
                                       aliases=['mailPrimaryAddress']),
             mobile_telephone_number=dict(default=[],
                                          type='list',
                                          aliases=['mobileTelephoneNumber']),
-            organisation=dict(default=None,
-                              type='str',
+            organisation=dict(type='str',
                               aliases=['organization']),
             overridePWHistory=dict(default=False,
                                    type='bool',
@@ -337,24 +368,18 @@ def main():
             pager_telephonenumber=dict(default=[],
                                        type='list',
                                        aliases=['pagerTelephonenumber']),
-            password=dict(default=None,
-                          type='str',
+            password=dict(type='str',
                           no_log=True),
             phone=dict(default=[],
                        type='list'),
-            postcode=dict(default=None,
-                          type='str'),
-            primary_group=dict(default=None,
-                               type='str',
+            postcode=dict(type='str'),
+            primary_group=dict(type='str',
                                aliases=['primaryGroup']),
-            profilepath=dict(default=None,
-                             type='str'),
-            pwd_change_next_login=dict(default=None,
-                                       type='str',
+            profilepath=dict(type='str'),
+            pwd_change_next_login=dict(type='str',
                                        choices=['0', '1'],
                                        aliases=['pwdChangeNextLogin']),
-            room_number=dict(default=None,
-                             type='str',
+            room_number=dict(type='str',
                              aliases=['roomNumber']),
             samba_privileges=dict(default=[],
                                   type='list',
@@ -362,24 +387,18 @@ def main():
             samba_user_workstations=dict(default=[],
                                          type='list',
                                          aliases=['sambaUserWorkstations']),
-            sambahome=dict(default=None,
-                           type='str'),
-            scriptpath=dict(default=None,
-                            type='str'),
+            sambahome=dict(type='str'),
+            scriptpath=dict(type='str'),
             secretary=dict(default=[],
                            type='list'),
             serviceprovider=dict(default=[''],
                                  type='list'),
             shell=dict(default='/bin/bash',
                        type='str'),
-            street=dict(default=None,
-                        type='str'),
-            title=dict(default=None,
-                       type='str'),
-            unixhome=dict(default=None,
-                          type='str'),
-            userexpiry=dict(default=expiry,
-                            type='str'),
+            street=dict(type='str'),
+            title=dict(type='str'),
+            unixhome=dict(type='str'),
+            userexpiry=dict(type='str'),
             username=dict(required=True,
                           aliases=['name'],
                           type='str'),
@@ -450,6 +469,8 @@ def main():
                     obj[k] = module.params[k]
             # handle some special values
             obj['e-mail'] = module.params['email']
+            if 'userexpiry' in obj and obj.get('userexpiry') is None:
+                obj['userexpiry'] = expiry
             password = module.params['password']
             if obj['password'] is None:
                 obj['password'] = password
