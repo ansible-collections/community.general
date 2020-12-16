@@ -102,7 +102,7 @@ options:
   variables:
     type: dict
     description:
-      - List of variables.
+      - Dictionary of variables.
 extends_documentation_fragment:
   - url
 '''
@@ -116,6 +116,8 @@ EXAMPLES = '''
     state: present
     name: "{{ ansible_fqdn }}"
     ip: "{{ ansible_default_ipv4.address }}"
+    variables:
+      foo: "bar"
   delegate_to: 127.0.0.1
 '''
 
