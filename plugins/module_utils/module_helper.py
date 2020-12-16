@@ -152,7 +152,7 @@ class DependencyCtxMgr(object):
         return self.msg or str(self.exc_val)
 
 
-class NamedDeprecation(object):
+class _NamedDeprecation(object):
     def __init__(self, deprecation):
         self.name = None
         self.deprecation = deprecation
@@ -166,15 +166,14 @@ class NamedDeprecation(object):
         self.name = name
         self.module = module
 
-        d = list(self.deprecation)
-        d[0] = (
+        self._prepared_deprecation = dict(self.deprecation)
+        self._prepared_deprecation['msg'] = (
             "{0}"
             "\n\n"
             "To prevent this message, add the deprecation name '{2}' to the '{1}' module parameter:\n"
             "  {1}:\n"
             "    - {2}"
-        ).format(d[0], ack_param, name)
-        self._prepared_deprecation = d
+        ).format(self.deprecation['msg'], ack_param, name)
 
     def acknowledge(self):
         self.acked = True
@@ -183,7 +182,7 @@ class NamedDeprecation(object):
         if self.triggered or self.acked:
             return
 
-        self.module.deprecate(*self._prepared_deprecation)  # pylint: disable=ansible-deprecated-no-version
+        self.module.deprecate(**self._prepared_deprecation)
         self.triggered = True
 
     def __str__(self):
@@ -203,9 +202,17 @@ class ModuleHelper(object):
     ack_deprecations_module_param = "ack_named_deprecations"
 
     class PrepareNamedDeprecation(object):
+        """
+        Helper class providing a bare ``deprecate()`` static method that mimics ``AnsibleModule.deprecate()``
+        signature. The sanity checks run pylint with a custom checker plugin that performs static analysis
+        on calls to methods named ``deprecate()``. So, this parlour trick exists to force users to declare
+        their named deprecations using one such call.
+        """
         @staticmethod
-        def deprecate(msg, version=None, date=None, collection_name=None):
-            return NamedDeprecation([msg, version, date, collection_name])
+        def deprecate(msg, version=None, date=None, collection_name=None, **kwargs):
+            return _NamedDeprecation(
+                dict(msg=msg, version=version, date=date, collection_name=collection_name, **kwargs)
+            )
 
     class AttrDict(dict):
         def __getattr__(self, item):
@@ -232,10 +239,10 @@ class ModuleHelper(object):
             self.ack_named_deprecation(ack)
 
     def update_output(self, **kwargs):
-        self.output_dict.update(kwargs or {})
+        self.output_dict.update(kwargs)
 
     def update_facts(self, **kwargs):
-        self.facts_dict.update(kwargs or {})
+        self.facts_dict.update(kwargs)
 
     def __init_module__(self):
         pass
