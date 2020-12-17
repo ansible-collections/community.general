@@ -131,13 +131,15 @@ import os
 import time
 import traceback
 
+PROXMOXER_IMP_ERR = None
 try:
     from proxmoxer import ProxmoxAPI
     HAS_PROXMOXER = True
 except ImportError:
+    PROXMOXER_IMP_ERR = traceback.format_exc()
     HAS_PROXMOXER = False
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
 
 
@@ -209,7 +211,8 @@ def main():
     )
 
     if not HAS_PROXMOXER:
-        module.fail_json(msg='proxmoxer required for this module')
+        module.fail_json(msg=missing_required_lib('python-proxmoxer'),
+                         exception=PROXMOXER_IMP_ERR)
 
     state = module.params['state']
     api_user = module.params['api_user']
