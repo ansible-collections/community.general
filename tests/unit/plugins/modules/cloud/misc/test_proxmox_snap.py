@@ -29,14 +29,14 @@ def get_resources(type):
              "diskread": 10000,
              "cpu": 0.01,
              "name": "test-lxc",
-             "status": "running" }]
+             "status": "running"}]
 
 
 def get_snaps():
     return [{"running": 0,
              "name": "test",
              "digest": "deadbeef",
-             "description": "Test!" }]
+             "description": "Test!"}]
 
 
 def fake_api(api_host, api_user, api_password, validate_certs):
@@ -64,7 +64,7 @@ def test_create_snapshot(mocker):
                      "state": "present",
                      "snapname": "test",
                      "timeout": "1",
-                     "force": True,})
+                     "force": True})
     proxmox_snap.HAS_PROXMOXER = True
     proxmox_snap.setup_api = mocker.MagicMock(side_effect=fake_api)
     proxmox_snap.main()
