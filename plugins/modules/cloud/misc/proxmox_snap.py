@@ -207,7 +207,8 @@ def main():
             snapname=dict(type='str', default='ansible_snap'),
             force=dict(type='bool', default='no'),
             vmstate=dict(type='bool', default='no'),
-        )
+        ),
+        supports_check_mode=True
     )
 
     if not HAS_PROXMOXER:
@@ -264,8 +265,11 @@ def main():
                 if i['name'] == snapname:
                     module.exit_json(changed=False, msg="Snapshot %s is already present" % snapname)
 
-            if snapshot_create(module, proxmox, vm, vmid, timeout, snapname, description, vmstate):
+            if module.check_mode:
+                module.exit_json(changed=False, msg="Would create snapshot %s" % snapname)
+            elif snapshot_create(module, proxmox, vm, vmid, timeout, snapname, description, vmstate):
                 module.exit_json(changed=True, msg="Snapshot %s created" % snapname)
+
         except Exception as e:
             module.fail_json(msg="Creating snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))
 
@@ -285,8 +289,11 @@ def main():
             if not snap_exist:
                 module.exit_json(changed=False, msg="Snapshot %s does not exist" % snapname)
             else:
-                if snapshot_remove(module, proxmox, vm, vmid, timeout, snapname, force):
+                if module.check_mode:
+                    module.exit_json(changed=False, msg="Would remove snapshot %s" % snapname)
+                elif snapshot_remove(module, proxmox, vm, vmid, timeout, snapname, force):
                     module.exit_json(changed=True, msg="Snapshot %s removed" % snapname)
+
         except Exception as e:
             module.fail_json(msg="Removing snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))
 
