@@ -41,32 +41,9 @@ def get_snaps():
     }]
 
 
-def task_start(snapname, description, vmstate):
-    return str("UPID:localhost:00007C26:05D37B74:5F90A0B7:vzsnapshot:100:root@pam:")
-
-
-def task_status():
-    return {
-      "starttime": 100000,
-      "node": "localhost",
-      "upid": "UPID:localhost:00007C26:05D37B74:5F90A0B7:vzsnapshot:100:root@pam:",
-      "pstart": 100001,
-      "exitstatus": "OK",
-      "status": "stopped",
-      "type": "vzsnapshot",
-      "id": "100",
-      "user": "root@pam",
-      "pid": 1001}
-
-
 def fake_api(api_host, api_user, api_password, validate_certs):
-    vmid = "100"
-    taskid = "UPID:localhost:00007C26:05D37B74:5F90A0B7:vzsnapshot:100:root@pam:"
     r = MagicMock()
     r.cluster.resources.get = MagicMock(side_effect=get_resources)
-    r.nodes.localhost.lxc.vmid.snapshot.get = MagicMock(side_effect=get_snaps)
-    r.nodes.localhost.lxc.vmid.snapshot.post = MagicMock(side_effect=task_start)
-    r.nodes.localhost.tasks.taskid.status.get = MagicMock(side_effect=task_status)
     return r
 
 def test_proxmox_snap_without_argument(capfd):
@@ -80,6 +57,7 @@ def test_proxmox_snap_without_argument(capfd):
 
 def test_create_snapshot(mocker):
     set_module_args({
+                "check_mode": True,
                 "hostname": "test-lxc",
                 "api_user": "root@pam",
                 "api_password": "secret",
