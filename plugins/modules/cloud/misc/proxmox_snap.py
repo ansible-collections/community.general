@@ -155,6 +155,9 @@ def get_instance(proxmox, vmid):
 
 
 def snapshot_create(module, proxmox, vm, vmid, timeout, snapname, description, vmstate):
+    if module.check_mode:
+        return True
+
     if VZ_TYPE == 'lxc':
         taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).snapshot.post(snapname=snapname, description=description)
     else:
@@ -173,6 +176,9 @@ def snapshot_create(module, proxmox, vm, vmid, timeout, snapname, description, v
 
 
 def snapshot_remove(module, proxmox, vm, vmid, timeout, snapname, force):
+    if module.check_mode:
+        return True
+
     taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).snapshot.delete(snapname, force=int(force))
     while timeout:
         if (proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['status'] == 'stopped' and
@@ -265,9 +271,7 @@ def main():
                 if i['name'] == snapname:
                     module.exit_json(changed=False, msg="Snapshot %s is already present" % snapname)
 
-            if module.check_mode:
-                module.exit_json(changed=False, msg="Would create snapshot %s" % snapname)
-            elif snapshot_create(module, proxmox, vm, vmid, timeout, snapname, description, vmstate):
+            if snapshot_create(module, proxmox, vm, vmid, timeout, snapname, description, vmstate):
                 module.exit_json(changed=True, msg="Snapshot %s created" % snapname)
 
         except Exception as e:
@@ -289,9 +293,7 @@ def main():
             if not snap_exist:
                 module.exit_json(changed=False, msg="Snapshot %s does not exist" % snapname)
             else:
-                if module.check_mode:
-                    module.exit_json(changed=False, msg="Would remove snapshot %s" % snapname)
-                elif snapshot_remove(module, proxmox, vm, vmid, timeout, snapname, force):
+                if snapshot_remove(module, proxmox, vm, vmid, timeout, snapname, force):
                     module.exit_json(changed=True, msg="Snapshot %s removed" % snapname)
 
         except Exception as e:

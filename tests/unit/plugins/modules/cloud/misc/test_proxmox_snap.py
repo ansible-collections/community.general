@@ -55,7 +55,7 @@ def test_proxmox_snap_without_argument(capfd):
     assert json.loads(out)['failed']
 
 
-def test_create_snapshot_check_mode(mocker):
+def test_create_snapshot_check_mode(capfd, mocker):
     set_module_args({"hostname": "test-lxc",
                      "api_user": "root@pam",
                      "api_password": "secret",
@@ -63,8 +63,13 @@ def test_create_snapshot_check_mode(mocker):
                      "state": "present",
                      "snapname": "test",
                      "timeout": "1",
-                     "force": True})
-    proxmox_snap.check_mode = True
+                     "force": True,
+                     "_ansible_check_mode": True})
     proxmox_snap.HAS_PROXMOXER = True
     proxmox_snap.setup_api = mocker.MagicMock(side_effect=fake_api)
-    proxmox_snap.main()
+    with pytest.raises(SystemExit) as results:
+        proxmox_snap.main()
+
+    out, err = capfd.readouterr()
+    assert not err
+    assert json.loads(out)['changed']
