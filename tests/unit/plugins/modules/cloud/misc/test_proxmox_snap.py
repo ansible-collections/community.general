@@ -12,33 +12,30 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
 
 
 def get_resources(type):
-    return [{
-      "diskwrite": 0,
-      "vmid": 100,
-      "node": "localhost",
-      "id": "lxc/100",
-      "maxdisk": 10000,
-      "template": 0,
-      "disk": 10000,
-      "uptime": 10000,
-      "maxmem": 10000,
-      "maxcpu": 1,
-      "netin": 10000,
-      "type": "lxc",
-      "netout": 10000,
-      "mem": 10000,
-      "diskread": 10000,
-      "cpu": 0.01,
-      "name": "test-lxc",
-      "status": "running" }]
+    return [{ "diskwrite": 0,
+              "vmid": 100,
+              "node": "localhost",
+              "id": "lxc/100",
+              "maxdisk": 10000,
+              "template": 0,
+              "disk": 10000,
+              "uptime": 10000,
+              "maxmem": 10000,
+              "maxcpu": 1,
+              "netin": 10000,
+              "type": "lxc",
+              "netout": 10000,
+              "mem": 10000,
+              "diskread": 10000,
+              "cpu": 0.01,
+              "name": "test-lxc",
+              "status": "running" }]
 
 def get_snaps():
-    return [{
-      "running": 0,
-      "name": "test",
-      "digest": "deadbeef",
-      "description": "Test!"
-    }]
+    return [{ "running": 0,
+              "name": "test",
+              "digest": "deadbeef",
+              "description": "Test!" }]
 
 
 def fake_api(api_host, api_user, api_password, validate_certs):
