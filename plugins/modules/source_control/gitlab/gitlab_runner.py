@@ -121,7 +121,7 @@ EXAMPLES = '''
     description: Docker Machine t1
     state: absent
 
-- name: "Delete an owned runner as a non-admin"
+- name: Delete an owned runner as a non-admin
   community.general.gitlab_runner:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
