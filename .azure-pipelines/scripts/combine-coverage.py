@@ -7,7 +7,8 @@ Keep in mind that Azure Pipelines does not enforce unique job display names (onl
 It is up to pipeline authors to avoid name collisions when deviating from the recommended format.
 """
 
-from __future__ import annotations
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 import os
 import re
