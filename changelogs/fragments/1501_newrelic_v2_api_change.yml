@@ -1,3 +1,5 @@
 major_changes:
-  - removed v1 newrelic api 
-  - added support for v2 newrelic api (https://github.com/ansible-collections/community.general/pull/1501).
+  - newrelic_deployment - removed newrelic v1 API, added support for v2 API (https://github.com/ansible-collections/community.general/pull/1501).
+breaking_changes:
+  - newrelic_deployment - I(revision) is required in v2 API.
+  - newrelic_deployment - check_mode is not supported.

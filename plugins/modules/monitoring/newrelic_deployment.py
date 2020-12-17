@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright 2020 Davinder Pal <dpsangwal@gmail.com>
+# Copyright 2013 Matt Coddington <coddington@gmail.com>
 # GNU General Public License v3.0+
 # (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -11,14 +11,13 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: newrelic_deployment
-version_added: "1.2.0"
 author:
     - "Davinder Pal (@116davinder)"
     - "Matt Coddington (@mcodd)"
-short_description: Notify newrelic about app deployments using newrelic v2 api
+short_description: Notify newrelic about app deployments
 description:
    - Notify newrelic about app deployments
-        (https://docs.newrelic.com/docs/apm/new-relic-apm/maintenance/record-deployments)
+        (U(https://docs.newrelic.com/docs/apm/new-relic-apm/maintenance/record-deployments)).
 options:
   token:
     description:
@@ -27,31 +26,48 @@ options:
     type: str
   app_name:
     description:
-      - (one of app_name or application_id is required)
-        The value of app_name in the newrelic.yml file used by the application
+      - The value of C(app_name) in the C(newrelic.yml) file used by the application.
+      - Exactly one of I(app_name) or I(application_id) is required.
     required: false
     type: str
   application_id:
     description:
-      - (one of app_name or application_id is required)
-        (see https://rpm.newrelic.com/api/explore/applications/list)
+      - See U(https://rpm.newrelic.com/api/explore/applications/list).
+      - Exactly one of I(app_name) or I(application_id) is required.
     required: false
     type: str
   changelog:
     description:
-      - A list of changes for this deployment
+      - A list of changes for this deployment.
     required: false
     type: str
   description:
     description:
-      - Text annotation for the deployment - notes for you
+      - Text annotation for the deployment - notes for you.
     required: false
     type: str
   revision:
     description:
-      - A revision number (e.g., git commit SHA)
+      - A revision number (for example, git commit SHA).
     required: true
     type: str
+  appname:  
+    type: str
+    description:  
+      - (deprecated) Name of the application 
+    required: false 
+  environment:  
+    type: str 
+    description:  
+      - (deprecated) The environment for this deployment.
+    required: false 
+  validate_certs: 
+    description:  
+      - (deprecated) If C(no), SSL certificates will not be validated. This should only be used  
+        on personally controlled sites using self-signed certificates.  
+    required: false 
+    default: 'yes'  
+    type: bool
   user:
     description:
       - The name of the user/process that triggered this deployment
@@ -89,12 +105,9 @@ def main():
             revision=dict(required=True),
             user=dict(required=False),
         ),
-        required_one_of=[['app_name', 'application_id']]
+        required_one_of=[['app_name', 'application_id']],
+        mutually_exclusive=[['app_name', 'application_id']],
     )
-
-    if module.params['app_name'] and module.params['application_id']:
-        module.fail_json(msg="both app_name' and 'application_id'\
-        are defined")
 
     if module.params['app_name']:
         data = 'filter[name]=' + str(module.params['app_name'])
@@ -107,8 +120,7 @@ def main():
                                  data=data,
                                  method='GET')
         if info['status'] != 200:
-            module.fail_json(msg="unable to get application list from\
-            newrelic: %s" % info['msg'])
+            module.fail_json(msg="unable to get application list from newrelic: %s" % info['msg'])
         else:
             body = json.loads(resp.read())
         if body is None:
