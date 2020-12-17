@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: community.general.proxmox_snap
+module: proxmox_snap
 short_description: Snapshot management of instances in Proxmox VE cluster
 description:
   - Allows you to create/delete snapshots from instances in Proxmox VE cluster.
