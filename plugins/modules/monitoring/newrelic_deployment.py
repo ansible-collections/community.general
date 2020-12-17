@@ -51,22 +51,22 @@ options:
       - A revision number (for example, git commit SHA).
     required: true
     type: str
-  appname:  
+  appname:
     type: str
-    description:  
-      - (deprecated) Name of the application 
-    required: false 
-  environment:  
-    type: str 
-    description:  
+    description:
+      - (deprecated) Name of the application
+    required: false
+  environment:
+    type: str
+    description:
       - (deprecated) The environment for this deployment.
-    required: false 
-  validate_certs: 
-    description:  
-      - (deprecated) If C(no), SSL certificates will not be validated. This should only be used  
-        on personally controlled sites using self-signed certificates.  
-    required: false 
-    default: 'yes'  
+    required: false
+  validate_certs:
+    description:
+      - (deprecated) If C(no), SSL certificates will not be validated. This should only be used
+        on personally controlled sites using self-signed certificates.
+    required: false
+    default: 'yes'
     type: bool
   user:
     description:
