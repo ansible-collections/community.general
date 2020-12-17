@@ -55,9 +55,8 @@ def test_proxmox_snap_without_argument(capfd):
     assert json.loads(out)['failed']
 
 
-def test_create_snapshot(mocker):
-    set_module_args({"check_mode": True,
-                     "hostname": "test-lxc",
+def test_create_snapshot_check_mode(mocker):
+    set_module_args({"hostname": "test-lxc",
                      "api_user": "root@pam",
                      "api_password": "secret",
                      "api_host": "127.0.0.1",
@@ -65,6 +64,7 @@ def test_create_snapshot(mocker):
                      "snapname": "test",
                      "timeout": "1",
                      "force": True})
+    proxmox_snap.check_mode = True
     proxmox_snap.HAS_PROXMOXER = True
     proxmox_snap.setup_api = mocker.MagicMock(side_effect=fake_api)
     proxmox_snap.main()
