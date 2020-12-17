@@ -32,13 +32,6 @@ def get_resources(type):
              "status": "running"}]
 
 
-def get_snaps():
-    return [{"running": 0,
-             "name": "test",
-             "digest": "deadbeef",
-             "description": "Test!"}]
-
-
 def fake_api(api_host, api_user, api_password, validate_certs):
     r = MagicMock()
     r.cluster.resources.get = MagicMock(side_effect=get_resources)
