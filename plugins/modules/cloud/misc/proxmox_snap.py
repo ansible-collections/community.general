@@ -1,5 +1,7 @@
 #!/usr/bin/python
-# Copyright: Ansible Project
+# -*- coding: utf-8 -*-
+
+# Copyright: (c) 2020, Jeffrey van Pelt (@Thulium-Drake) <jeff@vanpelt.one>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -8,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: community.general.proxmox_snap
-short_description: Snapshot management of instances in Proxmox VE cluster.
+short_description: Snapshot management of instances in Proxmox VE cluster
 description:
   - Allows you to create/delete snapshots from instances in Proxmox VE cluster.
 options:
@@ -102,7 +104,7 @@ EXAMPLES = r'''
   hosts: all
   gather_facts: false
   tasks:
-    - name: make snapshots using the vmid
+    - name: Make snapshots using the vmid
       community.general.proxmox_snap:
         api_user: root@pam
         api_password: 1q2w3e
@@ -112,7 +114,8 @@ EXAMPLES = r'''
         snapname: test
         vmstate: true
       delegate_to: localhost
-    - name: remove snapshots using the inventory hostname
+
+    - name: Remove snapshots using the inventory hostname
       community.general.proxmox_snap:
         api_user: root@pam
         api_password: 1q2w3e
@@ -226,13 +229,13 @@ def main():
         try:
             api_password = os.environ['PROXMOX_PASSWORD']
         except KeyError as e:
-            module.fail_json(msg='You should set api_password param or use PROXMOX_PASSWORD environment variable')
+            module.fail_json(msg='You should set api_password param or use PROXMOX_PASSWORD environment variable' % to_native(e))
 
     try:
         proxmox = setup_api(api_host, api_user, api_password, validate_certs)
 
     except Exception as e:
-        module.fail_json(msg='authorization on proxmox cluster failed with exception: %s' % e)
+        module.fail_json(msg='authorization on proxmox cluster failed with exception: %s' % to_native(e))
 
     # If hostname is set get the VM id from ProxmoxAPI
     if not vmid and hostname:
@@ -261,7 +264,7 @@ def main():
             if snapshot_create(module, proxmox, vm, vmid, timeout, snapname, description, vmstate):
                 module.exit_json(changed=True, msg="Snapshot %s created" % snapname)
         except Exception as e:
-            module.fail_json(msg="Creating snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, e))
+            module.fail_json(msg="Creating snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))
 
     elif state == 'absent':
         try:
@@ -282,7 +285,7 @@ def main():
                 if snapshot_remove(module, proxmox, vm, vmid, timeout, snapname, force):
                     module.exit_json(changed=True, msg="Snapshot %s removed" % snapname)
         except Exception as e:
-            module.fail_json(msg="Removing snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, e))
+            module.fail_json(msg="Removing snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))
 
 
 if __name__ == '__main__':
