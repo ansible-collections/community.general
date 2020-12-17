@@ -272,7 +272,10 @@ def main():
                     module.exit_json(changed=False, msg="Snapshot %s is already present" % snapname)
 
             if snapshot_create(module, proxmox, vm, vmid, timeout, snapname, description, vmstate):
-                module.exit_json(changed=True, msg="Snapshot %s created" % snapname)
+                if module.check_mode:
+                    module.exit_json(changed=False, msg="Snapshot %s would be created" % snapname)
+                else:
+                    module.exit_json(changed=True, msg="Snapshot %s created" % snapname)
 
         except Exception as e:
             module.fail_json(msg="Creating snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))
@@ -294,7 +297,10 @@ def main():
                 module.exit_json(changed=False, msg="Snapshot %s does not exist" % snapname)
             else:
                 if snapshot_remove(module, proxmox, vm, vmid, timeout, snapname, force):
-                    module.exit_json(changed=True, msg="Snapshot %s removed" % snapname)
+                    if module.check_mode:
+                        module.exit_json(changed=False, msg="Snapshot %s would be removed" % snapname)
+                    else:
+                        module.exit_json(changed=True, msg="Snapshot %s removed" % snapname)
 
         except Exception as e:
             module.fail_json(msg="Removing snapshot %s of VM %s failed with exception: %s" % (snapname, vmid, to_native(e)))

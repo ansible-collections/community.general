@@ -5,8 +5,8 @@ __metaclass__ = type
 
 import json
 import pytest
-from unittest.mock import MagicMock
 
+from ansible_collections.community.general.tests.unit.compat.mock import MagicMock
 from ansible_collections.community.general.plugins.modules.cloud.misc import proxmox_snap
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args
 
@@ -72,4 +72,24 @@ def test_create_snapshot_check_mode(capfd, mocker):
 
     out, err = capfd.readouterr()
     assert not err
-    assert json.loads(out)['changed']
+    assert not json.loads(out)['changed']
+
+
+def test_remove_snapshot_check_mode(capfd, mocker):
+    set_module_args({"hostname": "test-lxc",
+                     "api_user": "root@pam",
+                     "api_password": "secret",
+                     "api_host": "127.0.0.1",
+                     "state": "absent",
+                     "snapname": "test",
+                     "timeout": "1",
+                     "force": True,
+                     "_ansible_check_mode": True})
+    proxmox_snap.HAS_PROXMOXER = True
+    proxmox_snap.setup_api = mocker.MagicMock(side_effect=fake_api)
+    with pytest.raises(SystemExit) as results:
+        proxmox_snap.main()
+
+    out, err = capfd.readouterr()
+    assert not err
+    assert not json.loads(out)['changed']
