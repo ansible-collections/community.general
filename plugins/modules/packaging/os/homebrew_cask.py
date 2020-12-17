@@ -139,6 +139,7 @@ EXAMPLES = '''
 import os
 import re
 import tempfile
+import subprocess
 
 from ansible.module_utils._text import to_bytes
 from ansible.module_utils.basic import AnsibleModule
@@ -466,6 +467,54 @@ class HomebrewCask(object):
             return True
         else:
             return False
+
+    def _compare_version(self, version1, version2):
+        v1_int_arr = [int(i) for i in version1.split('.')]
+        v2_int_arr = [int(i) for i in version2.split('.')]
+
+        v1_len = len(v1_int_arr)
+        v2_len = len(v2_int_arr)
+
+        if v1_len > v2_len:
+            for i in range(v2_len, v1_len):
+                v2_int_arr.append(0)
+        elif v2_len > v1_len:
+            for i in range(v1_len, v2_len):
+                v1_int_arr.append(0)
+
+        print(v1_int_arr)
+        print(v2_int_arr)
+
+        for i in range(len(v1_int_arr)):
+            if v1_int_arr[i] > v2_int_arr[i]:
+                return 1
+            elif v2_int_arr[i] > v1_int_arr[i]:
+                return -1
+        return 0
+
+    def _brew_cask_is_deprecated(self):
+        latest_version_with_brew_cask = '2.5.0'
+
+        current_version = self._get_brew_version()
+
+        comparison_result = self._compare_version(current_version, latest_version_with_brew_cask)
+
+        return comparison_result > 0
+
+    def _get_brew_version(self):
+        opts = (
+            [self.brew_path, '--version']
+        )
+
+        cmd = [opt for opt in opts if opt]
+
+        process = subprocess.run(cmd, stdout=subprocess.PIPE)
+
+        process_output = process.stdout.decode()
+
+        version = process_output.split('\n')[0].split(' ')[1]
+
+        return version
     # /checks ------------------------------------------------------ }}}
 
     # commands ----------------------------------------------------- {{{
