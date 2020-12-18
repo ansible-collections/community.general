@@ -76,7 +76,8 @@ options:
     type: str
 
 notes:
-  - Requires proxmoxer and requests modules on host. This modules can be installed with pip.
+  - Requires proxmoxer and requests modules on host. These modules can be installed with pip.
+  - Supports C(check_mode).
 requirements: [ "proxmoxer", "python >= 2.7", "requests" ]
 author: Jeffrey van Pelt (@Thulium-Drake)
 '''
@@ -126,6 +127,8 @@ EXAMPLES = r'''
         force: true
       delegate_to: localhost
 '''
+
+RETURN = r'''#'''
 
 import os
 import time
@@ -251,7 +254,7 @@ def main():
     if not vmid and hostname:
         hosts = get_vmid(proxmox, hostname)
         if len(hosts) == 0:
-            module.fail_json(msg="Vmid could not be fetched => Hostname doesn't exist (action: %s)" % state)
+            module.fail_json(msg="Vmid could not be fetched => Hostname does not exist (action: %s)" % state)
         vmid = hosts[0]
     elif not vmid:
         module.exit_json(changed=False, msg="Vmid could not be fetched for the following action: %s" % state)
