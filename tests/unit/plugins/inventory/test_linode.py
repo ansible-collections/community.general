@@ -25,8 +25,8 @@ import sys
 
 linode_apiv4 = pytest.importorskip('linode_api4')
 mandatory_py_version = pytest.mark.skipif(
-    sys.version_info < (2, 7),
-    reason='The linode_api4 dependency requires python2.7 or higher'
+    sys.version_info < (3, 6),
+    reason='The linode_api4 dependency requires python3.6 or higher'
 )
 
 

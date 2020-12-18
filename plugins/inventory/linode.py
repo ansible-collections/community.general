@@ -11,7 +11,7 @@ DOCUMENTATION = r'''
       - Luke Murphy (@decentral1se)
     short_description: Ansible dynamic inventory plugin for Linode.
     requirements:
-        - python >= 3.5
+        - python >= 3.6
         - linode_api4 >= 2.0.0
     description:
         - Reads inventories from the Linode API v4.
