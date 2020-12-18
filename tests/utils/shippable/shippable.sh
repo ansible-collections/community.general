@@ -14,6 +14,9 @@ function join {
     echo "$*";
 }
 
+# Ensure we can write other collections to this dir
+sudo chown "$(whoami)" "${PWD}/../../"
+
 test="$(join / "${args[@]:1}")"
 
 docker images ansible/ansible
