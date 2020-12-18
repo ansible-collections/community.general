@@ -432,6 +432,7 @@ stages:
       - template: templates/matrix.yml
         parameters:
 <<<<<<< HEAD
+<<<<<<< HEAD
           nameFormat: Server {0}
           testFormat: i/windows/{0}
           targets:
@@ -444,8 +445,12 @@ stages:
 =======
           nameFormat: Python 3.6 {0}
           testFormat: 2.10/cloud/3.6/{0}/1
+=======
+          nameFormat: Python {0}
+          testFormat: 2.10/cloud/{0}/1
+>>>>>>> dd55c3c3bb (Fix AZP CI (#1508))
           targets:
-            - test: ''
+            - test: 3.6
   - stage: Cloud_2_9
     displayName: Cloud 2.9
 >>>>>>> 33126b7267 (AZP Bootstrap)
@@ -453,6 +458,7 @@ stages:
     jobs:
       - template: templates/matrix.yml
         parameters:
+<<<<<<< HEAD
 <<<<<<< HEAD
           testFormat: i/{0}/1
           targets:
@@ -475,8 +481,12 @@ stages:
 =======
           nameFormat: Python 3.6 {0}
           testFormat: 2.9/cloud/3.6/{0}/1
+=======
+          nameFormat: Python {0}
+          testFormat: 2.9/cloud/{0}/1
+>>>>>>> dd55c3c3bb (Fix AZP CI (#1508))
           targets:
-            - test: ''
+            - test: 3.6
   - stage: Summary
     condition: succeededOrFailed()
     dependsOn:
