@@ -156,6 +156,8 @@ stages:
             - 1
             - 2
             - 3
+            - 4
+            - 5
   - stage: Remote_2_10
     displayName: Remote 2.10
     dependsOn: []
@@ -173,6 +175,9 @@ stages:
           groups:
             - 1
             - 2
+            - 3
+            - 4
+            - 5
   - stage: Remote_2_9
     displayName: Remote 2.9
     dependsOn: []
@@ -188,6 +193,9 @@ stages:
           groups:
             - 1
             - 2
+            - 3
+            - 4
+            - 5
 
 ### Docker
   - stage: Docker_devel
@@ -220,6 +228,8 @@ stages:
             - 1
             - 2
             - 3
+            - 4
+            - 5
   - stage: Docker_2_10
     displayName: Docker 2.10
     dependsOn: []
@@ -235,8 +245,11 @@ stages:
             - name: openSUSE 15 py3
               test: opensuse15
           groups:
+            - 1
             - 2
             - 3
+            - 4
+            - 5
   - stage: Docker_2_9
     displayName: Docker 2.9
     dependsOn: []
@@ -252,8 +265,11 @@ stages:
             - name: openSUSE 15 py3
               test: opensuse15
           groups:
+            - 1
             - 2
             - 3
+            - 4
+            - 5
 
 ### Cloud
   - stage: Cloud_devel
