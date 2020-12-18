@@ -11,13 +11,13 @@ DOCUMENTATION = r'''
       - Luke Murphy (@decentral1se)
     short_description: Ansible dynamic inventory plugin for Linode.
     requirements:
-        - python >= 2.7
+        - python >= 3.5
         - linode_api4 >= 2.0.0
     description:
         - Reads inventories from the Linode API v4.
         - Uses a YAML configuration file that ends with linode.(yml|yaml).
         - Linode labels are used by default as the hostnames.
-        - The inventory groups are built from groups and not tags.
+        - The inventory groups are built from tags.
     options:
         plugin:
             description: marks this as an instance of the 'linode' plugin
@@ -43,8 +43,7 @@ DOCUMENTATION = r'''
 EXAMPLES = r'''
 # Minimal example. `LINODE_ACCESS_TOKEN` is exposed in environment.
 plugin: community.general.linode
-
-# Example with regions, types, groups and access token
+# Example with regions, types, tags, and access token
 plugin: community.general.linode
 access_token: foobar
 regions:
@@ -99,17 +98,14 @@ class InventoryModule(BaseInventoryPlugin):
             raise AnsibleError('Linode client raised: %s' % exception)
 
     def _add_groups(self):
-        """Add Linode instance groups to the dynamic inventory."""
-        self.linode_groups = set(
-            filter(None, [
-                instance.group
-                for instance
-                in self.instances
-            ])
-        )
+        """Add Linode instance tags to the dynamic inventory as groups."""
+        self.linode_tags = set()
+        for instance in self.instances:
+            for tag in instance.tags:
+                self.linode_tags.add(tag.label)
 
-        for linode_group in self.linode_groups:
-            self.inventory.add_group(linode_group)
+        for linode_tag in self.linode_tags:
+            self.inventory.add_group(linode_tag)
 
     def _filter_by_config(self, regions, types):
         """Filter instances by user specified configuration."""
@@ -128,7 +124,10 @@ class InventoryModule(BaseInventoryPlugin):
     def _add_instances_to_groups(self):
         """Add instance names to their dynamic inventory groups."""
         for instance in self.instances:
-            self.inventory.add_host(instance.label, group=instance.group)
+            for tag in instance.tags:
+                self.inventory.add_host(instance.label, group=tag.label)
+            else:
+                self.inventory.add_host(instance.label)
 
     def _add_hostvars_for_instances(self):
         """Add hostvars for instances in the dynamic inventory."""
