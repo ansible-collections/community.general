@@ -1,6 +1,6 @@
 # Community General Collection
 
-[![Run Status](https://api.shippable.com/projects/5e664a167c32620006c9fa50/badge?branch=main)](https://app.shippable.com/github/ansible-collections/community.general/dashboard)
+[![Build Status](https://dev.azure.com/ansible/community.general/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ansible/community.general/_build?definitionId=31)
 [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
 
 This repo contains the `community.general` Ansible Collection. The collection includes many modules and plugins supported by Ansible community which are not part of more specialized community collections.
