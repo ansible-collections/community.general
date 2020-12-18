@@ -21,11 +21,13 @@
       name:
       - cloud-init
       - udev
+    become: yes
 
   - name: setup run cloud-init
     service:
       name: cloud-init-local
       state: restarted
+    become: yes
 
   - name: test gather cloud-init facts in check mode
     cloud_init_data_facts:
