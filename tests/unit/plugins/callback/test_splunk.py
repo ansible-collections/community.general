@@ -25,7 +25,10 @@ import json
 
 
 class TestSplunkClient(unittest.TestCase):
-    def setUp(self):
+    @patch('ansible_collections.community.general.plugins.callback.splunk.socket')
+    def setUp(self, mock_socket):
+        mock_socket.gethostname.return_value = 'my-host'
+        mock_socket.gethostbyname.return_value = '1.2.3.4'
         self.splunk = SplunkHTTPCollectorSource()
         self.mock_task = Mock('MockTask')
         self.mock_task._role = 'myrole'
@@ -46,6 +49,8 @@ class TestSplunkClient(unittest.TestCase):
         sent_data = json.loads(args[1])
 
         self.assertEqual(sent_data['event']['timestamp'], '2020-12-01 00:00:00.000000 +0000')
+        self.assertEqual(sent_data['event']['host'], 'my-host')
+        self.assertEqual(sent_data['event']['ip_address'], '1.2.3.4')
 
     @patch('ansible_collections.community.general.plugins.callback.splunk.datetime')
     @patch('ansible_collections.community.general.plugins.callback.splunk.open_url')
@@ -59,3 +64,5 @@ class TestSplunkClient(unittest.TestCase):
         sent_data = json.loads(args[1])
 
         self.assertEqual(sent_data['event']['timestamp'], '2020-12-01 00:00:00 +0000')
+        self.assertEqual(sent_data['event']['host'], 'my-host')
+        self.assertEqual(sent_data['event']['ip_address'], '1.2.3.4')
