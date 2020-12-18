@@ -273,20 +273,20 @@ stages:
     jobs:
       - template: templates/matrix.yml
         parameters:
-          nameFormat: Python 3.6 {0}
-          testFormat: 2.10/cloud/3.6/{0}/1
+          nameFormat: Python {0}
+          testFormat: 2.10/cloud/{0}/1
           targets:
-            - test: ''
+            - test: 3.6
   - stage: Cloud_2_9
     displayName: Cloud 2.9
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          nameFormat: Python 3.6 {0}
-          testFormat: 2.9/cloud/3.6/{0}/1
+          nameFormat: Python {0}
+          testFormat: 2.9/cloud/{0}/1
           targets:
-            - test: ''
+            - test: 3.6
   - stage: Summary
     condition: succeededOrFailed()
     dependsOn:
