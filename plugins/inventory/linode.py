@@ -38,6 +38,11 @@ DOCUMENTATION = r'''
           default: []
           type: list
           required: false
+        tags:
+          description: Populate inventory with nodes that contain any of these tags, sorting into groups by tag name.
+          default: []
+          type: list
+          required: false
 '''
 
 EXAMPLES = r'''
@@ -50,6 +55,8 @@ regions:
   - eu-west
 types:
   - g5-standard-2
+tags:
+  - web-servers
 '''
 
 import os
@@ -107,7 +114,7 @@ class InventoryModule(BaseInventoryPlugin):
         for linode_tag in self.linode_tags:
             self.inventory.add_group(linode_tag)
 
-    def _filter_by_config(self, regions, types):
+    def _filter_by_config(self, regions, types, tags):
         """Filter instances by user specified configuration."""
         if regions:
             self.instances = [
@@ -119,6 +126,12 @@ class InventoryModule(BaseInventoryPlugin):
             self.instances = [
                 instance for instance in self.instances
                 if instance.type.id in types
+            ]
+
+        if tags:
+            self.instances = [
+                instance for instance in self.instances
+                if any(tag.label in tags for tag in instance.tags)
             ]
 
     def _add_instances_to_groups(self):
@@ -168,6 +181,10 @@ class InventoryModule(BaseInventoryPlugin):
                 'type_to_be': list,
                 'value': config_data.get('types', [])
             },
+            'tags': {
+                'type_to_be': list,
+                'value': config_data.get('tags', [])
+            },
         }
 
         for name in options:
@@ -179,8 +196,9 @@ class InventoryModule(BaseInventoryPlugin):
 
         regions = options['regions']['value']
         types = options['types']['value']
+        tags = options['tags']['value']
 
-        return regions, types
+        return regions, types, tags
 
     def verify_file(self, path):
         """Verify the Linode configuration file."""
@@ -202,8 +220,8 @@ class InventoryModule(BaseInventoryPlugin):
 
         self._get_instances_inventory()
 
-        regions, types = self._get_query_options(config_data)
-        self._filter_by_config(regions, types)
+        regions, types, tags = self._get_query_options(config_data)
+        self._filter_by_config(regions, types, tags)
 
         self._add_groups()
         self._add_instances_to_groups()
