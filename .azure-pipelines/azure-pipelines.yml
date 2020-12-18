@@ -188,8 +188,8 @@ stages:
           targets:
             - name: RHEL 8.2
               test: rhel/8.2
-            - name: FreeBSD 12.0
-              test: freebsd/12.0
+            #- name: FreeBSD 12.0
+            #  test: freebsd/12.0
           groups:
             - 1
             - 2
@@ -260,10 +260,10 @@ stages:
           targets:
             - name: CentOS 8
               test: centos8
-            - name: Fedora 31
-              test: fedora31
-            - name: openSUSE 15 py3
-              test: opensuse15
+            #- name: Fedora 31
+            #  test: fedora31
+            #- name: openSUSE 15 py3
+            #  test: opensuse15
           groups:
             - 1
             - 2
