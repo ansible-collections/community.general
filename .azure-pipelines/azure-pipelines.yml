@@ -238,12 +238,14 @@ stages:
         parameters:
           testFormat: 2.10/linux/{0}
           targets:
-            - name: CentOS 8
-              test: centos8
+            #- name: CentOS 8
+            #  test: centos8
             - name: Fedora 32
               test: fedora32
             - name: openSUSE 15 py3
               test: opensuse15
+            - name: Ubuntu 18.04
+              test: ubuntu1804
           groups:
             - 1
             - 2
@@ -258,12 +260,14 @@ stages:
         parameters:
           testFormat: 2.9/linux/{0}
           targets:
-            - name: CentOS 8
-              test: centos8
+            #- name: CentOS 8
+            #  test: centos8
             #- name: Fedora 31
             #  test: fedora31
             #- name: openSUSE 15 py3
             #  test: opensuse15
+            - name: Ubuntu 18.04
+              test: ubuntu1804
           groups:
             - 1
             - 2
@@ -292,7 +296,6 @@ stages:
           nameFormat: Python {0}
           testFormat: 2.10/cloud/{0}/1
           targets:
-            - test: 2.7
             - test: 3.6
   - stage: Cloud_2_9
     displayName: Cloud 2.9
@@ -304,7 +307,6 @@ stages:
           testFormat: 2.9/cloud/{0}/1
           targets:
             - test: 2.7
-            - test: 3.6
   - stage: Summary
     condition: succeededOrFailed()
     dependsOn:
