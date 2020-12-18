@@ -435,15 +435,26 @@ class HomebrewCask(object):
         if not self.valid_cask(self.current_cask):
             return False
 
-        cask_is_outdated_command = (
-            [
-                self.brew_path,
-                'outdated',
-                '--cask',
-            ]
-            + (['--greedy'] if self.greedy else [])
-            + [self.current_cask]
-        )
+        if self._brew_cask_command_is_deprecated():
+            cask_is_outdated_command = (
+                [
+                    self.brew_path,
+                    'outdated',
+                    '--cask',
+                ]
+                + (['--greedy'] if self.greedy else [])
+                + [self.current_cask]
+            )
+        else:
+            cask_is_outdated_command = (
+                [
+                    self.brew_path,
+                    'cask',
+                    'outdated',
+                ]
+                + (['--greedy'] if self.greedy else [])
+                + [self.current_cask]
+            )
 
         rc, out, err = self.module.run_command(cask_is_outdated_command)
 
@@ -455,12 +466,21 @@ class HomebrewCask(object):
             self.message = 'Invalid cask: {0}.'.format(self.current_cask)
             raise HomebrewCaskException(self.message)
 
-        cmd = [
-            "{brew_path}".format(brew_path=self.brew_path),
-            "list",
-            "--cask",
-            self.current_cask
-        ]
+        if self._brew_cask_command_is_deprecated():
+            cmd = [
+                "{brew_path}".format(brew_path=self.brew_path),
+                "list",
+                "--cask",
+                self.current_cask
+            ]
+        else:
+            cmd = [
+                "{brew_path}".format(brew_path=self.brew_path),
+                "cask",
+                "list",
+                self.current_cask
+            ]
+
         rc, out, err = self.module.run_command(cmd)
 
         if rc == 0:
@@ -469,12 +489,14 @@ class HomebrewCask(object):
             return False
 
     def _compare_version(self, version1, version2):
+        # convert version string into array of numbers (e.g '1.2.3' => [1,2,3])
         v1_int_arr = [int(i) for i in version1.split('.')]
         v2_int_arr = [int(i) for i in version2.split('.')]
 
         v1_len = len(v1_int_arr)
         v2_len = len(v2_int_arr)
 
+        # pad array with 0s if version arrays are different length (e.g '1.2.3' vs '1.2' => [1,2,3] vs [1,2,0])
         if v1_len > v2_len:
             for i in range(v2_len, v1_len):
                 v2_int_arr.append(0)
@@ -482,24 +504,13 @@ class HomebrewCask(object):
             for i in range(v1_len, v2_len):
                 v1_int_arr.append(0)
 
-        print(v1_int_arr)
-        print(v2_int_arr)
-
+        # compare each version number in array
         for i in range(len(v1_int_arr)):
             if v1_int_arr[i] > v2_int_arr[i]:
                 return 1
             elif v2_int_arr[i] > v1_int_arr[i]:
                 return -1
         return 0
-
-    def _brew_cask_is_deprecated(self):
-        latest_version_with_brew_cask = '2.5.0'
-
-        current_version = self._get_brew_version()
-
-        comparison_result = self._compare_version(current_version, latest_version_with_brew_cask)
-
-        return comparison_result > 0
 
     def _get_brew_version(self):
         opts = (
@@ -512,9 +523,19 @@ class HomebrewCask(object):
 
         process_output = process.stdout.decode()
 
+        # get version string from first line of "brew --version" output
         version = process_output.split('\n')[0].split(' ')[1]
 
         return version
+
+    def _brew_cask_command_is_deprecated(self):
+        latest_version_with_brew_cask_command = '2.5.0'
+
+        current_version = self._get_brew_version()
+
+        comparison_result = self._compare_version(current_version, latest_version_with_brew_cask_command)
+
+        return comparison_result > 0
     # /checks ------------------------------------------------------ }}}
 
     # commands ----------------------------------------------------- {{{
@@ -586,9 +607,14 @@ class HomebrewCask(object):
             self.message = 'Casks would be upgraded.'
             raise HomebrewCaskException(self.message)
 
-        opts = (
-            [self.brew_path, 'upgrade', '--cask']
-        )
+        if self._brew_cask_command_is_deprecated():
+            opts = (
+                [self.brew_path, 'upgrade', '--cask']
+            )
+        else:
+            opts = (
+                [self.brew_path, 'cask', 'upgrade']
+            )
 
         cmd = [opt for opt in opts if opt]
 
@@ -635,10 +661,16 @@ class HomebrewCask(object):
             )
             raise HomebrewCaskException(self.message)
 
-        opts = (
-            [self.brew_path, 'install', '--cask', self.current_cask]
-            + self.install_options
-        )
+        if self._brew_cask_command_is_deprecated():
+            opts = (
+                [self.brew_path, 'install', '--cask', self.current_cask]
+                + self.install_options
+            )
+        else:
+            opts = (
+                [self.brew_path, 'cask', 'install', self.current_cask]
+                + self.install_options
+            )
 
         cmd = [opt for opt in opts if opt]
 
@@ -699,11 +731,19 @@ class HomebrewCask(object):
             )
             raise HomebrewCaskException(self.message)
 
-        opts = (
-            [self.brew_path, command, '--cask']
-            + self.install_options
-            + [self.current_cask]
-        )
+        if self._brew_cask_command_is_deprecated():
+            opts = (
+                [self.brew_path, command, '--cask']
+                + self.install_options
+                + [self.current_cask]
+            )
+        else:
+            opts = (
+                [self.brew_path, 'cask', command]
+                + self.install_options
+                + [self.current_cask]
+            )
+
         cmd = [opt for opt in opts if opt]
 
         rc, out, err = '', '', ''
@@ -752,10 +792,16 @@ class HomebrewCask(object):
             )
             raise HomebrewCaskException(self.message)
 
-        opts = (
-            [self.brew_path, 'uninstall', '--cask', self.current_cask]
-            + self.install_options
-        )
+        if self._brew_cask_command_is_deprecated():
+            opts = (
+                [self.brew_path, 'uninstall', '--cask', self.current_cask]
+                + self.install_options
+            )
+        else:
+            opts = (
+                [self.brew_path, 'cask', 'uninstall', self.current_cask]
+                + self.install_options
+            )
 
         cmd = [opt for opt in opts if opt]
 

@@ -1,0 +1,2 @@
+minor_changes:
+  - Homebrew will be deprecating use of `brew cask` commands as of version 2.6.0 https://brew.sh/2020/12/01/homebrew-2.6.0/. Added logic to stop using `brew cask` for brew version >= 2.6.0
