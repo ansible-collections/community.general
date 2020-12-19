@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 module: jira
 short_description: create and modify issues in a JIRA instance
 description:
@@ -157,7 +157,7 @@ author:
 - "Per Abildgaard Toft (@pertoft)"
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 # Create a new issue and add a comment to it:
 - name: Create an issue
   community.general.jira:
@@ -327,7 +327,11 @@ def request(url, user, passwd, timeout, data=None, method=None):
                                         'Authorization': "Basic %s" % auth})
 
     if info['status'] not in (200, 201, 204):
-        error = json.loads(info['body'])
+        error = None
+        try:
+            error = json.loads(info['body'])
+        except Exception:
+            module.fail_json(msg=to_native(info['body']))
         if error:
             msg = []
             for key in ('errorMessages', 'errors'):
@@ -335,18 +339,15 @@ def request(url, user, passwd, timeout, data=None, method=None):
                     msg.append(to_native(error[key]))
             if msg:
                 module.fail_json(msg=', '.join(msg))
-            else:
-                module.fail_json(msg=to_native(error))
-        else:
-            # Fallback print body, if it cant be decoded
-            module.fail_json(msg=to_native(info['body']))
+            module.fail_json(msg=to_native(error))
+        # Fallback print body, if it cant be decoded
+        module.fail_json(msg=to_native(info['body']))
 
     body = response.read()
 
     if body:
         return json.loads(to_text(body, errors='surrogate_or_strict'))
-    else:
-        return {}
+    return {}
 
 
 def post(url, user, passwd, timeout, data):
@@ -378,9 +379,7 @@ def create(restbase, user, passwd, params):
 
     url = restbase + '/issue/'
 
-    ret = post(url, user, passwd, params['timeout'], data)
-
-    return ret
+    return post(url, user, passwd, params['timeout'], data)
 
 
 def comment(restbase, user, passwd, params):
@@ -390,9 +389,7 @@ def comment(restbase, user, passwd, params):
 
     url = restbase + '/issue/' + params['issue'] + '/comment'
 
-    ret = post(url, user, passwd, params['timeout'], data)
-
-    return ret
+    return post(url, user, passwd, params['timeout'], data)
 
 
 def edit(restbase, user, passwd, params):
@@ -402,9 +399,7 @@ def edit(restbase, user, passwd, params):
 
     url = restbase + '/issue/' + params['issue']
 
-    ret = put(url, user, passwd, params['timeout'], data)
-
-    return ret
+    return put(url, user, passwd, params['timeout'], data)
 
 
 def update(restbase, user, passwd, params):
@@ -413,9 +408,7 @@ def update(restbase, user, passwd, params):
     }
     url = restbase + '/issue/' + params['issue']
 
-    ret = put(url, user, passwd, params['timeout'], data)
-
-    return ret
+    return put(url, user, passwd, params['timeout'], data)
 
 
 def fetch(restbase, user, passwd, params):
@@ -431,8 +424,7 @@ def search(restbase, user, passwd, params):
         url = url + '&fields=' + '&fields='.join([pathname2url(f) for f in fields])
     if params['maxresults']:
         url = url + '&maxResults=' + str(params['maxresults'])
-    ret = get(url, user, passwd, params['timeout'])
-    return ret
+    return get(url, user, passwd, params['timeout'])
 
 
 def transition(restbase, user, passwd, params):
@@ -455,9 +447,7 @@ def transition(restbase, user, passwd, params):
     data = {'transition': {"id": tid},
             'update': params['fields']}
 
-    ret = post(url, user, passwd, params['timeout'], data)
-
-    return ret
+    return post(url, user, passwd, params['timeout'], data)
 
 
 def link(restbase, user, passwd, params):
@@ -469,9 +459,7 @@ def link(restbase, user, passwd, params):
 
     url = restbase + '/issueLink/'
 
-    ret = post(url, user, passwd, params['timeout'], data)
-
-    return ret
+    return post(url, user, passwd, params['timeout'], data)
 
 
 # Some parameters are required depending on the operation:
@@ -547,7 +535,7 @@ def main():
         ret = method(restbase, user, passwd, module.params)
 
     except Exception as e:
-        return module.fail_json(msg=e.message)
+        return module.fail_json(msg=to_native(e))
 
     module.exit_json(changed=True, meta=ret)
 
