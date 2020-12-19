@@ -11,6 +11,7 @@ DOCUMENTATION = r'''
 ---
 module: proxmox_snap
 short_description: Snapshot management of instances in Proxmox VE cluster
+version_added: 2.0.0
 description:
   - Allows you to create/delete snapshots from instances in Proxmox VE cluster.
 options:
@@ -100,32 +101,6 @@ EXAMPLES = r'''
     vmid: 100
     state: absent
     snapname: pre-updates
-
-- name: Make snapshots of multiple machines
-  hosts: all
-  gather_facts: false
-  tasks:
-    - name: Make snapshots using the vmid
-      community.general.proxmox_snap:
-        api_user: root@pam
-        api_password: 1q2w3e
-        api_host: node1
-        vmid: "{{ proxmox_vmid }}"
-        state: present
-        snapname: test
-        vmstate: true
-      delegate_to: localhost
-
-    - name: Remove snapshots using the inventory hostname
-      community.general.proxmox_snap:
-        api_user: root@pam
-        api_password: 1q2w3e
-        api_host: node1
-        hostname: "{{ inventory_hostname }}"
-        state: absent
-        snapname: test
-        force: true
-      delegate_to: localhost
 '''
 
 RETURN = r'''#'''
