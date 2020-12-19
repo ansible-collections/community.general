@@ -1,0 +1,2 @@
+bugfixes:
+- git_config - actually raises an error for non-existent repo paths, for Ansible versions greater or equal to 2.10.4 (https://github.com/ansible-collections/community.general/issues/630).

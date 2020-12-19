@@ -245,7 +245,13 @@ def main():
         else:
             new_value_quoted = shlex_quote(new_value)
             cmd = ' '.join(args + [new_value_quoted])
-        (rc, out, err) = module.run_command(cmd, cwd=dir)
+        try:  # extra parameter from Ansible 2.10.4 onwards
+            (rc, out, err) = module.run_command(cmd, cwd=dir, ignore_invalid_cwd=False)
+        except TypeError:
+            # @TODO remove try/except when community.general drop support for 2.10.x
+            module.warn('If "repo" is not an invalid directory, "git_config" will not raise an error and will run '
+                        '"git" from the current working dir. Use Ansible 2.10.4 or newer to prevent that.')
+            (rc, out, err) = module.run_command(cmd, cwd=dir)
         if err:
             module.fail_json(rc=rc, msg=err, cmd=cmd)
 
