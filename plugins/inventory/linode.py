@@ -17,7 +17,8 @@ DOCUMENTATION = r'''
         - Reads inventories from the Linode API v4.
         - Uses a YAML configuration file that ends with linode.(yml|yaml).
         - Linode labels are used by default as the hostnames.
-        - The inventory groups are built from groups and not tags.
+        - The default inventory groups are built from groups (deprecated by 
+          Linode) and not tags.
     extends_documentation_fragment:
         - constructed
     options:
