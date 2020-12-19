@@ -32,6 +32,7 @@ options:
     type: str
   application_id:
     description:
+      - The I(application_id), found in the URL when viewing the application in RPM.
       - See U(https://rpm.newrelic.com/api/explore/applications/list).
       - Exactly one of I(app_name) or I(application_id) is required.
     required: false
@@ -54,17 +55,20 @@ options:
   appname:
     type: str
     description:
-      - (deprecated) Name of the application
+      - Name of the application. The value is not used for the v2 API.
+      - This option has been deprecated and will be removed in community.general 4.0.0.
     required: false
   environment:
     type: str
     description:
-      - (deprecated) The environment for this deployment.
+      - Name of the environment for this deployment. The value is not used for the v2 API.
+      - This option has been deprecated and will be removed in community.general 4.0.0.
     required: false
   validate_certs:
     description:
-      - (deprecated) If C(no), SSL certificates will not be validated. This should only be used
-        on personally controlled sites using self-signed certificates.
+      - If C(no), SSL certificates will not be validated. The value is not used for the v2 API.
+      - This should only be used on personally controlled sites using self-signed certificates.
+      - This option has been deprecated and will be removed in community.general 4.0.0.
     required: false
     default: 'yes'
     type: bool
@@ -104,9 +108,9 @@ def main():
             description=dict(required=False),
             revision=dict(required=True),
             user=dict(required=False),
-            appname=dict(required=False),
-            environment=dict(required=False),
-            validate_certs=dict(default=True, type='bool'),
+            appname=dict(required=False, removed_in_version='4.0.0', removed_from_collection='community.general'),
+            environment=dict(required=False, removed_in_version='4.0.0', removed_from_collection='community.general'),
+            validate_certs=dict(default=True, type='bool', removed_in_version='4.0.0', removed_from_collection='community.general'),
         ),
         required_one_of=[['app_name', 'application_id']],
         mutually_exclusive=[['app_name', 'application_id']],
@@ -131,14 +135,12 @@ def main():
         else:
             app_id = body['applications'][0]['id']
             if app_id is None:
-                module.fail_json(msg="App not found in\
-                NewRelic Registerd Applications List")
+                module.fail_json(msg="App not found in NewRelic Registerd Applications List")
     else:
         app_id = module.params['application_id']
 
     # Send the data to NewRelic
-    url = 'https://api.newrelic.com/v2/applications/' + str(app_id) \
-        + '/deployments.json'
+    url = 'https://api.newrelic.com/v2/applications/' + str(app_id) + '/deployments.json'
     data = {
         'deployment': {
             'revision': str(module.params['revision']),
@@ -155,8 +157,7 @@ def main():
     if info['status'] == 201:
         module.exit_json(changed=True)
     else:
-        module.fail_json(msg='unable to update newrelic: %s'
-                         % info['msg'])
+        module.fail_json(msg='unable to update newrelic: %s' % info['msg'])
 
 
 if __name__ == '__main__':

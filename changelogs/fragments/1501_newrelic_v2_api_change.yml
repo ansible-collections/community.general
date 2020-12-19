@@ -1,5 +1,7 @@
 major_changes:
   - newrelic_deployment - removed newrelic v1 API, added support for v2 API (https://github.com/ansible-collections/community.general/pull/1501).
 breaking_changes:
-  - newrelic_deployment - I(revision) is required in v2 API.
+  - newrelic_deployment - the ``revision`` option is required in v2 API (https://github.com/ansible-collections/community.general/pull/1501).
   - newrelic_deployment - check_mode is not supported.
+deprecated_features:
+  - newrelic_deployment - ``check_mode`` , ``appname`` , ``environment`` and ``validate_certs`` are deprecated as not required in v2 API.
