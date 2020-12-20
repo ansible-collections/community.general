@@ -14,6 +14,7 @@ short_description: Snapshot management of instances in Proxmox VE cluster
 version_added: 2.0.0
 description:
   - Allows you to create/delete snapshots from instances in Proxmox VE cluster.
+  - Supports both KVM and LXC, OpenVZ has not been tested, as it is no longer supported on Proxmox VE.
 options:
   api_host:
     description:
