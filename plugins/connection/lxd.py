@@ -26,6 +26,18 @@ DOCUMENTATION = '''
         vars:
             - name: ansible_executable
             - name: ansible_lxd_executable
+      remote:
+        description:
+            - Name of the LXD remote to use
+        default: local
+        vars:
+            - name: ansible_lxd_remote
+      project:
+        description:
+            - Name of the LXD project to use
+        default: default
+        vars:
+            - name: ansible_lxd_project
 '''
 
 import os
@@ -70,7 +82,13 @@ class Connection(ConnectionBase):
 
         self._display.vvv(u"EXEC {0}".format(cmd), host=self._host)
 
-        local_cmd = [self._lxc_cmd, "exec", self._host, "--", self._play_context.executable, "-c", cmd]
+        local_cmd = [
+            self._lxc_cmd,
+            "--project", self.get_option("project"),
+            "exec",
+            "%s:%s" % (self.get_option("remote"), self._host),
+            "--",
+            self._play_context.executable, "-c", cmd]
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
         in_data = to_bytes(in_data, errors='surrogate_or_strict', nonstring='passthru')
@@ -98,7 +116,12 @@ class Connection(ConnectionBase):
         if not os.path.isfile(to_bytes(in_path, errors='surrogate_or_strict')):
             raise AnsibleFileNotFound("input path is not a file: %s" % in_path)
 
-        local_cmd = [self._lxc_cmd, "file", "push", in_path, self._host + "/" + out_path]
+        local_cmd = [
+            self._lxc_cmd,
+            "--project", self.get_option("project"),
+            "file", "push",
+            in_path,
+            "%s:%s/%s" % (self.get_option("remote"), self._host, out_path)]
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
 
@@ -111,7 +134,12 @@ class Connection(ConnectionBase):
 
         self._display.vvv(u"FETCH {0} TO {1}".format(in_path, out_path), host=self._host)
 
-        local_cmd = [self._lxc_cmd, "file", "pull", self._host + "/" + in_path, out_path]
+        local_cmd = [
+            self._lxc_cmd,
+            "--project", self.get_option("project"),
+            "file", "pull",
+            "%s:%s/%s" % (self.get_option("remote"), self._host, in_path),
+            out_path]
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
 
