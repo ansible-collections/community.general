@@ -437,25 +437,11 @@ class HomebrewCask(object):
             return False
 
         if self._brew_cask_command_is_deprecated():
-            cask_is_outdated_command = (
-                [
-                    self.brew_path,
-                    'outdated',
-                    '--cask',
-                ]
-                + (['--greedy'] if self.greedy else [])
-                + [self.current_cask]
-            )
+            base_opts = [self.brew_path, 'outdated', '--cask']
         else:
-            cask_is_outdated_command = (
-                [
-                    self.brew_path,
-                    'cask',
-                    'outdated',
-                ]
-                + (['--greedy'] if self.greedy else [])
-                + [self.current_cask]
-            )
+            base_opts = [self.brew_path, 'cask', 'outdated']
+
+        cask_is_outdated_command = base_opts + (['--greedy'] if self.greedy else []) + [self.current_cask]
 
         rc, out, err = self.module.run_command(cask_is_outdated_command)
 
@@ -468,20 +454,19 @@ class HomebrewCask(object):
             raise HomebrewCaskException(self.message)
 
         if self._brew_cask_command_is_deprecated():
-            cmd = [
+            base_opts = [
                 "{brew_path}".format(brew_path=self.brew_path),
                 "list",
                 "--cask",
-                self.current_cask
             ]
         else:
-            cmd = [
+            base_opts = [
                 "{brew_path}".format(brew_path=self.brew_path),
                 "cask",
                 "list",
-                self.current_cask
             ]
 
+        cmd = base_opts + [self.current_cask]
         rc, out, err = self.module.run_command(cmd)
 
         if rc == 0:
@@ -490,11 +475,7 @@ class HomebrewCask(object):
             return False
 
     def _get_brew_version(self):
-        opts = (
-            [self.brew_path, '--version']
-        )
-
-        cmd = [opt for opt in opts if opt]
+        cmd = [self.brew_path, '--version']
 
         process = subprocess.run(cmd, stdout=subprocess.PIPE)
 
@@ -583,15 +564,9 @@ class HomebrewCask(object):
             raise HomebrewCaskException(self.message)
 
         if self._brew_cask_command_is_deprecated():
-            opts = (
-                [self.brew_path, 'upgrade', '--cask']
-            )
+            cmd = [self.brew_path, 'upgrade', '--cask']
         else:
-            opts = (
-                [self.brew_path, 'cask', 'upgrade']
-            )
-
-        cmd = [opt for opt in opts if opt]
+            cmd = [self.brew_path, 'cask', 'upgrade']
 
         rc, out, err = '', '', ''
 
@@ -637,15 +612,11 @@ class HomebrewCask(object):
             raise HomebrewCaskException(self.message)
 
         if self._brew_cask_command_is_deprecated():
-            opts = (
-                [self.brew_path, 'install', '--cask', self.current_cask]
-                + self.install_options
-            )
+            base_opts = [self.brew_path, 'install', '--cask']
         else:
-            opts = (
-                [self.brew_path, 'cask', 'install', self.current_cask]
-                + self.install_options
-            )
+            base_opts = [self.brew_path, 'cask', 'install']
+
+        opts = base_opts + [self.current_cask] + self.install_options
 
         cmd = [opt for opt in opts if opt]
 
@@ -707,17 +678,11 @@ class HomebrewCask(object):
             raise HomebrewCaskException(self.message)
 
         if self._brew_cask_command_is_deprecated():
-            opts = (
-                [self.brew_path, command, '--cask']
-                + self.install_options
-                + [self.current_cask]
-            )
+            base_opts = [self.brew_path, command, '--cask']
         else:
-            opts = (
-                [self.brew_path, 'cask', command]
-                + self.install_options
-                + [self.current_cask]
-            )
+            base_opts = [self.brew_path, 'cask', command]
+
+        opts = base_opts + self.install_options + [self.current_cask]
 
         cmd = [opt for opt in opts if opt]
 
@@ -768,15 +733,11 @@ class HomebrewCask(object):
             raise HomebrewCaskException(self.message)
 
         if self._brew_cask_command_is_deprecated():
-            opts = (
-                [self.brew_path, 'uninstall', '--cask', self.current_cask]
-                + self.install_options
-            )
+            base_opts = [self.brew_path, 'uninstall', '--cask']
         else:
-            opts = (
-                [self.brew_path, 'cask', 'uninstall', self.current_cask]
-                + self.install_options
-            )
+            base_opts = [self.brew_path, 'cask', 'uninstall']
+
+        opts = base_opts + [self.current_cask] + self.install_options
 
         cmd = [opt for opt in opts if opt]
 
