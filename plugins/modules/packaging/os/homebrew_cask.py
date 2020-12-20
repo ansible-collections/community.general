@@ -140,6 +140,7 @@ import os
 import re
 import tempfile
 import subprocess
+from distutils import version
 
 from ansible.module_utils._text import to_bytes
 from ansible.module_utils.basic import AnsibleModule
@@ -488,30 +489,6 @@ class HomebrewCask(object):
         else:
             return False
 
-    def _compare_version(self, version1, version2):
-        # convert version string into array of numbers (e.g '1.2.3' => [1,2,3])
-        v1_int_arr = [int(i) for i in version1.split('.')]
-        v2_int_arr = [int(i) for i in version2.split('.')]
-
-        v1_len = len(v1_int_arr)
-        v2_len = len(v2_int_arr)
-
-        # pad array with 0s if version arrays are different length (e.g '1.2.3' vs '1.2' => [1,2,3] vs [1,2,0])
-        if v1_len > v2_len:
-            for i in range(v2_len, v1_len):
-                v2_int_arr.append(0)
-        elif v2_len > v1_len:
-            for i in range(v1_len, v2_len):
-                v1_int_arr.append(0)
-
-        # compare each version number in array
-        for i in range(len(v1_int_arr)):
-            if v1_int_arr[i] > v2_int_arr[i]:
-                return 1
-            elif v2_int_arr[i] > v1_int_arr[i]:
-                return -1
-        return 0
-
     def _get_brew_version(self):
         opts = (
             [self.brew_path, '--version']
@@ -529,13 +506,11 @@ class HomebrewCask(object):
         return version
 
     def _brew_cask_command_is_deprecated(self):
-        latest_version_with_brew_cask_command = '2.5.0'
+        latest_version_with_brew_cask_command = version.LooseVersion('2.5.0')
 
-        current_version = self._get_brew_version()
+        current_version = version.LooseVersion(self._get_brew_version())
 
-        comparison_result = self._compare_version(current_version, latest_version_with_brew_cask_command)
-
-        return comparison_result > 0
+        return current_version > latest_version_with_brew_cask_command
     # /checks ------------------------------------------------------ }}}
 
     # commands ----------------------------------------------------- {{{
