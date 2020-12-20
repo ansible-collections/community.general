@@ -132,35 +132,37 @@ class Sysrc(object):
 
         return self.value in out.strip().split(self.delim)
 
-    def create(self):
+    def present(self):
+        if self.exists():
+            return
+
         if self.module.check_mode:
             self.changed = True
-            return True
+            return
 
-        self.module._verbosity = 5
         (rc, out, err) = self.run_sysrc("%s=%s" % (self.name, self.value))
         if out.find("%s:" % self.name) == 0 and re.search("-> %s$" % re.escape(self.value), out) is not None:
             self.changed = True
-            return True
-        else:
-            return False
 
-    def destroy(self):
-        if self.module.check_mode:
-            self.changed = True
-            return True
+    def absent(self):
+        if not self.exists():
+            return
 
-        (rc, out, err) = self.run_sysrc('-x', self.name)
-        if self.has_unknown_variable(out, err):
-            return False
+        # inversed since we still need to mark as changed
+        if not self.module.check_mode:
+            (rc, out, err) = self.run_sysrc('-x', self.name)
+            if self.has_unknown_variable(out, err):
+                return
 
         self.changed = True
-        return True
 
     def value_present(self):
+        if self.contains():
+            return
+
         if self.module.check_mode:
             self.changed = True
-            return True
+            return
 
         setstring = '%s+=%s%s' % (self.name, self.delim, self.value)
         (rc, out, err) = self.run_sysrc(setstring)
@@ -168,13 +170,11 @@ class Sysrc(object):
             values = out.split(' -> ')[1].strip().split(self.delim)
             if self.value in values:
                 self.changed = True
-                return True
-            else:
-                return False
-        else:
-            return False
 
     def value_absent(self):
+        if not self.contains():
+            return
+
         if self.module.check_mode:
             self.changed = True
             return
@@ -183,13 +183,8 @@ class Sysrc(object):
         (rc, out, err) = self.run_sysrc(setstring)
         if out.find("%s:" % self.name) == 0:
             values = out.split(' -> ')[1].strip().split(self.delim)
-            if self.value in values:
-                return False
-            else:
+            if self.value not in values:
                 self.changed = True
-                return True
-        else:
-            return False
 
     def run_sysrc(self, *args):
         cmd = [self.sysrc, '-f', self.path]
@@ -247,13 +242,13 @@ def main():
         result['existed'] = rc_value.exists()
 
     if state == 'present':
-        not rc_value.exists() and rc_value.create()
+        rc_value.present()
     elif state == 'absent':
-        rc_value.exists() and rc_value.destroy()
+        rc_value.absent()
     elif state == 'value_present':
-        not rc_value.contains() and rc_value.value_present()
+        rc_value.value_present()
     elif state == 'value_absent':
-        rc_value.contains() and rc_value.value_absent()
+        rc_value.value_absent()
 
     if module._verbosity > 0:
         result['command'] = ' '.join(rc_value.cmd)
