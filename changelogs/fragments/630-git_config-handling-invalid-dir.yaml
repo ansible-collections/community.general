@@ -1,2 +1,0 @@
-bugfixes:
-- git_config - now raises an error for non-existent repository paths (https://github.com/ansible-collections/community.general/issues/630).

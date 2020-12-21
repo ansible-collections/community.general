@@ -5,6 +5,40 @@ Community General Release Notes
 .. contents:: Topics
 
 
+v1.3.1
+======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- bigpanda - removed the dynamic default for ``host`` param (https://github.com/ansible-collections/community.general/pull/1423).
+- bitbucket_pipeline_variable - change pagination logic for pipeline variable get API (https://github.com/ansible-collections/community.general/issues/1425).
+- cobbler inventory script - add Python 3 support (https://github.com/ansible-collections/community.general/issues/638).
+- docker_container - the validation for ``capabilities`` in ``device_requests`` was incorrect (https://github.com/ansible-collections/community.docker/issues/42, https://github.com/ansible-collections/community.docker/pull/43).
+- git_config - now raises an error for non-existent repository paths (https://github.com/ansible-collections/community.general/issues/630).
+- icinga2_host - fix returning error codes (https://github.com/ansible-collections/community.general/pull/335).
+- jira - provide error message raised from exception (https://github.com/ansible-collections/community.general/issues/1504).
+- json_query - handle ``AnsibleUnicode`` and ``AnsibleUnsafeText`` (https://github.com/ansible-collections/community.general/issues/320).
+- keycloak module_utils - provide meaningful error message to user when auth URL does not start with http or https (https://github.com/ansible-collections/community.general/issues/331).
+- ldap_entry - improvements in documentation, simplifications and replaced code with better ``AnsibleModule`` arguments (https://github.com/ansible-collections/community.general/pull/1516).
+- mas - fix ``invalid literal`` when no app can be found (https://github.com/ansible-collections/community.general/pull/1436).
+- nios_host_record - fix to remove ``aliases`` (CNAMES) for configuration comparison (https://github.com/ansible-collections/community.general/issues/1335).
+- osx_defaults - unquote values and unescape double quotes when reading array values (https://github.com/ansible-collections/community.general/pull/358).
+- profitbricks_nic - removed the dynamic default for ``name`` param (https://github.com/ansible-collections/community.general/pull/1423).
+- profitbricks_nic - replaced code with ``required`` and ``required_if`` (https://github.com/ansible-collections/community.general/pull/1423).
+- redfish_info module, redfish_utils module utils - correct ``PartNumber`` property name in Redfish ``GetMemoryInventory`` command (https://github.com/ansible-collections/community.general/issues/1483).
+- saltstack connection plugin - use ``hashutil.base64_decodefile`` to ensure that the file checksum is preserved (https://github.com/ansible-collections/community.general/pull/1472).
+- udm_user - removed the dynamic default for ``userexpiry`` param (https://github.com/ansible-collections/community.general/pull/1423).
+- utm_network_interface_address - changed param type from invalid 'boolean' to valid 'bool' (https://github.com/ansible-collections/community.general/pull/1423).
+- utm_proxy_exception - four parameters had elements types set as 'string' (invalid), changed to 'str' (https://github.com/ansible-collections/community.general/pull/1399).
+- vmadm - simplification of code (https://github.com/ansible-collections/community.general/pull/1415).
+- xfconf - add in missing return values that are specified in the documentation (https://github.com/ansible-collections/community.general/issues/1418).
+
 v1.3.0
 ======
 
