@@ -526,7 +526,7 @@
       {%-       if expected_lines != test_line                                                       -%}
       {{-         differences.append({
                     line: {
-                      'expected': expected_line,
+                      'expected': expected_lines,
                       'got': test_line }})                                                           -}}
       {%-       endif                                                                                -%}
       {%-     endif                                                                                  -%}
