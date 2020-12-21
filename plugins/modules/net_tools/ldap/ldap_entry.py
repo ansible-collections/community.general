@@ -38,11 +38,14 @@ options:
       - If I(state=present), attributes necessary to create an entry. Existing
         entries are never modified. To assert specific attribute values on an
         existing entry, use M(community.general.ldap_attr) module instead.
+    type: dict
   objectClass:
     description:
       - If I(state=present), value or list of values to use when creating
         the entry. It can either be a string or an actual list of
         strings.
+    type: list
+    elements: str
   state:
     description:
       - The target state of the entry.
@@ -103,7 +106,6 @@ RETURN = """
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.six import string_types
 from ansible.module_utils._text import to_native, to_bytes
 from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs
 
@@ -137,13 +139,10 @@ class LdapEntry(LdapGeneric):
         attrs = {}
 
         for name, value in self.module.params['attributes'].items():
-            if name not in attrs:
-                attrs[name] = []
-
             if isinstance(value, list):
                 attrs[name] = list(map(to_bytes, value))
             else:
-                attrs[name].append(to_bytes(value))
+                attrs[name] = [to_bytes(value)]
 
         return attrs
 
@@ -187,10 +186,11 @@ def main():
     module = AnsibleModule(
         argument_spec=gen_specs(
             attributes=dict(default={}, type='dict'),
-            objectClass=dict(type='raw'),
+            objectClass=dict(type='list', elements='str'),
             params=dict(type='dict'),
             state=dict(default='present', choices=['present', 'absent']),
         ),
+        required_if=[('state', 'present', ['objectClass'])],
         supports_check_mode=True,
     )
 
@@ -202,17 +202,6 @@ def main():
         module.fail_json(msg="The `params` option to ldap_attr was removed since it circumvents Ansible's option handling")
 
     state = module.params['state']
-
-    # Check if objectClass is present when needed
-    if state == 'present' and module.params['objectClass'] is None:
-        module.fail_json(msg="At least one objectClass must be provided.")
-
-    # Check if objectClass is of the correct type
-    if (
-            module.params['objectClass'] is not None and not (
-                isinstance(module.params['objectClass'], string_types) or
-                isinstance(module.params['objectClass'], list))):
-        module.fail_json(msg="objectClass must be either a string or a list.")
 
     # Instantiate the LdapEntry object
     ldap = LdapEntry(module)
