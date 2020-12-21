@@ -148,6 +148,8 @@ config_values:
     alias.diffc: "diff --cached"
     alias.remotev: "remote -v"
 '''
+import os
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves import shlex_quote
 
@@ -245,7 +247,13 @@ def main():
         else:
             new_value_quoted = shlex_quote(new_value)
             cmd = ' '.join(args + [new_value_quoted])
-        (rc, out, err) = module.run_command(cmd, cwd=dir)
+        try:  # try using extra parameter from ansible-base 2.10.4 onwards
+            (rc, out, err) = module.run_command(cmd, cwd=dir, ignore_invalid_cwd=False)
+        except TypeError:
+            # @TODO remove try/except when community.general drop support for 2.10.x
+            if not os.path.isdir(dir):
+                module.fail_json(msg="Cannot find directory '{0}'".format(dir))
+            (rc, out, err) = module.run_command(cmd, cwd=dir)
         if err:
             module.fail_json(rc=rc, msg=err, cmd=cmd)
 
