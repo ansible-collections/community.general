@@ -4,8 +4,10 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- name: Set tests
-  set_fact:
+- name: Run tests
+  include_role:
+    name: callback
+  vars:
     tests:
       - name: Basic run
         environment:
@@ -56,83 +58,3 @@
           "PLAY RECAP *********************************************************************",
           "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
-
-- name: Create temporary playbook files
-  tempfile:
-    state: file
-    suffix: temp
-  loop: "{{ tests }}"
-  loop_control:
-    loop_var: test
-    label: "{{ test.name }}"
-  register: temporary_playbook_files
-  notify: Remove temporary playbooks
-
-- name: Set temporary playbook file content
-  copy:
-    content: "{{ test.1.playbook }}"
-    dest: "{{ temporary_playbook_files.results[test.0].path }}"
-  loop: "{{ query('ansible.builtin.indexed_items', tests) }}"
-  loop_control:
-    loop_var: test
-    label: "{{ test.1.name }}"
-
-- name: Collect outputs
-  command: "ansible-playbook -i {{ inventory }} {{ playbook }}"
-  environment: "{{ test.environment }}"
-  loop: "{{ tests }}"
-  loop_control:
-    loop_var: test
-    label: "{{ test.name }}"
-  register: outputs
-  changed_when: false
-  vars:
-    inventory: "{{ role_path }}/inventory.yml"
-    playbook: "
-      {%- for result in temporary_playbook_files.results -%}
-      {%-   if result.test.name == test.name -%}
-      {{-     result.path -}}
-      {%-   endif -%}
-      {%- endfor -%}"
-
-- name: Assert test output equals expected output
-  assert:
-    that: result.output.differences | length == 0
-  loop: "{{ results }}"
-  loop_control:
-    loop_var: result
-    label: "{{ result.name }}"
-  register: assertions
-  vars:
-    results: >-
-      {%- set results = []                                                                           -%}
-      {%- for result in outputs.results                                                              -%}
-      {%-   set differences = []                                                                     -%}
-      {%-   for i in range([result.test.expected_output | count, result.stdout_lines | count] | max) -%}
-      {%-     set line = "line_%s" | format(i+1)                                                     -%}
-      {%-     set test_line = result.stdout_lines[i] | default(none)                                 -%}
-      {%-     set expected_lines = result.test.expected_output[i] | default(none)                    -%}
-      {%-     if expected_lines is not string                                                        -%}
-      {%-       if test_line not in expected_lines                                                   -%}
-      {{-         differences.append({
-                    line: {
-                      'expected_one_of': expected_lines,
-                      'got': test_line }})                                                           -}}
-      {%-       endif                                                                                -%}
-      {%-     else                                                                                   -%}
-      {%-       if expected_lines != test_line                                                       -%}
-      {{-         differences.append({
-                    line: {
-                      'expected': expected_lines,
-                      'got': test_line }})                                                           -}}
-      {%-       endif                                                                                -%}
-      {%-     endif                                                                                  -%}
-      {%-   endfor                                                                                   -%}
-      {{-   results.append({
-              'name': result.test.name,
-              'output': {
-                  'differences': differences,
-                  'expected': result.test.expected_output,
-                  'got': result.stdout_lines }})                                                     -}}
-      {%- endfor                                                                                     -%}
-      {{- results                                                                                    -}}
