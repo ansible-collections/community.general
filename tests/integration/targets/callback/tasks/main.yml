@@ -17,12 +17,13 @@
 
   - name: Set temporary playbook file content
     copy:
-      content: "{{ tests[test.0].playbook }}"
-      dest: "{{ temporary_playbook_files.results[test.0].path }}"
-    loop: "{{ query('ansible.builtin.indexed_items', tests) }}"
+      content: "{{ test.playbook }}"
+      dest: "{{ temporary_playbook_files.results[test_idx].path }}"
+    loop: "{{ tests }}"
     loop_control:
       loop_var: test
-      label: "{{ test.1.name }}"
+      index_var: test_idx
+      label: "{{ test.name }}"
 
   - name: Collect outputs
     command: "ansible-playbook -i {{ inventory }} {{ playbook }}"
