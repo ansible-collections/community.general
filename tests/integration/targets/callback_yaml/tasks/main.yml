@@ -1,3 +1,4 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
@@ -69,19 +70,12 @@
 
 - name: Set temporary playbook file content
   copy:
-    content: "{{ playbook }}"
-    dest: "{{ playbook_file }}"
-  loop: "{{ tests }}"
+    content: "{{ test.1.playbook }}"
+    dest: "{{ temporary_playbook_files.results[test.0].path }}"
+  loop: "{{ query('ansible.builtin.indexed_items', tests) }}"
   loop_control:
     loop_var: test
-    label: "{{ test.name }}"
-  vars:
-    playbook_file: "{{ (temporary_playbook_files.results | selectattr('test.name', 'equalto', test.name) | list())[0].path }}"
-    playbook: "{{
-      test.playbook
-      | regex_replace('(\\\\{){2}(.*?)(\\\\}){2}', '{{\\2}}')
-      | regex_replace('({\\\\%)(.*?)(%\\\\})', '{%\\2%}')
-    }}"
+    label: "{{ test.1.name }}"
 
 - name: Collect outputs
   command: "ansible-playbook -i {{ inventory }} {{ playbook }}"

@@ -1,4 +1,4 @@
-  
+---
 - name: Remove temporary playbooks
   file:
     path: "{{ temporary_file.path }}"
