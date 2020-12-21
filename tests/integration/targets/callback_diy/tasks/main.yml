@@ -10,7 +10,8 @@
     tests:
       - name: Not using diy callback options
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: |
           - hosts: testhost
@@ -24,17 +25,18 @@
           "PLAY [testhost] ****************************************************************",
           "",
           "TASK [Sample task name] ********************************************************",
-          "\u001b[0;32mok: [testhost] => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set playbook_on_start_msg callback using environment variable
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
           ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_START_MSG: "Sample output Sample playbook message"
         playbook: |
@@ -50,17 +52,18 @@
           "PLAY [testhost] ****************************************************************",
           "",
           "TASK [Sample task name] ********************************************************",
-          "\u001b[0;32mok: [testhost] => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set playbook_on_play_start_msg callback using play variable
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: !unsafe |
           - name: Sample play name
@@ -76,17 +79,18 @@
           "Sample output Sample play name",
           "",
           "TASK [Sample task name] ********************************************************",
-          "\u001b[0;32mok: [testhost] => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set playbook_on_task_start_msg callback using play variable
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: !unsafe |
           - hosts: testhost
@@ -101,17 +105,18 @@
           "",
           "PLAY [testhost] ****************************************************************",
           "Sample output Sample task name",
-          "\u001b[0;32mok: [testhost] => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set playbook_on_task_start_msg callback using task variable
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: !unsafe |
           - hosts: testhost
@@ -126,17 +131,18 @@
           "",
           "PLAY [testhost] ****************************************************************",
           "Sample output Sample task name",
-          "\u001b[0;32mok: [testhost] => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set runner_on_ok_msg callback using task variable
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: !unsafe |
           - hosts: testhost
@@ -155,12 +161,13 @@
           "Sample output sample debug msg",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set runner_on_failed_msg callback using task variable
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: |
           - hosts: testhost
@@ -181,12 +188,13 @@
           "Sample output Sample failure message",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    \u001b[1;35mignored=1   \u001b[0m"
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=1   "
         ]
 
       - name: Set runner_on_skipped_msg callback using task variable
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: !unsafe |
           - hosts: testhost
@@ -206,12 +214,13 @@
           "Sample output Skipped Sample task name",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : ok=0    changed=0    unreachable=0    failed=0    \u001b[0;36mskipped=1   \u001b[0m rescued=0    ignored=0   "
+          "testhost                   : ok=0    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   "
         ]
 
       - name: Set runner_item_on_ok_msg callback using task variable
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: !unsafe |
           - hosts: testhost
@@ -236,12 +245,13 @@
           "Sample output Looping sample debug msg sample item 3",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set runner_item_on_failed_msg callback using task variable
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: !unsafe |
           - hosts: testhost
@@ -263,27 +273,28 @@
           "PLAY [testhost] ****************************************************************",
           "",
           "TASK [Sample task name] ********************************************************",
-          "\u001b[0;32mok: [testhost] => (item=sample item 1) => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg sample item 1\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => (item=sample item 1) => {",
+          "    \"msg\": \"sample debug msg sample item 1\"",
+          "}",
           "Sample output Looping sample failure message",
-          "\u001b[0;32mok: [testhost] => (item=sample item 3) => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg sample item 3\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => (item=sample item 3) => {",
+          "    \"msg\": \"sample debug msg sample item 3\"",
+          "}",
           [
             # Apparently a bug was fixed in Ansible, as before it ran through with "All items completed"
-            "\u001b[0;31mfatal: [testhost]: FAILED! => {\"msg\": \"All items completed\"}\u001b[0m",
-            "\u001b[0;31mfatal: [testhost]: FAILED! => {\"msg\": \"One or more items failed\"}\u001b[0m",
+            "fatal: [testhost]: FAILED! => {\"msg\": \"All items completed\"}",
+            "fatal: [testhost]: FAILED! => {\"msg\": \"One or more items failed\"}",
           ],
-          "\u001b[0;36m...ignoring\u001b[0m",
+          "...ignoring",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    \u001b[1;35mignored=1   \u001b[0m"
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=1   "
         ]
 
       - name: Set runner_item_on_skipped_msg callback using task variable
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: !unsafe |
           - hosts: testhost
@@ -304,21 +315,22 @@
           "PLAY [testhost] ****************************************************************",
           "",
           "TASK [Sample task name] ********************************************************",
-          "\u001b[0;32mok: [testhost] => (item=sample item 1) => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg sample item 1\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => (item=sample item 1) => {",
+          "    \"msg\": \"sample debug msg sample item 1\"",
+          "}",
           "Sample output Looping Skipped sample item 2",
-          "\u001b[0;32mok: [testhost] => (item=sample item 3) => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg sample item 3\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => (item=sample item 3) => {",
+          "    \"msg\": \"sample debug msg sample item 3\"",
+          "}",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set playbook_on_stats_msg callback using play variable
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: !unsafe |
           - hosts: testhost
@@ -359,9 +371,9 @@
           "PLAY [testhost] ****************************************************************",
           "",
           "TASK [Sample task name] ********************************************************",
-          "\u001b[0;32mok: [testhost] => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
           "      Sample output stats",
           "===============================",
           "      ok     : testhost: 1",
@@ -371,7 +383,8 @@
 
       - name: Suppress output on playbook_on_task_start_msg callback using task variable
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: |
           - hosts: testhost
@@ -385,17 +398,18 @@
         expected_output: [
           "",
           "PLAY [testhost] ****************************************************************",
-          "\u001b[0;32mok: [testhost] => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Suppress output on runner_on_ok_msg callback using task variable
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: |
           - hosts: testhost
@@ -413,12 +427,13 @@
           "TASK [Sample task name] ********************************************************",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set runner_on_ok_msg_color using task variable
         environment:
-          ANSIBLE_FORCE_COLOR: 'true'
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
           ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: !unsafe |
           - hosts: testhost
@@ -435,8 +450,8 @@
           "PLAY [testhost] ****************************************************************",
           "",
           "TASK [Sample task name] ********************************************************",
-          "\u001b[0;34mSample output sample debug msg\u001b[0m",
+          "Sample output sample debug msg",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
