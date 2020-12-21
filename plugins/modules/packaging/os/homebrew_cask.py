@@ -358,6 +358,18 @@ class HomebrewCask(object):
         else:
             self._current_cask = cask
             return cask
+
+    @property
+    def brew_version(self):
+        try:
+            return self._brew_version
+        except AttributeError:
+            return None
+
+    @brew_version.setter
+    def params(self, brew_version):
+        self._brew_version = brew_version
+
     # /class properties -------------------------------------------- }}}
 
     def __init__(self, module, path=path, casks=None, state=None,
@@ -475,6 +487,9 @@ class HomebrewCask(object):
             return False
 
     def _get_brew_version(self):
+        if self.brew_version:
+            return self.brew_version
+
         cmd = [self.brew_path, '--version']
 
         process = subprocess.run(cmd, stdout=subprocess.PIPE)
@@ -484,7 +499,9 @@ class HomebrewCask(object):
         # get version string from first line of "brew --version" output
         version = process_output.split('\n')[0].split(' ')[1]
 
-        return version
+        self.brew_version = version
+
+        return self.brew_version
 
     def _brew_cask_command_is_deprecated(self):
         latest_version_with_brew_cask_command = version.LooseVersion('2.5.0')
