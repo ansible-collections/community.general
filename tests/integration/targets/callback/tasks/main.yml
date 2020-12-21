@@ -59,7 +59,7 @@
         {%-     set line = "line_%s" | format(i+1)                                                     -%}
         {%-     set test_line = result.stdout_lines[i] | default(none)                                 -%}
         {%-     set expected_lines = result.test.expected_output[i] | default(none)                    -%}
-        {%-     if expected_lines is not string                                                        -%}
+        {%-     if expected_lines is not string and expected_lines is not none                         -%}
         {%-       if test_line not in expected_lines                                                   -%}
         {{-         differences.append({
                       line: {

@@ -1,5 +1,0 @@
----
-all:
-  hosts:
-    testhost:
-      ansible_connection: local
