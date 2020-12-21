@@ -1,2 +1,2 @@
 bugfixes:
-  - remove bridge-slave from list of ip based connectons ((https://github.com/ansible-collections/community.general/issues/1500).
+  - nmcli - remove ``bridge-slave`` from list of IP based connections ((https://github.com/ansible-collections/community.general/issues/1500).
