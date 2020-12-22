@@ -112,7 +112,7 @@ def main():
         except Exception as exception:
             module.fail_json(msg="Attribute action failed.", details=to_native(exception))
 
-    module.exit_json(changed=True)
+    module.exit_json(changed=False)
 
 
 def _extract_entry(dn, attrs):
@@ -144,24 +144,20 @@ class LdapSearch(LdapGeneric):
             self.attrsonly = 0
 
     def _load_scope(self):
-        scope = self.module.params['scope']
-        if scope == 'base':
-            self.scope = ldap.SCOPE_BASE
-        elif scope == 'onelevel':
-            self.scope = ldap.SCOPE_ONELEVEL
-        elif scope == 'subordinate':
-            self.scope = ldap.SCOPE_SUBORDINATE
-        elif scope == 'children':
-            self.scope = ldap.SCOPE_SUBTREE
-        else:
-            raise AssertionError('Implementation error')
+        spec = dict(
+            base=ldap.SCOPE_BASE,
+            onelevel=ldap.SCOPE_ONELEVEL,
+            subordinate=ldap.SCOPE_SUBORDINATE,
+            children=ldap.SCOPE_SUBTREE,
+        )
+        self.scope = spec[self.module.params['scope']]
 
     def _load_attrs(self):
         self.attrlist = self.module.params['attrs'] or None
 
     def main(self):
         results = self.perform_search()
-        self.module.exit_json(changed=True, results=results)
+        self.module.exit_json(changed=False, results=results)
 
     def perform_search(self):
         try:
