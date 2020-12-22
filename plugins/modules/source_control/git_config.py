@@ -47,7 +47,7 @@ options:
       - This is required when setting config values.
       - If this is set to C(local), you must also specify the C(repo) parameter.
       - If this is set to C(file), you must also specify the C(file) parameter.
-      - It defaults to system only when not using I(list_all)=yes.
+      - It defaults to system only when not using I(list_all)=C(yes).
     choices: [ "file", "local", "global", "system" ]
   state:
     description:
