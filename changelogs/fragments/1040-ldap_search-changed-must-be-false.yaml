@@ -1,0 +1,3 @@
+bugfixes:
+  - ldap_search - replaced the output value ``changed`` with ``False`` (https://github.com/ansible-collections/community.general/issues/1040).
+
