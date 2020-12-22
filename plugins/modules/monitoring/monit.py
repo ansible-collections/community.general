@@ -154,7 +154,7 @@ class Monit(object):
         return self._parse_status(out, err)
 
     def _parse_status(self, output, err):
-        pattern = "(%s) '%s'" % ('|'.join(MONIT_SERVICES), self.process_name)
+        pattern = "(%s) '%s'" % ('|'.join(re.escape(MONIT_SERVICES)), re.escape(self.process_name))
         if not re.search(pattern, output, re.IGNORECASE):
             return Status.MISSING
 
