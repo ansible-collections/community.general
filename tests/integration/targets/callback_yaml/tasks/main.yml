@@ -1,0 +1,60 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Run tests
+  include_role:
+    name: callback
+  vars:
+    tests:
+      - name: Basic run
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.yaml
+        playbook: |
+          - hosts: testhost
+            gather_facts: false
+            tasks:
+              - name: Sample task name
+                debug:
+                  msg: sample debug msg
+        expected_output: [
+          "",
+          "PLAY [testhost] ****************************************************************",
+          "",
+          "TASK [Sample task name] ********************************************************",
+          "ok: [testhost] => ",
+          "  msg: sample debug msg",
+          "",
+          "PLAY RECAP *********************************************************************",
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+        ]
+      - name: Test umlauts in multiline
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.yaml
+        playbook: |
+          - hosts: testhost
+            gather_facts: false
+            tasks:
+              - name: Umlaut output
+                debug:
+                  msg: "äöü\néêè\nßï☺"
+        expected_output: [
+          "",
+          "PLAY [testhost] ****************************************************************",
+          "",
+          "TASK [Umlaut output] ***********************************************************",
+          "ok: [testhost] => ",
+          "  msg: |-",
+          "    äöü",
+          "    éêè",
+          "    ßï☺",
+          "",
+          "PLAY RECAP *********************************************************************",
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+        ]

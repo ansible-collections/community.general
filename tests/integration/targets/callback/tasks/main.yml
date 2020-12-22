@@ -1,0 +1,96 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- block:
+  - name: Create temporary playbook files
+    tempfile:
+      state: file
+      suffix: temp
+    loop: "{{ tests }}"
+    loop_control:
+      loop_var: test
+      label: "{{ test.name }}"
+    register: temporary_playbook_files
+
+  - name: Set temporary playbook file content
+    copy:
+      content: "{{ test.playbook }}"
+      dest: "{{ temporary_playbook_files.results[test_idx].path }}"
+    loop: "{{ tests }}"
+    loop_control:
+      loop_var: test
+      index_var: test_idx
+      label: "{{ test.name }}"
+
+  - name: Collect outputs
+    command: "ansible-playbook -i {{ inventory }} {{ playbook }}"
+    environment: "{{ test.environment }}"
+    loop: "{{ tests }}"
+    loop_control:
+      loop_var: test
+      label: "{{ test.name }}"
+    register: outputs
+    changed_when: false
+    vars:
+      inventory: "{{ role_path }}/inventory.yml"
+      playbook: "
+        {%- for result in temporary_playbook_files.results -%}
+        {%-   if result.test.name == test.name -%}
+        {{-     result.path -}}
+        {%-   endif -%}
+        {%- endfor -%}"
+
+  - name: Assert test output equals expected output
+    assert:
+      that: result.output.differences | length == 0
+    loop: "{{ results }}"
+    loop_control:
+      loop_var: result
+      label: "{{ result.name }}"
+    register: assertions
+    vars:
+      results: >-
+        {%- set results = []                                                                           -%}
+        {%- for result in outputs.results                                                              -%}
+        {%-   set differences = []                                                                     -%}
+        {%-   for i in range([result.test.expected_output | count, result.stdout_lines | count] | max) -%}
+        {%-     set line = "line_%s" | format(i+1)                                                     -%}
+        {%-     set test_line = result.stdout_lines[i] | default(none)                                 -%}
+        {%-     set expected_lines = result.test.expected_output[i] | default(none)                    -%}
+        {%-     if expected_lines is not string and expected_lines is not none                         -%}
+        {%-       if test_line not in expected_lines                                                   -%}
+        {{-         differences.append({
+                      line: {
+                        'expected_one_of': expected_lines,
+                        'got': test_line }})                                                           -}}
+        {%-       endif                                                                                -%}
+        {%-     else                                                                                   -%}
+        {%-       if expected_lines != test_line                                                       -%}
+        {{-         differences.append({
+                      line: {
+                        'expected': expected_lines,
+                        'got': test_line }})                                                           -}}
+        {%-       endif                                                                                -%}
+        {%-     endif                                                                                  -%}
+        {%-   endfor                                                                                   -%}
+        {{-   results.append({
+                'name': result.test.name,
+                'output': {
+                    'differences': differences,
+                    'expected': result.test.expected_output,
+                    'got': result.stdout_lines }})                                                     -}}
+        {%- endfor                                                                                     -%}
+        {{- results                                                                                    -}}
+
+  always:
+  - name: Remove temporary playbooks
+    file:
+      path: "{{ temporary_file.path }}"
+      state: absent
+    loop: "{{ temporary_playbook_files.results }}"
+    loop_control:
+      loop_var: temporary_file
+      label: "{{ temporary_file.test.name }}: {{ temporary_file.path }}"
