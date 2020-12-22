@@ -155,7 +155,7 @@ class Monit(object):
 
     def _parse_status(self, output, err):
         pattern = "(%s) '%s'" % ('|'.join(MONIT_SERVICES), self.process_name)
-        if not re.search(pattern, output):
+        if not re.search(pattern, output, re.IGNORECASE):
             return Status.MISSING
 
         status_val = re.findall(r"^\s*status\s*([\w\- ]+)", output, re.MULTILINE)
