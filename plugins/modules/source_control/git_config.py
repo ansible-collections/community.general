@@ -41,6 +41,8 @@ options:
   file:
     description:
       - Path to an adhoc git configuration file to be managed using the C(file) scope.
+    type: path
+    version_added: 2.0.0
   scope:
     description:
       - Specify which scope to read/set values from.
