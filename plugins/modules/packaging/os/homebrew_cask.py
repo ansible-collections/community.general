@@ -367,7 +367,7 @@ class HomebrewCask(object):
             return None
 
     @brew_version.setter
-    def params(self, brew_version):
+    def brew_version(self, brew_version):
         self._brew_version = brew_version
 
     # /class properties -------------------------------------------- }}}
