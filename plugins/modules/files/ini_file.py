@@ -143,11 +143,8 @@ def do_ini(module, filename, section=None, option=None, value=None,
             os.makedirs(destpath)
         ini_lines = []
     else:
-        ini_file = open(filename, 'r')
-        try:
+        with open(filename, 'r') as ini_file:
             ini_lines = ini_file.readlines()
-        finally:
-            ini_file.close()
 
     if module._diff:
         diff['before'] = ''.join(ini_lines)
@@ -172,7 +169,7 @@ def do_ini(module, filename, section=None, option=None, value=None,
     # Insert it at the beginning
     ini_lines.insert(0, '[%s]' % fake_section_name)
 
-    # At botton:
+    # At bottom:
     ini_lines.append('[')
 
     # If no section is defined, fake section is used
@@ -249,14 +246,17 @@ def do_ini(module, filename, section=None, option=None, value=None,
     del ini_lines[0]
     del ini_lines[-1:]
 
-    if not within_section and option and state == 'present':
+    if not within_section and state == 'present':
         ini_lines.append('[%s]\n' % section)
-        if not value and allow_no_value:
-            ini_lines.append('%s\n' % option)
-        else:
+        if option and value:
             ini_lines.append(assignment_format % (option, value))
+            msg = 'section, option and value added'
+        elif option and not value and allow_no_value:
+            ini_lines.append('%s\n' % option)
+            msg = 'section and option added (without value)'
+        else:
+            msg = 'only section added'
         changed = True
-        msg = 'section and option added'
 
     if module._diff:
         diff['after'] = ''.join(ini_lines)
@@ -310,6 +310,9 @@ def main():
     no_extra_spaces = module.params['no_extra_spaces']
     allow_no_value = module.params['allow_no_value']
     create = module.params['create']
+
+    if state == 'present' and not allow_no_value and not value:
+        module.fail_json("Parameter 'value' must not be empty if state=present and allow_no_value=False")
 
     (changed, backup_file, diff, msg) = do_ini(module, path, section, option, value, state, backup, no_extra_spaces, create, allow_no_value)
 
