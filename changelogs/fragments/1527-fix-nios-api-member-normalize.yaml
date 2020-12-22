@@ -1,0 +1,3 @@
+---
+bugfixes:
+    - nios_member - fix python3 compatability with nios api member_normalize function (https://github.com/ansible-collections/community.general/issues/1526).
