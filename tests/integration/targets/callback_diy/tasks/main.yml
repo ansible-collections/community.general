@@ -3,13 +3,16 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-- name: Set tests
-  set_fact:
+- name: Run tests
+  include_role:
+    name: callback
+  vars:
     tests:
       - name: Not using diy callback options
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: |
           - hosts: testhost
             gather_facts: false
@@ -22,19 +25,20 @@
           "PLAY [testhost] ****************************************************************",
           "",
           "TASK [Sample task name] ********************************************************",
-          "\u001b[0;32mok: [testhost] => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set playbook_on_start_msg callback using environment variable
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
-          ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_START_MSG="Sample output Sample playbook message"
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
+          ANSIBLE_CALLBACK_DIY_PLAYBOOK_ON_START_MSG: "Sample output Sample playbook message"
         playbook: |
           - hosts: testhost
             gather_facts: false
@@ -48,24 +52,25 @@
           "PLAY [testhost] ****************************************************************",
           "",
           "TASK [Sample task name] ********************************************************",
-          "\u001b[0;32mok: [testhost] => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set playbook_on_play_start_msg callback using play variable
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
-        playbook: |
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
+        playbook: !unsafe |
           - name: Sample play name
             hosts: testhost
             gather_facts: false
             vars:
-              ansible_callback_diy_playbook_on_play_start_msg: Sample output \{\{ ansible_callback_diy.play.name \}\}
+              ansible_callback_diy_playbook_on_play_start_msg: Sample output {{ ansible_callback_diy.play.name }}
             tasks:
               - name: Sample task name
                 debug:
@@ -74,23 +79,24 @@
           "Sample output Sample play name",
           "",
           "TASK [Sample task name] ********************************************************",
-          "\u001b[0;32mok: [testhost] => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set playbook_on_task_start_msg callback using play variable
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
-        playbook: |
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
+        playbook: !unsafe |
           - hosts: testhost
             gather_facts: false
             vars:
-              ansible_callback_diy_playbook_on_task_start_msg: Sample output \{\{ ansible_callback_diy.task.name \}\}
+              ansible_callback_diy_playbook_on_task_start_msg: Sample output {{ ansible_callback_diy.task.name }}
             tasks:
               - name: Sample task name
                 debug:
@@ -99,19 +105,20 @@
           "",
           "PLAY [testhost] ****************************************************************",
           "Sample output Sample task name",
-          "\u001b[0;32mok: [testhost] => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set playbook_on_task_start_msg callback using task variable
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
-        playbook: |
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
+        playbook: !unsafe |
           - hosts: testhost
             gather_facts: false
             tasks:
@@ -119,24 +126,25 @@
                 debug:
                   msg: sample debug msg
                 vars:
-                  ansible_callback_diy_playbook_on_task_start_msg: Sample output \{\{ ansible_callback_diy.task.name \}\}
+                  ansible_callback_diy_playbook_on_task_start_msg: Sample output {{ ansible_callback_diy.task.name }}
         expected_output: [
           "",
           "PLAY [testhost] ****************************************************************",
           "Sample output Sample task name",
-          "\u001b[0;32mok: [testhost] => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set runner_on_ok_msg callback using task variable
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
-        playbook: |
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
+        playbook: !unsafe |
           - hosts: testhost
             gather_facts: false
             tasks:
@@ -144,7 +152,7 @@
                 debug:
                   msg: sample debug msg
                 vars:
-                  ansible_callback_diy_runner_on_ok_msg: Sample output \{\{ ansible_callback_diy.result.output.msg \}\}
+                  ansible_callback_diy_runner_on_ok_msg: Sample output {{ ansible_callback_diy.result.output.msg }}
         expected_output: [
           "",
           "PLAY [testhost] ****************************************************************",
@@ -153,13 +161,14 @@
           "Sample output sample debug msg",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set runner_on_failed_msg callback using task variable
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: |
           - hosts: testhost
             gather_facts: false
@@ -179,14 +188,15 @@
           "Sample output Sample failure message",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    \u001b[1;35mignored=1   \u001b[0m"
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=1   "
         ]
 
       - name: Set runner_on_skipped_msg callback using task variable
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
-        playbook: |
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
+        playbook: !unsafe |
           - hosts: testhost
             gather_facts: false
             tasks:
@@ -195,7 +205,7 @@
                   msg: sample debug msg
                 when: false
                 vars:
-                  ansible_callback_diy_runner_on_skipped_msg: Sample output Skipped \{\{ ansible_callback_diy.task.name \}\}
+                  ansible_callback_diy_runner_on_skipped_msg: Sample output Skipped {{ ansible_callback_diy.task.name }}
         expected_output: [
           "",
           "PLAY [testhost] ****************************************************************",
@@ -204,26 +214,27 @@
           "Sample output Skipped Sample task name",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : ok=0    changed=0    unreachable=0    failed=0    \u001b[0;36mskipped=1   \u001b[0m rescued=0    ignored=0   "
+          "testhost                   : ok=0    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   "
         ]
 
       - name: Set runner_item_on_ok_msg callback using task variable
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
-        playbook: |
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
+        playbook: !unsafe |
           - hosts: testhost
             gather_facts: false
             tasks:
               - name: Sample task name
                 debug:
-                  msg: sample debug msg \{\{ item \}\}
+                  msg: sample debug msg {{ item }}
                 loop:
                   - sample item 1
                   - sample item 2
                   - sample item 3
                 vars:
-                  ansible_callback_diy_runner_item_on_ok_msg: Sample output Looping \{\{ ansible_callback_diy.result.output.msg \}\}
+                  ansible_callback_diy_runner_item_on_ok_msg: Sample output Looping {{ ansible_callback_diy.result.output.msg }}
         expected_output: [
           "",
           "PLAY [testhost] ****************************************************************",
@@ -234,20 +245,21 @@
           "Sample output Looping sample debug msg sample item 3",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set runner_item_on_failed_msg callback using task variable
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
-        playbook: |
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
+        playbook: !unsafe |
           - hosts: testhost
             gather_facts: false
             tasks:
               - name: Sample task name
                 debug:
-                  msg: sample debug msg \{\{ item \}\}
+                  msg: sample debug msg {{ item }}
                 loop:
                   - sample item 1
                   - sample item 2
@@ -261,93 +273,95 @@
           "PLAY [testhost] ****************************************************************",
           "",
           "TASK [Sample task name] ********************************************************",
-          "\u001b[0;32mok: [testhost] => (item=sample item 1) => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg sample item 1\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => (item=sample item 1) => {",
+          "    \"msg\": \"sample debug msg sample item 1\"",
+          "}",
           "Sample output Looping sample failure message",
-          "\u001b[0;32mok: [testhost] => (item=sample item 3) => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg sample item 3\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => (item=sample item 3) => {",
+          "    \"msg\": \"sample debug msg sample item 3\"",
+          "}",
           [
             # Apparently a bug was fixed in Ansible, as before it ran through with "All items completed"
-            "\u001b[0;31mfatal: [testhost]: FAILED! => {\"msg\": \"All items completed\"}\u001b[0m",
-            "\u001b[0;31mfatal: [testhost]: FAILED! => {\"msg\": \"One or more items failed\"}\u001b[0m",
+            "fatal: [testhost]: FAILED! => {\"msg\": \"All items completed\"}",
+            "fatal: [testhost]: FAILED! => {\"msg\": \"One or more items failed\"}",
           ],
-          "\u001b[0;36m...ignoring\u001b[0m",
+          "...ignoring",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    \u001b[1;35mignored=1   \u001b[0m"
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=1   "
         ]
 
       - name: Set runner_item_on_skipped_msg callback using task variable
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
-        playbook: |
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
+        playbook: !unsafe |
           - hosts: testhost
             gather_facts: false
             tasks:
               - name: Sample task name
                 debug:
-                  msg: sample debug msg \{\{ item \}\}
+                  msg: sample debug msg {{ item }}
                 loop:
                   - sample item 1
                   - sample item 2
                   - sample item 3
                 when: item != 'sample item 2'
                 vars:
-                  ansible_callback_diy_runner_item_on_skipped_msg: Sample output Looping Skipped \{\{ ansible_callback_diy.result.output.item \}\}
+                  ansible_callback_diy_runner_item_on_skipped_msg: Sample output Looping Skipped {{ ansible_callback_diy.result.output.item }}
         expected_output: [
           "",
           "PLAY [testhost] ****************************************************************",
           "",
           "TASK [Sample task name] ********************************************************",
-          "\u001b[0;32mok: [testhost] => (item=sample item 1) => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg sample item 1\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => (item=sample item 1) => {",
+          "    \"msg\": \"sample debug msg sample item 1\"",
+          "}",
           "Sample output Looping Skipped sample item 2",
-          "\u001b[0;32mok: [testhost] => (item=sample item 3) => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg sample item 3\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => (item=sample item 3) => {",
+          "    \"msg\": \"sample debug msg sample item 3\"",
+          "}",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set playbook_on_stats_msg callback using play variable
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
-        playbook: |
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
+        playbook: !unsafe |
           - hosts: testhost
             gather_facts: false
             vars:
               ansible_callback_diy_playbook_on_stats_msg: |+2
                       Sample output stats
                 ===============================
-                {\% for key in ansible_callback_diy.stats | sort %\}
-                {\% set color_one = "" %\}
-                {\% set color_two = "" %\}
-                {\% if ansible_callback_diy.stats[key] %\}
-                {\% if key == 'ok' %\}
-                {\% set prefix = '      ' %\}
-                {\% set suffix = '     ' %\}
-                {\% elif key == 'changed' %\}
-                {\% set prefix = '   ' %\}
-                {\% set suffix = '   ' %\}
-                {\% elif key == 'processed' %\}
-                {\% set prefix = '  ' %\}
-                {\% set suffix = '  ' %\}
-                {\% elif key == 'skipped' %\}
-                {\% set prefix = '   ' %\}
-                {\% set suffix = '   ' %\}
-                {\% else %\}
-                {\% set prefix = "" %\}
-                {\% set suffix = "" %\}
-                {\% endif %\}
-                \{\{ color_one \}\}\{\{ "%s%s%s" | format(prefix,key,suffix) \}\}\{\{ color_two \}\}: \{\{ ansible_callback_diy.stats[key] | to_nice_yaml \}\}
-                {\% endif %\}
-                {\% endfor %\}
+                {% for key in ansible_callback_diy.stats | sort %}
+                {% set color_one = "" %}
+                {% set color_two = "" %}
+                {% if ansible_callback_diy.stats[key] %}
+                {% if key == 'ok' %}
+                {% set prefix = '      ' %}
+                {% set suffix = '     ' %}
+                {% elif key == 'changed' %}
+                {% set prefix = '   ' %}
+                {% set suffix = '   ' %}
+                {% elif key == 'processed' %}
+                {% set prefix = '  ' %}
+                {% set suffix = '  ' %}
+                {% elif key == 'skipped' %}
+                {% set prefix = '   ' %}
+                {% set suffix = '   ' %}
+                {% else %}
+                {% set prefix = "" %}
+                {% set suffix = "" %}
+                {% endif %}
+                {{ color_one }}{{ "%s%s%s" | format(prefix,key,suffix) }}{{ color_two }}: {{ ansible_callback_diy.stats[key] | to_nice_yaml }}
+                {% endif %}
+                {% endfor %}
             tasks:
               - name: Sample task name
                 debug:
@@ -357,9 +371,9 @@
           "PLAY [testhost] ****************************************************************",
           "",
           "TASK [Sample task name] ********************************************************",
-          "\u001b[0;32mok: [testhost] => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
           "      Sample output stats",
           "===============================",
           "      ok     : testhost: 1",
@@ -368,9 +382,10 @@
         ]
 
       - name: Suppress output on playbook_on_task_start_msg callback using task variable
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: |
           - hosts: testhost
             gather_facts: false
@@ -383,18 +398,19 @@
         expected_output: [
           "",
           "PLAY [testhost] ****************************************************************",
-          "\u001b[0;32mok: [testhost] => {\u001b[0m",
-          "\u001b[0;32m    \"msg\": \"sample debug msg\"\u001b[0m",
-          "\u001b[0;32m}\u001b[0m",
+          "ok: [testhost] => {",
+          "    \"msg\": \"sample debug msg\"",
+          "}",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Suppress output on runner_on_ok_msg callback using task variable
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
         playbook: |
           - hosts: testhost
             gather_facts: false
@@ -411,14 +427,15 @@
           "TASK [Sample task name] ********************************************************",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
 
       - name: Set runner_on_ok_msg_color using task variable
-        environment: >-
-          ANSIBLE_FORCE_COLOR=True
-          ANSIBLE_STDOUT_CALLBACK=community.general.diy
-        playbook: |
+        environment:
+          ANSIBLE_NOCOLOR: 'true'
+          ANSIBLE_FORCE_COLOR: 'false'
+          ANSIBLE_STDOUT_CALLBACK: community.general.diy
+        playbook: !unsafe |
           - hosts: testhost
             gather_facts: false
             tasks:
@@ -426,116 +443,15 @@
                 debug:
                   msg: sample debug msg
                 vars:
-                  ansible_callback_diy_runner_on_ok_msg: Sample output \{\{ ansible_callback_diy.result.output.msg \}\}
+                  ansible_callback_diy_runner_on_ok_msg: Sample output {{ ansible_callback_diy.result.output.msg }}
                   ansible_callback_diy_runner_on_ok_msg_color: blue
         expected_output: [
           "",
           "PLAY [testhost] ****************************************************************",
           "",
           "TASK [Sample task name] ********************************************************",
-          "\u001b[0;34mSample output sample debug msg\u001b[0m",
+          "Sample output sample debug msg",
           "",
           "PLAY RECAP *********************************************************************",
-          "\u001b[0;32mtesthost\u001b[0m                   : \u001b[0;32mok=1   \u001b[0m changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
+          "testhost                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   "
         ]
-
-- when: ansible_distribution == 'FreeBSD' and ansible_distribution_version in ['11.1', '12.1']
-  name: Create temporary playbooks
-  block:
-    - name: Create temporary playbook files
-      tempfile:
-        state: file
-        suffix: temp
-      loop: "{{ tests }}"
-      loop_control:
-        loop_var: test
-        label: "{{ test.name }}"
-      register: temporary_playbook_files
-      notify: Remove temporary playbooks
-
-    - name: Set temporary playbook file content
-      copy:
-        content: "{{ playbook }}"
-        dest: "{{ playbook_file }}"
-      loop: "{{ tests }}"
-      loop_control:
-        loop_var: test
-        label: "{{ test.name }}"
-      vars:
-        playbook_file: "{{ (temporary_playbook_files.results | selectattr('test.name', 'equalto', test.name) | list())[0].path }}"
-        playbook: "{{
-          test.playbook
-          | regex_replace('(\\\\{){2}(.*?)(\\\\}){2}', '{{\\2}}')
-          | regex_replace('({\\\\%)(.*?)(%\\\\})', '{%\\2%}')
-        }}"
-
-- name: Collect outputs
-  shell: "{{ env }} ansible-playbook -i {{ inventory }} {{ playbook }}"
-  loop: "{{ tests }}"
-  loop_control:
-    loop_var: test
-    label: "{{ test.name }}"
-  register: outputs
-  changed_when: false
-  vars:
-    env: "{{ test.environment | regex_replace('(\\\\{){2}(.*?)(\\\\}){2}', '{{\\2}}') }}"
-    inventory: "{{ role_path }}/inventory.yml"
-    playbook: "
-      {%- if temporary_playbook_files is changed                                                                  -%}
-      {%-   for result in temporary_playbook_files.results                                                        -%}
-      {%-     if result.test.name == test.name                                                                    -%}
-      {{-       result.path                                                                                       -}}
-      {%-     endif                                                                                               -%}
-      {%-   endfor                                                                                                -%}
-      {%- else                                                                                                    -%}
-      {{-   [
-              '/dev/fd/0 <<EOF',
-              (
-                test.playbook
-                | regex_replace('(\\\\{){2}(.*?)(\\\\}){2}', '{{\\2}}')
-                | regex_replace('({\\\\%)(.*?)(%\\\\})', '{%\\2%}')
-              )
-            ] | join('\n')                                                                                        -}}
-      {%- endif                                                                                                   -%}"
-
-- name: Assert test output equals expected output
-  assert:
-    that: result.output.differences | length == 0
-  loop: "{{ results }}"
-  loop_control:
-    loop_var: result
-    label: "{{ result.name }}"
-  register: assertions
-  vars:
-    results: >-
-      {%- set results = []                                                                           -%}
-      {%- for result in outputs.results                                                              -%}
-      {%-   set differences = []                                                                     -%}
-      {%-   for i in range([result.test.expected_output | count, result.stdout_lines | count] | max) -%}
-      {%-     set line = "line_%s" | format(i+1)                                                     -%}
-      {%-     set test_line = result.stdout_lines[i] | default(none)                                 -%}
-      {%-     set expected_lines = result.test.expected_output[i] | default(none)                    -%}
-      {%-     if expected_lines is not string                                                        -%}
-      {%-       if test_line not in expected_lines                                                   -%}
-      {{-         differences.append({
-                    line: {
-                      'expected_one_of': expected_lines,
-                      'got': test_line }})                                                           -}}
-      {%-       endif                                                                                -%}
-      {%-     else                                                                                   -%}
-      {%-       if expected_lines != test_line                                                       -%}
-      {{-         differences.append({
-                    line: {
-                      'expected': expected_line,
-                      'got': test_line }})                                                           -}}
-      {%-       endif                                                                                -%}
-      {%-     endif                                                                                  -%}
-      {%-   endfor                                                                                   -%}
-      {{-   results.append({
-              'name': result.test.name,
-              'output': {
-                  'differences': differences,
-                  'expected': result.test.expected_output,
-                  'got': result.stdout_lines }})                                                     -}}
-      {%- endfor                                                                                     -%}
-      {{- results                                                                                    -}}
