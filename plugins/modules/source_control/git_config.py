@@ -27,7 +27,7 @@ description:
 options:
   list_all:
     description:
-      - List all settings (optionally limited to a given I(scope))
+      - List all settings (optionally limited to a given I(scope)).
     type: bool
     default: 'no'
   name:
@@ -38,13 +38,17 @@ options:
     description:
       - Path to a git repository for reading and writing values from a
         specific repo.
+  file:
+    description:
+      - Path to an adhoc git configuration file to be managed using the C(file) scope.
   scope:
     description:
-      - Specify which scope to read/set values from. This is required
-        when setting config values. If this is set to local, you must
-        also specify the repo parameter. It defaults to system only when
-        not using I(list_all)=yes.
-    choices: [ "local", "global", "system" ]
+      - Specify which scope to read/set values from.
+      - This is required when setting config values.
+      - If this is set to C(local), you must also specify the C(repo) parameter.
+      - If this is set to C(file), you must also specify the C(file) parameter.
+      - It defaults to system only when not using I(list_all)=yes.
+    choices: [ "file", "local", "global", "system" ]
   state:
     description:
       - "Indicates the setting should be set/unset.
@@ -160,12 +164,16 @@ def main():
             list_all=dict(required=False, type='bool', default=False),
             name=dict(type='str'),
             repo=dict(type='path'),
-            scope=dict(required=False, type='str', choices=['local', 'global', 'system']),
+            file=dict(type='path'),
+            scope=dict(required=False, type='str', choices=['file', 'local', 'global', 'system']),
             state=dict(required=False, type='str', default='present', choices=['present', 'absent']),
-            value=dict(required=False)
+            value=dict(required=False),
         ),
         mutually_exclusive=[['list_all', 'name'], ['list_all', 'value'], ['list_all', 'state']],
-        required_if=[('scope', 'local', ['repo'])],
+        required_if=[
+            ('scope', 'local', ['repo']),
+            ('scope', 'file', ['file'])
+        ],
         required_one_of=[['list_all', 'name']],
         supports_check_mode=True,
     )
@@ -207,6 +215,10 @@ def main():
     if name:
         args.append(name)
 
+    if scope == 'file':
+        args.append('-f')
+        args.append(params['file'])
+
     if scope == 'local':
         dir = params['repo']
     elif params['list_all'] and params['repo']:
@@ -243,10 +255,10 @@ def main():
     if not module.check_mode:
         if unset:
             args.insert(len(args) - 1, "--" + unset)
-            cmd = ' '.join(args)
+            cmd = args
         else:
             new_value_quoted = shlex_quote(new_value)
-            cmd = ' '.join(args + [new_value_quoted])
+            cmd = args + [new_value_quoted]
         try:  # try using extra parameter from ansible-base 2.10.4 onwards
             (rc, out, err) = module.run_command(cmd, cwd=dir, ignore_invalid_cwd=False)
         except TypeError:
