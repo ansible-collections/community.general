@@ -504,11 +504,8 @@ class HomebrewCask(object):
         return self.brew_version
 
     def _brew_cask_command_is_deprecated(self):
-        latest_version_with_brew_cask_command = version.LooseVersion('2.5.0')
-
-        current_version = version.LooseVersion(self._get_brew_version())
-
-        return current_version > latest_version_with_brew_cask_command
+        # The `brew cask` replacements were fully available in 2.6.0 (https://brew.sh/2020/12/01/homebrew-2.6.0/)
+        return version.LooseVersion(self._get_brew_version()) >= version.LooseVersion('2.6.0')
     # /checks ------------------------------------------------------ }}}
 
     # commands ----------------------------------------------------- {{{
