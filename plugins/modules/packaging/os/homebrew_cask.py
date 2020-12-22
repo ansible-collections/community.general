@@ -484,12 +484,10 @@ class HomebrewCask(object):
 
         cmd = [self.brew_path, '--version']
 
-        process = subprocess.run(cmd, stdout=subprocess.PIPE)
-
-        process_output = process.stdout.decode()
+        process_output = subprocess.check_output(cmd)
 
         # get version string from first line of "brew --version" output
-        version = process_output.split('\n')[0].split(' ')[1]
+        version = process_output.decode('utf-8').split('\n')[0].split(' ')[1]
 
         self.brew_version = version
 
