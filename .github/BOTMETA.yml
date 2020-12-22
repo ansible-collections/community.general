@@ -209,6 +209,10 @@ files:
     labels: proxmox_kvm virt
     ignore: skvidal
     keywords: kvm libvirt proxmox qemu
+  $modules/cloud/misc/proxmox_snap.py:
+    maintainers: $team_virt Thulium-Drake
+    labels: proxmox virt
+    keywords: kvm libvirt proxmox qemu
   $modules/cloud/misc/proxmox_template.py:
     maintainers: $team_virt UnderGreen
     labels: proxmox_template virt
