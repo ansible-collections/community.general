@@ -1,0 +1,2 @@
+bugfixes:
+  - ldap_search - the module no longer incorrectly reports a change (https://github.com/ansible-collections/community.general/issues/1040).
