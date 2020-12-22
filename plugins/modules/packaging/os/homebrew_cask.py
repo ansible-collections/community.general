@@ -466,17 +466,9 @@ class HomebrewCask(object):
             raise HomebrewCaskException(self.message)
 
         if self._brew_cask_command_is_deprecated():
-            base_opts = [
-                "{brew_path}".format(brew_path=self.brew_path),
-                "list",
-                "--cask",
-            ]
+            base_opts = [self.brew_path, "list", "--cask"]
         else:
-            base_opts = [
-                "{brew_path}".format(brew_path=self.brew_path),
-                "cask",
-                "list",
-            ]
+            base_opts = [self.brew_path, "cask", "list"]
 
         cmd = base_opts + [self.current_cask]
         rc, out, err = self.module.run_command(cmd)
