@@ -484,14 +484,17 @@ class HomebrewCask(object):
 
         cmd = [self.brew_path, '--version']
 
-        process_output = subprocess.check_output(cmd)
+        rc, out, err = self.module.run_command(cmd, check_rc=True)
 
-        # get version string from first line of "brew --version" output
-        version = process_output.decode('utf-8').split('\n')[0].split(' ')[1]
-
-        self.brew_version = version
-
-        return self.brew_version
+        if rc == 0:
+            # get version string from first line of "brew --version" output
+            version = out.split('\n')[0].split(' ')[1]
+            self.brew_version = version
+            return self.brew_version
+        else:
+            self.failed = True
+            self.message = err.strip()
+            raise HomebrewCaskException(self.message)
 
     def _brew_cask_command_is_deprecated(self):
         # The `brew cask` replacements were fully available in 2.6.0 (https://brew.sh/2020/12/01/homebrew-2.6.0/)
