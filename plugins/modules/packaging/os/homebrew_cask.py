@@ -139,7 +139,6 @@ EXAMPLES = '''
 import os
 import re
 import tempfile
-import subprocess
 from distutils import version
 
 from ansible.module_utils._text import to_bytes
