@@ -1,6 +1,6 @@
 bugfixes:
-  - Fixed examples documentation ().
-  - Module no longer incorrectly reports change for information gathering operations ().
-  - Replaced custom parameter validation with ``required_if`` ().
+  - Fixed examples documentation (https://github.com/ansible-collections/community.general/pull/1536).
+  - Module no longer incorrectly reports change for information gathering operations (https://github.com/ansible-collections/community.general/pull/1536).
+  - Replaced custom parameter validation with ``required_if`` (https://github.com/ansible-collections/community.general/pull/1536).
 minor_changes:
-  - Added the traceback output to ``fail_json()`` calls deriving from exceptions ().
+  - Added the traceback output to ``fail_json()`` calls deriving from exceptions (https://github.com/ansible-collections/community.general/pull/1536).
