@@ -1,3 +1,4 @@
 bugfixes:
   - ini_file - module now can create an empty section (https://github.com/ansible-collections/community.general/issues/479).
-  - ini_file - check for parameter `value` if `state` is `present` and `allow_no_value` is `False` (https://github.com/ansible-collections/community.general/issues/479).
+bugfixes:
+  - ini_file - check for parameter ``value`` if ``state`` is ``present`` and ``allow_no_value`` is ``false`` (https://github.com/ansible-collections/community.general/issues/479).
