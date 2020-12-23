@@ -1,0 +1,6 @@
+bugfixes:
+  - Fixed examples documentation ().
+  - Module no longer incorrectly reports change for information gathering operations ().
+  - Replaced custom parameter validation with ``required_if`` ().
+minor_changes:
+  - Added the traceback output to ``fail_json()`` calls deriving from exceptions ().
