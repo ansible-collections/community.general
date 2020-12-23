@@ -195,12 +195,14 @@ def do_ini(module, filename, section=None, option=None, value=None,
                     for i in range(index, 0, -1):
                         # search backwards for previous non-blank or non-comment line
                         if not re.match(r'^[ \t]*([#;].*)?$', ini_lines[i - 1]):
-                            if not value and allow_no_value:
-                                ini_lines.insert(i, '%s\n' % option)
-                            else:
+                            if option and value:
                                 ini_lines.insert(i, assignment_format % (option, value))
-                            msg = 'option added'
-                            changed = True
+                                msg = 'option added'
+                                changed = True
+                            elif option and not value and allow_no_value:
+                                ini_lines.insert(i, '%s\n' % option)
+                                msg = 'option added'
+                                changed = True
                             break
                 elif state == 'absent' and not option:
                     # remove the entire section
@@ -248,12 +250,11 @@ def do_ini(module, filename, section=None, option=None, value=None,
 
     if not within_section and state == 'present':
         ini_lines.append('[%s]\n' % section)
+        msg = 'section and option added'
         if option and value:
             ini_lines.append(assignment_format % (option, value))
-            msg = 'section, option and value added'
         elif option and not value and allow_no_value:
             ini_lines.append('%s\n' % option)
-            msg = 'section and option added (without value)'
         else:
             msg = 'only section added'
         changed = True

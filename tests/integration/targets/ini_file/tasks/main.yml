@@ -177,6 +177,39 @@
       - result6.changed == False
       - result6.msg == 'OK'
 
+- name: test create empty section
+  ini_file:
+    path: "{{ output_file }}"
+    section: new_empty_section
+    allow_no_value: yes
+  register: result6a
+
+- name: assert section added
+  assert:
+    that:
+      - result6a.changed == True
+      - result6a.msg == 'only section added'
+
+- name: test create empty section idempotency
+  ini_file:
+    path: "{{ output_file }}"
+    section: new_empty_section
+    allow_no_value: yes
+  register: result6a
+
+- name: assert 'changed' false
+  assert:
+    that:
+      - result6a.changed == false
+      - result6a.msg == 'OK'
+
+- name: test remove empty section
+  ini_file:
+    state: absent
+    path: "{{ output_file }}"
+    section: new_empty_section
+    allow_no_value: yes
+
 - name: test allow_no_value with loop
   ini_file:
     path: "{{ output_file }}"
