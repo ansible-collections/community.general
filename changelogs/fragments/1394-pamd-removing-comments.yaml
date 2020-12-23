@@ -1,3 +1,2 @@
 bugfixes:
   - pamd - Added logic to retain the comment line (https://github.com/ansible-collections/community.general/issues/1394).
-
