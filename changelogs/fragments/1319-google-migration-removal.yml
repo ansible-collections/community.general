@@ -3,6 +3,7 @@ removed_features:
   All Google cloud modules and plugins have now been migrated away from this collection.
   They can be found in either the `community.google <https://galaxy.ansible.com/community/google>`_ or `google.cloud <https://galaxy.ansible.com/google/cloud> collections.
   If you use ansible-base 2.10 or newer, redirections have been provided.
+
   If you use Ansible 2.9 and installed this collection, you need to adjust the FQCNs (``community.general.gce_img`` → ``community.google.gce_img``) and make sure to install the community.google or google.cloud collections as appropriate.
 breaking_changes:
 - |
