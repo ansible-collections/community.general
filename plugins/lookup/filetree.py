@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = r'''
-lookup: filetree
+name: filetree
 author: Dag Wieers (@dagwieers) <dag@wieers.com>
 short_description: recursively match all files in a directory tree
 description:

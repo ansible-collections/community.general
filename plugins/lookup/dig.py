@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: dig
+    name: dig
     author: Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
     short_description: query DNS using the dnspython library
     requirements:

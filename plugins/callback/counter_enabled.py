@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    callback: counter_enabled
+    name: counter_enabled
     type: stdout
     short_description: adds counters to the output items (tasks and hosts/task)
     description:

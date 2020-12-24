@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Michael Scherer (@msherer) <misc@zarb.org>
-    connection: funcd
+    name: funcd
     short_description: Use funcd to connect to target
     description:
         - This transport permits you to use Ansible over Func.

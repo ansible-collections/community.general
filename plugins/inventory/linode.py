@@ -6,7 +6,6 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
     name: linode
-    plugin_type: inventory
     author:
       - Luke Murphy (@decentral1se)
     short_description: Ansible dynamic inventory plugin for Linode.
