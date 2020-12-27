@@ -292,15 +292,16 @@ EXAMPLES = r"""
     operation: transition
     status: Done
   args:
-  fields:
-    customfield_14321: [ {'set': {'value': 'Value of Select' }} ]
-    comment:  [ { 'add': { 'body' : 'Test' } }]
+    fields:
+      customfield_14321: [ {'set': {'value': 'Value of Select' }} ]
+      comment:  [ { 'add': { 'body' : 'Test' } }]
 
 """
 
 import base64
 import json
 import sys
+import traceback
 
 from ansible.module_utils.six.moves.urllib.request import pathname2url
 
@@ -331,7 +332,7 @@ def request(url, user, passwd, timeout, data=None, method=None):
         try:
             error = json.loads(info['body'])
         except Exception:
-            module.fail_json(msg=to_native(info['body']))
+            module.fail_json(msg=to_native(info['body']), exception=traceback.format_exc())
         if error:
             msg = []
             for key in ('errorMessages', 'errors'):
@@ -379,27 +380,25 @@ def create(restbase, user, passwd, params):
 
     url = restbase + '/issue/'
 
-    return post(url, user, passwd, params['timeout'], data)
+    return True, post(url, user, passwd, params['timeout'], data)
 
 
 def comment(restbase, user, passwd, params):
     data = {
         'body': params['comment']
     }
-
     url = restbase + '/issue/' + params['issue'] + '/comment'
 
-    return post(url, user, passwd, params['timeout'], data)
+    return True, post(url, user, passwd, params['timeout'], data)
 
 
 def edit(restbase, user, passwd, params):
     data = {
         'fields': params['fields']
     }
-
     url = restbase + '/issue/' + params['issue']
 
-    return put(url, user, passwd, params['timeout'], data)
+    return True, put(url, user, passwd, params['timeout'], data)
 
 
 def update(restbase, user, passwd, params):
@@ -408,13 +407,12 @@ def update(restbase, user, passwd, params):
     }
     url = restbase + '/issue/' + params['issue']
 
-    return put(url, user, passwd, params['timeout'], data)
+    return True, put(url, user, passwd, params['timeout'], data)
 
 
 def fetch(restbase, user, passwd, params):
     url = restbase + '/issue/' + params['issue']
-    ret = get(url, user, passwd, params['timeout'])
-    return ret
+    return False, get(url, user, passwd, params['timeout'])
 
 
 def search(restbase, user, passwd, params):
@@ -424,7 +422,7 @@ def search(restbase, user, passwd, params):
         url = url + '&fields=' + '&fields='.join([pathname2url(f) for f in fields])
     if params['maxresults']:
         url = url + '&maxResults=' + str(params['maxresults'])
-    return get(url, user, passwd, params['timeout'])
+    return False, get(url, user, passwd, params['timeout'])
 
 
 def transition(restbase, user, passwd, params):
@@ -447,7 +445,7 @@ def transition(restbase, user, passwd, params):
     data = {'transition': {"id": tid},
             'update': params['fields']}
 
-    return post(url, user, passwd, params['timeout'], data)
+    return True, post(url, user, passwd, params['timeout'], data)
 
 
 def link(restbase, user, passwd, params):
@@ -459,18 +457,7 @@ def link(restbase, user, passwd, params):
 
     url = restbase + '/issueLink/'
 
-    return post(url, user, passwd, params['timeout'], data)
-
-
-# Some parameters are required depending on the operation:
-OP_REQUIRED = dict(create=['project', 'issuetype', 'summary'],
-                   comment=['issue', 'comment'],
-                   edit=[],
-                   update=[],
-                   fetch=['issue'],
-                   transition=['status'],
-                   link=['linktype', 'inwardissue', 'outwardissue'],
-                   search=['jql'])
+    return True, post(url, user, passwd, params['timeout'], data)
 
 
 def main():
@@ -500,18 +487,18 @@ def main():
             timeout=dict(type='float', default=10),
             validate_certs=dict(default=True, type='bool'),
         ),
+        required_if=(
+            ('operation', 'create', ['project', 'issuetype', 'summary']),
+            ('operation', 'comment', ['issue', 'comment']),
+            ('operation', 'fetch', ['issue']),
+            ('operation', 'transition', ['issue', 'status']),
+            ('operation', 'link', ['linktype', 'inwardissue', 'outwardissue']),
+            ('operation', 'search', ['jql']),
+        ),
         supports_check_mode=False
     )
 
     op = module.params['operation']
-
-    # Check we have the necessary per-operation parameters
-    missing = []
-    for parm in OP_REQUIRED[op]:
-        if not module.params[parm]:
-            missing.append(parm)
-    if missing:
-        module.fail_json(msg="Operation %s require the following missing parameters: %s" % (op, ",".join(missing)))
 
     # Handle rest of parameters
     uri = module.params['uri']
@@ -532,12 +519,12 @@ def main():
         thismod = sys.modules[__name__]
         method = getattr(thismod, op)
 
-        ret = method(restbase, user, passwd, module.params)
+        changed, ret = method(restbase, user, passwd, module.params)
 
     except Exception as e:
-        return module.fail_json(msg=to_native(e))
+        return module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
-    module.exit_json(changed=True, meta=ret)
+    module.exit_json(changed=changed, meta=ret)
 
 
 if __name__ == '__main__':
