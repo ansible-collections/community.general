@@ -36,6 +36,12 @@ DOCUMENTATION = r'''
           default: []
           type: list
           required: false
+        tags:
+          description: Populate inventory with instances with this tag.
+          default: []
+          type: list
+          reqired: false
+          version_added: 2.0.0
         types:
           description: Populate inventory with instances with this type.
           default: []
@@ -136,7 +142,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         for linode_group in self.linode_groups:
             self.inventory.add_group(linode_group)
 
-    def _filter_by_config(self, regions, types):
+    def _filter_by_config(self, regions, types, tags):
         """Filter instances by user specified configuration."""
         if regions:
             self.instances = [
@@ -148,6 +154,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
             self.instances = [
                 instance for instance in self.instances
                 if instance.type.id in types
+            ]
+
+        if tags:
+            self.instances = [
+                instance for instance in self.instances
+                for tag in instance.tags if tag in tags
             ]
 
     def _add_instances_to_groups(self):
@@ -194,6 +206,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
                 'type_to_be': list,
                 'value': config_data.get('types', [])
             },
+            'tags': {
+                'type_to_be': list,
+                'value': config_data.get('tags', [])
+            },
         }
 
         for name in options:
@@ -205,8 +221,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
         regions = options['regions']['value']
         types = options['types']['value']
+        tags = options['tags']['value']
 
-        return regions, types
+        return regions, types, tags
 
     def verify_file(self, path):
         """Verify the Linode configuration file."""
@@ -229,8 +246,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         self._get_instances_inventory()
 
         strict = self.get_option('strict')
-        regions, types = self._get_query_options(config_data)
-        self._filter_by_config(regions, types)
+        regions, types, tags = self._get_query_options(config_data)
+        self._filter_by_config(regions, types, tags)
 
         self._add_groups()
         self._add_instances_to_groups()
