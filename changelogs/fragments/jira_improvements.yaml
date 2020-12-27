@@ -1,0 +1,7 @@
+bugfixes:
+  - jira - ``fetch`` and ``search`` no longer indicate that something changed (https://github.com/ansible-collections/community.general/pull/1536).
+  - jira - module no longer incorrectly reports change for information gathering operations (https://github.com/ansible-collections/community.general/pull/1536).
+  - jira - replaced custom parameter validation with ``required_if`` (https://github.com/ansible-collections/community.general/pull/1536).
+  - jira - ensured parameter ``issue`` is mandatory for operation ``transition`` (https://github.com/ansible-collections/community.general/pull/1536).
+minor_changes:
+  - jira - added the traceback output to ``fail_json()`` calls deriving from exceptions (https://github.com/ansible-collections/community.general/pull/1536).
