@@ -43,8 +43,8 @@ options:
   jobs:
     description:
       - Set the number of make jobs to run concurrently.
+      - Typically if set, this would be the number of processors and/or threads available to the machine
     type: int
-    version_added: 'not yet'
 '''
 
 EXAMPLES = r'''
