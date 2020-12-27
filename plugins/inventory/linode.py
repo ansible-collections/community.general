@@ -159,7 +159,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
         if tags:
             self.instances = [
                 instance for instance in self.instances
-                for tag in instance.tags if tag in tags
+                if any(tag in instance.tags for tag in tags)
             ]
 
     def _add_instances_to_groups(self):
