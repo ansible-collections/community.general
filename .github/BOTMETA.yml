@@ -192,7 +192,7 @@ files:
   $modules/cloud/lxc/lxc_container.py:
     maintainers: cloudnull
   $modules/cloud/lxd/:
-    maintainers: hnakamur
+    ignore: hnakamur
   $modules/cloud/memset/:
     maintainers: glitchcrab
   $modules/cloud/misc/cloud_init_data_facts.py:
