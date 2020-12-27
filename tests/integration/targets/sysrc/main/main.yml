@@ -102,7 +102,6 @@
 
     - name: Add gif1 interface (checkmode)
       sysrc:
-        name: accf_http_load
         name: cloned_interfaces
         state: value_present
         value: "gif1"
