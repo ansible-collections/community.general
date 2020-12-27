@@ -1,0 +1,2 @@
+minor_changes:
+- gitlab_project - add parameter ``lfs_enabled`` to specify Git LFS (https://github.com/ansible-collections/community.general/issues/1506).
