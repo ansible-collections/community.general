@@ -1,0 +1,2 @@
+minor_changes:
+- make - add jobs parameter to allow specification of number of simultaneous jobs for make to run
