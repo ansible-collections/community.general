@@ -36,7 +36,7 @@
 - name: verify ini_file 'changed' is true
   assert:
     that:
-      - result1.changed == True
+      - result1 is changed
       - result1.msg == 'section and option added'
 
 - name: read content from output file
@@ -68,7 +68,7 @@
 - name: Ensure unchanged
   assert:
     that:
-      - result2.changed == False
+      - result2 is not changed
       - result2.msg == 'OK'
 
 - name: Ensure "beverage=coke" is in section "[drinks]"
@@ -96,7 +96,7 @@
 - name: assert 'changed' is true and content is OK
   assert:
     that:
-      - result3.changed == True
+      - result3 is changed
       - result3.msg == 'option added'
       - content3 == expected3
 
@@ -120,7 +120,7 @@
 - name: assert changed and content is as expected
   assert:
     that:
-      - result4.changed == True
+      - result4 is changed
       - result4.msg == 'option changed'
       - content4 == expected1
 
@@ -143,7 +143,7 @@
 - name: assert changed and content is empty
   assert:
     that:
-      - result5.changed == True
+      - result5 is changed
       - result5.msg == 'section removed'
       - content5 == "\n"
 
@@ -160,7 +160,7 @@
 - name: assert section and option added
   assert:
     that:
-      - result6.changed == True
+      - result6 is changed
       - result6.msg == 'section and option added'
 
 - name: test allow_no_value idempotency
@@ -174,8 +174,41 @@
 - name: assert 'changed' false
   assert:
     that:
-      - result6.changed == False
+      - result6 is not changed
       - result6.msg == 'OK'
+
+- name: test create empty section
+  ini_file:
+    path: "{{ output_file }}"
+    section: new_empty_section
+    allow_no_value: yes
+  register: result6a
+
+- name: assert section added
+  assert:
+    that:
+      - result6a is changed
+      - result6a.msg == 'only section added'
+
+- name: test create empty section idempotency
+  ini_file:
+    path: "{{ output_file }}"
+    section: new_empty_section
+    allow_no_value: yes
+  register: result6a
+
+- name: assert 'changed' false
+  assert:
+    that:
+      - result6a is not changed
+      - result6a.msg == 'OK'
+
+- name: test remove empty section
+  ini_file:
+    state: absent
+    path: "{{ output_file }}"
+    section: new_empty_section
+    allow_no_value: yes
 
 - name: test allow_no_value with loop
   ini_file:
@@ -234,7 +267,7 @@
 - name: assert 'changed' and msg 'option changed' and content is as expected
   assert:
     that:
-      - result8.changed == True
+      - result8 is changed
       - result8.msg == 'option changed'
       - content8 == expected8
 
@@ -264,7 +297,7 @@
 - name: assert 'changed' and msg 'option changed' and content is as expected
   assert:
     that:
-      - result9.changed == True
+      - result9 is changed
       - result9.msg == 'option changed'
       - content9 == expected9
 
@@ -293,7 +326,7 @@
 - name: assert 'changed' and msg 'option changed' and content is as expected
   assert:
     that:
-      - result10.changed == True
+      - result10 is changed
       - result10.msg == 'option changed'
       - content10 == expected10
 
