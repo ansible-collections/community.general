@@ -37,8 +37,7 @@ DOCUMENTATION = r'''
           type: list
           required: false
         tags:
-          description: Populate inventory only with instances which have at
-          least one of the tags listed here.
+          description: Populate inventory only with instances which have at least one of the tags listed here.
           default: []
           type: list
           reqired: false
