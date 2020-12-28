@@ -43,8 +43,10 @@ options:
   jobs:
     description:
       - Set the number of make jobs to run concurrently.
-      - Typically if set, this would be the number of processors and/or threads available to the machine
+      - Typically if set, this would be the number of processors and/or threads available to the machine.
+      - This is not supported by all make implementations.
     type: int
+    version_added: 2.0.0
 '''
 
 EXAMPLES = r'''
@@ -116,7 +118,7 @@ def main():
             chdir=dict(type='path', required=True),
             file=dict(type='path'),
             make=dict(type='path'),
-            jobs=dict(type='int')
+            jobs=dict(type='int'),
         ),
         supports_check_mode=True,
     )
