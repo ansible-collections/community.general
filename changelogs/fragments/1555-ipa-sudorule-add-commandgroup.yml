@@ -1,0 +1,2 @@
+minor_changes:
+  - IPA - Added option to use command groups inside sudo rules (https://github.com/ansible-collections/community.general/issues/1555)
