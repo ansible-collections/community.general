@@ -33,6 +33,13 @@ options:
     - If option is omitted commands will not be checked or changed.
     type: list
     elements: str
+  cmdgroup:
+    description:
+    - List of command groups assigned to the rule.
+    - If an empty list is passed all command groups will be removed from the rule.
+    - If option is omitted command groups will not be checked or changed.
+    type: list
+    elements: str
   description:
     description:
     - Description of the sudo rule.
