@@ -87,10 +87,10 @@ class Connection(ConnectionBase):
         if self.get_option("project"):
             local_cmd.extend(["--project", self.get_option("project")])
         local_cmd.extend([
-                "exec",
-                "%s:%s" % (self.get_option("remote"), self._host),
-                "--",
-                self._play_context.executable, "-c", cmd
+            "exec",
+            "%s:%s" % (self.get_option("remote"), self._host),
+            "--",
+            self._play_context.executable, "-c", cmd
         ])
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
@@ -123,9 +123,9 @@ class Connection(ConnectionBase):
         if self.get_option("project"):
             local_cmd.extend(["--project", self.get_option("project")])
         local_cmd.extend([
-                "file", "push",
-                in_path,
-                "%s:%s/%s" % (self.get_option("remote"), self._host, out_path)
+            "file", "push",
+            in_path,
+            "%s:%s/%s" % (self.get_option("remote"), self._host, out_path)
         ])
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
@@ -143,9 +143,9 @@ class Connection(ConnectionBase):
         if self.get_option("project"):
             local_cmd.extend(["--project", self.get_option("project")])
         local_cmd.extend([
-                "file", "pull",
-                "%s:%s/%s" % (self.get_option("remote"), self._host, in_path),
-                out_path
+            "file", "pull",
+            "%s:%s/%s" % (self.get_option("remote"), self._host, in_path),
+            out_path
         ])
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
