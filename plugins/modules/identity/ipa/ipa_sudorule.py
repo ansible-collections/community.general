@@ -40,6 +40,7 @@ options:
     - If option is omitted command groups will not be checked or changed.
     type: list
     elements: str
+    version_added: 2.0.0
   description:
     description:
     - Description of the sudo rule.
