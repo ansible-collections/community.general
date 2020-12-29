@@ -40,10 +40,6 @@ files:
     labels: saltstack
   $doc_fragments/:
     labels: docs_fragments
-  $doc_fragments/gcp.py:
-    maintainers: $team_google
-    labels: gcp
-    supershipit: erjohnso rambleraptor
   $doc_fragments/hpe3par.py:
     maintainers: farhan7500 gautamphegde
     labels: hpe3par
@@ -173,10 +169,6 @@ files:
     labels: dimensiondata_network
   $modules/cloud/dimensiondata/dimensiondata_vlan.py:
     maintainers: tintoy
-  $modules/cloud/google/:
-    maintainers: $team_google
-    ignore: supertom
-    supershipit: $team_google
   $modules/cloud/heroku/heroku_collaborator.py:
     maintainers: marns93
   $modules/cloud/huawei/:
@@ -1014,7 +1006,6 @@ macros:
   team_e_spirit: MatrixCrawler getjack
   team_flatpak: JayKayy oolongbrothers
   team_gitlab: Lunik Shaps dj-wasabi marwatk waheedi zanssa scodeman
-  team_google: erjohnso rambleraptor
   team_hpux: bcoca davx8342
   team_huawei: QijunPan TommyLike edisonxiang freesky-edward hwDCN niuzhenguo xuxiaowei0512 yanzhangi zengchen1024 zhongjun2
   team_ipa: Akasurde Nosmoht fxfitz

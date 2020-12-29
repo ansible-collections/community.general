@@ -1,1 +1,0 @@
-./cloud/google/gce_instance_template.py

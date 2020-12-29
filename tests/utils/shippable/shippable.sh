@@ -76,7 +76,6 @@ fi
 # START: HACK install dependencies
 retry ansible-galaxy -vvv collection install ansible.netcommon
 retry ansible-galaxy -vvv collection install community.kubernetes
-retry ansible-galaxy -vvv collection install google.cloud
 
 if [ "${script}" != "sanity" ] || [ "${test}" == "sanity/extra" ]; then
     # Nothing further should be added to this list.
