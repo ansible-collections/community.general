@@ -1,0 +1,2 @@
+bugfixes:
+- sendgrid - update documentation and warn user about sendgrid Python library version (https://github.com/ansible-collections/community.general/issues/1553).
