@@ -4,16 +4,6 @@ plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
 plugins/module_utils/_mount.py future-import-boilerplate
 plugins/module_utils/_mount.py metaclass-boilerplate
-plugins/modules/cloud/google/gce_eip.py pylint:blacklisted-name
-plugins/modules/cloud/google/gce_img.py pylint:blacklisted-name
-plugins/modules/cloud/google/gce_instance_template.py pylint:blacklisted-name
-plugins/modules/cloud/google/gce_instance_template.py validate-modules:doc-missing-type
-plugins/modules/cloud/google/gce_lb.py pylint:blacklisted-name
-plugins/modules/cloud/google/gce_mig.py pylint:blacklisted-name
-plugins/modules/cloud/google/gce_net.py pylint:blacklisted-name
-plugins/modules/cloud/google/gce_pd.py pylint:blacklisted-name
-plugins/modules/cloud/google/gce_snapshot.py pylint:blacklisted-name
-plugins/modules/cloud/google/gce_tag.py pylint:blacklisted-name
 plugins/modules/cloud/kubevirt/kubevirt_cdi_upload.py validate-modules:doc-missing-type
 plugins/modules/cloud/kubevirt/kubevirt_preset.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/kubevirt/kubevirt_pvc.py validate-modules:parameter-type-not-in-doc
@@ -405,6 +395,5 @@ plugins/modules/web_infrastructure/jenkins_plugin.py use-argspec-type-path
 plugins/modules/web_infrastructure/nginx_status_facts.py validate-modules:deprecation-mismatch
 plugins/modules/web_infrastructure/nginx_status_facts.py validate-modules:invalid-documentation
 plugins/modules/web_infrastructure/rundeck_acl_policy.py pylint:blacklisted-name
-scripts/inventory/gce.py pylint:blacklisted-name
 tests/utils/shippable/check_matrix.py replace-urlopen
 tests/utils/shippable/timing.py shebang
