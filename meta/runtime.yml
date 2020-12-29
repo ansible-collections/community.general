@@ -39,6 +39,9 @@ plugin_routing:
       redirect: community.docker.docker
     oc:
       redirect: community.okd.oc
+  lookup:
+    gcp_storage_file:
+      redirect: community.google.gcp_storage_file
   modules:
     ali_instance_facts:
       deprecation:
@@ -102,6 +105,8 @@ plugin_routing:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use the modules from the theforeman.foreman collection instead.
+    gc_storage:
+      redirect: community.google.gc_storage
     gcdns_record:
       tombstone:
         removal_version: 2.0.0
@@ -114,6 +119,26 @@ plugin_routing:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use google.cloud.gcp_compute_instance instead.
+    gce_eip:
+      redirect: community.google.gce_eip
+    gce_img:
+      redirect: community.google.gce_img
+    gce_instance_template:
+      redirect: community.google.gce_instance_template
+    gce_labels:
+      redirect: community.google.gce_labels
+    gce_lb:
+      redirect: community.google.gce_lb
+    gce_mig:
+      redirect: community.google.gce_mig
+    gce_net:
+      redirect: community.google.gce_net
+    gce_pd:
+      redirect: community.google.gce_pd
+    gce_snapshot:
+      redirect: community.google.gce_snapshot
+    gce_tag:
+      redirect: community.google.gce_tag
     gcp_backend_service:
       tombstone:
         removal_version: 2.0.0
@@ -134,10 +159,13 @@ plugin_routing:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use google.cloud.gcp_compute_url_map instead.
+    gcpubsub:
+      redirect: community.google.gcpubsub
     gcpubsub_facts:
+      redirect: community.google.gcpubsub_info
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.google.gcpubsub_info instead.
     gcspanner:
       tombstone:
         removal_version: 2.0.0
@@ -515,6 +543,8 @@ plugin_routing:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
   doc_fragments:
+    _gcp:
+      redirect: community.google._gcp
     docker:
       redirect: community.docker.docker
     hetzner:
@@ -526,6 +556,12 @@ plugin_routing:
       redirect: community.docker.common
     docker.swarm:
       redirect: community.docker.swarm
+    gcdns:
+      redirect: community.google.gcdns
+    gce:
+      redirect: community.google.gce
+    gcp:
+      redirect: community.google.gcp
     hetzner:
       redirect: community.hrobot.robot
     postgresql:
