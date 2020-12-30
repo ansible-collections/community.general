@@ -173,12 +173,37 @@ EXAMPLES = '''
 
 RETURN = ''' # '''
 
+import socket
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
-from ansible_collections.ansible.netcommon.plugins.module_utils.network.common.utils import validate_ip_address, validate_ip_v6_address
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import NIOS_IPV4_NETWORK, NIOS_IPV6_NETWORK
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import NIOS_IPV4_NETWORK_CONTAINER, NIOS_IPV6_NETWORK_CONTAINER
+
+
+# The following function validate_ip_address has been taken from
+# https://github.com/ansible-collections/ansible.netcommon/blob/20124ecbb420daa0f5bb9cdaa865a952657aa0e7/plugins/module_utils/network/common/utils.py#L496
+# The code there is licensed under BSD 2-clause.
+# Copyright (c) 2016 Red Hat Inc.
+def validate_ip_address(address):
+    try:
+        socket.inet_aton(address)
+    except socket.error:
+        return False
+    return address.count(".") == 3
+
+
+# The following function validate_ip_v6_address has been taken from
+# https://github.com/ansible-collections/ansible.netcommon/blob/20124ecbb420daa0f5bb9cdaa865a952657aa0e7/plugins/module_utils/network/common/utils.py#L504
+# The code there is licensed under BSD 2-clause.
+# Copyright (c) 2016 Red Hat Inc.
+def validate_ip_v6_address(address):
+    try:
+        socket.inet_pton(socket.AF_INET6, address)
+    except socket.error:
+        return False
+    return True
 
 
 def options(module):
