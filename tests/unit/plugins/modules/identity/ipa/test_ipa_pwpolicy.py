@@ -89,60 +89,15 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_add(self):
         """Add a new policy"""
         module_args = {
-            'cn': 'admins',
-            'state': 'present',
-            'cospriority': '10',
-            'krbmaxpwdlife': '90',
-            'krbminpwdlife': '1',
-            'krbpwdhistorylength': '8',
-            'krbpwdmindiffchars': '3',
-            'krbpwdminlength': '16',
-            'krbpwdmaxfailure': '6',
-            'krbpwdfailurecountinterval': '60',
-            'krbpwdlockoutduration': '600'
-        }
-        return_value = {}
-        mock_calls = (
-            {
-                'method': 'pwpolicy_find',
-                'name': None,
-                'item': {
-                    'all': True,
-                    'cn': 'admins'
-                }
-            },
-            {
-                'method': 'pwpolicy_add',
-                'name': 'admins',
-                'item': {
-                    'cospriority': '10',
-                    'krbmaxpwdlife': '90',
-                    'krbminpwdlife': '1',
-                    'krbpwdhistorylength': '8',
-                    'krbpwdmindiffchars': '3',
-                    'krbpwdminlength': '16',
-                    'krbpwdmaxfailure': '6',
-                    'krbpwdfailurecountinterval': '60',
-                    'krbpwdlockoutduration': '600'
-                }
-            }
-        )
-        changed = True
-
-        self._test_base(module_args, return_value, mock_calls, changed)
-
-    def test_aliases(self):
-        """Same as test_add, but uses the alias arg names"""
-        module_args = {
             'group': 'admins',
             'state': 'present',
             'priority': '10',
-            'maxlife': '90',
-            'minlife': '1',
-            'history': '8',
+            'maxpwdlife': '90',
+            'minpwdlife': '1',
+            'historylength': '8',
             'minclasses': '3',
             'minlength': '16',
-            'maxfail': '6',
+            'maxfailcount': '6',
             'failinterval': '60',
             'lockouttime': '600'
         }
@@ -176,18 +131,18 @@ class TestIPAPwPolicy(ModuleTestCase):
 
         self._test_base(module_args, return_value, mock_calls, changed)
 
-    def test_alias_name(self):
-        """Same as test_aliases, but uses the `name` alias for cn instead of `group`"""
+    def test_aliases(self):
+        """Same as test_add, but uses the `name` alias for the `group` option"""
         module_args = {
             'name': 'admins',
             'state': 'present',
             'priority': '10',
-            'maxlife': '90',
-            'minlife': '1',
-            'history': '8',
+            'maxpwdlife': '90',
+            'minpwdlife': '1',
+            'historylength': '8',
             'minclasses': '3',
             'minlength': '16',
-            'maxfail': '6',
+            'maxfailcount': '6',
             'failinterval': '60',
             'lockouttime': '600'
         }
@@ -224,17 +179,17 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_mod_different_args(self):
         """Policy exists, but some of the args are different and need to be modified"""
         module_args = {
-            'cn': 'sysops',
+            'group': 'sysops',
             'state': 'present',
-            'cospriority': '10',
-            'krbmaxpwdlife': '60',
-            'krbminpwdlife': '24',
-            'krbpwdhistorylength': '8',
-            'krbpwdmindiffchars': '3',
-            'krbpwdminlength': '12',
-            'krbpwdmaxfailure': '8',
-            'krbpwdfailurecountinterval': '60',
-            'krbpwdlockoutduration': '600'
+            'priority': '10',
+            'maxpwdlife': '60',
+            'minpwdlife': '24',
+            'historylength': '8',
+            'minclasses': '3',
+            'minlength': '12',
+            'maxfailcount': '8',
+            'failinterval': '60',
+            'lockouttime': '600'
         }
         return_value = {
             'cn': ['sysops'],
@@ -282,17 +237,17 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_mod_missing_args(self):
         """Policy exists, but some of the args aren't set, so need to be added"""
         module_args = {
-            'cn': 'sysops',
+            'group': 'sysops',
             'state': 'present',
-            'cospriority': '10',
-            'krbmaxpwdlife': '90',
-            'krbminpwdlife': '1',
-            'krbpwdhistorylength': '8',
-            'krbpwdmindiffchars': '3',
-            'krbpwdminlength': '16',
-            'krbpwdmaxfailure': '6',
-            'krbpwdfailurecountinterval': '60',
-            'krbpwdlockoutduration': '600'
+            'priority': '10',
+            'maxpwdlife': '90',
+            'minpwdlife': '1',
+            'historylength': '8',
+            'minclasses': '3',
+            'minlength': '16',
+            'maxfailcount': '6',
+            'failinterval': '60',
+            'lockouttime': '600'
         }
         return_value = {
             'cn': ['sysops'],
@@ -336,14 +291,14 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_del(self):
         """Policy exists, and state is absent. Needs to be deleted"""
         module_args = {
-            'cn': 'sysops',
+            'group': 'sysops',
             'state': 'absent',
             # other arguments are ignored when state is `absent`
-            'cospriority': '10',
-            'krbmaxpwdlife': '90',
-            'krbpwdhistorylength': '8',
-            'krbpwdminlength': '16',
-            'krbpwdmaxfailure': '6'
+            'priority': '10',
+            'maxpwdlife': '90',
+            'historylength': '8',
+            'minlength': '16',
+            'maxfailcount': '6'
         }
         return_value = {
             'cn': ['sysops'],
@@ -376,17 +331,17 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_no_change(self):
         """Policy already exists. No changes needed"""
         module_args = {
-            'cn': 'admins',
+            'group': 'admins',
             'state': 'present',
-            'cospriority': '10',
-            'krbmaxpwdlife': '90',
-            'krbminpwdlife': '1',
-            'krbpwdhistorylength': '8',
-            'krbpwdmindiffchars': '3',
-            'krbpwdminlength': '16',
-            'krbpwdmaxfailure': '6',
-            'krbpwdfailurecountinterval': '60',
-            'krbpwdlockoutduration': '600'
+            'priority': '10',
+            'maxpwdlife': '90',
+            'minpwdlife': '1',
+            'historylength': '8',
+            'minclasses': '3',
+            'minlength': '16',
+            'maxfailcount': '6',
+            'failinterval': '60',
+            'lockouttime': '600'
         }
         return_value = {
             'cn': ['admins'],
@@ -419,14 +374,14 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_del_no_change(self):
         """Policy doesn't exist, and state is absent. No change needed"""
         module_args = {
-            'cn': 'sysops',
+            'group': 'sysops',
             'state': 'absent',
             # other arguments are ignored when state is `absent`
-            'cospriority': '10',
-            'krbmaxpwdlife': '90',
-            'krbpwdhistorylength': '8',
-            'krbpwdminlength': '16',
-            'krbpwdmaxfailure': '6'
+            'priority': '10',
+            'maxpwdlife': '90',
+            'historylength': '8',
+            'minlength': '16',
+            'maxfailcount': '6'
         }
         return_value = {}
         mock_calls = [
@@ -446,14 +401,14 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_global(self):
         """Modify the global policy"""
         module_args = {
-            'krbmaxpwdlife': '60',
-            'krbminpwdlife': '24',
-            'krbpwdhistorylength': '8',
-            'krbpwdmindiffchars': '3',
-            'krbpwdminlength': '12',
-            'krbpwdmaxfailure': '8',
-            'krbpwdfailurecountinterval': '60',
-            'krbpwdlockoutduration': '600'
+            'maxpwdlife': '60',
+            'minpwdlife': '24',
+            'historylength': '8',
+            'minclasses': '3',
+            'minlength': '12',
+            'maxfailcount': '8',
+            'failinterval': '60',
+            'lockouttime': '600'
         }
         return_value = {
             'cn': ['global_policy'],
@@ -498,14 +453,14 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_global_no_change(self):
         """Global policy already matches the given arguments. No change needed"""
         module_args = {
-            'krbmaxpwdlife': '90',
-            'krbminpwdlife': '1',
-            'krbpwdhistorylength': '8',
-            'krbpwdmindiffchars': '3',
-            'krbpwdminlength': '16',
-            'krbpwdmaxfailure': '6',
-            'krbpwdfailurecountinterval': '60',
-            'krbpwdlockoutduration': '600'
+            'maxpwdlife': '90',
+            'minpwdlife': '1',
+            'historylength': '8',
+            'minclasses': '3',
+            'minlength': '16',
+            'maxfailcount': '6',
+            'failinterval': '60',
+            'lockouttime': '600'
         }
         return_value = {
             'cn': ['global_policy'],
@@ -538,17 +493,17 @@ class TestIPAPwPolicy(ModuleTestCase):
         """Add a new policy in check mode. pwpolicy_add shouldn't be called"""
         module_args = {
             '_ansible_check_mode': True,
-            'cn': 'admins',
+            'group': 'admins',
             'state': 'present',
-            'cospriority': '10',
-            'krbmaxpwdlife': '90',
-            'krbminpwdlife': '1',
-            'krbpwdhistorylength': '8',
-            'krbpwdmindiffchars': '3',
-            'krbpwdminlength': '16',
-            'krbpwdmaxfailure': '6',
-            'krbpwdfailurecountinterval': '60',
-            'krbpwdlockoutduration': '600'
+            'priority': '10',
+            'maxpwdlife': '90',
+            'minpwdlife': '1',
+            'historylength': '8',
+            'minclasses': '3',
+            'minlength': '16',
+            'maxfailcount': '6',
+            'failinterval': '60',
+            'lockouttime': '600'
         }
         return_value = {}
         mock_calls = [
@@ -569,17 +524,17 @@ class TestIPAPwPolicy(ModuleTestCase):
         """Modify a policy in check mode. pwpolicy_mod shouldn't be called"""
         module_args = {
             '_ansible_check_mode': True,
-            'cn': 'sysops',
+            'group': 'sysops',
             'state': 'present',
-            'cospriority': '10',
-            'krbmaxpwdlife': '60',
-            'krbminpwdlife': '24',
-            'krbpwdhistorylength': '8',
-            'krbpwdmindiffchars': '3',
-            'krbpwdminlength': '12',
-            'krbpwdmaxfailure': '8',
-            'krbpwdfailurecountinterval': '60',
-            'krbpwdlockoutduration': '600'
+            'priority': '10',
+            'maxpwdlife': '60',
+            'minpwdlife': '24',
+            'historylength': '8',
+            'minclasses': '3',
+            'minlength': '12',
+            'maxfailcount': '8',
+            'failinterval': '60',
+            'lockouttime': '600'
         }
         return_value = {
             'cn': ['sysops'],
@@ -613,7 +568,7 @@ class TestIPAPwPolicy(ModuleTestCase):
         """Delete a policy in check mode. pwpolicy_del shouldn't be called"""
         module_args = {
             '_ansible_check_mode': True,
-            'cn': 'sysops',
+            'group': 'sysops',
             'state': 'absent'
         }
         return_value = {
@@ -643,7 +598,7 @@ class TestIPAPwPolicy(ModuleTestCase):
     def test_fail_post(self):
         """Fail due to an exception raised from _post_json"""
         set_module_args({
-            'cn': 'admins',
+            'group': 'admins',
             'state': 'absent'
         })
 

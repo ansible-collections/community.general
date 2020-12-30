@@ -15,57 +15,48 @@ description:
 - Add, modify, or delete a password policy using the IPA API.
 version_added: 2.0.0
 options:
-    cn:
+    group:
         description:
         - Name of the group that the policy applies to.
         - If omitted, the global policy is used.
-        aliases: ["group", "name"]
+        aliases: ["name"]
         type: str
     state:
         description: State to ensure.
         default: "present"
         choices: ["absent", "present"]
         type: str
-    krbmaxpwdlife:
+    maxpwdlife:
         description: Maximum password lifetime (in days).
-        aliases: ["maxlife"]
         type: str
-    krbminpwdlife:
+    minpwdlife:
         description: Minimum password lifetime (in hours).
-        aliases: ["minlife"]
         type: str
-    krbpwdhistorylength:
+    historylength:
         description:
         - Number of previous passwords that are remembered.
         - Users cannot reuse remembered passwords.
-        aliases: ["history"]
         type: str
-    krbpwdmindiffchars:
+    minclasses:
         description: Minimum number of character classes.
-        aliases: ["minclasses"]
         type: str
-    krbpwdminlength:
+    minlength:
         description: Minimum password length.
-        aliases: ["minlength"]
         type: str
-    cospriority:
+    priority:
         description:
         - Priority of the policy.
         - High number means lower priority.
         - Required when C(cn) is not the global policy.
-        aliases: ["priority"]
         type: str
-    krbpwdmaxfailure:
+    maxfailcount:
         description: Maximum number of consecutive failures before lockout.
-        aliases: ["maxfail"]
         type: str
-    krbpwdfailurecountinterval:
+    failinterval:
         description: Period (in seconds) after which the number of failed login attempts is reset.
-        aliases: ["failinterval"]
         type: str
-    krbpwdlockoutduration:
+    lockouttime:
         description: Period (in seconds) for which users are locked out.
-        aliases: ["lockouttime"]
         type: str
 extends_documentation_fragment:
 - community.general.ipa.documentation
@@ -76,12 +67,12 @@ notes:
 EXAMPLES = r'''
 - name: Modify the global password policy
   community.general.ipa_pwpolicy:
-      maxlife: '90'
-      minlife: '1'
-      history: '8'
+      maxpwdlife: '90'
+      minpwdlife: '1'
+      historylength: '8'
       minclasses: '3'
       minlength: '16'
-      maxfail: '6'
+      maxfailcount: '6'
       failinterval: '60'
       lockouttime: '600'
       ipa_host: ipa.example.com
@@ -92,12 +83,12 @@ EXAMPLES = r'''
   community.general.ipa_pwpolicy:
       group: admins
       state: present
-      maxlife: '60'
-      minlife: '24'
-      history: '16'
+      maxpwdlife: '60'
+      minpwdlife: '24'
+      historylength: '16'
       minclasses: '4'
       priority: '10'
-      maxfail: '4'
+      maxfailcount: '4'
       failinterval: '600'
       lockouttime: '1200'
       ipa_host: ipa.example.com
@@ -161,24 +152,24 @@ class PwPolicyIPAClient(IPAClient):
         return self._post_json(method='pwpolicy_del', name=name)
 
 
-def get_pwpolicy_dict(maxlife=None, minlife=None, history=None, minclasses=None,
-                      minlength=None, priority=None, maxfail=None, failinterval=None,
+def get_pwpolicy_dict(maxpwdlife=None, minpwdlife=None, historylength=None, minclasses=None,
+                      minlength=None, priority=None, maxfailcount=None, failinterval=None,
                       lockouttime=None):
     pwpolicy = {}
-    if maxlife is not None:
-        pwpolicy['krbmaxpwdlife'] = maxlife
-    if minlife is not None:
-        pwpolicy['krbminpwdlife'] = minlife
-    if history is not None:
-        pwpolicy['krbpwdhistorylength'] = history
+    if maxpwdlife is not None:
+        pwpolicy['krbmaxpwdlife'] = maxpwdlife
+    if minpwdlife is not None:
+        pwpolicy['krbminpwdlife'] = minpwdlife
+    if historylength is not None:
+        pwpolicy['krbpwdhistorylength'] = historylength
     if minclasses is not None:
         pwpolicy['krbpwdmindiffchars'] = minclasses
     if minlength is not None:
         pwpolicy['krbpwdminlength'] = minlength
     if priority is not None:
         pwpolicy['cospriority'] = priority
-    if maxfail is not None:
-        pwpolicy['krbpwdmaxfailure'] = maxfail
+    if maxfailcount is not None:
+        pwpolicy['krbpwdmaxfailure'] = maxfailcount
     if failinterval is not None:
         pwpolicy['krbpwdfailurecountinterval'] = failinterval
     if lockouttime is not None:
@@ -193,17 +184,17 @@ def get_pwpolicy_diff(client, ipa_pwpolicy, module_pwpolicy):
 
 def ensure(module, client):
     state = module.params['state']
-    name = module.params['cn']
+    name = module.params['group']
 
-    module_pwpolicy = get_pwpolicy_dict(maxlife=module.params.get('krbmaxpwdlife'),
-                                        minlife=module.params.get('krbminpwdlife'),
-                                        history=module.params.get('krbpwdhistorylength'),
-                                        minclasses=module.params.get('krbpwdmindiffchars'),
-                                        minlength=module.params.get('krbpwdminlength'),
-                                        priority=module.params.get('cospriority'),
-                                        maxfail=module.params.get('krbpwdmaxfailure'),
-                                        failinterval=module.params.get('krbpwdfailurecountinterval'),
-                                        lockouttime=module.params.get('krbpwdlockoutduration'))
+    module_pwpolicy = get_pwpolicy_dict(maxpwdlife=module.params.get('maxpwdlife'),
+                                        minpwdlife=module.params.get('minpwdlife'),
+                                        historylength=module.params.get('historylength'),
+                                        minclasses=module.params.get('minclasses'),
+                                        minlength=module.params.get('minlength'),
+                                        priority=module.params.get('priority'),
+                                        maxfailcount=module.params.get('maxfailcount'),
+                                        failinterval=module.params.get('failinterval'),
+                                        lockouttime=module.params.get('lockouttime'))
 
     ipa_pwpolicy = client.pwpolicy_find(name=name)
 
@@ -230,17 +221,17 @@ def ensure(module, client):
 
 def main():
     argument_spec = ipa_argument_spec()
-    argument_spec.update(cn=dict(type='str', aliases=['group', 'name']),
+    argument_spec.update(group=dict(type='str', aliases=['name']),
                          state=dict(type='str', default='present', choices=['present', 'absent']),
-                         krbmaxpwdlife=dict(type='str', aliases=['maxlife']),
-                         krbminpwdlife=dict(type='str', aliases=['minlife']),
-                         krbpwdhistorylength=dict(type='str', aliases=['history']),
-                         krbpwdmindiffchars=dict(type='str', aliases=['minclasses']),
-                         krbpwdminlength=dict(type='str', aliases=['minlength']),
-                         cospriority=dict(type='str', aliases=['priority']),
-                         krbpwdmaxfailure=dict(type='str', aliases=['maxfail']),
-                         krbpwdfailurecountinterval=dict(type='str', aliases=['failinterval']),
-                         krbpwdlockoutduration=dict(type='str', aliases=['lockouttime']))
+                         maxpwdlife=dict(type='str'),
+                         minpwdlife=dict(type='str'),
+                         historylength=dict(type='str'),
+                         minclasses=dict(type='str'),
+                         minlength=dict(type='str'),
+                         priority=dict(type='str'),
+                         maxfailcount=dict(type='str'),
+                         failinterval=dict(type='str'),
+                         lockouttime=dict(type='str'))
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True)
