@@ -13,7 +13,7 @@ author: Adralioh (@adralioh)
 short_description: Manage FreeIPA password policies
 description:
 - Add, modify, and delete password policy within IPA server.
-version_added: 1.3.0
+version_added: 2.0.0
 options:
     cn:
         description:
