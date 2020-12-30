@@ -12,7 +12,7 @@ module: ipa_pwpolicy
 author: Adralioh (@adralioh)
 short_description: Manage FreeIPA password policies
 description:
-- Add, modify, and delete password policy within IPA server.
+- Add, modify, or delete a password policy using the IPA API.
 version_added: 2.0.0
 options:
     cn:
@@ -35,7 +35,9 @@ options:
         aliases: ["minlife"]
         type: str
     krbpwdhistorylength:
-        description: Password history size.
+        description:
+        - Number of previous passwords that are remembered.
+        - Users cannot reuse remembered passwords.
         aliases: ["history"]
         type: str
     krbpwdmindiffchars:
@@ -43,7 +45,7 @@ options:
         aliases: ["minclasses"]
         type: str
     krbpwdminlength:
-        description: Minimum length of password.
+        description: Minimum password length.
         aliases: ["minlength"]
         type: str
     cospriority:
@@ -54,15 +56,15 @@ options:
         aliases: ["priority"]
         type: str
     krbpwdmaxfailure:
-        description: Consecutive failures before lockout.
+        description: Maximum number of consecutive failures before lockout.
         aliases: ["maxfail"]
         type: str
     krbpwdfailurecountinterval:
-        description: Period after which lockout is enforced (seconds).
+        description: Period (in seconds) after which the number of failed login attempts is reset.
         aliases: ["failinterval"]
         type: str
     krbpwdlockoutduration:
-        description: Period for which lockout is enforced (seconds).
+        description: Period (in seconds) for which users are locked out.
         aliases: ["lockouttime"]
         type: str
 extends_documentation_fragment:
