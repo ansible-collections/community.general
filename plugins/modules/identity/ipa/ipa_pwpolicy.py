@@ -67,6 +67,8 @@ options:
         type: str
 extends_documentation_fragment:
 - community.general.ipa.documentation
+notes:
+- Supports C(check_mode).
 '''
 
 EXAMPLES = r'''
