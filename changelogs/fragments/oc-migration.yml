@@ -6,4 +6,4 @@ major_changes:
   If you use Ansible 2.9 and explicitly use OC connection plugin from this collection, you will need to adjust your playbooks and roles to use FQCNs ``community.okd.oc`` instead of ``community.general.oc``.
 
   If you use ansible-base and installed ``community.general`` manually and rely on the OC connection plugin, you have to make sure to install the ``community.okd`` collection as well.
-  If you are using FQCNs, i.e. ``community.general.oc`` instead of ``oc``, it will continue working, but we still recommend to adjust this FQCN as well.
+  If you are using FQCNs, in other words ``community.general.oc`` instead of ``oc``, it will continue working, but we still recommend to adjust this FQCN as well.

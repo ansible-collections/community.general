@@ -7,4 +7,4 @@ major_changes:
   for example replace ``community.general.gcpubsub`` in a task by ``community.google.gcpubsub``.
 
   If you use ansible-base and installed ``community.general`` manually and rely on the Google modules, you have to make sure to install the ``community.google`` collection as well.
-  If you are using FQCNs, i.e. ``community.general.gcpubsub`` instead of ``gcpubsub``, it will continue working, but we still recommend to adjust the FQCNs as well.
+  If you are using FQCNs, for example ``community.general.gcpubsub`` instead of ``gcpubsub``, it will continue working, but we still recommend to adjust the FQCNs as well.
