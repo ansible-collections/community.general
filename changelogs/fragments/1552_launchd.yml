@@ -1,0 +1,2 @@
+bugfixes:
+- launchd - handle deprecated APIs like ``readPlist`` and ``writePlist`` in ``plistlib`` (https://github.com/ansible-collections/community.general/issues/1552).
