@@ -1,9 +1,7 @@
 integration_tests_dependencies:
-- ansible.netcommon
 - ansible.posix
 - community.crypto
 - community.kubernetes
 unit_tests_dependencies:
-- ansible.netcommon
 - community.internal_test_tools
 - community.kubernetes
