@@ -113,7 +113,7 @@ EXAMPLES = r'''
 
 RETURN = r'''
 pwpolicy:
-    description: Password policy as returned by IPA API
+    description: Password policy as returned by IPA API.
     returned: always
     type: dict
     sample:
