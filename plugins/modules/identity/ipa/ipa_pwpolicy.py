@@ -17,8 +17,8 @@ version_added: 2.0.0
 options:
     cn:
         description:
-        - Name of the group that the policy will apply to.
-        - If omitted, the global policy will be used.
+        - Name of the group that the policy applies to.
+        - If omitted, the global policy is used.
         aliases: ["group", "name"]
         type: str
     state:
