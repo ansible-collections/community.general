@@ -1,0 +1,2 @@
+minor_changes:
+- pam_limits - add support for nice and priority limits (https://github.com/ansible/ansible/pull/47680).
