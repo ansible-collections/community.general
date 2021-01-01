@@ -1,39 +1,38 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2014, Sebastien Rohaut <sebastien.rohaut@gmail.com>
+# Copyright: (c) 2014, Sebastien Rohaut <sebastien.rohaut@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: pam_limits
 author:
-    - "Sebastien Rohaut (@usawa)"
+- "Sebastien Rohaut (@usawa)"
 short_description: Modify Linux PAM limits
 description:
-     - The C(pam_limits) module modifies PAM limits. The default file is
-       C(/etc/security/limits.conf). For the full documentation, see C(man 5
-       limits.conf).
+  - The C(pam_limits) module modifies PAM limits.
+  - The default file is C(/etc/security/limits.conf).
+  - For the full documentation, see C(man 5 limits.conf).
 options:
   domain:
     type: str
     description:
-      - A username, @groupname, wildcard, uid/gid range.
+      - A username, @groupname, wildcard, UID/GID range.
     required: true
   limit_type:
     type: str
     description:
-      - Limit type, see C(man 5 limits.conf) for an explanation
+      - Limit type, see C(man 5 limits.conf) for an explanation.
     required: true
     choices: [ "hard", "soft", "-" ]
   limit_item:
     type: str
     description:
-      - The limit to be set
+      - The limit to be set.
     required: true
     choices:
         - "core"
@@ -59,6 +58,9 @@ options:
     type: str
     description:
       - The value of the limit.
+      - Value must either be C(unlimited), C(infinity) or C(-1), all of which indicate no limit, or a limit of 0 or larger.
+      - Value must be a number in the range -20 to 19 inclusive, if I(limit_item) is set to C(nice) or C(priority).
+      - Refer to the C(man 5 limits.conf) manual pages for more details.
     required: true
   backup:
     description:
@@ -70,16 +72,16 @@ options:
   use_min:
     description:
       - If set to C(yes), the minimal value will be used or conserved.
-        If the specified value is inferior to the value in the file, file content is replaced with the new value,
-        else content is not modified.
+      - If the specified value is inferior to the value in the file,
+        file content is replaced with the new value, else content is not modified.
     required: false
     type: bool
     default: "no"
   use_max:
     description:
       - If set to C(yes), the maximal value will be used or conserved.
-        If the specified value is superior to the value in the file, file content is replaced with the new value,
-        else content is not modified.
+      - If the specified value is superior to the value in the file,
+        file content is replaced with the new value, else content is not modified.
     required: false
     type: bool
     default: "no"
@@ -96,10 +98,10 @@ options:
     required: false
     default: ''
 notes:
-  - If C(dest) file doesn't exist, it is created.
+  - If I(dest) file does not exist, it is created.
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Add or modify nofile soft limit for the user joe
   community.general.pam_limits:
     domain: joe
@@ -107,7 +109,7 @@ EXAMPLES = '''
     limit_item: nofile
     value: 64000
 
-- name: Add or modify fsize hard limit for the user smith. Keep or set the maximal value.
+- name: Add or modify fsize hard limit for the user smith. Keep or set the maximal value
   community.general.pam_limits:
     domain: smith
     limit_type: hard
@@ -115,7 +117,7 @@ EXAMPLES = '''
     value: 1000000
     use_max: yes
 
-- name: Add or modify memlock, both soft and hard, limit for the user james with a comment.
+- name: Add or modify memlock, both soft and hard, limit for the user james with a comment
   community.general.pam_limits:
     domain: james
     limit_type: '-'
@@ -132,12 +134,26 @@ EXAMPLES = '''
 '''
 
 import os
-import os.path
 import tempfile
 import re
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
+
+
+def _assert_is_valid_value(module, item, value, prefix=''):
+    if item in ['nice', 'priority']:
+        try:
+            valid = -20 <= int(value) <= 19
+        except ValueError:
+            valid = False
+        if not valid:
+            module.fail_json(msg="%s Value of %r for item %r is invalid. Value must be a number in the range -20 to 19 inclusive. "
+                                 "Refer to the limits.conf(5) manual pages for more details." % (prefix, value, item))
+    elif not (value in ['unlimited', 'infinity', '-1'] or value.isdigit()):
+        module.fail_json(msg="%s Value of %r for item %r is invalid. Value must either be 'unlimited', 'infinity' or -1, all of "
+                             "which indicate no limit, or a limit of 0 or larger. Refer to the limits.conf(5) manual pages for "
+                             "more details." % (prefix, value, item))
 
 
 def main():
@@ -189,8 +205,7 @@ def main():
     if use_max and use_min:
         module.fail_json(msg="Cannot use use_min and use_max at the same time.")
 
-    if not (value in ['unlimited', 'infinity', '-1'] or value.isdigit()):
-        module.fail_json(msg="Argument 'value' can be one of 'unlimited', 'infinity', '-1' or positive number. Refer to manual pages for more details.")
+    _assert_is_valid_value(module, limit_item, value)
 
     # Backup
     if backup:
@@ -240,8 +255,8 @@ def main():
         line_item = line_fields[2]
         actual_value = line_fields[3]
 
-        if not (actual_value in ['unlimited', 'infinity', '-1'] or actual_value.isdigit()):
-            module.fail_json(msg="Invalid configuration of '%s'. Current value of %s is unsupported." % (limits_conf, line_item))
+        _assert_is_valid_value(module, line_item, actual_value,
+                               prefix="Invalid configuration found in '%s'." % limits_conf)
 
         # Found the line
         if line_domain == domain and line_type == limit_type and line_item == limit_item:
@@ -251,24 +266,29 @@ def main():
                 nf.write(line)
                 continue
 
-            actual_value_unlimited = actual_value in ['unlimited', 'infinity', '-1']
-            value_unlimited = value in ['unlimited', 'infinity', '-1']
+            if line_type not in ['nice', 'priority']:
+                actual_value_unlimited = actual_value in ['unlimited', 'infinity', '-1']
+                value_unlimited = value in ['unlimited', 'infinity', '-1']
+            else:
+                actual_value_unlimited = value_unlimited = False
 
             if use_max:
-                if value.isdigit() and actual_value.isdigit():
-                    new_value = str(max(int(value), int(actual_value)))
-                elif actual_value_unlimited:
+                if actual_value_unlimited:
                     new_value = actual_value
-                else:
+                elif value_unlimited:
                     new_value = value
+                else:
+                    new_value = str(max(int(value), int(actual_value)))
 
             if use_min:
-                if value.isdigit() and actual_value.isdigit():
-                    new_value = str(min(int(value), int(actual_value)))
+                if actual_value_unlimited and value_unlimited:
+                    new_value = actual_value
+                elif actual_value_unlimited:
+                    new_value = value
                 elif value_unlimited:
                     new_value = actual_value
                 else:
-                    new_value = value
+                    new_value = str(min(int(value), int(actual_value)))
 
             # Change line only if value has changed
             if new_value != actual_value:
