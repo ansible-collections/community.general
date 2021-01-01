@@ -42,6 +42,8 @@ plugin_routing:
   lookup:
     gcp_storage_file:
       redirect: community.google.gcp_storage_file
+    hashi_vault:
+      redirect: community.hashi_vault.hashi_vault
   modules:
     ali_instance_facts:
       deprecation:
