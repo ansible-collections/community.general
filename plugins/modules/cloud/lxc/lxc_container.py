@@ -1,19 +1,19 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2014, Kevin Carter <kevin.carter@rackspace.com>
+# Copyright: (c) 2014, Kevin Carter <kevin.carter@rackspace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: lxc_container
 short_description: Manage LXC Containers
 description:
-  - Management of LXC containers
+  - Management of LXC containers.
 author: "Kevin Carter (@cloudnull)"
 options:
     name:
@@ -53,7 +53,7 @@ options:
         type: str
     vg_name:
         description:
-          - If Backend store is lvm, specify the name of the volume group.
+          - If backend store is lvm, specify the name of the volume group.
         type: str
         default: lxc
     thinpool:
@@ -84,7 +84,7 @@ options:
         type: str
     lxc_path:
         description:
-          - Place container under PATH
+          - Place container under PATH.
         type: path
     container_log:
         description:
@@ -109,26 +109,26 @@ options:
         default: INFO
     clone_name:
         description:
-          - Name of the new cloned server. This is only used when state is
-            clone.
+          - Name of the new cloned server.
+          - This is only used when state is clone.
         type: str
     clone_snapshot:
         description:
-          - Create a snapshot a container when cloning. This is not supported
-            by all container storage backends. Enabling this may fail if the
-            backing store does not support snapshots.
+          - Create a snapshot a container when cloning.
+          - This is not supported by all container storage backends.
+          - Enabling this may fail if the backing store does not support snapshots.
         type: bool
         default: 'no'
     archive:
         description:
-          - Create an archive of a container. This will create a tarball of the
-            running container.
+          - Create an archive of a container.
+          - This will create a tarball of the running container.
         type: bool
         default: 'no'
     archive_path:
         description:
-          - Path the save the archived container. If the path does not exist
-            the archive method will attempt to create it.
+          - Path the save the archived container.
+          - If the path does not exist the archive method will attempt to create it.
         type: path
     archive_compression:
         choices:
@@ -149,16 +149,17 @@ options:
           - frozen
           - clone
         description:
-          - Define the state of a container. If you clone a container using
-            `clone_name` the newly cloned container created in a stopped state.
-            The running container will be stopped while the clone operation is
+          - Define the state of a container.
+          - If you clone a container using I(clone_name) the newly cloned
+            container created in a stopped state.
+          - The running container will be stopped while the clone operation is
             happening and upon completion of the clone the original container
             state will be restored.
         type: str
         default: started
     container_config:
         description:
-          - list of 'key=value' options to use when configuring a container.
+          - A list of C(key=value) options to use when configuring a container.
         type: list
         elements: str
 requirements:
@@ -188,7 +189,7 @@ notes:
     name lxc-python2.
 '''
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Create a started container
   community.general.lxc_container:
     name: test-container-started
@@ -371,7 +372,7 @@ EXAMPLES = """
     - test-container-new-archive-destroyed-clone
 """
 
-RETURN = """
+RETURN = r"""
 lxc_container:
     description: container information
     returned: success
@@ -928,8 +929,7 @@ class LxcContainerManagement(object):
 
         if self._container_exists(container_name=self.container_name, lxc_path=self.lxc_path):
             return str(self.container.state).lower()
-        else:
-            return str('absent')
+        return str('absent')
 
     def _execute_command(self):
         """Execute a shell command."""
