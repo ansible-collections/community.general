@@ -21,51 +21,51 @@ requirements:
 options:
     host:
         description:
-            - Set to target snmp server (normally C({{ inventory_hostname }})).
+            - Set to target SNMP server (normally C({{ inventory_hostname }})).
         type: str
         required: true
     version:
         description:
-            - SNMP Version to use, v2/v2c or v3.
+            - SNMP Version to use, C(v2), C(v2c) or C(v3).
         type: str
         required: true
         choices: [ v2, v2c, v3 ]
     community:
         description:
-            - The SNMP community string, required if version is v2/v2c.
+            - The SNMP community string, required if I(version) is C(v2) or C(v2c).
         type: str
     level:
         description:
             - Authentication level.
-            - Required if version is v3.
+            - Required if I(version) is C(v3).
         type: str
         choices: [ authNoPriv, authPriv ]
     username:
         description:
             - Username for SNMPv3.
-            - Required if version is v3.
+            - Required if I(version) is C(v3).
         type: str
     integrity:
         description:
             - Hashing algorithm.
-            - Required if version is v3.
+            - Required if I(version) is C(v3).
         type: str
         choices: [ md5, sha ]
     authkey:
         description:
             - Authentication key.
-            - Required if version is v3.
+            - Required I(version) is C(v3).
         type: str
     privacy:
         description:
             - Encryption algorithm.
-            - Required if level is authPriv.
+            - Required if I(level) is C(authPriv).
         type: str
         choices: [ aes, des ]
     privkey:
         description:
             - Encryption key.
-            - Required if version is authPriv.
+            - Required if I(level) is C(authPriv).
         type: str
 '''
 
@@ -174,10 +174,10 @@ PYSNMP_IMP_ERR = None
 try:
     from pysnmp.entity.rfc3413.oneliner import cmdgen
     from pysnmp.proto.rfc1905 import EndOfMibView
-    has_pysnmp = True
+    HAS_PYSNMP = True
 except Exception:
     PYSNMP_IMP_ERR = traceback.format_exc()
-    has_pysnmp = False
+    HAS_PYSNMP = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_text
@@ -221,8 +221,7 @@ def decode_hex(hexstring):
         return hexstring
     if hexstring[:2] == "0x":
         return to_text(binascii.unhexlify(hexstring[2:]))
-    else:
-        return hexstring
+    return hexstring
 
 
 def decode_mac(hexstring):
@@ -231,8 +230,7 @@ def decode_mac(hexstring):
         return hexstring
     if hexstring[:2] == "0x":
         return hexstring[2:]
-    else:
-        return hexstring
+    return hexstring
 
 
 def lookup_adminstatus(int_adminstatus):
@@ -243,8 +241,7 @@ def lookup_adminstatus(int_adminstatus):
     }
     if int_adminstatus in adminstatus_options:
         return adminstatus_options[int_adminstatus]
-    else:
-        return ""
+    return ""
 
 
 def lookup_operstatus(int_operstatus):
@@ -259,8 +256,7 @@ def lookup_operstatus(int_operstatus):
     }
     if int_operstatus in operstatus_options:
         return operstatus_options[int_operstatus]
-    else:
-        return ""
+    return ""
 
 
 def main():
@@ -285,13 +281,13 @@ def main():
 
     m_args = module.params
 
-    if not has_pysnmp:
+    if not HAS_PYSNMP:
         module.fail_json(msg=missing_required_lib('pysnmp'), exception=PYSNMP_IMP_ERR)
 
     cmdGen = cmdgen.CommandGenerator()
 
     # Verify that we receive a community when using snmp v2
-    if m_args['version'] == "v2" or m_args['version'] == "v2c":
+    if m_args['version'] in ("v2", "v2c"):
         if m_args['community'] is None:
             module.fail_json(msg='Community not set when using snmp version 2')
 
@@ -313,7 +309,7 @@ def main():
             privacy_proto = cmdgen.usmDESPrivProtocol
 
     # Use SNMP Version 2
-    if m_args['version'] == "v2" or m_args['version'] == "v2c":
+    if m_args['version'] in ("v2", "v2c"):
         snmp_auth = cmdgen.CommunityData(m_args['community'])
 
     # Use SNMP Version 3 with authNoPriv
