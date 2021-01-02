@@ -5,7 +5,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: syslogger
 short_description: Log messages in the syslog
@@ -33,7 +33,7 @@ options:
         default: "daemon"
     log_pid:
         description:
-            - Log the pid in brackets.
+            - Log the PID in brackets.
         type: bool
         default: False
     ident:
@@ -83,7 +83,7 @@ facility:
   type: str
   sample: "info"
 log_pid:
-  description: Log pid status
+  description: Log PID status
   returned: always
   type: bool
   sample: True
@@ -94,11 +94,14 @@ msg:
   sample: "Hello from Ansible"
 '''
 
-from ansible.module_utils.basic import AnsibleModule
 import syslog
+import traceback
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils._text import to_native
 
 
-def get_facility(x):
+def get_facility(facility):
     return {
         'kern': syslog.LOG_KERN,
         'user': syslog.LOG_USER,
@@ -118,10 +121,10 @@ def get_facility(x):
         'local5': syslog.LOG_LOCAL5,
         'local6': syslog.LOG_LOCAL6,
         'local7': syslog.LOG_LOCAL7
-    }.get(x, syslog.LOG_DAEMON)
+    }.get(facility, syslog.LOG_DAEMON)
 
 
-def get_priority(x):
+def get_priority(priority):
     return {
         'emerg': syslog.LOG_EMERG,
         'alert': syslog.LOG_ALERT,
@@ -131,7 +134,7 @@ def get_priority(x):
         'notice': syslog.LOG_NOTICE,
         'info': syslog.LOG_INFO,
         'debug': syslog.LOG_DEBUG
-    }.get(x, syslog.LOG_INFO)
+    }.get(priority, syslog.LOG_INFO)
 
 
 def main():
@@ -168,20 +171,16 @@ def main():
 
     # do the logging
     try:
-        if module.params['log_pid']:
-            syslog.openlog(module.params['ident'],
-                           logoption=syslog.LOG_PID,
-                           facility=get_facility(module.params['facility']))
-        else:
-            syslog.openlog(module.params['ident'],
-                           facility=get_facility(module.params['facility']))
+        syslog.openlog(module.params['ident'],
+                       syslog.LOG_PID if module.params['log_pid'] else 0,
+                       get_facility(module.params['facility']))
         syslog.syslog(get_priority(module.params['priority']),
                       module.params['msg'])
         syslog.closelog()
         result['changed'] = True
 
-    except Exception:
-        module.fail_json(error='Failed to write to syslog', **result)
+    except Exception as exc:
+        module.fail_json(error='Failed to write to syslog %s' % to_native(exc), exception=traceback.format_exc(), **result)
 
     module.exit_json(**result)
 
