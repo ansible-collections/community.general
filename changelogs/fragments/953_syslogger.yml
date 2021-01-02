@@ -1,0 +1,2 @@
+bugfixes:
+- syslogger - update ``syslog.openlog`` API call for older Python versions (https://github.com/ansible-collections/community.general/issues/953).
