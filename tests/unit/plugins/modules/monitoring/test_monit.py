@@ -12,7 +12,7 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
 
 
 TEST_OUTPUT = """
-Process '%s'
+%s '%s'
   status                       %s
   monitoring status            Not monitored
   monitoring mode              active
@@ -106,24 +106,41 @@ def test_status_value(status_name):
 
 
 BASIC_OUTPUT_CASES = [
-    (TEST_OUTPUT % ('processX', name), getattr(monit.Status, name.upper()))
+    (TEST_OUTPUT % ('Process', 'processX', name), getattr(monit.Status, name.upper()))
     for name in monit.StatusValue.ALL_STATUS
 ]
 
 
 @pytest.mark.parametrize('output, expected', BASIC_OUTPUT_CASES + [
     ('', monit.Status.MISSING),
-    (TEST_OUTPUT % ('processY', 'OK'), monit.Status.MISSING),
-    (TEST_OUTPUT % ('processX', 'Not Monitored - start pending'), monit.Status.OK),
-    (TEST_OUTPUT % ('processX', 'Monitored - stop pending'), monit.Status.NOT_MONITORED),
-    (TEST_OUTPUT % ('processX', 'Monitored - restart pending'), monit.Status.OK),
-    (TEST_OUTPUT % ('processX', 'Not Monitored - monitor pending'), monit.Status.OK),
-    (TEST_OUTPUT % ('processX', 'Does not exist'), monit.Status.DOES_NOT_EXIST),
-    (TEST_OUTPUT % ('processX', 'Not monitored'), monit.Status.NOT_MONITORED),
-    (TEST_OUTPUT % ('processX', 'Running'), monit.Status.OK),
-    (TEST_OUTPUT % ('processX', 'Execution failed | Does not exist'), monit.Status.EXECUTION_FAILED),
+    (TEST_OUTPUT % ('Process', 'processY', 'OK'), monit.Status.MISSING),
+    (TEST_OUTPUT % ('Process', 'processX', 'Not Monitored - start pending'), monit.Status.OK),
+    (TEST_OUTPUT % ('Process', 'processX', 'Monitored - stop pending'), monit.Status.NOT_MONITORED),
+    (TEST_OUTPUT % ('Process', 'processX', 'Monitored - restart pending'), monit.Status.OK),
+    (TEST_OUTPUT % ('Process', 'processX', 'Not Monitored - monitor pending'), monit.Status.OK),
+    (TEST_OUTPUT % ('Process', 'processX', 'Does not exist'), monit.Status.DOES_NOT_EXIST),
+    (TEST_OUTPUT % ('Process', 'processX', 'Not monitored'), monit.Status.NOT_MONITORED),
+    (TEST_OUTPUT % ('Process', 'processX', 'Running'), monit.Status.OK),
+    (TEST_OUTPUT % ('Process', 'processX', 'Execution failed | Does not exist'), monit.Status.EXECUTION_FAILED),
 ])
 def test_parse_status(output, expected):
+    status = monit.Monit(None, '', 'processX', 0)._parse_status(output, '')
+    assert status == expected
+
+
+@pytest.mark.parametrize('output, expected', BASIC_OUTPUT_CASES + [
+    (TEST_OUTPUT % ('Process', 'processX', 'OK'), monit.Status.OK),
+    (TEST_OUTPUT % ('File', 'processX', 'OK'), monit.Status.OK),
+    (TEST_OUTPUT % ('Fifo', 'processX', 'OK'), monit.Status.OK),
+    (TEST_OUTPUT % ('Filesystem', 'processX', 'OK'), monit.Status.OK),
+    (TEST_OUTPUT % ('Directory', 'processX', 'OK'), monit.Status.OK),
+    (TEST_OUTPUT % ('Remote host', 'processX', 'OK'), monit.Status.OK),
+    (TEST_OUTPUT % ('System', 'processX', 'OK'), monit.Status.OK),
+    (TEST_OUTPUT % ('Program', 'processX', 'OK'), monit.Status.OK),
+    (TEST_OUTPUT % ('Network', 'processX', 'OK'), monit.Status.OK),
+    (TEST_OUTPUT % ('Unsupported', 'processX', 'OK'), monit.Status.MISSING),
+])
+def test_parse_status_supports_all_services(output, expected):
     status = monit.Monit(None, '', 'processX', 0)._parse_status(output, '')
     assert status == expected
 
