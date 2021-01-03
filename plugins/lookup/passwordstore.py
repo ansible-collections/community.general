@@ -204,7 +204,7 @@ class LookupModule(LookupBase):
     def check_pass(self):
         try:
             self.passoutput = to_text(
-                check_output2(["pass", self.passname], env=self.env),
+                check_output2(["pass", "show", self.passname], env=self.env),
                 errors='surrogate_or_strict'
             ).splitlines()
             self.password = self.passoutput[0]
