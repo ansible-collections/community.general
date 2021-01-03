@@ -781,7 +781,6 @@ class Nmcli(object):
         return self.type in (
             'bond',
             'bridge',
-            'bridge-slave',
             'ethernet',
             'generic',
             'infiniband',
