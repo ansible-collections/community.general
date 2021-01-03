@@ -62,6 +62,9 @@ STATE_COMMAND_MAP = {
     'restarted': 'restart'
 }
 
+MONIT_SERVICES = ['Process', 'File', 'Fifo', 'Filesystem', 'Directory', 'Remote host', 'System', 'Program',
+                  'Network']
+
 
 @python_2_unicode_compatible
 class StatusValue(namedtuple("Status", "value, is_pending")):
@@ -151,7 +154,9 @@ class Monit(object):
         return self._parse_status(out, err)
 
     def _parse_status(self, output, err):
-        if "Process '%s'" % self.process_name not in output:
+        escaped_monit_services = '|'.join([re.escape(x) for x in MONIT_SERVICES])
+        pattern = "(%s) '%s'" % (escaped_monit_services, re.escape(self.process_name))
+        if not re.search(pattern, output, re.IGNORECASE):
             return Status.MISSING
 
         status_val = re.findall(r"^\s*status\s*([\w\- ]+)", output, re.MULTILINE)
