@@ -1,0 +1,2 @@
+bugfixes:
+  - rhn_channel - Python 2.7.5 fails if the certificate should not be validated. Fixed this by creating the correct ``ssl_context`` (https://github.com/ansible-collections/community.general/pull/470).
