@@ -136,7 +136,7 @@ def main():
     base_command.extend(make_parameters)
 
     # Check if the target is already up to date
-    rc, out, err = run_command(base_command + ['--question'], module, check_rc=False)
+    rc, out, err = run_command(base_command + ['-q'], module, check_rc=False)
     if module.check_mode:
         # If we've been asked to do a dry run, we only need
         # to report whether or not the target is up to date
