@@ -1,0 +1,2 @@
+bugfixes:
+  - make - Fixed ``make`` parameter used for check mode when running a non-GNU ``make`` (https://github.com/ansible-collections/community.general/pull/1574).
