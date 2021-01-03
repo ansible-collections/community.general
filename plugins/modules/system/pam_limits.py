@@ -176,7 +176,8 @@ def main():
             backup=dict(default=False, type='bool'),
             dest=dict(default=limits_conf, type='str'),
             comment=dict(required=False, default='', type='str')
-        )
+        ),
+        supports_check_mode=True,
     )
 
     domain = module.params['domain']
@@ -315,8 +316,15 @@ def main():
     f.close()
     nf.flush()
 
-    # Copy tempfile to newfile
-    module.atomic_move(nf.name, f.name)
+    with open(limits_conf, 'r') as content:
+        content_current = content.read()
+
+    with open(nf.name, 'r') as content:
+        content_new = content.read()
+
+    if not module.check_mode:
+        # Copy tempfile to newfile
+        module.atomic_move(nf.name, limits_conf)
 
     try:
         nf.close()
@@ -324,7 +332,9 @@ def main():
         pass
 
     res_args = dict(
-        changed=changed, msg=message
+        changed=changed,
+        msg=message,
+        diff=dict(before=content_current, after=content_new),
     )
 
     if backup:
