@@ -1,5 +1,0 @@
-minor_changes:
-  - hashi_vault lookup - add ``VAULT_TOKEN_PATH`` as env option to specify ``token_path`` param (https://github.com/ansible-collections/community.general/issues/373).
-  - hashi_vault lookup - add ``VAULT_TOKEN_FILE`` as env option to specify ``token_file`` param (https://github.com/ansible-collections/community.general/issues/373).
-bugfixes:
-  - hashi_vault lookup - ``token_path`` in config file overridden by env ``HOME`` (https://github.com/ansible-collections/community.general/issues/373).

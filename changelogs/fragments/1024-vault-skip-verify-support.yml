@@ -1,3 +1,0 @@
----
-minor_changes:
-  - hashi_vault - support ``VAULT_SKIP_VERIFY`` environment variable for determining if to verify certificates (in addition to the ``validate_certs=`` flag supported today) (https://github.com/ansible-collections/community.general/pull/1024).
