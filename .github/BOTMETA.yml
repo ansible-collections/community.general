@@ -94,9 +94,6 @@ files:
     maintainers: amigus
   $lookups/dsv.py:
     maintainers: amigus
-  $lookups/hashi_vault.py:
-    labels: hashi_vault
-    maintainers: briantist
   $lookups/manifold.py:
     maintainers: galanoff
     labels: manifold

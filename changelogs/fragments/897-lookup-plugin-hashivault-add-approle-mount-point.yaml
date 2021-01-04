@@ -1,3 +1,0 @@
----
-bugfixes:
-  - hashi_vault - add missing ``mount_point`` parameter for approle auth (https://github.com/ansible-collections/community.general/pull/897).
