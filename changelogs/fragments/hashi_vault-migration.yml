@@ -1,0 +1,9 @@
+major_changes:
+- |
+  For community.general 2.0.0, the hashi_vault lookup plugin will be moved to the `community.hashi_vault <https://galaxy.ansible.com/community/hashi_vault>`_ collection.
+  A redirection will be inserted so that users using ansible-base 2.10 or newer do not have to change anything.
+
+  If you use Ansible 2.9 and explicitly use hashi_vault lookup plugin from this collection, you will need to adjust your playbooks and roles to use FQCNs ``community.hashi_vault.hashi_vault`` instead of ``community.general.hashi_vault``.
+
+  If you use ansible-base and installed ``community.general`` manually and rely on the hashi_vault lookup plugin, you have to make sure to install the ``community.hashi_vault`` collection as well.
+  If you are using FQCNs, in other words ``community.general.hashi_vault`` instead of ``hashi_vault``, it will continue working, but we still recommend to adjust this FQCN as well.
