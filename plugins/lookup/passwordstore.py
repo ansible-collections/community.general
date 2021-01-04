@@ -214,7 +214,7 @@ class LookupModule(LookupBase):
                     name, value = line.split(':', 1)
                     self.passdict[name.strip()] = value.strip()
         except (subprocess.CalledProcessError) as e:
-            if e.returncode =! 0 and 'not in the password store' in e.output:
+            if e.returncode != 0 and 'not in the password store' in e.output:
                 # if pass returns 1 and return string contains 'is not in the password store.'
                 # We need to determine if this is valid or Error.
                 if not self.paramvals['create']:
