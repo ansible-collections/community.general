@@ -33,6 +33,13 @@ options:
     description:
       - A dictionary of zfs properties to be set.
       - See the zfs(8) man page for more information.
+  destroy_cloned_filesystems:
+    description:
+      - When state is absent, destroy snapshots even if there are clone.
+      - If there is a clone, the task won't failed, but the warning output will be filled.
+      - See the zfs(8) destroy man page for more information, -r vs -R option.
+    type: bool
+    default: yes
 author:
 - Johan Wiren (@johanwiren)
 '''
@@ -74,6 +81,12 @@ EXAMPLES = '''
   community.general.zfs:
     name: rpool/myfs
     state: absent
+
+- name: Destroy a filesystem, only if it not cloned to another.
+  community.general.zfs:
+    name: rpool/myfs
+    state: absent
+    destroy_cloned_filesystems: no
 '''
 
 import os
@@ -94,6 +107,7 @@ class Zfs(object):
         self.is_solaris = os.uname()[0] == 'SunOS'
         self.is_openzfs = self.check_openzfs()
         self.enhanced_sharing = self.check_enhanced_sharing()
+        self.warning = ''
 
     def check_openzfs(self):
         cmd = [self.zpool_cmd]
@@ -167,10 +181,14 @@ class Zfs(object):
         if self.module.check_mode:
             self.changed = True
             return
-        cmd = [self.zfs_cmd, 'destroy', '-R', self.name]
+        recursive_flag = '-R' if self.module.params.get('destroy_cloned_filesystems') else '-r'
+        cmd = [self.zfs_cmd, 'destroy', recursive_flag, self.name]
         (rc, out, err) = self.module.run_command(' '.join(cmd))
         if rc == 0:
             self.changed = True
+        elif not self.module.params.get('destroy_cloned_filesystems') and rc == 1:
+            self.warning = err
+            return
         else:
             self.module.fail_json(msg=err)
 
@@ -216,6 +234,7 @@ def main():
             state=dict(type='str', required=True, choices=['absent', 'present']),
             origin=dict(type='str', default=None),
             extra_zfs_properties=dict(type='dict', default={}),
+            destroy_cloned_filesystems=dict(type='bool', default=True),
         ),
         supports_check_mode=True,
     )
@@ -255,6 +274,7 @@ def main():
 
     result.update(zfs.properties)
     result['changed'] = zfs.changed
+    result['warning'] = zfs.warning
     module.exit_json(**result)
 
 
