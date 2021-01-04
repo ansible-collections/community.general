@@ -34,7 +34,7 @@ def gen_specs(**specs):
         'server_uri': dict(default='ldapi:///'),
         'start_tls': dict(default=False, type='bool'),
         'validate_certs': dict(default=True, type='bool'),
-        'sasl_class': dict(choices=['external', 'gssapi'], default='external', type='string'),
+        'sasl_class': dict(choices=['external', 'gssapi'], default='external', type='str'),
     })
 
     return specs
