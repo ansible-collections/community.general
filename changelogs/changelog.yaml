@@ -1627,3 +1627,140 @@ releases:
     - fix_parsing_array_values_in_osx_defaults.yml
     - nios_host_record-fix-aliases-removal.yml
     release_date: '2020-12-21'
+  1.3.2:
+    changes:
+      bugfixes:
+      - docker_image - if ``push=true`` is used with ``repository``, and the image
+        does not need to be tagged, still push. This can happen if ``repository``
+        and ``name`` are equal (https://github.com/ansible-collections/community.docker/issues/52,
+        https://github.com/ansible-collections/community.docker/pull/53).
+      - docker_image - report error when loading a broken archive that contains no
+        image (https://github.com/ansible-collections/community.docker/issues/46,
+        https://github.com/ansible-collections/community.docker/pull/55).
+      - docker_image - report error when the loaded archive does not contain the specified
+        image (https://github.com/ansible-collections/community.docker/issues/41,
+        https://github.com/ansible-collections/community.docker/pull/55).
+      - jira - ``fetch`` and ``search`` no longer indicate that something changed
+        (https://github.com/ansible-collections/community.general/pull/1536).
+      - jira - ensured parameter ``issue`` is mandatory for operation ``transition``
+        (https://github.com/ansible-collections/community.general/pull/1536).
+      - jira - module no longer incorrectly reports change for information gathering
+        operations (https://github.com/ansible-collections/community.general/pull/1536).
+      - jira - replaced custom parameter validation with ``required_if`` (https://github.com/ansible-collections/community.general/pull/1536).
+      - launchd - handle deprecated APIs like ``readPlist`` and ``writePlist`` in
+        ``plistlib`` (https://github.com/ansible-collections/community.general/issues/1552).
+      - ldap_search - the module no longer incorrectly reports a change (https://github.com/ansible-collections/community.general/issues/1040).
+      - make - fixed ``make`` parameter used for check mode when running a non-GNU
+        ``make`` (https://github.com/ansible-collections/community.general/pull/1574).
+      - monit - add support for all monit service checks (https://github.com/ansible-collections/community.general/pull/1532).
+      - nios_member - fix Python 3 compatibility with nios api ``member_normalize``
+        function (https://github.com/ansible-collections/community.general/issues/1526).
+      - nmcli - remove ``bridge-slave`` from list of IP based connections ((https://github.com/ansible-collections/community.general/issues/1500).
+      - pamd - added logic to retain the comment line (https://github.com/ansible-collections/community.general/issues/1394).
+      - passwordstore lookup plugin - always use explicit ``show`` command to retrieve
+        password. This ensures compatibility with ``gopass`` and avoids problems when
+        password names equal ``pass`` commands (https://github.com/ansible-collections/community.general/pull/1493).
+      - rhn_channel - Python 2.7.5 fails if the certificate should not be validated.
+        Fixed this by creating the correct ``ssl_context`` (https://github.com/ansible-collections/community.general/pull/470).
+      - sendgrid - update documentation and warn user about sendgrid Python library
+        version (https://github.com/ansible-collections/community.general/issues/1553).
+      - syslogger - update ``syslog.openlog`` API call for older Python versions,
+        and improve error handling (https://github.com/ansible-collections/community.general/issues/953).
+      - yaml callback plugin - do not remove non-ASCII Unicode characters from multiline
+        string output (https://github.com/ansible-collections/community.general/issues/1519).
+      major_changes:
+      - 'For community.general 2.0.0, the Google modules will be moved to the `community.google
+        <https://galaxy.ansible.com/community/google>`_ collection.
+
+        A redirection will be inserted so that users using ansible-base 2.10 or newer
+        do not have to change anything.
+
+
+        If you use Ansible 2.9 and explicitly use Google modules from this collection,
+        you will need to adjust your playbooks and roles to use FQCNs starting with
+        ``community.google.`` instead of ``community.general.``,
+
+        for example replace ``community.general.gcpubsub`` in a task by ``community.google.gcpubsub``.
+
+
+        If you use ansible-base and installed ``community.general`` manually and rely
+        on the Google modules, you have to make sure to install the ``community.google``
+        collection as well.
+
+        If you are using FQCNs, for example ``community.general.gcpubsub`` instead
+        of ``gcpubsub``, it will continue working, but we still recommend to adjust
+        the FQCNs as well.
+
+        '
+      - 'For community.general 2.0.0, the OC connection plugin will be moved to the
+        `community.okd <https://galaxy.ansible.com/community/okd>`_ collection.
+
+        A redirection will be inserted so that users using ansible-base 2.10 or newer
+        do not have to change anything.
+
+
+        If you use Ansible 2.9 and explicitly use OC connection plugin from this collection,
+        you will need to adjust your playbooks and roles to use FQCNs ``community.okd.oc``
+        instead of ``community.general.oc``.
+
+
+        If you use ansible-base and installed ``community.general`` manually and rely
+        on the OC connection plugin, you have to make sure to install the ``community.okd``
+        collection as well.
+
+        If you are using FQCNs, in other words ``community.general.oc`` instead of
+        ``oc``, it will continue working, but we still recommend to adjust this FQCN
+        as well.
+
+        '
+      - 'For community.general 2.0.0, the hashi_vault lookup plugin will be moved
+        to the `community.hashi_vault <https://galaxy.ansible.com/community/hashi_vault>`_
+        collection.
+
+        A redirection will be inserted so that users using ansible-base 2.10 or newer
+        do not have to change anything.
+
+
+        If you use Ansible 2.9 and explicitly use hashi_vault lookup plugin from this
+        collection, you will need to adjust your playbooks and roles to use FQCNs
+        ``community.hashi_vault.hashi_vault`` instead of ``community.general.hashi_vault``.
+
+
+        If you use ansible-base and installed ``community.general`` manually and rely
+        on the hashi_vault lookup plugin, you have to make sure to install the ``community.hashi_vault``
+        collection as well.
+
+        If you are using FQCNs, in other words ``community.general.hashi_vault`` instead
+        of ``hashi_vault``, it will continue working, but we still recommend to adjust
+        this FQCN as well.
+
+        '
+      minor_changes:
+      - homebrew_cask - Homebrew will be deprecating use of ``brew cask`` commands
+        as of version 2.6.0, see https://brew.sh/2020/12/01/homebrew-2.6.0/. Added
+        logic to stop using ``brew cask`` for brew version >= 2.6.0 (https://github.com/ansible-collections/community.general/pull/1481).
+      - jira - added the traceback output to ``fail_json()`` calls deriving from exceptions
+        (https://github.com/ansible-collections/community.general/pull/1536).
+      release_summary: Regular bugfix release.
+    fragments:
+    - 1.3.2.yml
+    - 1040-ldap_search-changed-must-be-false.yaml
+    - 1394-pamd-removing-comments.yaml
+    - 1481-deprecated-brew-cask-command.yaml
+    - 1493-fix_passwordstore.py_to_be_compatible_with_gopass_versions.yml
+    - 1517-bridge-slave-from-list-of-ip-based-connections.yml
+    - 1522-yaml-callback-unicode.yml
+    - 1527-fix-nios-api-member-normalize.yaml
+    - 1532-monit-support-all-services.yaml
+    - 1552_launchd.yml
+    - 1553_sendgrid.yml
+    - 1574-make-question.yaml
+    - 470-spacewalk-legacy-python-certificate-validation.yaml
+    - 953_syslogger.yml
+    - community.docker-53-docker_image-tag-push.yml
+    - community.docker-55-docker_image-loading.yml
+    - google-migration.yml
+    - hashi_vault-migration.yml
+    - jira_improvements.yaml
+    - oc-migration.yml
+    release_date: '2021-01-04'
