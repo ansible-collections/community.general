@@ -1,3 +1,0 @@
----
-minor_changes:
-  - hashi_vault - support ``VAULT_NAMESPACE`` environment variable for namespaced lookups against Vault Enterprise (in addition to the ``namespace=`` flag supported today) (https://github.com/ansible-collections/community.general/pull/929).
