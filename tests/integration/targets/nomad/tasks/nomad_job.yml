@@ -56,6 +56,15 @@
     content: "{{ lookup('file', 'job.hcl') }}"
   register: job_deployed_idempotence
 
+- name: get list of nomad jobs
+  nomad_job_info:
+    host: localhost
+    use_ssl: false
+  register: list_nomad_jobs
+
+- debug:
+    msg: "{{ list_nomad_jobs }}"
+
 - name: run check delete nomad job
   nomad_job:
     host: localhost
@@ -79,6 +88,15 @@
     use_ssl: false
     name: example
   register: get_job_delete
+
+- name: get list of nomad jobs
+  nomad_job_info:
+    host: localhost
+    use_ssl: false
+  register: list_nomad_jobs
+
+- debug:
+    msg: "{{ list_nomad_jobs }}"
 
 - name: assert idempotence
   assert:
