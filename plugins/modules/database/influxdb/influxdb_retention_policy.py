@@ -75,15 +75,16 @@ EXAMPLES = r'''
       replication: 1
       shard_group_duration: 1h
 
-- name: Create 1 week retention policy
+- name: Create 1 week retention policy with 1 day shard group duration
   community.general.influxdb_retention_policy:
       hostname: "{{influxdb_ip_address}}"
       database_name: "{{influxdb_database_name}}"
       policy_name: test
       duration: 1w
       replication: 1
+      shard_group_duration: 1d
 
-- name: Create infinite retention policy
+- name: Create infinite retention policy with 1 week of shard group duration
   community.general.influxdb_retention_policy:
       hostname: "{{influxdb_ip_address}}"
       database_name: "{{influxdb_database_name}}"
@@ -92,6 +93,7 @@ EXAMPLES = r'''
       replication: 1
       ssl: no
       validate_certs: no
+      shard_group_duration: 1w
 '''
 
 RETURN = r'''
@@ -204,8 +206,8 @@ def main():
         policy_name=dict(required=True, type='str'),
         duration=dict(required=True, type='str'),
         replication=dict(required=True, type='int'),
-        default=dict(default=False, type='bool'),
-        shard_group_duration=dict(required=False, type='str')
+        shard_group_duration=dict(required=False, type='str'),
+        default=dict(default=False, type='bool')
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
