@@ -558,6 +558,10 @@ plugin_routing:
       redirect: community.docker.docker
     hetzner:
       redirect: community.hrobot.robot
+    kubevirt_common_options:
+      redirect: community.kubevirt.kubevirt_common_options
+    kubevirt_vm_options:
+      redirect: community.kubevirt.kubevirt_vm_options
     postgresql:
       redirect: community.postgresql.postgresql
   module_utils:
@@ -573,6 +577,8 @@ plugin_routing:
       redirect: community.google.gcp
     hetzner:
       redirect: community.hrobot.robot
+    kubevirt:
+      redirect: community.kubevirt.kubevirt
     postgresql:
       redirect: community.postgresql.postgresql
   callback:
