@@ -2,6 +2,7 @@ removed_features:
   - |
     All Kubevirt modules and plugins have now been migrated from community.general to the `community.kubevirt <https://galaxy.ansible.com/community/kubevirt>`_ Ansible collection.
     If you use ansible-base 2.10 or newer, redirections have been provided.
+
     If you use Ansible 2.9 and installed this collection, you need to adjust the FQCNs (``community.general.kubevirt_vm`` → ``community.kubevirt.kubevirt_vm``) and make sure to install the community.kubevirt collection.
 breaking_changes:
   - |
