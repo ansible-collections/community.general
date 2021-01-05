@@ -1,1 +1,0 @@
-./cloud/kubevirt/kubevirt_pvc.py
