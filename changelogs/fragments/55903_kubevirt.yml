@@ -1,3 +1,0 @@
----
-bugfixes:
-- kubevirt - Add aliases 'interface_name' for network_name (https://github.com/ansible/ansible/issues/55641).
