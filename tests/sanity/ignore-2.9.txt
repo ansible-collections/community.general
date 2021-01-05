@@ -4,11 +4,6 @@ plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
 plugins/module_utils/_mount.py future-import-boilerplate
 plugins/module_utils/_mount.py metaclass-boilerplate
-plugins/modules/cloud/kubevirt/kubevirt_cdi_upload.py validate-modules:doc-missing-type
-plugins/modules/cloud/kubevirt/kubevirt_preset.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/kubevirt/kubevirt_pvc.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/kubevirt/kubevirt_rs.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/kubevirt/kubevirt_vm.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/linode/linode.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/linode/linode.py validate-modules:undocumented-parameter
 plugins/modules/cloud/lxc/lxc_container.py pylint:blacklisted-name

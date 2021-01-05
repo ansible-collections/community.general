@@ -7,9 +7,8 @@ authors:
 description: null
 license_file: COPYING
 tags: [community]
-# NOTE: No more dependencies can be added to this list
-dependencies:
-  community.kubernetes: '>=1.0.0'
+# NOTE: No dependencies are expected to be added here
+# dependencies:
 repository: https://github.com/ansible-collections/community.general
 documentation: https://docs.ansible.com/ansible/latest/collections/community/general/
 homepage: https://github.com/ansible-collections/community.general
