@@ -1,0 +1,11 @@
+removed_features:
+  - |
+    All Kubevirt modules and plugins have now been migrated from community.general to the `community.kubevirt <https://galaxy.ansible.com/community/kubevirt>`_ Ansible collection.
+    If you use ansible-base 2.10 or newer, redirections have been provided.
+    If you use Ansible 2.9 and installed this collection, you need to adjust the FQCNs (``community.general.kubevirt_vm`` → ``community.kubevirt.kubevirt_vm``) and make sure to install the community.kubevirt collection.
+breaking_changes:
+  - |
+    If you use Ansible 2.9 and the Kubevirt plugins or modules from this collection, community.general 2.0.0 results in errors when trying to use the Kubevirt content by FQCN, like ``community.general.kubevirt_vm``.
+    Since Ansible 2.9 is not able to use redirections, you will have to adjust your playbooks and roles manually to use the new FQCNs (``community.kubevirt.kubevirt_vm`` for the previous example) and to make sure that you have ``community.kubevirt`` installed.
+    If you use ansible-base 2.10 or newer and did not install Ansible 3.0.0, but installed (and/or upgraded) community.general manually, you need to make sure to also install the ``community.kubevirt`` collection if you are using any of the Kubevirt plugins or modules.
+    While ansible-base 2.10 or newer can use the redirects that community.general 2.0.0 adds, the collection they point to (such as community.google) must be installed for them to work.

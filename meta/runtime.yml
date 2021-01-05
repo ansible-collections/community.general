@@ -1,13 +1,6 @@
 ---
 requires_ansible: '>=2.9.10'
 action_groups:
-  k8s:
-  - kubevirt_cdi_upload
-  - kubevirt_preset
-  - kubevirt_pvc
-  - kubevirt_rs
-  - kubevirt_template
-  - kubevirt_vm
   ovirt:
   - ovirt_affinity_label_facts
   - ovirt_api_facts
@@ -218,6 +211,18 @@ plugin_routing:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use the modules from the theforeman.foreman collection instead.
+    kubevirt_cdi_upload:
+      redirect: community.kubevirt.kubevirt_cdi_upload
+    kubevirt_preset:
+      redirect: community.kubevirt.kubevirt_preset
+    kubevirt_pvc:
+      redirect: community.kubevirt.kubevirt_pvc
+    kubevirt_rs:
+      redirect: community.kubevirt.kubevirt_rs
+    kubevirt_template:
+      redirect: community.kubevirt.kubevirt_template
+    kubevirt_vm:
+      redirect: community.kubevirt.kubevirt_vm
     ldap_attr:
       deprecation:
         removal_version: 3.0.0
@@ -588,3 +593,5 @@ plugin_routing:
       redirect: community.docker.docker_machine
     docker_swarm:
       redirect: community.docker.docker_swarm
+    kubevirt:
+      redirect: community.kubevirt.kubevirt
