@@ -47,6 +47,8 @@ options:
     shard_group_duration:
         description:
             - Determines the size of a shard group.
+            - Value needs to be integer literal followed immediately (with no spaces) by a duration unit.
+              Supported duration units are h,d,w. For example 10d, 1h, 2w.
         type: str
         version_added: '2.0.0'
 extends_documentation_fragment:
@@ -206,8 +208,8 @@ def main():
         policy_name=dict(required=True, type='str'),
         duration=dict(required=True, type='str'),
         replication=dict(required=True, type='int'),
+        default=dict(default=False, type='bool'),
         shard_group_duration=dict(required=False, type='str'),
-        default=dict(default=False, type='bool')
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
