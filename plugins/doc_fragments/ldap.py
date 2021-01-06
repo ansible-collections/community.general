@@ -49,6 +49,7 @@ options:
       - The class to use for SASL authentication.
       - possible choices are C(external), C(gssapi).
     type: str
+    choices: ['external', 'gssapi']
     default: external
     version_added: "2.0.0"
 '''
