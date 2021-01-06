@@ -1,0 +1,2 @@
+bugfixes:
+  - nios - added normalizing function to cleanup ``ib_spec`` of extraneous attributes before being merged into ``argument_spec`` (https://github.com/ansible-collections/community.general/pull/1598).
