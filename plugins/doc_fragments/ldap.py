@@ -46,8 +46,9 @@ options:
     default: yes
   sasl_class:
     description:
-      - The class to use for SASL authentication
-      - possible choices: external, gssapi
+      - The class to use for SASL authentication.
+      - possible choices are C(external), C(gssapi).
     type: str
     default: external
+    version_added: "2.0.0"
 '''
