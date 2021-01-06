@@ -15,7 +15,7 @@ class ModuleDocFragment(object):
 options:
   bind_dn:
     description:
-      - A DN to bind with. If this is omitted, we'll try a SASL bind with the EXTERNAL mechanism.
+      - A DN to bind with. If this is omitted, we'll try a SASL bind with the EXTERNAL mechanism as default.
       - If this is blank, we'll use an anonymous bind.
     type: str
   bind_pw:
@@ -44,4 +44,10 @@ options:
       - This should only be used on sites using self-signed certificates.
     type: bool
     default: yes
+  sasl_class:
+    description:
+      - The class to use for SASL authentication
+      - possible choices: external, gssapi
+    type: str
+    default: external
 '''
