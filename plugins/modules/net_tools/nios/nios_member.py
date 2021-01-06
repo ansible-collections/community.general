@@ -25,6 +25,7 @@ options:
     required: true
     aliases:
       - name
+    type: str
   vip_setting:
     description:
       - Configures the network settings for the grid member.
@@ -34,12 +35,15 @@ options:
       address:
         description:
           - The IPv4 Address of the Grid Member
+        type: str
       subnet_mask:
         description:
           - The subnet mask for the Grid Member
+        type: str
       gateway:
         description:
           - The default gateway for the Grid Member
+        type: str
   ipv6_setting:
     description:
       - Configures the IPv6 settings for the grid member.
@@ -49,22 +53,28 @@ options:
       virtual_ip:
         description:
           - The IPv6 Address of the Grid Member
+        type: str
       cidr_prefix:
         description:
           - The IPv6 CIDR prefix for the Grid Member
+        type: int
       gateway:
         description:
           - The gateway address for the Grid Member
+        type: str
   config_addr_type:
     description:
       - Address configuration type (IPV4/IPV6/BOTH)
     default: IPV4
+    type: str
   comment:
     description:
       - A descriptive comment of the Grid member.
+    type: str
   extattrs:
     description:
       - Extensible attributes associated with the object.
+    type: dict
   enable_ha:
     description:
       - If set to True, the member has two physical nodes (HA pair).
@@ -72,6 +82,7 @@ options:
   router_id:
     description:
       - Virtual router identifier. Provide this ID if "ha_enabled" is set to "true". This is a unique VRID number (from 1 to 255) for the local subnet.
+    type: int
   lan2_enabled:
     description:
       - When set to "true", the LAN2 port is enabled as an independent port or as a port for failover purposes.
@@ -95,12 +106,15 @@ options:
           address:
             description:
               - The IPv4 Address of LAN2
+            type: str
           subnet_mask:
             description:
               - The subnet mask of LAN2
+            type: str
           gateway:
             description:
               - The default gateway of LAN2
+            type: str
       v6_network_setting:
         description:
           - If the 'enable' field is set to True, this defines IPv6 network settings for LAN2.
@@ -110,16 +124,20 @@ options:
           virtual_ip:
             description:
               - The IPv6 Address of LAN2
+            type: str
           cidr_prefix:
             description:
               - The IPv6 CIDR prefix of LAN2
+            type: int
           gateway:
             description:
               - The gateway address of LAN2
+            type: str
   platform:
     description:
       - Configures the Hardware Platform.
     default: INFOBLOX
+    type: str
   node_info:
     description:
       - Configures the node information list with detailed status report on the operations of the Grid Member.
@@ -139,9 +157,11 @@ options:
           duplex:
             description:
               - The port duplex; if speed is 1000, duplex must be FULL.
+            type: str
           speed:
             description:
               - The port speed; if speed is 1000, duplex is FULL.
+            type: str
       lan_ha_port_setting:
         description:
           - LAN/HA port settings for the node.
@@ -151,6 +171,7 @@ options:
           ha_ip_address:
             description:
               - HA IP address.
+            type: str
           ha_port_setting:
             description:
               - Physical port settings for the HA interface.
@@ -164,9 +185,11 @@ options:
               duplex:
                 description:
                   - The port duplex; if speed is 1000, duplex must be FULL.
+                type: str
               speed:
                 description:
                   - The port speed; if speed is 1000, duplex is FULL.
+                type: str
           lan_port_setting:
             description:
               - Physical port settings for the LAN interface.
@@ -180,15 +203,19 @@ options:
               duplex:
                 description:
                   - The port duplex; if speed is 1000, duplex must be FULL.
+                type: str
               speed:
                 description:
                   - The port speed; if speed is 1000, duplex is FULL.
+                type: str
           mgmt_ipv6addr:
             description:
               - Public IPv6 address for the LAN1 interface.
+            type: str
           mgmt_lan:
             description:
               - Public IPv4 address for the LAN1 interface.
+            type: str
       mgmt_network_setting:
         description:
           - Network settings for the MGMT port of the node.
@@ -198,12 +225,15 @@ options:
           address:
             description:
               - The IPv4 Address of MGMT
+            type: str
           subnet_mask:
             description:
               - The subnet mask of MGMT
+            type: str
           gateway:
             description:
               - The default gateway of MGMT
+            type: str
       v6_mgmt_network_setting:
         description:
           - The network settings for the IPv6 MGMT port of the node.
@@ -213,12 +243,15 @@ options:
           virtual_ip:
             description:
               - The IPv6 Address of MGMT
+            type: str
           cidr_prefix:
             description:
               - The IPv6 CIDR prefix of MGMT
+            type: int
           gateway:
             description:
               - The gateway address of MGMT
+            type: str
   mgmt_port_setting:
     description:
       - Settings for the member MGMT port.
@@ -241,6 +274,7 @@ options:
     description:
       - The name of the upgrade group to which this Grid member belongs.
     default: Default
+    type: str
   use_syslog_proxy_setting:
     description:
       - Use flag for external_syslog_server_enable , syslog_servers, syslog_proxy_setting, syslog_size
@@ -258,25 +292,32 @@ options:
       address:
         description:
           - The server address.
+        type: str
       category_list:
         description:
           - The list of all syslog logging categories.
+        type: list
+        elements: str
       connection_type:
         description:
           - The connection type for communicating with this server.(STCP/TCP?UDP)
         default: UDP
+        type: str
       local_interface:
         description:
           - The local interface through which the appliance sends syslog messages to the syslog server.(ANY/LAN/MGMT)
         default: ANY
+        type: str
       message_node_id:
         description:
           - Identify the node in the syslog message. (HOSTNAME/IP_HOSTNAME/LAN/MGMT)
         default: LAN
+        type: str
       message_source:
         description:
           - The source of syslog messages to be sent to the external syslog server.
         default: ANY
+        type: str
       only_category_list:
         description:
           - The list of selected syslog logging categories. The appliance forwards syslog messages that belong to the selected categories.
@@ -285,10 +326,12 @@ options:
         description:
           - The port this server listens on.
         default: 514
+        type: int
       severity:
         description:
           - The severity filter. The appliance sends log messages of the specified severity and above to the external syslog server.
         default: DEBUG
+        type: str
   pre_provisioning:
     description:
       - Pre-provisioning information.
@@ -304,12 +347,16 @@ options:
           hwmodel:
             description:
               - Hardware model
+            type: str
           hwtype:
             description:
               - Hardware type.
+            type: str
       licenses:
         description:
           - An array of license types.
+        type: list
+        elements: str
   create_token:
     description:
       - Flag for initiating a create token request for pre-provisioned members.
@@ -325,6 +372,7 @@ options:
     choices:
       - present
       - absent
+    type: str
 '''
 
 EXAMPLES = '''
@@ -402,9 +450,9 @@ EXAMPLES = '''
 RETURN = ''' # '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import NIOS_MEMBER
+from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_ib_spec
 
 
 def main():
@@ -457,7 +505,7 @@ def main():
 
     syslog_spec = dict(
         address=dict(),
-        category_list=dict(type='list'),
+        category_list=dict(type='list', elements='str'),
         connection_type=dict(default='UDP'),
         local_interface=dict(default='ANY'),
         message_node_id=dict(default='LAN'),
@@ -474,7 +522,7 @@ def main():
 
     pre_prov_spec = dict(
         hardware_info=dict(type='list', elements='dict', options=hw_spec),
-        licenses=dict(type='list'),
+        licenses=dict(type='list', elements='str'),
     )
 
     ib_spec = dict(
@@ -504,7 +552,7 @@ def main():
         state=dict(default='present', choices=['present', 'absent'])
     )
 
-    argument_spec.update(ib_spec)
+    argument_spec.update(normalize_ib_spec(ib_spec))
     argument_spec.update(WapiModule.provider_spec)
 
     module = AnsibleModule(argument_spec=argument_spec,
