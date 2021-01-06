@@ -79,6 +79,7 @@ options:
     description:
       - If set to True, the member has two physical nodes (HA pair).
     type: bool
+    default: false
   router_id:
     description:
       - Virtual router identifier. Provide this ID if "ha_enabled" is set to "true". This is a unique VRID number (from 1 to 255) for the local subnet.
@@ -87,6 +88,7 @@ options:
     description:
       - When set to "true", the LAN2 port is enabled as an independent port or as a port for failover purposes.
     type: bool
+    default: false
   lan2_port_setting:
     description:
       - Settings for the Grid member LAN2 port if 'lan2_enabled' is set to "true".
