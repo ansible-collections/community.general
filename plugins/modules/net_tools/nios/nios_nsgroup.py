@@ -83,7 +83,7 @@ options:
             default: false
           tsig_key_name:
             description:
-              - Sets a label for the I(tsig_key) value
+              - Sets a label for the I(tsig_key) value.
             required: true
             type: str
           tsig_key_alg:
