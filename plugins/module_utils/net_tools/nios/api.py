@@ -161,7 +161,9 @@ def member_normalize(member_spec):
 def normalize_ib_spec(ib_spec):
     result = {}
     for arg in ib_spec:
-        result[arg] = dict([(k, v) for k, v in iteritems(ib_spec[arg]) if k != 'ib_req'])
+        result[arg] = dict([(k, v)
+                            for k, v in iteritems(ib_spec[arg])
+                            if k not in ('ib_req', 'transform', 'update')])
     return result
 
 
