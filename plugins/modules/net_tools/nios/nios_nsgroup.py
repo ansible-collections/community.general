@@ -151,7 +151,7 @@ options:
             default: false
           tsig_key_name:
             description:
-              - Sets a label for the I(tsig_key) value
+              - Sets a label for the I(tsig_key) value.
             type: str
             required: true
           tsig_key_alg:
