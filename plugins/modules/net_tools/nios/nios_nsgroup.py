@@ -68,7 +68,7 @@ options:
         suboptions:
           address:
             description:
-              - Configures the IP address of the preferred primary nameserver
+              - Configures the IP address of the preferred primary nameserver.
             required: true
             type: str
           name:
