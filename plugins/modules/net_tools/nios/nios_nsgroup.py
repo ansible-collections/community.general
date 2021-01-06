@@ -73,7 +73,7 @@ options:
             type: str
           name:
             description:
-              - Set a label for the preferred primary nameserver
+              - Set a label for the preferred primary nameserver.
             required: true
             type: str
           stealth:
