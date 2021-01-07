@@ -34,6 +34,8 @@ options:
 author:
 - Dusty Mabe (@dustymabe)
 - Abhijeet Kasurde (@Akasurde)
+notes:
+- Does not support C(check_mode).
 '''
 
 EXAMPLES = r'''
