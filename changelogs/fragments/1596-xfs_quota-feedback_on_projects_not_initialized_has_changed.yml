@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - xfs_quota - The feedback for initializing project quota using xfs_quota binary from `xfsprogs` has changed since the version it was written for.
