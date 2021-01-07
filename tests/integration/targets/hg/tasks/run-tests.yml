@@ -1,27 +1,16 @@
 # test code for the hg module
-# (c) 2018, Ansible Project
-
-# This file is part of Ansible
+# Copyright: (c) 2018, Ansible Project
 #
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 
 - name: set where to extract the repo
-  set_fact: checkout_dir={{ output_dir }}/epdb
+  set_fact:
+    checkout_dir: "{{ output_dir }}/hg_project_test"
 
 - name: set what repo to use
-  set_fact: repo=https://bitbucket.org/rpathsync/epdb
+  set_fact:
+    repo: "http://hg.pf.osdn.net/view/a/ak/akasurde/hg_project_test"
 
 - name: clean out the output_dir
   shell: rm -rf {{ output_dir }}/*
@@ -30,7 +19,9 @@
   shell: which hg
 
 - name: initial checkout
-  hg: repo={{ repo }} dest={{ checkout_dir }}
+  hg:
+    repo: "{{ repo }}"
+    dest: "{{ checkout_dir }}"
   register: hg_result
 
 - debug: var=hg_result
@@ -46,17 +37,21 @@
       - "hg_result.changed"
 
 - name: repeated checkout
-  hg: repo={{ repo }} dest={{ checkout_dir }}
+  hg:
+    repo: "{{ repo }}"
+    dest: "{{ checkout_dir }}"
   register: hg_result2
 
 - debug: var=hg_result2
 
 - name: check for tags
-  stat: path={{ checkout_dir }}/.hgtags
+  stat:
+    path: "{{ checkout_dir }}/.hgtags"
   register: tags
 
 - name: check for remotes
-  stat: path={{ checkout_dir }}/.hg/branch
+  stat:
+    path: "{{ checkout_dir }}/.hg/branch"
   register: branches
 
 - debug: var=tags
@@ -68,13 +63,16 @@
       - "tags.stat.isreg"
       - "branches.stat.isreg"
 
-- name: verify on a reclone things are marked unchanged
+- name: verify on a re-clone things are marked unchanged
   assert:
     that:
       - "not hg_result2.changed"
 
 - name: Checkout non-existent repo clone
-  hg: repo=https://bitbucket.org/pyro46/pythonscript_1 clone=no update=no
+  hg:
+    repo: "http://hg.pf.osdn.net/view/a/ak/akasurde/hg_project_test_1"
+    clone: no
+    update: no
   register: hg_result3
   ignore_errors: true
 
