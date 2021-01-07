@@ -193,11 +193,6 @@ class Sysrc(object):
         cmd.extend(args)
 
         (rc, out, err) = self.module.run_command(cmd)
-        if self.module._verbosity > 0:
-            self.cmd = cmd
-
-        if self.module._verbosity >= 4:
-            self.cmd_output = out
 
         return (rc, out, err)
 
@@ -238,9 +233,6 @@ def main():
 
     rc_value = Sysrc(module, name, value, path, delim, jail)
 
-    if module._verbosity >= 4:
-        result['existed'] = rc_value.exists()
-
     if state == 'present':
         rc_value.present()
     elif state == 'absent':
@@ -249,12 +241,6 @@ def main():
         rc_value.value_present()
     elif state == 'value_absent':
         rc_value.value_absent()
-
-    if module._verbosity > 0:
-        result['command'] = ' '.join(rc_value.cmd)
-
-    if module._verbosity >= 4:
-        result['output'] = rc_value.cmd_output
 
     result['changed'] = rc_value.changed
 
