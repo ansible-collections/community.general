@@ -48,7 +48,7 @@ options:
         description:
             - Determines the size of a shard group.
             - Value needs to be integer literal followed immediately (with no spaces) by a duration unit.
-              Supported duration units are h,d,w. For example 10d, 1h, 2w.
+              Supported duration units are C(h) for hours, C(d) for days, and C(w) for weeks. For example C(10d), C(1h), C(2w).
         type: str
         version_added: '2.0.0'
 extends_documentation_fragment:
