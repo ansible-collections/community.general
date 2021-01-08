@@ -59,7 +59,7 @@ options:
     type: str
   owned:
     description:
-      - Searches only owned runners when searching for existing, when false admin token required.
+      - Searches only owned runners (i.e. specific and group runners) when searching for existing runners, when false admin token required, but also returns shared runners.
     default: no
     type: bool
     version_added: 2.0.0
