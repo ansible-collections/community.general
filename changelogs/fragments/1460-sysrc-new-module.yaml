@@ -1,0 +1,2 @@
+minor_changes:
+- sysrc - new module plugin for managing rc files on FreeBSD (https://github.com/ansible-collections/community.general/pull/1460).
