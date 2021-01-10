@@ -471,5 +471,9 @@ tests/integration/targets/django_manage/files/base_test/simple_project/p1/manage
 tests/integration/targets/django_manage/files/base_test/simple_project/p1/manage.py compile-2.7   # django generated code
 tests/integration/targets/django_manage/files/base_test/simple_project/p1/manage.py metaclass-boilerplate       # django generated code
 tests/integration/targets/django_manage/files/base_test/simple_project/p1/manage.py future-import-boilerplate   # django generated code
+tests/integration/targets/django_manage/files/base_test/simple_project/p1/p1/settings.py metaclass-boilerplate       # django generated code
+tests/integration/targets/django_manage/files/base_test/simple_project/p1/p1/settings.py future-import-boilerplate   # django generated code
+tests/integration/targets/django_manage/files/base_test/simple_project/p1/p1/urls.py metaclass-boilerplate       # django generated code
+tests/integration/targets/django_manage/files/base_test/simple_project/p1/p1/urls.py future-import-boilerplate   # django generated code
 tests/utils/shippable/check_matrix.py replace-urlopen
 tests/utils/shippable/timing.py shebang
