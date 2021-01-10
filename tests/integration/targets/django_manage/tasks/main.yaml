@@ -44,4 +44,3 @@
     project_path: "{{ tmp_django_root.path }}/1045-single-app-project/single_app_project"
     pythonpath: "{{ tmp_django_root.path }}/1045-single-app-project/"
     command: check
-
