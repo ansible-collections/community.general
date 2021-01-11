@@ -1,4 +1,6 @@
 shippable/posix/group2
+skip/python2
+skip/freebsd
 skip/centos6
 skip/centos7
 skip/fedora28
