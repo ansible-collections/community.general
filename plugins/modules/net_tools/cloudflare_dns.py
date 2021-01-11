@@ -101,7 +101,7 @@ options:
   service:
     description:
     - Record service.
-    - Required for C(type=SRV).
+    - Required for I(type=SRV).
     type: str
   solo:
     description:
