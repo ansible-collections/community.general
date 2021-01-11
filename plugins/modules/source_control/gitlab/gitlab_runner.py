@@ -59,7 +59,7 @@ options:
     type: str
   owned:
     description:
-      - Searches only owned runners when searching for existing runners, when false admin token required.
+      - Searches only runners available to the user when searching for existing, when false admin token required.
     default: no
     type: bool
     version_added: 2.0.0
@@ -268,7 +268,7 @@ class GitLabRunner(object):
 
         for runner in runners:
             # python-gitlab 2.2 through at least 2.5 returns a list of dicts for list() instead of a Runner
-            # object, so we need to handle both, hasattr allows that
+            # object, so we need to handle both, getattr allows that
             if hasattr(runner, "description"):
                 if (runner.description == description):
                     return self._gitlab.runners.get(runner.id)
