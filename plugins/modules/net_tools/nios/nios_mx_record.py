@@ -25,6 +25,7 @@ options:
       - Specifies the fully qualified hostname to add or remove from
         the system
     required: true
+    type: str
   view:
     description:
       - Sets the DNS view to associate this a record with.  The DNS
@@ -32,27 +33,33 @@ options:
     default: default
     aliases:
       - dns_view
+    type: str
   mail_exchanger:
     description:
       - Configures the mail exchanger FQDN for this MX record.
     aliases:
       - mx
+    type: str
   preference:
     description:
       - Configures the preference (0-65535) for this MX record.
+    type: int
   ttl:
     description:
       - Configures the TTL to be associated with this host record
+    type: int
   extattrs:
     description:
       - Allows for the configuration of Extensible Attributes on the
         instance of the object.  This argument accepts a set of key / value
         pairs for configuration.
+    type: dict
   comment:
     description:
       - Configures a text string comment to be associated with the instance
         of this object.  The provided text string will be configured on the
         object instance.
+    type: str
   state:
     description:
       - Configures the intended state of the instance of the object on
@@ -63,6 +70,7 @@ options:
     choices:
       - present
       - absent
+    type: str
 '''
 
 EXAMPLES = '''
@@ -107,9 +115,9 @@ EXAMPLES = '''
 RETURN = ''' # '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import NIOS_MX_RECORD
+from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_ib_spec
 
 
 def main():
@@ -134,7 +142,7 @@ def main():
         state=dict(default='present', choices=['present', 'absent'])
     )
 
-    argument_spec.update(ib_spec)
+    argument_spec.update(normalize_ib_spec(ib_spec))
     argument_spec.update(WapiModule.provider_spec)
 
     module = AnsibleModule(argument_spec=argument_spec,
