@@ -654,6 +654,8 @@ files:
     maintainers: seandst
   $modules/packaging/os/rhsm_repository.py:
     maintainers: giovannisciortino
+  $modules/packaging/os/rpm_ostree_pkg.py:
+    maintainers: dustymabe Akasurde
   $modules/packaging/os/slackpkg.py:
     maintainers: KimNorgaard
   $modules/packaging/os/snap.py:
