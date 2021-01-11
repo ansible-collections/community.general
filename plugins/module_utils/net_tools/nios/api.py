@@ -158,6 +158,15 @@ def member_normalize(member_spec):
     return member_spec
 
 
+def normalize_ib_spec(ib_spec):
+    result = {}
+    for arg in ib_spec:
+        result[arg] = dict([(k, v)
+                            for k, v in iteritems(ib_spec[arg])
+                            if k not in ('ib_req', 'transform', 'update')])
+    return result
+
+
 class WapiBase(object):
     ''' Base class for implementing Infoblox WAPI API '''
     provider_spec = {'provider': dict(type='dict', options=NIOS_PROVIDER_SPEC)}
