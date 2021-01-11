@@ -2,6 +2,20 @@
 #
 # Copyright: (c) 2020, Alexei Znamensky <russoz@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+- name: skip python 2
+  meta: end_play
+  when: ansible_python_version is version('3', '<')
+
+- name: Set pyXX version
+  set_fact:
+    py_ver: "py{{ansible_python_version_info[0]}}{{ansible_python_version_info[1]}}"
+
+- name: Install FreeBSD deps
+  package:
+    name: "{{py_ver}}-sqlite3"
+    state: present
+  when: ansible_os_family == "FreeBSD"
+
 - name: Install required library
   pip:
     name: django

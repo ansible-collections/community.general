@@ -5,3 +5,5 @@ skip/fedora28
 skip/opensuse15py2
 skip/ubuntu1404
 skip/ubuntu1604
+skip/macos
+skip/osx
