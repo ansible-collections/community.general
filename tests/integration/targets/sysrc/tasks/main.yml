@@ -153,7 +153,7 @@
       register: sysrc_example4_idempotent
 
     - name: Get file content
-      shell: "cat /usr/jails/testjail/etc/rc.conf | egrep -v ^\\#"
+      shell: "cat `jls | grep stream | awk '{ print $4; }'`/etc/rc.conf | egrep -v ^\\#"
       register: sysrc_example4_content
 
     - name: Ensure sysrc worked in testjail
