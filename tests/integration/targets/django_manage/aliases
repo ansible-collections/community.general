@@ -1,1 +1,7 @@
 shippable/posix/group2
+skip/centos6
+skip/centos7
+skip/fedora28
+skip/opensuse15py2
+skip/ubuntu1404
+skip/ubuntu1604
