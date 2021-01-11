@@ -60,6 +60,7 @@ class LdapGeneric(object):
             ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 
         connection = ldap.initialize(self.server_uri)
+        connection.set_option(ldap.OPT_REFERRALS, 0) #Switch off chasing of referrals
 
         if self.start_tls:
             try:
