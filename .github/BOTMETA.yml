@@ -344,6 +344,8 @@ files:
     maintainers: Rylon
   $modules/identity/ipa/:
     maintainers: $team_ipa
+  $modules/identity/ipa/ipa_pwpolicy.py:
+    maintainers: adralioh
   $modules/identity/ipa/ipa_service.py:
     maintainers: cprh
   $modules/identity/ipa/ipa_vault.py:
