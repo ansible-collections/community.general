@@ -26,24 +26,29 @@ options:
       - Specifies the hostname with which fixed DHCP ip-address is stored
         for respective mac.
     required: true
+    type: str
   ipaddr:
     description:
       - IPV4/V6 address of the fixed address.
     required: true
+    type: str
   mac:
     description:
       - The MAC address of the interface.
     required: true
+    type: str
   network:
     description:
       - Specifies the network range in which ipaddr exists.
     required: true
+    type: str
   network_view:
     description:
       - Configures the name of the network view to associate with this
         configured instance.
     required: false
     default: default
+    type: str
   options:
     description:
       - Configures the set of DHCP options to be included as part of
@@ -56,13 +61,16 @@ options:
       name:
         description:
           - The name of the DHCP option to configure
+        type: str
       num:
         description:
           - The number of the DHCP option to configure
+        type: int
       value:
         description:
           - The value of the DHCP option specified by C(name)
         required: true
+        type: str
       use_option:
         description:
           - Only applies to a subset of options (see NIOS API documentation)
@@ -72,16 +80,19 @@ options:
         description:
           - The name of the space this DHCP option is associated to
         default: DHCP
+        type: str
   extattrs:
     description:
       - Allows for the configuration of Extensible Attributes on the
         instance of the object.  This argument accepts a set of key / value
         pairs for configuration.
+    type: dict
   comment:
     description:
       - Configures a text string comment to be associated with the instance
         of this object.  The provided text string will be configured on the
         object instance.
+    type: str
   state:
     description:
       - Configures the intended state of the instance of the object on
@@ -92,6 +103,7 @@ options:
     choices:
       - present
       - absent
+    type: str
 '''
 
 EXAMPLES = '''
@@ -163,6 +175,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import NIOS_IPV4_FIXED_ADDRESS, NIOS_IPV6_FIXED_ADDRESS
+from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_ib_spec
 
 
 def validate_ip_address(address):
@@ -261,7 +274,7 @@ def main():
         state=dict(default='present', choices=['present', 'absent'])
     )
 
-    argument_spec.update(ib_spec)
+    argument_spec.update(normalize_ib_spec(ib_spec))
     argument_spec.update(WapiModule.provider_spec)
 
     module = AnsibleModule(argument_spec=argument_spec,
