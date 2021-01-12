@@ -22,7 +22,7 @@ class ModuleHelperException(Exception):
         return None
 
     def __init__(self, *args, **kwargs):
-        self.msg = self._get_remove('msg', kwargs) or "Module failed with exception: {0}".format(str(self))
+        self.msg = self._get_remove('msg', kwargs) or "Module failed with exception: {0}".format(self)
         self.update_output = self._get_remove('update_output', kwargs) or {}
         super(ModuleHelperException, self).__init__(*args, **kwargs)
 
