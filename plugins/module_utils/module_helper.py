@@ -152,67 +152,10 @@ class DependencyCtxMgr(object):
         return self.msg or str(self.exc_val)
 
 
-class _NamedDeprecation(object):
-    def __init__(self, deprecation):
-        self.name = None
-        self.deprecation = deprecation
-        self._prepared_deprecation = None
-        self.acked = False
-        self.triggered = False
-        self.module = None
-        self.ack_param = None
-
-    def prepare(self, name, module, ack_param):
-        self.name = name
-        self.module = module
-
-        self._prepared_deprecation = dict(self.deprecation)
-        self._prepared_deprecation['msg'] = (
-            "{0}"
-            "\n\n"
-            "To prevent this message, add the deprecation name '{2}' to the '{1}' module parameter:\n"
-            "  {1}:\n"
-            "    - {2}"
-        ).format(self.deprecation['msg'], ack_param, name)
-
-    def acknowledge(self):
-        self.acked = True
-
-    def trigger(self):
-        if self.triggered or self.acked:
-            return
-
-        self.module.deprecate(**self._prepared_deprecation)
-        self.triggered = True
-
-    def __str__(self):
-        return "<NamedDeprecation: {0} {1}{2}{3}>".format(
-            self.name,
-            self.deprecation,
-            ' ACK' if self.acked else "",
-            ' TRG' if self.triggered else "",
-        )
-
-
 class ModuleHelper(object):
     _dependencies = []
     module = {}
     facts_name = None
-    named_deprecations = {}
-    ack_deprecations_module_param = "ack_named_deprecations"
-
-    class PrepareNamedDeprecation(object):
-        """
-        Helper class providing a bare ``deprecate()`` static method that mimics ``AnsibleModule.deprecate()``
-        signature. The sanity checks run pylint with a custom checker plugin that performs static analysis
-        on calls to methods named ``deprecate()``. So, this parlour trick exists to force users to declare
-        their named deprecations using one such call.
-        """
-        @staticmethod
-        def deprecate(msg, version=None, date=None, collection_name=None, **kwargs):
-            return _NamedDeprecation(
-                dict(msg=msg, version=version, date=date, collection_name=collection_name, **kwargs)
-            )
 
     class AttrDict(dict):
         def __getattr__(self, item):
@@ -228,15 +171,7 @@ class ModuleHelper(object):
             self.module = module
 
         if isinstance(self.module, dict):
-            if self.named_deprecations:
-                self.module['argument_spec'].update(self.make_ack_named_deprecation_arg_spec())
             self.module = AnsibleModule(**self.module)
-
-        for name, deprecation in self.named_deprecations.items():
-            deprecation.prepare(name, self.module, self.ack_deprecations_module_param)
-
-        for ack in self.module.params.get(self.ack_deprecations_module_param) or []:
-            self.ack_named_deprecation(ack)
 
     def update_output(self, **kwargs):
         self.output_dict.update(kwargs)
@@ -289,21 +224,6 @@ class ModuleHelper(object):
                                       exception=d.exc_val.__traceback__.format_exc(),
                                       msg=d.text,
                                       **self.output_dict)
-
-    def make_ack_named_deprecation_arg_spec(self):
-        return {self.ack_deprecations_module_param: dict(type='list', elements='str')}
-
-    def ack_named_deprecation(self, name):
-        try:
-            self.named_deprecations[name].acknowledge()
-        except Exception as e:
-            raise ModuleHelperException("No such named deprecation: {0}\n{1}".format(name, e))
-
-    def trigger_named_deprecation(self, name):
-        try:
-            self.named_deprecations[name].trigger()
-        except Exception as e:
-            raise ModuleHelperException("No such named deprecation: {0}\n{1}".format(name, e))
 
 
 class StateMixin(object):
