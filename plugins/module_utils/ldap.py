@@ -60,7 +60,8 @@ class LdapGeneric(object):
             ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 
         connection = ldap.initialize(self.server_uri)
-        connection.set_option(ldap.OPT_REFERRALS, 0) #Switch off chasing of referrals
+        # Switch off chasing of referrals (https://github.com/ansible-collections/community.general/issues/1067)
+        connection.set_option(ldap.OPT_REFERRALS, 0) 
 
         if self.start_tls:
             try:
