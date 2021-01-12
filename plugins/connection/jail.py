@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Ansible Core Team
-    connection: jail
+    name: jail
     short_description: Run tasks in jails
     description:
         - Run commands or put/fetch files to an existing jail

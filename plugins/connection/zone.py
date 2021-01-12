@@ -11,7 +11,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Ansible Core Team
-    connection: zone
+    name: zone
     short_description: Run tasks in a zone instance
     description:
         - Run commands or put/fetch files to an existing zone

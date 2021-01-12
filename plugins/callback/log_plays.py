@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    callback: log_plays
+    name: log_plays
     type: notification
     short_description: write playbook output to log file
     description:

@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    cache: yaml
+    name: yaml
     short_description: YAML formatted files.
     description:
         - This cache uses YAML formatted, per host, files saved to the filesystem.

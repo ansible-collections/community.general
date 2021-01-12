@@ -7,7 +7,6 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     name: scaleway
-    plugin_type: inventory
     author:
       - Remy Leone (@sieben)
     short_description: Scaleway inventory source

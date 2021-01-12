@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: flattened
+    name: flattened
     author: Serge van Ginderachter (!UNKNOWN) <serge@vanginderachter.be>
     short_description: return single list completely flattened
     description:

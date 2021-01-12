@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: lastpass
+    name: lastpass
     author:
       - Andrew Zenk (!UNKNOWN) <azenk@umn.edu>
     requirements:

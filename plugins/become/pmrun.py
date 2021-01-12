@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    become: pmrun
+    name: pmrun
     short_description: Privilege Manager run
     description:
         - This become plugins allows your remote/login user to execute commands as another user via the pmrun utility.

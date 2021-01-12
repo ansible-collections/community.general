@@ -18,7 +18,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: splunk
+    name: splunk
     type: aggregate
     short_description: Sends task result events to Splunk HTTP Event Collector
     author: "Stuart Hirst (!UNKNOWN) <support@convergingdata.com>"

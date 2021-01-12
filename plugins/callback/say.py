@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    callback: say
+    name: say
     type: notification
     requirements:
       - whitelisting in configuration

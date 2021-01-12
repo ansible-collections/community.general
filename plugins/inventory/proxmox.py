@@ -7,7 +7,6 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     name: proxmox
-    plugin_type: inventory
     short_description: Proxmox inventory source
     version_added: "1.2.0"
     author:
