@@ -576,7 +576,7 @@ files:
   $modules/net_tools/nmcli.py:
     maintainers: alcamie101
   $modules/net_tools/snmp_facts.py:
-    maintainers: ogenstad bigmstone ujwalkomarla
+    maintainers: ogenstad ujwalkomarla
   $modules/notification/osx_say.py:
     maintainers: ansible mpdehaan
     labels: _osx_say
