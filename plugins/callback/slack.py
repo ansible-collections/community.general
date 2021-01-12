@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    callback: slack
+    name: slack
     type: notification
     requirements:
       - whitelist in configuration

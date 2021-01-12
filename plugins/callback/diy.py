@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = r'''
-  callback: diy
+  name: diy
   type: stdout
   short_description: Customize the output
   version_added: 0.2.0
