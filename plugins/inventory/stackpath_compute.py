@@ -8,7 +8,6 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     name: stackpath_compute
-    plugin_type: inventory
     short_description: StackPath Edge Computing inventory source
     version_added: 1.2.0
     extends_documentation_fragment:

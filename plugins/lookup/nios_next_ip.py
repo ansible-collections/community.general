@@ -23,7 +23,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 author: Unknown (!UNKNOWN)
-lookup: nios_next_ip
+name: nios_next_ip
 short_description: Return the next available IP address for a network
 description:
   - Uses the Infoblox WAPI API to return the next available IP addresses

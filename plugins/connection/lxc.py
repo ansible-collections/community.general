@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Joerg Thalheim (!UNKNOWN) <joerg@higgsboson.tk>
-    connection: lxc
+    name: lxc
     short_description: Run tasks in lxc containers via lxc python library
     description:
         - Run commands or put/fetch files to an existing lxc container using lxc python library

@@ -7,7 +7,6 @@ __metaclass__ = type
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
     name: virtualbox
-    plugin_type: inventory
     short_description: virtualbox inventory source
     description:
         - Get inventory hosts from the local virtualbox installation.

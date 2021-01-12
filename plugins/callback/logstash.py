@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    callback: logstash
+    name: logstash
     type: notification
     short_description: Sends events to Logstash
     description:

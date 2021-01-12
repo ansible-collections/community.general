@@ -6,7 +6,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = r"""
-lookup: dsv
+name: dsv
 author: Adam Migus (@amigus) <adam@migus.org>
 short_description: Get secrets from Thycotic DevOps Secrets Vault
 version_added: 1.0.0
