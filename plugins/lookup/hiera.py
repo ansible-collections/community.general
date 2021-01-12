@@ -7,7 +7,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
     author:
       - Juan Manuel Parrilla (@jparrill)
-    lookup: hiera
+    name: hiera
     short_description: get info from hiera data
     requirements:
       - hiera (command line utility)

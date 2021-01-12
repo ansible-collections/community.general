@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    callback: selective
+    name: selective
     type: stdout
     requirements:
       - set as main display callback

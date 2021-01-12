@@ -6,7 +6,6 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
     name: online
-    plugin_type: inventory
     author:
       - Remy Leone (@sieben)
     short_description: Scaleway (previously Online SAS or Online.net) inventory source

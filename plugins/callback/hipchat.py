@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    callback: hipchat
+    name: hipchat
     type: notification
     requirements:
       - whitelist in configuration.

@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Maykel Moya (!UNKNOWN) <mmoya@speedyrails.com>
-    connection: chroot
+    name: chroot
     short_description: Interact with local chroot
     description:
         - Run commands or put/fetch files to an existing chroot on the Ansible controller.

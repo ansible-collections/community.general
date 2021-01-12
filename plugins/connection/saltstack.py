@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Michael Scherer (@mscherer) <misc@zarb.org>
-    connection: saltstack
+    name: saltstack
     short_description: Allow ansible to piggyback on salt minions
     description:
         - This allows you to use existing Saltstack infrastructure to connect to targets.

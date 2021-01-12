@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    lookup: consul_kv
+    name: consul_kv
     short_description: Fetch metadata from a Consul key value store.
     description:
       - Lookup metadata for a playbook from the key value store in a Consul cluster.

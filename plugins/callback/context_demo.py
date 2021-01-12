@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    callback: context_demo
+    name: context_demo
     type: aggregate
     short_description: demo callback that adds play/task context
     description:

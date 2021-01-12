@@ -6,7 +6,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    callback: logdna
+    name: logdna
     type: aggregate
     short_description: Sends playbook logs to LogDNA
     description:

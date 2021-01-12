@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: nrdp
+    name: nrdp
     type: notification
     author: "Remi VERCHERE (@rverchere)"
     short_description: post task result to a nagios server through nrdp

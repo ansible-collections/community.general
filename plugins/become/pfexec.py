@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    become: pfexec
+    name: pfexec
     short_description: profile based execution
     description:
         - This become plugins allows your remote/login user to execute commands as another user via the pfexec utility.

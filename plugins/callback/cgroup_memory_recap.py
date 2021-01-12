@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    callback: cgroup_memory_recap
+    name: cgroup_memory_recap
     type: aggregate
     requirements:
       - whitelist in configuration
