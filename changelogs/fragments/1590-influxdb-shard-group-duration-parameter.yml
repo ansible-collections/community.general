@@ -1,0 +1,2 @@
+minor_changes:
+  - influxdb_retention_policy - add shard group duration parameter ``shard_group_duration`` (https://github.com/ansible-collections/community.general/pull/1590).
