@@ -1,0 +1,2 @@
+bugfixes:
+  - Ldapsearch - switch off client-chasing referrals (https://github.com/ansible-collections/community.general/issues/1067)
