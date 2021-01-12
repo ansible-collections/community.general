@@ -23,7 +23,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 author: Unknown (!UNKNOWN)
-lookup: nios
+name: nios
 short_description: Query Infoblox NIOS objects
 description:
   - Uses the Infoblox WAPI API to fetch NIOS specified objects.  This lookup

@@ -6,7 +6,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    cache: redis
+    name: redis
     short_description: Use Redis DB for cache
     description:
         - This cache uses JSON formatted, per host records saved in Redis.

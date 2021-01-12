@@ -6,7 +6,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    lookup: chef_databag
+    name: chef_databag
     short_description: fetches data from a Chef Databag
     description:
        - "This is a lookup plugin to provide access to chef data bags using the pychef package.

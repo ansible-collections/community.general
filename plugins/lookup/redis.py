@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: redis
+    name: redis
     author:
       - Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
       - Ansible Core Team

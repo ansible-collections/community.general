@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: unixy
+    name: unixy
     type: stdout
     author: Allyson Bowles (@akatch)
     short_description: condensed Ansible output

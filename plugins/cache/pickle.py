@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    cache: pickle
+    name: pickle
     short_description: Pickle formatted files.
     description:
         - This cache uses Python's pickle serialization format, in per host files, saved to the filesystem.

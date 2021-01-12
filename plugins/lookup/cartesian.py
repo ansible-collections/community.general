@@ -6,7 +6,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    lookup: cartesian
+    name: cartesian
     short_description: returns the cartesian product of lists
     description:
         - Takes the input lists and returns a list that represents the product of the input lists.

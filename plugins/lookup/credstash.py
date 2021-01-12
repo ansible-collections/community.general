@@ -6,7 +6,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    lookup: credstash
+    name: credstash
     short_description: retrieve secrets from Credstash on AWS
     requirements:
       - credstash (python library)

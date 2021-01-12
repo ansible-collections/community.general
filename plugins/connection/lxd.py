@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Matt Clay (@mattclay) <matt@mystile.com>
-    connection: lxd
+    name: lxd
     short_description: Run tasks in lxc containers via lxc CLI
     description:
         - Run commands or put/fetch files to an existing lxc container using lxc CLI

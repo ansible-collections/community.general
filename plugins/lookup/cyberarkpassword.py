@@ -6,7 +6,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    lookup: cyberarkpassword
+    name: cyberarkpassword
     short_description: get secrets from CyberArk AIM
     requirements:
       - CyberArk AIM tool installed

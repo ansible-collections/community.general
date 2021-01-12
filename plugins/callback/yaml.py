@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    callback: yaml
+    name: yaml
     type: stdout
     short_description: yaml-ized Ansible screen output
     description:
