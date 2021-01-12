@@ -1,0 +1,2 @@
+minor_changes:
+- homebrew_tap - provide error message to user when module fails (https://github.com/ansible-collections/community.general/issues/1411).
