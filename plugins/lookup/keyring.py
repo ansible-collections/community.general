@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: keyring
+    name: keyring
     author:
       - Samuel Boucher (!UNKNOWN) <boucher.samuel.c@gmail.com>
     requirements:

@@ -6,7 +6,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    callback: logentries
+    name: logentries
     type: notification
     short_description: Sends events to Logentries
     description:

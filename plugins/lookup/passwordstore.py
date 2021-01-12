@@ -6,7 +6,7 @@ __metaclass__ = type
 
 
 DOCUMENTATION = '''
-    lookup: passwordstore
+    name: passwordstore
     author:
       - Patrick Deelman (!UNKNOWN) <patrick@patrickdeelman.nl>
     short_description: manage passwords with passwordstore.org's pass utility

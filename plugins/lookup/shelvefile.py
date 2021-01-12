@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: shelvefile
+    name: shelvefile
     author: Alejandro Guirao (!UNKNOWN) <lekumberri@gmail.com>
     short_description: read keys from Python shelve file
     description:

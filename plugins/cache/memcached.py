@@ -7,7 +7,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Unknown (!UNKNOWN)
-    cache: memcached
+    name: memcached
     short_description: Use memcached DB for cache
     description:
         - This cache uses JSON formatted, per host records saved in memcached.
