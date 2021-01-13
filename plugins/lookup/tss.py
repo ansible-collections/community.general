@@ -76,9 +76,11 @@ EXAMPLES = '''
       secret: "{{ lookup('community.general.tss', 1) }}"
   tasks:
       - ansible.builtin.debug:
-          msg="the password is {{ (secret['items'] | >
-          items2dict(key_name='slug',
-          value_name='itemValue'))['password'] }}"
+          msg: >
+            the password is {
+              (secret['items'] | items2dict(key_name='slug',
+                                            value_name='itemValue'))['password']
+            }}
 
 '''
 
