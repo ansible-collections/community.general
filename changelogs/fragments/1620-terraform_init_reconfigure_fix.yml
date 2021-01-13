@@ -1,0 +1,2 @@
+bugfixes:
+- terraform - fix ``init_reconfigure`` option for proper CLI args (https://github.com/ansible-collections/community.general/pull/1620).
