@@ -61,7 +61,7 @@ class LdapGeneric(object):
 
         connection = ldap.initialize(self.server_uri)
         # Switch off chasing of referrals (https://github.com/ansible-collections/community.general/issues/1067)
-        connection.set_option(ldap.OPT_REFERRALS, 0) 
+        connection.set_option(ldap.OPT_REFERRALS, 0)
 
         if self.start_tls:
             try:
