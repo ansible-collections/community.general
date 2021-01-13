@@ -54,7 +54,7 @@ options:
       - Support for masked values requires GitLab >= 11.10.
       - A I(value) must be a string or a number.
       - Field I(variable_type) must be a string with either C(env_var), which is the default, or C(file).
-      - Field I(environment_scope) must be a string defined by scope environment, whitch is C(*) the default.
+      - Field I(environment_scope) must be a string defined by scope environment.
       - When a value is masked, it must be in Base64 and have a length of at least 8 characters.
         See GitLab documentation on acceptable values for a masked variable (https://docs.gitlab.com/ce/ci/variables/#masked-variables).
     default: {}
@@ -169,10 +169,14 @@ class GitlabProjectVariables(object):
     def create_variable(self, key, value, masked, protected, variable_type, environment_scope):
         if self._module.check_mode:
             return
-        return self.project.variables.create({"key": key, "value": value,
-                                              "masked": masked, "protected": protected,
-                                              "variable_type": variable_type,
-                                              "environment_scope": environment_scope})
+        var = {
+            "key": key, "value": value,
+            "masked": masked, "protected": protected,
+            "variable_type": variable_type
+        }
+        if environment_scope is not None:
+            var["environment_scope"] = environment_scope
+        return self.project.variables.create(var)
 
     def update_variable(self, key, var, value, masked, protected, variable_type, environment_scope):
         if (var.value == value and var.protected == protected and var.masked == masked
@@ -213,13 +217,13 @@ def native_python_main(this_gitlab, purge, var_list, state, module):
             masked = False
             protected = False
             variable_type = 'env_var'
-            environment_scope = '*'
+            environment_scope = None
         elif isinstance(var_list[key], dict):
             value = var_list[key].get('value')
             masked = var_list[key].get('masked', False)
             protected = var_list[key].get('protected', False)
             variable_type = var_list[key].get('variable_type', 'env_var')
-            environment_scope = var_list[key].get('environment_scope', '*')
+            environment_scope = var_list[key].get('environment_scope')
         else:
             module.fail_json(msg="value must be of type string, integer or dict")
 
