@@ -1,11 +1,6 @@
 shippable/posix/group2
 skip/python2
 skip/freebsd
-skip/centos6
-skip/centos7
-skip/fedora28
-skip/opensuse15py2
-skip/ubuntu1404
-skip/ubuntu1604
 skip/macos
 skip/osx
+skip/rhel8.2
