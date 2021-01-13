@@ -219,7 +219,7 @@ def init_plugins(bin_path, project_path, backend_config, backend_config_files, i
         for f in backend_config_files:
             command.extend(['-backend-config', f])
     if init_reconfigure:
-        command.extend('-reconfigure')
+        command.extend(['-reconfigure'])
     rc, out, err = module.run_command(command, cwd=project_path)
     if rc != 0:
         module.fail_json(msg="Failed to initialize Terraform modules:\r\n{0}".format(err))
