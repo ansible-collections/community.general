@@ -61,16 +61,16 @@ options:
         required: false
 """
 
-RETURN = '''
+RETURN = r"""
 _list:
     description:
         - The JSON responses to C(GET /secrets/{id}).
         - See U(https://updates.thycotic.net/secretserver/restapiguide/TokenAuth/#operation--secrets--id--get).
     type: list
     elements: dict
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = r"""
 - hosts: localhost
   vars:
       secret: "{{ lookup('community.general.tss', 1) }}"
@@ -82,7 +82,7 @@ EXAMPLES = '''
                                             value_name='itemValue'))['password']
             }}
 
-'''
+"""
 
 from ansible.errors import AnsibleError, AnsibleOptionsError
 
