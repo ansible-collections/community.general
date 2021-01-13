@@ -6,9 +6,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-import traceback
-import os
 __metaclass__ = type
 
 
@@ -45,19 +42,21 @@ options:
   script:
     description:
       - The script you'd like to run.
+    required: true
     type: str
   return_rows:
     description:
       - When true, returns an array of rows in the return values. (Always false.)
     default: false
-    type: Boolean
+    type: bool
 notes:
    - Requires the pymssql Python package on the remote host. For Ubuntu, this
      is as easy as pip install pymssql (See M(ansible.builtin.pip).)
 requirements:
    - python >= 2.7
    - pymssql
-author: Steven Tobias (github.com/stobias123)
+author:
+  - Steven Tobias (@stobias123)
 '''
 
 EXAMPLES = '''
@@ -73,19 +72,15 @@ EXAMPLES = '''
   community.general.mssql_script:
     db: mydb
     script: "{{lookup('file', 'seed.sql')}}"
-
-- name: Run Migrations
-  community.general.mssql_script:
-    db: mydb
-    script: "{{lookup('file', item)}}"
-  with_fileglob:
-    - "/path_to_scripts/*.sql'
-
 '''
 
 RETURN = '''
 #
 '''
+
+import traceback
+import os
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
 
 PYMSSQL_IMP_ERR = None
@@ -103,7 +98,7 @@ def db_exists(conn, cursor, db):
     conn.commit()
     return bool(cursor.rowcount)
 
-def db_execute(conn, cursor,script):
+def db_execute(conn, cursor, script):
     try:
       cursor.execute(script)
       conn.commit()
@@ -115,13 +110,13 @@ def db_execute(conn, cursor,script):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            db=dict(default=None, required=True),
+            db=dict(required=True),
             login_user=dict(default=''),
             login_password=dict(default='', no_log=True),
             login_host=dict(required=True),
             login_port=dict(default='1433'),
-            script=dict(default=None,required=True),
-            return_rows=dict(default=False)
+            script=dict(required=True),
+            return_rows=dict(type='bool',default=False)
         )
     )
 
@@ -133,8 +128,8 @@ def main():
     script = module.params['script']
     #return_rows = module.params['return_rows']
     return_rows = False
-    
-    
+
+
     login_user = module.params['login_user']
     login_password = module.params['login_password']
     login_host = module.params['login_host']
