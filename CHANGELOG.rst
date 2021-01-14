@@ -5,6 +5,24 @@ Community General Release Notes
 .. contents:: Topics
 
 
+v1.3.4
+======
+
+Release Summary
+---------------
+
+Bugfix/security release that addresses CVE-2021-20180.
+
+Security Fixes
+--------------
+
+- bitbucket_pipeline_variable - **CVE-2021-20180** - hide user sensitive information which are marked as ``secured`` from logging into the console (https://github.com/ansible-collections/community.general/pull/1635).
+
+Bugfixes
+--------
+
+- npm - handle json decode exception while parsing command line output (https://github.com/ansible-collections/community.general/issues/1614).
+
 v1.3.3
 ======
 

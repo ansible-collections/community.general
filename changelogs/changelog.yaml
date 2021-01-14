@@ -1802,3 +1802,16 @@ releases:
     - kubevirt-migration.yml
     - snmp_facts.yml
     release_date: '2021-01-13'
+  1.3.4:
+    changes:
+      bugfixes:
+      - npm - handle json decode exception while parsing command line output (https://github.com/ansible-collections/community.general/issues/1614).
+      release_summary: Bugfix/security release that addresses CVE-2021-20180.
+      security_fixes:
+      - bitbucket_pipeline_variable - **CVE-2021-20180** - hide user sensitive information
+        which are marked as ``secured`` from logging into the console (https://github.com/ansible-collections/community.general/pull/1635).
+    fragments:
+    - 1.3.4.yml
+    - 1614_npm.yml
+    - cve_bitbucket_pipeline_variable.yml
+    release_date: '2021-01-14'
