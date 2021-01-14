@@ -7,39 +7,39 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: npm
 short_description: Manage node.js packages with npm
 description:
-  - Manage node.js packages with Node Package Manager (npm)
+  - Manage node.js packages with Node Package Manager (npm).
 author: "Chris Hoffman (@chrishoffman)"
 options:
   name:
     description:
-      - The name of a node.js library to install
+      - The name of a node.js library to install.
     type: str
     required: false
   path:
     description:
-      - The base path where to install the node.js libraries
+      - The base path where to install the node.js libraries.
     type: path
     required: false
   version:
     description:
-      - The version to be installed
+      - The version to be installed.
     type: str
     required: false
   global:
     description:
-      - Install the node.js library globally
+      - Install the node.js library globally.
     required: false
     default: no
     type: bool
   executable:
     description:
       - The executable location for npm.
-      - This is useful if you are using a version manager, such as nvm
+      - This is useful if you are using a version manager, such as nvm.
     type: path
     required: false
   ignore_scripts:
@@ -55,12 +55,12 @@ options:
     default: no
   ci:
     description:
-      - Install packages based on package-lock file, same as running npm ci
+      - Install packages based on package-lock file, same as running C(npm ci).
     type: bool
     default: no
   production:
     description:
-      - Install dependencies in production mode, excluding devDependencies
+      - Install dependencies in production mode, excluding devDependencies.
     required: false
     type: bool
     default: no
@@ -71,7 +71,7 @@ options:
     type: str
   state:
     description:
-      - The state of the node.js library
+      - The state of the node.js library.
     required: false
     type: str
     default: present
@@ -80,7 +80,7 @@ requirements:
     - npm installed in bin path (recommended /usr/local/bin)
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Install "coffee-script" node.js package.
   community.general.npm:
     name: coffee-script
@@ -124,12 +124,12 @@ EXAMPLES = '''
     state: present
 '''
 
+import json
 import os
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-
-import json
+from ansible.module_utils._text import to_native
 
 
 class Npm(object):
@@ -155,7 +155,7 @@ class Npm(object):
         else:
             self.name_version = self.name
 
-    def _exec(self, args, run_in_check_mode=False, check_rc=True):
+    def _exec(self, args, run_in_check_mode=False, check_rc=True, add_package_name=True):
         if not self.module.check_mode or (self.module.check_mode and run_in_check_mode):
             cmd = self.executable + args
 
@@ -167,7 +167,7 @@ class Npm(object):
                 cmd.append('--ignore-scripts')
             if self.unsafe_perm:
                 cmd.append('--unsafe-perm')
-            if self.name:
+            if self.name and add_package_name:
                 cmd.append(self.name_version)
             if self.registry:
                 cmd.append('--registry')
@@ -191,7 +191,11 @@ class Npm(object):
 
         installed = list()
         missing = list()
-        data = json.loads(self._exec(cmd, True, False))
+        data = {}
+        try:
+            data = json.loads(self._exec(cmd, True, False, False) or '{}')
+        except (getattr(json, 'JSONDecodeError', ValueError)) as e:
+            self.module.fail_json(msg="Failed to parse NPM output with error %s" % to_native(e))
         if 'dependencies' in data:
             for dep in data['dependencies']:
                 if 'missing' in data['dependencies'][dep] and data['dependencies'][dep]['missing']:
