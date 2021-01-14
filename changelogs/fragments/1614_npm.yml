@@ -1,0 +1,2 @@
+bugfixes:
+- npm - handle json decode exception while parsing command line output (https://github.com/ansible-collections/community.general/issues/1614).
