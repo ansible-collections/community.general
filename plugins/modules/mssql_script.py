@@ -14,16 +14,16 @@ DOCUMENTATION = '''
 module: mssql_script
 short_description: Run simple, file based, or templated mssql scripts
 description:
-   - Run simple, file based, or templated mssql scripts
+   - Run simple, file based, or templated mssql scripts.
 options:
   db:
     description:
-      - name of the database to select
+      - Name of the database to connect to.
     required: true
     type: str
   login_user:
     description:
-      - The username used to authenticate with
+      - The username used to authenticate with.
     type: str
   login_password:
     description:
@@ -36,22 +36,23 @@ options:
     required: true
   login_port:
     description:
-      - Port of the MSSQL server. Requires login_host be defined as other than localhost if login_port is used
+      - Port of the MSSQL server. Requires I(login_host) be defined as other than localhost if I(login_port) is used.
     default: '1433'
-    type: str
+    type: int
   script:
     description:
-      - The script you'd like to run.
+      - The script you would like to run.
     required: true
     type: str
   return_rows:
     description:
-      - When true, returns an array of rows in the return values. (Always false.)
+      - When C(true), returns an array of rows in the return values. (Always false.)
     default: false
     type: bool
 notes:
    - Requires the pymssql Python package on the remote host. For Ubuntu, this
-     is as easy as pip install pymssql (See M(ansible.builtin.pip).)
+     is as easy as pip install pymssql (See M(ansible.builtin.pip)).
+   - Does not support C(check_mode).
 requirements:
    - python >= 2.7
    - pymssql
@@ -60,15 +61,15 @@ author:
 '''
 
 EXAMPLES = '''
-- name: run a simple script to check 
-  mssql_script:
+- name: Run a simple script to check 
+  community.general.mssql_script:
     db: mydb
     login_user: user
     login_password: pass
     login_host: foo.bar
     script: "drop table foo"
 
-- name: Seed the db.
+- name: Seed the database
   community.general.mssql_script:
     db: mydb
     script: "{{lookup('file', 'seed.sql')}}"
