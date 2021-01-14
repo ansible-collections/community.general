@@ -1,2 +1,2 @@
 bugfixes:
-- terraform - adding ``check_rc`` option for commands in terraform.py (https://github.com/ansible-collections/community.general/pull/1632).
+- terraform - improve result code checking when executing terraform commands (https://github.com/ansible-collections/community.general/pull/1632).
