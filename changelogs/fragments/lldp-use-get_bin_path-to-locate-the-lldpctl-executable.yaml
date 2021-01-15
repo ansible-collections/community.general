@@ -1,0 +1,2 @@
+minor_changes:
+  - lldp - use get_bin_path to locate the lldpctl executable
