@@ -157,7 +157,7 @@
           register: sysrc_example4_idempotent
 
         - name: Get file content
-          shell: "cat {{ testjail_path.stdout }}/etc/rc.conf | grep nginx_enable"
+          shell: "cat /usr/jails/testjail/etc/rc.conf | grep nginx_enable"
           register: sysrc_example4_content
 
         - name: Ensure sysrc worked in testjail
