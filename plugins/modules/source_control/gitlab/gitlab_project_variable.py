@@ -180,14 +180,16 @@ class GitlabProjectVariables(object):
 
     def update_variable(self, key, var, value, masked, protected, variable_type, environment_scope):
         if (var.value == value and var.protected == protected and var.masked == masked
-                and var.variable_type == variable_type and var.environment_scope == environment_scope):
+                and var.variable_type == variable_type
+                and (var.environment_scope == environment_scope or environment_scope is None)):
             return False
 
         if self._module.check_mode:
             return True
 
         if (var.protected == protected and var.masked == masked
-                and var.variable_type == variable_type and var.environment_scope == environment_scope):
+                and var.variable_type == variable_type
+                and (var.environment_scope == environment_scope or environment_scope is None)):
             var.value = value
             var.save()
             return True
