@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2014, Vedit Firat Arig <firatarig@gmail.com>
+# Copyright: (c) 2014, Vedit Firat Arig <firatarig@gmail.com>
 # Outline and parts are reused from Mark Theunissen's mysql_db module
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: mssql_script
 short_description: Run simple, file based, or templated mssql scripts
@@ -27,11 +27,11 @@ options:
     type: str
   login_password:
     description:
-      - The password used to authenticate with
+      - The password used to authenticate with.
     type: str
   login_host:
     description:
-      - Host running the database
+      - Host running the database.
     type: str
     required: true
   login_port:
@@ -60,7 +60,7 @@ author:
   - Steven Tobias (@stobias123)
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Run a simple script to check 
   community.general.mssql_script:
     db: mydb
