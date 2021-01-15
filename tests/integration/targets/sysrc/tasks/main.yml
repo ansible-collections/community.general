@@ -130,6 +130,9 @@
     ##
     ## sysrc - example - Enable nginx in testjail
     ##
+    - name: Setup testjail
+      include: setup-testjail.yml
+
     - name: Enable nginx in test jail
       sysrc:
         name: nginx_enable
@@ -153,7 +156,7 @@
       register: sysrc_example4_idempotent
 
     - name: Get file content
-      shell: "cat `jls | grep stream | awk '{ print $4; }'`/etc/rc.conf | egrep -v ^\\#"
+      shell: "cat /usr/jails/testjail/etc/rc.conf | egrep -v nginx_enable"
       register: sysrc_example4_content
 
     - name: Ensure sysrc worked in testjail
@@ -163,6 +166,10 @@
           - sysrc_example4_checkmode.changed
           - not sysrc_example4_idempotent.changed
           - "'nginx_enable=\"YES\"' in sysrc_example4_content.stdout_lines"
+
+    - name: Stop and remove testjail
+      when: is_testjail_up.rc == 1
+      command: "ezjail-admin delete -wf testjail"
 
     ##
     ## sysrc - Test Absent

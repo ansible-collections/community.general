@@ -1,0 +1,4 @@
+---
+- name: stop & delete testjail
+  when: is_testjail_up.rc == 1
+  command: "ezjail-admin delete testjail"
