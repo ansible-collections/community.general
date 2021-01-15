@@ -28,7 +28,6 @@
       sysrc:
         name: mysql_pidfile
         value: /tmp/mysql.pid
-      check_mode: yes
       register: sysrc_example1_idempotent
 
     - name: Get file content
@@ -130,46 +129,49 @@
     ##
     ## sysrc - example - Enable nginx in testjail
     ##
-    - name: Setup testjail
-      include: setup-testjail.yml
+    - name: Test within jail
+      block:
+        - name: Setup testjail
+          include: setup-testjail.yml
 
-    - name: Enable nginx in test jail
-      sysrc:
-        name: nginx_enable
-        value: "YES"
-        jail: testjail
-      register: sysrc_example4
+        - name: Enable nginx in test jail
+          sysrc:
+            name: nginx_enable
+            value: "YES"
+            jail: testjail
+          register: sysrc_example4
 
-    - name: Enable nginx in test jail (checkmode)
-      sysrc:
-        name: nginx_enable
-        value: "NO"
-        jail: testjail
-      check_mode: yes
-      register: sysrc_example4_checkmode
+        - name: Enable nginx in test jail (checkmode)
+          sysrc:
+            name: nginx_enable
+            value: "NO"
+            jail: testjail
+          check_mode: yes
+          register: sysrc_example4_checkmode
 
-    - name: Enable nginx in test jail (idempotent)
-      sysrc:
-        name: nginx_enable
-        value: "YES"
-        jail: testjail
-      register: sysrc_example4_idempotent
+        - name: Enable nginx in test jail (idempotent)
+          sysrc:
+            name: nginx_enable
+            value: "YES"
+            jail: testjail
+          register: sysrc_example4_idempotent
 
-    - name: Get file content
-      shell: "cat /usr/jails/testjail/etc/rc.conf | egrep -v nginx_enable"
-      register: sysrc_example4_content
+        - name: Get file content
+          shell: "cat {{ testjail_path.stdout }}/etc/rc.conf | grep nginx_enable"
+          register: sysrc_example4_content
 
-    - name: Ensure sysrc worked in testjail
-      assert:
-        that:
-          - sysrc_example4.changed
-          - sysrc_example4_checkmode.changed
-          - not sysrc_example4_idempotent.changed
-          - "'nginx_enable=\"YES\"' in sysrc_example4_content.stdout_lines"
-
-    - name: Stop and remove testjail
-      when: is_testjail_up.rc == 1
-      command: "ezjail-admin delete -wf testjail"
+        - name: Ensure sysrc worked in testjail
+          assert:
+            that:
+              - sysrc_example4.changed
+              - sysrc_example4_checkmode.changed
+              - not sysrc_example4_idempotent.changed
+              - "'nginx_enable=\"YES\"' in sysrc_example4_content.stdout_lines"
+      always:
+        - name: Stop and remove testjail
+          failed_when: false
+          changed_when: false
+          command: "ezjail-admin delete -wf testjail"
 
     ##
     ## sysrc - Test Absent

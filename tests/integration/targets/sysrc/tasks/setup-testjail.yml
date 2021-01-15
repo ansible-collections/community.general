@@ -13,7 +13,7 @@
   command: "service netif cloneup"
   changed_when: false
 
-- name: install ezjail
+- name: Install ezjail
   pkgng:
     name: ezjail
 
@@ -24,39 +24,39 @@
     regexp: ^ezjail_ftphost
     line: ezjail_ftphost=ftp-archive.freebsd.org
 
-- name: start ezjail
+- name: Start ezjail
   ignore_errors: yes
   service:
     name: ezjail
     state: started
     enabled: yes
 
-- name: has ezjail
+- name: Has ezjail
   register: ezjail_base_jail
   stat:
     path: /usr/jails/basejail
 
-- name: ezjail base
+- name: Setup ezjail base
   when: not ezjail_base_jail.stat.exists
   shell: "ezjail-admin install >> /tmp/ezjail.log"
   changed_when: false
 
-- name: has ezjail testjail
+- name: Has testjail
   register: ezjail_test_jail
   stat:
     path: /usr/jails/testjail
 
-- name: testjail commands
+- name: Create testjail
   when: not ezjail_test_jail.stat.exists
   shell: "ezjail-admin create testjail 'lo1|127.0.1.1' >> /tmp/ezjail.log"
   changed_when: false
 
-- name: is testjail running
+- name: Is testjail running
   shell: "jls | grep testjail"
   changed_when: false
   failed_when: false
   register: is_testjail_up
 
-- name: start testjail
+- name: Start testjail
   when: is_testjail_up.rc == 1
   command: "ezjail-admin start testjail"
