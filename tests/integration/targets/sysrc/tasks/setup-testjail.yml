@@ -1,0 +1,62 @@
+---
+#
+# Instructions for setting up a jail
+# https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/jails-ezjail.html
+#
+- name: Setup cloned interfaces
+  lineinfile:
+    dest: /etc/rc.conf
+    regexp: ^cloned_interfaces=lo1
+    line: cloned_interfaces=lo1
+
+- name: Activate cloned interfaces
+  command: "service netif cloneup"
+  changed_when: false
+
+- name: Install ezjail
+  pkgng:
+    name: ezjail
+
+- name: Configure ezjail to use archive for old freebsd releases
+  when: ansible_distribution_version is version('11.01', '<=')
+  lineinfile:
+    dest: /usr/local/etc/ezjail.conf
+    regexp: ^ezjail_ftphost
+    line: ezjail_ftphost=ftp-archive.freebsd.org
+
+- name: Start ezjail
+  ignore_errors: yes
+  service:
+    name: ezjail
+    state: started
+    enabled: yes
+
+- name: Has ezjail
+  register: ezjail_base_jail
+  stat:
+    path: /usr/jails/basejail
+
+- name: Setup ezjail base
+  when: not ezjail_base_jail.stat.exists
+  shell: "ezjail-admin install >> /tmp/ezjail.log"
+  changed_when: false
+
+- name: Has testjail
+  register: ezjail_test_jail
+  stat:
+    path: /usr/jails/testjail
+
+- name: Create testjail
+  when: not ezjail_test_jail.stat.exists
+  shell: "ezjail-admin create testjail 'lo1|127.0.1.1' >> /tmp/ezjail.log"
+  changed_when: false
+
+- name: Is testjail running
+  shell: "jls | grep testjail"
+  changed_when: false
+  failed_when: false
+  register: is_testjail_up
+
+- name: Start testjail
+  when: is_testjail_up.rc == 1
+  command: "ezjail-admin start testjail"
