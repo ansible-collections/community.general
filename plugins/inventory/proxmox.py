@@ -30,14 +30,20 @@ DOCUMENTATION = '''
         description: URL to Proxmox cluster.
         default: 'http://localhost:8006'
         type: str
+        env:
+          - name: PROXMOX_URL
       user:
         description: Proxmox authentication user.
         required: yes
         type: str
+        env:
+          - name: PROXMOX_USER
       password:
         description: Proxmox authentication password.
         required: yes
         type: str
+        env:
+          - name: PROXMOX_PASSWORD
       validate_certs:
         description: Verify SSL certificate if using HTTPS.
         type: boolean
