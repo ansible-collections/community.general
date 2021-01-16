@@ -27,19 +27,25 @@ DOCUMENTATION = '''
         choices: ['community.general.proxmox']
         type: str
       url:
-        description: URL to Proxmox cluster.
+        description:
+          - URL to Proxmox cluster.
+          - If the value is not specified in the task, the value of environment variable C(PROXMOX_URL) will be used instead.
         default: 'http://localhost:8006'
         type: str
         env:
           - name: PROXMOX_URL
       user:
-        description: Proxmox authentication user.
+        description:
+          - Proxmox authentication user.
+          - If the value is not specified in the task, the value of environment variable C(PROXMOX_USER) will be used instead.
         required: yes
         type: str
         env:
           - name: PROXMOX_USER
       password:
-        description: Proxmox authentication password.
+        description:
+          - Proxmox authentication password.
+          - If the value is not specified in the task, the value of environment variable C(PROXMOX_PASSWORD) will be used instead.
         required: yes
         type: str
         env:
