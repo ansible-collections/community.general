@@ -236,7 +236,7 @@ class OnePass(object):
         """
         data = json.loads(data_json)
         if section_title is None:
-            # GitHub PR 1610:
+            # https://github.com/ansible-collections/community.general/pull/1610:
             # check the details dictionary for `field_name` and return it immediately if it exists
             # when the entry is a "password" instead of a "login" item, the password field is a key
             # in the `details` dictionary:
