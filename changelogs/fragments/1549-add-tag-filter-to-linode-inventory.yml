@@ -1,0 +1,4 @@
+minor_changes:
+        - linode inventory plugin - add support for ``tags`` option to filter
+          instances by tag
+          (https://github.com/ansible-collections/community.general/issues/1549).
