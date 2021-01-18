@@ -1,5 +1,5 @@
 minor_changes:
-  - community.general.telegram - now can call any methods in Telegram bot API.
+  - telegram - now can call any methods in Telegram bot API.
     Previously this module was hardcoded to use "SendMessage" only.
-  - With previous change, usage of "SendMessage" API method was also librated,
-    and now you can specify any arguments you need, for example, "disable_notificaton".
+    Usage of "SendMessage" API method was also librated,
+    and now you can specify any arguments you need, for example, "disable_notificaton" (https://github.com/ansible-collections/community.general/pull/1642).
