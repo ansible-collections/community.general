@@ -1,2 +1,2 @@
 minor_changes:
-- gitlab_project_variable - add support for environment_scope on projects variables (https://github.com/ansible-collections/community.general/pull/1197).
+- gitlab_project_variable - add support for ``environment_scope`` on projects variables (https://github.com/ansible-collections/community.general/pull/1197).
