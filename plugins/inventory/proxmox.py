@@ -34,7 +34,7 @@ DOCUMENTATION = '''
         type: str
         env:
           - name: PROXMOX_URL
-            version_added: 2.2.0
+            version_added: 2.0.0
       user:
         description:
           - Proxmox authentication user.
@@ -43,7 +43,7 @@ DOCUMENTATION = '''
         type: str
         env:
           - name: PROXMOX_USER
-            version_added: 2.2.0
+            version_added: 2.0.0
       password:
         description:
           - Proxmox authentication password.
@@ -52,7 +52,7 @@ DOCUMENTATION = '''
         type: str
         env:
           - name: PROXMOX_PASSWORD
-            version_added: 2.2.0
+            version_added: 2.0.0
       validate_certs:
         description: Verify SSL certificate if using HTTPS.
         type: boolean
