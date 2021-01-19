@@ -77,9 +77,11 @@ EXAMPLES = r"""
   tasks:
       - ansible.builtin.debug:
           msg: >
-            the password is {{(secret['items']
-            | items2dict(key_name='slug',
-            value_name='itemValue'))['password']}}
+            the password is {{
+              (secret['items']
+                | items2dict(key_name='slug',
+                             value_name='itemValue'))['password']
+            }}
 """
 
 from ansible.errors import AnsibleError, AnsibleOptionsError
