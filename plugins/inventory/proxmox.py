@@ -27,17 +27,32 @@ DOCUMENTATION = '''
         choices: ['community.general.proxmox']
         type: str
       url:
-        description: URL to Proxmox cluster.
+        description:
+          - URL to Proxmox cluster.
+          - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_URL) will be used instead.
         default: 'http://localhost:8006'
         type: str
+        env:
+          - name: PROXMOX_URL
+            version_added: 2.0.0
       user:
-        description: Proxmox authentication user.
+        description:
+          - Proxmox authentication user.
+          - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_USER) will be used instead.
         required: yes
         type: str
+        env:
+          - name: PROXMOX_USER
+            version_added: 2.0.0
       password:
-        description: Proxmox authentication password.
+        description:
+          - Proxmox authentication password.
+          - If the value is not specified in the inventory configuration, the value of environment variable C(PROXMOX_PASSWORD) will be used instead.
         required: yes
         type: str
+        env:
+          - name: PROXMOX_PASSWORD
+            version_added: 2.0.0
       validate_certs:
         description: Verify SSL certificate if using HTTPS.
         type: boolean
