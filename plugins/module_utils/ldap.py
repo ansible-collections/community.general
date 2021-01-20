@@ -26,6 +26,7 @@ def gen_specs(**specs):
         'bind_dn': dict(),
         'bind_pw': dict(default='', no_log=True),
         'dn': dict(required=True),
+        'referrals_chasing': dict(type='str', default='anonymous', choices=['disabled', 'anonymous']),
         'server_uri': dict(default='ldapi:///'),
         'start_tls': dict(default=False, type='bool'),
         'validate_certs': dict(default=True, type='bool'),
@@ -41,6 +42,7 @@ class LdapGeneric(object):
         self.bind_dn = self.module.params['bind_dn']
         self.bind_pw = self.module.params['bind_pw']
         self.dn = self.module.params['dn']
+        self.referrals_chasing = self.module.params['referrals_chasing']
         self.server_uri = self.module.params['server_uri']
         self.start_tls = self.module.params['start_tls']
         self.verify_cert = self.module.params['validate_certs']
@@ -60,8 +62,10 @@ class LdapGeneric(object):
             ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
 
         connection = ldap.initialize(self.server_uri)
-        # Switch off chasing of referrals (https://github.com/ansible-collections/community.general/issues/1067)
-        connection.set_option(ldap.OPT_REFERRALS, 0)
+        
+        if self.referrals_chasing is 'disabled':
+            # Switch off chasing of referrals (https://github.com/ansible-collections/community.general/issues/1067)
+            connection.set_option(ldap.OPT_REFERRALS, 0)
 
         if self.start_tls:
             try:

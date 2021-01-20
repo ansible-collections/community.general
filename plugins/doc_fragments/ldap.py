@@ -27,6 +27,12 @@ options:
     description:
       - The DN of the entry to add or remove.
     type: str
+  referrals_chasing:
+    choices: [disabled, anonymous]
+    default: anonymous
+    type: str
+    description:
+      - Set the referrals chasing behavior.
   server_uri:
     description:
       - A URI to the LDAP server.
