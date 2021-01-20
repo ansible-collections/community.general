@@ -113,7 +113,7 @@ class ScalyrLogSource(object):
             "sessionInfo": {
                 "serverHost": result._host.get_name(),
                 "logfile": "ansible.log",
-                "parser": ""
+                "parser": "json"
             },
             "events": [
                 {
