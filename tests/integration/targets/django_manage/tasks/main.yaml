@@ -1,0 +1,50 @@
+# Test code for django_manage module
+#
+# Copyright: (c) 2020, Alexei Znamensky <russoz@gmail.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+- name: Create temporary test directory
+  tempfile:
+    state: directory
+    suffix: .django_manage
+  register: tmp_django_root
+
+- name: Install required library
+  pip:
+    name: django
+    state: present
+    virtualenv: "{{ tmp_django_root.path }}/venv"
+
+- name: Copy files
+  copy:
+    src: base_test/
+    dest: "{{ tmp_django_root.path }}"
+    mode: preserve
+
+- name: Create project
+  command:
+    chdir: "{{ tmp_django_root.path }}/startproj"
+    cmd: "{{ tmp_django_root.path }}/venv/bin/django-admin startproject test_django_manage_1"
+
+- name: Create app
+  command:
+    chdir: "{{ tmp_django_root.path }}/startproj"
+    cmd: "{{ tmp_django_root.path }}/venv/bin/django-admin startapp app1"
+
+- name: Check
+  community.general.django_manage:
+    project_path: "{{ tmp_django_root.path }}/startproj/test_django_manage_1"
+    command: check
+    virtualenv: "{{ tmp_django_root.path }}/venv"
+
+- name: Check simple_project
+  community.general.django_manage:
+    project_path: "{{ tmp_django_root.path }}/simple_project/p1"
+    command: check
+    virtualenv: "{{ tmp_django_root.path }}/venv"
+
+- name: Check custom project
+  community.general.django_manage:
+    project_path: "{{ tmp_django_root.path }}/1045-single-app-project/single_app_project"
+    pythonpath: "{{ tmp_django_root.path }}/1045-single-app-project/"
+    command: check
+    virtualenv: "{{ tmp_django_root.path }}/venv"
