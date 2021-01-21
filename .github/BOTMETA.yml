@@ -901,6 +901,8 @@ files:
     maintainers: bcoca
   $modules/system/syspatch.py:
     maintainers: precurse
+  $modules/system/sysrc.py:
+    maintainers: dlundgren
   $modules/system/sysupgrade.py:
     maintainers: precurse
   $modules/system/timezone.py:
