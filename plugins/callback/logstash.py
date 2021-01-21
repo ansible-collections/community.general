@@ -68,7 +68,7 @@ DOCUMENTATION = r'''
 '''
 
 EXAMPLES = r'''
-ansible.cfg: >
+ansible.cfg: |
     # Enable Callback plugin
     [defaults]
         callback_whitelist = community.general.logstash
