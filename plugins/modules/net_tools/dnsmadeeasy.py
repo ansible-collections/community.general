@@ -469,7 +469,7 @@ class DME2(object):
                     value = record_value.split(" ")[1]
                 # Note that TXT records are surrounded by quotes in the API response.
                 elif record_type == "TXT":
-                    value = '"{}"'.format(record_value)
+                    value = '"{0}"'.format(record_value)
                 elif record_type == "SRV":
                     value = record_value.split(" ")[3]
                 else:
