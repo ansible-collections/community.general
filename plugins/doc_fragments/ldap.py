@@ -33,6 +33,8 @@ options:
     type: str
     description:
       - Set the referrals chasing behavior.
+      - C(anonymous) follow referrals anonymously. See python-ldap default beahvior.
+      - C(disabled) disable referrals chasing. See python-ldap OPT_REFERRALS=0 option.
   server_uri:
     description:
       - A URI to the LDAP server.
