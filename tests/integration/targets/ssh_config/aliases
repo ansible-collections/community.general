@@ -2,4 +2,4 @@ destructive
 shippable/posix/group2
 skip/python2.6  # stromssh only supports python3
 skip/python2.7  # stromssh only supports python3
-skip/freebsd # stromssh installation failures on freebsd
+skip/freebsd # stromssh installation fails on freebsd
