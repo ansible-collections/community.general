@@ -23,7 +23,7 @@ DOCUMENTATION = r'''
         ini:
           - section: callback_logstash
             key: server
-        version_added: 1.0.0
+            version_added: 1.0.0
         default: localhost
       port:
         description: Port on which logstash is listening
@@ -32,7 +32,7 @@ DOCUMENTATION = r'''
         ini:
           - section: callback_logstash
             key: port
-        version_added: 1.0.0
+            version_added: 1.0.0
         default: 5000
       type:
         description: Message type
@@ -41,7 +41,7 @@ DOCUMENTATION = r'''
         ini:
           - section: callback_logstash
             key: type
-        version_added: 1.0.0
+            version_added: 1.0.0
         default: ansible
       pre_command:
         description: Executes command before run and result put to ansible_pre_command_output field.
