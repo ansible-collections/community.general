@@ -168,10 +168,14 @@ class LdapSearch(LdapGeneric):
                 attrlist=self.attrlist,
                 attrsonly=self.attrsonly
             )
-            if self.schema:
-                return [dict(dn=result[0], attrs=list(result[1].keys())) for result in results]
-            else:
-                return [_extract_entry(result[0], result[1]) for result in results]
+            ldap_entries = []
+            for result in results:
+              if isinstance(result[1],dict):
+                if self.schema:
+                  ldap_entries.append(dict(dn=result[0], attrs=list(result[1].keys())))
+                else:
+                  ldap_entries.append(_extract_entry(result[0], result[1]))
+            return ldap_entries
         except ldap.NO_SUCH_OBJECT:
             self.module.fail_json(msg="Base not found: {0}".format(self.dn))
 
