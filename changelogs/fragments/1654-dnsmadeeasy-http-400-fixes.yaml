@@ -1,2 +1,2 @@
 bugfixes:
-  - dnsmadeeasy - fix http 400 errors when creating a txt record (https://github.com/ansible-collections/community.general/issues/1237).
+  - dnsmadeeasy - fix HTTP 400 errors when creating a TXT record (https://github.com/ansible-collections/community.general/issues/1237).
