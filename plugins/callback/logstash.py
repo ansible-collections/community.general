@@ -79,7 +79,7 @@ ansible.cfg: |
         pre_command = git rev-parse HEAD
         type = ansible
 
-11-input-tcp.conf: >
+11-input-tcp.conf: |
     # Enable Logstash TCP Input
     input {
             tcp {
