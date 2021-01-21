@@ -467,6 +467,9 @@ class DME2(object):
             for result in self.all_records:
                 if record_type == "MX":
                     value = record_value.split(" ")[1]
+                # Note that TXT records are surrounded by quotes in the API response.
+                elif record_type == "TXT":
+                    value = '"{}"'.format(record_value)
                 elif record_type == "SRV":
                     value = record_value.split(" ")[3]
                 else:
@@ -651,7 +654,9 @@ def main():
     record_changed = False
     if current_record:
         for i in new_record:
-            if str(current_record[i]) != str(new_record[i]):
+            # Remove leading and trailing quote character from values because TXT records
+            # are surrounded by quotes.
+            if str(current_record[i]).strip('"') != str(new_record[i]):
                 record_changed = True
         new_record['id'] = str(current_record['id'])
 
@@ -673,8 +678,11 @@ def main():
         # create record and monitor as the record does not exist
         if not current_record:
             record = DME.createRecord(DME.prepareRecord(new_record))
-            monitor = DME.updateMonitor(record['id'], DME.prepareMonitor(new_monitor))
-            module.exit_json(changed=True, result=dict(record=record, monitor=monitor))
+            if new_monitor['monitor'] and record_type == "A":
+                monitor = DME.updateMonitor(record['id'], DME.prepareMonitor(new_monitor))
+                module.exit_json(changed=True, result=dict(record=record, monitor=monitor))
+            else:
+                module.exit_json(changed=True, result=dict(record=record, monitor=current_monitor))
 
         # update the record
         updated = False
