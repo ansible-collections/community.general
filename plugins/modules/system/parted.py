@@ -217,10 +217,11 @@ EXAMPLES = r'''
 
 - name: Extend an existing partition to fill all available space
   community.general.parted:
-    decice: /dev/sdb
+    device: /dev/sdb
     number: "{{ sdb_info.partitions | length }}"
     part_end: "100%"
     resize: true
+    state: present
 '''
 
 
