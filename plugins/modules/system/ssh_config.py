@@ -85,7 +85,7 @@ options:
 requirements:
 - StormSSH
 notes:
-- Support check mode.
+- Supports check mode.
 '''
 
 EXAMPLES = r'''
