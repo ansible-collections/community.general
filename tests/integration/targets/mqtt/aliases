@@ -5,4 +5,3 @@ skip/osx
 skip/macos
 skip/freebsd
 skip/rhel
-skip/ubuntu2004  # FIXME
