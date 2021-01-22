@@ -150,10 +150,10 @@ stages:
               test: rhel/7.8
             - name: RHEL 8.2
               test: rhel/8.2
-            - name: FreeBSD 11.1
-              test: freebsd/11.1
-            - name: FreeBSD 12.1
-              test: freebsd/12.1
+            - name: FreeBSD 11.4
+              test: freebsd/11.4
+            - name: FreeBSD 12.2
+              test: freebsd/12.2
           groups:
             - 1
             - 2
