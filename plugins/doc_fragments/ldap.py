@@ -35,6 +35,7 @@ options:
       - Set the referrals chasing behavior.
       - C(anonymous) follow referrals anonymously. See python-ldap default beahvior.
       - C(disabled) disable referrals chasing. See python-ldap OPT_REFERRALS=0 option.
+    version_added: 2.0.0
   server_uri:
     description:
       - A URI to the LDAP server.
