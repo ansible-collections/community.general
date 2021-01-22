@@ -1,2 +1,4 @@
 bugfixes:
-  - ldap_search - switch off client-chasing referrals (https://github.com/ansible-collections/community.general/issues/1067)
+  - ldap_search - ignore returned referrals (https://github.com/ansible-collections/community.general/issues/1067).
+minor_changes:
+  - ldap modules - allow to configure referral chasing (https://github.com/ansible-collections/community.general/pull/1618).
