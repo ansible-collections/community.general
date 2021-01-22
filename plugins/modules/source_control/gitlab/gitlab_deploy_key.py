@@ -145,9 +145,9 @@ class GitLabDeployKey(object):
     def createOrUpdateDeployKey(self, project, key_title, key_key, options):
         changed = False
 
-        ## note: unfortunately public key cannot be updated directly by 
-        ##   gitlap rest api, so for that case we need to delete and 
-        ##   than recreate the key
+        # note: unfortunately public key cannot be updated directly by
+        #   gitlap rest api, so for that case we need to delete and
+        #   than recreate the key
         if self.deployKeyObject and self.deployKeyObject.key != key_key:
             self.deployKeyObject.delete()
             self.deployKeyObject = None
