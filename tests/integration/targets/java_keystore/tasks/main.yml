@@ -130,9 +130,10 @@
 
     - name: Validate reults
       assert:
-        - result is changed
-        - result_check is changed
-        - result_idem is not changed
-        - result_idem_check is not changed
-        - result_change is changed
-        - result_change_check is changed
+        that:
+          - result is changed
+          - result_check is changed
+          - result_idem is not changed
+          - result_idem_check is not changed
+          - result_change is changed
+          - result_change_check is changed
