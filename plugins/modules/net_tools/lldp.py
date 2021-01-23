@@ -41,7 +41,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def gather_lldp(module):
-    cmd = ['lldpctl', '-f', 'keyvalue']
+    cmd = [module.get_bin_path('lldpctl'), '-f', 'keyvalue']
     rc, output, err = module.run_command(cmd)
     if output:
         output_dict = {}
