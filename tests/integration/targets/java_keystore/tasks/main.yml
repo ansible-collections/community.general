@@ -1,0 +1,138 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+- when: has_java_keytool
+  block:
+    - name: Create private keys
+      community.crypto.openssl_privatekey:
+        path: "{{ output_dir ~ '/' ~ item.name ~ '.key' }}"
+        size: 2048  # this should work everywhere
+        # The following is more efficient, but might not work everywhere:
+        # type: ECC
+        # curve: secp384r1
+        cipher: "{{ 'auto' if item.passphrase is defined else omit }}"
+        passphrase: "{{ item.passphrase | default(omit) }}"
+      loop:
+        - name: cert
+        - name: cert-pw
+          passphrase: hunter2
+
+    - name: Create CSRs
+      community.crypto.openssl_csr:
+        path: "{{ output_dir ~ '/' ~ item.name ~ '.csr' }}"
+        privatekey_path: "{{ output_dir ~ '/' ~ item.name ~ '.key' }}"
+        privatekey_passphrase: "{{ item.passphrase | default(omit) }}"
+      loop:
+        - name: cert
+        - name: cert-pw
+          passphrase: hunter2
+
+    - name: Create certificate
+      community.crypto.x509_certificate:
+        path: "{{ output_dir ~ '/' ~ item.name ~ '.pem' }}"
+        csr_path: "{{ output_dir ~ '/' ~ item.name ~ '.csr' }}"
+        privatekey_path: "{{ output_dir ~ '/' ~ item.name ~ '.key' }}"
+        privatekey_passphrase: "{{ item.passphrase | default(omit) }}"
+        provider: selfsigned
+      loop:
+        - name: cert
+        - name: cert-pw
+          passphrase: hunter2
+
+    - name: Create a Java key store for the given certificates (check mode)
+      community.general.java_keystore:
+        name: example
+        certificate: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.pem') }}"
+        private_key: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.key') }}"
+        private_key_passphrase: "{{ item.passphrase | default(omit) }}"
+        password: changeit
+        dest: "{{ output_dir ~ '/' ~ item.name ~ '.jks' }}"
+      loop:
+        - name: cert
+        - name: cert-pw
+          passphrase: hunter2
+      check_mode: yes
+      register: result_check
+
+    - name: Create a Java key store for the given certificates
+      community.general.java_keystore:
+        name: example
+        certificate: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.pem') }}"
+        private_key: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.key') }}"
+        private_key_passphrase: "{{ item.passphrase | default(omit) }}"
+        password: changeit
+        dest: "{{ output_dir ~ '/' ~ item.name ~ '.jks' }}"
+      loop:
+        - name: cert
+        - name: cert-pw
+          passphrase: hunter2
+      register: result
+
+    - name: Create a Java key store for the given certificates (idempotency, check mode)
+      community.general.java_keystore:
+        name: example
+        certificate: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.pem') }}"
+        private_key: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.key') }}"
+        private_key_passphrase: "{{ item.passphrase | default(omit) }}"
+        password: changeit
+        dest: "{{ output_dir ~ '/' ~ item.name ~ '.jks' }}"
+      loop:
+        - name: cert
+        - name: cert-pw
+          passphrase: hunter2
+      check_mode: yes
+      register: result_idem_check
+
+    - name: Create a Java key store for the given certificates (idempotency)
+      community.general.java_keystore:
+        name: example
+        certificate: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.pem') }}"
+        private_key: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.key') }}"
+        private_key_passphrase: "{{ item.passphrase | default(omit) }}"
+        password: changeit
+        dest: "{{ output_dir ~ '/' ~ item.name ~ '.jks' }}"
+      loop:
+        - name: cert
+        - name: cert-pw
+          passphrase: hunter2
+      register: result_idem
+
+    - name: Create a Java key store for the given certificates (changed, check mode)
+      community.general.java_keystore:
+        name: example
+        certificate: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.pem') }}"
+        private_key: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.key') }}"
+        private_key_passphrase: "{{ item.passphrase | default(omit) }}"
+        password: hunter2
+        dest: "{{ output_dir ~ '/' ~ item.name ~ '.jks' }}"
+      loop:
+        - name: cert
+        - name: cert-pw
+          passphrase: hunter2
+      check_mode: yes
+      register: result_change_check
+
+    - name: Create a Java key store for the given certificates (changed)
+      community.general.java_keystore:
+        name: example
+        certificate: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.pem') }}"
+        private_key: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.key') }}"
+        private_key_passphrase: "{{ item.passphrase | default(omit) }}"
+        password: hunter2
+        dest: "{{ output_dir ~ '/' ~ item.name ~ '.jks' }}"
+      loop:
+        - name: cert
+        - name: cert-pw
+          passphrase: hunter2
+      register: result_change
+
+    - name: Validate reults
+      assert:
+        - result is changed
+        - result_check is changed
+        - result_idem is not changed
+        - result_idem_check is not changed
+        - result_change is changed
+        - result_change_check is changed
