@@ -1,0 +1,2 @@
+bugfixes:
+  - lldp - use ``get_bin_path`` to locate the ``lldpctl`` executable (https://github.com/ansible-collections/community.general/pull/1643).
