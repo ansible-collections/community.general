@@ -1,0 +1,21 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+- set_fact:
+    has_java_keytool: >-
+      {{
+        ansible_os_family not in ['Darwin', 'FreeBSD']
+        and not (ansible_distribution == "CentOS" and ansible_distribution_version is version("7.0", "<"))
+      }}
+
+- name: Include OS-specific variables
+  include_vars: '{{ ansible_os_family }}.yml'
+  when: has_java_keytool
+
+- name: Install keytool
+  package:
+    name: '{{ keytool_package_name }}'
+  become: true
+  when: has_java_keytool
