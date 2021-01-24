@@ -92,14 +92,8 @@
       register: result_idem
 
     - name: Create a Java key store for the given certificates (certificate changed, check mode)
-      community.general.java_keystore:
-        name: example
-        certificate: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.pem') }}"
-        private_key: "{{lookup('file', output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key') }}"
-        private_key_passphrase: "{{ item.passphrase | default(omit) }}"
-        password: changeit
-        dest: "{{ output_dir ~ '/' ~ item.name ~ '.jks' }}"
-      loop:
+      community.general.java_keystore: *create_key_store_data
+      loop: &create_key_store_loop_new_certs
         - name: cert2
           keyname: cert
         - name: cert2-pw
@@ -109,53 +103,24 @@
       register: result_change_check
 
     - name: Create a Java key store for the given certificates (certificate changed)
-      community.general.java_keystore:
-        name: example
-        certificate: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.pem') }}"
-        private_key: "{{lookup('file', output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key') }}"
-        private_key_passphrase: "{{ item.passphrase | default(omit) }}"
-        password: changeit
-        dest: "{{ output_dir ~ '/' ~ item.name ~ '.jks' }}"
-      loop:
-        - name: cert2
-          keyname: cert
-        - name: cert2-pw
-          keyname: cert-pw
-          passphrase: hunter2
+      community.general.java_keystore: *create_key_store_data
+      loop: *create_key_store_loop_new_certs
       register: result_change
 
     - name: Create a Java key store for the given certificates (password changed, check mode)
       community.general.java_keystore:
-        name: example
-        certificate: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.pem') }}"
-        private_key: "{{lookup('file', output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key') }}"
-        private_key_passphrase: "{{ item.passphrase | default(omit) }}"
+        <<: *create_key_store_data
         password: hunter2
-        dest: "{{ output_dir ~ '/' ~ item.name ~ '.jks' }}"
-      loop:
-        - name: cert2
-          keyname: cert
-        - name: cert2-pw
-          keyname: cert-pw
-          passphrase: hunter2
+      loop: *create_key_store_loop_new_certs
       check_mode: yes
       register: result_pw_change_check
       when: false  # FIXME: module currently crashes
 
     - name: Create a Java key store for the given certificates (password changed)
       community.general.java_keystore:
-        name: example
-        certificate: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.pem') }}"
-        private_key: "{{lookup('file', output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key') }}"
-        private_key_passphrase: "{{ item.passphrase | default(omit) }}"
+        <<: *create_key_store_data
         password: hunter2
-        dest: "{{ output_dir ~ '/' ~ item.name ~ '.jks' }}"
-      loop:
-        - name: cert2
-          keyname: cert
-        - name: cert2-pw
-          keyname: cert-pw
-          passphrase: hunter2
+      loop: *create_key_store_loop_new_certs
       register: result_pw_change
       when: false  # FIXME: module currently crashes
 
