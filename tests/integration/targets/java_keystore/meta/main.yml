@@ -1,0 +1,3 @@
+dependencies:
+  - setup_java_keytool
+  - setup_openssl
