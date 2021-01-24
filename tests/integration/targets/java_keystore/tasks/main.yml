@@ -124,7 +124,7 @@
       register: result_pw_change
       when: false  # FIXME: module currently crashes
 
-    - name: Validate reults
+    - name: Validate results
       assert:
         that:
           - result is changed
