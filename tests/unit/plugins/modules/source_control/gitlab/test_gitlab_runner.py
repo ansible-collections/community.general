@@ -21,6 +21,7 @@ pytestmark = []
 try:
     from .gitlab import (GitlabModuleTestCase,
                          python_version_match_requirement,
+                         resp_find_runners_all,
                          resp_find_runners_list, resp_get_runner,
                          resp_create_runner, resp_delete_runner)
 
@@ -50,14 +51,25 @@ class TestGitlabRunner(GitlabModuleTestCase):
 
         self.moduleUtil = GitLabRunner(module=self.mock_module, gitlab_instance=self.gitlab_instance)
 
-    @with_httmock(resp_find_runners_list)
+    @with_httmock(resp_find_runners_all)
     @with_httmock(resp_get_runner)
-    def test_runner_exist(self):
+    def test_runner_exist_all(self):
         rvalue = self.moduleUtil.existsRunner("test-1-20150125")
 
         self.assertEqual(rvalue, True)
 
         rvalue = self.moduleUtil.existsRunner("test-3-00000000")
+
+        self.assertEqual(rvalue, False)
+
+    @with_httmock(resp_find_runners_list)
+    @with_httmock(resp_get_runner)
+    def test_runner_exist_owned(self):
+        rvalue = self.moduleUtil.existsRunner("test-1-20201214", True)
+
+        self.assertEqual(rvalue, True)
+
+        rvalue = self.moduleUtil.existsRunner("test-3-00000000", True)
 
         self.assertEqual(rvalue, False)
 
@@ -68,7 +80,7 @@ class TestGitlabRunner(GitlabModuleTestCase):
         self.assertEqual(type(runner), Runner)
         self.assertEqual(runner.description, "test-1-20150125")
 
-    @with_httmock(resp_find_runners_list)
+    @with_httmock(resp_find_runners_all)
     @with_httmock(resp_get_runner)
     def test_update_runner(self):
         runner = self.moduleUtil.findRunner("test-1-20150125")
@@ -84,7 +96,7 @@ class TestGitlabRunner(GitlabModuleTestCase):
         self.assertEqual(changed, False)
         self.assertEqual(newRunner.description, "Runner description")
 
-    @with_httmock(resp_find_runners_list)
+    @with_httmock(resp_find_runners_all)
     @with_httmock(resp_get_runner)
     @with_httmock(resp_delete_runner)
     def test_delete_runner(self):
