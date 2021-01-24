@@ -24,10 +24,13 @@
         path: "{{ output_dir ~ '/' ~ item.name ~ '.csr' }}"
         privatekey_path: "{{ output_dir ~ '/' ~ item.name ~ '.key' }}"
         privatekey_passphrase: "{{ item.passphrase | default(omit) }}"
+        commonName: "{{ item.commonName }}"
       loop:
         - name: cert
+          commonName: example.com
         - name: cert-pw
           passphrase: hunter2
+          commonName: example.org
 
     - name: Create certificate
       community.crypto.x509_certificate:
