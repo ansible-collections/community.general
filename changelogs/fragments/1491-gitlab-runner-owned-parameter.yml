@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - gitlab_runner - add ``owned`` option to allow non-admin use (https://github.com/ansible-collections/community.general/pull/1491).
+bugfixes:
+  - gitlab_runner - fix compatiblity with some versions of python-gitlab (https://github.com/ansible-collections/community.general/pull/1491).
