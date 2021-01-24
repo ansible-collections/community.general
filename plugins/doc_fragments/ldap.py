@@ -33,8 +33,8 @@ options:
     type: str
     description:
       - Set the referrals chasing behavior.
-      - C(anonymous) follow referrals anonymously. See python-ldap default beahvior.
-      - C(disabled) disable referrals chasing. See python-ldap OPT_REFERRALS=0 option.
+      - C(anonymous) follow referrals anonymously. This is the default behavior.
+      - C(disabled) disable referrals chasing. This sets C(OPT_REFERRALS) to off.
     version_added: 2.0.0
   server_uri:
     description:
