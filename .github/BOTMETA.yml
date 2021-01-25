@@ -529,7 +529,7 @@ files:
   $modules/notification/syslogger.py:
     maintainers: garbled1
   $modules/notification/telegram.py:
-    maintainers: tyouxa
+    maintainers: tyouxa loms
   $modules/notification/twilio.py:
     maintainers: makaimc
   $modules/notification/typetalk.py:
