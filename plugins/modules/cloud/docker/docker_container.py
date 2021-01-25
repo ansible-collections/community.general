@@ -1721,7 +1721,7 @@ class TaskParameters(DockerBaseClass):
             elif p_len == 3:
                 # We only allow IPv4 and IPv6 addresses for the bind address
                 ipaddr = parts[0]
-                if not re.match(r'^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$', parts[0]) and not re.match(r'^\[[0-9a-fA-F:]+\]$', ipaddr):
+                if not re.match(r'^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$', parts[0]) and not re.match(r'^\[[0-9a-fA-F:]+(?:|%[^\]/]+)\]$', ipaddr):
                     self.fail(('Bind addresses for published ports must be IPv4 or IPv6 addresses, not hostnames. '
                                'Use the dig lookup to resolve hostnames. (Found hostname: {0})').format(ipaddr))
                 if re.match(r'^\[[0-9a-fA-F:]+\]$', ipaddr):
