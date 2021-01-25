@@ -1,0 +1,8 @@
+---
+bugfixes:
+  - homebrew - add default search path for `brew` on Apple silicon hardware
+    https://github.com/ansible-collections/community.general/pull/1679
+  - homebrew_cask - add default search path for `brew` on Apple silicon hardware
+    https://github.com/ansible-collections/community.general/pull/1679
+  - homebrew_tap - add default search path for `brew` on Apple silicon hardware
+    https://github.com/ansible-collections/community.general/pull/1679
