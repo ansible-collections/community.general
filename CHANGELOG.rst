@@ -5,6 +5,28 @@ Community General Release Notes
 .. contents:: Topics
 
 
+v1.3.5
+======
+
+Release Summary
+---------------
+
+Regular bugfix release.
+
+Bugfixes
+--------
+
+- dnsmadeeasy - fix HTTP 400 errors when creating a TXT record (https://github.com/ansible-collections/community.general/issues/1237).
+- docker_container - allow IPv6 zones (RFC 4007) in bind IPs (https://github.com/ansible-collections/community.docker/pull/66).
+- docker_image - fix crash on loading images with versions of Docker SDK for Python before 2.5.0 (https://github.com/ansible-collections/community.docker/issues/72, https://github.com/ansible-collections/community.docker/pull/73).
+- homebrew - add default search path for ``brew`` on Apple silicon hardware (https://github.com/ansible-collections/community.general/pull/1679).
+- homebrew_cask - add default search path for ``brew`` on Apple silicon hardware (https://github.com/ansible-collections/community.general/pull/1679).
+- homebrew_tap - add default search path for ``brew`` on Apple silicon hardware (https://github.com/ansible-collections/community.general/pull/1679).
+- lldp - use ``get_bin_path`` to locate the ``lldpctl`` executable (https://github.com/ansible-collections/community.general/pull/1643).
+- onepassword lookup plugin - updated to support password items, which place the password field directly in the payload's ``details`` attribute (https://github.com/ansible-collections/community.general/pull/1610).
+- passwordstore lookup plugin - fix compatibility with gopass when used with ``create=true``. While pass returns 1 on a non-existent password, gopass returns 10, or 11, depending on whether a similar named password was stored. We now just check standard output and that the return code is not zero (https://github.com/ansible-collections/community.general/pull/1589).
+- terraform - improve result code checking when executing terraform commands (https://github.com/ansible-collections/community.general/pull/1632).
+
 v1.3.4
 ======
 

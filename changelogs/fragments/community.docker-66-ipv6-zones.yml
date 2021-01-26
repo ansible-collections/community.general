@@ -1,2 +1,0 @@
-bugfixes:
-- "docker_container - allow IPv6 zones (RFC 4007) in bind IPs (https://github.com/ansible-collections/community.docker/pull/66)."
