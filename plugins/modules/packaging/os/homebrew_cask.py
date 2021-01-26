@@ -32,7 +32,7 @@ options:
   path:
     description:
     - "':' separated list of paths to search for 'brew' executable."
-    default: '/usr/local/bin'
+    default: '/usr/local/bin:/opt/homebrew/bin'
     type: path
   state:
     description:
@@ -779,7 +779,7 @@ def main():
                 elements='str',
             ),
             path=dict(
-                default="/usr/local/bin",
+                default="/usr/local/bin:/opt/homebrew/bin",
                 required=False,
                 type='path',
             ),
