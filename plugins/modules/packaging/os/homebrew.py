@@ -38,7 +38,7 @@ options:
             - "A ':' separated list of paths to search for 'brew' executable.
               Since a package (I(formula) in homebrew parlance) location is prefixed relative to the actual path of I(brew) command,
               providing an alternative I(brew) path enables managing different set of packages in an alternative location in the system."
-        default: '/usr/local/bin'
+        default: '/usr/local/bin:/opt/homebrew/bin'
         type: path
     state:
         description:
@@ -76,7 +76,7 @@ notes:
 '''
 
 EXAMPLES = '''
-# Install formula foo with 'brew' in default path (C(/usr/local/bin))
+# Install formula foo with 'brew' in default path
 - community.general.homebrew:
     name: foo
     state: present
@@ -871,7 +871,7 @@ def main():
                 elements='str',
             ),
             path=dict(
-                default="/usr/local/bin",
+                default="/usr/local/bin:/opt/homebrew/bin",
                 required=False,
                 type='path',
             ),
