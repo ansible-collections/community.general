@@ -218,7 +218,7 @@ def main():
     brew_path = module.get_bin_path(
         'brew',
         required=True,
-        opt_dirs=['/usr/local/bin']
+        opt_dirs=['/usr/local/bin', '/opt/homebrew/bin']
     )
 
     taps = module.params['name']
