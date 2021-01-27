@@ -43,6 +43,10 @@ options:
       - EMEA-NL-EVS
       - par1
       - EMEA-FR-PAR1
+      - par2
+      - EMEA-FR-PAR2
+      - waw1
+      - EMEA-PL-WAW1
 
   protocol:
     type: str
