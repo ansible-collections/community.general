@@ -65,7 +65,6 @@ options:
     - Organization for the repository.
     - If not provided, the repository will be created in the current user profile.
     type: str
-    default: None
     required: false
 requirements:
 - PyGithub>=1.54
@@ -162,7 +161,7 @@ def delete_repo(gh, name, organization=None):
     return result
 
 
-def main(params):
+def run_module(params):
     gh = authenticate(username=params['username'], password=params['password'], access_token=params['access_token'])
     if params['state'] == "absent":
         args = {
@@ -182,7 +181,7 @@ def main(params):
         return create_repo(**args)
 
 
-if __name__ == '__main__':
+def main():
     module_args = dict(
         username=dict(type='str', required=False, default=None, no_log=True),
         password=dict(type='str', required=False, default=None, no_log=True),
@@ -208,9 +207,13 @@ if __name__ == '__main__':
         result = dict(
             changed=False
         )
-        result = main(module.params)
+        result = run_module(module.params)
         module.exit_json(**result)
     except GithubException as e:
         module.fail_json(msg="Github error. {0}".format(repr(e)), **result)
     except Exception as e:
         module.fail_json(msg="Unexpected error. {0}".format(repr(e)), **result)
+
+
+if __name__ == '__main__':
+    main()
