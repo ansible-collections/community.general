@@ -4,34 +4,34 @@
 # Copyright: (c) 2021, Álvaro Torres Cogollo
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from ansible.module_utils.basic import AnsibleModule
-from github import Github, GithubException
-import sys
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = '''
 ---
 module: github_repo
 short_description: Manage your repos on Github
+version_added: 2.1.0
 description:
-- Manages Github repos using PyGithub library
-- Authentication can be done with access_token or with username and password
+- Manages Github repos using PyGithub library.
+- Authentication can be done with I(access_token) or with I(username) and I(password).
 options:
   username:
     description:
-    - Username parameter for authentication.
-    - This is only needed when not using access_token.
+    - I(username) parameter for authentication.
+    - This is only needed when not using I(access_token).
     type: str
     required: false
   password:
     description:
-    - Password parameter for authentication.
-    - This is only needed when not using access_token.
+    - I(password) parameter for authentication.
+    - This is only needed when not using I(access_token).
     type: str
     required: false
   access_token:
     description:
     - Token parameter for authentication.
-    - This is only needed when not using username and password.
+    - This is only needed when not using I(username) and I(password).
     type: str
     required: false
   name:
@@ -71,13 +71,13 @@ requirements:
 - PyGithub>=1.54
 notes:
 - For python3, PyGithub>=1.54 should be used.
-- For python3.5, PyGithub==1.54 should be used. More info: https://pygithub.readthedocs.io/en/latest/changes.html#version-1-54-november-30-2020
-- For python2, PyGithub==1.45 should be used. More info: https://pygithub.readthedocs.io/en/latest/changes.html#version-1-45-december-29-2019
+- "For python3.5, PyGithub==1.54 should be used. More info: https://pygithub.readthedocs.io/en/latest/changes.html#version-1-54-november-30-2020."
+- "For python2, PyGithub==1.45 should be used. More info: https://pygithub.readthedocs.io/en/latest/changes.html#version-1-45-december-29-2019."
 author:
 - Álvaro Torres Cogollo (@atorrescogollo)
 '''
 
-EXAMPLES = r'''
+EXAMPLES = '''
 - name: Create a Github Repo
   github_repo:
     access_token: mytoken
@@ -97,22 +97,39 @@ EXAMPLES = r'''
   register: result
 '''
 
-RETURN = r'''
+RETURN = '''
 repo:
-  description: repo as json. Only present when creating repository. See https://docs.github.com/en/rest/reference/repos#get-a-repository.
-  type: json
+  description: Repository information as JSON. See U(https://docs.github.com/en/rest/reference/repos#get-a-repository).
+  returned: success and I(state) is C(present)
+  type: dict
 '''
 
 
+import traceback
+
+GITHUB_IMP_ERR = None
+try:
+    from github import Github, GithubException
+    HAS_GITHUB_PACKAGE = True
+except Exception:
+    GITHUB_IMP_ERR = traceback.format_exc()
+    HAS_GITHUB_PACKAGE = False
+
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+import sys
+
+
 def authenticate(username=None, password=None, access_token=None):
-    if access_token: return Github(access_token)
-    else: Github(username,password)
+    if access_token:
+        return Github(access_token)
+    else:
+        return Github(username, password)
+
 
 def create_repo(gh, name, organization=None, private=False, description=''):
     result = dict(
-            changed=False,
-            repo=None
-        )
+        changed=False,
+        repo=None)
     target = gh.get_organization(organization) if organization else gh.get_user()
 
     repo = None
@@ -121,24 +138,26 @@ def create_repo(gh, name, organization=None, private=False, description=''):
     except GithubException as e:
         if e.args[0] == 404:
             repo = target.create_repo(name=name, private=private, description=description)
-            result['changed']=True
-        else: raise e
+            result['changed'] = True
+        else:
+            raise e
 
     result['repo'] = repo.raw_data
     return result
 
+
 def delete_repo(gh, name, organization=None):
-    result = dict(
-            changed=False
-        )
+    result = dict(changed=False)
     target = gh.get_organization(organization) if organization else gh.get_user()
     try:
         repo = target.get_repo(name=name)
         repo.delete()
         result['changed'] = True
     except GithubException as e:
-        if e.args[0] == 404: pass
-        else: raise e
+        if e.args[0] == 404:
+            pass
+        else:
+            raise e
 
     return result
 
@@ -162,23 +181,28 @@ def main(params):
         }
         return create_repo(**args)
 
+
 if __name__ == '__main__':
     module_args = dict(
-        username=dict(    type='str',  required=False, default=None, no_log=True),
-        password=dict(    type='str',  required=False, default=None, no_log=True),
-        access_token=dict(type='str',  required=False, default=None, no_log=True),
-        name=dict(        type='str',  required=True),
-        state=dict(       type='str',  required=False, default="present", choices=["present","absent"]),
-        organization=dict(type='str',  required=False, default=None),
-        private=dict(     type='bool', required=False, default=False),
-        description=dict( type='str',  required=False, default=''),
+        username=dict(type='str', required=False, default=None, no_log=True),
+        password=dict(type='str', required=False, default=None, no_log=True),
+        access_token=dict(type='str', required=False, default=None, no_log=True),
+        name=dict(type='str', required=True),
+        state=dict(type='str', required=False, default="present", choices=["present", "absent"]),
+        organization=dict(type='str', required=False, default=None),
+        private=dict(type='bool', required=False, default=False),
+        description=dict(type='str', required=False, default=''),
     )
     module = AnsibleModule(
         argument_spec=module_args,
         supports_check_mode=False
     )
 
-    assert module.params['access_token'] or ( module.params['username'] and module.params['password'] )
+    if not HAS_GITHUB_PACKAGE:
+        module.fail_json(msg=missing_required_lib("PyGithub"), exception=GITHUB_IMP_ERR)
+
+    if not module.params['access_token'] and not (module.params['username'] and module.params['password']):
+        raise AssertionError("Access token must be provided for authentation. Username and password are also valid, instead.")
 
     try:
         result = dict(
@@ -187,6 +211,6 @@ if __name__ == '__main__':
         result = main(module.params)
         module.exit_json(**result)
     except GithubException as e:
-        module.fail_json(msg="Github error. {}".format(repr(e)), **result)
+        module.fail_json(msg="Github error. {0}".format(repr(e)), **result)
     except Exception as e:
-        module.fail_json(msg="Unexpected error. {}".format(repr(e)), **result)
+        module.fail_json(msg="Unexpected error. {0}".format(repr(e)), **result)
