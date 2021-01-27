@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ancestor: 2.14.0
 releases: {}
 =======
@@ -858,3 +859,7 @@ releases:
         namespace: null
     release_date: '2020-06-20'
 >>>>>>> e54dd3a01f (Release 0.2.0 of community.general (#546))
+=======
+ancestor: 1.0.0
+releases: {}
+>>>>>>> 711405507d (Reset changelog.)
