@@ -74,8 +74,6 @@ else
 fi
 
 # START: HACK install dependencies
-retry ansible-galaxy -vvv collection install community.kubernetes
-
 if [ "${script}" != "sanity" ] || [ "${test}" == "sanity/extra" ]; then
     # Nothing further should be added to this list.
     # This is to prevent modules or plugins in this collection having a runtime dependency on other collections.
