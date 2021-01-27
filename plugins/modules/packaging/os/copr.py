@@ -17,6 +17,8 @@ author: Silvie Chlupova (@schlupov) <schlupov@redhat.com>
 requirements:
     - dnf
     - dnf-plugins-core
+notes:
+    - Supports C(check_mode).
 options:
     host:
         description: The Copr host to work with.
