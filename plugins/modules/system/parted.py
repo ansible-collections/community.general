@@ -516,7 +516,12 @@ def parted_version():
     if len(lines) == 0:
         module.fail_json(msg="Failed to get parted version.", rc=0, out=out)
 
-    matches = re.search(r'^parted.+(\d+)\.(\d+)(?:\.(\d+))?.?$', lines[0])
+    # failed to write a test unit, so sample versions in here:
+    # parted (GNU parted) 3.3
+    # parted (GNU parted) 3.4.5
+    # parted (GNU parted) 3.3.14-dfc61
+    matches = re.search(r'^parted .*(\d+)\.(\d+)(?:\.(\d+))?', lines[0])
+
     if matches is None:
         module.fail_json(msg="Failed to get parted version.", rc=0, out=out)
 
