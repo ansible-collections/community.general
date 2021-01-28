@@ -59,6 +59,7 @@ options:
     choices:
       - nl-ams
       - fr-par
+      - pl-waw
 
   tags:
     type: list
