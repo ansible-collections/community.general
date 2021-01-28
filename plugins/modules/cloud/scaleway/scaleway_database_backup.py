@@ -44,6 +44,7 @@ options:
     choices:
         - fr-par
         - nl-ams
+        - pl-waw
 
   id:
     description:
