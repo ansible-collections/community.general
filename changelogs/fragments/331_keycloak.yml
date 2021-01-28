@@ -1,2 +1,0 @@
-bugfixes:
-- keycloak module_utils - provide meaningful error message to user when auth URL does not start with http or https (https://github.com/ansible-collections/community.general/issues/331).

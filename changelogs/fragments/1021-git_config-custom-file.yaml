@@ -1,4 +1,0 @@
-minor_changes:
-  - git_config - added parameter and scope ``file`` allowing user to change parameters in a custom file (https://github.com/ansible-collections/community.general/issues/1021).
-bugfixes:
-  - git_config - using list instead of string as first parameter in the ``run_command()`` call (https://github.com/ansible-collections/community.general/issues/1021).

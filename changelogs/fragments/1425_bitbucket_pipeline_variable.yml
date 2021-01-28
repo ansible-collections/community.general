@@ -1,2 +1,0 @@
-bugfixes:
-- bitbucket_pipeline_variable - change pagination logic for pipeline variable get API (https://github.com/ansible-collections/community.general/issues/1425).

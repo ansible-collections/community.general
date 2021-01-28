@@ -1,2 +1,0 @@
-minor_changes:
-  - redfish_command - support same reset actions on Managers as on Systems (https://github.com/ansible-collections/community.general/issues/901).

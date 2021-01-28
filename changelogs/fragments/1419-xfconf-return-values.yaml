@@ -1,2 +1,0 @@
-bugfixes:
-- xfconf - add in missing return values that are specified in the documentation (https://github.com/ansible-collections/community.general/issues/1418).

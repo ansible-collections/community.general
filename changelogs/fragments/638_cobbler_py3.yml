@@ -1,2 +1,0 @@
-bugfixes:
-- cobbler inventory script - add Python 3 support (https://github.com/ansible-collections/community.general/issues/638).

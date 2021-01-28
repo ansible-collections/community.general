@@ -1,2 +1,0 @@
-bugfixes:
-  - "gem - fix get_installed_versions: correctly parse ``default`` version (https://github.com/ansible-collections/community.general/pull/783)."

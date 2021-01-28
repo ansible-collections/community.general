@@ -1,2 +1,0 @@
-bugfixes:
-- jira - improve error message handling (https://github.com/ansible-collections/community.general/pull/311).

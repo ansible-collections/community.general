@@ -1,2 +1,0 @@
-minor_changes:
-  - facter - added option for ``arguments`` (https://github.com/ansible-collections/community.general/pull/768).
