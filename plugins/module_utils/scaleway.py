@@ -169,8 +169,14 @@ SCALEWAY_LOCATION = {
     'par1': {'name': 'Paris 1', 'country': 'FR', "api_endpoint": 'https://api.scaleway.com/instance/v1/zones/fr-par-1'},
     'EMEA-FR-PAR1': {'name': 'Paris 1', 'country': 'FR', "api_endpoint": 'https://api.scaleway.com/instance/v1/zones/fr-par-1'},
 
+    'par2': {'name': 'Paris 2', 'country': 'FR', "api_endpoint": 'https://api.scaleway.com/instance/v1/zones/fr-par-2'},
+    'EMEA-FR-PAR2': {'name': 'Paris 2', 'country': 'FR', "api_endpoint": 'https://api.scaleway.com/instance/v1/zones/fr-par-2'},
+
     'ams1': {'name': 'Amsterdam 1', 'country': 'NL', "api_endpoint": 'https://api.scaleway.com/instance/v1/zones/nl-ams-1'},
-    'EMEA-NL-EVS': {'name': 'Amsterdam 1', 'country': 'NL', "api_endpoint": 'https://api.scaleway.com/instance/v1/zones/nl-ams-1'}
+    'EMEA-NL-EVS': {'name': 'Amsterdam 1', 'country': 'NL', "api_endpoint": 'https://api.scaleway.com/instance/v1/zones/nl-ams-1'},
+
+    'waw1': {'name': 'Warsaw 1', 'country': 'PL', "api_endpoint": 'https://api.scaleway.com/instance/v1/zones/pl-waw-1'},
+    'EMEA-PL-WAW1': {'name': 'Warsaw 1', 'country': 'PL', "api_endpoint": 'https://api.scaleway.com/instance/v1/zones/pl-waw-1'},
 }
 
 SCALEWAY_ENDPOINT = "https://api.scaleway.com"
@@ -178,9 +184,12 @@ SCALEWAY_ENDPOINT = "https://api.scaleway.com"
 SCALEWAY_REGIONS = [
     "fr-par",
     "nl-ams",
+    "pl-waw",
 ]
 
 SCALEWAY_ZONES = [
     "fr-par-1",
+    "fr-par-2",
     "nl-ams-1",
+    "pl-waw-1",
 ]

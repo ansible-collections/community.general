@@ -24,6 +24,8 @@ DOCUMENTATION = '''
             default:
                 - ams1
                 - par1
+                - par2
+                - waw1
         tags:
             description: Filter results on a specific tag
             type: list
