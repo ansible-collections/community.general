@@ -60,3 +60,63 @@
   assert:
     that:
       - readpass == newpass
+
+# As inserting multiline passwords on the commandline would require something
+# like expect, simply create it by using default gpg on a file with the correct
+# structure.
+- name: Create the YAML password content
+  copy:
+    dest: "~/.password-store/test-yaml-pass"
+    content: |
+      testpassword
+      key: |
+        multi
+        line
+
+- name: Read .gpg-id from .password-store
+  set_fact:
+    gpgid: "{{ lookup('file', '~/.password-store/.gpg-id') }}"
+
+- name: Encrypt the file using the gpg key
+  command: "{{ gpg2_bin }} --batch --encrypt -r {{ gpgid }} ~/.password-store/test-yaml-pass"
+
+- name: Fetch a password with YAML subkey
+  set_fact:
+    readyamlpass: "{{ lookup('community.general.passwordstore', 'test-yaml-pass subkey=key') }}"
+
+- name: Read a yaml subkey
+  assert:
+    that:
+      - readyamlpass == 'multi\nline'
+
+- name: Create a non-YAML multiline file
+  copy:
+    dest: "~/.password-store/test-multiline-pass"
+    content: |
+      testpassword
+      random additional line
+
+- name: Read .gpg-id from .password-store
+  set_fact:
+    gpgid: "{{ lookup('file', '~/.password-store/.gpg-id') }}"
+
+- name: Encrypt the file using the gpg key
+  command: "{{ gpg2_bin }} --batch --encrypt -r {{ gpgid }} ~/.password-store/test-multiline-pass"
+
+- name: Fetch password from multiline file
+  set_fact:
+    readyamlpass: "{{ lookup('community.general.passwordstore', 'test-multiline-pass') }}"
+
+- name: Multiline pass only returns first line
+  assert:
+    that:
+      - readyamlpass == 'testpassword'
+
+- name: Fetch all from multiline file
+  set_fact:
+    readyamlpass: "{{ lookup('community.general.passwordstore', 'test-multiline-pass returnall=yes') }}"
+
+- name: Multiline pass returnall returns everything in the file
+  assert:
+    that:
+      - readyamlpass == 'testpassword\nrandom additional line'
