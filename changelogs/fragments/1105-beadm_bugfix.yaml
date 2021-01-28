@@ -1,3 +1,0 @@
----
-bugfixes:
-  - beadm - fixed issue "list object has no attribute split" (https://github.com/ansible-collections/community.general/issues/791).

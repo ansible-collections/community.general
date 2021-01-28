@@ -1,2 +1,0 @@
-bugfixes:
-- syslogger - update ``syslog.openlog`` API call for older Python versions, and improve error handling (https://github.com/ansible-collections/community.general/issues/953).

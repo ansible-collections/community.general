@@ -1,2 +1,0 @@
-minor_changes:
-- "pacman - improve group expansion speed: query list of pacman groups once (https://github.com/ansible-collections/community.general/pull/349)."

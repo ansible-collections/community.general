@@ -1,2 +1,0 @@
-minor_changes:
-- rundeck_acl_policy - add check for rundeck_acl_policy name parameter (https://github.com/ansible-collections/community.general/pull/612).

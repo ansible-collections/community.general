@@ -1,2 +1,0 @@
-bugfixes:
-- slack - avoid trying to update existing message when sending messages that contain the string "ts" (https://github.com/ansible-collections/community.general/issues/1097).

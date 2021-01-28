@@ -1,3 +1,0 @@
----
-bugfixes:
-  - proxmox_kvm - improve handling of long-running tasks by creating a dedicated function (https://github.com/ansible-collections/community.general/pull/831).

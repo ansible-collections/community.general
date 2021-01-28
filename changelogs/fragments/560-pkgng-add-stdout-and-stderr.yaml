@@ -1,2 +1,0 @@
-minor_changes:
-  - pkgng - added ``stdout`` and ``stderr`` attributes to the result (https://github.com/ansible-collections/community.general/pull/560).
