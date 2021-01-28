@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 ancestor: 2.14.0
 releases: {}
 =======
@@ -861,5 +862,8 @@ releases:
 >>>>>>> e54dd3a01f (Release 0.2.0 of community.general (#546))
 =======
 ancestor: 1.0.0
+=======
+ancestor: 2.0.0
+>>>>>>> 83afe0f868 (Next expected release is 2.1.0. Next changelog ancestor is 2.0.0.)
 releases: {}
 >>>>>>> 711405507d (Reset changelog.)
