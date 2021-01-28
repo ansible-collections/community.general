@@ -1,2 +1,0 @@
-minor_changes:
-  - rhn_register - added ``force`` parameter to allow forced registering (https://github.com/ansible-collections/community.general/issues/1454).

@@ -1,2 +1,0 @@
-minor_changes:
-  - nios modules - clean up module argument spec processing (https://github.com/ansible-collections/community.general/pull/1598).

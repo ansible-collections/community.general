@@ -1,2 +1,0 @@
-bugfixes:
-- dsv lookup - use correct dict usage (https://github.com/ansible-collections/community.general/pull/743).
