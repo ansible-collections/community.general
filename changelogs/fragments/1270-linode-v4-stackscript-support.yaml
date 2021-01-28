@@ -1,2 +1,0 @@
-minor_changes:
-  - linode_v4 - added support for Linode StackScript usage when creating instances (https://github.com/ansible-collections/community.general/issues/723).

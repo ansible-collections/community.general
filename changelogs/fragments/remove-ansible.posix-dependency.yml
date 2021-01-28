@@ -1,2 +1,0 @@
-major_changes:
-- "The community.general collection no longer depends on the ansible.posix collection (https://github.com/ansible-collections/community.general/pull/1157)."

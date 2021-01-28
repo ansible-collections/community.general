@@ -1,2 +1,0 @@
-minor_changes: 
-- cloudflare_dns - add support for environment variable ``CLOUDFLARE_TOKEN`` (https://github.com/ansible-collections/community.general/pull/1238).

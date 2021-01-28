@@ -1,4 +1,0 @@
-major_changes:
-- "The community.general collection no longer depends on the ansible.netcommon collection (https://github.com/ansible-collections/community.general/pull/1561)."
-minor_changes:
-- "nios_network - no longer requires the ansible.netcommon collection (https://github.com/ansible-collections/community.general/pull/1561)."

@@ -1,2 +1,0 @@
-minor_changes:
-- "odbc - added a parameter ``commit`` which allows users to disable the explicit commit after the execute call (https://github.com/ansible-collections/community.general/pull/1139)."
