@@ -105,6 +105,8 @@ _raw:
 import os
 import subprocess
 import time
+import yaml
+
 
 from distutils import util
 from ansible.errors import AnsibleError, AnsibleAssertionError
@@ -209,10 +211,15 @@ class LookupModule(LookupBase):
             ).splitlines()
             self.password = self.passoutput[0]
             self.passdict = {}
-            for line in self.passoutput[1:]:
-                if ':' in line:
-                    name, value = line.split(':', 1)
-                    self.passdict[name.strip()] = value.strip()
+            try:
+                values = yaml.safe_load('\n'.join(self.passoutput[1:]))
+                for key, item in values.items():
+                    self.passdict[key] = item
+            except (yaml.YAMLError, AttributeError):
+                for line in self.passoutput[1:]:
+                    if ':' in line:
+                        name, value = line.split(':', 1)
+                        self.passdict[name.strip()] = value.strip()
         except (subprocess.CalledProcessError) as e:
             if e.returncode != 0 and 'not in the password store' in e.output:
                 # if pass returns 1 and return string contains 'is not in the password store.'
