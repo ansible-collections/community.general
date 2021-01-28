@@ -1,2 +1,0 @@
-bugfixes:
-- jira - provide error message raised from exception (https://github.com/ansible-collections/community.general/issues/1504).

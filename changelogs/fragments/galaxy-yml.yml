@@ -1,2 +1,0 @@
-minor_changes:
-- "The collection dependencies were adjusted so that ``community.kubernetes`` is required to be of version 1.0.0 or newer (https://github.com/ansible-collections/community.general/pull/774)."

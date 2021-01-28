@@ -1,2 +1,0 @@
-bugfixes:
-  - monit - add support for all monit service checks (https://github.com/ansible-collections/community.general/pull/1532).

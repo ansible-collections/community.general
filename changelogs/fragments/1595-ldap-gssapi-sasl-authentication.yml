@@ -1,2 +1,0 @@
-bugfixes:
-- "ldap modules - add ``sasl_class`` parameter to support passwordless SASL authentication via GSSAPI (kerberos), next to external (https://github.com/ansible-collections/community.general/issues/1523)."
