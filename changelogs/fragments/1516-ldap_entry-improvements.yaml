@@ -1,2 +1,0 @@
-bugfixes:
-  - ldap_entry - improvements in documentation, simplifications and replaced code with better ``AnsibleModule`` arguments (https://github.com/ansible-collections/community.general/pull/1516).
