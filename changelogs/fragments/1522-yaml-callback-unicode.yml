@@ -1,2 +1,0 @@
-bugfixes:
-- "yaml callback plugin - do not remove non-ASCII Unicode characters from multiline string output (https://github.com/ansible-collections/community.general/issues/1519)."

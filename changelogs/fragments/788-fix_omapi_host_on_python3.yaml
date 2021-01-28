@@ -1,2 +1,0 @@
-bugfixes:
-  - omapi_host - fix compatibility with Python 3 (https://github.com/ansible-collections/community.general/issues/787).

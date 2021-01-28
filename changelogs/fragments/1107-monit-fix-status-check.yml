@@ -1,2 +1,0 @@
-bugfixes:
-  - monit - fix modules ability to determine the current state of the monitored process (https://github.com/ansible-collections/community.general/pull/1107).

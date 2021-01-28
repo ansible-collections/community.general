@@ -1,2 +1,0 @@
-minor_changes:
-  - datadog_monitor - add ``include_tags`` option (https://github.com/ansible/ansible/issues/57441).

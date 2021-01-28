@@ -1,3 +1,0 @@
----
-minor_changes:
-  - proxmox inventory plugin - add environment variable passthrough (https://github.com/ansible-collections/community.general/pull/1645).

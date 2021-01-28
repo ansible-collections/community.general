@@ -1,2 +1,0 @@
-minor_changes:
- - "parted - accept negative numbers in ``part_start`` and ``part_end``"
