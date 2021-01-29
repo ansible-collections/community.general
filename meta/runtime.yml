@@ -199,10 +199,14 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
+    idrac_firmware:
+      redirect: dellemc.openmanage.idrac_firmware
     idrac_redfish_facts:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
+    idrac_server_config_profile:
+      redirect: dellemc.openmanage.idrac_server_config_profile
     jenkins_job_facts:
       deprecation:
         removal_version: 3.0.0
@@ -283,6 +287,8 @@ plugin_routing:
       deprecation:
         removal_version: 3.0.0
         warning_text: see plugin documentation for details
+    ome_device_info:
+      redirect: dellemc.openmanage.ome_device_info
     one_image_facts:
       deprecation:
         removal_version: 3.0.0
