@@ -181,7 +181,7 @@ def clear(module, url, check, subscription):
             )
 
         try:
-            json_out = json.loads(response.read())
+            json_out = json.loads(response.read().decode('utf-8'))
         except Exception:
             json_out = ""
 
