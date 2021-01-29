@@ -571,7 +571,7 @@ plugin_routing:
     postgresql:
       redirect: community.postgresql.postgresql
   module_utils:
-    dellemc_idrac:
+    remote_management.dellemc.dellemc_idrac:
       redirect: dellemc.openmanage.dellemc_idrac
     docker.common:
       redirect: community.docker.common
