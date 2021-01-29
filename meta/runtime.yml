@@ -587,7 +587,7 @@ plugin_routing:
       redirect: community.hrobot.robot
     kubevirt:
       redirect: community.kubevirt.kubevirt
-    ome:
+    remote_management.dellemc.ome:
       redirect: dellemc.openmanage.ome
     postgresql:
       redirect: community.postgresql.postgresql
