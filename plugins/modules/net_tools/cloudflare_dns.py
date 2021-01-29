@@ -16,13 +16,14 @@ requirements:
    - python >= 2.6
 short_description: Manage Cloudflare DNS records
 description:
-   - "Manages dns records via the Cloudflare API, see the docs: U(https://api.cloudflare.com/)"
+   - "Manages dns records via the Cloudflare API, see the docs: U(https://api.cloudflare.com/)."
 options:
   api_token:
     description:
     - API token.
     - Required for api token authentication.
-    - "You can obtain your API token from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)"
+    - "You can obtain your API token from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)."
+    - Can be specified in C(CLOUDFLARE_TOKEN) environment variable since community.general 2.0.0.
     type: str
     required: false
     version_added: '0.2.0'
@@ -30,13 +31,13 @@ options:
     description:
     - Account API key.
     - Required for api keys authentication.
-    - "You can obtain your API key from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)"
+    - "You can obtain your API key from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)."
     type: str
     required: false
     aliases: [ account_api_token ]
   account_email:
     description:
-    - Account email. Required for api keys authentication.
+    - Account email. Required for API keys authentication.
     type: str
     required: false
   algorithm:
@@ -71,6 +72,7 @@ options:
     - Record priority.
     - Required for C(type=MX) and C(type=SRV)
     default: 1
+    type: int
   proto:
     description:
     - Service protocol. Required for C(type=SRV) and C(type=TLSA).
@@ -99,7 +101,8 @@ options:
   service:
     description:
     - Record service.
-    - Required for C(type=SRV)
+    - Required for I(type=SRV).
+    type: str
   solo:
     description:
     - Whether the record should be the only one for that record type and record name.
@@ -355,7 +358,7 @@ record:
 
 import json
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils._text import to_native, to_text
 from ansible.module_utils.urls import fetch_url
@@ -786,7 +789,12 @@ class CloudflareAPI(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            api_token=dict(type='str', required=False, no_log=True),
+            api_token=dict(
+                type="str",
+                required=False,
+                no_log=True,
+                fallback=(env_fallback, ["CLOUDFLARE_TOKEN"]),
+            ),
             account_api_key=dict(type='str', required=False, no_log=True, aliases=['account_api_token']),
             account_email=dict(type='str', required=False),
             algorithm=dict(type='int'),

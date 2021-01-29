@@ -18,17 +18,21 @@ options:
      - Indicate desired state of the resource
     choices: [ absent, active, deleted, present, restarted, started, stopped ]
     default: present
+    type: str
   api_key:
     description:
      - Linode API key
+    type: str
   name:
     description:
      - Name to give the instance (alphanumeric, dashes, underscore).
      - To keep sanity on the Linode Web Console, name is prepended with C(LinodeID-).
     required: true
+    type: str
   displaygroup:
     description:
      - Add the instance to a Display Group in Linode Manager.
+    type: str
   linode_id:
     description:
      - Unique ID of a linode server. This value is read-only in the sense that
@@ -36,10 +40,12 @@ options:
        Linode API generates these IDs and we can those generated value here to
        reference a Linode more specifically. This is useful for idempotence.
     aliases: [ lid ]
+    type: int
   additional_disks:
     description:
       - List of dictionaries for creating additional disks that are added to the Linode configuration settings.
       - Dictionary takes Size, Label, Type. Size is in MB.
+    type: list
   alert_bwin_enabled:
     description:
     - Set status of bandwidth in alerts.
@@ -47,6 +53,7 @@ options:
   alert_bwin_threshold:
     description:
     - Set threshold in MB of bandwidth in alerts.
+    type: int
   alert_bwout_enabled:
     description:
     - Set status of bandwidth out alerts.
@@ -54,6 +61,7 @@ options:
   alert_bwout_threshold:
     description:
     - Set threshold in MB of bandwidth out alerts.
+    type: int
   alert_bwquota_enabled:
     description:
     - Set status of bandwidth quota alerts as percentage of network transfer quota.
@@ -61,6 +69,7 @@ options:
   alert_bwquota_threshold:
     description:
     - Set threshold in MB of bandwidth quota alerts.
+    type: int
   alert_cpu_enabled:
     description:
     - Set status of receiving CPU usage alerts.
@@ -68,6 +77,7 @@ options:
   alert_cpu_threshold:
     description:
     - Set percentage threshold for receiving CPU usage alerts. Each CPU core adds 100% to total.
+    type: int
   alert_diskio_enabled:
     description:
     - Set status of receiving disk IO alerts.
@@ -75,50 +85,61 @@ options:
   alert_diskio_threshold:
     description:
     - Set threshold for average IO ops/sec over 2 hour period.
+    type: int
   backupweeklyday:
     description:
     - Integer value for what day of the week to store weekly backups.
+    type: int
   plan:
     description:
      - plan to use for the instance (Linode plan)
+    type: int
   payment_term:
     description:
      - payment term to use for the instance (payment term in months)
     default: 1
     choices: [ 1, 12, 24 ]
+    type: int
   password:
     description:
      - root password to apply to a new server (auto generated if missing)
+    type: str
   private_ip:
     description:
     - Add private IPv4 address when Linode is created.
+    - Default is C(false).
     type: bool
-    default: "no"
   ssh_pub_key:
     description:
      - SSH public key applied to root user
+    type: str
   swap:
     description:
      - swap size in MB
     default: 512
+    type: int
   distribution:
     description:
      - distribution to use for the instance (Linode Distribution)
+    type: int
   datacenter:
     description:
      - datacenter to create an instance in (Linode Datacenter)
+    type: int
   kernel_id:
     description:
      - kernel to use for the instance (Linode Kernel)
+    type: int
   wait:
     description:
      - wait for the instance to be in state C(running) before returning
     type: bool
-    default: "no"
+    default: true
   wait_timeout:
     description:
      - how long before wait gives up, in seconds
     default: 300
+    type: int
   watchdog:
     description:
     - Set status of Lassie watchdog.
@@ -337,7 +358,7 @@ def linodeServers(module, api, state, name,
         if not servers:
             for arg in (name, plan, distribution, datacenter):
                 if not arg:
-                    module.fail_json(msg='%s is required for %s state' % (arg, state))
+                    module.fail_json(msg='%s is required for %s state' % (arg, state))  # @TODO use required_if instead
             # Create linode entity
             new_server = True
 

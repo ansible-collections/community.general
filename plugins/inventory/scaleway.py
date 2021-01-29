@@ -7,7 +7,6 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     name: scaleway
-    plugin_type: inventory
     author:
       - Remy Leone (@sieben)
     short_description: Scaleway inventory source
@@ -24,6 +23,8 @@ DOCUMENTATION = '''
             default:
                 - ams1
                 - par1
+                - par2
+                - waw1
         tags:
             description: Filter results on a specific tag
             type: list

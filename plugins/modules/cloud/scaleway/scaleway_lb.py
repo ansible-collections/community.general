@@ -25,21 +25,25 @@ extends_documentation_fragment:
 options:
 
   name:
+    type: str
     description:
       - Name of the load-balancer
     required: true
 
   description:
+    type: str
     description:
       - Description of the load-balancer
     required: true
 
   organization_id:
+    type: str
     description:
       - Organization identifier
     required: true
 
   state:
+    type: str
     description:
      - Indicate desired state of the instance.
     default: present
@@ -48,14 +52,17 @@ options:
       - absent
 
   region:
+    type: str
     description:
     - Scaleway zone
     required: true
     choices:
       - nl-ams
       - fr-par
+      - pl-waw
 
   tags:
+    type: list
     description:
     - List of tags to apply to the load-balancer
 
@@ -66,12 +73,14 @@ options:
     default: 'no'
 
   wait_timeout:
+    type: int
     description:
     - Time to wait for the load-balancer to reach the expected state
     required: false
     default: 300
 
   wait_sleep_time:
+    type: int
     description:
     - Time to wait before every attempt to check the state of the load-balancer
     required: false
@@ -328,7 +337,7 @@ def main():
         name=dict(required=True),
         description=dict(required=True),
         region=dict(required=True, choices=SCALEWAY_REGIONS),
-        state=dict(choices=state_strategy.keys(), default='present'),
+        state=dict(choices=list(state_strategy.keys()), default='present'),
         tags=dict(type="list", default=[]),
         organization_id=dict(required=True),
         wait=dict(type="bool", default=False),

@@ -23,22 +23,22 @@ options:
 
   credentials_path:
     description:
-      - (String) Optional parameter that allows to set a non-default credentials path.
-       Default is ~/.spotinst/credentials
+      - (Path) Optional parameter that allows to set a non-default credentials path.
+    default: ~/.spotinst/credentials
+    type: path
 
   account_id:
     description:
       - (String) Optional parameter that allows to set an account-id inside the module configuration
        By default this is retrieved from the credentials path
+    type: str
 
   availability_vs_cost:
-    choices:
-      - availabilityOriented
-      - costOriented
-      - balanced
     description:
       - (String) The strategy orientation.
+      - "The choices available are: C(availabilityOriented), C(costOriented), C(balanced)."
     required: true
+    type: str
 
   availability_zones:
     description:
@@ -49,6 +49,7 @@ options:
         subnet_id (String),
         placement_group_name (String),
     required: true
+    type: list
 
   block_device_mappings:
     description:
@@ -66,6 +67,7 @@ options:
         snapshot_id(Integer),
         volume_type(String),
         volume_size(Integer))
+    type: list
 
   chef:
     description:
@@ -75,10 +77,12 @@ options:
         user (String),
         pem_key (String),
         chef_version (String)
+    type: dict
 
   draining_timeout:
     description:
       - (Integer) Time for instance to be drained from incoming requests and deregistered from ELB before termination.
+    type: int
 
   ebs_optimized:
     description:
@@ -93,74 +97,72 @@ options:
         keys allowed are -
         volume_ids (List of Strings),
         device_name (String)
+    type: list
 
   ecs:
     description:
       - (Object) The ECS integration configuration.;
         Expects the following key -
         cluster_name (String)
-
+    type: dict
 
   elastic_ips:
     description:
       - (List of Strings) List of ElasticIps Allocation Ids (Example C(eipalloc-9d4e16f8)) to associate to the group instances
+    type: list
 
   fallback_to_od:
     description:
       - (Boolean) In case of no spots available, Elastigroup will launch an On-demand instance instead
     type: bool
+
   health_check_grace_period:
     description:
       - (Integer) The amount of time, in seconds, after the instance has launched to start and check its health.
-    default: 300
+      - If not specified, it defaults to C(300).
+    type: int
 
   health_check_unhealthy_duration_before_replacement:
     description:
       - (Integer) Minimal mount of time instance should be unhealthy for us to consider it unhealthy.
+    type: int
 
   health_check_type:
-    choices:
-      - ELB
-      - HCS
-      - TARGET_GROUP
-      - MLB
-      - EC2
     description:
       - (String) The service to use for the health check.
+      - "The choices available are: C(ELB), C(HCS), C(TARGET_GROUP), C(MLB), C(EC2)."
+    type: str
 
   iam_role_name:
     description:
       - (String) The instance profile iamRole name
       - Only use iam_role_arn, or iam_role_name
+    type: str
 
   iam_role_arn:
     description:
       - (String) The instance profile iamRole arn
       - Only use iam_role_arn, or iam_role_name
+    type: str
 
   id:
     description:
       - (String) The group id if it already exists and you want to update, or delete it.
         This will not work unless the uniqueness_by field is set to id.
         When this is set, and the uniqueness_by field is set, the group will either be updated or deleted, but not created.
-
-  ignore_changes:
-    choices:
-      - image_id
-      - target
-    description:
-      - (List of Strings) list of fields on which changes should be ignored when updating
+    type: str
 
   image_id:
     description:
       - (String) The image Id used to launch the instance.;
         In case of conflict between Instance type and image type, an error will be returned
     required: true
+    type: str
 
   key_pair:
     description:
       - (String) Specify a Key Pair to attach to the instances
-    required: true
+    type: str
 
   kubernetes:
     description:
@@ -168,40 +170,47 @@ options:
         Expects the following keys -
         api_server (String),
         token (String)
+    type: dict
 
   lifetime_period:
     description:
-      - (String) lifetime period
+      - (Integer) lifetime period
+    type: int
 
   load_balancers:
     description:
       - (List of Strings) List of classic ELB names
+    type: list
 
   max_size:
     description:
       - (Integer) The upper limit number of instances that you can scale up to
     required: true
+    type: int
 
   mesosphere:
     description:
       - (Object) The Mesosphere integration configuration.
         Expects the following key -
         api_server (String)
+    type: dict
 
   min_size:
     description:
       - (Integer) The lower limit number of instances that you can scale down to
     required: true
+    type: int
 
   monitoring:
     description:
-      - (Boolean) Describes whether instance Enhanced Monitoring is enabled
-    required: true
+      - (String) Describes whether instance Enhanced Monitoring is enabled
+    type: str
 
   name:
     description:
       - (String) Unique name for elastigroup to be created, updated or deleted
     required: true
+    type: str
 
   network_interfaces:
     description:
@@ -219,23 +228,26 @@ options:
         subnet_id (String),
         associate_ipv6_address (Boolean),
         private_ip_addresses (List of Objects, Keys are privateIpAddress (String, required) and primary (Boolean))
+    type: list
 
   on_demand_count:
     description:
       - (Integer) Required if risk is not set
       - Number of on demand instances to launch. All other instances will be spot instances.;
         Either set this parameter or the risk parameter
+    type: int
 
   on_demand_instance_type:
     description:
       - (String) On-demand instance type that will be provisioned
-    required: true
+    type: str
 
   opsworks:
     description:
       - (Object) The elastigroup OpsWorks integration configration.;
         Expects the following key -
         layer_id (String)
+    type: dict
 
   persistence:
     description:
@@ -244,18 +256,14 @@ options:
         should_persist_root_device (Boolean),
         should_persist_block_devices (Boolean),
         should_persist_private_ip (Boolean)
+    type: dict
 
   product:
-    choices:
-      - Linux/UNIX
-      - SUSE Linux
-      - Windows
-      - Linux/UNIX (Amazon VPC)
-      - SUSE Linux (Amazon VPC)
-      - Windows
     description:
-      - (String) Operation system type._
+      - (String) Operation system type.
+      - "Available choices are: C(Linux/UNIX), C(SUSE Linux), C(Windows), C(Linux/UNIX (Amazon VPC)), C(SUSE Linux (Amazon VPC))."
     required: true
+    type: str
 
   rancher:
     description:
@@ -265,6 +273,7 @@ options:
         access_key (String),
         secret_key (String),
         master_host (String)
+    type: dict
 
   right_scale:
     description:
@@ -272,10 +281,12 @@ options:
         Expects the following keys -
         account_id (String),
         refresh_token (String)
+    type: dict
 
   risk:
     description:
       - (Integer) required if on demand is not set. The percentage of Spot instances to launch (0 - 100).
+    type: int
 
   roll_config:
     description:
@@ -285,6 +296,7 @@ options:
         batch_size_percentage(Integer, Required),
         grace_period - (Integer, Required),
         health_check_type(String, Optional)
+    type: dict
 
   scheduled_tasks:
     description:
@@ -302,17 +314,20 @@ options:
         grace_period (Integer),
         task_type (String, required),
         is_enabled (Boolean)
+    type: list
 
   security_group_ids:
     description:
       - (List of Strings) One or more security group IDs. ;
         In case of update it will override the existing Security Group with the new given array
     required: true
+    type: list
 
   shutdown_script:
     description:
       - (String) The Base64-encoded shutdown script that executes prior to instance termination.
         Encode before setting.
+    type: str
 
   signals:
     description:
@@ -320,15 +335,18 @@ options:
         keys allowed are -
         name (String, required),
         timeout (Integer)
+    type: list
 
   spin_up_time:
     description:
       - (Integer) spin up time, in seconds, for the instance
+    type: int
 
   spot_instance_types:
     description:
       - (List of Strings) Spot instance type that will be provisioned.
     required: true
+    type: list
 
   state:
     choices:
@@ -336,38 +354,41 @@ options:
       - absent
     description:
       - (String) create or delete the elastigroup
+    default: present
+    type: str
 
   tags:
     description:
-      - (List of tagKey:tagValue paris) a list of tags to configure in the elastigroup. Please specify list of keys and values (key colon value);
+      - (List of tagKey:tagValue pairs) a list of tags to configure in the elastigroup. Please specify list of keys and values (key colon value);
+    type: list
 
   target:
     description:
       - (Integer) The number of instances to launch
     required: true
+    type: int
 
   target_group_arns:
     description:
       - (List of Strings) List of target group arns instances should be registered to
+    type: list
 
   tenancy:
-    choices:
-      - default
-      - dedicated
     description:
-      - (String) dedicated vs shared tenancy
+      - (String) dedicated vs shared tenancy.
+      - "The available choices are: C(default), C(dedicated)."
+    type: str
 
   terminate_at_end_of_billing_hour:
     description:
       - (Boolean) terminate at the end of billing hour
     type: bool
+
   unit:
-    choices:
-      - instance
-      - weight
     description:
       - (String) The capacity unit to launch instances by.
-    required: true
+      - "The available choices are: C(instance), C(weight)."
+    type: str
 
   up_scaling_policies:
     description:
@@ -391,7 +412,7 @@ options:
         target (String),
         maximum (String),
         minimum (String)
-
+    type: list
 
   down_scaling_policies:
     description:
@@ -415,6 +436,7 @@ options:
         target (String),
         maximum (String),
         minimum (String)
+    type: list
 
   target_tracking_policies:
     description:
@@ -429,6 +451,7 @@ options:
         unit (String, required),
         cooldown (String, required),
         target (String, required)
+    type: list
 
   uniqueness_by:
     choices:
@@ -437,12 +460,13 @@ options:
     description:
       - (String) If your group names are not unique, you may use this feature to update or delete a specific group.
         Whenever this property is set, you must set a group_id in order to update or delete a group, otherwise a group will be created.
-
+    default: name
+    type: str
 
   user_data:
     description:
       - (String) Base64-encoded MIME user data. Encode before setting the value.
-
+    type: str
 
   utilize_reserved_instances:
     description:
@@ -454,11 +478,13 @@ options:
     description:
       - (Boolean) Whether or not the elastigroup creation / update actions should wait for the instances to spin
     type: bool
+    default: false
 
   wait_timeout:
     description:
       - (Integer) How long the module should wait for instances before failing the action.;
         Only works if wait_for_instances is True.
+    type: int
 
 '''
 EXAMPLES = '''
@@ -906,7 +932,6 @@ multai_fields = ('multai_token',)
 
 def handle_elastigroup(client, module):
     has_changed = False
-    should_create = False
     group_id = None
     message = 'None'
 
@@ -999,7 +1024,7 @@ def retrieve_group_instances(client, module, group_id):
                 healthy_instances = client.get_instance_healthiness(group_id=group_id)
 
                 for healthy_instance in healthy_instances:
-                    if(healthy_instance.get('healthStatus') == 'HEALTHY'):
+                    if healthy_instance.get('healthStatus') == 'HEALTHY':
                         amount_of_fulfilled_instances += 1
                         instances.append(healthy_instance)
 

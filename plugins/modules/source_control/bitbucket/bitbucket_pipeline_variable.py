@@ -72,7 +72,7 @@ EXAMPLES = r'''
     secured: '{{ item.secured }}'
     state: present
   with_items:
-    - { name: AWS_ACCESS_KEY, value: ABCD1234 }
+    - { name: AWS_ACCESS_KEY, value: ABCD1234, secured: False }
     - { name: AWS_SECRET, value: qwe789poi123vbn0, secured: True }
 
 - name: Remove pipeline variable
@@ -85,7 +85,7 @@ EXAMPLES = r'''
 
 RETURN = r''' # '''
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, _load_params
 from ansible_collections.community.general.plugins.module_utils.source_control.bitbucket import BitbucketHelper
 
 error_messages = {
@@ -119,17 +119,16 @@ def get_existing_pipeline_variable(module, bitbucket):
 
     The `value` key in dict is absent in case of secured variable.
     """
-    content = {
-        'next': BITBUCKET_API_ENDPOINTS['pipeline-variable-list'].format(
-            username=module.params['username'],
-            repo_slug=module.params['repository'],
-        )
-    }
-
+    variables_base_url = BITBUCKET_API_ENDPOINTS['pipeline-variable-list'].format(
+        username=module.params['username'],
+        repo_slug=module.params['repository'],
+    )
     # Look through the all response pages in search of variable we need
-    while 'next' in content:
+    page = 1
+    while True:
+        next_url = "%s?page=%s" % (variables_base_url, page)
         info, content = bitbucket.request(
-            api_url=content['next'],
+            api_url=next_url,
             method='GET',
         )
 
@@ -139,6 +138,11 @@ def get_existing_pipeline_variable(module, bitbucket):
         if info['status'] != 200:
             module.fail_json(msg='Failed to retrieve the list of pipeline variables: {0}'.format(info))
 
+        # We are at the end of list
+        if 'pagelen' in content and content['pagelen'] == 0:
+            return None
+
+        page += 1
         var = next(filter(lambda v: v['key'] == module.params['name'], content['values']), None)
 
         if var is not None:
@@ -207,6 +211,14 @@ def delete_pipeline_variable(module, bitbucket, variable_uuid):
         ))
 
 
+class BitBucketPipelineVariable(AnsibleModule):
+    def __init__(self, *args, **kwargs):
+        params = _load_params() or {}
+        if params.get('secured'):
+            kwargs['argument_spec']['value'].update({'no_log': True})
+        super(BitBucketPipelineVariable, self).__init__(*args, **kwargs)
+
+
 def main():
     argument_spec = BitbucketHelper.bitbucket_argument_spec()
     argument_spec.update(
@@ -217,7 +229,7 @@ def main():
         secured=dict(type='bool', default=False),
         state=dict(type='str', choices=['present', 'absent'], required=True),
     )
-    module = AnsibleModule(
+    module = BitBucketPipelineVariable(
         argument_spec=argument_spec,
         supports_check_mode=True,
     )

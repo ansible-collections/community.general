@@ -6,8 +6,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: 'null'
-    callback_type: stdout
+    author: Unknown (!UNKNOWN)
+    name: 'null'
+    type: stdout
     requirements:
       - set as main display callback
     short_description: Don't display stuff to screen

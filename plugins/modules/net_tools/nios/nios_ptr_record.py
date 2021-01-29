@@ -27,6 +27,7 @@ options:
         the system.
         The field is required only for an PTR object in Forward Mapping Zone.
     required: false
+    type: str
   view:
     description:
       - Sets the DNS view to associate this a record with. The DNS
@@ -34,37 +35,41 @@ options:
     required: false
     aliases:
       - dns_view
+    type: str
   ipv4addr:
     description:
       - The IPv4 Address of the record. Mutually exclusive with the ipv6addr.
-    required: true
     aliases:
       - ipv4
+    type: str
   ipv6addr:
     description:
       - The IPv6 Address of the record. Mutually exclusive with the ipv4addr.
-    required: true
     aliases:
       - ipv6
+    type: str
   ptrdname:
     description:
       - The domain name of the DNS PTR record in FQDN format.
-    required: true
+    type: str
   ttl:
     description:
       - Time To Live (TTL) value for the record.
         A 32-bit unsigned integer that represents the duration, in seconds, that the record is valid (cached).
         Zero indicates that the record should not be cached.
+    type: int
   extattrs:
     description:
       - Allows for the configuration of Extensible Attributes on the
         instance of the object.  This argument accepts a set of key / value
         pairs for configuration.
+    type: dict
   comment:
     description:
       - Configures a text string comment to be associated with the instance
         of this object.  The provided text string will be configured on the
         object instance. Maximum 256 characters.
+    type: str
   state:
     description:
       - Configures the intended state of the instance of the object on
@@ -75,6 +80,7 @@ options:
     choices:
       - present
       - absent
+    type: str
 '''
 
 EXAMPLES = '''
@@ -106,6 +112,7 @@ RETURN = ''' # '''
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import NIOS_PTR_RECORD
+from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_ib_spec
 
 
 def main():
@@ -128,7 +135,7 @@ def main():
         state=dict(default='present', choices=['present', 'absent'])
     )
 
-    argument_spec.update(ib_spec)
+    argument_spec.update(normalize_ib_spec(ib_spec))
     argument_spec.update(WapiModule.provider_spec)
 
     mutually_exclusive = [('ipv4addr', 'ipv6addr')]

@@ -6,9 +6,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: keyring
+    name: keyring
     author:
-      - Samuel Boucher <boucher.samuel.c@gmail.com>
+      - Samuel Boucher (!UNKNOWN) <boucher.samuel.c@gmail.com>
     requirements:
       - keyring (python library)
     short_description: grab secrets from the OS keyring

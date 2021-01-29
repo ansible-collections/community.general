@@ -18,6 +18,7 @@ author:
   - "Remy Leone (@sieben)"
 options:
   region:
+    type: str
     description:
       - Scaleway region to use (for example C(par1)).
     required: true
@@ -26,6 +27,10 @@ options:
       - EMEA-NL-EVS
       - par1
       - EMEA-FR-PAR1
+      - par2
+      - EMEA-FR-PAR2
+      - waw1
+      - EMEA-PL-WAW1
 extends_documentation_fragment:
 - community.general.scaleway
 
@@ -88,7 +93,7 @@ class ScalewaySecurityGroupInfo(Scaleway):
 def main():
     argument_spec = scaleway_argument_spec()
     argument_spec.update(dict(
-        region=dict(required=True, choices=SCALEWAY_LOCATION.keys()),
+        region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
     ))
     module = AnsibleModule(
         argument_spec=argument_spec,

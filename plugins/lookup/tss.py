@@ -6,7 +6,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = r"""
-lookup: tss
+name: tss
 author: Adam Migus (@amigus) <adam@migus.org>
 short_description: Get secrets from Thycotic Secret Server
 version_added: 1.0.0
@@ -75,7 +75,13 @@ EXAMPLES = r"""
   vars:
       secret: "{{ lookup('community.general.tss', 1) }}"
   tasks:
-      - ansible.builtin.debug: msg="the password is {{ (secret['items'] | items2dict(key_name='slug', value_name='itemValue'))['password'] }}"
+      - ansible.builtin.debug:
+          msg: >
+            the password is {{
+              (secret['items']
+                | items2dict(key_name='slug',
+                             value_name='itemValue'))['password']
+            }}
 """
 
 from ansible.errors import AnsibleError, AnsibleOptionsError

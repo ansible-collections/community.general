@@ -38,7 +38,7 @@ options:
             - "A ':' separated list of paths to search for 'brew' executable.
               Since a package (I(formula) in homebrew parlance) location is prefixed relative to the actual path of I(brew) command,
               providing an alternative I(brew) path enables managing different set of packages in an alternative location in the system."
-        default: '/usr/local/bin'
+        default: '/usr/local/bin:/opt/homebrew/bin'
         type: path
     state:
         description:
@@ -76,7 +76,7 @@ notes:
 '''
 
 EXAMPLES = '''
-# Install formula foo with 'brew' in default path (C(/usr/local/bin))
+# Install formula foo with 'brew' in default path
 - community.general.homebrew:
     name: foo
     state: present
@@ -168,7 +168,7 @@ class HomebrewException(Exception):
 
 
 # utils ------------------------------------------------------------------- {{{
-def _create_regex_group(s):
+def _create_regex_group_complement(s):
     lines = (line.strip() for line in s.split('\n') if line.strip())
     chars = filter(None, (line.split('#')[0].strip() for line in lines))
     group = r'[^' + r''.join(chars) + r']'
@@ -186,7 +186,7 @@ class Homebrew(object):
         :                   # colons
         {sep}               # the OS-specific path separator
         .                   # dots
-        -                   # dashes
+        \-                  # dashes
     '''.format(sep=os.path.sep)
 
     VALID_BREW_PATH_CHARS = r'''
@@ -194,7 +194,7 @@ class Homebrew(object):
         \s                  # spaces
         {sep}               # the OS-specific path separator
         .                   # dots
-        -                   # dashes
+        \-                  # dashes
     '''.format(sep=os.path.sep)
 
     VALID_PACKAGE_CHARS = r'''
@@ -202,14 +202,14 @@ class Homebrew(object):
         .                   # dots
         /                   # slash (for taps)
         \+                  # plusses
-        -                   # dashes
+        \-                  # dashes
         :                   # colons (for URLs)
         @                   # at-sign
     '''
 
-    INVALID_PATH_REGEX = _create_regex_group(VALID_PATH_CHARS)
-    INVALID_BREW_PATH_REGEX = _create_regex_group(VALID_BREW_PATH_CHARS)
-    INVALID_PACKAGE_REGEX = _create_regex_group(VALID_PACKAGE_CHARS)
+    INVALID_PATH_REGEX = _create_regex_group_complement(VALID_PATH_CHARS)
+    INVALID_BREW_PATH_REGEX = _create_regex_group_complement(VALID_BREW_PATH_CHARS)
+    INVALID_PACKAGE_REGEX = _create_regex_group_complement(VALID_PACKAGE_CHARS)
     # /class regexes ----------------------------------------------- }}}
 
     # class validations -------------------------------------------- {{{
@@ -871,7 +871,7 @@ def main():
                 elements='str',
             ),
             path=dict(
-                default="/usr/local/bin",
+                default="/usr/local/bin:/opt/homebrew/bin",
                 required=False,
                 type='path',
             ),

@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
-# (c) 2016, Indrajit Raychaudhuri <irc+code@indrajit.com>
+# Copyright: (c) 2013, Daniel Jaouen <dcj24@cornell.edu>
+# Copyright: (c) 2016, Indrajit Raychaudhuri <irc+code@indrajit.com>
 #
 # Based on homebrew (Andrew Dunham <andrew@du.nham.ca>)
 #
@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: homebrew_tap
 author:
@@ -48,7 +48,7 @@ options:
 requirements: [ homebrew ]
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Tap a Homebrew repository, state present
   community.general.homebrew_tap:
     name: homebrew/dupes
@@ -117,7 +117,7 @@ def add_tap(module, brew_path, tap, url=None):
             msg = 'successfully tapped: %s' % tap
         else:
             failed = True
-            msg = 'failed to tap: %s' % tap
+            msg = 'failed to tap: %s due to %s' % (tap, err)
 
     else:
         msg = 'already tapped: %s' % tap
@@ -172,7 +172,7 @@ def remove_tap(module, brew_path, tap):
             msg = 'successfully untapped: %s' % tap
         else:
             failed = True
-            msg = 'failed to untap: %s' % tap
+            msg = 'failed to untap: %s due to %s' % (tap, err)
 
     else:
         msg = 'already untapped: %s' % tap
@@ -218,7 +218,7 @@ def main():
     brew_path = module.get_bin_path(
         'brew',
         required=True,
-        opt_dirs=['/usr/local/bin']
+        opt_dirs=['/usr/local/bin', '/opt/homebrew/bin']
     )
 
     taps = module.params['name']

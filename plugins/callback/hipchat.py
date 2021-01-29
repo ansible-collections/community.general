@@ -6,8 +6,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: hipchat
-    callback_type: notification
+    author: Unknown (!UNKNOWN)
+    name: hipchat
+    type: notification
     requirements:
       - whitelist in configuration.
       - prettytable (python lib)

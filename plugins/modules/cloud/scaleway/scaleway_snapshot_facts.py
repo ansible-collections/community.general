@@ -25,6 +25,7 @@ extends_documentation_fragment:
 
 options:
   region:
+    type: str
     description:
      - Scaleway region to use (for example par1).
     required: true
@@ -33,6 +34,10 @@ options:
       - EMEA-NL-EVS
       - par1
       - EMEA-FR-PAR1
+      - par2
+      - EMEA-FR-PAR2
+      - waw1
+      - EMEA-PL-WAW1
 '''
 
 EXAMPLES = r'''
@@ -88,7 +93,7 @@ class ScalewaySnapshotFacts(Scaleway):
 def main():
     argument_spec = scaleway_argument_spec()
     argument_spec.update(dict(
-        region=dict(required=True, choices=SCALEWAY_LOCATION.keys()),
+        region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
     ))
 
     module = AnsibleModule(

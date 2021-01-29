@@ -24,21 +24,25 @@ options:
         required: true
         description:
             - Indicates desired state of resource.
+        type: str
         choices: [ absent, present ]
     api_key:
         required: true
         description:
             - The API key obtained from the Memset control panel.
+        type: str
     name:
         required: true
         description:
             - The zone nickname; usually the same as the main domain. Ensure this
               value has at most 250 characters.
+        type: str
         aliases: [ nickname ]
     ttl:
         description:
             - The default TTL for all records created in the zone. This must be a
               valid int from U(https://www.memset.com/apidocs/methods_dns.html#dns.zone_create).
+        type: int
         choices: [ 0, 300, 600, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400 ]
     force:
         required: false

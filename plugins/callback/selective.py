@@ -6,8 +6,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: selective
-    callback_type: stdout
+    author: Unknown (!UNKNOWN)
+    name: selective
+    type: stdout
     requirements:
       - set as main display callback
     short_description: only print certain tasks

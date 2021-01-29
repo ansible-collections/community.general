@@ -32,7 +32,6 @@ options:
     description:
       - Region to create an instance in.
     type: str
-    default: DFW
   username:
     description:
       - Rackspace username, overrides I(credentials).
@@ -59,37 +58,45 @@ notes:
     OPENSTACK = r'''
 options:
   api_key:
+    type: str
     description:
       - Rackspace API key, overrides I(credentials).
     aliases: [ password ]
   auth_endpoint:
+    type: str
     description:
       - The URI of the authentication service.
-    default: https://identity.api.rackspacecloud.com/v2.0/
+      - If not specified will be set to U(https://identity.api.rackspacecloud.com/v2.0/)
   credentials:
+    type: path
     description:
       - File to find the Rackspace credentials in. Ignored if I(api_key) and
         I(username) are provided.
     aliases: [ creds_file ]
   env:
+    type: str
     description:
       - Environment as configured in I(~/.pyrax.cfg),
         see U(https://github.com/rackspace/pyrax/blob/master/docs/getting_started.md#pyrax-configuration).
   identity_type:
+    type: str
     description:
       - Authentication mechanism to use, such as rackspace or keystone.
     default: rackspace
   region:
+    type: str
     description:
       - Region to create an instance in.
-    default: DFW
   tenant_id:
+    type: str
     description:
       - The tenant ID used for authentication.
   tenant_name:
+    type: str
     description:
       - The tenant name used for authentication.
   username:
+    type: str
     description:
       - Rackspace username, overrides I(credentials).
   validate_certs:

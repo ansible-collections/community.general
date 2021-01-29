@@ -5,7 +5,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: cyberarkpassword
+    author: Unknown (!UNKNOWN)
+    name: cyberarkpassword
     short_description: get secrets from CyberArk AIM
     requirements:
       - CyberArk AIM tool installed

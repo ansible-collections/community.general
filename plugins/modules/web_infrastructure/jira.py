@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 module: jira
 short_description: create and modify issues in a JIRA instance
 description:
@@ -20,11 +20,13 @@ description:
 
 options:
   uri:
+    type: str
     required: true
     description:
       - Base URI for the JIRA instance.
 
   operation:
+    type: str
     required: true
     aliases: [ command ]
     choices: [ comment, create, edit, fetch, link, search, transition, update ]
@@ -32,71 +34,86 @@ options:
       - The operation to perform.
 
   username:
+    type: str
     required: true
     description:
       - The username to log-in with.
 
   password:
+    type: str
     required: true
     description:
       - The password to log-in with.
 
   project:
+    type: str
     required: false
     description:
       - The project for this operation. Required for issue creation.
 
   summary:
+    type: str
     required: false
     description:
      - The issue summary, where appropriate.
 
   description:
+    type: str
     required: false
     description:
      - The issue description, where appropriate.
 
   issuetype:
+    type: str
     required: false
     description:
      - The issue type, for issue creation.
 
   issue:
+    type: str
     required: false
     description:
      - An existing issue key to operate on.
+    aliases: ['ticket']
 
   comment:
+    type: str
     required: false
     description:
      - The comment text to add.
 
   status:
+    type: str
     required: false
     description:
      - The desired status; only relevant for the transition operation.
 
   assignee:
+    type: str
     required: false
     description:
      - Sets the assignee on create or transition operations. Note not all transitions will allow this.
 
   linktype:
+    type: str
     required: false
     description:
      - Set type of link, when action 'link' selected.
 
   inwardissue:
+    type: str
     required: false
     description:
      - Set issue from which link will be created.
 
   outwardissue:
+    type: str
     required: false
     description:
      - Set issue to which link will be created.
 
   fields:
+    type: dict
     required: false
     description:
      - This is a free-form data structure that can contain arbitrary data. This is passed directly to the JIRA REST API
@@ -119,6 +136,7 @@ options:
     version_added: '0.2.0'
 
   timeout:
+    type: float
     required: false
     description:
       - Set timeout, in seconds, on requests to JIRA API.
@@ -139,7 +157,7 @@ author:
 - "Per Abildgaard Toft (@pertoft)"
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 # Create a new issue and add a comment to it:
 - name: Create an issue
   community.general.jira:
@@ -274,15 +292,16 @@ EXAMPLES = """
     operation: transition
     status: Done
   args:
-  fields:
-    customfield_14321: [ {'set': {'value': 'Value of Select' }} ]
-    comment:  [ { 'add': { 'body' : 'Test' } }]
+    fields:
+      customfield_14321: [ {'set': {'value': 'Value of Select' }} ]
+      comment:  [ { 'add': { 'body' : 'Test' } }]
 
 """
 
 import base64
 import json
 import sys
+import traceback
 
 from ansible.module_utils.six.moves.urllib.request import pathname2url
 
@@ -309,7 +328,11 @@ def request(url, user, passwd, timeout, data=None, method=None):
                                         'Authorization': "Basic %s" % auth})
 
     if info['status'] not in (200, 201, 204):
-        error = json.loads(info['body'])
+        error = None
+        try:
+            error = json.loads(info['body'])
+        except Exception:
+            module.fail_json(msg=to_native(info['body']), exception=traceback.format_exc())
         if error:
             msg = []
             for key in ('errorMessages', 'errors'):
@@ -317,18 +340,15 @@ def request(url, user, passwd, timeout, data=None, method=None):
                     msg.append(to_native(error[key]))
             if msg:
                 module.fail_json(msg=', '.join(msg))
-            else:
-                module.fail_json(msg=to_native(error))
-        else:
-            # Fallback print body, if it cant be decoded
-            module.fail_json(msg=to_native(info['body']))
+            module.fail_json(msg=to_native(error))
+        # Fallback print body, if it cant be decoded
+        module.fail_json(msg=to_native(info['body']))
 
     body = response.read()
 
     if body:
         return json.loads(to_text(body, errors='surrogate_or_strict'))
-    else:
-        return {}
+    return {}
 
 
 def post(url, user, passwd, timeout, data):
@@ -360,33 +380,25 @@ def create(restbase, user, passwd, params):
 
     url = restbase + '/issue/'
 
-    ret = post(url, user, passwd, params['timeout'], data)
-
-    return ret
+    return True, post(url, user, passwd, params['timeout'], data)
 
 
 def comment(restbase, user, passwd, params):
     data = {
         'body': params['comment']
     }
-
     url = restbase + '/issue/' + params['issue'] + '/comment'
 
-    ret = post(url, user, passwd, params['timeout'], data)
-
-    return ret
+    return True, post(url, user, passwd, params['timeout'], data)
 
 
 def edit(restbase, user, passwd, params):
     data = {
         'fields': params['fields']
     }
-
     url = restbase + '/issue/' + params['issue']
 
-    ret = put(url, user, passwd, params['timeout'], data)
-
-    return ret
+    return True, put(url, user, passwd, params['timeout'], data)
 
 
 def update(restbase, user, passwd, params):
@@ -395,15 +407,12 @@ def update(restbase, user, passwd, params):
     }
     url = restbase + '/issue/' + params['issue']
 
-    ret = put(url, user, passwd, params['timeout'], data)
-
-    return ret
+    return True, put(url, user, passwd, params['timeout'], data)
 
 
 def fetch(restbase, user, passwd, params):
     url = restbase + '/issue/' + params['issue']
-    ret = get(url, user, passwd, params['timeout'])
-    return ret
+    return False, get(url, user, passwd, params['timeout'])
 
 
 def search(restbase, user, passwd, params):
@@ -413,8 +422,7 @@ def search(restbase, user, passwd, params):
         url = url + '&fields=' + '&fields='.join([pathname2url(f) for f in fields])
     if params['maxresults']:
         url = url + '&maxResults=' + str(params['maxresults'])
-    ret = get(url, user, passwd, params['timeout'])
-    return ret
+    return False, get(url, user, passwd, params['timeout'])
 
 
 def transition(restbase, user, passwd, params):
@@ -437,9 +445,7 @@ def transition(restbase, user, passwd, params):
     data = {'transition': {"id": tid},
             'update': params['fields']}
 
-    ret = post(url, user, passwd, params['timeout'], data)
-
-    return ret
+    return True, post(url, user, passwd, params['timeout'], data)
 
 
 def link(restbase, user, passwd, params):
@@ -451,20 +457,7 @@ def link(restbase, user, passwd, params):
 
     url = restbase + '/issueLink/'
 
-    ret = post(url, user, passwd, params['timeout'], data)
-
-    return ret
-
-
-# Some parameters are required depending on the operation:
-OP_REQUIRED = dict(create=['project', 'issuetype', 'summary'],
-                   comment=['issue', 'comment'],
-                   edit=[],
-                   update=[],
-                   fetch=['issue'],
-                   transition=['status'],
-                   link=['linktype', 'inwardissue', 'outwardissue'],
-                   search=['jql'])
+    return True, post(url, user, passwd, params['timeout'], data)
 
 
 def main():
@@ -472,40 +465,40 @@ def main():
     global module
     module = AnsibleModule(
         argument_spec=dict(
-            uri=dict(required=True),
-            operation=dict(choices=['create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search'],
+            uri=dict(type='str', required=True),
+            operation=dict(type='str', choices=['create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search'],
                            aliases=['command'], required=True),
-            username=dict(required=True),
-            password=dict(required=True, no_log=True),
-            project=dict(),
-            summary=dict(),
-            description=dict(),
-            issuetype=dict(),
-            issue=dict(aliases=['ticket']),
-            comment=dict(),
-            status=dict(),
-            assignee=dict(),
+            username=dict(type='str', required=True),
+            password=dict(type='str', required=True, no_log=True),
+            project=dict(type='str', ),
+            summary=dict(type='str', ),
+            description=dict(type='str', ),
+            issuetype=dict(type='str', ),
+            issue=dict(type='str', aliases=['ticket']),
+            comment=dict(type='str', ),
+            status=dict(type='str', ),
+            assignee=dict(type='str', ),
             fields=dict(default={}, type='dict'),
-            linktype=dict(),
-            inwardissue=dict(),
-            outwardissue=dict(),
-            jql=dict(),
+            linktype=dict(type='str', ),
+            inwardissue=dict(type='str', ),
+            outwardissue=dict(type='str', ),
+            jql=dict(type='str', ),
             maxresults=dict(type='int'),
             timeout=dict(type='float', default=10),
             validate_certs=dict(default=True, type='bool'),
+        ),
+        required_if=(
+            ('operation', 'create', ['project', 'issuetype', 'summary']),
+            ('operation', 'comment', ['issue', 'comment']),
+            ('operation', 'fetch', ['issue']),
+            ('operation', 'transition', ['issue', 'status']),
+            ('operation', 'link', ['linktype', 'inwardissue', 'outwardissue']),
+            ('operation', 'search', ['jql']),
         ),
         supports_check_mode=False
     )
 
     op = module.params['operation']
-
-    # Check we have the necessary per-operation parameters
-    missing = []
-    for parm in OP_REQUIRED[op]:
-        if not module.params[parm]:
-            missing.append(parm)
-    if missing:
-        module.fail_json(msg="Operation %s require the following missing parameters: %s" % (op, ",".join(missing)))
 
     # Handle rest of parameters
     uri = module.params['uri']
@@ -526,12 +519,12 @@ def main():
         thismod = sys.modules[__name__]
         method = getattr(thismod, op)
 
-        ret = method(restbase, user, passwd, module.params)
+        changed, ret = method(restbase, user, passwd, module.params)
 
     except Exception as e:
-        return module.fail_json(msg=e.message)
+        return module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
-    module.exit_json(changed=True, meta=ret)
+    module.exit_json(changed=changed, meta=ret)
 
 
 if __name__ == '__main__':

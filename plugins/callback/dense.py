@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-callback: dense
+name: dense
 type: stdout
 short_description: minimal stdout output
 extends_documentation_fragment:

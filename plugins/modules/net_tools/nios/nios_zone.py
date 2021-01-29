@@ -27,33 +27,43 @@ options:
     required: true
     aliases:
       - name
+    type: str
   view:
     description:
       - Configures the DNS view name for the configured resource.  The
         specified DNS zone must already exist on the running NIOS instance
         prior to configuring zones.
-    required: true
     default: default
     aliases:
       - dns_view
+    type: str
   grid_primary:
     description:
       - Configures the grid primary servers for this zone.
+    type: list
+    elements: dict
     suboptions:
       name:
         description:
           - The name of the grid primary server
+        required: true
+        type: str
   grid_secondaries:
     description:
       - Configures the grid secondary servers for this zone.
+    type: list
+    elements: dict
     suboptions:
       name:
         description:
           - The name of the grid secondary server
+        required: true
+        type: str
   ns_group:
     description:
       - Configures the name server group for this zone. Name server group is
         mutually exclusive with grid primary and grid secondaries.
+    type: str
   restart_if_needed:
     description:
       - If set to true, causes the NIOS DNS service to restart and load the
@@ -66,16 +76,19 @@ options:
         responsibility to respond to address-to-name queries. It supports
         reverse-mapping zones for both IPv4 and IPv6 addresses.
     default: FORWARD
+    type: str
   extattrs:
     description:
       - Allows for the configuration of Extensible Attributes on the
         instance of the object.  This argument accepts a set of key / value
         pairs for configuration.
+    type: dict
   comment:
     description:
       - Configures a text string comment to be associated with the instance
         of this object.  The provided text string will be configured on the
         object instance.
+    type: str
   state:
     description:
       - Configures the intended state of the instance of the object on
@@ -86,6 +99,7 @@ options:
     choices:
       - present
       - absent
+    type: str
 '''
 
 EXAMPLES = '''
@@ -173,6 +187,7 @@ RETURN = ''' # '''
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import NIOS_ZONE
+from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_ib_spec
 
 
 def main():
@@ -184,7 +199,7 @@ def main():
 
     ib_spec = dict(
         fqdn=dict(required=True, aliases=['name'], ib_req=True, update=False),
-        zone_format=dict(default='FORWARD', aliases=['zone_format'], ib_req=False),
+        zone_format=dict(default='FORWARD', ib_req=False),
         view=dict(default='default', aliases=['dns_view'], ib_req=True),
 
         grid_primary=dict(type='list', elements='dict', options=grid_spec),
@@ -201,7 +216,7 @@ def main():
         state=dict(default='present', choices=['present', 'absent'])
     )
 
-    argument_spec.update(ib_spec)
+    argument_spec.update(normalize_ib_spec(ib_spec))
     argument_spec.update(WapiModule.provider_spec)
 
     module = AnsibleModule(argument_spec=argument_spec,

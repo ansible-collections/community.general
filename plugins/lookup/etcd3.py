@@ -8,9 +8,9 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author:
-    - Eric Belhomme <ebelhomme@fr.scc.com>
+    - Eric Belhomme (@eric-belhomme) <ebelhomme@fr.scc.com>
     version_added: '0.2.0'
-    lookup: etcd3
+    name: etcd3
     short_description: Get key values from etcd3 server
     description:
     - Retrieves key values and/or key prefixes from etcd3 server using its native gRPC API.

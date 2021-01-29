@@ -6,7 +6,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: context_demo
+    author: Unknown (!UNKNOWN)
+    name: context_demo
     type: aggregate
     short_description: demo callback that adds play/task context
     description:

@@ -144,7 +144,7 @@ def member_normalize(member_spec):
                        'pre_provisioning', 'network_setting', 'v6_network_setting',
                        'ha_port_setting', 'lan_port_setting', 'lan2_physical_setting',
                        'lan_ha_port_setting', 'mgmt_network_setting', 'v6_mgmt_network_setting']
-    for key in member_spec.keys():
+    for key in list(member_spec.keys()):
         if key in member_elements and member_spec[key] is not None:
             member_spec[key] = member_spec[key][0]
         if isinstance(member_spec[key], dict):
@@ -156,6 +156,15 @@ def member_normalize(member_spec):
         elif member_spec[key] is None:
             del member_spec[key]
     return member_spec
+
+
+def normalize_ib_spec(ib_spec):
+    result = {}
+    for arg in ib_spec:
+        result[arg] = dict([(k, v)
+                            for k, v in iteritems(ib_spec[arg])
+                            if k not in ('ib_req', 'transform', 'update')])
+    return result
 
 
 class WapiBase(object):
@@ -455,6 +464,9 @@ class WapiModule(WapiBase):
                 return False
 
             elif isinstance(proposed_item, list):
+                if key == 'aliases':
+                    if set(current_item) != set(proposed_item):
+                        return False
                 for subitem in proposed_item:
                     if not self.issubset(subitem, current_item):
                         return False

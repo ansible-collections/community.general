@@ -13,40 +13,51 @@ DOCUMENTATION = '''
 module: django_manage
 short_description: Manages a Django application.
 description:
-    - Manages a Django application using the I(manage.py) application frontend to I(django-admin). With the I(virtualenv) parameter, all
-      management commands will be executed by the given I(virtualenv) installation.
+    - Manages a Django application using the C(manage.py) application frontend to C(django-admin). With the
+      C(virtualenv) parameter, all management commands will be executed by the given C(virtualenv) installation.
 options:
   command:
-    choices: [ 'cleanup', 'collectstatic', 'flush', 'loaddata', 'migrate', 'runfcgi', 'syncdb', 'test', 'validate', ]
     description:
-      - The name of the Django management command to run. Built in commands are cleanup, collectstatic, flush, loaddata, migrate, runfcgi, syncdb,
-        test, and validate.
-      - Other commands can be entered, but will fail if they're unknown to Django.  Other commands that may prompt for user input should be run
-        with the I(--noinput) flag.
+      - The name of the Django management command to run. Built in commands are C(cleanup), C(collectstatic),
+        C(flush), C(loaddata), C(migrate), C(syncdb), C(test), and C(validate).
+      - Other commands can be entered, but will fail if they're unknown to Django.  Other commands that may
+        prompt for user input should be run with the C(--noinput) flag.
+      - The module will perform some basic parameter validation (when applicable) to the commands C(cleanup),
+        C(collectstatic), C(createcachetable), C(flush), C(loaddata), C(migrate), C(syncdb), C(test), and C(validate).
+    type: str
     required: true
-  app_path:
+  project_path:
     description:
       - The path to the root of the Django application where B(manage.py) lives.
+    type: path
     required: true
+    aliases: [app_path, chdir]
   settings:
     description:
-      - The Python path to the application's settings module, such as 'myapp.settings'.
+      - The Python path to the application's settings module, such as C(myapp.settings).
+    type: path
     required: false
   pythonpath:
     description:
-      - A directory to add to the Python path. Typically used to include the settings module if it is located external to the application directory.
+      - A directory to add to the Python path. Typically used to include the settings module if it is located
+        external to the application directory.
+    type: path
     required: false
+    aliases: [python_path]
   virtualenv:
     description:
       - An optional path to a I(virtualenv) installation to use while running the manage application.
-    aliases: [virtualenv]
+    type: path
+    aliases: [virtual_env]
   apps:
     description:
-      - A list of space-delimited apps to target. Used by the 'test' command.
+      - A list of space-delimited apps to target. Used by the C(test) command.
+    type: str
     required: false
   cache_table:
     description:
-      - The name of the table used for database-backed caching. Used by the 'createcachetable' command.
+      - The name of the table used for database-backed caching. Used by the C(createcachetable) command.
+    type: str
     required: false
   clear:
     description:
@@ -57,41 +68,66 @@ options:
     type: bool
   database:
     description:
-      - The database to target. Used by the 'createcachetable', 'flush', 'loaddata', and 'syncdb' commands.
+      - The database to target. Used by the C(createcachetable), C(flush), C(loaddata), C(syncdb),
+        and C(migrate) commands.
+    type: str
     required: false
   failfast:
     description:
-      - Fail the command immediately if a test fails. Used by the 'test' command.
+      - Fail the command immediately if a test fails. Used by the C(test) command.
     required: false
-    default: "no"
+    default: false
     type: bool
+    aliases: [fail_fast]
   fixtures:
     description:
-      - A space-delimited list of fixture file names to load in the database. B(Required) by the 'loaddata' command.
+      - A space-delimited list of fixture file names to load in the database. B(Required) by the C(loaddata) command.
+    type: str
     required: false
   skip:
     description:
-     - Will skip over out-of-order missing migrations, you can only use this parameter with I(migrate)
+     - Will skip over out-of-order missing migrations, you can only use this parameter with C(migrate) command.
     required: false
     type: bool
   merge:
     description:
-     - Will run out-of-order or missing migrations as they are not rollback migrations, you can only use this parameter with 'migrate' command
+     - Will run out-of-order or missing migrations as they are not rollback migrations, you can only use this
+       parameter with C(migrate) command.
     required: false
     type: bool
   link:
     description:
-     - Will create links to the files instead of copying them, you can only use this parameter with 'collectstatic' command
+     - Will create links to the files instead of copying them, you can only use this parameter with
+       C(collectstatic) command.
     required: false
     type: bool
+  liveserver:
+    description:
+      - This parameter was implemented a long time ago in a galaxy far way. It probably relates to the
+        django-liveserver package, which is no longer updated.
+      - Hence, it will be considered DEPRECATED and should be removed in a future release.
+    type: str
+    required: false
+    aliases: [live_server]
+  testrunner:
+    description:
+      - "From the Django docs: Controls the test runner class that is used to execute tests."
+      - This parameter is passed as-is to C(manage.py).
+    type: str
+    required: false
+    aliases: [test_runner]
 notes:
-  - I(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the virtualenv parameter is specified.
-  - This module will create a virtualenv if the virtualenv parameter is specified and a virtualenv does not already exist at the given location.
-  - This module assumes English error messages for the 'createcachetable' command to detect table existence, unfortunately.
-  - To be able to use the migrate command with django versions < 1.7, you must have south installed and added as an app in your settings.
-  - To be able to use the collectstatic command, you must have enabled staticfiles in your settings.
-  - As of ansible 2.x, your I(manage.py) application must be executable (rwxr-xr-x), and must have a valid I(shebang), i.e. "#!/usr/bin/env python",
-    for invoking the appropriate Python interpreter.
+  - C(virtualenv) (U(http://www.virtualenv.org)) must be installed on the remote host if the virtualenv parameter
+    is specified.
+  - This module will create a virtualenv if the virtualenv parameter is specified and a virtualenv does not already
+    exist at the given location.
+  - This module assumes English error messages for the C(createcachetable) command to detect table existence,
+    unfortunately.
+  - To be able to use the C(migrate) command with django versions < 1.7, you must have C(south) installed and added
+    as an app in your settings.
+  - To be able to use the C(collectstatic) command, you must have enabled staticfiles in your settings.
+  - Your C(manage.py) application must be executable (rwxr-xr-x), and must have a valid shebang,
+    i.e. C(#!/usr/bin/env python), for invoking the appropriate Python interpreter.
 requirements: [ "virtualenv", "django" ]
 author: "Scott Anderson (@tastychutney)"
 '''
@@ -100,18 +136,18 @@ EXAMPLES = """
 - name: Run cleanup on the application installed in django_dir
   community.general.django_manage:
     command: cleanup
-    app_path: "{{ django_dir }}"
+    project_path: "{{ django_dir }}"
 
 - name: Load the initial_data fixture into the application
   community.general.django_manage:
     command: loaddata
-    app_path: "{{ django_dir }}"
+    project_path: "{{ django_dir }}"
     fixtures: "{{ initial_data }}"
 
 - name: Run syncdb on the application
   community.general.django_manage:
     command: syncdb
-    app_path: "{{ django_dir }}"
+    project_path: "{{ django_dir }}"
     settings: "{{ settings_app_name }}"
     pythonpath: "{{ settings_dir }}"
     virtualenv: "{{ virtualenv_dir }}"
@@ -119,13 +155,13 @@ EXAMPLES = """
 - name: Run the SmokeTest test case from the main app. Useful for testing deploys
   community.general.django_manage:
     command: test
-    app_path: "{{ django_dir }}"
+    project_path: "{{ django_dir }}"
     apps: main.SmokeTest
 
 - name: Create an initial superuser
   community.general.django_manage:
     command: "createsuperuser --noinput --username=admin --email=admin@example.com"
-    app_path: "{{ django_dir }}"
+    project_path: "{{ django_dir }}"
 """
 
 import os
@@ -154,7 +190,6 @@ def _ensure_virtualenv(module):
 
     if not os.path.exists(activate):
         virtualenv = module.get_bin_path('virtualenv', True)
-        vcmd = '%s %s' % (virtualenv, venv_param)
         vcmd = [virtualenv, venv_param]
         rc, out_venv, err_venv = module.run_command(vcmd)
         if rc != 0:
@@ -164,8 +199,8 @@ def _ensure_virtualenv(module):
     os.environ["VIRTUAL_ENV"] = venv_param
 
 
-def createcachetable_filter_output(line):
-    return "Already exists" not in line
+def createcachetable_check_changed(output):
+    return "already exists" not in output
 
 
 def flush_filter_output(line):
@@ -177,11 +212,14 @@ def loaddata_filter_output(line):
 
 
 def syncdb_filter_output(line):
-    return ("Creating table " in line) or ("Installed" in line and "Installed 0 object" not in line)
+    return ("Creating table " in line) \
+        or ("Installed" in line and "Installed 0 object" not in line)
 
 
 def migrate_filter_output(line):
-    return ("Migrating forwards " in line) or ("Installed" in line and "Installed 0 object" not in line) or ("Applying" in line)
+    return ("Migrating forwards " in line) \
+        or ("Installed" in line and "Installed 0 object" not in line) \
+        or ("Applying" in line)
 
 
 def collectstatic_filter_output(line):
@@ -224,20 +262,21 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            command=dict(default=None, required=True),
-            app_path=dict(default=None, required=True, type='path'),
-            settings=dict(default=None, required=False),
-            pythonpath=dict(default=None, required=False, aliases=['python_path']),
+            command=dict(required=True, type='str'),
+            project_path=dict(required=True, type='path', aliases=['app_path', 'chdir']),
+            settings=dict(default=None, required=False, type='path'),
+            pythonpath=dict(default=None, required=False, type='path', aliases=['python_path']),
             virtualenv=dict(default=None, required=False, type='path', aliases=['virtual_env']),
 
             apps=dict(default=None, required=False),
-            cache_table=dict(default=None, required=False),
-            clear=dict(default=None, required=False, type='bool'),
-            database=dict(default=None, required=False),
+            cache_table=dict(default=None, required=False, type='str'),
+            clear=dict(default=False, required=False, type='bool'),
+            database=dict(default=None, required=False, type='str'),
             failfast=dict(default=False, required=False, type='bool', aliases=['fail_fast']),
-            fixtures=dict(default=None, required=False),
-            liveserver=dict(default=None, required=False, aliases=['live_server']),
-            testrunner=dict(default=None, required=False, aliases=['test_runner']),
+            fixtures=dict(default=None, required=False, type='str'),
+            liveserver=dict(default=None, required=False, type='str', aliases=['live_server'],
+                            removed_in_version='3.0.0', removed_from_collection='community.general'),
+            testrunner=dict(default=None, required=False, type='str', aliases=['test_runner']),
             skip=dict(default=None, required=False, type='bool'),
             merge=dict(default=None, required=False, type='bool'),
             link=dict(default=None, required=False, type='bool'),
@@ -245,7 +284,7 @@ def main():
     )
 
     command = module.params['command']
-    app_path = module.params['app_path']
+    project_path = module.params['project_path']
     virtualenv = module.params['virtualenv']
 
     for param in specific_params:
@@ -279,10 +318,10 @@ def main():
         if module.params[param]:
             cmd = '%s %s' % (cmd, module.params[param])
 
-    rc, out, err = module.run_command(cmd, cwd=app_path)
+    rc, out, err = module.run_command(cmd, cwd=project_path)
     if rc != 0:
         if command == 'createcachetable' and 'table' in err and 'already exists' in err:
-            out = 'Already exists.'
+            out = 'already exists.'
         else:
             if "Unknown command:" in err:
                 _fail(module, cmd, err, "Unknown django command: %s" % command)
@@ -296,9 +335,12 @@ def main():
         filtered_output = list(filter(filt, lines))
         if len(filtered_output):
             changed = True
+    check_changed = globals().get("{0}_check_changed".format(command), None)
+    if check_changed:
+        changed = check_changed(out)
 
-    module.exit_json(changed=changed, out=out, cmd=cmd, app_path=app_path, virtualenv=virtualenv,
-                     settings=module.params['settings'], pythonpath=module.params['pythonpath'])
+    module.exit_json(changed=changed, out=out, cmd=cmd, app_path=project_path, project_path=project_path,
+                     virtualenv=virtualenv, settings=module.params['settings'], pythonpath=module.params['pythonpath'])
 
 
 if __name__ == '__main__':

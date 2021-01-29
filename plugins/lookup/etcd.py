@@ -22,7 +22,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
     author:
         - Jan-Piet Mens (@jpmens)
-    lookup: etcd
+    name: etcd
     short_description: get info from an etcd server
     description:
         - Retrieves data from an etcd server
@@ -71,7 +71,7 @@ RETURN = '''
         description:
             - list of values associated with input keys
         type: list
-        elements: strings
+        elements: string
 '''
 
 import json

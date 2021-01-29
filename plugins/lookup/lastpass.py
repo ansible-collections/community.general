@@ -5,9 +5,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: lastpass
+    name: lastpass
     author:
-      -  Andrew Zenk <azenk@umn.edu>
+      - Andrew Zenk (!UNKNOWN) <azenk@umn.edu>
     requirements:
       - lpass (command line utility)
       - must have already logged into lastpass

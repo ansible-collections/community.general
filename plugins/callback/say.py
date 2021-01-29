@@ -7,7 +7,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: say
+    author: Unknown (!UNKNOWN)
+    name: say
     type: notification
     requirements:
       - whitelisting in configuration

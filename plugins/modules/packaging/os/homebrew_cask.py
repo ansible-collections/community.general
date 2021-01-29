@@ -32,7 +32,7 @@ options:
   path:
     description:
     - "':' separated list of paths to search for 'brew' executable."
-    default: '/usr/local/bin'
+    default: '/usr/local/bin:/opt/homebrew/bin'
     type: path
   state:
     description:
@@ -139,6 +139,7 @@ EXAMPLES = '''
 import os
 import re
 import tempfile
+from distutils import version
 
 from ansible.module_utils._text import to_bytes
 from ansible.module_utils.basic import AnsibleModule
@@ -152,7 +153,7 @@ class HomebrewCaskException(Exception):
 
 
 # utils ------------------------------------------------------------------- {{{
-def _create_regex_group(s):
+def _create_regex_group_complement(s):
     lines = (line.strip() for line in s.split('\n') if line.strip())
     chars = filter(None, (line.split('#')[0].strip() for line in lines))
     group = r'[^' + r''.join(chars) + r']'
@@ -170,7 +171,7 @@ class HomebrewCask(object):
         :                   # colons
         {sep}               # the OS-specific path separator
         .                   # dots
-        -                   # dashes
+        \-                  # dashes
     '''.format(sep=os.path.sep)
 
     VALID_BREW_PATH_CHARS = r'''
@@ -178,20 +179,20 @@ class HomebrewCask(object):
         \s                  # spaces
         {sep}               # the OS-specific path separator
         .                   # dots
-        -                   # dashes
+        \-                  # dashes
     '''.format(sep=os.path.sep)
 
     VALID_CASK_CHARS = r'''
         \w                  # alphanumeric characters (i.e., [a-zA-Z0-9_])
         .                   # dots
         /                   # slash (for taps)
-        -                   # dashes
+        \-                  # dashes
         @                   # at symbol
     '''
 
-    INVALID_PATH_REGEX = _create_regex_group(VALID_PATH_CHARS)
-    INVALID_BREW_PATH_REGEX = _create_regex_group(VALID_BREW_PATH_CHARS)
-    INVALID_CASK_REGEX = _create_regex_group(VALID_CASK_CHARS)
+    INVALID_PATH_REGEX = _create_regex_group_complement(VALID_PATH_CHARS)
+    INVALID_BREW_PATH_REGEX = _create_regex_group_complement(VALID_BREW_PATH_CHARS)
+    INVALID_CASK_REGEX = _create_regex_group_complement(VALID_CASK_CHARS)
     # /class regexes ----------------------------------------------- }}}
 
     # class validations -------------------------------------------- {{{
@@ -356,6 +357,18 @@ class HomebrewCask(object):
         else:
             self._current_cask = cask
             return cask
+
+    @property
+    def brew_version(self):
+        try:
+            return self._brew_version
+        except AttributeError:
+            return None
+
+    @brew_version.setter
+    def brew_version(self, brew_version):
+        self._brew_version = brew_version
+
     # /class properties -------------------------------------------- }}}
 
     def __init__(self, module, path=path, casks=None, state=None,
@@ -434,15 +447,12 @@ class HomebrewCask(object):
         if not self.valid_cask(self.current_cask):
             return False
 
-        cask_is_outdated_command = (
-            [
-                self.brew_path,
-                'cask',
-                'outdated',
-            ]
-            + (['--greedy'] if self.greedy else [])
-            + [self.current_cask]
-        )
+        if self._brew_cask_command_is_deprecated():
+            base_opts = [self.brew_path, 'outdated', '--cask']
+        else:
+            base_opts = [self.brew_path, 'cask', 'outdated']
+
+        cask_is_outdated_command = base_opts + (['--greedy'] if self.greedy else []) + [self.current_cask]
 
         rc, out, err = self.module.run_command(cask_is_outdated_command)
 
@@ -454,18 +464,35 @@ class HomebrewCask(object):
             self.message = 'Invalid cask: {0}.'.format(self.current_cask)
             raise HomebrewCaskException(self.message)
 
-        cmd = [
-            "{brew_path}".format(brew_path=self.brew_path),
-            "cask",
-            "list",
-            self.current_cask
-        ]
+        if self._brew_cask_command_is_deprecated():
+            base_opts = [self.brew_path, "list", "--cask"]
+        else:
+            base_opts = [self.brew_path, "cask", "list"]
+
+        cmd = base_opts + [self.current_cask]
         rc, out, err = self.module.run_command(cmd)
 
         if rc == 0:
             return True
         else:
             return False
+
+    def _get_brew_version(self):
+        if self.brew_version:
+            return self.brew_version
+
+        cmd = [self.brew_path, '--version']
+
+        rc, out, err = self.module.run_command(cmd, check_rc=True)
+
+        # get version string from first line of "brew --version" output
+        version = out.split('\n')[0].split(' ')[1]
+        self.brew_version = version
+        return self.brew_version
+
+    def _brew_cask_command_is_deprecated(self):
+        # The `brew cask` replacements were fully available in 2.6.0 (https://brew.sh/2020/12/01/homebrew-2.6.0/)
+        return version.LooseVersion(self._get_brew_version()) >= version.LooseVersion('2.6.0')
     # /checks ------------------------------------------------------ }}}
 
     # commands ----------------------------------------------------- {{{
@@ -537,11 +564,10 @@ class HomebrewCask(object):
             self.message = 'Casks would be upgraded.'
             raise HomebrewCaskException(self.message)
 
-        opts = (
-            [self.brew_path, 'cask', 'upgrade']
-        )
-
-        cmd = [opt for opt in opts if opt]
+        if self._brew_cask_command_is_deprecated():
+            cmd = [self.brew_path, 'upgrade', '--cask']
+        else:
+            cmd = [self.brew_path, 'cask', 'upgrade']
 
         rc, out, err = '', '', ''
 
@@ -586,10 +612,12 @@ class HomebrewCask(object):
             )
             raise HomebrewCaskException(self.message)
 
-        opts = (
-            [self.brew_path, 'cask', 'install', self.current_cask]
-            + self.install_options
-        )
+        if self._brew_cask_command_is_deprecated():
+            base_opts = [self.brew_path, 'install', '--cask']
+        else:
+            base_opts = [self.brew_path, 'cask', 'install']
+
+        opts = base_opts + [self.current_cask] + self.install_options
 
         cmd = [opt for opt in opts if opt]
 
@@ -650,11 +678,13 @@ class HomebrewCask(object):
             )
             raise HomebrewCaskException(self.message)
 
-        opts = (
-            [self.brew_path, 'cask', command]
-            + self.install_options
-            + [self.current_cask]
-        )
+        if self._brew_cask_command_is_deprecated():
+            base_opts = [self.brew_path, command, '--cask']
+        else:
+            base_opts = [self.brew_path, 'cask', command]
+
+        opts = base_opts + self.install_options + [self.current_cask]
+
         cmd = [opt for opt in opts if opt]
 
         rc, out, err = '', '', ''
@@ -703,10 +733,12 @@ class HomebrewCask(object):
             )
             raise HomebrewCaskException(self.message)
 
-        opts = (
-            [self.brew_path, 'cask', 'uninstall', self.current_cask]
-            + self.install_options
-        )
+        if self._brew_cask_command_is_deprecated():
+            base_opts = [self.brew_path, 'uninstall', '--cask']
+        else:
+            base_opts = [self.brew_path, 'cask', 'uninstall']
+
+        opts = base_opts + [self.current_cask] + self.install_options
 
         cmd = [opt for opt in opts if opt]
 
@@ -747,7 +779,7 @@ def main():
                 elements='str',
             ),
             path=dict(
-                default="/usr/local/bin",
+                default="/usr/local/bin:/opt/homebrew/bin",
                 required=False,
                 type='path',
             ),

@@ -2,18 +2,15 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
-
-
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
     name: online
-    plugin_type: inventory
     author:
       - Remy Leone (@sieben)
-    short_description: Online inventory source
+    short_description: Scaleway (previously Online SAS or Online.net) inventory source
     description:
-        - Get inventory hosts from Online
+        - Get inventory hosts from Scaleway (previously Online SAS or Online.net).
     options:
         plugin:
             description: token that ensures this is a source file for the 'online' plugin.
@@ -45,7 +42,7 @@ DOCUMENTATION = '''
                 - rpn
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 # online_inventory.yml file in YAML format
 # Example command line: ansible-inventory --list -i online_inventory.yml
 

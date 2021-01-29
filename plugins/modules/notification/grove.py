@@ -17,23 +17,28 @@ description:
        channel.
 options:
   channel_token:
+    type: str
     description:
       - Token of the channel to post to.
     required: true
   service:
+    type: str
     description:
       - Name of the service (displayed as the "user" in the message)
     required: false
     default: ansible
   message:
+    type: str
     description:
       - Message content
     required: true
   url:
+    type: str
     description:
       - Service URL for the web client
     required: false
   icon_url:
+    type: str
     description:
       -  Icon for the service
     required: false

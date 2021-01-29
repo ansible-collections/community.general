@@ -4,6 +4,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -42,6 +43,14 @@ options:
         description:
             - Sets the retention policy as default retention policy.
         type: bool
+        default: false
+    shard_group_duration:
+        description:
+            - Determines the size of a shard group.
+            - Value needs to be integer literal followed immediately (with no spaces) by a duration unit.
+              Supported duration units are C(h) for hours, C(d) for days, and C(w) for weeks. For example C(10d), C(1h), C(2w).
+        type: str
+        version_added: '2.0.0'
 extends_documentation_fragment:
 - community.general.influxdb
 
@@ -59,23 +68,25 @@ EXAMPLES = r'''
       ssl: yes
       validate_certs: yes
 
-- name: Create 1 day retention policy
+- name: Create 1 day retention policy with 1 hour shard group duration
   community.general.influxdb_retention_policy:
       hostname: "{{influxdb_ip_address}}"
       database_name: "{{influxdb_database_name}}"
       policy_name: test
       duration: 1d
       replication: 1
+      shard_group_duration: 1h
 
-- name: Create 1 week retention policy
+- name: Create 1 week retention policy with 1 day shard group duration
   community.general.influxdb_retention_policy:
       hostname: "{{influxdb_ip_address}}"
       database_name: "{{influxdb_database_name}}"
       policy_name: test
       duration: 1w
       replication: 1
+      shard_group_duration: 1d
 
-- name: Create infinite retention policy
+- name: Create infinite retention policy with 1 week of shard group duration
   community.general.influxdb_retention_policy:
       hostname: "{{influxdb_ip_address}}"
       database_name: "{{influxdb_database_name}}"
@@ -84,6 +95,7 @@ EXAMPLES = r'''
       replication: 1
       ssl: no
       validate_certs: no
+      shard_group_duration: 1w
 '''
 
 RETURN = r'''
@@ -126,10 +138,15 @@ def create_retention_policy(module, client):
     duration = module.params['duration']
     replication = module.params['replication']
     default = module.params['default']
+    shard_group_duration = module.params['shard_group_duration']
 
     if not module.check_mode:
         try:
-            client.create_retention_policy(policy_name, duration, replication, database_name, default)
+            if shard_group_duration:
+                client.create_retention_policy(policy_name, duration, replication, database_name, default,
+                                               shard_group_duration)
+            else:
+                client.create_retention_policy(policy_name, duration, replication, database_name, default)
         except exceptions.InfluxDBClientError as e:
             module.fail_json(msg=e.content)
     module.exit_json(changed=True)
@@ -141,6 +158,7 @@ def alter_retention_policy(module, client, retention_policy):
     duration = module.params['duration']
     replication = module.params['replication']
     default = module.params['default']
+    shard_group_duration = module.params['shard_group_duration']
     duration_regexp = re.compile(r'(\d+)([hdw]{1})|(^INF$){1}')
     changed = False
 
@@ -155,12 +173,28 @@ def alter_retention_policy(module, client, retention_policy):
     elif duration == 'INF':
         influxdb_duration_format = '0'
 
+    if shard_group_duration:
+        shard_group_duration_lookup = duration_regexp.search(shard_group_duration)
+        if not shard_group_duration_lookup:
+            module.fail_json(
+                msg="Failed to parse value of shard_group_duration. Please see the documentation for valid values")
+        if shard_group_duration_lookup.group(2) == 'h':
+            influxdb_shard_group_duration_format = '%s0m0s' % duration
+        elif shard_group_duration_lookup.group(2) == 'd':
+            influxdb_shard_group_duration_format = '%sh0m0s' % (int(shard_group_duration_lookup.group(1)) * 24)
+        elif shard_group_duration_lookup.group(2) == 'w':
+            influxdb_shard_group_duration_format = '%sh0m0s' % (int(shard_group_duration_lookup.group(1)) * 24 * 7)
+    else:
+        influxdb_shard_group_duration_format = retention_policy['shardGroupDuration']
+
     if (not retention_policy['duration'] == influxdb_duration_format or
             not retention_policy['replicaN'] == int(replication) or
+            not retention_policy['shardGroupDuration'] == influxdb_shard_group_duration_format or
             not retention_policy['default'] == default):
         if not module.check_mode:
             try:
-                client.alter_retention_policy(policy_name, database_name, duration, replication, default)
+                client.alter_retention_policy(policy_name, database_name, duration, replication, default,
+                                              shard_group_duration)
             except exceptions.InfluxDBClientError as e:
                 module.fail_json(msg=e.content)
         changed = True
@@ -174,7 +208,8 @@ def main():
         policy_name=dict(required=True, type='str'),
         duration=dict(required=True, type='str'),
         replication=dict(required=True, type='int'),
-        default=dict(default=False, type='bool')
+        default=dict(default=False, type='bool'),
+        shard_group_duration=dict(required=False, type='str'),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,

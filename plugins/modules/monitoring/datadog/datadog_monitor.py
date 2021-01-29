@@ -70,6 +70,7 @@ options:
         type: str
         aliases: [ 'message' ]
     silenced:
+        type: dict
         description:
           - Dictionary of scopes to silence, with timestamps or None.
           - Each scope will be muted until the given POSIX timestamp or forever if the value is None.
@@ -83,7 +84,7 @@ options:
         description:
           - The number of minutes before a monitor will notify when data stops reporting.
           - Must be at least 2x the monitor timeframe for metric alerts or 2 minutes for service checks.
-        default: 2x timeframe for metric, 2 minutes for service
+          - If not specified, it defaults to 2x timeframe for metric, 2 minutes for service.
         type: str
     timeout_h:
         description:
@@ -105,11 +106,12 @@ options:
         type: bool
         default: 'no'
     thresholds:
+        type: dict
         description:
           - A dictionary of thresholds by status.
           - Only available for service checks and metric alerts.
           - Because each of them can have multiple thresholds, we do not define them directly in the query.
-        default: {'ok': 1, 'critical': 1, 'warning': 1}
+          - "If not specified, it defaults to: C({'ok': 1, 'critical': 1, 'warning': 1})."
     locked:
         description:
           - Whether changes to this monitor should be restricted to the creator or admins.
@@ -135,6 +137,12 @@ options:
           - The ID of the alert.
           - If set, will be used instead of the name to locate the alert.
         type: str
+    include_tags:
+        description:
+          - Whether notifications from this monitor automatically inserts its triggering tags into the title.
+        type: bool
+        default: yes
+        version_added: 1.3.0
 '''
 
 EXAMPLES = '''
@@ -203,7 +211,7 @@ def main():
             type=dict(required=False, choices=['metric alert', 'service check', 'event alert', 'process alert', 'log alert']),
             name=dict(required=True),
             query=dict(required=False),
-            notification_message=dict(required=False, default=None, aliases=['message'],
+            notification_message=dict(required=False, no_log=True, default=None, aliases=['message'],
                                       deprecated_aliases=[dict(name='message', version='3.0.0',
                                                                collection_name='community.general')]),  # was Ansible 2.14
             silenced=dict(required=False, default=None, type='dict'),
@@ -219,7 +227,8 @@ def main():
             require_full_window=dict(required=False, default=None, type='bool'),
             new_host_delay=dict(required=False, default=None),
             evaluation_delay=dict(required=False, default=None),
-            id=dict(required=False)
+            id=dict(required=False),
+            include_tags=dict(required=False, default=True, type='bool'),
         )
     )
 
@@ -333,7 +342,8 @@ def install_monitor(module):
         "locked": module.boolean(module.params['locked']),
         "require_full_window": module.params['require_full_window'],
         "new_host_delay": module.params['new_host_delay'],
-        "evaluation_delay": module.params['evaluation_delay']
+        "evaluation_delay": module.params['evaluation_delay'],
+        "include_tags": module.params['include_tags'],
     }
 
     if module.params['type'] == "service check":

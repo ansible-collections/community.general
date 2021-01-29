@@ -1,21 +1,21 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2017, Branko Majic <branko@majic.rs>
+# Copyright: (c) 2017, Branko Majic <branko@majic.rs>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 module: dconf
 author:
     - "Branko Majic (@azaghal)"
 short_description: Modify and read dconf database
 description:
-  - This module allows modifications and reading of dconf database. The module
-    is implemented as a wrapper around dconf tool. Please see the dconf(1) man
+  - This module allows modifications and reading of C(dconf) database. The module
+    is implemented as a wrapper around C(dconf) tool. Please see the dconf(1) man
     page for more details.
   - Since C(dconf) requires a running D-Bus session to change values, the module
     will try to detect an existing session and reuse it, or run the tool via
@@ -45,28 +45,28 @@ notes:
     /path/to/dir/) or C(dconf read /path/to/key).
 options:
   key:
+    type: str
     required: true
     description:
       - A dconf key to modify or read from the dconf database.
   value:
+    type: str
     required: false
     description:
       - Value to set for the specified dconf key. Value should be specified in
         GVariant format. Due to complexity of this format, it is best to have a
-        look at existing values in the dconf database. Required for
-        C(state=present).
+        look at existing values in the dconf database.
+      - Required for I(state=present).
   state:
+    type: str
     required: false
     default: present
-    choices:
-      - read
-      - present
-      - absent
+    choices: [ 'read', 'present', 'absent' ]
     description:
       - The action to take upon the key/value.
 '''
 
-RETURN = """
+RETURN = r"""
 value:
     description: value associated with the requested key
     returned: success, state was "read"
@@ -74,7 +74,7 @@ value:
     sample: "'Default'"
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Configure available keyboard layouts in Gnome
   community.general.dconf:
     key: "/org/gnome/desktop/input-sources/sources"
@@ -123,10 +123,10 @@ import traceback
 PSUTIL_IMP_ERR = None
 try:
     import psutil
-    psutil_found = True
+    HAS_PSUTIL = True
 except ImportError:
     PSUTIL_IMP_ERR = traceback.format_exc()
-    psutil_found = False
+    HAS_PSUTIL = False
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 
@@ -162,7 +162,7 @@ class DBusWrapper(object):
         # If no existing D-Bus session was detected, check if dbus-run-session
         # is available.
         if self.dbus_session_bus_address is None:
-            self.module.get_bin_path('dbus-run-session', required=True)
+            self.dbus_run_session_cmd = self.module.get_bin_path('dbus-run-session', required=True)
 
     def _get_existing_dbus_session(self):
         """
@@ -186,7 +186,8 @@ class DBusWrapper(object):
                 if process_real_uid == uid and 'DBUS_SESSION_BUS_ADDRESS' in process.environ():
                     dbus_session_bus_address_candidate = process.environ()['DBUS_SESSION_BUS_ADDRESS']
                     self.module.debug("Found D-Bus user session candidate at address: %s" % dbus_session_bus_address_candidate)
-                    command = ['dbus-send', '--address=%s' % dbus_session_bus_address_candidate, '--type=signal', '/', 'com.example.test']
+                    dbus_send_cmd = self.module.get_bin_path('dbus-send', required=True)
+                    command = [dbus_send_cmd, '--address=%s' % dbus_session_bus_address_candidate, '--type=signal', '/', 'com.example.test']
                     rc, _, _ = self.module.run_command(command)
 
                     if rc == 0:
@@ -216,7 +217,7 @@ class DBusWrapper(object):
 
         if self.dbus_session_bus_address is None:
             self.module.debug("Using dbus-run-session wrapper for running commands.")
-            command = ['dbus-run-session'] + command
+            command = [self.dbus_run_session_cmd] + command
             rc, out, err = self.module.run_command(command)
 
             if self.dbus_session_bus_address is None and rc == 127:
@@ -243,6 +244,8 @@ class DconfPreference(object):
 
         self.module = module
         self.check_mode = check_mode
+        # Check if dconf binary exists
+        self.dconf_bin = self.module.get_bin_path('dconf', required=True)
 
     def read(self, key):
         """
@@ -252,13 +255,14 @@ class DconfPreference(object):
 
         :returns: string -- Value assigned to the provided key. If the value is not set for specified key, returns None.
         """
-
-        command = ["dconf", "read", key]
+        command = [self.dconf_bin, "read", key]
 
         rc, out, err = self.module.run_command(command)
 
         if rc != 0:
-            self.module.fail_json(msg='dconf failed while reading the value with error: %s' % err)
+            self.module.fail_json(msg='dconf failed while reading the value with error: %s' % err,
+                                  out=out,
+                                  err=err)
 
         if out == '':
             value = None
@@ -281,7 +285,6 @@ class DconfPreference(object):
 
         :returns: bool -- True if a change was made, False if no change was required.
         """
-
         # If no change is needed (or won't be done due to check_mode), notify
         # caller straight away.
         if value == self.read(key):
@@ -291,14 +294,16 @@ class DconfPreference(object):
 
         # Set-up command to run. Since DBus is needed for write operation, wrap
         # dconf command dbus-launch.
-        command = ["dconf", "write", key, value]
+        command = [self.dconf_bin, "write", key, value]
 
         # Run the command and fetch standard return code, stdout, and stderr.
         dbus_wrapper = DBusWrapper(self.module)
         rc, out, err = dbus_wrapper.run_command(command)
 
         if rc != 0:
-            self.module.fail_json(msg='dconf failed while write the value with error: %s' % err)
+            self.module.fail_json(msg='dconf failed while write the value with error: %s' % err,
+                                  out=out,
+                                  err=err)
 
         # Value was changed.
         return True
@@ -327,14 +332,16 @@ class DconfPreference(object):
 
         # Set-up command to run. Since DBus is needed for reset operation, wrap
         # dconf command dbus-launch.
-        command = ["dconf", "reset", key]
+        command = [self.dconf_bin, "reset", key]
 
         # Run the command and fetch standard return code, stdout, and stderr.
         dbus_wrapper = DBusWrapper(self.module)
         rc, out, err = dbus_wrapper.run_command(command)
 
         if rc != 0:
-            self.module.fail_json(msg='dconf failed while reseting the value with error: %s' % err)
+            self.module.fail_json(msg='dconf failed while reseting the value with error: %s' % err,
+                                  out=out,
+                                  err=err)
 
         # Value was changed.
         return True
@@ -351,7 +358,7 @@ def main():
         supports_check_mode=True
     )
 
-    if not psutil_found:
+    if not HAS_PSUTIL:
         module.fail_json(msg=missing_required_lib("psutil"), exception=PSUTIL_IMP_ERR)
 
     # If present state was specified, value must be provided.

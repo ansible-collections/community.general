@@ -5,10 +5,10 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: redis
+    name: redis
     author:
       - Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
-      - Ansible Core
+      - Ansible Core Team
     short_description: fetch data from Redis
     description:
       - This lookup returns a list of results from a Redis DB corresponding to a list of items given to it

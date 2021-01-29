@@ -1,3 +1,8 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 #
 # Test for proper failures without pyodbc
 #
@@ -32,12 +37,7 @@
 # Name setup database
 #
 - name: Create a user to run the tests with
-  postgresql_user:
-    name: "{{ my_user }}"
-    password: "{{ my_pass }}"
-    encrypted: 'yes'
-    role_attr_flags: "SUPERUSER"
-    db: postgres
+  shell: echo "CREATE USER {{ my_user }} SUPERUSER PASSWORD '{{ my_pass }}'" | psql postgres
   become_user: "{{ pg_user }}"
   become: True
 

@@ -18,26 +18,32 @@ description:
 
 options:
   group:
+    type: str
     description:
       - Name of the Jenkins group on the OS.
     default: jenkins
   jenkins_home:
+    type: path
     description:
       - Home directory of the Jenkins user.
     default: /var/lib/jenkins
   mode:
+    type: raw
     description:
       - File mode applied on versioned plugins.
     default: '0644'
   name:
+    type: str
     description:
       - Plugin name.
     required: yes
   owner:
+    type: str
     description:
       - Name of the Jenkins user on the OS.
     default: jenkins
   state:
+    type: str
     description:
       - Desired plugin state.
       - If the C(latest) is set, the check for new version will be performed
@@ -45,10 +51,12 @@ options:
     choices: [absent, present, pinned, unpinned, enabled, disabled, latest]
     default: present
   timeout:
+    type: int
     description:
       - Server connection timeout in secs.
     default: 30
   updates_expiration:
+    type: int
     description:
       - Number of seconds after which a new copy of the I(update-center.json)
         file is downloaded. This is used to avoid the need to download the
@@ -58,16 +66,19 @@ options:
         C(latest) is specified.
     default: 86400
   updates_url:
+    type: str
     description:
       - URL of the Update Centre.
       - Used as the base URL to download the plugins and the
         I(update-center.json) JSON file.
     default: https://updates.jenkins.io
   url:
+    type: str
     description:
       - URL of the Jenkins server.
     default: http://localhost:8080
   version:
+    type: str
     description:
       - Plugin version number.
       - If this option is specified, all plugin dependencies must be installed
@@ -95,10 +106,9 @@ notes:
   - It is not possible to run the module remotely by changing the I(url)
     parameter to point to the Jenkins server. The module must be used on the
     host where Jenkins runs as it needs direct access to the plugin files.
-  - "The C(params) option was removed in Ansible 2.5 due to circumventing Ansible's
-    option handling"
 extends_documentation_fragment:
   - url
+  - files
 '''
 
 EXAMPLES = '''
@@ -692,12 +702,11 @@ def main():
     # Module arguments
     argument_spec = url_argument_spec()
     argument_spec.update(
-        group=dict(default='jenkins'),
-        jenkins_home=dict(default='/var/lib/jenkins'),
+        group=dict(type='str', default='jenkins'),
+        jenkins_home=dict(type='path', default='/var/lib/jenkins'),
         mode=dict(default='0644', type='raw'),
-        name=dict(required=True),
-        owner=dict(default='jenkins'),
-        params=dict(type='dict'),
+        name=dict(type='str', required=True),
+        owner=dict(type='str', default='jenkins'),
         state=dict(
             choices=[
                 'present',
@@ -722,11 +731,6 @@ def main():
         add_file_common_args=True,
         supports_check_mode=True,
     )
-
-    # Params was removed
-    # https://meetbot.fedoraproject.org/ansible-meeting/2017-09-28/ansible_dev_meeting.2017-09-28-15.00.log.html
-    if module.params['params']:
-        module.fail_json(msg="The params option to jenkins_plugin was removed in Ansible 2.5 since it circumvents Ansible's option handling")
 
     # Force basic authentication
     module.params['force_basic_auth'] = True

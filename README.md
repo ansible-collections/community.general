@@ -1,8 +1,11 @@
 # Community General Collection
 
-[![Run Status](https://api.shippable.com/projects/5e664a167c32620006c9fa50/badge?branch=main)](https://app.shippable.com/github/ansible-collections/community.general/dashboard) [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
+[![Build Status](https://dev.azure.com/ansible/community.general/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ansible/community.general/_build?definitionId=31)
+[![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.general)](https://codecov.io/gh/ansible-collections/community.general)
 
 This repo contains the `community.general` Ansible Collection. The collection includes many modules and plugins supported by Ansible community which are not part of more specialized community collections.
+
+You can find [documentation for this collection on the Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/general/).
 
 ## Tested with Ansible
 
@@ -14,7 +17,7 @@ Some modules and plugins require external libraries. Please check the requiremen
 
 ## Included content
 
-Please check the included content on the [Ansible Galaxy page for this collection](https://galaxy.ansible.com/community/general).
+Please check the included content on the [Ansible Galaxy page for this collection](https://galaxy.ansible.com/community/general) or the [documentation on the Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/general/).
 
 ## Using this collection
 
@@ -34,6 +37,14 @@ See [Ansible Using collections](https://docs.ansible.com/ansible/latest/user_gui
 ## Contributing to this collection
 
 If you want to develop new content for this collection or improve what is already here, the easiest way to work on the collection is to clone it into one of the configured [`COLLECTIONS_PATH`](https://docs.ansible.com/ansible/latest/reference_appendices/config.html#collections-paths), and work on it there.
+
+For example, if you are working in the `~/dev` directory:
+
+```
+cd ~/dev
+git clone git@github.com:ansible-collections/community.general.git collections/ansible_collections/community/general
+export COLLECTIONS_PATH=$(pwd)/collections:$COLLECTIONS_PATH
+```
 
 You can find more information in the [developer guide for collections](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#contributing-to-collections), and in the [Ansible Community Guide](https://docs.ansible.com/ansible/latest/community/index.html).
 

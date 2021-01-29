@@ -6,7 +6,6 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
     name: linode
-    plugin_type: inventory
     author:
       - Luke Murphy (@decentral1se)
     short_description: Ansible dynamic inventory plugin for Linode.
@@ -17,7 +16,10 @@ DOCUMENTATION = r'''
         - Reads inventories from the Linode API v4.
         - Uses a YAML configuration file that ends with linode.(yml|yaml).
         - Linode labels are used by default as the hostnames.
-        - The inventory groups are built from groups and not tags.
+        - The default inventory groups are built from groups (deprecated by
+          Linode) and not tags.
+    extends_documentation_fragment:
+        - constructed
     options:
         plugin:
             description: marks this as an instance of the 'linode' plugin
@@ -33,11 +35,25 @@ DOCUMENTATION = r'''
           default: []
           type: list
           required: false
+        tags:
+          description: Populate inventory only with instances which have at least one of the tags listed here.
+          default: []
+          type: list
+          reqired: false
+          version_added: 2.0.0
         types:
           description: Populate inventory with instances with this type.
           default: []
           type: list
           required: false
+        strict:
+          version_added: 2.0.0
+        compose:
+          version_added: 2.0.0
+        groups:
+          version_added: 2.0.0
+        keyed_groups:
+          version_added: 2.0.0
 '''
 
 EXAMPLES = r'''
@@ -51,23 +67,38 @@ regions:
   - eu-west
 types:
   - g5-standard-2
+
+# Example with keyed_groups, groups, and compose
+plugin: community.general.linode
+access_token: foobar
+keyed_groups:
+  - key: tags
+    separator: ''
+  - key: region
+    prefix: region
+groups:
+  webservers: "'web' in (tags|list)"
+  mailservers: "'mail' in (tags|list)"
+compose:
+  ansible_port: 2222
 '''
 
 import os
 
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.six import string_types
-from ansible.plugins.inventory import BaseInventoryPlugin
+from ansible.plugins.inventory import BaseInventoryPlugin, Constructable
 
 
 try:
     from linode_api4 import LinodeClient
     from linode_api4.errors import ApiError as LinodeApiError
+    HAS_LINODE = True
 except ImportError:
-    raise AnsibleError('the Linode dynamic inventory plugin requires linode_api4.')
+    HAS_LINODE = False
 
 
-class InventoryModule(BaseInventoryPlugin):
+class InventoryModule(BaseInventoryPlugin, Constructable):
 
     NAME = 'community.general.linode'
 
@@ -110,7 +141,7 @@ class InventoryModule(BaseInventoryPlugin):
         for linode_group in self.linode_groups:
             self.inventory.add_group(linode_group)
 
-    def _filter_by_config(self, regions, types):
+    def _filter_by_config(self, regions, types, tags):
         """Filter instances by user specified configuration."""
         if regions:
             self.instances = [
@@ -122,6 +153,12 @@ class InventoryModule(BaseInventoryPlugin):
             self.instances = [
                 instance for instance in self.instances
                 if instance.type.id in types
+            ]
+
+        if tags:
+            self.instances = [
+                instance for instance in self.instances
+                if any(tag in instance.tags for tag in tags)
             ]
 
     def _add_instances_to_groups(self):
@@ -168,6 +205,10 @@ class InventoryModule(BaseInventoryPlugin):
                 'type_to_be': list,
                 'value': config_data.get('types', [])
             },
+            'tags': {
+                'type_to_be': list,
+                'value': config_data.get('tags', [])
+            },
         }
 
         for name in options:
@@ -179,8 +220,9 @@ class InventoryModule(BaseInventoryPlugin):
 
         regions = options['regions']['value']
         types = options['types']['value']
+        tags = options['tags']['value']
 
-        return regions, types
+        return regions, types, tags
 
     def verify_file(self, path):
         """Verify the Linode configuration file."""
@@ -194,14 +236,35 @@ class InventoryModule(BaseInventoryPlugin):
         """Dynamically parse Linode the cloud inventory."""
         super(InventoryModule, self).parse(inventory, loader, path)
 
+        if not HAS_LINODE:
+            raise AnsibleError('the Linode dynamic inventory plugin requires linode_api4.')
+
         config_data = self._read_config_data(path)
         self._build_client()
 
         self._get_instances_inventory()
 
-        regions, types = self._get_query_options(config_data)
-        self._filter_by_config(regions, types)
+        strict = self.get_option('strict')
+        regions, types, tags = self._get_query_options(config_data)
+        self._filter_by_config(regions, types, tags)
 
         self._add_groups()
         self._add_instances_to_groups()
         self._add_hostvars_for_instances()
+        for instance in self.instances:
+            variables = self.inventory.get_host(instance.label).get_vars()
+            self._add_host_to_composed_groups(
+                self.get_option('groups'),
+                variables,
+                instance.label,
+                strict=strict)
+            self._add_host_to_keyed_groups(
+                self.get_option('keyed_groups'),
+                variables,
+                instance.label,
+                strict=strict)
+            self._set_composite_vars(
+                self.get_option('compose'),
+                variables,
+                instance.label,
+                strict=strict)

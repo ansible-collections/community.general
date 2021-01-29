@@ -25,33 +25,37 @@ options:
       - Specifies the fully qualified hostname to add or remove from
         the system
     required: true
+    type: str
   view:
     description:
       - Sets the DNS view to associate this CNAME record with.  The DNS
         view must already be configured on the system
-    required: true
     default: default
     aliases:
       - dns_view
+    type: str
   canonical:
     description:
       - Configures the canonical name for this CNAME record.
-    required: true
     aliases:
       - cname
+    type: str
   ttl:
     description:
       - Configures the TTL to be associated with this CNAME record
+    type: int
   extattrs:
     description:
       - Allows for the configuration of Extensible Attributes on the
         instance of the object.  This argument accepts a set of key / value
         pairs for configuration.
+    type: dict
   comment:
     description:
       - Configures a text string comment to be associated with the instance
         of this object.  The provided text string will be configured on the
         object instance.
+    type: str
   state:
     description:
       - Configures the intended state of the instance of the object on
@@ -62,6 +66,7 @@ options:
     choices:
       - present
       - absent
+    type: str
 '''
 
 EXAMPLES = '''
@@ -103,9 +108,9 @@ EXAMPLES = '''
 RETURN = ''' # '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import NIOS_CNAME_RECORD
+from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_ib_spec
 
 
 def main():
@@ -129,7 +134,7 @@ def main():
         state=dict(default='present', choices=['present', 'absent'])
     )
 
-    argument_spec.update(ib_spec)
+    argument_spec.update(normalize_ib_spec(ib_spec))
     argument_spec.update(WapiModule.provider_spec)
 
     module = AnsibleModule(argument_spec=argument_spec,

@@ -19,17 +19,20 @@ description:
 author: "Ramon de la Fuente (@ramondelafuente)"
 options:
   domain:
+    type: str
     description:
       - The domain for your environment without protocol. (i.e.
         C(example.com) or C(chat.example.com))
     required: true
   token:
+    type: str
     description:
       - Rocket Chat Incoming Webhook integration token.  This provides
         authentication to Rocket Chat's Incoming webhook for posting
         messages.
     required: true
   protocol:
+    type: str
     description:
       - Specify the protocol used to send notification messages before the webhook url. (i.e. http or https)
     default: https
@@ -37,25 +40,31 @@ options:
       - 'http'
       - 'https'
   msg:
+    type: str
     description:
       - Message to be sent.
   channel:
+    type: str
     description:
       - Channel to send the message to. If absent, the message goes to the channel selected for the I(token)
         specified during the creation of webhook.
   username:
+    type: str
     description:
       - This is the sender of the message.
     default: "Ansible"
   icon_url:
+    type: str
     description:
       - URL for the message sender's icon.
     default: "https://www.ansible.com/favicon.ico"
   icon_emoji:
+    type: str
     description:
       - Emoji for the message sender. The representation for the available emojis can be
         got from Rocket Chat. (for example :thumbsup:) (if I(icon_emoji) is set, I(icon_url) will not be used)
   link_names:
+    type: int
     description:
       - Automatically create links for channels and usernames in I(msg).
     default: 1
@@ -69,6 +78,7 @@ options:
     type: bool
     default: 'yes'
   color:
+    type: str
     description:
       - Allow text to use default colors - use the default of 'normal' to not send a custom color bar at the start of the message
     default: 'normal'
@@ -78,6 +88,7 @@ options:
       - 'warning'
       - 'danger'
   attachments:
+    type: list
     description:
       - Define a list of attachments.
 '''
@@ -193,18 +204,18 @@ def do_notify_rocketchat(module, domain, token, protocol, payload):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            domain=dict(type='str', required=True, default=None),
+            domain=dict(type='str', required=True),
             token=dict(type='str', required=True, no_log=True),
             protocol=dict(type='str', default='https', choices=['http', 'https']),
-            msg=dict(type='str', required=False, default=None),
-            channel=dict(type='str', default=None),
+            msg=dict(type='str', required=False),
+            channel=dict(type='str'),
             username=dict(type='str', default='Ansible'),
             icon_url=dict(type='str', default='https://www.ansible.com/favicon.ico'),
-            icon_emoji=dict(type='str', default=None),
+            icon_emoji=dict(type='str'),
             link_names=dict(type='int', default=1, choices=[0, 1]),
             validate_certs=dict(default=True, type='bool'),
             color=dict(type='str', default='normal', choices=['normal', 'good', 'warning', 'danger']),
-            attachments=dict(type='list', required=False, default=None)
+            attachments=dict(type='list', required=False)
         )
     )
 

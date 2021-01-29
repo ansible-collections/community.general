@@ -24,7 +24,6 @@ options:
           - Value can also be specified using C(INFOBLOX_HOST) environment
             variable.
         type: str
-        required: true
       username:
         description:
           - Configures the username to use to authenticate the connection to
@@ -79,6 +78,24 @@ options:
             variable.
         type: int
         default: 1000
+      http_pool_connections:
+        description:
+          - Number of pools to be used by the C(infoblox_client.Connector) object.
+          - This is passed as-is to the underlying C(requests.adapters.HTTPAdapter) class.
+        type: int
+        default: 10
+      http_pool_maxsize:
+        description:
+          - Maximum number of connections per pool to be used by the C(infoblox_client.Connector) object.
+          - This is passed as-is to the underlying C(requests.adapters.HTTPAdapter) class.
+        type: int
+        default: 10
+      silent_ssl_warnings:
+        description:
+          - Disable C(urllib3) SSL warnings in the C(infoblox_client.Connector) object.
+          - This is passed as-is to the underlying C(requests.adapters.HTTPAdapter) class.
+        type: bool
+        default: true
 notes:
   - "This module must be run locally, which can be achieved by specifying C(connection: local)."
   - Please read the :ref:`nios_guide` for more detailed information on how to use Infoblox with Ansible.

@@ -41,7 +41,6 @@ options:
               "absent" VDO volume does not exist, it will not be
               removed.
         type: str
-        required: true
         choices: [ absent, present ]
         default: present
     activated:
@@ -149,6 +148,7 @@ options:
               a new volume, and cannot be changed for an existing
               volume.
         type: bool
+        default: false
     growphysical:
         description:
             - Specifies whether to attempt to execute a growphysical

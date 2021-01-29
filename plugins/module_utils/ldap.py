@@ -17,6 +17,11 @@ try:
     import ldap.sasl
 
     HAS_LDAP = True
+
+    SASCL_CLASS = {
+        'gssapi': ldap.sasl.gssapi,
+        'external': ldap.sasl.external,
+    }
 except ImportError:
     HAS_LDAP = False
 
@@ -26,9 +31,11 @@ def gen_specs(**specs):
         'bind_dn': dict(),
         'bind_pw': dict(default='', no_log=True),
         'dn': dict(required=True),
+        'referrals_chasing': dict(type='str', default='anonymous', choices=['disabled', 'anonymous']),
         'server_uri': dict(default='ldapi:///'),
         'start_tls': dict(default=False, type='bool'),
         'validate_certs': dict(default=True, type='bool'),
+        'sasl_class': dict(choices=['external', 'gssapi'], default='external', type='str'),
     })
 
     return specs
@@ -41,9 +48,11 @@ class LdapGeneric(object):
         self.bind_dn = self.module.params['bind_dn']
         self.bind_pw = self.module.params['bind_pw']
         self.dn = self.module.params['dn']
+        self.referrals_chasing = self.module.params['referrals_chasing']
         self.server_uri = self.module.params['server_uri']
         self.start_tls = self.module.params['start_tls']
         self.verify_cert = self.module.params['validate_certs']
+        self.sasl_class = self.module.params['sasl_class']
 
         # Establish connection
         self.connection = self._connect_to_ldap()
@@ -61,6 +70,10 @@ class LdapGeneric(object):
 
         connection = ldap.initialize(self.server_uri)
 
+        if self.referrals_chasing == 'disabled':
+            # Switch off chasing of referrals (https://github.com/ansible-collections/community.general/issues/1067)
+            connection.set_option(ldap.OPT_REFERRALS, 0)
+
         if self.start_tls:
             try:
                 connection.start_tls_s()
@@ -71,7 +84,8 @@ class LdapGeneric(object):
             if self.bind_dn is not None:
                 connection.simple_bind_s(self.bind_dn, self.bind_pw)
             else:
-                connection.sasl_interactive_bind_s('', ldap.sasl.external())
+                klass = SASCL_CLASS.get(self.sasl_class, ldap.sasl.external)
+                connection.sasl_interactive_bind_s('', klass())
         except ldap.LDAPError as e:
             self.fail("Cannot bind to the server.", e)
 

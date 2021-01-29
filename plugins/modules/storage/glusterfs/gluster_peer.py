@@ -14,6 +14,10 @@ DOCUMENTATION = '''
 ---
 module: gluster_peer
 short_description: Attach/Detach peers to/from the cluster
+deprecated:
+    removed_in: 3.0.0
+    why: The gluster modules have migrated to the gluster.gluster collection.
+    alternative: Use M(gluster.gluster.gluster_peer) instead.
 description:
   - Create or diminish a GlusterFS trusted storage pool. A set of nodes can be
     added into an existing trusted storage pool or a new storage pool can be
@@ -21,22 +25,23 @@ description:
 author: Sachidananda Urs (@sac)
 options:
     state:
-       choices: ["present", "absent"]
-       default: "present"
-       description:
+        choices: ["present", "absent"]
+        default: "present"
+        description:
           - Determines whether the nodes should be attached to the pool or
             removed from the pool. If the state is present, nodes will be
             attached to the pool. If state is absent, nodes will be detached
             from the pool.
-       required: true
+        type: str
     nodes:
-       description:
+        description:
           - List of nodes that have to be probed into the pool.
-       required: true
+        required: true
+        type: list
     force:
-       type: bool
-       default: "false"
-       description:
+        type: bool
+        default: false
+        description:
           - Applicable only while removing the nodes from the pool. gluster
             will refuse to detach a node from the pool if any one of the node
             is down, in such cases force can be used.
@@ -141,7 +146,7 @@ class Peer(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            force=dict(type='bool', required=False),
+            force=dict(type='bool', required=False, default=False),
             nodes=dict(type='list', required=True),
             state=dict(type='str', choices=['absent', 'present'],
                        default='present'),

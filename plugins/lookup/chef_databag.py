@@ -5,7 +5,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: chef_databag
+    author: Unknown (!UNKNOWN)
+    name: chef_databag
     short_description: fetches data from a Chef Databag
     description:
        - "This is a lookup plugin to provide access to chef data bags using the pychef package.

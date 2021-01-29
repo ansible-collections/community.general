@@ -1,1 +1,0 @@
-./cloud/google/gcpubsub_info.py

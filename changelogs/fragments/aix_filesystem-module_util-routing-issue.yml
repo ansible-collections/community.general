@@ -1,3 +1,0 @@
----
-bugfixes:
-  - aix_filesystem - fix issues with ismount module_util pathing for Ansible 2.9 (https://github.com/ansible-collections/community.general/pull/567).

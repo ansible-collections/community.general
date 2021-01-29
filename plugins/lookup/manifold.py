@@ -6,8 +6,8 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author:
-        - Kyrylo Galanov (galanoff@gmail.com)
-    lookup: manifold
+        - Kyrylo Galanov (!UNKNOWN) <galanoff@gmail.com>
+    name: manifold
     short_description: get credentials from Manifold.co
     description:
         - Retrieves resources' credentials from Manifold.co

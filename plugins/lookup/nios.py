@@ -22,7 +22,8 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-lookup: nios
+author: Unknown (!UNKNOWN)
+name: nios
 short_description: Query Infoblox NIOS objects
 description:
   - Uses the Infoblox WAPI API to fetch NIOS specified objects.  This lookup
@@ -83,7 +84,7 @@ RETURN = """
 obj_type:
   description:
     - The object type specified in the terms argument
-  type: complex
+  type: dictionary
   contains:
     obj_field:
       description:

@@ -75,7 +75,6 @@ options:
             - Upon successful registration, auto-consume available subscriptions
             - Added in favor of deprecated autosubscribe in 2.5.
         type: bool
-        default: no
         aliases: [autosubscribe]
     activationkey:
         description:
@@ -816,7 +815,6 @@ def main():
                             ['activationkey', 'consumer_id'],
                             ['activationkey', 'environment'],
                             ['activationkey', 'autosubscribe'],
-                            ['force', 'consumer_id'],
                             ['pool', 'pool_ids']],
         required_if=[['state', 'present', ['username', 'activationkey'], True]],
     )

@@ -22,7 +22,8 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-lookup: nios_next_network
+author: Unknown (!UNKNOWN)
+name: nios_next_network
 short_description: Return the next available network range for a network-container
 description:
   - Uses the Infoblox WAPI API to return the next available network addresses for

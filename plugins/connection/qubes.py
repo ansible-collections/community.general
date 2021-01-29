@@ -11,7 +11,7 @@ __metaclass__ = type
 
 
 DOCUMENTATION = '''
-    connection: qubes
+    name: qubes
     short_description: Interact with an existing QubesOS AppVM
 
     description:

@@ -12,12 +12,12 @@ linode-python  # APIv3
 linode_api4 ; python_version > '2.6'  # APIv4
 
 # requirement for the gitlab module
-python-gitlab < 2.3.0  # version 2.3.0 makes gitlab_runner tests fail
+python-gitlab
 httmock
-
-# requirement for kubevirt modules
-openshift ; python_version >= '2.7'
 
 # requirement for maven_artifact module
 lxml
 semantic_version
+
+# requirement for datadog_downtime module
+datadog-api-client >= 1.0.0b3 ; python_version >= '3.6'

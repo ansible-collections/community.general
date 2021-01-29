@@ -27,14 +27,15 @@ options:
         the system. User can also update the hostname as it is possible
         to pass a dict containing I(new_name), I(old_name). See examples.
     required: true
+    type: str
   view:
     description:
       - Sets the DNS view to associate this host record with.  The DNS
         view must already be configured on the system
-    required: true
     default: default
     aliases:
       - dns_view
+    type: str
   configure_for_dns:
     description:
       - Sets the DNS to particular parent. If user needs to bypass DNS
@@ -50,6 +51,8 @@ options:
         accepts a list of values (see suboptions)
     aliases:
       - ipv4
+    type: list
+    elements: dict
     suboptions:
       ipv4addr:
         description:
@@ -61,6 +64,7 @@ options:
         required: true
         aliases:
           - address
+        type: str
       configure_for_dhcp:
         description:
           - Configure the host_record over DHCP instead of DNS, if user
@@ -68,13 +72,13 @@ options:
         required: false
         aliases:
           - dhcp
+        type: bool
       mac:
         description:
           - Configures the hardware MAC address for the host record. If user makes
             DHCP to true, user need to mention MAC address.
         required: false
-        aliases:
-          - mac
+        type: str
       add:
         description:
           - If user wants to add the ipv4 address to an existing host record.
@@ -82,8 +86,6 @@ options:
             as new IP address is allocated to existing host record. See examples.
         type: bool
         required: false
-        aliases:
-          - add
         version_added: '0.2.0'
       remove:
         description:
@@ -92,8 +94,6 @@ options:
             as IP address is de-allocated from an existing host record. See examples.
         type: bool
         required: false
-        aliases:
-          - remove
         version_added: '0.2.0'
   ipv6addrs:
     description:
@@ -101,6 +101,8 @@ options:
         accepts a list of values (see options)
     aliases:
       - ipv6
+    type: list
+    elements: dict
     suboptions:
       ipv6addr:
         description:
@@ -108,31 +110,42 @@ options:
         required: true
         aliases:
           - address
+        type: str
       configure_for_dhcp:
         description:
           - Configure the host_record over DHCP instead of DNS, if user
             changes it to true, user need to mention MAC address to configure
         required: false
-        aliases:
-          - dhcp
+        type: bool
+      mac:
+        description:
+          - Configures the hardware MAC address for the host record. If user makes
+            DHCP to true, user need to mention MAC address.
+        required: false
+        type: str
   aliases:
     description:
       - Configures an optional list of additional aliases to add to the host
         record. These are equivalent to CNAMEs but held within a host
         record. Must be in list format.
+    type: list
+    elements: str
   ttl:
     description:
       - Configures the TTL to be associated with this host record
+    type: int
   extattrs:
     description:
       - Allows for the configuration of Extensible Attributes on the
         instance of the object.  This argument accepts a set of key / value
         pairs for configuration.
+    type: dict
   comment:
     description:
       - Configures a text string comment to be associated with the instance
         of this object.  The provided text string will be configured on the
         object instance.
+    type: str
   state:
     description:
       - Configures the intended state of the instance of the object on
@@ -143,6 +156,7 @@ options:
     choices:
       - present
       - absent
+    type: str
 '''
 
 EXAMPLES = '''
@@ -260,6 +274,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import NIOS_HOST_RECORD
+from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_ib_spec
 
 
 def ipaddr(module, key, filtered_keys=None):
@@ -292,17 +307,17 @@ def main():
     ''' Main entry point for module execution
     '''
     ipv4addr_spec = dict(
-        ipv4addr=dict(required=True, aliases=['address'], ib_req=True),
-        configure_for_dhcp=dict(type='bool', required=False, aliases=['dhcp'], ib_req=True),
-        mac=dict(required=False, aliases=['mac'], ib_req=True),
-        add=dict(type='bool', aliases=['add'], required=False),
-        remove=dict(type='bool', aliases=['remove'], required=False)
+        ipv4addr=dict(required=True, aliases=['address']),
+        configure_for_dhcp=dict(type='bool', required=False, aliases=['dhcp']),
+        mac=dict(required=False),
+        add=dict(type='bool', required=False),
+        remove=dict(type='bool', required=False)
     )
 
     ipv6addr_spec = dict(
-        ipv6addr=dict(required=True, aliases=['address'], ib_req=True),
-        configure_for_dhcp=dict(type='bool', required=False, aliases=['configure_for_dhcp'], ib_req=True),
-        mac=dict(required=False, aliases=['mac'], ib_req=True)
+        ipv6addr=dict(required=True, aliases=['address']),
+        configure_for_dhcp=dict(type='bool', required=False),
+        mac=dict(required=False)
     )
 
     ib_spec = dict(
@@ -312,7 +327,7 @@ def main():
         ipv4addrs=dict(type='list', aliases=['ipv4'], elements='dict', options=ipv4addr_spec, transform=ipv4addrs),
         ipv6addrs=dict(type='list', aliases=['ipv6'], elements='dict', options=ipv6addr_spec, transform=ipv6addrs),
         configure_for_dns=dict(type='bool', default=True, required=False, aliases=['dns'], ib_req=True),
-        aliases=dict(type='list'),
+        aliases=dict(type='list', elements='str'),
 
         ttl=dict(type='int'),
 
@@ -325,7 +340,7 @@ def main():
         state=dict(default='present', choices=['present', 'absent'])
     )
 
-    argument_spec.update(ib_spec)
+    argument_spec.update(normalize_ib_spec(ib_spec))
     argument_spec.update(WapiModule.provider_spec)
 
     module = AnsibleModule(argument_spec=argument_spec,

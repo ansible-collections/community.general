@@ -6,7 +6,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    cache: memcached
+    author: Unknown (!UNKNOWN)
+    name: memcached
     short_description: Use memcached DB for cache
     description:
         - This cache uses JSON formatted, per host records saved in memcached.
@@ -52,12 +53,14 @@ from ansible import constants as C
 from ansible.errors import AnsibleError
 from ansible.module_utils.common._collections_compat import MutableSet
 from ansible.plugins.cache import BaseCacheModule
+from ansible.release import __version__ as ansible_base_version
 from ansible.utils.display import Display
 
 try:
     import memcache
+    HAS_MEMCACHE = True
 except ImportError:
-    raise AnsibleError("python-memcached is required for the memcached fact cache")
+    HAS_MEMCACHE = False
 
 display = Display()
 
@@ -178,13 +181,16 @@ class CacheModule(BaseCacheModule):
             self._timeout = self.get_option('_timeout')
             self._prefix = self.get_option('_prefix')
         except KeyError:
-            display.deprecated('Rather than importing CacheModules directly, '
-                               'use ansible.plugins.loader.cache_loader',
-                               version='2.0.0', collection_name='community.general')  # was Ansible 2.12
+            # TODO: remove once we no longer support Ansible 2.9
+            if not ansible_base_version.startswith('2.9.'):
+                raise AnsibleError("Do not import CacheModules directly. Use ansible.plugins.loader.cache_loader instead.")
             if C.CACHE_PLUGIN_CONNECTION:
                 connection = C.CACHE_PLUGIN_CONNECTION.split(',')
             self._timeout = C.CACHE_PLUGIN_TIMEOUT
             self._prefix = C.CACHE_PLUGIN_PREFIX
+
+        if not HAS_MEMCACHE:
+            raise AnsibleError("python-memcached is required for the memcached fact cache")
 
         self._cache = {}
         self._db = ProxyClientPool(connection, debug=0)

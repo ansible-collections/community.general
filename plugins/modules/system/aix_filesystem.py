@@ -28,6 +28,7 @@ options:
     description:
       - Specifies attributes for files system separated by comma.
     type: list
+    elements: str
     default: agblksize='4096',isnapshot='no'
   auto_mount:
     description:
@@ -90,7 +91,6 @@ options:
       - C(mounted) checks if the file system is mounted or mount the file system.
       - C(unmounted) check if the file system is unmounted or unmount the file system.
     type: str
-    required: true
     choices: [ absent, mounted, present, unmounted ]
     default: present
   vg:
@@ -170,7 +170,7 @@ msg:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.ansible.posix.plugins.module_utils.mount import ismount
+from ansible_collections.community.general.plugins.module_utils._mount import ismount
 import re
 
 
@@ -455,7 +455,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             account_subsystem=dict(type='bool', default=False),
-            attributes=dict(type='list', default=["agblksize='4096'", "isnapshot='no'"]),
+            attributes=dict(type='list', elements='str', default=["agblksize='4096'", "isnapshot='no'"]),
             auto_mount=dict(type='bool', default=True),
             device=dict(type='str'),
             filesystem=dict(type='str', required=True),

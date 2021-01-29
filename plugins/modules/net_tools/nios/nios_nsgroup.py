@@ -27,15 +27,19 @@ options:
     description:
       - Specifies the name of the NIOS nameserver group to be managed.
     required: true
+    type: str
   grid_primary:
     description:
       - This host is to be used as primary server in this nameserver group. It must be a grid member.
         This option is required when setting I(use_external_primaries) to C(false).
+    type: list
+    elements: dict
     suboptions:
       name:
         description:
           - Provide the name of the grid member to identify the host.
         required: true
+        type: str
       enable_preferred_primaries:
         description:
           - This flag represents whether the preferred_primaries field values of this member are used (see Infoblox WAPI docs).
@@ -56,15 +60,54 @@ options:
           - Configure the external nameserver as stealth server (without NS record) in the zones.
         type: bool
         default: false
+      preferred_primaries:
+        description:
+          - Provide a list of elements like in I(external_primaries) to set the precedence of preferred primary nameservers.
+        type: list
+        elements: dict
+        suboptions:
+          address:
+            description:
+              - Configures the IP address of the preferred primary nameserver.
+            required: true
+            type: str
+          name:
+            description:
+              - Set a label for the preferred primary nameserver.
+            required: true
+            type: str
+          stealth:
+            description:
+              - Configure the preferred primary nameserver as stealth server (without NS record) in the zones.
+            type: bool
+            default: false
+          tsig_key_name:
+            description:
+              - Sets a label for the I(tsig_key) value.
+            required: true
+            type: str
+          tsig_key_alg:
+            description:
+              - Provides the algorithm used for the I(tsig_key) in use.
+            choices: ['HMAC-MD5', 'HMAC-SHA256']
+            default: 'HMAC-MD5'
+            type: str
+          tsig_key:
+            description:
+              - Set a DNS TSIG key for the nameserver to secure zone transfers (AFXRs).
+            type: str
   grid_secondaries:
     description:
      - Configures the list of grid member hosts that act as secondary nameservers.
        This option is required when setting I(use_external_primaries) to C(true).
+    type: list
+    elements: dict
     suboptions:
       name:
         description:
           - Provide the name of the grid member to identify the host.
         required: true
+        type: str
       enable_preferred_primaries:
         description:
           - This flag represents whether the preferred_primaries field values of this member are used (see Infoblox WAPI docs).
@@ -88,6 +131,39 @@ options:
       preferred_primaries:
         description:
           - Provide a list of elements like in I(external_primaries) to set the precedence of preferred primary nameservers.
+        type: list
+        elements: dict
+        suboptions:
+          address:
+            description:
+              - Configures the IP address of the preferred primary nameserver.
+            required: true
+            type: str
+          name:
+            description:
+              - Set a label for the preferred primary nameserver.
+            required: true
+            type: str
+          stealth:
+            description:
+              - Configure the preferred primary nameserver as stealth server (without NS record) in the zones.
+            type: bool
+            default: false
+          tsig_key_name:
+            description:
+              - Sets a label for the I(tsig_key) value.
+            type: str
+            required: true
+          tsig_key_alg:
+            description:
+              - Provides the algorithm used for the I(tsig_key) in use.
+            choices: ['HMAC-MD5', 'HMAC-SHA256']
+            default: 'HMAC-MD5'
+            type: str
+          tsig_key:
+            description:
+              - Set a DNS TSIG key for the nameserver to secure zone transfers (AFXRs).
+            type: str
   is_grid_default:
     description:
       - If set to C(True) this nsgroup will become the default nameserver group for new zones.
@@ -105,15 +181,19 @@ options:
     description:
       - Configures a list of external nameservers (non-members of the grid).
         This option is required when setting I(use_external_primaries) to C(true).
+    type: list
+    elements: dict
     suboptions:
       address:
         description:
           - Configures the IP address of the external nameserver
         required: true
+        type: str
       name:
         description:
           - Set a label for the external nameserver
         required: true
+        type: str
       stealth:
         description:
           - Configure the external nameserver as stealth server (without NS record) in the zones.
@@ -122,27 +202,35 @@ options:
       tsig_key_name:
         description:
           - Sets a label for the I(tsig_key) value
+        type: str
+        required: true
       tsig_key_alg:
         description:
           - Provides the algorithm used for the I(tsig_key) in use.
         choices: ['HMAC-MD5', 'HMAC-SHA256']
         default: 'HMAC-MD5'
+        type: str
       tsig_key:
         description:
           - Set a DNS TSIG key for the nameserver to secure zone transfers (AFXRs).
+        type: str
     required: false
   external_secondaries:
     description:
       - Allows to provide a list of external secondary nameservers, that are not members of the grid.
+    type: list
+    elements: dict
     suboptions:
       address:
         description:
           - Configures the IP address of the external nameserver
         required: true
+        type: str
       name:
         description:
           - Set a label for the external nameserver
         required: true
+        type: str
       stealth:
         description:
           - Configure the external nameserver as stealth server (without NS record) in the zones.
@@ -151,26 +239,32 @@ options:
       tsig_key_name:
         description:
           - Sets a label for the I(tsig_key) value
+        type: str
+        required: true
       tsig_key_alg:
         description:
           - Provides the algorithm used for the I(tsig_key) in use.
         choices: ['HMAC-MD5', 'HMAC-SHA256']
         default: 'HMAC-MD5'
+        type: str
       tsig_key:
         description:
           - Set a DNS TSIG key for the nameserver to secure zone transfers (AFXRs).
+        type: str
   extattrs:
     description:
       - Allows for the configuration of Extensible Attributes on the
         instance of the object.  This argument accepts a set of key / value
         pairs for configuration.
     required: false
+    type: str
   comment:
     description:
       - Configures a text string comment to be associated with the instance
         of this object.  The provided text string will be configured on the
         object instance.
     required: false
+    type: str
   state:
     description:
       - Configures the intended state of the instance of the object on
@@ -179,7 +273,8 @@ options:
         the value is removed (if necessary) from the device.
     choices: [present, absent]
     default: present
-'''
+    type: str
+    '''
 
 EXAMPLES = '''
 - name: Create simple infoblox nameserver group
@@ -231,6 +326,7 @@ RETURN = ''' # '''
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import NIOS_NSGROUP
+from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_ib_spec
 
 
 # from infoblox documentation
@@ -299,8 +395,8 @@ def main():
         return module.params['grid_secondaries']
 
     extserver_spec = dict(
-        address=dict(required=True, ib_req=True),
-        name=dict(required=True, ib_req=True),
+        address=dict(required=True),
+        name=dict(required=True),
         stealth=dict(type='bool', default=False),
         tsig_key=dict(),
         tsig_key_alg=dict(choices=['HMAC-MD5', 'HMAC-SHA256'], default='HMAC-MD5'),
@@ -308,7 +404,7 @@ def main():
     )
 
     memberserver_spec = dict(
-        name=dict(required=True, ib_req=True),
+        name=dict(required=True, ),
         enable_preferred_primaries=dict(type='bool', default=False),
         grid_replicate=dict(type='bool', default=False),
         lead=dict(type='bool', default=False),
@@ -331,7 +427,7 @@ def main():
         comment=dict(),
     )
 
-    argument_spec.update(ib_spec)
+    argument_spec.update(normalize_ib_spec(ib_spec))
     argument_spec.update(WapiModule.provider_spec)
 
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)

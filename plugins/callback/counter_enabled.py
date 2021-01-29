@@ -8,7 +8,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: counter_enabled
+    author: Unknown (!UNKNOWN)
+    name: counter_enabled
     type: stdout
     short_description: adds counters to the output items (tasks and hosts/task)
     description:

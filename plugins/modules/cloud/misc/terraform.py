@@ -105,6 +105,12 @@ options:
     type: list
     elements: path
     version_added: '0.2.0'
+  init_reconfigure:
+    description:
+      - Forces backend reconfiguration during init.
+    default: false
+    type: bool
+    version_added: '1.3.0'
 notes:
    - To just run a `terraform plan`, use check mode.
 requirements: [ "terraform" ]
@@ -153,6 +159,7 @@ outputs:
       returned: always
       description: The type of the value (string, int, etc)
     value:
+      type: str
       returned: always
       description: The value of the output as interpolated by Terraform
 stdout:
@@ -170,7 +177,6 @@ command:
 import os
 import json
 import tempfile
-import traceback
 from ansible.module_utils.six.moves import shlex_quote
 
 from ansible.module_utils.basic import AnsibleModule
@@ -188,9 +194,7 @@ def preflight_validation(bin_path, project_path, variables_args=None, plan_file=
     if not os.path.isdir(project_path):
         module.fail_json(msg="Path for Terraform project '{0}' doesn't exist on this host - check the path and try again please.".format(project_path))
 
-    rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, cwd=project_path, use_unsafe_shell=True)
-    if rc != 0:
-        module.fail_json(msg="Failed to validate Terraform configuration files:\r\n{0}".format(err))
+    rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, check_rc=True, cwd=project_path, use_unsafe_shell=True)
 
 
 def _state_args(state_file):
@@ -201,7 +205,7 @@ def _state_args(state_file):
     return []
 
 
-def init_plugins(bin_path, project_path, backend_config, backend_config_files):
+def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_reconfigure):
     command = [bin_path, 'init', '-input=false']
     if backend_config:
         for key, val in backend_config.items():
@@ -212,9 +216,9 @@ def init_plugins(bin_path, project_path, backend_config, backend_config_files):
     if backend_config_files:
         for f in backend_config_files:
             command.extend(['-backend-config', f])
-    rc, out, err = module.run_command(command, cwd=project_path)
-    if rc != 0:
-        module.fail_json(msg="Failed to initialize Terraform modules:\r\n{0}".format(err))
+    if init_reconfigure:
+        command.extend(['-reconfigure'])
+    rc, out, err = module.run_command(command, check_rc=True, cwd=project_path)
 
 
 def get_workspace_context(bin_path, project_path):
@@ -236,9 +240,7 @@ def get_workspace_context(bin_path, project_path):
 
 def _workspace_cmd(bin_path, project_path, action, workspace):
     command = [bin_path, 'workspace', action, workspace, '-no-color']
-    rc, out, err = module.run_command(command, cwd=project_path)
-    if rc != 0:
-        module.fail_json(msg="Failed to {0} workspace:\r\n{1}".format(action, err))
+    rc, out, err = module.run_command(command, check_rc=True, cwd=project_path)
     return rc, out, err
 
 
@@ -299,6 +301,7 @@ def main():
             force_init=dict(type='bool', default=False),
             backend_config=dict(type='dict', default=None),
             backend_config_files=dict(type='list', elements='path', default=None),
+            init_reconfigure=dict(required=False, type='bool', default=False),
         ),
         required_if=[('state', 'planned', ['plan_file'])],
         supports_check_mode=True,
@@ -316,6 +319,7 @@ def main():
     force_init = module.params.get('force_init')
     backend_config = module.params.get('backend_config')
     backend_config_files = module.params.get('backend_config_files')
+    init_reconfigure = module.params.get('init_reconfigure')
 
     if bin_path is not None:
         command = [bin_path]
@@ -323,7 +327,7 @@ def main():
         command = [module.get_bin_path('terraform', required=True)]
 
     if force_init:
-        init_plugins(command[0], project_path, backend_config, backend_config_files)
+        init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure)
 
     workspace_ctx = get_workspace_context(command[0], project_path)
     if workspace_ctx["current"] != workspace:
@@ -378,15 +382,10 @@ def main():
         command.append(plan_file)
 
     if needs_application and not module.check_mode and not state == 'planned':
-        rc, out, err = module.run_command(command, cwd=project_path)
+        rc, out, err = module.run_command(command, check_rc=True, cwd=project_path)
         # checks out to decide if changes were made during execution
         if ' 0 added, 0 changed' not in out and not state == "absent" or ' 0 destroyed' not in out:
             changed = True
-        if rc != 0:
-            module.fail_json(
-                msg="Failure when executing Terraform command. Exited {0}.\nstdout: {1}\nstderr: {2}".format(rc, out, err),
-                command=' '.join(command)
-            )
 
     outputs_command = [command[0], 'output', '-no-color', '-json'] + _state_args(state_file)
     rc, outputs_text, outputs_err = module.run_command(outputs_command, cwd=project_path)

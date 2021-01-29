@@ -1,24 +1,25 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2014, Kevin Carter <kevin.carter@rackspace.com>
+# Copyright: (c) 2014, Kevin Carter <kevin.carter@rackspace.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: lxc_container
 short_description: Manage LXC Containers
 description:
-  - Management of LXC containers
+  - Management of LXC containers.
 author: "Kevin Carter (@cloudnull)"
 options:
     name:
         description:
           - Name of a container.
+        type: str
         required: true
     backing_store:
         choices:
@@ -30,93 +31,105 @@ options:
           - zfs
         description:
           - Backend storage type for the container.
+        type: str
         default: dir
     template:
         description:
           - Name of the template to use within an LXC create.
+        type: str
         default: ubuntu
     template_options:
         description:
           - Template options when building the container.
+        type: str
     config:
         description:
           - Path to the LXC configuration file.
+        type: path
     lv_name:
         description:
           - Name of the logical volume, defaults to the container name.
-        default: $CONTAINER_NAME
+          - If not specified, it defaults to C($CONTAINER_NAME).
+        type: str
     vg_name:
         description:
-          - If Backend store is lvm, specify the name of the volume group.
+          - If backend store is lvm, specify the name of the volume group.
+        type: str
         default: lxc
     thinpool:
         description:
           - Use LVM thin pool called TP.
+        type: str
     fs_type:
         description:
           - Create fstype TYPE.
+        type: str
         default: ext4
     fs_size:
         description:
           - File system Size.
+        type: str
         default: 5G
     directory:
         description:
           - Place rootfs directory under DIR.
+        type: path
     zfs_root:
         description:
           - Create zfs under given zfsroot.
+        type: str
     container_command:
         description:
           - Run a command within a container.
+        type: str
     lxc_path:
         description:
-          - Place container under PATH
+          - Place container under PATH.
+        type: path
     container_log:
-        choices:
-          - true
-          - false
         description:
           - Enable a container log for host actions to the container.
         type: bool
         default: 'no'
     container_log_level:
         choices:
+          - Info
+          - info
           - INFO
+          - Error
+          - error
           - ERROR
+          - Debug
+          - debug
           - DEBUG
         description:
           - Set the log level for a container where *container_log* was set.
+        type: str
         required: false
         default: INFO
     clone_name:
         description:
-          - Name of the new cloned server. This is only used when state is
-            clone.
+          - Name of the new cloned server.
+          - This is only used when state is clone.
         type: str
     clone_snapshot:
-        choices:
-          - true
-          - false
         description:
-          - Create a snapshot a container when cloning. This is not supported
-            by all container storage backends. Enabling this may fail if the
-            backing store does not support snapshots.
+          - Create a snapshot a container when cloning.
+          - This is not supported by all container storage backends.
+          - Enabling this may fail if the backing store does not support snapshots.
         type: bool
         default: 'no'
     archive:
-        choices:
-          - true
-          - false
         description:
-          - Create an archive of a container. This will create a tarball of the
-            running container.
+          - Create an archive of a container.
+          - This will create a tarball of the running container.
         type: bool
         default: 'no'
     archive_path:
         description:
-          - Path the save the archived container. If the path does not exist
-            the archive method will attempt to create it.
+          - Path the save the archived container.
+          - If the path does not exist the archive method will attempt to create it.
+        type: path
     archive_compression:
         choices:
           - gzip
@@ -125,6 +138,7 @@ options:
         description:
           - Type of compression to use when creating an archive of a running
             container.
+        type: str
         default: gzip
     state:
         choices:
@@ -133,16 +147,21 @@ options:
           - restarted
           - absent
           - frozen
+          - clone
         description:
-          - Define the state of a container. If you clone a container using
-            `clone_name` the newly cloned container created in a stopped state.
-            The running container will be stopped while the clone operation is
+          - Define the state of a container.
+          - If you clone a container using I(clone_name) the newly cloned
+            container created in a stopped state.
+          - The running container will be stopped while the clone operation is
             happening and upon completion of the clone the original container
             state will be restored.
+        type: str
         default: started
     container_config:
         description:
-          - list of 'key=value' options to use when configuring a container.
+          - A list of C(key=value) options to use when configuring a container.
+        type: list
+        elements: str
 requirements:
   - 'lxc >= 1.0 # OS package'
   - 'python >= 2.6 # OS Package'
@@ -170,7 +189,7 @@ notes:
     name lxc-python2.
 '''
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Create a started container
   community.general.lxc_container:
     name: test-container-started
@@ -353,7 +372,7 @@ EXAMPLES = """
     - test-container-new-archive-destroyed-clone
 """
 
-RETURN = """
+RETURN = r"""
 lxc_container:
     description: container information
     returned: success
@@ -701,14 +720,7 @@ class LxcContainerManagement(object):
         with open(container_config_file, 'rb') as f:
             container_config = to_text(f.read(), errors='surrogate_or_strict').splitlines(True)
 
-        # Note used ast literal_eval because AnsibleModule does not provide for
-        # adequate dictionary parsing.
-        # Issue: https://github.com/ansible/ansible/issues/7679
-        # TODO(cloudnull) adjust import when issue has been resolved.
-        import ast
-        options_dict = ast.literal_eval(_container_config)
-        parsed_options = [i.split('=', 1) for i in options_dict]
-
+        parsed_options = [i.split('=', 1) for i in _container_config]
         config_change = False
         for key, value in parsed_options:
             key = key.strip()
@@ -917,8 +929,7 @@ class LxcContainerManagement(object):
 
         if self._container_exists(container_name=self.container_name, lxc_path=self.lxc_path):
             return str(self.container.state).lower()
-        else:
-            return str('absent')
+        return str('absent')
 
     def _execute_command(self):
         """Execute a shell command."""
@@ -1695,11 +1706,12 @@ def main():
                 type='str'
             ),
             container_config=dict(
-                type='str'
+                type='list',
+                elements='str'
             ),
             container_log=dict(
                 type='bool',
-                default='false'
+                default=False
             ),
             container_log_level=dict(
                 choices=[n for i in LXC_LOGGING_LEVELS.values() for n in i],
@@ -1715,7 +1727,7 @@ def main():
             ),
             archive=dict(
                 type='bool',
-                default='false'
+                default=False
             ),
             archive_path=dict(
                 type='path',

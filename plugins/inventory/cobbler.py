@@ -6,8 +6,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
+    author: Orion Poplawski (@opoplawski)
     name: cobbler
-    plugin_type: inventory
     short_description: Cobbler inventory source
     version_added: 1.0.0
     description:

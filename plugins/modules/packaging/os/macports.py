@@ -35,7 +35,7 @@ options:
     state:
         description:
             - Indicates the desired state of the port.
-        choices: [ 'present', 'absent', 'active', 'inactive' ]
+        choices: [ 'present', 'absent', 'active', 'inactive', 'installed', 'removed']
         default: present
         type: str
     upgrade:
@@ -148,17 +148,18 @@ def query_port(module, port_path, name, state="present"):
 
     if state == "present":
 
-        rc, out, err = module.run_command("%s installed | grep -q ^.*%s" % (shlex_quote(port_path), shlex_quote(name)), use_unsafe_shell=True)
-        if rc == 0:
+        rc, out, err = module.run_command([port_path, "-q", "installed", name])
+
+        if rc == 0 and out.strip().startswith(name + " "):
             return True
 
         return False
 
     elif state == "active":
 
-        rc, out, err = module.run_command("%s installed %s | grep -q active" % (shlex_quote(port_path), shlex_quote(name)), use_unsafe_shell=True)
+        rc, out, err = module.run_command([port_path, "-q", "installed", name])
 
-        if rc == 0:
+        if rc == 0 and "(active)" in out:
             return True
 
         return False
