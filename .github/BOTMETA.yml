@@ -167,7 +167,6 @@ files:
   $module_utils/redfish_utils.py:
     maintainers: $team_redfish
     labels: redfish_utils
-  $module_utils/remote_management/dellemc/: rajeevarakkal
   $module_utils/remote_management/lxca/common.py: navalkp prabhosa
   $module_utils/scaleway.py:
     maintainers: $team_scaleway
@@ -946,14 +945,6 @@ files:
     authors: matze
   $modules/remote_management/cobbler/:
     authors: dagwieers
-  $modules/remote_management/dellemc/idrac_firmware.py:
-    authors: rajeevarakkal
-  $modules/remote_management/dellemc/idrac_server_config_profile.py:
-    authors: jagadeeshnv
-    maintainers: rajeevarakkal
-  $modules/remote_management/dellemc/ome_device_info.py:
-    authors: Sajna-Shetty
-    maintainers: rajeevarakkal
   $modules/remote_management/foreman/:
     authors: ehelms
     maintainers: ares ekohl xprazak2

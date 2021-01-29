@@ -1,0 +1,9 @@
+removed_features:
+- >
+  ``ome_device_info``,  ``idrac_firmware`` and  ``idrac_server_config_profile`` modules have been removed from this collection.
+  They have been migrated to the `dellemc.openmanage <https://galaxy.ansible.com/dellemc/openmanage>`_ collection.
+  If you use ansible-base 2.10 or newer, redirections have been provided.
+
+breaking_changes:
+- >
+  If you use ansible-base 2.10 or newer and did not install Ansible 3.0.0, but installed (and/or upgraded) community.general manually, you need to make sure to also install ``dellemc.openmanage`` if you are using any one of these ``ome_device_info``,  ``idrac_firmware`` or  ``idrac_server_config_profile`` modules.
