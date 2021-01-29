@@ -469,7 +469,7 @@ class RedfishUtils(object):
         controller_results = []
         # Get these entries, but does not fail if not found
         properties = ['CacheSummary', 'FirmwareVersion', 'Identifiers',
-                      'Location', 'Manufacturer', 'Model', 'Name',
+                      'Location', 'Manufacturer', 'Model', 'Name', 'Id',
                       'PartNumber', 'SerialNumber', 'SpeedGbps', 'Status']
         key = "StorageControllers"
 
@@ -1700,7 +1700,7 @@ class RedfishUtils(object):
         chassis_results = []
 
         # Get these entries, but does not fail if not found
-        properties = ['ChassisType', 'PartNumber', 'AssetTag',
+        properties = ['Name', 'Id', 'ChassisType', 'PartNumber', 'AssetTag',
                       'Manufacturer', 'IndicatorLED', 'SerialNumber', 'Model']
 
         # Go through list
@@ -1724,7 +1724,7 @@ class RedfishUtils(object):
         fan_results = []
         key = "Thermal"
         # Get these entries, but does not fail if not found
-        properties = ['FanName', 'Reading', 'ReadingUnits', 'Status']
+        properties = ['Name', 'FanName', 'Reading', 'ReadingUnits', 'Status']
 
         # Go through list
         for chassis_uri in self.chassis_uris:
@@ -1836,8 +1836,8 @@ class RedfishUtils(object):
         cpu_results = []
         key = "Processors"
         # Get these entries, but does not fail if not found
-        properties = ['Id', 'Manufacturer', 'Model', 'MaxSpeedMHz', 'TotalCores',
-                      'TotalThreads', 'Status']
+        properties = ['Id', 'Name', 'Manufacturer', 'Model', 'MaxSpeedMHz',
+                      'TotalCores', 'TotalThreads', 'Status']
 
         # Search for 'key' entry and extract URI from it
         response = self.get_request(self.root_uri + systems_uri)
@@ -1886,7 +1886,7 @@ class RedfishUtils(object):
         memory_results = []
         key = "Memory"
         # Get these entries, but does not fail if not found
-        properties = ['SerialNumber', 'MemoryDeviceType', 'PartNumber',
+        properties = ['Id', 'SerialNumber', 'MemoryDeviceType', 'PartNumber',
                       'MemoryLocation', 'RankCount', 'CapacityMiB', 'OperatingMemoryModes', 'Status', 'Manufacturer', 'Name']
 
         # Search for 'key' entry and extract URI from it
@@ -1943,7 +1943,7 @@ class RedfishUtils(object):
         nic_results = []
         key = "EthernetInterfaces"
         # Get these entries, but does not fail if not found
-        properties = ['Description', 'FQDN', 'IPv4Addresses', 'IPv6Addresses',
+        properties = ['Name', 'Id', 'Description', 'FQDN', 'IPv4Addresses', 'IPv6Addresses',
                       'NameServers', 'MACAddress', 'PermanentMACAddress',
                       'SpeedMbps', 'MTUSize', 'AutoNeg', 'Status']
 
@@ -2368,7 +2368,7 @@ class RedfishUtils(object):
         properties = ['Status', 'HostName', 'PowerState', 'Model', 'Manufacturer',
                       'PartNumber', 'SystemType', 'AssetTag', 'ServiceTag',
                       'SerialNumber', 'SKU', 'BiosVersion', 'MemorySummary',
-                      'ProcessorSummary', 'TrustedModules']
+                      'ProcessorSummary', 'TrustedModules', 'Name', 'Id']
 
         response = self.get_request(self.root_uri + systems_uri)
         if response['ret'] is False:
