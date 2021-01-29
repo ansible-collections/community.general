@@ -3,7 +3,7 @@ removed_features:
     ``ome_device_info``, ``idrac_firmware`` and ``idrac_server_config_profile``  modules and plugins have now been migrated from community.general to the `dellemc.openmanage <https://galaxy.ansible.com/dellemc/openmanage>`_ Ansible collection.
     If you use ansible-base 2.10 or newer, redirections have been provided.
 
-    If you use Ansible 2.9 and installed this collection, you need to adjust the FQCNs (``community.general`` → ``dellemc.openmanage``) and make sure to install the dellemc.openmanage collection.
+    If you use Ansible 2.9 and installed this collection, you need to adjust the FQCNs (``community.general.idrac_firmware`` → ``dellemc.openmanage.idrac_firmware``) and make sure to install the dellemc.openmanage collection.
 breaking_changes:
   - |
     If you use Ansible 2.9 and these plugins or modules from this collection, community.general 2.0.0 results in errors when trying to use the Kubevirt content by FQCN, like ``community.general``.
