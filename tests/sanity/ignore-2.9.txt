@@ -753,8 +753,6 @@ plugins/modules/packaging/os/xbps.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/zypper.py validate-modules:doc-choices-do-not-match-spec
 plugins/modules/remote_management/cobbler/cobbler_sync.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/cobbler/cobbler_system.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/dellemc/idrac_server_config_profile.py validate-modules:doc-missing-type
-plugins/modules/remote_management/dellemc/idrac_server_config_profile.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/foreman/foreman.py validate-modules:deprecation-mismatch
 plugins/modules/remote_management/foreman/foreman.py validate-modules:invalid-documentation
 plugins/modules/remote_management/foreman/foreman.py validate-modules:missing-main-call
