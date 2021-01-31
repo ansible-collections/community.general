@@ -5,6 +5,10 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+import sys
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+import traceback
+
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -104,8 +108,6 @@ repo:
 '''
 
 
-import traceback
-
 GITHUB_IMP_ERR = None
 try:
     from github import Github, GithubException
@@ -114,40 +116,59 @@ except Exception:
     GITHUB_IMP_ERR = traceback.format_exc()
     HAS_GITHUB_PACKAGE = False
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-import sys
-
 
 def authenticate(username=None, password=None, access_token=None):
     if access_token:
-        return Github(access_token)
+        return Github(base_url="https://api.github.com:443", login_or_token=access_token)
     else:
-        return Github(username, password)
+        return Github(base_url="https://api.github.com:443", login_or_token=username, password=password)
 
 
 def create_repo(gh, name, organization=None, private=False, description=''):
     result = dict(
         changed=False,
         repo=None)
-    target = gh.get_organization(organization) if organization else gh.get_user()
+    if organization:
+        target = gh.get_organization(organization)
+    else:
+        gh.get_user()
 
     repo = None
     try:
         repo = target.get_repo(name=name)
+        result['repo'] = repo.raw_data
+
+        changes = {}
+        if repo.raw_data['private'] != private:
+            changes['private'] = private
+        if repo.raw_data['description'] != description:
+            changes['description'] = description
+
+        if changes:
+            repo.edit(**changes)
+
+        result['repo'].update({
+            'private': repo._private.value,
+            'description': repo._description.value
+        })
     except GithubException as e:
         if e.args[0] == 404:
-            repo = target.create_repo(name=name, private=private, description=description)
+            repo = target.create_repo(
+                name=name, private=private, description=description)
             result['changed'] = True
+            result['repo'] = repo.raw_data
         else:
             raise e
 
-    result['repo'] = repo.raw_data
     return result
 
 
 def delete_repo(gh, name, organization=None):
     result = dict(changed=False)
-    target = gh.get_organization(organization) if organization else gh.get_user()
+    if organization:
+        target = gh.get_organization(organization)
+    else:
+        gh.get_user()
     try:
         repo = target.get_repo(name=name)
         repo.delete()
@@ -162,7 +183,8 @@ def delete_repo(gh, name, organization=None):
 
 
 def run_module(params):
-    gh = authenticate(username=params['username'], password=params['password'], access_token=params['access_token'])
+    gh = authenticate(
+        username=params['username'], password=params['password'], access_token=params['access_token'])
     if params['state'] == "absent":
         args = {
             "gh": gh,
@@ -185,9 +207,11 @@ def main():
     module_args = dict(
         username=dict(type='str', required=False, default=None, no_log=True),
         password=dict(type='str', required=False, default=None, no_log=True),
-        access_token=dict(type='str', required=False, default=None, no_log=True),
+        access_token=dict(type='str', required=False,
+                          default=None, no_log=True),
         name=dict(type='str', required=True),
-        state=dict(type='str', required=False, default="present", choices=["present", "absent"]),
+        state=dict(type='str', required=False, default="present",
+                   choices=["present", "absent"]),
         organization=dict(type='str', required=False, default=None),
         private=dict(type='bool', required=False, default=False),
         description=dict(type='str', required=False, default=''),
@@ -198,10 +222,12 @@ def main():
     )
 
     if not HAS_GITHUB_PACKAGE:
-        module.fail_json(msg=missing_required_lib("PyGithub"), exception=GITHUB_IMP_ERR)
+        module.fail_json(msg=missing_required_lib(
+            "PyGithub"), exception=GITHUB_IMP_ERR)
 
     if not module.params['access_token'] and not (module.params['username'] and module.params['password']):
-        raise AssertionError("Access token must be provided for authentation. Username and password are also valid, instead.")
+        raise AssertionError(
+            "Access token must be provided for authentation. Username and password are also valid, instead.")
 
     try:
         result = dict(
