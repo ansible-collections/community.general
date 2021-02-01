@@ -71,7 +71,7 @@ requirements:
 notes:
 - For python3, PyGithub>=1.54 should be used.
 - "For python3.5, PyGithub==1.54 should be used. More info: https://pygithub.readthedocs.io/en/latest/changes.html#version-1-54-november-30-2020."
-- "For python2, PyGithub==1.45 should be used. More info: https://pygithub.readthedocs.io/en/latest/changes.html#version-1-45-december-29-2019."
+- "For python2.7, PyGithub==1.45 should be used. More info: https://pygithub.readthedocs.io/en/latest/changes.html#version-1-45-december-29-2019."
 author:
 - Álvaro Torres Cogollo (@atorrescogollo)
 '''
