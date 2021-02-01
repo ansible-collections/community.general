@@ -202,8 +202,6 @@ plugins/modules/packaging/os/redhat_subscription.py validate-modules:return-synt
 plugins/modules/packaging/os/slackpkg.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/urpmi.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/xbps.py validate-modules:parameter-invalid
-plugins/modules/remote_management/dellemc/idrac_server_config_profile.py validate-modules:doc-missing-type
-plugins/modules/remote_management/dellemc/idrac_server_config_profile.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/hpilo/hpilo_boot.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/hpilo/hpilo_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/hpilo/hponcfg.py validate-modules:parameter-type-not-in-doc
