@@ -6,13 +6,13 @@ inputs:
 
     attributes:
       preview_only: true
-      text: |
+      value: |
         Verify first that your issue is not already reported on [GitHub](https://github.com/ansible-collections/community.general/labels/bug)
         Also test if the latest release and devel branch are affected too
         Complete *all* sections as described, this form is processed automatically
   - type: textarea
     attributes:
-      label: SUMMARY
+      label: OVERVIEW
       description: 'Explain the problem briefly below'
       required: true
   - type: textarea
@@ -23,6 +23,7 @@ inputs:
 
   - type: dropdown
     attributes:
+      label: ISSUE TYPE
       choices:
         - Bug Report
       required: true
