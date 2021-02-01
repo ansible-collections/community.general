@@ -506,7 +506,7 @@ def parted_fetch_version(out):
     """
     lines = [x for x in out.split('\n') if x.strip() != '']
     if len(lines) == 0:
-        return
+        return None, None, None
 
     # failed to write a test unit, so sample versions in here:
     # parted (GNU parted) 3.3
@@ -515,7 +515,7 @@ def parted_fetch_version(out):
     matches = re.search(r'^parted.+\s(\d+)\.(\d+)(?:\.(\d+))?', lines[0].strip())
 
     if matches is None:
-        return
+        return None, None, None
 
     # Convert version to numbers
     major = int(matches.group(1))
