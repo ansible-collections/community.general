@@ -131,7 +131,7 @@ def create_repo(gh, name, organization=None, private=False, description=''):
     if organization:
         target = gh.get_organization(organization)
     else:
-        gh.get_user()
+        target = gh.get_user()
 
     repo = None
     try:
@@ -168,7 +168,7 @@ def delete_repo(gh, name, organization=None):
     if organization:
         target = gh.get_organization(organization)
     else:
-        gh.get_user()
+        target = gh.get_user()
     try:
         repo = target.get_repo(name=name)
         repo.delete()
