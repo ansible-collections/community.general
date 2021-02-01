@@ -730,31 +730,6 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-devices:
-    description:
-      - The list of devices created or used.
-      - Returned only when C(state=current)
-    returned: success
-    type: dict
-    sample: '
-      {
-        "ide0": "VMS_LVM:vm-115-disk-1",
-        "ide1": "VMs:115/vm-115-disk-3.raw",
-        "virtio0": "VMS_LVM:vm-115-disk-2",
-        "virtio1": "VMs:115/vm-115-disk-1.qcow2",
-        "virtio2": "VMs:115/vm-115-disk-2.raw"
-      }'
-mac:
-    description:
-      - List of mac address created and net[n] attached. Useful when you want to use provision systems like Foreman via PXE.
-      - Returned only when C(state=current)
-    returned: success
-    type: dict
-    sample: '
-      {
-        "net0": "3E:6E:97:D2:31:9F",
-        "net1": "B6:A1:FC:EF:78:A4"
-      }'
 vmid:
     description: The VM vmid.
     returned: success
@@ -763,7 +738,6 @@ vmid:
 status:
     description:
       - The current virtual machine status.
-      - Returned only when C(state=current)
     returned: success
     type: dict
     sample: '{
