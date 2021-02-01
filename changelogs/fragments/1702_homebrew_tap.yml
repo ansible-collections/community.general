@@ -1,0 +1,2 @@
+minor_changes:
+- homebrew_tap - add support to specify search path for ``brew`` executable (https://github.com/ansible-collections/community.general/issues/1702).
