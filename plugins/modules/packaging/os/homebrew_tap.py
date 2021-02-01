@@ -45,6 +45,12 @@ options:
         required: false
         default: 'present'
         type: str
+    path:
+        description:
+            - "A ':' separated list of paths to search for C(brew) executable."
+        default: '/usr/local/bin:/opt/homebrew/bin'
+        type: path
+        version_added: '2.1.0'
 requirements: [ homebrew ]
 '''
 
@@ -127,7 +133,7 @@ def add_tap(module, brew_path, tap, url=None):
 
 def add_taps(module, brew_path, taps):
     '''Adds one or more taps.'''
-    failed, unchanged, added, msg = False, 0, 0, ''
+    failed, changed, unchanged, added, msg = False, False, 0, 0, ''
 
     for tap in taps:
         (failed, changed, msg) = add_tap(module, brew_path, tap)
@@ -182,7 +188,7 @@ def remove_tap(module, brew_path, tap):
 
 def remove_taps(module, brew_path, taps):
     '''Removes one or more taps.'''
-    failed, unchanged, removed, msg = False, 0, 0, ''
+    failed, changed, unchanged, removed, msg = False, False, 0, 0, ''
 
     for tap in taps:
         (failed, changed, msg) = remove_tap(module, brew_path, tap)
@@ -211,14 +217,23 @@ def main():
             name=dict(aliases=['tap'], type='list', required=True, elements='str'),
             url=dict(default=None, required=False),
             state=dict(default='present', choices=['present', 'absent']),
+            path=dict(
+                default="/usr/local/bin:/opt/homebrew/bin",
+                required=False,
+                type='path',
+            ),
         ),
         supports_check_mode=True,
     )
 
+    path = module.params['path']
+    if path:
+        path = path.split(':')
+
     brew_path = module.get_bin_path(
         'brew',
         required=True,
-        opt_dirs=['/usr/local/bin', '/opt/homebrew/bin']
+        opt_dirs=path,
     )
 
     taps = module.params['name']
