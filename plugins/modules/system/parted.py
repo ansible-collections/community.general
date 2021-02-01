@@ -500,6 +500,33 @@ def check_parted_label(device):
     return False
 
 
+def parted_fetch_version(out):
+    """
+    returns version string from the output of "parted --version" command
+    """
+    lines = [x for x in out.split('\n') if x.strip() != '']
+    if len(lines) == 0:
+        return
+
+    # failed to write a test unit, so sample versions in here:
+    # parted (GNU parted) 3.3
+    # parted (GNU parted) 3.4.5
+    # parted (GNU parted) 3.3.14-dfc61
+    matches = re.search(r'^parted.+\s(\d+)\.(\d+)(?:\.(\d+))?', lines[0].strip())
+
+    if matches is None:
+        return
+
+    # Convert version to numbers
+    major = int(matches.group(1))
+    minor = int(matches.group(2))
+    rev = 0
+    if matches.group(3) is not None:
+        rev = int(matches.group(3))
+
+    return major, minor, rev
+
+
 def parted_version():
     """
     Returns the major and minor version of parted installed on the system.
@@ -512,25 +539,9 @@ def parted_version():
             msg="Failed to get parted version.", rc=rc, out=out, err=err
         )
 
-    lines = [x for x in out.split('\n') if x.strip() != '']
-    if len(lines) == 0:
+    (major, minor, rev) = parted_fetch_version(out)
+    if major is None:
         module.fail_json(msg="Failed to get parted version.", rc=0, out=out)
-
-    # failed to write a test unit, so sample versions in here:
-    # parted (GNU parted) 3.3
-    # parted (GNU parted) 3.4.5
-    # parted (GNU parted) 3.3.14-dfc61
-    matches = re.search(r'^parted .*(\d+)\.(\d+)(?:\.(\d+))?', lines[0])
-
-    if matches is None:
-        module.fail_json(msg="Failed to get parted version.", rc=0, out=out)
-
-    # Convert version to numbers
-    major = int(matches.group(1))
-    minor = int(matches.group(2))
-    rev = 0
-    if matches.group(3) is not None:
-        rev = int(matches.group(3))
 
     return major, minor, rev
 
