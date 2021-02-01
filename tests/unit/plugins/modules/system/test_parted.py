@@ -340,6 +340,6 @@ class TestParted(ModuleTestCase):
             self.execute_module(changed=True)
 
     def test_version_info(self):
-        """Test that the parted_version returns the expected tuple"""
+        """Test that the parted_fetch_version returns the expected tuple"""
         for key, value in parted_version_info.items():
             self.assertEqual(parted_fetch_version(key), value)
