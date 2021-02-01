@@ -7,6 +7,7 @@ __metaclass__ = type
 from ansible_collections.community.general.tests.unit.compat.mock import patch, call
 from ansible_collections.community.general.plugins.modules.system import parted as parted_module
 from ansible_collections.community.general.plugins.modules.system.parted import parse_partition_info
+from ansible_collections.community.general.plugins.modules.system.parted import parted_fetch_version
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 # Example of output : parted -s -m /dev/sdb -- unit 'MB' print
@@ -16,6 +17,34 @@ BYT;
 1:1.05MB:106MB:105MB:fat32::esp;
 2:106MB:368MB:262MB:ext2::;
 3:368MB:256061MB:255692MB:::;"""
+
+parted_version_info = { """
+        parted (GNU parted) 3.3
+        Copyright (C) 2019 Free Software Foundation, Inc.
+        License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+        This is free software: you are free to change and redistribute it.
+        There is NO WARRANTY, to the extent permitted by law.
+
+        Written by <http://git.debian.org/?p=parted/parted.git;a=blob_plain;f=AUTHORS>.
+        """: (3,3,0),
+        """
+        parted (GNU parted) 3.4.5
+        Copyright (C) 2019 Free Software Foundation, Inc.
+        License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+        This is free software: you are free to change and redistribute it.
+        There is NO WARRANTY, to the extent permitted by law.
+
+        Written by <http://git.debian.org/?p=parted/parted.git;a=blob_plain;f=AUTHORS>.
+        """: (3,4,5),
+        """
+        parted (GNU parted) 3.3.14-dfc61
+        Copyright (C) 2019 Free Software Foundation, Inc.
+        License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+        This is free software: you are free to change and redistribute it.
+        There is NO WARRANTY, to the extent permitted by law.
+
+        Written by <http://git.debian.org/?p=parted/parted.git;a=blob_plain;f=AUTHORS>.
+        """: (3,3,14) }
 
 # corresponding dictionary after parsing by parse_partition_info
 parted_dict1 = {
@@ -311,3 +340,8 @@ class TestParted(ModuleTestCase):
         })
         with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict3):
             self.execute_module(changed=True)
+
+    def test_version_info(self):
+        """Test that the parted_version returns the expected tuple"""
+        for key, value in parted_version_info.items():
+            self.assertEqual(parted_fetch_version(key), value)
