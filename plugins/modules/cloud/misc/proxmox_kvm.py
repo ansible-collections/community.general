@@ -1405,7 +1405,7 @@ def main():
         current = proxmox.nodes(vm[0]['node']).qemu(vmid).status.current.get()['status']
         status['status'] = current
         if status:
-            module.exit_json(changed=False, vmid=vmid, devices=devices, mac=mac, msg="VM %s with vmid = %s is %s" % (name, vmid, current), **status)
+            module.exit_json(changed=False, vmid=vmid, msg="VM %s with vmid = %s is %s" % (name, vmid, current), **status)
 
 
 if __name__ == '__main__':
