@@ -3,7 +3,7 @@ about: Create a report to help us improve
 
 inputs:
   - type: description
-  
+
     attributes:
       preview_only: true
       text: |
@@ -20,22 +20,22 @@ inputs:
       label: SUMMARY
       description: 'Explain the problem briefly below'
       required: true
-      
+
   - type: dropdown
-    attributes: 
-      choices: 
-        - Bug Report      
+    attributes:
+      choices:
+        - Bug Report
       required: true
-    
-- type: textarea
+
+  - type: textarea
     attributes:
       # For smaller collections we could use a multi-select and hardcode the list
-      #May generate this list via GitHub action and walking files under https://github.com/ansible-collections/community.general/tree/main/plugins
+      # May generate this list via GitHub action and walking files under https://github.com/ansible-collections/community.general/tree/main/plugins
       # Select from list, filter as you type (`mysql` would only show the 3 mysql components)
       # OR freeform - doesn't seem to be supported in adaptivecards
-    
+
       label: COMPONENT NAME
-      description: 'List the component, ie `template`, `mysql_users`
+      description: 'List the component, ie `template`, `mysql_users`'
       required: true
   - type: textarea
     attributes:
@@ -47,9 +47,9 @@ inputs:
       value: |
          <!--- Paste verbatim output from "ansible --version" between quotes -->
          ```paste below
-         
+
          ```
-       - type: textarea
+  - type: textarea
     attributes:
       label: CONFIGURATION
       required: false
@@ -59,8 +59,8 @@ inputs:
       value: |
          <!--- Paste verbatim output from "ansible-config dump --only-changed" between quotes -->
          ```paste below
-         
-         ```   
+
+         ```
   - type: textarea
     attributes:
       label: OS / ENVIRONMENT
@@ -75,15 +75,15 @@ inputs:
       value: |
          <!--- Paste verbatim output from "ansible-config dump --only-changed" between quotes -->
          ```paste below
-         
-         ```  
-- type: textarea
+
+         ```
+  - type: textarea
     attributes:
       label: EXPECTED RESULTS
       description: 'Describe what you expected to happen when running the steps above'
       required: false
 
-- type: textarea
+  - type: textarea
     attributes:
       label: ACTUAL RESULTS
       description: 'Describe what actually happened. If possible run with extra verbosity (-vvvv)'
@@ -91,6 +91,5 @@ inputs:
       value: |
          <!--- Paste verbatim command output between -->
          ```paste below
-         
-         ```  
-      
+
+         ```
