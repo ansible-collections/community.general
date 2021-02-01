@@ -18,7 +18,7 @@ BYT;
 2:106MB:368MB:262MB:ext2::;
 3:368MB:256061MB:255692MB:::;"""
 
-parted_version_info = { """
+parted_version_info = {"""
         parted (GNU parted) 3.3
         Copyright (C) 2019 Free Software Foundation, Inc.
         License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
@@ -26,8 +26,7 @@ parted_version_info = { """
         There is NO WARRANTY, to the extent permitted by law.
 
         Written by <http://git.debian.org/?p=parted/parted.git;a=blob_plain;f=AUTHORS>.
-        """: (3,3,0),
-        """
+        """: (3, 3, 0), """
         parted (GNU parted) 3.4.5
         Copyright (C) 2019 Free Software Foundation, Inc.
         License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
@@ -35,8 +34,7 @@ parted_version_info = { """
         There is NO WARRANTY, to the extent permitted by law.
 
         Written by <http://git.debian.org/?p=parted/parted.git;a=blob_plain;f=AUTHORS>.
-        """: (3,4,5),
-        """
+        """: (3, 4, 5), """
         parted (GNU parted) 3.3.14-dfc61
         Copyright (C) 2019 Free Software Foundation, Inc.
         License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
@@ -44,7 +42,7 @@ parted_version_info = { """
         There is NO WARRANTY, to the extent permitted by law.
 
         Written by <http://git.debian.org/?p=parted/parted.git;a=blob_plain;f=AUTHORS>.
-        """: (3,3,14) }
+        """: (3, 3, 14)}
 
 # corresponding dictionary after parsing by parse_partition_info
 parted_dict1 = {
