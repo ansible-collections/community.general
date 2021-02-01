@@ -1,4 +1,4 @@
 bugfixes:
   - parted - change the regex that decodes the partition size to better support different formats that parted uses.
-    Change the regex that validate parted's version string.
+    Change the regex that validates parted's version string
     (https://github.com/ansible-collections/community.general/pull/1695).
