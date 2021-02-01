@@ -50,7 +50,7 @@ options:
             - "A ':' separated list of paths to search for C(brew) executable."
         default: '/usr/local/bin:/opt/homebrew/bin'
         type: path
-        version_added: '2.0.0'
+        version_added: '2.1.0'
 requirements: [ homebrew ]
 '''
 
