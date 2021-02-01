@@ -1,0 +1,116 @@
+name: Bug Report
+about: Create a report to help us improve
+
+body:
+  - id: help
+    type: TextBlock
+    isSubtle: true # Not implemented, just wanted a way to make it stand out
+    color: good
+    text: |
+      Verify first that your issue is not already reported on [GitHub](https://github.com/ansible-collections/community.general/labels/bug)
+      Also test if the latest release and devel branch are affected too
+      Complete *all* sections as described, this form is processed automatically
+
+  - id: summary
+    type: Input.Text
+    isMultiline: true
+    isRequired: true
+    size: small
+    label: SUMMARY
+    placeholder: 'Explain the problem briefly below'
+    
+  - id: issue type
+    type: Input.ChoiceSet
+    isMultiSelect: false
+    isRequired: true
+    style: compact
+    size: large
+    label: ISSUE TYPE
+    value: Bug Report
+    choices: 
+      - title: Bug Report
+        value: Bug Report
+
+  - id: component name
+    type: Input.ChoiceSet
+    isMultiSelect: true
+    isRequired: true
+    style: compact
+    size: large
+    label: COMPONENT NAME
+    #value: Bug Report
+    choices: 
+    # May generate this list via GitHub action and walking files under https://github.com/ansible-collections/community.general/tree/main/plugins
+    # Select from list, filter as you type (`mysql` would only show the 3 mysql components)
+    # OR freeform - doesn't seem to be supported in adaptivecards
+    # BUG: Multiselect only adds last item to issue
+      - title: mysql_user
+        value: mysql_user
+      - title: mysql_database
+        value: mysql_database    
+      - title: mysql_connection
+        value: mysql_connection  
+      - title: postgres_user
+        value: postgres_user        
+
+  - id: ansible version
+    type: Input.Text
+    isMultiline: true
+    size: large
+    label: ANSIBLE VERSION
+    value: |
+       <!--- Paste verbatim output from "ansible-config dump --only-changed" between quotes -->
+       ```paste below
+       
+       ```
+  - id: configuration
+    type: Input.Text
+    isMultiline: true
+    size: large
+    label: CONFIGURATION
+    value: |
+       <!--- Paste verbatim output from "ansible-config dump --only-changed" between quotes -->
+       ```paste below
+       
+       ```
+
+  - id: configuration
+    type: Input.Text
+    isMultiline: true
+    size: large
+    label: OS / ENVIRONMENT
+    placeholder: Provide all relevant information below, e.g. target OS versions, network device firmware, etc
+    
+  - id: steps to repo
+    type: Input.Text
+    isMultiline: true
+    size: large
+    label: STEPS TO REPRODUCE
+    value: |
+       <!--- Describe exactly how to reproduce the problem, using a minimal test-case -->
+       <!--- Paste example playbooks or commands between quotes below -->
+
+       ```yaml
+       
+       ```
+
+  - id: expected
+    type: Input.Text
+    isMultiline: true
+    size: large
+    label: EXPECTED RESULTS
+    placeholder: Describe what you expected to happen when running the steps above
+    
+    
+    
+  - id: actual results
+    type: Input.Text
+    isMultiline: true
+    size: large
+    label: ACTUAL RESULTS
+    value: |
+       <!--- Describe what actually happened. If possible run with extra verbosity (-vvvv)  -->
+       <!--- Paste verbatim command output between quotes  -->
+       ```
+       
+       ```    
