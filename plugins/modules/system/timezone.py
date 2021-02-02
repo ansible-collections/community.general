@@ -316,7 +316,7 @@ class NosystemdTimezone(Timezone):
 
     For timezone setting, it edits the following file and reflect changes:
         - /etc/sysconfig/clock  ... RHEL/CentOS
-        - /etc/timezone         ... Debian/Ubuntu/Alpine
+        - /etc/timezone         ... Debian/Ubuntu
     For hwclock setting, it executes `hwclock --systohc` command with the
     '--utc' or '--localtime' option.
     """
@@ -370,10 +370,12 @@ class NosystemdTimezone(Timezone):
             self.conf_files['hwclock'] = '/etc/default/rcS'
             self.regexps['name'] = re.compile(r'^([^\s]+)', re.MULTILINE)
             self.tzline_format = '%s\n'
-        else if distribution == 'Alpine':
+        elif distribution == 'Alpine':
             self.conf_files['name'] = '/etc/timezone'
             self.conf_files['hwclock'] = '/etc/conf.d/hwclock'
             self.tzline_format = '%s\n'
+            self.regexps['name'] = re.compile(r'^([^\s]+)', re.MULTILINE)
+            self.update_timezone = ['%s -z %s' % (self.module.get_bin_path('setup-timezone', required=True), tzfile)]
         else:
             # RHEL/CentOS/SUSE
             if self.module.get_bin_path('tzdata-update') is not None:
