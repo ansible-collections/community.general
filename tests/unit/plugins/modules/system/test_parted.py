@@ -6,8 +6,8 @@ __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat.mock import patch, call
 from ansible_collections.community.general.plugins.modules.system import parted as parted_module
+from ansible_collections.community.general.plugins.modules.system.parted import parse_parted_version
 from ansible_collections.community.general.plugins.modules.system.parted import parse_partition_info
-from ansible_collections.community.general.plugins.modules.system.parted import parted_fetch_version
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 # Example of output : parted -s -m /dev/sdb -- unit 'MB' print
@@ -340,6 +340,6 @@ class TestParted(ModuleTestCase):
             self.execute_module(changed=True)
 
     def test_version_info(self):
-        """Test that the parted_fetch_version returns the expected tuple"""
+        """Test that the parse_parted_version returns the expected tuple"""
         for key, value in parted_version_info.items():
-            self.assertEqual(parted_fetch_version(key), value)
+            self.assertEqual(parse_parted_version(key), value)

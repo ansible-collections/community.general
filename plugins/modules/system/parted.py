@@ -500,7 +500,7 @@ def check_parted_label(device):
     return False
 
 
-def parted_fetch_version(out):
+def parse_parted_version(out):
     """
     returns version tupple from the output of "parted --version" command
     """
@@ -539,7 +539,7 @@ def parted_version():
             msg="Failed to get parted version.", rc=rc, out=out, err=err
         )
 
-    (major, minor, rev) = parted_fetch_version(out)
+    (major, minor, rev) = parse_parted_version(out)
     if major is None:
         module.fail_json(msg="Failed to get parted version.", rc=0, out=out)
 
