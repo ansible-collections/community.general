@@ -1181,7 +1181,7 @@ def main():
 
         # Ensure source VM name exists when cloning
         if -1 == vmid:
-            module.fail_json(vmid=vmid, msg='VM with name = %s does not exist in cluster' % clone)
+            module.fail_json(msg='VM with name = %s does not exist in cluster' % clone)
 
         # Ensure source VM id exists when cloning
         if not get_vm(proxmox, vmid):
@@ -1303,7 +1303,7 @@ def main():
     elif state == 'started':
         try:
             if -1 == vmid:
-                module.fail_json(vmid=vmid, msg='VM with name = %s does not exist in cluster' % name)
+                module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
             vm = get_vm(proxmox, vmid)
             if not vm:
                 module.fail_json(vmid=vmid, msg='VM with vmid <%s> does not exist in cluster' % vmid)
@@ -1318,7 +1318,7 @@ def main():
     elif state == 'stopped':
         try:
             if -1 == vmid:
-                module.fail_json(vmid=vmid, msg='VM with name = %s does not exist in cluster' % name)
+                module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
 
             vm = get_vm(proxmox, vmid)
             if not vm:
@@ -1335,7 +1335,7 @@ def main():
     elif state == 'restarted':
         try:
             if -1 == vmid:
-                module.fail_json(vmid=vmid, msg='VM with name = %s does not exist in cluster' % name)
+                module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
 
             vm = get_vm(proxmox, vmid)
             if not vm:
