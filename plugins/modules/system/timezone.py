@@ -371,12 +371,13 @@ class NosystemdTimezone(Timezone):
             self.conf_files['hwclock'] = '/etc/default/rcS'
             self.regexps['name'] = re.compile(r'^([^\s]+)', re.MULTILINE)
             self.tzline_format = '%s\n'
-        elif distribution == 'Alpine':
+        elif distribution == 'Alpine' or distribution == 'Gentoo':
             self.conf_files['name'] = '/etc/timezone'
             self.conf_files['hwclock'] = '/etc/conf.d/hwclock'
             self.tzline_format = '%s\n'
             self.regexps['name'] = re.compile(r'^([^\s]+)', re.MULTILINE)
-            self.update_timezone = ['%s -z %s' % (self.module.get_bin_path('setup-timezone', required=True), planned_tz)]
+            if distribution == 'Alpine':
+                self.update_timezone = ['%s -z %s' % (self.module.get_bin_path('setup-timezone', required=True), planned_tz)]
         else:
             # RHEL/CentOS/SUSE
             if self.module.get_bin_path('tzdata-update') is not None:
