@@ -1,0 +1,5 @@
+---
+bugfixes:
+  - filesystem - do not fail when ``resizefs=yes`` and ``fstype=xfs`` if there is nothing to do, even if
+    the filesystem is not mounted. This only covers systems supporting access to unmounted XFS filesystems.
+    Others will still fail (https://github.com/ansible-collections/community.general/issues/1457, https://github.com/ansible-collections/community.general/pull/1478).
