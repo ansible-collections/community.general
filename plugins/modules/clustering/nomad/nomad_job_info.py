@@ -313,6 +313,7 @@ def run():
 
     changed = False
     nomad_jobs = list()
+    result = list()
     try:
         job_list = nomad_client.jobs.get_jobs()
         for job in job_list:
