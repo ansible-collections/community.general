@@ -312,13 +312,11 @@ def run():
     )
 
     changed = False
-    nomad_jobs = list()
     result = list()
     try:
         job_list = nomad_client.jobs.get_jobs()
         for job in job_list:
-            nomad_jobs.append(nomad_client.job.get_job(job.get('ID')))
-            result = nomad_jobs
+            result.append(nomad_client.job.get_job(job.get('ID')))
     except Exception as e:
         module.fail_json(msg=to_native(e))
 
