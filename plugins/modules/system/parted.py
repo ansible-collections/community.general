@@ -502,7 +502,7 @@ def check_parted_label(device):
 
 def parse_parted_version(out):
     """
-    returns version tupple from the output of "parted --version" command
+    Returns version tuple from the output of "parted --version" command
     """
     lines = [x for x in out.split('\n') if x.strip() != '']
     if len(lines) == 0:
