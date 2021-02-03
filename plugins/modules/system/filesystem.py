@@ -240,26 +240,35 @@ class XFS(Filesystem):
     GROW = 'xfs_growfs'
 
     def get_fs_size(self, dev):
-        cmd = self.module.get_bin_path('xfs_growfs', required=True)
+        cmd = self.module.get_bin_path('xfs_info', required=True)
+
         mountpoint = dev.get_mountpoint()
+        if mountpoint:
+            rc, out, err = self.module.run_command([cmd, str(mountpoint)], environ_update=self.LANG_ENV)
+        else:
+            # Recent GNU/Linux distros support access to unmounted XFS filesystems
+            rc, out, err = self.module.run_command([cmd, str(dev)], environ_update=self.LANG_ENV)
+        if rc != 0:
+            self.module.fail_json(msg="Error while attempting to query size of XFS filesystem: %s" % err)
 
-        if not mountpoint:
-            # xfs filesystem needs to be mounted
-            self.module.fail_json(msg="%s needs to be mounted for xfs operations" % dev)
-
-        _, size, _ = self.module.run_command([cmd, '-n', str(mountpoint)], check_rc=True, environ_update=self.LANG_ENV)
-        for line in size.splitlines():
+        for line in out.splitlines():
             col = line.split('=')
             if col[0].strip() == 'data':
                 if col[1].strip() != 'bsize':
-                    self.module.fail_json(msg='Unexpected output format from xfs_growfs (could not locate "bsize")')
+                    self.module.fail_json(msg='Unexpected output format from xfs_info (could not locate "bsize")')
                 if col[2].split()[1] != 'blocks':
-                    self.module.fail_json(msg='Unexpected output format from xfs_growfs (could not locate "blocks")')
+                    self.module.fail_json(msg='Unexpected output format from xfs_info (could not locate "blocks")')
                 block_size = int(col[2].split()[0])
                 block_count = int(col[3].split(',')[0])
                 return block_size * block_count
 
     def grow_cmd(self, dev):
+        # Check first if growing is needed, and then if it is doable or not.
+        devsize_in_bytes = dev.size()
+        fssize_in_bytes = self.get_fs_size(dev)
+        if not fssize_in_bytes < devsize_in_bytes:
+            self.module.exit_json(changed=False, msg="%s filesystem is using the whole device %s" % (self.fstype, dev))
+
         mountpoint = dev.get_mountpoint()
         if not mountpoint:
             # xfs filesystem needs to be mounted
