@@ -24,8 +24,12 @@ schedules:
       - stable-*
 
 schedules:
+<<<<<<< HEAD
   - cron: 0 9 * * *
 >>>>>>> 33126b7267 (AZP Bootstrap)
+=======
+  - cron: 0 8 * * *
+>>>>>>> 2297f2f802 (AZP nightly at 0800)
     displayName: Nightly
     always: true
     branches:
