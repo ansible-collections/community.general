@@ -543,7 +543,9 @@ class NosystemdTimezone(Timezone):
                         # to other zone files, so it's hard to get which TZ is actually set
                         # if we follow the symlink.
                         path = os.readlink('/etc/localtime')
-                        linktz = re.search(r'/usr/share/zoneinfo/(.*)', path, re.MULTILINE)
+                        # most linuxes has it in /usr/share/zoneinfo
+                        # alpine linux links under /etc/zoneinfo
+                        linktz = re.search(r'(?:/(?:usr/share|etc)/zoneinfo/)(.*)', path, re.MULTILINE)
                         if linktz:
                             valuelink = linktz.group(1)
                             if valuelink != planned:
