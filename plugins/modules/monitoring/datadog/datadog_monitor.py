@@ -49,6 +49,7 @@ options:
     type:
         description:
           - The type of the monitor.
+          - The types C(query alert), C(trace-analytics alert) and C(rum alert) were added in community.general 2.1.0.
         choices: ['metric alert', 'service check', 'event alert', 'process alert', 'log alert', 'query alert', 'trace-analytics alert', 'rum alert']
         type: str
     query:
