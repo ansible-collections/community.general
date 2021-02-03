@@ -360,22 +360,19 @@ class NosystemdTimezone(Timezone):
             # that it overwrites it instead of following it.
             self.update_timezone = ['%s --remove-destination %s /etc/localtime' % (self.module.get_bin_path('cp', required=True), tzfile)]
         self.update_hwclock = self.module.get_bin_path('hwclock', required=True)
-        # Distribution-specific configurations
         distribution = get_distribution()
+        self.conf_files['name'] = '/etc/timezone'
+        self.regexps['name'] = re.compile(r'^([^\s]+)', re.MULTILINE)
+        self.tzline_format = '%s\n'
+        # Distribution-specific configurations
         if self.module.get_bin_path('dpkg-reconfigure') is not None:
             # Debian/Ubuntu
             if 'name' in self.value:
                 self.update_timezone = ['%s -sf %s /etc/localtime' % (self.module.get_bin_path('ln', required=True), tzfile),
                                         '%s --frontend noninteractive tzdata' % self.module.get_bin_path('dpkg-reconfigure', required=True)]
-            self.conf_files['name'] = '/etc/timezone'
             self.conf_files['hwclock'] = '/etc/default/rcS'
-            self.regexps['name'] = re.compile(r'^([^\s]+)', re.MULTILINE)
-            self.tzline_format = '%s\n'
         elif distribution == 'Alpine' or distribution == 'Gentoo':
-            self.conf_files['name'] = '/etc/timezone'
             self.conf_files['hwclock'] = '/etc/conf.d/hwclock'
-            self.tzline_format = '%s\n'
-            self.regexps['name'] = re.compile(r'^([^\s]+)', re.MULTILINE)
             if distribution == 'Alpine':
                 self.update_timezone = ['%s -z %s' % (self.module.get_bin_path('setup-timezone', required=True), planned_tz)]
         else:
