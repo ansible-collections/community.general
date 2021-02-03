@@ -1,2 +1,2 @@
 minor_changes:
-  - proxmox_kvm module - Added VMID and status returns to returns. Updated docs to reflect current situation.
+  - proxmox_kvm module - actually implemented ``vmid`` and ``status`` return values. Updated documentation to reflect current situation (https://github.com/ansible-collections/community.general/issues/1410, https://github.com/ansible-collections/community.general/pull/1715).
