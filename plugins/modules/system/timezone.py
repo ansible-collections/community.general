@@ -355,6 +355,7 @@ class NosystemdTimezone(Timezone):
         # Validate given timezone
         if 'name' in self.value:
             tzfile = self._verify_timezone()
+            planned_tz = self.value['name']['planned']
             # `--remove-destination` is needed if /etc/localtime is a symlink so
             # that it overwrites it instead of following it.
             self.update_timezone = ['%s --remove-destination %s /etc/localtime' % (self.module.get_bin_path('cp', required=True), tzfile)]
@@ -375,7 +376,7 @@ class NosystemdTimezone(Timezone):
             self.conf_files['hwclock'] = '/etc/conf.d/hwclock'
             self.tzline_format = '%s\n'
             self.regexps['name'] = re.compile(r'^([^\s]+)', re.MULTILINE)
-            self.update_timezone = ['%s -z %s' % (self.module.get_bin_path('setup-timezone', required=True), tzfile)]
+            self.update_timezone = ['%s -z %s' % (self.module.get_bin_path('setup-timezone', required=True), planned_tz)]
         else:
             # RHEL/CentOS/SUSE
             if self.module.get_bin_path('tzdata-update') is not None:
