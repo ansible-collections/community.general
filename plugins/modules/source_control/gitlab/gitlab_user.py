@@ -205,6 +205,7 @@ class GitLabUser(object):
     '''
     def createOrUpdateUser(self, username, options):
         changed = False
+        potentionally_changed = False
 
         # Because we have already call userExists in main()
         if self.userObject is None:
@@ -219,10 +220,32 @@ class GitLabUser(object):
             changed = True
         else:
             changed, user = self.updateUser(self.userObject, {
-                'name': options['name'],
-                'email': options['email'],
-                'is_admin': options['isadmin'],
-                'external': options['external']})
+                  # add "normal" parameters here, put uncheckable
+                  # params in the dict below
+                  'name': { 'value': options['name'] },
+                  'email': { 'value': options['email'] },
+
+                  # note: for some attributes like this one the key 
+                  #   from reading back from server is unfortunately 
+                  #   different to the one needed for pushing/writing, 
+                  #   in that case use the optional setter key
+                  'is_admin': { 
+                     'value': options['isadmin'], 'setter': 'admin' 
+                  },
+                  'external': { 'value': options['external'] },
+                }, {
+                  # put "uncheckable" params here, this means params 
+                  # which the gitlab does accept for setting but does 
+                  # not return any information about it
+                  'skip_reconfirmation': { 'value': not options['confirm'] },
+                  'password': { 'value': options['password'] },
+                })
+
+            # note: as we unfortunately have some uncheckable parameters 
+            #   where it is not possible to determine if the update 
+            #   changed something or not, we must assume here that a 
+            #   changed happend and that an user object update is needed
+            potentionally_changed = True
 
         # Assign ssh keys
         if options['sshkey_name'] and options['sshkey_file']:
@@ -237,14 +260,15 @@ class GitLabUser(object):
             changed = changed or group_changed
 
         self.userObject = user
-        if changed:
-            if self._module.check_mode:
-                self._module.exit_json(changed=True, msg="Successfully created or updated the user %s" % username)
-
+        if (changed or potentionally_changed) and not self._module.check_mode:
             try:
                 user.save()
             except Exception as e:
                 self._module.fail_json(msg="Failed to update user: %s " % to_native(e))
+
+        if changed:
+            if self._module.check_mode:
+                self._module.exit_json(changed=True, msg="Successfully created or updated the user %s" % username)
             return True
         else:
             return False
@@ -348,14 +372,22 @@ class GitLabUser(object):
     @param user User object
     @param arguments User attributes
     '''
-    def updateUser(self, user, arguments):
+    def updateUser(self, user, arguments, uncheckable_args):
         changed = False
 
         for arg_key, arg_value in arguments.items():
-            if arguments[arg_key] is not None:
-                if getattr(user, arg_key) != arguments[arg_key]:
-                    setattr(user, arg_key, arguments[arg_key])
+            av = arg_value['value']
+
+            if av is not None:
+                if getattr(user, arg_key) != av:
+                    setattr(user, arg_value.get('setter', arg_key), av)
                     changed = True
+
+        for arg_key, arg_value in uncheckable_args.items():
+            av = arg_value['value']
+
+            if av is not None:
+                setattr(user, arg_value.get('setter', arg_key), av)
 
         return (changed, user)
 
