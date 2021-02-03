@@ -1,3 +1,4 @@
+---
 - name: 'Recreate "disk" file'
   command: 'dd if=/dev/zero of={{ image_file }} bs=1M count={{ fssize }}'
 

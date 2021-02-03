@@ -1,3 +1,4 @@
+---
 tested_filesystems:
   # key: fstype
   #   fssize: size (Mo)
