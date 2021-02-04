@@ -508,7 +508,7 @@ def parse_parted_version(out):
     if len(lines) == 0:
         return None, None, None
 
-    # failed to write a test unit, so sample versions in here:
+    # Sample parted versions (see as well test unit):
     # parted (GNU parted) 3.3
     # parted (GNU parted) 3.4.5
     # parted (GNU parted) 3.3.14-dfc61
