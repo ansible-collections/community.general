@@ -115,10 +115,6 @@ class TestGitlabUser(GitlabModuleTestCase):
         self.assertEqual(newUser.skip_reconfirmation, True)
         self.assertEqual(newUser.password, 'super_secret-super_secret')
 
-        changed, newUser = self.moduleUtil.updateUser(user, {'email': {'value': "foo@bar.baz"}}, {})
-
-        self.assertEqual(changed, False)
-
     @with_httmock(resp_find_user)
     @with_httmock(resp_delete_user)
     def test_delete_user(self):
