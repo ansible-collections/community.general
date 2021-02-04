@@ -88,6 +88,9 @@ class TestGitlabUser(GitlabModuleTestCase):
     @with_httmock(resp_get_user)
     def test_update_user(self):
         user = self.gitlab_instance.users.get(1)
+
+        assert False, "\n\n{}\n\n{}".format(user.__dict__["_updated_attrs"], user.__dict__["_attrs"])
+
         changed, newUser = self.moduleUtil.updateUser(
             user,
             {'name': {'value': "Jack Smith"}, "is_admin": {'value': "true", 'setter': 'admin'}}, {}
