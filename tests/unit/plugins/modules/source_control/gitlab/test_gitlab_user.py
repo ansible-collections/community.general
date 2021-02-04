@@ -89,7 +89,7 @@ class TestGitlabUser(GitlabModuleTestCase):
     def test_update_user(self):
         user = self.gitlab_instance.users.get(1)
         changed, newUser = self.moduleUtil.updateUser(user,
-          {'name': {'value': "Jack Smith"}, "is_admin": {'value': "true", 'setter': 'admin'}}, {}
+            {'name': {'value': "Jack Smith"}, "is_admin": {'value': "true", 'setter': 'admin'}}, {}
         )
 
         self.assertEqual(changed, True)
@@ -101,10 +101,10 @@ class TestGitlabUser(GitlabModuleTestCase):
         self.assertEqual(changed, False)
 
         changed, newUser = self.moduleUtil.updateUser(user,
-          {'email': {'value': "foo@bar.baz"}}, {
-             'skip_reconfirmation': {'value': True},
-             'password': {'value': 'super_secret-super_secret'},
-          }
+            {'email': {'value': "foo@bar.baz"}}, {
+                'skip_reconfirmation': {'value': True},
+                'password': {'value': 'super_secret-super_secret'},
+            }
         )
 
         self.assertEqual(changed, True)

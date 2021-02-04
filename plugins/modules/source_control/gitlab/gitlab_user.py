@@ -230,10 +230,11 @@ class GitLabUser(object):
                 #   different to the one needed for pushing/writing,
                 #   in that case use the optional setter key
                 'is_admin': {
-                   'value': options['isadmin'], 'setter': 'admin'
+                    'value': options['isadmin'], 'setter': 'admin'
                 },
                 'external': {'value': options['external']},
-                }, {
+                }, 
+                {
                 # put "uncheckable" params here, this means params
                 # which the gitlab does accept for setting but does
                 # not return any information about it
