@@ -88,22 +88,22 @@ class TestGitlabUser(GitlabModuleTestCase):
     @with_httmock(resp_get_user)
     def test_update_user(self):
         user = self.gitlab_instance.users.get(1)
-        changed, newUser = self.moduleUtil.updateUser(user, 
-          {'name': { 'value': "Jack Smith"}, "is_admin": { 'value': "true", 'setter': 'admin' }}, {}
+        changed, newUser = self.moduleUtil.updateUser(user,
+          {'name': {'value': "Jack Smith"}, "is_admin": {'value': "true", 'setter': 'admin'}}, {}
         )
 
         self.assertEqual(changed, True)
         self.assertEqual(newUser.name, "Jack Smith")
         self.assertEqual(newUser.admin, "true")
 
-        changed, newUser = self.moduleUtil.updateUser(user, {'name': { 'value': "Jack Smith" }}, {})
+        changed, newUser = self.moduleUtil.updateUser(user, {'name': {'value': "Jack Smith"}}, {})
 
         self.assertEqual(changed, False)
 
-        changed, newUser = self.moduleUtil.updateUser(user, 
-          {'email': { 'value': "foo@bar.baz"}}, {
-             'skip_reconfirmation': { 'value': True },
-             'password': { 'value': 'super_secret-super_secret' },
+        changed, newUser = self.moduleUtil.updateUser(user,
+          {'email': {'value': "foo@bar.baz"}}, {
+             'skip_reconfirmation': {'value': True},
+             'password': {'value': 'super_secret-super_secret'},
           }
         )
 
@@ -112,7 +112,7 @@ class TestGitlabUser(GitlabModuleTestCase):
         self.assertEqual(newUser.skip_reconfirmation, True)
         self.assertEqual(newUser.password, 'super_secret-super_secret')
 
-        changed, newUser = self.moduleUtil.updateUser(user, {'email': { 'value': "foo@bar.baz" }}, {})
+        changed, newUser = self.moduleUtil.updateUser(user, {'email': {'value': "foo@bar.baz"}}, {})
 
         self.assertEqual(changed, False)
 

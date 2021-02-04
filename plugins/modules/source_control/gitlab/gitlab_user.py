@@ -220,30 +220,30 @@ class GitLabUser(object):
             changed = True
         else:
             changed, user = self.updateUser(self.userObject, {
-                  # add "normal" parameters here, put uncheckable
-                  # params in the dict below
-                  'name': { 'value': options['name'] },
-                  'email': { 'value': options['email'] },
+                # add "normal" parameters here, put uncheckable
+                # params in the dict below
+                'name': {'value': options['name']},
+                'email': {'value': options['email']},
 
-                  # note: for some attributes like this one the key 
-                  #   from reading back from server is unfortunately 
-                  #   different to the one needed for pushing/writing, 
-                  #   in that case use the optional setter key
-                  'is_admin': { 
-                     'value': options['isadmin'], 'setter': 'admin' 
-                  },
-                  'external': { 'value': options['external'] },
+                # note: for some attributes like this one the key
+                #   from reading back from server is unfortunately
+                #   different to the one needed for pushing/writing,
+                #   in that case use the optional setter key
+                'is_admin': {
+                   'value': options['isadmin'], 'setter': 'admin'
+                },
+                'external': {'value': options['external']},
                 }, {
-                  # put "uncheckable" params here, this means params 
-                  # which the gitlab does accept for setting but does 
-                  # not return any information about it
-                  'skip_reconfirmation': { 'value': not options['confirm'] },
-                  'password': { 'value': options['password'] },
+                # put "uncheckable" params here, this means params
+                # which the gitlab does accept for setting but does
+                # not return any information about it
+                'skip_reconfirmation': {'value': not options['confirm']},
+                'password': {'value': options['password']},
                 })
 
-            # note: as we unfortunately have some uncheckable parameters 
-            #   where it is not possible to determine if the update 
-            #   changed something or not, we must assume here that a 
+            # note: as we unfortunately have some uncheckable parameters
+            #   where it is not possible to determine if the update
+            #   changed something or not, we must assume here that a
             #   changed happend and that an user object update is needed
             potentionally_changed = True
 
