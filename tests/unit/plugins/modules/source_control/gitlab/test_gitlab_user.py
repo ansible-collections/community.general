@@ -83,14 +83,11 @@ class TestGitlabUser(GitlabModuleTestCase):
                                            'username': 'john_smith', 'name': 'John Smith'})
         self.assertEqual(type(user), User)
         self.assertEqual(user.name, "John Smith")
-        self.assertEqual(user.email, 'john@example.com')
         self.assertEqual(user.id, 1)
 
     @with_httmock(resp_get_user)
     def test_update_user(self):
         user = self.gitlab_instance.users.get(1)
-
-        ##assert False, "\n\n{}\n\n{}".format(user.__dict__["_updated_attrs"], user.__dict__["_attrs"])
 
         changed, newUser = self.moduleUtil.updateUser(
             user,
@@ -107,15 +104,14 @@ class TestGitlabUser(GitlabModuleTestCase):
 
         changed, newUser = self.moduleUtil.updateUser(
             user,
-            ##{'email': {'value': "foo@bar.baz"}}, {
             {}, {
                 'skip_reconfirmation': {'value': True},
                 'password': {'value': 'super_secret-super_secret'},
             }
         )
 
-        self.assertEqual(changed, True)
-        ##self.assertEqual(newUser.email, "foo@bar.baz")
+        # note: uncheckable parameters dont set changed state
+        self.assertEqual(changed, False)
         self.assertEqual(newUser.skip_reconfirmation, True)
         self.assertEqual(newUser.password, 'super_secret-super_secret')
 
