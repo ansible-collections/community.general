@@ -17,6 +17,7 @@ inputs:
 
   - type: dropdown
     attributes:
+      # FIXME: Once GitHub allows defining the default choice, update this
       label: Issue Type
       choices:
         - Bug Report
@@ -32,15 +33,14 @@ inputs:
       label: Component Name
       description: 'List the component, ie `template`, `mysql_users`'
       required: true
+
   - type: textarea
     attributes:
       label: Ansible Version
       required: false
       description: |
-        If this issue has an example piece of YAML that can help to reproduce this problem, please provide it.
-        This can be a piece of YAML from, e.g., an automation, script, scene or configuration.
+        Paste verbatim output from `ansible --version` between quotes
       value: |
-         <!--- Paste verbatim output from "ansible --version" between quotes -->
          ```paste below
 
          ```
@@ -51,8 +51,8 @@ inputs:
       description: |
         If this issue has an example piece of YAML that can help to reproduce this problem, please provide it.
         This can be a piece of YAML from, e.g., an automation, script, scene or configuration.
+        Paste verbatim output from `ansible-config dump --only-changed` between quotes
       value: |
-         <!--- Paste verbatim output from "ansible-config dump --only-changed" between quotes -->
          ```paste below
 
          ```
@@ -68,23 +68,22 @@ inputs:
       description: 'Describe exactly how to reproduce the problem, using a minimal test-case'
       required: false
       value: |
-         <!--- Paste verbatim output from "ansible-config dump --only-changed" between quotes -->
          ```paste below
 
          ```
   - type: textarea
     attributes:
       label: Expected Results
-      description: 'Describe what you expected to happen when running the steps above'
+      description: |
+        Describe what you expected to happen when running the steps above
       required: false
 
   - type: textarea
     attributes:
       label: Actual Results
-      description: 'Describe what actually happened. If possible run with extra verbosity (-vvvv)'
+      description: 'Describe what actually happened. If possible run with extra verbosity (`ansible-playbook -vvvv`)'
       required: false
       value: |
-         <!--- Paste verbatim command output between -->
          ```paste below
 
          ```
