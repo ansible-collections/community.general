@@ -39,3 +39,35 @@
 - assert:
     that:
       - deploy_key_status is changed
+      - deploy_key_status.deploy_key.key == gitlab_deploy_key
+
+
+- name: Update public key {{ gitlab_project_name }}  (change expected)
+  gitlab_deploy_key:
+    login_token: "{{ gitlab_login_token }}"
+    project: "root/{{ gitlab_project_name }}"
+    server_url: "{{ gitlab_host }}"
+    title: "{{ gitlab_project_name }}"
+    key: "{{ gitlab_deploy_key_new }}"
+    state: present
+  register: deploy_key_status
+
+- assert:
+    that:
+      - deploy_key_status is changed
+      - deploy_key_status.deploy_key.key == gitlab_deploy_key_new
+
+- name: Update public key {{ gitlab_project_name }}  (no change expected)
+  gitlab_deploy_key:
+    login_token: "{{ gitlab_login_token }}"
+    project: "root/{{ gitlab_project_name }}"
+    server_url: "{{ gitlab_host }}"
+    title: "{{ gitlab_project_name }}"
+    key: "{{ gitlab_deploy_key_new }}"
+    state: present
+  register: deploy_key_status
+
+- assert:
+    that:
+      - not deploy_key_status.changed
+      - deploy_key_status.deploy_key.key == gitlab_deploy_key_new
