@@ -36,6 +36,11 @@
     name: mercurial
   when: ansible_facts.pkg_mgr in ['pkgng', 'community.general.pkgng']
 
+- name: install mercurial (zypper)
+  package:
+    name: mercurial
+  when: ansible_facts.pkg_mgr in ['zypper', 'community.general.zypper']
+
 - name: preserve the updated python
   command: cp -av "{{ which_python.stdout }}" "{{ which_python.stdout }}.updated"
 
