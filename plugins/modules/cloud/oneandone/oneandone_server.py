@@ -614,7 +614,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             auth_token=dict(
-                type='str',
+                type='str', no_log=True,
                 default=os.environ.get('ONEANDONE_AUTH_TOKEN'),
                 no_log=True),
             api_url=dict(

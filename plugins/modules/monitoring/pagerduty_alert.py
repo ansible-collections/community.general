@@ -199,7 +199,7 @@ def main():
             service_id=dict(required=True),
             service_key=dict(required=False),
             integration_key=dict(required=False),
-            api_key=dict(required=True),
+            api_key=dict(required=True, no_log=True),
             state=dict(required=True,
                        choices=['triggered', 'acknowledged', 'resolved']),
             client=dict(required=False, default=None),
