@@ -1,2 +1,2 @@
 bugfixes:
-  -  gitlab_user - make updates to following attributes of an existing gitlab user work: ``isadmin``, ``password``, ``confirm`` (https://github.com/ansible-collections/community.general/pull/1724).
+  - gitlab_user - make updates to following attributes of an existing gitlab user work: isadmin, password, confirm (https://github.com/ansible-collections/community.general/pull/1724).
