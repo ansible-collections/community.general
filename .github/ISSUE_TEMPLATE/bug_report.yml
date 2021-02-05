@@ -6,24 +6,18 @@ inputs:
   - type: description
     attributes:
       value: |
-        Verify first that your issue is not already reported on [GitHub](https://github.com/ansible-collections/community.general/labels/bug)
-        Also test if the latest release and devel branch are affected too
+        Verify first that your issue is not already reported on [GitHub](https://github.com/ansible-collections/community.general/issues)
+        Also test if the latest release and main branch are affected too
 
   - type: textarea
     attributes:
-      label: OVERVIEW
-      description: 'Explain the problem briefly below'
-      required: true
-
-  - type: textarea
-    attributes:
-      label: SUMMARY
+      label: Summary
       description: 'Explain the problem briefly below'
       required: true
 
   - type: dropdown
     attributes:
-      label: ISSUE TYPE
+      label: Issue Type
       choices:
         - Bug Report
       required: true
@@ -35,12 +29,12 @@ inputs:
       # Select from list, filter as you type (`mysql` would only show the 3 mysql components)
       # OR freeform - doesn't seem to be supported in adaptivecards
 
-      label: COMPONENT NAME
+      label: Component Name
       description: 'List the component, ie `template`, `mysql_users`'
       required: true
   - type: textarea
     attributes:
-      label: ANSIBLE VERSION
+      label: Ansible Version
       required: false
       description: |
         If this issue has an example piece of YAML that can help to reproduce this problem, please provide it.
@@ -52,7 +46,7 @@ inputs:
          ```
   - type: textarea
     attributes:
-      label: CONFIGURATION
+      label: Configuration
       required: false
       description: |
         If this issue has an example piece of YAML that can help to reproduce this problem, please provide it.
@@ -64,13 +58,13 @@ inputs:
          ```
   - type: textarea
     attributes:
-      label: OS / ENVIRONMENT
+      label: OS / Environment
       description: 'Provide all relevant information below, e.g. target OS versions, network device firmware, etc'
       required: false
 
   - type: textarea
     attributes:
-      label: STEPS TO REPRO
+      label: Steps To Reproduce
       description: 'Describe exactly how to reproduce the problem, using a minimal test-case'
       required: false
       value: |
@@ -80,13 +74,13 @@ inputs:
          ```
   - type: textarea
     attributes:
-      label: EXPECTED RESULTS
+      label: Expected Results
       description: 'Describe what you expected to happen when running the steps above'
       required: false
 
   - type: textarea
     attributes:
-      label: ACTUAL RESULTS
+      label: Actual Results
       description: 'Describe what actually happened. If possible run with extra verbosity (-vvvv)'
       required: false
       value: |
