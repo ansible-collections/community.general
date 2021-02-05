@@ -35,6 +35,12 @@
     autoremove: yes
   when: ansible_facts.pkg_mgr in ['pkgng', 'community.general.pkgng']
 
+- name: uninstall packages which were not originally installed (zypper)
+  package:
+    name: mercurial
+    state: absent
+  when: ansible_facts.pkg_mgr in ['zypper', 'community.general.zypper']
+
 - name: restore the default python
   raw: mv "{{ which_python.stdout }}.default" "{{ which_python.stdout }}"
 
