@@ -1,14 +1,16 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 """
-Vagrant external inventory script. Automatically finds the IP of the booted vagrant vm(s), and
-returns it under the host group 'vagrant' with the directory name as ansible hostname.
+Vagrant external inventory script. Automatically finds the IP of the booted
+vagrant vm(s), and returns it under the host group 'vagrant' with the
+directory name as ansible inventory hostname.
 
 # Copyright (C) 2013  Mark Mandel <mark@compoundtheory.com>
 #               2015  Igor Khomyakov <homyakov@gmail.com>
-                2021  Christopher Hornberger github.com/horni23
+#               2021  Christopher Hornberger github.com/horni23
 #
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+
+# (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 """
 
 from __future__ import (absolute_import, division, print_function)
@@ -62,16 +64,18 @@ names = []
 mapping = {}
 
 for line in output:
-    matchname = re.search(r"(running.+?)([^\/]+$)",line)
-    matcher   = re.search(r"^\s*([a-zA-Z0-9]+).*running",line)
+    matchname = re.search(r"(running.+?)([^\/]+$)", line)
+    matcher = re.search(r"^\s*([a-zA-Z0-9]+).*running", line)
     if matcher and matchname:
         boxes = str(matcher.group(1))
         boxname = str(matchname.group(2))
         boxname = boxname.strip()
         mapping[boxes] = boxname
 
+
 def get_ssh_config():
     return dict((k, get_a_ssh_config(k)) for k in mapping)
+
 
 # get the ssh config for a single box
 def get_a_ssh_config(box_name):
@@ -92,10 +96,11 @@ def get_a_ssh_config(box_name):
 
     return dict((v, host_config[k]) for k, v in _ssh_to_ansible)
 
+
 # List out servers that vagrant has running
 # ------------------------------
 if options.list:
-    ssh_config   = get_ssh_config()
+    ssh_config = get_ssh_config()
     list_names = []
     meta = defaultdict(dict)
 
@@ -113,7 +118,7 @@ elif options.host:
     host = list(mapping.keys())[list(mapping.values()).index(options.host)]
     host = host.strip("[]")
     host = host.strip("\'")
-    print(json.dumps(get_a_ssh_config(host),indent=4))
+    print(json.dumps(get_a_ssh_config(host), indent=4))
     sys.exit(0)
 
 # Print out help
