@@ -65,8 +65,7 @@ def get_repo_mock(url, request):
         "private": False,
         "description": "This your first repo!",
         "default_branch": "master",
-        "allow_rebase_merge": True,
-
+        "allow_rebase_merge": True
     }
     content = json.dumps(content).encode("utf-8")
     return response(200, content, headers, None, 5, request)
@@ -84,7 +83,8 @@ def create_new_org_repo_mock(url, request):
     content = {
         "name": repo['name'],
         "full_name": "{0}/{1}".format(org, repo['name']),
-        "private": repo['private']
+        "private": repo['private'],
+        "description": repo['description']
     }
     content = json.dumps(content).encode("utf-8")
     return response(201, content, headers, None, 5, request)
@@ -99,7 +99,8 @@ def create_new_user_repo_mock(url, request):
     content = {
         "name": repo['name'],
         "full_name": "{0}/{1}".format("octocat", repo['name']),
-        "private": repo['private']
+        "private": repo['private'],
+        "description": repo['description']
     }
     content = json.dumps(content).encode("utf-8")
     return response(201, content, headers, None, 5, request)
@@ -195,7 +196,7 @@ class TestGithubRepo(unittest.TestCase):
             "private": True,
             "state": "present"
         })
-        self.assertEqual(result['changed'], False)
+        self.assertEqual(result['changed'], True)
         self.assertEqual(result['repo']['private'], True)
 
     @with_httmock(get_orgs_mock)
@@ -217,7 +218,6 @@ class TestGithubRepo(unittest.TestCase):
     @with_httmock(get_user_mock)
     @with_httmock(get_repo_mock)
     @with_httmock(delete_repo_mock)
-    @with_httmock(debug_mock)
     def test_delete_user_repo(self):
         result = github_repo.run_module({
             'username': None,
@@ -232,7 +232,7 @@ class TestGithubRepo(unittest.TestCase):
         self.assertEqual(result['changed'], True)
 
     @with_httmock(get_orgs_mock)
-    @with_httmock(get_repo_mock)
+    @with_httmock(get_repo_notfound_mock)
     @with_httmock(delete_repo_notfound_mock)
     def test_delete_org_repo_notfound(self):
         result = github_repo.run_module({

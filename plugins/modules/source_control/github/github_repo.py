@@ -5,6 +5,9 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+import traceback
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+import sys
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -42,14 +45,14 @@ options:
   description:
     description:
     - Description for the repository.
-    - This is only makes sense when creating the new repository.
+    - This is only used when I(state) is C(present).
     type: str
     default: ''
     required: false
   private:
     description:
     - Whether the new repository should be private or not.
-    - This is only makes sense when creating the new repository.
+    - This is only used when I(state) is C(present).
     type: bool
     default: no
     required: false
@@ -63,7 +66,7 @@ options:
   organization:
     description:
     - Organization for the repository.
-    - If not provided, the repository will be created in the current user profile.
+    - When I(state) is C(present), the repository will be created in the current user profile.
     type: str
     required: false
 requirements:
@@ -104,13 +107,10 @@ repo:
 '''
 
 
-import sys
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-import traceback
-
 GITHUB_IMP_ERR = None
 try:
     from github import Github, GithubException
+    from github.GithubException import UnknownObjectException
     HAS_GITHUB_PACKAGE = True
 except Exception:
     GITHUB_IMP_ERR = traceback.format_exc()
@@ -124,10 +124,10 @@ def authenticate(username=None, password=None, access_token=None):
         return Github(base_url="https://api.github.com:443", login_or_token=username, password=password)
 
 
-def create_repo(gh, name, organization=None, private=False, description=''):
+def create_repo(gh, name, organization=None, private=False, description='', check_mode=False):
     result = dict(
         changed=False,
-        repo=None)
+        repo=dict())
     if organization:
         target = gh.get_organization(organization)
     else:
@@ -137,33 +137,34 @@ def create_repo(gh, name, organization=None, private=False, description=''):
     try:
         repo = target.get_repo(name=name)
         result['repo'] = repo.raw_data
+    except UnknownObjectException:
+        if not check_mode:
+            repo = target.create_repo(
+                name=name, private=private, description=description)
+            result['repo'] = repo.raw_data
 
-        changes = {}
-        if repo.raw_data['private'] != private:
-            changes['private'] = private
-        if repo.raw_data['description'] != description:
-            changes['description'] = description
+        result['changed'] = True
 
-        if changes:
+    changes = {}
+    if check_mode or repo.raw_data['private'] != private:
+        changes['private'] = private
+    if check_mode or repo.raw_data['description'] != description:
+        changes['description'] = description
+
+    if changes:
+        if not check_mode:
             repo.edit(**changes)
 
         result['repo'].update({
-            'private': repo._private.value,
-            'description': repo._description.value
+            'private': repo._private.value if not check_mode else private,
+            'description': repo._description.value if not check_mode else description
         })
-    except GithubException as e:
-        if e.args[0] == 404:
-            repo = target.create_repo(
-                name=name, private=private, description=description)
-            result['changed'] = True
-            result['repo'] = repo.raw_data
-        else:
-            raise e
+        result['changed'] = True
 
     return result
 
 
-def delete_repo(gh, name, organization=None):
+def delete_repo(gh, name, organization=None, check_mode=False):
     result = dict(changed=False)
     if organization:
         target = gh.get_organization(organization)
@@ -171,25 +172,24 @@ def delete_repo(gh, name, organization=None):
         target = gh.get_user()
     try:
         repo = target.get_repo(name=name)
-        repo.delete()
+        if not check_mode:
+            repo.delete()
         result['changed'] = True
-    except GithubException as e:
-        if e.args[0] == 404:
-            pass
-        else:
-            raise e
+    except UnknownObjectException:
+        pass
 
     return result
 
 
-def run_module(params):
+def run_module(params, check_mode=False):
     gh = authenticate(
         username=params['username'], password=params['password'], access_token=params['access_token'])
     if params['state'] == "absent":
         args = {
             "gh": gh,
             "name": params['name'],
-            "organization": params['organization']
+            "organization": params['organization'],
+            "check_mode": check_mode
         }
         return delete_repo(**args)
     else:
@@ -198,14 +198,15 @@ def run_module(params):
             "name": params['name'],
             "organization": params['organization'],
             "private": params['private'],
-            "description": params['description']
+            "description": params['description'],
+            "check_mode": check_mode
         }
         return create_repo(**args)
 
 
 def main():
     module_args = dict(
-        username=dict(type='str', required=False, default=None, no_log=True),
+        username=dict(type='str', required=False, default=None),
         password=dict(type='str', required=False, default=None, no_log=True),
         access_token=dict(type='str', required=False,
                           default=None, no_log=True),
@@ -218,7 +219,7 @@ def main():
     )
     module = AnsibleModule(
         argument_spec=module_args,
-        supports_check_mode=False
+        supports_check_mode=True
     )
 
     if not HAS_GITHUB_PACKAGE:
@@ -233,7 +234,7 @@ def main():
         result = dict(
             changed=False
         )
-        result = run_module(module.params)
+        result = run_module(module.params, module.check_mode)
         module.exit_json(**result)
     except GithubException as e:
         module.fail_json(msg="Github error. {0}".format(repr(e)), **result)
