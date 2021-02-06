@@ -5,9 +5,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-import traceback
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-import sys
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -106,6 +103,9 @@ repo:
   type: dict
 '''
 
+import traceback
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+import sys
 
 GITHUB_IMP_ERR = None
 try:
