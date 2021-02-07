@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright: (c) 2016, Hiroaki Nakamura <hnakamur@gmail.com>
+# Copyright: (c) 2020, Frnak Dornheim <dornheim@posteo.de>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -307,10 +308,53 @@ class LXDProfileManagement(object):
             self._needs_to_change_profile_config('devices')
         )
 
+    def _merge_dicts(self, source: dict, destination: dict) -> dict:
+        """Merge Dictionary
+        
+        Get a list of filehandle numbers from logger to be handed to
+        DaemonContext.files_preserve
+        
+        Args:
+            source: source dict
+            destination: destination dict
+        Kwargs:
+            None
+        Raises:
+            None
+        Returns:
+            destination: merged dict"""
+        for key, value in source.items():
+            if isinstance(value, dict):
+                # get node or create one
+                node = destination.setdefault(key, {})
+                self._merge_dicts(value, node)
+            else:
+                destination[key] = value
+        return destination
+
     def _apply_profile_configs(self):
+        """ merge profile
+
+        merge the keys that are already defined in the profile and those defined in the current task
+
+        Args:
+            None
+        Kwargs:
+            None
+        Raises:
+            None
+        Returns:
+            None"""
         config = self.old_profile_json.copy()
-        for k, v in self.config.items():
-            config[k] = v
+        # merge or copy the sections from the existing profile to 'config'
+        for item in ['config', 'description', 'devices', 'name', 'used_by']:
+            if item in config:
+                config[item] = self._merge_dicts(config['metadata'][item], config[item])
+            else:
+                config[item] = config['metadata'][item]
+        # merge or copy the sections from the ansible-task to 'config'
+        config = self._merge_dicts(self.config, config)
+        # upload config to lxd
         self.client.do('PUT', '/1.0/profiles/{0}'.format(self.name), config)
         self.actions.append('apply_profile_configs')
 
