@@ -382,7 +382,7 @@ def main():
     result.update(imc_response(module, resp.read()))
 
     # Store cookie for future requests
-    cookie = ""
+    cookie = ''
     try:
         cookie = result['aaaLogin']['attributes']['outCookie']
     except Exception:
