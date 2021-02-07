@@ -27,21 +27,25 @@ options:
     - IP Address or hostname of Cisco IMC, resolvable by Ansible control host.
     required: true
     aliases: [ host, ip ]
+    type: str
   username:
     description:
     - Username used to login to the switch.
     default: admin
     aliases: [ user ]
+    type: str
   password:
     description:
     - The password to use for authentication.
     default: password
+    type: str
   path:
     description:
     - Name of the absolute path of the filename that includes the body
       of the http request being sent to the Cisco IMC REST API.
     - Parameter C(path) is mutual exclusive with parameter C(content).
     aliases: [ 'src', 'config_file' ]
+    type: path
   content:
     description:
     - When used instead of C(path), sets the content of the API requests directly.
@@ -49,11 +53,13 @@ options:
     - You can collate multiple IMC XML fragments and they will be processed sequentially in a single stream,
       the Cisco IMC output is subsequently merged.
     - Parameter C(content) is mutual exclusive with parameter C(path).
+    type: str
   protocol:
     description:
     - Connection protocol to use.
     default: https
     choices: [ http, https ]
+    type: str
   timeout:
     description:
     - The socket level timeout in seconds.
@@ -61,6 +67,7 @@ options:
       If this C(timeout) is reached, the module will fail with a
       C(Connection failure) indicating that C(The read operation timed out).
     default: 60
+    type: int
   validate_certs:
     description:
     - If C(no), SSL certificates will not be validated.
@@ -253,11 +260,11 @@ output:
       errorDescr="XML PARSING ERROR: Element 'computeRackUnit', attribute 'admin_Power': The attribute 'admin_Power' is not allowed.\n"/>
 '''
 
-import atexit
 import datetime
 import itertools
 import os
 import traceback
+from functools import partial
 
 LXML_ETREE_IMP_ERR = None
 try:
@@ -279,7 +286,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.urls import fetch_url
 
 
-def imc_response(module, rawoutput, rawinput=''):
+def imc_response(module, rawoutput, logout_func=None, rawinput=''):
     ''' Handle IMC returned data '''
     xmloutput = lxml.etree.fromstring(rawoutput)
     result = cobra.data(xmloutput)
@@ -291,6 +298,8 @@ def imc_response(module, rawoutput, rawinput=''):
         result['output'] = rawoutput
         result['error_code'] = xmloutput.get('errorCode')
         result['error_text'] = xmloutput.get('errorDescr')
+        if logout_func is not None:
+            logout_func()
         module.fail_json(msg='Request failed: %(error_text)s' % result, **result)
 
     return result
@@ -317,7 +326,6 @@ def merge(one, two):
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
             hostname=dict(type='str', required=True, aliases=['host', 'ip']),
@@ -374,13 +382,13 @@ def main():
     result.update(imc_response(module, resp.read()))
 
     # Store cookie for future requests
+    cookie = ""
     try:
         cookie = result['aaaLogin']['attributes']['outCookie']
     except Exception:
         module.fail_json(msg='Could not find cookie in output', **result)
 
-    # If we would not log out properly, we run out of sessions quickly
-    atexit.register(logout, module, url, cookie, timeout)
+    logout_func = partial(logout, module, url, cookie, timeout)
 
     # Prepare request data
     if content:
@@ -404,11 +412,12 @@ def main():
         resp, info = fetch_url(module, url, data=data, method='POST', timeout=timeout)
         if resp is None or info['status'] != 200:
             result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
+            logout_func()
             module.fail_json(msg='Task failed with error %(status)s: %(msg)s' % info, **result)
 
         # Merge results with previous results
         rawoutput = resp.read()
-        result = merge(result, imc_response(module, rawoutput, rawinput=data))
+        result = merge(result, imc_response(module, rawoutput, logout_func, rawinput=data))
         result['response'] = info['msg']
         result['status'] = info['status']
 
@@ -420,6 +429,7 @@ def main():
 
     # Report success
     result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
+    logout_func()
     module.exit_json(**result)
 
 
