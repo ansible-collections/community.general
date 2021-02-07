@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright: (c) 2016, Hiroaki Nakamura <hnakamur@gmail.com>
-# Copyright: (c) 2020, Frnak Dornheim <dornheim@posteo.de>
+# Copyright: (c) 2020, Frank Dornheim <dornheim@posteo.de>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
