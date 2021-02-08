@@ -398,7 +398,7 @@ def main():
         address=dict(required=True),
         name=dict(required=True),
         stealth=dict(type='bool', default=False),
-        tsig_key=dict(),
+        tsig_key=dict(no_log=True),
         tsig_key_alg=dict(choices=['HMAC-MD5', 'HMAC-SHA256'], default='HMAC-MD5'),
         tsig_key_name=dict(required=True)
     )
