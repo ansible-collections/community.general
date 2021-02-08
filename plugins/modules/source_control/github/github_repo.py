@@ -10,21 +10,21 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: github_repo
-short_description: Manage your repos on Github
+short_description: Manage your repositories on Github
 version_added: 2.1.0
 description:
-- Manages Github repos using PyGithub library.
+- Manages Github repositories using PyGithub library.
 - Authentication can be done with I(access_token) or with I(username) and I(password).
 options:
   username:
     description:
-    - I(username) parameter for authentication.
+    - Username used for authentication.
     - This is only needed when not using I(access_token).
     type: str
     required: false
   password:
     description:
-    - I(password) parameter for authentication.
+    - Password used for authentication.
     - This is only needed when not using I(access_token).
     type: str
     required: false
@@ -78,7 +78,7 @@ author:
 
 EXAMPLES = '''
 - name: Create a Github Repo
-  github_repo:
+  community.general.github_repo:
     access_token: mytoken
     organization: MyOrganization
     name: myrepo
@@ -87,7 +87,7 @@ EXAMPLES = '''
     state: present
   register: result
 - name: Delete the repo
-  github_repo:
+  community.general.github_repo:
     username: octocat
     password: password
     organization: MyOrganization
@@ -146,9 +146,9 @@ def create_repo(gh, name, organization=None, private=False, description='', chec
         result['changed'] = True
 
     changes = {}
-    if check_mode or repo.raw_data['private'] != private:
+    if repo is None or repo.raw_data['private'] != private:
         changes['private'] = private
-    if check_mode or repo.raw_data['description'] != description:
+    if repo is None or repo.raw_data['description'] != description:
         changes['description'] = description
 
     if changes:
@@ -185,23 +185,21 @@ def run_module(params, check_mode=False):
     gh = authenticate(
         username=params['username'], password=params['password'], access_token=params['access_token'])
     if params['state'] == "absent":
-        args = {
-            "gh": gh,
-            "name": params['name'],
-            "organization": params['organization'],
-            "check_mode": check_mode
-        }
-        return delete_repo(**args)
+        return delete_repo(
+            gh=gh,
+            name=params['name'],
+            organization=params['organization'],
+            check_mode=check_mode
+        )
     else:
-        args = {
-            "gh": gh,
-            "name": params['name'],
-            "organization": params['organization'],
-            "private": params['private'],
-            "description": params['description'],
-            "check_mode": check_mode
-        }
-        return create_repo(**args)
+        return create_repo(
+            gh=gh,
+            name=params['name'],
+            organization=params['organization'],
+            private=params['private'],
+            description=params['description'],
+            check_mode=check_mode
+        )
 
 
 def main():
@@ -219,16 +217,15 @@ def main():
     )
     module = AnsibleModule(
         argument_spec=module_args,
-        supports_check_mode=True
+        supports_check_mode=True,
+        required_together=[('username', 'password')],
+        required_one_of=[('username', 'access_token')],
+        mutually_exclusive=[('username', 'access_token')]
     )
 
     if not HAS_GITHUB_PACKAGE:
         module.fail_json(msg=missing_required_lib(
             "PyGithub"), exception=GITHUB_IMP_ERR)
-
-    if not module.params['access_token'] and not (module.params['username'] and module.params['password']):
-        raise AssertionError(
-            "Access token must be provided for authentation. Username and password are also valid, instead.")
 
     try:
         result = dict(
