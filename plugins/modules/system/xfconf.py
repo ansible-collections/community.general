@@ -164,7 +164,7 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
                             elements='str', choices=('int', 'uint', 'bool', 'float', 'double', 'string')),
             value=dict(required=False, type='list', elements='raw'),
             force_array=dict(default=False, type='bool', aliases=['array']),
-            disable_facts=dict(type=bool, default=False),
+            disable_facts=dict(type='bool', default=False),
         ),
         required_if=[('state', 'present', ['value', 'value_type'])],
         required_together=[('value', 'value_type')],
