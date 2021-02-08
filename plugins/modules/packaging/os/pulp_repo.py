@@ -545,7 +545,7 @@ def main():
                           deprecated_aliases=[dict(name='ca_cert', version='3.0.0',
                                                    collection_name='community.general')]),  # was Ansible 2.14
         feed_client_cert=dict(aliases=['importer_ssl_client_cert']),
-        feed_client_key=dict(aliases=['importer_ssl_client_key']),
+        feed_client_key=dict(aliases=['importer_ssl_client_key'], no_log=True),
         name=dict(required=True, aliases=['repo']),
         proxy_host=dict(),
         proxy_port=dict(),

@@ -543,7 +543,7 @@ def build_module():
                 snapshot_id=dict(type='str')
             )),
             vpc_id=dict(type='str', required=True),
-            admin_pass=dict(type='str'),
+            admin_pass=dict(type='str', no_log=True),
             data_volumes=dict(type='list', elements='dict', options=dict(
                 volume_id=dict(type='str', required=True),
                 device=dict(type='str')
