@@ -59,7 +59,8 @@ options:
     version_added: 1.0.0
   disable_facts:
     description:
-    - For backward compatibility, output results are also returned as ansible facts, but this behaviour is deprecated.
+    - For backward compatibility, output results are also returned as C(ansible_facts), but this behaviour is deprecated
+      and will be removed in community.general 4.0.0.
     - This flag disables the output as facts and also disables the deprecation warning.
     type: bool
     default: no
