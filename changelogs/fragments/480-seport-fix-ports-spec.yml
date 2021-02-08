@@ -1,0 +1,2 @@
+bugfixes:
+  - seport module - fix the specification of the `ports` argument, type cast to string
