@@ -316,7 +316,7 @@ class LXDProfileManagement(object):
 
         Args:
             dict(source): source dict
-            dicht(destination): destination dict
+            dict(destination): destination dict
         Kwargs:
             None
         Raises:
