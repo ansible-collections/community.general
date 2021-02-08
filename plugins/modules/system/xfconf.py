@@ -198,7 +198,8 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
         if not self.module.params['disable_facts']:
             self.facts_name = "xfconf"
             self.module.deprecate(
-                msg="Returning results as facts is deprecated. Please register the module output to a variable instead",
+                msg="Returning results as facts is deprecated. Please register the module output to a variable instead."
+                    " You can use the disable_facts option to switch to the new behavior already now and disable this warning"
                 version="4.0.0", collection_name="community.general"
             )
 
