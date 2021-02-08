@@ -256,9 +256,6 @@ result:
         frontend_cookie:
             description: Frontend cookie name
             type: str
-        frontend_cookie_secret:
-            description: Frontend cookie secret
-            type: str
         frontend_form:
             description: Frontend authentication form name
             type: str

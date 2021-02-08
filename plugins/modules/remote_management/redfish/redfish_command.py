@@ -572,7 +572,7 @@ def main():
                 type='dict',
                 options=dict(
                     username=dict(),
-                    password=dict()
+                    password=dict(no_log=True)
                 )
             ),
             virtual_media=dict(
