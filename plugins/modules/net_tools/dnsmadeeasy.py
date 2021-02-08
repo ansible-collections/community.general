@@ -546,7 +546,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            account_key=dict(required=True),
+            account_key=dict(required=True, no_log=True),
             account_secret=dict(required=True, no_log=True),
             domain=dict(required=True),
             sandbox=dict(default=False, type='bool'),
