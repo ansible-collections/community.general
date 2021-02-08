@@ -258,7 +258,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             ignore_selinux_state=dict(type='bool', default=False),
-            ports=dict(type='list', required=True),
+            ports=dict(type='list', elements='str', required=True),
             proto=dict(type='str', required=True, choices=['tcp', 'udp']),
             setype=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
@@ -278,7 +278,7 @@ def main():
     if not get_runtime_status(ignore_selinux_state):
         module.fail_json(msg="SELinux is disabled on this host.")
 
-    ports = list(map(str, module.params['ports']))
+    ports = module.params['ports']
     proto = module.params['proto']
     setype = module.params['setype']
     state = module.params['state']
