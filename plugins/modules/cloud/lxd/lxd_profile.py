@@ -308,21 +308,21 @@ class LXDProfileManagement(object):
             self._needs_to_change_profile_config('devices')
         )
 
-    def _merge_dicts(self, source: dict, destination: dict) -> dict:
+    def _merge_dicts(self, source, destination):
         """Merge Dictionary
 
         Get a list of filehandle numbers from logger to be handed to
         DaemonContext.files_preserve
 
         Args:
-            source: source dict
-            destination: destination dict
+            dict(source): source dict
+            dicht(destination): destination dict
         Kwargs:
             None
         Raises:
             None
         Returns:
-            destination: merged dict"""
+            dict(destination): merged dict"""
         for key, value in source.items():
             if isinstance(value, dict):
                 # get node or create one
