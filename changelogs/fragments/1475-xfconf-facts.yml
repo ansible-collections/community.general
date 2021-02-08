@@ -1,2 +1,4 @@
 minor_changes:
-  - xfconf - added feature flag to disable facts and its associated deprecation warning (https://github.com/ansible-collections/community.general/issues/1475).
+  - xfconf - added option ``disable_facts`` to disable facts and its associated deprecation warning (https://github.com/ansible-collections/community.general/issues/1475).
+deprecated_features:
+  - xfconf - returning output as facts is deprecated, should be removed by version 4.0.0
