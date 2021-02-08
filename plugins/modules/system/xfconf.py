@@ -57,6 +57,12 @@ options:
     default: 'no'
     aliases: ['array']
     version_added: 1.0.0
+  disable_facts:
+    description:
+    - For backward compatibility, output results are also returned as ansible facts, but this behaviour is deprecated.
+    - This flag disables the output as facts and also disables the deprecation warning.
+    type: bool
+    default: no
 '''
 
 EXAMPLES = """
@@ -158,13 +164,13 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
                             elements='str', choices=('int', 'uint', 'bool', 'float', 'double', 'string')),
             value=dict(required=False, type='list', elements='raw'),
             force_array=dict(default=False, type='bool', aliases=['array']),
+            disable_facts=dict(type=bool, default=False),
         ),
         required_if=[('state', 'present', ['value', 'value_type'])],
         required_together=[('value', 'value_type')],
         supports_check_mode=True,
     )
 
-    facts_name = "xfconf"
     default_state = 'present'
     command = 'xfconf-query'
     command_args_formats = dict(
@@ -178,7 +184,8 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
 
     def update_xfconf_output(self, **kwargs):
         self.update_output(**kwargs)
-        self.update_facts(**kwargs)
+        if not self.module.params['disable_facts']:
+            self.update_facts(**kwargs)
 
     def __init_module__(self):
         self.does_not = 'Property "{0}" does not exist on channel "{1}".'.format(self.module.params['property'],
@@ -187,6 +194,12 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
         self.update_xfconf_output(property=self.module.params['property'],
                                   channel=self.module.params['channel'],
                                   previous_value=None)
+        if not self.module.params['disable_facts']:
+            self.facts_name = "xfconf"
+            self.module.deprecate(
+                msg="Returning results as facts is deprecated. Please register the module output to a variable instead",
+                version="4.0.0", collection_name="community.general"
+            )
 
     def process_command_output(self, rc, out, err):
         if err.rstrip() == self.does_not:
