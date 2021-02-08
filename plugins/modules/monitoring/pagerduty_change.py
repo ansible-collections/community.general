@@ -108,7 +108,7 @@ from datetime import datetime
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            integration_key=dict(required=True, type='str'),
+            integration_key=dict(required=True, type='str', no_log=True),
             summary=dict(required=True, type='str'),
             source=dict(required=False, default='Ansible', type='str'),
             user=dict(required=False, type='str'),
