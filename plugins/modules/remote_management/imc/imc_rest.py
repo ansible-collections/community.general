@@ -286,7 +286,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.urls import fetch_url
 
 
-def imc_response(module, rawoutput, logout_func=None, rawinput=''):
+def imc_response(module, rawoutput, rawinput=''):
     ''' Handle IMC returned data '''
     xmloutput = lxml.etree.fromstring(rawoutput)
     result = cobra.data(xmloutput)
@@ -298,8 +298,6 @@ def imc_response(module, rawoutput, logout_func=None, rawinput=''):
         result['output'] = rawoutput
         result['error_code'] = xmloutput.get('errorCode')
         result['error_text'] = xmloutput.get('errorDescr')
-        if logout_func is not None:
-            logout_func()
         module.fail_json(msg='Request failed: %(error_text)s' % result, **result)
 
     return result
@@ -388,49 +386,48 @@ def main():
     except Exception:
         module.fail_json(msg='Could not find cookie in output', **result)
 
-    logout_func = partial(logout, module, url, cookie, timeout)
+    try:
+        # Prepare request data
+        if content:
+            rawdata = content
+        elif file_exists:
+            with open(path, 'r') as config_object:
+                rawdata = config_object.read()
 
-    # Prepare request data
-    if content:
-        rawdata = content
-    elif file_exists:
-        with open(path, 'r') as config_object:
-            rawdata = config_object.read()
+        # Wrap the XML documents in a <root> element
+        xmldata = lxml.etree.fromstring('<root>%s</root>' % rawdata.replace('\n', ''))
 
-    # Wrap the XML documents in a <root> element
-    xmldata = lxml.etree.fromstring('<root>%s</root>' % rawdata.replace('\n', ''))
+        # Handle each XML document separately in the same session
+        for xmldoc in list(xmldata):
+            if xmldoc.tag is lxml.etree.Comment:
+                continue
+            # Add cookie to XML
+            xmldoc.set('cookie', cookie)
+            data = lxml.etree.tostring(xmldoc)
 
-    # Handle each XML document separately in the same session
-    for xmldoc in list(xmldata):
-        if xmldoc.tag is lxml.etree.Comment:
-            continue
-        # Add cookie to XML
-        xmldoc.set('cookie', cookie)
-        data = lxml.etree.tostring(xmldoc)
+            # Perform actual request
+            resp, info = fetch_url(module, url, data=data, method='POST', timeout=timeout)
+            if resp is None or info['status'] != 200:
+                result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
+                module.fail_json(msg='Task failed with error %(status)s: %(msg)s' % info, **result)
 
-        # Perform actual request
-        resp, info = fetch_url(module, url, data=data, method='POST', timeout=timeout)
-        if resp is None or info['status'] != 200:
-            result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
-            logout_func()
-            module.fail_json(msg='Task failed with error %(status)s: %(msg)s' % info, **result)
+            # Merge results with previous results
+            rawoutput = resp.read()
+            result = merge(result, imc_response(module, rawoutput, rawinput=data))
+            result['response'] = info['msg']
+            result['status'] = info['status']
 
-        # Merge results with previous results
-        rawoutput = resp.read()
-        result = merge(result, imc_response(module, rawoutput, logout_func, rawinput=data))
-        result['response'] = info['msg']
-        result['status'] = info['status']
+            # Check for any changes
+            # NOTE: Unfortunately IMC API always report status as 'modified'
+            xmloutput = lxml.etree.fromstring(rawoutput)
+            results = xmloutput.xpath('/configConfMo/outConfig/*/@status')
+            result['changed'] = ('modified' in results)
 
-        # Check for any changes
-        # NOTE: Unfortunately IMC API always report status as 'modified'
-        xmloutput = lxml.etree.fromstring(rawoutput)
-        results = xmloutput.xpath('/configConfMo/outConfig/*/@status')
-        result['changed'] = ('modified' in results)
-
-    # Report success
-    result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
-    logout_func()
-    module.exit_json(**result)
+        # Report success
+        result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
+        module.exit_json(**result)
+    finally:
+        logout(module, url, cookie, timeout)
 
 
 if __name__ == '__main__':
