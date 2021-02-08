@@ -1,0 +1,2 @@
+minor_changes:
+  - xfconf - added feature flag to disable facts and its associated deprecation warning (https://github.com/ansible-collections/community.general/issues/1475).
