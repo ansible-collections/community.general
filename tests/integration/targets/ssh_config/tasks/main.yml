@@ -6,6 +6,7 @@
   pip:
     name: stormssh
     state: present
+    extra_args: "-c {{ remote_constraints }}"
 
 - set_fact:
     output_dir_test: '{{ output_dir }}/test_ssh_config'
