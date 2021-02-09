@@ -1850,3 +1850,103 @@ releases:
     - community.docker-73-docker_image-fix-old-docker-py-version.yml
     - lldp-use-get_bin_path-to-locate-the-lldpctl-executable.yaml
     release_date: '2021-01-26'
+  1.3.6:
+    changes:
+      breaking_changes:
+      - utm_proxy_auth_profile - the ``frontend_cookie_secret`` return value now contains
+        a placeholder string instead of the module's ``frontend_cookie_secret`` parameter
+        (https://github.com/ansible-collections/community.general/pull/1736).
+      bugfixes:
+      - docker connection plugin - fix Docker version parsing, as some docker versions
+        have a leading ``v`` in the output of the command ``docker version --format
+        "{{.Server.Version}}"`` (https://github.com/ansible-collections/community.docker/pull/76).
+      - filesystem - do not fail when ``resizefs=yes`` and ``fstype=xfs`` if there
+        is nothing to do, even if the filesystem is not mounted. This only covers
+        systems supporting access to unmounted XFS filesystems. Others will still
+        fail (https://github.com/ansible-collections/community.general/issues/1457,
+        https://github.com/ansible-collections/community.general/pull/1478).
+      - gitlab_user - make updates to the ``isadmin``, ``password`` and ``confirm``
+        options of an already existing GitLab user work (https://github.com/ansible-collections/community.general/pull/1724).
+      - parted - change the regex that decodes the partition size to better support
+        different formats that parted uses. Change the regex that validates parted's
+        version string (https://github.com/ansible-collections/community.general/pull/1695).
+      - redfish_info module, redfish_utils module utils - add ``Name`` and ``Id``
+        properties to output of Redfish inventory commands (https://github.com/ansible-collections/community.general/issues/1650).
+      - sensu-silence module - fix json parsing of sensu API responses on Python 3.5
+        (https://github.com/ansible-collections/community.general/pull/1703).
+      minor_changes:
+      - scaleway modules and inventory plugin - update regions and zones to add the
+        new ones (https://github.com/ansible-collections/community.general/pull/1690).
+      release_summary: Regular bugfix and security bugfix (potential information leaks
+        in multiple modules, CVE-2021-20191) release.
+      security_fixes:
+      - dnsmadeeasy - mark the ``account_key`` parameter as ``no_log`` to avoid leakage
+        of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - docker_swarm - enabled ``no_log`` for the option ``signing_ca_key`` to prevent
+        accidental disclosure (CVE-2021-20191, https://github.com/ansible-collections/community.general/pull/1728).
+      - gitlab_runner - mark the ``registration_token`` parameter as ``no_log`` to
+        avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - hwc_ecs_instance - mark the ``admin_pass`` parameter as ``no_log`` to avoid
+        leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - ibm_sa_host - mark the ``iscsi_chap_secret`` parameter as ``no_log`` to avoid
+        leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - keycloak_* modules - mark the ``auth_client_secret`` parameter as ``no_log``
+        to avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - keycloak_client - mark the ``registration_access_token`` parameter as ``no_log``
+        to avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - librato_annotation - mark the ``api_key`` parameter as ``no_log`` to avoid
+        leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - logentries_msg - mark the ``token`` parameter as ``no_log`` to avoid leakage
+        of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - module_utils/_netapp, na_ontap_gather_facts - enabled ``no_log`` for the options
+        ``api_key`` and ``secret_key`` to prevent accidental disclosure (CVE-2021-20191,
+        https://github.com/ansible-collections/community.general/pull/1725).
+      - module_utils/identity/keycloak, keycloak_client, keycloak_clienttemplate,
+        keycloak_group - enabled ``no_log`` for the option ``auth_client_secret``
+        to prevent accidental disclosure (CVE-2021-20191, https://github.com/ansible-collections/community.general/pull/1725).
+      - nios_nsgroup - mark the ``tsig_key`` parameter as ``no_log`` to avoid leakage
+        of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - oneandone_firewall_policy, oneandone_load_balancer, oneandone_monitoring_policy,
+        oneandone_private_network, oneandone_public_ip - mark the ``auth_token`` parameter
+        as ``no_log`` to avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - ovirt - mark the ``instance_key`` parameter as ``no_log`` to avoid leakage
+        of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - ovirt - mark the ``instance_rootpw`` parameter as ``no_log`` to avoid leakage
+        of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - pagerduty_alert - mark the ``api_key``, ``service_key`` and ``integration_key``
+        parameters as ``no_log`` to avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - pagerduty_change - mark the ``integration_key`` parameter as ``no_log`` to
+        avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - pingdom - mark the ``key`` parameter as ``no_log`` to avoid leakage of secrets
+        (https://github.com/ansible-collections/community.general/pull/1736).
+      - pulp_repo - mark the ``feed_client_key`` parameter as ``no_log`` to avoid
+        leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - rax_clb_ssl - mark the ``private_key`` parameter as ``no_log`` to avoid leakage
+        of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - redfish_command - mark the ``update_creds.password`` parameter as ``no_log``
+        to avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - rollbar_deployment - mark the ``token`` parameter as ``no_log`` to avoid leakage
+        of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - spotinst_aws_elastigroup - mark the ``multai_token`` and ``token`` parameters
+        as ``no_log`` to avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - stackdriver - mark the ``key`` parameter as ``no_log`` to avoid leakage of
+        secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - utm_proxy_auth_profile - enabled ``no_log`` for the option ``frontend_cookie_secret``
+        to prevent accidental disclosure (CVE-2021-20191, https://github.com/ansible-collections/community.general/pull/1725).
+      - utm_proxy_auth_profile - mark the ``frontend_cookie_secret`` parameter as
+        ``no_log`` to avoid leakage of secrets. This causes the ``utm_proxy_auth_profile``
+        return value to no longer containing the correct value, but a placeholder
+        (https://github.com/ansible-collections/community.general/pull/1736).
+    fragments:
+    - 1.3.6.yml
+    - 1478-filesystem-fix-1457-resizefs-idempotency.yml
+    - 1690-scaleway-regions.yaml
+    - 1691-add-name-and-id-props-to-redfish-inventory-output.yml
+    - 1695-parted-updatedregex.yaml
+    - 1703-sensu_silence-fix_json_parsing.yml
+    - 1724-various-fixes-for-updating-existing-gitlab-user.yml
+    - CVE-2021-20191_no_log.yml
+    - CVE-2021-20191_no_log_docker.yml
+    - community.docker-76-leading-v-support-in-docker-version.yml
+    - no_log-fixes.yml
+    release_date: '2021-02-09'
