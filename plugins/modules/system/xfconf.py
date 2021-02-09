@@ -64,6 +64,7 @@ options:
     - This flag disables the output as facts and also disables the deprecation warning.
     type: bool
     default: no
+    version_added: 2.1.0
 '''
 
 EXAMPLES = """
