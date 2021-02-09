@@ -1,5 +1,3 @@
 ---
 bugfixes:
   - filesystem - remove ``swap`` from list of FS supported by ``resizefs=yes`` (https://github.com/ansible-collections/community.general/issues/790).
-minor_changes:
-  - lvol - list filesystems supported by ``resizefs=yes``.
