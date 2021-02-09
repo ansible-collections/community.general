@@ -76,6 +76,8 @@ options:
   resizefs:
     description:
     - Resize the underlying filesystem together with the logical volume.
+    - Supported for C(ext2), C(ext3), C(ext4), C(reiserfs) and C(XFS) filesystems.
+      Attempts to resize other filesystem types will fail.
     type: bool
     default: 'no'
 notes:
