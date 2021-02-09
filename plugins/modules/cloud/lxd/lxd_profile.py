@@ -7,9 +7,6 @@
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
-import os
-from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
 
 DOCUMENTATION = '''
 ---
@@ -56,9 +53,6 @@ options:
         required: false
         type: str
     merge:
-        choices:
-            - true
-            - false
         description:
             - Merge the configuration of the present profile and the new desired configitems
         required: false
@@ -208,6 +202,9 @@ actions:
   type: list
   sample: '["create"]'
 '''
+import os
+from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
 
 # ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
 ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
@@ -483,7 +480,7 @@ def main():
             ),
             merge=dict(
                 type='bool',
-                default='false'
+                default=False
             ),
             state=dict(
                 choices=PROFILES_STATES,
