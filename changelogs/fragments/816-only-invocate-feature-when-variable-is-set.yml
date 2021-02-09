@@ -1,0 +1,4 @@
+bugfixes:
+  - proxmox lxc - only invocate feature flag, when variable is set, 
+  - proxmox lxc - an empty feature variable breaks proxmox pct list 
+  - proxmox lxc - feature invocation forces to use root@pam for module execution  
