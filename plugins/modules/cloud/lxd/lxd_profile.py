@@ -7,7 +7,9 @@
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
-
+import os
+from ansible.module_utils.basic import AnsibleModule
+from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
 
 DOCUMENTATION = '''
 ---
@@ -53,6 +55,15 @@ options:
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-11)
         required: false
         type: str
+    merge:
+        choices:
+            - true
+            - false
+        description:
+            - Merge the configuration of the present profile and the new desired configitems
+        required: false
+        default: false
+        type: bool
     state:
         choices:
           - present
@@ -143,6 +154,23 @@ EXAMPLES = '''
           parent: br0
           type: nic
 
+# An example for modify/merge a profile
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Merge a profile
+      community.general.lxd_profile:
+        merge: true
+        name: macvlan
+        state: present
+        config: {}
+        description: my macvlan profile
+        devices:
+          eth0:
+            nictype: macvlan
+            parent: br0
+            type: nic
+
 # An example for deleting a profile
 - hosts: localhost
   connection: local
@@ -181,11 +209,6 @@ actions:
   sample: '["create"]'
 '''
 
-import os
-
-from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
-
 # ANSIBLE_LXD_DEFAULT_URL is a default value of the lxd endpoint
 ANSIBLE_LXD_DEFAULT_URL = 'unix:/var/lib/lxd/unix.socket'
 
@@ -196,7 +219,7 @@ PROFILES_STATES = [
 
 # CONFIG_PARAMS is a list of config attribute names.
 CONFIG_PARAMS = [
-    'config', 'description', 'devices'
+    'config', 'description', 'devices', 'merge'
 ]
 
 
@@ -267,7 +290,7 @@ class LXDProfileManagement(object):
                     self._create_profile()
                 else:
                     self.module.fail_json(
-                        msg='new_name must not be set when the profile does not exist and the specified state is present',
+                        msg='new_name must not be set when the profile does not exist and the state is present',
                         changed=False)
             else:
                 if self.new_name is not None and self.new_name != self.name:
@@ -332,10 +355,56 @@ class LXDProfileManagement(object):
                 destination[key] = value
         return destination
 
-    def _apply_profile_configs(self):
+    def _merge_config(self, config):
         """ merge profile
 
-        merge the keys that are already defined in the profile and those defined in the current task
+        Merge Configuration of the present profile and the new desired configitems
+
+        Args:
+            dict(config): Dict with the old config in 'metadata' and new config in 'config'
+        Kwargs:
+            None
+        Raises:
+            None
+        Returns:
+            dict(config): new config"""
+        # merge or copy the sections from the existing profile to 'config'
+        for item in ['config', 'description', 'devices', 'name', 'used_by']:
+            if item in config:
+                config[item] = self._merge_dicts(config['metadata'][item], config[item])
+            else:
+                config[item] = config['metadata'][item]
+        # merge or copy the sections from the ansible-task to 'config'
+        return (self._merge_dicts(self.config, config))
+
+    def _generate_new_config(self, config):
+        """ rebuild profile
+
+        Rebuild the Profile by the configuration provided in the play.
+        Existing configurations are discarded.
+
+        This ist the default behavior.
+
+        Args:
+            dict(config): Dict with the old config in 'metadata' and new config in 'config'
+        Kwargs:
+            None
+        Raises:
+            None
+        Returns:
+            dict(config): new config"""
+        for k, v in self.config.items():
+            config[k] = v
+        return(config)
+
+    def _apply_profile_configs(self):
+        """ Selection of the procedure rebuild or merge
+
+        The standard behavior is that all information not contained
+        in the play is discarded.
+
+        If "Merge" is provides in the play and "True", then existing
+        configurations from the profile and new ones defined are merged.
 
         Args:
             None
@@ -346,14 +415,11 @@ class LXDProfileManagement(object):
         Returns:
             None"""
         config = self.old_profile_json.copy()
-        # merge or copy the sections from the existing profile to 'config'
-        for item in ['config', 'description', 'devices', 'name', 'used_by']:
-            if item in config:
-                config[item] = self._merge_dicts(config['metadata'][item], config[item])
-            else:
-                config[item] = config['metadata'][item]
-        # merge or copy the sections from the ansible-task to 'config'
-        config = self._merge_dicts(self.config, config)
+        if 'merge' in self.config.keys() and self.config['merge'] is True:
+            config = self._merge_config(config)
+        else:
+            config = self._generate_new_config(config)
+
         # upload config to lxd
         self.client.do('PUT', '/1.0/profiles/{0}'.format(self.name), config)
         self.actions.append('apply_profile_configs')
@@ -414,6 +480,10 @@ def main():
             ),
             devices=dict(
                 type='dict',
+            ),
+            merge=dict(
+                type='bool',
+                default='false'
             ),
             state=dict(
                 choices=PROFILES_STATES,
