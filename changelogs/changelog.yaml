@@ -1000,3 +1000,118 @@ releases:
       name: yum_versionlock
       namespace: packaging.os
     release_date: '2021-01-28'
+  2.0.1:
+    changes:
+      breaking_changes:
+      - utm_proxy_auth_profile - the ``frontend_cookie_secret`` return value now contains
+        a placeholder string instead of the module's ``frontend_cookie_secret`` parameter
+        (https://github.com/ansible-collections/community.general/pull/1736).
+      bugfixes:
+      - filesystem - do not fail when ``resizefs=yes`` and ``fstype=xfs`` if there
+        is nothing to do, even if the filesystem is not mounted. This only covers
+        systems supporting access to unmounted XFS filesystems. Others will still
+        fail (https://github.com/ansible-collections/community.general/issues/1457,
+        https://github.com/ansible-collections/community.general/pull/1478).
+      - gitlab_user - make updates to the ``isadmin``, ``password`` and ``confirm``
+        options of an already existing GitLab user work (https://github.com/ansible-collections/community.general/pull/1724).
+      - parted - change the regex that decodes the partition size to better support
+        different formats that parted uses. Change the regex that validates parted's
+        version string (https://github.com/ansible-collections/community.general/pull/1695).
+      - redfish_info module, redfish_utils module utils - add ``Name`` and ``Id``
+        properties to output of Redfish inventory commands (https://github.com/ansible-collections/community.general/issues/1650).
+      - sensu-silence module - fix json parsing of sensu API responses on Python 3.5
+        (https://github.com/ansible-collections/community.general/pull/1703).
+      major_changes:
+      - 'For community.general 3.0.0, the ``ome_device_info``, ``idrac_firmware``
+        and ``idrac_server_config_profile`` modules will be moved to the `dellemc.openmanage
+        <https://galaxy.ansible.com/dellemc/openmanage>`_ collection.
+
+        A redirection will be inserted so that users using ansible-base 2.10 or newer
+        do not have to change anything.
+
+
+        If you use Ansible 2.9 and explicitly use the DellEMC modules mentioned above
+        from this collection, you will need to adjust your playbooks and roles to
+        use FQCNs starting with ``dellemc.openmanage.`` instead of ``community.general.``,
+
+        for example replace ``community.general.ome_device_info`` in a task by ``dellemc.openmanage.ome_device_info``.
+
+
+        If you use ansible-base and installed ``community.general`` manually and rely
+        on the DellEMC modules mentioned above, you have to make sure to install the
+        ``dellemc.openmanage`` collection as well.
+
+        If you are using FQCNs, for example ``community.general.ome_device_info``
+        instead of ``ome_device_info``, it will continue working, but we still recommend
+        to adjust the FQCNs as well.
+
+        '
+      release_summary: Bugfix and security bugfix (potential information leaks in
+        multiple modules, CVE-2021-20191) release.
+      security_fixes:
+      - dnsmadeeasy - mark the ``account_key`` parameter as ``no_log`` to avoid leakage
+        of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - gitlab_runner - mark the ``registration_token`` parameter as ``no_log`` to
+        avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - hwc_ecs_instance - mark the ``admin_pass`` parameter as ``no_log`` to avoid
+        leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - ibm_sa_host - mark the ``iscsi_chap_secret`` parameter as ``no_log`` to avoid
+        leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - keycloak_* modules - mark the ``auth_client_secret`` parameter as ``no_log``
+        to avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - keycloak_client - mark the ``registration_access_token`` parameter as ``no_log``
+        to avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - librato_annotation - mark the ``api_key`` parameter as ``no_log`` to avoid
+        leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - logentries_msg - mark the ``token`` parameter as ``no_log`` to avoid leakage
+        of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - module_utils/_netapp, na_ontap_gather_facts - enabled ``no_log`` for the options
+        ``api_key`` and ``secret_key`` to prevent accidental disclosure (CVE-2021-20191,
+        https://github.com/ansible-collections/community.general/pull/1725).
+      - module_utils/identity/keycloak, keycloak_client, keycloak_clienttemplate,
+        keycloak_group - enabled ``no_log`` for the option ``auth_client_secret``
+        to prevent accidental disclosure (CVE-2021-20191, https://github.com/ansible-collections/community.general/pull/1725).
+      - nios_nsgroup - mark the ``tsig_key`` parameter as ``no_log`` to avoid leakage
+        of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - oneandone_firewall_policy, oneandone_load_balancer, oneandone_monitoring_policy,
+        oneandone_private_network, oneandone_public_ip - mark the ``auth_token`` parameter
+        as ``no_log`` to avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - ovirt - mark the ``instance_key`` parameter as ``no_log`` to avoid leakage
+        of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - ovirt - mark the ``instance_rootpw`` parameter as ``no_log`` to avoid leakage
+        of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - pagerduty_alert - mark the ``api_key``, ``service_key`` and ``integration_key``
+        parameters as ``no_log`` to avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - pagerduty_change - mark the ``integration_key`` parameter as ``no_log`` to
+        avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - pingdom - mark the ``key`` parameter as ``no_log`` to avoid leakage of secrets
+        (https://github.com/ansible-collections/community.general/pull/1736).
+      - pulp_repo - mark the ``feed_client_key`` parameter as ``no_log`` to avoid
+        leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - rax_clb_ssl - mark the ``private_key`` parameter as ``no_log`` to avoid leakage
+        of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - redfish_command - mark the ``update_creds.password`` parameter as ``no_log``
+        to avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - rollbar_deployment - mark the ``token`` parameter as ``no_log`` to avoid leakage
+        of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - spotinst_aws_elastigroup - mark the ``multai_token`` and ``token`` parameters
+        as ``no_log`` to avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - stackdriver - mark the ``key`` parameter as ``no_log`` to avoid leakage of
+        secrets (https://github.com/ansible-collections/community.general/pull/1736).
+      - utm_proxy_auth_profile - enabled ``no_log`` for the option ``frontend_cookie_secret``
+        to prevent accidental disclosure (CVE-2021-20191, https://github.com/ansible-collections/community.general/pull/1725).
+      - utm_proxy_auth_profile - mark the ``frontend_cookie_secret`` parameter as
+        ``no_log`` to avoid leakage of secrets. This causes the ``utm_proxy_auth_profile``
+        return value to no longer containing the correct value, but a placeholder
+        (https://github.com/ansible-collections/community.general/pull/1736).
+    fragments:
+    - 1478-filesystem-fix-1457-resizefs-idempotency.yml
+    - 1691-add-name-and-id-props-to-redfish-inventory-output.yml
+    - 1695-parted-updatedregex.yaml
+    - 1703-sensu_silence-fix_json_parsing.yml
+    - 1724-various-fixes-for-updating-existing-gitlab-user.yml
+    - 2.0.1.yml
+    - CVE-2021-20191_no_log.yml
+    - dellemc-migration.yml
+    - no_log-fixes.yml
+    release_date: '2021-02-09'
