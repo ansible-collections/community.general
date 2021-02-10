@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_config - case insensitive search for situations where the hostname/FQDN case on iLO doesn't match variable's case (https://github.com/ansible-collections/community.general/pull/1744).
