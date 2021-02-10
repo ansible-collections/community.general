@@ -31,6 +31,9 @@ options:
     description:
       - Pass arbitrary arguments to kvm.
       - This option is for experts only!
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(-serial unix:/var/run/qemu-server/<vmid>.serial,server,nowait). 
+        Note that the default value of I(proxmox_default_behavior) changes in community.general 4.0.0.      
     type: str
   autostart:
     description:
@@ -948,9 +951,9 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
         if searchdomains:
             kwargs['searchdomain'] = ' '.join(searchdomains)
 
-    # -args and skiplock require root@pam user
+    # -args and skiplock require root@pam user - but can not use api tokens
     if module.params['api_user'] == "root@pam" and module.params['args'] is None:
-        if not update:
+        if not update and module.params['proxmox_default_behavior'] == 'compatibility':
             kwargs['args'] = vm_args
     elif module.params['api_user'] == "root@pam" and module.params['args'] is not None:
         kwargs['args'] = module.params['args']
