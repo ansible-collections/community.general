@@ -52,12 +52,13 @@ options:
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-11)
         required: false
         type: str
-    merge:
+    merge_profile:
         description:
             - Merge the configuration of the present profile and the new desired configitems
         required: false
         default: false
         type: bool
+        version_added: 2.1.0
     state:
         choices:
           - present
@@ -154,7 +155,7 @@ EXAMPLES = '''
   tasks:
     - name: Merge a profile
       community.general.lxd_profile:
-        merge: true
+        merge_profile: true
         name: macvlan
         state: present
         config: {}
@@ -216,7 +217,7 @@ PROFILES_STATES = [
 
 # CONFIG_PARAMS is a list of config attribute names.
 CONFIG_PARAMS = [
-    'config', 'description', 'devices', 'merge'
+    'config', 'description', 'devices'
 ]
 
 
@@ -329,7 +330,7 @@ class LXDProfileManagement(object):
         )
 
     def _merge_dicts(self, source, destination):
-        """Merge Dictionary
+        """Merge Dictionarys
 
         Get a list of filehandle numbers from logger to be handed to
         DaemonContext.files_preserve
@@ -372,7 +373,7 @@ class LXDProfileManagement(object):
             else:
                 config[item] = config['metadata'][item]
         # merge or copy the sections from the ansible-task to 'config'
-        return (self._merge_dicts(self.config, config))
+        return self._merge_dicts(self.config, config)
 
     def _generate_new_config(self, config):
         """ rebuild profile
@@ -392,15 +393,15 @@ class LXDProfileManagement(object):
             dict(config): new config"""
         for k, v in self.config.items():
             config[k] = v
-        return(config)
+        return config
 
     def _apply_profile_configs(self):
-        """ Selection of the procedure rebuild or merge
+        """ Selection of the procedure: rebuild or merge
 
         The standard behavior is that all information not contained
         in the play is discarded.
 
-        If "Merge" is provides in the play and "True", then existing
+        If "merge_profile" is provides in the play and "True", then existing
         configurations from the profile and new ones defined are merged.
 
         Args:
@@ -412,7 +413,7 @@ class LXDProfileManagement(object):
         Returns:
             None"""
         config = self.old_profile_json.copy()
-        if 'merge' in self.config.keys() and self.config['merge'] is True:
+        if self.module.params['merge_profile']:
             config = self._merge_config(config)
         else:
             config = self._generate_new_config(config)
@@ -478,7 +479,7 @@ def main():
             devices=dict(
                 type='dict',
             ),
-            merge=dict(
+            merge_profile=dict(
                 type='bool',
                 default=False
             ),
