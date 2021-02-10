@@ -54,7 +54,8 @@ options:
         type: str
     merge_profile:
         description:
-            - Merge the configuration of the present profile and the new desired configitems
+            - Merge the configuration of the present profile with the new desired configuration,
+              instead of replacing it.
         required: false
         default: false
         type: bool
