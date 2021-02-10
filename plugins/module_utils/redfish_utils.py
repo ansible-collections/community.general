@@ -2632,7 +2632,7 @@ class RedfishUtils(object):
             if response['ret'] is False:
                 return response
             data = response['data']
-            if '"' + nic_addr + '"' in str(data) or "'" + nic_addr + "'" in str(data):
+            if '"' + nic_addr.lower() + '"' in str(data).lower() or "'" + nic_addr.lower() + "'" in str(data).lower():
                 target_ethernet_uri = uri
                 target_ethernet_current_setting = data
                 break
