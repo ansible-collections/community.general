@@ -57,7 +57,8 @@ options:
   resizefs:
     description:
     - If C(yes), if the block device and filesystem size differ, grow the filesystem into the space.
-    - Supported for C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(vfat), C(swap) filesystems.
+    - Supported for C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs) and C(vfat) filesystems.
+      Attempts to resize other filesystem types will fail.
     - XFS Will only grow if mounted. Currently, the module is based on commands
       from C(util-linux) package to perform operations, so resizing of XFS is
       not supported on FreeBSD systems.
