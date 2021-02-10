@@ -1,2 +1,2 @@
 bugfixes:
-  - zfs_delegate_admin - added ``elements`` to documentation and ``argument_spec`` (https://github.com/ansible-collections/community.general/pull/1766).
+  - zfs_delegate_admin - the elements of ``users``, ``groups`` and ``permissions`` are now enforced to be strings (https://github.com/ansible-collections/community.general/pull/1766).
