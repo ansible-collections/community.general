@@ -622,7 +622,7 @@ def main():
                             searchdomain=module.params['searchdomain'],
                             force=int(module.params['force']),
                             pubkey=module.params['pubkey'],
-                            features=",".join(module.params['features'] or []),
+                            features=",".join(module.params['features']) if module.params['features'] is not None else None,
                             unprivileged=int(module.params['unprivileged']),
                             description=module.params['description'],
                             hookscript=module.params['hookscript'])
