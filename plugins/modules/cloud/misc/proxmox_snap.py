@@ -31,6 +31,7 @@ options:
       - The password to authenticate with.
       - You can use PROXMOX_PASSWORD environment variable.
     type: str
+    required: yes
   hostname:
     description:
       - The instance name.
@@ -118,7 +119,7 @@ except ImportError:
     PROXMOXER_IMP_ERR = traceback.format_exc()
     HAS_PROXMOXER = False
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib, env_fallback
 from ansible.module_utils._text import to_native
 
 
@@ -182,7 +183,7 @@ def main():
         argument_spec=dict(
             api_host=dict(required=True),
             api_user=dict(required=True),
-            api_password=dict(no_log=True),
+            api_password=dict(no_log=True, required=True, fallback=(env_fallback, ['PROXMOX_PASSWORD'])),
             vmid=dict(required=False),
             validate_certs=dict(type='bool', default='no'),
             hostname=dict(),
@@ -212,13 +213,6 @@ def main():
     timeout = module.params['timeout']
     force = module.params['force']
     vmstate = module.params['vmstate']
-
-    # If password not set get it from PROXMOX_PASSWORD env
-    if not api_password:
-        try:
-            api_password = os.environ['PROXMOX_PASSWORD']
-        except KeyError as e:
-            module.fail_json(msg='You should set api_password param or use PROXMOX_PASSWORD environment variable' % to_native(e))
 
     try:
         proxmox = setup_api(api_host, api_user, api_password, validate_certs)
