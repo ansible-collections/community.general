@@ -19,18 +19,22 @@ options:
     description:
       - Hostname or ip address of the BMC.
     required: true
+    type: str
   port:
     description:
       - Remote RMCP port.
     default: 623
+    type: int
   user:
     description:
       - Username to use to connect to the BMC.
     required: true
+    type: str
   password:
     description:
       - Password to connect to the BMC.
     required: true
+    type: str
   state:
     description:
       - Whether to ensure that the machine in desired state.
@@ -42,10 +46,12 @@ options:
             - boot -- If system is off, then 'on', else 'reset'"
     choices: ['on', 'off', shutdown, reset, boot]
     required: true
+    type: str
   timeout:
     description:
       - Maximum number of seconds before interrupt request.
     default: 300
+    type: int
 requirements:
   - "python >= 2.6"
   - pyghmi
