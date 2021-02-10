@@ -107,7 +107,6 @@ EXAMPLES = r'''
 
 RETURN = r'''#'''
 
-import os
 import time
 import traceback
 

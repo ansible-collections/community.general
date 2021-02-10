@@ -345,7 +345,6 @@ EXAMPLES = r'''
     state: absent
 '''
 
-import os
 import time
 import traceback
 from distutils.version import LooseVersion
