@@ -219,7 +219,7 @@ PROFILES_STATES = [
 
 # CONFIG_PARAMS is a list of config attribute names.
 CONFIG_PARAMS = [
-    'config', 'description', 'devices', 'merge'
+    'config', 'description', 'devices'
 ]
 
 
