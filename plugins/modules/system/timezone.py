@@ -355,20 +355,26 @@ class NosystemdTimezone(Timezone):
         # Validate given timezone
         if 'name' in self.value:
             tzfile = self._verify_timezone()
+            planned_tz = self.value['name']['planned']
             # `--remove-destination` is needed if /etc/localtime is a symlink so
             # that it overwrites it instead of following it.
             self.update_timezone = ['%s --remove-destination %s /etc/localtime' % (self.module.get_bin_path('cp', required=True), tzfile)]
         self.update_hwclock = self.module.get_bin_path('hwclock', required=True)
+        distribution = get_distribution()
+        self.conf_files['name'] = '/etc/timezone'
+        self.regexps['name'] = re.compile(r'^([^\s]+)', re.MULTILINE)
+        self.tzline_format = '%s\n'
         # Distribution-specific configurations
         if self.module.get_bin_path('dpkg-reconfigure') is not None:
             # Debian/Ubuntu
             if 'name' in self.value:
                 self.update_timezone = ['%s -sf %s /etc/localtime' % (self.module.get_bin_path('ln', required=True), tzfile),
                                         '%s --frontend noninteractive tzdata' % self.module.get_bin_path('dpkg-reconfigure', required=True)]
-            self.conf_files['name'] = '/etc/timezone'
             self.conf_files['hwclock'] = '/etc/default/rcS'
-            self.regexps['name'] = re.compile(r'^([^\s]+)', re.MULTILINE)
-            self.tzline_format = '%s\n'
+        elif distribution == 'Alpine' or distribution == 'Gentoo':
+            self.conf_files['hwclock'] = '/etc/conf.d/hwclock'
+            if distribution == 'Alpine':
+                self.update_timezone = ['%s -z %s' % (self.module.get_bin_path('setup-timezone', required=True), planned_tz)]
         else:
             # RHEL/CentOS/SUSE
             if self.module.get_bin_path('tzdata-update') is not None:
@@ -386,7 +392,6 @@ class NosystemdTimezone(Timezone):
             except IOError as err:
                 if self._allow_ioerror(err, 'name'):
                     # If the config file doesn't exist detect the distribution and set regexps.
-                    distribution = get_distribution()
                     if distribution == 'SuSE':
                         # For SUSE
                         self.regexps['name'] = self.dist_regexps['SuSE']
@@ -536,7 +541,9 @@ class NosystemdTimezone(Timezone):
                         # to other zone files, so it's hard to get which TZ is actually set
                         # if we follow the symlink.
                         path = os.readlink('/etc/localtime')
-                        linktz = re.search(r'/usr/share/zoneinfo/(.*)', path, re.MULTILINE)
+                        # most linuxes has it in /usr/share/zoneinfo
+                        # alpine linux links under /etc/zoneinfo
+                        linktz = re.search(r'(?:/(?:usr/share|etc)/zoneinfo/)(.*)', path, re.MULTILINE)
                         if linktz:
                             valuelink = linktz.group(1)
                             if valuelink != planned:
