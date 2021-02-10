@@ -32,8 +32,8 @@ options:
       - Pass arbitrary arguments to kvm.
       - This option is for experts only!
       - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
-        option has a default of C(-serial unix:/var/run/qemu-server/<vmid>.serial,server,nowait). 
-        Note that the default value of I(proxmox_default_behavior) changes in community.general 4.0.0.      
+        option has a default of C(-serial unix:/var/run/qemu-server/<vmid>.serial,server,nowait).
+        Note that the default value of I(proxmox_default_behavior) changes in community.general 4.0.0.
     type: str
   autostart:
     description:
