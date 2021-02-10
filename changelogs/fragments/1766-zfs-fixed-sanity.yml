@@ -1,0 +1,2 @@
+bugfixes:
+  - zfs_delegate_admin - added ``elements`` to documentation and ``argument_spec`` (https://github.com/ansible-collections/community.general/pull/1766).
