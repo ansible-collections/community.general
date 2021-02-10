@@ -1143,7 +1143,6 @@ def main():
             cores=1,
             cpu='kvm64',
             cpuunits=1000,
-            force=False,
             format='qcow2',
             kvm=True,
             memory=512,
