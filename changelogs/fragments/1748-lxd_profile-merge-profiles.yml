@@ -1,3 +1,2 @@
 minor_changes:
 - lxd_profile - add ``merge_profile`` to merge configurations from the play to an existing profile
-
