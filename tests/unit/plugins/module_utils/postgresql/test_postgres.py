@@ -225,8 +225,8 @@ class TestConnectToDb():
         db_connection = pg.connect_to_db(m_ansible_module, conn_params)
         cursor = db_connection.cursor()
         # if errors, db_connection returned as None:
-        assert isinstance(db_connection, DbConnection)
-        assert isinstance(cursor, Cursor)
+        assert isinstance(db_connection, DbConnection)  # pylint: disable=isinstance-second-argument-not-valid-type
+        assert isinstance(cursor, Cursor)  # pylint: disable=isinstance-second-argument-not-valid-type
         assert m_ansible_module.err_msg == ''
         # The default behaviour, normal in this case:
         assert 'Database name has not been passed' in m_ansible_module.warn_msg
@@ -241,8 +241,8 @@ class TestConnectToDb():
         db_connection = pg.connect_to_db(m_ansible_module, conn_params)
         cursor = db_connection.cursor()
         # if errors, db_connection returned as None:
-        assert isinstance(db_connection, DbConnection)
-        assert isinstance(cursor, Cursor)
+        assert isinstance(db_connection, DbConnection)  # pylint: disable=isinstance-second-argument-not-valid-type
+        assert isinstance(cursor, Cursor)  # pylint: disable=isinstance-second-argument-not-valid-type
         assert m_ansible_module.err_msg == ''
         # The default behaviour, normal in this case:
         assert 'Database name has not been passed' in m_ansible_module.warn_msg
@@ -292,8 +292,8 @@ class TestConnectToDb():
         cursor = db_connection.cursor()
 
         # if errors, db_connection returned as None:
-        assert isinstance(db_connection, DbConnection)
-        assert isinstance(cursor, Cursor)
+        assert isinstance(db_connection, DbConnection)  # pylint: disable=isinstance-second-argument-not-valid-type
+        assert isinstance(cursor, Cursor)  # pylint: disable=isinstance-second-argument-not-valid-type
         assert m_ansible_module.err_msg == ''
 
         # case 2: psycopg2.__version < 2.4.2
@@ -305,8 +305,8 @@ class TestConnectToDb():
         cursor = db_connection.cursor()
 
         # if errors, db_connection returned as None:
-        assert isinstance(db_connection, DbConnection)
-        assert isinstance(cursor, Cursor)
+        assert isinstance(db_connection, DbConnection)  # pylint: disable=isinstance-second-argument-not-valid-type
+        assert isinstance(cursor, Cursor)  # pylint: disable=isinstance-second-argument-not-valid-type
         assert 'psycopg2 must be at least 2.4.3' in m_ansible_module.err_msg
 
 

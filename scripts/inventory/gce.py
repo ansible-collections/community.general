@@ -326,8 +326,8 @@ class GceInventory(object):
         If provided, this will be used to filter the results of the grouped_instances call'''
         import csv
         reader = csv.reader([os.environ.get('GCE_ZONE', "")], skipinitialspace=True)
-        zones = [r for r in reader]
-        return [z for z in zones[0]]
+        zones = list(reader)
+        return list(zones[0])
 
     def parse_cli_args(self):
         ''' Command line argument processing '''
