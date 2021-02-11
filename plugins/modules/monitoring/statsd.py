@@ -73,6 +73,23 @@ options:
 '''
 
 EXAMPLES = '''
+- name: Increment the metric my_counter by 1
+  community.general.statsd:
+    host: localhost
+    port: 9125
+    protocol: tcp
+    metric: my_counter
+    metric_type: counter
+    value: 1
+
+- name: Set the gauge my_gauge to 7
+  community.general.statsd:
+    host: localhost
+    port: 9125
+    protocol: tcp
+    metric: my_gauge
+    metric_type: gauge
+    value: 7
 '''
 
 import traceback
