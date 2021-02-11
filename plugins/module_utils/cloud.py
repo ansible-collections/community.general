@@ -130,7 +130,7 @@ class CloudRetry(object):
                     try:
                         return f(*args, **kwargs)
                     except Exception as e:
-                        if isinstance(e, cls.base_class):
+                        if isinstance(e, cls.base_class):  # pylint: disable=isinstance-second-argument-not-valid-type
                             response_code = cls.status_code_from_exception(e)
                             if cls.found(response_code, catch_extra_error_codes):
                                 msg = "{0}: Retrying in {1} seconds...".format(str(e), delay)

@@ -259,7 +259,7 @@ class CmdMixin(object):
 
     def _calculate_args(self, extra_params=None, params=None):
         def add_arg_formatted_param(_cmd_args, arg_format, _value):
-            args = [x for x in arg_format.to_text(_value)]
+            args = list(arg_format.to_text(_value))
             return _cmd_args + args
 
         def find_format(_param):
