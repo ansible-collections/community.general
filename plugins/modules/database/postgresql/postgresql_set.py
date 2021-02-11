@@ -336,7 +336,6 @@ def main():
         # Check input for potentially dangerous elements:
         check_input(module, name, value, session_role)
 
-    # Allow to pass values like 1mb instead of 1MB, etc:
     if value:
         # Convert a value like 1mb (Postgres does not support) to 1MB, etc:
         if len(value) > 2 and value[:-2].isdigit() and value[-2:] in LOWERCASE_SIZE_UNITS:
