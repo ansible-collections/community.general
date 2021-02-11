@@ -171,6 +171,27 @@ EXAMPLES = r'''
     search_path:
     - app1
     - public
+
+# If you use a variable in positional_args / named_args that can
+# be undefined and you wish to set it as NULL, the constructions like
+# "{{ my_var if (my_var is defined) else none | default(none) }}"
+# will not work as expected substituting an empty string instead of NULL.
+# If possible, we suggest to use Ansible's DEFAULT_JINJA2_NATIVE configuration
+# (https://docs.ansible.com/ansible/latest/reference_appendices/config.html#default-jinja2-native).
+# Enabling it fixes this problem. If you cannot enable it, the following workaround
+# can be used.
+# You should precheck such a value and define it as NULL when undefined.
+# For example:
+- name: When undefined, set to NULL
+  set_fact:
+    my_var: NULL
+  when: my_var is undefined
+# Then:
+- name: Insert a value using positional arguments
+  community.postgresql.postgresql_query:
+    query: INSERT INTO test_table (col1) VALUES (%s)
+    positional_args:
+    - '{{ my_var }}'
 '''
 
 RETURN = r'''
@@ -221,6 +242,9 @@ rowcount:
     type: int
     sample: 5
 '''
+
+import datetime
+import decimal
 
 try:
     from psycopg2 import ProgrammingError as Psycopg2ProgrammingError
@@ -390,7 +414,18 @@ def main():
                 rowcount += cursor.rowcount
 
             try:
-                query_result = [dict(row) for row in cursor.fetchall()]
+                for row in cursor.fetchall():
+                    # Ansible engine does not support decimals.
+                    # An explicit conversion is required on the module's side
+                    row = dict(row)
+                    for (key, val) in iteritems(row):
+                        if isinstance(val, decimal.Decimal):
+                            row[key] = float(val)
+
+                        elif isinstance(val, datetime.timedelta):
+                            row[key] = str(val)
+
+                    query_result.append(row)
 
             except Psycopg2ProgrammingError as e:
                 if to_native(e) == 'no results to fetch':

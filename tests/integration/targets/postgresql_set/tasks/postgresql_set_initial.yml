@@ -373,3 +373,17 @@
   - assert:
       that:
       - result is not changed
+
+  - name: Pass non-existent parameter
+    <<: *task_parameters
+    postgresql_set:
+      <<: *pg_parameters
+      name: Timezone
+      value: utc
+    register: result
+    ignore_errors: yes
+
+  - assert:
+      that:
+      - result is failed
+      - result.msg is search('No such parameter')

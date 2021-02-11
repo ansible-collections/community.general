@@ -107,6 +107,7 @@ options:
   no_password_changes:
     description:
     - If C(yes), does not inspect the database for password changes.
+      If the user already exists, skips all password related checks.
       Useful when C(pg_authid) is not accessible (such as in AWS RDS).
       Otherwise, makes password changes as necessary.
     default: no
@@ -156,6 +157,10 @@ notes:
   On the previous versions the whole hashed string is used as a password.
 - 'Working with SCRAM-SHA-256-hashed passwords, be sure you use the I(environment:) variable
   C(PGOPTIONS: "-c password_encryption=scram-sha-256") (see the provided example).'
+- On some systems (such as AWS RDS), C(pg_authid) is not accessible, thus, the module cannot compare
+  the current and desired C(password). In this case, the module assumes that the passwords are
+  different and changes it reporting that the state has been changed.
+  To skip all password related checks for existing users, use I(no_password_changes=yes).
 - Supports ``check_mode``.
 seealso:
 - module: community.general.postgresql_privs
