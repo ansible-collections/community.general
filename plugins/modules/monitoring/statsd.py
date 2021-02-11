@@ -128,8 +128,6 @@ def main():
     value = module.params.get('value')
     delta = module.params.get('delta')
 
-    result = dict()
-
     try:
         if protocol == 'udp':
             statsd = StatsClient(
@@ -140,14 +138,17 @@ def main():
 
         if metric_type == 'counter':
             statsd.incr(metric, value)
+            module.exit_json(msg="Sent counter %s/%s -> %s to StatsD" % (metric_prefix, metric, str(value)), changed=True)
         elif metric_type == 'gauge':
             statsd.gauge(metric, value, delta=delta)
+            if metric_prefix:
+              module.exit_json(msg="Sent gauge %s/%s (delta=%s) -> %s to StatsD" % (metric_prefix, metric, str(delta), str(value)), changed=True)
+            else:
+              module.exit_json(msg="Sent gauge %s (delta=%s) -> %s to StatsD" % (metric, str(delta), str(value)), changed=True)
 
     except Exception as exc:
-        module.fail_json(error='Failed to sending to StatsD %s' % to_native(
-            exc), exception=traceback.format_exc(), **result)
+        module.fail_json(msg='Failed sending to StatsD %s' % str(exc))
 
-    module.exit_json(**result)
 
 
 if __name__ == '__main__':
