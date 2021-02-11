@@ -226,10 +226,8 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 if config == 'rootfs' or config.startswith(('virtio', 'sata', 'ide', 'scsi')):
                     value = ('disk_image=' + value)
 
-                if isinstance(value, int) or ',' not in value:
-                    value = value
-                # split off strings with commas to a dict
-                else:
+                if not (isinstance(value, int) or ',' not in value):
+                    # split off strings with commas to a dict
                     # skip over any keys that cannot be processed
                     try:
                         value = dict(key.split("=") for key in value.split(","))
