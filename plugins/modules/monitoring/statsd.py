@@ -13,7 +13,6 @@ __metaclass__ = type
 
 
 DOCUMENTATION = '''
-
 module: statsd
 short_description: Send metrics to StatsD
 description:
