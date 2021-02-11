@@ -237,6 +237,7 @@ def pretty_to_bytes(pretty_val):
     # The function returns a value in bytes
     # if the value contains 'B', 'kB', 'MB', 'GB', 'TB'.
     # Otherwise it returns the passed argument.
+
     # It's sometimes possible to have an empty values
     if not pretty_val:
         return pretty_val
