@@ -24,5 +24,7 @@
     - import_tasks: precedence_between_unset_and_value.yml
     # testing state=absent with check mode
     - import_tasks: unset_check_mode.yml
+    # testing for case in issue #1776
+    - import_tasks: set_value_with_tilde.yml
   when: git_installed is succeeded and git_version.stdout is version(git_version_supporting_includes, ">=")
 ...
