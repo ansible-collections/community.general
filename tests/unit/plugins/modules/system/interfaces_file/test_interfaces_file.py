@@ -60,7 +60,7 @@ class TestInterfacesFileModule(unittest.TestCase):
                                              tofile=os.path.basename(backup))
         # Restore backup
         move(backup, path)
-        deltas = [d for d in diffs]
+        deltas = list(diffs)
         self.assertTrue(len(deltas) == 0)
 
     def compareInterfacesLinesToFile(self, interfaces_lines, path, testname=None):
