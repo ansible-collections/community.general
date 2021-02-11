@@ -338,7 +338,7 @@ class Migrations:
             namespace_tx = \
                 int(namespace_stats[self.module.params['migrate_tx_key']])
             namespace_rx = \
-                int(namespace_stats[self.module.params['migrate_tx_key']])
+                int(namespace_stats[self.module.params['migrate_rx_key']])
         except KeyError:
             self.module.fail_json(
                 msg="Did not find partition remaining key:" +
