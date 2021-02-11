@@ -1,0 +1,50 @@
+# Test code for the postgresql_set module
+# Copyright: (c) 2021, Andrew Klychkov (@Andersson007) <aaklychkov@mail.ru>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- vars:
+    task_parameters: &task_parameters
+      become_user: '{{ pg_user }}'
+      become: yes
+    pg_parameters: &pg_parameters
+      login_user: '{{ pg_user }}'
+      login_db: postgres
+
+  block:
+  - name: Define a test setting map
+    set_fact:
+      setting_map:
+        allow_system_table_mods: on
+        archive_command: /bin/true
+        archive_timeout: 10min
+        autovacuum_work_mem: '-1'
+        backend_flush_after: 0
+        autovacuum_vacuum_scale_factor: 0.5
+        client_encoding: UTF-8
+        bgwriter_delay: 400
+        maintenance_work_mem: 32mb
+        effective_cache_size: 1024kB
+        shared_buffers: 1GB
+        stats_temp_directory: pg_stat_tmp
+        wal_level: replica
+        log_statement: mod
+        track_functions: none
+
+  # Check mode:
+  - name: Set settings in check mode
+    <<: *task_parameters
+    postgresql_set:
+      <<: *pg_parameters
+      name: '{{ item.key }}'
+      value: '{{ item.value }}'
+    check_mode: yes
+    with_dict: '{{ setting_map }}'
+
+  # Actual mode:
+  - name: Set settings in actual mode
+    <<: *task_parameters
+    postgresql_set:
+      <<: *pg_parameters
+      name: '{{ item.key }}'
+      value: '{{ item.value }}'
+    with_dict: '{{ setting_map }}'
