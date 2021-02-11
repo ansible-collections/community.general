@@ -271,7 +271,6 @@ stages:
             - name: openSUSE 15 py3
               test: opensuse15
           groups:
-            - 1
             - 2
             - 3
             - 4
