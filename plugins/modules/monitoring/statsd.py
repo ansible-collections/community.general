@@ -150,6 +150,5 @@ def main():
         module.fail_json(msg='Failed sending to StatsD %s' % str(exc))
 
 
-
 if __name__ == '__main__':
     main()
