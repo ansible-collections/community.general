@@ -12,13 +12,15 @@ DOCUMENTATION = '''
 module: statsd
 short_description: Send metrics to StatsD
 description:
-  - Send metrics to StatsD
+  - The C(statsd) module sends metrics to StatsD
+  - Supported metric types are C(counter) and C(gauge)
+  - Currently unupported metric types are C(timer), C(set), and C(gaugedelta)
 author: "Mark Mercado (@mamercad)"
 options:
   state:
     type: str
     description:
-      - State of the check, only "present" makes sense with StatsD.
+      - State of the check, only C(present) makes sense.
     choices: ["present"]
     default: present
   host:
@@ -41,13 +43,13 @@ options:
     type: float
     default: 1.0
     description:
-      - StatsD timeout (only applicable if protocol is tcp).
+      - StatsD timeout (only applicable if protocol is C(tcp)).
   metric:
     type: str
     required: true
     description:
       - StatsD metric name.
-  value:
+  metric_type:
     type: str
     required: true
     description:
@@ -58,6 +60,16 @@ options:
     choices: ["counter", "gauge"]
     description:
       - StatsD metric type.
+  value:
+    type: int
+    required: true
+    description:
+      - StatsD metric value.
+  delta:
+    type: bool
+    required: false
+    description:
+      - If the metric is of type C(gauge), change the value by C(delta).
 '''
 
 EXAMPLES = '''
