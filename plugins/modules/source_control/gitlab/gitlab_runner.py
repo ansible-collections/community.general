@@ -99,6 +99,7 @@ options:
     required: False
     default: []
     type: list
+    elements: str
 '''
 
 EXAMPLES = '''
@@ -304,7 +305,7 @@ def main():
         description=dict(type='str', required=True, aliases=["name"]),
         active=dict(type='bool', default=True),
         owned=dict(type='bool', default=False),
-        tag_list=dict(type='list', default=[]),
+        tag_list=dict(type='list', elements='str', default=[]),
         run_untagged=dict(type='bool', default=True),
         locked=dict(type='bool', default=False),
         access_level=dict(type='str', default='ref_protected', choices=["not_protected", "ref_protected"]),
