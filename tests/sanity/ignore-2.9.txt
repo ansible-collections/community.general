@@ -1,5 +1,6 @@
 plugins/callback/hipchat.py pylint:blacklisted-name
 plugins/connection/lxc.py pylint:blacklisted-name
+plugins/module_utils/cloud.py pylint:bad-option-value  # a pylint test that is disabled was modified over time
 plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
 plugins/module_utils/_mount.py future-import-boilerplate

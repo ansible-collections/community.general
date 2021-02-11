@@ -137,17 +137,13 @@ def main():
             host = search_by_name(hosts_service, module.params['host'])
             if host is None:
                 raise Exception("Host '%s' was not found." % module.params['host'])
-            tags.extend([
-                tag for tag in hosts_service.host_service(host.id).tags_service().list()
-            ])
+            tags.extend(hosts_service.host_service(host.id).tags_service().list())
         if module.params['vm']:
             vms_service = connection.system_service().vms_service()
             vm = search_by_name(vms_service, module.params['vm'])
             if vm is None:
                 raise Exception("Vm '%s' was not found." % module.params['vm'])
-            tags.extend([
-                tag for tag in vms_service.vm_service(vm.id).tags_service().list()
-            ])
+            tags.extend(vms_service.vm_service(vm.id).tags_service().list())
 
         if not (module.params['vm'] or module.params['host'] or module.params['name']):
             tags = all_tags
