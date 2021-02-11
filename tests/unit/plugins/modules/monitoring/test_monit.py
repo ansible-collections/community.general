@@ -97,7 +97,7 @@ class MonitTest(unittest.TestCase):
                 self.monit.wait_for_monit_to_stop_pending()
 
 
-@pytest.mark.parametrize('status_name', [name for name in monit.StatusValue.ALL_STATUS])
+@pytest.mark.parametrize('status_name', monit.StatusValue.ALL_STATUS)
 def test_status_value(status_name):
     value = getattr(monit.StatusValue, status_name.upper())
     status = monit.StatusValue(value)
