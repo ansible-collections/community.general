@@ -216,7 +216,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     yield host not in v
             yield True
 
-        return all([found_host for found_host in find_host(host, inventory)])
+        return all(find_host(host, inventory))
 
     def verify_file(self, path):
 
