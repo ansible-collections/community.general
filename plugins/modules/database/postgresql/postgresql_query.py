@@ -413,6 +413,7 @@ def main():
             if cursor.rowcount > 0:
                 rowcount += cursor.rowcount
 
+            query_result = []
             try:
                 for row in cursor.fetchall():
                     # Ansible engine does not support decimals.
