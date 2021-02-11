@@ -105,10 +105,11 @@ def main():
             protocol=dict(type=str, default='udp', choices=['udp', 'tcp']),
             timeout=dict(type=float, default=1.0),
             metric=dict(type=str, required=True),
-            mtype=dict(type=str, choices=['counter', 'gauge']),
-            value=dict(type=str, required=True),
-       ),
-        supports_check_mode=True
+            metric_type=dict(type=str, choices=['counter', 'gauge']),
+            value=dict(type=int, required=True),
+            delta=dict(type=bool, default=False),
+        ),
+        supports_check_mode=False
     )
 
     host = module.params.get('host')
@@ -116,8 +117,9 @@ def main():
     protocol = module.params.get('protocol')
     timeout = module.params.get('timeout')
     metric = module.params.get('metric')
+    metric_type = module.params.get('metric_type')
     value = module.params.get('value')
-    mtype = module.params.get('type')
+    delta = module.params.get('delta')
 
     result = dict()
 
@@ -127,9 +129,10 @@ def main():
       elif protocol == 'tcp':
         statsd = TCPStatsClient(host=host, port=port, timeout=timeout, prefix=None, ipv6=False)
 
-      if mtype == 'counter':
-          statsd.incr(metric)
-
+      if metric_type == 'counter':
+        statsd.incr(metric, value)
+      elif metric_type == 'gauge':
+        statsd.gauge(metric, value, delta=delta)
 
     except Exception as exc:
         module.fail_json(error='Failed to sending to StatsD %s' % to_native(exc), exception=traceback.format_exc(), **result)
