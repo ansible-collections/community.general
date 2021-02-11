@@ -12,10 +12,13 @@ DOCUMENTATION = '''
 module: statsd
 short_description: Send metrics to StatsD
 description:
-  - The C(statsd) module sends metrics to StatsD
-  - Supported metric types are C(counter) and C(gauge)
-  - Currently unupported metric types are C(timer), C(set), and C(gaugedelta)
+  - The C(statsd) module sends metrics to StatsD.
+  - For more information, see U(https://statsd-metrics.readthedocs.io/en/latest/).
+  - Supported metric types are C(counter) and C(gauge).
+  - Currently unupported metric types are C(timer), C(set), and C(gaugedelta).
 author: "Mark Mercado (@mamercad)"
+requirements:
+  - statsd
 options:
   state:
     type: str
@@ -27,39 +30,43 @@ options:
     type: str
     default: localhost
     description:
-      - StatsD host (hostname or IP).
+      - StatsD host (hostname or IP) to send metrics to.
   port:
     type: int
     default: 8125
     description:
-      - StatsD port.
+      - The port on C(host) which StatsD is listening on.
   protocol:
     type: str
     default: udp
     choices: ["udp", "tcp"]
     description:
-      - StatsD protocol.
+      - The transport protocol to send metrics over.
   timeout:
     type: float
     default: 1.0
     description:
-      - StatsD timeout (only applicable if protocol is C(tcp)).
+      - Sender timeout, only applicable if C(protocol) is C(tcp).
   metric:
     type: str
     required: true
     description:
-      - StatsD metric name.
+      - The name of the metric.
   metric_type:
     type: str
     required: true
     choices: ["counter", "gauge"]
     description:
-      - StatsD metric type.
+      - The type of metric.
+  metric_prefix:
+    type: str
+    description:
+      - The prefix to add to the metric.
   value:
     type: int
     required: true
     description:
-      - StatsD metric value.
+      - The value of the metric.
   delta:
     type: bool
     required: false
@@ -106,6 +113,7 @@ def main():
             timeout=dict(type=float, default=1.0),
             metric=dict(type=str, required=True),
             metric_type=dict(type=str, choices=['counter', 'gauge']),
+            metric_prefix=dict(type=str, default=''),
             value=dict(type=int, required=True),
             delta=dict(type=bool, default=False),
         ),
@@ -118,6 +126,7 @@ def main():
     timeout = module.params.get('timeout')
     metric = module.params.get('metric')
     metric_type = module.params.get('metric_type')
+    metric_prefix = module.params.get('metric_prefix')
     value = module.params.get('value')
     delta = module.params.get('delta')
 
@@ -125,9 +134,9 @@ def main():
 
     try:
       if protocol == 'udp':
-        statsd = StatsClient(host=host, port=port, prefix=None, maxudpsize=512, ipv6=False)
+        statsd = StatsClient(host=host, port=port, prefix=metric_prefix, maxudpsize=512, ipv6=False)
       elif protocol == 'tcp':
-        statsd = TCPStatsClient(host=host, port=port, timeout=timeout, prefix=None, ipv6=False)
+        statsd = TCPStatsClient(host=host, port=port, timeout=timeout, prefix=metric_prefix, ipv6=False)
 
       if metric_type == 'counter':
         statsd.incr(metric, value)
