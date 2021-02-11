@@ -180,7 +180,7 @@ from ansible.module_utils._text import to_native
 PG_REQ_VER = 90400
 
 # To allow to set value like 1mb instead of 1MB, etc:
-POSSIBLE_SIZE_UNITS = ("mb", "gb", "tb")
+LOWERCASE_SIZE_UNITS = ("mb", "gb", "tb")
 
 # ===========================================
 # PostgreSQL module specific support methods.
@@ -237,33 +237,55 @@ def pretty_to_bytes(pretty_val):
     # The function returns a value in bytes
     # if the value contains 'B', 'kB', 'MB', 'GB', 'TB'.
     # Otherwise it returns the passed argument.
+    # It's sometimes possible to have an empty values
+    if not pretty_val:
+        return pretty_val
+
+    # If the first char is not a digit, it does not make sense
+    # to parse further, so just return a passed value
+    if not pretty_val[0].isdigit():
+        return pretty_val
+
+    # If the last char is not an alphabetical symbol, it means that
+    # it does not contain any suffixes, so no sense to parse further
+    if not pretty_val[-1].isalpha():
+        return pretty_val
+
+    # Extract digits
+    num_part = []
+    for c in pretty_val:
+        # When we reach the first non-digit element,
+        # e.g. in 1024kB, stop iterating
+        if not c.isdigit():
+            break
+        else:
+            num_part.append(c)
+
+    num_part = ''.join(num_part)
 
     val_in_bytes = None
 
-    if 'kB' in pretty_val:
-        num_part = int(''.join(d for d in pretty_val if d.isdigit()))
-        val_in_bytes = num_part * 1024
+    if len(pretty_val) >= 2:
+        if 'kB' in pretty_val[-2:]:
+            val_in_bytes = num_part * 1024
 
-    elif 'MB' in pretty_val.upper():
-        num_part = int(''.join(d for d in pretty_val if d.isdigit()))
-        val_in_bytes = num_part * 1024 * 1024
+        elif 'MB' in pretty_val[-2:]:
+            val_in_bytes = num_part * 1024 * 1024
 
-    elif 'GB' in pretty_val.upper():
-        num_part = int(''.join(d for d in pretty_val if d.isdigit()))
-        val_in_bytes = num_part * 1024 * 1024 * 1024
+        elif 'GB' in pretty_val[-2:]:
+            val_in_bytes = num_part * 1024 * 1024 * 1024
 
-    elif 'TB' in pretty_val.upper():
-        num_part = int(''.join(d for d in pretty_val if d.isdigit()))
-        val_in_bytes = num_part * 1024 * 1024 * 1024 * 1024
+        elif 'TB' in pretty_val[-2:]:
+            val_in_bytes = num_part * 1024 * 1024 * 1024 * 1024
 
-    elif 'B' in pretty_val.upper():
-        num_part = int(''.join(d for d in pretty_val if d.isdigit()))
+    # For cases like "1B"
+    if not val_in_bytes and 'B' in pretty_val[-1]:
         val_in_bytes = num_part
 
+    if val_in_bytes is not None:
+        return val_in_bytes
     else:
         return pretty_val
-
-    return val_in_bytes
 
 
 def param_set(cursor, module, name, value, context):
@@ -315,9 +337,13 @@ def main():
 
     # Allow to pass values like 1mb instead of 1MB, etc:
     if value:
-        for unit in POSSIBLE_SIZE_UNITS:
-            if value[:-2].isdigit() and unit in value[-2:]:
-                value = value.upper()
+        # Convert a value like 1mb (Postgres does not support) to 1MB, etc:
+        if len(value) > 2 and value[:-2].isdigit() and value[-2:] in LOWERCASE_SIZE_UNITS:
+            value = value.upper()
+
+        # Convert a value like 1b (Postgres does not support) to 1B:
+        elif len(value) > 1 and ('b' in value[-1] and value[:-1].isdigit()):
+            value = value.upper()
 
     if value is not None and reset:
         module.fail_json(msg="%s: value and reset params are mutually exclusive" % name)
