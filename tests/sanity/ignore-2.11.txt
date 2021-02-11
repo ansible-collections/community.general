@@ -14,29 +14,18 @@ plugins/modules/cloud/centurylink/clc_server.py validate-modules:parameter-list-
 plugins/modules/cloud/centurylink/clc_server_snapshot.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/docker/docker_container.py use-argspec-type-path # uses colon-separated paths, can't use type=path
 plugins/modules/cloud/google/gcdns_record.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gce.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gce.py yamllint:unparsable-with-libyaml
-plugins/modules/cloud/google/gce_eip.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_eip.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gce_img.py pylint:blacklisted-name
-plugins/modules/cloud/google/gce_instance_template.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_instance_template.py validate-modules:doc-missing-type
 plugins/modules/cloud/google/gce_instance_template.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gce_labels.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gce_lb.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_lb.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gce_mig.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_mig.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gce_net.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_net.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gce_pd.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_pd.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gce_snapshot.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_snapshot.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gce_tag.py pylint:blacklisted-name
 plugins/modules/cloud/google/gce_tag.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/google/gcp_backend_service.py pylint:blacklisted-name
 plugins/modules/cloud/google/gcp_backend_service.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gcp_forwarding_rule.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/google/gcp_healthcheck.py pylint:blacklisted-name
@@ -551,7 +540,6 @@ plugins/modules/system/xfconf.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/xfconf.py validate-modules:return-syntax-error
 plugins/modules/web_infrastructure/jenkins_plugin.py use-argspec-type-path
 plugins/modules/web_infrastructure/rundeck_acl_policy.py pylint:blacklisted-name
-scripts/inventory/gce.py pylint:blacklisted-name
 tests/unit/plugins/modules/cloud/google/test_gcp_forwarding_rule.py future-import-boilerplate
 tests/unit/plugins/modules/cloud/google/test_gcp_forwarding_rule.py metaclass-boilerplate
 tests/utils/shippable/check_matrix.py replace-urlopen

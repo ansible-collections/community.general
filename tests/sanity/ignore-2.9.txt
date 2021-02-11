@@ -483,6 +483,7 @@ plugins/modules/web_infrastructure/nginx_status_facts.py validate-modules:deprec
 plugins/modules/web_infrastructure/nginx_status_facts.py validate-modules:invalid-documentation
 plugins/modules/web_infrastructure/rundeck_acl_policy.py pylint:blacklisted-name
 scripts/inventory/gce.py pylint:blacklisted-name
+tests/unit/plugins/module_utils/postgresql/test_postgres.py pylint:bad-option-value  # a pylint test that is disabled was modified over time
 tests/unit/plugins/modules/cloud/google/test_gcp_forwarding_rule.py future-import-boilerplate
 tests/unit/plugins/modules/cloud/google/test_gcp_forwarding_rule.py metaclass-boilerplate
 tests/utils/shippable/check_matrix.py replace-urlopen
