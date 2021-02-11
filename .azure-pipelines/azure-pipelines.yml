@@ -140,16 +140,12 @@ stages:
         parameters:
           testFormat: devel/{0}
           targets:
-            - name: OS X 10.11
-              test: osx/10.11
-            - name: macOS 10.15
-              test: macos/10.15
             - name: macOS 11.1
               test: macos/11.1
-            - name: RHEL 7.8
-              test: rhel/7.8
-            - name: RHEL 8.2
-              test: rhel/8.2
+            - name: RHEL 7.9
+              test: rhel/7.9
+            - name: RHEL 8.3
+              test: rhel/8.3
             - name: FreeBSD 11.4
               test: freebsd/11.4
             - name: FreeBSD 12.2
@@ -166,8 +162,14 @@ stages:
         parameters:
           testFormat: 2.10/{0}
           targets:
+            - name: OS X 10.11
+              test: osx/10.11
+            - name: macOS 10.15
+              test: macos/10.15
             - name: macOS 11.1
               test: macos/11.1
+            - name: RHEL 7.8
+              test: rhel/7.8
             - name: RHEL 8.2
               test: rhel/8.2
             - name: FreeBSD 12.1
@@ -214,8 +216,6 @@ stages:
               test: opensuse15py2
             - name: openSUSE 15 py3
               test: opensuse15
-            - name: Ubuntu 16.04
-              test: ubuntu1604
             - name: Ubuntu 18.04
               test: ubuntu1804
             - name: Ubuntu 20.04
@@ -238,6 +238,8 @@ stages:
               test: fedora32
             - name: openSUSE 15 py3
               test: opensuse15
+            - name: Ubuntu 16.04
+              test: ubuntu1604
           groups:
             - 2
             - 3
