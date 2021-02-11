@@ -38,7 +38,7 @@ def build_dict():
                        for c in lxc.list_containers()])
 
     # Extract the groups, flatten the list, and remove duplicates
-    groups = set(sum([g for g in containers.values()], []))
+    groups = set(sum(containers.values(), []))
 
     # Create a dictionary for each group (including the 'all' group
     return dict([(g, {'hosts': [k for k, v in containers.items() if g in v],
