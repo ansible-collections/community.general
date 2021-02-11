@@ -133,7 +133,10 @@ def main():
 
         if metric_type == 'counter':
             statsd.incr(metric, value)
-            module.exit_json(msg="Sent counter %s/%s -> %s to StatsD" % (metric_prefix, metric, str(value)), changed=True)
+            if metric_prefix:
+              module.exit_json(msg="Sent counter %s/%s -> %s to StatsD" % (metric_prefix, metric, str(value)), changed=True)
+            else:
+              module.exit_json(msg="Sent counter %s -> %s to StatsD" % (metric, str(value)), changed=True)
         elif metric_type == 'gauge':
             statsd.gauge(metric, value, delta=delta)
             if metric_prefix:
