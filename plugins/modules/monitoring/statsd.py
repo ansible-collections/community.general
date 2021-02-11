@@ -4,6 +4,11 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+from ansible.module_utils.urls import fetch_url
+from ansible.module_utils._text import to_native
+from ansible.module_utils.basic import AnsibleModule
+from statsd import StatsClient, TCPStatsClient
+import traceback
 __metaclass__ = type
 
 
@@ -94,13 +99,6 @@ EXAMPLES = '''
     value: 7
 '''
 
-import traceback
-from statsd import StatsClient, TCPStatsClient
-
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_native
-from ansible.module_utils.urls import fetch_url
-
 
 def main():
 
@@ -133,18 +131,21 @@ def main():
     result = dict()
 
     try:
-      if protocol == 'udp':
-        statsd = StatsClient(host=host, port=port, prefix=metric_prefix, maxudpsize=512, ipv6=False)
-      elif protocol == 'tcp':
-        statsd = TCPStatsClient(host=host, port=port, timeout=timeout, prefix=metric_prefix, ipv6=False)
+        if protocol == 'udp':
+            statsd = StatsClient(
+                host=host, port=port, prefix=metric_prefix, maxudpsize=512, ipv6=False)
+        elif protocol == 'tcp':
+            statsd = TCPStatsClient(
+                host=host, port=port, timeout=timeout, prefix=metric_prefix, ipv6=False)
 
-      if metric_type == 'counter':
-        statsd.incr(metric, value)
-      elif metric_type == 'gauge':
-        statsd.gauge(metric, value, delta=delta)
+        if metric_type == 'counter':
+            statsd.incr(metric, value)
+        elif metric_type == 'gauge':
+            statsd.gauge(metric, value, delta=delta)
 
     except Exception as exc:
-        module.fail_json(error='Failed to sending to StatsD %s' % to_native(exc), exception=traceback.format_exc(), **result)
+        module.fail_json(error='Failed to sending to StatsD %s' % to_native(
+            exc), exception=traceback.format_exc(), **result)
 
     module.exit_json(**result)
 
