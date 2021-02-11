@@ -3,12 +3,8 @@
 # Copyright: Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import, division, print_function
-from ansible.module_utils.urls import fetch_url
-from ansible.module_utils._text import to_native
 from ansible.module_utils.basic import AnsibleModule
 from statsd import StatsClient, TCPStatsClient
-import traceback
 __metaclass__ = type
 
 
