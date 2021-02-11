@@ -37,6 +37,7 @@ options:
     required: true
   to_numbers:
     type: list
+    elements: str
     description:
       one or more phone numbers to send the text message to,
       format +15551112222
@@ -143,7 +144,7 @@ def main():
             auth_token=dict(required=True, no_log=True),
             msg=dict(required=True),
             from_number=dict(required=True),
-            to_numbers=dict(required=True, aliases=['to_number'], type='list'),
+            to_numbers=dict(required=True, aliases=['to_number'], type='list', elements='str'),
             media_url=dict(default=None, required=False),
         ),
         supports_check_mode=True
