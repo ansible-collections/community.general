@@ -52,11 +52,6 @@ options:
   metric_type:
     type: str
     required: true
-    description:
-      - StatsD metric value.
-  mtype:
-    type: str
-    required: true
     choices: ["counter", "gauge"]
     description:
       - StatsD metric type.
