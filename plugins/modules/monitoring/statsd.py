@@ -94,9 +94,13 @@ EXAMPLES = '''
 '''
 
 
-from statsd import StatsClient, TCPStatsClient
-
 from ansible.module_utils.basic import AnsibleModule
+
+try:
+    from statsd import StatsClient, TCPStatsClient
+    HAS_STATSD = True
+except ImportError:
+    HAS_STATSD = False
 
 
 def main():
@@ -126,6 +130,9 @@ def main():
     metric_prefix = module.params.get('metric_prefix')
     value = module.params.get('value')
     delta = module.params.get('delta')
+
+    if not HAS_STATSD:
+        module.fail_json(msg=missing_required_lib('statsd'))
 
     try:
         if protocol == 'udp':
