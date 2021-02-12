@@ -23,5 +23,5 @@ minor_changes:
   - redhat_subscription - elements of list parameters ``pool_ids``, ``addons`` is now validated (https://github.com/ansible-collections/community.general/pull/1795).
   - gitlab_runner - elements of list parameters ``tag_list`` is now validated (https://github.com/ansible-collections/community.general/pull/1795).
   - na_ontap_gather_facts - elements of list parameters ``gather_subset`` is now validated (https://github.com/ansible-collections/community.general/pull/1795).
-bug_fixes:
+bugfixes:
   - redhat_subscription - ``mutually_exclusive`` was referring to parameter alias instead of name (https://github.com/ansible-collections/community.general/pull/1795).
