@@ -94,7 +94,7 @@ EXAMPLES = '''
 '''
 
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import (AnsibleModule, missing_required_lib)
 
 try:
     from statsd import StatsClient, TCPStatsClient
