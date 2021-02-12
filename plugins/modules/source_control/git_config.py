@@ -157,7 +157,6 @@ config_values:
 import os
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves import shlex_quote
 
 
 def main():
@@ -230,7 +229,7 @@ def main():
         # Run from root directory to avoid accidentally picking up any local config settings
         dir = "/"
 
-    (rc, out, err) = module.run_command(' '.join(args), cwd=dir)
+    (rc, out, err) = module.run_command(args, cwd=dir, expand_user_and_vars=False)
     if params['list_all'] and scope and rc == 128 and 'unable to read config file' in err:
         # This just means nothing has been set at the given scope
         module.exit_json(changed=False, msg='', config_values={})
@@ -259,15 +258,14 @@ def main():
             args.insert(len(args) - 1, "--" + unset)
             cmd = args
         else:
-            new_value_quoted = shlex_quote(new_value)
-            cmd = args + [new_value_quoted]
+            cmd = args + [new_value]
         try:  # try using extra parameter from ansible-base 2.10.4 onwards
-            (rc, out, err) = module.run_command(cmd, cwd=dir, ignore_invalid_cwd=False)
+            (rc, out, err) = module.run_command(cmd, cwd=dir, ignore_invalid_cwd=False, expand_user_and_vars=False)
         except TypeError:
             # @TODO remove try/except when community.general drop support for 2.10.x
             if not os.path.isdir(dir):
                 module.fail_json(msg="Cannot find directory '{0}'".format(dir))
-            (rc, out, err) = module.run_command(cmd, cwd=dir)
+            (rc, out, err) = module.run_command(cmd, cwd=dir, expand_user_and_vars=False)
         if err:
             module.fail_json(rc=rc, msg=err, cmd=cmd)
 

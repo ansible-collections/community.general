@@ -1,0 +1,2 @@
+bugfixes:
+  - git_config - prevent ``run_command`` from expanding values (https://github.com/ansible-collections/community.general/issues/1776).
