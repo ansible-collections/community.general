@@ -292,12 +292,6 @@ plugins/modules/remote_management/oneview/oneview_san_manager.py validate-module
 plugins/modules/remote_management/oneview/oneview_san_manager.py validate-modules:undocumented-parameter
 plugins/modules/remote_management/oneview/oneview_san_manager_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/oneview/oneview_san_manager_info.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/redfish/idrac_redfish_command.py validate-modules:parameter-list-no-elements
-plugins/modules/remote_management/redfish/idrac_redfish_config.py validate-modules:parameter-list-no-elements
-plugins/modules/remote_management/redfish/idrac_redfish_info.py validate-modules:parameter-list-no-elements
-plugins/modules/remote_management/redfish/redfish_command.py validate-modules:parameter-list-no-elements
-plugins/modules/remote_management/redfish/redfish_config.py validate-modules:parameter-list-no-elements
-plugins/modules/remote_management/redfish/redfish_info.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:no-default-for-required-parameter
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:parameter-type-not-in-doc
