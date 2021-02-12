@@ -45,6 +45,7 @@ options:
         description:
           - Profile to be used by the container
         type: list
+        elements: str
     devices:
         description:
           - 'The devices for the container
@@ -658,6 +659,7 @@ def main():
             ),
             profiles=dict(
                 type='list',
+                elements='str',
             ),
             source=dict(
                 type='dict',
