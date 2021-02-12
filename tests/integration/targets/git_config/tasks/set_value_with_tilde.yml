@@ -1,0 +1,33 @@
+---
+#- import_tasks: setup_no_value.yml
+
+- name: setting value
+  git_config:
+    name: core.hooksPath
+    value: '~/foo/bar'
+    state: present
+    scope: global
+  register: set_result
+
+- name: setting value again
+  git_config:
+    name: core.hooksPath
+    value: '~/foo/bar'
+    state: present
+    scope: global
+  register: set_result2
+
+- name: getting value
+  git_config:
+    name: core.hooksPath
+    scope: global
+  register: get_result
+
+- name: assert set changed and value is correct
+  assert:
+    that:
+      - set_result is changed
+      - set_result2 is not changed
+      - get_result is not changed
+      - get_result.config_value == '~/foo/bar'
+...
