@@ -14,7 +14,7 @@ description:
   - The C(statsd) module sends metrics to StatsD.
   - For more information, see U(https://statsd-metrics.readthedocs.io/en/latest/).
   - Supported metric types are C(counter) and C(gauge).
-  - Currently unupported metric types are C(timer), C(set), and C(gaugedelta).
+    Currently unupported metric types are C(timer), C(set), and C(gaugedelta).
 author: "Mark Mercado (@mamercad)"
 requirements:
   - statsd
