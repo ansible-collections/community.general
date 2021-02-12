@@ -149,6 +149,9 @@ def main():
             statsd.gauge(metric, value, delta=delta)
             module.exit_json(msg="Sent gauge %s (delta=%s) -> %s to StatsD" % (metric_name, str(delta), str(value)), changed=True)
 
+        if protocol == 'tcp':
+            statsd.close()
+
     except Exception as exc:
         module.fail_json(msg='Failed sending to StatsD %s' % str(exc))
 
