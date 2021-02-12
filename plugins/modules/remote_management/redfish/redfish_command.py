@@ -28,6 +28,7 @@ options:
     description:
       - List of commands to execute on OOB controller
     type: list
+    elements: str
   baseuri:
     required: true
     description:
@@ -550,7 +551,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             category=dict(required=True),
-            command=dict(required=True, type='list'),
+            command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
             username=dict(required=True),
             password=dict(required=True, no_log=True),
