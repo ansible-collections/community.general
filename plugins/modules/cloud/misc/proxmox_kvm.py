@@ -813,7 +813,6 @@ status:
     }'
 '''
 
-import os
 import re
 import time
 import traceback
@@ -826,7 +825,7 @@ try:
 except ImportError:
     HAS_PROXMOXER = False
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible.module_utils._text import to_native
 
 
@@ -1059,7 +1058,7 @@ def main():
             agent=dict(type='bool'),
             args=dict(type='str'),
             api_host=dict(required=True),
-            api_password=dict(no_log=True),
+            api_password=dict(no_log=True, fallback=(env_fallback, ['PROXMOX_PASSWORD'])),
             api_token_id=dict(no_log=True),
             api_token_secret=dict(no_log=True),
             api_user=dict(required=True),
@@ -1072,12 +1071,12 @@ def main():
             cipassword=dict(type='str', no_log=True),
             citype=dict(type='str', choices=['nocloud', 'configdrive2']),
             ciuser=dict(type='str'),
-            clone=dict(type='str', default=None),
+            clone=dict(type='str'),
             cores=dict(type='int'),
             cpu=dict(type='str'),
             cpulimit=dict(type='int'),
             cpuunits=dict(type='int'),
-            delete=dict(type='str', default=None),
+            delete=dict(type='str'),
             description=dict(type='str'),
             digest=dict(type='str'),
             force=dict(type='bool'),
@@ -1100,7 +1099,7 @@ def main():
             name=dict(type='str'),
             nameservers=dict(type='list', elements='str'),
             net=dict(type='dict'),
-            newid=dict(type='int', default=None),
+            newid=dict(type='int'),
             node=dict(),
             numa=dict(type='dict'),
             numa_enabled=dict(type='bool'),
@@ -1136,13 +1135,14 @@ def main():
             vcpus=dict(type='int'),
             vga=dict(choices=['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']),
             virtio=dict(type='dict'),
-            vmid=dict(type='int', default=None),
+            vmid=dict(type='int'),
             watchdog=dict(),
             proxmox_default_behavior=dict(type='str', choices=['compatibility', 'no_defaults']),
         ),
         mutually_exclusive=[('delete', 'revert'), ('delete', 'update'), ('revert', 'update'), ('clone', 'update'), ('clone', 'delete'), ('clone', 'revert')],
-        required_one_of=[('name', 'vmid',)],
-        required_if=[('state', 'present', ['node'])]
+        required_together=[('api_token_id', 'api_token_secret')],
+        required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
+        required_if=[('state', 'present', ['node'])],
     )
 
     if not HAS_PROXMOXER:
@@ -1203,12 +1203,6 @@ def main():
 
     auth_args = {'user': api_user}
     if not (api_token_id and api_token_secret):
-        # If password not set get it from PROXMOX_PASSWORD env
-        if not api_password:
-            try:
-                api_password = os.environ['PROXMOX_PASSWORD']
-            except KeyError:
-                module.fail_json(msg='You should set api_password param or use PROXMOX_PASSWORD environment variable')
         auth_args['password'] = api_password
     else:
         auth_args['token_name'] = api_token_id
