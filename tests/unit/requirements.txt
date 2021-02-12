@@ -23,4 +23,4 @@ semantic_version
 datadog-api-client >= 1.0.0b3 ; python_version >= '3.6'
 
 # requirement for the statsd module
-statsd
+statsd ; python_version >= '2.7'
