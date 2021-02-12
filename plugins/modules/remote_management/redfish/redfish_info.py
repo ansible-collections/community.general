@@ -24,11 +24,13 @@ options:
       - List of categories to execute on OOB controller
     default: ['Systems']
     type: list
+    elements: str
   command:
     required: false
     description:
       - List of commands to execute on OOB controller
     type: list
+    elements: str
   baseuri:
     required: true
     description:
@@ -296,8 +298,8 @@ def main():
     category_list = []
     module = AnsibleModule(
         argument_spec=dict(
-            category=dict(type='list', default=['Systems']),
-            command=dict(type='list'),
+            category=dict(type='list', elements='str', default=['Systems']),
+            command=dict(type='list', elements='str'),
             baseuri=dict(required=True),
             username=dict(required=True),
             password=dict(required=True, no_log=True),
