@@ -13,7 +13,7 @@ pr:
       - stable-*
 
 schedules:
-  - cron: 0 9 * * *
+  - cron: 0 8 * * *
     displayName: Nightly
     always: true
     branches:
@@ -179,9 +179,6 @@ stages:
           groups:
             - 1
             - 2
-            - 3
-            - 4
-            - 5
   - stage: Remote_2_9
     displayName: Remote 2.9
     dependsOn: []
@@ -192,14 +189,11 @@ stages:
           targets:
             - name: RHEL 8.2
               test: rhel/8.2
-            #- name: FreeBSD 12.0
-            #  test: freebsd/12.0
+            - name: FreeBSD 12.0
+              test: freebsd/12.0
           groups:
             - 1
             - 2
-            - 3
-            - 4
-            - 5
 
 ### Docker
   - stage: Docker_devel
@@ -226,6 +220,8 @@ stages:
               test: opensuse15
             - name: Ubuntu 18.04
               test: ubuntu1804
+            - name: Ubuntu 20.04
+              test: ubuntu2004
           groups:
             - 1
             - 2
@@ -240,18 +236,15 @@ stages:
         parameters:
           testFormat: 2.10/linux/{0}
           targets:
-            #- name: CentOS 8
-            #  test: centos8
+            - name: CentOS 8
+              test: centos8
             - name: Fedora 32
               test: fedora32
             - name: openSUSE 15 py3
               test: opensuse15
             - name: Ubuntu 16.04
               test: ubuntu1604
-            #- name: Ubuntu 18.04
-            #  test: ubuntu1804
           groups:
-            - 1
             - 2
             - 3
             - 4
@@ -264,16 +257,13 @@ stages:
         parameters:
           testFormat: 2.9/linux/{0}
           targets:
-            #- name: CentOS 8
-            #  test: centos8
-            #- name: Fedora 31
-            #  test: fedora31
-            #- name: openSUSE 15 py3
-            #  test: opensuse15
-            - name: Ubuntu 18.04
-              test: ubuntu1804
+            - name: CentOS 8
+              test: centos8
+            - name: Fedora 31
+              test: fedora31
+            - name: openSUSE 15 py3
+              test: opensuse15
           groups:
-            - 1
             - 2
             - 3
             - 4
@@ -310,7 +300,7 @@ stages:
           nameFormat: Python {0}
           testFormat: 2.9/cloud/{0}/1
           targets:
-            - test: 2.7
+            - test: 3.6
   - stage: Summary
     condition: succeededOrFailed()
     dependsOn:
