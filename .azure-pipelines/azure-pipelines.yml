@@ -179,9 +179,6 @@ stages:
           groups:
             - 1
             - 2
-            - 3
-            - 4
-            - 5
   - stage: Remote_2_9
     displayName: Remote 2.9
     dependsOn: []
@@ -192,14 +189,11 @@ stages:
           targets:
             - name: RHEL 8.2
               test: rhel/8.2
-            #- name: FreeBSD 12.0
-            #  test: freebsd/12.0
+            - name: FreeBSD 12.0
+              test: freebsd/12.0
           groups:
             - 1
             - 2
-            - 3
-            - 4
-            - 5
 
 ### Docker
   - stage: Docker_devel
@@ -251,7 +245,6 @@ stages:
             - name: Ubuntu 16.04
               test: ubuntu1604
           groups:
-            - 1
             - 2
             - 3
             - 4
