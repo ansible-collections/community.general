@@ -68,7 +68,8 @@ options:
       - The value of the metric.
   delta:
     type: bool
-    required: false
+    default: False
+    choices: [False, True]
     description:
       - If the metric is of type C(gauge), change the value by C(delta).
 '''
