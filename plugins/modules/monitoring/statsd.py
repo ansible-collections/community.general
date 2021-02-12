@@ -3,10 +3,8 @@
 # Copyright: Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from ansible.module_utils.basic import AnsibleModule
-from statsd import StatsClient, TCPStatsClient
+from __future__ import absolute_import, division, print_function
 __metaclass__ = type
-
 
 DOCUMENTATION = '''
 module: statsd
@@ -93,6 +91,11 @@ EXAMPLES = '''
     metric_type: gauge
     value: 7
 '''
+
+
+from statsd import StatsClient, TCPStatsClient
+
+from ansible.module_utils.basic import AnsibleModule
 
 
 def main():
