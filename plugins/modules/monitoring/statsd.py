@@ -108,15 +108,15 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(type='str', default='present', choices=['present']),
-            host=dict(type=str, default='localhost'),
-            port=dict(type=int, default=8125),
-            protocol=dict(type=str, default='udp', choices=['udp', 'tcp']),
-            timeout=dict(type=float, default=1.0),
-            metric=dict(type=str, required=True),
-            metric_type=dict(type=str, choices=['counter', 'gauge']),
-            metric_prefix=dict(type=str, default=''),
-            value=dict(type=int, required=True),
-            delta=dict(type=bool, default=False),
+            host=dict(type='str', default='localhost'),
+            port=dict(type='int', default=8125),
+            protocol=dict(type='str', default='udp', choices=['udp', 'tcp']),
+            timeout=dict(type='float', default=1.0),
+            metric=dict(type='str', required=True),
+            metric_type=dict(type='str', required=True, choices=['counter', 'gauge']),
+            metric_prefix=dict(type='str', default=''),
+            value=dict(type='int', required=True),
+            delta=dict(type='bool', default=False, choices=[False, True]),
         ),
         supports_check_mode=False
     )
