@@ -134,18 +134,13 @@ def main():
             statsd = TCPStatsClient(
                 host=host, port=port, timeout=timeout, prefix=metric_prefix, ipv6=False)
 
+        metric_name = '%s/%s' % (metric_prefix, metric) if metric_prefix else metric
         if metric_type == 'counter':
             statsd.incr(metric, value)
-            if metric_prefix:
-              module.exit_json(msg="Sent counter %s/%s -> %s to StatsD" % (metric_prefix, metric, str(value)), changed=True)
-            else:
-              module.exit_json(msg="Sent counter %s -> %s to StatsD" % (metric, str(value)), changed=True)
+            module.exit_json(msg="Sent counter %s -> %s to StatsD" % (metric_name, str(value)), changed=True)
         elif metric_type == 'gauge':
             statsd.gauge(metric, value, delta=delta)
-            if metric_prefix:
-              module.exit_json(msg="Sent gauge %s/%s (delta=%s) -> %s to StatsD" % (metric_prefix, metric, str(delta), str(value)), changed=True)
-            else:
-              module.exit_json(msg="Sent gauge %s (delta=%s) -> %s to StatsD" % (metric, str(delta), str(value)), changed=True)
+            module.exit_json(msg="Sent gauge %s (delta=%s) -> %s to StatsD" % (metric_name, str(delta), str(value)), changed=True)
 
     except Exception as exc:
         module.fail_json(msg='Failed sending to StatsD %s' % str(exc))
