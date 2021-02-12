@@ -18,7 +18,7 @@ module: spectrum_model_attrs
 short_description: Enforce a model's attributes in CA Spectrum.
 description:
     - This module can be used to enforce a model's attributes in CA Spectrum.
-version_added: 2.9
+version_added: 2.1.0
 author:
     - Tyler Gates (@tgates81)
 notes:
@@ -73,7 +73,7 @@ options:
      - All values and parameters are case sensitive and must be provided as strings only.
      required: True
      type: list
-     elements: list
+     elements: dict
      suboptions:
        name:
          description:
