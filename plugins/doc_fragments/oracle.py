@@ -47,7 +47,7 @@ class ModuleDocFragment(object):
                   OCI_USER_KEY_FILE variable, if any, is used. This option is required if the private key is
                   not specified through a configuration file (See C(config_file_location)). If the key is encrypted
                   with a pass-phrase, the C(api_user_key_pass_phrase) option must also be provided.
-            type: str
+            type: path
         api_user_key_pass_phrase:
             description:
                 - Passphrase used by the key referenced in C(api_user_key_file), if it is encrypted. If not set, then
