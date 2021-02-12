@@ -24,40 +24,50 @@ options:
     description:
       - Name of the schema to add or remove.
     required: true
+    type: str
   usage_roles:
     description:
       - Comma separated list of roles to create and grant usage access to the schema.
     aliases: ['usage_role']
+    type: str
   create_roles:
     description:
       - Comma separated list of roles to create and grant usage and create access to the schema.
     aliases: ['create_role']
+    type: str
   owner:
     description:
       - Name of the user to set as owner of the schema.
+    type: str
   state:
     description:
       - Whether to create C(present), or drop C(absent) a schema.
     default: present
     choices: ['present', 'absent']
+    type: str
   db:
     description:
       - Name of the Vertica database.
+    type: str
   cluster:
     description:
       - Name of the Vertica cluster.
     default: localhost
+    type: str
   port:
     description:
       - Vertica cluster port to connect to.
     default: 5433
+    type: str
   login_user:
     description:
       - The username used to authenticate with.
     default: dbadmin
+    type: str
   login_password:
     description:
       - The password used to authenticate with.
+    type: str
 notes:
   - The default authentication assumes that you are either logging in as or sudo'ing
     to the C(dbadmin) account on the host.
@@ -230,15 +240,15 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             schema=dict(required=True, aliases=['name']),
-            usage_roles=dict(default=None, aliases=['usage_role']),
-            create_roles=dict(default=None, aliases=['create_role']),
-            owner=dict(default=None),
+            usage_roles=dict(aliases=['usage_role']),
+            create_roles=dict(aliases=['create_role']),
+            owner=dict(),
             state=dict(default='present', choices=['absent', 'present']),
-            db=dict(default=None),
+            db=dict(),
             cluster=dict(default='localhost'),
             port=dict(default='5433'),
             login_user=dict(default='dbadmin'),
-            login_password=dict(default=None, no_log=True),
+            login_password=dict(no_log=True),
         ), supports_check_mode=True)
 
     if not pyodbc_found:
