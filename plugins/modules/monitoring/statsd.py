@@ -137,11 +137,9 @@ def main():
 
     try:
         if protocol == 'udp':
-            statsd = StatsClient(
-                host=host, port=port, prefix=metric_prefix, maxudpsize=512, ipv6=False)
+            statsd = StatsClient(host=host, port=port, prefix=metric_prefix, maxudpsize=512, ipv6=False)
         elif protocol == 'tcp':
-            statsd = TCPStatsClient(
-                host=host, port=port, timeout=timeout, prefix=metric_prefix, ipv6=False)
+            statsd = TCPStatsClient(host=host, port=port, timeout=timeout, prefix=metric_prefix, ipv6=False)
 
         metric_name = '%s/%s' % (metric_prefix, metric) if metric_prefix else metric
         if metric_type == 'counter':
