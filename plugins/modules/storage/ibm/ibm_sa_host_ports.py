@@ -49,7 +49,6 @@ options:
 extends_documentation_fragment:
 - community.general.ibm_storage
 
-
 author:
     - Tzur Eliyahu (@tzure)
 '''
