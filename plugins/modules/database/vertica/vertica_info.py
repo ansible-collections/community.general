@@ -21,25 +21,30 @@ options:
     description:
       - Name of the cluster running the schema.
     default: localhost
+    type: str
   port:
     description:
       Database port to connect to.
     default: 5433
+    type: str
   db:
     description:
       - Name of the database running the schema.
+    type: str
   login_user:
     description:
       - The username used to authenticate with.
     default: dbadmin
+    type: str
   login_password:
     description:
       - The password used to authenticate with.
+    type: str
 notes:
   - The default authentication assumes that you are either logging in as or sudo'ing
     to the C(dbadmin) account on the host.
   - This module uses C(pyodbc), a Python ODBC database adapter. You must ensure
-    that C(unixODBC) and C(pyodbc) is installed on the host and properly configured.
+    that C(unixODBC) and C(pyodbc) are installed on the host and properly configured.
   - Configuring C(unixODBC) for Vertica requires C(Driver = /opt/vertica/lib64/libverticaodbc.so)
     to be added to the C(Vertica) section of either C(/etc/odbcinst.ini) or C($HOME/.odbcinst.ini)
     and both C(ErrorMessagesPath = /opt/vertica/lib64) and C(DriverManagerEncoding = UTF-16)
