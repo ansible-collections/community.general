@@ -9,6 +9,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 module: statsd
 short_description: Send metrics to StatsD
+version_added: 2.1.0
 description:
   - The C(statsd) module sends metrics to StatsD.
   - For more information, see U(https://statsd-metrics.readthedocs.io/en/latest/).
