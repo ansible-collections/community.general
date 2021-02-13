@@ -365,18 +365,7 @@ plugins/modules/system/xfconf.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/xfconf.py validate-modules:return-syntax-error
 plugins/modules/web_infrastructure/jenkins_plugin.py use-argspec-type-path
 plugins/modules/web_infrastructure/rundeck_acl_policy.py pylint:blacklisted-name
-tests/integration/targets/django_manage/files/base_test/1045-single-app-project/single_app_project/manage.py metaclass-boilerplate      # django generated code
-tests/integration/targets/django_manage/files/base_test/1045-single-app-project/single_app_project/manage.py future-import-boilerplate  # django generated code
-tests/integration/targets/django_manage/files/base_test/1045-single-app-project/single_app_project/manage.py pep8:E302  # django generated code
-tests/integration/targets/django_manage/files/base_test/1045-single-app-project/single_app_project/manage.py pep8:E305  # django generated code
-tests/integration/targets/django_manage/files/base_test/1045-single-app-project/single_app_project/manage.py shebang    # django generated code
 tests/integration/targets/django_manage/files/base_test/simple_project/p1/manage.py compile-2.6   # django generated code
 tests/integration/targets/django_manage/files/base_test/simple_project/p1/manage.py compile-2.7   # django generated code
-tests/integration/targets/django_manage/files/base_test/simple_project/p1/manage.py metaclass-boilerplate       # django generated code
-tests/integration/targets/django_manage/files/base_test/simple_project/p1/manage.py future-import-boilerplate   # django generated code
-tests/integration/targets/django_manage/files/base_test/simple_project/p1/p1/settings.py metaclass-boilerplate       # django generated code
-tests/integration/targets/django_manage/files/base_test/simple_project/p1/p1/settings.py future-import-boilerplate   # django generated code
-tests/integration/targets/django_manage/files/base_test/simple_project/p1/p1/urls.py metaclass-boilerplate       # django generated code
-tests/integration/targets/django_manage/files/base_test/simple_project/p1/p1/urls.py future-import-boilerplate   # django generated code
 tests/utils/shippable/check_matrix.py replace-urlopen
 tests/utils/shippable/timing.py shebang
