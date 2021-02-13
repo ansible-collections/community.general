@@ -1,5 +1,6 @@
 minor_changes:
 <<<<<<< HEAD
+<<<<<<< HEAD
 - lxd_profile - added ``merge_profile`` parameter to merge configurations from the play to an existing profile (https://github.com/ansible-collections/community.general/pull/1748). 
 =======
 - lxd_profile - add ``merge_profile`` to merge configurations from the play to an existing profile
@@ -8,3 +9,6 @@ minor_changes:
 >>>>>>> 24321a92... a fragment icreated with a short summary
 =======
 >>>>>>> a2df4022... fix ansible-test - changelogs/fragments/1748-lxd_profile-merge-profiles.yml:3:1: empty-lines: too many blank lines (1 > 0)
+=======
+- lxd_profile - added ``merge_profile`` parameter to merge configurations from the play to an existing profile (https://github.com/ansible-collections/community.general/pull/1748).
+>>>>>>> 6b0695ae... spell fixing
