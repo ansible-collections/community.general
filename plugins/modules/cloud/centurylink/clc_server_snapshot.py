@@ -18,6 +18,7 @@ options:
       - The list of CLC server Ids.
     type: list
     required: True
+    elements: str
   expiration_days:
     description:
       - The number of days to keep the server snapshot before it expires.
@@ -330,7 +331,7 @@ class ClcSnapshot:
         :return: the package dictionary object
         """
         argument_spec = dict(
-            server_ids=dict(type='list', required=True),
+            server_ids=dict(type='list', required=True, elements='str'),
             expiration_days=dict(default=7, type='int'),
             wait=dict(default=True),
             state=dict(
