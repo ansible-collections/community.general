@@ -18,6 +18,7 @@ options:
       - A list of server Ids to deploy the blue print package.
     type: list
     required: True
+    elements: str
   package_id:
     description:
       - The package id of the blue print.
@@ -164,7 +165,7 @@ class ClcBlueprintPackage:
         :return: the package dictionary object
         """
         argument_spec = dict(
-            server_ids=dict(type='list', required=True),
+            server_ids=dict(type='list', elements='str', required=True),
             package_id=dict(required=True),
             package_params=dict(type='dict', default={}),
             wait=dict(default=True),   # @FIXME should be bool?

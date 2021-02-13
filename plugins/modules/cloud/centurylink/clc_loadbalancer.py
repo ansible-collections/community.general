@@ -53,6 +53,7 @@ options:
       - A list of nodes that needs to be added to the load balancer pool
     type: list
     default: []
+    elements: dict
   status:
     description:
       - The status of the loadbalancer
@@ -869,7 +870,7 @@ class ClcLoadBalancer:
             port=dict(choices=[80, 443]),
             method=dict(choices=['leastConnection', 'roundRobin']),
             persistence=dict(choices=['standard', 'sticky']),
-            nodes=dict(type='list', default=[]),
+            nodes=dict(type='list', default=[], elements='dict'),
             status=dict(default='enabled', choices=['enabled', 'disabled']),
             state=dict(
                 default='present',
