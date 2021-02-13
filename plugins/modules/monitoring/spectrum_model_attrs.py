@@ -8,10 +8,6 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
 DOCUMENTATION = r'''
 ---
 module: spectrum_model_attrs
@@ -78,7 +74,26 @@ options:
        name:
          description:
          - Attribute name OR hex ID.
-         - Not all names are defined, see C(attr_map) var declaration in __init__() for a complete listing.
+         - Currently defined names are..
+         - '                 App_Manufacturer (0x230683)'
+         - '                 CollectionsModelNameString (0x12adb)'
+         - '                 Condition (0x1000a)'
+         - '                 Criticality (0x1290c)'
+         - '                 DeviceType (0x23000e)'
+         - '                 isManaged (0x1295d)'
+         - '                 Model_Class (0x11ee8)'
+         - '                 Model_Handle (0x129fa)'
+         - '                 Model_Name (0x1006e)'
+         - '                 Modeltype_Handle (0x10001)'
+         - '                 Modeltype_Name (0x10000)'
+         - '                 Network_Address (0x12d7f)'
+         - '                 Notes (0x11564)'
+         - '                 ServiceDesk_Asset_ID (0x12db9)'
+         - '                 TopologyModelNameString (0x129e7)'
+         - '                 sysDescr (0x10052)'
+         - '                 sysName (0x10b5b)'
+         - '                 Vendor_Name (0x11570)'
+         - '                 Description (0x230017)'
          - Hex IDs are the direct identifiers in Spectrum and will always work.
          - To lookup hex IDs go to the UI..
          - Locator -> Devices -> By Model Name -> <enter any model> -> Attributes tab.
@@ -270,8 +285,7 @@ class spectrum_model_attrs:
         else:
             body = "" if resp is None else resp.read()
         if status_code != 200:
-            self.result['msg'] = \
-                "HTTP PUT error %s: %s: %s" % (status_code, update_url, body)
+            self.result['msg'] = "HTTP PUT error %s: %s: %s" % (status_code, update_url, body)
             self.module.fail_json(**self.result)
 
         # Load and parse the JSON response and either fail or set results.
@@ -282,8 +296,7 @@ class spectrum_model_attrs:
         Example failure response:
         {'model-update-response-list': {'model-responses': {'model': {'@error': 'PartialFailure', '@mh': '0x1010e76', 'attribute': {'@error-message': 'brn0vlappua001: You do not have permission to set attribute Network_Address for this model.', '@error': 'Error', '@id': '0x12d7f'}}}}}
         """  # noqa
-        model_resp = \
-            json_resp['model-update-response-list']['model-responses']['model']
+        model_resp = json_resp['model-update-response-list']['model-responses']['model']
         if model_resp['@error'] != "Success":
             # I'm not 100% confident on the expected failure structure so just
             # dump all of ['attribute'].
@@ -316,8 +329,7 @@ class spectrum_model_attrs:
         rqstd_attrs = ""
         for ra in ret_attrs:
             _id = self.attr_id(ra) or ra
-            rqstd_attrs += \
-                '<rs:requested-attribute id="%s" />' % (self.attr_id(ra) or ra)
+            rqstd_attrs += '<rs:requested-attribute id="%s" />' % (self.attr_id(ra) or ra)
 
         # Build the complete XML search query for HTTP POST.
         xml = """<?xml version="1.0" encoding="UTF-8"?>
@@ -348,8 +360,7 @@ xsi:schemaLocation="http://www.ca.com/spectrum/restful/schema/request ../../../x
         else:
             body = "" if resp is None else resp.read()
         if status_code != 200:
-            self.result['msg'] = "HTTP POST error %s: %s: %s" \
-                                 % (status_code, url, body)
+            self.result['msg'] = "HTTP POST error %s: %s: %s" % (status_code, url, body)
             self.module.fail_json(**self.result)
 
         # Parse through the XML response and fail on any detected errors.
@@ -358,20 +369,15 @@ xsi:schemaLocation="http://www.ca.com/spectrum/restful/schema/request ../../../x
         error = root.attrib['error']
         model_responses = root.find('ca:model-responses', self.resp_namespace)
         if total_models < 1:
-            self.result['msg'] = \
-                "No models found matching search criteria `%s'" \
-                % search_criteria
+            self.result['msg'] = "No models found matching search criteria `%s'" % search_criteria
             self.module.fail_json(**self.result)
         elif total_models > 1:
-            self.result['msg'] = \
-                "More than one model found (%s): `%s'" \
-                % (total_models, ET.tostring(model_responses,
-                                             encoding='unicode'))
+            self.result['msg'] = "More than one model found (%s): `%s'" % (total_models, ET.tostring(model_responses,
+                                                                                                     encoding='unicode'))
             self.module.fail_json(**self.result)
         if error != "EndOfResults":
-            self.result['msg'] = "Unexpected search response `%s': %s" \
-                                 % (error, ET.tostring(model_responses,
-                                                       encoding='unicode'))
+            self.result['msg'] = "Unexpected search response `%s': %s" % (error, ET.tostring(model_responses,
+                                                                                             encoding='unicode'))
             self.module.fail_json(**self.result)
         model = model_responses.find('ca:model', self.resp_namespace)
         attrs = model.findall('ca:attribute', self.resp_namespace)
