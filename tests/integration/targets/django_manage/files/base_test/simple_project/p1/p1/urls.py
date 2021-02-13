@@ -1,3 +1,6 @@
+from __future__ import absolute_import, division, print_function
+__metaclass__ = type
+
 """p1 URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
