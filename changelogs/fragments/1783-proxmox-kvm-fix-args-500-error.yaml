@@ -1,3 +1,3 @@
 bugfixes:
   - proxmox_kvm - do not add ``args`` if ``proxmox_default_behavior`` is set to no_defaults  (https://github.com/ansible-collections/community.general/issues/1641).
-  - proxmox_kvm - never implicitly add ``force`` equal to False, Proxmox API requires not implemented parameters otherwise, and assumes force to be false by default anyways. 
+  - proxmox_kvm - stop implicitly adding ``force`` equal to ``false``. Proxmox API requires not implemented parameters otherwise, and assumes ``force`` to be ``false`` by default anyways (https://github.com/ansible-collections/community.general/pull/1783).
