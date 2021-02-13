@@ -1,0 +1,2 @@
+bugfixes:
+- "selective callback plugin - adjust import so that the plugin also works with ansible-core 2.11 (https://github.com/ansible-collections/community.general/pull/1807)."
