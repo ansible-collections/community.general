@@ -29,17 +29,20 @@ options:
       - The list  of source addresses for traffic on the originating firewall.
         This is required when state is 'present'
     type: list
+    elements: str
   destination:
     description:
       - The list of destination addresses for traffic on the terminating firewall.
         This is required when state is 'present'
     type: list
+    elements: str
   ports:
     description:
       - The list of ports associated with the policy.
         TCP and UDP can take in single ports or port ranges.
       - "Example: C(['any', 'icmp', 'TCP/123', 'UDP/123', 'TCP/123-456', 'UDP/123-456'])."
     type: list
+    elements: str
   firewall_policy_id:
     description:
       - Id of the firewall policy. This is required to update or delete an existing firewall policy
@@ -217,9 +220,9 @@ class ClcFirewallPolicy:
             source_account_alias=dict(required=True),
             destination_account_alias=dict(),
             firewall_policy_id=dict(),
-            ports=dict(type='list'),
-            source=dict(type='list'),
-            destination=dict(type='list'),
+            ports=dict(type='list', elements='str'),
+            source=dict(type='list', elements='str'),
+            destination=dict(type='list', elements='str'),
             wait=dict(default=True),   # @FIXME type=bool
             state=dict(default='present', choices=['present', 'absent']),
             enabled=dict(default=True, choices=[True, False])
