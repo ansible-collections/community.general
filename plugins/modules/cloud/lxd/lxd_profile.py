@@ -53,7 +53,6 @@ options:
         required: false
         type: str
     merge_profile:
-    merge:
         description:
             - Merge the configuration of the present profile with the new desired configuration,
               instead of replacing it.
