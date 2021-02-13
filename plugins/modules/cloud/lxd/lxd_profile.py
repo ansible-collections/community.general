@@ -87,14 +87,14 @@ options:
           - If not specified, it defaults to C($HOME/.config/lxc/client.key).
         required: false
         aliases: [ key_file ]
-        type: path
+        type: str
     client_cert:
         description:
           - The client certificate file path.
           - If not specified, it defaults to C($HOME/.config/lxc/client.crt).
         required: false
         aliases: [ cert_file ]
-        type: path
+        type: str
     trust_password:
         description:
           - The client trusted password.
@@ -204,7 +204,6 @@ actions:
   type: list
   sample: '["create"]'
 '''
-
 import os
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
@@ -498,11 +497,11 @@ def main():
                 default='unix:/var/snap/lxd/common/lxd/unix.socket'
             ),
             client_key=dict(
-                type='path',
+                type='str',
                 aliases=['key_file']
             ),
             client_cert=dict(
-                type='path',
+                type='str',
                 aliases=['cert_file']
             ),
             trust_password=dict(type='str', no_log=True)
