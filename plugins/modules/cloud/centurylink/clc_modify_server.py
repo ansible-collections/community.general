@@ -18,6 +18,7 @@ options:
       - A list of server Ids to modify.
     type: list
     required: True
+    elements: str
   cpu:
     description:
       - How many CPUs to update on the server
@@ -396,7 +397,7 @@ class ClcModifyServer:
         :return: argument spec dictionary
         """
         argument_spec = dict(
-            server_ids=dict(type='list', required=True),
+            server_ids=dict(type='list', required=True, elements='str'),
             state=dict(default='present', choices=['present', 'absent']),
             cpu=dict(),
             memory=dict(),

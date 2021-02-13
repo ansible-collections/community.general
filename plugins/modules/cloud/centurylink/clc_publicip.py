@@ -23,11 +23,13 @@ options:
     description:
       - A list of ports to expose. This is required when state is 'present'
     type: list
+    elements: int
   server_ids:
     description:
       - A list of servers to create public ips on.
     type: list
     required: True
+    elements: str
   state:
     description:
       - Determine whether to create or delete public IPs. If present module will not create a second public ip if one
@@ -193,9 +195,9 @@ class ClcPublicIp(object):
         :return: argument spec dictionary
         """
         argument_spec = dict(
-            server_ids=dict(type='list', required=True),
+            server_ids=dict(type='list', required=True, elements='str'),
             protocol=dict(default='TCP', choices=['TCP', 'UDP', 'ICMP']),
-            ports=dict(type='list'),
+            ports=dict(type='list', elements='int'),
             wait=dict(type='bool', default=True),
             state=dict(default='present', choices=['present', 'absent']),
         )
