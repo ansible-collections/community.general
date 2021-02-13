@@ -22,8 +22,8 @@ version_added: 2.1.0
 author:
     - Tyler Gates (@tgates81)
 notes:
-    - Tested on CA Spectrum version 10.4.2.0.189
-    - Model creation and deletion are not possible with this module. For that use M(spectrum_device) instead.
+    - Tested on CA Spectrum version 10.4.2.0.189.
+    - Model creation and deletion are not possible with this module. For that use M(community.general.spectrum_device) instead.
 requirements:
     - 'python >= 2.7'
 options:
@@ -31,7 +31,7 @@ options:
      description:
      - URL of OneClick server.
      type: str
-     required: True
+     required: true
    url_username:
      description:
      - OneClick username.
@@ -63,7 +63,7 @@ options:
      required: True
    validate_certs:
      description:
-     - Validate SSL certificates.
+     - Validate SSL certificates. Only use if you can guarantee that you are talking to the correct endpoint and there is no man-in-the-middle attack happening.
      type: bool
      default: yes
      required: False
@@ -93,13 +93,13 @@ options:
 
 EXAMPLES = r'''
 - name: Enforce maintenance mode for modelxzy01 with a note about why
-  spectrum_model_attrs:
+  community.general.spectrum_model_attrs:
     url: "http://oneclick.url.com"
     username: "{{ oneclick_username }}"
     password: "{{ oneclick_password }}"
     name: "modelxyz01"
     type: "Host_Device"
-    validate_certs: no
+    validate_certs: true
     attributes:
       - name: "isManaged"
         value: "false"
@@ -181,8 +181,7 @@ class spectrum_model_attrs:
             "has-pcre-ignore-case", "has-wildcard", "has-wildcard-ignore-case",
             "is-derived-from", "not-is-derived-from"]
 
-        self.resp_namespace = \
-            dict(ca="http://www.ca.com/spectrum/restful/schema/response")
+        self.resp_namespace = dict(ca="http://www.ca.com/spectrum/restful/schema/response")
 
         self.result = dict(msg="", changed_attrs=dict())
         self.success_msg = "Success"
@@ -492,7 +491,7 @@ def run_module():
         url_username=dict(type='str', required=True, aliases=['username']),
         url_password=dict(type='str', required=True, aliases=['password'],
                           no_log=True),
-        validate_certs=dict(type='bool', default='yes'),
+        validate_certs=dict(type='bool', default=True),
         use_proxy=dict(type='bool', default='yes'),
         name=dict(type='str', required=True),
         type=dict(type='str', required=True),
