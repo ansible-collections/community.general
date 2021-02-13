@@ -32,6 +32,7 @@ options:
       - A list of recipient email ids to notify the alert.
         This is required for state 'present'
     type: list
+    elements: str
   metric:
     description:
       - The metric on which to measure the condition that will trigger the alert.
@@ -220,7 +221,7 @@ class ClcAlertPolicy:
             name=dict(),
             id=dict(),
             alias=dict(required=True),
-            alert_recipients=dict(type='list'),
+            alert_recipients=dict(type='list', elements='str'),
             metric=dict(
                 choices=[
                     'cpu',
