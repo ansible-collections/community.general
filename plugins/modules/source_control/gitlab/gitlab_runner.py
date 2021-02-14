@@ -55,7 +55,7 @@ options:
   registration_token:
     description:
       - The registration token is used to register new runners.
-    required: True
+      - Required if I(state) is C(present).
     type: str
   owned:
     description:
@@ -309,7 +309,7 @@ def main():
         locked=dict(type='bool', default=False),
         access_level=dict(type='str', default='ref_protected', choices=["not_protected", "ref_protected"]),
         maximum_timeout=dict(type='int', default=3600),
-        registration_token=dict(type='str', required=True, no_log=True),
+        registration_token=dict(type='str', no_log=True),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     ))
 
@@ -324,6 +324,9 @@ def main():
         ],
         required_one_of=[
             ['api_username', 'api_token'],
+        ],
+        required_if=[
+            ('state', 'present', ['registration_token']),
         ],
         supports_check_mode=True,
     )
