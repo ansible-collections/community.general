@@ -451,7 +451,7 @@ def main():
         if module.check_mode:
             module.exit_json(changed=True)
         else:
-            (rc, _, error) = delete_maintenance(
+            (rc, unused_var, error) = delete_maintenance(
                 auth_headers, url, statuspage, maintenance_id)
             if rc == 0:
                 module.exit_json(
