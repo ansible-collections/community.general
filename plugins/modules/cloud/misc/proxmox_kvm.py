@@ -774,27 +774,6 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-devices:
-    description: The list of devices created or used.
-    returned: success
-    type: dict
-    sample: '
-      {
-        "ide0": "VMS_LVM:vm-115-disk-1",
-        "ide1": "VMs:115/vm-115-disk-3.raw",
-        "virtio0": "VMS_LVM:vm-115-disk-2",
-        "virtio1": "VMs:115/vm-115-disk-1.qcow2",
-        "virtio2": "VMs:115/vm-115-disk-2.raw"
-      }'
-mac:
-    description: List of mac address created and net[n] attached. Useful when you want to use provision systems like Foreman via PXE.
-    returned: success
-    type: dict
-    sample: '
-      {
-        "net0": "3E:6E:97:D2:31:9F",
-        "net1": "B6:A1:FC:EF:78:A4"
-      }'
 vmid:
     description: The VM vmid.
     returned: success
@@ -803,7 +782,6 @@ vmid:
 status:
     description:
       - The current virtual machine status.
-      - Returned only when C(state=current)
     returned: success
     type: dict
     sample: '{
@@ -1251,36 +1229,36 @@ def main():
 
         # Ensure source VM id exists when cloning
         if not get_vm(proxmox, vmid):
-            module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
+            module.fail_json(vmid=vmid, msg='VM with vmid = %s does not exist in cluster' % vmid)
 
         # Ensure the choosen VM name doesn't already exist when cloning
         if get_vmid(proxmox, name):
-            module.exit_json(changed=False, msg="VM with name <%s> already exists" % name)
+            module.exit_json(changed=False, vmid=vmid, msg="VM with name <%s> already exists" % name)
 
         # Ensure the choosen VM id doesn't already exist when cloning
         if get_vm(proxmox, newid):
-            module.exit_json(changed=False, msg="vmid %s with VM name %s already exists" % (newid, name))
+            module.exit_json(changed=False, vmid=vmid, msg="vmid %s with VM name %s already exists" % (newid, name))
 
     if delete is not None:
         try:
             settings(module, proxmox, vmid, node, name, delete=delete)
-            module.exit_json(changed=True, msg="Settings has deleted on VM {0} with vmid {1}".format(name, vmid))
+            module.exit_json(changed=True, vmid=vmid, msg="Settings has deleted on VM {0} with vmid {1}".format(name, vmid))
         except Exception as e:
-            module.fail_json(msg='Unable to delete settings on VM {0} with vmid {1}: '.format(name, vmid) + str(e))
+            module.fail_json(vmid=vmid, msg='Unable to delete settings on VM {0} with vmid {1}: '.format(name, vmid) + str(e))
 
     if revert is not None:
         try:
             settings(module, proxmox, vmid, node, name, revert=revert)
-            module.exit_json(changed=True, msg="Settings has reverted on VM {0} with vmid {1}".format(name, vmid))
+            module.exit_json(changed=True, vmid=vmid, msg="Settings has reverted on VM {0} with vmid {1}".format(name, vmid))
         except Exception as e:
-            module.fail_json(msg='Unable to revert settings on VM {0} with vmid {1}: Maybe is not a pending task...   '.format(name, vmid) + str(e))
+            module.fail_json(vmid=vmid, msg='Unable to revert settings on VM {0} with vmid {1}: Maybe is not a pending task...   '.format(name, vmid) + str(e))
 
     if state == 'present':
         try:
             if get_vm(proxmox, vmid) and not (update or clone):
-                module.exit_json(changed=False, msg="VM with vmid <%s> already exists" % vmid)
+                module.exit_json(changed=False, vmid=vmid, msg="VM with vmid <%s> already exists" % vmid)
             elif get_vmid(proxmox, name) and not (update or clone):
-                module.exit_json(changed=False, msg="VM with name <%s> already exists" % name)
+                module.exit_json(changed=False, vmid=vmid, msg="VM with name <%s> already exists" % name)
             elif not (node, name):
                 module.fail_json(msg='node, name is mandatory for creating/updating vm')
             elif not node_check(proxmox, node):
@@ -1353,18 +1331,18 @@ def main():
                            scsi=module.params['scsi'],
                            virtio=module.params['virtio'])
             if update:
-                module.exit_json(changed=True, msg="VM %s with vmid %s updated" % (name, vmid))
+                module.exit_json(changed=True, vmid=vmid, msg="VM %s with vmid %s updated" % (name, vmid))
             elif clone is not None:
-                module.exit_json(changed=True, msg="VM %s with newid %s cloned from vm with vmid %s" % (name, newid, vmid))
+                module.exit_json(changed=True, vmid=vmid, msg="VM %s with newid %s cloned from vm with vmid %s" % (name, newid, vmid))
             else:
-                module.exit_json(changed=True, msg="VM %s with vmid %s deployed" % (name, vmid), **results)
+                module.exit_json(changed=True, vmid=vmid, msg="VM %s with vmid %s deployed" % (name, vmid), **results)
         except Exception as e:
             if update:
-                module.fail_json(msg="Unable to update vm {0} with vmid {1}=".format(name, vmid) + str(e))
+                module.fail_json(vmid=vmid, msg="Unable to update vm {0} with vmid {1}=".format(name, vmid) + str(e))
             elif clone is not None:
-                module.fail_json(msg="Unable to clone vm {0} from vmid {1}=".format(name, vmid) + str(e))
+                module.fail_json(vmid=vmid, msg="Unable to clone vm {0} from vmid {1}=".format(name, vmid) + str(e))
             else:
-                module.fail_json(msg="creation of qemu VM %s with vmid %s failed with exception=%s" % (name, vmid, e))
+                module.fail_json(vmid=vmid, msg="creation of qemu VM %s with vmid %s failed with exception=%s" % (name, vmid, e))
 
     elif state == 'started':
         try:
@@ -1372,14 +1350,14 @@ def main():
                 module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
             vm = get_vm(proxmox, vmid)
             if not vm:
-                module.fail_json(msg='VM with vmid <%s> does not exist in cluster' % vmid)
+                module.fail_json(vmid=vmid, msg='VM with vmid <%s> does not exist in cluster' % vmid)
             if vm[0]['status'] == 'running':
-                module.exit_json(changed=False, msg="VM %s is already running" % vmid)
+                module.exit_json(changed=False, vmid=vmid, msg="VM %s is already running" % vmid, **status)
 
             if start_vm(module, proxmox, vm):
-                module.exit_json(changed=True, msg="VM %s started" % vmid)
+                module.exit_json(changed=True, vmid=vmid, msg="VM %s started" % vmid, **status)
         except Exception as e:
-            module.fail_json(msg="starting of VM %s failed with exception: %s" % (vmid, e))
+            module.fail_json(vmid=vmid, msg="starting of VM %s failed with exception: %s" % (vmid, e), **status)
 
     elif state == 'stopped':
         try:
@@ -1388,15 +1366,15 @@ def main():
 
             vm = get_vm(proxmox, vmid)
             if not vm:
-                module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
+                module.fail_json(vmid=vmid, msg='VM with vmid = %s does not exist in cluster' % vmid)
 
             if vm[0]['status'] == 'stopped':
-                module.exit_json(changed=False, msg="VM %s is already stopped" % vmid)
+                module.exit_json(changed=False, vmid=vmid, msg="VM %s is already stopped" % vmid, **status)
 
             if stop_vm(module, proxmox, vm, force=module.params['force']):
-                module.exit_json(changed=True, msg="VM %s is shutting down" % vmid)
+                module.exit_json(changed=True, vmid=vmid, msg="VM %s is shutting down" % vmid, **status)
         except Exception as e:
-            module.fail_json(msg="stopping of VM %s failed with exception: %s" % (vmid, e))
+            module.fail_json(vmid=vmid, msg="stopping of VM %s failed with exception: %s" % (vmid, e), **status)
 
     elif state == 'restarted':
         try:
@@ -1405,30 +1383,30 @@ def main():
 
             vm = get_vm(proxmox, vmid)
             if not vm:
-                module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
+                module.fail_json(vmid=vmid, msg='VM with vmid = %s does not exist in cluster' % vmid)
             if vm[0]['status'] == 'stopped':
-                module.exit_json(changed=False, msg="VM %s is not running" % vmid)
+                module.exit_json(changed=False, vmid=vmid, msg="VM %s is not running" % vmid, **status)
 
             if stop_vm(module, proxmox, vm, force=module.params['force']) and start_vm(module, proxmox, vm):
-                module.exit_json(changed=True, msg="VM %s is restarted" % vmid)
+                module.exit_json(changed=True, vmid=vmid, msg="VM %s is restarted" % vmid, **status)
         except Exception as e:
-            module.fail_json(msg="restarting of VM %s failed with exception: %s" % (vmid, e))
+            module.fail_json(vmid=vmid, msg="restarting of VM %s failed with exception: %s" % (vmid, e), **status)
 
     elif state == 'absent':
         try:
             vm = get_vm(proxmox, vmid)
             if not vm:
-                module.exit_json(changed=False)
+                module.exit_json(changed=False, vmid=vmid)
 
             proxmox_node = proxmox.nodes(vm[0]['node'])
             if vm[0]['status'] == 'running':
-                module.exit_json(changed=False, msg="VM %s is running. Stop it before deletion." % vmid)
+                module.exit_json(changed=False, vmid=vmid, msg="VM %s is running. Stop it before deletion." % vmid)
             taskid = proxmox_node.qemu.delete(vmid)
             if not wait_for_task(module, proxmox, vm[0]['node'], taskid):
                 module.fail_json(msg='Reached timeout while waiting for removing VM. Last line in task before timeout: %s' %
                                  proxmox_node.tasks(taskid).log.get()[:1])
             else:
-                module.exit_json(changed=True, msg="VM %s removed" % vmid)
+                module.exit_json(changed=True, vmid=vmid, msg="VM %s removed" % vmid)
         except Exception as e:
             module.fail_json(msg="deletion of VM %s failed with exception: %s" % (vmid, e))
 
@@ -1442,7 +1420,7 @@ def main():
         current = proxmox.nodes(vm[0]['node']).qemu(vmid).status.current.get()['status']
         status['status'] = current
         if status:
-            module.exit_json(changed=False, msg="VM %s with vmid = %s is %s" % (name, vmid, current), **status)
+            module.exit_json(changed=False, vmid=vmid, msg="VM %s with vmid = %s is %s" % (name, vmid, current), **status)
 
 
 if __name__ == '__main__':
