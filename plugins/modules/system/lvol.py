@@ -447,7 +447,7 @@ def main():
                 cmd = "%s %s -%s %s%s %s -T %s/%s" % (lvcreate_cmd, yesopt, size_opt, size, size_unit, opts, vg, thinpool)
             else:
                 cmd = "%s %s %s -n %s -%s %s%s %s %s %s" % (lvcreate_cmd, test_opt, yesopt, lv, size_opt, size, size_unit, opts, vg, pvs)
-            rc, _, err = module.run_command(cmd)
+            rc, unused_var, err = module.run_command(cmd)
             if rc == 0:
                 changed = True
             else:
@@ -458,7 +458,7 @@ def main():
             if not force:
                 module.fail_json(msg="Sorry, no removal of logical volume %s without force=yes." % (this_lv['name']))
             lvremove_cmd = module.get_bin_path("lvremove", required=True)
-            rc, _, err = module.run_command("%s %s --force %s/%s" % (lvremove_cmd, test_opt, vg, this_lv['name']))
+            rc, unused_var, err = module.run_command("%s %s --force %s/%s" % (lvremove_cmd, test_opt, vg, this_lv['name']))
             if rc == 0:
                 module.exit_json(changed=True)
             else:
@@ -548,14 +548,14 @@ def main():
     if this_lv is not None:
         if active:
             lvchange_cmd = module.get_bin_path("lvchange", required=True)
-            rc, _, err = module.run_command("%s -ay %s/%s" % (lvchange_cmd, vg, this_lv['name']))
+            rc, unused_var, err = module.run_command("%s -ay %s/%s" % (lvchange_cmd, vg, this_lv['name']))
             if rc == 0:
                 module.exit_json(changed=((not this_lv['active']) or changed), vg=vg, lv=this_lv['name'], size=this_lv['size'])
             else:
                 module.fail_json(msg="Failed to activate logical volume %s" % (lv), rc=rc, err=err)
         else:
             lvchange_cmd = module.get_bin_path("lvchange", required=True)
-            rc, _, err = module.run_command("%s -an %s/%s" % (lvchange_cmd, vg, this_lv['name']))
+            rc, unused_var, err = module.run_command("%s -an %s/%s" % (lvchange_cmd, vg, this_lv['name']))
             if rc == 0:
                 module.exit_json(changed=(this_lv['active'] or changed), vg=vg, lv=this_lv['name'], size=this_lv['size'])
             else:
