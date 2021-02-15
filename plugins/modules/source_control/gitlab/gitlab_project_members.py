@@ -13,7 +13,6 @@ module: gitlab_project_members
 short_description: Manage project members on GitLab Server
 description:
     - This module allows to add and remove members to/from a project, or change a member's access level in a project on GitLab.
-version_added: ''
 author: Sergey Mikhaltsov (@metanovii)
 requirements:
     - python-gitlab python module <= 1.15.0
@@ -23,6 +22,23 @@ options:
         description:
             - A personal access token to authenticate with the GitLab API.
         required: true
+        type: str
+    validate_certs:
+        description:
+            - Whether or not to validate SSL certs when supplying a https endpoint.
+        default: True
+        type: bool
+    api_username:
+        description:
+            - The username to use for authentication against the API.
+        type: str
+    api_password:
+        description:
+            - The password to use for authentication against the API.
+        type: str
+    api_url:
+        description:
+            - The resolvable endpoint for the API.
         type: str
     project:
         description:
@@ -57,6 +73,7 @@ EXAMPLES = r'''
   community.general.gitlab_project_members:
     api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
+    validate_certs: True
     project: projectname
     gitlab_user: username
     access_level: developer
@@ -66,6 +83,7 @@ EXAMPLES = r'''
   community.general.gitlab_project_members:
     api_url: 'https://gitlab.example.com'
     api_token: 'Your-Private-Token'
+    validate_certs: False
     project: projectname
     gitlab_user: username
     state: absent
