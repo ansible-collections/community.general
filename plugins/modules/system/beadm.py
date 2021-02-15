@@ -191,7 +191,7 @@ class BE(object):
         return None
 
     def exists(self):
-        (rc, out, unused_var) = self._beadm_list()
+        (rc, out, dummy) = self._beadm_list()
 
         if rc == 0:
             if self._find_be_by_name(out):
@@ -202,7 +202,7 @@ class BE(object):
             return False
 
     def is_activated(self):
-        (rc, out, unused_var) = self._beadm_list()
+        (rc, out, dummy) = self._beadm_list()
 
         if rc == 0:
             line = self._find_be_by_name(out)
@@ -257,7 +257,7 @@ class BE(object):
         return self.module.run_command(cmd)
 
     def is_mounted(self):
-        (rc, out, unused_var) = self._beadm_list()
+        (rc, out, dummy) = self._beadm_list()
 
         if rc == 0:
             line = self._find_be_by_name(out)

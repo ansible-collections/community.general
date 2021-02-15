@@ -86,7 +86,7 @@ class Connection(ConnectionBase):
             write_fds = []
         while len(read_fds) > 0 or len(write_fds) > 0:
             try:
-                ready_reads, ready_writes, unused_var = select.select(read_fds, write_fds, [])
+                ready_reads, ready_writes, dummy = select.select(read_fds, write_fds, [])
             except select.error as e:
                 if e.args[0] == errno.EINTR:
                     continue

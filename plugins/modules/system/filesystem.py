@@ -126,7 +126,7 @@ class Device(object):
         cmd_findmnt = self.module.get_bin_path("findmnt", required=True)
 
         # find mountpoint
-        rc, mountpoint, unused_var = self.module.run_command([cmd_findmnt, "--mtab", "--noheadings", "--output",
+        rc, mountpoint, dummy = self.module.run_command([cmd_findmnt, "--mtab", "--noheadings", "--output",
                                                              "TARGET", "--source", self.path], check_rc=False)
         if rc != 0:
             mountpoint = None
@@ -290,7 +290,7 @@ class Btrfs(Filesystem):
 
     def __init__(self, module):
         super(Btrfs, self).__init__(module)
-        unused_var, stdout, stderr = self.module.run_command('%s --version' % self.MKFS, check_rc=True)
+        dummy, stdout, stderr = self.module.run_command('%s --version' % self.MKFS, check_rc=True)
         match = re.search(r" v([0-9.]+)", stdout)
         if not match:
             # v0.20-rc1 use stderr

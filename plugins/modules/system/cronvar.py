@@ -228,7 +228,7 @@ class CronVar(object):
         var_names = []
         for l in self.lines:
             try:
-                (var_name, unused_var) = self.parse_for_var(l)
+                (var_name, dummy) = self.parse_for_var(l)
                 var_names.append(var_name)
             except CronVarError:
                 pass
