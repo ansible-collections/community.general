@@ -185,7 +185,7 @@ def check_cert_present(module, executable, keystore_path, keystore_pass, alias, 
     test_cmd = ("%s -noprompt -list -keystore '%s' -storepass '%s' "
                 "-alias '%s' %s") % (executable, keystore_path, keystore_pass, alias, get_keystore_type(keystore_type))
 
-    check_rc = module.run_command(test_cmd)[0]
+    check_rc, dummy, dummy = module.run_command(test_cmd)
     if check_rc == 0:
         return True
     return False
@@ -221,7 +221,7 @@ def import_cert_url(module, executable, url, port, keystore_path, keystore_pass,
         import_cmd = import_cmd + " -trustcacerts"
 
     # Fetch SSL certificate from remote host.
-    fetch_out = module.run_command(fetch_cmd, check_rc=True)[1]
+    dummy, fetch_out, dummy = module.run_command(fetch_cmd, check_rc=True)
 
     # Use remote certificate from remote host and import it to a java keystore
     (import_rc, import_out, import_err) = module.run_command(import_cmd,

@@ -173,7 +173,7 @@ class CallbackModule(CallbackBase):
         # Displays info about playbook being started by a person on an
         # inventory, as well as Tags, Skip Tags and Limits
         if not self.printed_playbook:
-            self.playbook_name = os.path.splitext(os.path.basename(self.play.playbook.filename))[0]
+            self.playbook_name, dummy = os.path.splitext(os.path.basename(self.play.playbook.filename))
             host_list = self.play.playbook.inventory.host_list
             inventory = os.path.basename(os.path.realpath(host_list))
             self.send_msg("%s: Playbook initiated by %s against %s" %
