@@ -181,14 +181,14 @@ class DBusWrapper(object):
 
         for pid in psutil.pids():
             process = psutil.Process(pid)
-            process_real_uid, _, _ = process.uids()
+            process_real_uid = process.uids()[0]
             try:
                 if process_real_uid == uid and 'DBUS_SESSION_BUS_ADDRESS' in process.environ():
                     dbus_session_bus_address_candidate = process.environ()['DBUS_SESSION_BUS_ADDRESS']
                     self.module.debug("Found D-Bus user session candidate at address: %s" % dbus_session_bus_address_candidate)
                     dbus_send_cmd = self.module.get_bin_path('dbus-send', required=True)
                     command = [dbus_send_cmd, '--address=%s' % dbus_session_bus_address_candidate, '--type=signal', '/', 'com.example.test']
-                    rc, _, _ = self.module.run_command(command)
+                    rc = self.module.run_command(command)[0]
 
                     if rc == 0:
                         self.module.debug("Verified D-Bus user session candidate as usable at address: %s" % dbus_session_bus_address_candidate)
