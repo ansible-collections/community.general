@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - nios_host_record - allow DNS Bypass for views other than default (https://github.com/ansible-collections/community.general/issues/1786).
