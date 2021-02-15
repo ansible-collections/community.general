@@ -94,7 +94,7 @@ def main():
     all_alternatives = []
 
     # Run `update-alternatives --display <name>` to find existing alternatives
-    (rc, display_output, _) = module.run_command(
+    (rc, display_output, unused_var) = module.run_command(
         ['env', 'LC_ALL=C', UPDATE_ALTERNATIVES, '--display', name]
     )
 
