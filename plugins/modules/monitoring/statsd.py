@@ -107,6 +107,7 @@ except ImportError:
 def udp_statsd_client(**client_params):
     return StatsClient(**client_params)
 
+
 def tcp_statsd_client(**client_params):
     return TCPStatsClient(**client_params)
 
@@ -164,6 +165,7 @@ def main():
             client.close()
 
     module.exit_json(msg="Sent %s %s -> %s to StatsD" % (metric_type, metric_name, str(metric_display_value)), changed=True)
+
 
 if __name__ == '__main__':
     main()

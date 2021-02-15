@@ -9,6 +9,7 @@ from ansible_collections.community.general.plugins.modules.monitoring import sta
 from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
+
 class FakeStatsD(MagicMock):
 
     def incr(self, *args, **kwargs):
@@ -19,6 +20,7 @@ class FakeStatsD(MagicMock):
 
     def close(self, *args, **kwargs):
         pass
+
 
 class TestStatsDModule(ModuleTestCase):
 
