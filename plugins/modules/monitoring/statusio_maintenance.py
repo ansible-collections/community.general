@@ -425,7 +425,7 @@ def main():
         if module.check_mode:
             module.exit_json(changed=True)
         else:
-            (rc, _, error) = create_maintenance(
+            (rc, unused_var, error) = create_maintenance(
                 auth_headers, url, statuspage, host_ids,
                 all_infrastructure_affected, automation,
                 title, desc, returned_date, maintenance_notify_now,
