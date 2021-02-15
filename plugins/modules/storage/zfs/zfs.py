@@ -19,6 +19,7 @@ options:
     description:
       - File system, snapshot or volume name e.g. C(rpool/myfs).
     required: true
+    type: str
   state:
     description:
       - Whether to create (C(present)), or remove (C(absent)) a
@@ -26,13 +27,16 @@ options:
         will be created/destroyed as needed to reach the desired state.
     choices: [ absent, present ]
     required: true
+    type: str
   origin:
     description:
       - Snapshot from which to create a clone.
+    type: str
   extra_zfs_properties:
     description:
       - A dictionary of zfs properties to be set.
       - See the zfs(8) man page for more information.
+    type: dict
 author:
 - Johan Wiren (@johanwiren)
 '''
