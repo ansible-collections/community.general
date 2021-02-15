@@ -1,0 +1,2 @@
+bugfixes:
+  - nomad_job_info - fix module failure when nomad client returns no jobs (https://github.com/ansible-collections/community.general/pull/1721).
