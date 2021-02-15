@@ -383,7 +383,7 @@ class LVM(Filesystem):
 
     def get_fs_size(self, dev):
         cmd = self.module.get_bin_path('pvs', required=True)
-        dummy, size, dummy = self.module.run_command([cmd, '--noheadings', '-o', 'pv_size', '--units', 'b', '--nosuffix', str(dev)], check_rc=True)[1]
+        dummy, size, dummy = self.module.run_command([cmd, '--noheadings', '-o', 'pv_size', '--units', 'b', '--nosuffix', str(dev)], check_rc=True)
         block_count = int(size)
         return block_count
 
