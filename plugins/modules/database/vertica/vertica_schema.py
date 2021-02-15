@@ -20,10 +20,11 @@ description:
     will fail and only remove roles created for the schema if they have
     no dependencies.
 options:
-  name:
+  schema:
     description:
       - Name of the schema to add or remove.
     required: true
+    aliases: ['name']
     type: str
   usage_roles:
     description:

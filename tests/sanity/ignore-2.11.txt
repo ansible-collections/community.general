@@ -145,9 +145,6 @@ plugins/modules/clustering/consul/consul_session.py validate-modules:parameter-s
 plugins/modules/clustering/etcd3.py validate-modules:parameter-type-not-in-doc
 plugins/modules/clustering/znode.py validate-modules:doc-missing-type
 plugins/modules/clustering/znode.py validate-modules:parameter-type-not-in-doc
-plugins/modules/database/vertica/vertica_role.py validate-modules:undocumented-parameter
-plugins/modules/database/vertica/vertica_schema.py validate-modules:undocumented-parameter
-plugins/modules/database/vertica/vertica_user.py validate-modules:undocumented-parameter
 plugins/modules/monitoring/bigpanda.py validate-modules:invalid-argument-name
 plugins/modules/monitoring/datadog/datadog_event.py validate-modules:parameter-list-no-elements
 plugins/modules/monitoring/datadog/datadog_monitor.py validate-modules:invalid-argument-name

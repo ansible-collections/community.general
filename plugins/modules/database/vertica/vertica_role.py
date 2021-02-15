@@ -15,11 +15,12 @@ short_description: Adds or removes Vertica database roles and assigns roles to t
 description:
   - Adds or removes Vertica database role and, optionally, assign other roles.
 options:
-  name:
+  role:
     description:
       - Name of the role to add or remove.
     required: true
     type: str
+    aliases: ['name']
   assigned_roles:
     description:
       - Comma separated list of roles to assign to the role.

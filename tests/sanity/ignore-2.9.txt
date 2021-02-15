@@ -157,9 +157,6 @@ plugins/modules/clustering/consul/consul_kv.py validate-modules:parameter-type-n
 plugins/modules/clustering/etcd3.py validate-modules:parameter-type-not-in-doc
 plugins/modules/clustering/znode.py validate-modules:doc-missing-type
 plugins/modules/clustering/znode.py validate-modules:parameter-type-not-in-doc
-plugins/modules/database/vertica/vertica_role.py validate-modules:undocumented-parameter
-plugins/modules/database/vertica/vertica_schema.py validate-modules:undocumented-parameter
-plugins/modules/database/vertica/vertica_user.py validate-modules:undocumented-parameter
 plugins/modules/monitoring/icinga2_host.py validate-modules:undocumented-parameter
 plugins/modules/net_tools/ldap/ldap_attr.py validate-modules:deprecation-mismatch
 plugins/modules/net_tools/ldap/ldap_attr.py validate-modules:invalid-documentation

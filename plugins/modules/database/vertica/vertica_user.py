@@ -17,11 +17,12 @@ description:
   - In such a situation, if the module tries to remove the user it
     will fail and only remove roles granted to the user.
 options:
-  name:
+  user:
     description:
       - Name of the user to add or remove.
     required: true
     type: str
+    aliases: ['name']
   profile:
     description:
       - Sets the user's profile.
