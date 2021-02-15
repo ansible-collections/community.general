@@ -175,7 +175,7 @@ class RundeckACLManager:
 
             dummy, info = self.request_rundeck_api("system/acl/%s.aclpolicy" % self.module.params["name"],
                                                    method="POST",
-                                                   data={"contents": self.module.params["policy"]})[1]
+                                                   data={"contents": self.module.params["policy"]})
 
             if info["status"] == 201:
                 self.module.exit_json(changed=True, before={}, after=self.get_acl())
