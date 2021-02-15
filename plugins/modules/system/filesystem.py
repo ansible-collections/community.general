@@ -127,7 +127,7 @@ class Device(object):
 
         # find mountpoint
         rc, mountpoint, dummy = self.module.run_command([cmd_findmnt, "--mtab", "--noheadings", "--output",
-                                                             "TARGET", "--source", self.path], check_rc=False)
+                                                        "TARGET", "--source", self.path], check_rc=False)
         if rc != 0:
             mountpoint = None
         else:
