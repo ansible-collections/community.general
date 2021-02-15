@@ -730,7 +730,7 @@ class LxcContainerManagement(object):
             for option_line in container_config:
                 # Look for key in config
                 if keyre.match(option_line):
-                    _, _value = option_line.split('=', 1)
+                    _value = option_line.split('=', 1)[1]
                     config_value = ' '.join(_value.split())
                     line_index = container_config.index(option_line)
                     # If the sanitized values don't match replace them
@@ -953,7 +953,7 @@ class LxcContainerManagement(object):
         """
 
         self.container = self.get_container_bind()
-        for _ in xrange(timeout):
+        for i in xrange(timeout):
             if self._get_state() != 'running':
                 self.container.start()
                 self.state_change = True
@@ -1006,7 +1006,7 @@ class LxcContainerManagement(object):
         :type timeout: ``int``
         """
 
-        for _ in xrange(timeout):
+        for i in xrange(timeout):
             if not self._container_exists(container_name=self.container_name, lxc_path=self.lxc_path):
                 break
 
