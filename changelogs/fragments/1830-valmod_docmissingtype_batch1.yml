@@ -4,6 +4,8 @@ bugfixes:
   - riak - parameters ``wait_for_handoffs`` and ``wait_for_ring`` are ``int`` but the default value was ``False``
   - logstash_plugin - wrapped ``dict.keys()`` with ``list`` for use in ``choices`` setting
 minor_changes:
-  - runit - unused parameter ``dist`` marked for deprecation
   - runit - removed unused code
+  - runit - passing command as ``list`` instead of ``str`` to ``run_command()``
+deprecated_features:
   - iso_extract - alias ``thirsty`` was being deprecated with ``module.deprecate()``, added ``deprecated_aliases``
+  - runit - unused parameter ``dist`` marked for deprecation
