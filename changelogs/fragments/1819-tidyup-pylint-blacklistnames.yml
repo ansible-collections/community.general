@@ -1,17 +1,17 @@
 bugfixes:
-  - alternatives - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - beadm - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - cronvar - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - dconf - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - filesystem - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - hipchat - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - interfaces_file - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - java_cert - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - lvg - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - lvol - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - lxc - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - lxc_container - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - parted - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - rundeck_acl_policy - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - statusio_maintenance - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
-  - timezone - replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).
+  - "alternatives - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "beadm - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "cronvar - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "dconf - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "filesystem - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "hipchat - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "interfaces_file - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "java_cert - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "lvg - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "lvol - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "lxc - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "lxc_container - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "parted - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "rundeck_acl_policy - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "statusio_maintenance - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
+  - "timezone - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819)."
