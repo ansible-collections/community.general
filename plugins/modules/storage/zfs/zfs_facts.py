@@ -21,6 +21,7 @@ options:
             - ZFS dataset name.
         required: yes
         aliases: [ "ds", "dataset" ]
+        type: str
     recurse:
         description:
             - Specifies if properties for any children should be recursively
@@ -38,15 +39,18 @@ options:
             - Specifies which dataset properties should be queried in comma-separated format.
               For more information about dataset properties, check zfs(1M) man page.
         default: all
+        type: str
     type:
         description:
             - Specifies which datasets types to display. Multiple values have to be
               provided in comma-separated form.
         choices: [ 'all', 'filesystem', 'volume', 'snapshot', 'bookmark' ]
         default: all
+        type: str
     depth:
         description:
             - Specifies recursion depth.
+        type: int
 '''
 
 EXAMPLES = '''

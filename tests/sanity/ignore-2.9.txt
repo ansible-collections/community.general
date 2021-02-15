@@ -289,10 +289,6 @@ plugins/modules/storage/purestorage/purefa_facts.py validate-modules:return-synt
 plugins/modules/storage/purestorage/purefb_facts.py validate-modules:deprecation-mismatch
 plugins/modules/storage/purestorage/purefb_facts.py validate-modules:invalid-documentation
 plugins/modules/storage/purestorage/purefb_facts.py validate-modules:return-syntax-error
-plugins/modules/storage/zfs/zfs.py validate-modules:parameter-type-not-in-doc
-plugins/modules/storage/zfs/zfs_delegate_admin.py validate-modules:parameter-type-not-in-doc
-plugins/modules/storage/zfs/zfs_facts.py validate-modules:parameter-type-not-in-doc
-plugins/modules/storage/zfs/zpool_facts.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/alternatives.py pylint:blacklisted-name
 plugins/modules/system/beadm.py pylint:blacklisted-name
 plugins/modules/system/cronvar.py pylint:blacklisted-name

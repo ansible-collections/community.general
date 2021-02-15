@@ -32,14 +32,17 @@ options:
       - When set to C(absent), removes permissions from the specified entities, or removes all permissions if no entity params are specified.
     choices: [ absent, present ]
     default: present
+    type: str
   users:
     description:
       - List of users to whom permission(s) should be granted.
     type: list
+    elements: str
   groups:
     description:
       - List of groups to whom permission(s) should be granted.
     type: list
+    elements: str
   everyone:
     description:
       - Apply permissions to everyone.
@@ -50,6 +53,7 @@ options:
       - The list of permission(s) to delegate (required if C(state) is C(present)).
     type: list
     choices: [ allow, clone, create, destroy, diff, hold, mount, promote, readonly, receive, release, rename, rollback, send, share, snapshot, unallow ]
+    elements: str
   local:
     description:
       - Apply permissions to C(name) locally (C(zfs allow -l)).
@@ -241,10 +245,10 @@ def main():
         argument_spec=dict(
             name=dict(type='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
-            users=dict(type='list'),
-            groups=dict(type='list'),
+            users=dict(type='list', elements='str'),
+            groups=dict(type='list', elements='str'),
             everyone=dict(type='bool', default=False),
-            permissions=dict(type='list',
+            permissions=dict(type='list', elements='str',
                              choices=['allow', 'clone', 'create', 'destroy', 'diff', 'hold', 'mount', 'promote',
                                       'readonly', 'receive', 'release', 'rename', 'rollback', 'send', 'share',
                                       'snapshot', 'unallow']),
