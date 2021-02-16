@@ -115,7 +115,6 @@ EXAMPLES = '''
     local_only: False
 
 # example playbook:
----
 - name: Upgrade aerospike
   hosts: all
   become: true

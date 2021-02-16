@@ -23,51 +23,63 @@ options:
         description:
             - Name of the domain to be managed.
         required: true
+        type: str
     state:
         description:
             - The desired state of the domain.
         default: "present"
         choices: [ "present", "absent" ]
+        type: str
     ldap_id:
         description:
             - ldap id to add to the domain.
         required: false
+        type: str
     size:
         description:
             - Size of the domain.
         required: false
+        type: str
     hard_capacity:
         description:
             - Hard capacity of the domain.
         required: false
+        type: str
     soft_capacity:
         description:
             - Soft capacity of the domain.
         required: false
+        type: str
     max_cgs:
         description:
             - Number of max cgs.
         required: false
+        type: str
     max_dms:
         description:
             - Number of max dms.
         required: false
+        type: str
     max_mirrors:
         description:
             - Number of max_mirrors.
         required: false
+        type: str
     max_pools:
         description:
             - Number of max_pools.
         required: false
+        type: str
     max_volumes:
         description:
             - Number of max_volumes.
         required: false
+        type: str
     perf_class:
         description:
             - Add the domain to a performance class.
         required: false
+        type: str
 
 extends_documentation_fragment:
 - community.general.ibm_storage
