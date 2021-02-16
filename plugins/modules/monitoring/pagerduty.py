@@ -47,6 +47,7 @@ options:
             - ID of user making the request. Only needed when creating a maintenance_window.
     service:
         type: list
+        elements: str
         description:
             - A comma separated list of PagerDuty service IDs.
         aliases: [ services ]
@@ -233,7 +234,7 @@ def main():
             name=dict(required=False),
             user=dict(required=False),
             token=dict(required=True, no_log=True),
-            service=dict(required=False, type='list', aliases=["services"]),
+            service=dict(required=False, type='list', elements='str', aliases=["services"]),
             window_id=dict(required=False),
             requester_id=dict(required=False),
             hours=dict(default='1', required=False),   # @TODO change to int?
