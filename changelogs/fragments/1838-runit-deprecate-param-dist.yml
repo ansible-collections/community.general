@@ -1,0 +1,2 @@
+deprecated_features:
+  - runit - unused parameter ``dist`` marked for deprecation (https://github.com/ansible-collections/community.general/pull/1830).
