@@ -56,7 +56,6 @@ plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
 plugins/modules/cloud/lxc/lxc_container.py validate-modules:invalid-ansiblemodule-schema
 plugins/modules/cloud/lxc/lxc_container.py validate-modules:use-run-command-not-popen
 plugins/modules/cloud/lxd/lxd_container.py validate-modules:invalid-ansiblemodule-schema
-plugins/modules/cloud/lxd/lxd_container.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/misc/rhevm.py validate-modules:parameter-state-invalid-choice
 plugins/modules/cloud/oneandone/oneandone_firewall_policy.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/oneandone/oneandone_load_balancer.py validate-modules:parameter-list-no-elements
@@ -70,7 +69,6 @@ plugins/modules/cloud/online/online_user_info.py validate-modules:return-syntax-
 plugins/modules/cloud/opennebula/one_host.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/opennebula/one_image_info.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/opennebula/one_vm.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/oracle/oci_vcn.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/ovirt/ovirt_affinity_label_facts.py validate-modules:doc-missing-type
 plugins/modules/cloud/ovirt/ovirt_affinity_label_facts.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/ovirt/ovirt_api_facts.py validate-modules:parameter-list-no-elements
@@ -121,9 +119,6 @@ plugins/modules/cloud/ovirt/ovirt_vm_facts.py validate-modules:parameter-list-no
 plugins/modules/cloud/ovirt/ovirt_vm_facts.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:doc-missing-type
 plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/packet/packet_device.py validate-modules:doc-missing-type
-plugins/modules/cloud/packet/packet_device.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/packet/packet_device.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/packet/packet_sshkey.py validate-modules:doc-missing-type
 plugins/modules/cloud/packet/packet_sshkey.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/packet/packet_sshkey.py validate-modules:undocumented-parameter
@@ -132,7 +127,6 @@ plugins/modules/cloud/profitbricks/profitbricks.py validate-modules:parameter-li
 plugins/modules/cloud/profitbricks/profitbricks_volume.py validate-modules:doc-missing-type
 plugins/modules/cloud/profitbricks/profitbricks_volume.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/profitbricks/profitbricks_volume.py validate-modules:undocumented-parameter
-plugins/modules/cloud/pubnub/pubnub_blocks.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/rackspace/rax.py use-argspec-type-path # fix needed
 plugins/modules/cloud/rackspace/rax.py validate-modules:doc-missing-type
 plugins/modules/cloud/rackspace/rax.py validate-modules:parameter-list-no-elements
@@ -160,10 +154,8 @@ plugins/modules/cloud/scaleway/scaleway_snapshot_info.py validate-modules:return
 plugins/modules/cloud/scaleway/scaleway_volume_facts.py validate-modules:return-syntax-error
 plugins/modules/cloud/scaleway/scaleway_volume_info.py validate-modules:return-syntax-error
 plugins/modules/cloud/smartos/smartos_image_info.py validate-modules:doc-missing-type
-plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/smartos/vmadm.py validate-modules:undocumented-parameter
-plugins/modules/cloud/softlayer/sl_vm.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:undocumented-parameter
@@ -221,9 +213,6 @@ plugins/modules/database/vertica/vertica_schema.py validate-modules:undocumented
 plugins/modules/database/vertica/vertica_user.py validate-modules:doc-missing-type
 plugins/modules/database/vertica/vertica_user.py validate-modules:undocumented-parameter
 plugins/modules/files/iso_extract.py validate-modules:doc-default-does-not-match-spec
-plugins/modules/files/xml.py validate-modules:parameter-list-no-elements
-plugins/modules/identity/keycloak/keycloak_client.py validate-modules:parameter-list-no-elements
-plugins/modules/identity/onepassword_info.py validate-modules:parameter-list-no-elements
 plugins/modules/identity/opendj/opendj_backendprop.py validate-modules:doc-missing-type
 plugins/modules/identity/opendj/opendj_backendprop.py validate-modules:parameter-type-not-in-doc
 plugins/modules/monitoring/bigpanda.py validate-modules:invalid-argument-name
@@ -231,15 +220,11 @@ plugins/modules/monitoring/datadog/datadog_event.py validate-modules:parameter-l
 plugins/modules/monitoring/datadog/datadog_monitor.py validate-modules:invalid-argument-name
 plugins/modules/monitoring/datadog/datadog_monitor.py validate-modules:parameter-list-no-elements
 plugins/modules/monitoring/icinga2_host.py validate-modules:undocumented-parameter
-plugins/modules/monitoring/librato_annotation.py validate-modules:parameter-list-no-elements
 plugins/modules/monitoring/logstash_plugin.py validate-modules:invalid-ansiblemodule-schema
-plugins/modules/monitoring/pagerduty.py validate-modules:parameter-list-no-elements
 plugins/modules/monitoring/sensu/sensu_check.py validate-modules:parameter-list-no-elements
 plugins/modules/monitoring/sensu/sensu_client.py validate-modules:parameter-list-no-elements
 plugins/modules/monitoring/sensu/sensu_handler.py validate-modules:parameter-list-no-elements
 plugins/modules/monitoring/statusio_maintenance.py pylint:blacklisted-name
-plugins/modules/monitoring/statusio_maintenance.py validate-modules:parameter-list-no-elements
-plugins/modules/net_tools/dnsimple.py validate-modules:parameter-list-no-elements
 plugins/modules/net_tools/ldap/ldap_attr.py validate-modules:parameter-type-not-in-doc  # This triggers when a parameter is undocumented
 plugins/modules/net_tools/ldap/ldap_attr.py validate-modules:undocumented-parameter # Parameter removed but reason for removal is shown by custom code
 plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:doc-missing-type
@@ -331,21 +316,11 @@ plugins/modules/net_tools/nios/nios_zone.py validate-modules:doc-missing-type
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:invalid-ansiblemodule-schema
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:undocumented-parameter
-plugins/modules/net_tools/nsupdate.py validate-modules:parameter-list-no-elements
-plugins/modules/net_tools/nsupdate.py validate-modules:parameter-type-not-in-doc
-plugins/modules/net_tools/omapi_host.py validate-modules:parameter-list-no-elements
 plugins/modules/notification/cisco_webex.py validate-modules:invalid-argument-name
 plugins/modules/notification/grove.py validate-modules:invalid-argument-name
 plugins/modules/notification/grove.py validate-modules:nonexistent-parameter-documented
-plugins/modules/notification/mail.py validate-modules:parameter-list-no-elements
-plugins/modules/notification/nexmo.py validate-modules:parameter-list-no-elements
-plugins/modules/notification/office_365_connector_card.py validate-modules:parameter-list-no-elements
 plugins/modules/notification/pushbullet.py validate-modules:parameter-type-not-in-doc
 plugins/modules/notification/pushbullet.py validate-modules:undocumented-parameter
-plugins/modules/notification/rocketchat.py validate-modules:parameter-list-no-elements
-plugins/modules/notification/sendgrid.py validate-modules:parameter-list-no-elements
-plugins/modules/notification/slack.py validate-modules:parameter-list-no-elements
-plugins/modules/notification/twilio.py validate-modules:parameter-list-no-elements
 plugins/modules/packaging/language/bundler.py validate-modules:parameter-list-no-elements
 plugins/modules/packaging/language/composer.py validate-modules:parameter-invalid
 plugins/modules/packaging/language/maven_artifact.py validate-modules:parameter-type-not-in-doc
@@ -356,8 +331,6 @@ plugins/modules/packaging/os/homebrew.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/homebrew_cask.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/opkg.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/pacman.py validate-modules:parameter-invalid
-plugins/modules/packaging/os/redhat_subscription.py validate-modules:mutually_exclusive-unknown
-plugins/modules/packaging/os/redhat_subscription.py validate-modules:parameter-list-no-elements
 plugins/modules/packaging/os/redhat_subscription.py validate-modules:return-syntax-error
 plugins/modules/packaging/os/slackpkg.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/urpmi.py validate-modules:parameter-invalid
@@ -438,7 +411,6 @@ plugins/modules/source_control/github/github_release.py validate-modules:doc-mis
 plugins/modules/source_control/github/github_release.py validate-modules:parameter-type-not-in-doc
 plugins/modules/source_control/github/github_webhook.py validate-modules:parameter-type-not-in-doc
 plugins/modules/source_control/github/github_webhook_info.py validate-modules:parameter-type-not-in-doc
-plugins/modules/source_control/gitlab/gitlab_runner.py validate-modules:parameter-list-no-elements
 plugins/modules/source_control/hg.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/emc/emc_vnx_sg_member.py validate-modules:doc-missing-type
 plugins/modules/storage/emc/emc_vnx_sg_member.py validate-modules:parameter-type-not-in-doc
@@ -470,10 +442,7 @@ plugins/modules/storage/netapp/na_cdot_volume.py validate-modules:doc-missing-ty
 plugins/modules/storage/netapp/na_cdot_volume.py validate-modules:no-default-for-required-parameter
 plugins/modules/storage/netapp/na_cdot_volume.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/netapp/na_cdot_volume.py validate-modules:undocumented-parameter
-plugins/modules/storage/netapp/na_ontap_gather_facts.py validate-modules:doc-missing-type
-plugins/modules/storage/netapp/na_ontap_gather_facts.py validate-modules:parameter-list-no-elements
 plugins/modules/storage/netapp/na_ontap_gather_facts.py validate-modules:parameter-state-invalid-choice
-plugins/modules/storage/netapp/na_ontap_gather_facts.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/netapp/sf_account_manager.py validate-modules:doc-missing-type
 plugins/modules/storage/netapp/sf_account_manager.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/netapp/sf_check_connections.py validate-modules:parameter-type-not-in-doc

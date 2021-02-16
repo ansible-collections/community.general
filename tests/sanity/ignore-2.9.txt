@@ -142,8 +142,6 @@ plugins/modules/cloud/ovirt/ovirt_vm_facts.py validate-modules:parameter-type-no
 plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:deprecation-mismatch
 plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:doc-missing-type
 plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:invalid-documentation
-plugins/modules/cloud/packet/packet_device.py validate-modules:doc-missing-type
-plugins/modules/cloud/packet/packet_device.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/packet/packet_sshkey.py validate-modules:doc-missing-type
 plugins/modules/cloud/packet/packet_sshkey.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/packet/packet_sshkey.py validate-modules:undocumented-parameter
@@ -308,7 +306,6 @@ plugins/modules/net_tools/nios/nios_zone.py validate-modules:doc-default-does-no
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:doc-missing-type
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/nios/nios_zone.py validate-modules:undocumented-parameter
-plugins/modules/net_tools/nsupdate.py validate-modules:parameter-type-not-in-doc
 plugins/modules/notification/pushbullet.py validate-modules:parameter-type-not-in-doc
 plugins/modules/notification/pushbullet.py validate-modules:undocumented-parameter
 plugins/modules/packaging/language/composer.py validate-modules:parameter-invalid
@@ -428,9 +425,7 @@ plugins/modules/storage/netapp/na_cdot_volume.py validate-modules:deprecation-mi
 plugins/modules/storage/netapp/na_cdot_volume.py validate-modules:invalid-documentation
 plugins/modules/storage/netapp/na_cdot_volume.py validate-modules:missing-main-call
 plugins/modules/storage/netapp/na_ontap_gather_facts.py validate-modules:deprecation-mismatch
-plugins/modules/storage/netapp/na_ontap_gather_facts.py validate-modules:doc-missing-type
 plugins/modules/storage/netapp/na_ontap_gather_facts.py validate-modules:invalid-documentation
-plugins/modules/storage/netapp/na_ontap_gather_facts.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/netapp/sf_account_manager.py validate-modules:deprecation-mismatch
 plugins/modules/storage/netapp/sf_account_manager.py validate-modules:invalid-documentation
 plugins/modules/storage/netapp/sf_account_manager.py validate-modules:missing-main-call
