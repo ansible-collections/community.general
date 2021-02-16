@@ -68,8 +68,7 @@ options:
       - The value of the metric.
   delta:
     type: bool
-    default: False
-    choices: [False, True]
+    default: false
     description:
       - If the metric is of type C(gauge), change the value by C(delta).
 '''
@@ -125,7 +124,7 @@ def main():
             metric_type=dict(type='str', required=True, choices=['counter', 'gauge']),
             metric_prefix=dict(type='str', default=''),
             value=dict(type='int', required=True),
-            delta=dict(type='bool', default=False, choices=[False, True]),
+            delta=dict(type='bool', default=False),
         ),
         supports_check_mode=False
     )
