@@ -94,7 +94,7 @@ def main():
     all_alternatives = []
 
     # Run `update-alternatives --display <name>` to find existing alternatives
-    (rc, display_output, _) = module.run_command(
+    (rc, display_output, dummy) = module.run_command(
         ['env', 'LC_ALL=C', UPDATE_ALTERNATIVES, '--display', name]
     )
 
@@ -117,7 +117,7 @@ def main():
             #
             # This is only compatible on Debian-based systems, as the other
             # alternatives don't have --query available
-            rc, query_output, _ = module.run_command(
+            rc, query_output, dummy = module.run_command(
                 ['env', 'LC_ALL=C', UPDATE_ALTERNATIVES, '--query', name]
             )
             if rc == 0:
