@@ -111,6 +111,7 @@ options:
     required: false
     default: []
     type: list
+    elements: dict
   changes:
     description:
       - "List of fields which should be changed by block itself (doesn't
@@ -552,7 +553,7 @@ def main():
         state=dict(default='present', type='str',
                    choices=['started', 'stopped', 'present', 'absent']),
         name=dict(required=True, type='str'), description=dict(type='str'),
-        event_handlers=dict(default=list(), type='list'),
+        event_handlers=dict(default=list(), type='list', elements='dict'),
         changes=dict(default=dict(), type='dict'),
         cache=dict(default=dict(), type='dict'),
         validate_certs=dict(default=True, type='bool'))

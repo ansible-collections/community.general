@@ -40,6 +40,7 @@ options:
     description:
       - List of records to ensure they either exist or do not exist.
     type: list
+    elements: str
   type:
     description:
       - The type of DNS record to create.
@@ -167,7 +168,7 @@ def main():
             account_api_token=dict(type='str', no_log=True),
             domain=dict(type='str'),
             record=dict(type='str'),
-            record_ids=dict(type='list'),
+            record_ids=dict(type='list', elements='str'),
             type=dict(type='str', choices=['A', 'ALIAS', 'CNAME', 'MX', 'SPF', 'URL', 'TXT', 'NS', 'SRV', 'NAPTR', 'PTR', 'AAAA', 'SSHFP', 'HINFO',
                                            'POOL']),
             ttl=dict(type='int', default=3600),

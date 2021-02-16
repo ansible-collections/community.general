@@ -20,4 +20,5 @@ class ModuleDocFragment(object):
                          identify an instance of the resource. By default, all the attributes of a resource except
                          I(freeform_tags) are used to uniquely identify a resource.
             type: list
+            elements: str
     """

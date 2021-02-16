@@ -116,6 +116,7 @@ options:
     default: 'normal'
   attachments:
     type: list
+    elements: dict
     description:
       - Define a list of attachments. This list mirrors the Slack JSON API.
       - For more information, see U(https://api.slack.com/docs/attachments).
@@ -420,7 +421,7 @@ def main():
             parse=dict(type='str', default=None, choices=['none', 'full']),
             validate_certs=dict(default=True, type='bool'),
             color=dict(type='str', default='normal'),
-            attachments=dict(type='list', required=False, default=None),
+            attachments=dict(type='list', elements='dict', required=False, default=None),
             blocks=dict(type='list', elements='dict'),
             message_id=dict(type='str', default=None),
         ),

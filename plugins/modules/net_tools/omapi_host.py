@@ -63,6 +63,7 @@ options:
         description:
             - Attach a list of OMAPI DHCP statements with host lease (without ending semicolon).
         type: list
+        elements: str
         default: []
     ddns:
         description:
@@ -282,7 +283,7 @@ def main():
             hostname=dict(type='str', aliases=['name']),
             ip=dict(type='str'),
             ddns=dict(type='bool', default=False),
-            statements=dict(type='list', default=[]),
+            statements=dict(type='list', elements='str', default=[]),
         ),
         supports_check_mode=False,
     )
