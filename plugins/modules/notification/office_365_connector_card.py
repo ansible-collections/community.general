@@ -45,11 +45,13 @@ options:
       - and above any sections or actions present.
   actions:
     type: list
+    elements: dict
     description:
       - This array of objects will power the action links
       - found at the bottom of the card.
   sections:
     type: list
+    elements: dict
     description:
       - Contains a list of sections to display in the card.
       - For more information see https://dev.outlook.com/Connectors/reference.
@@ -264,8 +266,8 @@ def main():
             color=dict(type='str'),
             title=dict(type='str'),
             text=dict(type='str'),
-            actions=dict(type='list'),
-            sections=dict(type='list')
+            actions=dict(type='list', elements='dict'),
+            sections=dict(type='list', elements='dict')
         ),
         supports_check_mode=True
     )

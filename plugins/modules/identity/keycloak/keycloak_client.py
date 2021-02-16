@@ -137,6 +137,7 @@ options:
         aliases:
             - defaultRoles
         type: list
+        elements: str
 
     redirect_uris:
         description:
@@ -145,6 +146,7 @@ options:
         aliases:
             - redirectUris
         type: list
+        elements: str
 
     web_origins:
         description:
@@ -153,6 +155,7 @@ options:
         aliases:
             - webOrigins
         type: list
+        elements: str
 
     not_before:
         description:
@@ -708,9 +711,9 @@ def main():
         client_authenticator_type=dict(type='str', choices=['client-secret', 'client-jwt'], aliases=['clientAuthenticatorType']),
         secret=dict(type='str', no_log=True),
         registration_access_token=dict(type='str', aliases=['registrationAccessToken'], no_log=True),
-        default_roles=dict(type='list', aliases=['defaultRoles']),
-        redirect_uris=dict(type='list', aliases=['redirectUris']),
-        web_origins=dict(type='list', aliases=['webOrigins']),
+        default_roles=dict(type='list', elements='str', aliases=['defaultRoles']),
+        redirect_uris=dict(type='list', elements='str', aliases=['redirectUris']),
+        web_origins=dict(type='list', elements='str', aliases=['webOrigins']),
         not_before=dict(type='int', aliases=['notBefore']),
         bearer_only=dict(type='bool', aliases=['bearerOnly']),
         consent_required=dict(type='bool', aliases=['consentRequired']),

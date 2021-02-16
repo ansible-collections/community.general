@@ -31,20 +31,25 @@ options:
   auth_token:
     description:
       - Packet API token. You can also supply it in env var C(PACKET_API_TOKEN).
+    type: str
 
   count:
     description:
       - The number of devices to create. Count number can be included in hostname via the %d string formatter.
     default: 1
+    type: int
 
   count_offset:
     description:
       - From which number to start the count.
     default: 1
+    type: int
 
   device_ids:
     description:
       - List of device IDs on which to operate.
+    type: list
+    elements: str
 
   tags:
     description:
@@ -57,10 +62,12 @@ options:
   facility:
     description:
       - Facility slug for device creation. See Packet API for current list - U(https://www.packet.net/developers/api/facilities/).
+    type: str
 
   features:
     description:
       - Dict with "features" for device creation. See Packet API docs for details.
+    type: dict
 
   hostnames:
     description:
@@ -68,6 +75,8 @@ options:
       - If given string or one-item list, you can use the C("%d") Python string format to expand numbers from I(count).
       - If only one hostname, it might be expanded to list if I(count)>1.
     aliases: [name]
+    type: list
+    elements: str
 
   locked:
     description:
@@ -79,15 +88,18 @@ options:
   operating_system:
     description:
       - OS slug for device creation. See Packet API for current list - U(https://www.packet.net/developers/api/operatingsystems/).
+    type: str
 
   plan:
     description:
       - Plan slug for device creation. See Packet API for current list - U(https://www.packet.net/developers/api/plans/).
+    type: str
 
   project_id:
     description:
       - ID of project of the device.
     required: true
+    type: str
 
   state:
     description:
@@ -96,10 +108,12 @@ options:
       - If set to C(active), the module call will block until all the specified devices are in state active due to the Packet API, or until I(wait_timeout).
     choices: [present, absent, active, inactive, rebooted]
     default: present
+    type: str
 
   user_data:
     description:
       - Userdata blob made available to the machine
+    type: str
 
   wait_for_public_IPv:
     description:
@@ -107,16 +121,21 @@ options:
       - If set to 4, it will wait until IPv4 is assigned to the instance.
       - If set to 6, wait until public IPv6 is assigned to the instance.
     choices: [4,6]
+    type: int
 
   wait_timeout:
     description:
       - How long (seconds) to wait either for automatic IP address assignment, or for the device to reach the C(active) I(state).
       - If I(wait_for_public_IPv) is set and I(state) is C(active), the module will wait for both events consequently, applying the timeout twice.
     default: 900
+    type: int
+
   ipxe_script_url:
     description:
       - URL of custom iPXE script for provisioning.
       - More about custom iPXE for Packet devices at U(https://help.packet.net/technical/infrastructure/custom-ipxe).
+    type: str
+
   always_pxe:
     description:
       - Persist PXE as the first boot option.
@@ -601,10 +620,10 @@ def main():
                             no_log=True),
             count=dict(type='int', default=1),
             count_offset=dict(type='int', default=1),
-            device_ids=dict(type='list'),
+            device_ids=dict(type='list', elements='str'),
             facility=dict(),
             features=dict(type='dict'),
-            hostnames=dict(type='list', aliases=['name']),
+            hostnames=dict(type='list', elements='str', aliases=['name']),
             tags=dict(type='list', elements='str'),
             locked=dict(type='bool', default=False, aliases=['lock']),
             operating_system=dict(),

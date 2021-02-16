@@ -34,6 +34,7 @@ description:
 options:
     search_terms:
         type: list
+        elements: dict
         description:
             - A list of one or more search terms.
             - Each search term can either be a simple string or it can be a dictionary for more control.
@@ -372,7 +373,7 @@ def main():
                 master_password=dict(required=True, type='str', no_log=True),
                 secret_key=dict(type='str', no_log=True),
             ), default=None),
-            search_terms=dict(required=True, type='list')
+            search_terms=dict(required=True, type='list', elements='dict'),
         ),
         supports_check_mode=True
     )

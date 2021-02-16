@@ -32,6 +32,7 @@ options:
     required: true
   dest:
     type: list
+    elements: int
     description:
       - Phone number(s) to send SMS message to
     required: true
@@ -119,7 +120,7 @@ def main():
             api_key=dict(required=True, no_log=True),
             api_secret=dict(required=True, no_log=True),
             src=dict(required=True, type='int'),
-            dest=dict(required=True, type='list'),
+            dest=dict(required=True, type='list', elements='int'),
             msg=dict(required=True),
         ),
     )
