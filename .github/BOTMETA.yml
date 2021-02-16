@@ -419,6 +419,8 @@ files:
     maintainers: orgito
   $modules/monitoring/stackdriver.py:
     maintainers: bwhaley
+  $modules/monitoring/statsd.py:
+    maintainers: mamercad
   $modules/monitoring/statusio_maintenance.py:
     maintainers: bhcopeland
   $modules/monitoring/uptimerobot.py:
