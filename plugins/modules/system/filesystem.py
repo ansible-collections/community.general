@@ -114,7 +114,7 @@ class Device(object):
         statinfo = os.stat(self.path)
         if stat.S_ISBLK(statinfo.st_mode):
             blockdev_cmd = self.module.get_bin_path("blockdev", required=True)
-            _, devsize_in_bytes, _ = self.module.run_command([blockdev_cmd, "--getsize64", self.path], check_rc=True)
+            dummy, devsize_in_bytes, dummy = self.module.run_command([blockdev_cmd, "--getsize64", self.path], check_rc=True)
             return int(devsize_in_bytes)
         elif os.path.isfile(self.path):
             return os.path.getsize(self.path)
@@ -126,8 +126,8 @@ class Device(object):
         cmd_findmnt = self.module.get_bin_path("findmnt", required=True)
 
         # find mountpoint
-        rc, mountpoint, _ = self.module.run_command([cmd_findmnt, "--mtab", "--noheadings", "--output",
-                                                    "TARGET", "--source", self.path], check_rc=False)
+        rc, mountpoint, dummy = self.module.run_command([cmd_findmnt, "--mtab", "--noheadings", "--output",
+                                                        "TARGET", "--source", self.path], check_rc=False)
         if rc != 0:
             mountpoint = None
         else:
@@ -203,7 +203,7 @@ class Filesystem(object):
         elif self.module.check_mode:
             self.module.exit_json(changed=True, msg="Resizing filesystem %s on device %s" % (self.fstype, dev))
         else:
-            _, out, _ = self.module.run_command(self.grow_cmd(dev), check_rc=True)
+            dummy, out, dummy = self.module.run_command(self.grow_cmd(dev), check_rc=True)
             return out
 
 
@@ -214,7 +214,7 @@ class Ext(Filesystem):
     def get_fs_size(self, dev):
         cmd = self.module.get_bin_path('tune2fs', required=True)
         # Get Block count and Block size
-        _, size, _ = self.module.run_command([cmd, '-l', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
+        dummy, size, dummy = self.module.run_command([cmd, '-l', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
         for line in size.splitlines():
             if 'Block count:' in line:
                 block_count = int(line.split(':')[1].strip())
@@ -290,7 +290,7 @@ class Btrfs(Filesystem):
 
     def __init__(self, module):
         super(Btrfs, self).__init__(module)
-        _, stdout, stderr = self.module.run_command('%s --version' % self.MKFS, check_rc=True)
+        dummy, stdout, stderr = self.module.run_command('%s --version' % self.MKFS, check_rc=True)
         match = re.search(r" v([0-9.]+)", stdout)
         if not match:
             # v0.20-rc1 use stderr
@@ -320,7 +320,7 @@ class F2fs(Filesystem):
     def MKFS_FORCE_FLAGS(self):
         mkfs = self.module.get_bin_path(self.MKFS, required=True)
         cmd = "%s %s" % (mkfs, os.devnull)
-        _, out, _ = self.module.run_command(cmd, check_rc=False, environ_update=self.LANG_ENV)
+        dummy, out, dummy = self.module.run_command(cmd, check_rc=False, environ_update=self.LANG_ENV)
         # Looking for "	F2FS-tools: mkfs.f2fs Ver: 1.10.0 (2018-01-30)"
         # mkfs.f2fs displays version since v1.2.0
         match = re.search(r"F2FS-tools: mkfs.f2fs Ver: ([0-9.]+) \(", out)
@@ -335,7 +335,7 @@ class F2fs(Filesystem):
     def get_fs_size(self, dev):
         cmd = self.module.get_bin_path('dump.f2fs', required=True)
         # Get sector count and sector size
-        _, dump, _ = self.module.run_command([cmd, str(dev)], check_rc=True, environ_update=self.LANG_ENV)
+        dummy, dump, dummy = self.module.run_command([cmd, str(dev)], check_rc=True, environ_update=self.LANG_ENV)
         sector_size = None
         sector_count = None
         for line in dump.splitlines():
@@ -364,7 +364,7 @@ class VFAT(Filesystem):
 
     def get_fs_size(self, dev):
         cmd = self.module.get_bin_path(self.GROW, required=True)
-        _, output, _ = self.module.run_command([cmd, '--info', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
+        dummy, output, dummy = self.module.run_command([cmd, '--info', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
         for line in output.splitlines()[1:]:
             param, value = line.split(':', 1)
             if param.strip() == 'Size':
@@ -383,7 +383,7 @@ class LVM(Filesystem):
 
     def get_fs_size(self, dev):
         cmd = self.module.get_bin_path('pvs', required=True)
-        _, size, _ = self.module.run_command([cmd, '--noheadings', '-o', 'pv_size', '--units', 'b', '--nosuffix', str(dev)], check_rc=True)
+        dummy, size, dummy = self.module.run_command([cmd, '--noheadings', '-o', 'pv_size', '--units', 'b', '--nosuffix', str(dev)], check_rc=True)
         block_count = int(size)
         return block_count
 
