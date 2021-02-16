@@ -488,7 +488,7 @@ def check_parted_label(device):
     global parted_exec
 
     # Check the version
-    parted_major, parted_minor, _ = parted_version()
+    parted_major, parted_minor, dummy = parted_version()
     if (parted_major == 3 and parted_minor >= 1) or parted_major > 3:
         return False
 
