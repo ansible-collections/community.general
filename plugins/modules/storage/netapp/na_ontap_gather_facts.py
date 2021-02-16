@@ -26,25 +26,28 @@ options:
     state:
         description:
             - Returns "info"
-        default: "info"
-        choices: ['info']
+        default: info
+        choices: [info]
+        type: str
     gather_subset:
         description:
             - When supplied, this argument will restrict the facts collected
                 to a given subset.  Possible values for this argument include
-                "aggregate_info", "cluster_node_info", "igroup_info", "lun_info", "net_dns_info",
-                "net_ifgrp_info",
-                "net_interface_info", "net_port_info", "nvme_info", "nvme_interface_info",
-                "nvme_namespace_info", "nvme_subsystem_info", "ontap_version",
-                "qos_adaptive_policy_info", "qos_policy_info", "security_key_manager_key_info",
-                "security_login_account_info", "storage_failover_info", "volume_info",
-                "vserver_info", "vserver_login_banner_info", "vserver_motd_info", "vserver_nfs_info"
+                C(aggregate_info), C(cluster_node_info), C(igroup_info), C(lun_info), C(net_dns_info),
+                C(net_ifgrp_info),
+                C(net_interface_info), C(net_port_info), C(nvme_info), C(nvme_interface_info),
+                C(nvme_namespace_info), C(nvme_subsystem_info), C(ontap_version),
+                C(qos_adaptive_policy_info), C(qos_policy_info), C(security_key_manager_key_info),
+                C(security_login_account_info), C(storage_failover_info), C(volume_info),
+                C(vserver_info), C(vserver_login_banner_info), C(vserver_motd_info), C(vserver_nfs_info)
                 Can specify a list of values to include a larger subset.  Values can also be used
                 with an initial C(M(!)) to specify that a specific subset should
                 not be collected.
             - nvme is supported with ONTAP 9.4 onwards.
-            - use "help" to get a list of supported facts for your system.
-        default: "all"
+            - use C(help) to get a list of supported facts for your system.
+        default: all
+        type: list
+        elements: str
 '''
 
 EXAMPLES = '''
@@ -582,7 +585,7 @@ def main():
     argument_spec = netapp_utils.na_ontap_host_argument_spec()
     argument_spec.update(dict(
         state=dict(default='info', choices=['info']),
-        gather_subset=dict(default=['all'], type='list'),
+        gather_subset=dict(default=['all'], type='list', elements='str'),
     ))
 
     module = AnsibleModule(
