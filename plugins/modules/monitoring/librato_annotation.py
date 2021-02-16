@@ -63,6 +63,7 @@ options:
         required: false
     links:
         type: list
+        elements: dict
         description:
             - See examples
 '''
@@ -155,7 +156,7 @@ def main():
             description=dict(required=False),
             start_time=dict(required=False, default=None, type='int'),
             end_time=dict(required=False, default=None, type='int'),
-            links=dict(type='list')
+            links=dict(type='list', elements='dict')
         )
     )
 

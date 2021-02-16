@@ -104,7 +104,7 @@ def get_common_arg_spec(supports_create=False, supports_wait=False):
 
     if supports_create:
         common_args.update(
-            key_by=dict(type="list"),
+            key_by=dict(type="list", elements="str"),
             force_create=dict(type="bool", default=False),
         )
 
