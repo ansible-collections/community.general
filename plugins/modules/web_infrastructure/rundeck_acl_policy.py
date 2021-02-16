@@ -173,9 +173,9 @@ class RundeckACLManager:
             if self.module.check_mode:
                 self.module.exit_json(changed=True, before={}, after=self.module.params["policy"])
 
-            _, info = self.request_rundeck_api("system/acl/%s.aclpolicy" % self.module.params["name"],
-                                               method="POST",
-                                               data={"contents": self.module.params["policy"]})
+            dummy, info = self.request_rundeck_api("system/acl/%s.aclpolicy" % self.module.params["name"],
+                                                   method="POST",
+                                                   data={"contents": self.module.params["policy"]})
 
             if info["status"] == 201:
                 self.module.exit_json(changed=True, before={}, after=self.get_acl())
@@ -194,9 +194,9 @@ class RundeckACLManager:
             if self.module.check_mode:
                 self.module.exit_json(changed=True, before=facts, after=facts)
 
-            _, info = self.request_rundeck_api("system/acl/%s.aclpolicy" % self.module.params["name"],
-                                               method="PUT",
-                                               data={"contents": self.module.params["policy"]})
+            dummy, info = self.request_rundeck_api("system/acl/%s.aclpolicy" % self.module.params["name"],
+                                                   method="PUT",
+                                                   data={"contents": self.module.params["policy"]})
 
             if info["status"] == 200:
                 self.module.exit_json(changed=True, before=facts, after=self.get_acl())
