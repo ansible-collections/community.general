@@ -28,7 +28,7 @@ options:
 author: Tristan Le Guern (@Aversiste)
 extends_documentation_fragment: community.general.proxmox.documentation
 notes:
-  - Storage specific options can be returned by this module, please look at the documentation https://pve.proxmox.com/wiki/Storage.
+  - Storage specific options can be returned by this module, please look at the documentation at U(https://pve.proxmox.com/wiki/Storage).
 '''
 
 
