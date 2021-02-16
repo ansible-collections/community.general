@@ -11,6 +11,7 @@ DOCUMENTATION = r'''
 ---
 module: gitlab_project_members
 short_description: Manage project members on GitLab Server
+version_added: 2.2.0
 description:
     - This module allows to add and remove members to/from a project, or change a member's access level in a project on GitLab.
 author: Sergey Mikhaltsov (@metanovii)
