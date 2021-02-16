@@ -29,10 +29,12 @@ options:
         description:
             - Name of the Storage group to manage.
         required: true
+        type: str
     lunid:
         description:
             - Lun id to be added.
         required: true
+        type: int
     state:
         description:
         - Indicates the desired lunid state.
@@ -40,6 +42,7 @@ options:
         - C(absent) ensures specified lunid is absent from Storage Group.
         default: present
         choices: [ "present", "absent"]
+        type: str
 
 
 author:
