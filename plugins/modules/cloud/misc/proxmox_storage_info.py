@@ -18,7 +18,7 @@ description:
 options:
   storage:
     description:
-      - Only return informations on a specific storage
+      - Only return informations on a specific storage.
     aliases: ['name']
     type: str
   type:
