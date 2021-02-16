@@ -22,19 +22,23 @@ options:
         description:
             - Volume name.
         required: true
+        type: str
     pool:
         description:
             - Volume pool.
         required: false
+        type: str
     state:
         description:
             - Volume state.
         default: "present"
         choices: [ "present", "absent" ]
+        type: str
     size:
         description:
             - Volume size.
         required: false
+        type: str
 
 extends_documentation_fragment:
 - community.general.ibm_storage
