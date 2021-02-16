@@ -105,6 +105,7 @@ options:
               entitlements from a pool (the pool must support this). Mutually exclusive with I(pool).
         default: []
         type: list
+        elements: raw
     consumer_type:
         description:
             - The type of unit to register, defaults to system
@@ -153,6 +154,7 @@ options:
             addons:
                 description: Syspurpose attribute addons
                 type: list
+                elements: str
             sync:
                 description:
                     - When this option is true, then syspurpose attributes are synchronized with
@@ -787,7 +789,7 @@ def main():
             'org_id': {},
             'environment': {},
             'pool': {'default': '^$'},
-            'pool_ids': {'default': [], 'type': 'list'},
+            'pool_ids': {'default': [], 'type': 'list', 'elements': 'raw'},
             'consumer_type': {},
             'consumer_name': {},
             'consumer_id': {},
@@ -803,7 +805,7 @@ def main():
                     'role': {},
                     'usage': {},
                     'service_level_agreement': {},
-                    'addons': {'type': 'list'},
+                    'addons': {'type': 'list', 'elements': 'str'},
                     'sync': {'type': 'bool', 'default': False}
                 }
             }
@@ -814,7 +816,7 @@ def main():
         mutually_exclusive=[['activationkey', 'username'],
                             ['activationkey', 'consumer_id'],
                             ['activationkey', 'environment'],
-                            ['activationkey', 'autosubscribe'],
+                            ['activationkey', 'auto_attach'],
                             ['pool', 'pool_ids']],
         required_if=[['state', 'present', ['username', 'activationkey'], True]],
     )

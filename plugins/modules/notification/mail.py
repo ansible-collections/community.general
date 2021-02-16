@@ -39,6 +39,7 @@ options:
     - The email-address(es) the mail is being sent to.
     - This is a list, which may contain address and phrase portions.
     type: list
+    elements: str
     default: root
     aliases: [ recipients ]
   cc:
@@ -46,11 +47,13 @@ options:
     - The email-address(es) the mail is being copied to.
     - This is a list, which may contain address and phrase portions.
     type: list
+    elements: str
   bcc:
     description:
     - The email-address(es) the mail is being 'blind' copied to.
     - This is a list, which may contain address and phrase portions.
     type: list
+    elements: str
   subject:
     description:
     - The subject of the email being sent.
@@ -85,12 +88,14 @@ options:
     - A list of pathnames of files to attach to the message.
     - Attached files will have their content-type set to C(application/octet-stream).
     type: list
+    elements: path
     default: []
   headers:
     description:
     - A list of headers which should be added to the message.
     - Each individual header is specified as C(header=value) (see example below).
     type: list
+    elements: str
     default: []
   charset:
     description:
@@ -211,13 +216,13 @@ def main():
             host=dict(type='str', default='localhost'),
             port=dict(type='int', default=25),
             sender=dict(type='str', default='root', aliases=['from']),
-            to=dict(type='list', default=['root'], aliases=['recipients']),
-            cc=dict(type='list', default=[]),
-            bcc=dict(type='list', default=[]),
+            to=dict(type='list', elements='str', default=['root'], aliases=['recipients']),
+            cc=dict(type='list', elements='str', default=[]),
+            bcc=dict(type='list', elements='str', default=[]),
             subject=dict(type='str', required=True, aliases=['msg']),
             body=dict(type='str'),
-            attach=dict(type='list', default=[]),
-            headers=dict(type='list', default=[]),
+            attach=dict(type='list', elements='path', default=[]),
+            headers=dict(type='list', elements='str', default=[]),
             charset=dict(type='str', default='utf-8'),
             subtype=dict(type='str', default='plain', choices=['html', 'plain']),
             secure=dict(type='str', default='try', choices=['always', 'never', 'starttls', 'try']),
