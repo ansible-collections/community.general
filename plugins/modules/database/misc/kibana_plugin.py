@@ -22,31 +22,38 @@ options:
       description:
       - Name of the plugin to install.
       required: True
+      type: str
     state:
       description:
       - Desired state of a plugin.
       choices: ["present", "absent"]
       default: present
+      type: str
     url:
       description:
       - Set exact URL to download the plugin from.
       - For local file, prefix its absolute path with file://
+      type: str
     timeout:
       description:
       - "Timeout setting: 30s, 1m, 1h etc."
       default: 1m
+      type: str
     plugin_bin:
       description:
       - Location of the Kibana binary.
       default: /opt/kibana/bin/kibana
+      type: path
     plugin_dir:
       description:
       - Your configured plugin directory specified in Kibana.
       default: /opt/kibana/installedPlugins/
+      type: path
     version:
       description:
       - Version of the plugin to be installed.
       - If plugin exists with previous version, plugin will NOT be updated unless C(force) is set to yes.
+      type: str
     force:
       description:
       - Delete and re-install the plugin. Can be useful for plugins update.
@@ -209,7 +216,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True),
-            state=dict(default="present", choices=PACKAGE_STATE_MAP.keys()),
+            state=dict(default="present", choices=list(PACKAGE_STATE_MAP.keys())),
             url=dict(default=None),
             timeout=dict(default="1m"),
             plugin_bin=dict(default="/opt/kibana/bin/kibana", type="path"),
