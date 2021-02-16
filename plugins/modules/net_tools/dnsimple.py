@@ -44,7 +44,7 @@ options:
   type:
     description:
       - The type of DNS record to create.
-    choices: [ 'A', 'ALIAS', 'CNAME', 'MX', 'SPF', 'URL', 'TXT', 'NS', 'SRV', 'NAPTR', 'PTR', 'AAAA', 'SSHFP', 'HINFO', 'POOL' ]
+    choices: [ 'A', 'ALIAS', 'CNAME', 'MX', 'SPF', 'URL', 'TXT', 'NS', 'SRV', 'NAPTR', 'PTR', 'AAAA', 'SSHFP', 'HINFO', 'POOL', 'CAA' ]
     type: str
   ttl:
     description:
@@ -170,7 +170,7 @@ def main():
             record=dict(type='str'),
             record_ids=dict(type='list', elements='str'),
             type=dict(type='str', choices=['A', 'ALIAS', 'CNAME', 'MX', 'SPF', 'URL', 'TXT', 'NS', 'SRV', 'NAPTR', 'PTR', 'AAAA', 'SSHFP', 'HINFO',
-                                           'POOL']),
+                                           'POOL', 'CAA']),
             ttl=dict(type='int', default=3600),
             value=dict(type='str'),
             priority=dict(type='int'),
