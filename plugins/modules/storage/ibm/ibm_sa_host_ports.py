@@ -23,27 +23,31 @@ options:
         description:
             - Host name.
         required: true
+        type: str
     state:
         description:
             - Host ports state.
         default: "present"
         choices: [ "present", "absent" ]
+        type: str
     iscsi_name:
         description:
             - iSCSI initiator name.
         required: false
+        type: str
     fcaddress:
         description:
             - Fiber channel address.
         required: false
+        type: str
     num_of_visible_targets:
         description:
             - Number of visible targets.
         required: false
+        type: str
 
 extends_documentation_fragment:
 - community.general.ibm_storage
-
 
 author:
     - Tzur Eliyahu (@tzure)

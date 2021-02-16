@@ -22,11 +22,13 @@ options:
         description:
             - Name of the plugin to install.
         required: True
+        type: str
     state:
         description:
             - Desired state of a plugin.
         choices: ["present", "absent"]
         default: present
+        type: str
     src:
         description:
             - Optionally set the source location to retrieve the plugin from. This can be a file://
@@ -38,16 +40,19 @@ options:
               effect.
             - For ES 1.x use url.
         required: False
+        type: str
     url:
         description:
             - Set exact URL to download the plugin from (Only works for ES 1.x).
             - For ES 2.x and higher, use src.
         required: False
+        type: str
     timeout:
         description:
             - "Timeout setting: 30s, 1m, 1h..."
             - Only valid for Elasticsearch < 5.0. This option is ignored for Elasticsearch > 5.0.
         default: 1m
+        type: str
     force:
         description:
             - "Force batch mode when installing plugins. This is only necessary if a plugin requires additional permissions and console detection fails."
@@ -57,20 +62,25 @@ options:
         description:
             - Location of the plugin binary. If this file is not found, the default plugin binaries will be used.
             - The default changed in Ansible 2.4 to None.
+        type: path
     plugin_dir:
         description:
             - Your configured plugin directory specified in Elasticsearch
         default: /usr/share/elasticsearch/plugins/
+        type: path
     proxy_host:
         description:
             - Proxy host to use during plugin installation
+        type: str
     proxy_port:
         description:
             - Proxy port to use during plugin installation
+        type: str
     version:
         description:
             - Version of the plugin to be installed.
               If plugin exists with previous version, it will NOT be updated
+        type: str
 '''
 
 EXAMPLES = '''
@@ -241,7 +251,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True),
-            state=dict(default="present", choices=PACKAGE_STATE_MAP.keys()),
+            state=dict(default="present", choices=list(PACKAGE_STATE_MAP.keys())),
             src=dict(default=None),
             url=dict(default=None),
             timeout=dict(default="1m"),
