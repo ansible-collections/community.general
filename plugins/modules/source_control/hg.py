@@ -21,15 +21,18 @@ options:
             - The repository address.
         required: yes
         aliases: [ name ]
+        type: str
     dest:
         description:
             - Absolute path of where the repository should be cloned to.
               This parameter is required, unless clone and update are set to no
+        type: path
     revision:
         description:
             - Equivalent C(-r) option in hg command which could be the changeset, revision number,
               branch name or even tag.
         aliases: [ version ]
+        type: str
     force:
         description:
             - Discards uncommitted changes. Runs C(hg update -C).  Prior to
@@ -55,6 +58,7 @@ options:
         description:
             - Path to hg executable to use. If not supplied,
               the normal mechanism for resolving binary paths will be used.
+        type: str
 notes:
     - This module does not support push capability. See U(https://github.com/ansible/ansible/issues/31156).
     - "If the task seems to be hanging, first verify remote host is in C(known_hosts).
