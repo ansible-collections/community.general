@@ -78,6 +78,7 @@ options:
     description:
       - A list of disks to add, valid properties are documented in vmadm(1M).
     type: list
+    elements: dict
   dns_domain:
     required: false
     description:
@@ -93,6 +94,7 @@ options:
     description:
       - Mount additional filesystems into an OS VM.
     type: list
+    elements: dict
   firewall_enabled:
     required: false
     description:
@@ -198,6 +200,7 @@ options:
     description:
       - A list of nics to add, valid properties are documented in vmadm(1M).
     type: list
+    elements: dict
   nowait:
     required: false
     description:
@@ -230,6 +233,7 @@ options:
     description:
       - List of resolvers to be put into C(/etc/resolv.conf).
     type: list
+    elements: dict
   routes:
     required: false
     description:
@@ -670,7 +674,6 @@ def main():
             'zfs_snapshot_limit'
         ],
         'dict': ['customer_metadata', 'internal_metadata', 'routes'],
-        'list': ['disks', 'nics', 'resolvers', 'filesystems']
     }
 
     # Start with the options that are not as trivial as those above.
@@ -697,6 +700,10 @@ def main():
         # Regular strings, however these require additional options.
         spice_password=dict(type='str', no_log=True),
         vnc_password=dict(type='str', no_log=True),
+        disks=dict(type='list', elements='dict'),
+        nics=dict(type='list', elements='dict'),
+        resolvers=dict(type='list', elements='dict'),
+        filesystems=dict(type='list', elements='dict'),
     )
 
     # Add our 'simple' options to options dict.
