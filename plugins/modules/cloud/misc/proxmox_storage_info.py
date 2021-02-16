@@ -67,7 +67,7 @@ EXAMPLES = '''
 RETURN = '''
 proxmox_storage:
   description: List of storage pools.
-  returned: always
+  returned: on success
   type: list
   elements: dict
   contains:
