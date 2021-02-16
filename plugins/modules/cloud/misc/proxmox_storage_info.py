@@ -23,7 +23,7 @@ options:
     type: str
   type:
     description:
-      - Filter on a specifc storage type
+      - Filter on a specifc storage type.
     type: str
 author: Tristan Le Guern (@Aversiste)
 extends_documentation_fragment: community.general.proxmox.documentation
