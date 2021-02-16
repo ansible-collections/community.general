@@ -232,13 +232,13 @@ def main():
                 # create PV
                 pvcreate_cmd = module.get_bin_path('pvcreate', True)
                 for current_dev in dev_list:
-                    rc, _, err = module.run_command([pvcreate_cmd] + pvoptions + ['-f', str(current_dev)])
+                    rc, dummy, err = module.run_command([pvcreate_cmd] + pvoptions + ['-f', str(current_dev)])
                     if rc == 0:
                         changed = True
                     else:
                         module.fail_json(msg="Creating physical volume '%s' failed" % current_dev, rc=rc, err=err)
                 vgcreate_cmd = module.get_bin_path('vgcreate')
-                rc, _, err = module.run_command([vgcreate_cmd] + vgoptions + ['-s', pesize, vg] + dev_list)
+                rc, dummy, err = module.run_command([vgcreate_cmd] + vgoptions + ['-s', pesize, vg] + dev_list)
                 if rc == 0:
                     changed = True
                 else:
@@ -251,7 +251,7 @@ def main():
                 if this_vg['lv_count'] == 0 or force:
                     # remove VG
                     vgremove_cmd = module.get_bin_path('vgremove', True)
-                    rc, _, err = module.run_command("%s --force %s" % (vgremove_cmd, vg))
+                    rc, dummy, err = module.run_command("%s --force %s" % (vgremove_cmd, vg))
                     if rc == 0:
                         module.exit_json(changed=True)
                     else:
@@ -283,7 +283,7 @@ def main():
                         if module.check_mode:
                             changed = True
                         else:
-                            rc, _, err = module.run_command([pvresize_cmd, device])
+                            rc, dummy, err = module.run_command([pvresize_cmd, device])
                             if rc != 0:
                                 module.fail_json(msg="Failed executing pvresize command.", rc=rc, err=err)
                             else:
@@ -298,14 +298,14 @@ def main():
                     # create PV
                     pvcreate_cmd = module.get_bin_path('pvcreate', True)
                     for current_dev in devs_to_add:
-                        rc, _, err = module.run_command([pvcreate_cmd] + pvoptions + ['-f', str(current_dev)])
+                        rc, dummy, err = module.run_command([pvcreate_cmd] + pvoptions + ['-f', str(current_dev)])
                         if rc == 0:
                             changed = True
                         else:
                             module.fail_json(msg="Creating physical volume '%s' failed" % current_dev, rc=rc, err=err)
                     # add PV to our VG
                     vgextend_cmd = module.get_bin_path('vgextend', True)
-                    rc, _, err = module.run_command("%s %s %s" % (vgextend_cmd, vg, devs_to_add_string))
+                    rc, dummy, err = module.run_command("%s %s %s" % (vgextend_cmd, vg, devs_to_add_string))
                     if rc == 0:
                         changed = True
                     else:
@@ -315,7 +315,7 @@ def main():
                 if devs_to_remove:
                     devs_to_remove_string = ' '.join(devs_to_remove)
                     vgreduce_cmd = module.get_bin_path('vgreduce', True)
-                    rc, _, err = module.run_command("%s --force %s %s" % (vgreduce_cmd, vg, devs_to_remove_string))
+                    rc, dummy, err = module.run_command("%s --force %s %s" % (vgreduce_cmd, vg, devs_to_remove_string))
                     if rc == 0:
                         changed = True
                     else:
