@@ -113,10 +113,6 @@ def main():
     force = module.params['force']
     executable = module.params['executable']
 
-    if module.params.get('thirsty'):
-        module.deprecate('The alias "thirsty" has been deprecated and will be removed, use "force" instead',
-                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
-
     result = dict(
         changed=False,
         dest=dest,
