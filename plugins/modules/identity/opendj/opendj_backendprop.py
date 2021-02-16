@@ -22,46 +22,56 @@ options:
             - The path to the bin directory of OpenDJ.
         required: false
         default: /opt/opendj/bin
+        type: path
     hostname:
         description:
             - The hostname of the OpenDJ server.
         required: true
+        type: str
     port:
         description:
             - The Admin port on which the OpenDJ instance is available.
         required: true
+        type: str
     username:
         description:
             - The username to connect to.
         required: false
         default: cn=Directory Manager
+        type: str
     password:
         description:
             - The password for the cn=Directory Manager user.
             - Either password or passwordfile is needed.
         required: false
+        type: str
     passwordfile:
         description:
             - Location to the password file which holds the password for the cn=Directory Manager user.
             - Either password or passwordfile is needed.
         required: false
+        type: path
     backend:
         description:
             - The name of the backend on which the property needs to be updated.
         required: true
+        type: str
     name:
         description:
             - The configuration setting to update.
         required: true
+        type: str
     value:
         description:
             - The value for the configuration item.
         required: true
+        type: str
     state:
         description:
             - If configuration needs to be added/updated
         required: false
         default: "present"
+        type: str
 '''
 
 EXAMPLES = '''

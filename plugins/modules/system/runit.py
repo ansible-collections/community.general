@@ -87,33 +87,11 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
 
-def _load_dist_subclass(cls, *args, **kwargs):  # @FIXME remove unused function?
-    '''
-    Used for derivative implementations
-    '''
-    subclass = None
-
-    distro = kwargs['module'].params['distro']
-
-    # get the most specific superclass for this platform
-    if distro is not None:
-        for sc in cls.__subclasses__():
-            if sc.distro is not None and sc.distro == distro:
-                subclass = sc
-    if subclass is None:
-        subclass = cls
-
-    return super(cls, subclass).__new__(subclass)
-
-
 class Sv(object):
     """
     Main class that handles daemontools, can be subclassed and overridden in case
     we want to use a 'derivative' like encore, s6, etc
     """
-
-    # def __new__(cls, *args, **kwargs):
-    #    return _load_dist_subclass(cls, args, kwargs)
 
     def __init__(self, module):
         self.extra_paths = []
@@ -220,10 +198,10 @@ class Sv(object):
 
     def execute_command(self, cmd):
         try:
-            (rc, out, err) = self.module.run_command(' '.join(cmd))
+            (rc, out, err) = self.module.run_command(cmd)
         except Exception as e:
             self.module.fail_json(msg="failed to execute: %s" % to_native(e))
-        return (rc, out, err)
+        return rc, out, err
 
     def report(self):
         self.get_status()
@@ -253,7 +231,6 @@ def main():
 
     sv = Sv(module)
     changed = False
-    orig_state = sv.report()
 
     if enabled is not None and enabled != sv.enabled:
         changed = True
