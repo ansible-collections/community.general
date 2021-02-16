@@ -25,7 +25,9 @@ options:
         type: str
     validate_certs:
         description:
-            - Whether or not to validate SSL certs when supplying a https endpoint.
+            - Whether or not to validate TLS/SSL certificates when supplying a HTTPS endpoint.
+            - Should only be set to C(false) if you can guarantee that you are talking to the correct server
+              and no man-in-the-middle attack can happen.
         default: True
         type: bool
     api_username:
