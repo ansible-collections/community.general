@@ -1,0 +1,2 @@
+minor_changes:
+  - dnsimple - add CAA records to the whitelist of valid record types (https://github.com/ansible-collections/community.general/pull/1814).
