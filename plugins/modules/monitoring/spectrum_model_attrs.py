@@ -32,78 +32,77 @@ options:
      description:
      - OneClick username.
      type: str
-     required: True
+     required: true
      aliases: [username]
    url_password:
      description:
      - OneClick password.
      type: str
-     required: True
+     required: true
      aliases: [password]
    use_proxy:
      description:
      - if C(no), it will not use a proxy, even if one is defined in
        an environment variable on the target hosts.
      default: yes
-     required: False
+     required: false
      type: bool
    name:
      description:
      - Model name.
      type: str
-     required: True
+     required: true
    type:
      description:
      - Model type.
      type: str
-     required: True
+     required: true
    validate_certs:
      description:
      - Validate SSL certificates. Only use if you can guarantee that you are talking to the correct endpoint and there is no man-in-the-middle attack happening.
      type: bool
      default: yes
-     required: False
+     required: false
    attributes:
      description:
      - A list of attribute names and values to enforce.
      - All values and parameters are case sensitive and must be provided as strings only.
-     required: True
+     required: true
      type: list
      elements: dict
      suboptions:
        name:
          description:
          - Attribute name OR hex ID.
-         - Currently defined names are..
-         - '                 App_Manufacturer (0x230683)'
-         - '                 CollectionsModelNameString (0x12adb)'
-         - '                 Condition (0x1000a)'
-         - '                 Criticality (0x1290c)'
-         - '                 DeviceType (0x23000e)'
-         - '                 isManaged (0x1295d)'
-         - '                 Model_Class (0x11ee8)'
-         - '                 Model_Handle (0x129fa)'
-         - '                 Model_Name (0x1006e)'
-         - '                 Modeltype_Handle (0x10001)'
-         - '                 Modeltype_Name (0x10000)'
-         - '                 Network_Address (0x12d7f)'
-         - '                 Notes (0x11564)'
-         - '                 ServiceDesk_Asset_ID (0x12db9)'
-         - '                 TopologyModelNameString (0x129e7)'
-         - '                 sysDescr (0x10052)'
-         - '                 sysName (0x10b5b)'
-         - '                 Vendor_Name (0x11570)'
-         - '                 Description (0x230017)'
+         - 'Currently defined names are:'
+         - '                 C(App_Manufacturer) (C(0x230683))'
+         - '                 C(CollectionsModelNameString) (C(0x12adb))'
+         - '                 C(Condition) (C(0x1000a))'
+         - '                 C(Criticality) (C(0x1290c))'
+         - '                 C(DeviceType) (C(0x23000e))'
+         - '                 C(isManaged) (C(0x1295d))'
+         - '                 C(Model_Class) (C(0x11ee8))'
+         - '                 C(Model_Handle) (C(0x129fa))'
+         - '                 C(Model_Name) (C(0x1006e))'
+         - '                 C(Modeltype_Handle) (C(0x10001))'
+         - '                 C(Modeltype_Name) (C(0x10000))'
+         - '                 C(Network_Address) (C(0x12d7f))'
+         - '                 C(Notes) (C(0x11564))'
+         - '                 C(ServiceDesk_Asset_ID) (C(0x12db9))'
+         - '                 C(TopologyModelNameString) (C(0x129e7))'
+         - '                 C(sysDescr) (C(0x10052))'
+         - '                 C(sysName) (C(0x10b5b))'
+         - '                 C(Vendor_Name) (C(0x11570))'
+         - '                 C(Description) (C(0x230017))'
          - Hex IDs are the direct identifiers in Spectrum and will always work.
-         - To lookup hex IDs go to the UI..
-         - Locator -> Devices -> By Model Name -> <enter any model> -> Attributes tab.
+         - 'To lookup hex IDs go to the UI: Locator -> Devices -> By Model Name -> <enter any model> -> Attributes tab.'
          type: str
-         required: True
+         required: true
        value:
          description:
          - Attribute value. Empty strings should be C("") or C(null).
          type: str
-         required: True
+         required: true
 '''
 
 EXAMPLES = r'''
@@ -125,16 +124,18 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-spectrum_model_attrs_status:
-    description: Information about changed model attributes.
+msg:
+    description: Informational message on the job result.
+    type: str
     returned: always
+    sample: 'Success'
+changed_attrs:
+    description: Dictionary of changed name or hex IDs (whichever was specified) to their new corresponding values.
     type: dict
+    returned: always
     sample: {
-        "msg": "Success",
-        "changed_attrs": {
             "Notes": "MM set on 2021-02-03T22:04:02Z via CO CO9999 by tgates",
             "isManaged": "true"
-        },
     }
 '''
 
@@ -142,15 +143,10 @@ spectrum_model_attrs_status:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 from ansible.module_utils.urls import fetch_url
+from ansible.module_utils.six.moves.urllib.parse import quote
 import json
 import re
 import xml.etree.ElementTree as ET
-try:
-    # python3
-    import urllib.parse as urlparse
-except ImportError:
-    # python2
-    import urlparse
 
 
 class spectrum_model_attrs:
@@ -249,7 +245,7 @@ class spectrum_model_attrs:
         :rtype: str
         """
 
-        return urlparse.quote(string, "<>%-_.!*'():?#/@&+,;=")
+        return quote(string, "<>%-_.!*'():?#/@&+,;=")
 
     def update_model(self, model_handle, attrs):
         """
@@ -498,7 +494,7 @@ def run_module():
         url_password=dict(type='str', required=True, aliases=['password'],
                           no_log=True),
         validate_certs=dict(type='bool', default=True),
-        use_proxy=dict(type='bool', default='yes'),
+        use_proxy=dict(type='bool', default=True),
         name=dict(type='str', required=True),
         type=dict(type='str', required=True),
         attributes=dict(type='list',
