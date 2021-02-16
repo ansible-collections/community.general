@@ -1,0 +1,2 @@
+minor_changes:
+- lxd_profile - added ``merge_profile`` parameter to merge configurations from the play to an existing profile (https://github.com/ansible-collections/community.general/pull/1813). 
