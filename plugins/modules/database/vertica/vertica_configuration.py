@@ -14,11 +14,11 @@ short_description: Updates Vertica configuration parameters.
 description:
     - Updates Vertica configuration parameters.
 options:
-  name:
+  parameter:
     description:
         - Name of the parameter to update.
     required: true
-    aliases: [parameter]
+    aliases: [name]
     type: str
   value:
     description:
