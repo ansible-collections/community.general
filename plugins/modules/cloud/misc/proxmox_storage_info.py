@@ -65,7 +65,7 @@ EXAMPLES = '''
 
 
 RETURN = '''
-proxmox_storage:
+proxmox_storages:
   description: List of storage pools.
   returned: on success
   type: list
