@@ -69,15 +69,16 @@ options:
 requirements:
 - PyGithub>=1.54
 notes:
-- For python3, PyGithub>=1.54 should be used.
-- "For python3.5, PyGithub==1.54 should be used. More info: https://pygithub.readthedocs.io/en/latest/changes.html#version-1-54-november-30-2020."
-- "For python2.7, PyGithub==1.45 should be used. More info: https://pygithub.readthedocs.io/en/latest/changes.html#version-1-45-december-29-2019."
+- For Python 3, PyGithub>=1.54 should be used.
+- "For Python 3.5, PyGithub==1.54 should be used. More information: U(https://pygithub.readthedocs.io/en/latest/changes.html#version-1-54-november-30-2020)."
+- "For Python 2.7, PyGithub==1.45 should be used. More information: U(https://pygithub.readthedocs.io/en/latest/changes.html#version-1-45-december-29-2019)."
+- Supports C(check_mode).
 author:
 - Álvaro Torres Cogollo (@atorrescogollo)
 '''
 
 EXAMPLES = '''
-- name: Create a Github Repo
+- name: Create a Github repository
   community.general.github_repo:
     access_token: mytoken
     organization: MyOrganization
@@ -86,7 +87,8 @@ EXAMPLES = '''
     private: yes
     state: present
   register: result
-- name: Delete the repo
+
+- name: Delete the repository
   community.general.github_repo:
     username: octocat
     password: password
@@ -157,7 +159,7 @@ def create_repo(gh, name, organization=None, private=False, description='', chec
 
         result['repo'].update({
             'private': repo._private.value if not check_mode else private,
-            'description': repo._description.value if not check_mode else description
+            'description': repo._description.value if not check_mode else description,
         })
         result['changed'] = True
 
@@ -228,15 +230,12 @@ def main():
             "PyGithub"), exception=GITHUB_IMP_ERR)
 
     try:
-        result = dict(
-            changed=False
-        )
         result = run_module(module.params, module.check_mode)
         module.exit_json(**result)
     except GithubException as e:
-        module.fail_json(msg="Github error. {0}".format(repr(e)), **result)
+        module.fail_json(msg="Github error. {0}".format(repr(e)))
     except Exception as e:
-        module.fail_json(msg="Unexpected error. {0}".format(repr(e)), **result)
+        module.fail_json(msg="Unexpected error. {0}".format(repr(e)))
 
 
 if __name__ == '__main__':
