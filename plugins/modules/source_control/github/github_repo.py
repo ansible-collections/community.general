@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: github_repo
 short_description: Manage your repositories on Github
-version_added: 2.1.0
+version_added: 2.2.0
 description:
 - Manages Github repositories using PyGithub library.
 - Authentication can be done with I(access_token) or with I(username) and I(password).
