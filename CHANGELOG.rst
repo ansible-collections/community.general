@@ -6,6 +6,19 @@ Community General Release Notes
 
 This changelog describes changes after version 1.0.0.
 
+v2.1.1
+======
+
+Release Summary
+---------------
+
+Extraordinary bugfix release to fix a fatal bug in ``proxmox_kvm``.
+
+Bugfixes
+--------
+
+- proxmox_kvm - fix undefined local variable ``status`` when the parameter ``state`` is either ``stopped``, ``started``, ``restarted`` or ``absent`` (https://github.com/ansible-collections/community.general/pull/1847).
+
 v2.1.0
 ======
 

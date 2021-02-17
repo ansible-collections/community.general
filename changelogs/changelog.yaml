@@ -1287,3 +1287,13 @@ releases:
       name: statsd
       namespace: monitoring
     release_date: '2021-02-16'
+  2.1.1:
+    changes:
+      bugfixes:
+      - proxmox_kvm - fix undefined local variable ``status`` when the parameter ``state``
+        is either ``stopped``, ``started``, ``restarted`` or ``absent`` (https://github.com/ansible-collections/community.general/pull/1847).
+      release_summary: Extraordinary bugfix release to fix a fatal bug in ``proxmox_kvm``.
+    fragments:
+    - 1847-proxmox-kvm-fix-status.yml
+    - 2.1.0.yml
+    release_date: '2021-02-17'
