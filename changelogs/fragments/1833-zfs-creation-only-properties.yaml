@@ -1,0 +1,2 @@
+bugfixes:
+  - zfs - some zfs properties could be passed when the dataset/volume did not exist, but would fail if the dataset already existed, even if the property matched what was specified in the ansible task
