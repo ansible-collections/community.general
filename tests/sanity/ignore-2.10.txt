@@ -269,7 +269,9 @@ plugins/modules/system/puppet.py validate-modules:doc-default-does-not-match-spe
 plugins/modules/system/puppet.py validate-modules:parameter-invalid
 plugins/modules/system/puppet.py validate-modules:parameter-type-not-in-doc
 plugins/modules/system/puppet.py validate-modules:undocumented-parameter
+plugins/modules/system/runit.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/system/runit.py validate-modules:parameter-type-not-in-doc
+plugins/modules/system/runit.py validate-modules:undocumented-parameter
 plugins/modules/system/ssh_config.py use-argspec-type-path # Required since module uses other methods to specify path
 plugins/modules/system/xfconf.py validate-modules:parameter-state-invalid-choice
 plugins/modules/system/xfconf.py validate-modules:return-syntax-error
