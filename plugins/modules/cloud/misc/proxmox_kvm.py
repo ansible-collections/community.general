@@ -1380,6 +1380,8 @@ def main():
         vm = get_vm(proxmox, vmid)
         if not vm:
             module.fail_json(msg='VM with vmid = %s does not exist in cluster' % vmid)
+        if not name:
+            name = vm[0]['name']
         current = proxmox.nodes(vm[0]['node']).qemu(vmid).status.current.get()['status']
         status['status'] = current
         if status:
