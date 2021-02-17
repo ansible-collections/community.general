@@ -734,20 +734,20 @@ EXAMPLES = '''
 
 RETURN = '''
 vmid:
-    description: The VM vmid.
-    returned: success
-    type: int
-    sample: 115
+  description: The VM vmid.
+  returned: success
+  type: int
+  sample: 115
 status:
-    description:
-      - The current virtual machine status.
-    returned: success
-    type: dict
-    sample: '{
-      "changed": false,
-      "msg": "VM kropta with vmid = 110 is running",
-      "status": "running"
-    }'
+  description: The current virtual machine status.
+  returned: success, not clone, not absent, not update
+  type: str
+  sample: running
+msg:
+  description: A short message
+  returned: always
+  type: str
+  sample: "VM kropta with vmid = 110 is running"
 '''
 
 import re
