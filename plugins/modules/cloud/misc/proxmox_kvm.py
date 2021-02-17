@@ -1297,12 +1297,14 @@ def main():
                 module.fail_json(vmid=vmid, msg="creation of qemu VM %s with vmid %s failed with exception=%s" % (name, vmid, e))
 
     elif state == 'started':
+        status = {}
         try:
             if -1 == vmid:
                 module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
             vm = get_vm(proxmox, vmid)
             if not vm:
                 module.fail_json(vmid=vmid, msg='VM with vmid <%s> does not exist in cluster' % vmid)
+            status['status'] = vm[0]['status']
             if vm[0]['status'] == 'running':
                 module.exit_json(changed=False, vmid=vmid, msg="VM %s is already running" % vmid, **status)
 
@@ -1312,6 +1314,7 @@ def main():
             module.fail_json(vmid=vmid, msg="starting of VM %s failed with exception: %s" % (vmid, e), **status)
 
     elif state == 'stopped':
+        status = {}
         try:
             if -1 == vmid:
                 module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
@@ -1320,6 +1323,7 @@ def main():
             if not vm:
                 module.fail_json(vmid=vmid, msg='VM with vmid = %s does not exist in cluster' % vmid)
 
+            status['status'] = vm[0]['status']
             if vm[0]['status'] == 'stopped':
                 module.exit_json(changed=False, vmid=vmid, msg="VM %s is already stopped" % vmid, **status)
 
@@ -1329,6 +1333,7 @@ def main():
             module.fail_json(vmid=vmid, msg="stopping of VM %s failed with exception: %s" % (vmid, e), **status)
 
     elif state == 'restarted':
+        status = {}
         try:
             if -1 == vmid:
                 module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
@@ -1336,6 +1341,7 @@ def main():
             vm = get_vm(proxmox, vmid)
             if not vm:
                 module.fail_json(vmid=vmid, msg='VM with vmid = %s does not exist in cluster' % vmid)
+            status['status'] = vm[0]['status']
             if vm[0]['status'] == 'stopped':
                 module.exit_json(changed=False, vmid=vmid, msg="VM %s is not running" % vmid, **status)
 
@@ -1345,12 +1351,14 @@ def main():
             module.fail_json(vmid=vmid, msg="restarting of VM %s failed with exception: %s" % (vmid, e), **status)
 
     elif state == 'absent':
+        status = {}
         try:
             vm = get_vm(proxmox, vmid)
             if not vm:
                 module.exit_json(changed=False, vmid=vmid)
 
             proxmox_node = proxmox.nodes(vm[0]['node'])
+            status['status'] = vm[0]['status']
             if vm[0]['status'] == 'running':
                 if module.params['force']:
                     stop_vm(module, proxmox, vm, True)
