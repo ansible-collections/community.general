@@ -50,6 +50,8 @@ options:
     type: int
 author: Tristan Le Guern (@Aversiste)
 extends_documentation_fragment: community.general.proxmox.documentation
+notes:
+  - Supports C(check_mode).
 '''
 
 
