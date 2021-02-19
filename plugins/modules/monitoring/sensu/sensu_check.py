@@ -272,7 +272,7 @@ def sensu_check(module, path, name, state='present', backup=False):
                     changed = True
                     reasons.append('`custom param {opt}\' was added'.format(opt=k))
                 check[k] = v
-            simple_opts += list(custom_params.keys())
+            simple_opts += custom_params.keys()
 
         # Remove obsolete custom params
         for opt in set(config['checks'][name].keys()) - set(simple_opts + ['type', 'subdue', 'subdue_begin', 'subdue_end']):
