@@ -228,7 +228,7 @@ EXAMPLES = '''
     release: '{{ deploy_helper.new_release }}'
     state: finalize
 
-# Postponing the cleanup of older builds:
+# Postponing the cleanup of older builds (explicitly setting the release will exclude it from cleanup):
 - community.general.deploy_helper:
     path: /path/to/root
     release: '{{ deploy_helper.new_release }}'
@@ -236,8 +236,9 @@ EXAMPLES = '''
     clean: False
 - community.general.deploy_helper:
     path: /path/to/root
+    release: '{{ deploy_helper.new_release }}'
     state: clean
-# Or running the cleanup ahead of the new deploy
+# Or running the cleanup ahead of the new deploy (not setting release because there is no release yet):
 - community.general.deploy_helper:
     path: /path/to/root
     state: clean
@@ -305,6 +306,9 @@ class DeployHelper(object):
 
         if not self.release and (self.state == 'query' or self.state == 'present'):
             self.release = time.strftime("%Y%m%d%H%M%S")
+
+        if not self.release and (self.state == 'clean'):
+            self.release = "clean_can_be_run_without_setting_a_release_so_this_is_a_default_value_unlikely_to_exists"
 
         if self.release:
             new_release_path = os.path.join(releases_path, self.release)
