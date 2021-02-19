@@ -217,7 +217,7 @@ class CacheModule(BaseCacheModule):
         self._db.zrem(self._keys_set, key)
 
     def flush(self):
-        for key in list(self.keys()):
+        for key in self.keys():
             self.delete(key)
 
     def copy(self):
