@@ -1305,10 +1305,12 @@ def expand_tags(eg_launchspec, tags):
 
         for tag in tags:
             eg_tag = spotinst.aws_elastigroup.Tag()
-            if tag.keys():
-                eg_tag.tag_key = tag.keys()[0]
-            if tag.values():
-                eg_tag.tag_value = tag.values()[0]
+            key_list = list(tag.keys())
+            val_list = list(tag.values())
+            if key_list:
+                eg_tag.tag_key = key_list[0]
+            if val_list:
+                eg_tag.tag_value = val_list[0]
 
             eg_tags.append(eg_tag)
 

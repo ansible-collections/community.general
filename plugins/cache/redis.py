@@ -217,13 +217,13 @@ class CacheModule(BaseCacheModule):
         self._db.zrem(self._keys_set, key)
 
     def flush(self):
-        for key in self.keys():
+        for key in list(self.keys()):
             self.delete(key)
 
     def copy(self):
         # TODO: there is probably a better way to do this in redis
         ret = dict()
-        for key in self.keys():
+        for key in list(self.keys()):
             ret[key] = self.get(key)
         return ret
 
