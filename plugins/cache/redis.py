@@ -223,7 +223,7 @@ class CacheModule(BaseCacheModule):
     def copy(self):
         # TODO: there is probably a better way to do this in redis
         ret = dict()
-        for key in list(self.keys()):
+        for key in self.keys():
             ret[key] = self.get(key)
         return ret
 
