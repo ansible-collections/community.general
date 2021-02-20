@@ -6,3 +6,4 @@ skip/osx
 skip/macos
 skip/rhel
 needs/root
+disabled  # FIXME
