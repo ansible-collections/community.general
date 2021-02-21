@@ -91,6 +91,7 @@ options:
       - Enables pull mirroring in a project.
     type: bool
     default: no
+    version_added: 2.2.0
   state:
     description:
       - Create or delete project.
