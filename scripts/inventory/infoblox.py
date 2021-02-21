@@ -13,10 +13,22 @@ import json
 import argparse
 
 from ansible.parsing.dataloader import DataLoader
-from ansible.module_utils.six import iteritems
+from ansible.module_utils.six import iteritems, raise_from
 from ansible.module_utils._text import to_text
-from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiInventory
-from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_extattrs, flatten_extattrs
+try:
+    from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiInventory
+    from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_extattrs, flatten_extattrs
+except ImportError as exc:
+    try:
+        # Fallback for Ansible 2.9
+        from ansible.module_utils.net_tools.nios.api import WapiInventory
+        from ansible.module_utils.net_tools.nios.api import normalize_extattrs, flatten_extattrs
+    except ImportError:
+        raise_from(
+            Exception(
+                'This inventory plugin only works with Ansible 2.9, 2.10, or 3, or when community.general is installed correctly in PYTHONPATH.'
+                ' Try using the inventory plugin from infoblox.nios_modules instead.'),
+            exc)
 
 
 CONFIG_FILES = [
