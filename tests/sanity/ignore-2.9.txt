@@ -181,7 +181,6 @@ plugins/modules/packaging/os/xbps.py validate-modules:parameter-invalid
 plugins/modules/remote_management/hpilo/hpilo_boot.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/hpilo/hpilo_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/hpilo/hponcfg.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/imc/imc_rest.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/lxca/lxca_cmms.py validate-modules:doc-missing-type
 plugins/modules/remote_management/lxca/lxca_nodes.py validate-modules:doc-missing-type
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec
