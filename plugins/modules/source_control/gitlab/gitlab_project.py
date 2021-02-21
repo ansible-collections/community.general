@@ -86,6 +86,11 @@ options:
       - GitLab server needs read access to this git repository.
     required: false
     type: str
+  mirror:
+    description:
+      - Enables pull mirroring in a project.
+    type: bool
+    default: no
   state:
     description:
       - Create or delete project.
@@ -215,6 +220,7 @@ class GitLabProject(object):
             project_options.update({
                 'path': options['path'],
                 'import_url': options['import_url'],
+                'mirror': options['mirror'],
             })
             project = self.createProject(namespace, project_options)
             changed = True
@@ -300,6 +306,7 @@ def main():
         snippets_enabled=dict(default=True, type='bool'),
         visibility=dict(type='str', default="private", choices=["internal", "private", "public"], aliases=["visibility_level"]),
         import_url=dict(type='str'),
+        mirror=dict(type='bool', default=False),
         state=dict(type='str', default="present", choices=["absent", "present"]),
         lfs_enabled=dict(default=False, type='bool'),
     ))
@@ -330,6 +337,7 @@ def main():
     snippets_enabled = module.params['snippets_enabled']
     visibility = module.params['visibility']
     import_url = module.params['import_url']
+    mirror = module.params['mirror']
     state = module.params['state']
     lfs_enabled = module.params['lfs_enabled']
 
@@ -385,6 +393,7 @@ def main():
                                                 "snippets_enabled": snippets_enabled,
                                                 "visibility": visibility,
                                                 "import_url": import_url,
+                                                "mirror": mirror,
                                                 "lfs_enabled": lfs_enabled}):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.projectObject._attrs)
