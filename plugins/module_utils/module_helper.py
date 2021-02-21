@@ -282,7 +282,7 @@ class CmdMixin(object):
             result[param] = ArgFormat(param, **fmt_spec)
         return result
 
-    def _calculate_args(self, params=None):
+    def _calculate_args(self, extra_params=None, params=None):
         def add_arg_formatted_param(_cmd_args, arg_format, _value):
             args = list(arg_format.to_text(_value))
             return _cmd_args + args
@@ -290,6 +290,7 @@ class CmdMixin(object):
         def find_format(_param):
             return self.custom_formats.get(_param, self.module_formats.get(_param))
 
+        extra_params = extra_params or dict()
         cmd_args = list([self.command]) if isinstance(self.command, str) else list(self.command)
         cmd_args[0] = self.module.get_bin_path(cmd_args[0])
         param_list = params if params else self.module.params.keys()
@@ -306,6 +307,11 @@ class CmdMixin(object):
                 if param in self.module.argument_spec:
                     fmt = find_format(param)
                     value = self.module.params[param]
+                elif param in extra_params:
+                    fmt = find_format(param)
+                    value = extra_params[param]
+                else:
+                    raise ModuleHelperException("Cannot determine value for parameter: {0}".format(param))
 
             else:
                 raise ModuleHelperException("run_command parameter must be either a str or a dict: {0}".format(param))
@@ -316,8 +322,8 @@ class CmdMixin(object):
     def process_command_output(self, rc, out, err):
         return rc, out, err
 
-    def run_command(self, params=None, *args, **kwargs):
-        self.vars['cmd_args'] = self._calculate_args(params)
+    def run_command(self, extra_params=None, params=None, *args, **kwargs):
+        self.vars['cmd_args'] = self._calculate_args(extra_params, params)
         options = dict(self.run_command_fixed_options)
         env_update = dict(options.get('environ_update', {}))
         options['check_rc'] = options.get('check_rc', self.check_rc)
