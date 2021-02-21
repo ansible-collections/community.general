@@ -1,0 +1,5 @@
+gitlab_server_url: https://gitlab.com
+gitlab_api_access_token: "token"
+gitlab_project: some_project
+username: some_user
+gitlab_access_level: developer
