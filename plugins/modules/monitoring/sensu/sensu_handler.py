@@ -42,6 +42,7 @@ options:
       - Each array item must be a string.
   severities:
     type: list
+    elements: str
     description:
       - An array of check result severities the handler will handle.
       - 'NOTE: event resolution bypasses this filtering.'
@@ -84,9 +85,9 @@ options:
       - 'NOTE: the pipe attribute is only required for Transport handlers (i.e. handlers configured with "type": "transport").'
   handlers:
     type: list
+    elements: str
     description:
       - An array of Sensu event handlers (names) to use for events using the handler set.
-      - Each array item must be a string.
       - 'NOTE: the handlers attribute is only required for handler sets (i.e. handlers configured with "type": "set").'
 notes:
   - Check mode is supported
@@ -165,20 +166,20 @@ def main():
     module = AnsibleModule(
         supports_check_mode=True,
         argument_spec=dict(
-            state=dict(type='str', required=False, choices=['present', 'absent'], default='present'),
+            state=dict(type='str', choices=['present', 'absent'], default='present'),
             name=dict(type='str', required=True),
-            type=dict(type='str', required=False, choices=['pipe', 'tcp', 'udp', 'transport', 'set']),
-            filter=dict(type='str', required=False),
-            filters=dict(type='list', required=False),
-            severities=dict(type='list', required=False),
-            mutator=dict(type='str', required=False),
-            timeout=dict(type='int', required=False, default=10),
-            handle_silenced=dict(type='bool', required=False, default=False),
-            handle_flapping=dict(type='bool', required=False, default=False),
-            command=dict(type='str', required=False),
-            socket=dict(type='dict', required=False),
-            pipe=dict(type='dict', required=False),
-            handlers=dict(type='list', required=False),
+            type=dict(type='str', choices=['pipe', 'tcp', 'udp', 'transport', 'set']),
+            filter=dict(type='str'),
+            filters=dict(type='list'),
+            severities=dict(type='list', elements='str'),
+            mutator=dict(type='str'),
+            timeout=dict(type='int', default=10),
+            handle_silenced=dict(type='bool', default=False),
+            handle_flapping=dict(type='bool', default=False),
+            command=dict(type='str'),
+            socket=dict(type='dict'),
+            pipe=dict(type='dict'),
+            handlers=dict(type='list', elements='str'),
         ),
         required_if=[
             ['state', 'present', ['type']],
