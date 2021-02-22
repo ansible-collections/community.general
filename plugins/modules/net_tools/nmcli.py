@@ -719,6 +719,10 @@ class Nmcli(object):
                 'primary': self.primary,
                 'updelay': self.updelay,
             })
+        elif self.type == 'bond-slave':
+            options.update({
+                'connection.slave-type': 'bond',
+            })
         elif self.type == 'bridge':
             options.update({
                 'bridge.ageing-time': self.ageingtime,
