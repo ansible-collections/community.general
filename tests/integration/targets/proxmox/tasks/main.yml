@@ -110,6 +110,24 @@
     - results_userid.proxmox_users[0].user == "{{ user }}"
     - results_userid.proxmox_users[0].userid == "{{ user }}@{{ domain }}"
 
+- name: Retrieve info about storage
+  proxmox_storage_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+    storage: "{{ storage }}"
+  register: results_storage
+
+- assert:
+    that:
+    - results_storage is not changed
+    - results_storage.proxmox_storages is defined
+    - results_storage.proxmox_storages|length == 1
+    - results_storage.proxmox_storages[0].storage == "{{ storage }}"
+
 - name: VM creation
   tags: [ 'create' ]
   block:
