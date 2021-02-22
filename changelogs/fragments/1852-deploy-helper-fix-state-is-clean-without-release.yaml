@@ -1,0 +1,2 @@
+bugfixes:
+  - deploy_helper - allow ``state=clean`` to be used without defining a ``release`` (https://github.com/ansible-collections/community.general/issues/1852).
