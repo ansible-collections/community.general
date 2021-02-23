@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 ---
 module: proxmox_instance_actions
 short_description: Perform actions on Qemu/KVM and LXC instances from Proxmox VE
-version_added: 2.0.0
+version_added: 2.2.0
 description:
   - Perform actions on an existing instance from Proxmox VE.
   - This module does not return data.
