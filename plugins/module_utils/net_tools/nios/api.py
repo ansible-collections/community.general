@@ -490,12 +490,12 @@ class WapiModule(WapiBase):
                 else:
                     test_obj_filter = dict([('name', old_name)])
                 # get the object reference
-                ib_obj = self.get_object(ib_obj_type, test_obj_filter, return_fields=ib_spec.keys())
+                ib_obj = self.get_object(ib_obj_type, test_obj_filter, return_fields=list(ib_spec.keys()))
                 if ib_obj:
                     obj_filter['name'] = new_name
                 else:
                     test_obj_filter['name'] = new_name
-                    ib_obj = self.get_object(ib_obj_type, test_obj_filter, return_fields=ib_spec.keys())
+                    ib_obj = self.get_object(ib_obj_type, test_obj_filter, return_fields=list(ib_spec.keys()))
                 update = True
                 return ib_obj, update, new_name
             if (ib_obj_type == NIOS_HOST_RECORD):
@@ -529,7 +529,7 @@ class WapiModule(WapiBase):
             # check if test_obj_filter is empty copy passed obj_filter
             else:
                 test_obj_filter = obj_filter
-            ib_obj = self.get_object(ib_obj_type, test_obj_filter.copy(), return_fields=ib_spec.keys())
+            ib_obj = self.get_object(ib_obj_type, test_obj_filter.copy(), return_fields=list(ib_spec.keys()))
         elif (ib_obj_type == NIOS_A_RECORD):
             # resolves issue where multiple a_records with same name and different IP address
             test_obj_filter = obj_filter
@@ -539,7 +539,7 @@ class WapiModule(WapiBase):
             except TypeError:
                 ipaddr = obj_filter['ipv4addr']
             test_obj_filter['ipv4addr'] = ipaddr
-            ib_obj = self.get_object(ib_obj_type, test_obj_filter.copy(), return_fields=ib_spec.keys())
+            ib_obj = self.get_object(ib_obj_type, test_obj_filter.copy(), return_fields=list(ib_spec.keys()))
         elif (ib_obj_type == NIOS_TXT_RECORD):
             # resolves issue where multiple txt_records with same name and different text
             test_obj_filter = obj_filter
@@ -549,12 +549,12 @@ class WapiModule(WapiBase):
             except TypeError:
                 txt = obj_filter['text']
             test_obj_filter['text'] = txt
-            ib_obj = self.get_object(ib_obj_type, test_obj_filter.copy(), return_fields=ib_spec.keys())
+            ib_obj = self.get_object(ib_obj_type, test_obj_filter.copy(), return_fields=list(ib_spec.keys()))
         elif (ib_obj_type == NIOS_ZONE):
             # del key 'restart_if_needed' as nios_zone get_object fails with the key present
             temp = ib_spec['restart_if_needed']
             del ib_spec['restart_if_needed']
-            ib_obj = self.get_object(ib_obj_type, obj_filter.copy(), return_fields=ib_spec.keys())
+            ib_obj = self.get_object(ib_obj_type, obj_filter.copy(), return_fields=list(ib_spec.keys()))
             # reinstate restart_if_needed if ib_obj is none, meaning there's no existing nios_zone ref
             if not ib_obj:
                 ib_spec['restart_if_needed'] = temp
@@ -562,12 +562,12 @@ class WapiModule(WapiBase):
             # del key 'create_token' as nios_member get_object fails with the key present
             temp = ib_spec['create_token']
             del ib_spec['create_token']
-            ib_obj = self.get_object(ib_obj_type, obj_filter.copy(), return_fields=ib_spec.keys())
+            ib_obj = self.get_object(ib_obj_type, obj_filter.copy(), return_fields=list(ib_spec.keys()))
             if temp:
                 # reinstate 'create_token' key
                 ib_spec['create_token'] = temp
         else:
-            ib_obj = self.get_object(ib_obj_type, obj_filter.copy(), return_fields=ib_spec.keys())
+            ib_obj = self.get_object(ib_obj_type, obj_filter.copy(), return_fields=list(ib_spec.keys()))
         return ib_obj, update, new_name
 
     def on_update(self, proposed_object, ib_spec):
