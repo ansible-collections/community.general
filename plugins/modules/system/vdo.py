@@ -327,7 +327,7 @@ def inventory_vdos(module, vdocmd):
     vdoyamls = vdostatusyaml['VDOs']
 
     if vdoyamls is not None:
-        vdolist = vdoyamls.keys()
+        vdolist = list(vdoyamls.keys())
 
     return vdolist
 

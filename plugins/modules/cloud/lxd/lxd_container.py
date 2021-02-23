@@ -665,7 +665,7 @@ def main():
                 type='dict',
             ),
             state=dict(
-                choices=LXD_ANSIBLE_STATES.keys(),
+                choices=list(LXD_ANSIBLE_STATES.keys()),
                 default='started'
             ),
             target=dict(

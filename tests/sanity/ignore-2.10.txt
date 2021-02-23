@@ -9,9 +9,7 @@ plugins/modules/cloud/linode/linode.py validate-modules:parameter-type-not-in-do
 plugins/modules/cloud/linode/linode.py validate-modules:undocumented-parameter
 plugins/modules/cloud/linode/linode_v4.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
-plugins/modules/cloud/lxc/lxc_container.py validate-modules:invalid-ansiblemodule-schema
 plugins/modules/cloud/lxc/lxc_container.py validate-modules:use-run-command-not-popen
-plugins/modules/cloud/lxd/lxd_container.py validate-modules:invalid-ansiblemodule-schema
 plugins/modules/cloud/misc/rhevm.py validate-modules:parameter-state-invalid-choice
 plugins/modules/cloud/oneandone/oneandone_firewall_policy.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/oneandone/oneandone_load_balancer.py validate-modules:parameter-list-no-elements
