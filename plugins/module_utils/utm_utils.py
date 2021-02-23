@@ -84,7 +84,7 @@ class UTM:
             raise UTMModuleConfigurationError(
                 "The keys " + to_native(
                     self.change_relevant_keys) + " to check are not in the modules keys:\n" + to_native(
-                    module.params.keys()))
+                    list(module.params.keys())))
 
     def execute(self):
         try:
