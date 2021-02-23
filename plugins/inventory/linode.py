@@ -32,12 +32,10 @@ DOCUMENTATION = r'''
           description: Populate inventory with instances in this region.
           default: []
           type: list
-          required: false
         types:
           description: Populate inventory with instances with this type.
           default: []
           type: list
-          required: false
 '''
 
 EXAMPLES = r'''
