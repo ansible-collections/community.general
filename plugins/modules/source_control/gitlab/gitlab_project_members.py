@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Copyright: (c) 2021, Sergey Mikhaltsov <metanovii@gmail.com>
+# Copyright: (c) 2020, Zainab Alsaffar <Zainab.Alsaffar@mail.rit.edu>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -14,7 +15,9 @@ short_description: Manage project members on GitLab Server
 version_added: 2.2.0
 description:
     - This module allows to add and remove members to/from a project, or change a member's access level in a project on GitLab.
-author: Sergey Mikhaltsov (@metanovii)
+author:
+    - Sergey Mikhaltsov (@metanovii)
+    - Zainab Alsaffar (@zanssa)
 requirements:
     - python-gitlab python module <= 1.15.0
     - owner or maintainer rights to project on the GitLab server
