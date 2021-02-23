@@ -37,6 +37,7 @@ options:
       - The Sensu event filter (name) to use when filtering events for the handler.
   filters:
     type: list
+    elements: str
     description:
       - An array of Sensu event filters (names) to use when filtering events for the handler.
       - Each array item must be a string.
@@ -170,7 +171,7 @@ def main():
             name=dict(type='str', required=True),
             type=dict(type='str', choices=['pipe', 'tcp', 'udp', 'transport', 'set']),
             filter=dict(type='str'),
-            filters=dict(type='list'),
+            filters=dict(type='list', elements='str'),
             severities=dict(type='list', elements='str'),
             mutator=dict(type='str'),
             timeout=dict(type='int', default=10),
