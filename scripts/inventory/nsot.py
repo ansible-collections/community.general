@@ -181,7 +181,7 @@ class NSoTInventory(object):
                     sys.exit('%s\n' % e)
         else:  # Use defaults if env var missing
             self._config_default()
-        self.groups = self.config.keys()
+        self.groups = list(self.config.keys())
         self.client = get_api_client()
         self._meta = {'hostvars': dict()}
 

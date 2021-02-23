@@ -596,7 +596,7 @@ class Rhsm(RegistrationBase):
 
         if missing_pools or serials:
             changed = True
-        return {'changed': changed, 'subscribed_pool_ids': missing_pools.keys(),
+        return {'changed': changed, 'subscribed_pool_ids': list(missing_pools.keys()),
                 'unsubscribed_serials': serials}
 
     def sync_syspurpose(self):
