@@ -695,15 +695,15 @@ def update_monitoring_policy(module, oneandone_conn):
             threshold_entities = ['cpu', 'ram', 'disk', 'internal_ping', 'transfer']
 
             _thresholds = []
-            for treshold in thresholds:
-                key = treshold.keys()[0]
+            for threshold in thresholds:
+                key = list(threshold.keys())[0]
                 if key in threshold_entities:
                     _threshold = oneandone.client.Threshold(
                         entity=key,
-                        warning_value=treshold[key]['warning']['value'],
-                        warning_alert=str(treshold[key]['warning']['alert']).lower(),
-                        critical_value=treshold[key]['critical']['value'],
-                        critical_alert=str(treshold[key]['critical']['alert']).lower())
+                        warning_value=threshold[key]['warning']['value'],
+                        warning_alert=str(threshold[key]['warning']['alert']).lower(),
+                        critical_value=threshold[key]['critical']['value'],
+                        critical_alert=str(threshold[key]['critical']['alert']).lower())
                     _thresholds.append(_threshold)
 
         if name or description or email or thresholds:
@@ -864,15 +864,15 @@ def create_monitoring_policy(module, oneandone_conn):
         threshold_entities = ['cpu', 'ram', 'disk', 'internal_ping', 'transfer']
 
         _thresholds = []
-        for treshold in thresholds:
-            key = treshold.keys()[0]
+        for threshold in thresholds:
+            key = list(threshold.keys())[0]
             if key in threshold_entities:
                 _threshold = oneandone.client.Threshold(
                     entity=key,
-                    warning_value=treshold[key]['warning']['value'],
-                    warning_alert=str(treshold[key]['warning']['alert']).lower(),
-                    critical_value=treshold[key]['critical']['value'],
-                    critical_alert=str(treshold[key]['critical']['alert']).lower())
+                    warning_value=threshold[key]['warning']['value'],
+                    warning_alert=str(threshold[key]['warning']['alert']).lower(),
+                    critical_value=threshold[key]['critical']['value'],
+                    critical_alert=str(threshold[key]['critical']['alert']).lower())
                 _thresholds.append(_threshold)
 
         _ports = []
