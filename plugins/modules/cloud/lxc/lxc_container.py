@@ -1662,7 +1662,7 @@ def main():
             ),
             backing_store=dict(
                 type='str',
-                choices=LXC_BACKING_STORE.keys(),
+                choices=list(LXC_BACKING_STORE.keys()),
                 default='dir'
             ),
             template_options=dict(
@@ -1699,7 +1699,7 @@ def main():
                 type='path'
             ),
             state=dict(
-                choices=LXC_ANSIBLE_STATES.keys(),
+                choices=list(LXC_ANSIBLE_STATES.keys()),
                 default='started'
             ),
             container_command=dict(
@@ -1733,7 +1733,7 @@ def main():
                 type='path',
             ),
             archive_compression=dict(
-                choices=LXC_COMPRESSION_MAP.keys(),
+                choices=list(LXC_COMPRESSION_MAP.keys()),
                 default='gzip'
             )
         ),
