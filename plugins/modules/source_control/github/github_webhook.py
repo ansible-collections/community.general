@@ -18,22 +18,26 @@ options:
   repository:
     description:
       - Full name of the repository to configure a hook for
+    type: str
     required: true
     aliases:
       - repo
   url:
     description:
       - URL to which payloads will be delivered
+    type: str
     required: true
   content_type:
     description:
       - The media type used to serialize the payloads
+    type: str
     required: false
     choices: [ form, json ]
     default: form
   secret:
     description:
       - The shared secret between GitHub and the payload URL.
+    type: str
     required: false
   insecure_ssl:
     description:
@@ -61,24 +65,29 @@ options:
   state:
     description:
       - Whether the hook should be present or absent
+    type: str
     required: false
     choices: [ absent, present ]
     default: present
   user:
     description:
       - User to authenticate to GitHub as
+    type: str
     required: true
   password:
     description:
       - Password to authenticate to GitHub with
+    type: str
     required: false
   token:
     description:
       - Token to authenticate to GitHub with
+    type: str
     required: false
   github_url:
     description:
       - Base URL of the GitHub API
+    type: str
     required: false
     default: https://api.github.com
 
