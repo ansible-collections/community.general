@@ -118,7 +118,7 @@ options:
         description:
             - The IPv6 address to this interface.
             - Use the format C(abbe::cafe).
-            - If defined, automatically set ipv6.method to manual and remove the need to set method6 parameter.
+            - If defined, automatically set C(ipv6.method) to C(manual). If the I(method6) parameter is used, this parameter is ignored.
         type: str
     gw6:
         description:
@@ -139,7 +139,7 @@ options:
     method6:
         description:
             - Configuration method to be used for IPv6
-            - If ip6 is set, ipv6.method is automatically set to manual and this parameter is not needed.
+            - If I(ip6) is set, C(ipv6.method) is automatically set to C(manual) and this parameter is not needed.
         type: str
         choices: [ignore, auto, dhcp, link-local, manual, shared]
         version_added: 2.2.0
@@ -668,19 +668,17 @@ class Nmcli(object):
 
         if self.method4:
             self.ipv4_method = self.method4
+        elif self.ip4:
+            self.ipv4_method = 'manual'
         else:
-            if self.ip4:
-                self.ipv4_method = 'manual'
-            else:
-                self.ipv4_method = None
+            self.ipv4_method = None
 
         if self.method6:
             self.ipv6_method = self.method6
+        elif self.ip6:
+            self.ipv6_method = 'manual'
         else:
-            if self.ip6:
-                self.ipv6_method = 'manual'
-            else:
-                self.ipv6_method = None
+            self.ipv6_method = None
 
     def execute_command(self, cmd, use_unsafe_shell=False, data=None):
         if isinstance(cmd, list):
