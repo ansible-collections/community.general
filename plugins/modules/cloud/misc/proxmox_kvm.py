@@ -1287,7 +1287,7 @@ def main():
             elif clone is not None:
                 module.exit_json(changed=True, vmid=vmid, msg="VM %s with newid %s cloned from vm with vmid %s" % (name, newid, vmid))
             else:
-                module.exit_json(changed=True, vmid=vmid, msg="VM %s with vmid %s deployed" % (name, vmid), **results)
+                module.exit_json(changed=True, msg="VM %s with vmid %s deployed" % (name, vmid), **results)
         except Exception as e:
             if update:
                 module.fail_json(vmid=vmid, msg="Unable to update vm {0} with vmid {1}=".format(name, vmid) + str(e))
