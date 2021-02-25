@@ -34,10 +34,12 @@ options:
     description:
       - The name of the setting. If no value is supplied, the value will
         be read from the config if it has been set.
+    type: str
   repo:
     description:
       - Path to a git repository for reading and writing values from a
         specific repo.
+    type: path
   scope:
     description:
       - Specify which scope to read/set values from. This is required
@@ -45,6 +47,7 @@ options:
         also specify the repo parameter. It defaults to system only when
         not using I(list_all)=yes.
     choices: [ "local", "global", "system" ]
+    type: str
   state:
     description:
       - "Indicates the setting should be set/unset.
@@ -52,10 +55,12 @@ options:
         when I(state)=absent and I(value) is defined, I(value) is discarded."
     choices: [ 'present', 'absent' ]
     default: 'present'
+    type: str
   value:
     description:
       - When specifying the name of a single setting, supply a value to
         set that setting to the given value.
+    type: str
 '''
 
 EXAMPLES = '''
