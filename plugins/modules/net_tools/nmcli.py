@@ -108,7 +108,7 @@ options:
         type: list
     method4:
         description:
-            - Configuration method to be used for ipv4
+            - Configuration method to be used for IPv4.
         type: str
         choices: [auto, link-local, manual, shared, disabled]
         version_added: 2.2.0
