@@ -19,24 +19,29 @@ options:
   repository:
     description:
       - Full name of the repository to configure a hook for
+    type: str
     required: true
     aliases:
       - repo
   user:
     description:
       - User to authenticate to GitHub as
+    type: str
     required: true
   password:
     description:
       - Password to authenticate to GitHub with
+    type: str
     required: false
   token:
     description:
       - Token to authenticate to GitHub with
+    type: str
     required: false
   github_url:
     description:
       - Base URL of the github api
+    type: str
     required: false
     default: https://api.github.com
 

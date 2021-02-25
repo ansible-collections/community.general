@@ -17,18 +17,22 @@ options:
     description:
       - GitHub Access Token with permission to list and create public keys.
     required: true
+    type: str
   name:
     description:
       - SSH key name
     required: true
+    type: str
   pubkey:
     description:
       - SSH public key value. Required when C(state=present).
+    type: str
   state:
     description:
       - Whether to remove a key, ensure that it exists, or update its value.
     choices: ['present', 'absent']
     default: 'present'
+    type: str
   force:
     description:
       - The default is C(yes), which will replace the existing remote key
