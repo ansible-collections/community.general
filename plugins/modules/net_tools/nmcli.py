@@ -110,7 +110,7 @@ options:
     method4:
         description:
             - Configuration method to be used for IPv4.
-            - If ip4 is set, ipv4.method is automatically set to manual and this parameter is not needed.
+            - If I(ip4) is set, C(ipv4.method) is automatically set to C(manual) and this parameter is not needed.
         type: str
         choices: [auto, link-local, manual, shared, disabled]
         version_added: 2.2.0
