@@ -118,7 +118,7 @@ options:
         description:
             - The IPv6 address to this interface.
             - Use the format C(abbe::cafe).
-            - If defined, automatically set C(ipv6.method) to C(manual). If the I(method6) parameter is used, this parameter is ignored.
+            - If defined and I(method6) is not specified, automatically set C(ipv6.method) to C(manual).
         type: str
     gw6:
         description:
