@@ -208,7 +208,7 @@ author:
 
 EXAMPLES = '''
 - name: Create a monitoring policy
-  oneandone_monitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     name: ansible monitoring policy
     description: Testing creation of a monitoring policy with ansible
@@ -269,13 +269,13 @@ EXAMPLES = '''
     wait: true
 
 - name: Destroy a monitoring policy
-  oneandone_monitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     state: absent
     name: ansible monitoring policy
 
 - name: Update a monitoring policy
-  oneandone_monitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy
     name: ansible monitoring policy updated
@@ -326,7 +326,7 @@ EXAMPLES = '''
     state: update
 
 - name: Add a port to a monitoring policy
-  oneandone_monitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     add_ports:
@@ -339,7 +339,7 @@ EXAMPLES = '''
     state: update
 
 - name: Update existing ports of a monitoring policy
-  oneandone_monitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     update_ports:
@@ -359,7 +359,7 @@ EXAMPLES = '''
     state: update
 
 - name: Remove a port from a monitoring policy
-  oneandone_monitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     remove_ports:
@@ -367,7 +367,7 @@ EXAMPLES = '''
     state: update
 
 - name: Add a process to a monitoring policy
-  oneandone_monitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     add_processes:
@@ -379,7 +379,7 @@ EXAMPLES = '''
     state: update
 
 - name: Update existing processes of a monitoring policy
-  oneandone_monitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     update_processes:
@@ -397,7 +397,7 @@ EXAMPLES = '''
     state: update
 
 - name: Remove a process from a monitoring policy
-  oneandone_monitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     remove_processes:
@@ -406,7 +406,7 @@ EXAMPLES = '''
     state: update
 
 - name: Add server to a monitoring policy
-  oneandone_monitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     add_servers:
@@ -415,7 +415,7 @@ EXAMPLES = '''
     state: update
 
 - name: Remove server from a monitoring policy
-  oneandone_monitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     remove_servers:
