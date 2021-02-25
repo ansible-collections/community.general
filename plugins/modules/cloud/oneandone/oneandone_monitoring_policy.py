@@ -977,7 +977,7 @@ def main():
             add_processes=dict(type='list', elements="dict", default=[]),
             update_processes=dict(type='list', elements="dict", default=[]),
             remove_processes=dict(type='list', elements="str", default=[]),
-            add_servers=dict(type='list', elements="dict", default=[]),
+            add_servers=dict(type='list', elements="str", default=[]),
             remove_servers=dict(type='list', elements="str", default=[]),
             wait=dict(type='bool', default=True),
             wait_timeout=dict(type='int', default=600),
