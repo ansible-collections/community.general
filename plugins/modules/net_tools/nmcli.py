@@ -69,6 +69,7 @@ options:
         description:
             - The IPv4 address to this interface.
             - Use the format C(192.0.2.24/24).
+            - If defined, automatically set ipv4.method to manual and remove the need to set method4 parameter.
         type: str
     gw4:
         description:
@@ -109,6 +110,7 @@ options:
     method4:
         description:
             - Configuration method to be used for IPv4.
+            - If ip4 is set, ipv4.method is automatically set to manual and this parameter is not needed.
         type: str
         choices: [auto, link-local, manual, shared, disabled]
         version_added: 2.2.0
@@ -116,6 +118,7 @@ options:
         description:
             - The IPv6 address to this interface.
             - Use the format C(abbe::cafe).
+            - If defined, automatically set ipv6.method to manual and remove the need to set method6 parameter.
         type: str
     gw6:
         description:
@@ -135,9 +138,11 @@ options:
         type: list
     method6:
         description:
-            - Configuration method to be used for ipv6
+            - Configuration method to be used for IPv6
+            - If ip6 is set, ipv6.method is automatically set to manual and this parameter is not needed.
         type: str
         choices: [ignore, auto, dhcp, link-local, manual, shared]
+        version_added: 2.2.0
     mtu:
         description:
             - The connection MTU, e.g. 9000. This can't be applied when creating the interface and is done once the interface has been created.
