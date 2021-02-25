@@ -34,10 +34,12 @@ options:
     description:
       - The name of the setting. If no value is supplied, the value will
         be read from the config if it has been set.
+    type: str
   repo:
     description:
       - Path to a git repository for reading and writing values from a
         specific repo.
+    type: path
   file:
     description:
       - Path to an adhoc git configuration file to be managed using the C(file) scope.
@@ -51,6 +53,7 @@ options:
       - If this is set to C(file), you must also specify the C(file) parameter.
       - It defaults to system only when not using I(list_all)=C(yes).
     choices: [ "file", "local", "global", "system" ]
+    type: str
   state:
     description:
       - "Indicates the setting should be set/unset.
@@ -58,10 +61,12 @@ options:
         when I(state)=absent and I(value) is defined, I(value) is discarded."
     choices: [ 'present', 'absent' ]
     default: 'present'
+    type: str
   value:
     description:
       - When specifying the name of a single setting, supply a value to
         set that setting to the given value.
+    type: str
 '''
 
 EXAMPLES = '''
