@@ -295,7 +295,8 @@ files:
   $modules/clustering/consul/:
     maintainers: $team_consul
   $modules/clustering/etcd3.py:
-    maintainers: evrardjp vfauth
+    maintainers: evrardjp
+    ignore: vfauth
   $modules/clustering/nomad/:
     maintainers: chris93111
   $modules/clustering/pacemaker_cluster.py:
