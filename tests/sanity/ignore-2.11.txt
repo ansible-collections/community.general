@@ -231,8 +231,6 @@ plugins/modules/remote_management/stacki/stacki_host.py validate-modules:no-defa
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:undocumented-parameter
 plugins/modules/source_control/github/github_deploy_key.py validate-modules:parameter-invalid
-plugins/modules/source_control/github/github_webhook.py validate-modules:parameter-type-not-in-doc
-plugins/modules/source_control/github/github_webhook_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/glusterfs/gluster_heal_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/storage/glusterfs/gluster_peer.py validate-modules:parameter-list-no-elements
 plugins/modules/storage/glusterfs/gluster_volume.py validate-modules:parameter-list-no-elements
