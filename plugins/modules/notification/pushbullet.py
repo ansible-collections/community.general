@@ -51,7 +51,7 @@ options:
     url:
         type: str
         description:
-          - URL field, used for I(push_type) is C(link).
+          - URL field, used when I(push_type) is C(link).
 
 notes:
    - Requires pushbullet.py Python package on the remote host.
