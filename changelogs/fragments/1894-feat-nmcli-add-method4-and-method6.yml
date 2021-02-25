@@ -1,2 +1,2 @@
 bugfixes:
-  - nmcli - Add method4 and method6 (https://github.com/ansible-collections/community.general/pull/1894).
+  - nmcli - add ``method4`` and ``method6`` options (https://github.com/ansible-collections/community.general/pull/1894).
