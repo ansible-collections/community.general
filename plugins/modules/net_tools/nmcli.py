@@ -111,6 +111,7 @@ options:
             - Configuration method to be used for ipv4
         type: str
         choices: [auto, link-local, manual, shared, disabled]
+        version_added: 2.2.0
     ip6:
         description:
             - The IPv6 address to this interface.
