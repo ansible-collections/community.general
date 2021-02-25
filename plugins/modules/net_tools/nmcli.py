@@ -69,7 +69,7 @@ options:
         description:
             - The IPv4 address to this interface.
             - Use the format C(192.0.2.24/24).
-            - If defined, automatically set ipv4.method to manual and remove the need to set method4 parameter.
+            - If defined, automatically set C(ipv4.method) to C(manual). If the I(method4) parameter is used, this parameter is ignored.
         type: str
     gw4:
         description:
