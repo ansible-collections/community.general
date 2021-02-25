@@ -297,7 +297,7 @@ class CmdMixin(object):
 
         for param in param_list:
             if isinstance(param, dict):
-                if len(param.keys()) != 1:
+                if len(param) != 1:
                     raise ModuleHelperException("run_command parameter as a dict must "
                                                 "contain only one key: {0}".format(param))
                 _param = list(param.keys())[0]
