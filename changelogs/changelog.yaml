@@ -1950,3 +1950,202 @@ releases:
     - community.docker-76-leading-v-support-in-docker-version.yml
     - no_log-fixes.yml
     release_date: '2021-02-09'
+  1.3.7:
+    changes:
+      bugfixes:
+      - aerospike_migration - fix typo that caused ``migrate_tx_key`` instead of ``migrate_rx_key``
+        being used (https://github.com/ansible-collections/community.general/pull/1739).
+      - 'alternatives - internal refactoring: replaced uses of ``_`` with ``dummy``
+        (https://github.com/ansible-collections/community.general/pull/1819).'
+      - 'beadm - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).'
+      - chef_databag lookup plugin - wrapped usages of ``dict.keys()`` in ``list()``
+        for Python 3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - cobbler_sync, cobbler_system - fix SSL/TLS certificate check when ``validate_certs``
+        set to ``false`` (https://github.com/ansible-collections/community.general/pull/1880).
+      - 'cronvar - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).'
+      - 'dconf - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).'
+      - deploy_helper - allow ``state=clean`` to be used without defining a ``release``
+        (https://github.com/ansible-collections/community.general/issues/1852).
+      - diy callback plugin - wrapped usages of ``dict.keys()`` in ``list()`` for
+        Python 3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - elasticsearch_plugin - ``state`` parameter choices must use ``list()`` in
+        python3 (https://github.com/ansible-collections/community.general/pull/1830).
+      - 'filesystem - internal refactoring: replaced uses of ``_`` with ``dummy``
+        (https://github.com/ansible-collections/community.general/pull/1819).'
+      - filesystem - remove ``swap`` from list of FS supported by ``resizefs=yes``
+        (https://github.com/ansible-collections/community.general/issues/790).
+      - git_config - prevent ``run_command`` from expanding values (https://github.com/ansible-collections/community.general/issues/1776).
+      - gitlab_runner - parameter ``registration_token`` was required but is used
+        only when ``state`` is ``present`` (https://github.com/ansible-collections/community.general/issues/1714).
+      - 'hipchat - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).'
+      - idrac_redfish_command - wrapped usages of ``dict.keys()`` in ``list()`` for
+        Python 3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - idrac_redfish_config - wrapped usages of ``dict.keys()`` in ``list()`` for
+        Python 3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - idrac_redfish_info - wrapped usages of ``dict.keys()`` in ``list()`` for Python
+        3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - imc_rest - explicitly logging out instead of registering the call in ```atexit```
+        (https://github.com/ansible-collections/community.general/issues/1735).
+      - infoblox inventory script - make sure that the script also works with Ansible
+        2.9, and returns a more helpful error when community.general is not installed
+        as part of Ansible 2.10/3 (https://github.com/ansible-collections/community.general/pull/1871).
+      - 'interfaces_file - internal refactoring: replaced uses of ``_`` with ``dummy``
+        (https://github.com/ansible-collections/community.general/pull/1819).'
+      - iso_extract - use proper alias deprecation mechanism for ``thirsty`` alias
+        of ``force`` (https://github.com/ansible-collections/community.general/pull/1830).
+      - 'java_cert - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).'
+      - kibana_plugin - ``state`` parameter choices must use ``list()`` in python3
+        (https://github.com/ansible-collections/community.general/pull/1830).
+      - logstash_plugin - wrapped ``dict.keys()`` with ``list`` for use in ``choices``
+        setting (https://github.com/ansible-collections/community.general/pull/1830).
+      - 'lvg - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).'
+      - 'lvol - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).'
+      - 'lxc - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).'
+      - 'lxc_container - internal refactoring: replaced uses of ``_`` with ``dummy``
+        (https://github.com/ansible-collections/community.general/pull/1819).'
+      - lxc_container - wrapped usages of ``dict.keys()`` in ``list()`` for Python
+        3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - lxd_container - wrapped usages of ``dict.keys()`` in ``list()`` for Python
+        3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - memcached cache plugin - wrapped usages of ``dict.keys()`` in ``list()`` for
+        Python 3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - net_tools.nios.api module_utils - wrapped usages of ``dict.keys()`` in ``list()``
+        for Python 3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - nios_host_record - allow DNS Bypass for views other than default (https://github.com/ansible-collections/community.general/issues/1786).
+      - nomad_job_info - fix module failure when nomad client returns no jobs (https://github.com/ansible-collections/community.general/pull/1721).
+      - nsot inventory script - wrapped usages of ``dict.keys()`` in ``list()`` for
+        Python 3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - oci_vcn - wrapped usages of ``dict.keys()`` in ``list()`` for Python 3 compatibility
+        (https://github.com/ansible-collections/community.general/pull/1861).
+      - oneandone_monitoring_policy - wrapped usages of ``dict.keys()`` in ``list()``
+        for Python 3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - 'parted - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).'
+      - postgresql_info - fix crash caused by wrong PgSQL version parsing (https://github.com/ansible-collections/community.postgresql/issues/40).
+      - postgresql_ping - fix crash caused by wrong PgSQL version parsing (https://github.com/ansible-collections/community.postgresql/issues/40).
+      - postgresql_query - fix datetime.timedelta type handling (https://github.com/ansible-collections/community.postgresql/issues/47).
+      - postgresql_query - fix decimal handling (https://github.com/ansible-collections/community.postgresql/issues/45).
+      - postgresql_set - fails in check_mode on non-numeric values containing ``B``
+        (https://github.com/ansible-collections/community.postgresql/issues/48).
+      - postgresql_set - return a message instead of traceback when a passed parameter
+        has not been found (https://github.com/ansible-collections/community.postgresql/issues/41).
+      - proxmox* modules - refactored some parameter validation code into use of ``env_fallback``,
+        ``required_if``, ``required_together``, ``required_one_of`` (https://github.com/ansible-collections/community.general/pull/1765).
+      - proxmox_kvm - do not add ``args`` if ``proxmox_default_behavior`` is set to
+        no_defaults  (https://github.com/ansible-collections/community.general/issues/1641).
+      - proxmox_kvm - fix parameter ``vmid`` passed twice to ``exit_json`` while creating
+        a virtual machine without cloning (https://github.com/ansible-collections/community.general/issues/1875,
+        https://github.com/ansible-collections/community.general/pull/1895).
+      - proxmox_kvm - fix undefined local variable ``status`` when the parameter ``state``
+        is either ``stopped``, ``started``, ``restarted`` or ``absent`` (https://github.com/ansible-collections/community.general/pull/1847).
+      - proxmox_kvm - stop implicitly adding ``force`` equal to ``false``. Proxmox
+        API requires not implemented parameters otherwise, and assumes ``force`` to
+        be ``false`` by default anyways (https://github.com/ansible-collections/community.general/pull/1783).
+      - redfish_command - wrapped usages of ``dict.keys()`` in ``list()`` for Python
+        3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - redfish_config - wrapped usages of ``dict.keys()`` in ``list()`` for Python
+        3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - redhat_subscription - ``mutually_exclusive`` was referring to parameter alias
+        instead of name (https://github.com/ansible-collections/community.general/pull/1795).
+      - redhat_subscription - wrapped usages of ``dict.keys()`` in ``list()`` for
+        Python 3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - redis cache plugin - wrapped usages of ``keys()`` in ``list()`` for Python
+        3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - riak - parameters ``wait_for_handoffs`` and ``wait_for_ring`` are ``int``
+        but the default value was ``false`` (https://github.com/ansible-collections/community.general/pull/1830).
+      - 'rundeck_acl_policy - internal refactoring: replaced uses of ``_`` with ``dummy``
+        (https://github.com/ansible-collections/community.general/pull/1819).'
+      - runit - removed unused code, and passing command as ``list`` instead of ``str``
+        to ``run_command()`` (https://github.com/ansible-collections/community.general/pull/1830).
+      - selective callback plugin - adjust import so that the plugin also works with
+        ansible-core 2.11 (https://github.com/ansible-collections/community.general/pull/1807).
+      - selective callback plugin - wrapped usages of ``dict.keys()`` in ``list()``
+        for Python 3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - sensu_check - wrapped usages of ``dict.keys()`` in ``list()`` for Python 3
+        compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - spotinst_aws_elastigroup - wrapped usages of ``dict.keys()`` in ``list()``
+        for Python 3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - 'statusio_maintenance - internal refactoring: replaced uses of ``_`` with
+        ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).'
+      - 'timezone - internal refactoring: replaced uses of ``_`` with ``dummy`` (https://github.com/ansible-collections/community.general/pull/1819).'
+      - utm_utils module_utils - wrapped usages of ``dict.keys()`` in ``list()`` for
+        Python 3 compatibility (https://github.com/ansible-collections/community.general/pull/1861).
+      - vdo - wrapped usages of ``dict.keys()`` in ``list()`` for Python 3 compatibility
+        (https://github.com/ansible-collections/community.general/pull/1861).
+      - zfs_delegate_admin - the elements of ``users``, ``groups`` and ``permissions``
+        are now enforced to be strings (https://github.com/ansible-collections/community.general/pull/1766).
+      minor_changes:
+      - clc_* modules - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1771).
+      - dnsimple - elements of list parameters ``record_ids`` are now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - gitlab_runner - elements of list parameters ``tag_list`` are now validated
+        (https://github.com/ansible-collections/community.general/pull/1795).
+      - keycloak_client - elements of list parameters ``default_roles``, ``redirect_uris``,
+        ``web_origins`` are now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - librato_annotation - elements of list parameters ``links`` are now validated
+        (https://github.com/ansible-collections/community.general/pull/1795).
+      - lxd_container - elements of list parameter ``profiles`` are now validated
+        (https://github.com/ansible-collections/community.general/pull/1795).
+      - mail - elements of list parameters ``to``, ``cc``, ``bcc``, ``attach``, ``headers``
+        are now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - na_ontap_gather_facts - elements of list parameters ``gather_subset`` are
+        now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - nexmo - elements of list parameters ``dest`` are now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - nsupdate - elements of list parameters ``value`` are now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - omapi_host - elements of list parameters ``statements`` are now validated
+        (https://github.com/ansible-collections/community.general/pull/1795).
+      - onepassword_info - elements of list parameters ``search_terms`` are now validated
+        (https://github.com/ansible-collections/community.general/pull/1795).
+      - packet_device - elements of list parameters ``device_ids``, ``hostnames``
+        are now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - pagerduty - elements of list parameters ``service`` are now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - plugins/module_utils/oracle/oci_utils.py - elements of list parameter ``key_by``
+        are now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - proxmox_kvm module - actually implemented ``vmid`` and ``status`` return values.
+        Updated documentation to reflect current situation (https://github.com/ansible-collections/community.general/issues/1410,
+        https://github.com/ansible-collections/community.general/pull/1715).
+      - pubnub_blocks - elements of list parameters ``event_handlers`` are now validated
+        (https://github.com/ansible-collections/community.general/pull/1795).
+      - redfish modules - explicitly setting lists' elements to ``str`` (https://github.com/ansible-collections/community.general/pull/1761).
+      - redhat_subscription - elements of list parameters ``pool_ids``, ``addons``
+        are now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - rocketchat - elements of list parameters ``attachments`` are now validated
+        (https://github.com/ansible-collections/community.general/pull/1795).
+      - sendgrid - elements of list parameters ``to_addresses``, ``cc``, ``bcc``,
+        ``attachments`` are now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - sl_vm - elements of list parameters ``disks``, ``ssh_keys`` are now validated
+        (https://github.com/ansible-collections/community.general/pull/1795).
+      - slack - elements of list parameters ``attachments`` are now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - statusio_maintenance - elements of list parameters ``components``, ``containers``
+        are now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - twilio - elements of list parameters ``to_numbers`` are now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - vmadm - elements of list parameters ``disks``, ``nics``, ``resolvers``, ``filesystems``
+        are now validated (https://github.com/ansible-collections/community.general/pull/1795).
+      - xml - elements of list parameters ``add_children``, ``set_children`` are now
+        validated (https://github.com/ansible-collections/community.general/pull/1795).
+      release_summary: Regular maintenance and bugfix release.
+    fragments:
+    - 1-community-postgresql_backports.yml
+    - 1.3.7.yml
+    - 1714-gitlab_runner-required-reg-token.yml
+    - 1715-proxmox_kvm-add-vmid-to-returns.yml
+    - 1721-fix-nomad_job_info-no-jobs-failure.yml
+    - 1735-imc-sessions.yml
+    - 1740-aerospike_migration.yml
+    - 1753-document-fstypes-supported-by-resizefs.yml
+    - 1761-redfish-tidy-up-validation.yml
+    - 1765-proxmox-params.yml
+    - 1766-zfs-fixed-sanity.yml
+    - 1771-centurylink-validation-elements.yml
+    - 1776-git_config-tilde_value.yml
+    - 1783-proxmox-kvm-fix-args-500-error.yaml
+    - 1788-ease-nios_host_record-dns-bypass-check.yml
+    - 1795-list-elements-batch1.yml
+    - 1819-tidyup-pylint-blacklistnames.yml
+    - 1830-valmod_docmissingtype_batch1.yml
+    - 1847-proxmox-kvm-fix-status.yml
+    - 1852-deploy-helper-fix-state-is-clean-without-release.yaml
+    - 1861-python3-keys.yml
+    - 1871-infoblox-inventory.yml
+    - 1880-fix_cobbler_system_ssl.yml
+    - 1895-proxmox-kvm-fix-issue-1875.yml
+    - selective-core-2.11.yml
+    release_date: '2021-02-25'
