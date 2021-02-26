@@ -141,6 +141,10 @@ options:
         required: false
         default: 'download'
         choices: ['never', 'download', 'change', 'always']
+    directory_mode:
+        type: str
+        description:
+            - Filesystem permission mode applied recursively to I(dest) when it is a directory.
 extends_documentation_fragment:
     - files
 '''
@@ -342,7 +346,7 @@ class Artifact(object):
         if len(parts) >= 3:
             g = parts[0]
             a = parts[1]
-            v = parts[len(parts) - 1]
+            v = parts[-1]
             t = None
             c = None
             if len(parts) == 4:
@@ -595,8 +599,7 @@ def main():
             client_key=dict(type="path", required=False),
             keep_name=dict(required=False, default=False, type='bool'),
             verify_checksum=dict(required=False, default='download', choices=['never', 'download', 'change', 'always']),
-            directory_mode=dict(type='str'),  # Used since https://github.com/ansible/ansible/pull/24965, not sure
-                                              # if this should really be here.
+            directory_mode=dict(type='str'),
         ),
         add_file_common_args=True,
         mutually_exclusive=([('version', 'version_by_spec')])
