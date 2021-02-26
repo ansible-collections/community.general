@@ -41,7 +41,7 @@ plugin_routing:
     ali_instance_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.ali_instance_info instead.
     docker_compose:
       redirect: community.docker.docker_compose
     docker_config:
@@ -198,19 +198,19 @@ plugin_routing:
     hpilo_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.hpilo_info instead.
     idrac_firmware:
       redirect: dellemc.openmanage.idrac_firmware
     idrac_redfish_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.idrac_redfish_info instead.
     idrac_server_config_profile:
       redirect: dellemc.openmanage.idrac_server_config_profile
     jenkins_job_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.jenkins_job_info instead.
     katello:
       tombstone:
         removal_version: 2.0.0
@@ -230,7 +230,7 @@ plugin_routing:
     ldap_attr:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.ldap_attrs instead.
     logicmonitor:
       tombstone:
         removal_version: 1.0.0
@@ -242,11 +242,11 @@ plugin_routing:
     memset_memstore_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.memset_memstore_info instead.
     memset_server_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.memset_server_info instead.
     na_cdot_aggregate:
       tombstone:
         removal_version: 2.0.0
@@ -282,161 +282,161 @@ plugin_routing:
     na_ontap_gather_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use netapp.ontap.na_ontap_info instead.
     nginx_status_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.nginx_status_info instead.
     ome_device_info:
       redirect: dellemc.openmanage.ome_device_info
     one_image_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.one_image_info instead.
     onepassword_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.onepassword_info instead.
     oneview_datacenter_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.oneview_datacenter_info instead.
     oneview_enclosure_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.oneview_enclosure_info instead.
     oneview_ethernet_network_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.oneview_ethernet_network_info instead.
     oneview_fc_network_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.oneview_fc_network_info instead.
     oneview_fcoe_network_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.oneview_fcoe_network_info instead.
     oneview_logical_interconnect_group_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.oneview_logical_interconnect_group_info instead.
     oneview_network_set_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.oneview_network_set_info instead.
     oneview_san_manager_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.oneview_san_manager_info instead.
     online_server_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.online_server_info instead.
     online_user_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.online_user_info instead.
     ovirt:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_vm instead.
     ovirt_affinity_label_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_affinity_label_info instead.
     ovirt_api_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_api_info instead.
     ovirt_cluster_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_cluster_info instead.
     ovirt_datacenter_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_datacenter_info instead.
     ovirt_disk_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_disk_info instead.
     ovirt_event_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_event_info instead.
     ovirt_external_provider_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_external_provider_info instead.
     ovirt_group_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_group_info instead.
     ovirt_host_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_host_info instead.
     ovirt_host_storage_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_host_storage_info instead.
     ovirt_network_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_network_info instead.
     ovirt_nic_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_nic_info instead.
     ovirt_permission_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_permission_info instead.
     ovirt_quota_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_quota_info instead.
     ovirt_scheduling_policy_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_scheduling_policy_info instead.
     ovirt_snapshot_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_snapshot_info instead.
     ovirt_storage_domain_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_storage_domain_info instead.
     ovirt_storage_template_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_storage_template_info instead.
     ovirt_storage_vm_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_storage_vm_info instead.
     ovirt_tag_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_tag_info instead.
     ovirt_template_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_template_info instead.
     ovirt_user_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_user_info instead.
     ovirt_vm_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_vm_info instead.
     ovirt_vmpool_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use ovirt.ovirt.ovirt_vmpool_info instead.
     postgresql_copy:
       redirect: community.postgresql.postgresql_copy
     postgresql_db:
@@ -484,47 +484,47 @@ plugin_routing:
     purefa_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use purestorage.flasharray.purefa_info instead.
     purefb_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use purestorage.flashblade.purefb_info instead.
     python_requirements_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.python_requirements_info instead.
     redfish_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.redfish_info instead.
     scaleway_image_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.scaleway_image_info instead.
     scaleway_ip_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.scaleway_ip_info instead.
     scaleway_organization_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.scaleway_organization_info instead.
     scaleway_security_group_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.scaleway_security_group_info instead.
     scaleway_server_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.scaleway_server_info instead.
     scaleway_snapshot_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.scaleway_snapshot_info instead.
     scaleway_volume_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.scaleway_volume_info instead.
     sf_account_manager:
       tombstone:
         removal_version: 2.0.0
@@ -548,15 +548,15 @@ plugin_routing:
     smartos_image_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.smartos_image_info instead.
     vertica_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.vertica_info instead.
     xenserver_guest_facts:
       deprecation:
         removal_version: 3.0.0
-        warning_text: see plugin documentation for details
+        warning_text: Use community.general.xenserver_guest_info instead.
   doc_fragments:
     _gcp:
       redirect: community.google._gcp
