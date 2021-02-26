@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 ---
 module: jenkins_build
 short_description: Manage jenkins builds
-version_added: 1.3.0
+version_added: 2.2.0
 description:
     - Manage Jenkins builds with Jenkins REST API.
 requirements:
