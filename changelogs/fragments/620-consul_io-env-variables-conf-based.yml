@@ -2,4 +2,4 @@
 bugfixes:
   - consul_io inventory script - kv_groups - fix byte chain decoding for Python 3 (https://github.com/ansible-collections/community.general/pull/620/files).
 minor_changes:
-  - conf options - Allow custom configuration options via env variables
+  - consul_io inventory script - conf options - allow custom configuration options via env variables (https://github.com/ansible-collections/community.general/pull/620).
