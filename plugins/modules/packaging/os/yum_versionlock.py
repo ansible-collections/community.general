@@ -128,7 +128,7 @@ def main():
                 if module.check_mode:
                     changed = True
                     continue
-                changed = yum_v.ensure_state(single_pkg, command)
+        changed = yum_v.ensure_state(packages, command)
     elif state in ('absent'):
         command = 'delete'
         for single_pkg in packages:
@@ -136,7 +136,7 @@ def main():
                 if module.check_mode:
                     changed = True
                     continue
-                changed = yum_v.ensure_state(single_pkg, command)
+        changed = yum_v.ensure_state(packages, command)
 
     module.exit_json(
         changed=changed,
