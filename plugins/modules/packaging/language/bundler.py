@@ -33,6 +33,7 @@ options:
       - If not specified, it will default to the temporary working directory
   exclude_groups:
     type: list
+    elements: str
     description:
       - A list of Gemfile groups to exclude during operations. This only
         applies when state is C(present). Bundler considers this
@@ -134,7 +135,7 @@ def main():
             executable=dict(default=None, required=False),
             state=dict(default='present', required=False, choices=['present', 'latest']),
             chdir=dict(default=None, required=False, type='path'),
-            exclude_groups=dict(default=None, required=False, type='list'),
+            exclude_groups=dict(default=None, required=False, type='list', elements='str'),
             clean=dict(default=False, required=False, type='bool'),
             gemfile=dict(default=None, required=False, type='path'),
             local=dict(default=False, required=False, type='bool'),

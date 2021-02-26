@@ -32,27 +32,33 @@ options:
         description:
             - The name of the domain
         required: true
+        type: str
 
     state:
         description:
             - Whether the domain should exist
         choices: ['present', 'absent']
         default: "present"
+        type: str
 
     subdomains:
         description:
             - Any subdomains to create.
         default: []
+        type: list
+        elements: str
 
     login_name:
         description:
             - The webfaction account to use
         required: true
+        type: str
 
     login_password:
         description:
             - The webfaction password to use
         required: true
+        type: str
 '''
 
 EXAMPLES = '''
@@ -87,8 +93,8 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True),
-            state=dict(required=False, choices=['present', 'absent'], default='present'),
-            subdomains=dict(required=False, default=[], type='list'),
+            state=dict(choices=['present', 'absent'], default='present'),
+            subdomains=dict(default=[], type='list', elements='str'),
             login_name=dict(required=True),
             login_password=dict(required=True, no_log=True),
         ),
