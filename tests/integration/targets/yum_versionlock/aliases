@@ -1,3 +1,4 @@
+disabled  # The tests are way too slow - the locking/unlocking steps need 10 minutes each!
 shippable/posix/group1
 skip/aix
 skip/freebsd
