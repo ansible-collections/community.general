@@ -67,6 +67,7 @@ options:
             associated with the session will be release and can be acquired once
             the associated lock delay has expired.
         type: list
+        elements: str
     host:
         description:
           - The host of the consul agent defaults to localhost.
@@ -237,7 +238,7 @@ def test_dependencies(module):
 
 def main():
     argument_spec = dict(
-        checks=dict(type='list'),
+        checks=dict(type='list', elements='str'),
         delay=dict(type='int', default='15'),
         behavior=dict(type='str', default='release', choices=['release', 'delete']),
         host=dict(type='str', default='localhost'),

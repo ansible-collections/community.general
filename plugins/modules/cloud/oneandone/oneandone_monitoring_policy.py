@@ -71,6 +71,7 @@ options:
         warning alerts, critical is used to set critical alerts. alert enables alert,
         and value is used to advise when the value is exceeded.
     type: list
+    elements: dict
     suboptions:
       cpu:
         description:
@@ -96,6 +97,7 @@ options:
     description:
       - Array of ports that will be monitoring.
     type: list
+    elements: dict
     suboptions:
       protocol:
         description:
@@ -119,6 +121,7 @@ options:
     description:
       - Array of processes that will be monitoring.
     type: list
+    elements: dict
     suboptions:
       process:
         description:
@@ -133,41 +136,49 @@ options:
     description:
       - Ports to add to the monitoring policy.
     type: list
+    elements: dict
     required: false
   add_processes:
     description:
       - Processes to add to the monitoring policy.
     type: list
+    elements: dict
     required: false
   add_servers:
     description:
       - Servers to add to the monitoring policy.
     type: list
+    elements: str
     required: false
   remove_ports:
     description:
       - Ports to remove from the monitoring policy.
     type: list
+    elements: str
     required: false
   remove_processes:
     description:
       - Processes to remove from the monitoring policy.
     type: list
+    elements: str
     required: false
   remove_servers:
     description:
       - Servers to remove from the monitoring policy.
     type: list
+    elements: str
     required: false
   update_ports:
     description:
       - Ports to be updated on the monitoring policy.
     type: list
+    elements: dict
     required: false
   update_processes:
     description:
       - Processes to be updated on the monitoring policy.
     type: list
+    elements: dict
     required: false
   wait:
     description:
@@ -197,7 +208,7 @@ author:
 
 EXAMPLES = '''
 - name: Create a monitoring policy
-  oneandone_moitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     name: ansible monitoring policy
     description: Testing creation of a monitoring policy with ansible
@@ -258,13 +269,13 @@ EXAMPLES = '''
     wait: true
 
 - name: Destroy a monitoring policy
-  oneandone_moitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     state: absent
     name: ansible monitoring policy
 
 - name: Update a monitoring policy
-  oneandone_moitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy
     name: ansible monitoring policy updated
@@ -315,7 +326,7 @@ EXAMPLES = '''
     state: update
 
 - name: Add a port to a monitoring policy
-  oneandone_moitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     add_ports:
@@ -328,7 +339,7 @@ EXAMPLES = '''
     state: update
 
 - name: Update existing ports of a monitoring policy
-  oneandone_moitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     update_ports:
@@ -348,7 +359,7 @@ EXAMPLES = '''
     state: update
 
 - name: Remove a port from a monitoring policy
-  oneandone_moitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     remove_ports:
@@ -356,7 +367,7 @@ EXAMPLES = '''
     state: update
 
 - name: Add a process to a monitoring policy
-  oneandone_moitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     add_processes:
@@ -368,7 +379,7 @@ EXAMPLES = '''
     state: update
 
 - name: Update existing processes of a monitoring policy
-  oneandone_moitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     update_processes:
@@ -386,7 +397,7 @@ EXAMPLES = '''
     state: update
 
 - name: Remove a process from a monitoring policy
-  oneandone_moitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     remove_processes:
@@ -395,7 +406,7 @@ EXAMPLES = '''
     state: update
 
 - name: Add server to a monitoring policy
-  oneandone_moitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     add_servers:
@@ -404,7 +415,7 @@ EXAMPLES = '''
     state: update
 
 - name: Remove server from a monitoring policy
-  oneandone_moitoring_policy:
+  community.general.oneandone_monitoring_policy:
     auth_token: oneandone_private_api_key
     monitoring_policy: ansible monitoring policy updated
     remove_servers:
@@ -957,17 +968,17 @@ def main():
             agent=dict(type='str'),
             email=dict(type='str'),
             description=dict(type='str'),
-            thresholds=dict(type='list', default=[]),
-            ports=dict(type='list', default=[]),
-            processes=dict(type='list', default=[]),
-            add_ports=dict(type='list', default=[]),
-            update_ports=dict(type='list', default=[]),
-            remove_ports=dict(type='list', default=[]),
-            add_processes=dict(type='list', default=[]),
-            update_processes=dict(type='list', default=[]),
-            remove_processes=dict(type='list', default=[]),
-            add_servers=dict(type='list', default=[]),
-            remove_servers=dict(type='list', default=[]),
+            thresholds=dict(type='list', elements="dict", default=[]),
+            ports=dict(type='list', elements="dict", default=[]),
+            processes=dict(type='list', elements="dict", default=[]),
+            add_ports=dict(type='list', elements="dict", default=[]),
+            update_ports=dict(type='list', elements="dict", default=[]),
+            remove_ports=dict(type='list', elements="str", default=[]),
+            add_processes=dict(type='list', elements="dict", default=[]),
+            update_processes=dict(type='list', elements="dict", default=[]),
+            remove_processes=dict(type='list', elements="str", default=[]),
+            add_servers=dict(type='list', elements="str", default=[]),
+            remove_servers=dict(type='list', elements="str", default=[]),
             wait=dict(type='bool', default=True),
             wait_timeout=dict(type='int', default=600),
             wait_interval=dict(type='int', default=5),

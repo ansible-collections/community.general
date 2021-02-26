@@ -56,6 +56,7 @@ options:
         - If not specified, it defaults to the remote system's hostname.
     tags:
         type: list
+        elements: str
         description: ["Comma separated list of tags to apply to the event."]
     alert_type:
         type: str
@@ -114,17 +115,12 @@ def main():
             app_key=dict(required=True, no_log=True),
             title=dict(required=True),
             text=dict(required=True),
-            date_happened=dict(required=False, default=None, type='int'),
-            priority=dict(
-                required=False, default='normal', choices=['normal', 'low']
-            ),
-            host=dict(required=False, default=None),
-            tags=dict(required=False, default=None, type='list'),
-            alert_type=dict(
-                required=False, default='info',
-                choices=['error', 'warning', 'info', 'success']
-            ),
-            aggregation_key=dict(required=False, default=None),
+            date_happened=dict(type='int'),
+            priority=dict(default='normal', choices=['normal', 'low']),
+            host=dict(),
+            tags=dict(type='list', elements='str'),
+            alert_type=dict(default='info', choices=['error', 'warning', 'info', 'success']),
+            aggregation_key=dict(),
             validate_certs=dict(default=True, type='bool'),
         )
     )

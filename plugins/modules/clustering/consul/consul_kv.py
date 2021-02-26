@@ -37,6 +37,7 @@ options:
             'release' respectively. a valid session must be supplied to make the
             attempt changed will be true if the attempt is successful, false
             otherwise.
+        type: str
         choices: [ absent, acquire, present, release ]
         default: present
     key:

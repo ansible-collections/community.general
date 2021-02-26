@@ -49,11 +49,13 @@ options:
       - Path to the sensu check to run (not required when I(state=absent))
   handlers:
     type: list
+    elements: str
     description:
       - List of handlers to notify when the check fails
     default: []
   subscribers:
     type: list
+    elements: str
     description:
       - List of subscribers/channels this check should run for
       - See sensu_subscribers to subscribe a machine to a channel
@@ -86,9 +88,9 @@ options:
       - When to enable handling of check failures
   dependencies:
     type: list
+    elements: str
     description:
-      - Other checks this check depends on, if dependencies fail,
-      - handling of this check will be disabled
+      - Other checks this check depends on, if dependencies fail handling of this check will be disabled
     default: []
   metric:
     description:
@@ -327,15 +329,15 @@ def main():
                 'state': {'type': 'str', 'default': 'present', 'choices': ['present', 'absent']},
                 'backup': {'type': 'bool', 'default': 'no'},
                 'command': {'type': 'str'},
-                'handlers': {'type': 'list'},
-                'subscribers': {'type': 'list'},
+                'handlers': {'type': 'list', 'elements': 'str'},
+                'subscribers': {'type': 'list', 'elements': 'str'},
                 'interval': {'type': 'int'},
                 'timeout': {'type': 'int'},
                 'ttl': {'type': 'int'},
                 'handle': {'type': 'bool'},
                 'subdue_begin': {'type': 'str'},
                 'subdue_end': {'type': 'str'},
-                'dependencies': {'type': 'list'},
+                'dependencies': {'type': 'list', 'elements': 'str'},
                 'metric': {'type': 'bool', 'default': 'no'},
                 'standalone': {'type': 'bool'},
                 'publish': {'type': 'bool'},
