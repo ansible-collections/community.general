@@ -148,7 +148,7 @@ options:
     description:
       - Servers to add to the monitoring policy.
     type: list
-    elements: dict
+    elements: str
     required: false
   remove_ports:
     description:
