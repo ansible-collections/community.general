@@ -130,7 +130,8 @@ def main():
                     changed = True
                     continue
                 packages_list.append(single_pkg)
-        changed = yum_v.ensure_state(packages_list, command)
+        if packages_list:
+            changed = yum_v.ensure_state(packages_list, command)
     elif state in ('absent'):
         command = 'delete'
         for single_pkg in packages:
@@ -139,7 +140,8 @@ def main():
                     changed = True
                     continue
                 packages_list.append(single_pkg)
-        changed = yum_v.ensure_state(packages_list, command)
+        if packages_list:
+            changed = yum_v.ensure_state(packages_list, command)
 
     module.exit_json(
         changed=changed,
