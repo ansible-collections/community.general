@@ -71,10 +71,12 @@ options:
     description:
       - List of server identifiers (name or id) to be added to the private network.
     type: list
+    elements: str
   remove_members:
     description:
       - List of server identifiers (name or id) to be removed from the private network.
     type: list
+    elements: str
   wait:
     description:
       - wait for the instance to be in state 'running' before returning
@@ -394,8 +396,8 @@ def main():
             description=dict(type='str'),
             network_address=dict(type='str'),
             subnet_mask=dict(type='str'),
-            add_members=dict(type='list', default=[]),
-            remove_members=dict(type='list', default=[]),
+            add_members=dict(type='list', elements="str", default=[]),
+            remove_members=dict(type='list', elements="str", default=[]),
             datacenter=dict(
                 choices=DATACENTERS),
             wait=dict(type='bool', default=True),
