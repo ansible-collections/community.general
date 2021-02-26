@@ -75,6 +75,7 @@ options:
     description:
       - Name used to create / delete the host. This does not need to be the FQDN, but does needs to be unique.
     required: true
+    aliases: [host]
   zone:
     type: str
     description:

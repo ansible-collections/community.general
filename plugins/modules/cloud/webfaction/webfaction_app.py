@@ -35,17 +35,20 @@ options:
         description:
             - The name of the application
         required: true
+        type: str
 
     state:
         description:
             - Whether the application should exist
         choices: ['present', 'absent']
         default: "present"
+        type: str
 
     type:
         description:
             - The type of application to create. See the Webfaction docs at U(https://docs.webfaction.com/xmlrpc-api/apps.html) for a list.
         required: true
+        type: str
 
     autostart:
         description:
@@ -57,6 +60,7 @@ options:
         description:
             - Any extra parameters required by the app
         default: ''
+        type: str
 
     port_open:
         description:
@@ -68,15 +72,18 @@ options:
         description:
             - The webfaction account to use
         required: true
+        type: str
 
     login_password:
         description:
             - The webfaction password to use
         required: true
+        type: str
 
     machine:
         description:
             - The machine name to use (optional for accounts with only one machine)
+        type: str
 
 '''
 
