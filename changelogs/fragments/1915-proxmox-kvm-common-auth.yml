@@ -1,0 +1,2 @@
+minor_changes:
+  - proxmox_kvm - use shared authentication code (https://github.com/ansible-collections/community.general/pull/1915).

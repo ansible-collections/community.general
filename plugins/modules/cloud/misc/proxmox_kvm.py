@@ -755,14 +755,10 @@ import time
 import traceback
 from distutils.version import LooseVersion
 from ansible.module_utils.six.moves.urllib.parse import quote
-
-try:
-    from proxmoxer import ProxmoxAPI
-    HAS_PROXMOXER = True
-except ImportError:
-    HAS_PROXMOXER = False
-
-from ansible.module_utils.basic import AnsibleModule, env_fallback
+from ansible_collections.community.general.plugins.module_utils.proxmox import (
+    proxmox_auth_argument_spec, ProxmoxAnsible, HAS_PROXMOXER,
+    PROXMOXER_IMP_ERR)
+from ansible.module_utils.basic import AnsibleModule, env_fallback, missing_required_lib
 from ansible.module_utils._text import to_native
 
 
@@ -856,10 +852,6 @@ def wait_for_task(module, proxmox, node, taskid):
 
 
 def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sockets, update, **kwargs):
-    # Available only in PVE 4
-    only_v4 = ['force', 'protection', 'skiplock']
-    only_v6 = ['ciuser', 'cipassword', 'sshkeys', 'ipconfig']
-
     # valide clone parameters
     valid_clone_params = ['format', 'full', 'pool', 'snapname', 'storage', 'target']
     clone_params = {}
@@ -871,18 +863,6 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
     # Sanitize kwargs. Remove not defined args and ensure True and False converted to int.
     kwargs = dict((k, v) for k, v in kwargs.items() if v is not None)
     kwargs.update(dict([k, int(v)] for k, v in kwargs.items() if isinstance(v, bool)))
-
-    # The features work only on PVE 4+
-    if PVE_MAJOR_VERSION < 4:
-        for p in only_v4:
-            if p in kwargs:
-                del kwargs[p]
-
-    # The features work only on PVE 6
-    if PVE_MAJOR_VERSION < 6:
-        for p in only_v6:
-            if p in kwargs:
-                del kwargs[p]
 
     # 'sshkeys' param expects an urlencoded string
     if 'sshkeys' in kwargs:
@@ -988,94 +968,114 @@ def proxmox_version(proxmox):
     return LooseVersion(apireturn['version'])
 
 
+def proxmox_kvm_argument_spec():
+    return dict(
+        acpi=dict(type='bool'),
+        agent=dict(type='bool'),
+        args=dict(type='str'),
+        autostart=dict(type='bool'),
+        balloon=dict(type='int'),
+        bios=dict(type='str',
+                  choices=['seabios', 'ovmf']),
+        boot=dict(type='str'),
+        bootdisk=dict(type='str'),
+        cicustom=dict(type='str'),
+        cipassword=dict(type='str',
+                        no_log=True
+                        ),
+        citype=dict(type='str',
+                    choices=['nocloud', 'configdrive2']
+                    ),
+        ciuser=dict(type='str'),
+        clone=dict(type='str'),
+        cores=dict(type='int'),
+        cpu=dict(type='str'),
+        cpulimit=dict(type='int'),
+        cpuunits=dict(type='int'),
+        delete=dict(type='str'),
+        description=dict(type='str'),
+        digest=dict(type='str'),
+        force=dict(type='bool'),
+        format=dict(type='str',
+                    choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk', 'unspecified']),
+        freeze=dict(type='bool'),
+        full=dict(type='bool',
+                  default=True),
+        hostpci=dict(type='dict'),
+        hotplug=dict(type='str'),
+        hugepages=dict(type='str',
+                       choices=['any', '2', '1024']),
+        ide=dict(type='dict'),
+        ipconfig=dict(type='dict'),
+        keyboard=dict(type='str'),
+        kvm=dict(type='bool'),
+        localtime=dict(type='bool'),
+        lock=dict(type='str',
+                  choices=['migrate', 'backup', 'snapshot', 'rollback']),
+        machine=dict(type='str'),
+        memory=dict(type='int'),
+        migrate_downtime=dict(type='int'),
+        migrate_speed=dict(type='int'),
+        name=dict(type='str'),
+        nameservers=dict(type='list',
+                         elements='str'
+                         ),
+        net=dict(type='dict'),
+        newid=dict(type='int'),
+        node=dict(type='str'),
+        numa=dict(type='dict'),
+        numa_enabled=dict(type='bool'),
+        onboot=dict(type='bool'),
+        ostype=dict(type='str',
+                    choices=['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'l24', 'l26', 'solaris']),
+        parallel=dict(type='dict'),
+        pool=dict(type='str'),
+        protection=dict(type='bool'),
+        reboot=dict(type='bool'),
+        revert=dict(type='str'),
+        sata=dict(type='dict'),
+        scsi=dict(type='dict'),
+        scsihw=dict(type='str',
+                    choices=['lsi', 'lsi53c810', 'virtio-scsi-pci', 'virtio-scsi-single', 'megasas', 'pvscsi']),
+        searchdomains=dict(type='list',
+                           elements='str'),
+        serial=dict(type='dict'),
+        shares=dict(type='int'),
+        skiplock=dict(type='bool'),
+        smbios=dict(type='str'),
+        snapname=dict(type='str'),
+        sockets=dict(type='int'),
+        sshkeys=dict(type='str'),
+        startdate=dict(type='str'),
+        startup=dict(type='str'),
+        state=dict(type='str',
+                   default='present',
+                   choices=['present', 'absent', 'stopped', 'started', 'restarted', 'current']),
+        storage=dict(type='str'),
+        tablet=dict(type='bool'),
+        target=dict(type='str'),
+        tdf=dict(type='bool'),
+        template=dict(type='bool'),
+        timeout=dict(type='int',
+                     default=30),
+        update=dict(type='bool',
+                    default=False),
+        vcpus=dict(type='int'),
+        vga=dict(type='str',
+                 choices=['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']),
+        virtio=dict(type='dict'),
+        vmid=dict(type='int'),
+        watchdog=dict(type='str'),
+        proxmox_default_behavior=dict(type='str',
+                                      choices=['compatibility', 'no_defaults']),
+    )
+
+
 def main():
+    module_args = proxmox_auth_argument_spec()
+    module_args.update(proxmox_kvm_argument_spec())
     module = AnsibleModule(
-        argument_spec=dict(
-            acpi=dict(type='bool'),
-            agent=dict(type='bool'),
-            args=dict(type='str'),
-            api_host=dict(required=True),
-            api_password=dict(no_log=True, fallback=(env_fallback, ['PROXMOX_PASSWORD'])),
-            api_token_id=dict(no_log=True),
-            api_token_secret=dict(no_log=True),
-            api_user=dict(required=True),
-            autostart=dict(type='bool'),
-            balloon=dict(type='int'),
-            bios=dict(choices=['seabios', 'ovmf']),
-            boot=dict(type='str'),
-            bootdisk=dict(type='str'),
-            cicustom=dict(type='str'),
-            cipassword=dict(type='str', no_log=True),
-            citype=dict(type='str', choices=['nocloud', 'configdrive2']),
-            ciuser=dict(type='str'),
-            clone=dict(type='str'),
-            cores=dict(type='int'),
-            cpu=dict(type='str'),
-            cpulimit=dict(type='int'),
-            cpuunits=dict(type='int'),
-            delete=dict(type='str'),
-            description=dict(type='str'),
-            digest=dict(type='str'),
-            force=dict(type='bool'),
-            format=dict(type='str', choices=['cloop', 'cow', 'qcow', 'qcow2', 'qed', 'raw', 'vmdk', 'unspecified']),
-            freeze=dict(type='bool'),
-            full=dict(type='bool', default=True),
-            hostpci=dict(type='dict'),
-            hotplug=dict(type='str'),
-            hugepages=dict(choices=['any', '2', '1024']),
-            ide=dict(type='dict'),
-            ipconfig=dict(type='dict'),
-            keyboard=dict(type='str'),
-            kvm=dict(type='bool'),
-            localtime=dict(type='bool'),
-            lock=dict(choices=['migrate', 'backup', 'snapshot', 'rollback']),
-            machine=dict(type='str'),
-            memory=dict(type='int'),
-            migrate_downtime=dict(type='int'),
-            migrate_speed=dict(type='int'),
-            name=dict(type='str'),
-            nameservers=dict(type='list', elements='str'),
-            net=dict(type='dict'),
-            newid=dict(type='int'),
-            node=dict(),
-            numa=dict(type='dict'),
-            numa_enabled=dict(type='bool'),
-            onboot=dict(type='bool'),
-            ostype=dict(choices=['other', 'wxp', 'w2k', 'w2k3', 'w2k8', 'wvista', 'win7', 'win8', 'win10', 'l24', 'l26', 'solaris']),
-            parallel=dict(type='dict'),
-            pool=dict(type='str'),
-            protection=dict(type='bool'),
-            reboot=dict(type='bool'),
-            revert=dict(type='str'),
-            sata=dict(type='dict'),
-            scsi=dict(type='dict'),
-            scsihw=dict(choices=['lsi', 'lsi53c810', 'virtio-scsi-pci', 'virtio-scsi-single', 'megasas', 'pvscsi']),
-            serial=dict(type='dict'),
-            searchdomains=dict(type='list', elements='str'),
-            shares=dict(type='int'),
-            skiplock=dict(type='bool'),
-            smbios=dict(type='str'),
-            snapname=dict(type='str'),
-            sockets=dict(type='int'),
-            sshkeys=dict(type='str'),
-            startdate=dict(type='str'),
-            startup=dict(),
-            state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'current']),
-            storage=dict(type='str'),
-            tablet=dict(type='bool'),
-            target=dict(type='str'),
-            tdf=dict(type='bool'),
-            template=dict(type='bool'),
-            timeout=dict(type='int', default=30),
-            update=dict(type='bool', default=False),
-            validate_certs=dict(type='bool', default=False),
-            vcpus=dict(type='int'),
-            vga=dict(choices=['std', 'cirrus', 'vmware', 'qxl', 'serial0', 'serial1', 'serial2', 'serial3', 'qxl2', 'qxl3', 'qxl4']),
-            virtio=dict(type='dict'),
-            vmid=dict(type='int'),
-            watchdog=dict(),
-            proxmox_default_behavior=dict(type='str', choices=['compatibility', 'no_defaults']),
-        ),
+        argument_spec=module_args,
         mutually_exclusive=[('delete', 'revert'), ('delete', 'update'), ('revert', 'update'), ('clone', 'update'), ('clone', 'delete'), ('clone', 'revert')],
         required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
@@ -1083,13 +1083,8 @@ def main():
     )
 
     if not HAS_PROXMOXER:
-        module.fail_json(msg='proxmoxer required for this module')
+        module.fail_json(msg=missing_required_lib('proxmoxer'), exception=PROXMOXER_IMP_ERR)
 
-    api_host = module.params['api_host']
-    api_password = module.params['api_password']
-    api_token_id = module.params['api_token_id']
-    api_token_secret = module.params['api_token_secret']
-    api_user = module.params['api_user']
     clone = module.params['clone']
     cpu = module.params['cpu']
     cores = module.params['cores']
@@ -1137,20 +1132,21 @@ def main():
     if module.params['format'] == 'unspecified':
         module.params['format'] = None
 
-    auth_args = {'user': api_user}
-    if not (api_token_id and api_token_secret):
-        auth_args['password'] = api_password
-    else:
-        auth_args['token_name'] = api_token_id
-        auth_args['token_value'] = api_token_secret
+    proxmox = ProxmoxAnsible(module).proxmox_api
 
-    try:
-        proxmox = ProxmoxAPI(api_host, verify_ssl=validate_certs, **auth_args)
-        global PVE_MAJOR_VERSION
-        version = proxmox_version(proxmox)
-        PVE_MAJOR_VERSION = 3 if version < LooseVersion('4.0') else version.version[0]
-    except Exception as e:
-        module.fail_json(msg='authorization on proxmox cluster failed with exception: %s' % e)
+    pve_version = proxmox_version(proxmox)
+    # These features only work with Proxmox VE 4.0 and later
+    if pve_version < LooseVersion('4.0'):
+        if module.params['force']:
+            module.fail_json(msg="This feature only works with Proxmox VE version 4 and onwards: force")
+        for p in ['protection', 'skiplock']:
+            if module.params[p] is not None:
+                module.fail_json(msg="This feature only works with Proxmox VE version 4 and onwards: {0}".format(p))
+    # These features only work since Proxmox VE 6.0
+    if pve_version < LooseVersion('6.0'):
+        for p in ['ciuser', 'cipassword', 'sshkeys', 'ipconfig']:
+            if module.params[p] is not None:
+                module.fail_json(msg="This feature only works with Proxmox VE version 6 and onwards: {0}".format(p))
 
     # If vmid is not defined then retrieve its value from the vm name,
     # the cloned vm name or retrieve the next free VM id from ProxmoxAPI.
