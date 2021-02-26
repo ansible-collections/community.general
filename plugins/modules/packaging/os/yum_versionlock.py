@@ -13,7 +13,7 @@ module: yum_versionlock
 version_added: 2.0.0
 short_description: Locks / unlocks a installed package(s) from being updated by yum package manager
 description:
-     - This module adds installed packages to yum versionlock to prevent the package from being updated.
+     - This module adds installed packages to yum versionlock to prevent the package(s) from being updated.
 options:
   name:
     description:
@@ -93,9 +93,9 @@ class YumVersionLock:
             self.module.fail_json(msg="Error: Please install rpm package yum-plugin-versionlock : " + to_native(err) + to_native(out))
         self.module.fail_json(msg="Error: " + to_native(err) + to_native(out))
 
-    def ensure_state(self, package, command):
-        """ Ensure package state """
-        rc, out, err = self.module.run_command([self.yum_bin, "-q", "versionlock", command] + package)
+    def ensure_state(self, packages, command):
+        """ Ensure packages state """
+        rc, out, err = self.module.run_command([self.yum_bin, "-q", "versionlock", command] + packages)
         if rc == 0:
             return True
         self.module.fail_json(msg="Error: " + to_native(err) + to_native(out))
