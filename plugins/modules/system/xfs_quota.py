@@ -171,6 +171,8 @@ def main():
     rtbsoft = module.params['rtbsoft']
     state = module.params['state']
 
+    xfs_quota_bin = module.get_bin_path('xfs_quota',True)
+
     if bhard is not None:
         bhard = human_to_bytes(bhard)
 
@@ -246,7 +248,7 @@ def main():
         prj_set = True
         if name != quota_default:
             cmd = 'project %s' % name
-            rc, stdout, stderr = exec_quota(module, cmd, mountpoint)
+            rc, stdout, stderr = exec_quota(module, xfs_quota_bin, cmd, mountpoint)
             if rc != 0:
                 result['cmd'] = cmd
                 result['rc'] = rc
@@ -261,7 +263,7 @@ def main():
 
         if not prj_set and not module.check_mode:
             cmd = 'project -s'
-            rc, stdout, stderr = exec_quota(module, cmd, mountpoint)
+            rc, stdout, stderr = exec_quota(module, xfs_quota_bin, cmd, mountpoint)
             if rc != 0:
                 result['cmd'] = cmd
                 result['rc'] = rc
@@ -283,9 +285,9 @@ def main():
         rtbhard = 0
         rtbsoft = 0
 
-    current_bsoft, current_bhard = quota_report(module, mountpoint, name, quota_type, 'b')
-    current_isoft, current_ihard = quota_report(module, mountpoint, name, quota_type, 'i')
-    current_rtbsoft, current_rtbhard = quota_report(module, mountpoint, name, quota_type, 'rtb')
+    current_bsoft, current_bhard = quota_report(module, xfs_quota_bin, mountpoint, name, quota_type, 'b')
+    current_isoft, current_ihard = quota_report(module, xfs_quota_bin, mountpoint, name, quota_type, 'i')
+    current_rtbsoft, current_rtbhard = quota_report(module, xfs_quota_bin, mountpoint, name, quota_type, 'rtb')
 
     result['xfs_quota'] = dict(
         bsoft=current_bsoft,
@@ -327,7 +329,7 @@ def main():
         else:
             cmd = 'limit %s %s %s' % (type_arg, ' '.join(limit), name)
 
-        rc, stdout, stderr = exec_quota(module, cmd, mountpoint)
+        rc, stdout, stderr = exec_quota(module, xfs_quota_bin, cmd, mountpoint)
         if rc != 0:
             result['cmd'] = cmd
             result['rc'] = rc
@@ -343,7 +345,7 @@ def main():
     module.exit_json(**result)
 
 
-def quota_report(module, mountpoint, name, quota_type, used_type):
+def quota_report(module, xfs_quota_bin, mountpoint, name, quota_type, used_type):
     soft = None
     hard = None
 
@@ -367,7 +369,7 @@ def quota_report(module, mountpoint, name, quota_type, used_type):
         used_name = 'realtime blocks'
         factor = 1024
 
-    rc, stdout, stderr = exec_quota(module, 'report %s %s' % (type_arg, used_arg), mountpoint)
+    rc, stdout, stderr = exec_quota(module, xfs_quota_bin, 'report %s %s' % (type_arg, used_arg), mountpoint)
 
     if rc != 0:
         result = dict(
@@ -388,8 +390,8 @@ def quota_report(module, mountpoint, name, quota_type, used_type):
     return soft, hard
 
 
-def exec_quota(module, cmd, mountpoint):
-    cmd = ['xfs_quota', '-x', '-c'] + [cmd, mountpoint]
+def exec_quota(module, xfs_quota_bin, cmd, mountpoint):
+    cmd = [xfs_quota_bin, '-x', '-c'] + [cmd, mountpoint]
     (rc, stdout, stderr) = module.run_command(cmd, use_unsafe_shell=True)
     if "XFS_GETQUOTA: Operation not permitted" in stderr.split('\n') or \
             rc == 1 and 'xfs_quota: cannot set limits: Operation not permitted' in stderr.split('\n'):
