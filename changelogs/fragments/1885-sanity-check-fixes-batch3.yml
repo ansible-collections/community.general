@@ -1,0 +1,18 @@
+minor_changes:
+  - oneandone_firewall_policy - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - oneandone_load_balancer - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - oneandone_monitoring_policy - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - oneandone_private_network - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - oneandone_server - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - profitbricks - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - profitbricks_volume - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - webfaction_domain - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - webfaction_site - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - consul - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - consul_acl - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - consul_session - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - datadog_monitor - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - sensu_check - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - sensu_client - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - sensu_handler - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+  - bundler - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
