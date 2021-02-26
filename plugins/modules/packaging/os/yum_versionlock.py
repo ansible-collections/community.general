@@ -93,9 +93,9 @@ class YumVersionLock:
             self.module.fail_json(msg="Error: Please install rpm package yum-plugin-versionlock : " + to_native(err) + to_native(out))
         self.module.fail_json(msg="Error: " + to_native(err) + to_native(out))
 
-    def ensure_state(self, package, command):
+    def ensure_state(self, packages_list, command):
         """ Ensure package state """
-        packages = " ".join(package)
+        packages = " ".join(packages_list)
         cmd = "%s -q versionlock %s %s" % (self.yum_bin, command, packages)
         rc, out, err = self.module.run_command(cmd)
         if rc == 0:
