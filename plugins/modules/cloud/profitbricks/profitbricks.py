@@ -35,6 +35,7 @@ options:
     description:
       - Public SSH keys allowing access to the virtual machine.
     type: list
+    elements: str
   datacenter:
     description:
       - The datacenter to provision this virtual machine.
@@ -70,6 +71,7 @@ options:
     description:
       - list of instance ids, currently only used when state='absent' to remove instances.
     type: list
+    elements: str
   count:
     description:
       - The number of virtual machines to create.
@@ -581,12 +583,12 @@ def main():
             volume_size=dict(type='int', default=10),
             disk_type=dict(choices=['HDD', 'SSD'], default='HDD'),
             image_password=dict(default=None, no_log=True),
-            ssh_keys=dict(type='list', default=[]),
+            ssh_keys=dict(type='list', elements='str', default=[]),
             bus=dict(choices=['VIRTIO', 'IDE'], default='VIRTIO'),
             lan=dict(type='int', default=1),
             count=dict(type='int', default=1),
             auto_increment=dict(type='bool', default=True),
-            instance_ids=dict(type='list', default=[]),
+            instance_ids=dict(type='list', elements='str', default=[]),
             subscription_user=dict(),
             subscription_password=dict(no_log=True),
             location=dict(choices=LOCATIONS, default='us/las'),

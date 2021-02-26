@@ -57,27 +57,32 @@ options:
         Each rule must contain protocol parameter, in addition to three optional parameters
         (port_from, port_to, and source)
     type: list
+    elements: dict
   add_server_ips:
     description:
       - A list of server identifiers (id or name) to be assigned to a firewall policy.
         Used in combination with update state.
     type: list
+    elements: str
     required: false
   remove_server_ips:
     description:
       - A list of server IP ids to be unassigned from a firewall policy. Used in combination with update state.
     type: list
+    elements: str
     required: false
   add_rules:
     description:
       - A list of rules that will be added to an existing firewall policy.
         It is syntax is the same as the one used for rules parameter. Used in combination with update state.
     type: list
+    elements: dict
     required: false
   remove_rules:
     description:
       - A list of rule ids that will be removed from an existing firewall policy. Used in combination with update state.
     type: list
+    elements: str
     required: false
   description:
     description:
@@ -508,11 +513,11 @@ def main():
             name=dict(type='str'),
             firewall_policy=dict(type='str'),
             description=dict(type='str'),
-            rules=dict(type='list', default=[]),
-            add_server_ips=dict(type='list', default=[]),
-            remove_server_ips=dict(type='list', default=[]),
-            add_rules=dict(type='list', default=[]),
-            remove_rules=dict(type='list', default=[]),
+            rules=dict(type='list', elements="dict", default=[]),
+            add_server_ips=dict(type='list', elements="str", default=[]),
+            remove_server_ips=dict(type='list', elements="str", default=[]),
+            add_rules=dict(type='list', elements="dict", default=[]),
+            remove_rules=dict(type='list', elements="str", default=[]),
             wait=dict(type='bool', default=True),
             wait_timeout=dict(type='int', default=600),
             wait_interval=dict(type='int', default=5),
