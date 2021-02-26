@@ -174,8 +174,6 @@ def main():
 
     xfs_quota_bin = module.get_bin_path("xfs_quota", True)
 
-    xfs_quota_bin = module.get_bin_path('xfs_quota',True)
-
     if bhard is not None:
         bhard = human_to_bytes(bhard)
 
