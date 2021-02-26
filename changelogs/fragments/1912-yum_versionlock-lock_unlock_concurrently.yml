@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - yum_versionlock - Do the lock/unlock concurrently to speed up (https://github.com/ansible-collections/community.general/pull/1912).
