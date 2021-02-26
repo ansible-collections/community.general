@@ -33,17 +33,20 @@ options:
         description:
             - The name of the website
         required: true
+        type: str
 
     state:
         description:
             - Whether the website should exist
         choices: ['present', 'absent']
         default: "present"
+        type: str
 
     host:
         description:
             - The webfaction host on which the site should be created.
         required: true
+        type: str
 
     https:
         description:
@@ -55,21 +58,27 @@ options:
         description:
             - A mapping of URLs to apps
         default: []
+        type: list
+        elements: list
 
     subdomains:
         description:
             - A list of subdomains associated with this site.
         default: []
+        type: list
+        elements: str
 
     login_name:
         description:
             - The webfaction account to use
         required: true
+        type: str
 
     login_password:
         description:
             - The webfaction password to use
         required: true
+        type: str
 '''
 
 EXAMPLES = '''
@@ -101,12 +110,12 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             name=dict(required=True),
-            state=dict(required=False, choices=['present', 'absent'], default='present'),
+            state=dict(choices=['present', 'absent'], default='present'),
             # You can specify an IP address or hostname.
             host=dict(required=True),
             https=dict(required=False, type='bool', default=False),
-            subdomains=dict(required=False, type='list', default=[]),
-            site_apps=dict(required=False, type='list', default=[]),
+            subdomains=dict(type='list', elements='str', default=[]),
+            site_apps=dict(type='list', elements='list', default=[]),
             login_name=dict(required=True),
             login_password=dict(required=True, no_log=True),
         ),
