@@ -95,7 +95,8 @@ class YumVersionLock:
 
     def ensure_state(self, package, command):
         """ Ensure package state """
-        rc, out, err = self.module.run_command([self.yum_bin, "-q", "versionlock", command, package])
+        packages = " ".join(package)
+        rc, out, err = self.module.run_command([self.yum_bin, "-q", "versionlock", command, packages])
         if rc == 0:
             return True
         self.module.fail_json(msg="Error: " + to_native(err) + to_native(out))
