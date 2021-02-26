@@ -121,22 +121,25 @@ def main():
     versionlock_packages = yum_v.get_versionlock_packages()
 
     # Ensure versionlock state of packages
+    packages_list = []
     if state in ('present'):
         command = 'add'
         for single_pkg in packages:
             if single_pkg not in versionlock_packages:
                 if module.check_mode:
                     changed = True
-        if not module.check_mode:
-            changed = yum_v.ensure_state(packages, command)
+                    continue
+                packages_list.append(single_pkg)
+        changed = yum_v.ensure_state(packages_list, command)
     elif state in ('absent'):
         command = 'delete'
         for single_pkg in packages:
             if single_pkg in versionlock_packages:
                 if module.check_mode:
                     changed = True
-        if not module.check_mode:
-            changed = yum_v.ensure_state(packages, command)
+                    continue
+                packages_list.append(single_pkg)
+        changed = yum_v.ensure_state(packages_list, command)
 
     module.exit_json(
         changed=changed,
