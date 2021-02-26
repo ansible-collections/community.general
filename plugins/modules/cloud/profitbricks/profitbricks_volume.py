@@ -47,6 +47,7 @@ options:
     description:
       - Public SSH keys allowing access to the virtual machine.
     type: list
+    elements: str
     required: false
   disk_type:
     description:
@@ -77,6 +78,7 @@ options:
     description:
       - list of instance ids, currently only used when state='absent' to remove instances.
     type: list
+    elements: str
     required: false
   subscription_user:
     description:
@@ -106,6 +108,10 @@ options:
     type: str
     required: false
     default: 'present'
+  server:
+    description:
+      - Server name to attach the volume to.
+    type: str
 
 requirements: [ "profitbricks" ]
 author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
@@ -369,13 +375,13 @@ def main():
             size=dict(type='int', default=10),
             bus=dict(choices=['VIRTIO', 'IDE'], default='VIRTIO'),
             image=dict(),
-            image_password=dict(default=None, no_log=True),
-            ssh_keys=dict(type='list', default=[]),
+            image_password=dict(no_log=True),
+            ssh_keys=dict(type='list', elements='str', default=[]),
             disk_type=dict(choices=['HDD', 'SSD'], default='HDD'),
             licence_type=dict(default='UNKNOWN'),
             count=dict(type='int', default=1),
             auto_increment=dict(type='bool', default=True),
-            instance_ids=dict(type='list', default=[]),
+            instance_ids=dict(type='list', elements='str', default=[]),
             subscription_user=dict(),
             subscription_password=dict(no_log=True),
             wait=dict(type='bool', default=True),
