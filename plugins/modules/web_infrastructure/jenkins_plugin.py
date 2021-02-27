@@ -280,6 +280,7 @@ import json
 import os
 import tempfile
 import time
+from io import open
 
 
 class JenkinsPlugin(object):
