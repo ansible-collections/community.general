@@ -338,7 +338,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         self._read_config_data(path)
 
         # get connection host
-        self.proxmox_url = self.get_option('url')
+        self.proxmox_url = self.get_option('url').rstrip('/')
         self.proxmox_user = self.get_option('user')
         self.proxmox_password = self.get_option('password')
         self.cache_key = self.get_cache_key(path)
