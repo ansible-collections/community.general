@@ -118,7 +118,7 @@
   - name: Assert project limits results for xft_quotaval after re-apply
     assert:
       that:
-      - not test_pquota_project_after.changed
+      - test_pquota_project_after.changed
   - name: Reset default project limits
     xfs_quota:
       mountpoint: '{{ remote_tmp_dir }}/pquota'
