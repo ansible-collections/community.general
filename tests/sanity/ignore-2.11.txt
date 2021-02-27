@@ -123,7 +123,6 @@ plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:parameter-type-not
 plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:undocumented-parameter # Parameter removed but reason for removal is shown by custom code
 plugins/modules/notification/cisco_webex.py validate-modules:invalid-argument-name
 plugins/modules/notification/grove.py validate-modules:invalid-argument-name
-plugins/modules/notification/grove.py validate-modules:nonexistent-parameter-documented
 plugins/modules/packaging/language/composer.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/apt_rpm.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/homebrew.py validate-modules:parameter-invalid
