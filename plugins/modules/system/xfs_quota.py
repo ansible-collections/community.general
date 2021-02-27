@@ -7,9 +7,10 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: xfs_quota
 short_description: Manage quotas on XFS filesystems
@@ -77,9 +78,9 @@ options:
 
 requirements:
    - xfsprogs
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Set default project soft and hard limit on /opt of 1g
   community.general.xfs_quota:
     type: project
@@ -101,9 +102,9 @@ EXAMPLES = r'''
     isoft: 1024
     ihard: 2048
 
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 bhard:
     description: the current bhard setting in bytes
     returned: always
@@ -134,7 +135,7 @@ rtbsoft:
     returned: always
     type: int
     sample: 1024
-'''
+"""
 
 import grp
 import os
@@ -146,30 +147,32 @@ from ansible.module_utils.basic import AnsibleModule, human_to_bytes
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            bhard=dict(type='str'),
-            bsoft=dict(type='str'),
-            ihard=dict(type='int'),
-            isoft=dict(type='int'),
-            mountpoint=dict(type='str', required=True),
-            name=dict(type='str'),
-            rtbhard=dict(type='str'),
-            rtbsoft=dict(type='str'),
-            state=dict(type='str', default='present', choices=['absent', 'present']),
-            type=dict(type='str', required=True, choices=['group', 'project', 'user'])
+            bhard=dict(type="str"),
+            bsoft=dict(type="str"),
+            ihard=dict(type="int"),
+            isoft=dict(type="int"),
+            mountpoint=dict(type="str", required=True),
+            name=dict(type="str"),
+            rtbhard=dict(type="str"),
+            rtbsoft=dict(type="str"),
+            state=dict(type="str", default="present", choices=["absent", "present"]),
+            type=dict(type="str", required=True, choices=["group", "project", "user"]),
         ),
         supports_check_mode=True,
     )
 
-    quota_type = module.params['type']
-    name = module.params['name']
-    mountpoint = module.params['mountpoint']
-    bhard = module.params['bhard']
-    bsoft = module.params['bsoft']
-    ihard = module.params['ihard']
-    isoft = module.params['isoft']
-    rtbhard = module.params['rtbhard']
-    rtbsoft = module.params['rtbsoft']
-    state = module.params['state']
+    quota_type = module.params["type"]
+    name = module.params["name"]
+    mountpoint = module.params["mountpoint"]
+    bhard = module.params["bhard"]
+    bsoft = module.params["bsoft"]
+    ihard = module.params["ihard"]
+    isoft = module.params["isoft"]
+    rtbhard = module.params["rtbhard"]
+    rtbsoft = module.params["rtbsoft"]
+    state = module.params["state"]
+
+    xfs_quota_bin = module.get_bin_path("xfs_quota", True)
 
     if bhard is not None:
         bhard = human_to_bytes(bhard)
@@ -192,90 +195,122 @@ def main():
 
     mp = get_fs_by_mountpoint(mountpoint)
     if mp is None:
-        module.fail_json(msg="Path '%s' is not a mount point or not located on an xfs file system." % mountpoint, **result)
+        module.fail_json(
+            msg="Path '%s' is not a mount point or not located on an xfs file system."
+            % mountpoint,
+            **result
+        )
 
-    if quota_type == 'user':
-        type_arg = '-u'
-        quota_default = 'root'
+    if quota_type == "user":
+        type_arg = "-u"
+        quota_default = "root"
         if name is None:
             name = quota_default
 
-        if 'uquota' not in mp['mntopts'] and 'usrquota' not in mp['mntopts'] and 'quota' not in mp['mntopts'] and 'uqnoenforce' not in mp['mntopts'] and \
-                'qnoenforce' not in mp['mntopts']:
+        if (
+            "uquota" not in mp["mntopts"]
+            and "usrquota" not in mp["mntopts"]
+            and "quota" not in mp["mntopts"]
+            and "uqnoenforce" not in mp["mntopts"]
+            and "qnoenforce" not in mp["mntopts"]
+        ):
             module.fail_json(
-                msg="Path '%s' is not mounted with the uquota/usrquota/quota/uqnoenforce/qnoenforce option." % mountpoint, **result
+                msg="Path '%s' is not mounted with the uquota/usrquota/quota/uqnoenforce/qnoenforce option."
+                % mountpoint,
+                **result
             )
         try:
             pwd.getpwnam(name)
         except KeyError as e:
             module.fail_json(msg="User '%s' does not exist." % name, **result)
 
-    elif quota_type == 'group':
-        type_arg = '-g'
-        quota_default = 'root'
+    elif quota_type == "group":
+        type_arg = "-g"
+        quota_default = "root"
         if name is None:
             name = quota_default
 
-        if 'gquota' not in mp['mntopts'] and 'grpquota' not in mp['mntopts'] and 'gqnoenforce' not in mp['mntopts']:
+        if (
+            "gquota" not in mp["mntopts"]
+            and "grpquota" not in mp["mntopts"]
+            and "gqnoenforce" not in mp["mntopts"]
+        ):
             module.fail_json(
-                msg="Path '%s' is not mounted with the gquota/grpquota/gqnoenforce option. (current options: %s)" % (mountpoint, mp['mntopts']), **result
+                msg="Path '%s' is not mounted with the gquota/grpquota/gqnoenforce option. (current options: %s)"
+                % (mountpoint, mp["mntopts"]),
+                **result
             )
         try:
             grp.getgrnam(name)
         except KeyError as e:
             module.fail_json(msg="User '%s' does not exist." % name, **result)
 
-    elif quota_type == 'project':
-        type_arg = '-p'
-        quota_default = '#0'
+    elif quota_type == "project":
+        type_arg = "-p"
+        quota_default = "#0"
         if name is None:
             name = quota_default
 
-        if 'pquota' not in mp['mntopts'] and 'prjquota' not in mp['mntopts'] and 'pqnoenforce' not in mp['mntopts']:
-            module.fail_json(msg="Path '%s' is not mounted with the pquota/prjquota/pqnoenforce option." % mountpoint, **result)
+        if (
+            "pquota" not in mp["mntopts"]
+            and "prjquota" not in mp["mntopts"]
+            and "pqnoenforce" not in mp["mntopts"]
+        ):
+            module.fail_json(
+                msg="Path '%s' is not mounted with the pquota/prjquota/pqnoenforce option."
+                % mountpoint,
+                **result
+            )
 
-        if name != quota_default and not os.path.isfile('/etc/projects'):
+        if name != quota_default and not os.path.isfile("/etc/projects"):
             module.fail_json(msg="Path '/etc/projects' does not exist.", **result)
 
-        if name != quota_default and not os.path.isfile('/etc/projid'):
+        if name != quota_default and not os.path.isfile("/etc/projid"):
             module.fail_json(msg="Path '/etc/projid' does not exist.", **result)
 
         if name != quota_default and name is not None and get_project_id(name) is None:
-            module.fail_json(msg="Entry '%s' has not been defined in /etc/projid." % name, **result)
+            module.fail_json(
+                msg="Entry '%s' has not been defined in /etc/projid." % name, **result
+            )
 
         prj_set = True
         if name != quota_default:
-            cmd = 'project %s' % name
-            rc, stdout, stderr = exec_quota(module, cmd, mountpoint)
+            cmd = "project %s" % name
+            rc, stdout, stderr = exec_quota(module, xfs_quota_bin, cmd, mountpoint)
             if rc != 0:
-                result['cmd'] = cmd
-                result['rc'] = rc
-                result['stdout'] = stdout
-                result['stderr'] = stderr
-                module.fail_json(msg='Could not get project state.', **result)
+                result["cmd"] = cmd
+                result["rc"] = rc
+                result["stdout"] = stdout
+                result["stderr"] = stderr
+                module.fail_json(msg="Could not get project state.", **result)
             else:
-                for line in stdout.split('\n'):
-                    if "Project Id '%s' - is not set." in line:
+                for line in stdout.split("\n"):
+                    if (
+                        "Project Id '%s' - is not set." in line
+                        or "project identifier is not set" in line
+                    ):
                         prj_set = False
                         break
 
         if not prj_set and not module.check_mode:
-            cmd = 'project -s'
-            rc, stdout, stderr = exec_quota(module, cmd, mountpoint)
+            cmd = "project -s"
+            rc, stdout, stderr = exec_quota(module, xfs_quota_bin, cmd, mountpoint)
             if rc != 0:
-                result['cmd'] = cmd
-                result['rc'] = rc
-                result['stdout'] = stdout
-                result['stderr'] = stderr
-                module.fail_json(msg='Could not get quota realtime block report.', **result)
+                result["cmd"] = cmd
+                result["rc"] = rc
+                result["stdout"] = stdout
+                result["stderr"] = stderr
+                module.fail_json(
+                    msg="Could not get quota realtime block report.", **result
+                )
 
-            result['changed'] = True
+            result["changed"] = True
 
         elif not prj_set and module.check_mode:
-            result['changed'] = True
+            result["changed"] = True
 
     # Set limits
-    if state == 'absent':
+    if state == "absent":
         bhard = 0
         bsoft = 0
         ihard = 0
@@ -283,91 +318,99 @@ def main():
         rtbhard = 0
         rtbsoft = 0
 
-    current_bsoft, current_bhard = quota_report(module, mountpoint, name, quota_type, 'b')
-    current_isoft, current_ihard = quota_report(module, mountpoint, name, quota_type, 'i')
-    current_rtbsoft, current_rtbhard = quota_report(module, mountpoint, name, quota_type, 'rtb')
+    current_bsoft, current_bhard = quota_report(
+        module, xfs_quota_bin, mountpoint, name, quota_type, "b"
+    )
+    current_isoft, current_ihard = quota_report(
+        module, xfs_quota_bin, mountpoint, name, quota_type, "i"
+    )
+    current_rtbsoft, current_rtbhard = quota_report(
+        module, xfs_quota_bin, mountpoint, name, quota_type, "rtb"
+    )
 
-    result['xfs_quota'] = dict(
+    result["xfs_quota"] = dict(
         bsoft=current_bsoft,
         bhard=current_bhard,
         isoft=current_isoft,
         ihard=current_ihard,
         rtbsoft=current_rtbsoft,
-        rtbhard=current_rtbhard
+        rtbhard=current_rtbhard,
     )
 
     limit = []
     if bsoft is not None and int(bsoft) != current_bsoft:
-        limit.append('bsoft=%s' % bsoft)
-        result['bsoft'] = int(bsoft)
+        limit.append("bsoft=%s" % bsoft)
+        result["bsoft"] = int(bsoft)
 
     if bhard is not None and int(bhard) != current_bhard:
-        limit.append('bhard=%s' % bhard)
-        result['bhard'] = int(bhard)
+        limit.append("bhard=%s" % bhard)
+        result["bhard"] = int(bhard)
 
     if isoft is not None and isoft != current_isoft:
-        limit.append('isoft=%s' % isoft)
-        result['isoft'] = isoft
+        limit.append("isoft=%s" % isoft)
+        result["isoft"] = isoft
 
     if ihard is not None and ihard != current_ihard:
-        limit.append('ihard=%s' % ihard)
-        result['ihard'] = ihard
+        limit.append("ihard=%s" % ihard)
+        result["ihard"] = ihard
 
     if rtbsoft is not None and int(rtbsoft) != current_rtbsoft:
-        limit.append('rtbsoft=%s' % rtbsoft)
-        result['rtbsoft'] = int(rtbsoft)
+        limit.append("rtbsoft=%s" % rtbsoft)
+        result["rtbsoft"] = int(rtbsoft)
 
     if rtbhard is not None and int(rtbhard) != current_rtbhard:
-        limit.append('rtbhard=%s' % rtbhard)
-        result['rtbhard'] = int(rtbhard)
+        limit.append("rtbhard=%s" % rtbhard)
+        result["rtbhard"] = int(rtbhard)
 
     if len(limit) > 0 and not module.check_mode:
         if name == quota_default:
-            cmd = 'limit %s -d %s' % (type_arg, ' '.join(limit))
+            cmd = "limit %s -d %s" % (type_arg, " ".join(limit))
         else:
-            cmd = 'limit %s %s %s' % (type_arg, ' '.join(limit), name)
+            cmd = "limit %s %s %s" % (type_arg, " ".join(limit), name)
 
-        rc, stdout, stderr = exec_quota(module, cmd, mountpoint)
+        rc, stdout, stderr = exec_quota(module, xfs_quota_bin, cmd, mountpoint)
         if rc != 0:
-            result['cmd'] = cmd
-            result['rc'] = rc
-            result['stdout'] = stdout
-            result['stderr'] = stderr
-            module.fail_json(msg='Could not set limits.', **result)
+            result["cmd"] = cmd
+            result["rc"] = rc
+            result["stdout"] = stdout
+            result["stderr"] = stderr
+            module.fail_json(msg="Could not set limits.", **result)
 
-        result['changed'] = True
+        result["changed"] = True
 
     elif len(limit) > 0 and module.check_mode:
-        result['changed'] = True
+        result["changed"] = True
 
     module.exit_json(**result)
 
 
-def quota_report(module, mountpoint, name, quota_type, used_type):
+def quota_report(module, xfs_quota_bin, mountpoint, name, quota_type, used_type):
     soft = None
     hard = None
 
-    if quota_type == 'project':
-        type_arg = '-p'
-    elif quota_type == 'user':
-        type_arg = '-u'
-    elif quota_type == 'group':
-        type_arg = '-g'
+    if quota_type == "project":
+        type_arg = "-p"
+    elif quota_type == "user":
+        type_arg = "-u"
+    elif quota_type == "group":
+        type_arg = "-g"
 
-    if used_type == 'b':
-        used_arg = '-b'
-        used_name = 'blocks'
+    if used_type == "b":
+        used_arg = "-b"
+        used_name = "blocks"
         factor = 1024
-    elif used_type == 'i':
-        used_arg = '-i'
-        used_name = 'inodes'
+    elif used_type == "i":
+        used_arg = "-i"
+        used_name = "inodes"
         factor = 1
-    elif used_type == 'rtb':
-        used_arg = '-r'
-        used_name = 'realtime blocks'
+    elif used_type == "rtb":
+        used_arg = "-r"
+        used_name = "realtime blocks"
         factor = 1024
 
-    rc, stdout, stderr = exec_quota(module, 'report %s %s' % (type_arg, used_arg), mountpoint)
+    rc, stdout, stderr = exec_quota(
+        module, xfs_quota_bin, "report %s %s" % (type_arg, used_arg), mountpoint
+    )
 
     if rc != 0:
         result = dict(
@@ -376,9 +419,9 @@ def quota_report(module, mountpoint, name, quota_type, used_type):
             stdout=stdout,
             stderr=stderr,
         )
-        module.fail_json(msg='Could not get quota report for %s.' % used_name, **result)
+        module.fail_json(msg="Could not get quota report for %s." % used_name, **result)
 
-    for line in stdout.split('\n'):
+    for line in stdout.split("\n"):
         line = line.strip().split()
         if len(line) > 3 and line[0] == name:
             soft = int(line[2]) * factor
@@ -388,33 +431,41 @@ def quota_report(module, mountpoint, name, quota_type, used_type):
     return soft, hard
 
 
-def exec_quota(module, cmd, mountpoint):
-    cmd = ['xfs_quota', '-x', '-c'] + [cmd, mountpoint]
+def exec_quota(module, xfs_quota_bin, cmd, mountpoint):
+    cmd = [xfs_quota_bin, "-x", "-c"] + [cmd, mountpoint]
     (rc, stdout, stderr) = module.run_command(cmd, use_unsafe_shell=True)
-    if "XFS_GETQUOTA: Operation not permitted" in stderr.split('\n') or \
-            rc == 1 and 'xfs_quota: cannot set limits: Operation not permitted' in stderr.split('\n'):
-        module.fail_json(msg='You need to be root or have CAP_SYS_ADMIN capability to perform this operation')
+    if (
+        "XFS_GETQUOTA: Operation not permitted" in stderr.split("\n")
+        or rc == 1
+        and "xfs_quota: cannot set limits: Operation not permitted"
+        in stderr.split("\n")
+    ):
+        module.fail_json(
+            msg="You need to be root or have CAP_SYS_ADMIN capability to perform this operation"
+        )
 
     return rc, stdout, stderr
 
 
 def get_fs_by_mountpoint(mountpoint):
     mpr = None
-    with open('/proc/mounts', 'r') as s:
+    with open("/proc/mounts", "r") as s:
         for line in s.readlines():
             mp = line.strip().split()
-            if len(mp) == 6 and mp[1] == mountpoint and mp[2] == 'xfs':
-                mpr = dict(zip(['spec', 'file', 'vfstype', 'mntopts', 'freq', 'passno'], mp))
-                mpr['mntopts'] = mpr['mntopts'].split(',')
+            if len(mp) == 6 and mp[1] == mountpoint and mp[2] == "xfs":
+                mpr = dict(
+                    zip(["spec", "file", "vfstype", "mntopts", "freq", "passno"], mp)
+                )
+                mpr["mntopts"] = mpr["mntopts"].split(",")
                 break
     return mpr
 
 
 def get_project_id(name):
     prjid = None
-    with open('/etc/projid', 'r') as s:
+    with open("/etc/projid", "r") as s:
         for line in s.readlines():
-            line = line.strip().partition(':')
+            line = line.strip().partition(":")
             if line[0] == name:
                 prjid = line[2]
                 break
@@ -422,5 +473,5 @@ def get_project_id(name):
     return prjid
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
