@@ -68,9 +68,7 @@ options:
           - A message to include with notifications for this monitor.
           - Email notifications can be sent to specific users by using the same '@username' notation as events.
           - Monitor message template variables can be accessed by using double square brackets, i.e '[[' and ']]'.
-          - C(message) alias is deprecated in community.general 0.2.0, since it is used internally by Ansible Core Engine.
         type: str
-        aliases: [ 'message' ]
     silenced:
         type: dict
         description:
@@ -214,9 +212,7 @@ def main():
                                'log alert', 'query alert', 'trace-analytics alert', 'rum alert']),
             name=dict(required=True),
             query=dict(),
-            notification_message=dict(no_log=True, aliases=['message'],
-                                      deprecated_aliases=[dict(name='message', version='3.0.0',
-                                                               collection_name='community.general')]),  # was Ansible 2.14
+            notification_message=dict(no_log=True),
             silenced=dict(type='dict'),
             notify_no_data=dict(default=False, type='bool'),
             no_data_timeframe=dict(),
@@ -238,9 +234,6 @@ def main():
     # Prepare Datadog
     if not HAS_DATADOG:
         module.fail_json(msg=missing_required_lib('datadogpy'), exception=DATADOG_IMP_ERR)
-
-    if 'message' in module.params:
-        module.fail_json(msg="'message' is reserved keyword, please change this parameter to 'notification_message'")
 
     options = {
         'api_key': module.params['api_key'],
