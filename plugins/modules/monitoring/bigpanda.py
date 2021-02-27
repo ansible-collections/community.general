@@ -183,7 +183,7 @@ def main():
 
         request_url = url + '/data/events/deployments/start'
     else:
-        message = module.params['message']
+        message = module.params['deployment_message']
         if message is not None:
             body['errorMessage'] = message
 
