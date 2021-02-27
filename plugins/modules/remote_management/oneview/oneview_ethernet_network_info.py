@@ -115,11 +115,6 @@ class EthernetNetworkInfoModule(OneViewModuleBase):
 
     def __init__(self):
         super(EthernetNetworkInfoModule, self).__init__(additional_arg_spec=self.argument_spec)
-        self.is_old_facts = self.module._name in ('oneview_ethernet_network_facts', 'community.general.oneview_ethernet_network_facts')
-        if self.is_old_facts:
-            self.module.deprecate("The 'oneview_ethernet_network_facts' module has been renamed to 'oneview_ethernet_network_info', "
-                                  "and the renamed one no longer returns ansible_facts",
-                                  version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
         self.resource_client = self.oneview_client.ethernet_networks
 
@@ -135,10 +130,7 @@ class EthernetNetworkInfoModule(OneViewModuleBase):
 
         info['ethernet_networks'] = ethernet_networks
 
-        if self.is_old_facts:
-            return dict(changed=False, ansible_facts=info)
-        else:
-            return dict(changed=False, **info)
+        return dict(changed=False, **info)
 
     def __gather_optional_info(self, ethernet_network):
 
