@@ -1,0 +1,6 @@
+add plugin.filter:
+  - name: version_sort
+    description: sort a list according to version order instead of pure alphabetical one
+add plugin.test:
+  - name: filter_version_sort
+    description: make sure that the version_sort filter works properly
