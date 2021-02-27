@@ -611,6 +611,15 @@ Bugfixes
 - zfs - fixed ``invalid character '@' in pool name"`` error when working with snapshots on a root zvol (https://github.com/ansible-collections/community.general/issues/932).
 - zypper - force ``LANG=C`` to as zypper is looking in XML output where attribute could be translated (https://github.com/ansible-collections/community.general/issues/1175).
 
+New Plugins
+-----------
+
+Inventory
+~~~~~~~~~
+
+- proxmox - Proxmox inventory source
+- stackpath_compute - StackPath Edge Computing inventory source
+
 New Modules
 -----------
 
@@ -620,7 +629,24 @@ Cloud
 misc
 ^^^^
 
+- proxmox_domain_info - Retrieve information about one or more Proxmox VE domains
+- proxmox_group_info - Retrieve information about one or more Proxmox VE groups
 - proxmox_snap - Snapshot management of instances in Proxmox VE cluster
+- proxmox_user_info - Retrieve information about one or more Proxmox VE users
+
+scaleway
+^^^^^^^^
+
+- scaleway_database_backup - Scaleway database backups management module
+
+Clustering
+~~~~~~~~~~
+
+nomad
+^^^^^
+
+- nomad_job - Launch a Nomad Job
+- nomad_job_info - Get Nomad Jobs info
 
 Identity
 ~~~~~~~~
@@ -632,6 +658,9 @@ ipa
 
 Monitoring
 ~~~~~~~~~~
+
+- pagerduty_change - Track a code or infrastructure change as a PagerDuty change event
+- pagerduty_user - Manage a user account on PagerDuty
 
 datadog
 ^^^^^^^
@@ -648,8 +677,20 @@ os
 - rpm_ostree_pkg - Install or uninstall overlay additional packages
 - yum_versionlock - Locks / unlocks a installed package(s) from being updated by yum package manager
 
+Source Control
+~~~~~~~~~~~~~~
+
+gitlab
+^^^^^^
+
+- gitlab_group_members - Manage group members on GitLab Server
+- gitlab_group_variable - Creates, updates, or deletes GitLab groups variables
+
 System
 ~~~~~~
 
+- iptables_state - Save iptables state into a file or restore it from a file
+- shutdown - Shut down a machine
 - ssh_config - Manage SSH config for user
 - sysrc - Manage FreeBSD using sysrc
+- sysupgrade - Manage OpenBSD system upgrades
