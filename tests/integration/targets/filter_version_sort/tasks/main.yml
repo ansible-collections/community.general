@@ -1,0 +1,10 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: validate that versions are properly sorted in a stable way 
+  assert:
+    that:
+      - "['a-1.9.rpm', 'a-1.10-1.rpm', 'a-1.09.rpm', 'b-1.01.rpm', 'a-2.1-0.rpm', 'a-1.10-0.rpm'] | community.general.version_sort == ['a-1.9.rpm', 'a-1.09.rpm', 'a-1.10-0.rpm', 'a-1.10-1.rpm', 'a-2.1-0.rpm', 'b-1.01.rpm']"
