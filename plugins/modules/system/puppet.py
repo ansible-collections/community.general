@@ -171,14 +171,11 @@ def main():
             puppetmaster=dict(type='str'),
             modulepath=dict(type='str'),
             manifest=dict(type='str'),
-            noop=dict(required=False, type='bool'),
-            logdest=dict(type='str', default='stdout', choices=['all',
-                                                                'stdout',
-                                                                'syslog']),
-            # internal code to work with --diff, do not use
+            noop=dict(type='bool'),
+            logdest=dict(type='str', default='stdout', choices=['all', 'stdout', 'syslog']),
             show_diff=dict(
                 type='bool', default=False, aliases=['show-diff'],
-                deprecated_aliases=[dict(name='show-diff', version='5.0.0', collection_name='community.general')]),
+                removed_in_version='4.0.0', removed_from_collection='community.general'),
             facts=dict(type='dict'),
             facter_basename=dict(type='str', default='ansible'),
             environment=dict(type='str'),
@@ -248,7 +245,8 @@ def main():
         if p['puppetmaster']:
             cmd += " --server %s" % shlex_quote(p['puppetmaster'])
         if p['show_diff']:
-            cmd += " --show_diff"
+            module.deprecate("The 'show_diff' parameter is deprecated, use module diff instead ",
+                             version='4.0.0', collection_name='community.general')
         if p['environment']:
             cmd += " --environment '%s'" % p['environment']
         if p['tags']:
