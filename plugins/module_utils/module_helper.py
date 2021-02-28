@@ -311,7 +311,10 @@ class CmdMixin(object):
                     fmt = find_format(param)
                     value = extra_params[param]
                 else:
-                    raise ModuleHelperException("Cannot determine value for parameter: {0}".format(param))
+                    self.module.deprecate("Cannot determine value for parameter: {0}. "
+                                          "From version 4.0.0 onwards this will generate an exception.".format(param),
+                                          version="4.0.0", collection_name="community.general")
+                    continue
 
             else:
                 raise ModuleHelperException("run_command parameter must be either a str or a dict: {0}".format(param))
