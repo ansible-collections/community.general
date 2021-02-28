@@ -244,7 +244,7 @@ def main():
                " --detailed-exitcodes --verbose --color 0") % dict(base_cmd=base_cmd)
         if p['puppetmaster']:
             cmd += " --server %s" % shlex_quote(p['puppetmaster'])
-        if p['show_diff']:
+        if p['show_diff'] or module._diff:
             module.deprecate("The 'show_diff' parameter is deprecated, use module diff instead ",
                              version='4.0.0', collection_name='community.general')
         if p['environment']:
