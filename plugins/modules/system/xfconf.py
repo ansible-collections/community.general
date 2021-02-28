@@ -238,7 +238,7 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
 
     def state_absent(self):
         self.vars.value = None
-        self.run_command(params=('channel', 'property', 'reset'), extra_params={"reset": True})
+        self.run_command(params=('channel', 'property', {'reset': True}))
         self.update_xfconf_output(previous_value=self.vars.previous_value,
                                   value=None)
 
@@ -267,17 +267,13 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
             isinstance(self.vars.previous_value, list) or \
             values_len > 1
 
-        params = ['channel', 'property', 'create']
+        params = ['channel', 'property', {'create': True}]
         if self.vars.is_array:
-            params.append('is_array')
-        params.append('values_and_types')
-
-        extra_params = dict(values_and_types=(self.vars.value, value_type))
-        extra_params['create'] = True
-        extra_params['is_array'] = self.vars.is_array
+            params.append({'is_array': True})
+        params.append({'values_and_types': (self.vars.value, value_type)})
 
         if not self.module.check_mode:
-            self.run_command(params=params, extra_params=extra_params)
+            self.run_command(params=params)
 
         if not self.vars.is_array:
             self.vars.value = self.vars.value[0]
