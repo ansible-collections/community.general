@@ -312,7 +312,7 @@ class CmdMixin(object):
                     value = extra_params[param]
                 else:
                     self.module.deprecate("Cannot determine value for parameter: {0}. "
-                                          "From version 4.0.0 onwards this will generate an exception.".format(param),
+                                          "From version 4.0.0 onwards this will generate an exception".format(param),
                                           version="4.0.0", collection_name="community.general")
                     continue
 
