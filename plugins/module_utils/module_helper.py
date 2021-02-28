@@ -296,17 +296,28 @@ class CmdMixin(object):
         param_list = params if params else self.module.params.keys()
 
         for param in param_list:
-            if param in self.module.argument_spec:
-                if param not in self.module.params:
+            if isinstance(param, dict):
+                if len(param) != 1:
+                    raise ModuleHelperException("run_command parameter as a dict must "
+                                                "contain only one key: {0}".format(param))
+                _param = list(param.keys())[0]
+                fmt = find_format(_param)
+                value = param[_param]
+            elif isinstance(param, str):
+                if param in self.module.argument_spec:
+                    fmt = find_format(param)
+                    value = self.module.params[param]
+                elif param in extra_params:
+                    fmt = find_format(param)
+                    value = extra_params[param]
+                else:
+                    self.module.deprecate("Cannot determine value for parameter: {0}. "
+                                          "From version 4.0.0 onwards this will generate an exception".format(param),
+                                          version="4.0.0", collection_name="community.general")
                     continue
-                fmt = find_format(param)
-                value = self.module.params[param]
+
             else:
-                if param not in extra_params:
-                    continue
-                fmt = find_format(param)
-                value = extra_params[param]
-            self.cmd_args = cmd_args
+                raise ModuleHelperException("run_command parameter must be either a str or a dict: {0}".format(param))
             cmd_args = add_arg_formatted_param(cmd_args, fmt, value)
 
         return cmd_args
