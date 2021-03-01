@@ -980,25 +980,72 @@ releases:
     - description: Manages Datadog downtimes
       name: datadog_downtime
       namespace: monitoring.datadog
+    - description: Manage group members on GitLab Server
+      name: gitlab_group_members
+      namespace: source_control.gitlab
+    - description: Creates, updates, or deletes GitLab groups variables
+      name: gitlab_group_variable
+      namespace: source_control.gitlab
     - description: Manage FreeIPA password policies
       name: ipa_pwpolicy
       namespace: identity.ipa
+    - description: Save iptables state into a file or restore it from a file
+      name: iptables_state
+      namespace: system
+    - description: Launch a Nomad Job
+      name: nomad_job
+      namespace: clustering.nomad
+    - description: Get Nomad Jobs info
+      name: nomad_job_info
+      namespace: clustering.nomad
+    - description: Track a code or infrastructure change as a PagerDuty change event
+      name: pagerduty_change
+      namespace: monitoring
+    - description: Manage a user account on PagerDuty
+      name: pagerduty_user
+      namespace: monitoring
+    - description: Retrieve information about one or more Proxmox VE domains
+      name: proxmox_domain_info
+      namespace: cloud.misc
+    - description: Retrieve information about one or more Proxmox VE groups
+      name: proxmox_group_info
+      namespace: cloud.misc
     - description: Snapshot management of instances in Proxmox VE cluster
       name: proxmox_snap
+      namespace: cloud.misc
+    - description: Retrieve information about one or more Proxmox VE users
+      name: proxmox_user_info
       namespace: cloud.misc
     - description: Install or uninstall overlay additional packages
       name: rpm_ostree_pkg
       namespace: packaging.os
+    - description: Scaleway database backups management module
+      name: scaleway_database_backup
+      namespace: cloud.scaleway
+    - description: Shut down a machine
+      name: shutdown
+      namespace: system
     - description: Manage SSH config for user
       name: ssh_config
       namespace: system
     - description: Manage FreeBSD using sysrc
       name: sysrc
       namespace: system
+    - description: Manage OpenBSD system upgrades
+      name: sysupgrade
+      namespace: system
     - description: Locks / unlocks a installed package(s) from being updated by yum
         package manager
       name: yum_versionlock
       namespace: packaging.os
+    plugins:
+      inventory:
+      - description: Proxmox inventory source
+        name: proxmox
+        namespace: null
+      - description: StackPath Edge Computing inventory source
+        name: stackpath_compute
+        namespace: null
     release_date: '2021-01-28'
   2.0.1:
     changes:
