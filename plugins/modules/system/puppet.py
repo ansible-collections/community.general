@@ -175,7 +175,7 @@ def main():
             logdest=dict(type='str', default='stdout', choices=['all', 'stdout', 'syslog']),
             show_diff=dict(
                 type='bool', default=False, aliases=['show-diff'],
-                removed_in_version='5.0.0', removed_from_collection='community.general'),
+                removed_in_version='7.0.0', removed_from_collection='community.general'),
             facts=dict(type='dict'),
             facter_basename=dict(type='str', default='ansible'),
             environment=dict(type='str'),
