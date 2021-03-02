@@ -85,7 +85,7 @@ EXAMPLES = r"""
             
 - hosts: localhost
   vars:
-      secret: >
+      secret: >-
         {{
             lookup(
                 'community.general.tss',
