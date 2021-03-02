@@ -82,7 +82,6 @@ EXAMPLES = r"""
                 | items2dict(key_name='slug',
                              value_name='itemValue'))['password']
             }}
-            
 - hosts: localhost
   vars:
       secret: >-
