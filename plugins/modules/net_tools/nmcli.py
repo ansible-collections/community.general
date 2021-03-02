@@ -69,6 +69,7 @@ options:
         description:
             - The IPv4 address to this interface.
             - Use the format C(192.0.2.24/24).
+            - If defined and I(method4) is not specified, automatically set C(ipv4.method) to C(manual).
         type: str
     gw4:
         description:
@@ -106,10 +107,18 @@ options:
             - A list of DNS search domains.
         elements: str
         type: list
+    method4:
+        description:
+            - Configuration method to be used for IPv4.
+            - If I(ip4) is set, C(ipv4.method) is automatically set to C(manual) and this parameter is not needed.
+        type: str
+        choices: [auto, link-local, manual, shared, disabled]
+        version_added: 2.2.0
     ip6:
         description:
             - The IPv6 address to this interface.
             - Use the format C(abbe::cafe).
+            - If defined and I(method6) is not specified, automatically set C(ipv6.method) to C(manual).
         type: str
     gw6:
         description:
@@ -127,6 +136,13 @@ options:
             - A list of DNS search domains.
         elements: str
         type: list
+    method6:
+        description:
+            - Configuration method to be used for IPv6
+            - If I(ip6) is set, C(ipv6.method) is automatically set to C(manual) and this parameter is not needed.
+        type: str
+        choices: [ignore, auto, dhcp, link-local, manual, shared]
+        version_added: 2.2.0
     mtu:
         description:
             - The connection MTU, e.g. 9000. This can't be applied when creating the interface and is done once the interface has been created.
@@ -611,10 +627,12 @@ class Nmcli(object):
         self.never_default4 = module.params['never_default4']
         self.dns4 = module.params['dns4']
         self.dns4_search = module.params['dns4_search']
+        self.method4 = module.params['method4']
         self.ip6 = module.params['ip6']
         self.gw6 = module.params['gw6']
         self.dns6 = module.params['dns6']
         self.dns6_search = module.params['dns6_search']
+        self.method6 = module.params['method6']
         self.mtu = module.params['mtu']
         self.stp = module.params['stp']
         self.priority = module.params['priority']
@@ -648,18 +666,18 @@ class Nmcli(object):
         self.dhcp_client_id = module.params['dhcp_client_id']
         self.zone = module.params['zone']
 
-        if self.ip4:
+        if self.method4:
+            self.ipv4_method = self.method4
+        elif self.ip4:
             self.ipv4_method = 'manual'
         else:
-            # supported values for 'ipv4.method': [auto, link-local, manual, shared, disabled]
-            # TODO: add a new module parameter to specify a non 'manual' value
             self.ipv4_method = None
 
-        if self.ip6:
+        if self.method6:
+            self.ipv6_method = self.method6
+        elif self.ip6:
             self.ipv6_method = 'manual'
         else:
-            # supported values for 'ipv6.method': [ignore, auto, dhcp, link-local, manual, shared]
-            # TODO: add a new module parameter to specify a non 'manual' value
             self.ipv6_method = None
 
     def execute_command(self, cmd, use_unsafe_shell=False, data=None):
@@ -1075,11 +1093,13 @@ def main():
             never_default4=dict(type='bool', default=False),
             dns4=dict(type='list', elements='str'),
             dns4_search=dict(type='list', elements='str'),
+            method4=dict(type='str', choices=['auto', 'link-local', 'manual', 'shared', 'disabled']),
             dhcp_client_id=dict(type='str'),
             ip6=dict(type='str'),
             gw6=dict(type='str'),
             dns6=dict(type='list', elements='str'),
             dns6_search=dict(type='list', elements='str'),
+            method6=dict(type='str', choices=['ignore', 'auto', 'dhcp', 'link-local', 'manual', 'shared']),
             # Bond Specific vars
             mode=dict(type='str', default='balance-rr',
                       choices=['802.3ad', 'active-backup', 'balance-alb', 'balance-rr', 'balance-tlb', 'balance-xor', 'broadcast']),
