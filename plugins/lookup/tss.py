@@ -85,7 +85,16 @@ EXAMPLES = r"""
             
 - hosts: localhost
   vars:
-      secret: "{{ lookup('community.general.tss', 102, base_url='https://secretserver.domain.com/SecretServer/', username='user.name', password='password') }}"
+      secret: >
+        {{
+            lookup(
+                'community.general.tss',
+                102,
+                base_url='https://secretserver.domain.com/SecretServer/',
+                username='user.name',
+                password='password'
+            )
+        }}
   tasks:
       - ansible.builtin.debug:
           msg: >
