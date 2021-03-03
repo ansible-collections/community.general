@@ -18,7 +18,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible_collections.ansible.netcommon.plugins.module_utils.compat import ipaddress
+from ansible_collections.community.crypto.plugins.module_utils.compat import ipaddress
 
 
 def _normalize_ipaddr(ipaddr):
