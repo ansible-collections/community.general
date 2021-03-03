@@ -226,11 +226,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 if config == 'rootfs' or config.startswith(('virtio', 'sata', 'ide', 'scsi')):
                     value = ('disk_image=' + value)
 
-                # Parse Proxmox tag string into list
-                if config == 'tags':
-                    value = [tag.strip() for tag in value.split(",")]
-
-                if not (isinstance(value, int) or ',' not in value):
+                if config != 'tags' and not (isinstance(value, int) or ',' not in value):
                     # split off strings with commas to a dict
                     # skip over any keys that cannot be processed
                     try:
