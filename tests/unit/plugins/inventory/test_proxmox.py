@@ -72,7 +72,7 @@ def get_json(url):
                  "vmid": "100",
                  "disk": "1000",
                  "uptime": 1000,
-                 "tags": "test, tags, ..."}]
+                 "tags": "test, tags, here"}]
     elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu":
         # _get_qemu_per_node
         return [{"name": "test-qemu",
@@ -107,7 +107,7 @@ def get_json(url):
                  "uptime": 0,
                  "disk": 0,
                  "status": "stopped",
-                 "tags": "test, tags, ..."}]
+                 "tags": "test, tags, here"}]
     elif url == "https://localhost:8006/api2/json/pools/test":
         # _get_members_per_pool
         return {"members": [{"uptime": 1000,
