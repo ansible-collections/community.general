@@ -29,6 +29,8 @@ options:
         - "List with options to gather information about Network Set.
           Option allowed: C(withoutEthernet).
           The option C(withoutEthernet) retrieves the list of network_sets excluding Ethernet networks."
+      type: list
+      elements: str
 
 extends_documentation_fragment:
 - community.general.oneview
@@ -127,7 +129,7 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 class NetworkSetInfoModule(OneViewModuleBase):
     argument_spec = dict(
         name=dict(type='str'),
-        options=dict(type='list'),
+        options=dict(type='list', elements='str'),
         params=dict(type='dict'),
     )
 
