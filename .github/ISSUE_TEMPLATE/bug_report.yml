@@ -31,7 +31,7 @@ body:
     label: Issue Type
     # FIXME: Once GitHub allows defining the default choice, update this
     options:
-    - Bug Report
+      - Bug Report
   validations:
     required: true
 
