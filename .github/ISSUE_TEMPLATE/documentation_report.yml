@@ -1,10 +1,18 @@
 ---
+<<<<<<< HEAD
 name: 📝 Documentation Report
 description: Ask us about docs
+=======
+name: Documentation Report
+description: Ask us about docs
+# NOTE: issue body is enabled to allow screenshots
+issue_body: true  # default: true, adds a classic WSYWIG textarea, if on
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
 
 body:
 - type: markdown
   attributes:
+<<<<<<< HEAD
     value: >
       **Thank you for wanting to report a problem with ansible-core
       documentation!**
@@ -33,11 +41,21 @@ body:
 
       [submit a pull request]:
       https://docs.ansible.com/ansible-core/devel/community/documentation_contributions.html
+=======
+    value: |
+      ⚠
+      Verify first that your issue is not [already reported on GitHub][issue search].
+      Also test if the latest release and devel branch are affected too.
+      *Complete **all** sections as described, this form is processed automatically.*
+
+      [issue search]: https://github.com/ansible-collections/community.general/search?q=is%3Aissue&type=issues
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
 
 
 - type: textarea
   attributes:
     label: Summary
+<<<<<<< HEAD
     description: >
       Explain the problem briefly below, add suggestions to wording
       or structure.
@@ -48,6 +66,14 @@ body:
       right from the GitHub UI!
     placeholder: >-
       I was reading the ansible-core documentation of version X and I'm having
+=======
+    description: |
+      Explain the problem briefly below, add suggestions to wording or structure.
+
+      **HINT:** Did you know the documentation has an `Edit on GitHub` link on every page?
+    placeholder: >-
+      I was reading the Collection documentation of version X and I'm having
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
       problems understanding Y. It would be very helpful if that got
       rephrased as Z.
   validations:
@@ -56,6 +82,7 @@ body:
 - type: dropdown
   attributes:
     label: Issue Type
+<<<<<<< HEAD
     description: >
       Please select the single available option in the drop-down.
 
@@ -72,6 +99,8 @@ body:
         supports dropdown defaults. Promise!_
 
       </details>
+=======
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
     # FIXME: Once GitHub allows defining the default choice, update this
     options:
     - Documentation Report
@@ -81,6 +110,7 @@ body:
 - type: input
   attributes:
     label: Component Name
+<<<<<<< HEAD
     description: >
       Write the short name of the rst file, module, plugin, task or
       feature below, *use your best guess if unsure*.
@@ -98,6 +128,12 @@ body:
 
       [collections org]: /ansible-collections
     placeholder: docs/docsite/rst/dev_guide/debugging.rst
+=======
+    description: >-
+      Write the short name of the rst file, module, plugin, task or
+      feature below, *use your best guess if unsure*.
+    placeholder: mysql_user
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
   validations:
     required: true
 
@@ -105,6 +141,7 @@ body:
   attributes:
     label: Ansible Version
     description: >-
+<<<<<<< HEAD
       Paste verbatim output from `ansible --version` below, under
       the prompt line. Please don't wrap it with tripple backticks — your
       whole input will be turned into a code snippet automatically.
@@ -124,11 +161,23 @@ body:
         libyaml = True
   validations:
     required: true
+=======
+      Paste verbatim output from `ansible --version` between
+      tripple backticks.
+    value: |
+      ```console (paste below)
+      $ ansible --version
+
+      ```
+  validations:
+    required: false
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
 
 - type: textarea
   attributes:
     label: Configuration
     description: >-
+<<<<<<< HEAD
       Paste verbatim output from `ansible-config dump --only-changed -t all` below, under the prompt line.
       (if using a version older than ansible-core 2.12 you should omit the '-t all')
       Please don't wrap it with tripple backticks — your
@@ -145,6 +194,16 @@ body:
       DEFAULT_VAULT_PASSWORD_FILE(~/src/github/ansible/ansible/ansible.cfg) = ~/src/github/ansible/ansible/vault/print-password.sh
   validations:
     required: true
+=======
+      Paste verbatim output from `ansible-config dump --only-changed` between quotes.
+    value: |
+      ```console (paste below)
+      $ ansible-config dump --only-changed
+
+      ```
+  validations:
+    required: false
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
 
 - type: textarea
   attributes:
@@ -154,8 +213,12 @@ body:
       browser, etc.
     placeholder: Fedora 33, Firefox etc.
   validations:
+<<<<<<< HEAD
     required: true
 
+=======
+    required: false
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
 
 - type: textarea
   attributes:
@@ -163,11 +226,17 @@ body:
     description: |
       Describe how this improves the documentation, e.g. before/after situation or screenshots.
 
+<<<<<<< HEAD
+=======
+      **Tip:** It's not possible to upload the screenshot via this field directly but you can use the last textarea in this form to attach them.
+
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
       **HINT:** You can paste https://gist.github.com links for larger files.
     placeholder: >-
       When the improvement is applied, it makes it more straightforward
       to understand X.
   validations:
+<<<<<<< HEAD
     required: true
 
 
@@ -187,14 +256,21 @@ body:
       [ansibot help]:
       /ansible/ansibullbot/blob/master/ISSUE_HELP.md#for-issue-submitters
 
+=======
+    required: false
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
 
 - type: checkboxes
   attributes:
     label: Code of Conduct
     description: |
       Read the [Ansible Code of Conduct][CoC] first.
+<<<<<<< HEAD
 
       [CoC]: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html?utm_medium=github&utm_source=issue_form--documentation_report.yml
+=======
+      [CoC]: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html?utm_medium=github&utm_source=issue_form--ansible-collections
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
     options:
     - label: I agree to follow the Ansible Code of Conduct
       required: true

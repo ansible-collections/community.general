@@ -1,10 +1,17 @@
 ---
+<<<<<<< HEAD
 name: ✨ Feature request
 description: Suggest an idea for this project
+=======
+name: Feature request
+description: Suggest an idea for this project
+issue_body: false  # default: true, adds a classic WSYWIG textarea, if on
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
 
 body:
 - type: markdown
   attributes:
+<<<<<<< HEAD
     value: >
       **Thank you for wanting to suggest a feature for ansible-core!**
 
@@ -61,11 +68,21 @@ body:
       https://docs.ansible.com/ansible-core/devel/community/communication.html?utm_medium=github&utm_source=issue_form--feature_request.yml#mailing-list-information
 
       [new proposal]: ../../proposals/issues/new
+=======
+    value: |
+      ⚠
+      Verify first that your issue is not [already reported on GitHub][issue search].
+      Also test if the latest release and devel branch are affected too.
+      *Complete **all** sections as described, this form is processed automatically.*
+
+      [issue search]: https://github.com/ansible-collections/community.general/search?q=is%3Aissue&type=issues
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
 
 
 - type: textarea
   attributes:
     label: Summary
+<<<<<<< HEAD
     description: >
       Describe the new feature/improvement you would like briefly below.
 
@@ -93,6 +110,11 @@ body:
       [new proposal]: ../../proposals/issues/new
     placeholder: >-
       I am trying to do X with ansible-core from the devel branch on GitHub and
+=======
+    description: Describe the new feature/improvement briefly below.
+    placeholder: >-
+      I am trying to do X with the collection from the main branch on GitHub and
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
       I think that implementing a feature Y would be very helpful for me and
       every other user of ansible-core because of Z.
   validations:
@@ -101,6 +123,7 @@ body:
 - type: dropdown
   attributes:
     label: Issue Type
+<<<<<<< HEAD
     description: >
       Please select the single available option in the drop-down.
 
@@ -117,6 +140,8 @@ body:
         supports dropdown defaults. Promise!_
 
       </details>
+=======
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
     # FIXME: Once GitHub allows defining the default choice, update this
     options:
     - Feature Idea
@@ -126,6 +151,7 @@ body:
 - type: input
   attributes:
     label: Component Name
+<<<<<<< HEAD
     description: >
       Write the short name of the module, plugin, task or feature below,
       *use your best guess if unsure*.
@@ -139,6 +165,11 @@ body:
 
 
       [collections org]: /ansible-collections
+=======
+    description: >-
+      Write the short name of the module, plugin, task or feature below,
+      *use your best guess if unsure*.
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
     placeholder: dnf, apt, yum, pip, user etc.
   validations:
     required: true
@@ -155,6 +186,7 @@ body:
       ```yaml (paste below)
 
       ```
+<<<<<<< HEAD
     placeholder: >-
       I asked on https://stackoverflow.com/.... and the community
       advised me to do X, Y and Z.
@@ -179,13 +211,21 @@ body:
       /ansible/ansibullbot/blob/master/ISSUE_HELP.md#for-issue-submitters
 
 
+=======
+  validations:
+    required: false
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
 - type: checkboxes
   attributes:
     label: Code of Conduct
     description: |
       Read the [Ansible Code of Conduct][CoC] first.
+<<<<<<< HEAD
 
       [CoC]: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html?utm_medium=github&utm_source=issue_form--feature_request.yml
+=======
+      [CoC]: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html?utm_medium=github&utm_source=issue_form--ansible-collections
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
     options:
     - label: I agree to follow the Ansible Code of Conduct
       required: true

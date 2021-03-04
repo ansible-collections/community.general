@@ -1,8 +1,17 @@
+<<<<<<< HEAD
 # Ref: https://help.github.com/en/github/building-a-strong-community/configuring-issue-templates-for-your-repository#configuring-the-template-chooser
 blank_issues_enabled: false  # default: true
 contact_links:
 - name: 🔐 Security bug report 🔥
   url: https://docs.ansible.com/ansible/latest/community/reporting_bugs_and_features.html?utm_medium=github&utm_source=issue_template_chooser
+=======
+---
+# Ref: https://help.github.com/en/github/building-a-strong-community/configuring-issue-templates-for-your-repository#configuring-the-template-chooser
+blank_issues_enabled: false  # default: true
+contact_links:
+- name: Security bug report
+  url: https://docs.ansible.com/ansible-core/devel/community/reporting_bugs_and_features.html?utm_medium=github&utm_source=issue_template_chooser_ansible_collections
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
   about: |
     Please learn how to report security vulnerabilities here.
 
@@ -12,6 +21,7 @@ contact_links:
 
     For more information, see
     https://docs.ansible.com/ansible/latest/community/reporting_bugs_and_features.html
+<<<<<<< HEAD
 - name: 📝 Ansible Code of Conduct
   url: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html?utm_medium=github&utm_source=issue_template_chooser
   about: ❤ Be nice to other members of the community. ☮ Behave.
@@ -23,4 +33,17 @@ contact_links:
   about: Interested in improving a specific area? Become a part of a working group!
 - name: 💼 For Enterprise
   url: https://www.ansible.com/products/engine?utm_medium=github&utm_source=issue_template_chooser
+=======
+- name: Ansible Code of Conduct
+  url: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html?utm_medium=github&utm_source=issue_template_chooser_ansible_collections
+  about: Be nice to other members of the community.
+- name: Talks to the community
+  url: https://docs.ansible.com/ansible/latest/community/communication.html?utm_medium=github&utm_source=issue_template_chooser#mailing-list-information
+  about: Please ask and answer usage questions here
+- name: Working groups
+  url: https://github.com/ansible/community/wiki
+  about: Interested in improving a specific area? Become a part of a working group!
+- name: For Enterprise
+  url: https://www.ansible.com/products/engine?utm_medium=github&utm_source=issue_template_chooser_ansible_collections
+>>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
   about: Red Hat offers support for the Ansible Automation Platform
