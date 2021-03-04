@@ -203,7 +203,10 @@ class Zfs(object):
         rc, out, err = self.module.run_command(" ".join(cmd))
         properties = dict()
         for prop, value, source in [l.split('\t')[1:4] for l in out.splitlines()]:
-            if source == 'local':
+            # include source '-' so that creation-only properties are not removed
+            # to avoids errors when the dataset already exists and the property is not changed
+            # this scenario is most likely when the same playbook is run more than once
+            if source == 'local' or source == '-':
                 properties[prop] = value
         # Add alias for enhanced sharing properties
         if self.enhanced_sharing:
