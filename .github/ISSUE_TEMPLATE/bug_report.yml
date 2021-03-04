@@ -41,7 +41,7 @@ body:
     # May generate this list via GitHub action and walking files under https://github.com/ansible-collections/community.general/tree/main/plugins
     # Select from list, filter as you type (`mysql` would only show the 3 mysql components)
     # OR freeform - doesn't seem to be supported in adaptivecards
-
+    label: Component Name
     description: >-
       Write the short name of the module, plugin, task or feature below,
       *use your best guess if unsure*.
