@@ -28,7 +28,7 @@ This script can be run with the switches
 --host to restrict the inventory to a single named node. (requires datacenter config)
 
 The configuration for this plugin is read from a consul_io.ini file located in the
-same directory as this inventory script. All config options in the config file
+same directory as this inventory script or via environment variables. All config options in the config file
 are optional except the host and port, which must point to a valid agent or
 server running the http api. For more information on enabling the endpoint see.
 
@@ -36,17 +36,23 @@ http://www.consul.io/docs/agent/options.html
 
 Other options include:
 
+'bulk_load'
+
+boolean flag. Load all possible data before building inventory JSON
+If true, script processes in-memory data. JSON generation reduces drastically
+This can also be set with the environmental variable CONSUL_BULK_LOAD.
+
 'datacenter':
 
 which restricts the included nodes to those from the given datacenter
-This can also be set with the environmental variable CONSUL_DATACENTER
+This can also be set with the environmental variable CONSUL_DATACENTER.
 
 'url':
 
 the URL of the Consul cluster. host, port and scheme are derived from the
 URL. If not specified, connection configuration defaults to http requests
 to localhost on port 8500.
-This can also be set with the environmental variable CONSUL_URL
+This can also be set with the environmental variable CONSUL_URL.
 
 'domain':
 
@@ -57,6 +63,15 @@ have consul hooked into your DNS server for these to resolve. See the consul
 DNS docs for more info.
 
 which restricts the included nodes to those from the given datacenter
+This can also be set with the environmental variable CONSUL_DOMAIN.
+
+'suffixes':
+
+boolean flag. By default, final JSON is built based on all available info in consul.
+Suffixes means that services groups will be added in addition to basic information. See servers_suffix for additional info
+There are cases when speed is preferable than having services groups
+False value will reduce script execution time drastically.
+This can also be set with the environmental variable CONSUL_SUFFIXES.
 
 'servers_suffix':
 
@@ -64,6 +79,7 @@ defining the a suffix to add to the service name when creating the service
 group. e.g Service name of 'redis' and a suffix of '_servers' will add
 each nodes address to the group name 'redis_servers'. No suffix is added
 if this is not set
+This can also be set with the environmental variable CONSUL_SERVERS_SUFFIX.
 
 'tags':
 
@@ -71,11 +87,13 @@ boolean flag defining if service tags should be used to create Inventory
 groups e.g. an nginx service with the tags ['master', 'v1'] will create
 groups nginx_master and nginx_v1 to which the node running the service
 will be added. No tag groups are created if this is missing.
+This can also be set with the environmental variable CONSUL_TAGS.
 
 'token':
 
 ACL token to use to authorize access to the key value store. May be required
 to retrieve the kv_groups and kv_metadata based on your consul configuration.
+This can also be set with the environmental variable CONSUL_TOKEN.
 
 'kv_groups':
 
@@ -86,6 +104,7 @@ names to which the node should be added e.g. if the inventory contains node
 'nyc-web-1' in datacenter 'nyc-dc1' and kv_groups = 'ansible/groups' then the key
 'ansible/groups/nyc-dc1/nyc-web-1' will be queried for a group list. If this query
  returned 'test,honeypot' then the node address to both groups.
+This can also be set with the environmental variable CONSUL_KV_GROUPS.
 
 'kv_metadata':
 
@@ -95,6 +114,7 @@ find a json dictionary of metadata entries. If found, each key/value pair in the
 dictionary is added to the metadata for the node. eg node 'nyc-web-1' in datacenter
 'nyc-dc1' and kv_metadata = 'ansible/metadata', then the key
 'ansible/metadata/nyc-dc1/nyc-web-1' should contain '{"databse": "postgres"}'
+This can also be set with the environmental variable CONSUL_KV_METADATA.
 
 'availability':
 
@@ -102,6 +122,7 @@ if true then availability groups will be created for each service. The node will
 be added to one of the groups based on the health status of the service. The
 group name is derived from the service name and the configurable availability
 suffixes
+This can also be set with the environmental variable CONSUL_AVAILABILITY.
 
 'available_suffix':
 
@@ -109,10 +130,12 @@ suffix that should be appended to the service availability groups for available
 services e.g. if the suffix is '_up' and the service is nginx, then nodes with
 healthy nginx services will be added to the nginix_up group. Defaults to
 '_available'
+This can also be set with the environmental variable CONSUL_AVAILABLE_SUFFIX.
 
 'unavailable_suffix':
 
 as above but for unhealthy services, defaults to '_unavailable'
+This can also be set with the environmental variable CONSUL_UNAVAILABLE_SUFFIX.
 
 Note that if the inventory discovers an 'ssh' service running on a node it will
 register the port as ansible_ssh_port in the node's metadata and this port will
@@ -337,7 +360,7 @@ class ConsulInventory(object):
             else:
                 index, groups = self.consul_api.kv.get(key)
             if groups and groups['Value']:
-                for group in groups['Value'].split(','):
+                for group in groups['Value'].decode().split(','):
                     self.add_node_to_map(self.nodes_by_kv, group.strip(), node)
 
     def load_data_from_service(self, service_name, service, node_data):
@@ -488,7 +511,10 @@ class ConsulConfig(dict):
                 setattr(self, arg, getattr(args, arg))
 
     def read_env_vars(self):
-        env_var_options = ['datacenter', 'url']
+        env_var_options = ['host', 'token', 'datacenter', 'servers_suffix',
+                           'tags', 'kv_metadata', 'kv_groups', 'availability',
+                           'unavailable_suffix', 'available_suffix', 'url',
+                           'domain', 'suffixes', 'bulk_load']
         for option in env_var_options:
             value = None
             env_var = 'CONSUL_' + option.upper()
