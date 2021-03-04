@@ -31,13 +31,13 @@ body:
     label: Issue Type
     # FIXME: Once GitHub allows defining the default choice, update this
     options:
-      - Feature Idea
+    - Feature Idea
   validations:
     required: true
 
 - type: input
   attributes:
-    label: Component Type
+    label: Component Name
     description: >-
       Write the short name of the module, plugin, task or feature below,
       *use your best guess if unsure*.
@@ -59,4 +59,13 @@ body:
       ```
   validations:
     required: false
+- type: checkboxes
+  attributes:
+    label: Code of Conduct
+    description: |
+      Read the [Ansible Code of Conduct][CoC] first.
+      [CoC]: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html?utm_medium=github&utm_source=issue_form--ansible-collections
+    options:
+    - label: I agree to follow the Ansible Code of Conduct
+      required: true
 ...

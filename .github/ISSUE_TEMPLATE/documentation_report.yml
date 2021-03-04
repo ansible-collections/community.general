@@ -35,7 +35,7 @@ body:
     label: Issue Type
     # FIXME: Once GitHub allows defining the default choice, update this
     options:
-      - Documentation Report
+    - Documentation Report
   validations:
     required: true
 
@@ -100,4 +100,14 @@ body:
       to understand X.
   validations:
     required: false
+
+- type: checkboxes
+  attributes:
+    label: Code of Conduct
+    description: |
+      Read the [Ansible Code of Conduct][CoC] first.
+      [CoC]: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html?utm_medium=github&utm_source=issue_form--ansible-collections
+    options:
+    - label: I agree to follow the Ansible Code of Conduct
+      required: true
 ...
