@@ -219,6 +219,7 @@ body:
   attributes:
     label: Code of Conduct
     description: |
+<<<<<<< HEAD
       Read the [Ansible Code of Conduct][CoC] first.
 <<<<<<< HEAD
 
@@ -226,6 +227,9 @@ body:
 =======
       [CoC]: https://docs.ansible.com/ansible/latest/community/code_of_conduct.html?utm_medium=github&utm_source=issue_form--ansible-collections
 >>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
+=======
+      Read the [Ansible Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html?utm_medium=github&utm_source=issue_form--ansible-collections) first.
+>>>>>>> 1133e5c865 (Fix CoC links)
     options:
     - label: I agree to follow the Ansible Code of Conduct
       required: true
