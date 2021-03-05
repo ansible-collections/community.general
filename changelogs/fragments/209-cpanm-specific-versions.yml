@@ -1,0 +1,2 @@
+bugfixes:
+  - cpanm - honor and install specified version (https://github.com/ansible-collections/community.general/issues/208).
