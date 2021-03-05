@@ -447,7 +447,7 @@
 
 - name: Check add option with empty string value
   block:
-    - name: Remove drinksn
+    - name: Remove drinks
       ini_file:
         path: "{{ output_file }}"
         section: drinks
