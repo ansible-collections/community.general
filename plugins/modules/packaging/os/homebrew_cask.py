@@ -49,6 +49,7 @@ options:
     description:
     - Update homebrew itself first.
     - Note that C(brew cask update) is a synonym for C(brew update).
+    - Alias C(update-brew) has been deprecated and will be removed in community.general 5.0.0.
     type: bool
     default: no
     aliases: [ 'update-brew' ]
@@ -800,6 +801,7 @@ def main():
                 default=False,
                 aliases=["update-brew"],
                 type='bool',
+                deprecated_aliases=[dict(name='update-brew', version='5.0.0', collection_name='community.general')],
             ),
             install_options=dict(
                 default=None,
