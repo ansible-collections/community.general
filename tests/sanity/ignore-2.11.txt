@@ -140,7 +140,6 @@ plugins/modules/remote_management/oneview/oneview_enclosure_info.py validate-mod
 plugins/modules/remote_management/oneview/oneview_enclosure_info.py validate-modules:undocumented-parameter
 plugins/modules/remote_management/oneview/oneview_ethernet_network.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/oneview/oneview_ethernet_network.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_ethernet_network_info.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/oneview/oneview_ethernet_network_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/oneview/oneview_ethernet_network_info.py validate-modules:undocumented-parameter
 plugins/modules/remote_management/oneview/oneview_fc_network.py validate-modules:doc-missing-type
@@ -161,7 +160,6 @@ plugins/modules/remote_management/oneview/oneview_logical_interconnect_group_inf
 plugins/modules/remote_management/oneview/oneview_network_set.py validate-modules:doc-missing-type
 plugins/modules/remote_management/oneview/oneview_network_set.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/oneview/oneview_network_set.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_network_set_info.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/oneview/oneview_network_set_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/oneview/oneview_network_set_info.py validate-modules:undocumented-parameter
 plugins/modules/remote_management/oneview/oneview_san_manager.py validate-modules:parameter-type-not-in-doc
