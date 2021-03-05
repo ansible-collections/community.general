@@ -33,12 +33,14 @@ options:
   update_cache:
     description:
       - Update the package database first C(urpmi.update -a).
+      - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
     type: bool
     default: no
     aliases: ['update-cache']
   no_recommends:
     description:
       - Corresponds to the C(--no-recommends) option for I(urpmi).
+      - Alias C(no-recommends) has been deprecated and will be removed in community.general 5.0.0.
     type: bool
     default: yes
     aliases: ['no-recommends']
@@ -195,9 +197,13 @@ def main():
         argument_spec=dict(
             state=dict(type='str', default='present',
                        choices=['absent', 'installed', 'present', 'removed']),
-            update_cache=dict(type='bool', default=False, aliases=['update-cache']),
+            update_cache=dict(
+                type='bool', default=False, aliases=['update-cache'],
+                deprecated_aliases=[dict(name='update-cache', version='5.0.0', collection_name='community.general')]),
             force=dict(type='bool', default=True),
-            no_recommends=dict(type='bool', default=True, aliases=['no-recommends']),
+            no_recommends=dict(
+                type='bool', default=True, aliases=['no-recommends'],
+                deprecated_aliases=[dict(name='no-recommends', version='5.0.0', collection_name='community.general')]),
             name=dict(type='list', elements='str', required=True, aliases=['package', 'pkg']),
             root=dict(type='str', aliases=['installroot']),
         ),
