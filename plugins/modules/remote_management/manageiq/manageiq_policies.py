@@ -48,12 +48,11 @@ options:
       - The name of the resource to which the profile should be [un]assigned.
       - Must be specified if I(resource_id) is not set. Both options are mutually exclusive.
     required: false
-    type: str
   resource_id:
+    type: int
     description:
       - The ID of the resource to which the profile should be [un]assigned.
       - Must be specified if I(resource_name) is not set. Both options are mutually exclusive.
-    type: int
     version_added: 2.2.0
 '''
 
