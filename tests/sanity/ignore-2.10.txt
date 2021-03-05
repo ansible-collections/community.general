@@ -62,7 +62,6 @@ plugins/modules/cloud/ovirt/ovirt_vm_facts.py validate-modules:parameter-list-no
 plugins/modules/cloud/ovirt/ovirt_vm_facts.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:doc-missing-type
 plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/packet/packet_volume_attachment.py pylint:ansible-bad-function
 plugins/modules/cloud/rackspace/rax.py use-argspec-type-path # fix needed
 plugins/modules/cloud/rackspace/rax.py validate-modules:doc-missing-type
 plugins/modules/cloud/rackspace/rax.py validate-modules:parameter-list-no-elements
