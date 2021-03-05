@@ -171,12 +171,11 @@ def main():
             puppetmaster=dict(type='str'),
             modulepath=dict(type='str'),
             manifest=dict(type='str'),
-            noop=dict(required=False, type='bool'),
-            logdest=dict(type='str', default='stdout', choices=['all',
-                                                                'stdout',
-                                                                'syslog']),
-            # internal code to work with --diff, do not use
-            show_diff=dict(type='bool', default=False, aliases=['show-diff']),
+            noop=dict(type='bool'),
+            logdest=dict(type='str', default='stdout', choices=['all', 'stdout', 'syslog']),
+            show_diff=dict(
+                type='bool', default=False, aliases=['show-diff'],
+                removed_in_version='7.0.0', removed_from_collection='community.general'),
             facts=dict(type='dict'),
             facter_basename=dict(type='str', default='ansible'),
             environment=dict(type='str'),
