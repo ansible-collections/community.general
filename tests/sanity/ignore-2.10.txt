@@ -3,6 +3,7 @@ plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
 plugins/module_utils/_mount.py future-import-boilerplate
 plugins/module_utils/_mount.py metaclass-boilerplate
+plugins/modules/cloud/linode/linode.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/linode/linode.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/linode/linode.py validate-modules:undocumented-parameter
 plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
