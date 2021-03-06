@@ -12,7 +12,6 @@ matrix:
     - env: T=devel/sanity/2
     - env: T=devel/sanity/3
     - env: T=devel/sanity/4
-    - env: T=devel/sanity/extra
 
     - env: T=2.10/sanity/1
     - env: T=2.10/sanity/2
