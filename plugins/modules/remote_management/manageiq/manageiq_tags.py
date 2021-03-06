@@ -47,7 +47,6 @@ options:
     description:
       - The name of the resource at which tags will be controlled.
       - Must be specified if I(resource_id) is not set. Both options are mutually exclusive.
-    type: str
   resource_id:
     description:
       - The ID of the resource at which tags will be controlled.
