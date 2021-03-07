@@ -56,7 +56,7 @@ options:
     description:
       - Use this if you want to install modules to the system perl include path. You must be root or have "passwordless" sudo for this to work.
       - This uses the cpanm commandline option C(--sudo), which has nothing to do with ansible privilege escalation.
-      - <
+      - >
         This option is not recommended for use and it should be deprecated in the future. If you need to escalate privileges
         please consider using any of the multiple mechanisms available in Ansible.
     type: bool
