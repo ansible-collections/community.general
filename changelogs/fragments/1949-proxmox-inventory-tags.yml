@@ -1,3 +1,5 @@
 ---
 bugfixes:
 - proxmox inventory plugin - allowed proxomox tag strng to contain commas when returned as fact (https://github.com/ansible-collections/community.general/pull/1949).
+minor_changes:
+- proxmox inventory plugin - added tags_parsed fact containing tags parsed as a list (https://github.com/ansible-collections/community.general/pull/1949).
