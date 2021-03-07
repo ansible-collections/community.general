@@ -1,0 +1,7 @@
+bugfixes:
+  - module_helper module utils - actually ignoring formatting of parameters with value ``None`` (https://github.com/ansible-collections/community.general/pull/1976).
+  - module_helper module utils - handling ``ModuleHelperException`` now properly calls ``fail_json()`` (https://github.com/ansible-collections/community.general/pull/1976).
+minor_changes:
+  - module_helper module utils - use the command name as-is in ``CmdMixin`` if it fails ``get_bin_path()`` - allowing full path names to be passed (https://github.com/ansible-collections/community.general/pull/1976).
+  - cpanm - rewritten using ``ModuleHelper`` (https://github.com/ansible-collections/community.general/pull/1976).
+  - cpanm - honor and install specified version (https://github.com/ansible-collections/community.general/issues/208).

@@ -56,7 +56,9 @@ options:
     description:
       - Use this if you want to install modules to the system perl include path. You must be root or have "passwordless" sudo for this to work.
       - This uses the cpanm commandline option C(--sudo), which has nothing to do with ansible privilege escalation.
-      - This option is not recommended for use and it should be deprecated in the future. If you need to escalate privileges please consider using any of the multiple mechanisms available in Ansible.
+      - <
+        This option is not recommended for use and it should be deprecated in the future. If you need to escalate privileges
+        please consider using any of the multiple mechanisms available in Ansible.
     type: bool
     default: no
     aliases: ['use_sudo']
@@ -126,8 +128,8 @@ class CPANMinus(CmdMixin, ModuleHelper):
             locallib=dict(type='path'),
             mirror=dict(type='str'),
             mirror_only=dict(default=False, type='bool'),
-            installdeps=dict(type='bool'),
-            system_lib=dict(type='bool', aliases=['use_sudo']),
+            installdeps=dict(type='bool', default=False),
+            system_lib=dict(type='bool', default=False, aliases=['use_sudo']),
             executable=dict(type='path'),
         ),
         required_one_of=[('name', 'from_path')],
