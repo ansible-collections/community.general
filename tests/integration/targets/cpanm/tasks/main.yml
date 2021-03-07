@@ -30,9 +30,6 @@
     state: present
   when: ansible_os_family == "RedHat"
 
-- name: Install cpanminus
-  raw: "curl -L http://cpanmin.us | sudo perl - --sudo App::cpanminus"
-
 - name: Install a Perl package
   cpanm:
     name: JSON
