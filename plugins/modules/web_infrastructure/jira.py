@@ -440,10 +440,19 @@ def transition(restbase, user, passwd, params):
     if not tid:
         raise ValueError("Failed find valid transition for '%s'" % target)
 
+    fields = dict(params['fields'])
+    if params['summary'] is not None:
+        fields.update({'summary': params['summary']})
     # Perform it
     url = restbase + '/issue/' + params['issue'] + "/transitions"
     data = {'transition': {"id": tid},
-            'update': params['fields']}
+            'fields': params['fields']}
+    if params['comment'] is not None:
+        data.update({"update": {
+            "comment": [{
+                "add": {"body": "Bug has been fixed."}
+            }],
+        }})
 
     return True, post(url, user, passwd, params['timeout'], data)
 
