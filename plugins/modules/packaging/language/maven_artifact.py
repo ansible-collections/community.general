@@ -500,7 +500,12 @@ class MavenDownloader:
         self.module.params['url_password'] = self.module.params.get('password', '')
         self.module.params['http_agent'] = self.user_agent
 
-        response, info = fetch_url(self.module, url_to_use, timeout=req_timeout, headers=self.headers)
+        options = dict(
+            timeout=req_timeout,
+            headers=self.headers,
+            force_basic_auth=self.module.params['force_basic_auth']
+        )
+        response, info = fetch_url(self.module, url_to_use, **options)
         if info['status'] == 200:
             return response
         if force:
