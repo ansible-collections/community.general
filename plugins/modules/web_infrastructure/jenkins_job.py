@@ -71,7 +71,7 @@ options:
       - If set to C(no), the SSL certificates will not be validated.
         This should only set to C(no) used on personally controlled sites
         using self-signed certificates as it avoids verifying the source site.
-      - The `python-jenkins` library only handles by using the environment variable `PYTHONHTTPSVERIFY`.
+      - The C(python-jenkins) library only handles this by using the environment variable C(PYTHONHTTPSVERIFY).
 '''
 
 EXAMPLES = '''
