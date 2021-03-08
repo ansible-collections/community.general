@@ -30,7 +30,7 @@ options:
           Options allowed: C(script), C(environmentalConfiguration), and C(utilization). For the option C(utilization),
           you can provide specific parameters."
       type: list
-      elements: dict
+      elements: raw
 
 extends_documentation_fragment:
 - community.general.oneview
@@ -157,7 +157,7 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 class EnclosureInfoModule(OneViewModuleBase):
     argument_spec = dict(
         name=dict(type='str'),
-        options=dict(type='list', elements='dict'),
+        options=dict(type='list', elements='raw'),
         params=dict(type='dict')
     )
 

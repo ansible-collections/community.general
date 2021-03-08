@@ -72,7 +72,7 @@ options:
       - A list of instance ids used for states':' C(absent), C(running), C(rebooted), C(poweredoff)
     aliases: ['ids']
     type: list
-    elements: str
+    elements: int
   state:
     description:
       - C(present) - create instances from a template specified with C(template_id)/C(template_name).
@@ -1354,7 +1354,7 @@ def main():
         "api_url": {"required": False, "type": "str"},
         "api_username": {"required": False, "type": "str"},
         "api_password": {"required": False, "type": "str", "no_log": True},
-        "instance_ids": {"required": False, "aliases": ['ids'], "type": "list", "elements": "str"},
+        "instance_ids": {"required": False, "aliases": ['ids'], "type": "list", "elements": "int"},
         "template_name": {"required": False, "type": "str"},
         "template_id": {"required": False, "type": "int"},
         "vm_start_on_hold": {"default": False, "type": "bool"},
