@@ -1,0 +1,2 @@
+bugfixes:
+  - "maven_artifact - parameter I(force_basic_auth) was being silently ignored by module (... waiting for #215 and #1171 to confirm)."
