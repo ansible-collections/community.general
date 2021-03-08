@@ -27,6 +27,8 @@ options:
     options:
       description:
         - "Retrieve additional information. Options available: 'visualContent'."
+      type: list
+      elements: str
 
 extends_documentation_fragment:
 - community.general.oneview
@@ -108,7 +110,7 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 class DatacenterInfoModule(OneViewModuleBase):
     argument_spec = dict(
         name=dict(type='str'),
-        options=dict(type='list'),
+        options=dict(type='list', elements='str'),
         params=dict(type='dict')
     )
 
