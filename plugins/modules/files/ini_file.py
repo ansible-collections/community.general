@@ -114,9 +114,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 def match_opt(option, line):
     option = re.escape(option)
-    return re.match('( |\t)*%s( |\t)*(=|$)' % option, line) \
-        or re.match('#( |\t)*%s( |\t)*(=|$)' % option, line) \
-        or re.match(';( |\t)*%s( |\t)*(=|$)' % option, line)
+    return re.match('[#;]?( |\t)*%s( |\t)*(=|$)' % option, line)
 
 
 def match_active_opt(option, line):
@@ -251,9 +249,9 @@ def do_ini(module, filename, section=None, option=None, value=None,
     if not within_section and state == 'present':
         ini_lines.append('[%s]\n' % section)
         msg = 'section and option added'
-        if option and value:
+        if option and value is not None:
             ini_lines.append(assignment_format % (option, value))
-        elif option and not value and allow_no_value:
+        elif option and value is None and allow_no_value:
             ini_lines.append('%s\n' % option)
         else:
             msg = 'only section added'
@@ -312,7 +310,7 @@ def main():
     allow_no_value = module.params['allow_no_value']
     create = module.params['create']
 
-    if state == 'present' and not allow_no_value and not value:
+    if state == 'present' and not allow_no_value and value is None:
         module.fail_json("Parameter 'value' must not be empty if state=present and allow_no_value=False")
 
     (changed, backup_file, diff, msg) = do_ini(module, path, section, option, value, state, backup, no_extra_spaces, create, allow_no_value)
