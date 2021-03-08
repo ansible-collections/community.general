@@ -66,6 +66,7 @@ options:
         description:
             - The labels for this host.
         type: list
+        elements: str
     template:
         description:
             - The template or attribute changes to merge into the host template.
@@ -130,7 +131,7 @@ class HostModule(OpenNebulaModule):
             vmm_mad_name=dict(type='str', default="kvm"),
             cluster_id=dict(type='int', default=0),
             cluster_name=dict(type='str'),
-            labels=dict(type='list'),
+            labels=dict(type='list', elements='str'),
             template=dict(type='dict', aliases=['attributes']),
         )
 

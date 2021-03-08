@@ -63,6 +63,7 @@ options:
 
   tags:
     type: list
+    elements: str
     description:
     - List of tags to apply to the load-balancer
 
@@ -338,7 +339,7 @@ def main():
         description=dict(required=True),
         region=dict(required=True, choices=SCALEWAY_REGIONS),
         state=dict(choices=list(state_strategy.keys()), default='present'),
-        tags=dict(type="list", default=[]),
+        tags=dict(type="list", elements="str", default=[]),
         organization_id=dict(required=True),
         wait=dict(type="bool", default=False),
         wait_timeout=dict(type="int", default=300),
