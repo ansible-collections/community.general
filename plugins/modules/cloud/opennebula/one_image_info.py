@@ -281,7 +281,9 @@ def main():
     else:
         images = get_all_images(client).IMAGE
 
-    result = [get_image_info(image) for image in images]
+    result = {
+        'images': [get_image_info(image) for image in images],
+    }
 
     module.exit_json(**result)
 
