@@ -444,3 +444,39 @@
   assert:
     that:
       - content14 == expected14
+
+- name: Check add option with empty string value
+  block:
+    - name: Remove drinks
+      ini_file:
+        path: "{{ output_file }}"
+        section: drinks
+        state: absent
+    - name: Remove tea
+      ini_file:
+        path: "{{ output_file }}"
+        section:
+        option: like
+        value: tea
+        state: absent
+    - name: Test with empty string
+      ini_file:
+        path: "{{ output_file }}"
+        section: extensions
+        option: evolve
+        value: ""
+
+- name: read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: set expected content and get current ini file content
+  set_fact:
+    expected15: "\n[extensions]\nevolve = \n"
+    content15: "{{ output_content.content | b64decode }}"
+- debug: var=content15
+- name: Verify content of ini file is as expected
+  assert:
+    that:
+      - content15 == expected15
