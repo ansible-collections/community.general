@@ -3,11 +3,9 @@ plugins/module_utils/compat/ipaddress.py no-assert
 plugins/module_utils/compat/ipaddress.py no-unicode-literals
 plugins/module_utils/_mount.py future-import-boilerplate
 plugins/module_utils/_mount.py metaclass-boilerplate
-plugins/modules/cloud/heroku/heroku_collaborator.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/linode/linode.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/linode/linode.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/linode/linode.py validate-modules:undocumented-parameter
-plugins/modules/cloud/linode/linode_v4.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/lxc/lxc_container.py use-argspec-type-path
 plugins/modules/cloud/lxc/lxc_container.py validate-modules:use-run-command-not-popen
 plugins/modules/cloud/misc/rhevm.py validate-modules:parameter-state-invalid-choice
@@ -15,9 +13,6 @@ plugins/modules/cloud/online/online_server_facts.py validate-modules:return-synt
 plugins/modules/cloud/online/online_server_info.py validate-modules:return-syntax-error
 plugins/modules/cloud/online/online_user_facts.py validate-modules:return-syntax-error
 plugins/modules/cloud/online/online_user_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/opennebula/one_host.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/opennebula/one_image_info.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/opennebula/one_vm.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/ovirt/ovirt_affinity_label_facts.py validate-modules:doc-missing-type
 plugins/modules/cloud/ovirt/ovirt_affinity_label_facts.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/ovirt/ovirt_api_facts.py validate-modules:parameter-list-no-elements
@@ -68,7 +63,6 @@ plugins/modules/cloud/ovirt/ovirt_vm_facts.py validate-modules:parameter-list-no
 plugins/modules/cloud/ovirt/ovirt_vm_facts.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:doc-missing-type
 plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/packet/packet_volume_attachment.py pylint:ansible-bad-function
 plugins/modules/cloud/rackspace/rax.py use-argspec-type-path # fix needed
 plugins/modules/cloud/rackspace/rax.py validate-modules:doc-missing-type
 plugins/modules/cloud/rackspace/rax.py validate-modules:parameter-list-no-elements
@@ -79,12 +73,10 @@ plugins/modules/cloud/rackspace/rax_files_objects.py use-argspec-type-path
 plugins/modules/cloud/rackspace/rax_mon_notification_plan.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/rackspace/rax_scaling_group.py use-argspec-type-path # fix needed
 plugins/modules/cloud/rackspace/rax_scaling_group.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/scaleway/scaleway_compute.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/scaleway/scaleway_image_facts.py validate-modules:return-syntax-error
 plugins/modules/cloud/scaleway/scaleway_image_info.py validate-modules:return-syntax-error
 plugins/modules/cloud/scaleway/scaleway_ip_facts.py validate-modules:return-syntax-error
 plugins/modules/cloud/scaleway/scaleway_ip_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/scaleway/scaleway_lb.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/scaleway/scaleway_organization_facts.py validate-modules:return-syntax-error
 plugins/modules/cloud/scaleway/scaleway_organization_info.py validate-modules:return-syntax-error
 plugins/modules/cloud/scaleway/scaleway_security_group_facts.py validate-modules:return-syntax-error
@@ -107,11 +99,11 @@ plugins/modules/cloud/univention/udm_dns_zone.py validate-modules:parameter-type
 plugins/modules/cloud/univention/udm_dns_zone.py validate-modules:undocumented-parameter
 plugins/modules/cloud/univention/udm_share.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:doc-required-mismatch
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:missing-suboption-docs
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:undocumented-parameter
+plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:doc-choices-do-not-match-spec  # missing docs on suboptions
+plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:doc-required-mismatch          # missing docs on suboptions
+plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:missing-suboption-docs         # missing docs on suboptions
+plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:parameter-type-not-in-doc      # missing docs on suboptions
+plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:undocumented-parameter         # missing docs on suboptions
 plugins/modules/clustering/consul/consul.py validate-modules:doc-missing-type
 plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parameter
 plugins/modules/clustering/consul/consul_session.py validate-modules:parameter-state-invalid-choice
@@ -140,25 +132,18 @@ plugins/modules/remote_management/dellemc/ome_device_info.py validate-modules:pa
 plugins/modules/remote_management/hpilo/hpilo_boot.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/hpilo/hpilo_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/hpilo/hponcfg.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/manageiq/manageiq_alert_profiles.py validate-modules:parameter-list-no-elements
-plugins/modules/remote_management/manageiq/manageiq_policies.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/manageiq/manageiq_policies.py validate-modules:parameter-state-invalid-choice
-plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-missing-type
-plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:invalid-ansiblemodule-schema
-plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/manageiq/manageiq_tags.py validate-modules:parameter-list-no-elements
+plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-choices-do-not-match-spec   # missing docs on suboptions
+plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
+plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:parameter-type-not-in-doc       # missing docs on suboptions
+plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:undocumented-parameter          # missing docs on suboptions
 plugins/modules/remote_management/manageiq/manageiq_tags.py validate-modules:parameter-state-invalid-choice
-plugins/modules/remote_management/oneview/oneview_datacenter_info.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/oneview/oneview_datacenter_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/oneview/oneview_datacenter_info.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_enclosure_info.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/oneview/oneview_enclosure_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/oneview/oneview_enclosure_info.py validate-modules:undocumented-parameter
 plugins/modules/remote_management/oneview/oneview_ethernet_network.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/oneview/oneview_ethernet_network.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_ethernet_network_info.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/oneview/oneview_ethernet_network_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/oneview/oneview_ethernet_network_info.py validate-modules:undocumented-parameter
 plugins/modules/remote_management/oneview/oneview_fc_network.py validate-modules:doc-missing-type
@@ -179,7 +164,6 @@ plugins/modules/remote_management/oneview/oneview_logical_interconnect_group_inf
 plugins/modules/remote_management/oneview/oneview_network_set.py validate-modules:doc-missing-type
 plugins/modules/remote_management/oneview/oneview_network_set.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/oneview/oneview_network_set.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_network_set_info.py validate-modules:parameter-list-no-elements
 plugins/modules/remote_management/oneview/oneview_network_set_info.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/oneview/oneview_network_set_info.py validate-modules:undocumented-parameter
 plugins/modules/remote_management/oneview/oneview_san_manager.py validate-modules:parameter-type-not-in-doc

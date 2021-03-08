@@ -29,6 +29,8 @@ options:
         - "List with options to gather additional information about an Enclosure and related resources.
           Options allowed: C(script), C(environmentalConfiguration), and C(utilization). For the option C(utilization),
           you can provide specific parameters."
+      type: list
+      elements: raw
 
 extends_documentation_fragment:
 - community.general.oneview
@@ -153,7 +155,11 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 
 
 class EnclosureInfoModule(OneViewModuleBase):
-    argument_spec = dict(name=dict(type='str'), options=dict(type='list'), params=dict(type='dict'))
+    argument_spec = dict(
+        name=dict(type='str'),
+        options=dict(type='list', elements='raw'),
+        params=dict(type='dict')
+    )
 
     def __init__(self):
         super(EnclosureInfoModule, self).__init__(additional_arg_spec=self.argument_spec)
