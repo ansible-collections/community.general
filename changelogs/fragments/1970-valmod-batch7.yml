@@ -1,0 +1,18 @@
+minor_changes:
+  - heroku_collaborator - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1970).
+  - linode_v4 - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1970).
+  - one_host - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1970).
+  - one_image_info - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1970).
+  - one_vm - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1970).
+  - scaleway_compute - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1970).
+  - scaleway_lb - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1970).
+  - manageiq_alert_profiles - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1970).
+  - manageiq_policies - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1970).
+  - manageiq_tags - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1970).
+  - oneview_datacenter_info - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1970).
+  - oneview_enclosure_info - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1970).
+  - oneview_ethernet_network_info - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1970).
+  - oneview_network_set_info - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1970).
+bugfixes:
+  - manageiq_provider - wrapped ``dict.keys()`` with ``list`` for use in ``choices`` setting (https://github.com/ansible-collections/community.general/pull/1970).
+  - packet_volume_attachment - removed extraneous ``print`` call - old debug? (https://github.com/ansible-collections/community.general/pull/1970).

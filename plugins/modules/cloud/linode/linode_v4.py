@@ -63,6 +63,7 @@ options:
         U(https://www.linode.com/docs/api/tags/).
     required: false
     type: list
+    elements: str
   root_pass:
     description:
       - The password for the root user. If not specified, one will be
@@ -75,6 +76,7 @@ options:
       - A list of SSH public key parts to deploy for the root user.
     required: false
     type: list
+    elements: str
   state:
     description:
       - The desired instance state.
@@ -240,12 +242,12 @@ def initialise_module():
                 no_log=True,
                 fallback=(env_fallback, ['LINODE_ACCESS_TOKEN']),
             ),
-            authorized_keys=dict(type='list', required=False),
+            authorized_keys=dict(type='list', elements='str', required=False),
             group=dict(type='str', required=False),
             image=dict(type='str', required=False),
             region=dict(type='str', required=False),
             root_pass=dict(type='str', required=False, no_log=True),
-            tags=dict(type='list', required=False),
+            tags=dict(type='list', elements='str', required=False),
             type=dict(type='str', required=False),
             stackscript_id=dict(type='int', required=False),
             stackscript_data=dict(type='dict', required=False),

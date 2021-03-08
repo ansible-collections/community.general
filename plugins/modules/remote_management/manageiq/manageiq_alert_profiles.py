@@ -40,6 +40,7 @@ options:
               'ExtManagementSystem', 'MiddlewareServer']
   alerts:
     type: list
+    elements: str
     description:
       - List of alert descriptions to assign to this profile.
       - Required if state is "present"
@@ -257,7 +258,7 @@ def main():
                                                 'EmsCluster',
                                                 'ExtManagementSystem',
                                                 'MiddlewareServer']),
-        alerts=dict(type='list'),
+        alerts=dict(type='list', elements='str'),
         notes=dict(type='str'),
         state=dict(default='present', choices=['present', 'absent']),
     )

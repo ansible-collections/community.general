@@ -181,7 +181,6 @@ def do_detach(packet_conn, vol, dev_id=None):
         return (dev_id is None) or (a['device']['id'] == dev_id)
     for a in vol['attachments']:
         if dev_match(a):
-            print(a['href'])
             packet_conn.call_api(a['href'], type="DELETE")
 
 
