@@ -1,0 +1,2 @@
+bugfixes:
+  - ini_file - allows an empty string as a value for an option (https://github.com/ansible-collections/community.general/pull/1972).
