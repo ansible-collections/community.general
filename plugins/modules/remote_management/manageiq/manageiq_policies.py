@@ -31,6 +31,7 @@ options:
     default: 'present'
   policy_profiles:
     type: list
+    elements: dict
     description:
       - list of dictionaries, each includes the policy_profile 'name' key.
       - required if state is present or absent.
@@ -301,7 +302,7 @@ class ManageIQPolicies(object):
 def main():
     actions = {'present': 'assign', 'absent': 'unassign', 'list': 'list'}
     argument_spec = dict(
-        policy_profiles=dict(type='list'),
+        policy_profiles=dict(type='list', elements='dict'),
         resource_id=dict(required=False, type='int'),
         resource_name=dict(required=False, type='str'),
         resource_type=dict(required=True, type='str',
