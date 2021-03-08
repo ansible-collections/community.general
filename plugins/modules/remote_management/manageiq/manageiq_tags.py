@@ -31,6 +31,7 @@ options:
     default: 'present'
   tags:
     type: list
+    elements: dict
     description:
       - tags - list of dictionaries, each includes 'name' and 'category' keys.
       - required if state is present or absent.
@@ -261,7 +262,7 @@ class ManageIQTags(object):
 def main():
     actions = {'present': 'assign', 'absent': 'unassign', 'list': 'list'}
     argument_spec = dict(
-        tags=dict(type='list'),
+        tags=dict(type='list', elements='dict'),
         resource_id=dict(required=False, type='int'),
         resource_name=dict(required=False, type='str'),
         resource_type=dict(required=True, type='str',
