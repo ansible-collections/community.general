@@ -106,14 +106,11 @@ plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:undocumented
 plugins/modules/clustering/consul/consul.py validate-modules:doc-missing-type
 plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parameter
 plugins/modules/clustering/consul/consul_session.py validate-modules:parameter-state-invalid-choice
-plugins/modules/monitoring/bigpanda.py validate-modules:invalid-argument-name
-plugins/modules/monitoring/datadog/datadog_monitor.py validate-modules:invalid-argument-name
 plugins/modules/net_tools/ldap/ldap_attr.py validate-modules:parameter-type-not-in-doc  # This triggers when a parameter is undocumented
 plugins/modules/net_tools/ldap/ldap_attr.py validate-modules:undocumented-parameter # Parameter removed but reason for removal is shown by custom code
 plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:doc-missing-type
 plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:parameter-type-not-in-doc
 plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:undocumented-parameter # Parameter removed but reason for removal is shown by custom code
-plugins/modules/notification/cisco_webex.py validate-modules:invalid-argument-name
 plugins/modules/notification/grove.py validate-modules:invalid-argument-name
 plugins/modules/packaging/language/composer.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/apt_rpm.py validate-modules:parameter-invalid

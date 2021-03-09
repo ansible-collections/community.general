@@ -45,16 +45,6 @@ options:
     description:
       - Password for authentication with iDRAC
     type: str
-  manager_attribute_name:
-    required: false
-    description:
-      - (deprecated) name of iDRAC attribute to update
-    type: str
-  manager_attribute_value:
-    required: false
-    description:
-      - (deprecated) value of iDRAC attribute to update
-    type: str
   manager_attributes:
     required: false
     description:
@@ -183,12 +173,6 @@ class IdracRedfishUtils(RedfishUtils):
         manager_uri = command_manager_attributes_uri_map.get(command, self.manager_uri)
 
         attributes = self.module.params['manager_attributes']
-        manager_attr_name = self.module.params.get('manager_attribute_name')
-        manager_attr_value = self.module.params.get('manager_attribute_value')
-
-        # manager attributes to update
-        if manager_attr_name:
-            attributes.update({manager_attr_name: manager_attr_value})
 
         attrs_to_patch = {}
         attrs_skipped = {}
@@ -250,8 +234,6 @@ def main():
             baseuri=dict(required=True),
             username=dict(required=True),
             password=dict(required=True, no_log=True),
-            manager_attribute_name=dict(default=None),
-            manager_attribute_value=dict(default=None),
             manager_attributes=dict(type='dict', default={}),
             timeout=dict(type='int', default=10),
             resource_id=dict()
@@ -309,13 +291,6 @@ def main():
         for command in command_list:
             if command in ["SetManagerAttributes", "SetLifecycleControllerAttributes", "SetSystemAttributes"]:
                 result = rf_utils.set_manager_attributes(command)
-
-    if any((module.params['manager_attribute_name'], module.params['manager_attribute_value'])):
-        module.deprecate(msg='Arguments `manager_attribute_name` and '
-                             '`manager_attribute_value` are deprecated. '
-                             'Use `manager_attributes` instead for passing in '
-                             'the manager attribute name and value pairs',
-                             version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     # Return data back or fail with proper message
     if result['ret'] is True:

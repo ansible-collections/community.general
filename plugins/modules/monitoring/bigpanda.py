@@ -76,8 +76,6 @@ options:
     type: str
     description:
     - Message about the deployment.
-    - C(message) alias is deprecated in community.general 0.2.0, since it is used internally by Ansible Core Engine.
-    aliases: ['message']
     version_added: '0.2.0'
   source_system:
     type: str
@@ -148,9 +146,7 @@ def main():
             env=dict(required=False),
             owner=dict(required=False),
             description=dict(required=False),
-            deployment_message=dict(required=False, aliases=['message'],
-                                    deprecated_aliases=[dict(name='message', version='3.0.0',
-                                                             collection_name='community.general')]),  # was Ansible 2.14
+            deployment_message=dict(required=False),
             source_system=dict(required=False, default='ansible'),
             validate_certs=dict(default=True, type='bool'),
             url=dict(required=False, default='https://api.bigpanda.io'),
