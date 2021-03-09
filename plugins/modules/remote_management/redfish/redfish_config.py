@@ -43,18 +43,6 @@ options:
     description:
       - Password for authentication with OOB controller
     type: str
-  bios_attribute_name:
-    required: false
-    description:
-      - name of BIOS attr to update (deprecated - use bios_attributes instead)
-    default: 'null'
-    type: str
-  bios_attribute_value:
-    required: false
-    description:
-      - value of BIOS attr to update (deprecated - use bios_attributes instead)
-    default: 'null'
-    type: raw
   bios_attributes:
     required: false
     description:
@@ -129,13 +117,13 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
 
-  - name: Enable PXE Boot for NIC1 using deprecated options
+  - name: Enable PXE Boot for NIC1
     community.general.redfish_config:
       category: Systems
       command: SetBiosAttributes
       resource_id: 437XR1138R2
-      bios_attribute_name: PxeDev1EnDis
-      bios_attribute_value: Enabled
+      bios_attributes:
+        PxeDev1EnDis: Enabled
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
@@ -233,8 +221,6 @@ def main():
             baseuri=dict(required=True),
             username=dict(required=True),
             password=dict(required=True, no_log=True),
-            bios_attribute_name=dict(default='null'),
-            bios_attribute_value=dict(default='null', type='raw'),
             bios_attributes=dict(type='dict', default={}),
             timeout=dict(type='int', default=10),
             boot_order=dict(type='list', elements='str', default=[]),
@@ -264,12 +250,6 @@ def main():
 
     # BIOS attributes to update
     bios_attributes = module.params['bios_attributes']
-    if module.params['bios_attribute_name'] != 'null':
-        bios_attributes[module.params['bios_attribute_name']] = module.params[
-            'bios_attribute_value']
-        module.deprecate(msg='The bios_attribute_name/bios_attribute_value '
-                         'options are deprecated. Use bios_attributes instead',
-                         version='3.0.0', collection_name='community.general')  # was Ansible 2.14
 
     # boot order
     boot_order = module.params['boot_order']

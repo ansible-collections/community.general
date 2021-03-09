@@ -17,18 +17,17 @@ author:
 short_description: Notify airbrake about app deployments
 description:
    - Notify airbrake about app deployments (see U(https://airbrake.io/docs/api/#deploys-v4)).
-   - Parameter I(token) has been deprecated for community.general 0.2.0. Please remove entry.
 options:
   project_id:
     description:
       - Airbrake PROJECT_ID
-    required: false
+    required: true
     type: str
     version_added: '0.2.0'
   project_key:
     description:
       - Airbrake PROJECT_KEY.
-    required: false
+    required: true
     type: str
     version_added: '0.2.0'
   environment:
@@ -70,11 +69,6 @@ options:
     required: false
     default: 'yes'
     type: bool
-  token:
-     description:
-      - This parameter (API token) has been deprecated in community.general 0.2.0. Please remove it from your tasks.
-     required: false
-     type: str
 
 requirements: []
 '''
@@ -111,9 +105,8 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            token=dict(required=False, no_log=True, type='str'),
-            project_id=dict(required=False, no_log=True, type='str'),
-            project_key=dict(required=False, no_log=True, type='str'),
+            project_id=dict(required=True, no_log=True, type='str'),
+            project_key=dict(required=True, no_log=True, type='str'),
             environment=dict(required=True, type='str'),
             user=dict(required=False, type='str'),
             repo=dict(required=False, type='str'),
@@ -123,8 +116,6 @@ def main():
             validate_certs=dict(default=True, type='bool'),
         ),
         supports_check_mode=True,
-        required_together=[('project_id', 'project_key')],
-        mutually_exclusive=[('project_id', 'token')],
     )
 
     # Build list of params
@@ -134,65 +125,32 @@ def main():
     if module.check_mode:
         module.exit_json(changed=True)
 
-    if module.params["token"]:
-        # v2 API documented at https://airbrake.io/docs/legacy-xml-api/#tracking-deploys
-        if module.params["environment"]:
-            params["deploy[rails_env]"] = module.params["environment"]
+    # v4 API documented at https://airbrake.io/docs/api/#create-deploy-v4
+    if module.params["environment"]:
+        params["environment"] = module.params["environment"]
 
-        if module.params["user"]:
-            params["deploy[local_username]"] = module.params["user"]
+    if module.params["user"]:
+        params["username"] = module.params["user"]
 
-        if module.params["repo"]:
-            params["deploy[scm_repository]"] = module.params["repo"]
+    if module.params["repo"]:
+        params["repository"] = module.params["repo"]
 
-        if module.params["revision"]:
-            params["deploy[scm_revision]"] = module.params["revision"]
+    if module.params["revision"]:
+        params["revision"] = module.params["revision"]
 
-        # version not supported in v2 API; omit
+    if module.params["version"]:
+        params["version"] = module.params["version"]
 
-        module.deprecate("Parameter 'token' is deprecated since community.general 0.2.0. Please remove "
-                         "it and use 'project_id' and 'project_key' instead",
-                         version='3.0.0', collection_name='community.general')  # was Ansible 2.14
+    # Build deploy url
+    url = module.params.get('url') + module.params["project_id"] + '/deploys?key=' + module.params["project_key"]
+    json_body = module.jsonify(params)
 
-        params["api_key"] = module.params["token"]
+    # Build header
+    headers = {'Content-Type': 'application/json'}
 
-        # Allow sending to Airbrake compliant v2 APIs
-        if module.params["url"] == 'https://api.airbrake.io/api/v4/projects/':
-            url = 'https://api.airbrake.io/deploys.txt'
-        else:
-            url = module.params["url"]
-
-        # Send the data to airbrake
-        data = urlencode(params)
-        response, info = fetch_url(module, url, data=data)
-
-    if module.params["project_id"] and module.params["project_key"]:
-        # v4 API documented at https://airbrake.io/docs/api/#create-deploy-v4
-        if module.params["environment"]:
-            params["environment"] = module.params["environment"]
-
-        if module.params["user"]:
-            params["username"] = module.params["user"]
-
-        if module.params["repo"]:
-            params["repository"] = module.params["repo"]
-
-        if module.params["revision"]:
-            params["revision"] = module.params["revision"]
-
-        if module.params["version"]:
-            params["version"] = module.params["version"]
-
-        # Build deploy url
-        url = module.params.get('url') + module.params["project_id"] + '/deploys?key=' + module.params["project_key"]
-        json_body = module.jsonify(params)
-
-        # Build header
-        headers = {'Content-Type': 'application/json'}
-
-        # Notify Airbrake of deploy
-        response, info = fetch_url(module, url, data=json_body,
-                                   headers=headers, method='POST')
+    # Notify Airbrake of deploy
+    response, info = fetch_url(module, url, data=json_body,
+                               headers=headers, method='POST')
 
     if info['status'] == 200 or info['status'] == 201:
         module.exit_json(changed=True)

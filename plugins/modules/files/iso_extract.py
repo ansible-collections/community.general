@@ -52,10 +52,8 @@ options:
     description:
     - If C(yes), which will replace the remote file when contents are different than the source.
     - If C(no), the file will only be extracted and copied if the destination does not already exist.
-    - Alias C(thirsty) has been deprecated and will be removed in community.general 3.0.0.
     type: bool
     default: yes
-    aliases: [ thirsty ]
   executable:
     description:
     - The path to the C(7z) executable to use for extracting files from the ISO.
@@ -101,8 +99,7 @@ def main():
             image=dict(type='path', required=True, aliases=['path', 'src']),
             dest=dict(type='path', required=True),
             files=dict(type='list', elements='str', required=True),
-            force=dict(type='bool', default=True, aliases=['thirsty'],
-                       deprecated_aliases=[dict(name='thirsty', version='3.0.0', collection_name='community.general')]),
+            force=dict(type='bool', default=True),
             executable=dict(type='path'),  # No default on purpose
         ),
         supports_check_mode=True,
