@@ -61,12 +61,6 @@ options:
         type: bool
         default: yes
         version_added: '0.2.0'
-    force:
-        description:
-            - This option doesn't have any effect and is deprecated, it will be
-              removed in 3.0.0.
-        type: bool
-        default: no
 '''
 
 EXAMPLES = '''
@@ -289,7 +283,6 @@ def main():
                                                    'latest', 'absent',
                                                    'removed']),
             recurse=dict(default=False, type='bool'),
-            force=dict(default=False, type='bool', removed_in_version='3.0.0', removed_from_collection='community.general'),
             upgrade=dict(default=False, type='bool'),
             update_cache=dict(
                 default=True, aliases=['update-cache'], type='bool',
