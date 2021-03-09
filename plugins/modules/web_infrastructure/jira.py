@@ -450,7 +450,7 @@ def transition(restbase, user, passwd, params):
     if params['comment'] is not None:
         data.update({"update": {
             "comment": [{
-                "add": {"body": "Bug has been fixed."}
+                "add": {"body": params['comment']}
             }],
         }})
 
