@@ -19,11 +19,10 @@ PATCH_HEADERS = {'content-type': 'application/json', 'accept': 'application/json
                  'OData-Version': '4.0'}
 DELETE_HEADERS = {'accept': 'application/json', 'OData-Version': '4.0'}
 
-DEPRECATE_MSG = 'Issuing a data modification command without specifying the '\
-                'ID of the target %(resource)s resource when there is more '\
-                'than one %(resource)s will use the first one in the '\
-                'collection. Use the `resource_id` option to specify the '\
-                'target %(resource)s ID'
+FAIL_MSG = 'Issuing a data modification command without specifying the '\
+           'ID of the target %(resource)s resource when there is more '\
+           'than one %(resource)s is no longer allowed. Use the `resource_id` '\
+           'option to specify the target %(resource)s ID.'
 
 
 class RedfishUtils(object):
@@ -245,8 +244,7 @@ class RedfishUtils(object):
                         'ret': False,
                         'msg': "System resource %s not found" % self.resource_id}
             elif len(self.systems_uris) > 1:
-                self.module.deprecate(DEPRECATE_MSG % {'resource': 'System'},
-                                      version='3.0.0', collection_name='community.general')  # was Ansible 2.14
+                self.module.fail_json(msg=FAIL_MSG % {'resource': 'System'})
         return {'ret': True}
 
     def _find_updateservice_resource(self):
@@ -296,8 +294,7 @@ class RedfishUtils(object):
                         'ret': False,
                         'msg': "Chassis resource %s not found" % self.resource_id}
             elif len(self.chassis_uris) > 1:
-                self.module.deprecate(DEPRECATE_MSG % {'resource': 'Chassis'},
-                                      version='3.0.0', collection_name='community.general')  # was Ansible 2.14
+                self.module.fail_json(msg=FAIL_MSG % {'resource': 'Chassis'})
         return {'ret': True}
 
     def _find_managers_resource(self):
@@ -326,8 +323,7 @@ class RedfishUtils(object):
                         'ret': False,
                         'msg': "Manager resource %s not found" % self.resource_id}
             elif len(self.manager_uris) > 1:
-                self.module.deprecate(DEPRECATE_MSG % {'resource': 'Manager'},
-                                      version='3.0.0', collection_name='community.general')  # was Ansible 2.14
+                self.module.fail_json(msg=FAIL_MSG % {'resource': 'Manager'})
         return {'ret': True}
 
     def _get_all_action_info_values(self, action):

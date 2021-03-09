@@ -101,14 +101,6 @@ options:
        C(collectstatic) command.
     required: false
     type: bool
-  liveserver:
-    description:
-      - This parameter was implemented a long time ago in a galaxy far way. It probably relates to the
-        django-liveserver package, which is no longer updated.
-      - Hence, it will be considered DEPRECATED and should be removed in a future release.
-    type: str
-    required: false
-    aliases: [live_server]
   testrunner:
     description:
       - "From the Django docs: Controls the test runner class that is used to execute tests."
@@ -233,7 +225,7 @@ def main():
         flush=('database', ),
         loaddata=('database', 'fixtures', ),
         syncdb=('database', ),
-        test=('failfast', 'testrunner', 'liveserver', 'apps', ),
+        test=('failfast', 'testrunner', 'apps', ),
         validate=(),
         migrate=('apps', 'skip', 'merge', 'database',),
         collectstatic=('clear', 'link', ),
@@ -253,7 +245,7 @@ def main():
     )
 
     # These params are allowed for certain commands only
-    specific_params = ('apps', 'clear', 'database', 'failfast', 'fixtures', 'liveserver', 'testrunner')
+    specific_params = ('apps', 'clear', 'database', 'failfast', 'fixtures', 'testrunner')
 
     # These params are automatically added to the command if present
     general_params = ('settings', 'pythonpath', 'database',)
@@ -274,8 +266,6 @@ def main():
             database=dict(default=None, required=False, type='str'),
             failfast=dict(default=False, required=False, type='bool', aliases=['fail_fast']),
             fixtures=dict(default=None, required=False, type='str'),
-            liveserver=dict(default=None, required=False, type='str', aliases=['live_server'],
-                            removed_in_version='3.0.0', removed_from_collection='community.general'),
             testrunner=dict(default=None, required=False, type='str', aliases=['test_runner']),
             skip=dict(default=None, required=False, type='bool'),
             merge=dict(default=None, required=False, type='bool'),
