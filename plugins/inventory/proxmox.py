@@ -236,7 +236,7 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     parsed_value = [tag.strip() for tag in value.split(",")]
                     self.inventory.set_variable(name, parsed_key, parsed_value)
 
-                if not (isinstance(value, int) or ',' not in value or config in plaintext_configs):
+                if not (isinstance(value, int) or ',' not in value):
                     # split off strings with commas to a dict
                     # skip over any keys that cannot be processed
                     try:
