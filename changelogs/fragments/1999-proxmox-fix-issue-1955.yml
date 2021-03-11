@@ -1,0 +1,3 @@
+---
+bugfixes:
+- proxmox - removed requirement that root password is provided when containter state is present (https://github.com/ansible-collections/community.general/pull/1999).
