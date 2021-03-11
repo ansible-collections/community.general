@@ -367,10 +367,9 @@ class HAProxy(object):
             # We can assume there will only be 1 element in state because both svname and pxname are always set when we get here
             # When using track we get a status like this: MAINT (via pxname/svname) so we need to do substring matching
             if status in state[0]['status']:
-                if not self._drain or (state[0]['scur'] == '0' and 'MAINT' in state):
+                if not self._drain or state[0]['scur'] == '0':
                     return True
-            else:
-                time.sleep(self.wait_interval)
+            time.sleep(self.wait_interval)
 
         self.module.fail_json(msg="server %s/%s not status '%s' after %d retries. Aborting." %
                               (pxname, svname, status, self.wait_retries))
@@ -417,7 +416,9 @@ class HAProxy(object):
         # check if haproxy version suppots DRAIN state (starting with 1.5)
         if haproxy_version and (1, 5) <= haproxy_version:
             cmd = "set server $pxname/$svname state drain"
-            self.execute_for_backends(cmd, backend, host, status)
+            self.execute_for_backends(cmd, backend, host, "DRAIN")
+            if status == "MAINT":
+                self.disabled(host, backend, self.shutdown_sessions)
 
     def act(self):
         """
