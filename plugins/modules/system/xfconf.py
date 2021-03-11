@@ -155,19 +155,8 @@ class XFConfException(Exception):
 
 
 class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
+    python_module_name = __name__
     module = dict(
-        argument_spec=dict(
-            state=dict(default="present",
-                       choices=("present", "get", "absent"),
-                       type='str'),
-            channel=dict(required=True, type='str'),
-            property=dict(required=True, type='str'),
-            value_type=dict(required=False, type='list',
-                            elements='str', choices=('int', 'uint', 'bool', 'float', 'double', 'string')),
-            value=dict(required=False, type='list', elements='raw'),
-            force_array=dict(default=False, type='bool', aliases=['array']),
-            disable_facts=dict(type='bool', default=False),
-        ),
         required_if=[('state', 'present', ['value', 'value_type'])],
         required_together=[('value', 'value_type')],
         supports_check_mode=True,

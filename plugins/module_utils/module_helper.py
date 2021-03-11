@@ -9,6 +9,7 @@ __metaclass__ = type
 from functools import partial, wraps
 import traceback
 
+import sys
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -154,12 +155,36 @@ class DependencyCtxMgr(object):
 
 class ModuleHelper(object):
     _dependencies = []
+    python_module_name = None
     module = {}
     facts_name = None
 
     class AttrDict(dict):
         def __getattr__(self, item):
             return self[item]
+
+    def filter_options(self, options):
+        param_spec_fields = ('type', 'elements', 'required', 'default', 'choices', 'aliases')
+        result = {}
+        for opt in options:
+            opt_spec = options[opt]
+            result.update({opt: dict([(k, opt_spec[k]) for k in opt_spec if k in param_spec_fields])})
+            if 'suboptions' in opt_spec:
+                result[opt]['suboptions'] = self.filter_options(opt_spec['suboptions'])
+        return result
+
+    def load_argspec_from_docs(self):
+        import ansible.parsing.plugin_docs as pdocs
+        ds = pdocs.read_docstring(sys.modules[self.python_module_name].__file__)
+        options = ds['doc']['options']
+        return self.filter_options(options)
+
+    def create_module(self):
+        if isinstance(self.module, dict):
+            if 'argument_spec' not in self.module:
+                self.module['argument_spec'] = self.load_argspec_from_docs()
+            # raise Exception('arg_spec={0}'.format(self.module['argument_spec']))
+            self.module = AnsibleModule(**self.module)
 
     def __init__(self, module=None):
         self.vars = ModuleHelper.AttrDict()
@@ -169,9 +194,7 @@ class ModuleHelper(object):
 
         if module:
             self.module = module
-
-        if isinstance(self.module, dict):
-            self.module = AnsibleModule(**self.module)
+        self.create_module()
 
     def update_output(self, **kwargs):
         self.output_dict.update(kwargs)
