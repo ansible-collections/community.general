@@ -72,6 +72,7 @@ options:
         This should only set to C(no) used on personally controlled sites
         using self-signed certificates as it avoids verifying the source site.
       - The C(python-jenkins) library only handles this by using the environment variable C(PYTHONHTTPSVERIFY).
+    version_added: 2.3.0
 '''
 
 EXAMPLES = '''
