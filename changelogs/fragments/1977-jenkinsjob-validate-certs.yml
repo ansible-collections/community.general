@@ -1,0 +1,2 @@
+minor_changes:
+  - jenkins_job - add a ``validate_certs`` parameter that allows disabling TLS/SSL certificate validation (https://github.com/ansible-collections/community.general/issues/255).
