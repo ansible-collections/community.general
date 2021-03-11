@@ -408,7 +408,7 @@ class HAProxy(object):
     def drain(self, host, backend, status='DRAIN'):
         """
         Drain action, sets the server to DRAIN mode.
-        In this mode mode, the server will not accept any new connections
+        In this mode, the server will not accept any new connections
         other than those that are accepted via persistence.
         """
         haproxy_version = self.discover_version()
