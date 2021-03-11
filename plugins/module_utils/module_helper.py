@@ -11,6 +11,7 @@ import traceback
 
 import sys
 from ansible.module_utils.basic import AnsibleModule
+from ansible.parsing.plugin_docs import read_docstring
 
 
 class ModuleHelperException(Exception):
@@ -174,8 +175,7 @@ class ModuleHelper(object):
         return result
 
     def load_argspec_from_docs(self):
-        import ansible.parsing.plugin_docs as pdocs
-        ds = pdocs.read_docstring(sys.modules[self.python_module_name].__file__)
+        ds = read_docstring(sys.modules[self.python_module_name].__file__)
         options = ds['doc']['options']
         return self.filter_options(options)
 
