@@ -203,6 +203,10 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         vmtype_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), vmtype_key.lower()))
         self.inventory.set_variable(name, vmtype_key, vmtype)
 
+        plaintext_configs = [
+            'tags',
+        ]
+
         for config in ret:
             key = config
             key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), key.lower()))
@@ -211,6 +215,12 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                 # fixup disk images as they have no key
                 if config == 'rootfs' or config.startswith(('virtio', 'sata', 'ide', 'scsi')):
                     value = ('disk_image=' + value)
+
+                # Additional field containing parsed tags as list
+                if config == 'tags':
+                    parsed_key = self.to_safe('%s%s' % (key, "_parsed"))
+                    parsed_value = [tag.strip() for tag in value.split(",")]
+                    self.inventory.set_variable(name, parsed_key, parsed_value)
 
                 if not (isinstance(value, int) or ',' not in value):
                     # split off strings with commas to a dict
