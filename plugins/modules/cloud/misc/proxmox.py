@@ -17,7 +17,6 @@ options:
   password:
     description:
       - the instance root password
-      - required only for C(state=present)
     type: str
   hostname:
     description:
