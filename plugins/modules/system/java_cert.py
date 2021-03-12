@@ -176,7 +176,7 @@ import string
 
 # import module snippets
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.crypto.plugins.module_utils.crypto.support import load_certificate
+from ansible.module_utils.crypto.support import load_certificate
 try:
     from urlparse import urlparse
     from urllib import getproxies
@@ -218,7 +218,7 @@ def _export_cert(module, executable, keystore_path, keystore_pass, alias, keysto
           The certificate is returned as a PEM formatted string """
     export_cmd = ("%s -noprompt -rfc -export -keystore '%s' -storepass '%s' "
                   "-alias '%s' %s") % (executable, keystore_path, keystore_pass, alias, get_keystore_type(keystore_type))
-    (_, stdout, _) = module.run_command(export_cmd)
+    (dummy, stdout, dummy) = module.run_command(export_cmd)
     return stdout
 
 
@@ -226,7 +226,7 @@ def _convert_pem_string_to_x509_object(pem_string):
     """ Takes a string containing a PEM formatted certificate and
           returns an OpenSSL.crypto.x509 object """
     try:
-        (_, tmp) = tempfile.mkstemp()
+        (dummy, tmp) = tempfile.mkstemp()
         with open(tmp, 'w') as f:
             f.write(pem_string)
         cert = load_certificate(tmp)
@@ -239,7 +239,7 @@ def get_digest_from_pkcs12_in_jks_store(module, executable, keystore_path, keyst
     """ Large wrapper function that creates a PKCS12 archive from an entry in a JKS store.
           The X509 public cert is then extracted from the PKCS12 archive. The digest is taken
          from this cert, and returned.  """
-    random_name = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(12))
+    random_name = "".join(random.choice(string.ascii_letters + string.digits) for dummy in range(12))
     tmp_pkcs12_store = os.path.join(tempfile.gettempdir(), random_name)
 
     try:
@@ -263,7 +263,7 @@ def _convert_jks_to_pkcs12(module, executable, keystore_path, keystore_pass, ali
 def get_digest_from_pkcs12(module, pkcs12_path, cert_alias, password, digest_function):
     """ Exports the X509 cert from a PKCS12 store to a temporary file, and then
           returns the digest of that cert """
-    (_, tmp_pem_cert) = tempfile.mkstemp()
+    (dummy, tmp_pem_cert) = tempfile.mkstemp()
     try:
         _export_public_cert_from_pkcs12(module, pkcs12_path, cert_alias,
                                         password, tmp_pem_cert)
@@ -322,7 +322,7 @@ def download_cert_url(module, executable, url, port):
     fetch_cmd = "%s -printcert -rfc -sslserver %s %s:%d" % (executable, proxy_opts, url, port)
 
     # Fetch SSL certificate from remote host.
-    (_, fetch_out, _) = module.run_command(fetch_cmd, check_rc=True)
+    (dummy, fetch_out, dummy) = module.run_command(fetch_cmd, check_rc=True)
 
     return fetch_out
 
