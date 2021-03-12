@@ -17,7 +17,6 @@ options:
   password:
     description:
       - the instance root password
-      - required only for C(state=present)
     type: str
   hostname:
     description:
@@ -514,7 +513,7 @@ def main():
             hookscript=dict(type='str'),
             proxmox_default_behavior=dict(type='str', choices=['compatibility', 'no_defaults']),
         ),
-        required_if=[('state', 'present', ['node', 'hostname', 'password', 'ostemplate'])],
+        required_if=[('state', 'present', ['node', 'hostname', 'ostemplate'])],
         required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('api_password', 'api_token_id')],
     )
