@@ -94,10 +94,8 @@ plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:deprecation-m
 plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:doc-missing-type
 plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:invalid-documentation
 plugins/modules/cloud/rackspace/rax.py use-argspec-type-path
-plugins/modules/cloud/rackspace/rax.py validate-modules:doc-missing-type
-plugins/modules/cloud/rackspace/rax.py validate-modules:undocumented-parameter
 plugins/modules/cloud/rackspace/rax_files_objects.py use-argspec-type-path
-plugins/modules/cloud/rackspace/rax_scaling_group.py use-argspec-type-path
+plugins/modules/cloud/rackspace/rax_scaling_group.py use-argspec-type-path  # fix needed, expanduser() applied to dict values
 plugins/modules/cloud/scaleway/scaleway_image_facts.py validate-modules:deprecation-mismatch
 plugins/modules/cloud/scaleway/scaleway_image_facts.py validate-modules:invalid-documentation
 plugins/modules/cloud/scaleway/scaleway_image_facts.py validate-modules:return-syntax-error
@@ -126,7 +124,6 @@ plugins/modules/cloud/scaleway/scaleway_volume_facts.py validate-modules:depreca
 plugins/modules/cloud/scaleway/scaleway_volume_facts.py validate-modules:invalid-documentation
 plugins/modules/cloud/scaleway/scaleway_volume_facts.py validate-modules:return-syntax-error
 plugins/modules/cloud/scaleway/scaleway_volume_info.py validate-modules:return-syntax-error
-plugins/modules/cloud/smartos/smartos_image_info.py validate-modules:doc-missing-type
 plugins/modules/cloud/smartos/vmadm.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/smartos/vmadm.py validate-modules:undocumented-parameter
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-type-not-in-doc
