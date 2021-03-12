@@ -292,7 +292,7 @@ def main():
             owner=dict(required=True, type='str', aliases=['account', 'organization']),
             repo=dict(required=True, type='str', aliases=['repository']),
             name=dict(required=True, type='str', aliases=['title', 'label']),
-            key=dict(required=True, type='str'),
+            key=dict(required=True, type='str', no_log=False),
             read_only=dict(required=False, type='bool', default=True),
             state=dict(default='present', choices=['present', 'absent']),
             force=dict(required=False, type='bool', default=False),

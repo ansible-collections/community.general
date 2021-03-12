@@ -369,7 +369,7 @@ def main():
         argument_spec=dict(
             domain=dict(type='str', default='NSGlobalDomain'),
             host=dict(type='str'),
-            key=dict(type='str'),
+            key=dict(type='str', no_log=False),
             type=dict(type='str', default='string', choices=['array', 'bool', 'boolean', 'date', 'float', 'int', 'integer', 'string']),
             array_add=dict(type='bool', default=False),
             value=dict(type='raw'),

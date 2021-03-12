@@ -1839,7 +1839,7 @@ def main():
             type='list',
             elements='dict',
             options=dict(
-                key=dict(type='str', required=True),
+                key=dict(type='str', required=True, no_log=False),
                 value=dict(type='raw', required=True),
             ),
         ),
