@@ -177,13 +177,8 @@ import string
 # import module snippets
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.crypto.support import load_certificate
-try:
-    from urlparse import urlparse
-    from urllib import getproxies
-except ImportError:
-    from urllib.parse import urlparse
-    from urllib.request import getproxies
-
+from ansible.module_utils.six.moves.urllib.parse import urlparse
+from ansible.module_utils.six.moves.urllib.request import urlparse
 
 def get_keystore_type(keystore_type):
     ''' Check that custom keystore is presented in parameters '''
