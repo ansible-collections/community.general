@@ -937,7 +937,7 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
             kwargs['searchdomain'] = ' '.join(searchdomains)
 
     # VM tags are expected to be valid and presented as a comma/semi-colon delimited string
-    if 'tags' in module.params:
+    if module.params['tags']:
         for tag in module.params['tags']:
             if not re.match(r'^[a-z0-9_][a-z0-9_\-\+\.]*$', tag):
                 module.fail_json(msg='%s is not a valid tag' % tag)
