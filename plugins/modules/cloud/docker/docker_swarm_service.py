@@ -2729,7 +2729,7 @@ def main():
             gid=dict(type='str'),
             mode=dict(type='int'),
         )),
-        secrets=dict(type='list', elements='dict', options=dict(
+        secrets=dict(type='list', elements='dict', no_log=False, options=dict(
             secret_id=dict(type='str'),
             secret_name=dict(type='str', required=True),
             filename=dict(type='str'),

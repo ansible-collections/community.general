@@ -1,0 +1,2 @@
+bugfixes:
+- "Mark various module options with ``no_log=False`` which have a name that potentially could leak secrets, but which do not (https://github.com/ansible-collections/community.general/pull/2001)."

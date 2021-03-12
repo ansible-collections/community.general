@@ -172,7 +172,7 @@ def main():
         argument_spec=dict(
             path=dict(type='path', required=True, aliases=['name']),
             namespace=dict(type='str', default='user'),
-            key=dict(type='str'),
+            key=dict(type='str', no_log=False),
             value=dict(type='str'),
             state=dict(type='str', default='read', choices=['absent', 'all', 'keys', 'present', 'read']),
             follow=dict(type='bool', default=True),
