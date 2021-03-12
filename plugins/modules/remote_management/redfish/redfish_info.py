@@ -37,14 +37,16 @@ options:
       - Base URI of OOB controller
     type: str
   username:
-    required: true
     description:
       - User for authentication with OOB controller
     type: str
   password:
-    required: true
     description:
       - Password for authentication with OOB controller
+    type: str
+  auth_token:
+    description:
+      - Security token for authentication with OOB controller
     type: str
   timeout:
     description:
@@ -301,10 +303,20 @@ def main():
             category=dict(type='list', elements='str', default=['Systems']),
             command=dict(type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(required=True),
-            password=dict(required=True, no_log=True),
+            username=dict(),
+            password=dict(no_log=True),
+            auth_token=dict(no_log=True),
             timeout=dict(type='int', default=10)
         ),
+        required_together=[
+            ('username', 'password'),
+        ],
+        required_one_of=[
+            ('username', 'auth_token'),
+        ],
+        mutually_exclusive=[
+            ('username', 'auth_token'),
+        ],
         supports_check_mode=False
     )
     is_old_facts = module._name in ('redfish_facts', 'community.general.redfish_facts')
@@ -315,7 +327,8 @@ def main():
 
     # admin credentials used for authentication
     creds = {'user': module.params['username'],
-             'pswd': module.params['password']}
+             'pswd': module.params['password'],
+             'token': module.params['auth_token']}
 
     # timeout
     timeout = module.params['timeout']

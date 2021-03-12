@@ -35,14 +35,20 @@ options:
       - Base URI of OOB controller
     type: str
   username:
-    required: true
     description:
       - Username for authentication with OOB controller
     type: str
   password:
-    required: true
     description:
       - Password for authentication with OOB controller
+    type: str
+  auth_token:
+    description:
+      - Security token for authentication with OOB controller
+    type: str
+  session_uri:
+    description:
+      - URI of the session resource
     type: str
   id:
     required: false
@@ -284,15 +290,6 @@ EXAMPLES = '''
       category: Systems
       command: DisableBootOverride
 
-  - name: Set chassis indicator LED to blink
-    community.general.redfish_command:
-      category: Chassis
-      command: IndicatorLedBlink
-      resource_id: 1U
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-
   - name: Add user
     community.general.redfish_command:
       category: Accounts
@@ -413,6 +410,31 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
       timeout: 20
+
+  - name: Create session
+    community.general.redfish_command:
+      category: Sessions
+      command: CreateSession
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+    register: result
+
+  - name: Set chassis indicator LED to blink using security token for auth
+    community.general.redfish_command:
+      category: Chassis
+      command: IndicatorLedBlink
+      resource_id: 1U
+      baseuri: "{{ baseuri }}"
+      auth_token: "{{ result.session.token }}"
+
+  - name: Delete session using security token created by CreateSesssion above
+    community.general.redfish_command:
+      category: Sessions
+      command: DeleteSession
+      baseuri: "{{ baseuri }}"
+      auth_token: "{{ result.session.token }}"
+      session_uri: "{{ result.session.uri }}"
 
   - name: Clear Sessions
     community.general.redfish_command:
@@ -538,7 +560,7 @@ CATEGORY_COMMANDS_ALL = {
     "Accounts": ["AddUser", "EnableUser", "DeleteUser", "DisableUser",
                  "UpdateUserRole", "UpdateUserPassword", "UpdateUserName",
                  "UpdateAccountServiceProperties"],
-    "Sessions": ["ClearSessions"],
+    "Sessions": ["ClearSessions", "CreateSession", "DeleteSession"],
     "Manager": ["GracefulRestart", "ClearLogs", "VirtualMediaInsert",
                 "VirtualMediaEject", "PowerOn", "PowerForceOff", "PowerForceRestart",
                 "PowerGracefulRestart", "PowerGracefulShutdown", "PowerReboot"],
@@ -553,8 +575,10 @@ def main():
             category=dict(required=True),
             command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(required=True),
-            password=dict(required=True, no_log=True),
+            username=dict(),
+            password=dict(no_log=True),
+            auth_token=dict(no_log=True),
+            session_uri=dict(),
             id=dict(aliases=["account_id"]),
             new_username=dict(aliases=["account_username"]),
             new_password=dict(aliases=["account_password"], no_log=True),
@@ -590,6 +614,15 @@ def main():
                 )
             )
         ),
+        required_together=[
+            ('username', 'password'),
+        ],
+        required_one_of=[
+            ('username', 'auth_token'),
+        ],
+        mutually_exclusive=[
+            ('username', 'auth_token'),
+        ],
         supports_check_mode=False
     )
 
@@ -598,7 +631,8 @@ def main():
 
     # admin credentials used for authentication
     creds = {'user': module.params['username'],
-             'pswd': module.params['password']}
+             'pswd': module.params['password'],
+             'token': module.params['auth_token']}
 
     # user to add/modify/delete
     user = {'account_id': module.params['id'],
@@ -712,6 +746,10 @@ def main():
         for command in command_list:
             if command == "ClearSessions":
                 result = rf_utils.clear_sessions()
+            elif command == "CreateSession":
+                result = rf_utils.create_session()
+            elif command == "DeleteSession":
+                result = rf_utils.delete_session(module.params['session_uri'])
 
     elif category == "Manager":
         # execute only if we find a Manager service resource
@@ -748,7 +786,9 @@ def main():
     if result['ret'] is True:
         del result['ret']
         changed = result.get('changed', True)
-        module.exit_json(changed=changed, msg='Action was successful')
+        session = result.get('session', dict())
+        module.exit_json(changed=changed, session=session,
+                         msg='Action was successful')
     else:
         module.fail_json(msg=to_native(result['msg']))
 
