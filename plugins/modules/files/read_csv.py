@@ -164,7 +164,7 @@ def main():
         argument_spec=dict(
             path=dict(type='path', required=True, aliases=['filename']),
             dialect=dict(type='str', default='excel'),
-            key=dict(type='str'),
+            key=dict(type='str', no_log=False),
             fieldnames=dict(type='list', elements='str'),
             unique=dict(type='bool', default=True),
             delimiter=dict(type='str'),
