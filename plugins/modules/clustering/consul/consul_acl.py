@@ -229,7 +229,7 @@ _ARGUMENT_SPEC = {
     PORT_PARAMETER_NAME: dict(default=8500, type='int'),
     RULES_PARAMETER_NAME: dict(type='list', elements='dict'),
     STATE_PARAMETER_NAME: dict(default=PRESENT_STATE_VALUE, choices=[PRESENT_STATE_VALUE, ABSENT_STATE_VALUE]),
-    TOKEN_PARAMETER_NAME: dict(),
+    TOKEN_PARAMETER_NAME: dict(no_log=False),
     TOKEN_TYPE_PARAMETER_NAME: dict(choices=[CLIENT_TOKEN_TYPE_VALUE, MANAGEMENT_TOKEN_TYPE_VALUE],
                                     default=CLIENT_TOKEN_TYPE_VALUE)
 }

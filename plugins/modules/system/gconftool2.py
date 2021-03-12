@@ -151,7 +151,7 @@ def main():
     # Setup the Ansible module
     module = AnsibleModule(
         argument_spec=dict(
-            key=dict(type='str', required=True),
+            key=dict(type='str', required=True, no_log=False),
             value_type=dict(type='str', choices=['bool', 'float', 'int', 'string']),
             value=dict(type='str'),
             state=dict(type='str', required=True, choices=['absent', 'get', 'present']),
