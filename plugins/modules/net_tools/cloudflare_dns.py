@@ -800,7 +800,7 @@ def main():
             algorithm=dict(type='int'),
             cert_usage=dict(type='int', choices=[0, 1, 2, 3]),
             hash_type=dict(type='int', choices=[1, 2]),
-            key_tag=dict(type='int'),
+            key_tag=dict(type='int', no_log=False),
             port=dict(type='int'),
             priority=dict(type='int', default=1),
             proto=dict(type='str'),

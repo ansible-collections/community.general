@@ -297,7 +297,7 @@ def main():
         argument_spec=dict(
             cas=dict(type='str'),
             flags=dict(type='str'),
-            key=dict(type='str', required=True),
+            key=dict(type='str', required=True, no_log=False),
             host=dict(type='str', default='localhost'),
             scheme=dict(type='str', default='http'),
             validate_certs=dict(type='bool', default=True),
