@@ -241,7 +241,7 @@ def main():
         api_token=dict(type='str', no_log=True),
         state=dict(type='str', default="present", choices=["absent", "present"]),
         project=dict(type='str', required=True),
-        key=dict(type='str', required=True),
+        key=dict(type='str', required=True, no_log=False),
         can_push=dict(type='bool', default=False),
         title=dict(type='str', required=True)
     ))
