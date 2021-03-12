@@ -134,7 +134,7 @@ def run_module():
     # define the available arguments/parameters that a user can pass to
     # the module
     module_args = dict(
-        key=dict(type='str', required=True),
+        key=dict(type='str', required=True, no_log=False),
         value=dict(type='str', required=True),
         host=dict(type='str', default='localhost'),
         port=dict(type='int', default=2379),
