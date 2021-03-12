@@ -549,7 +549,7 @@ def main():
         password=dict(default='', required=False, type='str', no_log=True),
         account=dict(default='', required=False, type='str'),
         application=dict(required=True, type='str'),
-        keyset=dict(required=True, type='str'),
+        keyset=dict(required=True, type='str', no_log=False),
         state=dict(default='present', type='str',
                    choices=['started', 'stopped', 'present', 'absent']),
         name=dict(required=True, type='str'), description=dict(type='str'),

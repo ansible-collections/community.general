@@ -1448,7 +1448,7 @@ def main():
         iam_role_arn=dict(type='str'),
         iam_role_name=dict(type='str'),
         image_id=dict(type='str', required=True),
-        key_pair=dict(type='str'),
+        key_pair=dict(type='str', no_log=False),
         kubernetes=dict(type='dict'),
         lifetime_period=dict(type='int'),
         load_balancers=dict(type='list'),
