@@ -349,7 +349,8 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
 
                 for member in self._get_members_per_pool(pool['poolid']):
                     if member.get('name'):
-                        self.inventory.add_child(pool_group, member['name'])
+                        if not member.get('template'):
+                            self.inventory.add_child(pool_group, member['name'])
 
     def parse(self, inventory, loader, path, cache=True):
         if not HAS_REQUESTS:
