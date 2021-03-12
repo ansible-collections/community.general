@@ -432,6 +432,7 @@ options:
       - Tags are only available in Proxmox 6+.
     type: list
     elements: str
+    version_added: 2.3.0
   target:
     description:
       - Target node. Only allowed if the original VM is on shared storage.
