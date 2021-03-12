@@ -5,9 +5,10 @@
 ####################################################################
 - when: has_java_keytool
   block:
-
   - name: prep pkcs12 file
-    copy: src="{{ test_pkcs12_path }}" dest="{{output_dir}}/{{ test_pkcs12_path }}"
+    copy: 
+      src: "{{ test_pkcs12_path }}" 
+      dest: "{{output_dir}}/{{ test_pkcs12_path }}"
 
   - name: import pkcs12
     java_cert:
@@ -20,6 +21,7 @@
       keystore_create: yes
       state: present
     register: result_success
+    
   - name: verify success
     assert:
       that:
