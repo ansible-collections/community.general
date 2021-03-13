@@ -1057,7 +1057,7 @@ def main():
             smbios=dict(type='str'),
             snapname=dict(type='str'),
             sockets=dict(type='int'),
-            sshkeys=dict(type='str'),
+            sshkeys=dict(type='str', no_log=False),
             startdate=dict(type='str'),
             startup=dict(),
             state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'current']),

@@ -404,7 +404,7 @@ def main():
             nic_speed=dict(type='int', choices=NIC_SPEEDS),
             public_vlan=dict(type='str'),
             private_vlan=dict(type='str'),
-            ssh_keys=dict(type='list', elements='str', default=[]),
+            ssh_keys=dict(type='list', elements='str', default=[], no_log=False),
             post_uri=dict(type='str'),
             state=dict(type='str', default='present', choices=STATES),
             wait=dict(type='bool', default=True),

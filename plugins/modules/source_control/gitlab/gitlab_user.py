@@ -470,7 +470,7 @@ def main():
         password=dict(type='str', no_log=True),
         email=dict(type='str'),
         sshkey_name=dict(type='str'),
-        sshkey_file=dict(type='str'),
+        sshkey_file=dict(type='str', no_log=False),
         group=dict(type='str'),
         access_level=dict(type='str', default="guest", choices=["developer", "guest", "maintainer", "master", "owner", "reporter"]),
         confirm=dict(type='bool', default=True),
