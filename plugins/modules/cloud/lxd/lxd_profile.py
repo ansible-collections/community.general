@@ -385,7 +385,8 @@ def main():
             ),
             client_key=dict(
                 type='str',
-                aliases=['key_file']
+                aliases=['key_file'],
+                no_log=False,
             ),
             client_cert=dict(
                 type='str',
