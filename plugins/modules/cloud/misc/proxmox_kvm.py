@@ -431,6 +431,7 @@ options:
       - Tags must start with [a-z0-9_] followed by zero or more of the following characters [a-z0-9_-+.].
       - Tags are only available in Proxmox 6+.
     type: list
+    default: [""]
     elements: str
     version_added: 2.3.0
   target:
@@ -937,11 +938,18 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
             kwargs['searchdomain'] = ' '.join(searchdomains)
 
     # VM tags are expected to be valid and presented as a comma/semi-colon delimited string
-    if module.params['tags']:
-        for tag in module.params['tags']:
-            if not re.match(r'^[a-z0-9_][a-z0-9_\-\+\.]*$', tag):
-                module.fail_json(msg='%s is not a valid tag' % tag)
-        kwargs['tags'] = ",".join(module.params['tags'])
+    if 'tags' in kwargs:
+        # Set tags to null if empty list
+        if not kwargs['tags']:
+            kwargs['tags'] = ""
+        # Do nothing if tags contains a single empty element
+        elif len(kwargs['tags']) == 1 and not kwargs['tags'][0]:
+            del kwargs['tags']
+        else:
+            for tag in kwargs['tags']:
+                if not re.match(r'^[a-z0-9_][a-z0-9_\-\+\.]*$', tag):
+                    module.fail_json(msg='%s is not a valid tag' % tag)
+            kwargs['tags'] = ",".join(kwargs['tags'])
 
     # -args and skiplock require root@pam user - but can not use api tokens
     if module.params['api_user'] == "root@pam" and module.params['args'] is None:
@@ -1078,7 +1086,7 @@ def main():
             state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'current']),
             storage=dict(type='str'),
             tablet=dict(type='bool'),
-            tags=dict(type='list', elements='str'),
+            tags=dict(type='list', default=[""], elements='str'),
             target=dict(type='str'),
             tdf=dict(type='bool'),
             template=dict(type='bool'),
@@ -1283,6 +1291,7 @@ def main():
                       startdate=module.params['startdate'],
                       startup=module.params['startup'],
                       tablet=module.params['tablet'],
+                      tags=module.params['tags'],
                       target=module.params['target'],
                       tdf=module.params['tdf'],
                       template=module.params['template'],
