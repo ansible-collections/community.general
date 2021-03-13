@@ -428,7 +428,7 @@ options:
   tags:
     description:
       - List of tags to apply to the VM instance.
-      - Tags must start with [a-z0-9_] followed by zero or more of the following characters [a-z0-9_-+.].
+      - Tags must start with C([a-z0-9_]) followed by zero or more of the following characters C([a-z0-9_-+.]).
       - Tags are only available in Proxmox 6+.
     type: list
     elements: str
