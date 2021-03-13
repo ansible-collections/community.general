@@ -583,7 +583,7 @@ def main():
             volume_size=dict(type='int', default=10),
             disk_type=dict(choices=['HDD', 'SSD'], default='HDD'),
             image_password=dict(default=None, no_log=True),
-            ssh_keys=dict(type='list', elements='str', default=[]),
+            ssh_keys=dict(type='list', elements='str', default=[], no_log=False),
             bus=dict(choices=['VIRTIO', 'IDE'], default='VIRTIO'),
             lan=dict(type='int', default=1),
             count=dict(type='int', default=1),

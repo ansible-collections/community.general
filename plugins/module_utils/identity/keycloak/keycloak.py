@@ -55,7 +55,7 @@ def keycloak_argument_spec():
     :return: argument_spec dict
     """
     return dict(
-        auth_keycloak_url=dict(type='str', aliases=['url'], required=True),
+        auth_keycloak_url=dict(type='str', aliases=['url'], required=True, no_log=False),
         auth_client_id=dict(type='str', default='admin-cli'),
         auth_realm=dict(type='str', required=True),
         auth_client_secret=dict(type='str', default=None, no_log=True),
