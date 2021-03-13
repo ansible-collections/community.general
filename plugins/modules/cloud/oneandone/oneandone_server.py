@@ -630,7 +630,7 @@ def main():
             ram=dict(type='float'),
             hdds=dict(type='list', elements='dict'),
             count=dict(type='int', default=1),
-            ssh_key=dict(type='raw'),
+            ssh_key=dict(type='raw', no_log=False),
             auto_increment=dict(type='bool', default=True),
             server=dict(type='str'),
             datacenter=dict(

@@ -569,7 +569,7 @@ def endpoint_list_spec():
         provider=dict(type='dict', options=endpoint_argument_spec()),
         metrics=dict(type='dict', options=endpoint_argument_spec()),
         alerts=dict(type='dict', options=endpoint_argument_spec()),
-        ssh_keypair=dict(type='dict', options=endpoint_argument_spec()),
+        ssh_keypair=dict(type='dict', options=endpoint_argument_spec(), no_log=False),
     )
 
 

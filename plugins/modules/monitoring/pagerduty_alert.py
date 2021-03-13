@@ -205,7 +205,7 @@ def main():
             client=dict(required=False, default=None),
             client_url=dict(required=False, default=None),
             desc=dict(required=False, default='Created via Ansible'),
-            incident_key=dict(required=False, default=None)
+            incident_key=dict(required=False, default=None, no_log=False)
         ),
         supports_check_mode=True
     )
