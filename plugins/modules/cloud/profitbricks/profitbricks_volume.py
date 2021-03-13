@@ -376,7 +376,7 @@ def main():
             bus=dict(choices=['VIRTIO', 'IDE'], default='VIRTIO'),
             image=dict(),
             image_password=dict(no_log=True),
-            ssh_keys=dict(type='list', elements='str', default=[]),
+            ssh_keys=dict(type='list', elements='str', default=[], no_log=False),
             disk_type=dict(choices=['HDD', 'SSD'], default='HDD'),
             licence_type=dict(default='UNKNOWN'),
             count=dict(type='int', default=1),

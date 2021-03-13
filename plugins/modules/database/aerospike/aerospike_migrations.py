@@ -190,9 +190,9 @@ def run_module():
         min_cluster_size=dict(type='int', required=False, default=1),
         target_cluster_size=dict(type='int', required=False, default=None),
         fail_on_cluster_change=dict(type='bool', required=False, default=True),
-        migrate_tx_key=dict(type='str', required=False,
+        migrate_tx_key=dict(type='str', required=False, no_log=False,
                             default="migrate_tx_partitions_remaining"),
-        migrate_rx_key=dict(type='str', required=False,
+        migrate_rx_key=dict(type='str', required=False, no_log=False,
                             default="migrate_rx_partitions_remaining")
     )
 
