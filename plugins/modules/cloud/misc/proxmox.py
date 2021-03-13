@@ -130,7 +130,8 @@ options:
       - Related ACLs and Firewall entries will always be removed.
       - Used with state C(absent).
     type: bool
-    default: 'no'
+    default: false
+    version_added: 2.3.0
   state:
     description:
      - Indicate desired state of the instance
