@@ -120,7 +120,7 @@ def main():
             host=dict(),
             tags=dict(type='list', elements='str'),
             alert_type=dict(default='info', choices=['error', 'warning', 'info', 'success']),
-            aggregation_key=dict(),
+            aggregation_key=dict(no_log=False),
             validate_certs=dict(default=True, type='bool'),
         )
     )

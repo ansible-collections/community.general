@@ -421,7 +421,7 @@ def main():
             permission=dict(choices=['private', 'public-read', 'authenticated-read'], default='private'),
             headers=dict(type='dict', default={}),
             gs_secret_key=dict(no_log=True, required=True),
-            gs_access_key=dict(required=True),
+            gs_access_key=dict(required=True, no_log=False),
             overwrite=dict(default=True, type='bool', aliases=['force']),
             region=dict(default='US', type='str'),
             versioning=dict(default=False, type='bool')
