@@ -59,6 +59,12 @@ options:
       - Delete and re-install the plugin. Can be useful for plugins update.
       type: bool
       default: false
+    allow_root:
+      description:
+      - Whether to allow C(kibana) and C(kibana-plugin) to be run as root. Passes the C(--allow-root) flag to these commands.
+      type: bool
+      default: false
+      version_added: 2.3.0
 '''
 
 EXAMPLES = '''
@@ -152,7 +158,7 @@ def parse_error(string):
         return string
 
 
-def install_plugin(module, plugin_bin, plugin_name, url, timeout, kibana_version='4.6'):
+def install_plugin(module, plugin_bin, plugin_name, url, timeout, allow_root, kibana_version='4.6'):
     if LooseVersion(kibana_version) > LooseVersion('4.6'):
         kibana_plugin_bin = os.path.join(os.path.dirname(plugin_bin), 'kibana-plugin')
         cmd_args = [kibana_plugin_bin, "install"]
@@ -169,6 +175,9 @@ def install_plugin(module, plugin_bin, plugin_name, url, timeout, kibana_version
     if timeout:
         cmd_args.append("--timeout %s" % timeout)
 
+    if allow_root:
+        cmd_args.append('--allow-root')
+
     cmd = " ".join(cmd_args)
 
     if module.check_mode:
@@ -182,13 +191,16 @@ def install_plugin(module, plugin_bin, plugin_name, url, timeout, kibana_version
     return True, cmd, out, err
 
 
-def remove_plugin(module, plugin_bin, plugin_name, kibana_version='4.6'):
+def remove_plugin(module, plugin_bin, plugin_name, allow_root, kibana_version='4.6'):
     if LooseVersion(kibana_version) > LooseVersion('4.6'):
         kibana_plugin_bin = os.path.join(os.path.dirname(plugin_bin), 'kibana-plugin')
         cmd_args = [kibana_plugin_bin, "remove", plugin_name]
     else:
         cmd_args = [plugin_bin, "plugin", PACKAGE_STATE_MAP["absent"], plugin_name]
 
+    if allow_root:
+        cmd_args.append('--allow-root')
+
     cmd = " ".join(cmd_args)
 
     if module.check_mode:
@@ -202,8 +214,12 @@ def remove_plugin(module, plugin_bin, plugin_name, kibana_version='4.6'):
     return True, cmd, out, err
 
 
-def get_kibana_version(module, plugin_bin):
+def get_kibana_version(module, plugin_bin, allow_root):
     cmd_args = [plugin_bin, '--version']
+
+    if allow_root:
+        cmd_args.append('--allow-root')
+
     cmd = " ".join(cmd_args)
     rc, out, err = module.run_command(cmd)
     if rc != 0:
@@ -222,7 +238,8 @@ def main():
             plugin_bin=dict(default="/opt/kibana/bin/kibana", type="path"),
             plugin_dir=dict(default="/opt/kibana/installedPlugins/", type="path"),
             version=dict(default=None),
-            force=dict(default=False, type="bool")
+            force=dict(default=False, type="bool"),
+            allow_root=dict(default=False, type="bool"),
         ),
         supports_check_mode=True,
     )
@@ -235,10 +252,11 @@ def main():
     plugin_dir = module.params["plugin_dir"]
     version = module.params["version"]
     force = module.params["force"]
+    allow_root = module.params["allow_root"]
 
     changed, cmd, out, err = False, '', '', ''
 
-    kibana_version = get_kibana_version(module, plugin_bin)
+    kibana_version = get_kibana_version(module, plugin_bin, allow_root)
 
     present = is_plugin_present(parse_plugin_repo(name), plugin_dir)
 
@@ -252,10 +270,10 @@ def main():
     if state == "present":
         if force:
             remove_plugin(module, plugin_bin, name)
-        changed, cmd, out, err = install_plugin(module, plugin_bin, name, url, timeout, kibana_version)
+        changed, cmd, out, err = install_plugin(module, plugin_bin, name, url, timeout, allow_root, kibana_version)
 
     elif state == "absent":
-        changed, cmd, out, err = remove_plugin(module, plugin_bin, name, kibana_version)
+        changed, cmd, out, err = remove_plugin(module, plugin_bin, name, allow_root, kibana_version)
 
     module.exit_json(changed=changed, cmd=cmd, name=name, state=state, url=url, timeout=timeout, stdout=out, stderr=err)
 
