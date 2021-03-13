@@ -240,7 +240,7 @@ def initialise_module():
                 no_log=True,
                 fallback=(env_fallback, ['LINODE_ACCESS_TOKEN']),
             ),
-            authorized_keys=dict(type='list', required=False),
+            authorized_keys=dict(type='list', required=False, no_log=False),
             group=dict(type='str', required=False),
             image=dict(type='str', required=False),
             region=dict(type='str', required=False),
