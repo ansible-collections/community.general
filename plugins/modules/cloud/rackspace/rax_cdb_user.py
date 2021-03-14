@@ -30,6 +30,7 @@ options:
     required: yes
   databases:
     type: list
+    elements: str
     description:
       - Name of the databases that the user can access
     default: []
@@ -189,7 +190,7 @@ def main():
             cdb_id=dict(type='str', required=True),
             db_username=dict(type='str', required=True),
             db_password=dict(type='str', required=True, no_log=True),
-            databases=dict(type='list', default=[]),
+            databases=dict(type='list', elements='str', default=[]),
             host=dict(type='str', default='%'),
             state=dict(default='present', choices=['present', 'absent'])
         )
