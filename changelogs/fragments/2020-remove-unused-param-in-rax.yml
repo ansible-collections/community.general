@@ -1,0 +1,2 @@
+removed_features:
+  - rax - unused parameter ``service`` removed (https://github.com/ansible-collections/community.general/pull/2020).

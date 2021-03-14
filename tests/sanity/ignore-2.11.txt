@@ -63,8 +63,6 @@ plugins/modules/cloud/ovirt/ovirt_vm_facts.py validate-modules:parameter-type-no
 plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:doc-missing-type
 plugins/modules/cloud/ovirt/ovirt_vmpool_facts.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/rackspace/rax.py use-argspec-type-path # fix needed
-plugins/modules/cloud/rackspace/rax.py validate-modules:doc-missing-type
-plugins/modules/cloud/rackspace/rax.py validate-modules:undocumented-parameter
 plugins/modules/cloud/rackspace/rax_files.py validate-modules:parameter-state-invalid-choice
 plugins/modules/cloud/rackspace/rax_files_objects.py use-argspec-type-path
 plugins/modules/cloud/rackspace/rax_mon_notification_plan.py validate-modules:parameter-list-no-elements
