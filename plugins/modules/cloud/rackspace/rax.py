@@ -110,6 +110,7 @@ options:
         with this image
   instance_ids:
     type: list
+    elements: str
     description:
       - list of instance ids, currently only used when state='absent' to
         remove instances
@@ -129,6 +130,7 @@ options:
       - Name to give the instance
   networks:
     type: list
+    elements: str
     description:
       - The network to attach to the instances. If specified, you must include
         ALL networks including the public and private interfaces. Can be C(id)
@@ -810,11 +812,11 @@ def main():
             flavor=dict(),
             group=dict(),
             image=dict(),
-            instance_ids=dict(type='list'),
+            instance_ids=dict(type='list', elements='str'),
             key_name=dict(aliases=['keypair']),
             meta=dict(type='dict', default={}),
             name=dict(),
-            networks=dict(type='list', default=['public', 'private']),
+            networks=dict(type='list', elements='str', default=['public', 'private']),
             service=dict(),
             state=dict(default='present', choices=['present', 'absent']),
             user_data=dict(no_log=True),

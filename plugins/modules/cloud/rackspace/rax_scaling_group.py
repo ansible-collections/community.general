@@ -53,6 +53,7 @@ options:
       - key pair to use on the instance
   loadbalancers:
     type: list
+    elements: dict
     description:
       - List of load balancer C(id) and C(port) hashes
   max_entities:
@@ -78,6 +79,7 @@ options:
     required: true
   networks:
     type: list
+    elements: str
     description:
       - The network to attach to the instances. If specified, you must include
         ALL networks including the public and private interfaces. Can be C(id)
@@ -376,12 +378,12 @@ def main():
             flavor=dict(required=True),
             image=dict(required=True),
             key_name=dict(),
-            loadbalancers=dict(type='list'),
+            loadbalancers=dict(type='list', elements='dict'),
             meta=dict(type='dict', default={}),
             min_entities=dict(type='int', required=True),
             max_entities=dict(type='int', required=True),
             name=dict(required=True),
-            networks=dict(type='list', default=['public', 'private']),
+            networks=dict(type='list', elements='str', default=['public', 'private']),
             server_name=dict(required=True),
             state=dict(default='present', choices=['present', 'absent']),
             user_data=dict(no_log=True),
