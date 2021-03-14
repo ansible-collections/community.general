@@ -58,7 +58,7 @@ options:
       description:
       - Delete and re-install the plugin. Can be useful for plugins update.
       type: bool
-      default: 'no'
+      default: false
 '''
 
 EXAMPLES = '''
@@ -222,7 +222,7 @@ def main():
             plugin_bin=dict(default="/opt/kibana/bin/kibana", type="path"),
             plugin_dir=dict(default="/opt/kibana/installedPlugins/", type="path"),
             version=dict(default=None),
-            force=dict(default="no", type="bool")
+            force=dict(default=False, type="bool")
         ),
         supports_check_mode=True,
     )
