@@ -21,7 +21,7 @@ description:
    by Consul from the Service name and id respectively by appending 'service:'
    Node level checks require a I(check_name) and optionally a I(check_id)."
  - Currently, there is no complete way to retrieve the script, interval or ttl
-   metadata for a registered check. Without this metadata it is  not possible to
+   metadata for a registered check. Without this metadata it is not possible to
    tell if the data supplied with ansible represents a change to a check. As a
    result this does not attempt to determine changes and will always report a
    changed occurred. An API method is planned to supply this metadata so at that
