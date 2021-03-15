@@ -226,10 +226,10 @@ def _get_first_certificate_from_x509_file(module, pem_certificate_file, pem_cert
         pem_certificate_output
     ]
     (extract_rc, dummy, extract_stderr) = module.run_command(extract_cmd, check_rc=False)
-    
+
     if extract_rc != 0:
         # trying der encoded file
-        extract_cmd += ["-inform","der"]
+        extract_cmd += ["-inform", "der"]
         (extract_rc, dummy, extract_stderr) = module.run_command(extract_cmd, check_rc=False)
 
         if extract_rc != 0:
