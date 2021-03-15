@@ -61,45 +61,37 @@ options:
     type: dict
     suboptions:
       media_types:
-        required: false
         description:
           - The list of media types appropriate for the image.
         type: list
         elements: str
       image_url:
-        required: false
         description:
           - The URL of the image to insert or eject.
         type: str
       inserted:
-        required: false
         description:
           - Indicates if the image is treated as inserted on command completion.
         type: bool
         default: true
       write_protected:
-        required: false
         description:
           - Indicates if the media is treated as write-protected.
         type: bool
         default: true
       username:
-        required: false
         description:
           - The username for accessing the image URL.
         type: str
       password:
-        required: false
         description:
           - The password for accessing the image URL.
         type: str
       transfer_protocol_type:
-        required: false
         description:
           - The network protocol to use with the image.
         type: str
       transfer_method:
-        required: false
         description:
           - The transfer method to use with the image.
         type: str
