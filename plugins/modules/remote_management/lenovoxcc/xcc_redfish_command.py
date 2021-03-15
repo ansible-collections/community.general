@@ -29,6 +29,7 @@ options:
     description:
       - List of commands to execute on OOB controller.
     type: list
+    elements: str
   baseuri:
     required: true
     description:
@@ -224,31 +225,33 @@ redfish_facts:
     description: Resource content.
     returned: when command == GetResource or command == GetCollectionResource
     type: dict
-    sample: {
-        "data": {
-            "@odata.etag": "\"3179bf00d69f25a8b3c\"",
-            "@odata.id": "/redfish/v1/Managers/1/NetworkProtocol/Oem/Lenovo/DNS",
-            "@odata.type": "#LenovoDNS.v1_0_0.LenovoDNS",
-            "DDNS": [
-                {
-                    "DDNSEnable": true,
-                    "DomainName": "",
-                    "DomainNameSource": "DHCP"
-                }
-            ],
-            "DNSEnable": true,
-            "Description": "This resource is used to represent a DNS resource for a Redfish implementation.",
-            "IPv4Address1": "10.103.62.178",
-            "IPv4Address2": "0.0.0.0",
-            "IPv4Address3": "0.0.0.0",
-            "IPv6Address1": "::",
-            "IPv6Address2": "::",
-            "IPv6Address3": "::",
-            "Id": "LenovoDNS",
-            "PreferredAddresstype": "IPv4"
-        },
-        "ret": true
-    }
+    sample: '{
+        "redfish_facts": {
+            "data": {
+                "@odata.etag": "\"3179bf00d69f25a8b3c\"",
+                "@odata.id": "/redfish/v1/Managers/1/NetworkProtocol/Oem/Lenovo/DNS",
+                "@odata.type": "#LenovoDNS.v1_0_0.LenovoDNS",
+                "DDNS": [
+                    {
+                        "DDNSEnable": true,
+                        "DomainName": "",
+                        "DomainNameSource": "DHCP"
+                    }
+                ],
+                "DNSEnable": true,
+                "Description": "This resource is used to represent a DNS resource for a Redfish implementation.",
+                "IPv4Address1": "10.103.62.178",
+                "IPv4Address2": "0.0.0.0",
+                "IPv4Address3": "0.0.0.0",
+                "IPv6Address1": "::",
+                "IPv6Address2": "::",
+                "IPv6Address3": "::",
+                "Id": "LenovoDNS",
+                "PreferredAddresstype": "IPv4"
+            },
+            "ret": true
+        }
+    }'
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -340,7 +343,7 @@ class xcc_RedfishUtils(RedfishUtils):
     def virtual_media_eject(self, options):
         if options:
             image_url = options.get('image_url')
-            if image_url: #eject specified one media
+            if image_url:  # eject specified one media
                 return self.virtual_media_eject_one(image_url)
 
         # eject all inserted media when no image_url specified
