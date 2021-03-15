@@ -263,19 +263,19 @@ def _get_digest_from_x509_file(module, pem_certificate_file):
 
 
 def _export_public_cert_from_pkcs12(module, pkcs_file, alias, password, dest):
-    """ Runs Openssl to extract the public cert from a PKCS12 archive and write it to a file. """
+    """ Runs keytools to extract the public cert from a PKCS12 archive and write it to a file. """
     export_cmd = [
-        "openssl",
-        "pkcs12",
-        "-in",
+        "keytool",
+        "-list",
+        "-keystore",
         pkcs_file,
-        "-nokeys",
-        "-name",
+        "-alias",
         alias,
-        "-passin",
-        "pass:%s" % password
+        "-storetype",
+        "pkcs12",
+        "-rfc"
     ]
-    (export_rc, export_stdout, export_err) = module.run_command(export_cmd, check_rc=False)
+    (export_rc, export_stdout, export_err) = module.run_command(export_cmd, data=password, check_rc=False)
 
     if export_rc != 0:
         module.fail_json(msg="Internal module failure, cannot extract public certificate from pkcs12, error: %s" % export_err,
