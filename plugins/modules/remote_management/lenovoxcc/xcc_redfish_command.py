@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+#
 # GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -224,7 +224,7 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: different results depending on task 
+    description: different results depending on task
     returned: always
     type: dict
     sample: "Action was successful" or list of Lenovo FoD key
@@ -319,7 +319,7 @@ class xcc_RedfishUtils(RedfishUtils):
     def virtual_media_eject(self, options):
         if options:
             image_url = options.get('image_url')
-            if image_url: # eject specified one media
+            if image_url:# eject specified one media
                 return self.virtual_media_eject_one(image_url)
 
         # eject all inserted media when no image_url specified
@@ -399,8 +399,8 @@ class xcc_RedfishUtils(RedfishUtils):
         data = response['data']
         for key in request_body.keys():
             if key not in data:
-                return {'ret': False, 'msg': "Key %s not found. Supported key list: %s" %(key, str(data.keys()))}
- 
+                return {'ret': False, 'msg': "Key %s not found. Supported key list: %s" % (key, str(data.keys()))}
+
         # perform patch
         response = self.patch_request(self.root_uri + resource_uri, request_body)
         if response['ret'] is False:
@@ -418,14 +418,14 @@ class xcc_RedfishUtils(RedfishUtils):
 
     def raw_post_resource(self, resource_uri, request_body):
         if '/Actions/' not in resource_uri:
-            return {'ret':False, 'msg': "Bad uri %s. Keyword /Actions/ should be included in uri" %resource_uri}
+            return {'ret': False, 'msg': "Bad uri %s. Keyword /Actions/ should be included in uri" % resource_uri}
         # get action base uri data for further checking
         action_base_uri = resource_uri.split('/Actions/')[0]
         response = self.get_request(self.root_uri + action_base_uri)
         if response['ret'] is False:
             return response
         if 'Actions' not in response['data']:
-            return {'ret':False, 'msg': "Actions property not found in %s" %action_base_uri}
+            return {'ret': False, 'msg': "Actions property not found in %s" % action_base_uri}
 
         # check resouce_uri with target uri found in action base uri data
         action_found = False
@@ -458,7 +458,9 @@ class xcc_RedfishUtils(RedfishUtils):
                         action_target_uri_list.append(response['data']['Actions']['Oem'][key]['target'])
 
         if not action_found:
-            return {'ret': False, 'msg': 'Specified resource_uri is not a supported action target uri, please specify a supported target uri instead. Supported uri: %s' %(str(action_target_uri_list))}
+            return {'ret': False,
+                    'msg': 'Specified resource_uri is not a supported action target uri, please specify a supported target uri instead. Supported uri: %s'
+                    % (str(action_target_uri_list))}
 
         # check request_body with parameter name defined by @Redfish.ActionInfo
         if action_info_uri is not None:
@@ -472,8 +474,10 @@ class xcc_RedfishUtils(RedfishUtils):
                         key_found = True
                         break
                 if not key_found:
-                    return {'ret': False, 'msg': 'Invalid property %s found in request_body. Please refer to @Redfish.ActionInfo Parameters: %s' %(key, str(response['data']['Parameters']))}
- 
+                    return {'ret': False,
+                            'msg': 'Invalid property %s found in request_body. Please refer to @Redfish.ActionInfo Parameters: %s'
+                            % (key, str(response['data']['Parameters']))}
+
         # perform post
         response = self.post_request(self.root_uri + resource_uri, request_body)
         if response['ret'] is False:
@@ -548,8 +552,8 @@ def main():
 
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
-    rf_utils = xcc_RedfishUtils(creds, root_uri, timeout, module,
-                            resource_id=resource_id, data_modification=True)
+    rf_utils = xcc_RedfishUtils(
+            creds, root_uri, timeout, module, resource_id=resource_id, data_modification=True)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
