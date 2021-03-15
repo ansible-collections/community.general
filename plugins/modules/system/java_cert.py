@@ -87,6 +87,7 @@ options:
     type: str
     choices: [ absent, present ]
     default: present
+requirements: [openssl, keytool]
 author:
 - Adam Hamsik (@haad)
 '''
@@ -215,10 +216,10 @@ def _get_certificate_from_url(module, executable, url, port, pem_certificate_out
         f.close()
 
 
-def _get_first_certificate_from_x509_file(module, pem_certificate_file, pem_certificate_output):
+def _get_first_certificate_from_x509_file(module, pem_certificate_file, pem_certificate_output, openssl_bin):
     """ Read a X509 certificate chain file and output the first certificate in the list """
     extract_cmd = [
-        "openssl",
+        openssl_bin,
         "x509",
         "-in",
         pem_certificate_file,
@@ -240,14 +241,14 @@ def _get_first_certificate_from_x509_file(module, pem_certificate_file, pem_cert
     return extract_rc
 
 
-def _get_digest_from_x509_file(module, pem_certificate_file):
+def _get_digest_from_x509_file(module, pem_certificate_file, openssl_bin):
     """ Read a X509 certificate file and output sha256 digest using openssl """
     # cleanup file before to compare
     (dummy, tmp_certificate) = tempfile.mkstemp()
     module.add_cleanup_file(tmp_certificate)
-    _get_first_certificate_from_x509_file(module, pem_certificate_file, tmp_certificate)
+    _get_first_certificate_from_x509_file(module, pem_certificate_file, tmp_certificate, openssl_bin)
     dgst_cmd = [
-        "openssl",
+        openssl_bin,
         "dgst",
         "-r",
         "-sha256",
@@ -455,6 +456,9 @@ def main():
     keystore_type = module.params.get('keystore_type')
     executable = module.params.get('executable')
     state = module.params.get('state')
+
+    # openssl dependency resolution
+    openssl_bin = module.get_bin_path('openssl', True)
 
     if path and not cert_alias:
         module.fail_json(changed=False,
