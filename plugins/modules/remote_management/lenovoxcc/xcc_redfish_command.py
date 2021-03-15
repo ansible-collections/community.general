@@ -76,13 +76,13 @@ options:
         description:
           - Indicates if the image is treated as inserted on command completion.
         type: bool
-        default: True
+        default: true
       write_protected:
         required: false
         description:
           - Indicates if the media is treated as write-protected.
         type: bool
-        default: True
+        default: true
       username:
         required: false
         description:
