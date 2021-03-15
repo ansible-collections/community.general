@@ -224,10 +224,39 @@ EXAMPLES = '''
 
 RETURN = '''
 msg:
-    description: different results depending on task
-    returned: always
+    description: A message related to the performed action(s).
+    returned: when failure or action/update success
+    type: str
+    sample: "Action was successful"
+redfish_facts:
+    description: Resource content.
+    returned: when command == GetResource or command == GetCollectionResource
     type: dict
-    sample: "Action was successful" or list of Lenovo FoD key
+    sample: {
+        "data": {
+            "@odata.etag": "\"3179bf00d69f25a8b3c\"",
+            "@odata.id": "/redfish/v1/Managers/1/NetworkProtocol/Oem/Lenovo/DNS",
+            "@odata.type": "#LenovoDNS.v1_0_0.LenovoDNS",
+            "DDNS": [
+                {
+                    "DDNSEnable": true,
+                    "DomainName": "",
+                    "DomainNameSource": "DHCP"
+                }
+            ],
+            "DNSEnable": true,
+            "Description": "This resource is used to represent a DNS resource for a Redfish implementation.",
+            "IPv4Address1": "10.103.62.178",
+            "IPv4Address2": "0.0.0.0",
+            "IPv4Address3": "0.0.0.0",
+            "IPv6Address1": "::",
+            "IPv6Address2": "::",
+            "IPv6Address3": "::",
+            "Id": "LenovoDNS",
+            "PreferredAddresstype": "IPv4"
+        },
+        "ret": true
+    }
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -319,7 +348,7 @@ class xcc_RedfishUtils(RedfishUtils):
     def virtual_media_eject(self, options):
         if options:
             image_url = options.get('image_url')
-            if image_url:# eject specified one media
+            if image_url: #eject specified one media
                 return self.virtual_media_eject_one(image_url)
 
         # eject all inserted media when no image_url specified
@@ -552,8 +581,7 @@ def main():
 
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
-    rf_utils = xcc_RedfishUtils(
-            creds, root_uri, timeout, module, resource_id=resource_id, data_modification=True)
+    rf_utils = xcc_RedfishUtils(creds, root_uri, timeout, module, resource_id=resource_id, data_modification=True)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
@@ -594,7 +622,8 @@ def main():
             module.exit_json(redfish_facts=result)
         else:
             changed = result.get('changed', True)
-            module.exit_json(changed=changed, msg='Action was successful')
+            msg = result.get('msg', 'Action was successful')
+            module.exit_json(changed=changed, msg=msg)
     else:
         module.fail_json(msg=to_native(result['msg']))
 
