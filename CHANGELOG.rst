@@ -5,6 +5,65 @@ Community General Release Notes
 .. contents:: Topics
 
 
+v1.3.8
+======
+
+Release Summary
+---------------
+
+Security bugfix and regular bugfix release.
+
+Minor Changes
+-------------
+
+- bundler - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- consul - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- consul_acl - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- consul_session - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- datadog_monitor - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- oneandone_firewall_policy - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- oneandone_load_balancer - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- oneandone_monitoring_policy - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- oneandone_private_network - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- oneandone_server - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- profitbricks - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- profitbricks_volume - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- sensu_check - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- sensu_client - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- sensu_handler - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- webfaction_domain - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+- webfaction_site - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1885).
+
+Breaking Changes / Porting Guide
+--------------------------------
+
+- docker_swarm - if ``join_token`` is specified, a returned join token with the same value will be replaced by ``VALUE_SPECIFIED_IN_NO_LOG_PARAMETER``. Make sure that you do not blindly use the join tokens from the return value of this module when the module is invoked with ``join_token`` specified! This breaking change appears in a minor release since it is necessary to fix a security issue (https://github.com/ansible-collections/community.docker/pull/103).
+
+Security Fixes
+--------------
+
+- docker_swarm - the ``join_token`` option is now marked as ``no_log`` so it is no longer written into logs (https://github.com/ansible-collections/community.docker/pull/103).
+- na_cdot_user - mark the ``set_password`` parameter as ``no_log`` to avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/2018).
+- sf_account_manager - mark the ``initiator_secret`` and ``target_secret`` parameters as ``no_log`` to avoid leakage of secrets (https://github.com/ansible-collections/community.general/pull/2018).
+
+Bugfixes
+--------
+
+- Mark various module options with ``no_log=False`` which have a name that potentially could leak secrets, but which do not (https://github.com/ansible-collections/community.general/pull/2001).
+- bigpanda - actually use the ``deployment_message`` option (https://github.com/ansible-collections/community.general/pull/1928).
+- cloudforms inventory - fixed issue that non-existing (archived) VMs were synced (https://github.com/ansible-collections/community.general/pull/720).
+- docker_container - fix healthcheck disabling idempotency issue with strict comparison (https://github.com/ansible-collections/community.docker/issues/85).
+- docker_image - prevent module failure when removing image that is removed between inspection and removal (https://github.com/ansible-collections/community.docker/pull/87).
+- docker_image - prevent module failure when removing non-existant image by ID (https://github.com/ansible-collections/community.docker/pull/87).
+- docker_image_info - prevent module failure when image vanishes between listing and inspection (https://github.com/ansible-collections/community.docker/pull/87).
+- docker_image_info - prevent module failure when querying non-existant image by ID (https://github.com/ansible-collections/community.docker/pull/87).
+- nmcli - ensure the ``slave-type`` option is passed to ``nmcli`` for type ``bond-slave`` (https://github.com/ansible-collections/community.general/pull/1882).
+- proxmox - removed requirement that root password is provided when containter state is ``present`` (https://github.com/ansible-collections/community.general/pull/1999).
+- proxmox inventory - added handling of extra trailing slashes in the URL (https://github.com/ansible-collections/community.general/pull/1914).
+- proxmox inventory - exclude qemu templates from inclusion to the inventory via pools (https://github.com/ansible-collections/community.general/issues/1986, https://github.com/ansible-collections/community.general/pull/1991).
+- xfs_quota - the feedback for initializing project quota using xfs_quota binary from ``xfsprogs`` has changed since the version it was written for (https://github.com/ansible-collections/community.general/pull/1596).
+- zfs - some ZFS properties could be passed when the dataset/volume did not exist, but would fail if the dataset already existed, even if the property matched what was specified in the ansible task (https://github.com/ansible-collections/community.general/issues/868, https://github.com/ansible-collections/community.general/pull/1833).
+
 v1.3.7
 ======
 
