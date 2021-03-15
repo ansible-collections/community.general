@@ -83,7 +83,7 @@ options:
     description:
       - Defines action which can be either certificate import or removal.
       - When state is present, the certificate will always idempotently be inserted
-      - into the keystore, even if there already exists a cert alias that is different.
+        into the keystore, even if there already exists a cert alias that is different.
     type: str
     choices: [ absent, present ]
     default: present
@@ -170,7 +170,6 @@ cmd:
 '''
 
 import os
-import re
 import tempfile
 import random
 import string
@@ -179,7 +178,7 @@ import string
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.module_utils.six.moves.urllib.request import getproxies
-from re import search
+from re import search, sub
 
 
 def _get_keystore_type_keytool_parameters(keystore_type):
@@ -213,7 +212,6 @@ def _get_certificate_from_url(module, executable, url, port, pem_certificate_out
     remote_cert_pem_chain = _download_cert_url(module, executable, url, port)
     with open(pem_certificate_output, 'w') as f:
         f.write(remote_cert_pem_chain)
-        f.close()
 
 
 def _get_first_certificate_from_x509_file(module, pem_certificate_file, pem_certificate_output, openssl_bin):
@@ -284,7 +282,6 @@ def _export_public_cert_from_pkcs12(module, pkcs_file, alias, password, dest):
 
     with open(dest, 'w') as f:
         f.write(export_stdout)
-        f.close()
 
 
 def get_proxy_settings(scheme='https'):
@@ -314,7 +311,7 @@ def build_proxy_options():
             # For Java's nonProxyHosts property, items are separated by '|',
             # and patterns have to start with "*".
             non_proxy_hosts = no_proxy.replace(',', '|')
-            non_proxy_hosts = re.sub(r'(^|\|)\.', r'\1*.', non_proxy_hosts)
+            non_proxy_hosts = sub(r'(^|\|)\.', r'\1*.', non_proxy_hosts)
 
             # The property name is http.nonProxyHosts, there is no
             # separate setting for HTTPS.
@@ -492,7 +489,6 @@ def main():
         if alias_exists:
             with open(old_certificate, "w") as f:
                 f.write(alias_exists_output)
-                f.close()
             keystore_cert_digest = _get_digest_from_x509_file(module, old_certificate, openssl_bin)
 
         else:

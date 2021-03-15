@@ -1,7 +1,7 @@
 minor_changes:
-  - "Java_cert: Change `state: present` to check certificates by hash, not just alias name (https://github.com/ansible/ansible/issues/43249)"
-  - "Java_cert: cosmetic - modify run_command indentations"
-  - "Java_cert: remove password from run_command arguments as suggested by @felixfontein (https://github.com/ansible-collections/community.general/pull/2008)"
+  - "Java_cert: Change ``state: present`` to check certificates by hash, not just alias name (https://github.com/ansible/ansible/issues/43249)"
 bugfixes:
-  - "Java_cert: Allow setting `state: absent` by providing just the cert_alias - (https://github.com/ansible/ansible/issues/27982)"
+  - "Java_cert: Allow setting ``state: absent`` by providing just the cert_alias - (https://github.com/ansible/ansible/issues/27982)"
   - "Java_cert: Properly handle proxy arguments when the scheme is provided - (https://github.com/ansible/ansible/issues/54481)"
+security_fixes:
+  - "java_cert - remove password from ``run_command`` arguments (https://github.com/ansible-collections/community.general/pull/2008)."
