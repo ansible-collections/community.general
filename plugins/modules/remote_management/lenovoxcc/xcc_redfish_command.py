@@ -22,96 +22,96 @@ options:
   category:
     required: true
     description:
-      - Category to execute on OOB controller
+      - Category to execute on OOB controller.
     type: str
   command:
     required: true
     description:
-      - List of commands to execute on OOB controller
+      - List of commands to execute on OOB controller.
     type: list
   baseuri:
     required: true
     description:
-      - Base URI of OOB controller
+      - Base URI of OOB controller.
     type: str
   username:
     required: true
     description:
-      - Username for authentication with OOB controller
+      - Username for authentication with OOB controller.
     type: str
   password:
     required: true
     description:
-      - Password for authentication with OOB controller
+      - Password for authentication with OOB controller.
     type: str
   timeout:
     description:
-      - Timeout in seconds for URL requests to OOB controller
+      - Timeout in seconds for URL requests to OOB controller.
     default: 10
     type: int
   resource_id:
     required: false
     description:
-      - The ID of the System, Manager or Chassis to modify
+      - The ID of the System, Manager or Chassis to modify.
     type: str
   virtual_media:
     required: false
     description:
-      - The options for VirtualMedia commands
+      - The options for VirtualMedia commands.
     type: dict
     suboptions:
       media_types:
         required: false
         description:
-          - The list of media types appropriate for the image
+          - The list of media types appropriate for the image.
         type: list
         elements: str
       image_url:
         required: false
         description:
-          - The URL of the image to insert or eject
+          - The URL of the image to insert or eject.
         type: str
       inserted:
         required: false
         description:
-          - Indicates if the image is treated as inserted on command completion
+          - Indicates if the image is treated as inserted on command completion.
         type: bool
         default: True
       write_protected:
         required: false
         description:
-          - Indicates if the media is treated as write-protected
+          - Indicates if the media is treated as write-protected.
         type: bool
         default: True
       username:
         required: false
         description:
-          - The username for accessing the image URL
+          - The username for accessing the image URL.
         type: str
       password:
         required: false
         description:
-          - The password for accessing the image URL
+          - The password for accessing the image URL.
         type: str
       transfer_protocol_type:
         required: false
         description:
-          - The network protocol to use with the image
+          - The network protocol to use with the image.
         type: str
       transfer_method:
         required: false
         description:
-          - The transfer method to use with the image
+          - The transfer method to use with the image.
         type: str
   resource_uri:
     required: false
     description:
-      - The resource uri to get or patch or post
+      - The resource uri to get or patch or post.
     type: str
   request_body:
     required: false
     description:
-      - The request body to patch or post
+      - The request body to patch or post.
     type: dict
 
 author: "Yuyan Pan (@panyy3)"
