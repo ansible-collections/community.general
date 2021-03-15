@@ -10,7 +10,7 @@ DOCUMENTATION = '''
 ---
 module: xcc_redfish_command
 short_description: Manages Lenovo Out-Of-Band controllers using Redfish APIs
-version_added: 2.2.0
+version_added: 2.3.0
 description:
   - Builds Redfish URIs locally and sends them to remote OOB controllers to
     perform an action or get information back or update a configuration attribute.
