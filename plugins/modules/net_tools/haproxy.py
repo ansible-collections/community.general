@@ -413,7 +413,7 @@ class HAProxy(object):
         """
         haproxy_version = self.discover_version()
 
-        # check if haproxy version suppots DRAIN state (starting with 1.5)
+        # check if haproxy version supports DRAIN state (starting with 1.5)
         if haproxy_version and (1, 5) <= haproxy_version:
             cmd = "set server $pxname/$svname state drain"
             self.execute_for_backends(cmd, backend, host, "DRAIN")
@@ -427,7 +427,7 @@ class HAProxy(object):
         # Get the state before the run
         self.command_results['state_before'] = self.get_state_for(self.backend, self.host)
 
-        # toggle enable/disbale server
+        # toggle enable/disable server
         if self.state == 'enabled':
             self.enabled(self.host, self.backend, self.weight)
         elif self.state == 'disabled' and self._drain:
