@@ -493,7 +493,7 @@ def main():
             with open(old_certificate, "w") as f:
                 f.write(alias_exists_output)
                 f.close()
-            keystore_cert_digest = _get_digest_from_x509_file(module, old_certificate)
+            keystore_cert_digest = _get_digest_from_x509_file(module, old_certificate, openssl_bin)
 
         else:
             keystore_cert_digest = ''
@@ -512,7 +512,7 @@ def main():
             # to download the cert first
             _get_certificate_from_url(module, executable, url, port, new_certificate)
 
-        new_cert_digest = _get_digest_from_x509_file(module, new_certificate)
+        new_cert_digest = _get_digest_from_x509_file(module, new_certificate, openssl_bin)
 
         if keystore_cert_digest != new_cert_digest:
 
