@@ -425,6 +425,14 @@ options:
         option has a default of C(no). Note that the default value of I(proxmox_default_behavior)
         changes in community.general 4.0.0.
     type: bool
+  tags:
+    description:
+      - List of tags to apply to the VM instance.
+      - Tags must start with C([a-z0-9_]) followed by zero or more of the following characters C([a-z0-9_-+.]).
+      - Tags are only available in Proxmox 6+.
+    type: list
+    elements: str
+    version_added: 2.3.0
   target:
     description:
       - Target node. Only allowed if the original VM is on shared storage.
@@ -858,7 +866,7 @@ def wait_for_task(module, proxmox, node, taskid):
 def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sockets, update, **kwargs):
     # Available only in PVE 4
     only_v4 = ['force', 'protection', 'skiplock']
-    only_v6 = ['ciuser', 'cipassword', 'sshkeys', 'ipconfig']
+    only_v6 = ['ciuser', 'cipassword', 'sshkeys', 'ipconfig', 'tags']
 
     # valide clone parameters
     valid_clone_params = ['format', 'full', 'pool', 'snapname', 'storage', 'target']
@@ -927,6 +935,13 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
         searchdomains = module.params.pop('searchdomains')
         if searchdomains:
             kwargs['searchdomain'] = ' '.join(searchdomains)
+
+    # VM tags are expected to be valid and presented as a comma/semi-colon delimited string
+    if 'tags' in kwargs:
+        for tag in kwargs['tags']:
+            if not re.match(r'^[a-z0-9_][a-z0-9_\-\+\.]*$', tag):
+                module.fail_json(msg='%s is not a valid tag' % tag)
+        kwargs['tags'] = ",".join(kwargs['tags'])
 
     # -args and skiplock require root@pam user - but can not use api tokens
     if module.params['api_user'] == "root@pam" and module.params['args'] is None:
@@ -1063,6 +1078,7 @@ def main():
             state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted', 'current']),
             storage=dict(type='str'),
             tablet=dict(type='bool'),
+            tags=dict(type='list', elements='str'),
             target=dict(type='str'),
             tdf=dict(type='bool'),
             template=dict(type='bool'),
@@ -1267,6 +1283,7 @@ def main():
                       startdate=module.params['startdate'],
                       startup=module.params['startup'],
                       tablet=module.params['tablet'],
+                      tags=module.params['tags'],
                       target=module.params['target'],
                       tdf=module.params['tdf'],
                       template=module.params['template'],
