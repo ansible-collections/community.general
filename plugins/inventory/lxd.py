@@ -116,7 +116,7 @@ groups:
   SMB-Server:
     type: pattern
     attribute: samba
-  vlan666: 
+  vlan666:
     type: vlanid
     attribute: 666
 '''
@@ -253,7 +253,8 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             None"""
         error_storage = {}
-        urls = (url for url in [self.get_option('url'), self.SNAP_SOCKET_URL, self.SOCKET_URL] if self.validate_url(url))
+        url_list = [self.get_option('url'), self.SNAP_SOCKET_URL, self.SOCKET_URL]
+        urls = (url for url in url_list if self.validate_url(url))
         for url in urls:
             try:
                 socket_connection = LXDClient(url, self.client_key, self.client_cert, self.debug)
@@ -285,7 +286,7 @@ class InventoryModule(BaseInventoryPlugin):
         #       'metadata': ['/1.0/networks/lxdbr0']}
         names = []
         for index in network_configs['metadata']:
-            #e.g. ['', '1.0', 'networks', 'lxdbr0']
+            # e.g. ['', '1.0', 'networks', 'lxdbr0']
             names.append(index.split('/')[3])
         return names
 
@@ -312,7 +313,7 @@ class InventoryModule(BaseInventoryPlugin):
         containers = self.socket.do('GET', '/1.0/containers')
         names = []
         for index in containers['metadata']:
-            #e.g. ['', '1.0', 'containers', 'udemy-ansible-ubuntu-2004']
+            # e.g. ['', '1.0', 'containers', 'udemy-ansible-ubuntu-2004']
             names.append(index.split('/')[3])
         return names
 
@@ -333,10 +334,10 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             dict(config): Config of the container"""
         config = {}
-        if isinstance(branch,tuple):
-            config[name] = {branch[1] : self.socket.do('GET', '/1.0/{0}/{1}/{2}'.format(to_native(branch[0]),to_native(name),to_native(branch[1])))}
+        if isinstance(branch, tuple):
+            config[name] = {branch[1]: self.socket.do('GET', '/1.0/{0}/{1}/{2}'.format(to_native(branch[0]), to_native(name), to_native(branch[1])))} # noqa
         else:
-            config[name] = {branch : self.socket.do('GET', '/1.0/{0}/{1}'.format(to_native(branch),to_native(name)))}
+            config[name] = {branch: self.socket.do('GET', '/1.0/{0}/{1}'.format(to_native(branch), to_native(name)))}
         return config
 
     def _merge_dicts(self, source, destination):
@@ -375,8 +376,9 @@ class InventoryModule(BaseInventoryPlugin):
             None
         Returns:
             None"""
-        # tuple(('instances','metadata/templates')) to get section in branch e.g. /1.0/instances/<name>/metadata/templates
-        branches = ['containers', ('instances','state')]
+        # tuple(('instances','metadata/templates')) to get section in branch
+        # e.g. /1.0/instances/<name>/metadata/templates
+        branches = ['containers', ('instances', 'state')]
         container_config = {}
         for branch in branches:
             for name in names:
@@ -396,8 +398,9 @@ class InventoryModule(BaseInventoryPlugin):
             None
         Returns:
             None"""
-        # tuple(('instances','metadata/templates')) to get section in branch e.g. /1.0/instances/<name>/metadata/templates
-        branches = [('networks','state')]
+        # tuple(('instances','metadata/templates')) to get section in branch
+        # e.g. /1.0/instances/<name>/metadata/templates
+        branches = [('networks', 'state')]
         network_config = {}
         for branch in branches:
             for name in names:
@@ -451,11 +454,11 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             str(prefered_interface): None or interface name"""
         container_network_interfaces = self._get_data_entry('inventory/{0}/network_interfaces'.format(container_name))
-        prefered_interface = None # init
-        if container_network_interfaces: # container have network interfaces
+        prefered_interface = None  # init
+        if container_network_interfaces:  # container have network interfaces
             # generator if interfases which start with the desired pattern
             net_generaor = [interface for interface in container_network_interfaces if interface.startswith(self.prefered_container_network_interface)]
-            selected_interfaces = [] # init
+            selected_interfaces = []  # init
             for interface in net_generaor:
                 selected_interfaces.append(interface)
             if len(selected_interfaces) > 0:
@@ -517,10 +520,10 @@ class InventoryModule(BaseInventoryPlugin):
             if delimiter in path:
                 path = path.split(delimiter)
 
-            if isinstance(path, list) and len(path)>1:
+            if isinstance(path, list) and len(path) > 1:
                 data = data[path.pop(0)]
                 path = delimiter.join(path)
-                return self._get_data_entry(path, data, delimiter) #recursion
+                return self._get_data_entry(path, data, delimiter)  # recursion
             return data[path]
         except KeyError:
             return None
@@ -543,7 +546,7 @@ class InventoryModule(BaseInventoryPlugin):
             None"""
         if not path:
             path = self.data['inventory']
-        if not container_name in path:
+        if container_name not in path:
             path[container_name] = {}
 
         try:
@@ -614,7 +617,7 @@ class InventoryModule(BaseInventoryPlugin):
                 None
             Returns:
                 dict(interface_name: ip)"""
-            prefered_interface = self._get_data_entry('inventory/{0}/preferred_interface'.format(container_name)) # name or None
+            prefered_interface = self._get_data_entry('inventory/{0}/preferred_interface'.format(container_name))  # name or None
             prefered_container_network_family = self.prefered_container_network_family
 
             ip_address = ''
@@ -632,8 +635,8 @@ class InventoryModule(BaseInventoryPlugin):
                         break
             return ip_address
 
-        if self._get_data_entry('inventory/{0}/network_interfaces'.format(container_name)): # container have network interfaces
-            if self._get_data_entry('inventory/{0}/preferred_interface'.format(container_name)): # container have a preferred interface
+        if self._get_data_entry('inventory/{0}/network_interfaces'.format(container_name)):  # container have network interfaces
+            if self._get_data_entry('inventory/{0}/preferred_interface'.format(container_name)):  # container have a preferred interface
                 self.inventory.set_variable(container_name, 'ansible_connection', 'ssh')
                 self.inventory.set_variable(container_name, 'ansible_host', interface_selection(container_name))
         else:
@@ -667,7 +670,7 @@ class InventoryModule(BaseInventoryPlugin):
             # add state
             self.inventory.set_variable(container_name, 'ansible_lxd_state', self._get_data_entry('inventory/{0}/state'.format(container_name)).lower())
             # add location information
-            if self._get_data_entry('inventory/{0}/location'.format(container_name)) != "none": # wrong type by lxd 'none' != 'None'
+            if self._get_data_entry('inventory/{0}/location'.format(container_name)) != "none":  # wrong type by lxd 'none' != 'None'
                 self.inventory.set_variable(container_name, 'ansible_lxd_location', self._get_data_entry('inventory/{0}/location'.format(container_name)))
             # add VLAN_ID information
             if self._get_data_entry('inventory/{0}/vlan_ids'.format(container_name)):
@@ -685,7 +688,7 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             None"""
         # maybe we just want to expand one group
-        if not group_name in self.inventory.groups:
+        if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
         for container_name in self.data['inventory'].keys():
@@ -704,7 +707,7 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             None"""
         # maybe we just want to expand one group
-        if not group_name in self.inventory.groups:
+        if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
         regex_pattern = self.groups[group_name].get('attribute')
@@ -820,7 +823,7 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             None"""
         # maybe we just want to expand one group
-        if not group_name in self.inventory.groups:
+        if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
         for container_name in self.data['inventory'].keys():
@@ -846,7 +849,7 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             None"""
         # maybe we just want to expand one group
-        if not group_name in self.inventory.groups:
+        if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
         gen_containers = [container_name for container_name in self.data['inventory'].keys() if 'ansible_lxd_os' in self.inventory.get_host(container_name).get_vars().keys()]
@@ -866,7 +869,7 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             None"""
         # maybe we just want to expand one group
-        if not group_name in self.inventory.groups:
+        if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
         gen_containers = [container_name for container_name in self.data['inventory'].keys() if 'ansible_lxd_release' in self.inventory.get_host(container_name).get_vars().keys()]
@@ -886,7 +889,7 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             None"""
         # maybe we just want to expand one group
-        if not group_name in self.inventory.groups:
+        if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
         gen_containers = [container_name for container_name in self.data['inventory'].keys() if 'ansible_lxd_profile' in self.inventory.get_host(container_name).get_vars().keys()]
@@ -906,7 +909,7 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             None"""
         # maybe we just want to expand one group
-        if not group_name in self.inventory.groups:
+        if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
         gen_containers = [container_name for container_name in self.data['inventory'].keys() if 'ansible_lxd_vlan_ids' in self.inventory.get_host(container_name).get_vars().keys()]
@@ -1042,7 +1045,7 @@ class InventoryModule(BaseInventoryPlugin):
             self.client_key = self.get_option('client_key')
             self.client_cert = self.get_option('client_cert')
             self.debug = self.DEBUG
-            self.data = {} # store for inventory-data
+            self.data = {}  # store for inventory-data
             self.dump_data = self.get_option('dumpdata')
             self.groups = self.get_option('groups')
             self.plugin = self.get_option('plugin')
@@ -1054,6 +1057,6 @@ class InventoryModule(BaseInventoryPlugin):
             self.url = self.get_option('url')
         except Exception as err:
             raise AnsibleParserError(
-                'All correct options required: {0}'.format(to_native(err)))
+                'All correct options required: {0}'.format(to_native(err))) from Exception
         # Call our internal helper to populate the dynamic inventory
         self._populate()
