@@ -1,6 +1,4 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 # Copyright: (c) 2021, Frank Dornheim <dornheim@posteo.de>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -236,7 +234,7 @@ class InventoryModule(BaseInventoryPlugin):
         if not isinstance(url, str):
             return False
         if not url.startswith(('unix:', 'https:')):
-            raise AnsibleError('URL is malformed: {}'.format(to_native(url)))
+            raise AnsibleError('URL is malformed: {0}'.format(to_native(url)))
         return True
 
     def _connect_to_socket(self):
@@ -261,7 +259,7 @@ class InventoryModule(BaseInventoryPlugin):
                 return socket_connection
             except LXDClientException as err:
                 error_storage[url] = err
-        raise AnsibleError('No connection to the socket: {}'.format(to_native(error_storage)))
+        raise AnsibleError('No connection to the socket: {0}'.format(to_native(error_storage)))
 
     def _get_networks(self):
         """Get Networknames
@@ -335,7 +333,7 @@ class InventoryModule(BaseInventoryPlugin):
             dict(config): Config of the container"""
         config = {}
         if isinstance(branch, tuple):
-            config[name] = {branch[1]: self.socket.do('GET', '/1.0/{0}/{1}/{2}'.format(to_native(branch[0]), to_native(name), to_native(branch[1])))} # noqa
+            config[name] = {branch[1]: self.socket.do('GET', '/1.0/{0}/{1}/{2}'.format(to_native(branch[0]), to_native(name), to_native(branch[1])))}
         else:
             config[name] = {branch: self.socket.do('GET', '/1.0/{0}/{1}'.format(to_native(branch), to_native(name)))}
         return config
@@ -1029,7 +1027,7 @@ class InventoryModule(BaseInventoryPlugin):
             str(inventory): inventory object with existing data and
                             the methods to add hosts/groups/variables
                             to inventory
-            str(loader):    Ansible’s DataLoader
+            str(loader):    Ansible's DataLoader
             str(path):      path to the config
             bool(cache):    use or avoid caches
         Kwargs:
@@ -1038,7 +1036,7 @@ class InventoryModule(BaseInventoryPlugin):
             AnsibleParseError
         Returns:
             None"""
-        super(InventoryModule, self).parse(inventory, loader, path, cache = False)
+        super(InventoryModule, self).parse(inventory, loader, path, cache=False)
         # Read the inventory YAML file
         self._read_config_data(path)
         try:
