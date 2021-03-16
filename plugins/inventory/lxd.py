@@ -121,7 +121,12 @@ groups:
     attribute: 666
 '''
 
-import binascii, json, re, time, os, socket
+import binascii
+import json
+import re
+import time
+import os
+import socket
 from ansible.plugins.inventory import BaseInventoryPlugin
 from ansible.module_utils._text import to_native
 from ansible.errors import AnsibleError, AnsibleParserError
@@ -135,7 +140,8 @@ class InventoryModule(BaseInventoryPlugin):
     SOCKET_URL = 'unix:/var/lib/lxd/unix.socket'
     TEST_PATH = ['test']
 
-    def load_json_data(self, path, file_name=None):
+    @staticmethod
+    def load_json_data(path, file_name=None):
         """Load json data
 
         Load json data from file
@@ -159,9 +165,9 @@ class InventoryModule(BaseInventoryPlugin):
             cwd = os.path.abspath(os.path.dirname(__file__))
             with open(os.path.abspath(os.path.join(cwd, *path)), 'r') as json_file:
                 return json.load(json_file)
-        except IOError as e:
-            raise AnsibleParserError('Could not load the test data: {0}'.format(to_native(e)))
-    
+        except IOError as err:
+            raise AnsibleParserError('Could not load the test data: {0}'.format(to_native(err))) from IOError
+
     def save_json_data(self, path, file_name=None):
         """save data as json
 
@@ -189,8 +195,8 @@ class InventoryModule(BaseInventoryPlugin):
             cwd = os.path.abspath(os.path.dirname(__file__))
             with open(os.path.abspath(os.path.join(cwd, *path)), 'w') as json_file:
                 json.dump(self.data, json_file)
-        except IOError as e:
-            raise AnsibleParserError('Could not save data: {0}'.format(to_native(e)))
+        except IOError as err:
+            raise AnsibleParserError('Could not save data: {0}'.format(to_native(err))) from IOError
 
     def verify_file(self, path):
         """Check the config
@@ -213,10 +219,11 @@ class InventoryModule(BaseInventoryPlugin):
                 self.display.vvv('Inventory source not ending in "lxd.yaml" or "lxd.yml"')
         return valid
 
-    def validate_url(self, url):
+    @staticmethod
+    def validate_url(url):
         """validate url
 
-        check whether the url is correctly formatted 
+        check whether the url is correctly formatted
 
         Args:
             url
@@ -251,8 +258,8 @@ class InventoryModule(BaseInventoryPlugin):
             try:
                 socket_connection = LXDClient(url, self.client_key, self.client_cert, self.debug)
                 return socket_connection
-            except LXDClientException as e:
-                error_storage[url] = e
+            except LXDClientException as err:
+                error_storage[url] = err
         raise AnsibleError('No connection to the socket: {}'.format(to_native(error_storage)))
 
     def _get_networks(self):
@@ -269,7 +276,7 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             list(names): names of all network_configs"""
         network_configs = self.socket.do('GET', '/1.0/networks')
-        # e.g. {'type': 'sync', 
+        # e.g. {'type': 'sync',
         #       'status': 'Success',
         #       'status_code': 200,
         #       'operation': '',
@@ -375,7 +382,6 @@ class InventoryModule(BaseInventoryPlugin):
             for name in names:
                 container_config['containers'] = self._get_config(branch, name)
                 self.data = self._merge_dicts(container_config, self.data)
-        return
 
     def get_network_data(self, names):
         """Create Inventory of the container
@@ -397,10 +403,9 @@ class InventoryModule(BaseInventoryPlugin):
             for name in names:
                 try:
                     network_config['networks'] = self._get_config(branch, name)
-                except LXDClientException as e:
+                except LXDClientException:
                     network_config['networks'] = {name: None}
                 self.data = self._merge_dicts(network_config, self.data)
-        return
 
     def extract_network_information_from_container_config(self, container_name):
         """Returns the network interface configuration
@@ -408,7 +413,7 @@ class InventoryModule(BaseInventoryPlugin):
         Returns the network ipv4 and ipv6 config of the container without local-link
 
         Args:
-            str(container_name): Name oft he container 
+            str(container_name): Name oft he container
         Kwargs:
             None
         Raises:
@@ -440,7 +445,7 @@ class InventoryModule(BaseInventoryPlugin):
         Args:
             str(containe_name): name of container
         Kwargs:
-            None 
+            None
         Raises:
             None
         Returns:
@@ -465,15 +470,14 @@ class InventoryModule(BaseInventoryPlugin):
         Args:
             str(containe_name): name of container
         Kwargs:
-            None 
+            None
         Raises:
             None
         Returns:
             None"""
         # get network device configuration and store {network: vlan_id}
         network_vlans = {}
-        gen_networks = [network for network in self._get_data_entry('networks')]
-        for network in gen_networks:
+        for network in self._get_data_entry('networks'):
             if self._get_data_entry('state/metadata/vlan/vid', data=self.data['networks'].get(network)):
                 network_vlans[network] = self._get_data_entry('state/metadata/vlan/vid', data=self.data['networks'].get(network))
 
@@ -502,7 +506,7 @@ class InventoryModule(BaseInventoryPlugin):
             str(path): path to nested dict
         Kwargs:
             dict(data): datastore
-            str(delimiter): delimiter in Path. 
+            str(delimiter): delimiter in Path.
         Raises:
             None
         Returns:
@@ -518,7 +522,7 @@ class InventoryModule(BaseInventoryPlugin):
                 path = delimiter.join(path)
                 return self._get_data_entry(path, data, delimiter) #recursion
             return data[path]
-        except KeyError as e:
+        except KeyError:
             return None
 
     def _set_data_entry(self, container_name, key, value, path=None):
@@ -547,8 +551,8 @@ class InventoryModule(BaseInventoryPlugin):
                 path[container_name] = self._merge_dicts(value, path[container_name][key])
             else:
                 path[container_name][key] = value
-        except KeyError as e:
-            raise AnsibleParserError("Unable to store Informations: {0}".format(to_native(e)))
+        except KeyError as err:
+            raise AnsibleParserError("Unable to store Informations: {0}".format(to_native(err))) from KeyError
 
     def extract_information_from_container_configs(self):
         """Process configuration information
@@ -564,11 +568,10 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             None"""
         # create branch "inventory"
-        if not 'inventory' in self.data:
+        if 'inventory' not in self.data:
             self.data['inventory'] = {}
 
-        gen_containers = [container_name for container_name in self.data['containers'].keys()]
-        for container_name in gen_containers:
+        for container_name in self.data['containers'].keys():
             self._set_data_entry(container_name, 'os', self._get_data_entry('containers/{0}/containers/metadata/config/image.os'.format(container_name)))
             self._set_data_entry(container_name, 'release', self._get_data_entry('containers/{0}/containers/metadata/config/image.release'.format(container_name)))
             self._set_data_entry(container_name, 'version', self._get_data_entry('containers/{0}/containers/metadata/config/image.version'.format(container_name)))
@@ -617,15 +620,13 @@ class InventoryModule(BaseInventoryPlugin):
             ip_address = ''
             if prefered_interface:
                 interface = self._get_data_entry('inventory/{0}/network_interfaces/{1}'.format(container_name, prefered_interface))
-                gen_network_configurations = [net_config for net_config in interface]
-                for config in gen_network_configurations:
+                for config in interface:
                     if config['family'] == prefered_container_network_family:
                         ip_address = config['address']
                         break
             else:
                 interface = self._get_data_entry('inventory/{0}/network_interfaces'.format(container_name))
-                gen_network_configurations = [net_config for net_config in interface]
-                for config in gen_network_configurations:
+                for config in interface:
                     if config['family'] == prefered_container_network_family:
                         ip_address = config['address']
                         break
@@ -652,8 +653,7 @@ class InventoryModule(BaseInventoryPlugin):
             None
         Returns:
             None"""
-        gen_container = [container_name for container_name in self.data['inventory'].keys()]
-        for container_name in gen_container:
+        for container_name in self.data['inventory'].keys():
             # add container
             self.inventory.add_host(container_name)
             # add network informations
@@ -677,7 +677,7 @@ class InventoryModule(BaseInventoryPlugin):
         """create group by attribute: location
 
         Args:
-            str(group_name): Group name 
+            str(group_name): Group name
         Kwargs:
             None
         Raises:
@@ -688,8 +688,7 @@ class InventoryModule(BaseInventoryPlugin):
         if not group_name in self.inventory.groups:
             self.inventory.add_group(group_name)
 
-        gen_containers = [container_name for container_name in self.data['inventory'].keys()]
-        for container_name in gen_containers:
+        for container_name in self.data['inventory'].keys():
             if 'ansible_lxd_location' in self.inventory.get_host(container_name).get_vars().keys():
                 self.inventory.add_child(group_name, container_name)
 
@@ -697,7 +696,7 @@ class InventoryModule(BaseInventoryPlugin):
         """create group by name pattern
 
         Args:
-            str(group_name): Group name 
+            str(group_name): Group name
         Kwargs:
             None
         Raises:
@@ -708,10 +707,9 @@ class InventoryModule(BaseInventoryPlugin):
         if not group_name in self.inventory.groups:
             self.inventory.add_group(group_name)
 
-        gen_containers = [container_name for container_name in self.data['inventory'].keys()]
         regex_pattern = self.groups[group_name].get('attribute')
 
-        for container_name in gen_containers:
+        for container_name in self.data['inventory'].keys():
             result = re.search(regex_pattern, container_name)
             if result:
                 self.inventory.add_child(group_name, container_name)
@@ -719,7 +717,7 @@ class InventoryModule(BaseInventoryPlugin):
     def ip_in_subnetwork(self, ip_address, subnetwork):
         """Test if IP is in IP-Subnet.
 
-        Both IPv4 addresses/subnetworks (e.g. "192.168.178.99" and "192.168.1.0/24") and 
+        Both IPv4 addresses/subnetworks (e.g. "192.168.178.99" and "192.168.1.0/24") and
              IPv6 addresses/subnetworks (e.g. "fd42:bd00:7b11:2167:216:3eff:fe21:e86b" and "fd42:bd00:7b11:2167:216:3eff::/44") are accepted.
         Source: https://diego.assencio.com/?index=85e407d6c771ba2bc5f02b17714241e2
 
@@ -735,12 +733,13 @@ class InventoryModule(BaseInventoryPlugin):
                     Both parameters are strings."""
         (ip_integer, version1) = self.ip_to_integer(ip_address)
         (ip_lower, ip_upper, version2) = self.subnetwork_to_ip_range(subnetwork)
-    
+
         if version1 != version2:
             raise ValueError("incompatible IP versions")
-        return (ip_lower <= ip_integer <= ip_upper)
+        return ip_lower <= ip_integer <= ip_upper
 
-    def ip_to_integer(self, ip_address):
+    @staticmethod
+    def ip_to_integer(ip_address):
         """Converts an IP address
 
         Converts an IP address expressed as a string to its representation as an integer value and returns a tuple
@@ -763,11 +762,12 @@ class InventoryModule(BaseInventoryPlugin):
                 ip_hex = socket.inet_pton(version, ip_address)
                 ip_integer = int(binascii.hexlify(ip_hex), 16)
                 return (ip_integer, 4 if version == socket.AF_INET else 6)
-            except:
+            except Exception:
                 pass
         raise ValueError("invalid IP address")
 
-    def subnetwork_to_ip_range(self, subnetwork):
+    @staticmethod
+    def subnetwork_to_ip_range(subnetwork):
         """Returns the uper and lower ip representations of the IP-Subnet.
 
         Returns a tuple (ip_lower, ip_upper, version) containing the integer values of the lower and upper IP addresses respectively
@@ -789,7 +789,7 @@ class InventoryModule(BaseInventoryPlugin):
             fragments = subnetwork.split('/')
             network_prefix = fragments[0]
             netmask_len = int(fragments[1])
-    
+
             # try parsing the subnetwork first as IPv4, then as IPv6
             for version in (socket.AF_INET, socket.AF_INET6):
                 ip_len = 32 if version == socket.AF_INET else 128
@@ -802,9 +802,9 @@ class InventoryModule(BaseInventoryPlugin):
                     return (ip_lower,
                             ip_upper,
                             4 if version == socket.AF_INET else 6)
-                except:
+                except Exception:
                     pass
-        except:
+        except Exception:
             pass
         raise ValueError("invalid subnetwork")
 
@@ -812,7 +812,7 @@ class InventoryModule(BaseInventoryPlugin):
         """check if IP is in network-class
 
         Args:
-            str(group_name): Group name 
+            str(group_name): Group name
         Kwargs:
             None
         Raises:
@@ -823,16 +823,14 @@ class InventoryModule(BaseInventoryPlugin):
         if not group_name in self.inventory.groups:
             self.inventory.add_group(group_name)
 
-        gen_containers = [container_name for container_name in self.data['inventory'].keys()]
-
-        for container_name in gen_containers:
-            if self.data['inventory'][container_name].get('network_interfaces') != None:
+        for container_name in self.data['inventory'].keys():
+            if self.data['inventory'][container_name].get('network_interfaces') is not None:
                 for interface in self.data['inventory'][container_name].get('network_interfaces'):
                     for interface_family in self.data['inventory'][container_name].get('network_interfaces')[interface]:
                         try:
                             if self.ip_in_subnetwork(interface_family['address'], self.groups[group_name].get('attribute')):
                                 self.inventory.add_child(group_name, container_name)
-                        except ValueError as e:
+                        except ValueError:
                             # catch ipv4/ipv6 matching incompatibility errors
                             continue
 
@@ -840,7 +838,7 @@ class InventoryModule(BaseInventoryPlugin):
         """create group by attribute: os
 
         Args:
-            str(group_name): Group name 
+            str(group_name): Group name
         Kwargs:
             Noneself.data['inventory'][container_name][interface]
         Raises:
@@ -854,13 +852,13 @@ class InventoryModule(BaseInventoryPlugin):
         gen_containers = [container_name for container_name in self.data['inventory'].keys() if 'ansible_lxd_os' in self.inventory.get_host(container_name).get_vars().keys()]
         for container_name in gen_containers:
             if self.groups[group_name].get('attribute').lower() == self.inventory.get_host(container_name).get_vars().get('ansible_lxd_os'):
-                self.inventory.add_child(group_name, container_name) 
+                self.inventory.add_child(group_name, container_name)
 
     def build_inventory_groups_release(self, group_name):
         """create group by attribute: release
 
         Args:
-            str(group_name): Group name 
+            str(group_name): Group name
         Kwargs:
             None
         Raises:
@@ -880,7 +878,7 @@ class InventoryModule(BaseInventoryPlugin):
         """create group by attribute: profile
 
         Args:
-            str(group_name): Group name 
+            str(group_name): Group name
         Kwargs:
             None
         Raises:
@@ -900,7 +898,7 @@ class InventoryModule(BaseInventoryPlugin):
         """create group by attribute: vlanid
 
         Args:
-            str(group_name): Group name 
+            str(group_name): Group name
         Kwargs:
             None
         Raises:
@@ -945,7 +943,7 @@ class InventoryModule(BaseInventoryPlugin):
                 * 'vlanid'
 
             Args:
-                str(group_name): Group name 
+                str(group_name): Group name
             Kwargs:
                 None
             Raises:
@@ -971,8 +969,7 @@ class InventoryModule(BaseInventoryPlugin):
             else:
                 raise AnsibleParserError('Unknown group type: {0}'.format(to_native(group_name)))
 
-        gen_groups = [group_name for group_name in self.groups.keys()]
-        for group_name in gen_groups:
+        for group_name in self.groups.keys():
             if not group_name.isalnum():
                 raise AnsibleParserError('Invalid character(s) in groupname: {0}'.format(to_native(group_name)))
             group_type(group_name)
@@ -1026,7 +1023,7 @@ class InventoryModule(BaseInventoryPlugin):
         Returns the processed inventory from the lxd import
 
         Args:
-            str(inventory): inventory object with existing data and 
+            str(inventory): inventory object with existing data and
                             the methods to add hosts/groups/variables
                             to inventory
             str(loader):    Ansible’s DataLoader
@@ -1055,8 +1052,8 @@ class InventoryModule(BaseInventoryPlugin):
             self.filter = self.get_option('state')
             self.trust_password = self.get_option('trust_password')
             self.url = self.get_option('url')
-        except Exception as e:
+        except Exception as err:
             raise AnsibleParserError(
-                'All correct options required: {0}'.format(to_native(e)))
+                'All correct options required: {0}'.format(to_native(err)))
         # Call our internal helper to populate the dynamic inventory
         self._populate()
