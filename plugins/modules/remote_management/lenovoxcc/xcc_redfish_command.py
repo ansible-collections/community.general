@@ -396,13 +396,9 @@ class xcc_RedfishUtils(RedfishUtils):
         response = self.get_request(self.root_uri + resource_uri)
         if response['ret'] is False:
             return response
+        if 'Members' not in response['data']:
+            return {'ret': False, 'msg': "Specified resource_uri doesn't have Members property"}
         member_list = [i['@odata.id'] for i in response['data'].get('Members', [])]
-
-        # return False if no Members property or Members array is empty
-        if not member_list:
-            return {
-                'ret': False,
-                'msg': "Members array is either empty or missing"}
 
         # get member resource one by one
         data_list = []
