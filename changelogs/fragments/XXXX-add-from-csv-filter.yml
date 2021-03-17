@@ -1,4 +1,0 @@
----
-add plugin.filter:
-  - name: from_csv
-    description: Converts csv text input into list of dicts
