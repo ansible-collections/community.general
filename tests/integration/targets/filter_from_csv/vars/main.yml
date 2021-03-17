@@ -22,5 +22,5 @@ expected_result:
     name: foo
     role: bar
   - id: '2'
-    name: bar 
+    name: bar
     role: baz

@@ -25,7 +25,7 @@
     that:
       - "valid_pipe_separated | community.general.from_csv(delimiter='|')  ==  expected_result"
       - "valid_pipe_separated | community.general.from_csv  !=  expected_result"
- 
+
 - name: Register result of invalid csv input when strict=False
   debug:
     var: "invalid_comma_separated | community.general.from_csv"
@@ -45,5 +45,5 @@
 - name: Test invalid csv input when strict=True is failed
   assert:
     that:
-      - _invalid_csv_strict_true is failed 
+      - _invalid_csv_strict_true is failed
       - _invalid_csv_strict_true.msg is match('Unable to process file:.*')
