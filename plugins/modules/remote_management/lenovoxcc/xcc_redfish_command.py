@@ -415,6 +415,8 @@ class xcc_RedfishUtils(RedfishUtils):
     def raw_patch_resource(self, resource_uri, request_body):
         if resource_uri is None:
             return {'ret': False, 'msg': "resource_uri is missing"}
+        if request_body is None:
+            return {'ret': False, 'msg': "request_body is missing"}
         # check whether resource_uri existing or not
         response = self.get_request(self.root_uri + resource_uri)
         if response['ret'] is False:
@@ -446,6 +448,8 @@ class xcc_RedfishUtils(RedfishUtils):
             return {'ret': False, 'msg': "resource_uri is missing"}
         if '/Actions/' not in resource_uri:
             return {'ret': False, 'msg': "Bad uri %s. Keyword /Actions/ should be included in uri" % resource_uri}
+        if request_body is None:
+            return {'ret': False, 'msg': "request_body is missing"}
         # get action base uri data for further checking
         action_base_uri = resource_uri.split('/Actions/')[0]
         response = self.get_request(self.root_uri + action_base_uri)
