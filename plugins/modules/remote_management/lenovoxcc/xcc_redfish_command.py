@@ -433,10 +433,9 @@ class xcc_RedfishUtils(RedfishUtils):
             return response
 
         # check whether changed or not
-        response = self.get_request(self.root_uri + resource_uri)
-        if response['ret'] is False:
-            return response
-        current_etag = response['data']['@odata.etag']
+        current_etag = ''
+        if 'data' in response and '@odata.etag' in response['data']:
+            current_etag = response['data']['@odata.etag']
         if current_etag != original_etag:
             return {'ret': True, 'changed': True}
         else:
