@@ -9,7 +9,10 @@ __metaclass__ = type
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils._text import to_native
-from ansible_collections.community.general.plugins.module_utils.csv import initialize_dialect, read_csv
+
+from ansible_collections.community.general.plugins.module_utils.csv import (initialize_dialect, read_csv, CSVError,
+                                                                            DialectNotAvailableError,
+                                                                            CustomDialectFailureError)
 
 
 def from_csv(data, dialect='excel', fieldnames=None, delimiter=None, skipinitialspace=None, strict=None):
@@ -22,8 +25,8 @@ def from_csv(data, dialect='excel', fieldnames=None, delimiter=None, skipinitial
 
     try:
         dialect = initialize_dialect(dialect, **dialect_params)
-    except Exception as e:
-        raise AnsibleFilterError(e.message)
+    except (CustomDialectFailureError, DialectNotAvailableError) as e:
+        raise AnsibleFilterError(to_native(e))
 
     reader = read_csv(data, dialect, fieldnames)
 
@@ -32,7 +35,7 @@ def from_csv(data, dialect='excel', fieldnames=None, delimiter=None, skipinitial
     try:
         for row in reader:
             data_list.append(row)
-    except Exception as e:
+    except CSVError as e:
         raise AnsibleFilterError("Unable to process file: %s" % to_native(e))
 
     return data_list

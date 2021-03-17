@@ -14,12 +14,15 @@ from ansible.module_utils._text import to_native
 from ansible.module_utils.six import PY3
 
 
+class CustomDialectFailureError(Exception):
+    pass
+
+
 class DialectNotAvailableError(Exception):
     pass
 
 
-class CustomDialectFailureError(Exception):
-    pass
+CSVError = csv.Error
 
 
 def initialize_dialect(dialect, **kwargs):
@@ -36,7 +39,7 @@ def initialize_dialect(dialect, **kwargs):
     csv.register_dialect("unix", unix_dialect)
 
     if dialect not in csv.list_dialects():
-        raise DialectNotAvailableError(dialect)
+        raise DialectNotAvailableError("Dialect '%s' is not supported by your version of python." % dialect)
 
     # Create a dictionary from only set options
     dialect_params = dict((k, v) for k, v in kwargs.items() if v is not None)
@@ -44,7 +47,7 @@ def initialize_dialect(dialect, **kwargs):
         try:
             csv.register_dialect('custom', dialect, **dialect_params)
         except TypeError as e:
-            raise CustomDialectFailureError(to_native(e))
+            raise CustomDialectFailureError("Unable to create custom dialect: %s" % to_native(e))
         dialect = 'custom'
 
     return dialect
