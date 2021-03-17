@@ -392,13 +392,13 @@ def ensure(module, client):
                 changed = True
                 if not module.check_mode:
                     for item in diff:
-                        client.sudorule_remove_runasuser(name=name,item=item)
+                        client.sudorule_remove_runasuser(name=name, item=item)
             diff = list(set(runasextusers) - set(ipa_sudorule_run_as_user))
             if len(diff) > 0:
                 changed = True
                 if not module.check_mode:
                     for item in diff:
-                        client.sudorule_add_runasuser(name=name,item=item)
+                        client.sudorule_add_runasuser(name=name, item=item)
 
         if user is not None:
             changed = category_changed(module, client, 'usercategory', ipa_sudorule) or changed
