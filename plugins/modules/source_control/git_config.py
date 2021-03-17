@@ -254,7 +254,7 @@ def main():
     elif unset and not out:
         module.exit_json(changed=False, msg='no setting to unset')
     else:
-        old_value = out.rstrip()
+        old_value = out.rstrip().strip("'")
         if old_value == new_value:
             module.exit_json(changed=False, msg="")
 
