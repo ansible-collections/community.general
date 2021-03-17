@@ -93,6 +93,8 @@ class ArgFormat(object):
             self.arg_format = (self.stars_deco(stars))(self.arg_format)
 
     def to_text(self, value):
+        if value is None:
+            return []
         func = self.arg_format
         return [str(p) for p in func(value)]
 
@@ -121,6 +123,7 @@ def module_fails_on_exception(func):
         except ModuleHelperException as e:
             if e.update_output:
                 self.update_output(e.update_output)
+            self.module.fail_json(changed=False, msg=e.msg, exception=traceback.format_exc(), output=self.output, vars=self.vars)
         except Exception as e:
             self.vars.msg = "Module failed with exception: {0}".format(str(e).strip())
             self.vars.exception = traceback.format_exc()
@@ -292,6 +295,10 @@ class CmdMixin(object):
 
         extra_params = extra_params or dict()
         cmd_args = list([self.command]) if isinstance(self.command, str) else list(self.command)
+        try:
+            cmd_args[0] = self.module.get_bin_path(cmd_args[0], required=True)
+        except ValueError:
+            pass
         param_list = params if params else self.module.params.keys()
 
         for param in param_list:
