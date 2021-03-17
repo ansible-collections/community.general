@@ -73,6 +73,7 @@ options:
       - List of external RunAs users
     type: list
     elements: str
+    version_added: 2.3.0
   runasusercategory:
     description:
     - RunAs User category the rule applies to.
