@@ -60,4 +60,4 @@
         - result_excl_params is failed
 
     - name: include extended test suite 
-      import_tasks: state_changed.yml
+      import_tasks: state_change.yml
