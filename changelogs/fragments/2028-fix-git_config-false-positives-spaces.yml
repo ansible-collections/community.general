@@ -1,3 +1,3 @@
 ---
 minor_changes:
-  - git_config - When the existing values have spaces, the step will report as changed only if the content changed
+  - git_config - when the existing values have spaces, the step will report as changed only if the content changed (https://github.com/ansible-collections/community.general/pull/2028).
