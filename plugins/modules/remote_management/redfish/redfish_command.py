@@ -46,10 +46,12 @@ options:
     description:
       - Security token for authentication with OOB controller
     type: str
+    version_added: 2.3.0
   session_uri:
     description:
       - URI of the session resource
     type: str
+    version_added: 2.3.0
   id:
     required: false
     aliases: [ account_id ]

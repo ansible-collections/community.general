@@ -45,6 +45,7 @@ options:
     description:
       - Security token for authentication with OOB controller
     type: str
+    version_added: 2.3.0
   bios_attributes:
     required: false
     description:

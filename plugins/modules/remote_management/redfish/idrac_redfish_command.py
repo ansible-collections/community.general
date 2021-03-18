@@ -44,6 +44,7 @@ options:
     description:
       - Security token for authentication with OOB controller
     type: str
+    version_added: 2.3.0
   timeout:
     description:
       - Timeout in seconds for URL requests to OOB controller
