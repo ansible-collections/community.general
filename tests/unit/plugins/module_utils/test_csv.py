@@ -86,7 +86,7 @@ VALID_CSV = [
     (
         'excel',
         {},
-        ['id','name','role'],
+        ['id', 'name', 'role'],
         "1,foo,bar\n2,bar,baz",
         [
             {
@@ -121,6 +121,7 @@ INVALID_DIALECT = [
     ),
 ]
 
+
 @pytest.mark.parametrize("dialect,dialect_params,fieldnames,data,expected", VALID_CSV)
 def test_valid_csv(data, dialect, dialect_params, fieldnames, expected):
     dialect = csv.initialize_dialect(dialect, **dialect_params)
@@ -128,13 +129,13 @@ def test_valid_csv(data, dialect, dialect_params, fieldnames, expected):
     result = True
 
     for idx, row in enumerate(reader):
-        for k,v in row.items():
-            print (k,v,expected[idx][k])
+        for k, v in row.items():
             if expected[idx][k] != v:
                 result = False
                 break
 
     assert result
+
 
 @pytest.mark.parametrize("dialect,dialect_params,fieldnames,data", INVALID_CSV)
 def test_invalid_csv(data, dialect, dialect_params, fieldnames):
@@ -149,6 +150,7 @@ def test_invalid_csv(data, dialect, dialect_params, fieldnames):
         result = True
 
     assert result
+
 
 @pytest.mark.parametrize("dialect,dialect_params,fieldnames,data", INVALID_DIALECT)
 def test_invalid_dialect(data, dialect, dialect_params, fieldnames):
