@@ -11,6 +11,7 @@ from ansible.module_utils import basic
 from ansible.module_utils._text import to_bytes
 import ansible_collections.community.general.plugins.modules.remote_management.lenovoxcc.xcc_redfish_command as module
 
+
 def set_module_args(args):
     """prepare arguments so that they will be picked up during module creation"""
     args = json.dumps({'ANSIBLE_MODULE_ARGS': args})
@@ -59,7 +60,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
         with self.assertRaises(AnsibleFailJson):
             set_module_args({})
             module.main()
- 
+
     def test_module_fail_when_unknown_category(self):
         with self.assertRaises(AnsibleFailJson):
             set_module_args({
@@ -70,7 +71,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 'password': 'PASSW0RD=21',
             })
             module.main()
- 
+
     def test_module_fail_when_unknown_command(self):
         with self.assertRaises(AnsibleFailJson):
             set_module_args({
@@ -103,7 +104,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
 
             with patch.object(module.xcc_RedfishUtils, 'virtual_media_insert') as mock_virtual_media_insert:
                 mock_virtual_media_insert.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
- 
+
                 with self.assertRaises(AnsibleExitJson) as result:
                     module.main()
 
@@ -124,7 +125,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
 
             with patch.object(module.xcc_RedfishUtils, 'virtual_media_eject') as mock_virtual_media_eject:
                 mock_virtual_media_eject.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
- 
+
                 with self.assertRaises(AnsibleExitJson) as result:
                     module.main()
 
@@ -196,7 +197,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
         })
 
         with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
-            mock_get_request.return_value = {'ret': True, 'data':{'teststr': 'xxxx'}}
+            mock_get_request.return_value = {'ret': True, 'data': {'teststr': 'xxxx'}}
 
             with self.assertRaises(AnsibleFailJson) as result:
                 module.main()
@@ -337,7 +338,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             mock_get_request.return_value = {'ret': True, 'data': {'teststr': 'xxxx', '@odata.etag': '27f6eb13fa1c28a2711'}}
 
             with patch.object(module.xcc_RedfishUtils, 'patch_request') as mock_patch_request:
-                mock_patch_request.return_value = {'ret': False, 'msg':'500 internal error'}
+                mock_patch_request.return_value = {'ret': False, 'msg': '500 internal error'}
 
                 with self.assertRaises(AnsibleFailJson) as result:
                     module.main()
@@ -372,24 +373,26 @@ class TestXCCRedfishCommand(unittest.TestCase):
         })
 
         with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
-            mock_get_request.return_value = {'ret': True,
-                'data': {'teststr': 'xxxx', '@odata.etag': '27f6eb13fa1c28a2711',
-                'Actions': {
-                    '#Bios.ChangePassword': {
-                        '@Redfish.ActionInfo': "/redfish/v1/Systems/1/Bios/ChangePasswordActionInfo",
-                        'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword",
-                        'title': "ChangePassword",
-                        'PasswordName@Redfish.AllowableValues': [
-                            "UefiAdminPassword",
-                            "UefiPowerOnPassword"
-                         ]
-                     },
-                     '#Bios.ResetBios': {
-                         'title': "ResetBios",
-                         'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
-                     }
-                 },
-                 }}
+            mock_get_request.return_value = {
+                'ret': True,
+                'data': {
+                    'Actions': {
+                        '#Bios.ChangePassword': {
+                            '@Redfish.ActionInfo': "/redfish/v1/Systems/1/Bios/ChangePasswordActionInfo",
+                            'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword",
+                            'title': "ChangePassword",
+                            'PasswordName@Redfish.AllowableValues': [
+                                "UefiAdminPassword",
+                                "UefiPowerOnPassword"
+                            ]
+                        },
+                        '#Bios.ResetBios': {
+                            'title': "ResetBios",
+                            'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
+                        }
+                    },
+                }
+            }
 
             with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': True}
@@ -408,24 +411,26 @@ class TestXCCRedfishCommand(unittest.TestCase):
         })
 
         with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
-            mock_get_request.return_value = {'ret': True,
-                'data': {'teststr': 'xxxx', '@odata.etag': '27f6eb13fa1c28a2711',
-                'Actions': {
-                    '#Bios.ChangePassword': {
-                        '@Redfish.ActionInfo': "/redfish/v1/Systems/1/Bios/ChangePasswordActionInfo",
-                        'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword",
-                        'title': "ChangePassword",
-                        'PasswordName@Redfish.AllowableValues': [
-                            "UefiAdminPassword",
-                            "UefiPowerOnPassword"
-                         ]
-                     },
-                     '#Bios.ResetBios': {
-                         'title': "ResetBios",
-                         'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
-                     }
-                 },
-                 }}
+            mock_get_request.return_value = {
+                'ret': True,
+                'data': {
+                    'Actions': {
+                        '#Bios.ChangePassword': {
+                            '@Redfish.ActionInfo': "/redfish/v1/Systems/1/Bios/ChangePasswordActionInfo",
+                            'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword",
+                            'title': "ChangePassword",
+                            'PasswordName@Redfish.AllowableValues': [
+                                "UefiAdminPassword",
+                                "UefiPowerOnPassword"
+                            ]
+                        },
+                        '#Bios.ResetBios': {
+                            'title': "ResetBios",
+                            'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
+                        }
+                    },
+                }
+            }
 
             with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': True}
@@ -444,24 +449,26 @@ class TestXCCRedfishCommand(unittest.TestCase):
         })
 
         with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
-            mock_get_request.return_value = {'ret': True,
-                'data': {'teststr': 'xxxx', '@odata.etag': '27f6eb13fa1c28a2711',
-                'Actions': {
-                    '#Bios.ChangePassword': {
-                        '@Redfish.ActionInfo': "/redfish/v1/Systems/1/Bios/ChangePasswordActionInfo",
-                        'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword",
-                        'title': "ChangePassword",
-                        'PasswordName@Redfish.AllowableValues': [
-                            "UefiAdminPassword",
-                            "UefiPowerOnPassword"
-                         ]
-                     },
-                     '#Bios.ResetBios': {
-                         'title': "ResetBios",
-                         'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
-                     }
-                 },
-                 }}
+            mock_get_request.return_value = {
+                'ret': True,
+                'data': {
+                    'Actions': {
+                        '#Bios.ChangePassword': {
+                            '@Redfish.ActionInfo': "/redfish/v1/Systems/1/Bios/ChangePasswordActionInfo",
+                            'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword",
+                            'title': "ChangePassword",
+                            'PasswordName@Redfish.AllowableValues': [
+                                "UefiAdminPassword",
+                                "UefiPowerOnPassword"
+                            ]
+                        },
+                        '#Bios.ResetBios': {
+                            'title': "ResetBios",
+                            'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
+                        }
+                    },
+                }
+            }
 
             with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': True}
@@ -480,24 +487,26 @@ class TestXCCRedfishCommand(unittest.TestCase):
         })
 
         with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
-            mock_get_request.return_value = {'ret': True,
-                'data': {'teststr': 'xxxx', '@odata.etag': '27f6eb13fa1c28a2711',
-                'Actions': {
-                    '#Bios.ChangePassword': {
-                        '@Redfish.ActionInfo': "/redfish/v1/Systems/1/Bios/ChangePasswordActionInfo",
-                        'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword",
-                        'title': "ChangePassword",
-                        'PasswordName@Redfish.AllowableValues': [
-                            "UefiAdminPassword",
-                            "UefiPowerOnPassword"
-                         ]
-                     },
-                     '#Bios.ResetBios': {
-                         'title': "ResetBios",
-                         'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
-                     }
-                 },
-                 }}
+            mock_get_request.return_value = {
+                'ret': True,
+                'data': {
+                    'Actions': {
+                        '#Bios.ChangePassword': {
+                            '@Redfish.ActionInfo': "/redfish/v1/Systems/1/Bios/ChangePasswordActionInfo",
+                            'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword",
+                            'title': "ChangePassword",
+                            'PasswordName@Redfish.AllowableValues': [
+                                "UefiAdminPassword",
+                                "UefiPowerOnPassword"
+                            ]
+                        },
+                        '#Bios.ResetBios': {
+                            'title': "ResetBios",
+                            'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
+                        }
+                    },
+                }
+            }
 
             with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': True}
@@ -517,25 +526,27 @@ class TestXCCRedfishCommand(unittest.TestCase):
         })
 
         with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
-            mock_get_request.return_value = {'ret': True,
-                'data': {'teststr': 'xxxx', '@odata.etag': '27f6eb13fa1c28a2711',
-                'Parameters': [],
-                'Actions': {
-                    '#Bios.ChangePassword': {
-                        '@Redfish.ActionInfo': "/redfish/v1/Systems/1/Bios/ChangePasswordActionInfo",
-                        'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword",
-                        'title': "ChangePassword",
-                        'PasswordName@Redfish.AllowableValues': [
-                            "UefiAdminPassword",
-                            "UefiPowerOnPassword"
-                         ]
-                     },
-                     '#Bios.ResetBios': {
-                         'title': "ResetBios",
-                         'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
-                     }
-                 },
-                 }}
+            mock_get_request.return_value = {
+                'ret': True,
+                'data': {
+                    'Parameters': [],
+                    'Actions': {
+                        '#Bios.ChangePassword': {
+                            '@Redfish.ActionInfo': "/redfish/v1/Systems/1/Bios/ChangePasswordActionInfo",
+                            'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword",
+                            'title': "ChangePassword",
+                            'PasswordName@Redfish.AllowableValues': [
+                                "UefiAdminPassword",
+                                "UefiPowerOnPassword"
+                            ]
+                        },
+                        '#Bios.ResetBios': {
+                            'title': "ResetBios",
+                            'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
+                        }
+                    },
+                }
+            }
 
             with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': True}
@@ -575,24 +586,26 @@ class TestXCCRedfishCommand(unittest.TestCase):
         })
 
         with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
-            mock_get_request.return_value = {'ret': True,
-                'data': {'teststr': 'xxxx', '@odata.etag': '27f6eb13fa1c28a2711',
-                'Actions': {
-                    '#Bios.ChangePassword': {
-                        '@Redfish.ActionInfo': "/redfish/v1/Systems/1/Bios/ChangePasswordActionInfo",
-                        'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword",
-                        'title': "ChangePassword",
-                        'PasswordName@Redfish.AllowableValues': [
-                            "UefiAdminPassword",
-                            "UefiPowerOnPassword"
-                         ]
-                     },
-                     '#Bios.ResetBios': {
-                         'title': "ResetBios",
-                         'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
-                     }
-                 },
-                 }}
+            mock_get_request.return_value = {
+                'ret': True,
+                'data': {
+                    'Actions': {
+                        '#Bios.ChangePassword': {
+                            '@Redfish.ActionInfo': "/redfish/v1/Systems/1/Bios/ChangePasswordActionInfo",
+                            'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword",
+                            'title': "ChangePassword",
+                            'PasswordName@Redfish.AllowableValues': [
+                                "UefiAdminPassword",
+                                "UefiPowerOnPassword"
+                            ]
+                        },
+                        '#Bios.ResetBios': {
+                            'title': "ResetBios",
+                            'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
+                        }
+                    },
+                }
+            }
 
             with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': False, 'msg': '500 internal error'}
@@ -612,24 +625,26 @@ class TestXCCRedfishCommand(unittest.TestCase):
         })
 
         with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
-            mock_get_request.return_value = {'ret': True,
-                'data': {'teststr': 'xxxx', '@odata.etag': '27f6eb13fa1c28a2711',
-                'Actions': {
-                    '#Bios.ChangePassword': {
-                        '@Redfish.ActionInfo': "/redfish/v1/Systems/1/Bios/ChangePasswordActionInfo",
-                        'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword",
-                        'title': "ChangePassword",
-                        'PasswordName@Redfish.AllowableValues': [
-                            "UefiAdminPassword",
-                            "UefiPowerOnPassword"
-                         ]
-                     },
-                     '#Bios.ResetBios': {
-                         'title': "ResetBios",
-                         'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
-                     }
-                 },
-                 }}
+            mock_get_request.return_value = {
+                'ret': True,
+                'data': {
+                    'Actions': {
+                        '#Bios.ChangePassword': {
+                            '@Redfish.ActionInfo': "/redfish/v1/Systems/1/Bios/ChangePasswordActionInfo",
+                            'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword",
+                            'title': "ChangePassword",
+                            'PasswordName@Redfish.AllowableValues': [
+                                "UefiAdminPassword",
+                                "UefiPowerOnPassword"
+                            ]
+                        },
+                        '#Bios.ResetBios': {
+                            'title': "ResetBios",
+                            'target': "/redfish/v1/Systems/1/Bios/Actions/Bios.ResetBios"
+                        }
+                    },
+                }
+            }
 
             with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': True, 'msg': 'post success'}
