@@ -123,6 +123,15 @@ options:
       - with states C(stopped) , C(restarted) allow to force stop instance
     type: bool
     default: 'no'
+  purge:
+    description:
+      - Remove container from all related configurations.
+      - For example backup jobs, replication jobs, or HA.
+      - Related ACLs and Firewall entries will always be removed.
+      - Used with state C(absent).
+    type: bool
+    default: false
+    version_added: 2.3.0
   state:
     description:
      - Indicate desired state of the instance
@@ -506,6 +515,7 @@ def main():
             searchdomain=dict(),
             timeout=dict(type='int', default=30),
             force=dict(type='bool', default=False),
+            purge=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted']),
             pubkey=dict(type='str', default=None),
             unprivileged=dict(type='bool', default=False),
@@ -686,7 +696,13 @@ def main():
             if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'mounted':
                 module.exit_json(changed=False, msg="VM %s is mounted. Stop it with force option before deletion." % vmid)
 
-            taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE).delete(vmid)
+            delete_params = {}
+
+            if module.params['purge']:
+                delete_params['purge'] = 1
+
+            taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE).delete(vmid, **delete_params)
+
             while timeout:
                 if (proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['status'] == 'stopped' and
                         proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):
