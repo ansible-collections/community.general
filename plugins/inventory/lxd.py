@@ -7,7 +7,6 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
     name: lxd
-    plugin_type: inventory
     short_description: Returns Ansible inventory from lxd host
     description:
         - Get inventory from the lxd
@@ -18,12 +17,12 @@ DOCUMENTATION = r'''
         plugin:
             description: token that ensures this is a source file for the 'lxd' plugin
             required: true
-            choices: ['lxd']
+            choices: ['community.general.lxd']
         url:
             description:
-            - The unix domain socket path or the https URL for the LXD server.
+            - The unix domain socket path or the https URL for the lxd server.
             - sockets in filesystem have to start with 'unix:'
-            - mostly unix:/var/lib/lxd/unix.socket or unix:/var/snap/lxd/common/lxd/unix.socket
+            - Mostly C(unix:/var/lib/lxd/unix.socket) or C(unix:/var/snap/lxd/common/lxd/unix.socket)
             default: unix:/var/snap/lxd/common/lxd/unix.socket
             required: false
             type: str
@@ -44,7 +43,7 @@ DOCUMENTATION = r'''
         trust_password:
             description:
             - The client trusted password.
-            - You need to set this password on the LXD server before
+            - You need to set this password on the lxd server before
                 running this module using the following command.
                 lxc config set core.trust_password <some random password>
                 See (https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/)
@@ -59,12 +58,12 @@ DOCUMENTATION = r'''
             default: none
             choices: ['STOPPED', 'STARTING', 'RUNNING', 'none']
         prefered_container_network_interface:
-            description: if a container has multiple network interfaces, which one is the prefered as pattern
+            description: 
+            - if a container has multiple network interfaces, which one is the prefered as pattern
+            - combined with the first number that can be found e.g. eth + 0
             required: false
             type: str
             default: eth
-            notes:
-              - combined with the first number that can be found e.g. eth + 0
         prefered_container_network_family:
             description: if a container has multiple network interfaces, which one is the prefered by family
             required: false
@@ -101,7 +100,7 @@ DOCUMENTATION = r'''
 
 EXAMPLES = '''
 # simple lxd.yml
-plugin: lxd
+plugin: community.general.lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
 
 # simple lxd.yml including filter
