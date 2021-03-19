@@ -22,7 +22,9 @@ DOCUMENTATION = r'''
         url:
             description:
             - The unix domain socket path or the https URL for the LXD server.
-            - mostly: unix:/var/lib/lxd/unix.socket or unix:/var/snap/lxd/common/lxd/unix.socket
+            - sockets in filesystem have to start with 'unix:'
+            - mostly unix:/var/lib/lxd/unix.socket or unix:/var/snap/lxd/common/lxd/unix.socket
+            default: unix:/var/snap/lxd/common/lxd/unix.socket
             required: false
             type: str
         client_key:
@@ -164,7 +166,7 @@ class InventoryModule(BaseInventoryPlugin):
             with open(os.path.abspath(os.path.join(cwd, *path)), 'r') as json_file:
                 return json.load(json_file)
         except IOError as err:
-            raise AnsibleParserError('Could not load the test data: {0}'.format(to_native(err))) from IOError
+            raise AnsibleParserError('Could not load the test data: {0}'.format(to_native(err)))
 
     def save_json_data(self, path, file_name=None):
         """save data as json
@@ -194,7 +196,7 @@ class InventoryModule(BaseInventoryPlugin):
             with open(os.path.abspath(os.path.join(cwd, *path)), 'w') as json_file:
                 json.dump(self.data, json_file)
         except IOError as err:
-            raise AnsibleParserError('Could not save data: {0}'.format(to_native(err))) from IOError
+            raise AnsibleParserError('Could not save data: {0}'.format(to_native(err)))
 
     def verify_file(self, path):
         """Check the config
@@ -553,7 +555,7 @@ class InventoryModule(BaseInventoryPlugin):
             else:
                 path[container_name][key] = value
         except KeyError as err:
-            raise AnsibleParserError("Unable to store Informations: {0}".format(to_native(err))) from KeyError
+            raise AnsibleParserError("Unable to store Informations: {0}".format(to_native(err)))
 
     def extract_information_from_container_configs(self):
         """Process configuration information
@@ -573,12 +575,18 @@ class InventoryModule(BaseInventoryPlugin):
             self.data['inventory'] = {}
 
         for container_name in self.data['containers'].keys():
-            self._set_data_entry(container_name, 'os', self._get_data_entry('containers/{0}/containers/metadata/config/image.os'.format(container_name)))
-            self._set_data_entry(container_name, 'release', self._get_data_entry('containers/{0}/containers/metadata/config/image.release'.format(container_name)))
-            self._set_data_entry(container_name, 'version', self._get_data_entry('containers/{0}/containers/metadata/config/image.version'.format(container_name)))
-            self._set_data_entry(container_name, 'profile', self._get_data_entry('containers/{0}/containers/metadata/profiles'.format(container_name)))
-            self._set_data_entry(container_name, 'location', self._get_data_entry('containers/{0}/containers/metadata/location'.format(container_name)))
-            self._set_data_entry(container_name, 'state', self._get_data_entry('containers/{0}/containers/metadata/config/volatile.last_state.power'.format(container_name)))
+            self._set_data_entry(container_name, 'os', self._get_data_entry(
+                'containers/{0}/containers/metadata/config/image.os'.format(container_name)))
+            self._set_data_entry(container_name, 'release', self._get_data_entry(
+                'containers/{0}/containers/metadata/config/image.release'.format(container_name)))
+            self._set_data_entry(container_name, 'version', self._get_data_entry(
+                'containers/{0}/containers/metadata/config/image.version'.format(container_name)))
+            self._set_data_entry(container_name, 'profile', self._get_data_entry(
+                'containers/{0}/containers/metadata/profiles'.format(container_name)))
+            self._set_data_entry(container_name, 'location', self._get_data_entry(
+                'containers/{0}/containers/metadata/location'.format(container_name)))
+            self._set_data_entry(container_name, 'state', self._get_data_entry(
+                'containers/{0}/containers/metadata/config/volatile.last_state.power'.format(container_name)))
             self._set_data_entry(container_name, 'network_interfaces', self.extract_network_information_from_container_config(container_name))
             self._set_data_entry(container_name, 'preferred_interface', self.get_prefered_container_network_interface(container_name))
             self._set_data_entry(container_name, 'vlan_ids', self.get_container_vlans(container_name))
@@ -850,7 +858,9 @@ class InventoryModule(BaseInventoryPlugin):
         if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
-        gen_containers = [container_name for container_name in self.data['inventory'].keys() if 'ansible_lxd_os' in self.inventory.get_host(container_name).get_vars().keys()]
+        gen_containers = [
+            container_name for container_name in self.data['inventory'].keys()
+            if 'ansible_lxd_os' in self.inventory.get_host(container_name).get_vars().keys()]
         for container_name in gen_containers:
             if self.groups[group_name].get('attribute').lower() == self.inventory.get_host(container_name).get_vars().get('ansible_lxd_os'):
                 self.inventory.add_child(group_name, container_name)
@@ -870,7 +880,9 @@ class InventoryModule(BaseInventoryPlugin):
         if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
-        gen_containers = [container_name for container_name in self.data['inventory'].keys() if 'ansible_lxd_release' in self.inventory.get_host(container_name).get_vars().keys()]
+        gen_containers = [
+            container_name for container_name in self.data['inventory'].keys()
+            if 'ansible_lxd_release' in self.inventory.get_host(container_name).get_vars().keys()]
         for container_name in gen_containers:
             if self.groups[group_name].get('attribute').lower() == self.inventory.get_host(container_name).get_vars().get('ansible_lxd_release'):
                 self.inventory.add_child(group_name, container_name)
@@ -890,7 +902,9 @@ class InventoryModule(BaseInventoryPlugin):
         if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
-        gen_containers = [container_name for container_name in self.data['inventory'].keys() if 'ansible_lxd_profile' in self.inventory.get_host(container_name).get_vars().keys()]
+        gen_containers = [
+            container_name for container_name in self.data['inventory'].keys()
+            if 'ansible_lxd_profile' in self.inventory.get_host(container_name).get_vars().keys()]
         for container_name in gen_containers:
             if self.groups[group_name].get('attribute').lower() in self.inventory.get_host(container_name).get_vars().get('ansible_lxd_profile'):
                 self.inventory.add_child(group_name, container_name)
@@ -910,7 +924,9 @@ class InventoryModule(BaseInventoryPlugin):
         if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
-        gen_containers = [container_name for container_name in self.data['inventory'].keys() if 'ansible_lxd_vlan_ids' in self.inventory.get_host(container_name).get_vars().keys()]
+        gen_containers = [
+            container_name for container_name in self.data['inventory'].keys()
+            if 'ansible_lxd_vlan_ids' in self.inventory.get_host(container_name).get_vars().keys()]
         for container_name in gen_containers:
             if self.groups[group_name].get('attribute') in self.inventory.get_host(container_name).get_vars().get('ansible_lxd_vlan_ids').values():
                 self.inventory.add_child(group_name, container_name)
@@ -1055,6 +1071,6 @@ class InventoryModule(BaseInventoryPlugin):
             self.url = self.get_option('url')
         except Exception as err:
             raise AnsibleParserError(
-                'All correct options required: {0}'.format(to_native(err))) from Exception
+                'All correct options required: {0}'.format(to_native(err)))
         # Call our internal helper to populate the dynamic inventory
         self._populate()
