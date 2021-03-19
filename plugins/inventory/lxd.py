@@ -58,7 +58,7 @@ DOCUMENTATION = r'''
             default: none
             choices: ['STOPPED', 'STARTING', 'RUNNING', 'none']
         prefered_container_network_interface:
-            description: 
+            description:
             - if a container has multiple network interfaces, which one is the prefered as pattern
             - combined with the first number that can be found e.g. eth + 0
             required: false
@@ -102,22 +102,50 @@ EXAMPLES = '''
 # simple lxd.yml
 plugin: community.general.lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
+selftest: False
+dumpdata: False
 
 # simple lxd.yml including filter
 plugin: lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
 state: RUNNING
+selftest: False
+dumpdata: False
 
 # grouping lxd.yml
-plugin: lxd
-state: RUNNING
 groups:
-  SMB-Server:
+  testpattern:
     type: pattern
-    attribute: samba
+    attribute: test
   vlan666:
     type: vlanid
     attribute: 666
+  locationBerlin:
+    type: location
+    attribute: Berlin
+  osUbuntu:
+    type: os
+    attribute: ubuntu
+  releaseFocal:
+    type: release
+    attribute: focal
+  releaseBionic:
+    type: release
+    attribute: bionic
+  profileDefault:
+    type: profile
+    attribute: default
+  profileX11:
+    type: profile
+    attribute: x11
+  netRangeIPv4:
+    type: network_range
+    attribute: 10.98.143.0/24
+  netRangeIPv6:
+    type: network_range
+    attribute: fd42:bd00:7b11:2167:216:3eff::/24
+selftest: False
+dumpdata: False
 '''
 
 import binascii
@@ -662,6 +690,11 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             None"""
         for container_name in self.data['inventory'].keys():
+            # import pdb; pdb.set_trace()
+            # Only consider containers that match the "state" filter, if self.state is not None
+            if self.filter:
+                if self.filter.lower() != self._get_data_entry('inventory/{0}/state'.format(container_name)).lower():
+                    continue
             # add container
             self.inventory.add_host(container_name)
             # add network informations
@@ -696,7 +729,7 @@ class InventoryModule(BaseInventoryPlugin):
         if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
-        for container_name in self.data['inventory'].keys():
+        for container_name in self.inventory.hosts.keys():
             if 'ansible_lxd_location' in self.inventory.get_host(container_name).get_vars().keys():
                 self.inventory.add_child(group_name, container_name)
 
@@ -717,7 +750,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         regex_pattern = self.groups[group_name].get('attribute')
 
-        for container_name in self.data['inventory'].keys():
+        for container_name in self.inventory.hosts.keys():
             result = re.search(regex_pattern, container_name)
             if result:
                 self.inventory.add_child(group_name, container_name)
@@ -831,7 +864,7 @@ class InventoryModule(BaseInventoryPlugin):
         if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
-        for container_name in self.data['inventory'].keys():
+        for container_name in self.inventory.hosts.keys():
             if self.data['inventory'][container_name].get('network_interfaces') is not None:
                 for interface in self.data['inventory'][container_name].get('network_interfaces'):
                     for interface_family in self.data['inventory'][container_name].get('network_interfaces')[interface]:
@@ -858,7 +891,7 @@ class InventoryModule(BaseInventoryPlugin):
             self.inventory.add_group(group_name)
 
         gen_containers = [
-            container_name for container_name in self.data['inventory'].keys()
+            container_name for container_name in self.inventory.hosts.keys()
             if 'ansible_lxd_os' in self.inventory.get_host(container_name).get_vars().keys()]
         for container_name in gen_containers:
             if self.groups[group_name].get('attribute').lower() == self.inventory.get_host(container_name).get_vars().get('ansible_lxd_os'):
@@ -880,7 +913,7 @@ class InventoryModule(BaseInventoryPlugin):
             self.inventory.add_group(group_name)
 
         gen_containers = [
-            container_name for container_name in self.data['inventory'].keys()
+            container_name for container_name in self.inventory.hosts.keys()
             if 'ansible_lxd_release' in self.inventory.get_host(container_name).get_vars().keys()]
         for container_name in gen_containers:
             if self.groups[group_name].get('attribute').lower() == self.inventory.get_host(container_name).get_vars().get('ansible_lxd_release'):
@@ -902,7 +935,7 @@ class InventoryModule(BaseInventoryPlugin):
             self.inventory.add_group(group_name)
 
         gen_containers = [
-            container_name for container_name in self.data['inventory'].keys()
+            container_name for container_name in self.inventory.hosts.keys()
             if 'ansible_lxd_profile' in self.inventory.get_host(container_name).get_vars().keys()]
         for container_name in gen_containers:
             if self.groups[group_name].get('attribute').lower() in self.inventory.get_host(container_name).get_vars().get('ansible_lxd_profile'):
@@ -924,7 +957,7 @@ class InventoryModule(BaseInventoryPlugin):
             self.inventory.add_group(group_name)
 
         gen_containers = [
-            container_name for container_name in self.data['inventory'].keys()
+            container_name for container_name in self.inventory.hosts.keys()
             if 'ansible_lxd_vlan_ids' in self.inventory.get_host(container_name).get_vars().keys()]
         for container_name in gen_containers:
             if self.groups[group_name].get('attribute') in self.inventory.get_host(container_name).get_vars().get('ansible_lxd_vlan_ids').values():
@@ -1065,7 +1098,10 @@ class InventoryModule(BaseInventoryPlugin):
             self.prefered_container_network_family = self.get_option('prefered_container_network_family')
             self.prefered_container_network_interface = self.get_option('prefered_container_network_interface')
             self.selftest = self.get_option('selftest')
-            self.filter = self.get_option('state')
+            if self.get_option('state').lower() == 'none':  # none in config is str()
+                self.filter = None
+            else:
+                self.filter = self.get_option('state').lower()
             self.trust_password = self.get_option('trust_password')
             self.url = self.get_option('url')
         except Exception as err:

@@ -1,5 +1,6 @@
 ---
 plugin: lxd
+state: None
 groups:
   testpattern:
     type: pattern
@@ -31,6 +32,6 @@ groups:
   netRangeIPv6:
     type: network_range
     attribute: fd42:bd00:7b11:2167:216:3eff::/24
-selftest: True
+selftest: False
 dumpdata: False
 ...
