@@ -18,8 +18,10 @@ options:
   name:
     type: str
     description:
-      - The name of the Perl library to install. You may use the "full distribution path", e.g. C(MIYAGAWA/Plack-0.99_05.tar.gz).
-    aliases: [pkg, from_url]
+      - The name of the Perl library to install. 
+      - The name can be either a module name, distribution file, HTTP URL or git repository URL as described in C(cpanminus) documentation.
+      - Note that for local path installation you should use the parameter I(from_path).
+    aliases: [pkg]
   from_path:
     type: path
     description:
@@ -133,7 +135,6 @@ class CPANMinus(CmdMixin, ModuleHelper):
             executable=dict(type='path'),
         ),
         required_one_of=[('name', 'from_path')],
-        mutually_exclusive=[('name', 'from_path'), ('from_path', 'version')],
     )
     command = 'cpanm'
     command_args_formats = dict(

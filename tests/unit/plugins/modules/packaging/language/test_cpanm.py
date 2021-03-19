@@ -164,7 +164,7 @@ TEST_CASES = [
             'run_command.calls': [],
             'changed': False,
             'failed': True,
-            'msg': "parameters are mutually exclusive: from_path|version",
+            'msg': "parameter 'version' must not be used when installing from a directory",
         }
     ],
     [
