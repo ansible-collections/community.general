@@ -16,48 +16,48 @@ class BitbucketHelper:
     BITBUCKET_API_URL = 'https://api.bitbucket.org'
 
     error_messages = {
-        'required_client_id': '`client_id` must be specified as a parameter or '
-                              'BITBUCKET_CLIENT_ID environment variable',
-        'required_client_secret': '`client_secret` must be specified as a parameter or '
-                                  'BITBUCKET_CLIENT_SECRET environment variable',
+        'credentials_required': '`client_id`/`client_secret` or `username`/`password` must be specified as a parameter',
     }
 
     def __init__(self, module):
         self.module = module
         self.access_token = None
+        self.username = None
+        self.password = None
 
     @staticmethod
     def bitbucket_argument_spec():
         return dict(
-            client_id=dict(type='str', no_log=True, fallback=(env_fallback, ['BITBUCKET_CLIENT_ID'])),
+            client_id=dict(type='str', no_log=False, fallback=(env_fallback, ['BITBUCKET_CLIENT_ID'])),
             client_secret=dict(type='str', no_log=True, fallback=(env_fallback, ['BITBUCKET_CLIENT_SECRET'])),
+            username=dict(type='str', no_log=False, fallback=(env_fallback, ['BITBUCKET_USERNAME'])),
+            password=dict(type='str', no_log=True, fallback=(env_fallback, ['BITBUCKET_PASSWORD'])),
         )
 
     def check_arguments(self):
-        if self.module.params['client_id'] is None:
+        if self.module.params['client_id'] is None and self.module.params['client_secret'] is None or \
+           self.module.params['username'] is None and self.module.params['password'] is None:
             self.module.fail_json(msg=self.error_messages['required_client_id'])
-
-        if self.module.params['client_secret'] is None:
-            self.module.fail_json(msg=self.error_messages['required_client_secret'])
 
     def fetch_access_token(self):
         self.check_arguments()
 
-        headers = {
-            'Authorization': basic_auth_header(self.module.params['client_id'], self.module.params['client_secret'])
-        }
+        if 'client_id' in self.module.params and 'client_secret' in self.module.params:
+            headers = {
+                'Authorization': basic_auth_header(self.module.params['client_id'], self.module.params['client_secret'])
+            }
 
-        info, content = self.request(
-            api_url='https://bitbucket.org/site/oauth2/access_token',
-            method='POST',
-            data='grant_type=client_credentials',
-            headers=headers,
-        )
+            info, content = self.request(
+                api_url='https://bitbucket.org/site/oauth2/access_token',
+                method='POST',
+                data='grant_type=client_credentials',
+                headers=headers,
+            )
 
-        if info['status'] == 200:
-            self.access_token = content['access_token']
-        else:
-            self.module.fail_json(msg='Failed to retrieve access token: {0}'.format(info))
+            if info['status'] == 200:
+                self.access_token = content['access_token']
+            else:
+                self.module.fail_json(msg='Failed to retrieve access token: {0}'.format(info))
 
     def request(self, api_url, method, data=None, headers=None):
         headers = headers or {}
@@ -65,6 +65,10 @@ class BitbucketHelper:
         if self.access_token:
             headers.update({
                 'Authorization': 'Bearer {0}'.format(self.access_token),
+            })
+        elif self.username and self.password:
+            headers.update({
+                'Authorization': basic_auth_header(self.username, self.password)
             })
 
         if isinstance(data, dict):
