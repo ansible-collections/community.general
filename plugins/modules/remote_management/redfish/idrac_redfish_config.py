@@ -254,8 +254,8 @@ def main():
             username=dict(),
             password=dict(no_log=True),
             auth_token=dict(no_log=True),
-            manager_attribute_name = dict(default=None),
-            manager_attribute_value = dict(default=None),
+            manager_attribute_name=dict(default=None),
+            manager_attribute_value=dict(default=None),
             manager_attributes=dict(type='dict', default={}),
             timeout=dict(type='int', default=10),
             resource_id=dict()
