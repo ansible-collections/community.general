@@ -12,7 +12,7 @@ DOCUMENTATION = r'''
     description:
         - Get inventory from the lxd
         - Uses a YAML configuration file that ends with 'lxd.(yml|yaml)'.
-    version_added: "2.1.0"
+    version_added: "2.3.0"
     author: "Frank Dornheim (@conloos)"
     options:
         plugin:
