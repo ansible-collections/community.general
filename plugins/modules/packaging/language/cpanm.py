@@ -123,7 +123,7 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 class CPANMinus(CmdMixin, ModuleHelper):
     module = dict(
         argument_spec=dict(
-            name=dict(type='str', aliases=['pkg', 'from_url']),
+            name=dict(type='str', aliases=['pkg']),
             version=dict(type='str'),
             from_path=dict(type='path', aliases=['from_dir']),
             notest=dict(default=False, type='bool'),
