@@ -168,7 +168,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'from_url': 'git://github.com/plack/Plack.git', 'version': '@1.7'},
+        {'name': 'git://github.com/plack/Plack.git', 'version': '@1.7'},
         {
             'id': 'test_install_specific_version_from_git_url_explicit',
             'run_command.calls': [(
@@ -181,7 +181,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'from_url': 'git://github.com/plack/Plack.git', 'version': '2.5'},
+        {'name': 'git://github.com/plack/Plack.git', 'version': '2.5'},
         {
             'id': 'test_install_specific_version_from_git_url_implicit',
             'run_command.calls': [(
@@ -194,7 +194,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'from_url': 'git://github.com/plack/Plack.git', 'version': '~2.5'},
+        {'name': 'git://github.com/plack/Plack.git', 'version': '~2.5'},
         {
             'id': 'test_install_version_operator_from_git_url_error',
             'run_command.calls': [],
