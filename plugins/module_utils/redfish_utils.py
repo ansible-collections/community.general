@@ -2672,6 +2672,10 @@ class RedfishUtils(object):
                         need_change = True
             # type is list
             if isinstance(set_value, list):
+                if len(set_value) != len(cur_value):
+                    # if arrays are not the same len, no need to check each element
+                    need_change = True
+                    continue
                 for i in range(len(set_value)):
                     for subprop in payload[property][i].keys():
                         if subprop not in target_ethernet_current_setting[property][i]:
