@@ -1,0 +1,2 @@
+minor_changes:
+  - redfish_* modules, redfish_utils module utils - add support for Redfish session create, delete, and authenticate (https://github.com/ansible-collections/community.general/issues/1975).
