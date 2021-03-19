@@ -457,9 +457,9 @@ class InventoryModule(BaseInventoryPlugin):
         prefered_interface = None  # init
         if container_network_interfaces:  # container have network interfaces
             # generator if interfases which start with the desired pattern
-            net_generaor = [interface for interface in container_network_interfaces if interface.startswith(self.prefered_container_network_interface)]
+            net_generator = [interface for interface in container_network_interfaces if interface.startswith(self.prefered_container_network_interface)]
             selected_interfaces = []  # init
-            for interface in net_generaor:
+            for interface in net_generator:
                 selected_interfaces.append(interface)
             if len(selected_interfaces) > 0:
                 prefered_interface = sorted(selected_interfaces)[0]
