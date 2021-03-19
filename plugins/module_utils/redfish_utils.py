@@ -39,13 +39,34 @@ class RedfishUtils(object):
         self.data_modification = data_modification
         self._init_session()
 
+    def _auth_params(self, headers):
+        """
+        Return tuple of required authentication params based on the presence
+        of a token in the self.creds dict. If using a token, set the
+        X-Auth-Token header in the `headers` param.
+
+        :param headers: dict containing headers to send in request
+        :return: tuple of username, password and force_basic_auth
+        """
+        if self.creds.get('token'):
+            username = None
+            password = None
+            force_basic_auth = False
+            headers['X-Auth-Token'] = self.creds['token']
+        else:
+            username = self.creds['user']
+            password = self.creds['pswd']
+            force_basic_auth = True
+        return username, password, force_basic_auth
+
     # The following functions are to send GET/POST/PATCH/DELETE requests
     def get_request(self, uri):
+        req_headers = dict(GET_HEADERS)
+        username, password, basic_auth = self._auth_params(req_headers)
         try:
-            resp = open_url(uri, method="GET", headers=GET_HEADERS,
-                            url_username=self.creds['user'],
-                            url_password=self.creds['pswd'],
-                            force_basic_auth=True, validate_certs=False,
+            resp = open_url(uri, method="GET", headers=req_headers,
+                            url_username=username, url_password=password,
+                            force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
             data = json.loads(to_native(resp.read()))
@@ -66,14 +87,16 @@ class RedfishUtils(object):
         return {'ret': True, 'data': data, 'headers': headers}
 
     def post_request(self, uri, pyld):
+        req_headers = dict(POST_HEADERS)
+        username, password, basic_auth = self._auth_params(req_headers)
         try:
             resp = open_url(uri, data=json.dumps(pyld),
-                            headers=POST_HEADERS, method="POST",
-                            url_username=self.creds['user'],
-                            url_password=self.creds['pswd'],
-                            force_basic_auth=True, validate_certs=False,
+                            headers=req_headers, method="POST",
+                            url_username=username, url_password=password,
+                            force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
+            headers = dict((k.lower(), v) for (k, v) in resp.info().items())
         except HTTPError as e:
             msg = self._get_extended_message(e)
             return {'ret': False,
@@ -87,10 +110,10 @@ class RedfishUtils(object):
         except Exception as e:
             return {'ret': False,
                     'msg': "Failed POST request to '%s': '%s'" % (uri, to_text(e))}
-        return {'ret': True, 'resp': resp}
+        return {'ret': True, 'headers': headers, 'resp': resp}
 
     def patch_request(self, uri, pyld):
-        headers = PATCH_HEADERS
+        req_headers = dict(PATCH_HEADERS)
         r = self.get_request(uri)
         if r['ret']:
             # Get etag from etag header or @odata.etag property
@@ -98,15 +121,13 @@ class RedfishUtils(object):
             if not etag:
                 etag = r['data'].get('@odata.etag')
             if etag:
-                # Make copy of headers and add If-Match header
-                headers = dict(headers)
-                headers['If-Match'] = etag
+                req_headers['If-Match'] = etag
+        username, password, basic_auth = self._auth_params(req_headers)
         try:
             resp = open_url(uri, data=json.dumps(pyld),
-                            headers=headers, method="PATCH",
-                            url_username=self.creds['user'],
-                            url_password=self.creds['pswd'],
-                            force_basic_auth=True, validate_certs=False,
+                            headers=req_headers, method="PATCH",
+                            url_username=username, url_password=password,
+                            force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
         except HTTPError as e:
@@ -125,13 +146,14 @@ class RedfishUtils(object):
         return {'ret': True, 'resp': resp}
 
     def delete_request(self, uri, pyld=None):
+        req_headers = dict(DELETE_HEADERS)
+        username, password, basic_auth = self._auth_params(req_headers)
         try:
             data = json.dumps(pyld) if pyld else None
             resp = open_url(uri, data=data,
-                            headers=DELETE_HEADERS, method="DELETE",
-                            url_username=self.creds['user'],
-                            url_password=self.creds['pswd'],
-                            force_basic_auth=True, validate_certs=False,
+                            headers=req_headers, method="DELETE",
+                            url_username=username, url_password=password,
+                            force_basic_auth=basic_auth, validate_certs=False,
                             follow_redirects='all',
                             use_proxy=True, timeout=self.timeout)
         except HTTPError as e:
@@ -1195,6 +1217,54 @@ class RedfishUtils(object):
                 return response
 
         return {'ret': True, 'changed': True, 'msg': "Clear all sessions successfully"}
+
+    def create_session(self):
+        if not self.creds.get('user') or not self.creds.get('pswd'):
+            return {'ret': False, 'msg':
+                    'Must provide the username and password parameters for '
+                    'the CreateSession command'}
+
+        payload = {
+            'UserName': self.creds['user'],
+            'Password': self.creds['pswd']
+        }
+        response = self.post_request(self.root_uri + self.sessions_uri, payload)
+        if response['ret'] is False:
+            return response
+
+        headers = response['headers']
+        if 'x-auth-token' not in headers:
+            return {'ret': False, 'msg':
+                    'The service did not return the X-Auth-Token header in '
+                    'the response from the Sessions collection POST'}
+
+        if 'location' not in headers:
+            self.module.warn(
+                'The service did not return the Location header for the '
+                'session URL in the response from the Sessions collection '
+                'POST')
+            session_uri = None
+        else:
+            session_uri = urlparse(headers.get('location')).path
+
+        session = dict()
+        session['token'] = headers.get('x-auth-token')
+        session['uri'] = session_uri
+        return {'ret': True, 'changed': True, 'session': session,
+                'msg': 'Session created successfully'}
+
+    def delete_session(self, session_uri):
+        if not session_uri:
+            return {'ret': False, 'msg':
+                    'Must provide the session_uri parameter for the '
+                    'DeleteSession command'}
+
+        response = self.delete_request(self.root_uri + session_uri)
+        if response['ret'] is False:
+            return response
+
+        return {'ret': True, 'changed': True,
+                'msg': 'Session deleted successfully'}
 
     def get_firmware_update_capabilities(self):
         result = {}
