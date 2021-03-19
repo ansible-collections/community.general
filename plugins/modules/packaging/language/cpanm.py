@@ -18,7 +18,7 @@ options:
   name:
     type: str
     description:
-      - The name of the Perl library to install. 
+      - The name of the Perl library to install.
       - The name can be either a module name, distribution file, HTTP URL or git repository URL as described in C(cpanminus) documentation.
       - Note that for local path installation you should use the parameter I(from_path).
     aliases: [pkg]
