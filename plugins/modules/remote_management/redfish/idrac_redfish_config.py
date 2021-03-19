@@ -36,15 +36,18 @@ options:
       - Base URI of iDRAC
     type: str
   username:
-    required: true
     description:
       - User for authentication with iDRAC
     type: str
   password:
-    required: true
     description:
       - Password for authentication with iDRAC
     type: str
+  auth_token:
+    description:
+      - Security token for authentication with OOB controller
+    type: str
+    version_added: 2.3.0
   manager_attributes:
     required: false
     description:
@@ -232,12 +235,22 @@ def main():
             category=dict(required=True),
             command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(required=True),
-            password=dict(required=True, no_log=True),
+            username=dict(),
+            password=dict(no_log=True),
+            auth_token=dict(no_log=True),
             manager_attributes=dict(type='dict', default={}),
             timeout=dict(type='int', default=10),
             resource_id=dict()
         ),
+        required_together=[
+            ('username', 'password'),
+        ],
+        required_one_of=[
+            ('username', 'auth_token'),
+        ],
+        mutually_exclusive=[
+            ('username', 'auth_token'),
+        ],
         supports_check_mode=False
     )
 
@@ -246,7 +259,8 @@ def main():
 
     # admin credentials used for authentication
     creds = {'user': module.params['username'],
-             'pswd': module.params['password']}
+             'pswd': module.params['password'],
+             'token': module.params['auth_token']}
 
     # timeout
     timeout = module.params['timeout']
