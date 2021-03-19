@@ -65,27 +65,27 @@ DOCUMENTATION = r'''
             type: str
             default: eth
         prefered_container_network_family:
-            description: if a container has multiple network interfaces, which one is the prefered by family
+            description:
+            - if a container has multiple network interfaces, which one is the prefered by family
+                - inet is ipv4
+                - inet6 is ipv6
             required: false
             type: str
             default: inet
             choices: ['inet', 'inet6']
-            notes:
-              - inet == ipv4
-              - inet6 == ipv6
         groups:
-            description: Group the results
+            description:
+            - Group the results
+                - 'location' grabed sample by web, maybe it works
+                - 'pattern' samba* or regex
+                - 'network_range' 192.168.0.0/24
+                - 'os' ubuntu
+                - 'release' groovy
+                - 'profile' default
+                - 'vlanid' works on defined networks e.g. br0 with vlan_default == 666
             required: false
             type: json
             default: none
-            notes:
-              - lxd location: no idea need sample
-              - pattern: samba* or regex
-              - network_range: 192.168.0.0/24
-              - os: ubuntu
-              - release: groovy
-              - profile: default
-              - vlanid: works on defined networks e.g. br0 with vlan_default == 666
         selftest:
             description: Load default data to test plugIn
             required: false
