@@ -1317,17 +1317,5 @@
                 }
             }
         }
-    },
-    "inventory":{
-        "tuya-convert":{
-            "name":"tuya-convert",
-            "os":"ubuntu",
-            "release":"focal",
-            "version":"20.04",
-            "profile":[
-                "default"
-            ],
-            "state":"STOPPED"
-        }
     }
 }
