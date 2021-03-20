@@ -18,6 +18,7 @@ from ansible.module_utils._text import to_native
 from ansible.module_utils.six import iteritems
 from ansible.module_utils._text import to_text
 from ansible.module_utils.basic import env_fallback
+from ansible.module_utils.common.validation import check_type_dict
 
 try:
     from infoblox_client.connector import Connector
@@ -390,11 +391,11 @@ class WapiModule(WapiBase):
 
         if 'ipv4addrs' in proposed_object:
             if 'nios_next_ip' in proposed_object['ipv4addrs'][0]['ipv4addr']:
-                ip_range = self.module._check_type_dict(proposed_object['ipv4addrs'][0]['ipv4addr'])['nios_next_ip']
+                ip_range = check_type_dict(proposed_object['ipv4addrs'][0]['ipv4addr'])['nios_next_ip']
                 proposed_object['ipv4addrs'][0]['ipv4addr'] = NIOS_NEXT_AVAILABLE_IP + ':' + ip_range
         elif 'ipv4addr' in proposed_object:
             if 'nios_next_ip' in proposed_object['ipv4addr']:
-                ip_range = self.module._check_type_dict(proposed_object['ipv4addr'])['nios_next_ip']
+                ip_range = check_type_dict(proposed_object['ipv4addr'])['nios_next_ip']
                 proposed_object['ipv4addr'] = NIOS_NEXT_AVAILABLE_IP + ':' + ip_range
 
         return proposed_object
@@ -476,7 +477,7 @@ class WapiModule(WapiBase):
         if ('name' in obj_filter):
             # gets and returns the current object based on name/old_name passed
             try:
-                name_obj = self.module._check_type_dict(obj_filter['name'])
+                name_obj = check_type_dict(obj_filter['name'])
                 old_name = name_obj['old_name']
                 new_name = name_obj['new_name']
             except TypeError:
@@ -512,7 +513,7 @@ class WapiModule(WapiBase):
                 test_obj_filter['name'] = test_obj_filter['name'].lower()
                 # resolves issue where multiple a_records with same name and different IP address
                 try:
-                    ipaddr_obj = self.module._check_type_dict(obj_filter['ipv4addr'])
+                    ipaddr_obj = check_type_dict(obj_filter['ipv4addr'])
                     ipaddr = ipaddr_obj['old_ipv4addr']
                 except TypeError:
                     ipaddr = obj_filter['ipv4addr']
@@ -521,7 +522,7 @@ class WapiModule(WapiBase):
                 # resolves issue where multiple txt_records with same name and different text
                 test_obj_filter = obj_filter
                 try:
-                    text_obj = self.module._check_type_dict(obj_filter['text'])
+                    text_obj = check_type_dict(obj_filter['text'])
                     txt = text_obj['old_text']
                 except TypeError:
                     txt = obj_filter['text']
@@ -534,7 +535,7 @@ class WapiModule(WapiBase):
             # resolves issue where multiple a_records with same name and different IP address
             test_obj_filter = obj_filter
             try:
-                ipaddr_obj = self.module._check_type_dict(obj_filter['ipv4addr'])
+                ipaddr_obj = check_type_dict(obj_filter['ipv4addr'])
                 ipaddr = ipaddr_obj['old_ipv4addr']
             except TypeError:
                 ipaddr = obj_filter['ipv4addr']
@@ -544,7 +545,7 @@ class WapiModule(WapiBase):
             # resolves issue where multiple txt_records with same name and different text
             test_obj_filter = obj_filter
             try:
-                text_obj = self.module._check_type_dict(obj_filter['text'])
+                text_obj = check_type_dict(obj_filter['text'])
                 txt = text_obj['old_text']
             except TypeError:
                 txt = obj_filter['text']
