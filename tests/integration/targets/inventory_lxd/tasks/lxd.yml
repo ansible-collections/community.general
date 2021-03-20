@@ -1,0 +1,39 @@
+---
+plugin: lxd
+state: None
+groups:
+  testpattern:
+    type: pattern
+    attribute: test
+  vlan666:
+    type: vlanid
+    attribute: 666
+  locationBerlin:
+    type: location
+    attribute: Berlin
+  osUbuntu:
+    type: os
+    attribute: ubuntu
+  releaseFocal:
+    type: release
+    attribute: focal
+  releaseBionic:
+    type: release
+    attribute: bionic
+  profileDefault:
+    type: profile
+    attribute: default
+  profileX11:
+    type: profile
+    attribute: x11
+  netRangeIPv4:
+    type: network_range
+    attribute: 10.98.143.0/24
+  netRangeIPv6:
+    type: network_range
+    attribute: fd42:bd00:7b11:2167:216:3eff::/24
+selftest:
+  activate: True
+  path: /home/BODOMOS/frank/Workspace/ansible_collections/community/general/tests/integration/targets/inventory_lxd/files/lxd_inventory.atd
+dumpdata: False
+...

@@ -82,14 +82,17 @@ DOCUMENTATION = r'''
                 - 'os' ubuntu
                 - 'release' groovy
                 - 'profile' default
-                - 'vlanid' works on defined networks e.g. br0 with vlan_default == 666
+                - 'vlanid' works on defined networks e.g. br0 with vlanid_default == 666
             required: false
             type: json
             default: none
         selftest:
-            description: Load default data to test plugIn
+            description:
+            - Load default data to test plugIn
+                - 'path' to file with test data e.g. ansible_collections/community/general/tests/integration/targets/inventory_lxd/files/lxd_inventory.atd
+                - 'activate' True
             required: false
-            type: bool
+            type: json
             default: false
         dumpdata:
             description: dump out data to debug
@@ -168,7 +171,7 @@ class InventoryModule(BaseInventoryPlugin):
     TEST_PATH = ['test']
 
     @staticmethod
-    def load_json_data(path, file_name=None):
+    def load_json_data(path):
         """Load json data
 
         Load json data from file
@@ -182,15 +185,8 @@ class InventoryModule(BaseInventoryPlugin):
             None
         Returns:
             dict(json_data): json data"""
-
-        if file_name:
-            path.append(file_name)
-        else:
-            path.append('lxd_inventory.atd')
-
         try:
-            cwd = os.path.abspath(os.path.dirname(__file__))
-            with open(os.path.abspath(os.path.join(cwd, *path)), 'r') as json_file:
+            with open(path, 'r') as json_file:
                 return json.load(json_file)
         except IOError as err:
             raise AnsibleParserError('Could not load the test data: {0}'.format(to_native(err)))
@@ -690,7 +686,6 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             None"""
         for container_name in self.data['inventory'].keys():
-            # import pdb; pdb.set_trace()
             # Only consider containers that match the "state" filter, if self.state is not None
             if self.filter:
                 if self.filter.lower() != self._get_data_entry('inventory/{0}/state'.format(container_name)).lower():
@@ -1054,7 +1049,8 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             None"""
         if self.selftest:
-            self.data = self.load_json_data(self.TEST_PATH)
+            if self.selftest.get('activate'):
+                self.data = self.load_json_data(self.selftest.get('path', self.TEST_PATH))
         else:
             self.socket = self._connect_to_socket()
             self.get_container_data(self._get_containers())
