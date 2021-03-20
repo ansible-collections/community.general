@@ -17,7 +17,7 @@ DOCUMENTATION = r'''
         plugin:
             description: token that ensures this is a source file for the 'lxd' plugin
             required: true
-            choices: ['community.general.lxd']
+            choices: [ 'community.general.lxd' ]
         url:
             description:
             - The unix domain socket path or the https URL for the lxd server.
@@ -46,7 +46,7 @@ DOCUMENTATION = r'''
             - You need to set this password on the lxd server before
                 running this module using the following command.
                 lxc config set core.trust_password <some random password>
-                See (https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/)
+                See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/)
             - If trust_password is set, this module send a request for
                 authentication before sending any requests.
             required: false
@@ -56,7 +56,7 @@ DOCUMENTATION = r'''
             required: false
             type: str
             default: none
-            choices: ['STOPPED', 'STARTING', 'RUNNING', 'none']
+            choices: [ 'STOPPED', 'STARTING', 'RUNNING', 'none' ]
         prefered_container_network_interface:
             description:
             - if a container has multiple network interfaces, which one is the prefered as pattern
@@ -72,16 +72,16 @@ DOCUMENTATION = r'''
             required: false
             type: str
             default: inet
-            choices: ['inet', 'inet6']
+            choices: [ 'inet', 'inet6' ]
         groups:
             description:
             - Group the results
-                - 'location' grabed sample by web, maybe it works
-                - 'pattern' samba* or regex
-                - 'network_range' 192.168.0.0/24
-                - 'os' ubuntu
-                - 'release' groovy
-                - 'profile' default
+                - 'location' e.g. grabed sample by web, maybe it works
+                - 'pattern' e.g. samba* or regex
+                - 'network_range' e.g. 192.168.0.0/24
+                - 'os' e.g. ubuntu
+                - 'release' e.g. groovy
+                - 'profile' e.g. default
                 - 'vlanid' works on defined networks e.g. br0 with vlanid_default == 666
             required: false
             type: json
@@ -89,7 +89,7 @@ DOCUMENTATION = r'''
         selftest:
             description:
             - Load default data to test plugIn
-                - 'path' to file with test data e.g. ansible_collections/community/general/tests/integration/targets/inventory_lxd/files/lxd_inventory.atd
+                - 'path' to file with test data e.g. C(ansible_collections/community/general/tests/integration/targets/inventory_lxd/files/lxd_inventory.atd)
                 - 'activate' True
             required: false
             type: json
@@ -147,7 +147,9 @@ groups:
   netRangeIPv6:
     type: network_range
     attribute: fd42:bd00:7b11:2167:216:3eff::/24
-selftest: False
+selftest:
+  activate: True
+  path: ~/dev/ansible_collections/community/general/tests/integration/targets/inventory_lxd/files/lxd_inventory.atd
 dumpdata: False
 '''
 
