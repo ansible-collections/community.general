@@ -443,10 +443,13 @@ def transition(restbase, user, passwd, params):
     fields = dict(params['fields'])
     if params['summary'] is not None:
         fields.update({'summary': params['summary']})
+    if params['description'] is not None:
+        fields.update({'description': params['description']})
+
     # Perform it
     url = restbase + '/issue/' + params['issue'] + "/transitions"
     data = {'transition': {"id": tid},
-            'fields': params['fields']}
+            'fields': fields}
     if params['comment'] is not None:
         data.update({"update": {
             "comment": [{
