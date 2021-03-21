@@ -11,7 +11,7 @@ from ansible.module_utils._text import to_native, to_text
 from ansible.module_utils.urls import fetch_url
 
 
-class GandiLiveDNSAPI:
+class GandiLiveDNSAPI(object):
 
     api_endpoint = 'https://api.gandi.net/v5/livedns'
     changed = False
