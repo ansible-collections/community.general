@@ -372,3 +372,6 @@
 
 - name: import broken-link tests
   import_tasks: broken-link.yml
+
+- name: import testcase for issue 1043
+  import_tasks: 1043-change-report.yml

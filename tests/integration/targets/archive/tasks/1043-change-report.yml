@@ -1,0 +1,71 @@
+---
+- name: test case from issue
+  block:
+  - name: reset after previous run
+    with_items:
+    - "{{ zip_dest }}"
+    - "{{ zip_src }}"
+    - "{{ zip_extracted }}"
+    file:
+      state: absent
+      path: "{{ item }}"
+
+  - name: create directory to be zipped up
+    file:
+      state: directory
+      path: "{{ zip_src }}"
+
+  - name: create a file to be zipped up
+    copy:
+      content: "hello"
+      dest: "{{ zip_src }}/hello_1.txt"
+
+  - name: create first zip
+    archive:
+      path: "{{ zip_src }}"
+      dest: "{{ zip_dest }}"
+
+  - name: create first zip again
+    archive:
+      path: "{{ zip_src }}"
+      dest: "{{ zip_dest }}"
+    register: zip1again
+
+  - name: check previous task is marked as not changed
+    assert:
+      that:
+      - zip1again is not changed
+
+  - name: rename the source file
+    shell: mv {{ zip_src }}/hello_1.txt {{ zip_src }}/hello_2.txt
+
+  - name: zip again with renamed contents
+    archive:
+      path: "{{ zip_src }}"
+      dest: "{{ zip_dest }}"
+    register: zip2
+
+  - name: create directory to unzip into
+    file:
+      state: directory
+      path: "{{ zip_extracted }}"
+
+  - name: unzip to check the change is there
+    unarchive:
+      src: "{{ zip_dest }}"
+      dest: "{{ zip_extracted }}"
+
+  - name: check the contents of the zip has changed
+    assert:
+      that:
+      - '"{{ zip_extracted }}/zip_source/hello_2.txt" is exists'
+      - '"{{ zip_extracted }}/zip_source/hello_1.txt" is not exists'
+
+  - name: check previous task is marked as changed
+    assert:
+      that:
+      - zip2 is changed
+  vars:
+    zip_dest: "{{ output_dir }}/zip.zip"
+    zip_src: "{{ output_dir }}/zip_source"
+    zip_extracted: "{{ output_dir }}/zip_extracted"

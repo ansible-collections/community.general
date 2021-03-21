@@ -336,10 +336,12 @@ def main():
             state = 'incomplete'
 
         archive = None
+        existing_md5 = ""
         size = 0
         errors = []
 
         if os.path.lexists(b_dest):
+            existing_md5 = module.md5(b_dest)
             size = os.path.getsize(b_dest)
 
         if state != 'archive':
@@ -456,9 +458,8 @@ def main():
             if errors:
                 module.fail_json(dest=dest, msg='Error deleting some source files: ', files=errors)
 
-        # Rudimentary check: If size changed then file changed. Not perfect, but easy.
-        if not check_mode and os.path.getsize(b_dest) != size:
-            changed = True
+        changed = changed or os.path.getsize(b_dest) != size
+        changed = changed or module.md5(dest) != existing_md5
 
         if b_successes and state != 'incomplete':
             state = 'archive'
@@ -481,9 +482,11 @@ def main():
                     changed = True
             else:
                 size = 0
+                existing_md5 = ""
                 f_in = f_out = arcfile = None
 
                 if os.path.lexists(b_dest):
+                    existing_md5 = module.md5(b_dest)
                     size = os.path.getsize(b_dest)
 
                 try:
@@ -535,9 +538,8 @@ def main():
                 if f_out:
                     f_out.close()
 
-                # Rudimentary check: If size changed then file changed. Not perfect, but easy.
-                if os.path.getsize(b_dest) != size:
-                    changed = True
+                changed = changed or os.path.getsize(b_dest) != size
+                changed = changed or module.md5(dest) != existing_md5
 
             state = 'compress'
 
