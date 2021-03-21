@@ -137,26 +137,12 @@ list:
     gid: 500
 '''
 
-import csv
-from io import BytesIO, StringIO
-
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_text
-from ansible.module_utils.six import PY3
+from ansible.module_utils._text import to_native
 
-
-# Add Unix dialect from Python 3
-class unix_dialect(csv.Dialect):
-    """Describe the usual properties of Unix-generated CSV files."""
-    delimiter = ','
-    quotechar = '"'
-    doublequote = True
-    skipinitialspace = False
-    lineterminator = '\n'
-    quoting = csv.QUOTE_ALL
-
-
-csv.register_dialect("unix", unix_dialect)
+from ansible_collections.community.general.plugins.module_utils.csv import (initialize_dialect, read_csv, CSVError,
+                                                                            DialectNotAvailableError,
+                                                                            CustomDialectFailureError)
 
 
 def main():
@@ -180,38 +166,24 @@ def main():
     fieldnames = module.params['fieldnames']
     unique = module.params['unique']
 
-    if dialect not in csv.list_dialects():
-        module.fail_json(msg="Dialect '%s' is not supported by your version of python." % dialect)
+    dialect_params = {
+        "delimiter": module.params['delimiter'],
+        "skipinitialspace": module.params['skipinitialspace'],
+        "strict": module.params['strict'],
+    }
 
-    dialect_options = dict(
-        delimiter=module.params['delimiter'],
-        skipinitialspace=module.params['skipinitialspace'],
-        strict=module.params['strict'],
-    )
-
-    # Create a dictionary from only set options
-    dialect_params = dict((k, v) for k, v in dialect_options.items() if v is not None)
-    if dialect_params:
-        try:
-            csv.register_dialect('custom', dialect, **dialect_params)
-        except TypeError as e:
-            module.fail_json(msg="Unable to create custom dialect: %s" % to_text(e))
-        dialect = 'custom'
+    try:
+        dialect = initialize_dialect(dialect, **dialect_params)
+    except (CustomDialectFailureError, DialectNotAvailableError) as e:
+        module.fail_json(msg=to_native(e))
 
     try:
         with open(path, 'rb') as f:
             data = f.read()
     except (IOError, OSError) as e:
-        module.fail_json(msg="Unable to open file: %s" % to_text(e))
+        module.fail_json(msg="Unable to open file: %s" % to_native(e))
 
-    if PY3:
-        # Manually decode on Python3 so that we can use the surrogateescape error handler
-        data = to_text(data, errors='surrogate_or_strict')
-        fake_fh = StringIO(data)
-    else:
-        fake_fh = BytesIO(data)
-
-    reader = csv.DictReader(fake_fh, fieldnames=fieldnames, dialect=dialect)
+    reader = read_csv(data, dialect, fieldnames)
 
     if key and key not in reader.fieldnames:
         module.fail_json(msg="Key '%s' was not found in the CSV header fields: %s" % (key, ', '.join(reader.fieldnames)))
@@ -223,16 +195,16 @@ def main():
         try:
             for row in reader:
                 data_list.append(row)
-        except csv.Error as e:
-            module.fail_json(msg="Unable to process file: %s" % to_text(e))
+        except CSVError as e:
+            module.fail_json(msg="Unable to process file: %s" % to_native(e))
     else:
         try:
             for row in reader:
                 if unique and row[key] in data_dict:
                     module.fail_json(msg="Key '%s' is not unique for value '%s'" % (key, row[key]))
                 data_dict[row[key]] = row
-        except csv.Error as e:
-            module.fail_json(msg="Unable to process file: %s" % to_text(e))
+        except CSVError as e:
+            module.fail_json(msg="Unable to process file: %s" % to_native(e))
 
     module.exit_json(dict=data_dict, list=data_list)
 
