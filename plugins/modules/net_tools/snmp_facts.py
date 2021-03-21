@@ -77,6 +77,7 @@ options:
             - Maximum number of request retries, 0 retries means just a single request.
         type: int
         default: 0
+        version_added: 2.3.0
 '''
 
 EXAMPLES = r'''
