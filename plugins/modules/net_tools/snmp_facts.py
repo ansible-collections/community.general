@@ -67,6 +67,15 @@ options:
             - Encryption key.
             - Required if I(level) is C(authPriv).
         type: str
+    timeout:
+        description:
+            - Response timeout in seconds.
+        type: int
+    retries:
+        description:
+            - Maximum number of request retries, 0 retries means just a single request.
+        type: int
+        default: 0
 '''
 
 EXAMPLES = r'''
@@ -271,6 +280,8 @@ def main():
             privacy=dict(type='str', choices=['aes', 'des']),
             authkey=dict(type='str', no_log=True),
             privkey=dict(type='str', no_log=True),
+            timeout=dict(type='int'),
+            retries=dict(type='int', default=0),
         ),
         required_together=(
             ['username', 'level', 'integrity', 'authkey'],
@@ -285,6 +296,9 @@ def main():
         module.fail_json(msg=missing_required_lib('pysnmp'), exception=PYSNMP_IMP_ERR)
 
     cmdGen = cmdgen.CommandGenerator()
+    transport_opts = {'retries': m_args['retries']}
+    if m_args['timeout']:
+        transport_opts['timeout'] = m_args['timeout']
 
     # Verify that we receive a community when using snmp v2
     if m_args['version'] in ("v2", "v2c"):
@@ -333,7 +347,7 @@ def main():
 
     errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
         snmp_auth,
-        cmdgen.UdpTransportTarget((m_args['host'], 161)),
+        cmdgen.UdpTransportTarget((m_args['host'], 161), **transport_opts),
         cmdgen.MibVariable(p.sysDescr,),
         cmdgen.MibVariable(p.sysObjectId,),
         cmdgen.MibVariable(p.sysUpTime,),
@@ -364,7 +378,7 @@ def main():
 
     errorIndication, errorStatus, errorIndex, varTable = cmdGen.nextCmd(
         snmp_auth,
-        cmdgen.UdpTransportTarget((m_args['host'], 161)),
+        cmdgen.UdpTransportTarget((m_args['host'], 161), **transport_opts),
         cmdgen.MibVariable(p.ifIndex,),
         cmdgen.MibVariable(p.ifDescr,),
         cmdgen.MibVariable(p.ifMtu,),
