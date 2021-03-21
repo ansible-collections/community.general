@@ -297,7 +297,7 @@ def main():
         module.fail_json(msg=missing_required_lib('pysnmp'), exception=PYSNMP_IMP_ERR)
 
     cmdGen = cmdgen.CommandGenerator()
-    transport_opts = dict((k, m_args[k]) for k in ('timeout', 'retries') if m_args[k])
+    transport_opts = dict((k, m_args[k]) for k in ('timeout', 'retries') if m_args[k] is not None)
 
     # Verify that we receive a community when using snmp v2
     if m_args['version'] in ("v2", "v2c"):
