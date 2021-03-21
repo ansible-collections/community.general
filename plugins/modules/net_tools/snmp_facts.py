@@ -76,7 +76,6 @@ options:
         description:
             - Maximum number of request retries, 0 retries means just a single request.
         type: int
-        default: 0
         version_added: 2.3.0
 '''
 
@@ -283,7 +282,7 @@ def main():
             authkey=dict(type='str', no_log=True),
             privkey=dict(type='str', no_log=True),
             timeout=dict(type='int'),
-            retries=dict(type='int', default=0),
+            retries=dict(type='int'),
         ),
         required_together=(
             ['username', 'level', 'integrity', 'authkey'],
@@ -298,9 +297,7 @@ def main():
         module.fail_json(msg=missing_required_lib('pysnmp'), exception=PYSNMP_IMP_ERR)
 
     cmdGen = cmdgen.CommandGenerator()
-    transport_opts = {'retries': m_args['retries']}
-    if m_args['timeout']:
-        transport_opts['timeout'] = m_args['timeout']
+    transport_opts = dict((k, m_args[k]) for k in ('timeout', 'retries') if m_args[k])
 
     # Verify that we receive a community when using snmp v2
     if m_args['version'] in ("v2", "v2c"):
