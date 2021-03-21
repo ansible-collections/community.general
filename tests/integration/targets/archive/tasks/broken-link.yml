@@ -20,4 +20,3 @@
   archive:
     path: "{{ output_dir }}/*.txt"
     dest: "{{ output_dir }}/archive_broken_link.zip"
-
