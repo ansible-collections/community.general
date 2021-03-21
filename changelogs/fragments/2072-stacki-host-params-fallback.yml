@@ -1,0 +1,2 @@
+bugfixes:
+  - stacki_host - replaced ``default`` to environment variables with ``fallback`` to them (https://github.com/ansible-collections/community.general/pull/2072).
