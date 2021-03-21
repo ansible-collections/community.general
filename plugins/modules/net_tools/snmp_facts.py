@@ -71,6 +71,7 @@ options:
         description:
             - Response timeout in seconds.
         type: int
+        version_added: 2.3.0
     retries:
         description:
             - Maximum number of request retries, 0 retries means just a single request.
