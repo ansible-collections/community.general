@@ -36,6 +36,7 @@ options:
     description:
       - The file name of the destination archive. The parent directory must exists on the remote host.
       - This is required when C(path) refers to multiple files by either specifying a glob, a directory or multiple paths in a list.
+      - If the destination archive already exists, it will be truncated and overwritten.
     type: path
   exclude_path:
     description:
@@ -153,7 +154,6 @@ expanded_exclude_paths:
 '''
 
 import bz2
-import filecmp
 import glob
 import gzip
 import io
