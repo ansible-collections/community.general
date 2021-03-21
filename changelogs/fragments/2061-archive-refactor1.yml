@@ -1,0 +1,2 @@
+minor_changes:
+  - archive - refactored some reused code out into a couple of functions (https://github.com/ansible-collections/community.general/pull/2061).
