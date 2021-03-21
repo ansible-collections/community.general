@@ -369,3 +369,6 @@
 
 - name: import remove tests
   import_tasks: remove.yml
+
+- name: import broken-link tests
+  import_tasks: broken-link.yml
