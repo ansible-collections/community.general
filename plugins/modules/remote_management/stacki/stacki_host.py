@@ -53,6 +53,7 @@ options:
     description:
      - Set value to True to force node into install state if it already exists in stacki.
     type: bool
+    default: no
   state:
     description:
       - Set value to the desired state for the specified host.
@@ -103,9 +104,8 @@ stdout_lines:
 '''
 
 import json
-import os
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url
 
@@ -235,9 +235,9 @@ def main():
             prim_intf_ip=dict(type='str'),
             network=dict(type='str', default='private'),
             prim_intf_mac=dict(type='str'),
-            stacki_user=dict(type='str', required=True, default=os.environ.get('stacki_user')),
-            stacki_password=dict(type='str', required=True, default=os.environ.get('stacki_password'), no_log=True),
-            stacki_endpoint=dict(type='str', required=True, default=os.environ.get('stacki_endpoint')),
+            stacki_user=dict(type='str', required=True, fallback=(env_fallback, ['stacki_user'])),
+            stacki_password=dict(type='str', required=True, fallback=(env_fallback, ['stacki_password']), no_log=True),
+            stacki_endpoint=dict(type='str', required=True, fallback=(env_fallback, ['stacki_endpoint'])),
             force_install=dict(type='bool', default=False),
         ),
         supports_check_mode=False,
