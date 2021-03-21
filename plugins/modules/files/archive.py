@@ -199,18 +199,17 @@ def to_na(s):
 
 def expand_paths(paths):
     expanded_path = []
-    is_globby = []
+    is_globby = False
     for path in paths:
         b_path = to_b(path)
         if b'*' in b_path or b'?' in b_path:
             e_paths = glob.glob(b_path)
-            is_globby.append(True)
+            is_globby = True
 
         else:
             e_paths = [b_path]
-            is_globby.append(False)
         expanded_path.extend(e_paths)
-    return expanded_path, any(is_globby)
+    return expanded_path, is_globby
 
 
 def main():
