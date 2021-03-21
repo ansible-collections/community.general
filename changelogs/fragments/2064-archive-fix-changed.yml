@@ -1,0 +1,2 @@
+bugfixes:
+  - archive - calculating ``changed`` now uses a md5 checksum instead of just the file size (https://github.com/ansible-collections/community.general/issues/1043).
