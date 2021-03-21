@@ -12,9 +12,7 @@ DOCUMENTATION = r'''
 module: gandi_livedns
 author:
 - Gregory Thiemonge (@gthiemonge)
-requirements:
-- python >= 2.6
-version_added: "2.0.0"
+version_added: "2.3.0"
 short_description: Manage Gandi LiveDNS records
 description:
 - "Manages DNS records by the Gandi LiveDNS API, see the docs: U(https://doc.livedns.gandi.net/)."
@@ -38,7 +36,7 @@ options:
   ttl:
     description:
     - The TTL to give the new record.
-    - Required when C(state=present).
+    - Required when I(state=present).
     type: int
   type:
     description:
@@ -48,7 +46,7 @@ options:
   values:
     description:
     - The record values.
-    - Required when C(state=present).
+    - Required when I(state=present).
     type: list
     elements: str
   domain:
