@@ -352,7 +352,7 @@ def import_cert_path(module, executable, path, keystore_path, keystore_pass, ali
     import_cmd += _get_keystore_type_keytool_parameters(keystore_type)
 
     if trust_cacert:
-        import_cmd = import_cmd + " -trustcacerts"
+        import_cmd.extend(["-trustcacerts"])
 
     # Use local certificate from local path and import it to a java keystore
     (import_rc, import_out, import_err) = module.run_command(import_cmd,
