@@ -44,8 +44,9 @@ options:
     elements: path
   force_archive:
     description:
-      - Allow you to force the module to treat this as an archive even if only a single file is specified.
-      - By default behaviour is maintained. i.e A when a single file is specified it is compressed only (not archived).
+      - Allows you to force the module to treat this as an archive even if only a single file is specified.
+      - By default when a single file is specified it is compressed only (not archived).
+      - Enable this if you want to use M(ansible.builtin.unarchive) on an archive of a single file created with this module.
     type: bool
     default: false
   remove:
