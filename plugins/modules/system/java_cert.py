@@ -299,7 +299,7 @@ def get_proxy_settings(scheme='https'):
 
 
 def build_proxy_options():
-    """ Returns string of valid proxy options for keytool """
+    """ Returns list of valid proxy options for keytool """
     (proxy_host, proxy_port) = get_proxy_settings()
     no_proxy = os.getenv("no_proxy")
 
