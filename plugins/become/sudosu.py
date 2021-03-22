@@ -6,14 +6,15 @@ __metaclass__ = type
 
 DOCUMENTATION = """
     become: sudosu
-    short_description: Run tashks using sudo su -
+    short_description: Run tasks using sudo su -
     description:
-        - This become plugins allows your remote/login user to execute commands as another user via the sudo and su utility combined.
-    author: ansible (@core)
-    version_added: "2.12"
+        - This become plugins allows your remote/login user to execute commands as another user via the C(sudo) and C(su) utilities combined.
+    author:
+    - Dag Wieers (@dagwieers)
+    version_added: 2.3.0
     options:
         become_user:
-            description: User you 'become' to execute the task
+            description: User you 'become' to execute the task.
             default: root
             ini:
               - section: privilege_escalation
@@ -27,7 +28,7 @@ DOCUMENTATION = """
               - name: ANSIBLE_BECOME_USER
               - name: ANSIBLE_SUDO_USER
         become_flags:
-            description: Options to pass to sudo
+            description: Options to pass to C(sudo).
             default: -H -S -n
             ini:
               - section: privilege_escalation
@@ -41,8 +42,8 @@ DOCUMENTATION = """
               - name: ANSIBLE_BECOME_FLAGS
               - name: ANSIBLE_SUDO_FLAGS
         become_pass:
-            description: Password to pass to sudo
-            required: False
+            description: Password to pass to C(sudo).
+            required: false
             vars:
               - name: ansible_become_password
               - name: ansible_become_pass
@@ -61,7 +62,7 @@ from ansible.plugins.become import BecomeBase
 
 class BecomeModule(BecomeBase):
 
-    name = 'sudo'
+    name = 'community.general.sudosu'
 
     # messages for detecting prompted password issues
     fail = ('Sorry, try again.',)
@@ -73,7 +74,7 @@ class BecomeModule(BecomeBase):
         if not cmd:
             return cmd
 
-        becomecmd = self.name
+        becomecmd = 'sudo'
 
         flags = self.get_option('become_flags') or ''
         prompt = ''
