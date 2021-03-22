@@ -315,7 +315,7 @@ def build_proxy_options():
 
             # The property name is http.nonProxyHosts, there is no
             # separate setting for HTTPS.
-            proxy_opts += " -J-Dhttp.nonProxyHosts='%s'" % non_proxy_hosts
+            proxy_opts.extend(["-J-Dhttp.nonProxyHosts=%s" % non_proxy_hosts])
     return proxy_opts
 
 
