@@ -305,7 +305,7 @@ def build_proxy_options():
 
     proxy_opts = []
     if proxy_host:
-        proxy_opts = "-J-Dhttps.proxyHost=%s -J-Dhttps.proxyPort=%s" % (proxy_host, proxy_port)
+        proxy_opts.extend(["-J-Dhttps.proxyHost=%s" % proxy_host, "-J-Dhttps.proxyPort=%s" % proxy_port])
 
         if no_proxy is not None:
             # For Java's nonProxyHosts property, items are separated by '|',
