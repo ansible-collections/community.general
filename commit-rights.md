@@ -1,0 +1,72 @@
+Committers Guidelines
+=====================
+
+(This document is based on https://github.com/ansible/ansible/blob/b57444af14062ec96e0af75fdfc2098c74fe2d9a/docs/docsite/rst/community/committer_guidelines.rst.)
+
+These are the guidelines for people with commit privileges on the Ansible Community General Collection GitHub repository. Please read the guidelines before you commit.
+
+These guidelines apply to everyone. At the same time, this ISN'T a process document. So just use good judgment. You've been given commit access because we trust your judgment.
+
+That said, use the trust wisely.
+
+If you abuse the trust and break components and builds, and so on, the trust level falls and you may be asked not to commit or you may lose your commit privileges.
+
+Our workflow on GitHub
+----------------------
+
+As a committer, you may already know this, but our workflow forms a lot of our team policies. Please ensure you're aware of the following workflow steps:
+
+* Fork the repository upon which you want to do some work to your own personal repository
+* Work on the specific branch upon which you need to commit
+* Create a Pull Request back to the Ansible repository and tag the people you would like to review; assign someone as the primary "owner" of your request
+* Adjust code as necessary based on the Comments provided
+* Ask someone from the other committers to do a final review and merge
+
+We are aware that this can be a difficult process at times. Sometimes, the team breaks the rules by making direct commits or merging their own PRs. This section is a set of guidelines. If you're changing a comma in a doc, or making a very minor change, you can use your best judgement. This is another trust thing. The process is critical for any major change, but for little things or getting something done quickly, use your best judgement and make sure people on the team are aware of your work.
+
+Roles
+-----
+* Release managers: Merge PRs to `stable-X` branches, create tags to do releases.
+* Committers: Fine to do PRs for most things, but we should have a timebox. Hanging PRs may merge on the judgement of these devs.
+* Module maintainers: Module maintainers own specific modules and have indirect commit access through the current module PR mechanisms. This is primary [ansibullbot](https://github.com/ansibullbot)'s `shipit` mechanism.
+
+General rules
+-------------
+Individuals with direct commit access to ansible/ansible are entrusted with powers that allow them to do a broad variety of things--probably more than we can write down. Rather than rules, treat these as general *guidelines*, individuals with this power are expected to use their best judgement.
+
+* Don't
+
+  - Commit directly.
+  - Merge your own PRs. Someone else should have a chance to review and approve the PR merge. You have a small amount of leeway here for very minor changes.
+  - Forget about alternate environments. Consider the alternatives--yes, people have bad environments, but they are the ones who need us the most.
+  - Drag your community team members down. Always discuss the technical merits, but you should never address the person's limitations (you can later go for beers and call them idiots, but not in IRC/GitHub/and so on).
+  - Forget about the maintenance burden. Some things are really cool to have, but they might not be worth shoehorning in if the maintenance burden is too great.
+  - Break playbooks. Always keep backwards compatibility in mind.
+  - Forget to keep it simple. Complexity breeds all kinds of problems.
+  - Merge to branches other than `main`, especially not to `stable-X`, if you do not have explicit permission to do so.
+  - Create tags. Tags are used in the release process, and should only be created by the people responsible for managing the stable branches.
+
+* Do
+
+  - Squash, avoid merges whenever possible, use GitHub's squash commits or cherry pick if needed (bisect thanks you).
+  - Be active. Committers who have no activity on the project (through merges, triage, commits, and so on) will have their permissions suspended.
+  - Consider backwards compatibility (goes back to "don't break existing playbooks").
+  - Write tests. PRs with tests are looked at with more priority than PRs without tests that should have them included. While not all changes require tests, be sure to add them for bug fixes or functionality changes.
+  - Discuss with other committers, specially when you are unsure of something.
+  - Document! If your PR is a new feature or a change to behavior, make sure you've updated all associated documentation or have notified the right people to do so.
+  - Consider scope, sometimes a fix can be generalized
+  - Keep it simple, then things are maintainable, debuggable and intelligible.
+
+Committers are expected to continue to follow the same community and contribution guidelines followed by the rest of the Ansible community.
+
+
+People
+------
+
+Individuals who've been asked to become a part of this group have generally been contributing in significant ways to the community.general collection for some time. Should they agree, they are requested to add their names and GitHub IDs to this file, in the section below, through a pull request. Doing so indicates that these individuals agree to act in the ways that their fellow committers trust that they will act.
+
+| Name                | GitHub ID            | IRC Nick           | Other                |
+| ------------------- | -------------------- | ------------------ | -------------------- |
+| Andrew Klychkov     | andersson007         | andersson007_      |                      |
+| Felix Fontein       | felixfontein         | felixfontein       |                      |
+| John R Barker       | gundalow             | gundalow           |                      |
