@@ -116,7 +116,9 @@
       - result_pkcs12_succeeded is succeeded
 
 - name: Copy the ssl server script
-  copy: src="setupSSLServer.py" dest="{{output_dir}}"
+  copy:
+    src: "setupSSLServer.py"
+    dest: "{{ output_dir }}"
 
 - name: Create an SSL server that we will use for testing URL imports
   command: python {{ output_dir }}/setupSSLServer.py {{ output_dir }} {{ test_ssl_port }}
