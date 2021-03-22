@@ -1,0 +1,1 @@
+release_summary: Fixes compatibility issues with the latest ansible-core 2.11 beta, some more bugs, and contains several new features, modules and plugins.
