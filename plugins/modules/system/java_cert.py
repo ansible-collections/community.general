@@ -303,7 +303,7 @@ def build_proxy_options():
     (proxy_host, proxy_port) = get_proxy_settings()
     no_proxy = os.getenv("no_proxy")
 
-    proxy_opts = ''
+    proxy_opts = []
     if proxy_host:
         proxy_opts = "-J-Dhttps.proxyHost=%s -J-Dhttps.proxyPort=%s" % (proxy_host, proxy_port)
 
