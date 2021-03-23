@@ -10,7 +10,7 @@ tags: [community]
 # NOTE: No more dependencies can be added to this list
 dependencies:
   ansible.netcommon: '>=1.0.0'
-  community.kubernetes: '>=1.0.0'
+  community.kubernetes: '>=1.0.0,<2.0.0'
   google.cloud: '>=1.0.0'
 repository: https://github.com/ansible-collections/community.general
 documentation: https://docs.ansible.com/ansible/latest/collections/community/general/

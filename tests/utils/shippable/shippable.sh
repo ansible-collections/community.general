@@ -74,20 +74,29 @@ else
 fi
 
 # START: HACK install dependencies
-retry ansible-galaxy -vvv collection install ansible.netcommon
-retry ansible-galaxy -vvv collection install community.kubernetes
-retry ansible-galaxy -vvv collection install google.cloud
+retry git clone --depth=1 --single-branch https://github.com/ansible-collections/ansible.netcommon.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/ansible/netcommon"
+retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.kubernetes.git --branch 1.2.0 "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/kubernetes"
+retry git clone --depth=1 --single-branch https://github.com/ansible-collections/google.cloud.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/google/cloud"
+# NOTE: we're installing with git to work around Galaxy being a huge PITA (https://github.com/ansible/galaxy/issues/2429)
+# retry ansible-galaxy -vvv collection install ansible.netcommon
+# retry ansible-galaxy -vvv collection install community.kubernetes
+# retry ansible-galaxy -vvv collection install google.cloud
 
 if [ "${script}" != "sanity" ] || [ "${test}" == "sanity/extra" ]; then
     # Nothing further should be added to this list.
     # This is to prevent modules or plugins in this collection having a runtime dependency on other collections.
-    retry ansible-galaxy -vvv collection install community.internal_test_tools
+    retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/internal_test_tools"
+    # NOTE: we're installing with git to work around Galaxy being a huge PITA (https://github.com/ansible/galaxy/issues/2429)
+    # retry ansible-galaxy -vvv collection install community.internal_test_tools
 fi
 
 if [ "${script}" != "sanity" ] && [ "${script}" != "units" ]; then
     # To prevent Python dependencies on other collections only install other collections for integration tests
-    retry ansible-galaxy -vvv collection install ansible.posix
-    retry ansible-galaxy -vvv collection install community.crypto
+    retry git clone --depth=1 --single-branch https://github.com/ansible-collections/ansible.posix.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/ansible/posix"
+    retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.crypto.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/crypto"
+    # NOTE: we're installing with git to work around Galaxy being a huge PITA (https://github.com/ansible/galaxy/issues/2429)
+    # retry ansible-galaxy -vvv collection install ansible.posix
+    # retry ansible-galaxy -vvv collection install community.crypto
 fi
 
 # END: HACK
