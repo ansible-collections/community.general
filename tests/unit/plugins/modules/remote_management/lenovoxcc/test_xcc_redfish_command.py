@@ -10,7 +10,8 @@ from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible.module_utils import basic
 from ansible.module_utils._text import to_bytes
 import ansible_collections.community.general.plugins.modules.remote_management.lenovoxcc.xcc_redfish_command as module
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args, exit_json, fail_json
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import set_module_args, exit_json, fail_json
 
 
 def get_bin_path(self, arg, required=False):
