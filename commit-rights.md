@@ -1,7 +1,7 @@
 Committers Guidelines
 =====================
 
-(This document is based on https://github.com/ansible/ansible/blob/b57444af14062ec96e0af75fdfc2098c74fe2d9a/docs/docsite/rst/community/committer_guidelines.rst.)
+This document is based on the [Ansible committer guidelines](https://github.com/ansible/ansible/blob/b57444af14062ec96e0af75fdfc2098c74fe2d9a/docs/docsite/rst/community/committer_guidelines.rst).
 
 These are the guidelines for people with commit privileges on the Ansible Community General Collection GitHub repository. Please read the guidelines before you commit.
 
