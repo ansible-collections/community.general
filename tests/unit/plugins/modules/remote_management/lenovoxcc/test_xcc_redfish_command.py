@@ -10,35 +10,7 @@ from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible.module_utils import basic
 from ansible.module_utils._text import to_bytes
 import ansible_collections.community.general.plugins.modules.remote_management.lenovoxcc.xcc_redfish_command as module
-
-
-def set_module_args(args):
-    """prepare arguments so that they will be picked up during module creation"""
-    args = json.dumps({'ANSIBLE_MODULE_ARGS': args})
-    basic._ANSIBLE_ARGS = to_bytes(args)
-
-
-class AnsibleExitJson(Exception):
-    """Exception class to be raised by module.exit_json and caught by the test case"""
-    pass
-
-
-class AnsibleFailJson(Exception):
-    """Exception class to be raised by module.fail_json and caught by the test case"""
-    pass
-
-
-def exit_json(*args, **kwargs):
-    """function to patch over exit_json; package return data into an exception"""
-    if 'changed' not in kwargs:
-        kwargs['changed'] = False
-    raise AnsibleExitJson(kwargs)
-
-
-def fail_json(*args, **kwargs):
-    """function to patch over fail_json; package return data into an exception"""
-    kwargs['failed'] = True
-    raise AnsibleFailJson(kwargs)
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args, exit_json, fail_json
 
 
 def get_bin_path(self, arg, required=False):
@@ -99,10 +71,10 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 'transfer_protocol_type': 'NFS'
             }
         })
-        with patch.object(module.xcc_RedfishUtils, '_find_managers_resource') as mock__find_managers_resource:
+        with patch.object(module.XCCRedfishUtils, '_find_managers_resource') as mock__find_managers_resource:
             mock__find_managers_resource.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
 
-            with patch.object(module.xcc_RedfishUtils, 'virtual_media_insert') as mock_virtual_media_insert:
+            with patch.object(module.XCCRedfishUtils, 'virtual_media_insert') as mock_virtual_media_insert:
                 mock_virtual_media_insert.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
 
                 with self.assertRaises(AnsibleExitJson) as result:
@@ -120,10 +92,10 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 'image_url': "nfs://10.245.52.18:/home/nfs/bootable-sr635-20210111-autorun.iso",
             }
         })
-        with patch.object(module.xcc_RedfishUtils, '_find_managers_resource') as mock__find_managers_resource:
+        with patch.object(module.XCCRedfishUtils, '_find_managers_resource') as mock__find_managers_resource:
             mock__find_managers_resource.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
 
-            with patch.object(module.xcc_RedfishUtils, 'virtual_media_eject') as mock_virtual_media_eject:
+            with patch.object(module.XCCRedfishUtils, 'virtual_media_eject') as mock_virtual_media_eject:
                 mock_virtual_media_eject.return_value = {'ret': True, 'changed': True, 'msg': 'success'}
 
                 with self.assertRaises(AnsibleExitJson) as result:
@@ -149,7 +121,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'password': 'PASSW0RD=21',
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {'ret': True, 'data': {'teststr': 'xxxx'}}
 
             with self.assertRaises(AnsibleFailJson) as result:
@@ -165,7 +137,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'resource_uri': '/redfish/v1/testuri',
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {'ret': False, 'msg': '404 error'}
 
             with self.assertRaises(AnsibleFailJson) as result:
@@ -181,7 +153,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'resource_uri': '/redfish/v1/testuri',
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {'ret': True, 'data': {'teststr': 'xxxx'}}
 
             with self.assertRaises(AnsibleExitJson) as result:
@@ -196,7 +168,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'password': 'PASSW0RD=21',
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {'ret': True, 'data': {'teststr': 'xxxx'}}
 
             with self.assertRaises(AnsibleFailJson) as result:
@@ -212,7 +184,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'resource_uri': '/redfish/v1/testuri',
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {'ret': False, 'msg': '404 error'}
 
             with self.assertRaises(AnsibleFailJson) as result:
@@ -228,7 +200,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'resource_uri': '/redfish/v1/testuri',
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {'ret': True, 'data': {'teststr': 'xxxx'}}
 
             with self.assertRaises(AnsibleFailJson) as result:
@@ -244,7 +216,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'resource_uri': '/redfish/v1/testuri',
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {'ret': True, 'data': {'Members': [], 'Members@odata.count': 0}}
 
             with self.assertRaises(AnsibleExitJson) as result:
@@ -260,7 +232,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'resource_uri': '/redfish/v1/testuri',
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {'ret': True, 'data': {'Members': [{'@odata.id': '/redfish/v1/testuri/1'}], 'Members@odata.count': 1}}
 
             with self.assertRaises(AnsibleExitJson) as result:
@@ -275,10 +247,10 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'password': 'PASSW0RD=21',
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {'ret': True, 'data': {'teststr': 'xxxx', '@odata.etag': '27f6eb13fa1c28a2711'}}
 
-            with patch.object(module.xcc_RedfishUtils, 'patch_request') as mock_patch_request:
+            with patch.object(module.XCCRedfishUtils, 'patch_request') as mock_patch_request:
                 mock_patch_request.return_value = {'ret': True, 'data': {'teststr': 'xxxx'}}
 
                 with self.assertRaises(AnsibleFailJson) as result:
@@ -294,10 +266,10 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'resource_uri': '/redfish/v1/testuri',
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {'ret': True, 'data': {'teststr': 'xxxx', '@odata.etag': '27f6eb13fa1c28a2711'}}
 
-            with patch.object(module.xcc_RedfishUtils, 'patch_request') as mock_patch_request:
+            with patch.object(module.XCCRedfishUtils, 'patch_request') as mock_patch_request:
                 mock_patch_request.return_value = {'ret': True, 'data': {'teststr': 'xxxx'}}
 
                 with self.assertRaises(AnsibleFailJson) as result:
@@ -314,10 +286,10 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'request_body': {'teststr': 'yyyy', 'otherkey': 'unknownkey'}
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {'ret': True, 'data': {'teststr': 'xxxx', '@odata.etag': '27f6eb13fa1c28a2711'}}
 
-            with patch.object(module.xcc_RedfishUtils, 'patch_request') as mock_patch_request:
+            with patch.object(module.XCCRedfishUtils, 'patch_request') as mock_patch_request:
                 mock_patch_request.return_value = {'ret': True, 'data': {'teststr': 'xxxx'}}
 
                 with self.assertRaises(AnsibleFailJson) as result:
@@ -334,10 +306,10 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'request_body': {'teststr': 'yyyy'}
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {'ret': True, 'data': {'teststr': 'xxxx', '@odata.etag': '27f6eb13fa1c28a2711'}}
 
-            with patch.object(module.xcc_RedfishUtils, 'patch_request') as mock_patch_request:
+            with patch.object(module.XCCRedfishUtils, 'patch_request') as mock_patch_request:
                 mock_patch_request.return_value = {'ret': False, 'msg': '500 internal error'}
 
                 with self.assertRaises(AnsibleFailJson) as result:
@@ -354,10 +326,10 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'request_body': {'teststr': 'yyyy'}
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {'ret': True, 'data': {'teststr': 'xxxx', '@odata.etag': '27f6eb13fa1c28a2711'}}
 
-            with patch.object(module.xcc_RedfishUtils, 'patch_request') as mock_patch_request:
+            with patch.object(module.XCCRedfishUtils, 'patch_request') as mock_patch_request:
                 mock_patch_request.return_value = {'ret': True, 'data': {'teststr': 'yyyy', '@odata.etag': '322e0d45d9572723c98'}}
 
                 with self.assertRaises(AnsibleExitJson) as result:
@@ -372,7 +344,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'password': 'PASSW0RD=21',
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {
                 'ret': True,
                 'data': {
@@ -394,7 +366,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 }
             }
 
-            with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
+            with patch.object(module.XCCRedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': True}
 
                 with self.assertRaises(AnsibleFailJson) as result:
@@ -410,7 +382,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'resource_uri': '/redfish/v1/testuri',
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {
                 'ret': True,
                 'data': {
@@ -432,7 +404,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 }
             }
 
-            with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
+            with patch.object(module.XCCRedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': True}
 
                 with self.assertRaises(AnsibleFailJson) as result:
@@ -448,7 +420,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'resource_uri': '/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword',
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {
                 'ret': True,
                 'data': {
@@ -470,7 +442,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 }
             }
 
-            with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
+            with patch.object(module.XCCRedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': True}
 
                 with self.assertRaises(AnsibleFailJson) as result:
@@ -486,7 +458,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'resource_uri': '/redfish/v1/Systems/1/Bios/Actions/Bios.ChangePassword',
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {
                 'ret': True,
                 'data': {
@@ -508,7 +480,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 }
             }
 
-            with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
+            with patch.object(module.XCCRedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': True}
 
                 with self.assertRaises(AnsibleFailJson) as result:
@@ -525,7 +497,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'request_body': {'PasswordName': 'UefiAdminPassword', 'NewPassword': 'PASSW0RD=='}
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {
                 'ret': True,
                 'data': {
@@ -548,7 +520,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 }
             }
 
-            with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
+            with patch.object(module.XCCRedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': True}
 
                 with self.assertRaises(AnsibleFailJson) as result:
@@ -565,10 +537,10 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'request_body': {'PasswordName': 'UefiAdminPassword', 'NewPassword': 'PASSW0RD=='}
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {'ret': False, 'msg': '404 error'}
 
-            with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
+            with patch.object(module.XCCRedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': True}
 
                 with self.assertRaises(AnsibleFailJson) as result:
@@ -585,7 +557,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'request_body': {}
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {
                 'ret': True,
                 'data': {
@@ -607,7 +579,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 }
             }
 
-            with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
+            with patch.object(module.XCCRedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': False, 'msg': '500 internal error'}
 
                 with self.assertRaises(AnsibleFailJson) as result:
@@ -624,7 +596,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
             'request_body': {}
         })
 
-        with patch.object(module.xcc_RedfishUtils, 'get_request') as mock_get_request:
+        with patch.object(module.XCCRedfishUtils, 'get_request') as mock_get_request:
             mock_get_request.return_value = {
                 'ret': True,
                 'data': {
@@ -646,7 +618,7 @@ class TestXCCRedfishCommand(unittest.TestCase):
                 }
             }
 
-            with patch.object(module.xcc_RedfishUtils, 'post_request') as mock_post_request:
+            with patch.object(module.XCCRedfishUtils, 'post_request') as mock_post_request:
                 mock_post_request.return_value = {'ret': True, 'msg': 'post success'}
 
                 with self.assertRaises(AnsibleExitJson) as result:

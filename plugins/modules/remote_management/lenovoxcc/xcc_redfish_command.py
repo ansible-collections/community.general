@@ -259,7 +259,7 @@ from ansible.module_utils._text import to_native
 from ansible_collections.community.general.plugins.module_utils.redfish_utils import RedfishUtils
 
 
-class xcc_RedfishUtils(RedfishUtils):
+class XCCRedfishUtils(RedfishUtils):
     @staticmethod
     def _find_empty_virt_media_slot(resources, media_types,
                                     media_match_strict=True):
@@ -583,7 +583,7 @@ def main():
 
     # Build root URI
     root_uri = "https://" + module.params['baseuri']
-    rf_utils = xcc_RedfishUtils(creds, root_uri, timeout, module, resource_id=resource_id, data_modification=True)
+    rf_utils = XCCRedfishUtils(creds, root_uri, timeout, module, resource_id=resource_id, data_modification=True)
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
