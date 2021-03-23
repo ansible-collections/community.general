@@ -75,7 +75,7 @@ fi
 
 # START: HACK install dependencies
 retry git clone --depth=1 --single-branch https://github.com/ansible-collections/ansible.netcommon.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/ansible/netcommon"
-retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.kubernetes.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/kubernetes"
+retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.kubernetes.git --branch 1.2.0 "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/kubernetes"
 retry git clone --depth=1 --single-branch https://github.com/ansible-collections/google.cloud.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/google/cloud"
 # NOTE: we're installing with git to work around Galaxy being a huge PITA (https://github.com/ansible/galaxy/issues/2429)
 # retry ansible-galaxy -vvv collection install ansible.netcommon
