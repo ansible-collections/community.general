@@ -1,2 +1,0 @@
-minor_changes:
-- "Restrict dependency to community.kubernetes to < 2.0.0, since community.general will no longer work with the latest git version of community.kubernetes (https://github.com/ansible-collections/community.general/pull/2087)."

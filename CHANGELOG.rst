@@ -5,6 +5,27 @@ Community General Release Notes
 .. contents:: Topics
 
 
+v1.3.9
+======
+
+Release Summary
+---------------
+
+Fixes compatibility issues with the latest ansible-core 2.11 beta, and some more bugs.
+
+Minor Changes
+-------------
+
+- Restrict dependency to community.kubernetes to < 2.0.0, since community.general will no longer work with the latest git version of community.kubernetes (https://github.com/ansible-collections/community.general/pull/2087).
+
+Bugfixes
+--------
+
+- nios* modules - fix modules to work with ansible-core 2.11 (https://github.com/ansible-collections/community.general/pull/2057).
+- redfish_config module, redfish_utils module utils - fix IndexError in ``SetManagerNic`` command (https://github.com/ansible-collections/community.general/issues/1692).
+- scaleway inventory plugin - fix pagination on scaleway inventory plugin (https://github.com/ansible-collections/community.general/pull/2036).
+- stacki_host - replaced ``default`` to environment variables with ``fallback`` to them (https://github.com/ansible-collections/community.general/pull/2072).
+
 v1.3.8
 ======
 

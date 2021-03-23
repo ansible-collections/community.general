@@ -2234,3 +2234,25 @@ releases:
     - community.docker-88-docker_container-healthcheck.yml
     - missing-no_log-again.yml
     release_date: '2021-03-15'
+  1.3.9:
+    changes:
+      bugfixes:
+      - nios* modules - fix modules to work with ansible-core 2.11 (https://github.com/ansible-collections/community.general/pull/2057).
+      - redfish_config module, redfish_utils module utils - fix IndexError in ``SetManagerNic``
+        command (https://github.com/ansible-collections/community.general/issues/1692).
+      - scaleway inventory plugin - fix pagination on scaleway inventory plugin (https://github.com/ansible-collections/community.general/pull/2036).
+      - stacki_host - replaced ``default`` to environment variables with ``fallback``
+        to them (https://github.com/ansible-collections/community.general/pull/2072).
+      minor_changes:
+      - Restrict dependency to community.kubernetes to < 2.0.0, since community.general
+        will no longer work with the latest git version of community.kubernetes (https://github.com/ansible-collections/community.general/pull/2087).
+      release_summary: Fixes compatibility issues with the latest ansible-core 2.11
+        beta, and some more bugs.
+    fragments:
+    - 1.3.9.yml
+    - 2036-scaleway-inventory.yml
+    - 2040-fix-index-error-in-redfish-set-manager-nic.yml
+    - 2057-nios-devel.yml
+    - 2072-stacki-host-params-fallback.yml
+    - 2087-restrict-kubernetes-dependency.yml
+    release_date: '2021-03-23'
