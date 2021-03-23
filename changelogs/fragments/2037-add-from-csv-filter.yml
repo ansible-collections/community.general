@@ -1,7 +1,0 @@
----
-add plugin.filter:
-  - name: from_csv
-    description: Converts CSV text input into list of dicts
-minor_changes:
-  - csv module utils - new module_utils for shared functions between ``from_csv`` filter and ``read_csv`` module (https://github.com/ansible-collections/community.general/pull/2037).
-  - read_csv - refactored read_csv module to use shared csv functions from csv module_utils (https://github.com/ansible-collections/community.general/pull/2037).

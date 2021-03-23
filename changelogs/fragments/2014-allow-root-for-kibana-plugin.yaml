@@ -1,2 +1,0 @@
-minor_changes:
-  - kibana_plugin - add parameter for passing ``--allow-root`` flag to kibana and kibana-plugin commands (https://github.com/ansible-collections/community.general/pull/2014).

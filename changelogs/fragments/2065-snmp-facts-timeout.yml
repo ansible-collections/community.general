@@ -1,2 +1,0 @@
-minor_changes:
-  - snmp_facts - added parameters ``timeout`` and ``retries`` to module (https://github.com/ansible-collections/community.general/issues/980).
