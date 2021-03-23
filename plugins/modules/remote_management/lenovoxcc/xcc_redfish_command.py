@@ -36,14 +36,16 @@ options:
       - Base URI of OOB controller.
     type: str
   username:
-    required: true
     description:
       - Username for authentication with OOB controller.
     type: str
   password:
-    required: true
     description:
       - Password for authentication with OOB controller.
+    type: str
+  auth_token:
+    description:
+      - Security token for authentication with OOB controller
     type: str
   timeout:
     description:
@@ -213,6 +215,32 @@ EXAMPLES = '''
       request_body:
         ResetKeysType: DeleteAllKeys
 
+  - name: Create session
+    community.general.redfish_command:
+      category: Sessions
+      command: CreateSession
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+    register: result
+
+  - name: Update Manager DateTimeLocalOffset property using security token for auth
+    community.general.xcc_redfish_command:
+      category: Raw
+      command: PatchResource
+      baseuri: "{{ baseuri }}"
+      auth_token: "{{ result.session.token }}"
+      resource_uri: "/redfish/v1/Managers/1"
+      request_body:
+        DateTimeLocalOffset: "+08:00"
+
+  - name: Delete session using security token created by CreateSesssion above
+    community.general.redfish_command:
+      category: Sessions
+      command: DeleteSession
+      baseuri: "{{ baseuri }}"
+      auth_token: "{{ result.session.token }}"
+      session_uri: "{{ result.session.uri }}"
 '''
 
 RETURN = '''
@@ -534,8 +562,9 @@ def main():
             category=dict(required=True),
             command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(required=True),
-            password=dict(required=True, no_log=True),
+            username=dict(),
+            password=dict(no_log=True),
+            auth_token=dict(no_log=True),
             timeout=dict(type='int', default=10),
             resource_id=dict(),
             virtual_media=dict(
@@ -556,6 +585,15 @@ def main():
                 type='dict',
             ),
         ),
+        required_together=[
+            ('username', 'password'),
+        ],
+        required_one_of=[
+            ('username', 'auth_token'),
+        ],
+        mutually_exclusive=[
+            ('username', 'auth_token'),
+        ],
         supports_check_mode=False
     )
 
@@ -564,7 +602,8 @@ def main():
 
     # admin credentials used for authentication
     creds = {'user': module.params['username'],
-             'pswd': module.params['password']}
+             'pswd': module.params['password'],
+             'token': module.params['auth_token']}
 
     # timeout
     timeout = module.params['timeout']
