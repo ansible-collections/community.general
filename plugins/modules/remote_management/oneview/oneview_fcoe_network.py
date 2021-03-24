@@ -21,11 +21,13 @@ options:
             - Indicates the desired state for the FCoE Network resource.
               C(present) will ensure data properties are compliant with OneView.
               C(absent) will remove the resource from OneView, if it exists.
+        type: str
         default: present
         choices: ['present', 'absent']
     data:
         description:
             - List with FCoE Network properties.
+        type: dict
         required: true
 
 extends_documentation_fragment:

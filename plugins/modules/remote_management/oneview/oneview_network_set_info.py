@@ -23,6 +23,7 @@ options:
     name:
       description:
         - Network Set name.
+      type: str
 
     options:
       description:
