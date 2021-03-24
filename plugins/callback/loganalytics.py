@@ -1,18 +1,4 @@
-# -*- coding: utf-8 -*-
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
@@ -22,13 +8,13 @@ DOCUMENTATION = '''
     type: aggregate
     short_description: Posts task results to Azure Log Analytics
     author: "Cyrus Li <cyrus1006@gmail.com>"
-    description: 
+    description:
       - This callback plugin will post task results in JSON formatted to an Azure Log Analytics workspace.
       - Credit to authors of splunk callback plugin(splunk.py).
     version_added: "2.9"
     requirements:
-      - Whitelisting this callback plugin
-      - An Azure log analytics work space has been established
+      - Whitelisting this callback plugin.
+      - An Azure log analytics work space has been established.
       - Define the Azure log analytics workspace id and key in ansible.cfg
     options:
       workspace_id:
@@ -65,7 +51,6 @@ import hashlib
 import hmac
 import base64
 import logging
-import urllib3
 import json
 import uuid
 import socket
@@ -91,18 +76,18 @@ class AzureLogAnalyticsSource(object):
 
     def __build_signature(self, date, workspace_id, shared_key, content_length):
         # Build authorisation signature for Azure log analytics API call
-        sigs= "POST\n{}\napplication/json\nx-ms-date:{}\n/api/logs".format(
-            str(content_length),date)
+        sigs = "POST\n{0}\napplication/json\nx-ms-date:{1}\n/api/logs".format(
+            str(content_length), date)
         utf8_sigs = sigs.encode('utf-8')
         decoded_shared_key = base64.b64decode(shared_key)
         hmac_sha256_sigs = hmac.new(
-                decoded_shared_key, utf8_sigs,digestmod=hashlib.sha256).digest()
+            decoded_shared_key, utf8_sigs, digestmod=hashlib.sha256).digest()
         encoded_hash = base64.b64encode(hmac_sha256_sigs).decode('utf-8')
-        signature = "SharedKey {}:{}".format(workspace_id,encoded_hash)
+        signature = "SharedKey {0}:{1}".format(workspace_id, encoded_hash)
         return signature
-    
+
     def __build_workspace_url(self, workspace_id):
-        return "https://{}.ods.opinsights.azure.com/api/logs?api-version=2016-04-01".format(workspace_id)
+        return "https://{0}.ods.opinsights.azure.com/api/logs?api-version=2016-04-01".format(workspace_id)
 
     def __rfc1123date(self):
         return datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
@@ -134,13 +119,13 @@ class AzureLogAnalyticsSource(object):
         data['ansible_playbook'] = self.ansible_playbook
         data['ansible_role'] = ansible_role
         data['ansible_task'] = result._task_fields
-        #NOTE: Removing args since it can contain sensitive data
+        # Removing args since it can contain sensitive data
         if 'args' in data['ansible_task']:
             data['ansible_task'].pop('args')
         data['ansible_result'] = result._result
         if 'content' in data['ansible_result']:
             data['ansible_result'].pop('content')
-        
+
         # Adding extra vars info
         data['extra_vars'] = self.extra_vars
 
@@ -155,7 +140,7 @@ class AzureLogAnalyticsSource(object):
         open_url(
             workspace_url,
             jsondata,
-            headers = {
+            headers={
                 'content-type': 'application/json',
                 'Authorization': signature,
                 'Log-Type': 'ansible_playbook',
@@ -172,7 +157,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self, display=None):
-        super(CallbackModule, self).__init__(display=display)
+        super().__init__(display=display)
         self.start_datetimes = {}  # Collect task start times
         self.workspace_id = None
         self.shared_key = None
@@ -185,7 +170,7 @@ class CallbackModule(CallbackBase):
         ).total_seconds()
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-        super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
+        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         self.workspace_id = self.get_option('workspace_id')
 
