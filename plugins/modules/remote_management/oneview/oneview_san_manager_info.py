@@ -23,6 +23,7 @@ options:
     provider_display_name:
       description:
         - Provider Display Name.
+      type: str
     params:
       description:
         - List of params to delimit, filter and sort the list of resources.
@@ -31,6 +32,7 @@ options:
            - C(count): The number of resources to return.
            - C(query): A general query string to narrow the list of resources returned.
            - C(sort): The sort order of the returned data set."
+      type: dict
 extends_documentation_fragment:
 - community.general.oneview
 
