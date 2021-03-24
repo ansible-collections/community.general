@@ -1,0 +1,4 @@
+---
+add plugin.callback:
+  - name: loganalytics
+    description: Send ansible playbook logs to Azure Log Analytics
