@@ -13,6 +13,8 @@ module: one_template
 
 short_description: Manages OpenNebula templates
 
+version_added: 2.4.0
+
 requirements:
   - pyone
 
@@ -22,12 +24,12 @@ description:
 options:
   id:
     description:
-      - A C(id) of the template you would like to manage.  If not set then a
-      - new template will be created with the given C(name).
+      - A I(id) of the template you would like to manage.  If not set then a
+      - new template will be created with the given I(name).
     type: int
   name:
     description:
-      - A C(name) of the template you would like to manage.  If a template with
+      - A I(name) of the template you would like to manage.  If a template with
       - the given name does not exist it will be created, otherwise it will be
       - managed by this module.
     type: str
@@ -37,8 +39,8 @@ options:
     type: str
   state:
     description:
-      - C(present) - state that is used to manage the template
-      - C(absent) - delete the template
+      - C(present) - state that is used to manage the template.
+      - C(absent) - delete the template.
     choices: ["present", "absent"]
     default: present
     type: str
@@ -103,36 +105,36 @@ RETURN = '''
 id:
     description: template id
     type: int
-    returned: when C(state=present)
+    returned: when I(state=present)
     sample: 153
 name:
     description: template name
     type: str
-    returned: when C(state=present)
+    returned: when I(state=present)
     sample: app1
 template:
     description: the parsed template
     type: dict
-    returned: when C(state=present)
+    returned: when I(state=present)
 group_id:
     description: template's group id
     type: int
-    returned: when C(state=present)
+    returned: when I(state=present)
     sample: 1
 group_name:
     description: template's group name
     type: str
-    returned: when C(state=present)
+    returned: when I(state=present)
     sample: one-users
 owner_id:
     description: template's owner id
     type: int
-    returned: when C(state=present)
+    returned: when I(state=present)
     sample: 143
 owner_name:
     description: template's owner name
     type: str
-    returned: when C(state=present)
+    returned: when I(state=present)
     sample: ansible-test
 '''
 
@@ -155,7 +157,16 @@ class TemplateModule(OpenNebulaModule):
 
         required_one_of = [('id', 'name')]
 
-        OpenNebulaModule.__init__(self, argument_spec, supports_check_mode=True, mutually_exclusive=mutually_exclusive, required_one_of=required_one_of)
+        required_if = [
+            ['state', 'present', ['template']]
+        ]
+
+        OpenNebulaModule.__init__(self,
+                                  argument_spec,
+                                  supports_check_mode=True,
+                                  mutually_exclusive=mutually_exclusive,
+                                  required_one_of=required_one_of,
+                                  required_if=required_if)
 
     def run(self, one, module, result):
         params = module.params
@@ -178,16 +189,9 @@ class TemplateModule(OpenNebulaModule):
             self.result = self.delete_template(template)
         else:
             if needs_creation:
-                if not template_data:
-                    module.fail_json(msg="To create a new template, the `template` attribute needs to be set.")
-
                 self.result = self.create_template(name, template_data)
             else:
-                if template_data:
-                    self.result = self.update_template(template, template_data)
-                else:
-                    self.result = self.get_template_info(template)
-                    self.result['changed'] = False
+                self.result = self.update_template(template, template_data)
 
         self.exit()
 

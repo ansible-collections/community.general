@@ -63,54 +63,11 @@
     PYONE_TEST_FIXTURE_REPLAY: "{{ opennebula_test_fixture_replay }}"
     PYONE_TEST_FIXTURE_UNIT: test_create_template
   register: result
-- set_fact:
-    template_id: "{{ result.id }}"
 
 - name: "assert that creation worked"
   assert:
     that:
     - result.changed
-
-
-# Fetch it by id and name
-
-- name: "Fetch the TEMPLATE by id"
-  one_template:
-    api_url: "{{ opennebula_url }}"
-    api_username: "{{ opennebula_username }}"
-    api_password: "{{ opennebula_password }}"
-    id: "{{ template_id }}"
-  environment:
-    PYONE_TEST_FIXTURE: "{{ opennebula_test_fixture }}"
-    PYONE_TEST_FIXTURE_FILE: /tmp/opennebula-fixtures.json.gz
-    PYONE_TEST_FIXTURE_REPLAY: "{{ opennebula_test_fixture_replay }}"
-    PYONE_TEST_FIXTURE_UNIT: test_get_template_by_id
-  register: result
-
-- name: "assert that we got the expected template back"
-  assert:
-    that:
-    - result.id == (template_id | int)
-    - result.name == "ansible-onetemplate-test"
-
-- name: "Fetch the TEMPLATE by name"
-  one_template:
-    api_url: "{{ opennebula_url }}"
-    api_username: "{{ opennebula_username }}"
-    api_password: "{{ opennebula_password }}"
-    name: ansible-onetemplate-test
-  environment:
-    PYONE_TEST_FIXTURE: "{{ opennebula_test_fixture }}"
-    PYONE_TEST_FIXTURE_FILE: /tmp/opennebula-fixtures.json.gz
-    PYONE_TEST_FIXTURE_REPLAY: "{{ opennebula_test_fixture_replay }}"
-    PYONE_TEST_FIXTURE_UNIT: test_get_template_by_name
-  register: result
-
-- name: "assert that we got the expected template back"
-  assert:
-    that:
-    - result.id == (template_id | int)
-    - result.name == "ansible-onetemplate-test"
 
 
 # Updating a template
@@ -255,6 +212,24 @@
   assert:
     that:
     - result.changed
+
+
+# Usage without `template` parameter
+
+- name: "Try to create use one_template with state=present and without the template parameter"
+  one_template:
+    api_url: "{{ opennebula_url }}"
+    api_username: "{{ opennebula_username }}"
+    api_password: "{{ opennebula_password }}"
+    name: ansible-onetemplate-test
+    state: present
+  register: result
+  ignore_errors: true
+
+- name: "assert that it failed because template is missing"
+  assert:
+    that:
+    - result.failed
 
 
 # TEARDOWN
