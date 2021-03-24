@@ -701,6 +701,8 @@ files:
     labels: cisco
   $modules/remote_management/ipmi/:
     maintainers: bgaifullin cloudnull
+  $modules/remote_management/lenovoxcc/:
+    maintainers: panyy3 renxulei
   $modules/remote_management/lxca/:
     maintainers: navalkp prabhosa
   $modules/remote_management/manageiq/:
