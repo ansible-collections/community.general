@@ -16,6 +16,7 @@ author: "Joe Adams (@sysadmind)"
 short_description: Add or remove Pulp repos from a remote host.
 description:
   - Add or remove Pulp repos from a remote host.
+  - Note, this is for Pulp 2 only.
 options:
   add_export_distributor:
     description:
