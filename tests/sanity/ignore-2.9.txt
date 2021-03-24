@@ -161,38 +161,6 @@ plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:doc-missing-type                # missing docs on suboptions
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:parameter-type-not-in-doc       # missing docs on suboptions
 plugins/modules/remote_management/manageiq/manageiq_provider.py validate-modules:undocumented-parameter          # missing docs on suboptions
-plugins/modules/remote_management/oneview/oneview_datacenter_info.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/oneview/oneview_datacenter_info.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_enclosure_info.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/oneview/oneview_enclosure_info.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_ethernet_network.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/oneview/oneview_ethernet_network.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_ethernet_network_info.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/oneview/oneview_ethernet_network_info.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_fc_network.py validate-modules:doc-missing-type
-plugins/modules/remote_management/oneview/oneview_fc_network.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/oneview/oneview_fc_network.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_fc_network_info.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/oneview/oneview_fc_network_info.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_fcoe_network.py validate-modules:doc-missing-type
-plugins/modules/remote_management/oneview/oneview_fcoe_network.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/oneview/oneview_fcoe_network.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_fcoe_network_info.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/oneview/oneview_fcoe_network_info.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_logical_interconnect_group.py validate-modules:doc-missing-type
-plugins/modules/remote_management/oneview/oneview_logical_interconnect_group.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/oneview/oneview_logical_interconnect_group.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_logical_interconnect_group_info.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/oneview/oneview_logical_interconnect_group_info.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_network_set.py validate-modules:doc-missing-type
-plugins/modules/remote_management/oneview/oneview_network_set.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/oneview/oneview_network_set.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_network_set_info.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/oneview/oneview_network_set_info.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_san_manager.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/oneview/oneview_san_manager.py validate-modules:undocumented-parameter
-plugins/modules/remote_management/oneview/oneview_san_manager_info.py validate-modules:parameter-type-not-in-doc
-plugins/modules/remote_management/oneview/oneview_san_manager_info.py validate-modules:undocumented-parameter
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:doc-default-does-not-match-spec
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:parameter-type-not-in-doc
 plugins/modules/remote_management/stacki/stacki_host.py validate-modules:undocumented-parameter

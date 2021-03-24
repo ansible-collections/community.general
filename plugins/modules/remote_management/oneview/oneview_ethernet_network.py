@@ -24,11 +24,13 @@ options:
                 - C(present) will ensure data properties are compliant with OneView.
                 - C(absent) will remove the resource from OneView, if it exists.
                 - C(default_bandwidth_reset) will reset the network connection template to the default.
+        type: str
         default: present
         choices: [present, absent, default_bandwidth_reset]
     data:
         description:
             - List with Ethernet Network properties.
+        type: dict
         required: true
 extends_documentation_fragment:
 - community.general.oneview

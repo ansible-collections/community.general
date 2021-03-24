@@ -24,12 +24,14 @@ options:
                 - C(present) ensures data properties are compliant with OneView.
                 - C(absent) removes the resource from OneView, if it exists.
                 - C(connection_information_set) updates the connection information for the SAN Manager. This operation is non-idempotent.
+        type: str
         default: present
         choices: [present, absent, connection_information_set]
     data:
-      description:
-        - List with SAN Manager properties.
-      required: true
+        description:
+            - List with SAN Manager properties.
+        type: dict
+        required: true
 
 extends_documentation_fragment:
 - community.general.oneview
