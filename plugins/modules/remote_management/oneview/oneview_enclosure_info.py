@@ -24,6 +24,7 @@ options:
     name:
       description:
         - Enclosure name.
+      type: str
     options:
       description:
         - "List with options to gather additional information about an Enclosure and related resources.

@@ -13,12 +13,32 @@ class ModuleDocFragment(object):
     DOCUMENTATION = r'''
 options:
     config:
-      description:
+        description:
         - Path to a .json configuration file containing the OneView client configuration.
           The configuration file is optional and when used should be present in the host running the ansible commands.
           If the file path is not provided, the configuration will be loaded from environment variables.
           For links to example configuration files or how to use the environment variables verify the notes section.
-      type: path
+        type: path
+    api_version:
+        description:
+        - OneView API Version.
+        type: int
+    image_streamer_hostname:
+        description:
+        - IP address or hostname for the HPE Image Streamer REST API.
+        type: str
+    hostname:
+        description:
+        - IP address or hostname for the appliance.
+        type: str
+    username:
+        description:
+        - Username for API authentication.
+        type: str
+    password:
+        description:
+        - Password for API authentication.
+        type: str
 
 requirements:
   - python >= 2.7.9

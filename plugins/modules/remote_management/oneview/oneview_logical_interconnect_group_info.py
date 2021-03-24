@@ -24,6 +24,7 @@ options:
     name:
       description:
         - Logical Interconnect Group name.
+      type: str
 extends_documentation_fragment:
 - community.general.oneview
 - community.general.oneview.factsparams

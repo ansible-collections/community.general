@@ -23,6 +23,7 @@ options:
     name:
       description:
         - Fibre Channel Network name.
+      type: str
 
 extends_documentation_fragment:
 - community.general.oneview

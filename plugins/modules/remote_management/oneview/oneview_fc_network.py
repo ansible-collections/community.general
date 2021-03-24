@@ -20,11 +20,13 @@ options:
             - Indicates the desired state for the Fibre Channel Network resource.
               C(present) will ensure data properties are compliant with OneView.
               C(absent) will remove the resource from OneView, if it exists.
+        type: str
         choices: ['present', 'absent']
         required: true
     data:
         description:
             - List with the Fibre Channel Network properties.
+        type: dict
         required: true
 
 extends_documentation_fragment:
