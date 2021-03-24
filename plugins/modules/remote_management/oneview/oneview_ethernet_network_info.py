@@ -23,6 +23,7 @@ options:
     name:
       description:
         - Ethernet Network name.
+      type: str
     options:
       description:
         - "List with options to gather additional information about an Ethernet Network and related resources.

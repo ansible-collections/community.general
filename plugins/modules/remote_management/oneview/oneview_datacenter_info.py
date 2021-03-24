@@ -24,6 +24,7 @@ options:
     name:
       description:
         - Data Center name.
+      type: str
     options:
       description:
         - "Retrieve additional information. Options available: 'visualContent'."

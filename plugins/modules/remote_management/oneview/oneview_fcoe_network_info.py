@@ -23,6 +23,7 @@ options:
     name:
       description:
         - FCoE Network name.
+      type: str
 extends_documentation_fragment:
 - community.general.oneview
 - community.general.oneview.factsparams

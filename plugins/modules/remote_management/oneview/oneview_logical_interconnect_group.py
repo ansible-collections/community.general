@@ -24,11 +24,13 @@ options:
             - Indicates the desired state for the Logical Interconnect Group resource.
               C(absent) will remove the resource from OneView, if it exists.
               C(present) will ensure data properties are compliant with OneView.
+        type: str
         choices: [absent, present]
         default: present
     data:
         description:
             - List with the Logical Interconnect Group properties.
+        type: dict
         required: true
 extends_documentation_fragment:
 - community.general.oneview
