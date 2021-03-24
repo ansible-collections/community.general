@@ -11,7 +11,7 @@ DOCUMENTATION = """
         - This become plugins allows your remote/login user to execute commands as another user via the C(sudo) and C(su) utilities combined.
     author:
     - Dag Wieers (@dagwieers)
-    version_added: 2.3.0
+    version_added: 2.4.0
     options:
         become_user:
             description: User you 'become' to execute the task.
