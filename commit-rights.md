@@ -1,5 +1,5 @@
-Committers Guidelines
-=====================
+Committers Guidelines for community.general
+===========================================
 
 This document is based on the [Ansible committer guidelines](https://github.com/ansible/ansible/blob/b57444af14062ec96e0af75fdfc2098c74fe2d9a/docs/docsite/rst/community/committer_guidelines.rst).
 
