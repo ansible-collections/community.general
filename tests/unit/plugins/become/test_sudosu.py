@@ -35,8 +35,8 @@ def test_sudosu(mocker, parser, reset_cli_args):
     play_context.become_flags = sudo_flags
     cmd = play_context.make_become_cmd(cmd=default_cmd, executable=default_exe)
 
-    assert (re.match("""%s %s  -u %s su -l %s -c 'echo %s; %s'""" % (sudo_exe, sudo_flags, play_context.become_user,
-                                                                     default_exe, success, default_cmd), cmd) is not None)
+    assert (re.match("""%s %s  su -l %s %s -c 'echo %s; %s'""" % (sudo_exe, sudo_flags, play_context.become_user,
+                                                                  default_exe, success, default_cmd), cmd) is not None)
 
     play_context.become_pass = 'testpass'
     cmd = play_context.make_become_cmd(cmd=default_cmd, executable=default_exe)
