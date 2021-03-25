@@ -7,25 +7,24 @@ DOCUMENTATION = '''
     callback: loganalytics
     type: aggregate
     short_description: Posts task results to Azure Log Analytics
-    author: "Cyrus Li <cyrus1006@gmail.com>"
+    author: "Cyrus Li (@zhcli) <cyrus1006@gmail.com>"
     description:
       - This callback plugin will post task results in JSON formatted to an Azure Log Analytics workspace.
-      - Credit to authors of splunk callback plugin(splunk.py).
-    version_added: "2.9"
+      - Credits to authors of splunk callback plugin.
+    version_added: "2.4.0"
     requirements:
       - Whitelisting this callback plugin.
       - An Azure log analytics work space has been established.
-      - Define the Azure log analytics workspace id and key in ansible.cfg
     options:
       workspace_id:
-        description: Workspace ID of the Azure log analytics workspace
+        description: Workspace ID of the Azure log analytics workspace.
         env:
           - name: WORKSPACE_ID
         ini:
           - section: callback_loganalytics
             key: workspace_id
       shared_key:
-        description: Shared key to connect to Azure log analytics workspace
+        description: Shared key to connect to Azure log analytics workspace.
         env:
           - name: WORKSPACE_SHARED_KEY
         ini:
@@ -35,10 +34,10 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 examples: >
-  Whitelist the plugin
+  Whitelist the plugin in ansible.cfg:
     [defaults]
-    callback_whitelist = loganalytics
-  Set the environment variable
+    callback_whitelist = community.general.loganalytics
+  Set the environment variable:
     export WORKSPACE_ID=01234567-0123-0123-0123-01234567890a
     export WORKSPACE_SHARED_KEY=dZD0kCbKl3ehZG6LHFMuhtE0yHiFCmetzFMc2u+roXIUQuatqU924SsAAAAPemhjbGlAemhjbGktTUJQAQIDBA==
   Or set the ansible.cfg variable in the callback_loganalytics block
