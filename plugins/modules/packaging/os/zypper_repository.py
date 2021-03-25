@@ -141,9 +141,9 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 REPO_OPTS = ['alias', 'name', 'priority', 'enabled', 'autorefresh', 'gpgcheck']
 
 
-def _get_cmd(*args):
+def _get_cmd(module, *args):
     """Combines the non-interactive zypper command with arguments/subcommands"""
-    cmd = ['/usr/bin/zypper', '--quiet', '--non-interactive']
+    cmd = [module.get_bin_path('zypper', required=True), '--quiet', '--non-interactive']
     cmd.extend(args)
 
     return cmd
@@ -151,7 +151,7 @@ def _get_cmd(*args):
 
 def _parse_repos(module):
     """parses the output of zypper --xmlout repos and return a parse repo dictionary"""
-    cmd = _get_cmd('--xmlout', 'repos')
+    cmd = _get_cmd(module, '--xmlout', 'repos')
 
     if not HAS_XML:
         module.fail_json(msg=missing_required_lib("python-xml"), exception=XML_IMP_ERR)
@@ -230,7 +230,7 @@ def repo_exists(module, repodata, overwrite_multiple):
 def addmodify_repo(module, repodata, old_repos, zypper_version, warnings):
     "Adds the repo, removes old repos before, that would conflict."
     repo = repodata['url']
-    cmd = _get_cmd('addrepo', '--check')
+    cmd = _get_cmd(module, 'addrepo', '--check')
     if repodata['name']:
         cmd.extend(['--name', repodata['name']])
 
@@ -274,14 +274,14 @@ def addmodify_repo(module, repodata, old_repos, zypper_version, warnings):
 
 def remove_repo(module, repo):
     "Removes the repo."
-    cmd = _get_cmd('removerepo', repo)
+    cmd = _get_cmd(module, 'removerepo', repo)
 
     rc, stdout, stderr = module.run_command(cmd, check_rc=True)
     return rc, stdout, stderr
 
 
 def get_zypper_version(module):
-    rc, stdout, stderr = module.run_command(['/usr/bin/zypper', '--version'])
+    rc, stdout, stderr = module.run_command([module.get_bin_path('zypper', required=True), '--version'])
     if rc != 0 or not stdout.startswith('zypper '):
         return LooseVersion('1.0')
     return LooseVersion(stdout.split()[1])
@@ -290,9 +290,9 @@ def get_zypper_version(module):
 def runrefreshrepo(module, auto_import_keys=False, shortname=None):
     "Forces zypper to refresh repo metadata."
     if auto_import_keys:
-        cmd = _get_cmd('--gpg-auto-import-keys', 'refresh', '--force')
+        cmd = _get_cmd(module, '--gpg-auto-import-keys', 'refresh', '--force')
     else:
-        cmd = _get_cmd('refresh', '--force')
+        cmd = _get_cmd(module, 'refresh', '--force')
     if shortname is not None:
         cmd.extend(['-r', shortname])
 
