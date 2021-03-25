@@ -1,4 +1,3 @@
 ---
-add plugin.callback:
-  - name: loganalytics
-    description: Send ansible playbook logs to Azure Log Analytics
+minor_changes:
+  - callback_plugin - add Azure Log Analytics (https://github.com/ansible-collections/community.general/pull/2091).
