@@ -45,6 +45,9 @@ options:
     default: present
     type: str
 
+notes:
+  - Supports C(check_mode).  Note that check mode always returns C(changed=true) for existing templates, even if the template would not actually change.
+
 extends_documentation_fragment:
   - community.general.opennebula
 
@@ -246,8 +249,12 @@ class TemplateModule(OpenNebulaModule):
             self.one.template.update(template.ID, template_data, 0)
 
         result = self.get_template_info(self.get_template_by_id(template.ID))
-        # if the previous parsed template data is not equal to the updated one, this has changed
-        result['changed'] = template.TEMPLATE != result['template']
+        if self.module.check_mode:
+            # Unfortunately it is not easy to detect if the template would have changed, therefore always report a change here.
+            result['changed'] = True
+        else:
+            # if the previous parsed template data is not equal to the updated one, this has changed
+            result['changed'] = template.TEMPLATE != result['template']
 
         return result
 

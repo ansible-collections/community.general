@@ -67,7 +67,7 @@
 - name: "assert that creation worked"
   assert:
     that:
-    - result.changed
+    - result is changed
 
 
 # Updating a template
@@ -120,7 +120,7 @@
 - name: "assert that it updated the template"
   assert:
     that:
-    - result.changed
+    - result is changed
 
 - name: "Update an existing TEMPLATE with the same changes again"
   one_template:
@@ -170,7 +170,7 @@
 - name: "assert that there was no change"
   assert:
     that:
-    - not result.changed
+    - result is not changed
 
 
 # Deletion of templates
@@ -192,7 +192,7 @@
 - name: "assert that there was no change"
   assert:
     that:
-    - not result.changed
+    - result is not changed
 
 - name: "Delete an existing TEMPLATE"
   one_template:
@@ -211,7 +211,7 @@
 - name: "assert that there was a change"
   assert:
     that:
-    - result.changed
+    - result is changed
 
 
 # Usage without `template` parameter
@@ -229,7 +229,7 @@
 - name: "assert that it failed because template is missing"
   assert:
     that:
-    - result.failed
+    - result is failed
 
 
 # TEARDOWN
