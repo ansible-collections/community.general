@@ -40,7 +40,7 @@ examples: >
   Set the environment variable:
     export WORKSPACE_ID=01234567-0123-0123-0123-01234567890a
     export WORKSPACE_SHARED_KEY=dZD0kCbKl3ehZG6LHFMuhtE0yHiFCmetzFMc2u+roXIUQuatqU924SsAAAAPemhjbGlAemhjbGktTUJQAQIDBA==
-  Or set the ansible.cfg variable in the callback_loganalytics block
+  Or configure the plugin in ansible.cfg in the callback_loganalytics block:
     [callback_loganalytics]
     workspace_id = 01234567-0123-0123-0123-01234567890a
     shared_key = dZD0kCbKl3ehZG6LHFMuhtE0yHiFCmetzFMc2u+roXIUQuatqU924SsAAAAPemhjbGlAemhjbGktTUJQAQIDBA==
