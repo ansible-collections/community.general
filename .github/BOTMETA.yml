@@ -914,7 +914,7 @@ files:
     maintainers: ahtik ovcharenko pyykkis
     labels: ufw
   $modules/system/vdo.py:
-    maintainers: bgurney-rh
+    maintainers: rhawalsh
   $modules/system/xfconf.py:
     maintainers: russoz jbenden
     labels: xfconf
