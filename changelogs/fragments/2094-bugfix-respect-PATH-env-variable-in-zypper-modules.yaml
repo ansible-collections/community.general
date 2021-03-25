@@ -1,3 +1,2 @@
 bugfixes:
-  - zypper_repository - respect PATH environment variable when resolving zypper executable path.
-  - zypper - respect PATH environment variable when resolving zypper executable path.
+  - zypper, zypper_repository - respect ``PATH`` environment variable when resolving zypper executable path (https://github.com/ansible-collections/community.general/pull/2094).
