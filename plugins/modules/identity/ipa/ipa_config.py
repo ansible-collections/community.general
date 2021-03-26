@@ -31,6 +31,7 @@ options:
     description: A comma-separated list of fields to search in when searching for groups.
     aliases: ["groupsearchfields"]
     type: str
+    version_added: '2.4.0'
   ipahomesrootdir:
     description: Default location of home directories.
     aliases: ["homesrootdir"]
