@@ -723,7 +723,7 @@ files:
   $modules/remote_management/oneview/oneview_fcoe_network.py:
     maintainers: fgbulsoni
   $modules/remote_management/redfish/:
-    maintainers: $team_redfish billdodd
+    maintainers: $team_redfish
     ignore: jose-delarosa
   $modules/remote_management/stacki/stacki_host.py:
     maintainers: bsanders bbyhuy
@@ -1017,7 +1017,7 @@ macros:
   team_opennebula: ilicmilan meerkampdvv rsmontero xorel
   team_oracle: manojmeda mross22 nalsaber
   team_purestorage: bannaych dnix101 genegr lionmax opslounge raekins sdodsley sile16
-  team_redfish: billdodd mraineri tomasg2012 xmadsen renxulei
+  team_redfish: mraineri tomasg2012 xmadsen renxulei
   team_rhn: FlossWare alikins barnabycourt vritant
   team_scaleway: QuentinBrosse abarbare jerome-quere kindermoumoute remyleone sieben
   team_solaris: bcoca fishman jasperla jpdasma mator scathatheworm troy2914 xen0l
