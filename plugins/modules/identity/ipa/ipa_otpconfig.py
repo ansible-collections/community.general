@@ -137,10 +137,10 @@ def ensure(module, client):
 def main():
     argument_spec = ipa_argument_spec()
     argument_spec.update(
-        ipatokentotpauthwindow=dict(type='str', aliases=['totpauthwindow']),
-        ipatokentotpsyncwindow=dict(type='str', aliases=['totpsyncwindow']),
-        ipatokenhotpauthwindow=dict(type='str', aliases=['hotpauthwindow']),
-        ipatokenhotpsyncwindow=dict(type='str', aliases=['hotpsyncwindow']),
+        ipatokentotpauthwindow=dict(type='str', aliases=['totpauthwindow'], no_log=False),
+        ipatokentotpsyncwindow=dict(type='str', aliases=['totpsyncwindow'], no_log=False),
+        ipatokenhotpauthwindow=dict(type='str', aliases=['hotpauthwindow'], no_log=False),
+        ipatokenhotpsyncwindow=dict(type='str', aliases=['hotpsyncwindow'], no_log=False),
     )
 
     module = AnsibleModule(
