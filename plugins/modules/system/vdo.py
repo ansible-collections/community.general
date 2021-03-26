@@ -478,7 +478,7 @@ def run_module():
         cputhreads=dict(type='str'),
         logicalthreads=dict(type='str'),
         physicalthreads=dict(type='str'),
-        force=dict(type='bool', default=False)
+        force=dict(type='bool', default=False),
     )
 
     # Seed the result dictionary in the object.  There will be an
