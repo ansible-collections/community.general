@@ -43,12 +43,12 @@ options:
     version_added: '2.4.0'
   ipapwdexpadvnotify:
     description: Notice of impending password expiration, in days.
-    aliases: ["pwexpadvnotify"]
+    aliases: ["pwdexpadvnotify"]
     type: str
     version_added: '2.4.0'
   ipasearchrecordslimit:
     description: Maximum number of records to search (-1 or 0 is unlimited).
-    aliases: ["searchrecordlimit"]
+    aliases: ["searchrecordslimit"]
     type: str
     version_added: '2.4.0'
   ipasearchtimelimit:
@@ -57,8 +57,8 @@ options:
     type: str
     version_added: '2.4.0'
   ipauserauthtype:
-    description:
-    - The authentication type to use for the user.
+    description: The authentication type to use by default.
+    aliases: ["userauthtype"]
     choices: ["password", "radius", "otp", "pkinit", "hardened", "disabled"]
     type: str
     version_added: '2.4.0'
