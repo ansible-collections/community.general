@@ -258,6 +258,18 @@ options:
               configured setting unless a different value is specified
               in the playbook.
         type: str
+    force:
+        description:
+            - When creating a volume, ignores any existing file system
+              or VDO signature already present in the storage device.
+              When stopping or removing a VDO volume, first unmounts
+              the file system stored on the device if mounted.
+            - "B(Warning:) Since this parameter removes all safety
+              checks it is important to make sure that all parameters
+              provided are accurate and intentional."
+        type: bool
+        default: no
+        version_added: 2.4.0
 notes:
   - In general, the default thread configuration should be used.
 requirements:
@@ -409,6 +421,9 @@ def add_vdooptions(params):
     if ('indexmode' in params) and (params['indexmode'] == 'sparse'):
         options.append("--sparseIndex=enabled")
 
+    if ('force' in params) and (params['force']):
+        options.append("--force")
+
     # Entering an invalid thread config results in a cryptic
     # 'Could not set up device mapper for %s' error from the 'vdo'
     # command execution.  The dmsetup module on the system will
@@ -465,7 +480,8 @@ def run_module():
         biothreads=dict(type='str'),
         cputhreads=dict(type='str'),
         logicalthreads=dict(type='str'),
-        physicalthreads=dict(type='str')
+        physicalthreads=dict(type='str'),
+        force=dict(type='bool', default=False),
     )
 
     # Seed the result dictionary in the object.  There will be an
