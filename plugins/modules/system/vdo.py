@@ -264,8 +264,9 @@ options:
               or VDO signature already present in the storage device.
               When stopping or removing a VDO volume, first unmounts
               the file system stored on the device if mounted.
-            - "B(Warning:) This will destroy existing data if there is
-              any. Use at your own risk."
+            - "B(Warning:) Since this parameter removes all safety
+              checks it is important to make sure that all parameters
+              provided are accurate and intentional."
         type: bool
         default: no
         version_added: 2.4.0
