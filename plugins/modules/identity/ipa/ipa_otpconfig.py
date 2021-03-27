@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright: (c) 2021, @justchris1
+# Copyright: (c) 2021, Ansible Project
 # Heavily influenced from Fran Fitzpatrick <francis.x.fitzpatrick@gmail.com> ipa_config module
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -18,19 +18,19 @@ options:
   ipatokentotpauthwindow:
     description: TOTP authentication window. (Seconds)
     aliases: ["totpauthwindow"]
-    type: str
+    type: int
   ipatokentotpsyncwindow:
     description: TOTP synchronization window. (Seconds)
     aliases: ["totpsyncwindow"]
-    type: str
+    type: int
   ipatokenhotpauthwindow:
     description: HOTP authentication window. (Hops)
     aliases: ["hotpauthwindow"]
-    type: str
+    type: int
   ipatokenhotpsyncwindow:
     description: HOTP synchronization window. (Hops)
     aliases: ["hotpsyncwindow"]
-    type: str
+    type: int
 extends_documentation_fragment:
 - community.general.ipa.documentation
 
@@ -67,8 +67,8 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-config:
-  description: Configuration as returned by IPA API.
+otpconfig:
+  description: OTP configuration as returned by IPA API.
   returned: always
   type: dict
 '''
@@ -96,13 +96,13 @@ def get_otpconfig_dict(ipatokentotpauthwindow=None, ipatokentotpsyncwindow=None,
 
     config = {}
     if ipatokentotpauthwindow is not None:
-        config['ipatokentotpauthwindow'] = ipatokentotpauthwindow
+        config['ipatokentotpauthwindow'] = str(ipatokentotpauthwindow)
     if ipatokentotpsyncwindow is not None:
-        config['ipatokentotpsyncwindow'] = ipatokentotpsyncwindow
+        config['ipatokentotpsyncwindow'] = str(ipatokentotpsyncwindow)
     if ipatokenhotpauthwindow is not None:
-        config['ipatokenhotpauthwindow'] = ipatokenhotpauthwindow
+        config['ipatokenhotpauthwindow'] = str(ipatokenhotpauthwindow)
     if ipatokenhotpsyncwindow is not None:
-        config['ipatokenhotpsyncwindow'] = ipatokenhotpsyncwindow
+        config['ipatokenhotpsyncwindow'] = str(ipatokenhotpsyncwindow)
 
     return config
 
@@ -137,10 +137,10 @@ def ensure(module, client):
 def main():
     argument_spec = ipa_argument_spec()
     argument_spec.update(
-        ipatokentotpauthwindow=dict(type='str', aliases=['totpauthwindow'], no_log=False),
-        ipatokentotpsyncwindow=dict(type='str', aliases=['totpsyncwindow'], no_log=False),
-        ipatokenhotpauthwindow=dict(type='str', aliases=['hotpauthwindow'], no_log=False),
-        ipatokenhotpsyncwindow=dict(type='str', aliases=['hotpsyncwindow'], no_log=False),
+        ipatokentotpauthwindow=dict(type='int', aliases=['totpauthwindow'], no_log=False),
+        ipatokentotpsyncwindow=dict(type='int', aliases=['totpsyncwindow'], no_log=False),
+        ipatokenhotpauthwindow=dict(type='int', aliases=['hotpauthwindow'], no_log=False),
+        ipatokenhotpsyncwindow=dict(type='int', aliases=['hotpsyncwindow'], no_log=False),
     )
 
     module = AnsibleModule(
