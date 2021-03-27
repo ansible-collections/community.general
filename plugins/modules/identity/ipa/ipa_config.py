@@ -88,7 +88,7 @@ EXAMPLES = r'''
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the default e-mail domain is ansible.com.
+- name: Ensure the default e-mail domain is ansible.com
   community.general.ipa_config:
     ipadefaultemaildomain: ansible.com
     ipa_host: localhost
