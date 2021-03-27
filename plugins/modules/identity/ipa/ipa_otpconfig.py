@@ -12,6 +12,7 @@ DOCUMENTATION = r'''
 module: ipa_otpconfig
 author: justchris1 (@justchris1)
 short_description: Manage FreeIPA OTP Configuration Settings
+version_added: 2.5.0
 description:
 - Modify global configuration settings of a FreeIPA Server with respect to OTP (One Time Passwords).
 options:
