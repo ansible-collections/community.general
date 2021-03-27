@@ -38,28 +38,28 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = r'''
-- name: Ensure the TOTP authentication window is set to 300 seconds.
+- name: Ensure the TOTP authentication window is set to 300 seconds
   community.general.ipa_otpconfig:
     ipatokentotpauthwindow: '300'
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the TOTP syncronization window is set to 86400 seconds.
+- name: Ensure the TOTP syncronization window is set to 86400 seconds
   community.general.ipa_otpconfig:
     ipatokentotpsyncwindow: '86400'
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the HOTP authentication window is set to 10 hops.
+- name: Ensure the HOTP authentication window is set to 10 hops
   community.general.ipa_otpconfig:
     ipatokenhotpauthwindow: '10'
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the HOTP syncronization window is set to 100 hops.
+- name: Ensure the HOTP syncronization window is set to 100 hops
   community.general.ipa_otpconfig:
     ipatokenhotpsyncwindow: '100'
     ipa_host: localhost
