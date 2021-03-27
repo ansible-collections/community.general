@@ -1,2 +1,2 @@
 minor_changes:
-  - Add support for new fields in ipa_config module: ipadefaultprimarygroup, ipagroupsearchfields, ipahomesrootdir, ipamaxusernamelength, ipapwdexpadvnotify, ipasearchrecordslimit, ipasearchtimelimit, ipauserauthtype, ipausersearchfields.  (https://github.com/ansible-collections/community.general/pull/2116)
+  - Add support new fields in ipa_config module for ipadefaultprimarygroup, ipagroupsearchfields, ipahomesrootdir, ipamaxusernamelength, ipapwdexpadvnotify, ipasearchrecordslimit, ipasearchtimelimit, ipauserauthtype, and ipausersearchfields.  (https://github.com/ansible-collections/community.general/pull/2116)
