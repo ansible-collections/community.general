@@ -40,22 +40,22 @@ options:
   ipamaxusernamelength:
     description: Maximum length of usernames.
     aliases: ["maxusernamelength"]
-    type: str
+    type: int
     version_added: '2.4.0'
   ipapwdexpadvnotify:
     description: Notice of impending password expiration, in days.
     aliases: ["pwdexpadvnotify"]
-    type: str
+    type: int
     version_added: '2.4.0'
   ipasearchrecordslimit:
     description: Maximum number of records to search (-1 or 0 is unlimited).
     aliases: ["searchrecordslimit"]
-    type: str
+    type: int
     version_added: '2.4.0'
   ipasearchtimelimit:
     description: Maximum amount of time (seconds) for a search (-1 or 0 is unlimited).
     aliases: ["searchtimelimit"]
-    type: str
+    type: int
     version_added: '2.4.0'
   ipauserauthtype:
     description: The authentication type to use by default.
@@ -77,13 +77,6 @@ EXAMPLES = r'''
 - name: Ensure the default login shell is bash
   community.general.ipa_config:
     ipadefaultloginshell: /bin/bash
-    ipa_host: localhost
-    ipa_user: admin
-    ipa_pass: supersecret
-
-- name: Ensure the default e-mail domain is ansible.com
-  community.general.ipa_config:
-    ipadefaultemaildomain: ansible.com
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
@@ -118,28 +111,28 @@ EXAMPLES = r'''
 
 - name: Ensure the maximum user name length is set to 32
   community.general.ipa_config:
-    ipamaxusernamelength: '32'
+    ipamaxusernamelength: 32
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
 - name: Ensure the password expiration notice is set to 4 days
   community.general.ipa_config:
-    ipapwdexpadvnotify: '4'
+    ipapwdexpadvnotify: 4
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
 - name: Ensure the search record limit is set to 100
   community.general.ipa_config:
-    ipasearchrecordslimit: '100'
+    ipasearchrecordslimit: 100
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
 - name: Ensure the search time limit is set to 2 seconds
   community.general.ipa_config:
-    ipasearchtimelimit: '2'
+    ipasearchtimelimit: 2
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
@@ -202,13 +195,13 @@ def get_config_dict(ipadefaultloginshell=None, ipadefaultemaildomain=None,
     if ipahomesrootdir is not None:
         config['ipahomesrootdir'] = ipahomesrootdir
     if ipamaxusernamelength is not None:
-        config['ipamaxusernamelength'] = ipamaxusernamelength
+        config['ipamaxusernamelength'] = str(ipamaxusernamelength)
     if ipapwdexpadvnotify is not None:
-        config['ipapwdexpadvnotify'] = ipapwdexpadvnotify
+        config['ipapwdexpadvnotify'] = str(ipapwdexpadvnotify)
     if ipasearchrecordslimit is not None:
-        config['ipasearchrecordslimit'] = ipasearchrecordslimit
+        config['ipasearchrecordslimit'] = str(ipasearchrecordslimit)
     if ipasearchtimelimit is not None:
-        config['ipasearchtimelimit'] = ipasearchtimelimit
+        config['ipasearchtimelimit'] = str(ipasearchtimelimit)
     if ipauserauthtype is not None:
         config['ipauserauthtype'] = ipauserauthtype
     if ipausersearchfields is not None:
@@ -259,10 +252,10 @@ def main():
         ipadefaultprimarygroup=dict(type='str', aliases=['primarygroup']),
         ipagroupsearchfields=dict(type='str', aliases=['groupsearchfields']),
         ipahomesrootdir=dict(type='str', aliases=['homesrootdir']),
-        ipamaxusernamelength=dict(type='str', aliases=['maxusernamelength']),
-        ipapwdexpadvnotify=dict(type='str', aliases=['pwdexpadvnotify']),
-        ipasearchrecordslimit=dict(type='str', aliases=['searchrecordslimit']),
-        ipasearchtimelimit=dict(type='str', aliases=['searchtimelimit']),
+        ipamaxusernamelength=dict(type='int', aliases=['maxusernamelength']),
+        ipapwdexpadvnotify=dict(type='int', aliases=['pwdexpadvnotify']),
+        ipasearchrecordslimit=dict(type='int', aliases=['searchrecordslimit']),
+        ipasearchtimelimit=dict(type='int', aliases=['searchtimelimit']),
         ipauserauthtype=dict(type='str', aliases=['userauthtype'],
                              choices=["password", "radius", "otp", "pkinit",
                                       "hardened", "disabled"]),
