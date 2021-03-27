@@ -1,2 +1,0 @@
-minor_changes:
-  - Add new module: ipa_otpconfig.  (https://github.com/ansible-collections/community.general/pull/2122)
