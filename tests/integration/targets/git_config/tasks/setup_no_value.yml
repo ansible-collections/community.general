@@ -5,4 +5,8 @@
   file:
     path: ~/.gitconfig
     state: absent
+- name: set up without value (file)
+  file:
+    path: "{{ output_dir }}/gitconfig_file"
+    state: absent
 ...
