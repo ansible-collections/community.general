@@ -33,7 +33,7 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
-examples: >
+examples: |
   Whitelist the plugin in ansible.cfg:
     [defaults]
     callback_whitelist = community.general.loganalytics
@@ -129,8 +129,7 @@ class AzureLogAnalyticsSource(object):
         data['extra_vars'] = self.extra_vars
 
         # Preparing the playbook logs as JSON format and send to Azure log analytics
-        jsondata = json.dumps(data, cls=AnsibleJSONEncoder, sort_keys=True)
-        jsondata = '{"event":' + jsondata + "}"
+        jsondata = json.dumps({'event': data}, cls=AnsibleJSONEncoder, sort_keys=True)
         content_length = len(jsondata)
         rfc1123date = self.__rfc1123date()
         signature = self.__build_signature(rfc1123date, workspace_id, shared_key, content_length)
@@ -156,7 +155,7 @@ class CallbackModule(CallbackBase):
     CALLBACK_NEEDS_WHITELIST = True
 
     def __init__(self, display=None):
-        super().__init__(display=display)
+        super(CallbackModule, self).__init__(display=display)
         self.start_datetimes = {}  # Collect task start times
         self.workspace_id = None
         self.shared_key = None
@@ -169,7 +168,7 @@ class CallbackModule(CallbackBase):
         ).total_seconds()
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
-        super().set_options(task_keys=task_keys, var_options=var_options, direct=direct)
+        super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
 
         self.workspace_id = self.get_option('workspace_id')
 
