@@ -74,84 +74,84 @@ extends_documentation_fragment:
 '''
 
 EXAMPLES = r'''
-- name: Ensure the default login shell is bash.
+- name: Ensure the default login shell is bash
   community.general.ipa_config:
     ipadefaultloginshell: /bin/bash
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the default e-mail domain is ansible.com.
+- name: Ensure the default e-mail domain is ansible.com
   community.general.ipa_config:
     ipadefaultemaildomain: ansible.com
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the default e-mail domain is ansible.com.
+- name: Ensure the default e-mail domain is ansible.com
   community.general.ipa_config:
     ipadefaultemaildomain: ansible.com
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the default primary group is set to ipausers.
+- name: Ensure the default primary group is set to ipausers
   community.general.ipa_config:
     ipadefaultprimarygroup: ipausers
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the group search fields are set to 'cn,description'.
+- name: Ensure the group search fields are set to 'cn,description'
   community.general.ipa_config:
     ipagroupsearchfields: cn,description
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the home directory location is set to /home.
+- name: Ensure the home directory location is set to /home
   community.general.ipa_config:
     ipahomesrootdir: /home
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the maximum user name length is set to 32.
+- name: Ensure the maximum user name length is set to 32
   community.general.ipa_config:
     ipamaxusernamelength: '32'
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the password expiration notice is set to 4 days.
+- name: Ensure the password expiration notice is set to 4 days
   community.general.ipa_config:
     ipapwdexpadvnotify: '4'
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the search record limit is set to 100.
+- name: Ensure the search record limit is set to 100
   community.general.ipa_config:
     ipasearchrecordslimit: '100'
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the search time limit is set to 2 seconds.
+- name: Ensure the search time limit is set to 2 seconds
   community.general.ipa_config:
     ipasearchtimelimit: '2'
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the default user auth type is password.
+- name: Ensure the default user auth type is password
   community.general.ipa_config:
     ipauserauthtype: password
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
 
-- name: Ensure the user search fields is set to 'uid,givenname,sn,ou,title'.
+- name: Ensure the user search fields is set to 'uid,givenname,sn,ou,title'
   community.general.ipa_config:
     ipausersearchfields: uid,givenname,sn,ou,title
     ipa_host: localhost
