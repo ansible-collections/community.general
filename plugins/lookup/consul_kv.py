@@ -138,6 +138,7 @@ class LookupModule(LookupBase):
             host = u.hostname
             if u.port is not None:
                 port = u.port
+        token = self.get_option('token')
 
         validate_certs = self.get_option('validate_certs')
         client_cert = self.get_option('client_cert')
@@ -146,7 +147,7 @@ class LookupModule(LookupBase):
         try:
             for term in terms:
                 params = self.parse_params(term)
-                consul_api = consul.Consul(host=host, port=port, scheme=scheme, verify=validate_certs, cert=client_cert)
+                consul_api = consul.Consul(host=host, port=port, scheme=scheme, token=token, verify=validate_certs, cert=client_cert)
 
                 results = consul_api.kv.get(params['key'],
                                             token=params['token'],
