@@ -206,7 +206,10 @@ def main():
     args = [git_path, "config", "--includes"]
     if params['list_all']:
         args.append('-l')
-    if scope:
+    if scope == 'file':
+        args.append('-f')
+        args.append(params['file'])
+    elif scope:
         args.append("--" + scope)
     if name:
         args.append(name)
