@@ -1,5 +1,5 @@
 ---
 bugfixes:
-  - plugins/lookup/consul_kv.py - use self.get_option and
-    wire the exsisting token attribute into consul_api call.
-    (https://github.com/ansible-collections/community.general/issues/2124)
+  - consul_kv lookup - use ``self.get_option`` and
+    wire the existing ``token`` attribute into consul_api call
+    (https://github.com/ansible-collections/community.general/issues/2124).
