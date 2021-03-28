@@ -18,6 +18,7 @@ DOCUMENTATION = '''
     options:
       workspace_id:
         description: Workspace ID of the Azure log analytics workspace.
+        required: true
         env:
           - name: WORKSPACE_ID
         ini:
@@ -25,6 +26,7 @@ DOCUMENTATION = '''
             key: workspace_id
       shared_key:
         description: Shared key to connect to Azure log analytics workspace.
+        required: true
         env:
           - name: WORKSPACE_SHARED_KEY
         ini:
@@ -61,6 +63,7 @@ from os.path import basename
 from ansible.module_utils.urls import open_url
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
+from ansible.errors import AnsibleError
 
 
 class AzureLogAnalyticsSource(object):
@@ -161,7 +164,7 @@ class CallbackModule(CallbackBase):
         self.shared_key = None
         self.loganalytics = AzureLogAnalyticsSource()
 
-    def _runtime(self, result):
+    def _seconds_since_start(self, result):
         return (
             datetime.utcnow() -
             self.start_datetimes[result._task._uuid]
@@ -174,21 +177,21 @@ class CallbackModule(CallbackBase):
 
         if self.workspace_id is None:
             self.disabled = True
-            self._display.warning('Azure Log analytics workspace ID was '
-                                  'not provided. The workspace '
-                                  'Workspace ID can be provided using the '
-                                  '`WORKSPACE_ID` environment variable or '
-                                  'in the ansible.cfg file.')
+            raise AnsibleError('Azure Log analytics workspace ID was '
+                               'not provided. The workspace '
+                               'Workspace ID can be provided using the '
+                               '`WORKSPACE_ID` environment variable or '
+                               'in the ansible.cfg file.')
 
         self.shared_key = self.get_option('shared_key')
 
         if self.shared_key is None:
             self.disabled = True
-            self._display.warning('Azure Log analytics workspace requires a '
-                                  'shared key. The authentication shared key '
-                                  'can be provided using the '
-                                  '`WORKSPACE_SHARED_KEY` environment variable or '
-                                  'in the ansible.cfg file.')
+            raise AnsibleError('Azure Log analytics workspace requires a '
+                               'shared key. The authentication shared key '
+                               'can be provided using the '
+                               '`WORKSPACE_SHARED_KEY` environment variable or '
+                               'in the ansible.cfg file.')
 
     def v2_playbook_on_play_start(self, play):
         vm = play.get_variable_manager()
@@ -210,7 +213,7 @@ class CallbackModule(CallbackBase):
             self.shared_key,
             'OK',
             result,
-            self._runtime(result)
+            self._seconds_since_start(result)
         )
 
     def v2_runner_on_skipped(self, result, **kwargs):
@@ -219,7 +222,7 @@ class CallbackModule(CallbackBase):
             self.shared_key,
             'SKIPPED',
             result,
-            self._runtime(result)
+            self._seconds_since_start(result)
         )
 
     def v2_runner_on_failed(self, result, **kwargs):
@@ -228,7 +231,7 @@ class CallbackModule(CallbackBase):
             self.shared_key,
             'FAILED',
             result,
-            self._runtime(result)
+            self._seconds_since_start(result)
         )
 
     def runner_on_async_failed(self, result, **kwargs):
@@ -237,7 +240,7 @@ class CallbackModule(CallbackBase):
             self.shared_key,
             'FAILED',
             result,
-            self._runtime(result)
+            self._seconds_since_start(result)
         )
 
     def v2_runner_on_unreachable(self, result, **kwargs):
@@ -246,5 +249,5 @@ class CallbackModule(CallbackBase):
             self.shared_key,
             'UNREACHABLE',
             result,
-            self._runtime(result)
+            self._seconds_since_start(result)
         )
