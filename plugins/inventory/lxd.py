@@ -9,20 +9,20 @@ DOCUMENTATION = r'''
     name: lxd
     short_description: Returns Ansible inventory from lxd host
     description:
-        - Get inventory from the lxd
+        - Get inventory from the lxd.
         - Uses a YAML configuration file that ends with 'lxd.(yml|yaml)'.
     version_added: "2.3.0"
     author: "Frank Dornheim (@conloos)"
     options:
         plugin:
-            description: token that ensures this is a source file for the 'lxd' plugin
+            description: Token that ensures this is a source file for the 'lxd' plugin.
             required: true
             choices: [ 'community.general.lxd' ]
         url:
             description:
             - The unix domain socket path or the https URL for the lxd server.
-            - sockets in filesystem have to start with 'unix:'
-            - Mostly C(unix:/var/lib/lxd/unix.socket) or C(unix:/var/snap/lxd/common/lxd/unix.socket)
+            - Sockets in filesystem have to start with 'unix:'.
+            - Mostly C(unix:/var/lib/lxd/unix.socket) or C(unix:/var/snap/lxd/common/lxd/unix.socket).
             default: unix:/var/snap/lxd/common/lxd/unix.socket
             required: false
             type: str
@@ -44,38 +44,37 @@ DOCUMENTATION = r'''
             description:
             - The client trusted password.
             - You need to set this password on the lxd server before
-                running this module using the following command.
-                lxc config set core.trust_password <some random password>
-                See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/)
-            - If trust_password is set, this module send a request for
-                authentication before sending any requests.
+                running this module using the following command
+                'lxc config set core.trust_password <some random password>'
+                See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).
+            - If trust_password is set, this module send a request for authentication before sending any requests.
             required: false
             type: str
         state:
-            description: Filter the container according to the current status
+            description: Filter the container according to the current status.
             required: false
             type: str
             default: none
             choices: [ 'STOPPED', 'STARTING', 'RUNNING', 'none' ]
         prefered_container_network_interface:
             description:
-            - if a container has multiple network interfaces, which one is the prefered as pattern
-            - combined with the first number that can be found e.g. eth + 0
+            - If a container has multiple network interfaces, select which one is the prefered as pattern.
+            - Combined with the first number that can be found e.g. 'eth' + 0.
             required: false
             type: str
             default: eth
         prefered_container_network_family:
             description:
-            - if a container has multiple network interfaces, which one is the prefered by family
-                - inet is ipv4
-                - inet6 is ipv6
+            - If a container has multiple network interfaces, which one is the prefered by family e.g.
+                - inet is ipv4 or
+                - inet6 is ipv6.
             required: false
             type: str
             default: inet
             choices: [ 'inet', 'inet6' ]
         groups:
             description:
-            - Group the results
+            - Create Groups by
                 - 'location' e.g. grabed sample by web, maybe it works
                 - 'pattern' e.g. samba* or regex
                 - 'network_range' e.g. 192.168.0.0/24
@@ -88,14 +87,14 @@ DOCUMENTATION = r'''
             default: none
         selftest:
             description:
-            - Load default data to test plugIn
+            - Load default data to test the plugIn
                 - 'path' to file with test data e.g. C(ansible_collections/community/general/tests/integration/targets/inventory_lxd/files/lxd_inventory.atd)
                 - 'activate' True
             required: false
             type: json
             default: false
         dumpdata:
-            description: dump out data to debug
+            description: Dump out data to debug.
             required: false
             type: bool
             default: false
@@ -105,15 +104,15 @@ EXAMPLES = '''
 # simple lxd.yml
 plugin: community.general.lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
-selftest: False
-dumpdata: False
+selftest: false
+dumpdata: false
 
 # simple lxd.yml including filter
-plugin: lxd
+plugin: community.general.lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
 state: RUNNING
-selftest: False
-dumpdata: False
+selftest: false
+dumpdata: false
 
 # grouping lxd.yml
 groups:
@@ -148,9 +147,9 @@ groups:
     type: network_range
     attribute: fd42:bd00:7b11:2167:216:3eff::/24
 selftest:
-  activate: True
+  activate: true
   path: ~/dev/ansible_collections/community/general/tests/integration/targets/inventory_lxd/files/lxd_inventory.atd
-dumpdata: False
+dumpdata: false
 '''
 
 import binascii
@@ -167,7 +166,7 @@ from ansible_collections.community.general.plugins.module_utils.lxd import LXDCl
 
 class InventoryModule(BaseInventoryPlugin):
     DEBUG = 4
-    NAME = 'lxd'
+    NAME = 'community.general.lxd'
     SNAP_SOCKET_URL = 'unix:/var/snap/lxd/common/lxd/unix.socket'
     SOCKET_URL = 'unix:/var/lib/lxd/unix.socket'
     TEST_PATH = ['test']
