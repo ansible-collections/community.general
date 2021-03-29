@@ -518,7 +518,7 @@ def main():
             if alias_exists:
                 # The certificate in the keystore does not match with the one we want to be present
                 # The existing certificate must first be deleted before we insert the correct one
-                delete_cert(module, executable, keystore_path, keystore_pass, cert_alias, keystore_type, False)
+                delete_cert(module, executable, keystore_path, keystore_pass, cert_alias, keystore_type, exit_after=False)
 
             import_cert_path(module, executable, new_certificate, keystore_path,
                              keystore_pass, cert_alias, keystore_type, trust_cacert)
