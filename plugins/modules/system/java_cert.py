@@ -173,12 +173,13 @@ import os
 import tempfile
 import random
 import string
+import re
+
 
 # import module snippets
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.module_utils.six.moves.urllib.request import getproxies
-from re import search, sub
 
 
 def _get_keystore_type_keytool_parameters(keystore_type):
@@ -261,10 +262,10 @@ def _get_digest_from_x509_file(module, pem_certificate_file, openssl_bin):
     return dgst_stdout.split(' ')[0]
 
 
-def _export_public_cert_from_pkcs12(module, pkcs_file, alias, password, dest):
+def _export_public_cert_from_pkcs12(module, executable, pkcs_file, alias, password, dest):
     """ Runs keytools to extract the public cert from a PKCS12 archive and write it to a file. """
     export_cmd = [
-        "keytool",
+        executable,
         "-list",
         "-keystore",
         pkcs_file,
@@ -311,7 +312,7 @@ def build_proxy_options():
             # For Java's nonProxyHosts property, items are separated by '|',
             # and patterns have to start with "*".
             non_proxy_hosts = no_proxy.replace(',', '|')
-            non_proxy_hosts = sub(r'(^|\|)\.', r'\1*.', non_proxy_hosts)
+            non_proxy_hosts = re.sub(r'(^|\|)\.', r'\1*.', non_proxy_hosts)
 
             # The property name is http.nonProxyHosts, there is no
             # separate setting for HTTPS.
@@ -428,7 +429,8 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
-        required_if=[['state', 'present', ('cert_path', 'cert_url', 'pkcs12_path'), True]],
+        required_if=[['state', 'present', ('cert_path', 'cert_url', 'pkcs12_path'), True],
+                     ['state', 'absent', ('cert_url', 'cert_alias'), True]],
         required_together=[['keystore_path', 'keystore_pass']],
         mutually_exclusive=[
             ['cert_url', 'cert_path', 'pkcs12_path']
@@ -496,7 +498,7 @@ def main():
 
         if pkcs12_path:
             # Extracting certificate with openssl
-            _export_public_cert_from_pkcs12(module, pkcs12_path, cert_alias, pkcs12_pass, new_certificate)
+            _export_public_cert_from_pkcs12(module, executable, pkcs12_path, cert_alias, pkcs12_pass, new_certificate)
 
         elif path:
             # Extracting the X509 digest is a bit easier. Keytool will print the PEM

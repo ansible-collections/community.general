@@ -122,16 +122,16 @@
 
 - name: Create an SSL server that we will use for testing URL imports
   command: python {{ output_dir }}/setupSSLServer.py {{ output_dir }} {{ test_ssl_port }}
-  async: 5
+  async: 10
   poll: 0
 
 - name: |
     Download the original cert.pem from our temporary server. The current cert should contain
      cert2.pem. Importing this cert should return a status of changed
   java_cert:
-    cert_alias: test_cert
-    cert_url: google.com
-    cert_port: 443
+    cert_alias: test_cert_localhost
+    cert_url: localhost
+    cert_port: "{{ test_ssl_port }}"
     keystore_path: "{{ test_keystore2_path }}"
     keystore_pass: "{{ test_keystore2_password }}"
     state: present

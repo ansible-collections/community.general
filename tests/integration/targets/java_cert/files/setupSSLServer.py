@@ -1,7 +1,5 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
-import BaseHTTPServer
-import SimpleHTTPServer
 import ssl
 import os
 import sys
@@ -9,7 +7,13 @@ import sys
 root_dir = sys.argv[1]
 port = int(sys.argv[2])
 
-httpd = BaseHTTPServer.HTTPServer(('localhost', port), SimpleHTTPServer.SimpleHTTPRequestHandler)
+try:
+    from BaseHTTPServer import HTTPServer
+    from SimpleHTTPServer import SimpleHTTPRequestHandler
+except:
+    from http.server import HTTPServer, SimpleHTTPRequestHandler
+
+httpd = HTTPServer(('localhost', port), SimpleHTTPRequestHandler)
 httpd.socket = ssl.wrap_socket(httpd.socket, server_side=True,
                                certfile=os.path.join(root_dir, 'cert.pem'),
                                keyfile=os.path.join(root_dir, 'key.pem'))
