@@ -63,7 +63,6 @@ from os.path import basename
 from ansible.module_utils.urls import open_url
 from ansible.parsing.ajson import AnsibleJSONEncoder
 from ansible.plugins.callback import CallbackBase
-from ansible.errors import AnsibleError
 
 
 class AzureLogAnalyticsSource(object):
@@ -172,26 +171,8 @@ class CallbackModule(CallbackBase):
 
     def set_options(self, task_keys=None, var_options=None, direct=None):
         super(CallbackModule, self).set_options(task_keys=task_keys, var_options=var_options, direct=direct)
-
         self.workspace_id = self.get_option('workspace_id')
-
-        if self.workspace_id is None:
-            self.disabled = True
-            raise AnsibleError('Azure Log analytics workspace ID was '
-                               'not provided. The workspace '
-                               'Workspace ID can be provided using the '
-                               '`WORKSPACE_ID` environment variable or '
-                               'in the ansible.cfg file.')
-
         self.shared_key = self.get_option('shared_key')
-
-        if self.shared_key is None:
-            self.disabled = True
-            raise AnsibleError('Azure Log analytics workspace requires a '
-                               'shared key. The authentication shared key '
-                               'can be provided using the '
-                               '`WORKSPACE_SHARED_KEY` environment variable or '
-                               'in the ansible.cfg file.')
 
     def v2_playbook_on_play_start(self, play):
         vm = play.get_variable_manager()
