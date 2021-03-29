@@ -10,7 +10,7 @@ port = int(sys.argv[2])
 try:
     from BaseHTTPServer import HTTPServer
     from SimpleHTTPServer import SimpleHTTPRequestHandler
-except:
+except ModuleNotFoundError:
     from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 httpd = HTTPServer(('localhost', port), SimpleHTTPRequestHandler)
