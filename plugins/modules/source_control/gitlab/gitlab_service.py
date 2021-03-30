@@ -13,11 +13,10 @@ module: gitlab_service
 short_description: Setup or delete GitLab integration services
 version_added: '2.4.0'
 description:
-  - Creates, updates or deletes GitLab services (aka "integrations").
+  - Creates, updates, or deletes GitLab integrations formerly known as "services".
 author:
   - Raphaël Droz (@drzraf)
 requirements:
-  - python >= 2.6
   - python-gitlab python module
 extends_documentation_fragment:
 - community.general.auth_basic
@@ -39,7 +38,7 @@ options:
     default: yes
   service:
     description:
-      - The service
+      - The type of service.
     required: true
     type: str
     choices:
@@ -80,11 +79,12 @@ options:
       - youtrack
   params:
     description:
-      - The description of the service, see documentation U(https://docs.gitlab.com/ee/api/services.html)
+      - The description of the service, see documentation U(https://docs.gitlab.com/ee/api/services.html).
     type: dict
   events:
     description:
-      - The events that trigger the service (required if I(state=present))
+      - The events that trigger the service.
+      - Required if I(state=present).
     choices: ["push", "issues", "confidential_issues", "merge_requests", "tag_push", "note", "confidential_note", "job", "pipeline", "wiki_page"]
     default: ["push", "issues", "confidential_issues", "merge_requests", "tag_push", "note", "confidential_note", "job", "pipeline", "wiki_page"]
     type: list
