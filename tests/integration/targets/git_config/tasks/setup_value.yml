@@ -5,4 +5,9 @@
   copy:
     src: gitconfig
     dest: ~/.gitconfig
+
+- name: set up with value (file)
+  copy:
+    src: gitconfig
+    dest: "{{ output_dir }}/gitconfig_file"
 ...
