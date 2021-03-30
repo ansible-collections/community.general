@@ -138,31 +138,31 @@ class LookupModule(LookupBase):
             if u.port is not None:
                 port = u.port
         token = self.get_option('token')
-        datacenter=self.get_option('datacenter')
-        recurse=self.get_option('recurse')
-        index=self.get_option('index')
+        datacenter = self.get_option('datacenter')
+        recurse = self.get_option('recurse')
+        index = self.get_option('index')
 
         validate_certs = self.get_option('validate_certs')
         client_cert = self.get_option('client_cert')
 
         values = []
         try:
-              for term in terms:
-                  key = term.split(' ')[0]
-                  consul_api = consul.Consul(host=host, port=port, scheme=scheme, token=token, 
-                  dc=datacenter,verify=validate_certs, cert=client_cert)
+            for term in terms:
+                key = term.split(' ')[0]
+                consul_api = consul.Consul(host=host, port=port, scheme=scheme, token=token,
+                                dc=datacenter, verify=validate_certs, cert=client_cert)
 
-                  results = consul_api.kv.get(key,
-                                              index=index,
-                                              recurse=recurse,
-                                              )
-                  if results[1]:
-                      # responds with a single or list of result maps
-                      if isinstance(results[1], list):
-                          for r in results[1]:
-                              values.append(to_text(r['Value']))
-                      else:
-                          values.append(to_text(results[1]['Value']))
+                results = consul_api.kv.get(key,
+                                            index=index,
+                                            recurse=recurse,
+                                            )
+                if results[1]:
+                    # responds with a single or list of result maps
+                    if isinstance(results[1], list):
+                        for r in results[1]:
+                            values.append(to_text(r['Value']))
+                    else:
+                        values.append(to_text(results[1]['Value']))
         except Exception as e:
             raise AnsibleError(
                 "Error locating '%s' in kv store. Error was %s" % (key, e))
