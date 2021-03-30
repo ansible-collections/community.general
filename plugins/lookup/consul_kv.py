@@ -126,7 +126,7 @@ class LookupModule(LookupBase):
 
         # get options
         self.set_options(direct=kwargs)
-
+        key = terms[0].split(' ')[0]
         scheme = self.get_option('scheme')
         host = self.get_option('host')
         port = self.get_option('port')
@@ -139,54 +139,31 @@ class LookupModule(LookupBase):
             if u.port is not None:
                 port = u.port
         token = self.get_option('token')
+        datacenter=self.get_option('datacenter')
+        recurse=self.get_option('recurse')
+        index=self.get_option('index')
 
         validate_certs = self.get_option('validate_certs')
         client_cert = self.get_option('client_cert')
 
         values = []
         try:
-            for term in terms:
-                params = self.parse_params(term)
-                consul_api = consul.Consul(host=host, port=port, scheme=scheme, token=token, verify=validate_certs, cert=client_cert)
+          consul_api = consul.Consul(host=host, port=port, scheme=scheme, token=token, dc=datacenter,
+                                        verify=validate_certs, cert=client_cert)
 
-                results = consul_api.kv.get(params['key'],
-                                            token=params['token'],
-                                            index=params['index'],
-                                            recurse=params['recurse'],
-                                            dc=params['datacenter'])
-                if results[1]:
-                    # responds with a single or list of result maps
-                    if isinstance(results[1], list):
-                        for r in results[1]:
-                            values.append(to_text(r['Value']))
-                    else:
-                        values.append(to_text(results[1]['Value']))
+          results = consul_api.kv.get(key,
+                                      index=index,
+                                      recurse=recurse,
+                                      )
+          if results[1]:
+              # responds with a single or list of result maps
+              if isinstance(results[1], list):
+                  for r in results[1]:
+                      values.append(to_text(r['Value']))
+              else:
+                  values.append(to_text(results[1]['Value']))
         except Exception as e:
             raise AnsibleError(
-                "Error locating '%s' in kv store. Error was %s" % (term, e))
+                "Error locating '%s' in kv store. Error was %s" % (key, e))
 
         return values
-
-    def parse_params(self, term):
-        params = term.split(' ')
-
-        paramvals = {
-            'key': params[0],
-            'token': None,
-            'recurse': False,
-            'index': None,
-            'datacenter': None
-        }
-
-        # parameters specified?
-        try:
-            for param in params[1:]:
-                if param and len(param) > 0:
-                    name, value = param.split('=')
-                    if name not in paramvals:
-                        raise AnsibleAssertionError("%s not a valid consul lookup parameter" % name)
-                    paramvals[name] = value
-        except (ValueError, AssertionError) as e:
-            raise AnsibleError(e)
-
-        return paramvals
