@@ -1,2 +1,0 @@
-bugfixes:
-  - git_config - fixed scope ``file`` behaviour and added integraton test for it (https://github.com/ansible-collections/community.general/issues/2117).

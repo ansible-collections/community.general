@@ -1629,3 +1629,35 @@ releases:
         name: from_csv
         namespace: null
     release_date: '2021-03-23'
+  2.4.0:
+    changes:
+      bugfixes:
+      - git_config - fixed scope ``file`` behaviour and added integraton test for
+        it (https://github.com/ansible-collections/community.general/issues/2117).
+      - zypper, zypper_repository - respect ``PATH`` environment variable when resolving
+        zypper executable path (https://github.com/ansible-collections/community.general/pull/2094).
+      minor_changes:
+      - vdo - add ``force`` option (https://github.com/ansible-collections/community.general/issues/2101).
+      release_summary: Regular feature and bugfix release.
+    fragments:
+    - 2.4.0.yml
+    - 2094-bugfix-respect-PATH-env-variable-in-zypper-modules.yaml
+    - 2110-vdo-add_force_option.yaml
+    - 2125-git-config-scope-file.yml
+    modules:
+    - description: Manages OpenNebula templates
+      name: one_template
+      namespace: cloud.opennebula
+    - description: Manages Lenovo Out-Of-Band controllers using Redfish APIs
+      name: xcc_redfish_command
+      namespace: remote_management.lenovoxcc
+    plugins:
+      become:
+      - description: Run tasks using sudo su -
+        name: sudosu
+        namespace: null
+      callback:
+      - description: Posts task results to Azure Log Analytics
+        name: loganalytics
+        namespace: null
+    release_date: '2021-03-30'
