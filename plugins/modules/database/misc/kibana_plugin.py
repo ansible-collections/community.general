@@ -199,17 +199,15 @@ def remove_plugin(module, plugin_bin, plugin_name, allow_root, kibana_version='4
     if allow_root:
         cmd_args.append('--allow-root')
 
-    cmd = " ".join(cmd_args)
-
     if module.check_mode:
-        return True, cmd, "check mode", ""
+        return True, " ".join(cmd_args), "check mode", ""
 
-    rc, out, err = module.run_command(cmd)
+    rc, out, err = module.run_command(cmd_args)
     if rc != 0:
         reason = parse_error(out)
         module.fail_json(msg=reason)
 
-    return True, cmd, out, err
+    return True, " ".join(cmd_args), out, err
 
 
 def get_kibana_version(module, plugin_bin, allow_root):
@@ -218,8 +216,7 @@ def get_kibana_version(module, plugin_bin, allow_root):
     if allow_root:
         cmd_args.append('--allow-root')
 
-    cmd = " ".join(cmd_args)
-    rc, out, err = module.run_command(cmd)
+    rc, out, err = module.run_command(cmd_args)
     if rc != 0:
         module.fail_json(msg="Failed to get Kibana version : %s" % err)
 
