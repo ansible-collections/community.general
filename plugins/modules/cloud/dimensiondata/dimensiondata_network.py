@@ -260,7 +260,7 @@ class DimensionDataNetworkModule(DimensionDataModule):
                 )
 
             self.module.fail_json(
-                "Unexpected failure deleting network with id %s", network.id
+                "Unexpected failure deleting network with id %s" % network.id
             )
 
         except DimensionDataAPIException as e:
