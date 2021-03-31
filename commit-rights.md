@@ -5,7 +5,7 @@ This document is based on the [Ansible committer guidelines](https://github.com/
 
 These are the guidelines for people with commit privileges on the Ansible Community General Collection GitHub repository. Please read the guidelines before you commit.
 
-These guidelines apply to everyone. At the same time, this ISN'T a process document. So just use good judgment. You've been given commit access because we trust your judgment.
+These guidelines apply to everyone. At the same time, this is NOT a process document. So just use good judgment. You have been given commit access because we trust your judgment.
 
 That said, use the trust wisely.
 
@@ -14,7 +14,7 @@ If you abuse the trust and break components and builds, and so on, the trust lev
 Our workflow on GitHub
 ----------------------
 
-As a committer, you may already know this, but our workflow forms a lot of our team policies. Please ensure you're aware of the following workflow steps:
+As a committer, you may already know this, but our workflow forms a lot of our team policies. Please ensure you are aware of the following workflow steps:
 
 * Fork the repository upon which you want to do some work to your own personal repository
 * Work on the specific branch upon which you need to commit
@@ -22,11 +22,11 @@ As a committer, you may already know this, but our workflow forms a lot of our t
 * Adjust code as necessary based on the Comments provided
 * Ask someone from the other committers to do a final review and merge
 
-We are aware that this can be a difficult process at times. Sometimes, the team breaks the rules by making direct commits or merging their own PRs. This section is a set of guidelines. If you're changing a comma in a doc, or making a very minor change, you can use your best judgement. This is another trust thing. The process is critical for any major change, but for little things or getting something done quickly, use your best judgement and make sure people on the team are aware of your work.
+Sometimes, committers merge their own pull requests. This section is a set of guidelines. If you are changing a comma in a doc or making a very minor change, you can use your best judgement. This is another trust thing. The process is critical for any major change, but for little things or getting something done quickly, use your best judgement and make sure people on the team are aware of your work.
 
 Roles
 -----
-* Release managers: Merge PRs to `stable-X` branches, create tags to do releases.
+* Release managers: Merge pull requests to `stable-X` branches, create tags to do releases.
 * Committers: Fine to do PRs for most things, but we should have a timebox. Hanging PRs may merge on the judgement of these devs.
 * Module maintainers: Module maintainers own specific modules and have indirect commit access through the current module PR mechanisms. This is primary [ansibullbot](https://github.com/ansibullbot)'s `shipit` mechanism.
 
@@ -50,7 +50,7 @@ Individuals with direct commit access to ansible/ansible are entrusted with powe
 
   - Squash, avoid merges whenever possible, use GitHub's squash commits or cherry pick if needed (bisect thanks you).
   - Be active. Committers who have no activity on the project (through merges, triage, commits, and so on) will have their permissions suspended.
-  - Consider backwards compatibility (goes back to "don't break existing playbooks").
+  - Consider backwards compatibility (goes back to "don not break existing playbooks").
   - Write tests. PRs with tests are looked at with more priority than PRs without tests that should have them included. While not all changes require tests, be sure to add them for bug fixes or functionality changes.
   - Discuss with other committers, specially when you are unsure of something.
   - Document! If your PR is a new feature or a change to behavior, make sure you've updated all associated documentation or have notified the right people to do so.
@@ -63,7 +63,7 @@ Committers are expected to continue to follow the same community and contributio
 People
 ------
 
-Individuals who've been asked to become a part of this group have generally been contributing in significant ways to the community.general collection for some time. Should they agree, they are requested to add their names and GitHub IDs to this file, in the section below, through a pull request. Doing so indicates that these individuals agree to act in the ways that their fellow committers trust that they will act.
+Individuals who have been asked to become a part of this group have generally been contributing in significant ways to the community.general collection for some time. Should they agree, they are requested to add their names and GitHub IDs to this file, in the section below, through a pull request. Doing so indicates that these individuals agree to act in the ways that their fellow committers trust that they will act.
 
 | Name                | GitHub ID            | IRC Nick           | Other                |
 | ------------------- | -------------------- | ------------------ | -------------------- |
