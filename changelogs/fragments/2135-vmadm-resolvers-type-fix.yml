@@ -1,2 +1,2 @@
 bugfixes:
-  - vmadm - correct type of list in resolvers parameter
+  - vmadm - correct type of list elements in ``resolvers`` parameter (https://github.com/ansible-collections/community.general/issues/2135).
