@@ -1,0 +1,2 @@
+bugfixes:
+  - dimensiondata_network - bug when formatting message, instead of % a simple comma was used (https://github.com/ansible-collections/community.general/pull/2139).
