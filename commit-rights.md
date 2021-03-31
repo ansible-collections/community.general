@@ -18,7 +18,7 @@ As a committer, you may already know this, but our workflow forms a lot of our t
 
 * Fork the repository upon which you want to do some work to your own personal repository
 * Work on the specific branch upon which you need to commit
-* Create a Pull Request back to the Ansible repository and tag the people you would like to review; assign someone as the primary "owner" of your request
+* Create a Pull Request back to the collection repository and await reviews
 * Adjust code as necessary based on the Comments provided
 * Ask someone from the other committers to do a final review and merge
 
@@ -32,7 +32,7 @@ Roles
 
 General rules
 -------------
-Individuals with direct commit access to ansible/ansible are entrusted with powers that allow them to do a broad variety of things--probably more than we can write down. Rather than rules, treat these as general *guidelines*, individuals with this power are expected to use their best judgement.
+Individuals with direct commit access to this collection repository are entrusted with powers that allow them to do a broad variety of things--probably more than we can write down. Rather than rules, treat these as general *guidelines*, individuals with this power are expected to use their best judgement.
 
 * Do NOTs:
 
