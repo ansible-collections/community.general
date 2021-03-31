@@ -1,0 +1,2 @@
+bugfixes:
+  - vmadm - correct type of list in resolvers parameter
