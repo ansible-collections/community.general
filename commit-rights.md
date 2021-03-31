@@ -39,8 +39,8 @@ Individuals with direct commit access to ansible/ansible are entrusted with powe
   - Do not commit directly.
   - Do not merge your own PRs. Someone else should have a chance to review and approve the PR merge. You have a small amount of leeway here for very minor changes.
   - Do not forget about alternate environments. Consider the alternatives--yes, people have bad environments, but they are the ones who need us the most.
-  - Do not drag your community team members down. Always discuss the technical merits, but you should never address the person's limitations (you can later go for beers and call them idiots, but not in IRC/GitHub/and so on). Also see the [Ansible Community Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html) which this collection adheres to.
-  - Do not forget about the maintenance burden. Some things are really cool to have, but they might not be worth shoehorning in if the maintenance burden is too great.
+  - Do not drag your community team members down. Discuss the technical merits of any pull requests you review. Avoid negativity and personal comments. For more guidance on being a good community member, read the [Ansible Community Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html).
+  - Do not forget about the maintenance burden. High-maintenance features may not be worth adding.
   - Do not break playbooks. Always keep backwards compatibility in mind.
   - Do not forget to keep it simple. Complexity breeds all kinds of problems.
   - Do not merge to branches other than `main`, especially not to `stable-X`, if you do not have explicit permission to do so.
