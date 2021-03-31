@@ -233,7 +233,7 @@ options:
     description:
       - List of resolvers to be put into C(/etc/resolv.conf).
     type: list
-    elements: dict
+    elements: str
   routes:
     required: false
     description:
@@ -702,7 +702,7 @@ def main():
         vnc_password=dict(type='str', no_log=True),
         disks=dict(type='list', elements='dict'),
         nics=dict(type='list', elements='dict'),
-        resolvers=dict(type='list', elements='dict'),
+        resolvers=dict(type='list', elements='str'),
         filesystems=dict(type='list', elements='dict'),
     )
 
