@@ -178,17 +178,15 @@ def install_plugin(module, plugin_bin, plugin_name, url, timeout, allow_root, ki
     if allow_root:
         cmd_args.append('--allow-root')
 
-    cmd = " ".join(cmd_args)
-
     if module.check_mode:
-        return True, cmd, "check mode", ""
+        return True, " ".join(cmd_args), "check mode", ""
 
-    rc, out, err = module.run_command(cmd)
+    rc, out, err = module.run_command(cmd_args)
     if rc != 0:
         reason = parse_error(out)
         module.fail_json(msg=reason)
 
-    return True, cmd, out, err
+    return True, " ".join(cmd_args), out, err
 
 
 def remove_plugin(module, plugin_bin, plugin_name, allow_root, kibana_version='4.6'):
@@ -269,7 +267,7 @@ def main():
 
     if state == "present":
         if force:
-            remove_plugin(module, plugin_bin, name)
+            remove_plugin(module, plugin_bin, name, allow_root, kibana_version)
         changed, cmd, out, err = install_plugin(module, plugin_bin, name, url, timeout, allow_root, kibana_version)
 
     elif state == "absent":
