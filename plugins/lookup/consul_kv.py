@@ -150,7 +150,7 @@ class LookupModule(LookupBase):
             for term in terms:
                 key = term.split(' ')[0]
                 consul_api = consul.Consul(host=host, port=port, scheme=scheme, token=token,
-                                dc=datacenter, verify=validate_certs, cert=client_cert)
+                                           dc=datacenter, verify=validate_certs, cert=client_cert)
 
                 results = consul_api.kv.get(key,
                                             index=index,
