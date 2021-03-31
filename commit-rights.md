@@ -50,11 +50,11 @@ Individuals with direct commit access to ansible/ansible are entrusted with powe
 
   - Squash, avoid merges whenever possible, use GitHub's squash commits or cherry pick if needed (bisect thanks you).
   - Be active. Committers who have no activity on the project (through merges, triage, commits, and so on) will have their permissions suspended.
-  - Consider backwards compatibility (goes back to "don not break existing playbooks").
+  - Consider backwards compatibility (goes back to "do not break existing playbooks").
   - Write tests. PRs with tests are looked at with more priority than PRs without tests that should have them included. While not all changes require tests, be sure to add them for bug fixes or functionality changes.
   - Discuss with other committers, specially when you are unsure of something.
   - Document! If your PR is a new feature or a change to behavior, make sure you've updated all associated documentation or have notified the right people to do so.
-  - Consider scope, sometimes a fix can be generalized
+  - Consider scope, sometimes a fix can be generalized.
   - Keep it simple, then things are maintainable, debuggable and intelligible.
 
 Committers are expected to continue to follow the same community and contribution guidelines followed by the rest of the Ansible community.
