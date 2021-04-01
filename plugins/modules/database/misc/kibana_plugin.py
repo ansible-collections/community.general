@@ -170,10 +170,10 @@ def install_plugin(module, plugin_bin, plugin_name, url, timeout, allow_root, ki
         cmd_args = [plugin_bin, "plugin", PACKAGE_STATE_MAP["present"], plugin_name]
 
         if url:
-            cmd_args.append("--url %s" % url)
+            cmd_args.extend(["--url", url])
 
     if timeout:
-        cmd_args.append("--timeout %s" % timeout)
+        cmd_args.extend(["--timeout", timeout])
 
     if allow_root:
         cmd_args.append('--allow-root')
