@@ -11,7 +11,7 @@ DOCUMENTATION = '''
 ---
 module: gitlab_service
 short_description: Setup or delete GitLab integration services
-version_added: '2.4.0'
+version_added: '2.5.0'
 description:
   - Creates, updates, or deletes GitLab integrations formerly known as "services".
 author:
@@ -35,7 +35,7 @@ options:
     description:
       - Not yet supported (U(https://gitlab.com/gitlab-org/gitlab-ce/issues/41113)).
     type: bool
-    default: yes
+    default: true
   service:
     description:
       - The type of service.
@@ -79,7 +79,7 @@ options:
       - youtrack
   params:
     description:
-      - The description of the service, see documentation U(https://docs.gitlab.com/ee/api/services.html).
+      - The description of the service, see documentation at U(https://docs.gitlab.com/ee/api/services.html).
     type: dict
   events:
     description:
@@ -100,7 +100,7 @@ options:
 
 EXAMPLES = '''
 # Setup email on push for this project
-- name: emails me on push
+- name: Email me on push
   community.general.gitlab_service:
     api_url: https://gitlab.com
     api_token: foobar
@@ -113,7 +113,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 # This will always be set to change because a non-null token is mandatory
-- name: trigger packagist update on push events (only)
+- name: Trigger packagist update on push events (only)
   community.general.gitlab_service:
     api_url: https://gitlab.com
     api_token: foobar
@@ -425,7 +425,7 @@ def main():
     except gitlab.GitlabGetError as e:
         module.fail_json(msg='No such a service %s' % service, exception=to_native(e))
 
-    Services_Helper = GitLab_Services(module, service)
+    services_helper = GitLab_Services(module, service)
     if state == 'absent':
         if not remote_service or not remote_service.created_at:
             module.exit_json(changed=False, service={}, msg='Service not found', details='Service %s not found' % service)
@@ -442,7 +442,7 @@ def main():
         if remote_service.created_at:
             # update
             try:
-                h = Services_Helper.update(remote_service, active, params, events)
+                h = services_helper.update(remote_service, active, params, events)
             except gitlab.GitlabUpdateError as e:
                 module.fail_json(changed=False, msg='Could not update service %s' % service, exception=to_native(e))
             else:
@@ -456,7 +456,7 @@ def main():
 
         else:
             try:
-                diff = Services_Helper.create(remote_service, active, params, events)
+                diff = services_helper.create(remote_service, active, params, events)
             except (gitlab.GitlabCreateError, gitlab.GitlabUpdateError) as e:
                 module.fail_json(changed=False, msg='Could not create service %s' % service, exception=to_native(e))
             else:
