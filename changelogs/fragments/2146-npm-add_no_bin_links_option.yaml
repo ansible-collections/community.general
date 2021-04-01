@@ -1,0 +1,3 @@
+---
+minor-changes:
+  - npm: add ``no_bin_links`` option (https://github.com/ansible-collections/community.general/issues/2128).
