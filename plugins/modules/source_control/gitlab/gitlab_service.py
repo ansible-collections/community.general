@@ -186,81 +186,98 @@ from ansible.module_utils._text import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import findProject, gitlabAuthentication
 
-# auto-generated 2020/07/09 from https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/api/helpers/services_helpers.rb
-RAW_SERVICES_DEFINITIONS = {"asana": {"api_key": {"required": 1}, "restrict_to_branch": {}},
-                            "assembla": {"token": {"required": 1}, "subdomain": {}},
-                            "bamboo": {"bamboo_url": {"required": 1}, "build_key": {"required": 1}, "username": {"required": 1}, "password": {"required": 1}},
-                            "bugzilla": {"new_issue_url": {"required": 1}, "issues_url": {"required": 1}, "project_url": {"required": 1}},
-                            "buildkite": {"token": {"required": 1}, "project_url": {"required": 1}, "enable_ssl_verification": {"type": "bool"}},
-                            "campfire": {"token": {"required": 1}, "subdomain": {}, "room": {}},
-                            "confluence": {"confluence_url": {"required": 1}},
-                            "custom-issue-tracker": {"new_issue_url": {"required": 1}, "issues_url": {"required": 1}, "project_url": {"required": 1}},
-                            "datadog": {"api_key": {"required": 1}, "datadog_site": {}, "api_url": {}, "datadog_service": {}, "datadog_env": {}},
-                            "discord": {"webhook": {"required": 1}},
-                            "drone-ci": {"token": {"required": 1}, "drone_url": {"required": 1}, "enable_ssl_verification": {"type": "bool"}},
-                            "emails-on-push": {"recipients": {"required": 1}, "disable_diffs": {"type": "bool"}, "send_from_committer_email": {"type": "bool"},
-                                               "branches_to_be_notified": {}},
-                            "external-wiki": {"external_wiki_url": {"required": 1}},
-                            "flowdock": {"token": {"required": 1}},
-                            "hangouts-chat": {"webhook": {"required": 1}, "branches_to_be_notified": {}, "push_events": {"type": "bool"},
-                                              "issues_events": {"type": "bool"}, "confidential_issues_events": {"type": "bool"},
-                                              "merge_requests_events": {"type": "bool"}, "note_events": {"type": "bool"},
-                                              "confidential_note_events": {"type": "bool"}, "tag_push_events": {"type": "bool"},
-                                              "pipeline_events": {"type": "bool"}, "wiki_page_events": {"type": "bool"}},
-                            "hipchat": {"token": {"required": 1}, "room": {}, "color": {}, "notify": {"type": "bool"}, "api_version": {}, "server": {}},
-                            "irker": {"recipients": {"required": 1}, "default_irc_uri": {}, "server_host": {}, "server_port": {"type": "int"},
-                                      "colorize_messages": {"type": "bool"}},
-                            "jenkins": {"jenkins_url": {"required": 1}, "project_name": {"required": 1}, "username": {}, "password": {}},
-                            "jira": {"url": {"required": 1}, "api_url": {}, "username": {"required": 1}, "password": {"required": 1},
-                                     "jira_issue_transition_id": {}, "comment_on_event_enabled": {"type": "bool"}},
-                            "mattermost-slash-commands": {"token": {"required": 1}},
-                            "slack-slash-commands": {"token": {"required": 1}},
-                            "packagist": {"username": {"required": 1}, "token": {"required": 1}, "server": {}},
-                            "pipelines-email": {"recipients": {"required": 1}, "notify_only_broken_pipelines": {"type": "bool"}, "branches_to_be_notified": {}},
-                            "pivotaltracker": {"token": {"required": 1}, "restrict_to_branch": {}},
-                            "prometheus": {"api_url": {"required": 1}, "google_iap_audience_client_id": {"required": 1},
-                                           "google_iap_service_account_json": {"required": 1}},
-                            "pushover": {"api_key": {"required": 1}, "user_key": {"required": 1}, "priority": {"required": 1},
-                                         "device": {"required": 1}, "sound": {"required": 1}},
-                            "redmine": {"new_issue_url": {"required": 1}, "project_url": {"required": 1}, "issues_url": {"required": 1}},
-                            "ewm": {"new_issue_url": {"required": 1}, "project_url": {"required": 1}, "issues_url": {"required": 1}},
-                            "youtrack": {"project_url": {"required": 1}, "issues_url": {"required": 1}},
-                            "slack": {"webhook": {"required": 1}, "username": {}, "channel": {}, "branches_to_be_notified": {},
-                                      "notify_only_broken_pipelines": {"type": "bool"}, "push_channel": {}, "issue_channel": {},
-                                      "confidential_issue_channel": {}, "merge_request_channel": {}, "note_channel": {},
-                                      "tag_push_channel": {}, "pipeline_channel": {}, "wiki_page_channel": {}, "push_events": {"type": "bool"},
-                                      "issues_events": {"type": "bool"}, "confidential_issues_events": {"type": "bool"},
-                                      "merge_requests_events": {"type": "bool"}, "note_events": {"type": "bool"}, "confidential_note_events": {"type": "bool"},
-                                      "tag_push_events": {"type": "bool"}, "pipeline_events": {"type": "bool"}, "wiki_page_events": {"type": "bool"}},
-                            "microsoft-teams": {"webhook": {"required": 1}, "branches_to_be_notified": {}, "notify_only_broken_pipelines": {"type": "bool"}},
-                            "mattermost": {"webhook": {"required": 1}, "username": {}, "channel": {}, "branches_to_be_notified": {},
-                                           "notify_only_broken_pipelines": {"type": "bool"}, "push_channel": {}, "issue_channel": {},
-                                           "confidential_issue_channel": {}, "merge_request_channel": {}, "note_channel": {},
-                                           "tag_push_channel": {}, "pipeline_channel": {}, "wiki_page_channel": {}, "push_events": {"type": "bool"},
-                                           "issues_events": {"type": "bool"}, "confidential_issues_events": {"type": "bool"},
-                                           "merge_requests_events": {"type": "bool"}, "note_events": {"type": "bool"},
-                                           "confidential_note_events": {"type": "bool"}, "tag_push_events": {"type": "bool"},
-                                           "pipeline_events": {"type": "bool"}, "wiki_page_events": {"type": "bool"}},
-                            "teamcity": {"teamcity_url": {"required": 1}, "build_type": {"required": 1}, "username": {"required": 1},
-                                         "password": {"required": 1}},
-                            "unify-circuit": {"webhook": {"required": 1}, "push_events": {"type": "bool"}, "issues_events": {"type": "bool"},
-                                              "confidential_issues_events": {"type": "bool"}, "merge_requests_events": {"type": "bool"},
-                                              "note_events": {"type": "bool"}, "confidential_note_events": {"type": "bool"},
-                                              "tag_push_events": {"type": "bool"}, "pipeline_events": {"type": "bool"}, "wiki_page_events": {"type": "bool"}},
-                            "webex-teams": {"webhook": {"required": 1}, "push_events": {"type": "bool"}, "issues_events": {"type": "bool"},
-                                            "confidential_issues_events": {"type": "bool"}, "merge_requests_events": {"type": "bool"},
-                                            "note_events": {"type": "bool"}, "confidential_note_events": {"type": "bool"},
-                                            "tag_push_events": {"type": "bool"}, "pipeline_events": {"type": "bool"}, "wiki_page_events": {"type": "bool"}}}
+# auto-generated 2021/04/01 from https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/api/helpers/services_helpers.rb
+SRV_DEF = {"asana": {"api_key": {"required": 1, "type": "str", "no_log": True}, "restrict_to_branch": {"type": "str"}},
+           "assembla": {"token": {"required": 1, "type": "str", "no_log": True}, "subdomain": {"type": "str"}},
+           "bamboo": {"bamboo_url": {"required": 1, "type": "str"}, "build_key": {"required": 1, "type": "str"},
+                      "username": {"required": 1, "type": "str"}, "password": {"required": 1, "type": "str", "no_log": True}},
+           "bugzilla": {"new_issue_url": {"required": 1, "type": "str"}, "issues_url": {"required": 1, "type": "str"},
+                        "project_url": {"required": 1, "type": "str"}},
+           "buildkite": {"token": {"required": 1, "type": "str", "no_log": True}, "project_url": {"required": 1, "type": "str"},
+                         "enable_ssl_verification": {"type": "bool"}},
+           "campfire": {"token": {"required": 1, "type": "str", "no_log": True}, "subdomain": {"type": "str"}, "room": {"type": "str"}},
+           "confluence": {"confluence_url": {"required": 1, "type": "str"}},
+           "custom-issue-tracker": {"new_issue_url": {"required": 1, "type": "str"}, "issues_url": {"required": 1, "type": "str"},
+                                    "project_url": {"required": 1, "type": "str"}},
+           "datadog": {"api_key": {"required": 1, "type": "str", "no_log": True}, "datadog_site": {"type": "str"}, "api_url": {"type": "str"},
+                       "datadog_service": {"type": "str"}, "datadog_env": {"type": "str"}},
+           "discord": {"webhook": {"required": 1, "type": "str", "no_log": True}},
+           "drone-ci": {"token": {"required": 1, "type": "str", "no_log": True}, "drone_url": {"required": 1, "type": "str"},
+                        "enable_ssl_verification": {"type": "bool"}},
+           "emails-on-push": {"recipients": {"required": 1, "type": "str"}, "disable_diffs": {"type": "bool"},
+                              "send_from_committer_email": {"type": "bool"}, "branches_to_be_notified": {"type": "str"}},
+           "ewm": {"new_issue_url": {"required": 1, "type": "str"}, "project_url": {"required": 1, "type": "str"},
+                   "issues_url": {"required": 1, "type": "str"}},
+           "external-wiki": {"external_wiki_url": {"required": 1, "type": "str"}},
+           "flowdock": {"token": {"required": 1, "type": "str", "no_log": True}},
+           "hangouts-chat": {"webhook": {"required": 1, "type": "str", "no_log": True}, "branches_to_be_notified": {"type": "str"},
+                             "push_events": {"type": "bool"}, "issues_events": {"type": "bool"}, "confidential_issues_events": {"type": "bool"},
+                             "merge_requests_events": {"type": "bool"}, "note_events": {"type": "bool"}, "confidential_note_events": {"type": "bool"},
+                             "tag_push_events": {"type": "bool"}, "pipeline_events": {"type": "bool"}, "wiki_page_events": {"type": "bool"}},
+           "hipchat": {"token": {"required": 1, "type": "str", "no_log": True}, "room": {"type": "str"}, "color": {"type": "str"},
+                       "notify": {"type": "bool"}, "api_version": {"type": "str"}, "server": {"type": "str"}},
+           "irker": {"recipients": {"required": 1, "type": "str"}, "default_irc_uri": {"type": "str"}, "server_host": {"type": "str"},
+                     "server_port": {"type": "int"}, "colorize_messages": {"type": "bool"}},
+           "jenkins": {"jenkins_url": {"required": 1, "type": "str"}, "project_name": {"required": 1, "type": "str"},
+                       "username": {"type": "str"}, "password": {"type": "str", "no_log": True}},
+           "jira": {"url": {"required": 1, "type": "str"}, "api_url": {"type": "str"}, "username": {"required": 1, "type": "str"},
+                    "password": {"required": 1, "type": "str", "no_log": True}, "jira_issue_transition_id": {"type": "str"},
+                    "comment_on_event_enabled": {"type": "bool"}},
+           "mattermost": {"webhook": {"required": 1, "type": "str", "no_log": True}, "username": {"type": "str"}, "channel": {"type": "str"},
+                          "branches_to_be_notified": {"type": "str"}, "notify_only_broken_pipelines": {"type": "bool"}, "push_channel": {"type": "str"},
+                          "issue_channel": {"type": "str"}, "confidential_issue_channel": {"type": "str"}, "merge_request_channel": {"type": "str"},
+                          "note_channel": {"type": "str"}, "tag_push_channel": {"type": "str"}, "pipeline_channel": {"type": "str"},
+                          "wiki_page_channel": {"type": "str"}, "push_events": {"type": "bool"}, "issues_events": {"type": "bool"},
+                          "confidential_issues_events": {"type": "bool"}, "merge_requests_events": {"type": "bool"}, "note_events": {"type": "bool"},
+                          "confidential_note_events": {"type": "bool"}, "tag_push_events": {"type": "bool"}, "pipeline_events": {"type": "bool"},
+                          "wiki_page_events": {"type": "bool"}},
+           "mattermost-slash-commands": {"token": {"required": 1, "type": "str", "no_log": True}},
+           "microsoft-teams": {"webhook": {"required": 1, "type": "str", "no_log": True}, "branches_to_be_notified": {"type": "str"},
+                               "notify_only_broken_pipelines": {"type": "bool"}},
+           "packagist": {"username": {"required": 1, "type": "str"}, "token": {"required": 1, "type": "str", "no_log": True},
+                         "server": {"type": "str"}},
+           "pipelines-email": {"recipients": {"required": 1, "type": "str"}, "notify_only_broken_pipelines": {"type": "bool"},
+                               "branches_to_be_notified": {"type": "str"}},
+           "pivotaltracker": {"token": {"required": 1, "type": "str", "no_log": True}, "restrict_to_branch": {"type": "str"}},
+           "prometheus": {"api_url": {"required": 1, "type": "str"}, "google_iap_audience_client_id": {"required": 1, "type": "str"},
+                          "google_iap_service_account_json": {"required": 1, "type": "str"}},
+           "pushover": {"api_key": {"required": 1, "type": "str", "no_log": True}, "user_key": {"required": 1, "type": "str"},
+                        "priority": {"required": 1, "type": "str"}, "device": {"required": 1, "type": "str"}, "sound": {"required": 1, "type": "str"}},
+           "redmine": {"new_issue_url": {"required": 1, "type": "str"}, "project_url": {"required": 1, "type": "str"},
+                       "issues_url": {"required": 1, "type": "str"}},
+           "slack": {"webhook": {"required": 1, "type": "str", "no_log": True}, "username": {"type": "str"}, "channel": {"type": "str"},
+                     "branches_to_be_notified": {"type": "str"}, "notify_only_broken_pipelines": {"type": "bool"}, "push_channel": {"type": "str"},
+                     "issue_channel": {"type": "str"}, "confidential_issue_channel": {"type": "str"}, "merge_request_channel": {"type": "str"},
+                     "note_channel": {"type": "str"}, "tag_push_channel": {"type": "str"}, "pipeline_channel": {"type": "str"},
+                     "wiki_page_channel": {"type": "str"}, "push_events": {"type": "bool"}, "issues_events": {"type": "bool"},
+                     "confidential_issues_events": {"type": "bool"}, "merge_requests_events": {"type": "bool"}, "note_events": {"type": "bool"},
+                     "confidential_note_events": {"type": "bool"}, "tag_push_events": {"type": "bool"}, "pipeline_events": {"type": "bool"},
+                     "wiki_page_events": {"type": "bool"}},
+           "slack-slash-commands": {"token": {"required": 1, "type": "str", "no_log": True}},
+           "teamcity": {"teamcity_url": {"required": 1, "type": "str"}, "build_type": {"required": 1, "type": "str"},
+                        "username": {"required": 1, "type": "str"}, "password": {"required": 1, "type": "str", "no_log": True}},
+           "unify-circuit": {"webhook": {"required": 1, "type": "str", "no_log": True}, "push_events": {"type": "bool"},
+                             "issues_events": {"type": "bool"}, "confidential_issues_events": {"type": "bool"}, "merge_requests_events": {"type": "bool"},
+                             "note_events": {"type": "bool"}, "confidential_note_events": {"type": "bool"}, "tag_push_events": {"type": "bool"},
+                             "pipeline_events": {"type": "bool"}, "wiki_page_events": {"type": "bool"}},
+           "webex-teams": {"webhook": {"required": 1, "type": "str", "no_log": True}, "push_events": {"type": "bool"},
+                           "issues_events": {"type": "bool"}, "confidential_issues_events": {"type": "bool"}, "merge_requests_events": {"type": "bool"},
+                           "note_events": {"type": "bool"}, "confidential_note_events": {"type": "bool"}, "tag_push_events": {"type": "bool"},
+                           "pipeline_events": {"type": "bool"}, "wiki_page_events": {"type": "bool"}},
+           "youtrack": {"project_url": {"required": 1, "type": "str"}, "issues_url": {"required": 1, "type": "str"}}}
 
 
 def init_definitions():
-    for params in RAW_SERVICES_DEFINITIONS.values():
+    for params in SRV_DEF.values():
         for name, definition in params.items():
             if 'type' in definition:
-                definition['type'] = bool if definition['type'] == 'bool' else int if definition['type'] == 'int' else definition['type']
+                definition['type'] = bool if definition['type'] == 'bool' else \
+                    int if definition['type'] == 'int' else \
+                    str if definition['type'] == 'str' else \
+                    definition['type']
             if name in GitLab_Services.credentialParams:
                 definition['no_log'] = True
-    return RAW_SERVICES_DEFINITIONS
+    return SRV_DEF
 
 
 class GitLab_Services(object):
@@ -307,7 +324,7 @@ class GitLab_Services(object):
         try:
             # See https://gitlab.com/gitlab-org/gitlab-ce/issues/58321 for why it's useful to
             # discard unsupported events before comparing
-            supported_events = RAW_SERVICES_DEFINITIONS[self.name]['_events']
+            supported_events = SRV_DEF[self.name]['_events']
         except KeyError:
             supported_events = None
         # ret = {value + '_events': bool(value in events) for value in self.HOOK_EVENTS if supported_events is None or value in supported_events}
