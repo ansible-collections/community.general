@@ -73,7 +73,8 @@ from ansible.module_utils._text import to_native
 
 
 def do_upgrade(module, image):
-    args = ['atomic', 'update', '--force', image]
+    atomic_bin = module.get_bin_path('atomic')
+    args = [atomic_bin, 'update', '--force', image]
     rc, out, err = module.run_command(args, check_rc=False)
     if rc != 0:  # something went wrong emit the msg
         module.fail_json(rc=rc, msg=err)
@@ -91,20 +92,21 @@ def core(module):
     is_upgraded = False
 
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C')
+    atomic_bin = module.get_bin_path('atomic')
     out = {}
     err = {}
     rc = 0
 
     if backend:
         if state == 'present' or state == 'latest':
-            args = ['atomic', 'pull', "--storage=%s" % backend, image]
+            args = [atomic_bin, 'pull', "--storage=%s" % backend, image]
             rc, out, err = module.run_command(args, check_rc=False)
             if rc < 0:
                 module.fail_json(rc=rc, msg=err)
             else:
                 out_run = ""
                 if started:
-                    args = ['atomic', 'run', "--storage=%s" % backend, image]
+                    args = [atomic_bin, 'run', "--storage=%s" % backend, image]
                     rc, out_run, err = module.run_command(args, check_rc=False)
                     if rc < 0:
                         module.fail_json(rc=rc, msg=err)
@@ -112,7 +114,7 @@ def core(module):
                 changed = "Extracting" in out or "Copying blob" in out
                 module.exit_json(msg=(out + out_run), changed=changed)
         elif state == 'absent':
-            args = ['atomic', 'images', 'delete', "--storage=%s" % backend, image]
+            args = [atomic_bin, 'images', 'delete', "--storage=%s" % backend, image]
             rc, out, err = module.run_command(args, check_rc=False)
             if rc < 0:
                 module.fail_json(rc=rc, msg=err)
@@ -126,11 +128,11 @@ def core(module):
             is_upgraded = do_upgrade(module, image)
 
         if started:
-            args = ['atomic', 'run', image]
+            args = [atomic_bin, 'run', image]
         else:
-            args = ['atomic', 'install', image]
+            args = [atomic_bin, 'install', image]
     elif state == 'absent':
-        args = ['atomic', 'uninstall', image]
+        args = [atomic_bin, 'uninstall', image]
 
     rc, out, err = module.run_command(args, check_rc=False)
 
@@ -155,9 +157,7 @@ def main():
     )
 
     # Verify that the platform supports atomic command
-    rc, out, err = module.run_command('atomic -v', check_rc=False)
-    if rc != 0:
-        module.fail_json(msg="Error in running atomic command", err=err)
+    dummy = module.get_bin_path('atomic', required=True)
 
     try:
         core(module)
