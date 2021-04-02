@@ -57,18 +57,14 @@ from ansible.module_utils._text import to_native
 
 def core(module):
     revision = module.params['revision']
-    args = []
+    atomic_bin = module.get_bin_path('atomic', required=True)
 
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C')
 
     if revision == 'latest':
-        args = ['atomic', 'host', 'upgrade']
+        args = [atomic_bin, 'host', 'upgrade']
     else:
-        args = ['atomic', 'host', 'deploy', revision]
-
-    out = {}
-    err = {}
-    rc = 0
+        args = [atomic_bin, 'host', 'deploy', revision]
 
     rc, out, err = module.run_command(args, check_rc=False)
 
