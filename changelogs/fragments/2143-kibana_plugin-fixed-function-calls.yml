@@ -1,2 +1,2 @@
 bugfixes:
-  - kibana_plugin - added missing parameters to ``remove_plugin`` when using ``state=present force=true`` (https://github.com/ansible-collections/community.general/pull/2143).
+  - kibana_plugin - added missing parameters to ``remove_plugin`` when using ``state=present force=true``, and fix potential quoting errors when invoking ``kibana`` (https://github.com/ansible-collections/community.general/pull/2143).
