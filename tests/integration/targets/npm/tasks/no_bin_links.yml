@@ -7,7 +7,7 @@
 - vars:
     # sample: node-v8.2.0-linux-x64.tar.xz
     node_path: '{{ remote_dir }}/{{ nodejs_path }}/bin'
-    package: 'thelounge'
+    package: 'ncp'
   block:
     - shell: npm --version
       environment:
