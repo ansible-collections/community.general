@@ -9,7 +9,7 @@ __metaclass__ = type
 import pytest
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    ArgFormat, DependencyCtxMgr, ModuleHelper
+    ArgFormat, DependencyCtxMgr, ModuleHelper, VariableMeta
 )
 
 
@@ -105,3 +105,60 @@ def test_dependency_ctxmgr():
     with ctx:
         import sys
     assert ctx.has_it
+
+
+def test_variable_meta():
+    meta = VariableMeta()
+    assert meta.output is False
+    assert meta.diff is False
+    assert meta.value is None
+    meta.set("abc")
+    assert meta.initial_value == "abc"
+    assert meta.value == "abc"
+    assert meta.obtain_diff() is None
+    meta.set("def")
+    assert meta.initial_value == "abc"
+    assert meta.value == "def"
+    assert meta.obtain_diff() is None
+
+
+def test_variable_meta_diff():
+    meta = VariableMeta(diff=True)
+    assert meta.output is False
+    assert meta.diff is True
+    assert meta.value is None
+    meta.set("abc")
+    assert meta.initial_value == "abc"
+    assert meta.value == "abc"
+    assert meta.obtain_diff() is None
+    meta.set("def")
+    assert meta.initial_value == "abc"
+    assert meta.value == "def"
+    assert meta.obtain_diff() == {"before": "abc", "after": "def"}
+    meta.set("ghi")
+    assert meta.initial_value == "abc"
+    assert meta.value == "ghi"
+    assert meta.obtain_diff() == {"before": "abc", "after": "ghi"}
+
+
+def test_vardict():
+    vd = ModuleHelper.VarDict()
+    vd['a'] = 123
+    assert vd['a'] == 123
+    assert vd.a == 123
+    assert 'a' in vd._meta
+    assert vd.get_meta('a').output is True
+    assert vd.get_meta('a').diff is False
+    vd['b'] = 456
+    vd.set_meta('a', diff=True)
+    vd.set_meta('b', diff=True, output=False)
+    vd['c'] = 789
+    vd['a'] = 'new_a'
+    vd['c'] = 'new_c'
+    assert vd.a == 'new_a'
+    assert vd.c == 'new_c'
+    assert vd.output() == {'a': 'new_a', 'c': 'new_c'}
+    assert vd.diff() == {
+        'before': {'a': 123},
+        'after': {'a': 'new_a'},
+    }

@@ -6,6 +6,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+from collections import UserDict
 from functools import partial, wraps
 import traceback
 
@@ -13,6 +14,8 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 class ModuleHelperException(Exception):
+    exclude_from_output = ('update_output', 'output', 'vars', 'msg', 'exception')
+
     @staticmethod
     def _get_remove(key, kwargs):
         if key in kwargs:
@@ -23,13 +26,14 @@ class ModuleHelperException(Exception):
 
     def __init__(self, *args, **kwargs):
         self.msg = self._get_remove('msg', kwargs) or "Module failed with exception: {0}".format(self)
+        self.update_output = dict((k, v) for k, v in kwargs.items() if k not in self.exclude_from_output)
         self.update_output = self._get_remove('update_output', kwargs) or {}
-        super(ModuleHelperException, self).__init__(*args, **kwargs)
+        super(ModuleHelperException, self).__init__(*args)
 
 
 class ArgFormat(object):
     """
-    Argument formatter
+    Argument formatter for use as a command line parameter. Used in CmdMixin.
     """
     BOOLEAN = 0
     PRINTF = 1
@@ -50,7 +54,8 @@ class ArgFormat(object):
 
     def __init__(self, name, fmt=None, style=FORMAT, stars=0):
         """
-        Creates a new formatter
+        Creates a CLI-formatter for one specific argument. The argument may be a module parameter or just a named parameter for
+        the CLI command execution.
         :param name: Name of the argument to be formatted
         :param fmt: Either a str to be formatted (using or not printf-style) or a callable that does that
         :param style: Whether arg_format (as str) should use printf-style formatting.
@@ -106,7 +111,7 @@ def cause_changes(func, on_success=True, on_failure=False):
             func(*args, **kwargs)
             if on_success:
                 self.changed = True
-        except Exception as e:
+        except Exception:
             if on_failure:
                 self.changed = True
             raise
@@ -123,11 +128,11 @@ def module_fails_on_exception(func):
         except ModuleHelperException as e:
             if e.update_output:
                 self.update_output(e.update_output)
-            self.module.fail_json(changed=False, msg=e.msg, exception=traceback.format_exc(), output=self.output, vars=self.vars)
+            self.module.fail_json(changed=False, msg=e.msg, exception=traceback.format_exc(), output=self.output, vars=self.vars, **self.output)
         except Exception as e:
-            self.vars.msg = "Module failed with exception: {0}".format(str(e).strip())
-            self.vars.exception = traceback.format_exc()
-            self.module.fail_json(changed=False, msg=self.vars.msg, exception=self.vars.exception, output=self.output, vars=self.vars)
+            msg = "Module failed with exception: {0}".format(str(e).strip())
+            exception = traceback.format_exc()
+            self.module.fail_json(changed=False, msg=msg, exception=exception, output=self.output, vars=self.vars, **self.output)
     return wrapper
 
 
@@ -155,17 +160,81 @@ class DependencyCtxMgr(object):
         return self.msg or str(self.exc_val)
 
 
+class VariableMeta(object):
+    def __init__(self, diff=False, output=False):
+        self.init = False
+        self.initial_value = None
+        self.value = None
+        self.diff = diff
+        self.output = output
+
+    def set(self, value):
+        if not self.init:
+            self.initial_value = value
+            self.init = True
+        self.value = value
+        return self
+
+    def obtain_diff(self):
+        if not self.diff or (self.initial_value == self.value):
+            return None
+
+        return {
+            'before': self.initial_value,
+            'after': self.value,
+        }
+
+
 class ModuleHelper(object):
     _dependencies = []
-    module = {}
+    module = None
     facts_name = None
+    output_vars = []
+    diff_vars = []
 
-    class AttrDict(dict):
+    class VarDict(UserDict):
+        def __init__(self):
+            self._meta = dict()
+            super(ModuleHelper.VarDict, self).__init__()
+
+        def __setitem__(self, key, value):
+            if key not in self._meta:
+                self._meta[key] = VariableMeta(output=True)
+
+            self._meta[key].set(value)
+            self.data[key] = value
+
         def __getattr__(self, item):
             return self[item]
 
+        def get_meta(self, name):
+            return self._meta[name]
+
+        def set_meta(self, name, diff=None, output=None):
+            if diff is not None:
+                self._meta[name].diff = diff
+            if output is not None:
+                self._meta[name].output = output
+
+        def output(self):
+            return dict((k, v) for k, v in self.items() if self._meta[k].output)
+
+        def diff(self):
+            before = {}
+            after = {}
+            for k in self.data:
+                diff = self._meta[k].obtain_diff()
+                if diff:
+                    before[k] = diff['before']
+                    after[k] = diff['after']
+
+            return {
+                'before': before,
+                'after': after,
+            }
+
     def __init__(self, module=None):
-        self.vars = ModuleHelper.AttrDict()
+        self.vars = ModuleHelper.VarDict()
         self.output_dict = dict()
         self.facts_dict = dict()
         self._changed = False
@@ -173,8 +242,12 @@ class ModuleHelper(object):
         if module:
             self.module = module
 
-        if isinstance(self.module, dict):
+        if not isinstance(self.module, AnsibleModule):
             self.module = AnsibleModule(**self.module)
+
+        for name, value in self.module.params.items():
+            self.vars[name] = value
+            self.vars.set_meta(name, diff=name in self.diff_vars, output=name in self.output_vars)
 
     def update_output(self, **kwargs):
         self.output_dict.update(kwargs)
@@ -201,7 +274,7 @@ class ModuleHelper(object):
 
     @property
     def output(self):
-        result = dict(self.vars)
+        result = dict(self.vars.output())
         result.update(self.output_dict)
         if self.facts_name:
             result['ansible_facts'] = {self.facts_name: self.facts_dict}
@@ -213,7 +286,7 @@ class ModuleHelper(object):
         self.__init_module__()
         self.__run__()
         self.__quit_module__()
-        self.module.exit_json(changed=self.changed, **self.output_dict)
+        self.module.exit_json(changed=self.changed, **self.output)
 
     @classmethod
     def dependency(cls, name, msg):
@@ -354,5 +427,5 @@ class CmdModuleHelper(CmdMixin, ModuleHelper):
     pass
 
 
-class CmdStateModuleHelper(CmdMixin, StateMixin, ModuleHelper):
+class CmdStateModuleHelper(CmdMixin, StateMixin):
     pass
