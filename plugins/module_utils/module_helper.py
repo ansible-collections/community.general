@@ -14,7 +14,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 class ModuleHelperException(Exception):
-    exclude_from_output = ('update_output', 'output', 'vars', 'msg', 'exception')
+    exclude_from_output = ('update_output', 'msg', 'exception')
 
     @staticmethod
     def _get_remove(key, kwargs):
@@ -128,11 +128,11 @@ def module_fails_on_exception(func):
         except ModuleHelperException as e:
             if e.update_output:
                 self.update_output(e.update_output)
-            self.module.fail_json(changed=False, msg=e.msg, exception=traceback.format_exc(), output=self.output, vars=self.vars, **self.output)
+            self.module.fail_json(msg=e.msg, exception=traceback.format_exc(), **self.output)
         except Exception as e:
             msg = "Module failed with exception: {0}".format(str(e).strip())
             exception = traceback.format_exc()
-            self.module.fail_json(changed=False, msg=msg, exception=exception, output=self.output, vars=self.vars, **self.output)
+            self.module.fail_json(msg=msg, exception=exception, **self.output)
     return wrapper
 
 
@@ -189,8 +189,8 @@ class ModuleHelper(object):
     _dependencies = []
     module = None
     facts_name = None
-    output_vars = []
-    diff_vars = []
+    output_params = ()
+    diff_params = ()
 
     class VarDict(UserDict):
         def __init__(self):
@@ -247,7 +247,7 @@ class ModuleHelper(object):
 
         for name, value in self.module.params.items():
             self.vars[name] = value
-            self.vars.set_meta(name, diff=name in self.diff_vars, output=name in self.output_vars)
+            self.vars.set_meta(name, diff=name in self.diff_params, output=name in self.output_params)
 
     def update_output(self, **kwargs):
         self.output_dict.update(kwargs)
