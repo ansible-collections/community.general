@@ -9,6 +9,7 @@ __metaclass__ = type
 from collections import UserDict
 from functools import partial, wraps
 import traceback
+from contextlib import AbstractContextManager
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.dict_transformations import dict_merge
@@ -137,7 +138,7 @@ def module_fails_on_exception(func):
     return wrapper
 
 
-class DependencyCtxMgr(object):
+class DependencyCtxMgr(AbstractContextManager):
     def __init__(self, name, msg=None):
         self.name = name
         self.msg = msg
@@ -145,9 +146,6 @@ class DependencyCtxMgr(object):
         self.exc_type = None
         self.exc_val = None
         self.exc_tb = None
-
-    def __enter__(self):
-        pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.has_it = exc_type is None
@@ -333,7 +331,7 @@ class ModuleHelper(object):
         for d in self._dependencies:
             if not d.has_it:
                 self.module.fail_json(changed=False,
-                                      exception=d.exc_val.__traceback__.format_exc(),
+                                      exception="\n".join(traceback.format_exception(d.exc_type, d.exc_val, d.exc_tb)),
                                       msg=d.text,
                                       **self.output_dict)
 
