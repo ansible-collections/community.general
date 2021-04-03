@@ -15,7 +15,7 @@ description:
 - Modify global configuration settings of a FreeIPA Server.
 options:
   ipaconfigstring:
-    description: Extra hashes to generate in password plug-in
+    description: Extra hashes to generate in password plug-in.
     aliases: ["configstring"]
     type: list
     elements: str
