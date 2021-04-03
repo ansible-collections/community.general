@@ -217,13 +217,13 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
             )['result']
 
             for iface in ifaces:
-                record = {}
-                record['name'] = iface['name']
-                record['mac-address'] = iface['hardware-address']
-                record['ip-addresses'] = [
-                    "%s/%s" % (ip['ip-address'], ip['prefix']) for ip in iface['ip-addresses']
-                ]
-                result.append(record)
+                result.append({
+                    'name': iface['name'],
+                    'mac-address': iface['hardware-address'],
+                    'ip-addresses': [
+                        "%s/%s" % (ip['ip-address'], ip['prefix']) for ip in iface['ip-addresses']
+                    ]
+                })
         except requests.HTTPError:
             pass
 
