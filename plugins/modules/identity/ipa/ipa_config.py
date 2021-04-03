@@ -45,7 +45,7 @@ options:
     type: str
     version_added: '2.5.0'
   ipakrbauthzdata:
-    description: Default types of PAC supported for services
+    description: Default types of PAC supported for services.
     aliases: ["krbauthzdata"]
     type: list
     elements: str
