@@ -36,6 +36,9 @@ from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.six.moves.urllib.error import HTTPError
 from ansible.module_utils._text import to_native
 
+URL_REALMS = "{url}/realms"
+URL_REALM = "{url}/realms/{realm}"
+
 URL_TOKEN = "{url}/realms/{realm}/protocol/openid-connect/token"
 URL_CLIENT = "{url}/admin/realms/{realm}/clients/{id}"
 URL_CLIENTS = "{url}/admin/realms/{realm}/clients"
@@ -119,6 +122,75 @@ class KeycloakAPI(object):
         self.baseurl = self.module.params.get('auth_keycloak_url')
         self.validate_certs = self.module.params.get('validate_certs')
         self.restheaders = connection_header
+
+    def get_realm_by_id(self, realm='master'):
+        """ Obtain realm representation by id
+
+        :param realm: realm id
+        :return: dict of real, representation or None if none matching exist
+        """
+        realm_url = URL_REALM.format(url=self.baseurl, realm=realm)
+
+        try:
+            return json.loads(to_native(open_url(realm_url, method='GET', headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+
+        except HTTPError as e:
+            if e.code == 404:
+                return None
+            else:
+                self.module.fail_json(msg='Could not obtain realm %s: %s'
+                                          % (realm, str(e)))
+        except ValueError as e:
+            self.module.fail_json(msg='API returned incorrect JSON when trying to obtain realm %s: %s'
+                                      % (realm, str(e)))
+        except Exception as e:
+            self.module.fail_json(msg='Could not obtain realm %s: %s'
+                                      % (realm, str(e)))
+
+    def update_realm(self, realmrep, realm="master"):
+        """ Update an existing realm
+        :param realmrep: corresponding (partial/full) realm representation with updates
+        :param realm: realm to be updated in Keycloak
+        :return: HTTPResponse object on success
+        """
+        realm_url = URL_REALM.format(url=self.baseurl, realm=realm)
+
+        try:
+            return open_url(realm_url, method='PUT', headers=self.restheaders,
+                            data=json.dumps(realmrep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not update realm %s: %s'
+                                      % (realm, str(e)))
+
+    def create_realm(self, realmrep):
+        """ Create a realm in keycloak
+        :param realmrep: Realm representation of realm to be created.
+        :return: HTTPResponse object on success
+        """
+        realm_url = URL_REALMS.format(url=self.baseurl)
+
+        try:
+            return open_url(realm_url, method='POST', headers=self.restheaders,
+                            data=json.dumps(realmrep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create realm %s: %s'
+                                      % (realmrep['id'], str(e)))
+
+    def delete_realm(self, realm="master"):
+        """ Delete a realm from Keycloak
+
+        :param realm: realm to be deleted
+        :return: HTTPResponse object on success
+        """
+        realm_url = URL_REALM.format(url=self.baseurl, realm=realm)
+
+        try:
+            return open_url(realm_url, method='DELETE', headers=self.restheaders,
+                            validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not delete realm %s: %s'
+                                      % (realm, str(e)))
 
     def get_clients(self, realm='master', filter=None):
         """ Obtains client representations for clients in a realm
