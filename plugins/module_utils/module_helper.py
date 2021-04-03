@@ -11,7 +11,7 @@ from functools import partial, wraps
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.utils.vars import combine_vars
+from ansible.module_utils.common.dict_transformations import dict_merge
 
 
 class ModuleHelperException(Exception):
@@ -313,7 +313,7 @@ class ModuleHelper(object):
         if self.module._diff:
             diff = result.get('diff', {})
             vars_diff = self.vars.diff() or {}
-            result['diff'] = combine_vars(dict(diff), vars_diff)
+            result['diff'] = dict_merge(dict(diff), vars_diff)
         return result
 
     @module_fails_on_exception

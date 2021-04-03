@@ -160,4 +160,3 @@ def test_vardict():
     assert vd.c == 'new_c'
     assert vd.output() == {'a': 'new_a', 'c': 'new_c'}
     assert vd.diff() == {'before': {'a': 123}, 'after': {'a': 'new_a'}}, "diff={0}".format(vd.diff())
-
