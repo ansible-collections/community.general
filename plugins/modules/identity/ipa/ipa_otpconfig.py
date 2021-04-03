@@ -162,9 +162,10 @@ def main():
             password=module.params['ipa_pass']
         )
         changed, user = ensure(module, client)
-        module.exit_json(changed=changed, user=user)
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+
+    module.exit_json(changed=changed, user=user)
 
 
 if __name__ == '__main__':
