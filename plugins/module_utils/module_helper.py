@@ -159,7 +159,7 @@ class DependencyCtxMgr(AbstractContextManager):
         return self.msg or str(self.exc_val)
 
 
-class VariableMeta(object):
+class VarMeta(object):
     def __init__(self, diff=False, output=False, change=None):
         self.init = False
         self.initial_value = None
@@ -196,7 +196,7 @@ class VariableMeta(object):
         }
 
     def __str__(self):
-        return"<VariableMeta: value={0}, initial={1}, diff={2}, output={3}, change={4}>".format(
+        return"<VarMeta: value={0}, initial={1}, diff={2}, output={3}, change={4}>".format(
             self.value, self.initial_value, self.diff, self.output, self.change
         )
 
@@ -233,7 +233,7 @@ class ModuleHelper(object):
             else:
                 if 'output' not in kwargs:
                     kwargs['output'] = True
-                meta = VariableMeta(**kwargs)
+                meta = VarMeta(**kwargs)
             meta.set_value(value)
             self._meta[name] = meta
 
