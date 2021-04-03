@@ -1474,7 +1474,7 @@ def delete_and_wait(
     :return: A dictionary containing the resource & the "changed" status. e.g. {"vcn":{x:y}, "changed":True}
     """
 
-    states_set = set(["DETACHING", "DETACHED", "DELETING", "DELETED", "TERMINATING", "TERMINATED"])
+    states_set = {"DETACHING", "DETACHED", "DELETING", "DELETED", "TERMINATING", "TERMINATED"}
     result = dict(changed=False)
     result[resource_type] = dict()
     try:

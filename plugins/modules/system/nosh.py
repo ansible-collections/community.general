@@ -361,7 +361,7 @@ def get_service_status(module, service_path):
 
 
 def service_is_running(service_status):
-    return service_status['DaemontoolsEncoreState'] in set(['starting', 'started', 'running'])
+    return service_status['DaemontoolsEncoreState'] in {'starting', 'started', 'running'}
 
 
 def handle_enabled(module, result, service_path):
