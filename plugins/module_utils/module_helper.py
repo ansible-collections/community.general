@@ -461,5 +461,5 @@ class CmdModuleHelper(CmdMixin, ModuleHelper):
     pass
 
 
-class CmdStateModuleHelper(CmdMixin, StateMixin):
+class CmdStateModuleHelper(CmdMixin, StateMixin, ModuleHelper):
     pass
