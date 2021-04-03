@@ -161,28 +161,45 @@ class DependencyCtxMgr(object):
 
 
 class VariableMeta(object):
-    def __init__(self, diff=False, output=False):
+    def __init__(self, diff=False, output=False, change=None):
         self.init = False
         self.initial_value = None
         self.value = None
+
         self.diff = diff
+        self.change = diff if change is None else change
         self.output = output
 
-    def set(self, value):
+    def set(self, diff=None, output=None, change=None):
+        if diff is not None:
+            self.diff = diff
+        if output is not None:
+            self.output = output
+        if change is not None:
+            self.change = change
+
+    def set_value(self, value):
         if not self.init:
             self.initial_value = value
             self.init = True
         self.value = value
         return self
 
-    def obtain_diff(self):
-        if not self.diff or (self.initial_value == self.value):
-            return None
+    @property
+    def has_changed(self):
+        return self.change and (self.initial_value != self.value)
 
-        return {
+    @property
+    def diff_result(self):
+        return None if not (self.diff and self.has_changed) else {
             'before': self.initial_value,
             'after': self.value,
         }
+
+    def __str__(self):
+        return"<Meta: value={0}, initial={1}, diff={2}, output={3}, change={4}>".format(
+            self.value, self.initial_value, self.diff, self.output, self.change
+        )
 
 
 class ModuleHelper(object):
@@ -191,6 +208,7 @@ class ModuleHelper(object):
     facts_name = None
     output_params = ()
     diff_params = ()
+    change_params = ()
 
     class VarDict(UserDict):
         def __init__(self):
@@ -198,32 +216,36 @@ class ModuleHelper(object):
             super(ModuleHelper.VarDict, self).__init__()
 
         def __setitem__(self, key, value):
-            if key not in self._meta:
-                self._meta[key] = VariableMeta(output=True)
-
-            self._meta[key].set(value)
-            self.data[key] = value
+            self.set(key, value)
 
         def __getattr__(self, item):
             return self[item]
 
-        def get_meta(self, name):
+        def meta(self, name):
             return self._meta[name]
 
-        def set_meta(self, name, diff=None, output=None):
-            if diff is not None:
-                self._meta[name].diff = diff
-            if output is not None:
-                self._meta[name].output = output
+        def set_meta(self, name, **kwargs):
+            self.meta(name).set(**kwargs)
+
+        def set(self, name, value, **kwargs):
+            self.data[name] = value
+            if name in self._meta:
+                meta = self.meta(name)
+            else:
+                if 'output' not in kwargs:
+                    kwargs['output'] = True
+                meta = VariableMeta(**kwargs)
+            meta.set_value(value)
+            self._meta[name] = meta
 
         def output(self):
-            return dict((k, v) for k, v in self.items() if self._meta[k].output)
+            return dict((k, v) for k, v in self.items() if self.meta(k).output)
 
         def diff(self):
             before = {}
             after = {}
             for k in self.data:
-                diff = self._meta[k].obtain_diff()
+                diff = self._meta[k].diff_result
                 if diff:
                     before[k] = diff['before']
                     after[k] = diff['after']
@@ -232,6 +254,12 @@ class ModuleHelper(object):
                 'before': before,
                 'after': after,
             }
+
+        def change_vars(self):
+            return [v for v in self if self.meta(v).change]
+
+        def has_changed(self, v):
+            return self._meta[v].has_changed
 
     def __init__(self, module=None):
         self.vars = ModuleHelper.VarDict()
@@ -246,8 +274,12 @@ class ModuleHelper(object):
             self.module = AnsibleModule(**self.module)
 
         for name, value in self.module.params.items():
-            self.vars[name] = value
-            self.vars.set_meta(name, diff=name in self.diff_params, output=name in self.output_params)
+            self.vars.set(
+                name, value,
+                diff=name in self.diff_params,
+                output=name in self.output_params,
+                change=None if not self.change_params else name in self.change_params,
+            )
 
     def update_output(self, **kwargs):
         self.output_dict.update(kwargs)
@@ -264,9 +296,12 @@ class ModuleHelper(object):
     def __quit_module__(self):
         pass
 
+    def _vars_changed(self):
+        return any(self.vars.has_changed(v) for v in self.vars.change_vars())
+
     @property
     def changed(self):
-        return self._changed
+        return self._changed or self._vars_changed()
 
     @changed.setter
     def changed(self, value):
@@ -278,6 +313,8 @@ class ModuleHelper(object):
         result.update(self.output_dict)
         if self.facts_name:
             result['ansible_facts'] = {self.facts_name: self.facts_dict}
+        if self.module._diff:
+            result['diff'] = self.vars.diff()
         return result
 
     @module_fails_on_exception
