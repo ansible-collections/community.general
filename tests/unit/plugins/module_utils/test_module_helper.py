@@ -112,14 +112,14 @@ def test_variable_meta():
     assert meta.output is False
     assert meta.diff is False
     assert meta.value is None
-    meta.set("abc")
+    meta.set_value("abc")
     assert meta.initial_value == "abc"
     assert meta.value == "abc"
-    assert meta.obtain_diff() is None
-    meta.set("def")
+    assert meta.diff_result is None
+    meta.set_value("def")
     assert meta.initial_value == "abc"
     assert meta.value == "def"
-    assert meta.obtain_diff() is None
+    assert meta.diff_result is None
 
 
 def test_variable_meta_diff():
@@ -127,30 +127,31 @@ def test_variable_meta_diff():
     assert meta.output is False
     assert meta.diff is True
     assert meta.value is None
-    meta.set("abc")
+    meta.set_value("abc")
     assert meta.initial_value == "abc"
     assert meta.value == "abc"
-    assert meta.obtain_diff() is None
-    meta.set("def")
+    assert meta.diff_result is None
+    meta.set_value("def")
     assert meta.initial_value == "abc"
     assert meta.value == "def"
-    assert meta.obtain_diff() == {"before": "abc", "after": "def"}
-    meta.set("ghi")
+    assert meta.diff_result == {"before": "abc", "after": "def"}
+    meta.set_value("ghi")
     assert meta.initial_value == "abc"
     assert meta.value == "ghi"
-    assert meta.obtain_diff() == {"before": "abc", "after": "ghi"}
+    assert meta.diff_result == {"before": "abc", "after": "ghi"}
 
 
 def test_vardict():
     vd = ModuleHelper.VarDict()
-    vd['a'] = 123
+    vd.set('a', 123)
     assert vd['a'] == 123
     assert vd.a == 123
     assert 'a' in vd._meta
-    assert vd.get_meta('a').output is True
-    assert vd.get_meta('a').diff is False
+    assert vd.meta('a').output is True
+    assert vd.meta('a').diff is False
+    assert vd.meta('a').change is False
     vd['b'] = 456
-    vd.set_meta('a', diff=True)
+    vd.set_meta('a', diff=True, change=True)
     vd.set_meta('b', diff=True, output=False)
     vd['c'] = 789
     vd['a'] = 'new_a'
@@ -158,7 +159,5 @@ def test_vardict():
     assert vd.a == 'new_a'
     assert vd.c == 'new_c'
     assert vd.output() == {'a': 'new_a', 'c': 'new_c'}
-    assert vd.diff() == {
-        'before': {'a': 123},
-        'after': {'a': 'new_a'},
-    }
+    assert vd.diff() == {'before': {'a': 123}, 'after': {'a': 'new_a'}}, "diff={0}".format(vd.diff())
+

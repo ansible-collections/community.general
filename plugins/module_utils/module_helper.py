@@ -11,6 +11,7 @@ from functools import partial, wraps
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.utils.vars import combine_vars
 
 
 class ModuleHelperException(Exception):
@@ -197,7 +198,7 @@ class VariableMeta(object):
         }
 
     def __str__(self):
-        return"<Meta: value={0}, initial={1}, diff={2}, output={3}, change={4}>".format(
+        return"<VariableMeta: value={0}, initial={1}, diff={2}, output={3}, change={4}>".format(
             self.value, self.initial_value, self.diff, self.output, self.change
         )
 
@@ -242,18 +243,14 @@ class ModuleHelper(object):
             return dict((k, v) for k, v in self.items() if self.meta(k).output)
 
         def diff(self):
-            before = {}
-            after = {}
-            for k in self.data:
-                diff = self._meta[k].diff_result
-                if diff:
-                    before[k] = diff['before']
-                    after[k] = diff['after']
+            diff_results = [(k, self.meta(k).diff_result) for k in self.data]
+            diff_results = [dr for dr in diff_results if dr[1] is not None]
+            if diff_results:
+                before = dict((dr[0], dr[1]['before']) for dr in diff_results)
+                after = dict((dr[0], dr[1]['after']) for dr in diff_results)
+                return {'before': before, 'after': after}
 
-            return {
-                'before': before,
-                'after': after,
-            }
+            return None
 
         def change_vars(self):
             return [v for v in self if self.meta(v).change]
@@ -314,7 +311,9 @@ class ModuleHelper(object):
         if self.facts_name:
             result['ansible_facts'] = {self.facts_name: self.facts_dict}
         if self.module._diff:
-            result['diff'] = self.vars.diff()
+            diff = result.get('diff', {})
+            vars_diff = self.vars.diff() or {}
+            result['diff'] = combine_vars(dict(diff), vars_diff)
         return result
 
     @module_fails_on_exception
