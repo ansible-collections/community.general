@@ -269,11 +269,13 @@ def get_user_diff(client, ipa_user, module_user):
 def get_ssh_key_fingerprint(ssh_key, hash_algo='sha256'):
     """
     Return the public key fingerprint of a given public SSH key
-    in format "[fp] [user@host] (ssh-rsa)" where fp is of the format:
+    in format "[fp] [comment] (ssh-rsa)" where fp is of the format:
     FB:0C:AC:0A:07:94:5B:CE:75:6E:63:32:13:AD:AD:D7
     for md5 or
     SHA256:[base64]
     for sha256
+    Comments are assumed to be all characters past the second
+    whitespace character in the sshpubkey string.
     :param ssh_key:
     :param hash_algo:
     :return:
@@ -293,8 +295,9 @@ def get_ssh_key_fingerprint(ssh_key, hash_algo='sha256'):
     if len(parts) < 3:
         return "%s (%s)" % (key_fp, key_type)
     else:
-        user_host = parts[2]
-        return "%s %s (%s)" % (key_fp, user_host, key_type)
+        comment_elements = parts[2:]
+        comment = ' '.join(comment_elements)
+        return "%s %s (%s)" % (key_fp, comment, key_type)
 
 
 def ensure(module, client):
