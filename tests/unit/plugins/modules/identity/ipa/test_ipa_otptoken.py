@@ -194,7 +194,7 @@ class TestIPAOTPToken(ModuleTestCase):
         self._test_base(module_args, return_value, mock_calls, changed)
 
     def test_already_existing_no_change_all_specified(self):
-        """Add a new OTP with all values specified needing no change"""
+        """Add a new OTP with all values specified but needing no change"""
         module_args = {
             'uniqueid': 'NewToken1',
             'otptype': 'hotp',
