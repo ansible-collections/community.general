@@ -71,14 +71,14 @@ class TestCreateJavaKeystore(ModuleTestCase):
         with patch('os.remove', return_value=True):
             self.create_path.side_effect = ['/tmp/tmpgrzm2ah7']
             self.create_file.side_effect = ['/tmp/etacifitrec', '/tmp/yek_etavirp']
-            self.run_commands.side_effect = lambda module, cmd, data: (0, '', '')
+            self.run_commands.side_effect = lambda module, cmd, data, environ_update: (0, '', '')
             create_jks(module, "test", "openssl", "keytool", "/path/to/keystore.jks", "changeit", "")
             module.exit_json.assert_called_once_with(
                 changed=True,
                 cmd=["keytool", "-importkeystore",
                      "-destkeystore", "/path/to/keystore.jks",
                      "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
-                     "-deststorepass", "changeit", "-srcstorepass", "changeit", "-noprompt"],
+                     "-deststorepass:env", "STOREPASS", "-srcstorepass:env", "STOREPASS", "-noprompt"],
                 msg='',
                 rc=0,
                 stdout_lines=''
@@ -173,7 +173,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
                 cmd=["keytool", "-importkeystore",
                      "-destkeystore", "/path/to/keystore.jks",
                      "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
-                     "-deststorepass", "changeit", "-srcstorepass", "changeit", "-noprompt"],
+                     "-deststorepass:env", "STOREPASS", "-srcstorepass:env", "STOREPASS", "-noprompt"],
                 msg='',
                 rc=1
             )
@@ -306,7 +306,7 @@ class TestCertChanged(ModuleTestCase):
             self.run_commands.side_effect = [(0, 'foo: wxyz:9876:stuv', ''), (1, '', 'Oops')]
             cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
             module.fail_json.assert_called_with(
-                cmd=["keytool", "-list", "-alias", "foo", "-keystore", "/path/to/keystore.jks", "-storepass", "changeit", "-v"],
+                cmd=["keytool", "-list", "-alias", "foo", "-keystore", "/path/to/keystore.jks", "-storepass:env", "STOREPASS", "-v"],
                 msg='',
                 err='Oops',
                 rc=1
