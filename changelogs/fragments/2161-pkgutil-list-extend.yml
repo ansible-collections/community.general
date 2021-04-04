@@ -1,0 +1,2 @@
+bugfixes:
+  - pkgutil - fixed calls to ``list.extend()`` (https://github.com/ansible-collections/community.general/pull/2161).
