@@ -96,14 +96,15 @@ options:
     required: false
     description:
      - Sets the the assignee when C(operation) is I(create), I(transition) or I(edit).
-     - Recent versions of JIRA no longer accept an user name as an user identifier. In that case, use C(accountId) instead.
+     - Recent versions of JIRA no longer accept an user name as an user identifier. In that case, use C(account_id) instead.
      - Note that JIRA may not allow changing field values on specific transitions or states.
 
-  accountId:
+  account_id:
     type: str
     description:
      - Sets the account identifier for the assignee when C(operation) is I(create), I(transition) or I(edit).
      - Note that JIRA may not allow changing field values on specific transitions or states.
+    version_added: 2.5.0
 
   linktype:
     type: str
@@ -295,8 +296,8 @@ EXAMPLES = r"""
     inwardissue: HSP-1
     outwardissue: MKY-1
 
-# Transition an issue by target status
-- name: Close the issue
+# Transition an issue
+- name: Resolve the issue
   community.general.jira:
     uri: '{{ server }}'
     username: '{{ user }}'
@@ -304,6 +305,7 @@ EXAMPLES = r"""
     issue: '{{ issue.meta.key }}'
     operation: transition
     status: Resolve Issue
+    account_id: 112233445566778899aabbcc
     fields:
       resolution:
         name: Done
@@ -510,7 +512,7 @@ def main():
             maxresults=dict(type='int'),
             timeout=dict(type='float', default=10),
             validate_certs=dict(default=True, type='bool'),
-            accountId=dict(type='str'),
+            account_id=dict(type='str'),
         ),
         required_if=(
             ('operation', 'create', ['project', 'issuetype', 'summary']),
@@ -520,7 +522,7 @@ def main():
             ('operation', 'link', ['linktype', 'inwardissue', 'outwardissue']),
             ('operation', 'search', ['jql']),
         ),
-        mutually_exclusive=[('assignee', 'accountId')],
+        mutually_exclusive=[('assignee', 'account_id')],
         supports_check_mode=False
     )
 
@@ -532,8 +534,8 @@ def main():
     passwd = module.params['password']
     if module.params['assignee']:
         module.params['fields']['assignee'] = {'name': module.params['assignee']}
-    if module.params['accountId']:
-        module.params['fields']['assignee'] = {'accountId': module.params['accountId']}
+    if module.params['account_id']:
+        module.params['fields']['assignee'] = {'account_id': module.params['accountId']}
 
     if not uri.endswith('/'):
         uri = uri + '/'
