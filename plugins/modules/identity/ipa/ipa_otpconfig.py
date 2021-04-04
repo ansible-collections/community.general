@@ -25,7 +25,7 @@ options:
     aliases: ["totpsyncwindow"]
     type: int
   ipatokenhotpauthwindow:
-    description: HOTP authentication window. (Hops)
+    description: HOTP authentication window in number of hops.
     aliases: ["hotpauthwindow"]
     type: int
   ipatokenhotpsyncwindow:
