@@ -21,7 +21,7 @@ options:
     aliases: ["totpauthwindow"]
     type: int
   ipatokentotpsyncwindow:
-    description: TOTP synchronization window. (Seconds)
+    description: TOTP synchronization window in seconds.
     aliases: ["totpsyncwindow"]
     type: int
   ipatokenhotpauthwindow:
@@ -29,7 +29,7 @@ options:
     aliases: ["hotpauthwindow"]
     type: int
   ipatokenhotpsyncwindow:
-    description: HOTP synchronization window. (Hops)
+    description: HOTP synchronization window in hops.
     aliases: ["hotpsyncwindow"]
     type: int
 extends_documentation_fragment:
@@ -161,11 +161,11 @@ def main():
             username=module.params['ipa_user'],
             password=module.params['ipa_pass']
         )
-        changed, user = ensure(module, client)
+        changed, otpconfig = ensure(module, client)
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
-    module.exit_json(changed=changed, user=user)
+    module.exit_json(changed=changed, otpconfig=otpconfig)
 
 
 if __name__ == '__main__':

@@ -100,9 +100,6 @@ options:
     type: int
 extends_documentation_fragment:
 - community.general.ipa.documentation
-
-requirements:
-- base64
 '''
 
 EXAMPLES = r'''
@@ -160,7 +157,7 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-otp:
+otptoken:
   description: OTP Token as returned by IPA API
   returned: always
   type: dict
