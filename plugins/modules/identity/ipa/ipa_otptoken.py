@@ -17,7 +17,7 @@ description:
 options:
   uniqueid:
     description: Unique ID of the token in IPA.
-    required: True
+    required: true
     aliases: ["name"]
     type: str
   newuniqueid:
