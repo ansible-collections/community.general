@@ -212,6 +212,9 @@ class ModuleHelper(object):
             self._data = dict()
             self._meta = dict()
 
+        def __getitem__(self, item):
+            return self._data[item]
+
         def __setitem__(self, key, value):
             self.set(key, value)
 
