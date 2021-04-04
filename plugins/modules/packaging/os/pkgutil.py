@@ -130,7 +130,7 @@ def packages_not_latest(module, names, site, update_catalog):
         cmd.append('-U')
     cmd.append('-c')
     if site is not None:
-        cmd.extend('-t', site)
+        cmd.extend(['-t', site])
     if names != ['*']:
         cmd.extend(names)
     rc, out, err = run_command(module, cmd)
@@ -159,7 +159,7 @@ def package_install(module, state, pkgs, site, update_catalog, force):
     if update_catalog:
         cmd.append('-U')
     if site is not None:
-        cmd.extend('-t', site)
+        cmd.extend(['-t', site])
     if force:
         cmd.append('-f')
     cmd.extend(pkgs)
@@ -174,7 +174,7 @@ def package_upgrade(module, pkgs, site, update_catalog, force):
     if update_catalog:
         cmd.append('-U')
     if site is not None:
-        cmd.extend('-t', site)
+        cmd.extend(['-t', site])
     if force:
         cmd.append('-f')
     cmd += pkgs
