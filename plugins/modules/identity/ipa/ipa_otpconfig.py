@@ -17,7 +17,7 @@ description:
 - Modify global configuration settings of a FreeIPA Server with respect to OTP (One Time Passwords).
 options:
   ipatokentotpauthwindow:
-    description: TOTP authentication window. (Seconds)
+    description: TOTP authentication window in seconds.
     aliases: ["totpauthwindow"]
     type: int
   ipatokentotpsyncwindow:
