@@ -56,12 +56,14 @@ options:
     required: false
     description:
      - The issue summary, where appropriate.
+     - Note that JIRA may not allow changing field values on specific transitions or states.
 
   description:
     type: str
     required: false
     description:
      - The issue description, where appropriate.
+     - Note that JIRA may not allow changing field values on specific transitions or states.
 
   issuetype:
     type: str
@@ -81,18 +83,27 @@ options:
     required: false
     description:
      - The comment text to add.
+     - Note that JIRA may not allow changing field values on specific transitions or states.
 
   status:
     type: str
     required: false
     description:
-     - The desired status; only relevant for the transition operation.
+     - Only used when C(operation) is I(transition), and a bit of aa misnomer, it actually refers to the transition name.
 
   assignee:
     type: str
     required: false
     description:
-     - Sets the assignee on create or transition operations. Note not all transitions will allow this.
+     - Sets the the assignee when C(operation) is I(create), I(transition) or I(edit).
+     - Recent versions of JIRA no longer accept an user name as an user identifier. In that case, use C(accountId) instead.
+     - Note that JIRA may not allow changing field values on specific transitions or states.
+
+  accountId:
+    type: str
+    description:
+     - Sets the account identifier for the assignee when C(operation) is I(create), I(transition) or I(edit).
+     - Note that JIRA may not allow changing field values on specific transitions or states.
 
   linktype:
     type: str
@@ -119,6 +130,7 @@ options:
      - This is a free-form data structure that can contain arbitrary data. This is passed directly to the JIRA REST API
        (possibly after merging with other required data, as when passed to create). See examples for more information,
        and the JIRA REST API for the structure required for various fields.
+     - Note that JIRA may not allow changing field values on specific transitions or states.
 
   jql:
     required: false
@@ -151,6 +163,7 @@ options:
 
 notes:
   - "Currently this only works with basic-auth."
+  - "To use with JIRA Cloud, pass the login e-mail as the C(username) and the API token as C(password)."
 
 author:
 - "Steve Smith (@tarka)"
@@ -172,7 +185,7 @@ EXAMPLES = r"""
   args:
     fields:
         customfield_13225: "test"
-        customfield_12931: '{"value": "Test"}'
+        customfield_12931: {"value": "Test"}
   register: issue
 
 - name: Comment on issue
@@ -290,12 +303,11 @@ EXAMPLES = r"""
     password: '{{ pass }}'
     issue: '{{ issue.meta.key }}'
     operation: transition
-    status: Done
-  args:
+    status: Resolve Issue
     fields:
-      customfield_14321: [ {'set': {'value': 'Value of Select' }} ]
-      comment:  [ { 'add': { 'body' : 'Test' } }]
-
+      resolution:
+        name: Done
+      description: I am done! This is the last description I will ever give you.
 """
 
 import base64
@@ -498,6 +510,7 @@ def main():
             maxresults=dict(type='int'),
             timeout=dict(type='float', default=10),
             validate_certs=dict(default=True, type='bool'),
+            accountId=dict(type='str'),
         ),
         required_if=(
             ('operation', 'create', ['project', 'issuetype', 'summary']),
@@ -507,6 +520,7 @@ def main():
             ('operation', 'link', ['linktype', 'inwardissue', 'outwardissue']),
             ('operation', 'search', ['jql']),
         ),
+        mutually_exclusive=[('assignee', 'accountId')],
         supports_check_mode=False
     )
 
@@ -518,6 +532,8 @@ def main():
     passwd = module.params['password']
     if module.params['assignee']:
         module.params['fields']['assignee'] = {'name': module.params['assignee']}
+    if module.params['accountId']:
+        module.params['fields']['assignee'] = {'accountId': module.params['accountId']}
 
     if not uri.endswith('/'):
         uri = uri + '/'

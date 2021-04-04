@@ -1,2 +1,4 @@
 bugfixes:
   - jira - fixed fields' update in ticket transitions (https://github.com/ansible-collections/community.general/issues/818).
+minor_changes:
+  - jira - added parameter ``accountId`` for compatibility with recent versions of JIRA (https://github.com/ansible-collections/community.general/issues/818).
