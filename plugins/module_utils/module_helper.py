@@ -125,11 +125,10 @@ def module_fails_on_exception(func):
         except ModuleHelperException as e:
             if e.update_output:
                 self.update_output(e.update_output)
-            self.module.fail_json(msg=e.msg, exception=traceback.format_exc(), **self.output)
+            self.module.fail_json(msg=e.msg, exception=traceback.format_exc(), output=self.output, vars=self.vars, **self.output)
         except Exception as e:
             msg = "Module failed with exception: {0}".format(str(e).strip())
-            exception = traceback.format_exc()
-            self.module.fail_json(msg=msg, exception=exception, **self.output)
+            self.module.fail_json(msg=msg, exception=traceback.format_exc(), output=self.output, vars=self.vars, **self.output)
     return wrapper
 
 
