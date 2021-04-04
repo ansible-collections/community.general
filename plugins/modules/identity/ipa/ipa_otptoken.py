@@ -41,8 +41,8 @@ options:
     description:  Assigned user of the token.
     type: str
   enabled:
-    description: Mark the token as enabled (default True).
-    default: True
+    description: Mark the token as enabled (default C(true)).
+    default: true
     type: bool
   notbefore:
     description:
