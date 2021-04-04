@@ -26,8 +26,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
 
         orig_exists = os.path.exists
         self.spec = ArgumentSpec()
-        self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file',
-                                      side_effect=lambda path, content: path)
+        self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file')
         self.mock_run_commands = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.run_commands')
         self.mock_os_path_exists = patch('os.path.exists',
                                          side_effect=lambda path: True if path == '/path/to/keystore.jks' else orig_exists(path))
@@ -174,8 +173,7 @@ class TestCertChanged(ModuleTestCase):
         """Setup."""
         super(TestCertChanged, self).setUp()
         self.spec = ArgumentSpec()
-        self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file',
-                                      side_effect=lambda path, content: path)
+        self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file')
         self.mock_run_commands = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.run_commands')
         self.run_commands = self.mock_run_commands.start()
         self.create_file = self.mock_create_file.start()
