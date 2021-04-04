@@ -48,7 +48,7 @@ options:
     description:
     - First date/time the token can be used.
     - In the format C(YYYYMMddHHmmss).
-    - e.g. 20180121182022 will allow the token to be used starting on 21 January 2018 at 18:20:22.
+    - For example, C(20180121182022) will allow the token to be used starting on 21 January 2018 at 18:20:22.
     type: str
   notafter:
     description:
