@@ -1,0 +1,107 @@
+---
+- name: "Test 1: using with with_dependent"
+  debug:
+    msg: "{{ item.0 }} {{ item.1 }} {{ item.2 }}"
+  with_community.general.dependent:
+    - [1, 2]
+    - "[item.0 + 3, item.0 + 6]"
+    - "[item.0 + item.1 * 10]"
+
+- name: "Test 2: using with loop"
+  debug:
+    msg: "{{ item.0 }} {{ item.1 }} {{ item.2 }}"
+  loop: >-
+    {{ query('community.general.dependent',
+             [1, 2],
+             '[item.0 + 3, item.0 + 6]',
+             '[item.0 + item.1 * 10]') }}
+
+- name: "Test 3: using with with_dependent, simplified loop label"
+  debug:
+    msg: "{{ item.0 }} {{ item.1 }} {{ item.2 }}"
+  with_community.general.dependent:
+    - [1, 2]
+    - "[item.0 + 3, item.0 + 6]"
+    - "[item.0 + item.1 * 10]"
+  loop_control:
+    label: "{{ [item.0, item.1, item.2] }}"
+
+- name: "Test 4: using with loop, simplified loop label"
+  debug:
+    msg: "{{ item.0 }} {{ item.1 }} {{ item.2 }}"
+  loop: >-
+    {{ query('community.general.dependent',
+             [1, 2],
+             '[item.0 + 3, item.0 + 6]',
+             '[item.0 + item.1 * 10]') }}
+  loop_control:
+    label: "{{ [item.0, item.1, item.2] }}"
+
+- name: Test dependent lookup
+  debug:
+    var: item
+  with_community.general.dependent:
+    - a:
+        - 1
+        - 2
+      b:
+        - 3
+        - 4
+    - 'item.0.value'
+    - 'dependent_lookup_test[item.0.key ~ "_" ~ item.1]'
+  loop_control:
+    label: "{{ [item.0.key, item.1, item.2] }}"
+  register: dependent
+  vars:
+    dependent_lookup_test:
+      a_1:
+        - A
+        - B
+      a_2:
+        - C
+      b_3:
+        - D
+      b_4:
+        - E
+        - F
+        - G
+
+- name: Verify dependent lookup
+  assert:
+    that:
+      - (dependent.results | length) == 7
+      - dependent.results[0].item.0.key == "a"
+      - dependent.results[0].item.1 == 1
+      - dependent.results[0].item.2 == "A"
+      - dependent.results[1].item.0.key == "a"
+      - dependent.results[1].item.1 == 1
+      - dependent.results[1].item.2 == "B"
+      - dependent.results[2].item.0.key == "a"
+      - dependent.results[2].item.1 == 2
+      - dependent.results[2].item.2 == "C"
+      - dependent.results[3].item.0.key == "b"
+      - dependent.results[3].item.1 == 3
+      - dependent.results[3].item.2 == "D"
+      - dependent.results[4].item.0.key == "b"
+      - dependent.results[4].item.1 == 4
+      - dependent.results[4].item.2 == "E"
+      - dependent.results[5].item.0.key == "b"
+      - dependent.results[5].item.1 == 4
+      - dependent.results[5].item.2 == "F"
+      - dependent.results[6].item.0.key == "b"
+      - dependent.results[6].item.1 == 4
+      - dependent.results[6].item.2 == "G"
+
+- name: "Test 5: failure"
+  debug:
+    msg: "{{ item.0 }} {{ item.1 }}"
+  with_community.general.dependent:
+    - [1, 2]
+    - "[item.0 + foo]"
+  ignore_errors: true
+  register: eval_error
+
+- name: Check for failure
+  assert:
+    that:
+      - eval_error is failed
