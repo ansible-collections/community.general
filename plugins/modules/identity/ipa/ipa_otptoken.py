@@ -25,7 +25,7 @@ options:
   otptype:
     description:
     - Type of OTP.
-    - NOTE, Cannot be modified after OTP is created.
+    - "B(Note:) Cannot be modified after OTP is created."
     type: str
     choices: [ totp, hotp ]
   secretkey:
