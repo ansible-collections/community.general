@@ -37,7 +37,8 @@ options:
   ipagroupsearchfields:
     description: A comma-separated list of fields to search in when searching for groups.
     aliases: ["groupsearchfields"]
-    type: str
+    type: list
+    elements: str
     version_added: '2.5.0'
   ipahomesrootdir:
     description: Default location of home directories.
@@ -81,7 +82,8 @@ options:
   ipausersearchfields:
     description: A comma-separated list of fields to search in when searching for users.
     aliases: ["usersearchfields"]
-    type: str
+    type: list
+    elements: str
     version_added: '2.5.0'
 extends_documentation_fragment:
 - community.general.ipa.documentation
@@ -119,7 +121,7 @@ EXAMPLES = r'''
 
 - name: Ensure the group search fields are set to 'cn,description'
   community.general.ipa_config:
-    ipagroupsearchfields: cn,description
+    ipagroupsearchfields: ['cn', 'description']
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
@@ -175,7 +177,7 @@ EXAMPLES = r'''
 
 - name: Ensure the user search fields is set to 'uid,givenname,sn,ou,title'
   community.general.ipa_config:
-    ipausersearchfields: uid,givenname,sn,ou,title
+    ipausersearchfields: ['uid', 'givenname', 'sn', 'ou', 'title']
     ipa_host: localhost
     ipa_user: admin
     ipa_pass: supersecret
@@ -223,7 +225,7 @@ def get_config_dict(ipaconfigstring=None, ipadefaultloginshell=None,
     if ipadefaultprimarygroup is not None:
         config['ipadefaultprimarygroup'] = ipadefaultprimarygroup
     if ipagroupsearchfields is not None:
-        config['ipagroupsearchfields'] = ipagroupsearchfields
+        config['ipagroupsearchfields'] = ','.join(ipagroupsearchfields)
     if ipahomesrootdir is not None:
         config['ipahomesrootdir'] = ipahomesrootdir
     if ipakrbauthzdata is not None:
@@ -239,7 +241,7 @@ def get_config_dict(ipaconfigstring=None, ipadefaultloginshell=None,
     if ipauserauthtype is not None:
         config['ipauserauthtype'] = ipauserauthtype
     if ipausersearchfields is not None:
-        config['ipausersearchfields'] = ipausersearchfields
+        config['ipausersearchfields'] = ','.join(ipausersearchfields)
 
     return config
 
@@ -292,7 +294,8 @@ def main():
         ipadefaultloginshell=dict(type='str', aliases=['loginshell']),
         ipadefaultemaildomain=dict(type='str', aliases=['emaildomain']),
         ipadefaultprimarygroup=dict(type='str', aliases=['primarygroup']),
-        ipagroupsearchfields=dict(type='str', aliases=['groupsearchfields']),
+        ipagroupsearchfields=dict(type='list', elements='str',
+                                  aliases=['groupsearchfields']),
         ipahomesrootdir=dict(type='str', aliases=['homesrootdir']),
         ipakrbauthzdata=dict(type='list', elements='str',
                              choices=['MS-PAC', 'PAD', 'nfs:NONE'],
@@ -305,7 +308,8 @@ def main():
                              aliases=['userauthtype'],
                              choices=["password", "radius", "otp", "pkinit",
                                       "hardened", "disabled"]),
-        ipausersearchfields=dict(type='str', aliases=['usersearchfields']),
+        ipausersearchfields=dict(type='list', elements='str',
+                                 aliases=['usersearchfields']),
     )
 
     module = AnsibleModule(
