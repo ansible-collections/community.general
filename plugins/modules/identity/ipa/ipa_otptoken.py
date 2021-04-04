@@ -11,6 +11,7 @@ DOCUMENTATION = r'''
 module: ipa_otptoken
 author: justchris1 (@justchris1)
 short_description: Manage FreeIPA OTPs
+version_added: 2.5.0
 description:
 - Add, modify, and delete One Time Passwords in IPA.
 options:
