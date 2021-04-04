@@ -280,7 +280,7 @@ def get_ssh_key_fingerprint(ssh_key, hash_algo='sha256'):
     :param hash_algo:
     :return:
     """
-    parts = ssh_key.strip().split()
+    parts = ssh_key.strip().split(None, 2)
     if len(parts) == 0:
         return None
     key_type = parts[0]
@@ -295,8 +295,7 @@ def get_ssh_key_fingerprint(ssh_key, hash_algo='sha256'):
     if len(parts) < 3:
         return "%s (%s)" % (key_fp, key_type)
     else:
-        comment_elements = parts[2:]
-        comment = ' '.join(comment_elements)
+        comment = parts[2]
         return "%s %s (%s)" % (key_fp, comment, key_type)
 
 
