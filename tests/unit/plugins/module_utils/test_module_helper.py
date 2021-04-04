@@ -9,7 +9,7 @@ __metaclass__ = type
 import pytest
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    ArgFormat, DependencyCtxMgr, ModuleHelper, VariableMeta
+    ArgFormat, DependencyCtxMgr, ModuleHelper, VarMeta
 )
 
 
@@ -108,7 +108,7 @@ def test_dependency_ctxmgr():
 
 
 def test_variable_meta():
-    meta = VariableMeta()
+    meta = VarMeta()
     assert meta.output is False
     assert meta.diff is False
     assert meta.value is None
@@ -123,7 +123,7 @@ def test_variable_meta():
 
 
 def test_variable_meta_diff():
-    meta = VariableMeta(diff=True)
+    meta = VarMeta(diff=True)
     assert meta.output is False
     assert meta.diff is True
     assert meta.value is None

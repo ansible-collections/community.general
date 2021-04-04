@@ -16,8 +16,6 @@ from ansible.module_utils.common.dict_transformations import dict_merge
 
 
 class ModuleHelperException(Exception):
-    exclude_from_output = ('update_output', 'msg', 'exception')
-
     @staticmethod
     def _get_remove(key, kwargs):
         if key in kwargs:
@@ -28,7 +26,6 @@ class ModuleHelperException(Exception):
 
     def __init__(self, *args, **kwargs):
         self.msg = self._get_remove('msg', kwargs) or "Module failed with exception: {0}".format(self)
-        self.update_output = dict((k, v) for k, v in kwargs.items() if k not in self.exclude_from_output)
         self.update_output = self._get_remove('update_output', kwargs) or {}
         super(ModuleHelperException, self).__init__(*args)
 
