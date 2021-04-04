@@ -6,10 +6,8 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from collections import UserDict
 from functools import partial, wraps
 import traceback
-from contextlib import AbstractContextManager
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.dict_transformations import dict_merge
@@ -135,7 +133,7 @@ def module_fails_on_exception(func):
     return wrapper
 
 
-class DependencyCtxMgr(AbstractContextManager):
+class DependencyCtxMgr(object):
     def __init__(self, name, msg=None):
         self.name = name
         self.msg = msg
@@ -143,6 +141,9 @@ class DependencyCtxMgr(AbstractContextManager):
         self.exc_type = None
         self.exc_val = None
         self.exc_tb = None
+
+    def __enter__(self):
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.has_it = exc_type is None
@@ -206,16 +207,22 @@ class ModuleHelper(object):
     diff_params = ()
     change_params = ()
 
-    class VarDict(UserDict):
+    class VarDict(object):
         def __init__(self):
             self._meta = dict()
-            super(ModuleHelper.VarDict, self).__init__()
+            self.data = dict()
 
         def __setitem__(self, key, value):
             self.set(key, value)
 
         def __getattr__(self, item):
-            return self[item]
+            try:
+                return self.data[item]
+            except:
+                return getattr(self.data, item)
+
+        def __setattr__(self, key, value):
+            self.set(key, value)
 
         def meta(self, name):
             return self._meta[name]
@@ -248,7 +255,7 @@ class ModuleHelper(object):
             return None
 
         def change_vars(self):
-            return [v for v in self if self.meta(v).change]
+            return [v for v in self.data if self.meta(v).change]
 
         def has_changed(self, v):
             return self._meta[v].has_changed
@@ -346,14 +353,14 @@ class StateMixin(object):
 
     def __run__(self):
         state = self._state()
-        self.vars.state = state
+        self.vars.set("state", state)
 
         # resolve aliases
         if state not in self.module.params:
             aliased = [name for name, param in self.module.argument_spec.items() if state in param.get('aliases', [])]
             if aliased:
                 state = aliased[0]
-                self.vars.effective_state = state
+                self.vars.set("effective_state", state)
 
         method = self._method(state)
         if not hasattr(self, method):
@@ -436,7 +443,7 @@ class CmdMixin(object):
         return rc, out, err
 
     def run_command(self, extra_params=None, params=None, *args, **kwargs):
-        self.vars['cmd_args'] = self._calculate_args(extra_params, params)
+        self.vars.cmd_args = self._calculate_args(extra_params, params)
         options = dict(self.run_command_fixed_options)
         env_update = dict(options.get('environ_update', {}))
         options['check_rc'] = options.get('check_rc', self.check_rc)
@@ -445,7 +452,7 @@ class CmdMixin(object):
             self.update_output(force_lang=self.force_lang)
             options['environ_update'] = env_update
         options.update(kwargs)
-        rc, out, err = self.module.run_command(self.vars['cmd_args'], *args, **options)
+        rc, out, err = self.module.run_command(self.vars.cmd_args, *args, **options)
         self.update_output(rc=rc, stdout=out, stderr=err)
         return self.process_command_output(rc, out, err)
 
