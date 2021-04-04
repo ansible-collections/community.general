@@ -209,20 +209,23 @@ class ModuleHelper(object):
 
     class VarDict(object):
         def __init__(self):
+            self._data = dict()
             self._meta = dict()
-            self.data = dict()
 
         def __setitem__(self, key, value):
             self.set(key, value)
 
         def __getattr__(self, item):
             try:
-                return self.data[item]
-            except:
-                return getattr(self.data, item)
+                return self._data[item]
+            except KeyError:
+                return getattr(self._data, item)
 
         def __setattr__(self, key, value):
-            self.set(key, value)
+            if key in ('_data', '_meta'):
+                super(ModuleHelper.VarDict, self).__setattr__(key, value)
+            else:
+                self.set(key, value)
 
         def meta(self, name):
             return self._meta[name]
@@ -231,7 +234,9 @@ class ModuleHelper(object):
             self.meta(name).set(**kwargs)
 
         def set(self, name, value, **kwargs):
-            self.data[name] = value
+            if name in ('_data', '_meta'):
+                raise ValueError("Names _data and _meta are reserver for use by ModuleHelper")
+            self._data[name] = value
             if name in self._meta:
                 meta = self.meta(name)
             else:
@@ -245,7 +250,7 @@ class ModuleHelper(object):
             return dict((k, v) for k, v in self.items() if self.meta(k).output)
 
         def diff(self):
-            diff_results = [(k, self.meta(k).diff_result) for k in self.data]
+            diff_results = [(k, self.meta(k).diff_result) for k in self._data]
             diff_results = [dr for dr in diff_results if dr[1] is not None]
             if diff_results:
                 before = dict((dr[0], dr[1]['before']) for dr in diff_results)
@@ -255,7 +260,7 @@ class ModuleHelper(object):
             return None
 
         def change_vars(self):
-            return [v for v in self.data if self.meta(v).change]
+            return [v for v in self._data if self.meta(v).change]
 
         def has_changed(self, v):
             return self._meta[v].has_changed
