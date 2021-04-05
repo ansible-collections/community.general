@@ -71,7 +71,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
         with patch('os.remove', return_value=True):
             self.create_path.side_effect = ['/tmp/tmpgrzm2ah7']
             self.create_file.side_effect = ['/tmp/etacifitrec', '/tmp/yek_etavirp']
-            self.run_commands.side_effect = lambda module, cmd, data, environ_update: (0, '', '')
+            self.run_commands.side_effect = [(0, '', ''), (0, '', '')]
             create_jks(module, "test", "openssl", "keytool", "/path/to/keystore.jks", "changeit", "")
             module.exit_json.assert_called_once_with(
                 changed=True,
