@@ -96,7 +96,7 @@ options:
     required: false
     description:
      - Sets the the assignee when I(operation) is C(create), C(transition) or C(edit).
-     - Recent versions of JIRA no longer accept an user name as an user identifier. In that case, use C(account_id) instead.
+     - Recent versions of JIRA no longer accept a user name as a user identifier. In that case, use I(account_id) instead.
      - Note that JIRA may not allow changing field values on specific transitions or states.
 
   account_id:
