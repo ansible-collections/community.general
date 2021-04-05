@@ -94,7 +94,8 @@ options:
     description:
     - The authentication type to use for the user.
     choices: ["password", "radius", "otp", "pkinit", "hardened"]
-    type: str
+    type: list
+    elements: str
     version_added: '1.2.0'
 extends_documentation_fragment:
 - community.general.ipa.documentation
@@ -146,11 +147,11 @@ EXAMPLES = r'''
     ipa_pass: topsecret
     update_password: on_create
 
-- name: Ensure pinky is present and using one time password authentication
+- name: Ensure pinky is present and using one time password and RADIUS authentication
   community.general.ipa_user:
     name: pinky
     state: present
-    userauthtype: otp
+    userauthtype: ['otp', 'radius']
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
@@ -361,7 +362,7 @@ def main():
                          telephonenumber=dict(type='list', elements='str'),
                          title=dict(type='str'),
                          homedirectory=dict(type='str'),
-                         userauthtype=dict(type='str',
+                         userauthtype=dict(type='list', elements='str',
                                            choices=['password', 'radius', 'otp', 'pkinit', 'hardened']))
 
     module = AnsibleModule(argument_spec=argument_spec,
