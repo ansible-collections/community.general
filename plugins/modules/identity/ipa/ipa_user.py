@@ -151,7 +151,9 @@ EXAMPLES = r'''
   community.general.ipa_user:
     name: pinky
     state: present
-    userauthtype: ['otp', 'radius']
+    userauthtype:
+      - otp
+      - radius
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
