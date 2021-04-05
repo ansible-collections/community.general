@@ -102,7 +102,7 @@ options:
   account_id:
     type: str
     description:
-     - Sets the account identifier for the assignee when C(operation) is I(create), I(transition) or I(edit).
+     - Sets the account identifier for the assignee when I(operation) is C(create), C(transition) or C(edit).
      - Note that JIRA may not allow changing field values on specific transitions or states.
     version_added: 2.5.0
 
