@@ -162,7 +162,6 @@ def waitForTaskDone(client, name, taskId, timeout):
         currentTimeout -= 5
         if currentTimeout < 0:
             return False
-    return True
 
 
 def main():
