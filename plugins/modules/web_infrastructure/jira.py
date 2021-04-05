@@ -164,7 +164,7 @@ options:
 
 notes:
   - "Currently this only works with basic-auth."
-  - "To use with JIRA Cloud, pass the login e-mail as the C(username) and the API token as C(password)."
+  - "To use with JIRA Cloud, pass the login e-mail as the I(username) and the API token as I(password)."
 
 author:
 - "Steve Smith (@tarka)"
