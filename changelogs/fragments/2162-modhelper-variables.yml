@@ -1,0 +1,2 @@
+minor_changes:
+  - module_helper module utils - added mechanism to manage variables, providing automatic output of variables, change status and diff information (https://github.com/ansible-collections/community.general/pull/2162).
