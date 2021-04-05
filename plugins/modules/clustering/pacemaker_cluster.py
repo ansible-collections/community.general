@@ -37,6 +37,11 @@ options:
         - Force the change of the cluster state
       type: bool
       default: 'yes'
+    enable:
+      description:
+        - Enable automatic cluster startup on all nodes
+      type: bool
+      default: 'yes'
 '''
 EXAMPLES = '''
 ---
@@ -66,13 +71,20 @@ rc:
     returned: always
 '''
 
-import time
+import time, re
 
 from ansible.module_utils.basic import AnsibleModule
 
 
 _PCS_CLUSTER_DOWN = "Error: cluster is not currently running on this node"
 
+class ClusterConfiguration(object):
+    def __init__(self, name, nodes, active_nodes, stonith_devices, resource_groups):
+        self.name = name
+        self.nodes = nodes
+        self.active_nodes = active_nodes
+        self.stonith_devices = stonith_devices
+        self.resource_groups = resource_groups
 
 def get_cluster_status(module):
     cmd = "pcs cluster status"
@@ -81,6 +93,22 @@ def get_cluster_status(module):
         return 'offline'
     else:
         return 'online'
+
+
+def get_cluster_configuration(module):
+    # parse output of 'pcs cluster config' into object of type ClusterConfiguration
+    cmd = "pcs config"
+    rc, out, err = module.run_command(cmd)
+    if rc == 1:
+        module.fail_json(msg="Failed to get cluster configuration.\nCommand: `%s`\nError: %s" % (cmd, err))
+    match_object = search(r'Cluster Name: (.*?)\n', out)
+    name = match_object.group(1)
+    match_object = search(r'Corosync Nodes:\n((?:\s\S+)*?)\n', out)
+    corosync_nodes = match_object.group(1).strip().split(' ')
+    match_object = search(r'Pacemaker Nodes:\n((?:\s\S+)*?)\n', out)
+    pacemaker_nodes = match_object.group(1).strip().split(' ')
+    # only include nodes in both corosync_nodes and pacemaker_nodes
+    nodes = [node for node in corosync_nodes if node in pacemaker_nodes]
 
 
 def get_node_status(module, node='all'):
@@ -106,6 +134,10 @@ def clean_cluster(module, timeout):
 
 def set_cluster(module, state, timeout, force):
     if state == 'online':
+        # if the cluster does not exist, create it
+        current_status = get_cluster_status(module)
+        if current_status != state:
+            rc, out, err = module.run_command("pcs")
         cmd = "pcs cluster start"
     if state == 'offline':
         cmd = "pcs cluster stop"
@@ -161,6 +193,7 @@ def main():
         node=dict(type='str'),
         timeout=dict(type='int', default=300),
         force=dict(type='bool', default=True),
+        members=list(type='bool', elements='str'),
     )
 
     module = AnsibleModule(
@@ -172,6 +205,7 @@ def main():
     node = module.params['node']
     force = module.params['force']
     timeout = module.params['timeout']
+    members = module.params['members']
 
     if state in ['online', 'offline']:
         # Get cluster status
@@ -180,7 +214,7 @@ def main():
             if cluster_state == state:
                 module.exit_json(changed=changed, out=cluster_state)
             else:
-                set_cluster(module, state, timeout, force)
+                set_cluster(module, state, timeout, members, force)
                 cluster_state = get_cluster_status(module)
                 if cluster_state == state:
                     module.exit_json(changed=True, out=cluster_state)
