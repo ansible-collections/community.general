@@ -26,8 +26,8 @@ class TestCreateJavaKeystore(ModuleTestCase):
 
         orig_exists = os.path.exists
         self.spec = ArgumentSpec()
-        self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file',
-                                      side_effect=lambda path, content: path)
+        self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file')
+        self.mock_create_path = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_path')
         self.mock_run_commands = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.run_commands')
         self.mock_os_path_exists = patch('os.path.exists',
                                          side_effect=lambda path: True if path == '/path/to/keystore.jks' else orig_exists(path))
@@ -37,6 +37,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
                                                   side_effect=lambda path: (False, None))
         self.run_commands = self.mock_run_commands.start()
         self.create_file = self.mock_create_file.start()
+        self.create_path = self.mock_create_path.start()
         self.selinux_context = self.mock_selinux_context.start()
         self.is_special_selinux_path = self.mock_is_special_selinux_path.start()
         self.os_path_exists = self.mock_os_path_exists.start()
@@ -45,6 +46,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
         """Teardown."""
         super(TestCreateJavaKeystore, self).tearDown()
         self.mock_create_file.stop()
+        self.mock_create_path.stop()
         self.mock_run_commands.stop()
         self.mock_selinux_context.stop()
         self.mock_is_special_selinux_path.stop()
@@ -67,13 +69,15 @@ class TestCreateJavaKeystore(ModuleTestCase):
         module.exit_json = Mock()
 
         with patch('os.remove', return_value=True):
+            self.create_path.side_effect = ['/tmp/tmpgrzm2ah7']
+            self.create_file.side_effect = ['/tmp/etacifitrec', '/tmp/yek_etavirp']
             self.run_commands.side_effect = lambda module, cmd, data: (0, '', '')
             create_jks(module, "test", "openssl", "keytool", "/path/to/keystore.jks", "changeit", "")
             module.exit_json.assert_called_once_with(
                 changed=True,
                 cmd=["keytool", "-importkeystore",
                      "-destkeystore", "/path/to/keystore.jks",
-                     "-srckeystore", "/tmp/keystore.p12", "-srcstoretype", "pkcs12", "-alias", "test",
+                     "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
                      "-deststorepass", "changeit", "-srcstorepass", "changeit", "-noprompt"],
                 msg='',
                 rc=0,
@@ -98,12 +102,15 @@ class TestCreateJavaKeystore(ModuleTestCase):
         module.fail_json = Mock()
 
         with patch('os.remove', return_value=True):
+            self.create_path.side_effect = ['/tmp/tmp1cyp12xa']
+            self.create_file.side_effect = ['/tmp/tmpvalcrt32', '/tmp/tmpwh4key0c']
             self.run_commands.side_effect = [(1, '', ''), (0, '', '')]
             create_jks(module, "test", "openssl", "keytool", "/path/to/keystore.jks", "changeit", "passphrase-foo")
             module.fail_json.assert_called_once_with(
                 cmd=["openssl", "pkcs12", "-export", "-name", "test",
-                     "-in", "/tmp/foo.crt", "-inkey", "/tmp/foo.key",
-                     "-out", "/tmp/keystore.p12",
+                     "-in", "/tmp/tmpvalcrt32",
+                     "-inkey", "/tmp/tmpwh4key0c",
+                     "-out", "/tmp/tmp1cyp12xa",
                      "-passout", "stdin",
                      "-passin", "stdin"],
                 msg='',
@@ -127,12 +134,15 @@ class TestCreateJavaKeystore(ModuleTestCase):
         module.fail_json = Mock()
 
         with patch('os.remove', return_value=True):
+            self.create_path.side_effect = ['/tmp/tmp1cyp12xa']
+            self.create_file.side_effect = ['/tmp/tmpvalcrt32', '/tmp/tmpwh4key0c']
             self.run_commands.side_effect = [(1, '', ''), (0, '', '')]
             create_jks(module, "test", "openssl", "keytool", "/path/to/keystore.jks", "changeit", "")
             module.fail_json.assert_called_once_with(
                 cmd=["openssl", "pkcs12", "-export", "-name", "test",
-                     "-in", "/tmp/foo.crt", "-inkey", "/tmp/foo.key",
-                     "-out", "/tmp/keystore.p12",
+                     "-in", "/tmp/tmpvalcrt32",
+                     "-inkey", "/tmp/tmpwh4key0c",
+                     "-out", "/tmp/tmp1cyp12xa",
                      "-passout", "stdin"],
                 msg='',
                 rc=1
@@ -155,12 +165,14 @@ class TestCreateJavaKeystore(ModuleTestCase):
         module.fail_json = Mock()
 
         with patch('os.remove', return_value=True):
+            self.create_path.side_effect = ['/tmp/tmpgrzm2ah7']
+            self.create_file.side_effect = ['/tmp/etacifitrec', '/tmp/yek_etavirp']
             self.run_commands.side_effect = [(0, '', ''), (1, '', '')]
             create_jks(module, "test", "openssl", "keytool", "/path/to/keystore.jks", "changeit", "")
             module.fail_json.assert_called_once_with(
                 cmd=["keytool", "-importkeystore",
                      "-destkeystore", "/path/to/keystore.jks",
-                     "-srckeystore", "/tmp/keystore.p12", "-srcstoretype", "pkcs12", "-alias", "test",
+                     "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
                      "-deststorepass", "changeit", "-srcstorepass", "changeit", "-noprompt"],
                 msg='',
                 rc=1
@@ -174,8 +186,7 @@ class TestCertChanged(ModuleTestCase):
         """Setup."""
         super(TestCertChanged, self).setUp()
         self.spec = ArgumentSpec()
-        self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file',
-                                      side_effect=lambda path, content: path)
+        self.mock_create_file = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.create_file')
         self.mock_run_commands = patch('ansible_collections.community.general.plugins.modules.system.java_keystore.run_commands')
         self.run_commands = self.mock_run_commands.start()
         self.create_file = self.mock_create_file.start()
@@ -201,6 +212,7 @@ class TestCertChanged(ModuleTestCase):
         )
 
         with patch('os.remove', return_value=True):
+            self.create_file.side_effect = ['/tmp/placeholder']
             self.run_commands.side_effect = [(0, 'foo=abcd:1234:efgh', ''), (0, 'SHA256: abcd:1234:efgh', '')]
             result = cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
             self.assertFalse(result, 'Fingerprint is identical')
@@ -220,6 +232,7 @@ class TestCertChanged(ModuleTestCase):
         )
 
         with patch('os.remove', return_value=True):
+            self.create_file.side_effect = ['/tmp/placeholder']
             self.run_commands.side_effect = [(0, 'foo=abcd:1234:efgh', ''), (0, 'SHA256: wxyz:9876:stuv', '')]
             result = cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
             self.assertTrue(result, 'Fingerprint mismatch')
@@ -239,6 +252,7 @@ class TestCertChanged(ModuleTestCase):
         )
 
         with patch('os.remove', return_value=True):
+            self.create_file.side_effect = ['/tmp/placeholder']
             self.run_commands.side_effect = [(0, 'foo=abcd:1234:efgh', ''),
                                              (1, 'keytool error: java.lang.Exception: Alias <foo> does not exist', '')]
             result = cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
@@ -261,10 +275,11 @@ class TestCertChanged(ModuleTestCase):
         module.fail_json = Mock()
 
         with patch('os.remove', return_value=True):
+            self.create_file.side_effect = ['/tmp/tmpdj6bvvme']
             self.run_commands.side_effect = [(1, '', 'Oops'), (0, 'SHA256: wxyz:9876:stuv', '')]
             cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
             module.fail_json.assert_called_once_with(
-                cmd=["openssl", "x509", "-noout", "-in", "/tmp/foo.crt", "-fingerprint", "-sha256"],
+                cmd=["openssl", "x509", "-noout", "-in", "/tmp/tmpdj6bvvme", "-fingerprint", "-sha256"],
                 msg='',
                 err='Oops',
                 rc=1
@@ -287,6 +302,7 @@ class TestCertChanged(ModuleTestCase):
         module.fail_json = Mock(return_value=True)
 
         with patch('os.remove', return_value=True):
+            self.create_file.side_effect = ['/tmp/placeholder']
             self.run_commands.side_effect = [(0, 'foo: wxyz:9876:stuv', ''), (1, '', 'Oops')]
             cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
             module.fail_json.assert_called_with(
