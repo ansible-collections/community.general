@@ -195,7 +195,7 @@ class VarMeta(object):
         }
 
     def __str__(self):
-        return"<VarMeta: value={0}, initial={1}, diff={2}, output={3}, change={4}>".format(
+        return "<VarMeta: value={0}, initial={1}, diff={2}, output={3}, change={4}>".format(
             self.value, self.initial_value, self.diff, self.output, self.change
         )
 
