@@ -1,0 +1,14 @@
+- name: test failing dependency
+  mdepfail:
+    a: 123
+  ignore_errors: yes
+  register: result
+
+- name: assert failing dependency
+  assert:
+    that:
+      - result.failed is true
+      - '"Failed to import" in result.msg'
+      - '"nopackagewiththisname" in result.msg'
+      - '"ModuleNotFoundError:" in result.exception'
+      - '"nopackagewiththisname" in result.exception'
