@@ -19,6 +19,7 @@ DOCUMENTATION = '''
         - Will retrieve the first network interface with an IP for Proxmox nodes.
         - Can retrieve LXC/QEMU configuration as facts.
     extends_documentation_fragment:
+        - constructed
         - inventory_cache
     options:
       plugin:
@@ -70,23 +71,13 @@ DOCUMENTATION = '''
         default: no
         type: bool
       strict:
-        description:
-          - If yes make invalid entries a fatal error, otherwise skip and continue.
-          - Since it is possible to use facts in the expressions they might not always be available and we ignore those errors by default.
-        default: no
-        type: bool
+        version_added: 2.5.0
       compose:
-        description: Create vars from jinja2 expressions.
-        default: {}
-        type: dict
+        version_added: 2.5.0
       groups:
-        description: Add hosts to group based on Jinja2 conditionals.
-        type: dict
-        default: {}
+        version_added: 2.5.0
       keyed_groups:
-        description: Add hosts to group based on the values of a variable.
-        type: list
-        default: []
+        version_added: 2.5.0
 '''
 
 EXAMPLES = '''
