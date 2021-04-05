@@ -1,0 +1,4 @@
+minor_changes:
+  - rhevm - removed unreachable code (https://github.com/ansible-collections/community.general/pull/2157).
+  - ovh_ip_failover - removed unreachable code (https://github.com/ansible-collections/community.general/pull/2157).
+  - bitbucket_pipeline_variable - removed unreachable code (https://github.com/ansible-collections/community.general/pull/2157).
