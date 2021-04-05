@@ -1,0 +1,20 @@
+---
+- name: "Test list_to_dict filter"
+  assert:
+    that:
+      - "[1, 2, 3] | community.general.list_to_dict(['k1', 'k2']) == result_1"
+      - "[1, 2] | community.general.list_to_dict(['k1', 'k2', 'k3']) == result_1"
+      - "[] | community.general.list_to_dict(['k1', 'k2', 'k3']) == dict([])"
+      - "[1, 2, 3] | community.general.list_to_dict([]) == dict([])"
+      - "[] | community.general.list_to_dict([]) == dict([])"
+  vars:
+    result_1:
+      k1: 1
+      k2: 2
+
+- name: "Test dict filter"
+  assert:
+    that:
+      - "[['a', 'b']] | community.general.dict == dict([['a', 'b']])"
+      - "[['a', 'b'], [1, 2]] | community.general.dict == dict([['a', 'b'], [1, 2]])"
+      - "[] | community.general.dict == dict([])"
