@@ -11,7 +11,7 @@ DOCUMENTATION = r'''
     description:
         - Get inventory from the lxd.
         - Uses a YAML configuration file that ends with 'lxd.(yml|yaml)'.
-    version_added: "2.3.0"
+    version_added: "2.5.0"
     author: "Frank Dornheim (@conloos)"
     options:
         plugin:
@@ -21,7 +21,7 @@ DOCUMENTATION = r'''
         url:
             description:
             - The unix domain socket path or the https URL for the lxd server.
-            - Sockets in filesystem have to start with 'unix:'.
+            - Sockets in filesystem have to start with C('unix:').
             - Mostly C(unix:/var/lib/lxd/unix.socket) or C(unix:/var/snap/lxd/common/lxd/unix.socket).
             default: unix:/var/snap/lxd/common/lxd/unix.socket
             required: false
@@ -45,9 +45,9 @@ DOCUMENTATION = r'''
             - The client trusted password.
             - You need to set this password on the lxd server before
                 running this module using the following command
-                'lxc config set core.trust_password <some random password>'
+                C('lxc config set core.trust_password <some random password>')
                 See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).
-            - If trust_password is set, this module send a request for authentication before sending any requests.
+            - If I(trust_password) is set, this module send a request for authentication before sending any requests.
             required: false
             type: str
         state:
@@ -65,23 +65,16 @@ DOCUMENTATION = r'''
             default: eth
         prefered_container_network_family:
             description:
-            - If a container has multiple network interfaces, which one is the prefered by family e.g.
-                - inet is ipv4 or
-                - inet6 is ipv6.
+            - If a container has multiple network interfaces, which one is the prefered by family.
+            - Specify C(inet) for IPv4 and C(inet6) for IPv6.
             required: false
             type: str
             default: inet
             choices: [ 'inet', 'inet6' ]
         groups:
             description:
-            - Create Groups by
-                - 'location' e.g. grabed sample by web, maybe it works
-                - 'pattern' e.g. samba* or regex
-                - 'network_range' e.g. 192.168.0.0/24
-                - 'os' e.g. ubuntu
-                - 'release' e.g. groovy
-                - 'profile' e.g. default
-                - 'vlanid' works on defined networks e.g. br0 with vlanid_default == 666
+            - Create Groups by the following keywords location, pattern, network_range, os, release, profile, vlanid.
+            - See example for syntax.
             required: false
             type: json
             default: none
