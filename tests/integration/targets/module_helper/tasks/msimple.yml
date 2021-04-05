@@ -1,0 +1,54 @@
+- name: test msimple 1
+  msimple:
+    a: 80
+  register: simple1
+
+- name: assert simple1
+  assert:
+    that:
+      - simple1.a == 80
+      - simple1.abc == "abc"
+      - simple1.changed is false
+      - simple1.value is none
+
+- name: test msimple 2
+  msimple:
+    a: 101
+  ignore_errors: yes
+  register: simple2
+
+- name: assert simple2
+  assert:
+    that:
+      - simple2.a == 101
+      - 'simple2.msg == "Module failed with exception: a >= 100"'
+      - simple2.abc == "abc"
+      - simple2.failed is true
+      - simple2.changed is false
+      - simple2.value is none
+
+- name: test msimple 3
+  msimple:
+    a: 2
+    b: potatoes
+  register: simple3
+
+- name: assert simple3
+  assert:
+    that:
+      - simple3.a == 2
+      - simple3.b == "potatoespotatoes"
+      - simple3.c == "NoneNone"
+      - simple3.changed is false
+
+- name: test msimple 4
+  msimple:
+    c: abc change
+  register: simple4
+
+- name: assert simple4
+  assert:
+    that:
+      - simple4.c == "abc change"
+      - simple4.abc == "changed abc"
+      - simple4.changed is true
