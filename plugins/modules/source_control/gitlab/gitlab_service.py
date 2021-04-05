@@ -31,11 +31,12 @@ options:
       - The ID or path of the project (urlencoded or not).
     required: true
     type: str
-  active:
-    description:
-      - Not yet supported (U(https://gitlab.com/gitlab-org/gitlab-ce/issues/41113)).
-    type: bool
-    default: true
+  # TODO: Not yet supported (U(https://gitlab.com/gitlab-org/gitlab-ce/issues/41113)).
+  # active:
+  #   description:
+  #     - Whether the service is active or not.
+  #   type: bool
+  #   default: true
   service:
     description:
       - The type of service.
@@ -124,6 +125,7 @@ EXAMPLES = '''
       username: foo
       token: bar
       server: https://packagist.org
+  no_log: True
   delegate_to: localhost
 
 - Idempotency is only partially provided since GitLab does
@@ -186,7 +188,53 @@ from ansible.module_utils._text import to_native
 
 from ansible_collections.community.general.plugins.module_utils.gitlab import findProject, gitlabAuthentication
 
-# auto-generated 2021/04/01 from https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/api/helpers/services_helpers.rb
+'''
+This dict has been auto-generated 2021/04/01 from https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/api/helpers/services_helpers.rb
+following these steps:
+1. Download above-mentioned file.
+2. Prepend:
+```ruby
+require 'json'
+class Boolean
+end
+```
+
+3. Append:
+```ruby
+no_log_keys = [:api_key, :webhook, :token, :password]
+services.each do |service_slug, params|
+  new_settings = {}
+  params.each do |entry|
+    e = {}
+    if (entry[:required] === true)
+      e[:required] = 1
+    end
+    if (entry[:type] == String)
+      e[:type] = "str"
+    elsif (entry[:type] == Integer)
+      e[:type] = "int"
+    elsif (entry[:type] == Boolean)
+      e[:type] = "bool"
+    else
+      e[:type] = entry[:type]
+    end
+    if (no_log_keys.find_index(entry[:name])) != nil
+      e[:no_log] = true
+    end
+    # e[:desc] = entry[:desc]
+    new_settings[entry[:name]] = e
+  end
+  services[service_slug] = new_settings
+end
+services = Hash[*services.sort.flatten]
+puts JSON.generate(services, options = {
+  indent:'',
+  space: ' '
+}).gsub(/}},/, "}},\n").gsub(/,(?![ ])/, ', ').gsub(/\btrue\b/, 'True')
+```
+3. Run and wrap/fold/indent
+'''
+
 SRV_DEF = {"asana": {"api_key": {"required": 1, "type": "str", "no_log": True}, "restrict_to_branch": {"type": "str"}},
            "assembla": {"token": {"required": 1, "type": "str", "no_log": True}, "subdomain": {"type": "str"}},
            "bamboo": {"bamboo_url": {"required": 1, "type": "str"}, "build_key": {"required": 1, "type": "str"},
@@ -275,14 +323,14 @@ def init_definitions():
                     int if definition['type'] == 'int' else \
                     str if definition['type'] == 'str' else \
                     definition['type']
-            if name in GitLab_Services.credentialParams:
+            if name in GitLabServices.CREDENTIAL_PARAMS:
                 definition['no_log'] = True
     return SRV_DEF
 
 
-class GitLab_Services(object):
+class GitLabServices(object):
     HOOK_EVENTS = ['push', 'issues', 'confidential_issues', 'merge_requests', 'tag_push', 'note', 'confidential_note', 'job', 'pipeline', 'wiki_page']
-    credentialParams = ['password', 'token', 'api_key']
+    CREDENTIAL_PARAMS = ['password', 'token', 'api_key', 'webhook']
 
     def __init__(self, module, name):
         self._module = module
@@ -291,7 +339,7 @@ class GitLab_Services(object):
     # "create" can only happen once for this service during the life of the project)
     # merge new attributes in the object retrieved from the server
     def create(self, remote_service, active, params, events):
-        local_service = self.as_api_object(active, params, events)
+        local_service = self.__as_api_object(active, params, events)
         for k, v in local_service.items():
             setattr(remote_service, k, v)
         if not self._module.check_mode:
@@ -299,10 +347,10 @@ class GitLab_Services(object):
         return {'before': {}, 'after': str(remote_service.attributes)}
 
     def update(self, remote, active, params, events):
-        diff = not self.equals(remote.attributes, active, params, events)
+        diff = not self.__equals(remote.attributes, active, params, events)
         if diff:
             # remote.active = active
-            for k, v in self.expand_events(events).items():
+            for k, v in self.__expand_events(events).items():
                 setattr(remote, k, v)
             # when saving, params does directly in the request
             # (remember they get retrieved under the "property" key of the remote dict())
@@ -314,50 +362,39 @@ class GitLab_Services(object):
 
         return False
 
-    def as_api_object(self, active, params, events):
+    def __as_api_object(self, active, params, events):
         obj = {'active': active}
-        obj.update(self.expand_events(events))
+        obj.update(self.__expand_events(events))
         obj.update(params)
         return obj
 
-    def expand_events(self, events):
+    def __expand_events(self, events):
         try:
             # See https://gitlab.com/gitlab-org/gitlab-ce/issues/58321 for why it's useful to
             # discard unsupported events before comparing
             supported_events = SRV_DEF[self.name]['_events']
         except KeyError:
             supported_events = None
-        # ret = {value + '_events': bool(value in events) for value in self.HOOK_EVENTS if supported_events is None or value in supported_events}
-        # python2.6 remove-me:
-        ret = {}
-        for value in iteritems(self.HOOK_EVENTS):
-            if supported_events is None or value in supported_events:
-                ret[value + '_events'] = bool(value in events)
+        ret = dict((value + '_events', bool(value in events)) for value in self.HOOK_EVENTS if supported_events is None or value in supported_events)
         return ret
 
     @staticmethod
-    def events_equal(obj, events):
+    def __events_equal(obj, events):
         return all((k in obj and obj[k] == v) for k, v in events.items())
 
     @staticmethod
-    def has_credentials(attr):
+    def __has_credentials(attr):
         return ('password' in attr and attr['password']) or ('token' in attr and attr['token']) or ('api_key' in attr and attr['api_key'])
 
-    def equals(self, prev_attr, active, params, events):
-        # filtered_params = {k: v for k, v in params.items() if k not in self.credentialParams}
-        # python2.6 remove-me:
-        filtered_params = {}
-        for k, v in iteritems(params):
-            if k not in self.credentialParams:
-                filtered_params[k] = v
-
+    def __equals(self, prev_attr, active, params, events):
+        filtered_params = dict((k, v) for k, v in params.items() if k not in self.CREDENTIAL_PARAMS)
         if prev_attr['active'] != active:
             self._module.debug("active status differs")
             return False
-        if self.has_credentials(params):
+        if self.__has_credentials(params):
             self._module.debug("has credentials: assuming difference")
             return False
-        if not self.events_equal(prev_attr, self.expand_events(events)):
+        if not self.__events_equal(prev_attr, self.__expand_events(events)):
             self._module.debug("events differs: %s != %s" % (prev_attr, events))
             return False
         if prev_attr['properties'] != filtered_params:
@@ -378,9 +415,9 @@ def main():
         api_token=dict(type='str', no_log=True),
         project=dict(required=True),
         service=dict(required=True, type='str', choices=list(definitions.keys())),
-        active=dict(required=False, default=True, type='bool'),
+        # active=dict(required=False, default=True, type='bool'),
         params=dict(required=False, type='dict'),
-        events=dict(required=False, type='list', elements='str', default=GitLab_Services.HOOK_EVENTS, choices=GitLab_Services.HOOK_EVENTS),
+        events=dict(required=False, type='list', elements='str', default=GitLabServices.HOOK_EVENTS, choices=GitLabServices.HOOK_EVENTS),
         state=dict(default='present', choices=['present', 'absent']),
     ))
 
@@ -406,13 +443,7 @@ def main():
     state = stub_init.params['state']
     if state == 'present':
         # since we know the service (which has been validated), recreate a module_specs to validate suboptions
-        # sub_arg_specs = {i: definitions[service][i] for i in definitions[service] if i != '_events'}
-        # python2.6 remove-me:
-        sub_arg_specs = {}
-        for i in iteritems(definitions[service]):
-            if i != '_events':
-                sub_arg_specs[i] = definitions[service][i]
-
+        sub_arg_specs = dict((k, v) for k, v in definitions[service].items() if k != '_events')
         base_spec['params'] = dict(required=False, type='dict', options=sub_arg_specs)
         if '_events' in definitions[service]:
             base_spec['events'] = dict(required=True, type='list', elements='str', choices=definitions[service]['_events'])
@@ -440,9 +471,9 @@ def main():
         remote_service = project.services.get(service)
         original_attributes = remote_service.attributes.copy()
     except gitlab.GitlabGetError as e:
-        module.fail_json(msg='No such a service %s' % service, exception=to_native(e))
+        module.fail_json(msg='No such service %s' % service, exception=to_native(e))
 
-    services_helper = GitLab_Services(module, service)
+    services_helper = GitLabServices(module, service)
     if state == 'absent':
         if not remote_service or not remote_service.created_at:
             module.exit_json(changed=False, service={}, msg='Service not found', details='Service %s not found' % service)
