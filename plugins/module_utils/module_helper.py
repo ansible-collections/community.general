@@ -125,10 +125,12 @@ def module_fails_on_exception(func):
         except ModuleHelperException as e:
             if e.update_output:
                 self.update_output(e.update_output)
-            self.module.fail_json(msg=e.msg, exception=traceback.format_exc(), output=self.output, vars=self.vars, **self.output)
+            self.module.fail_json(msg=e.msg, exception=traceback.format_exc(),
+                                  output=self.output, vars=self.vars.output(), **self.output)
         except Exception as e:
             msg = "Module failed with exception: {0}".format(str(e).strip())
-            self.module.fail_json(msg=msg, exception=traceback.format_exc(), output=self.output, vars=self.vars, **self.output)
+            self.module.fail_json(msg=msg, exception=traceback.format_exc(),
+                                  output=self.output, vars=self.vars.output(), **self.output)
     return wrapper
 
 
@@ -199,6 +201,7 @@ class VarMeta(object):
 
 
 class ModuleHelper(object):
+    _output_conflict_list = ('msg', 'exception', 'output', 'vars', 'changed')
     _dependencies = []
     module = None
     facts_name = None
@@ -237,7 +240,7 @@ class ModuleHelper(object):
 
         def set(self, name, value, **kwargs):
             if name in ('_data', '_meta'):
-                raise ValueError("Names _data and _meta are reserver for use by ModuleHelper")
+                raise ValueError("Names _data and _meta are reserved for use by ModuleHelper")
             self._data[name] = value
             if name in self._meta:
                 meta = self.meta(name)
@@ -249,7 +252,7 @@ class ModuleHelper(object):
             self._meta[name] = meta
 
         def output(self):
-            return dict((k, v) for k, v in self.items() if self.meta(k).output)
+            return dict((k, v) for k, v in self._data.items() if self.meta(k).output)
 
         def diff(self):
             diff_results = [(k, self.meta(k).diff_result) for k in self._data]
@@ -307,11 +310,14 @@ class ModuleHelper(object):
 
     @property
     def changed(self):
-        return self._changed or self._vars_changed()
+        return self._changed
 
     @changed.setter
     def changed(self, value):
         self._changed = value
+
+    def has_changed(self):
+        return self.changed or self._vars_changed()
 
     @property
     def output(self):
@@ -323,6 +329,11 @@ class ModuleHelper(object):
             diff = result.get('diff', {})
             vars_diff = self.vars.diff() or {}
             result['diff'] = dict_merge(dict(diff), vars_diff)
+
+        for varname in result:
+            if varname in self._output_conflict_list:
+                result["_" + varname] = result[varname]
+                del result[varname]
         return result
 
     @module_fails_on_exception
@@ -331,7 +342,7 @@ class ModuleHelper(object):
         self.__init_module__()
         self.__run__()
         self.__quit_module__()
-        self.module.exit_json(changed=self.changed, **self.output)
+        self.module.exit_json(changed=self.has_changed(), **self.output)
 
     @classmethod
     def dependency(cls, name, msg):
@@ -344,7 +355,7 @@ class ModuleHelper(object):
                 self.module.fail_json(changed=False,
                                       exception="\n".join(traceback.format_exception(d.exc_type, d.exc_val, d.exc_tb)),
                                       msg=d.text,
-                                      **self.output_dict)
+                                      **self.output)
 
 
 class StateMixin(object):
@@ -360,14 +371,14 @@ class StateMixin(object):
 
     def __run__(self):
         state = self._state()
-        self.vars.set("state", state)
+        self.vars.state = state
 
         # resolve aliases
         if state not in self.module.params:
             aliased = [name for name, param in self.module.argument_spec.items() if state in param.get('aliases', [])]
             if aliased:
                 state = aliased[0]
-                self.vars.set("effective_state", state)
+                self.vars.effective_state = state
 
         method = self._method(state)
         if not hasattr(self, method):
