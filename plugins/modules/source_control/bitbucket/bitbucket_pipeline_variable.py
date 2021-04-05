@@ -149,8 +149,6 @@ def get_existing_pipeline_variable(module, bitbucket):
             var['name'] = var.pop('key')
             return var
 
-    return None
-
 
 def create_pipeline_variable(module, bitbucket):
     info, content = bitbucket.request(
