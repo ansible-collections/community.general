@@ -172,6 +172,12 @@ def run_commands(module, cmd, data=None, check_rc=True):
     return module.run_command(cmd, check_rc=check_rc, data=data)
 
 
+def create_path():
+    tmpfd, tmpfile = tempfile.mkstemp()
+    os.remove(tmpfile)
+    return tmpfile
+
+
 def create_file(content):
     tmpfd, tmpfile = tempfile.mkstemp()
     with os.fdopen(tmpfd, 'w') as f:
@@ -203,16 +209,13 @@ def create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password, 
     else:
         certificate_path = create_tmp_certificate(module)
         private_key_path = create_tmp_private_key(module)
+        keystore_p12_path = create_path()
         try:
             if os.path.exists(keystore_path):
                 os.remove(keystore_path)
 
-            dummy_fd, keystore_p12_path = tempfile.mkstemp()
-            os.remove(keystore_p12_path)
-
             export_p12_cmd = [openssl_bin, "pkcs12", "-export", "-name", name, "-in", certificate_path,
-                              "-inkey", private_key_path, "-out",
-                              keystore_p12_path, "-passout", "stdin"]
+                              "-inkey", private_key_path, "-out", keystore_p12_path, "-passout", "stdin"]
 
             # when keypass is provided, add -passin
             cmd_stdin = ""
