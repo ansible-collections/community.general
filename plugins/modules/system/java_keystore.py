@@ -146,8 +146,9 @@ def read_certificate_fingerprint(module, openssl_bin, certificate_path):
 
 
 def read_stored_certificate_fingerprint(module, keytool_bin, alias, keystore_path, keystore_password):
-    stored_certificate_fingerprint_cmd = [keytool_bin, "-list", "-alias", alias, "-keystore", keystore_path, "-storepass", keystore_password, "-v"]
-    (rc, stored_certificate_fingerprint_out, stored_certificate_fingerprint_err) = run_commands(module, stored_certificate_fingerprint_cmd)
+    stored_certificate_fingerprint_cmd = [keytool_bin, "-list", "-alias", alias, "-keystore", keystore_path, "-storepass:env", "STOREPASS", "-v"]
+    (rc, stored_certificate_fingerprint_out, stored_certificate_fingerprint_err) = run_commands(
+        module, stored_certificate_fingerprint_cmd, environ_update=dict(STOREPASS=keystore_password))
     if rc != 0:
         if "keytool error: java.lang.Exception: Alias <%s> does not exist" % alias not in stored_certificate_fingerprint_out:
             return module.fail_json(msg=stored_certificate_fingerprint_out,
@@ -168,8 +169,8 @@ def read_stored_certificate_fingerprint(module, keytool_bin, alias, keystore_pat
         return stored_certificate_match.group(1)
 
 
-def run_commands(module, cmd, data=None, check_rc=True):
-    return module.run_command(cmd, check_rc=check_rc, data=data)
+def run_commands(module, cmd, data=None, environ_update=None, check_rc=True):
+    return module.run_command(cmd, check_rc=check_rc, data=data, environ_update=environ_update)
 
 
 def create_path():
@@ -236,10 +237,12 @@ def create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password, 
                                    "-srckeystore", keystore_p12_path,
                                    "-srcstoretype", "pkcs12",
                                    "-alias", name,
-                                   "-deststorepass", password,
-                                   "-srcstorepass", password,
+                                   "-deststorepass:env", "STOREPASS",
+                                   "-srcstorepass:env", "STOREPASS",
                                    "-noprompt"]
-            (rc, import_keystore_out, import_keystore_err) = run_commands(module, import_keystore_cmd, data=None)
+
+            (rc, import_keystore_out, import_keystore_err) = run_commands(module, import_keystore_cmd, data=None,
+                                                                          environ_update=dict(STOREPASS=password))
             if rc == 0:
                 update_jks_perm(module, keystore_path)
                 return module.exit_json(changed=True,
