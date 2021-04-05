@@ -1,0 +1,27 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Install required libs
+  pip:
+    name: python-gitlab
+    state: present
+
+- name: Create a new service
+  gitlab_service:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    project: test/project
+    service: emails-on-push
+    events:
+      - push
+    params:
+      recipients: test@example.com
+    state: present
+  register: gitlab_service_state
+
+- name: Check service has been created correctly
+  assert:
+    that:
+      - gitlab_service_state is changed
