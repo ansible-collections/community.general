@@ -114,13 +114,15 @@ cmd:
   description: Executed command to get action done
   returned: changed and failure
   type: str
-  sample: "openssl x509 -noout -in /tmp/cert.crt -fingerprint -sha256"
+  sample: "/usr/bin/openssl x509 -noout -in /tmp/user/1000/tmp8jd_lh23 -fingerprint -sha256"
 '''
 
 
-from ansible.module_utils.basic import AnsibleModule
 import os
 import re
+import tempfile
+
+from ansible.module_utils.basic import AnsibleModule
 
 
 def read_certificate_fingerprint(module, openssl_bin, certificate_path):
@@ -170,18 +172,25 @@ def run_commands(module, cmd, data=None, check_rc=True):
     return module.run_command(cmd, check_rc=check_rc, data=data)
 
 
-def create_file(path, content):
-    with open(path, 'w') as f:
+def create_path():
+    tmpfd, tmpfile = tempfile.mkstemp()
+    os.remove(tmpfile)
+    return tmpfile
+
+
+def create_file(content):
+    tmpfd, tmpfile = tempfile.mkstemp()
+    with os.fdopen(tmpfd, 'w') as f:
         f.write(content)
-    return path
+    return tmpfile
 
 
 def create_tmp_certificate(module):
-    return create_file("/tmp/%s.crt" % module.params['name'], module.params['certificate'])
+    return create_file(module.params['certificate'])
 
 
 def create_tmp_private_key(module):
-    return create_file("/tmp/%s.key" % module.params['name'], module.params['private_key'])
+    return create_file(module.params['private_key'])
 
 
 def cert_changed(module, openssl_bin, keytool_bin, keystore_path, keystore_pass, alias):
@@ -200,17 +209,13 @@ def create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password, 
     else:
         certificate_path = create_tmp_certificate(module)
         private_key_path = create_tmp_private_key(module)
+        keystore_p12_path = create_path()
         try:
             if os.path.exists(keystore_path):
                 os.remove(keystore_path)
 
-            keystore_p12_path = "/tmp/keystore.p12"
-            if os.path.exists(keystore_p12_path):
-                os.remove(keystore_p12_path)
-
             export_p12_cmd = [openssl_bin, "pkcs12", "-export", "-name", name, "-in", certificate_path,
-                              "-inkey", private_key_path, "-out",
-                              keystore_p12_path, "-passout", "stdin"]
+                              "-inkey", private_key_path, "-out", keystore_p12_path, "-passout", "stdin"]
 
             # when keypass is provided, add -passin
             cmd_stdin = ""
@@ -249,6 +254,7 @@ def create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password, 
         finally:
             os.remove(certificate_path)
             os.remove(private_key_path)
+            os.remove(keystore_p12_path)
 
 
 def update_jks_perm(module, keystore_path):
