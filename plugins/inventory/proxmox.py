@@ -286,7 +286,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         regex = r"[^A-Za-z0-9\_]"
         return re.sub(regex, "_", word.replace(" ", ""))
 
-    def _apply_rules(self, name, variables):
+    def _apply_constructable(self, name, variables):
         strict = self.get_option('strict')
         self._add_host_to_composed_groups(self.get_option('groups'), variables, name, strict=strict)
         self._add_host_to_keyed_groups(self.get_option('keyed_groups'), variables, name, strict=strict)
@@ -346,7 +346,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     if self.get_option('want_facts'):
                         self._get_vm_config(node['node'], lxc['vmid'], 'lxc', lxc['name'])
 
-                    self._apply_rules(lxc["name"], self.inventory.get_host(lxc['name']).get_vars())
+                    self._apply_constructable(lxc["name"], self.inventory.get_host(lxc['name']).get_vars())
 
                 # get QEMU vm's for this node
                 node_qemu_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), ('%s_qemu' % node['node']).lower()))
@@ -370,7 +370,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     if self.get_option('want_facts'):
                         self._get_vm_config(node['node'], qemu['vmid'], 'qemu', qemu['name'])
 
-                    self._apply_rules(qemu["name"], self.inventory.get_host(qemu['name']).get_vars())
+                    self._apply_constructable(qemu["name"], self.inventory.get_host(qemu['name']).get_vars())
 
         # gather vm's in pools
         for pool in self._get_pools():
