@@ -535,7 +535,7 @@ def main():
     if module.params['assignee']:
         module.params['fields']['assignee'] = {'name': module.params['assignee']}
     if module.params['account_id']:
-        module.params['fields']['assignee'] = {'account_id': module.params['accountId']}
+        module.params['fields']['assignee'] = {'accountId': module.params['account_id']}
 
     if not uri.endswith('/'):
         uri = uri + '/'
