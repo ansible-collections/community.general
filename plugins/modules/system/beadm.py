@@ -154,9 +154,7 @@ class BE(object):
         self.is_freebsd = os.uname()[0] == 'FreeBSD'
 
     def _beadm_list(self):
-        cmd = [self.module.get_bin_path('beadm')]
-        cmd.append('list')
-        cmd.append('-H')
+        cmd = [self.module.get_bin_path('beadm'), 'list', '-H']
         if '@' in self.name:
             cmd.append('-s')
         return self.module.run_command(cmd)
@@ -218,42 +216,26 @@ class BE(object):
         return False
 
     def activate_be(self):
-        cmd = [self.module.get_bin_path('beadm')]
-
-        cmd.append('activate')
-        cmd.append(self.name)
-
+        cmd = [self.module.get_bin_path('beadm'), 'activate', self.name]
         return self.module.run_command(cmd)
 
     def create_be(self):
-        cmd = [self.module.get_bin_path('beadm')]
-
-        cmd.append('create')
+        cmd = [self.module.get_bin_path('beadm'), 'create']
 
         if self.snapshot:
-            cmd.append('-e')
-            cmd.append(self.snapshot)
-
+            cmd.extend(['-e', self.snapshot])
         if not self.is_freebsd:
             if self.description:
-                cmd.append('-d')
-                cmd.append(self.description)
-
+                cmd.extend(['-d', self.description])
             if self.options:
-                cmd.append('-o')
-                cmd.append(self.options)
+                cmd.extend(['-o', self.options])
 
         cmd.append(self.name)
 
         return self.module.run_command(cmd)
 
     def destroy_be(self):
-        cmd = [self.module.get_bin_path('beadm')]
-
-        cmd.append('destroy')
-        cmd.append('-F')
-        cmd.append(self.name)
-
+        cmd = [self.module.get_bin_path('beadm'), 'destroy', '-F', self.name]
         return self.module.run_command(cmd)
 
     def is_mounted(self):
@@ -276,10 +258,7 @@ class BE(object):
         return False
 
     def mount_be(self):
-        cmd = [self.module.get_bin_path('beadm')]
-
-        cmd.append('mount')
-        cmd.append(self.name)
+        cmd = [self.module.get_bin_path('beadm'), 'mount', self.name]
 
         if self.mountpoint:
             cmd.append(self.mountpoint)
@@ -287,9 +266,7 @@ class BE(object):
         return self.module.run_command(cmd)
 
     def unmount_be(self):
-        cmd = [self.module.get_bin_path('beadm')]
-
-        cmd.append('unmount')
+        cmd = [self.module.get_bin_path('beadm'), 'unmount']
         if self.force:
             cmd.append('-f')
         cmd.append(self.name)
