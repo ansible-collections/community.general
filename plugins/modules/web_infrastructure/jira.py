@@ -89,7 +89,7 @@ options:
     type: str
     required: false
     description:
-     - Only used when C(operation) is I(transition), and a bit of aa misnomer, it actually refers to the transition name.
+     - Only used when I(operation) is C(transition), and a bit of a misnomer, it actually refers to the transition name.
 
   assignee:
     type: str
