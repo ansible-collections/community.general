@@ -42,14 +42,14 @@ pool: Standard
 
 stages:
 ### Sanity
-  - stage: Sanity_devel
-    displayName: Sanity devel
+  - stage: Sanity_2_11
+    displayName: Sanity 2.11
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
           nameFormat: Test {0}
-          testFormat: devel/sanity/{0}
+          testFormat: 2.11/sanity/{0}
           targets:
             - test: 1
             - test: 2
@@ -83,14 +83,14 @@ stages:
             - test: 3
             - test: 4
 ### Units
-  - stage: Units_devel
-    displayName: Units devel
+  - stage: Units_2_11
+    displayName: Units 2.11
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
           nameFormat: Python {0}
-          testFormat: devel/units/{0}/1
+          testFormat: 2.11/units/{0}/1
           targets:
             - test: 2.6
             - test: 2.7
@@ -132,13 +132,13 @@ stages:
             - test: 3.8
 
 ## Remote
-  - stage: Remote_devel
-    displayName: Remote devel
+  - stage: Remote_2_11
+    displayName: Remote 2.11
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: devel/{0}
+          testFormat: 2.11/{0}
           targets:
             - name: macOS 11.1
               test: macos/11.1
@@ -196,13 +196,13 @@ stages:
             - 2
 
 ### Docker
-  - stage: Docker_devel
-    displayName: Docker devel
+  - stage: Docker_2_11
+    displayName: Docker 2.11
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
-          testFormat: devel/linux/{0}
+          testFormat: 2.11/linux/{0}
           targets:
             - name: CentOS 6
               test: centos6
@@ -270,14 +270,14 @@ stages:
             - 5
 
 ### Cloud
-  - stage: Cloud_devel
-    displayName: Cloud devel
+  - stage: Cloud_2_11
+    displayName: Cloud 2.11
     dependsOn: []
     jobs:
       - template: templates/matrix.yml
         parameters:
           nameFormat: Python {0}
-          testFormat: devel/cloud/{0}/1
+          testFormat: 2.11/cloud/{0}/1
           targets:
             - test: 2.7
             - test: 3.6
@@ -304,19 +304,19 @@ stages:
   - stage: Summary
     condition: succeededOrFailed()
     dependsOn:
-      - Sanity_devel
+      - Sanity_2_11
       - Sanity_2_9
       - Sanity_2_10
-      - Units_devel
+      - Units_2_11
       - Units_2_9
       - Units_2_10
-      - Remote_devel
+      - Remote_2_11
       - Remote_2_9
       - Remote_2_10
-      - Docker_devel
+      - Docker_2_11
       - Docker_2_9
       - Docker_2_10
-      - Cloud_devel
+      - Cloud_2_11
       - Cloud_2_9
       - Cloud_2_10
     jobs:
