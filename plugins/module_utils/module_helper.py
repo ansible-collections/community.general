@@ -159,7 +159,9 @@ class DependencyCtxMgr(object):
 
 
 class VarMeta(object):
-    def __init__(self, diff=False, output=False, change=None):
+    NOTHING = object()
+
+    def __init__(self, diff=False, output=True, change=None, fact=False):
         self.init = False
         self.initial_value = None
         self.value = None
@@ -167,14 +169,19 @@ class VarMeta(object):
         self.diff = diff
         self.change = diff if change is None else change
         self.output = output
+        self.fact = fact
 
-    def set(self, diff=None, output=None, change=None):
+    def set(self, diff=None, output=None, change=None, fact=None, initial_value=NOTHING):
         if diff is not None:
             self.diff = diff
         if output is not None:
             self.output = output
         if change is not None:
             self.change = change
+        if fact is not None:
+            self.fact = fact
+        if initial_value is not self.NOTHING:
+            self.initial_value = initial_value
 
     def set_value(self, value):
         if not self.init:
@@ -208,6 +215,7 @@ class ModuleHelper(object):
     output_params = ()
     diff_params = ()
     change_params = ()
+    facts_params = ()
 
     class VarDict(object):
         def __init__(self):
@@ -245,8 +253,6 @@ class ModuleHelper(object):
             if name in self._meta:
                 meta = self.meta(name)
             else:
-                if 'output' not in kwargs:
-                    kwargs['output'] = True
                 meta = VarMeta(**kwargs)
             meta.set_value(value)
             self._meta[name] = meta
@@ -261,8 +267,11 @@ class ModuleHelper(object):
                 before = dict((dr[0], dr[1]['before']) for dr in diff_results)
                 after = dict((dr[0], dr[1]['after']) for dr in diff_results)
                 return {'before': before, 'after': after}
-
             return None
+
+        def facts(self):
+            facts_result = dict((k, v) for k, v in self._data.items() if self._meta[k].fact)
+            return facts_result if facts_result else None
 
         def change_vars(self):
             return [v for v in self._data if self.meta(v).change]
@@ -272,8 +281,6 @@ class ModuleHelper(object):
 
     def __init__(self, module=None):
         self.vars = ModuleHelper.VarDict()
-        self.output_dict = dict()
-        self.facts_dict = dict()
         self._changed = False
 
         if module:
@@ -288,13 +295,20 @@ class ModuleHelper(object):
                 diff=name in self.diff_params,
                 output=name in self.output_params,
                 change=None if not self.change_params else name in self.change_params,
+                fact=name in self.facts_params,
             )
 
+    def update_vars(self, meta=None, **kwargs):
+        if meta is None:
+            meta = {}
+        for k, v in kwargs.items():
+            self.vars.set(k, v, **meta)
+
     def update_output(self, **kwargs):
-        self.output_dict.update(kwargs)
+        self.update_vars(meta={"output": True}, **kwargs)
 
     def update_facts(self, **kwargs):
-        self.facts_dict.update(kwargs)
+        self.update_vars(meta={"fact": True}, **kwargs)
 
     def __init_module__(self):
         pass
@@ -322,9 +336,10 @@ class ModuleHelper(object):
     @property
     def output(self):
         result = dict(self.vars.output())
-        result.update(self.output_dict)
         if self.facts_name:
-            result['ansible_facts'] = {self.facts_name: self.facts_dict}
+            facts = self.vars.facts()
+            if facts is not None:
+                result['ansible_facts'] = {self.facts_name: facts}
         if self.module._diff:
             diff = result.get('diff', {})
             vars_diff = self.vars.diff() or {}
