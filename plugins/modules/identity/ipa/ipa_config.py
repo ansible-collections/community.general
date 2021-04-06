@@ -80,7 +80,7 @@ options:
     elements: str
     version_added: '2.5.0'
   ipausersearchfields:
-    description: A comma-separated list of fields to search in when searching for users.
+    description: A list of fields to search in when searching for users.
     aliases: ["usersearchfields"]
     type: list
     elements: str
