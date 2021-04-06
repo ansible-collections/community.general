@@ -1,3 +1,3 @@
 ---
 bugfixes:
-  - haproxy - Fix a bug preventing haproxy from properly entering 'DRAIN' mode (https://github.com/ansible-collections/community.general/issues/1913)
+  - haproxy - fix a bug preventing haproxy from properly entering ``DRAIN`` mode (https://github.com/ansible-collections/community.general/issues/1913).
