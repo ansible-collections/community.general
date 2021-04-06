@@ -109,7 +109,7 @@ def test_dependency_ctxmgr():
 
 def test_variable_meta():
     meta = VarMeta()
-    assert meta.output is False
+    assert meta.output is True
     assert meta.diff is False
     assert meta.value is None
     meta.set_value("abc")
@@ -124,7 +124,7 @@ def test_variable_meta():
 
 def test_variable_meta_diff():
     meta = VarMeta(diff=True)
-    assert meta.output is False
+    assert meta.output is True
     assert meta.diff is True
     assert meta.value is None
     meta.set_value("abc")
