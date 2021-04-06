@@ -35,7 +35,7 @@ options:
     type: str
     version_added: '2.5.0'
   ipagroupsearchfields:
-    description: A comma-separated list of fields to search in when searching for groups.
+    description: A list of fields to search in when searching for groups.
     aliases: ["groupsearchfields"]
     type: list
     elements: str
