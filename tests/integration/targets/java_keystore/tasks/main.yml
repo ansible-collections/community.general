@@ -63,8 +63,8 @@
     - name: Create a Java key store for the given certificates (check mode)
       community.general.java_keystore: &create_key_store_data
         name: example
-        certificate: "{{lookup('file', output_dir ~ '/' ~ item.name ~ '.pem') }}"
-        private_key: "{{lookup('file', output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key') }}"
+        certificate: "{{ lookup('file', output_dir ~ '/' ~ item.name ~ '.pem') }}"
+        private_key: "{{ lookup('file', output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key') }}"
         private_key_passphrase: "{{ item.passphrase | default(omit) }}"
         password: changeit
         dest: "{{ output_dir ~ '/' ~ item.name ~ '.jks' }}"
