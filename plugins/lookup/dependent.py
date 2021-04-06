@@ -45,22 +45,22 @@ EXAMPLES = """
     admin_user_data:
       admin1:
         name: Alice
-        active: yes
+        active: true
       admin2:
         name: Bob
-        active: yes
+        active: true
     admin_ssh_keys:
       admin1:
       - private_key: keys/private_key_admin1.pem
         public_key: keys/private_key_admin1.pub
-        active: yes
+        active: true
       admin2:
       - private_key: keys/private_key_admin2.pem
         public_key: keys/private_key_admin2.pub
-        active: yes
+        active: true
       - private_key: keys/private_key_admin2-old.pem
         public_key: keys/private_key_admin2-old.pub
-        active: no
+        active: false
 
 - name: Update DNS records
   community.aws.route53:
