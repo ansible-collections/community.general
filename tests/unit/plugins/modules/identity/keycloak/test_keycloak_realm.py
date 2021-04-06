@@ -134,7 +134,7 @@ class TestKeycloakRealm(ModuleTestCase):
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
 
     def test_create_when_present_with_change(self):
-        """Add a new realm"""
+        """Update with change a realm"""
 
         module_args = {
             'auth_keycloak_url': 'http://keycloak.url/auth',
@@ -185,7 +185,7 @@ class TestKeycloakRealm(ModuleTestCase):
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
 
     def test_create_when_present_no_change(self):
-        """Add a new realm"""
+        """Update without change a realm"""
 
         module_args = {
             'auth_keycloak_url': 'http://keycloak.url/auth',
@@ -271,7 +271,7 @@ class TestKeycloakRealm(ModuleTestCase):
         self.assertIs(exec_info.exception.args[0]['changed'], changed)
 
     def test_delete_when_present(self):
-        """Remove an present realm"""
+        """Remove a present realm"""
 
         module_args = {
             'auth_keycloak_url': 'http://keycloak.url/auth',

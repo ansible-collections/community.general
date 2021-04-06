@@ -725,7 +725,8 @@ def main():
     updated_realm.update(changeset)
 
     result['proposed'] = sanitize_cr(changeset)
-    result['existing'] = sanitize_cr(before_realm)
+    before_realm_sanitized = sanitize_cr(before_realm)
+    result['existing'] = before_realm_sanitized
 
     # If the realm does not exist yet, before_realm is still empty
     if not before_realm:
@@ -761,7 +762,7 @@ def main():
             if module.check_mode:
                 # We can only compare the current realm with the proposed updates we have
                 if module._diff:
-                    result['diff'] = dict(before=sanitize_cr(before_realm),
+                    result['diff'] = dict(before=before_realm_sanitized,
                                           after=sanitize_cr(updated_realm))
                 result['changed'] = (before_realm != updated_realm)
 
@@ -773,7 +774,7 @@ def main():
             if before_realm == after_realm:
                 result['changed'] = False
             if module._diff:
-                result['diff'] = dict(before=sanitize_cr(before_realm),
+                result['diff'] = dict(before=before_realm_sanitized,
                                       after=sanitize_cr(after_realm))
             result['end_state'] = sanitize_cr(after_realm)
 
@@ -783,7 +784,7 @@ def main():
             # Delete existing realm
             result['changed'] = True
             if module._diff:
-                result['diff']['before'] = sanitize_cr(before_realm)
+                result['diff']['before'] = before_realm_sanitized
                 result['diff']['after'] = ''
 
             if module.check_mode:
