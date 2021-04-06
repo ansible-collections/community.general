@@ -320,7 +320,7 @@ def test_populate(inventory, mocker):
     assert group_qemu.hosts == [host_qemu]
 
     # check if qemu-test has eth0 interface in agent_interfaces fact
-    assert 'eth0' in [ d['name'] for d in host_qemu.get_vars()['proxmox_agent_interfaces']]
+    assert 'eth0' in [d['name'] for d in host_qemu.get_vars()['proxmox_agent_interfaces']]
 
     # check if lxc-test has been discovered correctly
     group_lxc = inventory.inventory.groups['proxmox_all_lxc']
