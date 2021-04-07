@@ -67,8 +67,9 @@
       - zip2 is changed
   when:
   - ansible_system != "Darwin"
-  - not (ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8')
+  - not (ansible_facts.distribution in ['CentOS', 'RedHat'] and ansible_facts.distribution_major_version == '8')
   - not (ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '32')
+  - not (ansible_facts.distribution == 'Ubuntu' and ansible_facts.distribution_major_version == '20')
   vars:
     zip_dest: "{{ output_dir }}/zip.zip"
     zip_src: "{{ output_dir }}/zip_source"
