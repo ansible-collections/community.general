@@ -220,7 +220,7 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
 
     def state_absent(self):
         if not self.module.check_mode:
-            self.run_command(params=('channel', 'property', {'reset': True}))
+            self.run_command(params=('channel', 'property', 'reset'), extra_params={"reset": True})
         self.vars.value = None
         self.update_xfconf_output(previous_value=self.vars.previous_value,
                                   value=None)
