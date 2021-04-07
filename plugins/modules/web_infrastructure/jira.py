@@ -56,12 +56,14 @@ options:
     required: false
     description:
      - The issue summary, where appropriate.
+     - Note that JIRA may not allow changing field values on specific transitions or states.
 
   description:
     type: str
     required: false
     description:
      - The issue description, where appropriate.
+     - Note that JIRA may not allow changing field values on specific transitions or states.
 
   issuetype:
     type: str
@@ -81,18 +83,28 @@ options:
     required: false
     description:
      - The comment text to add.
+     - Note that JIRA may not allow changing field values on specific transitions or states.
 
   status:
     type: str
     required: false
     description:
-     - The desired status; only relevant for the transition operation.
+     - Only used when I(operation) is C(transition), and a bit of a misnomer, it actually refers to the transition name.
 
   assignee:
     type: str
     required: false
     description:
-     - Sets the assignee on create or transition operations. Note not all transitions will allow this.
+     - Sets the the assignee when I(operation) is C(create), C(transition) or C(edit).
+     - Recent versions of JIRA no longer accept a user name as a user identifier. In that case, use I(account_id) instead.
+     - Note that JIRA may not allow changing field values on specific transitions or states.
+
+  account_id:
+    type: str
+    description:
+     - Sets the account identifier for the assignee when I(operation) is C(create), C(transition) or C(edit).
+     - Note that JIRA may not allow changing field values on specific transitions or states.
+    version_added: 2.5.0
 
   linktype:
     type: str
@@ -119,6 +131,7 @@ options:
      - This is a free-form data structure that can contain arbitrary data. This is passed directly to the JIRA REST API
        (possibly after merging with other required data, as when passed to create). See examples for more information,
        and the JIRA REST API for the structure required for various fields.
+     - Note that JIRA may not allow changing field values on specific transitions or states.
 
   jql:
     required: false
@@ -151,6 +164,7 @@ options:
 
 notes:
   - "Currently this only works with basic-auth."
+  - "To use with JIRA Cloud, pass the login e-mail as the I(username) and the API token as I(password)."
 
 author:
 - "Steve Smith (@tarka)"
@@ -172,7 +186,7 @@ EXAMPLES = r"""
   args:
     fields:
         customfield_13225: "test"
-        customfield_12931: '{"value": "Test"}'
+        customfield_12931: {"value": "Test"}
   register: issue
 
 - name: Comment on issue
@@ -282,20 +296,20 @@ EXAMPLES = r"""
     inwardissue: HSP-1
     outwardissue: MKY-1
 
-# Transition an issue by target status
-- name: Close the issue
+# Transition an issue
+- name: Resolve the issue
   community.general.jira:
     uri: '{{ server }}'
     username: '{{ user }}'
     password: '{{ pass }}'
     issue: '{{ issue.meta.key }}'
     operation: transition
-    status: Done
-  args:
+    status: Resolve Issue
+    account_id: 112233445566778899aabbcc
     fields:
-      customfield_14321: [ {'set': {'value': 'Value of Select' }} ]
-      comment:  [ { 'add': { 'body' : 'Test' } }]
-
+      resolution:
+        name: Done
+      description: I am done! This is the last description I will ever give you.
 """
 
 import base64
@@ -440,10 +454,22 @@ def transition(restbase, user, passwd, params):
     if not tid:
         raise ValueError("Failed find valid transition for '%s'" % target)
 
+    fields = dict(params['fields'])
+    if params['summary'] is not None:
+        fields.update({'summary': params['summary']})
+    if params['description'] is not None:
+        fields.update({'description': params['description']})
+
     # Perform it
     url = restbase + '/issue/' + params['issue'] + "/transitions"
     data = {'transition': {"id": tid},
-            'update': params['fields']}
+            'fields': fields}
+    if params['comment'] is not None:
+        data.update({"update": {
+            "comment": [{
+                "add": {"body": params['comment']}
+            }],
+        }})
 
     return True, post(url, user, passwd, params['timeout'], data)
 
@@ -486,6 +512,7 @@ def main():
             maxresults=dict(type='int'),
             timeout=dict(type='float', default=10),
             validate_certs=dict(default=True, type='bool'),
+            account_id=dict(type='str'),
         ),
         required_if=(
             ('operation', 'create', ['project', 'issuetype', 'summary']),
@@ -495,6 +522,7 @@ def main():
             ('operation', 'link', ['linktype', 'inwardissue', 'outwardissue']),
             ('operation', 'search', ['jql']),
         ),
+        mutually_exclusive=[('assignee', 'account_id')],
         supports_check_mode=False
     )
 
@@ -506,6 +534,8 @@ def main():
     passwd = module.params['password']
     if module.params['assignee']:
         module.params['fields']['assignee'] = {'name': module.params['assignee']}
+    if module.params['account_id']:
+        module.params['fields']['assignee'] = {'accountId': module.params['account_id']}
 
     if not uri.endswith('/'):
         uri = uri + '/'
