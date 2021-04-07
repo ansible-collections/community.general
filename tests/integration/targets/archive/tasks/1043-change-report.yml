@@ -65,6 +65,7 @@
     assert:
       that:
       - zip2 is changed
+  when: ansible_system != "Darwin"
   vars:
     zip_dest: "{{ output_dir }}/zip.zip"
     zip_src: "{{ output_dir }}/zip_source"
