@@ -52,3 +52,6 @@ mccabe == 0.6.1
 pylint == 2.3.1
 typed-ast == 1.4.0  # 1.4.0 is required to compile on Python 3.8
 wrapt == 1.11.1
+
+# Restrict docker versions depending on Python version
+docker < 5.0.0 ; python_version <= '3.6'
