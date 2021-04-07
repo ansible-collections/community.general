@@ -5,6 +5,7 @@
 # Atlassian open-source approval reference OSR-76.
 #
 # (c) 2020, Per Abildgaard Toft <per@minfejl.dk> Search and update function
+# (c) 2021, Brandon McNama <brandonmcnama@outlook.com> Issue attachment functionality
 #
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -29,7 +30,7 @@ options:
     type: str
     required: true
     aliases: [ command ]
-    choices: [ comment, create, edit, fetch, link, search, transition, update ]
+    choices: [ attach, comment, create, edit, fetch, link, search, transition, update ]
     description:
       - The operation to perform.
 
@@ -162,6 +163,31 @@ options:
     default: true
     type: bool
 
+  attachment:
+    type: dict
+    version_added: 2.5.0
+    description:
+      - Information about the attachment being uploaded.
+    suboptions:
+      filename:
+        required: true
+        type: path
+        description: >
+          The path to the file to upload (from the remote node) or, if I(content) is specified,
+          the filename to use for the attachment
+      content:
+        required: false
+        type: str
+        description: >
+          The Base64 encoded contents of the file to attach. If not specified, the contents of I(filename) will be
+          used instead.
+      mimetype:
+        required: false
+        type: str
+        description: >
+          The MIME type to supply for the upload. If not specified, best-effort detection will be
+          done.
+
 notes:
   - "Currently this only works with basic-auth."
   - "To use with JIRA Cloud, pass the login e-mail as the I(username) and the API token as I(password)."
@@ -169,6 +195,7 @@ notes:
 author:
 - "Steve Smith (@tarka)"
 - "Per Abildgaard Toft (@pertoft)"
+- "Brandon McNama (@DWSR)"
 """
 
 EXAMPLES = r"""
@@ -310,10 +337,26 @@ EXAMPLES = r"""
       resolution:
         name: Done
       description: I am done! This is the last description I will ever give you.
+
+# Attach a file to an issue
+- name: Attach a file
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: HSP-1
+    operation: attach
+    attachment:
+      filename: topsecretreport.xlsx
 """
 
 import base64
+import binascii
 import json
+import mimetypes
+import os
+import random
+import string
 import sys
 import traceback
 
@@ -325,8 +368,17 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
 
-def request(url, user, passwd, timeout, data=None, method=None):
-    if data:
+def request(
+    url,
+    user,
+    passwd,
+    timeout,
+    data=None,
+    method=None,
+    content_type='application/json',
+    additional_headers=None
+):
+    if data and content_type == 'application/json':
         data = json.dumps(data)
 
     # NOTE: fetch_url uses a password manager, which follows the
@@ -337,9 +389,18 @@ def request(url, user, passwd, timeout, data=None, method=None):
     # inject the basic-auth header up-front to ensure that JIRA treats
     # the requests as authorized for this user.
     auth = to_text(base64.b64encode(to_bytes('{0}:{1}'.format(user, passwd), errors='surrogate_or_strict')))
-    response, info = fetch_url(module, url, data=data, method=method, timeout=timeout,
-                               headers={'Content-Type': 'application/json',
-                                        'Authorization': "Basic %s" % auth})
+
+    headers = {}
+    if isinstance(additional_headers) == dict:
+        headers = additional_headers.copy()
+    headers.update({
+        "Content-Type": content_type,
+        "Authorization": "Basic %s" % auth,
+    })
+
+    response, info = fetch_url(
+        module, url, data=data, method=method, timeout=timeout, headers=headers
+    )
 
     if info['status'] not in (200, 201, 204):
         error = None
@@ -365,8 +426,8 @@ def request(url, user, passwd, timeout, data=None, method=None):
     return {}
 
 
-def post(url, user, passwd, timeout, data):
-    return request(url, user, passwd, timeout, data=data, method='POST')
+def post(url, user, passwd, timeout, data, content_type='application/json', additional_headers=None):
+    return request(url, user, passwd, timeout, data=data, method='POST', content_type=content_type, additional_headers=additional_headers)
 
 
 def put(url, user, passwd, timeout, data):
@@ -486,13 +547,89 @@ def link(restbase, user, passwd, params):
     return True, post(url, user, passwd, params['timeout'], data)
 
 
+def attach(restbase, user, passwd, params):
+    filename = params['attachment'].get('filename')
+    content = params['attachment'].get('content')
+
+    if not any((filename, content)):
+        raise ValueError('at least one of filename or content must be provided')
+    mime = params['attachment'].get('mimetype')
+
+    if not os.path.isfile(filename):
+        raise ValueError('The provided filename does not exist: %s' % filename)
+
+    content_type, data = _prepare_attachment(filename, content, mime)
+
+    url = restbase + '/issue/' + params['issue'] + '/attachments'
+    return True, post(
+        url, user, passwd, params['timeout'], data, content_type=content_type,
+        additional_headers={"X-Atlassian-Token": "no-check"}
+    )
+
+
+# Ideally we'd just use prepare_multipart from ansible.module_utils.urls, but
+# unfortunately it does not support specifying the encoding and also defaults to
+# base64. Jira doesn't support base64 encoded attachments (and is therefore not
+# spec compliant. Go figure). I originally wrote this function as an almost
+# exact copypasta of prepare_multipart, but ran into some encoding issues when
+# using the noop encoder. Hand rolling the entire message body seemed to work
+# out much better.
+#
+# https://community.atlassian.com/t5/Jira-questions/Jira-dosen-t-decode-base64-attachment-request-REST-API/qaq-p/916427
+#
+# content is expected to be a base64 encoded string since Ansible doesn't
+# support passing raw bytes objects.
+def _prepare_attachment(filename, content=None, mime_type=None):
+    def escape_quotes(s):
+        return s.replace('"', '\\"')
+
+    boundary = "".join(random.choice(string.digits + string.ascii_letters) for i in range(30))
+    name = to_native(os.path.basename(filename))
+
+    if not mime_type:
+        try:
+            mime_type = mimetypes.guess_type(filename or '', strict=False)[0] or 'application/octet-stream'
+        except Exception:
+            mime_type = 'application/octet-stream'
+    main_type, sep, sub_type = mime_type.partition('/')
+
+    if not content and filename:
+        with open(to_bytes(filename, errors='surrogate_or_strict'), 'rb') as f:
+            content = f.read()
+    else:
+        try:
+            content = base64.decode(content)
+        except binascii.Error as e:
+            raise Exception("Unable to base64 decode file content: %s" % e)
+
+    lines = [
+        "--{0}".format(boundary),
+        'Content-Disposition: form-data; name="file"; filename={0}'.format(escape_quotes(name)),
+        "Content-Type: {0}".format("{0}/{1}".format(main_type, sub_type)),
+        '',
+        to_text(content),
+        "--{0}--".format(boundary),
+        ""
+    ]
+
+    return (
+        "multipart/form-data; boundary={0}".format(boundary),
+        "\r\n".join(lines)
+    )
+
+
 def main():
 
     global module
     module = AnsibleModule(
         argument_spec=dict(
+            attachment=dict(type='dict', default=None, options=dict(
+                content=dict(type='str', default=None),
+                filename=dict(type='path', required=True),
+                mimetype=dict(type='str', default=None)
+            )),
             uri=dict(type='str', required=True),
-            operation=dict(type='str', choices=['create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search'],
+            operation=dict(type='str', choices=['attach', 'create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search'],
                            aliases=['command'], required=True),
             username=dict(type='str', required=True),
             password=dict(type='str', required=True, no_log=True),
@@ -515,6 +652,7 @@ def main():
             account_id=dict(type='str'),
         ),
         required_if=(
+            ('operation', 'attach', ['issue', 'attachment']),
             ('operation', 'create', ['project', 'issuetype', 'summary']),
             ('operation', 'comment', ['issue', 'comment']),
             ('operation', 'fetch', ['issue']),
