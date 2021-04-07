@@ -78,14 +78,6 @@ DOCUMENTATION = r'''
             required: false
             type: json
             default: none
-        selftest:
-            description:
-            - Load default data to test the plugIn
-                - 'path' to file with test data e.g. C(ansible_collections/community/general/tests/integration/targets/inventory_lxd/files/lxd_inventory.atd)
-                - 'activate' True
-            required: false
-            type: json
-            default: false
         dumpdata:
             description: Dump out data to debug.
             required: false
@@ -97,14 +89,12 @@ EXAMPLES = '''
 # simple lxd.yml
 plugin: community.general.lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
-selftest: false
 dumpdata: false
 
 # simple lxd.yml including filter
 plugin: community.general.lxd
 url: unix:/var/snap/lxd/common/lxd/unix.socket
 state: RUNNING
-selftest: false
 dumpdata: false
 
 # grouping lxd.yml
@@ -139,9 +129,6 @@ groups:
   netRangeIPv6:
     type: network_range
     attribute: fd42:bd00:7b11:2167:216:3eff::/24
-selftest:
-  activate: true
-  path: ~/dev/ansible_collections/community/general/tests/integration/targets/inventory_lxd/files/lxd_inventory.atd
 dumpdata: false
 '''
 
@@ -162,7 +149,7 @@ class InventoryModule(BaseInventoryPlugin):
     NAME = 'community.general.lxd'
     SNAP_SOCKET_URL = 'unix:/var/snap/lxd/common/lxd/unix.socket'
     SOCKET_URL = 'unix:/var/lib/lxd/unix.socket'
-    TEST_PATH = ['test']
+    SELFTEST = False
 
     @staticmethod
     def load_json_data(path):
@@ -184,6 +171,8 @@ class InventoryModule(BaseInventoryPlugin):
                 return json.load(json_file)
         except IOError as err:
             raise AnsibleParserError('Could not load the test data: {0}'.format(to_native(err)))
+        except json.decoder.JSONDecodeError as err:
+            raise AnsibleParserError('The format of the JSON file {0} is incorrect: {1}'.format(to_native(path), to_native(err)))
 
     def save_json_data(self, path, file_name=None):
         """save data as json
@@ -1028,6 +1017,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         self.build_inventory_hosts()
         self.build_inventory_groups()
+        # import pdb; pdb. set_trace()
 
     def _populate(self):
         """Return the hosts and groups
@@ -1042,10 +1032,8 @@ class InventoryModule(BaseInventoryPlugin):
             None
         Returns:
             None"""
-        if self.selftest:
-            if self.selftest.get('activate'):
-                self.data = self.load_json_data(self.selftest.get('path', self.TEST_PATH))
-        else:
+
+        if len(self.data) == 0:  # If no data is injected by unittests open socket
             self.socket = self._connect_to_socket()
             self.get_container_data(self._get_containers())
             self.get_network_data(self._get_networks())
@@ -1074,6 +1062,7 @@ class InventoryModule(BaseInventoryPlugin):
             AnsibleParseError
         Returns:
             None"""
+
         super(InventoryModule, self).parse(inventory, loader, path, cache=False)
         # Read the inventory YAML file
         self._read_config_data(path)
@@ -1087,7 +1076,7 @@ class InventoryModule(BaseInventoryPlugin):
             self.plugin = self.get_option('plugin')
             self.prefered_container_network_family = self.get_option('prefered_container_network_family')
             self.prefered_container_network_interface = self.get_option('prefered_container_network_interface')
-            self.selftest = self.get_option('selftest')
+            self.selftest = self.SELFTEST
             if self.get_option('state').lower() == 'none':  # none in config is str()
                 self.filter = None
             else:
