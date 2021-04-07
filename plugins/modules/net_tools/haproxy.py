@@ -367,10 +367,9 @@ class HAProxy(object):
             # We can assume there will only be 1 element in state because both svname and pxname are always set when we get here
             # When using track we get a status like this: MAINT (via pxname/svname) so we need to do substring matching
             if status in state[0]['status']:
-                if not self._drain or (state[0]['scur'] == '0' and 'MAINT' in state):
+                if not self._drain or state[0]['scur'] == '0':
                     return True
-            else:
-                time.sleep(self.wait_interval)
+            time.sleep(self.wait_interval)
 
         self.module.fail_json(msg="server %s/%s not status '%s' after %d retries. Aborting." %
                               (pxname, svname, status, self.wait_retries))
@@ -409,15 +408,17 @@ class HAProxy(object):
     def drain(self, host, backend, status='DRAIN'):
         """
         Drain action, sets the server to DRAIN mode.
-        In this mode mode, the server will not accept any new connections
+        In this mode, the server will not accept any new connections
         other than those that are accepted via persistence.
         """
         haproxy_version = self.discover_version()
 
-        # check if haproxy version suppots DRAIN state (starting with 1.5)
+        # check if haproxy version supports DRAIN state (starting with 1.5)
         if haproxy_version and (1, 5) <= haproxy_version:
             cmd = "set server $pxname/$svname state drain"
-            self.execute_for_backends(cmd, backend, host, status)
+            self.execute_for_backends(cmd, backend, host, "DRAIN")
+            if status == "MAINT":
+                self.disabled(host, backend, self.shutdown_sessions)
 
     def act(self):
         """
@@ -426,7 +427,7 @@ class HAProxy(object):
         # Get the state before the run
         self.command_results['state_before'] = self.get_state_for(self.backend, self.host)
 
-        # toggle enable/disbale server
+        # toggle enable/disable server
         if self.state == 'enabled':
             self.enabled(self.host, self.backend, self.weight)
         elif self.state == 'disabled' and self._drain:
