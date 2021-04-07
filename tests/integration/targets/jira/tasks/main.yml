@@ -1,0 +1,58 @@
+---
+- community.general.jira:
+    uri: "{{ uri }}"
+    username: "{{ user }}"
+    password: "{{ pasw }}"
+    project: "{{ proj }}"
+    operation: create
+    summary: test ticket
+    description: bla bla bla
+    issuetype: Task
+  register: issue
+
+- debug:
+    msg: Issue={{ issue }}
+- name: Add comment bleep bleep
+  community.general.jira:
+    uri: "{{ uri }}"
+    username: "{{ user }}"
+    password: "{{ pasw }}"
+    issue: "{{ issue.meta.key }}"
+    operation: comment
+    comment: bleep bleep!
+- name: Transition -> In Progress with comment
+  community.general.jira:
+    uri: "{{ uri }}"
+    username: "{{ user }}"
+    password: "{{ pasw }}"
+    issue: "{{ issue.meta.key }}"
+    operation: transition
+    status: Start Progress
+    comment: -> in progress
+- name: Change assignee
+  community.general.jira:
+    uri: "{{ uri }}"
+    username: "{{ user }}"
+    password: "{{ pasw }}"
+    issue: "{{ issue.meta.key }}"
+    operation: edit
+    accountId: "{{ user2 }}"
+- name: Transition -> Resolved with comment
+  community.general.jira:
+    uri: "{{ uri }}"
+    username: "{{ user }}"
+    password: "{{ pasw }}"
+    issue: "{{ issue.meta.key }}"
+    operation: transition
+    status: Resolve Issue
+    comment: -> resolved
+    accountId: "{{ user1 }}"
+    fields:
+      resolution:
+        name: Done
+      description: wakawakawakawaka
+
+- debug:
+    msg:
+      - Issue = {{ issue.meta.key }}
+      - URL = {{ issue.meta.self }}
