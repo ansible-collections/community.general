@@ -1,874 +1,13 @@
 {
     "containers":{
-        "tuya-convert":{
-            "containers":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
-                "metadata":{
-                    "architecture":"x86_64",
-                    "config":{
-                        "image.architecture":"amd64",
-                        "image.description":"ubuntu 20.04 LTS amd64 (daily) (20200928)",
-                        "image.label":"daily",
-                        "image.os":"ubuntu",
-                        "image.release":"focal",
-                        "image.serial":"20200928",
-                        "image.type":"squashfs",
-                        "image.version":"20.04",
-                        "linux.kernel_modules":"ip_tables,ip6_tables,netlink_diag,nf_nat,overlay",
-                        "raw.lxc":"lxc.apparmor.profile=unconfined\nlxc.cap.drop= \nlxc.cgroup.devices.allow=a\nlxc.mount.auto=proc:rw sys:rw",
-                        "security.nesting":"true",
-                        "security.privileged":"true",
-                        "volatile.base_image":"2774d405f376d7897aafb3ad8f3863b1da98be3da741533c4ea801c4f12e5b03",
-                        "volatile.eth0.hwaddr":"00:16:3e:c8:68:02",
-                        "volatile.idmap.base":"0",
-                        "volatile.idmap.current":"[]",
-                        "volatile.idmap.next":"[]",
-                        "volatile.last_state.idmap":"[]",
-                        "volatile.last_state.power":"STOPPED",
-                        "volatile.wlx7cdd9043a133.host_name":"wlx7cdd9043a133",
-                        "volatile.wlx7cdd9043a133.last_state.created":"false",
-                        "volatile.wlx7cdd9043a133.last_state.hwaddr":"7c:dd:90:43:a1:33",
-                        "volatile.wlx7cdd9043a133.last_state.mtu":"1500"
-                    },
-                    "devices":{
-                        "wlx7cdd9043a133":{
-                            "name":"wlx7cdd9043a133",
-                            "nictype":"physical",
-                            "parent":"wlx7cdd9043a133",
-                            "type":"nic"
-                        }
-                    },
-                    "ephemeral":false,
-                    "profiles":[
-                        "default"
-                    ],
-                    "stateful":false,
-                    "description":"",
-                    "created_at":"2020-10-04T11:17:35.346632877+02:00",
-                    "expanded_config":{
-                        "image.architecture":"amd64",
-                        "image.description":"ubuntu 20.04 LTS amd64 (daily) (20200928)",
-                        "image.label":"daily",
-                        "image.os":"ubuntu",
-                        "image.release":"focal",
-                        "image.serial":"20200928",
-                        "image.type":"squashfs",
-                        "image.version":"20.04",
-                        "linux.kernel_modules":"ip_tables,ip6_tables,netlink_diag,nf_nat,overlay",
-                        "raw.lxc":"lxc.apparmor.profile=unconfined\nlxc.cap.drop= \nlxc.cgroup.devices.allow=a\nlxc.mount.auto=proc:rw sys:rw",
-                        "security.nesting":"true",
-                        "security.privileged":"true",
-                        "user.vendor-data":"users:\n  - name: root\n    ssh-import-id: gh:conloos\n    shell: /bin/bash\n  - name: hostadmin\n    ssh-import-id: gh:conloos\n    shell: /bin/bash\n",
-                        "volatile.base_image":"2774d405f376d7897aafb3ad8f3863b1da98be3da741533c4ea801c4f12e5b03",
-                        "volatile.eth0.hwaddr":"00:16:3e:c8:68:02",
-                        "volatile.idmap.base":"0",
-                        "volatile.idmap.current":"[]",
-                        "volatile.idmap.next":"[]",
-                        "volatile.last_state.idmap":"[]",
-                        "volatile.last_state.power":"STOPPED",
-                        "volatile.wlx7cdd9043a133.host_name":"wlx7cdd9043a133",
-                        "volatile.wlx7cdd9043a133.last_state.created":"false",
-                        "volatile.wlx7cdd9043a133.last_state.hwaddr":"7c:dd:90:43:a1:33",
-                        "volatile.wlx7cdd9043a133.last_state.mtu":"1500"
-                    },
-                    "expanded_devices":{
-                        "eth0":{
-                            "name":"eth0",
-                            "network":"lxdbr0",
-                            "type":"nic"
-                        },
-                        "root":{
-                            "path":"/",
-                            "pool":"lxd-pool",
-                            "type":"disk"
-                        },
-                        "wlx7cdd9043a133":{
-                            "name":"wlx7cdd9043a133",
-                            "nictype":"physical",
-                            "parent":"wlx7cdd9043a133",
-                            "type":"nic"
-                        }
-                    },
-                    "name":"tuya-convert",
-                    "status":"Stopped",
-                    "status_code":102,
-                    "last_used_at":"2020-10-04T12:27:23.321452972+02:00",
-                    "location":"none",
-                    "type":"container"
-                }
-            },
-            "state":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
-                "metadata":{
-                    "status":"Stopped",
-                    "status_code":102,
-                    "disk":{
-                        
-                    },
-                    "memory":{
-                        "usage":0,
-                        "usage_peak":0,
-                        "swap_usage":0,
-                        "swap_usage_peak":0
-                    },
-                    "network":null,
-                    "pid":0,
-                    "processes":0,
-                    "cpu":{
-                        "usage":0
-                    }
-                }
-            }
-        },
-        "udemy-docker":{
-            "containers":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
-                "metadata":{
-                    "architecture":"x86_64",
-                    "config":{
-                        "image.architecture":"amd64",
-                        "image.description":"ubuntu 20.04 LTS amd64 (daily) (20201007)",
-                        "image.label":"daily",
-                        "image.os":"ubuntu",
-                        "image.release":"focal",
-                        "image.serial":"20201007",
-                        "image.type":"squashfs",
-                        "image.version":"20.04",
-                        "security.nesting":"true",
-                        "volatile.base_image":"4131bee1197b570aff64d8e8377410327d3825ba5b27c975afbe3aaa7f22bc84",
-                        "volatile.eth0.hwaddr":"00:16:3e:43:5f:ec",
-                        "volatile.idmap.base":"0",
-                        "volatile.idmap.current":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.idmap.next":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.idmap":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.power":"STOPPED",
-                        "volatile.uuid":"609a30ce-1662-4a4e-b10d-222255c0d922"
-                    },
-                    "devices":{
-                        
-                    },
-                    "ephemeral":false,
-                    "profiles":[
-                        "default"
-                    ],
-                    "stateful":false,
-                    "description":"",
-                    "created_at":"2020-10-11T09:44:50.95920937+02:00",
-                    "expanded_config":{
-                        "image.architecture":"amd64",
-                        "image.description":"ubuntu 20.04 LTS amd64 (daily) (20201007)",
-                        "image.label":"daily",
-                        "image.os":"ubuntu",
-                        "image.release":"focal",
-                        "image.serial":"20201007",
-                        "image.type":"squashfs",
-                        "image.version":"20.04",
-                        "security.nesting":"true",
-                        "user.vendor-data":"users:\n  - name: root\n    ssh-import-id: gh:conloos\n    shell: /bin/bash\n  - name: hostadmin\n    ssh-import-id: gh:conloos\n    shell: /bin/bash\n",
-                        "volatile.base_image":"4131bee1197b570aff64d8e8377410327d3825ba5b27c975afbe3aaa7f22bc84",
-                        "volatile.eth0.hwaddr":"00:16:3e:43:5f:ec",
-                        "volatile.idmap.base":"0",
-                        "volatile.idmap.current":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.idmap.next":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.idmap":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.power":"STOPPED",
-                        "volatile.uuid":"609a30ce-1662-4a4e-b10d-222255c0d922"
-                    },
-                    "expanded_devices":{
-                        "eth0":{
-                            "name":"eth0",
-                            "network":"lxdbr0",
-                            "type":"nic"
-                        },
-                        "root":{
-                            "path":"/",
-                            "pool":"lxd-pool",
-                            "type":"disk"
-                        }
-                    },
-                    "name":"udemy-docker",
-                    "status":"Stopped",
-                    "status_code":102,
-                    "last_used_at":"2021-01-14T06:40:54.618833729+01:00",
-                    "location":"none",
-                    "type":"container"
-                }
-            },
-            "state":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
-                "metadata":{
-                    "status":"Stopped",
-                    "status_code":102,
-                    "disk":{
-                        
-                    },
-                    "memory":{
-                        "usage":0,
-                        "usage_peak":0,
-                        "swap_usage":0,
-                        "swap_usage_peak":0
-                    },
-                    "network":null,
-                    "pid":0,
-                    "processes":0,
-                    "cpu":{
-                        "usage":0
-                    }
-                }
-            }
-        },
-        "ecoDMSapp":{
-            "containers":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
-                "metadata":{
-                    "architecture":"x86_64",
-                    "config":{
-                        "image.architecture":"amd64",
-                        "image.description":"ubuntu 18.04 LTS amd64 (release) (20201014)",
-                        "image.label":"release",
-                        "image.os":"ubuntu",
-                        "image.release":"bionic",
-                        "image.serial":"20201014",
-                        "image.type":"squashfs",
-                        "image.version":"18.04",
-                        "volatile.base_image":"b789b81c7261b971e45b904c372b19b9a245172a50c6b88780554efbc582dab6",
-                        "volatile.eth0.host_name":"veth58f6793b",
-                        "volatile.eth0.hwaddr":"00:16:3e:46:cf:0b",
-                        "volatile.idmap.base":"0",
-                        "volatile.idmap.current":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.idmap.next":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.idmap":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.power":"RUNNING",
-                        "volatile.uuid":"e7daac3f-b203-43b1-ab77-5f321e087287"
-                    },
-                    "devices":{
-                        
-                    },
-                    "ephemeral":false,
-                    "profiles":[
-                        "default",
-                        "x11"
-                    ],
-                    "stateful":false,
-                    "description":"",
-                    "created_at":"2020-10-22T09:48:58.051664355+02:00",
-                    "expanded_config":{
-                        "environment.DISPLAY":":0",
-                        "environment.PULSE_SERVER":"unix:/home/ubuntu/pulse-native",
-                        "image.architecture":"amd64",
-                        "image.description":"ubuntu 18.04 LTS amd64 (release) (20201014)",
-                        "image.label":"release",
-                        "image.os":"ubuntu",
-                        "image.release":"bionic",
-                        "image.serial":"20201014",
-                        "image.type":"squashfs",
-                        "image.version":"18.04",
-                        "user.user-data":"#cloud-config\nruncmd:\n  - \\'sed -i \"s/; enable-shm = yes/enable-shm = no/g\" /etc/pulse/client.conf\\'\npackages:\n  - x11-apps\n  - mesa-utils\n  - pulseaudio\n",
-                        "user.vendor-data":"users:\n  - name: root\n    ssh-import-id: gh:conloos\n    shell: /bin/bash\n  - name: hostadmin\n    ssh-import-id: gh:conloos\n    shell: /bin/bash\n",
-                        "volatile.base_image":"b789b81c7261b971e45b904c372b19b9a245172a50c6b88780554efbc582dab6",
-                        "volatile.eth0.host_name":"veth58f6793b",
-                        "volatile.eth0.hwaddr":"00:16:3e:46:cf:0b",
-                        "volatile.idmap.base":"0",
-                        "volatile.idmap.current":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.idmap.next":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.idmap":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.power":"RUNNING",
-                        "volatile.uuid":"e7daac3f-b203-43b1-ab77-5f321e087287"
-                    },
-                    "expanded_devices":{
-                        "PASocket1":{
-                            "bind":"container",
-                            "connect":"unix:/run/user/498801104/pulse/native",
-                            "gid":"498800513",
-                            "listen":"unix:/home/ubuntu/pulse-native",
-                            "mode":"0777",
-                            "security.gid":"498800513",
-                            "security.uid":"498801104",
-                            "type":"proxy",
-                            "uid":"498801104"
-                        },
-                        "X0":{
-                            "bind":"container",
-                            "connect":"unix:@/tmp/.X11-unix/X0",
-                            "listen":"unix:@/tmp/.X11-unix/X0",
-                            "security.gid":"498800513",
-                            "security.uid":"498801104",
-                            "type":"proxy"
-                        },
-                        "eth0":{
-                            "name":"eth0",
-                            "network":"lxdbr0",
-                            "type":"nic"
-                        },
-                        "mygpu":{
-                            "type":"gpu"
-                        },
-                        "root":{
-                            "path":"/",
-                            "pool":"lxd-pool",
-                            "type":"disk"
-                        }
-                    },
-                    "name":"ecoDMSapp",
-                    "status":"Running",
-                    "status_code":103,
-                    "last_used_at":"2021-02-27T21:01:43.167471417+01:00",
-                    "location":"none",
-                    "type":"container"
-                }
-            },
-            "state":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
-                "metadata":{
-                    "status":"Running",
-                    "status_code":103,
-                    "disk":{
-                        
-                    },
-                    "memory":{
-                        "usage":642203648,
-                        "usage_peak":803356672,
-                        "swap_usage":0,
-                        "swap_usage_peak":0
-                    },
-                    "network":{
-                        "eth0":{
-                            "addresses":[
-                                {
-                                    "family":"inet",
-                                    "address":"10.98.143.231",
-                                    "netmask":"24",
-                                    "scope":"global"
-                                },
-                                {
-                                    "family":"inet6",
-                                    "address":"fd42:bd00:7b11:2167:216:3eff:fe46:cf0b",
-                                    "netmask":"64",
-                                    "scope":"global"
-                                },
-                                {
-                                    "family":"inet6",
-                                    "address":"fe80::216:3eff:fe46:cf0b",
-                                    "netmask":"64",
-                                    "scope":"link"
-                                }
-                            ],
-                            "counters":{
-                                "bytes_received":298752277,
-                                "bytes_sent":13813631,
-                                "packets_received":151315,
-                                "packets_sent":125816
-                            },
-                            "hwaddr":"00:16:3e:46:cf:0b",
-                            "host_name":"veth58f6793b",
-                            "mtu":1500,
-                            "state":"up",
-                            "type":"broadcast"
-                        },
-                        "lo":{
-                            "addresses":[
-                                {
-                                    "family":"inet",
-                                    "address":"127.0.0.1",
-                                    "netmask":"8",
-                                    "scope":"local"
-                                },
-                                {
-                                    "family":"inet6",
-                                    "address":"::1",
-                                    "netmask":"128",
-                                    "scope":"local"
-                                }
-                            ],
-                            "counters":{
-                                "bytes_received":23088,
-                                "bytes_sent":23088,
-                                "packets_received":256,
-                                "packets_sent":256
-                            },
-                            "hwaddr":"",
-                            "host_name":"",
-                            "mtu":65536,
-                            "state":"up",
-                            "type":"loopback"
-                        }
-                    },
-                    "pid":3141,
-                    "processes":154,
-                    "cpu":{
-                        "usage":592488025694
-                    }
-                }
-            }
-        },
-        "ansiblehost":{
-            "containers":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
-                "metadata":{
-                    "architecture":"x86_64",
-                    "config":{
-                        "image.architecture":"amd64",
-                        "image.description":"ubuntu 20.10 amd64 (release) (20201210)",
-                        "image.label":"release",
-                        "image.os":"ubuntu",
-                        "image.release":"groovy",
-                        "image.serial":"20201210",
-                        "image.type":"squashfs",
-                        "image.version":"20.10",
-                        "volatile.base_image":"bac1692e9ec7f5c5cee35d149ca789121bed238c1182df2134b5aefa3977f3e0",
-                        "volatile.eth0.host_name":"veth50f56421",
-                        "volatile.eth0.hwaddr":"00:16:3e:21:e8:6b",
-                        "volatile.eth1.hwaddr":"00:16:3e:b7:19:7c",
-                        "volatile.idmap.base":"0",
-                        "volatile.idmap.current":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.idmap.next":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.idmap":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.power":"RUNNING",
-                        "volatile.uuid":"d31ccbc5-3355-415d-90d6-ee6f3160a52f"
-                    },
-                    "devices":{
-                        
-                    },
-                    "ephemeral":false,
-                    "profiles":[
-                        "default"
-                    ],
-                    "stateful":false,
-                    "description":"",
-                    "created_at":"2020-12-16T08:09:15.782942659+01:00",
-                    "expanded_config":{
-                        "image.architecture":"amd64",
-                        "image.description":"ubuntu 20.10 amd64 (release) (20201210)",
-                        "image.label":"release",
-                        "image.os":"ubuntu",
-                        "image.release":"groovy",
-                        "image.serial":"20201210",
-                        "image.type":"squashfs",
-                        "image.version":"20.10",
-                        "user.vendor-data":"users:\n  - name: root\n    ssh-import-id: gh:conloos\n    shell: /bin/bash\n  - name: hostadmin\n    ssh-import-id: gh:conloos\n    shell: /bin/bash\n",
-                        "volatile.base_image":"bac1692e9ec7f5c5cee35d149ca789121bed238c1182df2134b5aefa3977f3e0",
-                        "volatile.eth0.host_name":"veth50f56421",
-                        "volatile.eth0.hwaddr":"00:16:3e:21:e8:6b",
-                        "volatile.eth1.hwaddr":"00:16:3e:b7:19:7c",
-                        "volatile.idmap.base":"0",
-                        "volatile.idmap.current":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.idmap.next":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.idmap":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.power":"RUNNING",
-                        "volatile.uuid":"d31ccbc5-3355-415d-90d6-ee6f3160a52f"
-                    },
-                    "expanded_devices":{
-                        "eth0":{
-                            "name":"eth0",
-                            "network":"lxdbr0",
-                            "type":"nic"
-                        },
-                        "root":{
-                            "path":"/",
-                            "pool":"lxd-pool",
-                            "type":"disk"
-                        }
-                    },
-                    "name":"ansiblehost",
-                    "status":"Running",
-                    "status_code":103,
-                    "last_used_at":"2021-02-27T21:01:42.756755175+01:00",
-                    "location":"none",
-                    "type":"container"
-                }
-            },
-            "state":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
-                "metadata":{
-                    "status":"Running",
-                    "status_code":103,
-                    "disk":{
-                        
-                    },
-                    "memory":{
-                        "usage":423776256,
-                        "usage_peak":1549819904,
-                        "swap_usage":0,
-                        "swap_usage_peak":0
-                    },
-                    "network":{
-                        "eth0":{
-                            "addresses":[
-                                {
-                                    "family":"inet",
-                                    "address":"10.98.143.30",
-                                    "netmask":"24",
-                                    "scope":"global"
-                                },
-                                {
-                                    "family":"inet6",
-                                    "address":"fd42:bd00:7b11:2167:216:3eff:fe21:e86b",
-                                    "netmask":"64",
-                                    "scope":"global"
-                                },
-                                {
-                                    "family":"inet6",
-                                    "address":"fe80::216:3eff:fe21:e86b",
-                                    "netmask":"64",
-                                    "scope":"link"
-                                }
-                            ],
-                            "counters":{
-                                "bytes_received":154812989,
-                                "bytes_sent":3846533,
-                                "packets_received":87116,
-                                "packets_sent":50542
-                            },
-                            "hwaddr":"00:16:3e:21:e8:6b",
-                            "host_name":"veth50f56421",
-                            "mtu":1500,
-                            "state":"up",
-                            "type":"broadcast"
-                        },
-                        "lo":{
-                            "addresses":[
-                                {
-                                    "family":"inet",
-                                    "address":"127.0.0.1",
-                                    "netmask":"8",
-                                    "scope":"local"
-                                },
-                                {
-                                    "family":"inet6",
-                                    "address":"::1",
-                                    "netmask":"128",
-                                    "scope":"local"
-                                }
-                            ],
-                            "counters":{
-                                "bytes_received":96480,
-                                "bytes_sent":96480,
-                                "packets_received":914,
-                                "packets_sent":914
-                            },
-                            "hwaddr":"",
-                            "host_name":"",
-                            "mtu":65536,
-                            "state":"up",
-                            "type":"loopback"
-                        },
-                        "lxdbr0":{
-                            "addresses":[
-                                {
-                                    "family":"inet",
-                                    "address":"10.175.27.1",
-                                    "netmask":"24",
-                                    "scope":"global"
-                                },
-                                {
-                                    "family":"inet6",
-                                    "address":"fd42:6288:d250:6070::1",
-                                    "netmask":"64",
-                                    "scope":"global"
-                                }
-                            ],
-                            "counters":{
-                                "bytes_received":0,
-                                "bytes_sent":0,
-                                "packets_received":0,
-                                "packets_sent":0
-                            },
-                            "hwaddr":"00:16:3e:33:54:ee",
-                            "host_name":"",
-                            "mtu":1500,
-                            "state":"up",
-                            "type":"broadcast"
-                        }
-                    },
-                    "pid":3007,
-                    "processes":85,
-                    "cpu":{
-                        "usage":294164727419
-                    }
-                }
-            }
-        },
-        "udemy-ansible-ubuntu-2004":{
-            "containers":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
-                "metadata":{
-                    "architecture":"x86_64",
-                    "config":{
-                        "image.architecture":"amd64",
-                        "image.description":"ubuntu 20.04 LTS amd64 (release) (20201210)",
-                        "image.label":"release",
-                        "image.os":"ubuntu",
-                        "image.release":"focal",
-                        "image.serial":"20201210",
-                        "image.type":"squashfs",
-                        "image.version":"20.04",
-                        "security.nesting":"true",
-                        "volatile.base_image":"e0c3495ffd489748aa5151628fa56619e6143958f041223cb4970731ef939cb6",
-                        "volatile.eth0.host_name":"veth4cb41a65",
-                        "volatile.eth0.hwaddr":"00:16:3e:78:2e:f3",
-                        "volatile.idmap.base":"0",
-                        "volatile.idmap.current":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.idmap.next":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.idmap":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.power":"RUNNING",
-                        "volatile.uuid":"42236271-defa-4eb9-af48-bd3bca211d84"
-                    },
-                    "devices":{
-                        
-                    },
-                    "ephemeral":false,
-                    "profiles":[
-                        "default"
-                    ],
-                    "stateful":false,
-                    "description":"",
-                    "created_at":"2020-12-28T13:40:25.042560865+01:00",
-                    "expanded_config":{
-                        "image.architecture":"amd64",
-                        "image.description":"ubuntu 20.04 LTS amd64 (release) (20201210)",
-                        "image.label":"release",
-                        "image.os":"ubuntu",
-                        "image.release":"focal",
-                        "image.serial":"20201210",
-                        "image.type":"squashfs",
-                        "image.version":"20.04",
-                        "security.nesting":"true",
-                        "user.vendor-data":"users:\n  - name: root\n    ssh-import-id: gh:conloos\n    shell: /bin/bash\n  - name: hostadmin\n    ssh-import-id: gh:conloos\n    shell: /bin/bash\n",
-                        "volatile.base_image":"e0c3495ffd489748aa5151628fa56619e6143958f041223cb4970731ef939cb6",
-                        "volatile.eth0.host_name":"veth4cb41a65",
-                        "volatile.eth0.hwaddr":"00:16:3e:78:2e:f3",
-                        "volatile.idmap.base":"0",
-                        "volatile.idmap.current":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.idmap.next":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.idmap":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.power":"RUNNING",
-                        "volatile.uuid":"42236271-defa-4eb9-af48-bd3bca211d84"
-                    },
-                    "expanded_devices":{
-                        "eth0":{
-                            "name":"eth0",
-                            "network":"lxdbr0",
-                            "type":"nic"
-                        },
-                        "root":{
-                            "path":"/",
-                            "pool":"lxd-pool",
-                            "type":"disk"
-                        }
-                    },
-                    "name":"udemy-ansible-ubuntu-2004",
-                    "status":"Running",
-                    "status_code":103,
-                    "last_used_at":"2021-02-27T21:01:45.480094408+01:00",
-                    "location":"none",
-                    "type":"container"
-                }
-            },
-            "state":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
-                "metadata":{
-                    "status":"Running",
-                    "status_code":103,
-                    "disk":{
-                        
-                    },
-                    "memory":{
-                        "usage":259317760,
-                        "usage_peak":1015005184,
-                        "swap_usage":0,
-                        "swap_usage_peak":0
-                    },
-                    "network":{
-                        "br-0b189a018e80":{
-                            "addresses":[
-                                {
-                                    "family":"inet",
-                                    "address":"172.18.0.1",
-                                    "netmask":"16",
-                                    "scope":"global"
-                                }
-                            ],
-                            "counters":{
-                                "bytes_received":0,
-                                "bytes_sent":0,
-                                "packets_received":0,
-                                "packets_sent":0
-                            },
-                            "hwaddr":"02:42:77:7b:72:fd",
-                            "host_name":"",
-                            "mtu":1500,
-                            "state":"up",
-                            "type":"broadcast"
-                        },
-                        "docker0":{
-                            "addresses":[
-                                {
-                                    "family":"inet",
-                                    "address":"172.17.0.1",
-                                    "netmask":"16",
-                                    "scope":"global"
-                                }
-                            ],
-                            "counters":{
-                                "bytes_received":0,
-                                "bytes_sent":0,
-                                "packets_received":0,
-                                "packets_sent":0
-                            },
-                            "hwaddr":"02:42:5e:b3:4d:17",
-                            "host_name":"",
-                            "mtu":1500,
-                            "state":"up",
-                            "type":"broadcast"
-                        },
-                        "eth0":{
-                            "addresses":[
-                                {
-                                    "family":"inet",
-                                    "address":"10.98.143.129",
-                                    "netmask":"24",
-                                    "scope":"global"
-                                },
-                                {
-                                    "family":"inet6",
-                                    "address":"fd42:bd00:7b11:2167:216:3eff:fe78:2ef3",
-                                    "netmask":"64",
-                                    "scope":"global"
-                                },
-                                {
-                                    "family":"inet6",
-                                    "address":"fe80::216:3eff:fe78:2ef3",
-                                    "netmask":"64",
-                                    "scope":"link"
-                                }
-                            ],
-                            "counters":{
-                                "bytes_received":46080583,
-                                "bytes_sent":1179304,
-                                "packets_received":34286,
-                                "packets_sent":13820
-                            },
-                            "hwaddr":"00:16:3e:78:2e:f3",
-                            "host_name":"veth4cb41a65",
-                            "mtu":1500,
-                            "state":"up",
-                            "type":"broadcast"
-                        },
-                        "lo":{
-                            "addresses":[
-                                {
-                                    "family":"inet",
-                                    "address":"127.0.0.1",
-                                    "netmask":"8",
-                                    "scope":"local"
-                                },
-                                {
-                                    "family":"inet6",
-                                    "address":"::1",
-                                    "netmask":"128",
-                                    "scope":"local"
-                                }
-                            ],
-                            "counters":{
-                                "bytes_received":40039,
-                                "bytes_sent":40039,
-                                "packets_received":423,
-                                "packets_sent":423
-                            },
-                            "hwaddr":"",
-                            "host_name":"",
-                            "mtu":65536,
-                            "state":"up",
-                            "type":"loopback"
-                        }
-                    },
-                    "pid":4128,
-                    "processes":92,
-                    "cpu":{
-                        "usage":253950243191
-                    }
-                }
-            }
-        },
         "vlantest":{
             "containers":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
                 "metadata":{
-                    "architecture":"x86_64",
                     "config":{
-                        "image.architecture":"amd64",
-                        "image.description":"ubuntu 20.04 LTS amd64 (release) (20210223)",
-                        "image.label":"release",
                         "image.os":"ubuntu",
                         "image.release":"focal",
-                        "image.serial":"20210223",
-                        "image.type":"squashfs",
                         "image.version":"20.04",
-                        "volatile.base_image":"b9e93652ee67612114951d910acc4fd6fce0473f8dc0bf562c602e997fcb4857",
-                        "volatile.eth0.host_name":"mac5ecbf94a",
-                        "volatile.eth0.hwaddr":"00:16:3e:64:f3:48",
-                        "volatile.eth0.last_state.created":"true",
-                        "volatile.idmap.base":"0",
-                        "volatile.idmap.current":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.idmap.next":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.idmap":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.power":"RUNNING",
-                        "volatile.uuid":"261a4025-925d-4ee3-aafe-30169ebc4eae"
+                        "volatile.last_state.power":"RUNNING"
                     },
                     "devices":{
                         "eth0":{
@@ -877,73 +16,24 @@
                             "type":"nic"
                         }
                     },
-                    "ephemeral":false,
                     "profiles":[
                         "default"
                     ],
-                    "stateful":false,
-                    "description":"",
-                    "created_at":"2021-02-27T21:11:34.879138468+01:00",
-                    "expanded_config":{
-                        "image.architecture":"amd64",
-                        "image.description":"ubuntu 20.04 LTS amd64 (release) (20210223)",
-                        "image.label":"release",
-                        "image.os":"ubuntu",
-                        "image.release":"focal",
-                        "image.serial":"20210223",
-                        "image.type":"squashfs",
-                        "image.version":"20.04",
-                        "user.vendor-data":"users:\n  - name: root\n    ssh-import-id: gh:conloos\n    shell: /bin/bash\n  - name: hostadmin\n    ssh-import-id: gh:conloos\n    shell: /bin/bash\n",
-                        "volatile.base_image":"b9e93652ee67612114951d910acc4fd6fce0473f8dc0bf562c602e997fcb4857",
-                        "volatile.eth0.host_name":"mac5ecbf94a",
-                        "volatile.eth0.hwaddr":"00:16:3e:64:f3:48",
-                        "volatile.eth0.last_state.created":"true",
-                        "volatile.idmap.base":"0",
-                        "volatile.idmap.current":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.idmap.next":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.idmap":"[{\"Isuid\":true,\"Isgid\":false,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000},{\"Isuid\":false,\"Isgid\":true,\"Hostid\":1000000,\"Nsid\":0,\"Maprange\":1000000000}]",
-                        "volatile.last_state.power":"RUNNING",
-                        "volatile.uuid":"261a4025-925d-4ee3-aafe-30169ebc4eae"
-                    },
                     "expanded_devices":{
                         "eth0":{
                             "name":"eth0",
                             "network":"my-macvlan",
                             "type":"nic"
-                        },
-                        "root":{
-                            "path":"/",
-                            "pool":"lxd-pool",
-                            "type":"disk"
                         }
                     },
                     "name":"vlantest",
                     "status":"Running",
-                    "status_code":103,
-                    "last_used_at":"2021-02-27T21:11:37.485885247+01:00",
-                    "location":"none",
-                    "type":"container"
+                    "location":"Berlin"
                 }
             },
             "state":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
                 "metadata":{
                     "status":"Running",
-                    "status_code":103,
-                    "disk":{
-                        
-                    },
-                    "memory":{
-                        "usage":192679936,
-                        "usage_peak":386654208,
-                        "swap_usage":0,
-                        "swap_usage_peak":0
-                    },
                     "network":{
                         "eth0":{
                             "addresses":[
@@ -954,23 +44,18 @@
                                     "scope":"global"
                                 },
                                 {
+                                "family":"inet6",
+                                "address":"fd42:bd00:7b11:2167:216:3eff:fe78:2ef3",
+                                "netmask":"64",
+                                "scope":"global"
+                                },
+                                {
                                     "family":"inet6",
-                                    "address":"fe80::216:3eff:fe64:f348",
+                                    "address":"fe80::216:3eff:fed3:7af3",
                                     "netmask":"64",
                                     "scope":"link"
                                 }
-                            ],
-                            "counters":{
-                                "bytes_received":0,
-                                "bytes_sent":939896,
-                                "packets_received":0,
-                                "packets_sent":2936
-                            },
-                            "hwaddr":"00:16:3e:64:f3:48",
-                            "host_name":"eno1.666",
-                            "mtu":1500,
-                            "state":"up",
-                            "type":"broadcast"
+                            ]
                         },
                         "lo":{
                             "addresses":[
@@ -986,49 +71,28 @@
                                     "netmask":"128",
                                     "scope":"local"
                                 }
-                            ],
-                            "counters":{
-                                "bytes_received":63326,
-                                "bytes_sent":63326,
-                                "packets_received":842,
-                                "packets_sent":842
-                            },
-                            "hwaddr":"",
-                            "host_name":"",
-                            "mtu":65536,
-                            "state":"up",
-                            "type":"loopback"
+                            ]
                         }
-                    },
-                    "pid":9737,
-                    "processes":49,
-                    "cpu":{
-                        "usage":60699175458
                     }
                 }
             }
         }
     },
+
     "networks":{
-        "lxdbr0":{
+        "my-macvlan":{
             "state":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
                 "metadata":{
                     "addresses":[
                         {
                             "family":"inet",
-                            "address":"10.98.143.1",
+                            "address":"192.168.178.199",
                             "netmask":"24",
                             "scope":"global"
                         },
                         {
                             "family":"inet6",
-                            "address":"fd42:bd00:7b11:2167::1",
+                            "address":"fd42:bd00:7b11:2167:216:3eff:fe78:2ef3",
                             "netmask":"64",
                             "scope":"global"
                         },
@@ -1039,62 +103,6 @@
                             "scope":"link"
                         }
                     ],
-                    "counters":{
-                        "bytes_received":16205495,
-                        "bytes_sent":497157796,
-                        "packets_received":190573,
-                        "packets_sent":257160
-                    },
-                    "hwaddr":"00:16:3e:d3:7a:f3",
-                    "mtu":1500,
-                    "state":"up",
-                    "type":"broadcast",
-                    "bond":null,
-                    "bridge":{
-                        "id":"8000.00163ed37af3",
-                        "stp":false,
-                        "forward_delay":1500,
-                        "vlan_default":1,
-                        "vlan_filtering":true,
-                        "upper_devices":[
-                            "veth4cb41a65",
-                            "veth50f56421",
-                            "veth58f6793b"
-                        ]
-                    },
-                    "vlan":null
-                }
-            }
-        },
-        "my-macvlan":{
-            "state":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
-                "metadata":{
-                    "addresses":[
-                        {
-                            "family":"inet",
-                            "address":"192.168.178.199",
-                            "netmask":"24",
-                            "scope":"global"
-                        }
-                    ],
-                    "counters":{
-                        "bytes_received":4667355294,
-                        "bytes_sent":10908983153,
-                        "packets_received":4088843,
-                        "packets_sent":31406946
-                    },
-                    "hwaddr":"dc:4a:3e:8d:fd:67",
-                    "mtu":1500,
-                    "state":"up",
-                    "type":"broadcast",
-                    "bond":null,
-                    "bridge":null,
                     "vlan":{
                         "lower_device":"eno1",
                         "vid":666
@@ -1104,12 +112,6 @@
         },
         "lo":{
             "state":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
                 "metadata":{
                     "addresses":[
                         {
@@ -1125,30 +127,12 @@
                             "scope":"local"
                         }
                     ],
-                    "counters":{
-                        "bytes_received":11806794,
-                        "bytes_sent":11806794,
-                        "packets_received":119459,
-                        "packets_sent":119459
-                    },
-                    "hwaddr":"",
-                    "mtu":65536,
-                    "state":"up",
-                    "type":"loopback",
-                    "bond":null,
-                    "bridge":null,
                     "vlan":null
                 }
             }
         },
         "eno1":{
             "state":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
                 "metadata":{
                     "addresses":[
                         {
@@ -1164,131 +148,12 @@
                             "scope":"link"
                         }
                     ],
-                    "counters":{
-                        "bytes_received":4963437403,
-                        "bytes_sent":11758640318,
-                        "packets_received":4312964,
-                        "packets_sent":32778245
-                    },
-                    "hwaddr":"dc:4a:3e:8d:f3:56",
-                    "mtu":1500,
-                    "state":"up",
-                    "type":"broadcast",
-                    "bond":null,
-                    "bridge":null,
                     "vlan":null
-                }
-            }
-        },
-        "virbr0":{
-            "state":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
-                "metadata":{
-                    "addresses":[
-                        {
-                            "family":"inet",
-                            "address":"192.168.122.1",
-                            "netmask":"24",
-                            "scope":"global"
-                        }
-                    ],
-                    "counters":{
-                        "bytes_received":0,
-                        "bytes_sent":0,
-                        "packets_received":0,
-                        "packets_sent":0
-                    },
-                    "hwaddr":"52:54:00:cd:66:e8",
-                    "mtu":1500,
-                    "state":"up",
-                    "type":"broadcast",
-                    "bond":null,
-                    "bridge":{
-                        "id":"8000.525400cd66e8",
-                        "stp":true,
-                        "forward_delay":200,
-                        "vlan_default":1,
-                        "vlan_filtering":false,
-                        "upper_devices":[
-                            "virbr0-nic"
-                        ]
-                    },
-                    "vlan":null
-                }
-            }
-        },
-        "virbr0-nic":{
-            "state":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
-                "metadata":{
-                    "addresses":[
-                        
-                    ],
-                    "counters":{
-                        "bytes_received":0,
-                        "bytes_sent":0,
-                        "packets_received":0,
-                        "packets_sent":0
-                    },
-                    "hwaddr":"52:54:00:cd:66:e8",
-                    "mtu":1500,
-                    "state":"down",
-                    "type":"broadcast",
-                    "bond":null,
-                    "bridge":null,
-                    "vlan":null
-                }
-            }
-        },
-        "veno1":{
-            "state":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
-                "metadata":{
-                    "addresses":[
-                        
-                    ],
-                    "counters":{
-                        "bytes_received":0,
-                        "bytes_sent":27736,
-                        "packets_received":0,
-                        "packets_sent":167
-                    },
-                    "hwaddr":"dc:4a:3e:8d:f3:56",
-                    "mtu":1500,
-                    "state":"up",
-                    "type":"broadcast",
-                    "bond":null,
-                    "bridge":null,
-                    "vlan":{
-                        "lower_device":"eno1",
-                        "vid":10
-                    }
                 }
             }
         },
         "eno1.666":{
             "state":{
-                "type":"sync",
-                "status":"Success",
-                "status_code":200,
-                "operation":"",
-                "error_code":0,
-                "error":"",
                 "metadata":{
                     "addresses":[
                         {
@@ -1298,18 +163,6 @@
                             "scope":"link"
                         }
                     ],
-                    "counters":{
-                        "bytes_received":0,
-                        "bytes_sent":1004870,
-                        "packets_received":0,
-                        "packets_sent":3231
-                    },
-                    "hwaddr":"dc:4a:3e:8d:f3:56",
-                    "mtu":1500,
-                    "state":"up",
-                    "type":"broadcast",
-                    "bond":null,
-                    "bridge":null,
                     "vlan":{
                         "lower_device":"eno1",
                         "vid":666
