@@ -61,6 +61,8 @@ files:
     maintainers: kellyjonbrazil
   $filters/list.py:
     maintainers: vbotka
+  $filters/path_join_shim.py:
+    maintainers: felixfontein
   $filters/time.py:
     maintainers: resmo
   $httpapis/:
