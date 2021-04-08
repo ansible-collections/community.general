@@ -9,13 +9,246 @@ import json
 import pytest
 from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible.module_utils.six import iteritems
-from ansible_collections.community.general.plugins.module_utils.net_tools.pritunl import api
+from ansible_collections.community.general.plugins.module_utils.net_tools.pritunl import (
+    api,
+)
 from mock import MagicMock
 
 __metaclass__ = type
 
 
 # Pritunl Mocks
+
+PRITUNL_ORGS = [
+    {
+        "auth_api": False,
+        "name": "Foo",
+        "auth_token": None,
+        "user_count": 0,
+        "auth_secret": None,
+        "id": "csftwlu6uhralzi2dpmhekz3",
+    },
+    {
+        "auth_api": False,
+        "name": "GumGum",
+        "auth_token": None,
+        "user_count": 3,
+        "auth_secret": None,
+        "id": "58070daee63f3b2e6e472c36",
+    },
+    {
+        "auth_api": False,
+        "name": "Bar",
+        "auth_token": None,
+        "user_count": 0,
+        "auth_secret": None,
+        "id": "v1sncsxxybnsylc8gpqg85pg",
+    },
+]
+
+NEW_PRITUNL_ORG = {
+    "auth_api": False,
+    "name": "NewOrg",
+    "auth_token": None,
+    "user_count": 0,
+    "auth_secret": None,
+    "id": "604a140ae63f3b36bc34c7bd",
+}
+
+PRITUNL_USERS = [
+    {
+        "auth_type": "google",
+        "dns_servers": None,
+        "pin": True,
+        "dns_suffix": None,
+        "servers": [
+            {
+                "status": False,
+                "platform": None,
+                "server_id": "580711322bb66c1d59b9568f",
+                "virt_address6": "fd00:c0a8: 9700: 0: 192: 168: 101: 27",
+                "virt_address": "192.168.101.27",
+                "name": "vpn-A",
+                "real_address": None,
+                "connected_since": None,
+                "id": "580711322bb66c1d59b9568f",
+                "device_name": None,
+            },
+            {
+                "status": False,
+                "platform": None,
+                "server_id": "5dad2cc6e63f3b3f4a6dfea5",
+                "virt_address6": "fd00:c0a8:f200: 0: 192: 168: 201: 37",
+                "virt_address": "192.168.201.37",
+                "name": "vpn-B",
+                "real_address": None,
+                "connected_since": None,
+                "id": "5dad2cc6e63f3b3f4a6dfea5",
+                "device_name": None,
+            },
+        ],
+        "disabled": False,
+        "network_links": [],
+        "port_forwarding": [],
+        "id": "58070dafe63f3b2e6e472c3b",
+        "organization_name": "GumGum",
+        "type": "server",
+        "email": "bot@company.com",
+        "status": True,
+        "dns_mapping": None,
+        "otp_secret": "123456789ABCDEFG",
+        "client_to_client": False,
+        "sso": "google",
+        "bypass_secondary": False,
+        "groups": ["admin", "multiregion"],
+        "audit": False,
+        "name": "bot",
+        "gravatar": True,
+        "otp_auth": True,
+        "organization": "58070daee63f3b2e6e472c36",
+    },
+    {
+        "auth_type": "google",
+        "dns_servers": None,
+        "pin": True,
+        "dns_suffix": None,
+        "servers": [
+            {
+                "status": False,
+                "platform": None,
+                "server_id": "580711322bb66c1d59b9568f",
+                "virt_address6": "fd00:c0a8: 9700: 0: 192: 168: 101: 27",
+                "virt_address": "192.168.101.27",
+                "name": "vpn-A",
+                "real_address": None,
+                "connected_since": None,
+                "id": "580711322bb66c1d59b9568f",
+                "device_name": None,
+            },
+            {
+                "status": False,
+                "platform": None,
+                "server_id": "5dad2cc6e63f3b3f4a6dfea5",
+                "virt_address6": "fd00:c0a8:f200: 0: 192: 168: 201: 37",
+                "virt_address": "192.168.201.37",
+                "name": "vpn-B",
+                "real_address": None,
+                "connected_since": None,
+                "id": "5dad2cc6e63f3b3f4a6dfea5",
+                "device_name": None,
+            },
+        ],
+        "disabled": False,
+        "network_links": [],
+        "port_forwarding": [],
+        "id": "58070dafe63f3b2e6e472c3b",
+        "organization_name": "GumGum",
+        "type": "client",
+        "email": "florian@company.com",
+        "status": True,
+        "dns_mapping": None,
+        "otp_secret": "123456789ABCDEFG",
+        "client_to_client": False,
+        "sso": "google",
+        "bypass_secondary": False,
+        "groups": ["web", "database"],
+        "audit": False,
+        "name": "florian",
+        "gravatar": True,
+        "otp_auth": True,
+        "organization": "58070daee63f3b2e6e472c36",
+    },
+    {
+        "auth_type": "google",
+        "dns_servers": None,
+        "pin": True,
+        "dns_suffix": None,
+        "servers": [
+            {
+                "status": False,
+                "platform": None,
+                "server_id": "580711322bb66c1d59b9568f",
+                "virt_address6": "fd00:c0a8: 9700: 0: 192: 168: 101: 27",
+                "virt_address": "192.168.101.27",
+                "name": "vpn-A",
+                "real_address": None,
+                "connected_since": None,
+                "id": "580711322bb66c1d59b9568f",
+                "device_name": None,
+            },
+            {
+                "status": False,
+                "platform": None,
+                "server_id": "5dad2cc6e63f3b3f4a6dfea5",
+                "virt_address6": "fd00:c0a8:f200: 0: 192: 168: 201: 37",
+                "virt_address": "192.168.201.37",
+                "name": "vpn-B",
+                "real_address": None,
+                "connected_since": None,
+                "id": "5dad2cc6e63f3b3f4a6dfea5",
+                "device_name": None,
+            },
+        ],
+        "disabled": False,
+        "network_links": [],
+        "port_forwarding": [],
+        "id": "58070dafe63f3b2e6e472c3b",
+        "organization_name": "GumGum",
+        "type": "server",
+        "email": "ops@company.com",
+        "status": True,
+        "dns_mapping": None,
+        "otp_secret": "123456789ABCDEFG",
+        "client_to_client": False,
+        "sso": "google",
+        "bypass_secondary": False,
+        "groups": ["web", "database"],
+        "audit": False,
+        "name": "ops",
+        "gravatar": True,
+        "otp_auth": True,
+        "organization": "58070daee63f3b2e6e472c36",
+    },
+]
+
+NEW_PRITUNL_USER = {
+    "auth_type": "local",
+    "disabled": False,
+    "dns_servers": None,
+    "otp_secret": "6M4UWP2BCJBSYZAT",
+    "name": "alice",
+    "pin": False,
+    "dns_suffix": None,
+    "client_to_client": False,
+    "email": "alice@company.com",
+    "organization_name": "GumGum",
+    "bypass_secondary": False,
+    "groups": ["a", "b"],
+    "organization": "58070daee63f3b2e6e472c36",
+    "port_forwarding": [],
+    "type": "client",
+    "id": "590add71e63f3b72d8bb951a",
+}
+
+NEW_PRITUNL_USER_UPDATED = dict_merge(
+    NEW_PRITUNL_USER,
+    {
+        "disabled": True,
+        "name": "bob",
+        "email": "bob@company.com",
+        "groups": ["c", "d"],
+    },
+)
+
+
+class PritunlEmptyOrganizationMock(MagicMock):
+    """Pritunl API Mock for organization GET API calls."""
+
+    def getcode(self):
+        return 200
+
+    def read(self):
+        return json.dumps([])
 
 
 class PritunlListOrganizationMock(MagicMock):
@@ -25,34 +258,7 @@ class PritunlListOrganizationMock(MagicMock):
         return 200
 
     def read(self):
-        return json.dumps(
-            [
-                {
-                    "auth_api": False,
-                    "name": "Foo",
-                    "auth_token": None,
-                    "user_count": 0,
-                    "auth_secret": None,
-                    "id": "csftwlu6uhralzi2dpmhekz3",
-                },
-                {
-                    "auth_api": False,
-                    "name": "GumGum",
-                    "auth_token": None,
-                    "user_count": 3,
-                    "auth_secret": None,
-                    "id": "58070daee63f3b2e6e472c36",
-                },
-                {
-                    "auth_api": False,
-                    "name": "Bar",
-                    "auth_token": None,
-                    "user_count": 0,
-                    "auth_secret": None,
-                    "id": "v1sncsxxybnsylc8gpqg85pg",
-                },
-            ]
-        )
+        return json.dumps(PRITUNL_ORGS)
 
 
 class PritunlListUserMock(MagicMock):
@@ -62,163 +268,7 @@ class PritunlListUserMock(MagicMock):
         return 200
 
     def read(self):
-        return json.dumps(
-            [
-                {
-                    "auth_type": "google",
-                    "dns_servers": None,
-                    "pin": True,
-                    "dns_suffix": None,
-                    "servers": [
-                        {
-                            "status": False,
-                            "platform": None,
-                            "server_id": "580711322bb66c1d59b9568f",
-                            "virt_address6": "fd00:c0a8: 9700: 0: 192: 168: 101: 27",
-                            "virt_address": "192.168.101.27",
-                            "name": "vpn-A",
-                            "real_address": None,
-                            "connected_since": None,
-                            "id": "580711322bb66c1d59b9568f",
-                            "device_name": None,
-                        },
-                        {
-                            "status": False,
-                            "platform": None,
-                            "server_id": "5dad2cc6e63f3b3f4a6dfea5",
-                            "virt_address6": "fd00:c0a8:f200: 0: 192: 168: 201: 37",
-                            "virt_address": "192.168.201.37",
-                            "name": "vpn-B",
-                            "real_address": None,
-                            "connected_since": None,
-                            "id": "5dad2cc6e63f3b3f4a6dfea5",
-                            "device_name": None,
-                        },
-                    ],
-                    "disabled": False,
-                    "network_links": [],
-                    "port_forwarding": [],
-                    "id": "58070dafe63f3b2e6e472c3b",
-                    "organization_name": "GumGum",
-                    "type": "server",
-                    "email": "bot@company.com",
-                    "status": True,
-                    "dns_mapping": None,
-                    "otp_secret": "123456789ABCDEFG",
-                    "client_to_client": False,
-                    "sso": "google",
-                    "bypass_secondary": False,
-                    "groups": ["admin", "multiregion"],
-                    "audit": False,
-                    "name": "bot",
-                    "gravatar": True,
-                    "otp_auth": True,
-                    "organization": "58070daee63f3b2e6e472c36",
-                },
-                {
-                    "auth_type": "google",
-                    "dns_servers": None,
-                    "pin": True,
-                    "dns_suffix": None,
-                    "servers": [
-                        {
-                            "status": False,
-                            "platform": None,
-                            "server_id": "580711322bb66c1d59b9568f",
-                            "virt_address6": "fd00:c0a8: 9700: 0: 192: 168: 101: 27",
-                            "virt_address": "192.168.101.27",
-                            "name": "vpn-A",
-                            "real_address": None,
-                            "connected_since": None,
-                            "id": "580711322bb66c1d59b9568f",
-                            "device_name": None,
-                        },
-                        {
-                            "status": False,
-                            "platform": None,
-                            "server_id": "5dad2cc6e63f3b3f4a6dfea5",
-                            "virt_address6": "fd00:c0a8:f200: 0: 192: 168: 201: 37",
-                            "virt_address": "192.168.201.37",
-                            "name": "vpn-B",
-                            "real_address": None,
-                            "connected_since": None,
-                            "id": "5dad2cc6e63f3b3f4a6dfea5",
-                            "device_name": None,
-                        },
-                    ],
-                    "disabled": False,
-                    "network_links": [],
-                    "port_forwarding": [],
-                    "id": "58070dafe63f3b2e6e472c3b",
-                    "organization_name": "GumGum",
-                    "type": "client",
-                    "email": "florian@company.com",
-                    "status": True,
-                    "dns_mapping": None,
-                    "otp_secret": "123456789ABCDEFG",
-                    "client_to_client": False,
-                    "sso": "google",
-                    "bypass_secondary": False,
-                    "groups": ["web", "database"],
-                    "audit": False,
-                    "name": "florian",
-                    "gravatar": True,
-                    "otp_auth": True,
-                    "organization": "58070daee63f3b2e6e472c36",
-                },
-                {
-                    "auth_type": "google",
-                    "dns_servers": None,
-                    "pin": True,
-                    "dns_suffix": None,
-                    "servers": [
-                        {
-                            "status": False,
-                            "platform": None,
-                            "server_id": "580711322bb66c1d59b9568f",
-                            "virt_address6": "fd00:c0a8: 9700: 0: 192: 168: 101: 27",
-                            "virt_address": "192.168.101.27",
-                            "name": "vpn-A",
-                            "real_address": None,
-                            "connected_since": None,
-                            "id": "580711322bb66c1d59b9568f",
-                            "device_name": None,
-                        },
-                        {
-                            "status": False,
-                            "platform": None,
-                            "server_id": "5dad2cc6e63f3b3f4a6dfea5",
-                            "virt_address6": "fd00:c0a8:f200: 0: 192: 168: 201: 37",
-                            "virt_address": "192.168.201.37",
-                            "name": "vpn-B",
-                            "real_address": None,
-                            "connected_since": None,
-                            "id": "5dad2cc6e63f3b3f4a6dfea5",
-                            "device_name": None,
-                        },
-                    ],
-                    "disabled": False,
-                    "network_links": [],
-                    "port_forwarding": [],
-                    "id": "58070dafe63f3b2e6e472c3b",
-                    "organization_name": "GumGum",
-                    "type": "server",
-                    "email": "ops@company.com",
-                    "status": True,
-                    "dns_mapping": None,
-                    "otp_secret": "123456789ABCDEFG",
-                    "client_to_client": False,
-                    "sso": "google",
-                    "bypass_secondary": False,
-                    "groups": ["web", "database"],
-                    "audit": False,
-                    "name": "ops",
-                    "gravatar": True,
-                    "otp_auth": True,
-                    "organization": "58070daee63f3b2e6e472c36",
-                },
-            ]
-        )
+        return json.dumps(PRITUNL_USERS)
 
 
 class PritunlErrorMock(MagicMock):
@@ -231,6 +281,22 @@ class PritunlErrorMock(MagicMock):
         return "{}"
 
 
+class PritunlPostOrganizationMock(MagicMock):
+    def getcode(self):
+        return 200
+
+    def read(self):
+        return json.dumps(NEW_PRITUNL_ORG)
+
+
+class PritunlListOrganizationAfterPostMock(MagicMock):
+    def getcode(self):
+        return 200
+
+    def read(self):
+        return json.dumps(PRITUNL_ORGS + [NEW_PRITUNL_ORG])
+
+
 class PritunlPostUserMock(MagicMock):
     """Pritunl API Mock for POST API calls."""
 
@@ -238,28 +304,7 @@ class PritunlPostUserMock(MagicMock):
         return 200
 
     def read(self):
-        return json.dumps(
-            [
-                {
-                    "auth_type": "local",
-                    "disabled": False,
-                    "dns_servers": None,
-                    "otp_secret": "6M4UWP2BCJBSYZAT",
-                    "name": "alice",
-                    "pin": False,
-                    "dns_suffix": None,
-                    "client_to_client": False,
-                    "email": "alice@company.com",
-                    "organization_name": "GumGum",
-                    "bypass_secondary": False,
-                    "groups": ["a", "b"],
-                    "organization": "58070daee63f3b2e6e472c36",
-                    "port_forwarding": [],
-                    "type": "client",
-                    "id": "590add71e63f3b72d8bb951a",
-                }
-            ]
-        )
+        return json.dumps([NEW_PRITUNL_USER])
 
 
 class PritunlPutUserMock(MagicMock):
@@ -269,26 +314,17 @@ class PritunlPutUserMock(MagicMock):
         return 200
 
     def read(self):
-        return json.dumps(
-            {
-                "auth_type": "local",
-                "disabled": True,
-                "dns_servers": None,
-                "otp_secret": "WEJANJYMF3Q2QSLG",
-                "name": "bob",
-                "pin": False,
-                "dns_suffix": False,
-                "client_to_client": False,
-                "email": "bob@company.com",
-                "organization_name": "GumGum",
-                "bypass_secondary": False,
-                "groups": ["c", "d"],
-                "organization": "58070daee63f3b2e6e472c36",
-                "port_forwarding": [],
-                "type": "client",
-                "id": "590add71e63f3b72d8bb951a",
-            }
-        )
+        return json.dumps(NEW_PRITUNL_USER_UPDATED)
+
+
+class PritunlDeleteOrganizationMock(MagicMock):
+    """Pritunl API Mock for DELETE API calls."""
+
+    def getcode(self):
+        return 200
+
+    def read(self):
+        return "{}"
 
 
 class PritunlDeleteUserMock(MagicMock):
@@ -322,13 +358,20 @@ def pritunl_settings():
 
 
 @pytest.fixture
+def pritunl_organization_data():
+    return {
+        "name": NEW_PRITUNL_ORG["name"],
+    }
+
+
+@pytest.fixture
 def pritunl_user_data():
     return {
-        "name": "alice",
-        "email": "alice@company.com",
-        "groups": ["a", "b"],
-        "disabled": False,
-        "type": "client",
+        "name": NEW_PRITUNL_USER["name"],
+        "email": NEW_PRITUNL_USER["email"],
+        "groups": NEW_PRITUNL_USER["groups"],
+        "disabled": NEW_PRITUNL_USER["disabled"],
+        "type": NEW_PRITUNL_USER["type"],
     }
 
 
@@ -348,6 +391,11 @@ def get_pritunl_error_mock():
 
 
 @pytest.fixture
+def post_pritunl_organization_mock():
+    return PritunlPostOrganizationMock()
+
+
+@pytest.fixture
 def post_pritunl_user_mock():
     return PritunlPostUserMock()
 
@@ -355,6 +403,11 @@ def post_pritunl_user_mock():
 @pytest.fixture
 def put_pritunl_user_mock():
     return PritunlPutUserMock()
+
+
+@pytest.fixture
+def delete_pritunl_organization_mock():
+    return PritunlDeleteOrganizationMock()
 
 
 @pytest.fixture
@@ -460,6 +513,25 @@ class TestPritunlApi:
             assert user["name"] == user_expected
 
     # Test for POST operation on Pritunl API
+    def test_add_pritunl_organization(
+        self,
+        pritunl_settings,
+        pritunl_organization_data,
+        post_pritunl_organization_mock,
+    ):
+        api._post_pritunl_organization = post_pritunl_organization_mock()
+
+        create_response = api.post_pritunl_organization(
+            **dict_merge(
+                pritunl_settings,
+                {"organization_name": pritunl_organization_data["name"]},
+            )
+        )
+
+        # Ensure provided settings match with the ones returned by Pritunl
+        for k, v in iteritems(pritunl_organization_data):
+            assert create_response[k] == v
+
     @pytest.mark.parametrize("org_id", [("58070daee63f3b2e6e472c36")])
     def test_add_and_update_pritunl_user(
         self,
@@ -513,6 +585,24 @@ class TestPritunlApi:
                 assert update_response[k] == create_response[k]
 
     # Test for DELETE operation on Pritunl API
+
+    @pytest.mark.parametrize("org_id", [("58070daee63f3b2e6e472c36")])
+    def test_delete_pritunl_organization(
+        self, pritunl_settings, org_id, delete_pritunl_organization_mock
+    ):
+        api._delete_pritunl_organization = delete_pritunl_organization_mock()
+
+        response = api.delete_pritunl_organization(
+            **dict_merge(
+                pritunl_settings,
+                {
+                    "organization_id": org_id,
+                },
+            )
+        )
+
+        assert response == {}
+
     @pytest.mark.parametrize(
         "org_id,user_id", [("58070daee63f3b2e6e472c36", "590add71e63f3b72d8bb951a")]
     )
