@@ -611,3 +611,10 @@ plugin_routing:
       redirect: community.docker.docker_swarm
     kubevirt:
       redirect: community.kubevirt.kubevirt
+  filter:
+    path_join:
+      # The ansible.builtin.path_join filter has been added in ansible-base 2.10.
+      # Since plugin routing is only available since ansible-base 2.10, this
+      # redirect will be used for ansible-base 2.10 or later, and the included
+      # path_join filter will be used for Ansible 2.9 or earlier.
+      redirect: ansible.builtin.path_join
