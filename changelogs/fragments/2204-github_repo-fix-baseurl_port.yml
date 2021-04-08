@@ -1,0 +1,2 @@
+bugfixes:
+  - PyGithub bug does not allow explicit port in base_url for github_repo.py (https://github.com/PyGithub/PyGithub/issues/1913). Specifying port is not required.
