@@ -101,18 +101,27 @@ class ArgFormat(object):
         return [str(p) for p in func(value)]
 
 
-def cause_changes(func, on_success=True, on_failure=False):
-    @wraps(func)
-    def wrapper(self, *args, **kwargs):
-        try:
-            func(*args, **kwargs)
-            if on_success:
-                self.changed = True
-        except Exception:
-            if on_failure:
-                self.changed = True
-            raise
-    return wrapper
+def cause_changes(on_success=None, on_failure=None):
+
+    def deco(func):
+        if on_success is None and on_failure is None:
+            return func
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                self = args[0]
+                func(*args, **kwargs)
+                if on_success is not None:
+                    self.changed = on_success
+            except Exception:
+                if on_failure is not None:
+                    self.changed = on_failure
+                raise
+
+        return wrapper
+
+    return deco
 
 
 def module_fails_on_exception(func):

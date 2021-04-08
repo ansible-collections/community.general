@@ -6,10 +6,12 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
+from collections import namedtuple
+
 import pytest
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    ArgFormat, DependencyCtxMgr, ModuleHelper, VarMeta
+    ArgFormat, DependencyCtxMgr, ModuleHelper, VarMeta, cause_changes
 )
 
 
@@ -160,3 +162,45 @@ def test_vardict():
     assert vd.c == 'new_c'
     assert vd.output() == {'a': 'new_a', 'c': 'new_c'}
     assert vd.diff() == {'before': {'a': 123}, 'after': {'a': 'new_a'}}, "diff={0}".format(vd.diff())
+
+
+class MockMH(object):
+    changed = None
+
+    def _div(self, x, y):
+        return x / y
+
+    func_none = cause_changes()(_div)
+    func_onsucc = cause_changes(on_success=True)(_div)
+    func_onfail = cause_changes(on_failure=True)(_div)
+    func_onboth = cause_changes(on_success=True, on_failure=True)(_div)
+
+
+CAUSE_CHG_DECO_PARAMS = ['method', 'expect_exception', 'expect_changed']
+CAUSE_CHG_DECO = dict(
+    none_succ=dict(method='func_none', expect_exception=False, expect_changed=None),
+    none_fail=dict(method='func_none', expect_exception=True, expect_changed=None),
+    onsucc_succ=dict(method='func_onsucc', expect_exception=False, expect_changed=True),
+    onsucc_fail=dict(method='func_onsucc', expect_exception=True, expect_changed=None),
+    onfail_succ=dict(method='func_onfail', expect_exception=False, expect_changed=None),
+    onfail_fail=dict(method='func_onfail', expect_exception=True, expect_changed=True),
+    onboth_succ=dict(method='func_onboth', expect_exception=False, expect_changed=True),
+    onboth_fail=dict(method='func_onboth', expect_exception=True, expect_changed=True),
+)
+CAUSE_CHG_DECO_IDS = sorted(CAUSE_CHG_DECO.keys())
+
+
+@pytest.mark.parametrize(CAUSE_CHG_DECO_PARAMS,
+                         [[CAUSE_CHG_DECO[tc][param]
+                           for param in CAUSE_CHG_DECO_PARAMS]
+                          for tc in CAUSE_CHG_DECO_IDS],
+                         ids=CAUSE_CHG_DECO_IDS)
+def test_cause_changes_deco(method, expect_exception, expect_changed):
+    mh = MockMH()
+    if expect_exception:
+        with pytest.raises(Exception):
+            getattr(mh, method)(1, 0)
+    else:
+        getattr(mh, method)(9, 3)
+
+    assert mh.changed == expect_changed
