@@ -116,6 +116,8 @@ class CapabilitiesModule(object):
             if ' =' in stdout:
                 # process output of an older version of libcap
                 caps = stdout.split(' =')[1].strip().split()
+            elif '=' in stdout:
+                caps = stdout.split('=')[1].strip().split()
             else:
                 # otherwise, we have a newer version here
                 # see original commit message of cap/v0.2.40-18-g177cd41 in libcap.git
