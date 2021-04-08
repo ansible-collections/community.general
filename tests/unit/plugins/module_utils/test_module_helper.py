@@ -6,12 +6,10 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from collections import namedtuple
-
 import pytest
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    ArgFormat, DependencyCtxMgr, ModuleHelper, VarMeta, cause_changes
+    ArgFormat, DependencyCtxMgr, cause_changes
 )
 
 
