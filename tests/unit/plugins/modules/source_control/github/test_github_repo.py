@@ -17,9 +17,9 @@ def debug_mock(url, request):
     print(request.original.__dict__)
 
 
-@urlmatch(netloc=r'api\.github\.com.*$', path=r'/orgs/.*', method="get")
+@urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/orgs/.*', method="get")
 def get_orgs_mock(url, request):
-    match = re.search(r"api\.github\.com/orgs/(?P<org>[^/]+)", request.url)
+    match = re.search(r"api\.github\.com(:[0-9]+)?/orgs/(?P<org>[^/]+)", request.url)
     org = match.group("org")
 
     # https://docs.github.com/en/rest/reference/orgs#get-an-organization
@@ -32,7 +32,7 @@ def get_orgs_mock(url, request):
     return response(200, content, headers, None, 5, request)
 
 
-@urlmatch(netloc=r'api\.github\.com.*$', path=r'/user', method="get")
+@urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/user', method="get")
 def get_user_mock(url, request):
     # https://docs.github.com/en/rest/reference/users#get-the-authenticated-user
     headers = {'content-type': 'application/json'}
@@ -44,15 +44,15 @@ def get_user_mock(url, request):
     return response(200, content, headers, None, 5, request)
 
 
-@urlmatch(netloc=r'api\.github\.com.*$', path=r'/repos/.*/.*', method="get")
+@urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/repos/.*/.*', method="get")
 def get_repo_notfound_mock(url, request):
     return response(404, "{\"message\": \"Not Found\"}", "", "Not Found", 5, request)
 
 
-@urlmatch(netloc=r'api\.github\.com.*$', path=r'/repos/.*/.*', method="get")
+@urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/repos/.*/.*', method="get")
 def get_repo_mock(url, request):
     match = re.search(
-        r"api\.github\.com/repos/(?P<org>[^/]+)/(?P<repo>[^/]+)", request.url)
+        r"api\.github\.com(:[0-9]+)?/repos/(?P<org>[^/]+)/(?P<repo>[^/]+)", request.url)
     org = match.group("org")
     repo = match.group("repo")
 
@@ -71,10 +71,10 @@ def get_repo_mock(url, request):
     return response(200, content, headers, None, 5, request)
 
 
-@urlmatch(netloc=r'api\.github\.com.*$', path=r'/orgs/.*/repos', method="post")
+@urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/orgs/.*/repos', method="post")
 def create_new_org_repo_mock(url, request):
     match = re.search(
-        r"api\.github\.com/orgs/(?P<org>[^/]+)/repos", request.url)
+        r"api\.github\.com(:[0-9]+)?/orgs/(?P<org>[^/]+)/repos", request.url)
     org = match.group("org")
     repo = json.loads(request.body)
 
@@ -90,7 +90,7 @@ def create_new_org_repo_mock(url, request):
     return response(201, content, headers, None, 5, request)
 
 
-@urlmatch(netloc=r'api\.github\.com.*$', path=r'/user/repos', method="post")
+@urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/user/repos', method="post")
 def create_new_user_repo_mock(url, request):
     repo = json.loads(request.body)
 
@@ -106,10 +106,10 @@ def create_new_user_repo_mock(url, request):
     return response(201, content, headers, None, 5, request)
 
 
-@urlmatch(netloc=r'api\.github\.com.*$', path=r'/repos/.*/.*', method="patch")
+@urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/repos/.*/.*', method="patch")
 def patch_repo_mock(url, request):
     match = re.search(
-        r"api\.github\.com/repos/(?P<org>[^/]+)/(?P<repo>[^/]+)", request.url)
+        r"api\.github\.com(:[0-9]+)?/repos/(?P<org>[^/]+)/(?P<repo>[^/]+)", request.url)
     org = match.group("org")
     repo = match.group("repo")
 
@@ -129,13 +129,13 @@ def patch_repo_mock(url, request):
     return response(200, content, headers, None, 5, request)
 
 
-@urlmatch(netloc=r'api\.github\.com.*$', path=r'/repos/.*/.*', method="delete")
+@urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/repos/.*/.*', method="delete")
 def delete_repo_mock(url, request):
     # https://docs.github.com/en/rest/reference/repos#delete-a-repository
     return response(204, None, None, None, 5, request)
 
 
-@urlmatch(netloc=r'api\.github\.com.*$', path=r'/repos/.*/.*', method="delete")
+@urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/repos/.*/.*', method="delete")
 def delete_repo_notfound_mock(url, request):
     # https://docs.github.com/en/rest/reference/repos#delete-a-repository
     return response(404, "{\"message\": \"Not Found\"}", "", "Not Found", 5, request)
