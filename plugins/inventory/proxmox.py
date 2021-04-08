@@ -19,6 +19,7 @@ DOCUMENTATION = '''
         - Will retrieve the first network interface with an IP for Proxmox nodes.
         - Can retrieve LXC/QEMU configuration as facts.
     extends_documentation_fragment:
+        - constructed
         - inventory_cache
     options:
       plugin:
@@ -69,6 +70,14 @@ DOCUMENTATION = '''
         description: Gather LXC/QEMU configuration facts.
         default: no
         type: bool
+      strict:
+        version_added: 2.5.0
+      compose:
+        version_added: 2.5.0
+      groups:
+        version_added: 2.5.0
+      keyed_groups:
+        version_added: 2.5.0
 '''
 
 EXAMPLES = '''
@@ -78,6 +87,15 @@ url: http://localhost:8006
 user: ansible@pve
 password: secure
 validate_certs: no
+keyed_groups:
+  - key: proxmox_tags_parsed
+    separator: ""
+    prefix: group
+groups:
+  webservers: "'web' in (proxmox_tags_parsed|list)"
+  mailservers: "'mail' in (proxmox_tags_parsed|list)"
+compose:
+  ansible_port: 2222
 '''
 
 import re
@@ -86,7 +104,7 @@ from ansible.module_utils.common._collections_compat import MutableMapping
 from distutils.version import LooseVersion
 
 from ansible.errors import AnsibleError
-from ansible.plugins.inventory import BaseInventoryPlugin, Cacheable
+from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 
 # 3rd party imports
@@ -99,7 +117,7 @@ except ImportError:
     HAS_REQUESTS = False
 
 
-class InventoryModule(BaseInventoryPlugin, Cacheable):
+class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     ''' Host inventory parser for ansible using Proxmox as source. '''
 
     NAME = 'community.general.proxmox'
@@ -209,6 +227,10 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
     def _get_vm_config(self, node, vmid, vmtype, name):
         ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/config" % (self.proxmox_url, node, vmtype, vmid))
 
+        node_key = 'node'
+        node_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), node_key.lower()))
+        self.inventory.set_variable(name, node_key, node)
+
         vmid_key = 'vmid'
         vmid_key = self.to_safe('%s%s' % (self.get_option('facts_prefix'), vmid_key.lower()))
         self.inventory.set_variable(name, vmid_key, vmid)
@@ -264,6 +286,12 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
         regex = r"[^A-Za-z0-9\_]"
         return re.sub(regex, "_", word.replace(" ", ""))
 
+    def _apply_constructable(self, name, variables):
+        strict = self.get_option('strict')
+        self._add_host_to_composed_groups(self.get_option('groups'), variables, name, strict=strict)
+        self._add_host_to_keyed_groups(self.get_option('keyed_groups'), variables, name, strict=strict)
+        self._set_composite_vars(self.get_option('compose'), variables, name, strict=strict)
+
     def _populate(self):
 
         self._get_auth()
@@ -318,6 +346,8 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     if self.get_option('want_facts'):
                         self._get_vm_config(node['node'], lxc['vmid'], 'lxc', lxc['name'])
 
+                    self._apply_constructable(lxc["name"], self.inventory.get_host(lxc['name']).get_vars())
+
                 # get QEMU vm's for this node
                 node_qemu_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), ('%s_qemu' % node['node']).lower()))
                 self.inventory.add_group(node_qemu_group)
@@ -339,6 +369,8 @@ class InventoryModule(BaseInventoryPlugin, Cacheable):
                     # get QEMU config for facts
                     if self.get_option('want_facts'):
                         self._get_vm_config(node['node'], qemu['vmid'], 'qemu', qemu['name'])
+
+                    self._apply_constructable(qemu["name"], self.inventory.get_host(qemu['name']).get_vars())
 
         # gather vm's in pools
         for pool in self._get_pools():
