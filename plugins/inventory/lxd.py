@@ -140,6 +140,7 @@ import os
 import socket
 from ansible.plugins.inventory import BaseInventoryPlugin
 from ansible.module_utils._text import to_native
+from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
 
@@ -169,10 +170,8 @@ class InventoryModule(BaseInventoryPlugin):
         try:
             with open(path, 'r') as json_file:
                 return json.load(json_file)
-        except IOError as err:
-            raise AnsibleParserError('Could not load the test data: {0}'.format(to_native(err)))
-        except json.decoder.JSONDecodeError as err:
-            raise AnsibleParserError('The format of the JSON file {0} is incorrect: {1}'.format(to_native(path), to_native(err)))
+        except (IOError, json.decoder.JSONDecodeError) as err:
+            raise AnsibleParserError('Could not load the test data from {0}: {1}'.format(to_native(path), to_native(err)))
 
     def save_json_data(self, path, file_name=None):
         """save data as json
@@ -346,29 +345,6 @@ class InventoryModule(BaseInventoryPlugin):
             config[name] = {branch: self.socket.do('GET', '/1.0/{0}/{1}'.format(to_native(branch), to_native(name)))}
         return config
 
-    def _merge_dicts(self, source, destination):
-        """merge dicts
-
-        Merge two dicts without overwrite the branches of the destination dictionary.
-
-        Args:
-            diclearct(source): Source Dictionary
-            dict(destination): Destination Dictionary
-        Kwargs:
-            None
-        Raises:
-            None
-        Returns:
-            dict(destination): merged Dictionary"""
-        for key, value in source.items():
-            if isinstance(value, dict):
-                # get node or create one
-                node = destination.setdefault(key, {})
-                self._merge_dicts(value, node)
-            else:
-                destination[key] = value
-        return destination
-
     def get_container_data(self, names):
         """Create Inventory of the container
 
@@ -389,7 +365,7 @@ class InventoryModule(BaseInventoryPlugin):
         for branch in branches:
             for name in names:
                 container_config['containers'] = self._get_config(branch, name)
-                self.data = self._merge_dicts(container_config, self.data)
+                self.data = dict_merge(container_config, self.data)
 
     def get_network_data(self, names):
         """Create Inventory of the container
@@ -414,7 +390,7 @@ class InventoryModule(BaseInventoryPlugin):
                     network_config['networks'] = self._get_config(branch, name)
                 except LXDClientException:
                     network_config['networks'] = {name: None}
-                self.data = self._merge_dicts(network_config, self.data)
+                self.data = dict_merge(network_config, self.data)
 
     def extract_network_information_from_container_config(self, container_name):
         """Returns the network interface configuration
@@ -538,7 +514,7 @@ class InventoryModule(BaseInventoryPlugin):
         """Helper to save data
 
         Helper to save the data in self.data
-        Detect if data is allready in branch and use _merge_dicts() to prevent that branch is overwritten.
+        Detect if data is allready in branch and use dict_merge() to prevent that branch is overwritten.
 
         Args:
             str(container_name): name of container
@@ -557,7 +533,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         try:
             if isinstance(value, dict) and key in path[container_name].keys():
-                path[container_name] = self._merge_dicts(value, path[container_name][key])
+                path[container_name] = dict_merge(value, path[container_name][key])
             else:
                 path[container_name][key] = value
         except KeyError as err:
