@@ -163,6 +163,7 @@ def get_json(url):
                  "autostart": 1,
                  "active": 1}]
     elif url == "https://localhost:8006/api2/json/nodes/testnode/lxc/100/config":
+        # _get_vm_config (lxc)
         return {
             "console": 1,
             "rootfs": "local-lvm:vm-100-disk-0,size=4G",
@@ -184,6 +185,7 @@ def get_json(url):
             "tags": "one, two, three",
         }
     elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu/101/config":
+        # _get_vm_config (qemu)
         return {
             "tags": "one, two, three",
             "cores": 1,
@@ -211,6 +213,7 @@ def get_json(url):
             "smbios1": "uuid=ffffffff-ffff-ffff-ffff-ffffffffffff"
         }
     elif url == "https://localhost:8006/api2/json/nodes/testnode/qemu/101/agent/network-get-interfaces":
+        # _get_agent_network_interfaces
         return {"result": [
             {
                 "hardware-address": "00:00:00:00:00:00",
