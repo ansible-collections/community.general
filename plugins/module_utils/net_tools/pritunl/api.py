@@ -57,6 +57,34 @@ def _get_pritunl_organizations(api_token, api_secret, base_url, validate_certs=T
     )
 
 
+def _delete_pritunl_organization(
+    api_token, api_secret, base_url, organization_id, validate_certs=True
+):
+    return pritunl_auth_request(
+        base_url=base_url,
+        api_token=api_token,
+        api_secret=api_secret,
+        method="DELETE",
+        path="/organization/%s" % (organization_id),
+        validate_certs=validate_certs,
+    )
+
+
+def _post_pritunl_organization(
+    api_token, api_secret, base_url, organization_data, validate_certs=True
+):
+    return pritunl_auth_request(
+        api_token=api_token,
+        api_secret=api_secret,
+        base_url=base_url,
+        method="POST",
+        path="/organization/%s",
+        headers={"Content-Type": "application/json"},
+        data=json.dumps(organization_data),
+        validate_certs=validate_certs,
+    )
+
+
 def _get_pritunl_users(
     api_token, api_secret, base_url, organization_id, validate_certs=True
 ):
@@ -179,6 +207,29 @@ def list_pritunl_users(
     return users
 
 
+def post_pritunl_organization(
+    api_token,
+    api_secret,
+    base_url,
+    organization_name,
+    validate_certs=True,
+):
+    response = _post_pritunl_organization(
+        api_token=api_token,
+        api_secret=api_secret,
+        base_url=base_url,
+        organization_data={"name": organization_name},
+        validate_certs=True,
+    )
+
+    if response.getcode() != 200:
+        raise PritunlException(
+            "Could not add organization %s to Pritunl" % (organization_name)
+        )
+    # The user PUT request returns the updated user object
+    return json.loads(response.read())
+
+
 def post_pritunl_user(
     api_token,
     api_secret,
@@ -225,6 +276,25 @@ def post_pritunl_user(
             )
         # The user PUT request returns the updated user object
         return json.loads(response.read())
+
+
+def delete_pritunl_organization(
+    api_token, api_secret, base_url, organization_id, validate_certs=True
+):
+    response = _delete_pritunl_organization(
+        api_token=api_token,
+        api_secret=api_secret,
+        base_url=base_url,
+        organization_id=organization_id,
+        validate_certs=True,
+    )
+
+    if response.getcode() != 200:
+        raise PritunlException(
+            "Could not remove organization %s from Pritunl" % (organization_id)
+        )
+
+    return json.loads(response.read())
 
 
 def delete_pritunl_user(
