@@ -1,0 +1,3 @@
+add plugin.filter:
+  - name: dict
+    description: "The ``dict`` function as a filter: converts a list of tuples to a dictionary"
