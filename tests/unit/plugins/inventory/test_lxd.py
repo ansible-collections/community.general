@@ -35,13 +35,13 @@ GROUP_Config = {
     'netRangeIPv6': {'type': 'network_range', 'attribute': 'fd42:bd00:7b11:2167:216:3eff::/24'}}
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def inventory():
     inv = InventoryModule()
     inv.inventory = InventoryData()
 
     # Test Values
-    inv.data = inv.load_json_data('tests/integration/targets/inventory_lxd/files/lxd_inventory.atd')  # Load Test Data
+    inv.data = inv.load_json_data('tests/integration/targets/inventory_lxd/fixtures/lxd_inventory.atd')  # Load Test Data
     inv.groups = GROUP_Config
     inv.prefered_container_network_interface = 'eth'
     inv.prefered_container_network_family = 'inet'
