@@ -21,7 +21,7 @@ DOCUMENTATION = r'''
         url:
             description:
             - The unix domain socket path or the https URL for the lxd server.
-            - Sockets in filesystem have to start with C('unix:').
+            - Sockets in filesystem have to start with C(unix:).
             - Mostly C(unix:/var/lib/lxd/unix.socket) or C(unix:/var/snap/lxd/common/lxd/unix.socket).
             default: unix:/var/snap/lxd/common/lxd/unix.socket
             required: false
