@@ -92,6 +92,8 @@ def disk_info(devicename):
     partitions = psutil.disk_partitions()
     found = False
     for partition in partitions:
+        if not partition.device.startswith("/dev/"):
+            continue
         output[partition.device] = {}
         output[partition.device]['mountpoint'] = partition.mountpoint
         output[partition.device]['fstype'] = partition.fstype

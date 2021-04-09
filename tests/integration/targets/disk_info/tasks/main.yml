@@ -13,7 +13,7 @@
     # Version 5.7.0 breaks on older pip versions. See https://github.com/ansible/ansible/pull/7066
 
 - name: "Checking the information from df command"
-  shell:  "df -h | grep /dev/ | awk '{ print $1 }'"
+  shell:  "df -h | grep '^/dev/' | awk '{ print $1 }'"
   register: result_df
 
 - name: "Checking the all disk info"
@@ -28,13 +28,13 @@
 - name: "Obtaining all disk info check"
   assert:
     that:
-      - "{{ result_df.stdout_lines | length }} == {{ result_all_disk['ansible_facts'].keys() | length }}"
+      - "{{ result_df.stdout_lines | unique | length }} == {{ result_all_disk['ansible_facts'].keys() | length }}"
     success_msg: "Check for obtaining all disk info passed"
     fail_msg: "Check for obtaining all disk info failed"
 
 - name: "Obtaining specific disk info check"
   assert:
     that:
-      - "{{ result_specific_disk['ansible_facts'] }} != '' "
+      - result_specific_disk['ansible_facts'] != {}
     success_msg: "Check for obtaining specific disk info passed"
     fail_msg: "Check for obtaining specific disk info failed"
