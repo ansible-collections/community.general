@@ -1,0 +1,35 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for the disk_facts module
+# Copyright 2021 VMware, Inc
+#
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+- name: "Checking the information from df command"
+  shell:  "df -h | grep /dev/ | awk '{ print $1 }'"
+  register: result_df
+
+- name: "Checking the all disk info"
+  community.general.disk_facts:
+  register: result_all_disk
+
+- name: "Checking the specific disk info"
+  community.general.disk_facts:
+    name: "{{ result_df.stdout_lines[0] }}"
+  register: result_specific_disk
+
+- name: "Obtaining all disk info check"
+  assert:
+    that:
+      - "{{ result_df.stdout_lines | length }} == {{ result_all_disk['ansible_facts'].keys() | length }}"
+    success_msg: "Check for obtaining all disk info passed"
+    fail_msg: "Check for obtaining all disk info failed"
+
+- name: "Obtaining specific disk info check"
+  assert:
+    that:
+      - "{{ result_specific_disk['ansible_facts'] }} != '' "
+    success_msg: "Check for obtaining specific disk info passed"
+    fail_msg: "Check for obtaining specific disk info failed"
