@@ -14,7 +14,7 @@ module: spectrum_model_attrs
 short_description: Enforce a model's attributes in CA Spectrum.
 description:
     - This module can be used to enforce a model's attributes in CA Spectrum.
-version_added: 2.1.0
+version_added: 2.2.0
 author:
     - Tyler Gates (@tgates81)
 notes:
@@ -106,7 +106,7 @@ options:
 '''
 
 EXAMPLES = r'''
-- name: Enforce maintenance mode for modelxzy01 with a note about why
+- name: Enforce maintenance mode for modelxyz01 with a note about why
   community.general.spectrum_model_attrs:
     url: "http://oneclick.url.com"
     username: "{{ oneclick_username }}"
