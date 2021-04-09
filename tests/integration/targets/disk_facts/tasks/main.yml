@@ -7,6 +7,11 @@
 # Copyright 2021 VMware, Inc
 #
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+- name: "Installing the psutil module"
+  pip:
+    name: psutil < 5.7.0
+    # Version 5.7.0 breaks on older pip versions. See https://github.com/ansible/ansible/pull/7066
+
 - name: "Checking the information from df command"
   shell:  "df -h | grep /dev/ | awk '{ print $1 }'"
   register: result_df
