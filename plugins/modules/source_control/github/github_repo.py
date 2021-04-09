@@ -121,9 +121,9 @@ except Exception:
 
 def authenticate(username=None, password=None, access_token=None):
     if access_token:
-        return Github(base_url="https://api.github.com:443", login_or_token=access_token)
+        return Github(base_url="https://api.github.com", login_or_token=access_token)
     else:
-        return Github(base_url="https://api.github.com:443", login_or_token=username, password=password)
+        return Github(base_url="https://api.github.com", login_or_token=username, password=password)
 
 
 def create_repo(gh, name, organization=None, private=False, description='', check_mode=False):
