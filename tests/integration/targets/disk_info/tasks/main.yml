@@ -3,7 +3,7 @@
 # and should not be used as examples of how to write Ansible roles #
 ####################################################################
 
-# Test code for the disk_facts module
+# Test code for the disk_info module
 # Copyright 2021 VMware, Inc
 #
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -17,11 +17,11 @@
   register: result_df
 
 - name: "Checking the all disk info"
-  community.general.disk_facts:
+  community.general.disk_info:
   register: result_all_disk
 
 - name: "Checking the specific disk info"
-  community.general.disk_facts:
+  community.general.disk_info:
     name: "{{ result_df.stdout_lines[0] }}"
   register: result_specific_disk
 
