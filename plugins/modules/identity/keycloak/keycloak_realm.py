@@ -33,9 +33,9 @@ description:
 options:
     state:
         description:
-            - State of the realm
+            - State of the realm.
             - On C(present), the realm will be created (or updated if it exists already).
-            - On C(absent), the realm will be removed if it exists
+            - On C(absent), the realm will be removed if it exists.
         choices: ['present', 'absent']
         default: 'present'
         type: str
@@ -46,7 +46,7 @@ options:
         type: str
     realm:
         description:
-            - The realm name
+            - The realm name.
         type: str
     access_code_lifespan:
         description:
@@ -574,6 +574,7 @@ def sanitize_cr(realmrep):
         result['secret'] = 'no_log'
     if 'attributes' in result:
         if 'saml.signing.private.key' in result['attributes']:
+            result['attributes'] = result['attributes'].copy()
             result['attributes']['saml.signing.private.key'] = 'no_log'
     return result
 
@@ -693,8 +694,9 @@ def main():
     state = module.params.get('state')
 
     # convert module parameters to realm representation parameters (if they belong in there)
+    params_to_ignore = list(keycloak_argument_spec().keys()) + ['state']
     realm_params = [x for x in module.params
-                    if x not in list(keycloak_argument_spec().keys()) + ['state'] and
+                    if x not in params_to_ignore and
                     module.params.get(x) is not None]
 
     # See whether the realm already exists in Keycloak
@@ -713,10 +715,6 @@ def main():
                     new_param_value = sorted(new_param_value)
                 except TypeError:
                     pass
-        # Unfortunately, the ansible argument spec checker introduces variables with null values when
-        # they are not specified
-        if realm_param == 'protocol_mappers':
-            new_param_value = [dict((k, v) for k, v in x.items() if x[k] is not None) for x in new_param_value]
 
         changeset[camel(realm_param)] = new_param_value
 
