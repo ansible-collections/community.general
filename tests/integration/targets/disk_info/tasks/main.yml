@@ -10,7 +10,13 @@
 - name: "Installing the psutil module"
   pip:
     name: psutil < 5.7.0
-    # Version 5.7.0 breaks on older pip versions. See https://github.com/ansible/ansible/pull/7066
+    # Version 5.7.0 breaks on python 2.x. See https://github.com/ansible/ansible/pull/70667
+  when: ansible_python_version is version ('3', '<')
+
+- name: "Installing the psutil module for python version 3"
+  pip:
+    name: psutil
+  when: ansible_python_version is version ('3', '>=')
 
 - name: "Checking the information from df command"
   shell:  "df -h | grep '^/dev/' | awk '{ print $1 }'"
