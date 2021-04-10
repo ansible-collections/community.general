@@ -707,15 +707,6 @@ def main():
 
     for realm_param in realm_params:
         new_param_value = module.params.get(realm_param)
-
-        # some lists in the Keycloak API are sorted, some are not.
-        if isinstance(new_param_value, list):
-            if realm_param in ['attributes']:
-                try:
-                    new_param_value = sorted(new_param_value)
-                except TypeError:
-                    pass
-
         changeset[camel(realm_param)] = new_param_value
 
     # Whether creating or updating a realm, take the before-state and merge the changeset into it
