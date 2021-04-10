@@ -1,7 +1,12 @@
 - name: "Verify required variables: model_name, model_type, oneclick_username, oneclick_password, oneclick_url"
   fail:
     msg: "One or more of the following variables are not set: model_name, model_type, oneclick_username, oneclick_password, oneclick_url"
-  when: model_name is not defined or model_type is not defined or oneclick_username is not defined or oneclick_password is not defined or oneclick_url is not defined
+  when: >
+    model_name is not defined
+    or model_type is not defined
+    or oneclick_username is not defined
+    or oneclick_password is not defined
+    or oneclick_url is not defined
 
 - block:
   - name: "001: Enforce maintenance mode for {{ model_name }} with a note about why [check_mode test]"
@@ -32,7 +37,8 @@
         - mm_enabled_check_mode.changed_attrs.isManaged == "false"
 
   - name: "002: Enforce maintenance mode for {{ model_name }} with a note about why"
-    spectrum_model_attrs: &mm_enabled_args
+    spectrum_model_attrs:
+      <<: *mm_enabled_args
     register: mm_enabled
     check_mode: false
 
@@ -48,7 +54,8 @@
         - mm_enabled.changed_attrs.isManaged == "false"
 
   - name: "003: Enforce maintenance mode for {{ model_name }} with a note about why [idempontence test]"
-    spectrum_model_attrs: &mm_enabled_args
+    spectrum_model_attrs:
+      <<: *mm_enabled_args
     register: mm_enabled_idp
     check_mode: false
 
