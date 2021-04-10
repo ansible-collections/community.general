@@ -14,7 +14,7 @@ module: spectrum_model_attrs
 short_description: Enforce a model's attributes in CA Spectrum.
 description:
     - This module can be used to enforce a model's attributes in CA Spectrum.
-version_added: 2.2.0
+version_added: 2.5.0
 author:
     - Tyler Gates (@tgates81)
 notes:
