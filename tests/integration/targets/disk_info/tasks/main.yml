@@ -9,14 +9,8 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 - name: "Installing the psutil module"
   pip:
-    name: psutil < 5.7.0
-    # Version 5.7.0 breaks on python 2.x. See https://github.com/ansible/ansible/pull/70667
-  when: ansible_python_version is version ('3', '<')
-
-- name: "Installing the psutil module for python version 3"
-  pip:
     name: psutil
-  when: ansible_python_version is version ('3', '>=')
+    extra_args: "-c {{ remote_constraints }}"
 
 - name: "Checking the information from df command"
   shell:  "df -h | grep '^/dev/' | awk '{ print $1 }'"
@@ -34,13 +28,13 @@
 - name: "Obtaining all disk info check"
   assert:
     that:
-      - "{{ result_df.stdout_lines | unique | length }} == {{ result_all_disk['ansible_facts'].keys() | length }}"
+      - "{{ result_df.stdout_lines | unique | length }} == {{ result_all_disk['disk_info'].keys() | length }}"
     success_msg: "Check for obtaining all disk info passed"
     fail_msg: "Check for obtaining all disk info failed"
 
 - name: "Obtaining specific disk info check"
   assert:
     that:
-      - result_specific_disk['ansible_facts'] != {}
+      - result_specific_disk['disk_info'] != {}
     success_msg: "Check for obtaining specific disk info passed"
     fail_msg: "Check for obtaining specific disk info failed"

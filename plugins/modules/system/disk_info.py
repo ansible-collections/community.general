@@ -13,7 +13,7 @@ DOCUMENTATION = '''
 ---
 module: disk_info
 version_added: "2.5.0"
-short_description: Retrieves disk info in the Linux/Unix systems
+short_description: Retrieves disk info
 description:
     - This module retrieves disk info like free space, used percentage, mount location, and so on.
 requirements:
@@ -22,13 +22,13 @@ options:
     name:
         description:
             - This is the disk name to query, if this parameter is not passed, it queries all the disk information.
-        default: all
         type: str
     filter:
         description:
             - This is the parameter used to filter only the specific information from the output like freespace, mountpoint, fstype, and so on.
         type: list
         elements: str
+        choices: ['freespace', 'usedspace', 'totalsize', 'mountpoint', 'fstype', 'capacity_percent']
 author:
     - Saranya Sridharan (@saranyasridharan)
     - Swetha M (@swetm)
@@ -63,15 +63,35 @@ EXAMPLES = '''
 
 
 RETURN = '''
-ansible_facts:
-    description: disk information only filtered parameter values if filter option is given.
+disk_info:
+    description: Retrieves disk info, if filter option is given retrieves only filtered values like freespace, totalsize and so on.
     returned: dictionary of disks informations
     type: dict
-    sample: {
-        '/dev/sda': {
-             'capacity_percentage': '2%'
-        }
-    }
+    contains:
+        totalsize:
+            description: Size in bytes of the particular disk.
+            type: int
+            sample: 499963174912
+        freespace:
+            description: Freespace in bytes of the particular disk.
+            type: int
+            sample: 351641169920
+        usedspace:
+            description: Usedspace in bytes of the particular disk.
+            type: int
+            sample: 11198701568
+        capacity_percentage:
+            description: Used capacity percentage of the particular disk.
+            type: float
+            sample: 3.1
+        fstype:
+            description: Filesystem of the particular disk.
+            type: str
+            sample: apfs
+        mountpoint:
+            description: Mountpoint of the particular disk.
+            type: str
+            sample: /
 '''
 
 
@@ -110,7 +130,7 @@ def disk_info(devicename):
         if partition.device == devicename:
             found = True
             break
-    if devicename == "all":
+    if devicename is None:
         return output
     if devicename in output:
         return {devicename: output[devicename]}
@@ -118,20 +138,17 @@ def disk_info(devicename):
 
 
 # To filter the required values from the output
-def filter_result(output, filtervalue):
+def filter_result(output, filter):
     filteroutput = {}
     for key in output:
-        filteroutput[key] = {}
-        for parameter, value in output[key].items():
-            if parameter in filtervalue:
-                filteroutput[key][parameter] = value
+        filteroutput[key] = {param: output[key][param] for param in filter}
     return filteroutput
 
 
 def main():
     module_args = dict(
-        name=dict(type='str', required=False, default="all"),
-        filter=dict(type='list', required=False, elements='str')
+        name=dict(type='str', required=False),
+        filter=dict(type='list', required=False, elements='str', choices=['freespace', 'usedspace', 'totalsize', 'mountpoint', 'fstype', 'capacity_percent'])
     )
 
     result = dict(
@@ -147,8 +164,9 @@ def main():
     # To handle 'psutil' not installed scenario
     if not HAS_PSUTIL:
         module.fail_json(msg=missing_required_lib('psutil'), exception=PSUTIL_IMP_ERR)
-
-    devicename = module.params['name'].lower()
+    devicename = None
+    if module.params['name']:
+        devicename = module.params['name'].lower()
     if module.params['filter']:
         filter = module.params['filter']
         filter = [value.lower() for value in filter]
@@ -159,7 +177,7 @@ def main():
 
     if filter:
         output = filter_result(output, filter)
-    result['ansible_facts'] = output
+    result['disk_info'] = output
     module.exit_json(**result)
 
 
