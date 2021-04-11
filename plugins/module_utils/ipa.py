@@ -119,9 +119,9 @@ class IPAClient(object):
         data = dict(method=method)
 
         # TODO: We should probably handle this a little better.
-        if method in ('ping', 'config_show'):
+        if method in ('ping', 'config_show', 'otpconfig_show'):
             data['params'] = [[], {}]
-        elif method == 'config_mod':
+        elif method in ('config_mod', 'otpconfig_mod'):
             data['params'] = [[], item]
         else:
             data['params'] = [[name], item]
