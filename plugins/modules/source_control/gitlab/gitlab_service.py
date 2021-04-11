@@ -315,19 +315,6 @@ SRV_DEF = {"asana": {"api_key": {"required": 1, "type": "str", "no_log": True}, 
            "youtrack": {"project_url": {"required": 1, "type": "str"}, "issues_url": {"required": 1, "type": "str"}}}
 
 
-def init_definitions():
-    for params in SRV_DEF.values():
-        for name, definition in params.items():
-            if 'type' in definition:
-                definition['type'] = bool if definition['type'] == 'bool' else \
-                    int if definition['type'] == 'int' else \
-                    str if definition['type'] == 'str' else \
-                    definition['type']
-            if name in GitLabServices.CREDENTIAL_PARAMS:
-                definition['no_log'] = True
-    return SRV_DEF
-
-
 class GitLabServices(object):
     HOOK_EVENTS = ['push', 'issues', 'confidential_issues', 'merge_requests', 'tag_push', 'note', 'confidential_note', 'job', 'pipeline', 'wiki_page']
     CREDENTIAL_PARAMS = ['password', 'token', 'api_key', 'webhook']
@@ -408,15 +395,13 @@ class GitLabServices(object):
 
 
 def main():
-    definitions = init_definitions()
-
     base_spec = basic_auth_argument_spec()
     base_spec.update(dict(
         api_token=dict(type='str', no_log=True),
         project=dict(required=True),
-        service=dict(required=True, type='str', choices=list(definitions.keys())),
+        service=dict(required=True, type='str', choices=list(SRV_DEF.keys())),
         # active=dict(required=False, default=True, type='bool'),
-        params=dict(required=False, type='dict'),
+        params=dict(required=False, type='dict', no_log=True),
         events=dict(required=False, type='list', elements='str', default=GitLabServices.HOOK_EVENTS, choices=GitLabServices.HOOK_EVENTS),
         state=dict(default='present', choices=['present', 'absent']),
     ))
@@ -443,10 +428,10 @@ def main():
     state = stub_init.params['state']
     if state == 'present':
         # since we know the service (which has been validated), recreate a module_specs to validate suboptions
-        sub_arg_specs = dict((k, v) for k, v in definitions[service].items() if k != '_events')
+        sub_arg_specs = dict((k, v) for k, v in SRV_DEF[service].items() if k != '_events')
         base_spec['params'] = dict(required=False, type='dict', options=sub_arg_specs)
-        if '_events' in definitions[service]:
-            base_spec['events'] = dict(required=True, type='list', elements='str', choices=definitions[service]['_events'])
+        if '_events' in SRV_DEF[service]:
+            base_spec['events'] = dict(required=True, type='list', elements='str', choices=SRV_DEF[service]['_events'])
         module = AnsibleModule(argument_spec=base_spec, **constraints)
     else:
         module = stub_init
