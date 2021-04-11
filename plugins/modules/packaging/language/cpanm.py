@@ -177,8 +177,8 @@ class CPANMinus(CmdMixin, ModuleHelper):
     check_rc = True
 
     def __init_module__(self):
-        if self.vars.behavior == "compatibility" and self.vars.name_check:
-            raise ModuleHelperException("Parameter name_check can only be used with behavior=new")
+        if self.vars.mode == "compatibility" and self.vars.name_check:
+            raise ModuleHelperException("Parameter name_check can only be used with mode=new")
 
     def _is_package_installed(self, name, locallib, version):
         if name is None or name.endswith('.tar.gz'):
@@ -186,8 +186,10 @@ class CPANMinus(CmdMixin, ModuleHelper):
 
         env = {"PERL5LIB": "%s/lib/perl5" % locallib} if locallib else {}
         cmd = ['perl', '-le', 'use %s %s;' % (name, version)]
-        res, stdout, stderr = self.module.run_command(cmd, check_rc=False, environ_update=env)
-        return res == 0
+        rc, out, err = self.module.run_command(cmd, check_rc=False, environ_update=env)
+        # raise Exception(f'aaa: rc={rc}, out={out}, err={err}')
+
+        return rc == 0
 
     def sanitize_pkg_spec_version(self, pkg_spec):
         v = self.module.params['version']
@@ -213,26 +215,32 @@ class CPANMinus(CmdMixin, ModuleHelper):
 
         pkg_param = 'from_path' if v.from_path else 'name'
 
-        if v.behavior == 'compatibility':
+        if v.mode == 'compatibility':
             if v.name_check:
-                raise ModuleHelperException("Parameter 'name_check' can only be used with 'behavior=new'")
+                raise ModuleHelperException("Parameter 'name_check' can only be used with 'mode=new'")
             installed = self._is_package_installed(v.name, v.locallib, v.version)
             if installed:
                 return
             pkg_spec = v[pkg_param]
+            self.changed = self.run_command(
+                params=['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', 'system_lib', {'name': pkg_spec}],
+            )
         else:
             if v.name and v.from_path:
-                raise ModuleHelperException("Parameters 'name' and 'from_path' are mutually exclusive when 'behavior=new'")
+                raise ModuleHelperException("Parameters 'name' and 'from_path' are mutually exclusive when 'mode=new'")
+            if v.system_lib:
+                raise ModuleHelperException("Parameter 'system_lib' is invalid when 'mode=new'")
 
             installed = self._is_package_installed(v.name_check, v.locallib, v.version) if v.name_check else False
             if installed:
                 return
             pkg_spec = self.sanitize_pkg_spec_version(v[pkg_param])
-
-        self.run_command(params=['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', 'system_lib', {'name': pkg_spec}])
+            self.changed = self.run_command(
+                params=['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', {'name': pkg_spec}],
+            )
 
     def process_command_output(self, rc, out, err):
-        self.changed = rc == 0 and 'is up to date' not in err and 'is up to date' not in out
+        return 'is up to date' not in err and 'is up to date' not in out
 
 
 def main():
