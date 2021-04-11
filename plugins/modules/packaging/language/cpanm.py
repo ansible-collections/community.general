@@ -13,17 +13,20 @@ DOCUMENTATION = '''
 module: cpanm
 short_description: Manages Perl library dependencies.
 description:
-  - Manage Perl library dependencies.
+  - Manage Perl library dependencies using cpanminus.
 options:
   name:
     type: str
     description:
-      - The name of the Perl library to install. You may use the "full distribution path", e.g.  MIYAGAWA/Plack-0.99_05.tar.gz
-    aliases: ["pkg"]
+      - The name of the Perl library to install.
+      - The name can be either a module name, distribution file, HTTP URL or git repository URL as described in C(cpanminus) documentation.
+      - Note that for local path installation you should use the parameter I(from_path).
+    aliases: [pkg]
   from_path:
     type: path
     description:
       - The local directory from where to install
+    aliases: [from_dir]
   notest:
     description:
       - Do not run unit tests
@@ -53,8 +56,11 @@ options:
     type: str
   system_lib:
     description:
-     -  Use this if you want to install modules to the system perl include path. You must be root or have "passwordless" sudo for this to work.
-     -  This uses the cpanm commandline option '--sudo', which has nothing to do with ansible privilege escalation.
+      - Use this if you want to install modules to the system perl include path. You must be root or have "passwordless" sudo for this to work.
+      - This uses the cpanm commandline option C(--sudo), which has nothing to do with ansible privilege escalation.
+      - >
+        This option is not recommended for use and it will be deprecated in the future. If you need to escalate privileges
+        please consider using any of the multiple mechanisms available in Ansible.
     type: bool
     default: no
     aliases: ['use_sudo']
@@ -63,7 +69,7 @@ options:
       - Override the path to the cpanm executable
     type: path
 notes:
-   - Please note that U(http://search.cpan.org/dist/App-cpanminus/bin/cpanm, cpanm) must be installed on the remote host.
+  - Please note that U(http://search.cpan.org/dist/App-cpanminus/bin/cpanm, cpanm) must be installed on the remote host.
 author: "Franck Cuny (@fcuny)"
 '''
 
@@ -109,21 +115,9 @@ EXAMPLES = '''
 
 import os
 
-from ansible.module_utils.basic import AnsibleModule
-
-
-def _is_package_installed(module, name, locallib, cpanm, version):
-    cmd = ""
-    if locallib:
-        os.environ["PERL5LIB"] = "%s/lib/perl5" % locallib
-    cmd = "%s perl -e ' use %s" % (cmd, name)
-    if version:
-        cmd = "%s %s;'" % (cmd, version)
-    else:
-        cmd = "%s;'" % cmd
-    res, stdout, stderr = module.run_command(cmd, check_rc=False)
-    return res == 0
-
+from ansible_collections.community.general.plugins.module_utils.module_helper import (
+    ModuleHelper, CmdMixin, ArgFormat, ModuleHelperException
+)
 
 def _build_cmd_line(name, from_path, notest, locallib, mirror, mirror_only, installdeps, cpanm, use_sudo):
     # this code should use "%s" like everything else and just return early but not fixing all of it now.
@@ -151,63 +145,71 @@ def _build_cmd_line(name, from_path, notest, locallib, mirror, mirror_only, inst
     if use_sudo is True:
         cmd = cmd + " --sudo"
 
-    return cmd
-
-
-def _get_cpanm_path(module):
-    if module.params['executable']:
-        result = module.params['executable']
-    else:
-        result = module.get_bin_path('cpanm', True)
-    return result
-
-
-def main():
-    arg_spec = dict(
-        name=dict(default=None, required=False, aliases=['pkg']),
-        from_path=dict(default=None, required=False, type='path'),
-        notest=dict(default=False, type='bool'),
-        locallib=dict(default=None, required=False, type='path'),
-        mirror=dict(default=None, required=False),
-        mirror_only=dict(default=False, type='bool'),
-        installdeps=dict(default=False, type='bool'),
-        system_lib=dict(default=False, type='bool', aliases=['use_sudo']),
-        version=dict(default=None, required=False),
-        executable=dict(required=False, type='path'),
+class CPANMinus(CmdMixin, ModuleHelper):
+    module = dict(
+        argument_spec=dict(
+            name=dict(type='str', aliases=['pkg']),
+            version=dict(type='str'),
+            from_path=dict(type='path', aliases=['from_dir']),
+            notest=dict(default=False, type='bool'),
+            locallib=dict(type='path'),
+            mirror=dict(type='str'),
+            mirror_only=dict(default=False, type='bool'),
+            installdeps=dict(type='bool', default=False),
+            system_lib=dict(type='bool', default=False, aliases=['use_sudo']),
+            executable=dict(type='path'),
+        ),
+        required_one_of=[('name', 'from_path')],
     )
-
-    module = AnsibleModule(
-        argument_spec=arg_spec,
-        required_one_of=[['name', 'from_path']],
+    command = 'cpanm'
+    command_args_formats = dict(
+        notest=dict(fmt="--notest", style=ArgFormat.BOOLEAN),
+        locallib=dict(fmt=('--local-lib', '{0}'),),
+        mirror=dict(fmt=('--mirror', '{0}'),),
+        mirror_only=dict(fmt="--mirror-only", style=ArgFormat.BOOLEAN),
+        installdeps=dict(fmt="--installdeps", style=ArgFormat.BOOLEAN),
+        system_lib=dict(fmt="--sudo", style=ArgFormat.BOOLEAN),
     )
+    check_rc = True
 
-    cpanm = _get_cpanm_path(module)
-    name = module.params['name']
-    from_path = module.params['from_path']
-    notest = module.boolean(module.params.get('notest', False))
-    locallib = module.params['locallib']
-    mirror = module.params['mirror']
-    mirror_only = module.params['mirror_only']
-    installdeps = module.params['installdeps']
-    use_sudo = module.params['system_lib']
-    version = module.params['version']
+    def sanitize_pkg_spec_version(self, pkg_spec):
+        v = self.module.params['version']
+        if v is None:
+            return pkg_spec
+        if pkg_spec.endswith('.tar.gz'):
+            raise ModuleHelperException(msg="parameter 'version' must not be used when installing from a file")
+        if os.path.isdir(pkg_spec):
+            raise ModuleHelperException(msg="parameter 'version' must not be used when installing from a directory")
+        if pkg_spec.endswith('.git'):
+            if v.startswith('~'):
+                raise ModuleHelperException(msg="operator '~' not allowed in version parameter when installing from git repository")
+            v = v if v.startswith('@') else '@' + v
+        elif v[0] not in ('@', '~'):
+            v = '~' + v
+        return pkg_spec + v
 
-    changed = False
+    def __run__(self):
+        p = self.module.params
 
-    installed = _is_package_installed(module, name, locallib, cpanm, version)
+        if p['executable']:
+            self.command = p['executable']
+        self.vars.binary = self.command
+        self.vars.name = p['name']
 
-    if not installed:
-        cmd = _build_cmd_line(name, from_path, notest, locallib, mirror, mirror_only, installdeps, cpanm, use_sudo)
+        pkg_param = 'from_path' if p['from_path'] else 'name'
+        pkg_spec = self.sanitize_pkg_spec_version(p[pkg_param])
 
-        rc_cpanm, out_cpanm, err_cpanm = module.run_command(cmd, check_rc=False)
+        self.run_command(params=['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', 'system_lib', {'name': pkg_spec}])
 
-        if rc_cpanm != 0:
-            module.fail_json(msg=err_cpanm, cmd=cmd)
+    def process_command_output(self, rc, out, err):
+        self.changed = 'is up to date' not in err and 'is up to date' not in out
 
         if (err_cpanm.find('is up to date') == -1 and out_cpanm.find('is up to date') == -1):
             changed = True
 
-    module.exit_json(changed=changed, binary=cpanm, name=name)
+def main():
+    cpanm = CPANMinus()
+    cpanm.run()
 
 
 if __name__ == '__main__':
