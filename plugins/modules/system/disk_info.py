@@ -21,11 +21,12 @@ requirements:
 options:
     name:
         description:
-            - This is the disk name to query, if this parameter is not passed, it queries all the disk information.
+           - This is the disk device name to query.
+           - If this parameter is not passed, information on all disks are returned.
         type: str
     filter:
         description:
-            - This is the parameter used to filter only the specific information from the output like freespace, mountpoint, fstype, and so on.
+           - When specified, will limit the information returned to the keys specified here.
         type: list
         elements: str
         choices: ['freespace', 'usedspace', 'totalsize', 'mountpoint', 'fstype', 'capacity_percent']
@@ -43,11 +44,11 @@ EXAMPLES = '''
 
 - name: Get Disk info for Particular disk info
   community.general.disk_info:
-    name: diskname
+    name: /dev/sda
 
 - name: Filter the output parameters for specific disk
   community.general.disk_info:
-    name: diskname
+    name: /dev/md0
     filter:
       - mountpoint
       - freespace
@@ -65,31 +66,37 @@ EXAMPLES = '''
 RETURN = '''
 disk_info:
     description: Retrieves disk info, if filter option is given retrieves only filtered values like freespace, totalsize and so on.
-    returned: dictionary of disks informations
+    returned: success
     type: dict
     contains:
         totalsize:
             description: Size in bytes of the particular disk.
+            returned: when I(filter) is not specified, or when I(filter) contains C(totalsize)
             type: int
             sample: 499963174912
         freespace:
-            description: Freespace in bytes of the particular disk.
+            description: Free space in bytes of the particular disk.
+            returned: when I(filter) is not specified, or when I(filter) contains C(freespace)
             type: int
             sample: 351641169920
         usedspace:
-            description: Usedspace in bytes of the particular disk.
+            description: Used space in bytes of the particular disk.
+            returned: when I(filter) is not specified, or when I(filter) contains C(usedspace)
             type: int
             sample: 11198701568
         capacity_percentage:
             description: Used capacity percentage of the particular disk.
+            returned: when I(filter) is not specified, or when I(filter) contains C(capacity_percentage)
             type: float
             sample: 3.1
         fstype:
             description: Filesystem of the particular disk.
+            returned: when I(filter) is not specified, or when I(filter) contains C(fstype)
             type: str
             sample: apfs
         mountpoint:
             description: Mountpoint of the particular disk.
+            returned: when I(filter) is not specified, or when I(filter) contains C(mountpoint)
             type: str
             sample: /
 '''
@@ -110,9 +117,8 @@ except ImportError:
 def disk_info(devicename):
     output = {}
     partitions = psutil.disk_partitions()
-    found = False
     for partition in partitions:
-        if not partition.device.startswith("/dev/"):
+        if devicename is not None and partition.device != devicename:
             continue
         output[partition.device] = {}
         output[partition.device]['mountpoint'] = partition.mountpoint
@@ -127,9 +133,6 @@ def disk_info(devicename):
         output[partition.device]['usedspace'] = partition_usage.used
         output[partition.device]['freespace'] = partition_usage.free
         output[partition.device]['capacity_percentage'] = partition_usage.percent
-        if partition.device == devicename:
-            found = True
-            break
     if devicename is None:
         return output
     if devicename in output:

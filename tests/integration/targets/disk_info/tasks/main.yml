@@ -13,7 +13,7 @@
     extra_args: "-c {{ remote_constraints }}"
 
 - name: "Checking the information from df command"
-  shell:  "df -h | grep '^/dev/' | awk '{ print $1 }'"
+  shell:  "df -h | grep '^/' | awk '{ print $1 }'"
   register: result_df
 
 - name: "Checking the all disk info"
