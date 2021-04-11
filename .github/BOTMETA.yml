@@ -549,7 +549,7 @@ files:
   $modules/packaging/language/composer.py:
     maintainers: dmtrs resmo
   $modules/packaging/language/cpanm.py:
-    maintainers: fcuny
+    maintainers: fcuny russoz
   $modules/packaging/language/easy_install.py:
     maintainers: mattupstate
   $modules/packaging/language/gem.py:
