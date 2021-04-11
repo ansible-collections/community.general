@@ -141,7 +141,7 @@ def disk_info(devicename):
 def filter_result(output, filter):
     filteroutput = {}
     for key in output:
-        filteroutput[key] = {param: output[key][param] for param in filter}
+        filteroutput[key] = dict((param, output[key][param]) for param in filter)
     return filteroutput
 
 

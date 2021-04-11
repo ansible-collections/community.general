@@ -28,7 +28,7 @@
 - name: "Obtaining all disk info check"
   assert:
     that:
-      - "{{ result_df.stdout_lines | unique | length }} == {{ result_all_disk['disk_info'].keys() | length }}"
+      - "result_df.stdout_lines | unique | length == result_all_disk['disk_info'].keys() | length"
     success_msg: "Check for obtaining all disk info passed"
     fail_msg: "Check for obtaining all disk info failed"
 

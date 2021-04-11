@@ -44,7 +44,6 @@ botocore >= 1.10.0 ; python_version >= '2.7' # adds support for the following AW
 setuptools < 45 ; python_version <= '2.7' # setuptools 45 and later require python 3.5 or later
 cffi >= 1.14.2, != 1.14.3 # Yanked version which older versions of pip will still install:
 psutil < 5.7.0 ; python_version < '3' # Version 5.7.0 breaks on python 2.x. See https://github.com/ansible/ansible/pull/70667
-psutil ; python_version >= '3' # Latest psutil version or version 5.7.0 does not breaks on python 3.x. See https://github.com/ansible/ansible/pull/70667
 
 # freeze pylint and its requirements for consistent test results
 astroid == 2.2.5
