@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # (c) 2012, Franck Cuny <franck@lumberjaph.net>
+# (c) 2021, Alexei Znamensky <russoz@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -18,15 +19,13 @@ options:
   name:
     type: str
     description:
-      - The name of the Perl library to install.
-      - The name can be either a module name, distribution file, HTTP URL or git repository URL as described in C(cpanminus) documentation.
+      - The Perl library to install. Valid values change according to the I(mode), see notes for more details.
       - Note that for local path installation you should use the parameter I(from_path).
     aliases: [pkg]
   from_path:
     type: path
     description:
       - The local directory from where to install
-    aliases: [from_dir]
   notest:
     description:
       - Do not run unit tests
@@ -52,7 +51,7 @@ options:
     default: no
   version:
     description:
-      - minimum version of perl module to consider acceptable
+      - Version specification for the perl module. When I(mode) is (C(new), C(cpanm) version operators are accepted.
     type: str
   system_lib:
     description:
@@ -68,9 +67,36 @@ options:
     description:
       - Override the path to the cpanm executable
     type: path
+  mode:
+    description:
+      - Controls the module behavior. See notes below for more details.
+    type: str
+    choices: [compatibility, new]
+    default: compatibility
+  name_check:
+    description:
+      - When in C(new) mode, this parameter can be used to check if there is a module I(name) installed (at I(version), when specified).
+    type: str
 notes:
   - Please note that U(http://search.cpan.org/dist/App-cpanminus/bin/cpanm, cpanm) must be installed on the remote host.
-author: "Franck Cuny (@fcuny)"
+  - "This module now comes with a choice of execution I(mode): C(compatibility) or C(new)."
+  - "C(compatibility) mode:"
+  - When using C(compatibility) mode, the module will keep backward compatibility. This is the default mode.
+  - I(name) must be either a module name or a distribution file.
+  - >
+    If the perl module given by I(name) is installed (at the exact I(version) when specified), then nothing happens.
+    Otherwise, it will be installed using the C(cpanm) executable.
+  - I(name) cannot be an URL, or a git URL.
+  - C(cpanm) version specifiers do not work in this mode.
+  - "C(new) mode:"
+  - "When using C(new) mode, the module will behave differently"
+  - >
+    The I(name) parameter may refer to a module name, a distribution file,
+    a HTTP URL or a git repository URL as described in C(cpanminus) documentation.
+  - C(cpanm) version specifiers are recognized.
+author:
+  - "Franck Cuny (@fcuny)"
+  - "Alexei Znamensky (@russoz)"
 '''
 
 EXAMPLES = '''
@@ -119,38 +145,13 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
     ModuleHelper, CmdMixin, ArgFormat, ModuleHelperException
 )
 
-def _build_cmd_line(name, from_path, notest, locallib, mirror, mirror_only, installdeps, cpanm, use_sudo):
-    # this code should use "%s" like everything else and just return early but not fixing all of it now.
-    # don't copy stuff like this
-    if from_path:
-        cmd = cpanm + " " + from_path
-    else:
-        cmd = cpanm + " " + name
-
-    if notest is True:
-        cmd = cmd + " -n"
-
-    if locallib is not None:
-        cmd = cmd + " -l " + locallib
-
-    if mirror is not None:
-        cmd = cmd + " --mirror " + mirror
-
-    if mirror_only is True:
-        cmd = cmd + " --mirror-only"
-
-    if installdeps is True:
-        cmd = cmd + " --installdeps"
-
-    if use_sudo is True:
-        cmd = cmd + " --sudo"
 
 class CPANMinus(CmdMixin, ModuleHelper):
     module = dict(
         argument_spec=dict(
             name=dict(type='str', aliases=['pkg']),
             version=dict(type='str'),
-            from_path=dict(type='path', aliases=['from_dir']),
+            from_path=dict(type='path'),
             notest=dict(default=False, type='bool'),
             locallib=dict(type='path'),
             mirror=dict(type='str'),
@@ -158,8 +159,11 @@ class CPANMinus(CmdMixin, ModuleHelper):
             installdeps=dict(type='bool', default=False),
             system_lib=dict(type='bool', default=False, aliases=['use_sudo']),
             executable=dict(type='path'),
+            mode=dict(type='str', choices=['compatibility', 'new'], default='compatibility'),
+            name_check=dict(type='str')
         ),
         required_one_of=[('name', 'from_path')],
+
     )
     command = 'cpanm'
     command_args_formats = dict(
@@ -171,6 +175,19 @@ class CPANMinus(CmdMixin, ModuleHelper):
         system_lib=dict(fmt="--sudo", style=ArgFormat.BOOLEAN),
     )
     check_rc = True
+
+    def __init_module__(self):
+        if self.vars.behavior == "compatibility" and self.vars.name_check:
+            raise ModuleHelperException("Parameter name_check can only be used with behavior=new")
+
+    def _is_package_installed(self, name, locallib, version):
+        if name is None or name.endswith('.tar.gz'):
+            return False
+
+        env = {"PERL5LIB": "%s/lib/perl5" % locallib} if locallib else {}
+        cmd = ['perl', '-le', 'use %s %s;' % (name, version)]
+        res, stdout, stderr = self.module.run_command(cmd, check_rc=False, environ_update=env)
+        return res == 0
 
     def sanitize_pkg_spec_version(self, pkg_spec):
         v = self.module.params['version']
@@ -189,23 +206,34 @@ class CPANMinus(CmdMixin, ModuleHelper):
         return pkg_spec + v
 
     def __run__(self):
-        p = self.module.params
+        v = self.vars
 
-        if p['executable']:
-            self.command = p['executable']
-        self.vars.binary = self.command
-        self.vars.name = p['name']
+        if v.executable:
+            self.command = v.executable
 
-        pkg_param = 'from_path' if p['from_path'] else 'name'
-        pkg_spec = self.sanitize_pkg_spec_version(p[pkg_param])
+        pkg_param = 'from_path' if v.from_path else 'name'
+
+        if v.behavior == 'compatibility':
+            if v.name_check:
+                raise ModuleHelperException("Parameter 'name_check' can only be used with 'behavior=new'")
+            installed = self._is_package_installed(v.name, v.locallib, v.version)
+            if installed:
+                return
+            pkg_spec = v[pkg_param]
+        else:
+            if v.name and v.from_path:
+                raise ModuleHelperException("Parameters 'name' and 'from_path' are mutually exclusive when 'behavior=new'")
+
+            installed = self._is_package_installed(v.name_check, v.locallib, v.version) if v.name_check else False
+            if installed:
+                return
+            pkg_spec = self.sanitize_pkg_spec_version(v[pkg_param])
 
         self.run_command(params=['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', 'system_lib', {'name': pkg_spec}])
 
     def process_command_output(self, rc, out, err):
-        self.changed = 'is up to date' not in err and 'is up to date' not in out
+        self.changed = rc == 0 and 'is up to date' not in err and 'is up to date' not in out
 
-        if (err_cpanm.find('is up to date') == -1 and out_cpanm.find('is up to date') == -1):
-            changed = True
 
 def main():
     cpanm = CPANMinus()

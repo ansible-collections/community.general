@@ -1,20 +1,41 @@
 # (c) 2020, Berkhan Berkdemir
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-- name: Instal make, curl and perl
-  package:
-    name:
-      - make
-      - curl
-      - perl
-    state: present
-  become: yes
+#- name: Install make and perl
+#  package:
+#    name:
+#      - make
+#      - perl
+#    state: present
+#  become: yes
 
 - name: Install perl development package for Red Hat family
   package:
-    name: perl-devel
+    name:
+      - perl-devel
+      - perl-App-cpanminus
     state: present
+  become: yes
   when: ansible_os_family == "RedHat"
+
+- name: Install perl development package for Debian family
+  package:
+    name:
+      - cpanminus
+    state: present
+  become: yes
+  when: ansible_os_family == "Debian"
+
+- name: Install a Perl package
+  cpanm:
+    name: JSON
+    notest: yes
+  register: install_perl_package_result
+  ignore_errors: yes
+
+- assert:
+    that:
+      - install_perl_package_result is changed
 
 - name: Install a Perl package
   cpanm:
@@ -24,9 +45,6 @@
   register: install_perl_package_result
   ignore_errors: yes
 
-- debug:
-    msg: "{{ install_perl_package_result }}"
-
 - assert:
     that:
-      - install_perl_package_result.changed == true
+      - install_perl_package_result is changed
