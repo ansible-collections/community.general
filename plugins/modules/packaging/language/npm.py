@@ -82,6 +82,12 @@ options:
     type: bool
     default: no
     version_added: 2.0.0
+  no_bin_links:
+    description:
+      - Use the C(--no-bin-links) flag when installing.
+    type: bool
+    default: no
+    version_added: 2.5.0
 requirements:
     - npm installed in bin path (recommended /usr/local/bin)
 '''
@@ -151,6 +157,7 @@ class Npm(object):
         self.unsafe_perm = kwargs['unsafe_perm']
         self.state = kwargs['state']
         self.no_optional = kwargs['no_optional']
+        self.no_bin_links = kwargs['no_bin_links']
 
         if kwargs['executable']:
             self.executable = kwargs['executable'].split(' ')
@@ -181,6 +188,8 @@ class Npm(object):
                 cmd.append(self.registry)
             if self.no_optional:
                 cmd.append('--no-optional')
+            if self.no_bin_links:
+                cmd.append('--no-bin-links')
 
             # If path is specified, cd into that path and run the command.
             cwd = None
@@ -259,6 +268,7 @@ def main():
         unsafe_perm=dict(default=False, type='bool'),
         ci=dict(default=False, type='bool'),
         no_optional=dict(default=False, type='bool'),
+        no_bin_links=dict(default=False, type='bool'),
     )
     arg_spec['global'] = dict(default=False, type='bool')
     module = AnsibleModule(
@@ -278,6 +288,7 @@ def main():
     unsafe_perm = module.params['unsafe_perm']
     ci = module.params['ci']
     no_optional = module.params['no_optional']
+    no_bin_links = module.params['no_bin_links']
 
     if not path and not glbl:
         module.fail_json(msg='path must be specified when not using global')
@@ -286,7 +297,7 @@ def main():
 
     npm = Npm(module, name=name, path=path, version=version, glbl=glbl, production=production,
               executable=executable, registry=registry, ignore_scripts=ignore_scripts,
-              unsafe_perm=unsafe_perm, state=state, no_optional=no_optional)
+              unsafe_perm=unsafe_perm, state=state, no_optional=no_optional, no_bin_links=no_bin_links)
 
     changed = False
     if ci:
