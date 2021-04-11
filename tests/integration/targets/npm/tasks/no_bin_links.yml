@@ -1,0 +1,64 @@
+---
+- name: 'Remove any node modules'
+  file:
+    path: '{{ remote_dir }}/node_modules'
+    state: absent
+
+- vars:
+    # sample: node-v8.2.0-linux-x64.tar.xz
+    node_path: '{{ remote_dir }}/{{ nodejs_path }}/bin'
+    package: 'ncp'
+  block:
+    - shell: npm --version
+      environment:
+        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
+      register: npm_version
+
+    - debug:
+        var: npm_version.stdout
+
+    - name: 'Install simple package with no_bin_links disabled'
+      npm:
+        path: '{{ remote_dir }}'
+        executable: '{{ node_path }}/npm'
+        state: present
+        name: '{{ package }}'
+        no_bin_links: false
+      environment:
+        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
+      register: npm_install_no_bin_links_disabled
+
+    - name: 'Make sure .bin folder has been created'
+      stat:
+        path: "{{ remote_dir }}/node_modules/.bin"
+      register: npm_dotbin_folder_disabled
+
+    - name: 'Remove any node modules'
+      file:
+        path: '{{ remote_dir }}/node_modules'
+        state: absent
+
+    - name: 'Install simple package with no_bin_links enabled'
+      npm:
+        path: '{{ remote_dir }}'
+        executable: '{{ node_path }}/npm'
+        state: present
+        name: '{{ package }}'
+        no_bin_links: true
+      environment:
+        PATH: '{{ node_path }}:{{ ansible_env.PATH }}'
+      register: npm_install_no_bin_links_enabled
+
+    - name: 'Make sure .bin folder has not been created'
+      stat:
+        path: "{{ remote_dir }}/node_modules/.bin"
+      register: npm_dotbin_folder_enabled
+
+    - assert:
+        that:
+          - npm_install_no_bin_links_disabled is success
+          - npm_install_no_bin_links_disabled is changed
+          - npm_install_no_bin_links_enabled is success
+          - npm_install_no_bin_links_enabled is changed
+          - npm_dotbin_folder_disabled.stat.exists
+          - not npm_dotbin_folder_enabled.stat.exists
