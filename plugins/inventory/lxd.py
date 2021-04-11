@@ -45,7 +45,7 @@ DOCUMENTATION = r'''
             - The client trusted password.
             - You need to set this password on the lxd server before
                 running this module using the following command
-                C('lxc config set core.trust_password <some random password>')
+                C(lxc config set core.trust_password <some random password>)
                 See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).
             - If I(trust_password) is set, this module send a request for authentication before sending any requests.
             required: false
@@ -73,7 +73,7 @@ DOCUMENTATION = r'''
             choices: [ 'inet', 'inet6' ]
         groups:
             description:
-            - Create Groups by the following keywords location, pattern, network_range, os, release, profile, vlanid.
+            - Create groups by the following keywords C(location), C(pattern), C(network_range), C(os), C(release), C(profile), C(vlanid).
             - See example for syntax.
             required: false
             type: json

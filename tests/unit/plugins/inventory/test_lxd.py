@@ -41,7 +41,7 @@ def inventory():
     inv.inventory = InventoryData()
 
     # Test Values
-    inv.data = inv.load_json_data('tests/integration/targets/inventory_lxd/fixtures/lxd_inventory.atd')  # Load Test Data
+    inv.data = inv.load_json_data('tests/unit/plugins/inventory/fixtures/lxd_inventory.atd')  # Load Test Data
     inv.groups = GROUP_Config
     inv.prefered_container_network_interface = 'eth'
     inv.prefered_container_network_family = 'inet'
