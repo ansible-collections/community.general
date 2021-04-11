@@ -27,7 +27,7 @@ def patch_cpanm(mocker):
 
 TEST_CASES = [
     [
-        {'name': 'Dancer'},
+        {'name': 'Dancer', 'mode': 'new'},
         {
             'id': 'test_install_dancer',
             'run_command.calls': [(
@@ -39,7 +39,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'name': 'MIYAGAWA/Plack-0.99_05.tar.gz'},
+        {'name': 'MIYAGAWA/Plack-0.99_05.tar.gz', 'mode': 'new'},
         {
             'id': 'test_install_distribution_file',
             'run_command.calls': [(
@@ -51,7 +51,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'name': 'Dancer', 'locallib': '/srv/webapps/my_app/extlib'},
+        {'name': 'Dancer', 'locallib': '/srv/webapps/my_app/extlib', 'mode': 'new'},
         {
             'id': 'test_install_into_locallib',
             'run_command.calls': [(
@@ -63,7 +63,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'from_path': '/srv/webapps/my_app/src/'},
+        {'from_path': '/srv/webapps/my_app/src/', 'mode': 'new'},
         {
             'id': 'test_install_from_local_directory',
             'run_command.calls': [(
@@ -75,7 +75,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'name': 'Dancer', 'locallib': '/srv/webapps/my_app/extlib', 'notest': True},
+        {'name': 'Dancer', 'locallib': '/srv/webapps/my_app/extlib', 'notest': True, 'mode': 'new'},
         {
             'id': 'test_install_into_locallib_no_unit_testing',
             'run_command.calls': [(
@@ -87,7 +87,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'name': 'Dancer', 'mirror': 'http://cpan.cpantesters.org/'},
+        {'name': 'Dancer', 'mirror': 'http://cpan.cpantesters.org/', 'mode': 'new'},
         {
             'id': 'test_install_from_mirror',
             'run_command.calls': [(
@@ -99,19 +99,16 @@ TEST_CASES = [
         }
     ],
     [
-        {'name': 'Dancer', 'system_lib': True},
+        {'name': 'Dancer', 'system_lib': True, 'mode': 'new'},
         {
             'id': 'test_install_into_system_lib',
-            'run_command.calls': [(
-                ['/testbin/cpanm', '--sudo', 'Dancer'],
-                {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
-                (0, '', '',),  # output rc, out, err
-            )],
-            'changed': True,
+            'run_command.calls': [],
+            'changed': False,
+            'failed': True,
         }
     ],
     [
-        {'name': 'Dancer', 'version': '1.0'},
+        {'name': 'Dancer', 'version': '1.0', 'mode': 'new'},
         {
             'id': 'test_install_minversion_implicit',
             'run_command.calls': [(
@@ -123,7 +120,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'name': 'Dancer', 'version': '~1.5'},
+        {'name': 'Dancer', 'version': '~1.5', 'mode': 'new'},
         {
             'id': 'test_install_minversion_explicit',
             'run_command.calls': [(
@@ -135,7 +132,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'name': 'Dancer', 'version': '@1.7'},
+        {'name': 'Dancer', 'version': '@1.7', 'mode': 'new'},
         {
             'id': 'test_install_specific_version',
             'run_command.calls': [(
@@ -148,7 +145,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'name': 'MIYAGAWA/Plack-0.99_05.tar.gz', 'version': '@1.7'},
+        {'name': 'MIYAGAWA/Plack-0.99_05.tar.gz', 'version': '@1.7', 'mode': 'new'},
         {
             'id': 'test_install_specific_version_from_file_error',
             'run_command.calls': [],
@@ -158,7 +155,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'from_path': '~/', 'version': '@1.7'},
+        {'from_path': '~/', 'version': '@1.7', 'mode': 'new'},
         {
             'id': 'test_install_specific_version_from_directory_error',
             'run_command.calls': [],
@@ -168,7 +165,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'name': 'git://github.com/plack/Plack.git', 'version': '@1.7'},
+        {'name': 'git://github.com/plack/Plack.git', 'version': '@1.7', 'mode': 'new'},
         {
             'id': 'test_install_specific_version_from_git_url_explicit',
             'run_command.calls': [(
@@ -181,7 +178,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'name': 'git://github.com/plack/Plack.git', 'version': '2.5'},
+        {'name': 'git://github.com/plack/Plack.git', 'version': '2.5', 'mode': 'new'},
         {
             'id': 'test_install_specific_version_from_git_url_implicit',
             'run_command.calls': [(
@@ -194,7 +191,7 @@ TEST_CASES = [
         }
     ],
     [
-        {'name': 'git://github.com/plack/Plack.git', 'version': '~2.5'},
+        {'name': 'git://github.com/plack/Plack.git', 'version': '~2.5', 'mode': 'new'},
         {
             'id': 'test_install_version_operator_from_git_url_error',
             'run_command.calls': [],
@@ -229,14 +226,7 @@ def test_cpanm(mocker, capfd, patch_cpanm, testcase):
 
     out, err = capfd.readouterr()
     results = json.loads(out)
-    print("testcase =\n%s" % testcase)
     print("results =\n%s" % results)
-
-    assert results.get('changed', False) == testcase['changed']
-    if 'failed' in testcase:
-        assert results.get('failed', False) == testcase['failed']
-    if 'msg' in testcase:
-        assert results.get('msg', '') == testcase['msg']
 
     assert mock_run_command.call_count == len(testcase['run_command.calls'])
     if mock_run_command.call_count:
@@ -245,3 +235,9 @@ def test_cpanm(mocker, capfd, patch_cpanm, testcase):
         print("call args list =\n%s" % call_args_list)
         print("expected args list =\n%s" % expected_call_args_list)
         assert call_args_list == expected_call_args_list
+
+    assert results.get('changed', False) == testcase['changed']
+    if 'failed' in testcase:
+        assert results.get('failed', False) == testcase['failed']
+    if 'msg' in testcase:
+        assert results.get('msg', '') == testcase['msg']
