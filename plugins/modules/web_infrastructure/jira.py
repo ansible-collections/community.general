@@ -172,21 +172,19 @@ options:
       filename:
         required: true
         type: path
-        description: >
-          The path to the file to upload (from the remote node) or, if I(content) is specified,
-          the filename to use for the attachment
+        description:
+          - The path to the file to upload (from the remote node) or, if I(content) is specified,
+            the filename to use for the attachment
       content:
-        required: false
         type: str
-        description: >
-          The Base64 encoded contents of the file to attach. If not specified, the contents of I(filename) will be
-          used instead.
+        description:
+          - The Base64 encoded contents of the file to attach. If not specified, the contents of I(filename) will be
+            used instead.
       mimetype:
-        required: false
         type: str
-        description: >
-          The MIME type to supply for the upload. If not specified, best-effort detection will be
-          done.
+        description:
+          - The MIME type to supply for the upload. If not specified, best-effort detection will be
+            done.
 
 notes:
   - "Currently this only works with basic-auth."
@@ -623,10 +621,10 @@ def main():
     global module
     module = AnsibleModule(
         argument_spec=dict(
-            attachment=dict(type='dict', default=None, options=dict(
-                content=dict(type='str', default=None),
+            attachment=dict(type='dict', options=dict(
+                content=dict(type='str'),
                 filename=dict(type='path', required=True),
-                mimetype=dict(type='str', default=None)
+                mimetype=dict(type='str')
             )),
             uri=dict(type='str', required=True),
             operation=dict(type='str', choices=['attach', 'create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search'],
