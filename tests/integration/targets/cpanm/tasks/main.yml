@@ -37,7 +37,6 @@
     notest: yes
     mode: new
   register: install_perl_package_with_version_op_result
-  ignore_errors: yes
 
 - name: assert package with version operator is installed
   assert:
