@@ -224,6 +224,29 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             except Exception:
                 return None
 
+    def _get_agent_network_interfaces(self, node, vmid, vmtype):
+        result = []
+
+        try:
+            ifaces = self._get_json(
+                "%s/api2/json/nodes/%s/%s/%s/agent/network-get-interfaces" % (
+                    self.proxmox_url, node, vmtype, vmid
+                )
+            )['result']
+
+            for iface in ifaces:
+                result.append({
+                    'name': iface['name'],
+                    'mac-address': iface['hardware-address'],
+                    'ip-addresses': [
+                        "%s/%s" % (ip['ip-address'], ip['prefix']) for ip in iface['ip-addresses']
+                    ]
+                })
+        except requests.HTTPError:
+            pass
+
+        return result
+
     def _get_vm_config(self, node, vmid, vmtype, name):
         ret = self._get_json("%s/api2/json/nodes/%s/%s/%s/config" % (self.proxmox_url, node, vmtype, vmid))
 
@@ -257,6 +280,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     parsed_key = self.to_safe('%s%s' % (key, "_parsed"))
                     parsed_value = [tag.strip() for tag in value.split(",")]
                     self.inventory.set_variable(name, parsed_key, parsed_value)
+
+                if config == 'agent' and int(value):
+                    agent_iface_key = self.to_safe('%s%s' % (key, "_interfaces"))
+                    agent_iface_value = self._get_agent_network_interfaces(node, vmid, vmtype)
+                    if agent_iface_value:
+                        self.inventory.set_variable(name, agent_iface_key, agent_iface_value)
 
                 if not (isinstance(value, int) or ',' not in value):
                     # split off strings with commas to a dict
