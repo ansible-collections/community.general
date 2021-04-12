@@ -116,7 +116,7 @@ except ImportError:
 # To get the disk partitions information
 def disk_info(devicename):
     output = {}
-    partitions = psutil.disk_partitions()
+    partitions = psutil.disk_partitions(all=False)
     for partition in partitions:
         if devicename is not None and partition.device != devicename:
             continue
