@@ -1,5 +1,7 @@
 automerge: true
 files:
+  plugins/:
+    supershipit: aminvakil russoz
   changelogs/fragments/:
     support: community
   $actions:
