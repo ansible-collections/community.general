@@ -210,7 +210,7 @@ options:
         default: 300
     mac:
         description:
-            - This is only used with bridge - MAC address of the bridge.
+            - MAC address of the connection.
             - Note this requires a recent kernel feature, originally introduced in 3.15 upstream kernel.
         type: str
     slavepriority:
@@ -714,7 +714,7 @@ class Nmcli(object):
             })
 
         # Layer 2 options.
-        if self.mac_conn_type:
+        if self.mac:
             options.update({self.mac_setting: self.mac})
 
         if self.mtu_conn_type:
@@ -809,10 +809,6 @@ class Nmcli(object):
             'team',
             'vlan',
         )
-
-    @property
-    def mac_conn_type(self):
-        return self.type == 'bridge'
 
     @property
     def mac_setting(self):
