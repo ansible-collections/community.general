@@ -23,7 +23,6 @@
     name: JSON
     notest: yes
   register: install_perl_package_result
-  ignore_errors: yes
 
 - name: assert package is installed
   assert:
