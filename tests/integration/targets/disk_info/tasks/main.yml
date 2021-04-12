@@ -13,7 +13,7 @@
     extra_args: "-c {{ remote_constraints }}"
 
 - name: "Checking the information from df command"
-  shell:  "df -h | awk 'NR >=2 { print $1 }'"
+  shell:  "df -h | grep '^/' | awk '{ print $1 }'"
   register: result_df
 
 - name: "Checking the all disk info"
@@ -36,7 +36,7 @@
 - name: "Obtaining all disk info check"
   assert:
     that:
-      - "'{{ item }}' in {{ result_df.stdout_lines }}"
+      - "{{ item in result_df.stdout_lines }}"
     success_msg: "Check for obtaining all disk info passed"
     fail_msg: "Check for obtaining all disk info failed"
   with_items: "{{ result_all_disk['disk_info'].keys() }}"
