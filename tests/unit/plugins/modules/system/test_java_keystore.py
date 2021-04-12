@@ -80,8 +80,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
                      "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
                      "-deststorepass:env", "STOREPASS", "-srcstorepass:env", "STOREPASS", "-noprompt"],
                 msg='',
-                rc=0,
-                stdout_lines=''
+                rc=0
             )
 
     def test_create_jks_keypass_fail_export_pkcs12(self):
@@ -237,7 +236,7 @@ class TestCertChanged(ModuleTestCase):
             result = cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
             self.assertTrue(result, 'Fingerprint mismatch')
 
-    def test_cert_changed_alias_does_not_exist(self):
+    def test_cert_changed_fail_alias_does_not_exist(self):
         set_module_args(dict(
             certificate='cert-foo',
             private_key='private-foo',
@@ -251,12 +250,19 @@ class TestCertChanged(ModuleTestCase):
             supports_check_mode=self.spec.supports_check_mode
         )
 
+        module.fail_json = Mock()
+
         with patch('os.remove', return_value=True):
             self.create_file.side_effect = ['/tmp/placeholder']
             self.run_commands.side_effect = [(0, 'foo=abcd:1234:efgh', ''),
                                              (1, 'keytool error: java.lang.Exception: Alias <foo> does not exist', '')]
-            result = cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
-            self.assertTrue(result, 'Certificate does not exist')
+            cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
+            module.fail_json.assert_called_once_with(
+                cmd=["keytool", "-list", "-alias", "foo", "-keystore", "/path/to/keystore.jks", "-storepass:env", "STOREPASS", "-v"],
+                msg='keytool error: java.lang.Exception: Alias <foo> does not exist',
+                err='',
+                rc=1
+            )
 
     def test_cert_changed_fail_read_cert(self):
         set_module_args(dict(
