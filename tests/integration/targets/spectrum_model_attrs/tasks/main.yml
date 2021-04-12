@@ -1,0 +1,73 @@
+- name: "Verify required variables: model_name, model_type, oneclick_username, oneclick_password, oneclick_url"
+  fail:
+    msg: "One or more of the following variables are not set: model_name, model_type, oneclick_username, oneclick_password, oneclick_url"
+  when: >
+    model_name is not defined
+    or model_type is not defined
+    or oneclick_username is not defined
+    or oneclick_password is not defined
+    or oneclick_url is not defined
+
+- block:
+  - name: "001: Enforce maintenance mode for {{ model_name }} with a note about why [check_mode test]"
+    spectrum_model_attrs: &mm_enabled_args
+      url: "{{ oneclick_url }}"
+      username: "{{ oneclick_username }}"
+      password: "{{ oneclick_password }}"
+      name: "{{ model_name }}"
+      type: "{{ model_type }}"
+      validate_certs: false
+      attributes:
+        - name: "isManaged"
+          value: "false"
+        - name: "Notes"
+          value: "{{ note_mm_enabled }}"
+    check_mode: true
+    register: mm_enabled_check_mode
+
+  - name: "001: assert that changes were made"
+    assert:
+      that:
+        - mm_enabled_check_mode is changed
+
+  - name: "001: assert that changed_attrs is properly set"
+    assert:
+      that:
+        - mm_enabled_check_mode.changed_attrs.Notes == note_mm_enabled
+        - mm_enabled_check_mode.changed_attrs.isManaged == "false"
+
+  - name: "002: Enforce maintenance mode for {{ model_name }} with a note about why"
+    spectrum_model_attrs:
+      <<: *mm_enabled_args
+    register: mm_enabled
+    check_mode: false
+
+  - name: "002: assert that changes were made"
+    assert:
+      that:
+        - mm_enabled is changed
+
+  - name: "002: assert that changed_attrs is properly set"
+    assert:
+      that:
+        - mm_enabled.changed_attrs.Notes == note_mm_enabled
+        - mm_enabled.changed_attrs.isManaged == "false"
+
+  - name: "003: Enforce maintenance mode for {{ model_name }} with a note about why [idempontence test]"
+    spectrum_model_attrs:
+      <<: *mm_enabled_args
+    register: mm_enabled_idp
+    check_mode: false
+
+  - name: "003: assert that changes were not made"
+    assert:
+      that:
+        - mm_enabled_idp is not changed
+
+  - name: "003: assert that changed_attrs is not set"
+    assert:
+      that:
+        - mm_enabled_idp.changed_attrs == {}
+
+  vars:
+    note_mm_enabled: "MM set via CO #1234 by OJ Simpson"
