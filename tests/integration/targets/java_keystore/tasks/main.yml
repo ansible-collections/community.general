@@ -67,7 +67,7 @@
         private_key: "{{ lookup('file', output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key') }}"
         private_key_passphrase: "{{ item.passphrase | default(omit) }}"
         password: changeit
-        dest: "{{ output_dir ~ '/' ~ item.name ~ '.jks' }}"
+        dest: "{{ output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.jks' }}"
       loop: &create_key_store_loop
         - name: cert
         - name: cert-pw
