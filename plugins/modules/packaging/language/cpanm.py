@@ -77,6 +77,7 @@ options:
     description:
       - When in C(new) mode, this parameter can be used to check if there is a module I(name) installed (at I(version), when specified).
     type: str
+    version_added: 2.5.0
 notes:
   - Please note that U(http://search.cpan.org/dist/App-cpanminus/bin/cpanm, cpanm) must be installed on the remote host.
   - "This module now comes with a choice of execution I(mode): C(compatibility) or C(new)."
@@ -129,9 +130,9 @@ EXAMPLES = '''
     mirror: 'http://cpan.cpantesters.org/'
 
 - name: Install Dancer perl package into the system root path
+  become: yes
   community.general.cpanm:
     name: Dancer
-    system_lib: yes
 
 - name: Install Dancer if it is not already installed OR the installed version is older than version 1.0
   community.general.cpanm:
