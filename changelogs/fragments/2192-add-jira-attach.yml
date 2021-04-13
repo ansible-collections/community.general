@@ -1,0 +1,2 @@
+minor_changes:
+  - jira - added ``attach`` operation, which allows a user to attach a file to an issue (https://github.com/ansible-collections/community.general/pull/2192).
