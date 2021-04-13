@@ -94,7 +94,7 @@ requirements:
   - dd (Data Duplicator) in PATH
 
 extends_documentation_fragment:
-  - files
+  - ansible.builtin.files
 
 seealso:
   - name: dd(1) manpage for Linux
