@@ -30,6 +30,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 import json
+import traceback
 
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.six.moves.urllib.parse import urlencode
@@ -145,8 +146,8 @@ class KeycloakAPI(object):
             self.module.fail_json(msg='API returned incorrect JSON when trying to obtain realm %s: %s'
                                       % (realm, str(e)))
         except Exception as e:
-            self.module.fail_json(msg='Could not obtain realm %s: %s'
-                                      % (realm, str(e)))
+            self.module.fail_json(msg='Could not obtain realm %s: %s' % (realm, str(e)),
+                                      exception=traceback.format_exc())
 
     def update_realm(self, realmrep, realm="master"):
         """ Update an existing realm
@@ -160,8 +161,8 @@ class KeycloakAPI(object):
             return open_url(realm_url, method='PUT', headers=self.restheaders,
                             data=json.dumps(realmrep), validate_certs=self.validate_certs)
         except Exception as e:
-            self.module.fail_json(msg='Could not update realm %s: %s'
-                                      % (realm, str(e)))
+            self.module.fail_json(msg='Could not update realm %s: %s' % (realm, str(e)),
+                                      exception=traceback.format_exc())
 
     def create_realm(self, realmrep):
         """ Create a realm in keycloak
@@ -174,8 +175,8 @@ class KeycloakAPI(object):
             return open_url(realm_url, method='POST', headers=self.restheaders,
                             data=json.dumps(realmrep), validate_certs=self.validate_certs)
         except Exception as e:
-            self.module.fail_json(msg='Could not create realm %s: %s'
-                                      % (realmrep['id'], str(e)))
+            self.module.fail_json(msg='Could not create realm %s: %s' % (realmrep['id'], str(e)),
+                                      exception=traceback.format_exc())
 
     def delete_realm(self, realm="master"):
         """ Delete a realm from Keycloak
@@ -189,8 +190,8 @@ class KeycloakAPI(object):
             return open_url(realm_url, method='DELETE', headers=self.restheaders,
                             validate_certs=self.validate_certs)
         except Exception as e:
-            self.module.fail_json(msg='Could not delete realm %s: %s'
-                                      % (realm, str(e)))
+            self.module.fail_json(msg='Could not delete realm %s: %s' % (realm, str(e)),
+                                      exception=traceback.format_exc())
 
     def get_clients(self, realm='master', filter=None):
         """ Obtains client representations for clients in a realm

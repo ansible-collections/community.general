@@ -50,11 +50,7 @@ def get_response(object_with_future_response, method, get_id_call_count):
         return get_response(
             object_with_future_response[method], method, get_id_call_count)
     if isinstance(object_with_future_response, list):
-        try:
-            call_number = get_id_call_count.__next__()
-        except AttributeError:
-            # manage python 2 versions.
-            call_number = get_id_call_count.next()
+        call_number = next(get_id_call_count)
         return get_response(
             object_with_future_response[call_number], method, get_id_call_count)
     return object_with_future_response
