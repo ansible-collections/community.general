@@ -174,7 +174,7 @@ options:
         type: path
         description:
           - The path to the file to upload (from the remote node) or, if I(content) is specified,
-            the filename to use for the attachment
+            the filename to use for the attachment.
       content:
         type: str
         description:
