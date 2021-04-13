@@ -1,1 +1,0 @@
-./cloud/scaleway/scaleway_security_group_facts.py

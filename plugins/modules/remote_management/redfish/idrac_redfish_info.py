@@ -193,11 +193,6 @@ def main():
         ],
         supports_check_mode=False
     )
-    is_old_facts = module._name in ('idrac_redfish_facts', 'community.general.idrac_redfish_facts')
-    if is_old_facts:
-        module.deprecate("The 'idrac_redfish_facts' module has been renamed to 'idrac_redfish_info', "
-                         "and the renamed one no longer returns ansible_facts",
-                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     category = module.params['category']
     command_list = module.params['command']
@@ -239,10 +234,7 @@ def main():
     # Return data back or fail with proper message
     if result['ret'] is True:
         del result['ret']
-        if is_old_facts:
-            module.exit_json(ansible_facts=dict(redfish_facts=result))
-        else:
-            module.exit_json(redfish_facts=result)
+        module.exit_json(redfish_facts=result)
     else:
         module.fail_json(msg=to_native(result['msg']))
 

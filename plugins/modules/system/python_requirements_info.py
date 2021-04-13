@@ -113,9 +113,6 @@ def main():
         ),
         supports_check_mode=True,
     )
-    if module._name in ('python_requirements_facts', 'community.general.python_requirements_facts'):
-        module.deprecate("The 'python_requirements_facts' module has been renamed to 'python_requirements_info'",
-                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
     if not HAS_DISTUTILS:
         module.fail_json(
             msg='Could not import "distutils" and "pkg_resources" libraries to introspect python environment.',

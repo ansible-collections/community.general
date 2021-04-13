@@ -1,1 +1,0 @@
-./cloud/ovirt/ovirt_quota_facts.py

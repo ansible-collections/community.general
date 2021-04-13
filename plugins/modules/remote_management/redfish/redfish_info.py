@@ -320,11 +320,6 @@ def main():
         ],
         supports_check_mode=False
     )
-    is_old_facts = module._name in ('redfish_facts', 'community.general.redfish_facts')
-    if is_old_facts:
-        module.deprecate("The 'redfish_facts' module has been renamed to 'redfish_info', "
-                         "and the renamed one no longer returns ansible_facts",
-                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     # admin credentials used for authentication
     creds = {'user': module.params['username'],
@@ -472,10 +467,7 @@ def main():
                     result["health_report"] = rf_utils.get_multi_manager_health_report()
 
     # Return data back
-    if is_old_facts:
-        module.exit_json(ansible_facts=dict(redfish_facts=result))
-    else:
-        module.exit_json(redfish_facts=result)
+    module.exit_json(redfish_facts=result)
 
 
 if __name__ == '__main__':

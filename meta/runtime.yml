@@ -39,7 +39,7 @@ plugin_routing:
       redirect: community.hashi_vault.hashi_vault
   modules:
     ali_instance_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.ali_instance_info instead.
     docker_compose:
@@ -159,8 +159,7 @@ plugin_routing:
     gcpubsub_info:
       redirect: community.google.gcpubsub_info
     gcpubsub_facts:
-      redirect: community.google.gcpubsub_info
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.google.gcpubsub_info instead.
     gcspanner:
@@ -171,22 +170,23 @@ plugin_routing:
       tombstone:
         removal_version: 2.0.0
         warning_text: Use community.general.github_webhook and community.general.github_webhook_info instead.
-    gluster_heal_info:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_heal_info instead.
-    gluster_peer:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_peer instead.
-    gluster_volume:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_volume instead.
-    helm:
-      deprecation:
-        removal_version: 3.0.0
-        warning_text: The helm module in community.general has been deprecated. Use community.kubernetes.helm instead.
+    # Adding tombstones burns the old name, so we simply remove the entries:
+    # gluster_heal_info:
+    #   tombstone:
+    #     removal_version: 3.0.0
+    #     warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_heal_info instead.
+    # gluster_peer:
+    #   tombstone:
+    #     removal_version: 3.0.0
+    #     warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_peer instead.
+    # gluster_volume:
+    #   tombstone:
+    #     removal_version: 3.0.0
+    #     warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_volume instead.
+    # helm:
+    #   tombstone:
+    #     removal_version: 3.0.0
+    #     warning_text: Use community.kubernetes.helm instead.
     hetzner_failover_ip:
       redirect: community.hrobot.failover_ip
     hetzner_failover_ip_info:
@@ -196,19 +196,19 @@ plugin_routing:
     hetzner_firewall_info:
       redirect: community.hrobot.firewall_info
     hpilo_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.hpilo_info instead.
     idrac_firmware:
       redirect: dellemc.openmanage.idrac_firmware
     idrac_redfish_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.idrac_redfish_info instead.
     idrac_server_config_profile:
       redirect: dellemc.openmanage.idrac_server_config_profile
     jenkins_job_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.jenkins_job_info instead.
     katello:
@@ -228,7 +228,7 @@ plugin_routing:
     kubevirt_vm:
       redirect: community.kubevirt.kubevirt_vm
     ldap_attr:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.ldap_attrs instead.
     logicmonitor:
@@ -240,11 +240,11 @@ plugin_routing:
         removal_version: 1.0.0
         warning_text: The logicmonitor_facts module is no longer maintained and the API used has been disabled in 2017.
     memset_memstore_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.memset_memstore_info instead.
     memset_server_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.memset_server_info instead.
     na_cdot_aggregate:
@@ -280,161 +280,161 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: Use netapp.ontap.na_ontap_volume instead.
     na_ontap_gather_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use netapp.ontap.na_ontap_info instead.
     nginx_status_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.nginx_status_info instead.
     ome_device_info:
       redirect: dellemc.openmanage.ome_device_info
     one_image_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.one_image_info instead.
     onepassword_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.onepassword_info instead.
     oneview_datacenter_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_datacenter_info instead.
     oneview_enclosure_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_enclosure_info instead.
     oneview_ethernet_network_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_ethernet_network_info instead.
     oneview_fc_network_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_fc_network_info instead.
     oneview_fcoe_network_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_fcoe_network_info instead.
     oneview_logical_interconnect_group_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_logical_interconnect_group_info instead.
     oneview_network_set_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_network_set_info instead.
     oneview_san_manager_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.oneview_san_manager_info instead.
     online_server_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.online_server_info instead.
     online_user_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.online_user_info instead.
     ovirt:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_vm instead.
     ovirt_affinity_label_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_affinity_label_info instead.
     ovirt_api_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_api_info instead.
     ovirt_cluster_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_cluster_info instead.
     ovirt_datacenter_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_datacenter_info instead.
     ovirt_disk_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_disk_info instead.
     ovirt_event_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_event_info instead.
     ovirt_external_provider_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_external_provider_info instead.
     ovirt_group_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_group_info instead.
     ovirt_host_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_host_info instead.
     ovirt_host_storage_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_host_storage_info instead.
     ovirt_network_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_network_info instead.
     ovirt_nic_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_nic_info instead.
     ovirt_permission_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_permission_info instead.
     ovirt_quota_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_quota_info instead.
     ovirt_scheduling_policy_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_scheduling_policy_info instead.
     ovirt_snapshot_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_snapshot_info instead.
     ovirt_storage_domain_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_storage_domain_info instead.
     ovirt_storage_template_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_storage_template_info instead.
     ovirt_storage_vm_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_storage_vm_info instead.
     ovirt_tag_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_tag_info instead.
     ovirt_template_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_template_info instead.
     ovirt_user_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_user_info instead.
     ovirt_vm_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_vm_info instead.
     ovirt_vmpool_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use ovirt.ovirt.ovirt_vmpool_info instead.
     postgresql_copy:
@@ -482,47 +482,47 @@ plugin_routing:
     postgresql_user:
       redirect: community.postgresql.postgresql_user
     purefa_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use purestorage.flasharray.purefa_info instead.
     purefb_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use purestorage.flashblade.purefb_info instead.
     python_requirements_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.python_requirements_info instead.
     redfish_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.redfish_info instead.
     scaleway_image_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_image_info instead.
     scaleway_ip_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_ip_info instead.
     scaleway_organization_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_organization_info instead.
     scaleway_security_group_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_security_group_info instead.
     scaleway_server_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_server_info instead.
     scaleway_snapshot_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_snapshot_info instead.
     scaleway_volume_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.scaleway_volume_info instead.
     sf_account_manager:
@@ -546,15 +546,15 @@ plugin_routing:
         removal_version: 2.0.0
         warning_text: Use netapp.elementsw.na_elementsw_volume instead.
     smartos_image_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.smartos_image_info instead.
     vertica_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.vertica_info instead.
     xenserver_guest_facts:
-      deprecation:
+      tombstone:
         removal_version: 3.0.0
         warning_text: Use community.general.xenserver_guest_info instead.
   doc_fragments:
