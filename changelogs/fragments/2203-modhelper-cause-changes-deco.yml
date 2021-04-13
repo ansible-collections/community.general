@@ -1,2 +1,0 @@
-bugfixes:
-  - module_helper module utils - fixed decorator ``cause_changes`` (https://github.com/ansible-collections/community.general/pull/2203).

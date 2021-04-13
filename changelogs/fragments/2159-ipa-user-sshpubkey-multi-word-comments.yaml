@@ -1,2 +1,0 @@
-bugfixes:
-  - ipa_user - allow ``sshpubkey`` to permit multiple word comments (https://github.com/ansible-collections/community.general/pull/2159).
