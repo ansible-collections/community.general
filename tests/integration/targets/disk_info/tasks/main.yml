@@ -13,8 +13,12 @@
     extra_args: "-c {{ remote_constraints }}"
 
 - name: "Checking the information from df command"
-  shell:  "df -h | grep '^/' | awk '{ print $1 }'"
+  shell:  "df -h | awk '{ print $1 }'"
   register: result_df
+
+- name: "Checking the information from df command with filters"
+  shell:  "df -h | grep '^/' | awk '{ print $1 }'"
+  register: result_df_withfilter
 
 - name: "Checking the all disk info"
   community.general.disk_info:
@@ -22,12 +26,12 @@
 
 - name: "Checking the specific disk info"
   community.general.disk_info:
-    name: "{{ result_df.stdout_lines[0] }}"
+    name: "{{ result_df_withfilter.stdout_lines[0] }}"
   register: result_specific_disk
 
 - name: "Checking the specific disk info with filter option"
   community.general.disk_info:
-    name: "{{ result_df.stdout_lines[0] }}"
+    name: "{{ result_df_withfilter.stdout_lines[0] }}"
     filter:
       - mountpoint
       - fstype
@@ -51,6 +55,6 @@
 - name: "Obtaining specific disk info with filter parameter check"
   assert:
     that:
-      - result_specific_disk_withfilter['disk_info'][result_df.stdout_lines[0]].keys() | length == 2
+      - result_specific_disk_withfilter['disk_info'][result_df_withfilter.stdout_lines[0]].keys() | length == 2
     success_msg: "Check for obtaining specific disk info with filter passed"
     fail_msg: "Check for obtaining specific disk info with filter failed"
