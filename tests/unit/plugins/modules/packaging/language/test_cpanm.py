@@ -27,9 +27,28 @@ def patch_cpanm(mocker):
 
 TEST_CASES = [
     [
+        {'name': 'Dancer'},
+        {
+            'id': 'install_dancer_compatibility',
+            'run_command.calls': [
+                (
+                    ['perl', '-le', 'use Dancer None;'],
+                    {'environ_update': {}, 'check_rc': False},
+                    (2, '', 'error, not installed',),  # output rc, out, err
+                ),
+                (
+                    ['/testbin/cpanm', 'Dancer'],
+                    {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                    (0, '', '',),  # output rc, out, err
+                ),
+            ],
+            'changed': True,
+        }
+    ],
+    [
         {'name': 'Dancer', 'mode': 'new'},
         {
-            'id': 'test_install_dancer',
+            'id': 'install_dancer',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'Dancer'],
                 {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
@@ -39,9 +58,21 @@ TEST_CASES = [
         }
     ],
     [
+        {'name': 'MIYAGAWA/Plack-0.99_05.tar.gz'},
+        {
+            'id': 'install_distribution_file_compatibility',
+            'run_command.calls': [(
+                ['/testbin/cpanm', 'MIYAGAWA/Plack-0.99_05.tar.gz'],
+                {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
+                (0, '', '',),  # output rc, out, err
+            )],
+            'changed': True,
+        }
+    ],
+    [
         {'name': 'MIYAGAWA/Plack-0.99_05.tar.gz', 'mode': 'new'},
         {
-            'id': 'test_install_distribution_file',
+            'id': 'install_distribution_file',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'MIYAGAWA/Plack-0.99_05.tar.gz'],
                 {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
@@ -53,7 +84,7 @@ TEST_CASES = [
     [
         {'name': 'Dancer', 'locallib': '/srv/webapps/my_app/extlib', 'mode': 'new'},
         {
-            'id': 'test_install_into_locallib',
+            'id': 'install_into_locallib',
             'run_command.calls': [(
                 ['/testbin/cpanm', '--local-lib', '/srv/webapps/my_app/extlib', 'Dancer'],
                 {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
@@ -65,7 +96,7 @@ TEST_CASES = [
     [
         {'from_path': '/srv/webapps/my_app/src/', 'mode': 'new'},
         {
-            'id': 'test_install_from_local_directory',
+            'id': 'install_from_local_directory',
             'run_command.calls': [(
                 ['/testbin/cpanm', '/srv/webapps/my_app/src/'],
                 {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
@@ -77,7 +108,7 @@ TEST_CASES = [
     [
         {'name': 'Dancer', 'locallib': '/srv/webapps/my_app/extlib', 'notest': True, 'mode': 'new'},
         {
-            'id': 'test_install_into_locallib_no_unit_testing',
+            'id': 'install_into_locallib_no_unit_testing',
             'run_command.calls': [(
                 ['/testbin/cpanm', '--notest', '--local-lib', '/srv/webapps/my_app/extlib', 'Dancer'],
                 {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
@@ -89,7 +120,7 @@ TEST_CASES = [
     [
         {'name': 'Dancer', 'mirror': 'http://cpan.cpantesters.org/', 'mode': 'new'},
         {
-            'id': 'test_install_from_mirror',
+            'id': 'install_from_mirror',
             'run_command.calls': [(
                 ['/testbin/cpanm', '--mirror', 'http://cpan.cpantesters.org/', 'Dancer'],
                 {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
@@ -101,7 +132,7 @@ TEST_CASES = [
     [
         {'name': 'Dancer', 'system_lib': True, 'mode': 'new'},
         {
-            'id': 'test_install_into_system_lib',
+            'id': 'install_into_system_lib',
             'run_command.calls': [],
             'changed': False,
             'failed': True,
@@ -110,7 +141,7 @@ TEST_CASES = [
     [
         {'name': 'Dancer', 'version': '1.0', 'mode': 'new'},
         {
-            'id': 'test_install_minversion_implicit',
+            'id': 'install_minversion_implicit',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'Dancer~1.0'],
                 {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
@@ -122,7 +153,7 @@ TEST_CASES = [
     [
         {'name': 'Dancer', 'version': '~1.5', 'mode': 'new'},
         {
-            'id': 'test_install_minversion_explicit',
+            'id': 'install_minversion_explicit',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'Dancer~1.5'],
                 {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
@@ -134,7 +165,7 @@ TEST_CASES = [
     [
         {'name': 'Dancer', 'version': '@1.7', 'mode': 'new'},
         {
-            'id': 'test_install_specific_version',
+            'id': 'install_specific_version',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'Dancer@1.7'],
                 {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
@@ -147,7 +178,7 @@ TEST_CASES = [
     [
         {'name': 'MIYAGAWA/Plack-0.99_05.tar.gz', 'version': '@1.7', 'mode': 'new'},
         {
-            'id': 'test_install_specific_version_from_file_error',
+            'id': 'install_specific_version_from_file_error',
             'run_command.calls': [],
             'changed': False,
             'failed': True,
@@ -157,7 +188,7 @@ TEST_CASES = [
     [
         {'from_path': '~/', 'version': '@1.7', 'mode': 'new'},
         {
-            'id': 'test_install_specific_version_from_directory_error',
+            'id': 'install_specific_version_from_directory_error',
             'run_command.calls': [],
             'changed': False,
             'failed': True,
@@ -167,7 +198,7 @@ TEST_CASES = [
     [
         {'name': 'git://github.com/plack/Plack.git', 'version': '@1.7', 'mode': 'new'},
         {
-            'id': 'test_install_specific_version_from_git_url_explicit',
+            'id': 'install_specific_version_from_git_url_explicit',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'git://github.com/plack/Plack.git@1.7'],
                 {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
@@ -180,7 +211,7 @@ TEST_CASES = [
     [
         {'name': 'git://github.com/plack/Plack.git', 'version': '2.5', 'mode': 'new'},
         {
-            'id': 'test_install_specific_version_from_git_url_implicit',
+            'id': 'install_specific_version_from_git_url_implicit',
             'run_command.calls': [(
                 ['/testbin/cpanm', 'git://github.com/plack/Plack.git@2.5'],
                 {'environ_update': {'LANGUAGE': 'C'}, 'check_rc': True},
@@ -193,7 +224,7 @@ TEST_CASES = [
     [
         {'name': 'git://github.com/plack/Plack.git', 'version': '~2.5', 'mode': 'new'},
         {
-            'id': 'test_install_version_operator_from_git_url_error',
+            'id': 'install_version_operator_from_git_url_error',
             'run_command.calls': [],
             'changed': False,
             'failed': True,

@@ -147,17 +147,19 @@ from ansible_collections.community.general.plugins.module_utils.module_helper im
 
 
 class CPANMinus(CmdMixin, ModuleHelper):
+    output_params = ['name', 'version']
     module = dict(
         argument_spec=dict(
             name=dict(type='str', aliases=['pkg']),
             version=dict(type='str'),
             from_path=dict(type='path'),
-            notest=dict(default=False, type='bool'),
+            notest=dict(type='bool', default=False),
             locallib=dict(type='path'),
             mirror=dict(type='str'),
-            mirror_only=dict(default=False, type='bool'),
+            mirror_only=dict(type='bool', default=False),
             installdeps=dict(type='bool', default=False),
-            system_lib=dict(type='bool', default=False, aliases=['use_sudo']),
+            system_lib=dict(type='bool', default=False, aliases=['use_sudo'],
+                            removed_in_version="4.0.0", removed_from_collection="community.general"),
             executable=dict(type='path'),
             mode=dict(type='str', choices=['compatibility', 'new'], default='compatibility'),
             name_check=dict(type='str')
@@ -187,31 +189,30 @@ class CPANMinus(CmdMixin, ModuleHelper):
         env = {"PERL5LIB": "%s/lib/perl5" % locallib} if locallib else {}
         cmd = ['perl', '-le', 'use %s %s;' % (name, version)]
         rc, out, err = self.module.run_command(cmd, check_rc=False, environ_update=env)
-        # raise Exception(f'aaa: rc={rc}, out={out}, err={err}')
 
         return rc == 0
 
-    def sanitize_pkg_spec_version(self, pkg_spec):
-        v = self.module.params['version']
-        if v is None:
+    @staticmethod
+    def sanitize_pkg_spec_version(pkg_spec, version):
+        if version is None:
             return pkg_spec
         if pkg_spec.endswith('.tar.gz'):
             raise ModuleHelperException(msg="parameter 'version' must not be used when installing from a file")
         if os.path.isdir(pkg_spec):
             raise ModuleHelperException(msg="parameter 'version' must not be used when installing from a directory")
         if pkg_spec.endswith('.git'):
-            if v.startswith('~'):
+            if version.startswith('~'):
                 raise ModuleHelperException(msg="operator '~' not allowed in version parameter when installing from git repository")
-            v = v if v.startswith('@') else '@' + v
-        elif v[0] not in ('@', '~'):
-            v = '~' + v
-        return pkg_spec + v
+            version = version if version.startswith('@') else '@' + version
+        elif version[0] not in ('@', '~'):
+            version = '~' + version
+        return pkg_spec + version
 
     def __run__(self):
         v = self.vars
 
-        if v.executable:
-            self.command = v.executable
+        self.command = self.module.get_bin_path(v.executable if v.executable else self.command)
+        self.vars.set("binary", self.command)
 
         pkg_param = 'from_path' if v.from_path else 'name'
 
@@ -234,12 +235,14 @@ class CPANMinus(CmdMixin, ModuleHelper):
             installed = self._is_package_installed(v.name_check, v.locallib, v.version) if v.name_check else False
             if installed:
                 return
-            pkg_spec = self.sanitize_pkg_spec_version(v[pkg_param])
+            pkg_spec = self.sanitize_pkg_spec_version(v[pkg_param], v.version)
             self.changed = self.run_command(
                 params=['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', {'name': pkg_spec}],
             )
 
     def process_command_output(self, rc, out, err):
+        if self.vars.mode == "compatibility" and rc != 0:
+            raise ModuleHelperException(msg=err, cmd=self.vars.cmd_args)
         return 'is up to date' not in err and 'is up to date' not in out
 
 
