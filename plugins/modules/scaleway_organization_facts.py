@@ -1,1 +1,0 @@
-./cloud/scaleway/scaleway_organization_facts.py
