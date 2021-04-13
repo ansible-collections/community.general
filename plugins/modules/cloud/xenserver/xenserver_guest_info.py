@@ -204,10 +204,6 @@ def main():
                            ],
                            )
 
-    if module._name in ('xenserver_guest_facts', 'community.general.xenserver_guest_facts'):
-        module.deprecate("The 'xenserver_guest_facts' module has been renamed to 'xenserver_guest_info'",
-                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
-
     result = {'failed': False, 'changed': False}
 
     # Module will exit with an error message if no VM is found.

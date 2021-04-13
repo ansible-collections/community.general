@@ -1,1 +1,0 @@
-./storage/purestorage/purefa_facts.py

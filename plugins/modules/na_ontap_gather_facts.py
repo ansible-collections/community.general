@@ -1,1 +1,0 @@
-./storage/netapp/na_ontap_gather_facts.py

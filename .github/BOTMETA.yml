@@ -186,8 +186,6 @@ files:
     maintainers: glitchcrab
   $modules/cloud/misc/cloud_init_data_facts.py:
     maintainers: resmo
-  $modules/cloud/misc/helm.py:
-    maintainers: flaper87
   $modules/cloud/misc/proxmox.py:
     maintainers: $team_virt UnderGreen
     labels: proxmox virt
@@ -348,8 +346,6 @@ files:
     maintainers: dagwieers magnus919 tbielawa cmprescott sm4rk0
     labels: m:xml xml
     ignore: magnus919
-  $modules/identity/onepassword_facts.py:
-    maintainers: Rylon
   $modules/identity/ipa/:
     maintainers: $team_ipa
   $modules/identity/ipa/ipa_pwpolicy.py:
@@ -452,8 +448,6 @@ files:
     maintainers: akostyuk
   $modules/net_tools/ipwcli_dns.py:
     maintainers: cwollinger
-  $modules/net_tools/ldap/ldap_attr.py:
-    maintainers: jtyr
   $modules/net_tools/ldap/ldap_attrs.py:
     maintainers: drybjed jtyr noles
   $modules/net_tools/ldap/ldap_entry.py:
@@ -718,8 +712,6 @@ files:
     maintainers: evertmulder
   $modules/remote_management/manageiq/manageiq_tenant.py:
     maintainers: evertmulder
-  $modules/remote_management/oneview/oneview_datacenter_facts.py:
-    maintainers: aalexmonteiro madhav-bharadwaj ricardogpsf soodpr
   $modules/remote_management/oneview/:
     maintainers: adriane-cardozo fgbulsoni tmiotto
   $modules/remote_management/oneview/oneview_datacenter_info.py:
@@ -766,12 +758,6 @@ files:
     maintainers: yeukhon
   $modules/storage/emc/emc_vnx_sg_member.py:
     maintainers: remixtj
-  $modules/storage/glusterfs/:
-    maintainers: devyanikota
-  $modules/storage/glusterfs/gluster_peer.py:
-    maintainers: sac
-  $modules/storage/glusterfs/gluster_volume.py:
-    maintainers: rosmo
   $modules/storage/hpe3par/ss_3par_cpg.py:
     maintainers: farhan7500 gautamphegde
   $modules/storage/ibm/:
@@ -793,9 +779,6 @@ files:
     maintainers: johanwiren
   $modules/storage/zfs/zfs_delegate_admin.py:
     maintainers: natefoo
-  $modules/system/python_requirements_facts.py:
-    maintainers: willthames
-    ignore: ryansb
   $modules/system/aix:
     maintainers: $team_aix
     labels: aix
@@ -926,10 +909,6 @@ files:
     labels: xfconf
   $modules/system/xfs_quota.py:
     maintainers: bushvin
-  $modules/web_infrastructure/jenkins_job_facts.py:
-    maintainers: stpierre
-  $modules/web_infrastructure/nginx_status_facts.py:
-    maintainers: resmo
   $modules/web_infrastructure/apache2_mod_proxy.py:
     maintainers: oboukili
   $modules/web_infrastructure/apache2_module.py:
