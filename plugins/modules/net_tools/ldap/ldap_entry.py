@@ -17,7 +17,7 @@ short_description: Add or remove LDAP entries.
 description:
   - Add or remove LDAP entries. This module only asserts the existence or
     non-existence of an LDAP entry, not its attributes. To assert the
-    attribute values of an entry, see M(community.general.ldap_attr).
+    attribute values of an entry, see M(community.general.ldap_attrs).
 notes:
   - The default authentication settings will attempt to use a SASL EXTERNAL
     bind over a UNIX domain socket. This works well with the default Ubuntu
@@ -37,7 +37,7 @@ options:
     description:
       - If I(state=present), attributes necessary to create an entry. Existing
         entries are never modified. To assert specific attribute values on an
-        existing entry, use M(community.general.ldap_attr) module instead.
+        existing entry, use M(community.general.ldap_attrs) module instead.
     type: dict
   objectClass:
     description:
@@ -199,7 +199,7 @@ def main():
                          exception=LDAP_IMP_ERR)
 
     if module.params['params']:
-        module.fail_json(msg="The `params` option to ldap_attr was removed since it circumvents Ansible's option handling")
+        module.fail_json(msg="The `params` option to ldap_entry was removed since it circumvents Ansible's option handling")
 
     state = module.params['state']
 

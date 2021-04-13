@@ -20,9 +20,6 @@ requirements:
 notes:
     - Tested with C(op) version 0.5.5
     - "Based on the C(onepassword) lookup plugin by Scott Buchanan <sbuchanan@ri.pn>."
-    - When this module is called with the deprecated C(onepassword_facts) name, potentially sensitive data
-      from 1Password is returned as Ansible facts. Facts are subject to caching if enabled, which means this
-      data could be stored in clear text on disk or in a database.
 short_description: Gather items from 1Password
 description:
     - M(community.general.onepassword_info) wraps the C(op) command line utility to fetch data about one or more 1Password items.
@@ -380,13 +377,7 @@ def main():
 
     results = {'onepassword': OnePasswordInfo().run()}
 
-    if module._name in ('onepassword_facts', 'community.general.onepassword_facts'):
-        module.deprecate("The 'onepassword_facts' module has been renamed to 'onepassword_info'. "
-                         "When called with the new name it no longer returns 'ansible_facts'",
-                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
-        module.exit_json(changed=False, ansible_facts=results)
-    else:
-        module.exit_json(changed=False, **results)
+    module.exit_json(changed=False, **results)
 
 
 if __name__ == '__main__':
