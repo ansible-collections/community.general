@@ -1,1 +1,0 @@
-./web_infrastructure/nginx_status_facts.py

@@ -159,11 +159,6 @@ def main():
         ),
         supports_check_mode=True,
     )
-    is_old_facts = module._name in ('hpilo_facts', 'community.general.hpilo_facts')
-    if is_old_facts:
-        module.deprecate("The 'hpilo_facts' module has been renamed to 'hpilo_info', "
-                         "and the renamed one no longer returns ansible_facts",
-                         version='3.0.0', collection_name='community.general')  # was Ansible 2.13
 
     if not HAS_HPILO:
         module.fail_json(msg=missing_required_lib('python-hpilo'), exception=HPILO_IMP_ERR)
@@ -248,10 +243,7 @@ def main():
         # reformat into a text friendly format
         info['hw_memory_total'] = "{0} GB".format(info['hw_memory_total'])
 
-    if is_old_facts:
-        module.exit_json(ansible_facts=info)
-    else:
-        module.exit_json(**info)
+    module.exit_json(**info)
 
 
 if __name__ == '__main__':

@@ -1,1 +1,0 @@
-cloud/memset/memset_memstore_facts.py

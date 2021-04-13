@@ -1,1 +1,0 @@
-./cloud/ovirt/ovirt_affinity_label_facts.py
