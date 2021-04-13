@@ -22,7 +22,7 @@ description:
 author:
   - quidame (@quidame)
 
-version_added: "2.5.0"
+version_added: "3.0.0"
 
 options:
   path:
