@@ -1,1 +1,0 @@
-./cloud/scaleway/scaleway_server_facts.py
