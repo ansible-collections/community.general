@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - proxmox inventory - added handling of commas in KVM agent configuration string (https://github.com/ansible-collections/community.general/pull/2245)
