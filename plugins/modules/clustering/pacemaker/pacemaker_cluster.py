@@ -313,6 +313,7 @@ def main():
     timeout = module.params['timeout']
     nodes = module.params['nodes']
     properties = module.params['properties']
+    name = module.params['name']
 
     if state in ['online', 'present']:
         changed = create_cluster(module, timeout, name, members, pcs_user, pcs_password)
