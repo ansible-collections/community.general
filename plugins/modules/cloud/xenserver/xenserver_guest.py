@@ -63,7 +63,6 @@ options:
     - In case of multiple VMs with same name, use C(uuid) to uniquely specify VM to manage.
     - This parameter is case sensitive.
     type: str
-    required: yes
     aliases: [ name_label ]
   name_desc:
     description:
@@ -104,11 +103,17 @@ options:
   hardware:
     description:
     - Manage VM's hardware parameters. VM needs to be shut down to reconfigure these parameters.
-    - 'Valid parameters are:'
-    - ' - C(num_cpus) (integer): Number of CPUs.'
-    - ' - C(num_cpu_cores_per_socket) (integer): Number of Cores Per Socket. C(num_cpus) has to be a multiple of C(num_cpu_cores_per_socket).'
-    - ' - C(memory_mb) (integer): Amount of memory in MB.'
     type: dict
+    suboptions:
+      num_cpus:
+        description: Number of CPUs.
+        type: int
+      num_cpu_cores_per_socket:
+        description: Number of Cores Per Socket. C(num_cpus) has to be a multiple of C(num_cpu_cores_per_socket).
+        type: int
+      memory_mb:
+        description: Amount of memory in MB.
+        type: int
   disks:
     description:
     - A list of disks to add to VM.
@@ -1829,7 +1834,7 @@ def main():
     argument_spec.update(
         state=dict(type='str', default='present',
                    choices=['present', 'absent', 'poweredon']),
-        name=dict(type='str', aliases=['name_label']),
+        name=dict(type='str', aliases=['name_label']),  # @TODO: required?
         name_desc=dict(type='str'),
         uuid=dict(type='str'),
         template=dict(type='str', aliases=['template_src']),
