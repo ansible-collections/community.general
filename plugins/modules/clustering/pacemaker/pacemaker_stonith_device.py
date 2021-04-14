@@ -82,15 +82,16 @@ def create_stonith_device(module, name, device_type, fencing_options):
     if rc == 1:
         # Any error other than 'resource not found' should fail
         if not out.startswith(_STONITH_NOT_FOUND):
-            module.fail_json(msg="Failed to get cluster configuration.\nCommand: `%s`\nError: %s" % (cmd, err))
+            module.fail_json(msg="Failed to get stonith device configuration.\nCommand: `%s`\nError: %s" % (cmd, err))
         # The device doesn't exist, so it needs to be created with the specified options
         exists = False
     else:
         # if the device already exists, check its current options
-        match_object = re.search(r'Resource: %s \(class=stonith type=(.*?)\)', out)
+        match_object = re.search(r'Resource:(?:.*?)\(class=stonith type=(.*?)\)', out)
         existing_device_type = match_object.group(1).strip()
         if existing_device_type != device_type:
             module.fail_json(msg="A stonith device of a different type exists with the same name")
+
         match_object = search(r'Attributes: (.*?)\n', out)
         existing_options = match_object.group(1).strip().split(' ')
 
