@@ -120,9 +120,9 @@ def authenticate_nodes(module, nodes, pcs_user, pcs_password):
 # ii. Pacemaker status
 # iii. Corosync status
 def get_nodes_status(module):
-    online_nodes = {}
+    online_nodes = set()
     # once a node is counted as offline by any of these tests, it'll stay there
-    offline_nodes = {}
+    offline_nodes = set()
     cmd = "pcs status nodes both"
     rc, out, err = module.run_command(cmd)
     if rc == 1:
@@ -137,7 +137,7 @@ def get_nodes_status(module):
             online_nodes.discard(offline_node)
             offline_nodes.add(offline_node)
 
-    match_object = re.search(r'Corosync Nodes:[\s\S]*?Online:((?: \S+)*)\n Offline: ((?: \S+)*)\n', out)
+    match_object = re.search(r'Corosync Nodes:[\s\S]*?Online:((?: \S+)*)\n Offline:((?: \S+)*)\n', out)
     helper(match_object)
 
     match_object = re.search(r'Pacemaker Nodes:[\s\S]*?Online:((?: \S+)*)[\s\S]*?Offline:((?: \S+)*)\n', out)
@@ -268,7 +268,7 @@ def create_cluster(module, timeout, name, cluster_nodes, pcs_user, pcs_password,
         match_object = re.search(r'Cluster Properties:\n (.*?:.*?\n)*', out)
         existing_properties = re.findall(r'(\S*?): (\S*?)\n', match_object.group(0))
         for existing_property in existing_properties:
-            if existing_property in properies:
+            if existing_property in properties:
                 properties.remove(existing_property)
 
         if len(properties) > 0:
@@ -317,30 +317,32 @@ def main():
 
     if state in ['online', 'present']:
         changed = create_cluster(module, timeout, name, nodes, pcs_user, pcs_password, properties)
+        if state == 'present':
+            module.exit_json(changed=changed)
 
     if state in ['online', 'offline']:
         cluster_state = get_cluster_status(module)
         # if state is already offline, we can't really determine the status
         # of other nodes, but we will not error out and just assume all is well
         if state == 'offline' and state == cluster_state:
-            pass
+            module.exit_json(changed=False)
         else:
             if state == 'online':
                 if cluster_state == 'offline':
-                    changed = True
                     # start them all
                     set_nodes(module, state, nodes, timeout, force)
+                    module.exit_json(changed=True)
                 else:
                     # make sure the cluster nodes are all up
                     online_nodes, offline_nodes = get_nodes_status(module)
                     if len(online_nodes) < len(nodes):
-                        changed = True
                         set_nodes(module, state, nodes, timeout, force)
+                        module.exit_json(changed=True)
             elif state == 'offline':
                 # cluster must still be online otherwise we wouldn't be here
                 # so no need to check node status just stop all nodes
-                changed = True
                 set_nodes(module, state, nodes, timeout, force)
+                module.exit_json(changed=True)
 
     if state in ['restart']:
         set_cluster(module, 'offline', timeout, force)
