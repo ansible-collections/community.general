@@ -137,13 +137,13 @@ def get_nodes_status(module):
             online_nodes.discard(offline_node)
             offline_nodes.add(offline_node)
 
-    match_object = re.search(r'Corosync Nodes:[\s\S]*?Online:((?: \S+)*)\n Offline: ((?: \S+)*)\n', res)
+    match_object = re.search(r'Corosync Nodes:[\s\S]*?Online:((?: \S+)*)\n Offline: ((?: \S+)*)\n', out)
     helper(match_object)
 
-    match_object = re.search(r'Pacemaker Nodes:[\s\S]*?Online:((?: \S+)*)[\s\S]*?Offline:((?: \S+)*)\n', res)
+    match_object = re.search(r'Pacemaker Nodes:[\s\S]*?Online:((?: \S+)*)[\s\S]*?Offline:((?: \S+)*)\n', out)
     helper(match_object)
     
-    match_object = re.search(r'Pacemaker Remote Nodes:[\s\S]*?Online:((?: \S+)*)[\s\S]*?Offline:((?: \S+)*)\n', res)
+    match_object = re.search(r'Pacemaker Remote Nodes:[\s\S]*?Online:((?: \S+)*)[\s\S]*?Offline:((?: \S+)*)\n', out)
     helper(match_object)
 
     # return a tuple of the online, offline nodes
@@ -265,7 +265,7 @@ def create_cluster(module, timeout, name, cluster_nodes, pcs_user, pcs_password,
         online_nodes, offline_nodes = get_nodes_status(module)
 
         # check if properties already exist
-        match_object = re.search(r'Cluster Properties:\n (.*?:.*?\n)*', res)
+        match_object = re.search(r'Cluster Properties:\n (.*?:.*?\n)*', out)
         existing_properties = re.findall(r'(\S*?): (\S*?)\n', match_object.group(0))
         for existing_property in existing_properties:
             if existing_property in properies:
@@ -298,7 +298,7 @@ def main():
         timeout=dict(type='int', default=300),
         force=dict(type='bool', default=True),
         nodes=dict(type='list', elements='str'),
-        properties=dict(type='dict'),
+        properties=dict(type='dict', default={}),
     )
 
     module = AnsibleModule(
