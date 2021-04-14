@@ -317,51 +317,47 @@ def main():
 
     if state in ['online', 'present']:
         changed = create_cluster(module, timeout, name, nodes, pcs_user, pcs_password, properties)
-        if state == 'present':
-            module.exit_json(changed=changed)
 
     if state in ['online', 'offline']:
         cluster_state = get_cluster_status(module)
         # if state is already offline, we can't really determine the status
         # of other nodes, but we will not error out and just assume all is well
-        if state == 'offline' and state == cluster_state:
-            module.exit_json(changed=False)
-        else:
+        if not(state == 'offline' and state == cluster_state):
             if state == 'online':
                 if cluster_state == 'offline':
+                    changed = True
                     # start them all
                     set_nodes(module, state, nodes, timeout, force)
-                    module.exit_json(changed=True)
                 else:
                     # make sure the cluster nodes are all up
                     online_nodes, offline_nodes = get_nodes_status(module)
                     if len(online_nodes) < len(nodes):
+                        changed = True
                         set_nodes(module, state, nodes, timeout, force)
-                        module.exit_json(changed=True)
             elif state == 'offline':
                 # cluster must still be online otherwise we wouldn't be here
                 # so no need to check node status just stop all nodes
+                changed = True
                 set_nodes(module, state, nodes, timeout, force)
-                module.exit_json(changed=True)
 
     if state in ['restart']:
+        changed = True
         set_cluster(module, 'offline', timeout, force)
         cluster_state = get_cluster_status(module)
         if cluster_state == 'offline':
             set_cluster(module, 'online', timeout, force)
             cluster_state = get_cluster_status(module)
-            if cluster_state == 'online':
-                module.exit_json(changed=True, out=cluster_state)
-            else:
+            if cluster_state != 'online':
                 module.fail_json(msg="Failed during the restart of the cluster, the cluster can't be started")
         else:
             module.fail_json(msg="Failed during the restart of the cluster, the cluster can't be stopped")
 
     if state in ['cleanup']:
+        changed = True
         clean_cluster(module, timeout)
         cluster_state = get_cluster_status(module)
-        module.exit_json(changed=True,
-                         out=cluster_state)
+
+    module.exit_json(changed=changed)
 
 
 if __name__ == '__main__':
