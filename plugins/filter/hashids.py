@@ -13,6 +13,7 @@ from ansible.errors import (
 )
 
 from ansible.module_utils.common.text.converters import to_native
+from ansible.module_utils.common.collections import is_sequence
 
 try:
     from hashids import Hashids
@@ -21,21 +22,11 @@ except ImportError:
     HAS_HASHIDS = False
 
 
-def initialize_hashids(salt, alphabet, min_length):
+def initialize_hashids(**kwargs):
     if not HAS_HASHIDS:
         raise AnsibleError("The hashids library must be installed in order to use this plugin")
 
-    unchecked_params = {
-        'salt': salt,
-        'alphabet': alphabet,
-        'min_length': min_length,
-    }
-
-    params = {}
-
-    for k in unchecked_params:
-        if unchecked_params[k]:
-            params[k] = unchecked_params[k]
+    params = dict((k, v) for k, v in kwargs.items() if v)
 
     try:
         return Hashids(**params)
@@ -49,33 +40,38 @@ def initialize_hashids(salt, alphabet, min_length):
 
 
 def hashids_encode(nums, salt=None, alphabet=None, min_length=None):
-    """Generates a youtube-like hash from a sequence of Ints
+    """Generates a youtube-like hash from a sequence of ints
 
-       :nums: Sequence of one or more Ints to hash
+       :nums: Sequence of one or more ints to hash
        :salt: String to use as salt when hashing
        :alphabet: String of 16 or more unique characters to produce a hash
        :min_length: Minimum length of hash produced
     """
 
-    hashids = initialize_hashids(salt, alphabet, min_length)
+    hashids = initialize_hashids(
+        salt=salt,
+        alphabet=alphabet,
+        min_length=min_length
+    )
 
-    # Handles the case where a single Int is not encapsulated in a list or tuple.
+    # Handles the case where a single int is not encapsulated in a list or tuple.
     # User convenience seems prefferable to strict typing in this case
-    if isinstance(nums, int):
+    # Also avoids obfuscated error messages related to single invalid inputs
+    if not is_sequence(nums):
         nums = [nums]
 
     try:
         hashid = hashids.encode(*nums)
     except TypeError as e:
         raise AnsibleFilterTypeError(
-            "Data to encode must by a tuple or list of Ints: %s" % to_native(e)
+            "Data to encode must by a tuple or list of ints: %s" % to_native(e)
         )
 
     return hashid
 
 
 def hashids_decode(hashid, salt=None, alphabet=None, min_length=None):
-    """Generates a youtube-like hash from a sequence of Ints
+    """Decodes a youtube-like hash to a sequence of ints
 
        :hashid: Hash string to decode
        :salt: String to use as salt when hashing
@@ -83,7 +79,11 @@ def hashids_decode(hashid, salt=None, alphabet=None, min_length=None):
        :min_length: Minimum length of hash produced
     """
 
-    hashids = initialize_hashids(salt, alphabet, min_length)
+    hashids = initialize_hashids(
+        salt=salt,
+        alphabet=alphabet,
+        min_length=min_length
+    )
     nums = hashids.decode(hashid)
     return nums
 
