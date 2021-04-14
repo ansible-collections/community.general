@@ -114,16 +114,42 @@ options:
     - A list of disks to add to VM.
     - All parameters are case sensitive.
     - Removing or detaching existing disks of VM is not supported.
-    - 'Required parameters per entry:'
-    - ' - C(size_[tb,gb,mb,kb,b]) (integer): Disk storage size in specified unit. VM needs to be shut down to reconfigure this parameter.'
-    - 'Optional parameters per entry:'
-    - ' - C(name) (string): Disk name. You can also use C(name_label) as an alias.'
-    - ' - C(name_desc) (string): Disk description.'
-    - ' - C(sr) (string): Storage Repository to create disk on. If not specified, will use default SR. Cannot be used for moving disk to other SR.'
-    - ' - C(sr_uuid) (string): UUID of a SR to create disk on. Use if SR name is not unique.'
+    - Entries are required to have either a I(size) or one of I(size_[tb,gb,mb,kb,b]) parameters.
     type: list
     elements: dict
     aliases: [ disk ]
+    suboptions:
+      size:
+        description: 'Disk size with unit. Unit must be: C(b), C(kb), C(mb), C(gb), C(tb). VM needs to be shut down to reconfigure this parameter.'
+        type: str
+      size_b:
+        description: Disk size in bytes. VM needs to be shut down to reconfigure this parameter.
+        type: str
+      size_kb:
+        description: Disk size in kilobytes. VM needs to be shut down to reconfigure this parameter.
+        type: str
+      size_mb:
+        description: Disk size in megabytes. VM needs to be shut down to reconfigure this parameter.
+        type: str
+      size_gb:
+        description: Disk size in gigabytes. VM needs to be shut down to reconfigure this parameter.
+        type: str
+      size_tb:
+        description: Disk size in terabytes. VM needs to be shut down to reconfigure this parameter.
+        type: str
+      name:
+        description: Disk name.
+        type: str
+        aliases: [name_label]
+      name_desc:
+        description: Disk description.
+        type: str
+      sr:
+        description: Storage Repository to create disk on. If not specified, will use default SR. Cannot be used for moving disk to other SR.
+        type: str
+      sr_uuid:
+        description: UUID of a SR to create disk on. Use if SR name is not unique.
+        type: str
   cdrom:
     description:
     - A CD-ROM configuration for the VM.
@@ -1822,12 +1848,12 @@ def main():
             type='list',
             elements='dict',
             options=dict(
-                size=dict(type='str'),
-                size_tb=dict(type='str'),
-                size_gb=dict(type='str'),
-                size_mb=dict(type='str'),
-                size_kb=dict(type='str'),
-                size_b=dict(type='str'),
+                size=dict(type='str'),  # @TODO: int?
+                size_tb=dict(type='str'),  # @TODO: int?
+                size_gb=dict(type='str'),  # @TODO: int?
+                size_mb=dict(type='str'),  # @TODO: int?
+                size_kb=dict(type='str'),  # @TODO: int?
+                size_b=dict(type='str'),  # @TODO: int?
                 name=dict(type='str', aliases=['name_label']),
                 name_desc=dict(type='str'),
                 sr=dict(type='str'),
