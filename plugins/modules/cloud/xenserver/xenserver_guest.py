@@ -120,6 +120,7 @@ options:
     - All parameters are case sensitive.
     - Removing or detaching existing disks of VM is not supported.
     - Entries are required to have either a I(size) or one of I(size_[tb,gb,mb,kb,b]) parameters.
+    - VM needs to be shut down to reconfigure this parameter.
     type: list
     elements: dict
     aliases: [ disk ]
@@ -128,24 +129,24 @@ options:
         description: 'Disk size with unit. Unit must be: C(b), C(kb), C(mb), C(gb), C(tb). VM needs to be shut down to reconfigure this parameter.'
         type: str
       size_b:
-        description: Disk size in bytes. VM needs to be shut down to reconfigure this parameter.
+        description: Disk size in bytes.
         type: str
       size_kb:
-        description: Disk size in kilobytes. VM needs to be shut down to reconfigure this parameter.
+        description: Disk size in kilobytes.
         type: str
       size_mb:
-        description: Disk size in megabytes. VM needs to be shut down to reconfigure this parameter.
+        description: Disk size in megabytes.
         type: str
       size_gb:
-        description: Disk size in gigabytes. VM needs to be shut down to reconfigure this parameter.
+        description: Disk size in gigabytes.
         type: str
       size_tb:
-        description: Disk size in terabytes. VM needs to be shut down to reconfigure this parameter.
+        description: Disk size in terabytes.
         type: str
       name:
         description: Disk name.
         type: str
-        aliases: [name_label]
+        aliases: [ name_label ]
       name_desc:
         description: Disk description.
         type: str
@@ -164,7 +165,7 @@ options:
       type:
         description: The type of CD-ROM. With C(none) the CD-ROM device will be present but empty.
         type: str
-        choices: [none, iso]
+        choices: [ none, iso ]
       iso_name:
         description:
           - 'The file name of an ISO image from one of the XenServer ISO Libraries (implies C(type: iso)).'
@@ -181,7 +182,7 @@ options:
         name:
           description: Name of a XenServer network to attach the network interface to.
           type: str
-          aliases: [name_label]
+          aliases: [ name_label ]
         mac:
           description: Customize MAC address of the interface.
           type: str
@@ -190,7 +191,7 @@ options:
             - Type of IPv4 assignment. Value C(none) means whatever is default for OS.
             - On some operating systems it could be DHCP configured (e.g. Windows) or unconfigured interface (e.g. Linux).
           type: str
-          choices: [none, dhcp, static]
+          choices: [ none, dhcp, static ]
         ip:
           description: 'Static IPv4 address (implies I(type): C(static)). Can include prefix in format <IPv4 address>/<prefix> instead of using C(netmask).'
           type: str
@@ -203,7 +204,7 @@ options:
         type6:
           description: Type of IPv6 assignment. Value C(none) means whatever is default for OS.
           type: str
-          choices: [none, dhcp, static]
+          choices: [ none, dhcp, static ]
         ip6:
           description: 'Static IPv6 address (implies I(type6): C(static)) with prefix in format <IPv6 address>/<prefix>.'
           type: str
@@ -1834,7 +1835,7 @@ def main():
     argument_spec.update(
         state=dict(type='str', default='present',
                    choices=['present', 'absent', 'poweredon']),
-        name=dict(type='str', aliases=['name_label']),  # @TODO: required?
+        name=dict(type='str', aliases=['name_label']),
         name_desc=dict(type='str'),
         uuid=dict(type='str'),
         template=dict(type='str', aliases=['template_src']),
@@ -1853,12 +1854,12 @@ def main():
             type='list',
             elements='dict',
             options=dict(
-                size=dict(type='str'),  # @TODO: int?
-                size_tb=dict(type='str'),  # @TODO: int?
-                size_gb=dict(type='str'),  # @TODO: int?
-                size_mb=dict(type='str'),  # @TODO: int?
-                size_kb=dict(type='str'),  # @TODO: int?
-                size_b=dict(type='str'),  # @TODO: int?
+                size=dict(type='str'),
+                size_tb=dict(type='str'),
+                size_gb=dict(type='str'),
+                size_mb=dict(type='str'),
+                size_kb=dict(type='str'),
+                size_b=dict(type='str'),
                 name=dict(type='str', aliases=['name_label']),
                 name_desc=dict(type='str'),
                 sr=dict(type='str'),
@@ -1873,7 +1874,7 @@ def main():
         cdrom=dict(
             type='dict',
             options=dict(
-                type=dict(type='str', choices=['none', 'iso']),  # @TODO: required ?
+                type=dict(type='str', choices=['none', 'iso']),
                 iso_name=dict(type='str'),
             ),
             required_if=[
@@ -1884,13 +1885,13 @@ def main():
             type='list',
             elements='dict',
             options=dict(
-                name=dict(type='str', aliases=['name_label']),  # @TODO: required ?
+                name=dict(type='str', aliases=['name_label']),
                 mac=dict(type='str'),
-                type=dict(type='str', choices=['none', 'dhcp', 'static']),  # @TODO: required ?
+                type=dict(type='str', choices=['none', 'dhcp', 'static']),
                 ip=dict(type='str'),
                 netmask=dict(type='str'),
                 gateway=dict(type='str'),
-                type6=dict(type='str', choices=['none', 'dhcp', 'static']),  # @TODO: required ?
+                type6=dict(type='str', choices=['none', 'dhcp', 'static']),
                 ip6=dict(type='str'),
                 gateway6=dict(type='str'),
             ),
