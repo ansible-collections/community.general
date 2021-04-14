@@ -43,7 +43,7 @@
       - "{{ item in result_df.stdout_lines }}"
     success_msg: "Check for obtaining all disk info passed"
     fail_msg: "Check for obtaining all disk info failed"
-  with_items: "{{ result_all_disk['disk_info'].keys() }}"
+  with_items: "{{ result_all_disk['disk_info'].keys() | list }}"
 
 - name: "Obtaining specific disk info check"
   assert:
