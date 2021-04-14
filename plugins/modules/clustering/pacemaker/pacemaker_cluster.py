@@ -212,7 +212,7 @@ def create_cluster(module, timeout, name, cluster_nodes, pcs_user, pcs_password,
     if rc == 1 and status == 'online':
         # if the cluster is up but still failed to get cluster config => error
         module.fail_json(msg="Failed to get cluster configuration.\nCommand: `%s`\nError: %s" % (cmd, err))
-    match_object = search(r'Cluster Name: (.+?)\n', out)
+    match_object = re.search(r'Cluster Name: (.+?)\n', out)
     existing_name = match_object.group(1)
     if len(existing_name) > 0 and existing_name != name:
         module.fail_json(msg="The node is currently part of a cluster of a different name.\nCommand: `%s`\nError: %s" % (cmd, err))
@@ -242,9 +242,9 @@ def create_cluster(module, timeout, name, cluster_nodes, pcs_user, pcs_password,
                 # if the cluster is up but still failed to get cluster config => error
                 module.fail_json(msg="Failed to get cluster configuration.\nCommand: `%s`\nError: %s" % (cmd, err))
 
-        match_object = search(r'Corosync Nodes:\n((?:\s\S+)*?)\n', out)
+        match_object = re.search(r'Corosync Nodes:\n((?:\s\S+)*?)\n', out)
         corosync_nodes = match_object.group(1).strip().split(' ')
-        match_object = search(r'Pacemaker Nodes:\n((?:\s\S+)*?)\n', out)
+        match_object = re.search(r'Pacemaker Nodes:\n((?:\s\S+)*?)\n', out)
         pacemaker_nodes = match_object.group(1).strip().split(' ')
         # only include nodes in both corosync_nodes and pacemaker_nodes
         existing_nodes = [node for node in corosync_nodes if node in pacemaker_nodes]
@@ -316,7 +316,7 @@ def main():
     name = module.params['name']
 
     if state in ['online', 'present']:
-        changed = create_cluster(module, timeout, name, members, pcs_user, pcs_password)
+        changed = create_cluster(module, timeout, name, nodes, pcs_user, pcs_password, properties)
 
     if state in ['online', 'offline']:
         cluster_state = get_cluster_status(module)
