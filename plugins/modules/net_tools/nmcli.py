@@ -286,12 +286,12 @@ options:
             - 'For instance to use common WPA-PSK auth with a password:'
             - '- C({key-mgmt: wpa-psk, psk: my_password})'
        type: dict
-       version_added: 2.5.0
+       version_added: 3.0.0
     ssid:
        description:
             - Name of the Wireless router or the access point.
        type: str
-       version_added: 2.5.0
+       version_added: 3.0.0
 '''
 
 EXAMPLES = r'''

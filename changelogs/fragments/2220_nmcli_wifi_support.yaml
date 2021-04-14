@@ -1,3 +1,3 @@
 ---
 minor_changes:
-- "nmcli - add ability to connect to a Wifi network and also to attach the connection to a master (bond) (https://github.com/ansible-collections/community.general/pull/2220)."
+- "nmcli - add ability to connect to a Wifi network and also to attach it to a master (bond) (https://github.com/ansible-collections/community.general/pull/2220)."
