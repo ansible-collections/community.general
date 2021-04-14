@@ -36,13 +36,13 @@ seealso:
 
 EXAMPLES = '''
 - name: Get info for job awx
-  community.general.nomad_job:
+  community.general.nomad_job_info:
     host: localhost
     name: awx
   register: result
 
 - name: List Nomad jobs
-  community.general.nomad_job:
+  community.general.nomad_job_info:
     host: localhost
   register: result
 
