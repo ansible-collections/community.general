@@ -281,6 +281,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     parsed_value = [tag.strip() for tag in value.split(",")]
                     self.inventory.set_variable(name, parsed_key, parsed_value)
 
+                # The first field in the agent string tells you whether the agent is enabled
+                # the rest of the comma separated string is extra config for the agent
+                #if config == 'agent' and int(value.split(',')[0]):
                 if config == 'agent' and int(value):
                     agent_iface_key = self.to_safe('%s%s' % (key, "_interfaces"))
                     agent_iface_value = self._get_agent_network_interfaces(node, vmid, vmtype)
