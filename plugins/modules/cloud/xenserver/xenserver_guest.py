@@ -131,7 +131,7 @@ options:
     type: dict
     suboptions:
       type:
-        description: The type of CD-ROM, valid options are C(none) or C(iso). With C(none) the CD-ROM device will be present but empty.
+        description: The type of CD-ROM. With C(none) the CD-ROM device will be present but empty.
         type: str
         choices: [none, iso]
       iso_name:
@@ -143,23 +143,42 @@ options:
     description:
     - A list of networks (in the order of the NICs).
     - All parameters are case sensitive.
-    - 'Required parameters per entry:'
-    - ' - C(name) (string): Name of a XenServer network to attach the network interface to. You can also use C(name_label) as an alias.'
-    - 'Optional parameters per entry (used for VM hardware):'
-    - ' - C(mac) (string): Customize MAC address of the interface.'
-    - 'Optional parameters per entry (used for OS customization):'
-    - ' - C(type) (string): Type of IPv4 assignment, valid options are C(none), C(dhcp) or C(static). Value C(none) means whatever is default for OS.
-          On some operating systems it could be DHCP configured (e.g. Windows) or unconfigured interface (e.g. Linux).'
-    - ' - C(ip) (string): Static IPv4 address (implies C(type: static)). Can include prefix in format <IPv4 address>/<prefix> instead of using C(netmask).'
-    - ' - C(netmask) (string): Static IPv4 netmask required for C(ip) if prefix is not specified.'
-    - ' - C(gateway) (string): Static IPv4 gateway.'
-    - ' - C(type6) (string): Type of IPv6 assignment, valid options are C(none), C(dhcp) or C(static). Value C(none) means whatever is default for OS.
-          On some operating systems it could be DHCP configured (e.g. Windows) or unconfigured interface (e.g. Linux).'
-    - ' - C(ip6) (string): Static IPv6 address (implies C(type6: static)) with prefix in format <IPv6 address>/<prefix>.'
-    - ' - C(gateway6) (string): Static IPv6 gateway.'
     type: list
     elements: dict
     aliases: [ network ]
+    suboptions:
+        name:
+          description: Name of a XenServer network to attach the network interface to.
+          type: str
+          aliases: [name_label]
+        mac:
+          description: Customize MAC address of the interface.
+          type: str
+        type:
+          description:
+            - Type of IPv4 assignment. Value C(none) means whatever is default for OS.
+            - On some operating systems it could be DHCP configured (e.g. Windows) or unconfigured interface (e.g. Linux).
+          type: str
+          choices: [none, dhcp, static]
+        ip:
+          description: 'Static IPv4 address (implies I(type): C(static)). Can include prefix in format <IPv4 address>/<prefix> instead of using C(netmask).'
+          type: str
+        netmask:
+          description: Static IPv4 netmask required for C(ip) if prefix is not specified.
+          type: str
+        gateway:
+          description: Static IPv4 gateway.
+          type: str
+        type6:
+          description: Type of IPv6 assignment. Value C(none) means whatever is default for OS.
+          type: str
+          choices: [none, dhcp, static]
+        ip6:
+          description: 'Static IPv6 address (implies I(type6): C(static)) with prefix in format <IPv6 address>/<prefix>.'
+          type: str
+        gateway6:
+          description: Static IPv6 gateway.
+          type: str
   home_server:
     description:
     - Name of a XenServer host that will be a Home Server for the VM.
@@ -172,6 +191,15 @@ options:
     - A custom value object takes two fields C(key) and C(value) (see example below).
     type: list
     elements: dict
+    suboptions:
+      key:
+        description: key name for the value object
+        type: str
+        required: yes
+      value:
+        description: value object
+        type: raw
+        required: yes
   wait_for_ip_address:
     description:
     - Wait until XenServer detects an IP address for the VM. If C(state) is set to C(absent), this parameter is ignored.
@@ -1814,7 +1842,7 @@ def main():
         cdrom=dict(
             type='dict',
             options=dict(
-                type=dict(type='str', choices=['none', 'iso']),
+                type=dict(type='str', choices=['none', 'iso']),  # @TODO: required ?
                 iso_name=dict(type='str'),
             ),
             required_if=[
@@ -1825,13 +1853,13 @@ def main():
             type='list',
             elements='dict',
             options=dict(
-                name=dict(type='str', aliases=['name_label']),
+                name=dict(type='str', aliases=['name_label']),  # @TODO: required ?
                 mac=dict(type='str'),
-                type=dict(type='str', choices=['none', 'dhcp', 'static']),
+                type=dict(type='str', choices=['none', 'dhcp', 'static']),  # @TODO: required ?
                 ip=dict(type='str'),
                 netmask=dict(type='str'),
                 gateway=dict(type='str'),
-                type6=dict(type='str', choices=['none', 'dhcp', 'static']),
+                type6=dict(type='str', choices=['none', 'dhcp', 'static']),  # @TODO: required ?
                 ip6=dict(type='str'),
                 gateway6=dict(type='str'),
             ),
