@@ -108,7 +108,7 @@ def get_cluster_status(module):
         return 'online'
 
 
-def authenticate_nodes(module, nodes):
+def authenticate_nodes(module, nodes, pcs_user, pcs_password):
     cmd = "pcs host auth %s -u %s -p %s" % (" ".join(nodes), pcs_user, pcs_password)
     rc, out, err = module.run_command(cmd)
     if rc == 1:
@@ -212,15 +212,15 @@ def create_cluster(module, timeout, name, cluster_nodes, pcs_user, pcs_password,
     if rc == 1 and status == 'online':
         # if the cluster is up but still failed to get cluster config => error
         module.fail_json(msg="Failed to get cluster configuration.\nCommand: `%s`\nError: %s" % (cmd, err))
-    match_object = re.search(r'Cluster Name: (.+?)\n', out)
+    match_object = re.search(r'Cluster Name: (.*?)\n', out)
     existing_name = match_object.group(1)
     if len(existing_name) > 0 and existing_name != name:
-        module.fail_json(msg="The node is currently part of a cluster of a different name.\nCommand: `%s`\nError: %s" % (cmd, err))
+        module.fail_json(msg="The node is currently part of a cluster of a different name: %s.\nCommand: `%s`\nError: %s" % (existing_name, cmd, err))
 
     # if the cluster needs to be created, no need to check existing config
     if len(existing_name) == 0:
         # first authenticate with all nodes
-        authenticate_nodes(module, nodes)
+        authenticate_nodes(module, nodes, pcs_user, pcs_password)
         cmd = "pcs cluster setup %s --start %s" % (name, " ".join(nodes))
         rc, out, err = module.run_command(cmd)
         if rc == 1:
@@ -254,7 +254,7 @@ def create_cluster(module, timeout, name, cluster_nodes, pcs_user, pcs_password,
         # if there are still nodes unaccounted for, add them to the cluster
         if len(nodes) > 0:
             changed = True
-            authenticate_nodes(module, nodes)
+            authenticate_nodes(module, nodes, pcs_user, pcs_password)
             for node in nodes:
                 cmd = "pcs cluster node add --start %s" % node
                 rc, out, err = module.run_command(cmd)
