@@ -1,2 +1,2 @@
 bugfixes:
-  - funcd connection can now load as a connection plugin.
+  - funcd connection plugin - can now load (https://github.com/ansible-collections/community.general/pull/2235).
