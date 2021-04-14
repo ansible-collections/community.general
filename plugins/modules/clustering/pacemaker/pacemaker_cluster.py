@@ -292,7 +292,7 @@ def clean_cluster(module, timeout):
 def main():
     argument_spec = dict(
         state=dict(type='str', choices=['online', 'offline', 'restart', 'cleanup', 'present', 'absent']),
-        name=dict(type='str'),
+        name=dict(type='str', required=True),
         pcs_user=dict(type='str', required=True),
         pcs_password=dict(type='str', required=True),
         timeout=dict(type='int', default=300),
