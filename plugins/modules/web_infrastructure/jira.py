@@ -389,7 +389,7 @@ def request(
     auth = to_text(base64.b64encode(to_bytes('{0}:{1}'.format(user, passwd), errors='surrogate_or_strict')))
 
     headers = {}
-    if isinstance(additional_headers) == dict:
+    if isinstance(additional_headers, dict):
         headers = additional_headers.copy()
     headers.update({
         "Content-Type": content_type,
