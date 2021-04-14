@@ -53,13 +53,24 @@ options:
 '''
 EXAMPLES = '''
 ---
-- name: Set cluster Online
+- name: Create pacemaker cluster
   hosts: localhost
   gather_facts: no
   tasks:
-  - name: Get cluster state
+  - name: Ensure cluster exists
+    community.general.pacemaker_cluster:
+      state: present
+      nodes:
+        - node1
+        - node2
+      pcs_user: username
+      pcs_password: password
+  - name: Bring the cluster online
     community.general.pacemaker_cluster:
       state: online
+      nodes:
+        - node1
+        - node2
 '''
 
 RETURN = '''
@@ -280,7 +291,7 @@ def clean_cluster(module, timeout):
 
 def main():
     argument_spec = dict(
-        state=dict(type='str', choices=['online', 'offline', 'restart', 'cleanup']),
+        state=dict(type='str', choices=['online', 'offline', 'restart', 'cleanup', 'present', 'absent']),
         name=dict(type='str'),
         pcs_user=dict(type='str', required=True),
         pcs_password=dict(type='str', required=True),
@@ -296,7 +307,6 @@ def main():
     )
     changed = False
     state = module.params['state']
-    node = module.params['node']
     pcs_user = module.params['pcs_user']
     pcs_password = module.params['pcs_password']
     force = module.params['force']
