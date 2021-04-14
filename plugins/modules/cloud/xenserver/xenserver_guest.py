@@ -128,11 +128,17 @@ options:
     description:
     - A CD-ROM configuration for the VM.
     - All parameters are case sensitive.
-    - 'Valid parameters are:'
-    - ' - C(type) (string): The type of CD-ROM, valid options are C(none) or C(iso). With C(none) the CD-ROM device will be present but empty.'
-    - ' - C(iso_name) (string): The file name of an ISO image from one of the XenServer ISO Libraries (implies C(type: iso)).
-          Required if C(type) is set to C(iso).'
     type: dict
+    suboptions:
+      type:
+        description: The type of CD-ROM, valid options are C(none) or C(iso). With C(none) the CD-ROM device will be present but empty.
+        type: str
+        choices: [none, iso]
+      iso_name:
+        description:
+          - 'The file name of an ISO image from one of the XenServer ISO Libraries (implies C(type: iso)).'
+          - Required if C(type) is set to C(iso).
+        type: str
   networks:
     description:
     - A list of networks (in the order of the NICs).
@@ -441,11 +447,12 @@ except ImportError:
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.network import is_mac
 from ansible.module_utils import six
-from ansible_collections.community.general.plugins.module_utils.xenserver import (xenserver_common_argument_spec, XAPI, XenServerObject, get_object_ref,
-                                                                                  gather_vm_params, gather_vm_facts, set_vm_power_state,
-                                                                                  wait_for_vm_ip_address, is_valid_ip_addr, is_valid_ip_netmask,
-                                                                                  is_valid_ip_prefix, ip_prefix_to_netmask, ip_netmask_to_prefix,
-                                                                                  is_valid_ip6_addr, is_valid_ip6_prefix)
+from ansible_collections.community.general.plugins.module_utils.xenserver import (
+    xenserver_common_argument_spec, XenServerObject, get_object_ref,
+    gather_vm_params, gather_vm_facts, set_vm_power_state,
+    wait_for_vm_ip_address, is_valid_ip_addr, is_valid_ip_netmask,
+    is_valid_ip_prefix, ip_prefix_to_netmask, ip_netmask_to_prefix,
+    is_valid_ip6_addr, is_valid_ip6_prefix)
 
 
 class XenServerVM(XenServerObject):
