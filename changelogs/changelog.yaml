@@ -1804,3 +1804,15 @@ releases:
         name: path_join
         namespace: null
     release_date: '2021-04-13'
+  2.5.1:
+    changes:
+      bugfixes:
+      - funcd connection plugin - can now load (https://github.com/ansible-collections/community.general/pull/2235).
+      - jira - fixed calling of ``isinstance`` (https://github.com/ansible-collections/community.general/issues/2234).
+      release_summary: Bugfix release for some bugs discovered right after the 2.5.0
+        release.
+    fragments:
+    - 2.5.1.yml
+    - 2236-jira-isinstance.yml
+    - allow_funcd_to_load.yml
+    release_date: '2021-04-14'

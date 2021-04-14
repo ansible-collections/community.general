@@ -6,6 +6,20 @@ Community General Release Notes
 
 This changelog describes changes after version 1.0.0.
 
+v2.5.1
+======
+
+Release Summary
+---------------
+
+Bugfix release for some bugs discovered right after the 2.5.0 release.
+
+Bugfixes
+--------
+
+- funcd connection plugin - can now load (https://github.com/ansible-collections/community.general/pull/2235).
+- jira - fixed calling of ``isinstance`` (https://github.com/ansible-collections/community.general/issues/2234).
+
 v2.5.0
 ======
 
