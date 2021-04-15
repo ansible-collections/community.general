@@ -264,7 +264,7 @@ def main():
         changed = destroy_resource(module, name)
     elif state == 'present':
         # make sure it exists with the same configuration
-        changed = create_resource(module, name, type, fencing_options)
+        changed = create_resource(module, name, type, attributes, operations)
         changed = changed or create_resource_constraints(module, name, location_constraints)
     elif state == 'enabled':
         # Just enable the device if it exists
