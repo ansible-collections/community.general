@@ -116,7 +116,7 @@ def create_resource(module, name, resource_type, attributes, operations):
     rc, out, err = module.run_command(cmd)
     if rc == 1:
         # Any error other than 'resource not found' should fail
-        if not out.startswith(_RESOURCE_NOT_FOUND):
+        if not err.startswith(_RESOURCE_NOT_FOUND):
             module.fail_json(msg="Failed to get resource configuration.\nCommand: `%s`\nError: %s" % (cmd, err))
         # The resource doesn't exist, so it needs to be created with the specified attributes
         exists = False
@@ -152,7 +152,7 @@ def create_resource(module, name, resource_type, attributes, operations):
     command_key = "update %s" % (name,) if exists else "create %s %s" % (name, resource_type)
     # this is for the resource attributes
     command_attributes = ["%s='%s'" % (key, val) for key, val in attributes.items()]
-    command_attributes = " ".join(command_options)
+    command_attributes = " ".join(command_attributes)
     # and this is for the operations
     command_operations = ["%s interval=%ss" % (key, val) for key, val in operations.items()]
     command_operations = "op " + " ".join(command_operations)
@@ -225,8 +225,8 @@ def main():
         name=dict(type='str', required=True),
         type=dict(type='str', required=True),
         force=dict(type='bool', default=False),
-        attributes=dict(type='dict'),
-        operations=dict(type='dict', options=dict(
+        attributes=dict(type='dict', default={}),
+        operations=dict(type='dict', default = {}, options=dict(
             monitor=dict(type='dict', options=dict(
                 timeout=dict(type='int'),
                 interval=dict(type='int'),
@@ -240,7 +240,7 @@ def main():
                 interval=dict(type='int'),
             )),
         )),
-        location_constraints=dict(type='list', elements='dict', options=dict(
+        location_constraints=dict(type='list', elements='dict', default=[], options=dict(
             node=dict(type='str'),
             score=dict(type='str'),
         )),
