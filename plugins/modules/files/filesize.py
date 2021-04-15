@@ -29,7 +29,7 @@ options:
     description:
       - Path of the regular file to create or resize.
     type: path
-    required: yes
+    required: true
   size:
     description:
       - Requested size of the file.
@@ -53,7 +53,7 @@ options:
         arbitrary size, and then resized down to its initial size without
         modifying its initial content.
     type: str
-    required: yes
+    required: true
   blocksize:
     description:
       - Size of blocks, in bytes if not followed by a multiplicative suffix.
@@ -76,7 +76,7 @@ options:
         means it always reports I(changed=true).
       - I(force=yes) and I(sparse=yes) are mutually exclusive.
     type: bool
-    default: no
+    default: false
   sparse:
     description:
       - Whether or not the file to create should be a sparse file.
@@ -85,7 +85,7 @@ options:
       - This option is not supported on OpenBSD, Solaris and AIX.
       - I(force=yes) and I(sparse=yes) are mutually exclusive.
     type: bool
-    default: no
+    default: false
 
 notes:
   - This module supports I(check_mode) and I(diff).
@@ -153,13 +153,13 @@ EXAMPLES = r'''
     path: /media/sdb1/mbr.bin
     size: 440B
     source: /dev/sda
-    force: yes
+    force: true
 
 - name: Create/resize a sparse file of/to 8TB
   community.general.filesize:
     path: /var/local/sparsefile
     size: 8TB
-    sparse: yes
+    sparse: true
 
 - name: Create a file with specific size and attributes, to be used as swap space
   community.general.filesize:
@@ -188,11 +188,11 @@ filesize:
       type: int
       sample: 500
     blocksize:
-      description: Size of the blocks.
+      description: Size of the blocks in bytes.
       type: int
       sample: 1024
     bytes:
-      description: Size of the file, in bytes, as the product of C(blocks) and C(blocksize)).
+      description: Size of the file, in bytes, as the product of C(blocks) and C(blocksize).
       type: int
       sample: 512000
     iec:
