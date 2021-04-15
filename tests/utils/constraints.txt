@@ -43,7 +43,7 @@ botocore >= 1.10.0, < 1.14 ; python_version < '2.7' # adds support for the follo
 botocore >= 1.10.0 ; python_version >= '2.7' # adds support for the following AWS services: secretsmanager, fms, and acm-pca
 setuptools < 45 ; python_version <= '2.7' # setuptools 45 and later require python 3.5 or later
 cffi >= 1.14.2, != 1.14.3 # Yanked version which older versions of pip will still install:
-psutil < 5.7.0 ; python_version < '3' # Version 5.7.0 breaks on python 2.x. See https://github.com/ansible/ansible/pull/70667
+psutil < 5.6.7 ; python_version < '3' # Version 5.7.0 breaks on python 2.x. See https://github.com/ansible/ansible/pull/70667
 
 # freeze pylint and its requirements for consistent test results
 astroid == 2.2.5

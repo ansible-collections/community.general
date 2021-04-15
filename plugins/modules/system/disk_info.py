@@ -12,7 +12,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: disk_info
-version_added: "2.5.0"
+version_added: "3.0.0"
 short_description: Retrieves disk info
 description:
     - This module retrieves disk info like free space, used percentage, mount location, and so on.
