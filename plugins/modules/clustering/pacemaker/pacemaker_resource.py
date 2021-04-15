@@ -58,7 +58,10 @@ EXAMPLES = '''
           interval: 30
       location_constraints:
         - node: node1
-          score: 5
+          score: -5
+      attributes:
+        ip: "192.168.1.10"
+        cidr_netmask: "24"
 '''
 
 RETURN = '''
@@ -85,7 +88,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 _RESOURCE_NOT_FOUND = "Error: unable to find resource"
 
-def create_resource_constraints(module, resource_name, constraints):
+def create_resource_constraints(module, resource_name, location_constraints):
     # Get all existing location constraints
     cmd = "pcs constraint location show %s" % resource_name
     rc, out, err = module.run_command(cmd)
@@ -93,7 +96,7 @@ def create_resource_constraints(module, resource_name, constraints):
         module.fail_json(msg="Failed to get location constraints for specified resource.\nCommand: `%s`\nError: %s" % (cmd, err))
     existing_constraints = re.findall(r'Node: (\S+) \(score:.*?\)', out)
     # parse constraints into same format
-    constraints = [(constraint.node, constraint.score) for constraint in constraints]
+    constraints = [(constraint.node, constraint.score) for constraint in location_constraints]
     # check if constraints are equivalent
     for existing_constraint in existing_constraints:
         # remove constraint from requested list
@@ -101,7 +104,7 @@ def create_resource_constraints(module, resource_name, constraints):
             constraints.remove(existing_constraint)
     if len(constraints) == 0:
         return False
-    cmd = "pcs constraint location %s prefers %s" % (resource_name, " ".join(["%s=%s" % (x,y) for x,y in constraints])
+    cmd = "pcs constraint location %s prefers %s" % (resource_name, " ".join(["%s=%s" % (x,y) for x,y in constraints]))
     rc, out, err = module.run_command(cmd)
     if rc == 1:
         module.fail_json(msg="Failed to create location constraint for specified resource.\nCommand: `%s`\nError: %s" % (cmd, err))
@@ -160,7 +163,7 @@ def create_resource(module, name, resource_type, attributes, operations):
     return True
 
 
-def destroy_resource(module, name)
+def destroy_resource(module, name):
     exists = True
     cmd = "pcs resource config %s" % (name,)
     rc, out, err = module.run_command(cmd)
@@ -237,6 +240,10 @@ def main():
                 interval=dict(type='int'),
             )),
         )),
+        location_constraints=dict(type='list', elements='dict', options=dict(
+            node=dict(type='str'),
+            score=dict(type='str'),
+        )),
     )
 
     module = AnsibleModule(
@@ -250,6 +257,7 @@ def main():
     force = module.params['force']
     attributes = module.params['attributes']
     operations = module.params['operations']
+    location_constraints = module.params['location_constraints']
 
     if state == 'absent':
         # just delete the device if it exists
@@ -257,7 +265,7 @@ def main():
     elif state == 'present':
         # make sure it exists with the same configuration
         changed = create_resource(module, name, type, fencing_options)
-        changed = changed or create_resource_constraints(module, name
+        changed = changed or create_resource_constraints(module, name, location_constraints)
     elif state == 'enabled':
         # Just enable the device if it exists
         changed = enable_resource(module, name)
@@ -268,5 +276,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
