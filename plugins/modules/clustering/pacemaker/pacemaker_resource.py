@@ -222,9 +222,9 @@ def disable_resource(module, name):
 def main():
     argument_spec = dict(
         state=dict(type='str', choices=['present', 'absent', 'enabled', 'disabled'], default='present'),
-        name=dict(type='str'),
-        type=dict(type='str'),
-        force=dict(type='bool', default=True),
+        name=dict(type='str', required=True),
+        type=dict(type='str', required=True),
+        force=dict(type='bool', default=False),
         attributes=dict(type='dict'),
         operations=dict(type='dict', options=dict(
             monitor=dict(type='dict', options=dict(
