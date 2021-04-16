@@ -32,7 +32,7 @@ options:
       type: str
     operations:
       description:
-        - Used to specify the intervals and/or timeouts for monitoring, start, and stop
+        - Used to specify the intervals and/or timeouts for monitoring, starting, and stopping
           operations on a resource.
       type: dict
     force:
@@ -169,8 +169,11 @@ def create_resource(module, name, resource_type, attributes, operations):
     command_attributes = ["%s='%s'" % (key, val) for key, val in attributes.items()]
     command_attributes = " ".join(command_attributes)
     # and this is for the operations
-    command_operations = ["%s interval=%ss" % (key, val) for key, val in operations.items()]
-    command_operations = "op " + " ".join(command_operations)
+    command_operations = "op "
+    for key,val in operations.items():
+        command_operations += (key + " ".join(["%s interval=%ss" % (key, val) for key, val in operations.items()]))
+    module.fail_json(msg=command_operations)
+    #command_operations = "op " + " ".join(command_operations)
     cmd = "pcs resource %s %s" % (command_key, command_attributes)
     rc, out, err = module.run_command(cmd)
     if rc != 0:
