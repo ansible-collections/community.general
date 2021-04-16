@@ -20,33 +20,33 @@ options:
     type: str
     description:
       - The Perl library to install. Valid values change according to the I(mode), see notes for more details.
-      - Note that for local path installation you should use the parameter I(from_path).
+      - Note that for installing from a local path the parameter I(from_path) should be used.
     aliases: [pkg]
   from_path:
     type: path
     description:
-      - The local directory from where to install
+      - The local directory or C(tar.gz) file to install from.
   notest:
     description:
-      - Do not run unit tests
+      - Do not run unit tests.
     type: bool
     default: no
   locallib:
     description:
-      - Specify the install base to install modules
+      - Specify the install base to install modules.
     type: path
   mirror:
     description:
-      - Specifies the base URL for the CPAN mirror to use
+      - Specifies the base URL for the CPAN mirror to use.
     type: str
   mirror_only:
     description:
-      - Use the mirror's index file instead of the CPAN Meta DB
+      - Use the mirror's index file instead of the CPAN Meta DB.
     type: bool
     default: no
   installdeps:
     description:
-      - Only install dependencies
+      - Only install dependencies.
     type: bool
     default: no
   version:
@@ -65,7 +65,7 @@ options:
     aliases: ['use_sudo']
   executable:
     description:
-      - Override the path to the cpanm executable
+      - Override the path to the cpanm executable.
     type: path
   mode:
     description:
