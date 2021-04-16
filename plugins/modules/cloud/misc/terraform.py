@@ -181,7 +181,7 @@ from ansible.module_utils.six.moves import shlex_quote
 
 from ansible.module_utils.basic import AnsibleModule
 
-DESTROY_ARGS = ('destroy', '-no-color', '-force')
+DESTROY_ARGS = ('destroy', '-no-color', '-auto-approve')
 APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve=true')
 module = None
 
