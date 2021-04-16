@@ -4,7 +4,7 @@
 # Copyright: (c) 2018, Bojan Vitnik <bvitnik@mainstream.rs>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import, division, print_function
+from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -24,14 +24,14 @@ notes:
    Citrix Hypervisor/XenServer SDK (downloadable from Citrix website). Copy the XenAPI.py file from the SDK to your Python site-packages on your
    Ansible Control Node to use it. Latest version of the library can also be acquired from GitHub:
    U(https://raw.githubusercontent.com/xapi-project/xen-api/master/scripts/examples/python/XenAPI/XenAPI.py)'
-- 'If no scheme is specified in C(hostname), module defaults to C(http://) because C(https://) is problematic in most setups. Make sure you are
+- 'If no scheme is specified in I(hostname), module defaults to C(http://) because C(https://) is problematic in most setups. Make sure you are
    accessing XenServer host in trusted environment or use C(https://) scheme explicitly.'
-- 'To use C(https://) scheme for C(hostname) you have to either import host certificate to your OS certificate store or use C(validate_certs: no)
+- 'To use C(https://) scheme for I(hostname) you have to either import host certificate to your OS certificate store or use I(validate_certs): C(no)
    which requires XenAPI library from XenServer 7.2 SDK or newer and Python 2.7.9 or newer.'
-- 'Network configuration inside a guest OS, by using C(networks.type), C(networks.ip), C(networks.gateway) etc. parameters, is supported on
+- 'Network configuration inside a guest OS, by using I(networks.type), I(networks.ip), I(networks.gateway) etc. parameters, is supported on
   XenServer 7.0 or newer for Windows guests by using official XenServer Guest agent support for network configuration. The module will try to
   detect if such support is available and utilize it, else it will use a custom method of configuration via xenstore. Since XenServer Guest
-  agent only support None and Static types of network configuration, where None means DHCP configured interface, C(networks.type) and C(networks.type6)
+  agent only support None and Static types of network configuration, where None means DHCP configured interface, I(networks.type) and I(networks.type6)
   values C(none) and C(dhcp) have same effect. More info here:
   U(https://www.citrix.com/community/citrix-developer/citrix-hypervisor-developer/citrix-hypervisor-developing-products/citrix-hypervisor-staticip.html)'
 - 'On platforms without official support for network configuration inside a guest OS, network parameters will be written to xenstore
@@ -49,10 +49,10 @@ options:
   state:
     description:
     - Specify the state VM should be in.
-    - If C(state) is set to C(present) and VM exists, ensure the VM configuration conforms to given parameters.
-    - If C(state) is set to C(present) and VM does not exist, then VM is deployed with given parameters.
-    - If C(state) is set to C(absent) and VM exists, then VM is removed with its associated components.
-    - If C(state) is set to C(poweredon) and VM does not exist, then VM is deployed with given parameters and powered on automatically.
+    - If I(state) is set to C(present) and VM exists, ensure the VM configuration conforms to given parameters.
+    - If I(state) is set to C(present) and VM does not exist, then VM is deployed with given parameters.
+    - If I(state) is set to C(absent) and VM exists, then VM is removed with its associated components.
+    - If I(state) is set to C(poweredon) and VM does not exist, then VM is deployed with given parameters and powered on automatically.
     type: str
     default: present
     choices: [ present, absent, poweredon ]
@@ -60,7 +60,7 @@ options:
     description:
     - Name of the VM to work with.
     - VMs running on XenServer do not necessarily have unique names. The module will fail if multiple VMs with same name are found.
-    - In case of multiple VMs with same name, use C(uuid) to uniquely specify VM to manage.
+    - In case of multiple VMs with same name, use I(uuid) to uniquely specify VM to manage.
     - This parameter is case sensitive.
     type: str
     aliases: [ name_label ]
@@ -78,7 +78,7 @@ options:
     description:
     - Name of a template, an existing VM (must be shut down) or a snapshot that should be used to create VM.
     - Templates/VMs/snapshots on XenServer do not necessarily have unique names. The module will fail if multiple templates with same name are found.
-    - In case of multiple templates/VMs/snapshots with same name, use C(template_uuid) to uniquely specify source template.
+    - In case of multiple templates/VMs/snapshots with same name, use I(template_uuid) to uniquely specify source template.
     - If VM already exists, this setting will be ignored.
     - This parameter is case sensitive.
     type: str
@@ -106,13 +106,16 @@ options:
     type: dict
     suboptions:
       num_cpus:
-        description: Number of CPUs.
+        description:
+        - Number of CPUs.
         type: int
       num_cpu_cores_per_socket:
-        description: Number of Cores Per Socket. C(num_cpus) has to be a multiple of C(num_cpu_cores_per_socket).
+        description:
+        - Number of Cores Per Socket. I(num_cpus) has to be a multiple of I(num_cpu_cores_per_socket).
         type: int
       memory_mb:
-        description: Amount of memory in MB.
+        description:
+        - Amount of memory in MB.
         type: int
   disks:
     description:
@@ -120,41 +123,51 @@ options:
     - All parameters are case sensitive.
     - Removing or detaching existing disks of VM is not supported.
     - Entries are required to have either a I(size) or one of I(size_[tb,gb,mb,kb,b]) parameters.
-    - VM needs to be shut down to reconfigure this parameter.
+    - VM needs to be shut down to reconfigure disk size.
     type: list
     elements: dict
     aliases: [ disk ]
     suboptions:
       size:
-        description: 'Disk size with unit. Unit must be: C(b), C(kb), C(mb), C(gb), C(tb). VM needs to be shut down to reconfigure this parameter.'
+        description:
+        - 'Disk size with unit. Unit must be: C(b), C(kb), C(mb), C(gb), C(tb). VM needs to be shut down to reconfigure this parameter.'
         type: str
       size_b:
-        description: Disk size in bytes.
+        description:
+        - Disk size in bytes.
         type: str
       size_kb:
-        description: Disk size in kilobytes.
+        description:
+        - Disk size in kilobytes.
         type: str
       size_mb:
-        description: Disk size in megabytes.
+        description:
+        - Disk size in megabytes.
         type: str
       size_gb:
-        description: Disk size in gigabytes.
+        description:
+        - Disk size in gigabytes.
         type: str
       size_tb:
-        description: Disk size in terabytes.
+        description:
+        - Disk size in terabytes.
         type: str
       name:
-        description: Disk name.
+        description:
+        - Disk name.
         type: str
         aliases: [ name_label ]
       name_desc:
-        description: Disk description.
+        description:
+        - Disk description.
         type: str
       sr:
-        description: Storage Repository to create disk on. If not specified, will use default SR. Cannot be used for moving disk to other SR.
+        description:
+        - Storage Repository to create disk on. If not specified, will use default SR. Cannot be used for moving disk to other SR.
         type: str
       sr_uuid:
-        description: UUID of a SR to create disk on. Use if SR name is not unique.
+        description:
+        - UUID of a SR to create disk on. Use if SR name is not unique.
         type: str
   cdrom:
     description:
@@ -163,28 +176,32 @@ options:
     type: dict
     suboptions:
       type:
-        description: The type of CD-ROM. With C(none) the CD-ROM device will be present but empty.
+        description:
+        - The type of CD-ROM. With C(none) the CD-ROM device will be present but empty.
         type: str
         choices: [ none, iso ]
       iso_name:
         description:
-          - 'The file name of an ISO image from one of the XenServer ISO Libraries (implies C(type: iso)).'
-          - Required if C(type) is set to C(iso).
+          - 'The file name of an ISO image from one of the XenServer ISO Libraries (implies I(type): C(iso)).'
+          - Required if I(type) is set to C(iso).
         type: str
   networks:
     description:
     - A list of networks (in the order of the NICs).
     - All parameters are case sensitive.
+    - Name is required for new NICs. Other parameters are optional in all cases.
     type: list
     elements: dict
     aliases: [ network ]
     suboptions:
         name:
-          description: Name of a XenServer network to attach the network interface to.
+          description:
+          - Name of a XenServer network to attach the network interface to.
           type: str
           aliases: [ name_label ]
         mac:
-          description: Customize MAC address of the interface.
+          description:
+          - Customize MAC address of the interface.
           type: str
         type:
           description:
@@ -193,23 +210,29 @@ options:
           type: str
           choices: [ none, dhcp, static ]
         ip:
-          description: 'Static IPv4 address (implies I(type): C(static)). Can include prefix in format <IPv4 address>/<prefix> instead of using C(netmask).'
+          description:
+          - 'Static IPv4 address (implies I(type): C(static)). Can include prefix in format C(<IPv4 address>/<prefix>) instead of using C(netmask).'
           type: str
         netmask:
-          description: Static IPv4 netmask required for C(ip) if prefix is not specified.
+          description:
+          - Static IPv4 netmask required for I(ip) if prefix is not specified.
           type: str
         gateway:
-          description: Static IPv4 gateway.
+          description:
+          - Static IPv4 gateway.
           type: str
         type6:
-          description: Type of IPv6 assignment. Value C(none) means whatever is default for OS.
+          description:
+          - Type of IPv6 assignment. Value C(none) means whatever is default for OS.
           type: str
           choices: [ none, dhcp, static ]
         ip6:
-          description: 'Static IPv6 address (implies I(type6): C(static)) with prefix in format <IPv6 address>/<prefix>.'
+          description:
+          - 'Static IPv6 address (implies I(type6): C(static)) with prefix in format C(<IPv6 address>/<prefix>).'
           type: str
         gateway6:
-          description: Static IPv6 gateway.
+          description:
+          - Static IPv6 gateway.
           type: str
   home_server:
     description:
@@ -220,27 +243,29 @@ options:
     description:
     - Define a list of custom VM params to set on VM.
     - Useful for advanced users familiar with managing VM params trough xe CLI.
-    - A custom value object takes two fields C(key) and C(value) (see example below).
+    - A custom value object takes two fields I(key) and I(value) (see example below).
     type: list
     elements: dict
     suboptions:
       key:
-        description: key name for the value object
+        description:
+        - VM param name.
         type: str
         required: yes
       value:
-        description: value object
+        description:
+        - VM param value.
         type: raw
         required: yes
   wait_for_ip_address:
     description:
-    - Wait until XenServer detects an IP address for the VM. If C(state) is set to C(absent), this parameter is ignored.
+    - Wait until XenServer detects an IP address for the VM. If I(state) is set to C(absent), this parameter is ignored.
     - This requires XenServer Tools to be preinstalled on the VM to work properly.
     type: bool
     default: no
   state_change_timeout:
     description:
-    - 'By default, module will wait indefinitely for VM to accquire an IP address if C(wait_for_ip_address: yes).'
+    - 'By default, module will wait indefinitely for VM to accquire an IP address if I(wait_for_ip_address): C(yes).'
     - If this parameter is set to positive value, the module will instead wait specified number of seconds for the state change.
     - In case of timeout, module will generate an error message.
     type: int
