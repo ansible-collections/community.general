@@ -81,7 +81,7 @@ author:
 '''
 
 EXAMPLES = '''
-- name: Create a Keycloak group, authentification with credentials 
+- name: Create a Keycloak group, authentification with credentials
   community.general.keycloak_group:
     name: my-new-kc-group
     realm: MyCustomRealm
@@ -93,14 +93,14 @@ EXAMPLES = '''
     auth_password: PASSWORD
   delegate_to: localhost
 
-  - name: Create a Keycloak group, authentification with token  
+- name: Create a Keycloak group, authentification with token
   community.general.keycloak_group:
     name: my-new-kc-group
     realm: MyCustomRealm
     state: present
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
-    token: TOKEN 
+    token: TOKEN
   delegate_to: localhost
 
 - name: Delete a keycloak group
@@ -236,20 +236,20 @@ def main():
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
-                           required_one_of=([['id', 'name'], 
-                           ['token', 'auth_realm', 'auth_username', 'auth_password']]),
+                           required_one_of=([['id', 'name'],
+                                             ['token', 'auth_realm', 'auth_username', 'auth_password']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
     result = dict(changed=False, msg='', diff={}, group='')
 
     # Obtain access token, initialize API
-    token = module.params.get('token') 
-    if(token != None): 
+    token = module.params.get('token')
+    if(token is not None):
         connection_header = {
             'Authorization': token,
             'Content-Type': 'application/json'
         }
-    else: 
+    else:
         try:
             connection_header = get_token(
                 base_url=module.params.get('auth_keycloak_url'),
