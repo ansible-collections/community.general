@@ -58,7 +58,6 @@ options:
       - If true, the created Linode will have private networking enabled and
         assigned a private IPv4 address.
     type: bool
-    required: false
     default: false
   tags:
     description:
@@ -245,7 +244,7 @@ def initialise_module():
             authorized_keys=dict(type='list', elements='str', no_log=False),
             group=dict(type='str'),
             image=dict(type='str'),
-            private_ip=dict(type='bool', default=False, required=False),
+            private_ip=dict(type='bool', default=False),
             region=dict(type='str'),
             root_pass=dict(type='str', no_log=True),
             tags=dict(type='list', elements='str'),
