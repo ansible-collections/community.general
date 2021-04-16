@@ -88,6 +88,13 @@ from ansible.module_utils.basic import AnsibleModule
 
 _RESOURCE_NOT_FOUND = "Error: unable to find resource"
 
+def sanitize_operations(operations):
+    for key,val in list(operations.items()):
+        if val is None:
+            del operations[key]
+        else:
+            sanitize_operations(operations[
+
 def create_resource_constraints(module, resource_name, location_constraints):
     # Get all existing location constraints
     cmd = "pcs constraint location show %s" % resource_name
@@ -111,6 +118,8 @@ def create_resource_constraints(module, resource_name, location_constraints):
     return True
 
 def create_resource(module, name, resource_type, attributes, operations):
+    # sanitize operations by removing null values
+    sanitize_operations(operations)
     exists = True
     cmd = "pcs resource config %s" % name
     rc, out, err = module.run_command(cmd)
@@ -169,7 +178,7 @@ def destroy_resource(module, name):
     rc, out, err = module.run_command(cmd)
     if rc == 1:
         # Any error other than 'resource not found' should fail
-        if not out.startswith(_RESOURCE_NOT_FOUND):
+        if not err.startswith(_RESOURCE_NOT_FOUND):
             module.fail_json(msg="Failed to get resource configuration.\nCommand: `%s`\nError: %s" % (cmd, err))
         # The resource doesn't exist, so nothing needs to be done
         return False
