@@ -77,7 +77,7 @@ options:
     description:
       - When in C(new) mode, this parameter can be used to check if there is a module I(name) installed (at I(version), when specified).
     type: str
-    version_added: 2.5.0
+    version_added: 3.0.0
 notes:
   - Please note that U(http://search.cpan.org/dist/App-cpanminus/bin/cpanm, cpanm) must be installed on the remote host.
   - "This module now comes with a choice of execution I(mode): C(compatibility) or C(new)."
