@@ -117,7 +117,7 @@ def create_stonith_device(module, name, device_type, fencing_options):
     return True
 
 
-def destroy_stonith_device(module, name)
+def destroy_stonith_device(module, name):
     exists = True
     cmd = "pcs stonith config %s" % (name,)
     rc, out, err = module.run_command(cmd)
@@ -175,7 +175,7 @@ def disable_stonith_device(module, name):
 
 def main():
     argument_spec = dict(
-        state=dict(type='str', choices=['present', 'absent', 'enabled', 'disabled']),
+        state=dict(type='str', choices=['present', 'absent', 'enabled', 'disabled'], required=True),
         name=dict(type='str', required=True),
         type=dict(type='str', required=True),
         timeout=dict(type='int', default=300),
@@ -206,7 +206,7 @@ def main():
         changed = disable_stonith_device(module, name)
     elif state == 'disabled':
         changed = enable_stonith_device(module, name)
-    module.exit_json(changed=True, out=cluster_state)
+    module.exit_json(changed=True)
 
 
 if __name__ == '__main__':
