@@ -71,7 +71,6 @@ import time, re
 from ansible.module_utils.basic import AnsibleModule
 
 
-_PCS_CLUSTER_DOWN = "Error: cluster is not currently running on this node"
 _STONITH_NOT_FOUND = "Error: unable to find resource"
 
 
@@ -81,7 +80,7 @@ def create_stonith_device(module, name, device_type, fencing_options):
     rc, out, err = module.run_command(cmd)
     if rc == 1:
         # Any error other than 'resource not found' should fail
-        if not out.startswith(_STONITH_NOT_FOUND):
+        if not err.startswith(_STONITH_NOT_FOUND):
             module.fail_json(msg="Failed to get stonith device configuration.\nCommand: `%s`\nError: %s" % (cmd, err))
         # The device doesn't exist, so it needs to be created with the specified options
         exists = False
@@ -123,7 +122,7 @@ def destroy_stonith_device(module, name):
     rc, out, err = module.run_command(cmd)
     if rc == 1:
         # Any error other than 'resource not found' should fail
-        if not out.startswith(_STONITH_NOT_FOUND):
+        if not err.startswith(_STONITH_NOT_FOUND):
             module.fail_json(msg="Failed to get cluster configuration.\nCommand: `%s`\nError: %s" % (cmd, err))
         # The device doesn't exist, so nothing needs to be done
         return False
