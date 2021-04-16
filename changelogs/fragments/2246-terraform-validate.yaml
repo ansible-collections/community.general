@@ -1,2 +1,0 @@
-breaking_changes:
-  - terraform - fix issue that cause the execution fail because from Terraform 0.15 ``-var`` and ``-var-file`` options are no longer available on terraform validate (https://github.com/ansible-collections/community.general/pull/2246). 
