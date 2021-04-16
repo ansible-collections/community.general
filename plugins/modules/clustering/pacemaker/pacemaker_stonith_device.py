@@ -91,7 +91,7 @@ def create_stonith_device(module, name, device_type, fencing_options):
         if existing_device_type != device_type:
             module.fail_json(msg="A stonith device of a different type exists with the same name")
 
-        match_object = search(r'Attributes: (.*?)\n', out)
+        match_object = re.search(r'Attributes: (.*?)\n', out)
         existing_options = match_object.group(1).strip().split(' ')
 
         for option in existing_options:
