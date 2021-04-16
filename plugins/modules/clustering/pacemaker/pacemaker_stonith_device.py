@@ -176,10 +176,10 @@ def disable_stonith_device(module, name):
 def main():
     argument_spec = dict(
         state=dict(type='str', choices=['present', 'absent', 'enabled', 'disabled']),
-        name=dict(type='str'),
-        type=dict(type='str'),
+        name=dict(type='str', required=True),
+        type=dict(type='str', required=True),
         timeout=dict(type='int', default=300),
-        force=dict(type='bool', default=True),
+        force=dict(type='bool', default=False),
         fencing_options=dict(type='dict'),
     )
 
