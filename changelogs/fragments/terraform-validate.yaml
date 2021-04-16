@@ -1,0 +1,2 @@
+bugfixes:
+  - terraform - fixed issue that cause the execution fail because in Terraform 0.15 -var and -var-file options are no longer available on terraform validate (https://github.com/ansible-collections/community.general/pull/2246). 
