@@ -171,7 +171,7 @@ def create_resource(module, name, resource_type, attributes, operations):
     # and this is for the operations
     command_operations = "op "
     for key,val in operations.items():
-        command_operations += (key + " ".join(["%s=%ss" % (event, time) for event, time in val.items()]))
+        command_operations += "%s %s" % (key, " ".join(["%s=%ss" % (event, time) for event, time in val.items()]))
     module.fail_json(msg=command_operations)
     #command_operations = "op " + " ".join(command_operations)
     cmd = "pcs resource %s %s" % (command_key, command_attributes)
