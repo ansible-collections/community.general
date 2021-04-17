@@ -29,8 +29,7 @@ options:
       - If the fingerprint of the provided certificate does not match the
         fingerprint of the certificate bundled in the keystore, the keystore
         is regenerated with the provided certificate.
-      - One of I(certificate) or I(certificate_path) is required.
-      - I(certificate) and I(certificate_path) are mutually exclusive.
+      - Exactly one of I(certificate) or I(certificate_path) is required.
     type: str
   certificate_path:
     description:
@@ -38,21 +37,18 @@ options:
       - If the fingerprint of the provided certificate does not match the
         fingerprint of the certificate bundled in the keystore, the keystore
         is regenerated with the provided certificate.
-      - One of I(certificate) or I(certificate_path) is required.
-      - I(certificate) and I(certificate_path) are mutually exclusive.
+      - Exactly one of I(certificate) or I(certificate_path) is required.
     type: path
     version_added: '3.0.0'
   private_key:
     description:
       - Content of the private key used to create the keystore.
-      - One of I(private_key) or I(private_key_path) is required.
-      - I(private_key) and I(private_key_path) are mutually exclusive.
+      - Exactly one of I(private_key) or I(private_key_path) is required.
     type: str
   private_key_path:
     description:
       - Location of the private key used to create the keystore.
-      - One of I(private_key) or I(private_key_path) is required.
-      - I(private_key) and I(private_key_path) are mutually exclusive.
+      - Exactly one of I(private_key) or I(private_key_path) is required.
     type: path
     version_added: '3.0.0'
   private_key_passphrase:
@@ -359,11 +355,11 @@ class ArgumentSpec(object):
             name=dict(type='str', required=True),
             dest=dict(type='path', required=True),
             certificate=dict(type='str', no_log=True),
+            certificate_path=dict(type='path'),
             private_key=dict(type='str', no_log=True),
+            private_key_path=dict(type='path', no_log=False),
             private_key_passphrase=dict(type='str', no_log=True),
             password=dict(type='str', required=True, no_log=True),
-            certificate_path=dict(type='path'),
-            private_key_path=dict(type='path', no_log=False),
             force=dict(type='bool', default=False),
         )
         choose_between = (
