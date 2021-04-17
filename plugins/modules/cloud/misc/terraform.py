@@ -186,8 +186,8 @@ module = None
 
 def get_version(bin_path):
     extract_version = module.run_command([bin_path, 'version', '-json'], use_unsafe_shell=True)
-    transform_version = (json.loads(extract_version[1]))['terraform_version']
-    return transform_version
+    terraform_version = (json.loads(extract_version[1]))['terraform_version']
+    return terraform_version
 
 
 def preflight_validation(bin_path, project_path, version, variables_args=None, plan_file=None):
