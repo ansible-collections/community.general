@@ -55,7 +55,7 @@ options:
     type: str
   private_ip:
     description:
-      - If true, the created Linode will have private networking enabled and
+      - If C(true), the created Linode will have private networking enabled and
         assigned a private IPv4 address.
     type: bool
     default: false
