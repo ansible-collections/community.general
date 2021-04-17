@@ -73,6 +73,7 @@ options:
     type: str
     choices: [compatibility, new]
     default: compatibility
+    version_added: 3.0.0
   name_check:
     description:
       - When in C(new) mode, this parameter can be used to check if there is a module I(name) installed (at I(version), when specified).
