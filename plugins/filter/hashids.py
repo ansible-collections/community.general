@@ -40,7 +40,7 @@ def initialize_hashids(**kwargs):
 
 
 def hashids_encode(nums, salt=None, alphabet=None, min_length=None):
-    """Generates a youtube-like hash from a sequence of ints
+    """Generates a YouTube-like hash from a sequence of ints
 
        :nums: Sequence of one or more ints to hash
        :salt: String to use as salt when hashing
@@ -55,7 +55,7 @@ def hashids_encode(nums, salt=None, alphabet=None, min_length=None):
     )
 
     # Handles the case where a single int is not encapsulated in a list or tuple.
-    # User convenience seems prefferable to strict typing in this case
+    # User convenience seems preferable to strict typing in this case
     # Also avoids obfuscated error messages related to single invalid inputs
     if not is_sequence(nums):
         nums = [nums]
@@ -71,7 +71,7 @@ def hashids_encode(nums, salt=None, alphabet=None, min_length=None):
 
 
 def hashids_decode(hashid, salt=None, alphabet=None, min_length=None):
-    """Decodes a youtube-like hash to a sequence of ints
+    """Decodes a YouTube-like hash to a sequence of ints
 
        :hashid: Hash string to decode
        :salt: String to use as salt when hashing
