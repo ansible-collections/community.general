@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: terraform
 short_description: Manages a Terraform deployment (and plans)
@@ -177,24 +177,31 @@ command:
 import os
 import json
 import tempfile
+from distutils.version import LooseVersion
 from ansible.module_utils.six.moves import shlex_quote
 
 from ansible.module_utils.basic import AnsibleModule
 
-DESTROY_ARGS = ('destroy', '-no-color', '-force')
-APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve=true')
 module = None
 
 
-def preflight_validation(bin_path, project_path, variables_args=None, plan_file=None):
+def get_version(bin_path):
+    extract_version = module.run_command([bin_path, 'version', '-json'])
+    terraform_version = (json.loads(extract_version[1]))['terraform_version']
+    return terraform_version
+
+
+def preflight_validation(bin_path, project_path, version, variables_args=None, plan_file=None):
     if project_path in [None, ''] or '/' not in project_path:
         module.fail_json(msg="Path for Terraform project can not be None or ''.")
     if not os.path.exists(bin_path):
         module.fail_json(msg="Path for Terraform binary '{0}' doesn't exist on this host - check the path and try again please.".format(bin_path))
     if not os.path.isdir(project_path):
         module.fail_json(msg="Path for Terraform project '{0}' doesn't exist on this host - check the path and try again please.".format(project_path))
-
-    rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, check_rc=True, cwd=project_path, use_unsafe_shell=True)
+    if LooseVersion(version) < LooseVersion('0.15.0'):
+        rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, check_rc=True, cwd=project_path)
+    else:
+        rc, out, err = module.run_command([bin_path, 'validate'], check_rc=True, cwd=project_path)
 
 
 def _state_args(state_file):
@@ -267,7 +274,7 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
 
     plan_command.extend(_state_args(state_file))
 
-    rc, out, err = module.run_command(plan_command + variables_args, cwd=project_path, use_unsafe_shell=True)
+    rc, out, err = module.run_command(plan_command + variables_args, cwd=project_path)
 
     if rc == 0:
         # no changes
@@ -326,6 +333,15 @@ def main():
     else:
         command = [module.get_bin_path('terraform', required=True)]
 
+    checked_version = get_version(command[0])
+
+    if LooseVersion(checked_version) < LooseVersion('0.15.0'):
+        DESTROY_ARGS = ('destroy', '-no-color', '-force')
+        APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve=true')
+    else:
+        DESTROY_ARGS = ('destroy', '-no-color', '-auto-approve')
+        APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve')
+
     if force_init:
         init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure)
 
@@ -351,7 +367,7 @@ def main():
         for f in variables_files:
             variables_args.extend(['-var-file', f])
 
-    preflight_validation(command[0], project_path, variables_args)
+    preflight_validation(command[0], project_path, checked_version, variables_args)
 
     if module.params.get('lock') is not None:
         if module.params.get('lock'):
