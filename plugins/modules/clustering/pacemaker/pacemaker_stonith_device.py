@@ -100,7 +100,7 @@ def create_stonith_device(module, name, device_type, fencing_options):
             # remove single and double quotes from value for a proper comparison
             option_value = option_tuple[1].strip("'").strip('"')
             if option_key in fencing_options:
-                if option_value == fencing_options[option_key]:
+                if option_value == str(fencing_options[option_key]):
                     del fencing_options[option_key]
 
     if exists and len(fencing_options) == 0:
@@ -174,7 +174,7 @@ def disable_stonith_device(module, name):
 
 def main():
     argument_spec = dict(
-        state=dict(type='str', choices=['present', 'absent', 'enabled', 'disabled'], required=True),
+        state=dict(type='str', choices=['present', 'absent', 'enabled', 'disabled'], default='present'),
         name=dict(type='str', required=True),
         type=dict(type='str', required=True),
         timeout=dict(type='int', default=300),
@@ -205,7 +205,7 @@ def main():
         changed = disable_stonith_device(module, name)
     elif state == 'disabled':
         changed = enable_stonith_device(module, name)
-    module.exit_json(changed=True)
+    module.exit_json(changed=changed)
 
 
 if __name__ == '__main__':

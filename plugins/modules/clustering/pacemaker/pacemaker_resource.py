@@ -169,10 +169,9 @@ def create_resource(module, name, resource_type, attributes, operations):
     command_attributes = ["%s='%s'" % (key, val) for key, val in attributes.items()]
     command_attributes = " ".join(command_attributes)
     # and this is for the operations
-    command_operations = "op "
+    command_operations = "op " if len(operations) > 0 else ""
     for key,val in operations.items():
         command_operations += "%s %s" % (key, " ".join(["%s=%ss" % (event, time) for event, time in val.items()]))
-    #command_operations = "op " + " ".join(command_operations)
     cmd = "pcs resource %s %s %s" % (command_key, command_attributes, command_operations)
     rc, out, err = module.run_command(cmd)
     if rc != 0:
