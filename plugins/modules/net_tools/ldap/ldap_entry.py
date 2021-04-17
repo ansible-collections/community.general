@@ -25,9 +25,6 @@ notes:
     rule allowing root to modify the server configuration. If you need to use
     a simple bind to access your server, pass the credentials in I(bind_dn)
     and I(bind_pw).
-  - "The I(params) parameter was removed due to circumventing Ansible's parameter
-     handling.  The I(params) parameter started disallowing setting the I(bind_pw) parameter in
-     Ansible-2.7 as it was insecure to set the parameter that way."
 author:
   - Jiri Tyr (@jtyr)
 requirements:
@@ -187,7 +184,6 @@ def main():
         argument_spec=gen_specs(
             attributes=dict(default={}, type='dict'),
             objectClass=dict(type='list', elements='str'),
-            params=dict(type='dict'),
             state=dict(default='present', choices=['present', 'absent']),
         ),
         required_if=[('state', 'present', ['objectClass'])],
@@ -197,9 +193,6 @@ def main():
     if not HAS_LDAP:
         module.fail_json(msg=missing_required_lib('python-ldap'),
                          exception=LDAP_IMP_ERR)
-
-    if module.params['params']:
-        module.fail_json(msg="The `params` option to ldap_entry was removed since it circumvents Ansible's option handling")
 
     state = module.params['state']
 
