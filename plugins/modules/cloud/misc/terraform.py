@@ -186,7 +186,7 @@ module = None
 
 
 def get_version(bin_path):
-    extract_version = module.run_command([bin_path, 'version', '-json'], use_unsafe_shell=True)
+    extract_version = module.run_command([bin_path, 'version', '-json'])
     terraform_version = (json.loads(extract_version[1]))['terraform_version']
     return terraform_version
 
@@ -199,9 +199,9 @@ def preflight_validation(bin_path, project_path, version, variables_args=None, p
     if not os.path.isdir(project_path):
         module.fail_json(msg="Path for Terraform project '{0}' doesn't exist on this host - check the path and try again please.".format(project_path))
     if LooseVersion(version) < LooseVersion('0.15.0'):
-        rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, check_rc=True, cwd=project_path, use_unsafe_shell=True)
+        rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, check_rc=True, cwd=project_path)
     else:
-        rc, out, err = module.run_command([bin_path, 'validate'], check_rc=True, cwd=project_path, use_unsafe_shell=True)
+        rc, out, err = module.run_command([bin_path, 'validate'], check_rc=True, cwd=project_path)
 
 
 def _state_args(state_file):
@@ -274,7 +274,7 @@ def build_plan(command, project_path, variables_args, state_file, targets, state
 
     plan_command.extend(_state_args(state_file))
 
-    rc, out, err = module.run_command(plan_command + variables_args, cwd=project_path, use_unsafe_shell=True)
+    rc, out, err = module.run_command(plan_command + variables_args, cwd=project_path)
 
     if rc == 0:
         # no changes
