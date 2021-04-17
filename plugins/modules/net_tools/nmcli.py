@@ -695,7 +695,7 @@ class Nmcli(object):
         }
 
         # IP address options.
-        if self.ip_conn_type:
+        if self.ip_conn_type and not self.master:
             options.update({
                 'ipv4.addresses': self.ip4,
                 'ipv4.dhcp-client-id': self.dhcp_client_id,
