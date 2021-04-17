@@ -1,2 +1,2 @@
 bugfixes:
-  - fix error when not using suffixes
+  - consul_io inventory script - fix error when not using suffixes (https://github.com/ansible-collections/community.general/pull/2252).
