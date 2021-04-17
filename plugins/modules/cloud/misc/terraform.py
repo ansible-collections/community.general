@@ -197,7 +197,7 @@ def preflight_validation(bin_path, project_path, version, variables_args=None, p
         module.fail_json(msg="Path for Terraform binary '{0}' doesn't exist on this host - check the path and try again please.".format(bin_path))
     if not os.path.isdir(project_path):
         module.fail_json(msg="Path for Terraform project '{0}' doesn't exist on this host - check the path and try again please.".format(project_path))
-    if version < '0.15.0' :
+    if version < '0.15.0':
         rc, out, err = module.run_command([bin_path, 'validate'] + variables_args, check_rc=True, cwd=project_path, use_unsafe_shell=True)
     else:
         rc, out, err = module.run_command([bin_path, 'validate'], check_rc=True, cwd=project_path, use_unsafe_shell=True)
@@ -334,7 +334,7 @@ def main():
 
     checked_version = get_version(command[0])
 
-    if checked_version < '0.15.0' :
+    if checked_version < '0.15.0':
         DESTROY_ARGS = ('destroy', '-no-color', '-force')
         APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve=true')
     else:
