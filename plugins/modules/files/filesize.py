@@ -43,9 +43,10 @@ options:
         an integer number of blocks of I(blocksize) bytes each (float values
         are rounded to the closest integer).
       - When the I(size) value is equal to the current file size, does nothing.
-      - When the I(size) value is bigger than the current file size, bytes are
-        appended to the file without truncating it, in other words, without
-        modifying the existing bytes of the file.
+      - When the I(size) value is bigger than the current file size, bytes from
+        I(source) (if I(sparse) is not C(false)) are appended to the file
+        without truncating it, in other words, without modifying the existing
+        bytes of the file.
       - When the I(size) value is smaller than the current file size, it is
         truncated to the requested value without modifying bytes before this
         value.
