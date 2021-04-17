@@ -94,11 +94,6 @@ plugins/modules/cloud/univention/udm_dns_zone.py validate-modules:parameter-type
 plugins/modules/cloud/univention/udm_dns_zone.py validate-modules:undocumented-parameter
 plugins/modules/cloud/univention/udm_share.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:doc-required-mismatch
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:missing-suboption-docs
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:undocumented-parameter
 plugins/modules/clustering/consul/consul.py validate-modules:doc-missing-type
 plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parameter
 plugins/modules/clustering/consul/consul_session.py validate-modules:parameter-state-invalid-choice
