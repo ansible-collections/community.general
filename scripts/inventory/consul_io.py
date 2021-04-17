@@ -292,11 +292,11 @@ class ConsulInventory(object):
 
     def consul_get_kv_inmemory(self, key):
         result = filter(lambda x: x['Key'] == key, self.inmemory_kv)
-        return result.pop() if result else None
+        return list(result).pop() if list(result) else None
 
     def consul_get_node_inmemory(self, node):
         result = filter(lambda x: x['Node'] == node, self.inmemory_nodes)
-        return {"Node": result.pop(), "Services": {}} if result else None
+        return {"Node": list(result).pop(), "Services": {}} if list(result) else None
 
     def load_data_for_datacenter(self, datacenter):
         '''processes all the nodes in a particular datacenter'''
@@ -312,10 +312,10 @@ class ConsulInventory(object):
         '''loads the data for a single node adding it to various groups based on
         metadata retrieved from the kv store and service availability'''
 
-        if self.config.suffixes == 'true':
-            index, node_data = self.consul_api.catalog.node(node, dc=datacenter)
-        else:
+        if self.config.bulk_load == 'true':
             node_data = self.consul_get_node_inmemory(node)
+        else:
+            index, node_data = self.consul_api.catalog.node(node, dc=datacenter)
         node = node_data['Node']
 
         self.add_node_to_map(self.nodes, 'all', node)
@@ -324,7 +324,7 @@ class ConsulInventory(object):
 
         self.load_groups_from_kv(node_data)
         self.load_node_metadata_from_kv(node_data)
-        if self.config.suffixes == 'true':
+        if self.config.bulk_load != 'true':
             self.load_availability_groups(node_data, datacenter)
             for name, service in node_data['Services'].items():
                 self.load_data_from_service(name, service, node_data)
@@ -475,7 +475,7 @@ class ConsulConfig(dict):
 
     def read_settings(self):
         ''' Reads the settings from the consul_io.ini file (or consul.ini for backwards compatibility)'''
-        config = configparser.SafeConfigParser()
+        config = configparser.ConfigParser()
         if os.path.isfile(os.path.dirname(os.path.realpath(__file__)) + '/consul_io.ini'):
             config.read(os.path.dirname(os.path.realpath(__file__)) + '/consul_io.ini')
         else:
