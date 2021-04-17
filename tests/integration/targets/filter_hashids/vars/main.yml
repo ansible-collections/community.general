@@ -1,0 +1,4 @@
+single_int: 1
+int_list: [1, 2, 3]
+single_float: [2.718]
+arbitrary_string: "will not hash"
