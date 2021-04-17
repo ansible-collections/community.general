@@ -52,7 +52,7 @@ options:
       - That means that a file of any arbitrary size can be grown to any other
         arbitrary size, and then resized down to its initial size without
         modifying its initial content.
-    type: str
+    type: raw
     required: true
   blocksize:
     description:
@@ -62,7 +62,7 @@ options:
       - If not set, the size of blocks is guessed from the OS and commonly
         results in C(512) or C(4096) bytes, that is used internally by the
         module or when I(size) has no unit.
-    type: str
+    type: raw
   source:
     description:
       - Device or file that provides input data to provision the file.
@@ -322,6 +322,15 @@ def split_size_unit(string, isint=False):
     return value, unit, product
 
 
+def size_string(value):
+    """Convert a raw value to a string, but only if it is an integer, a float
+       or a string itself.
+    """
+    if not isinstance(value, (int, float, str)):
+        raise AssertionError("invalid value type (%s): size must be integer, float or string" % type(value))
+    return str(value)
+
+
 def size_spec(args):
     """Return a dictionary with size specifications, especially the size in
        bytes (after rounding it to an integer number of blocks).
@@ -390,8 +399,8 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             path=dict(type='path', required=True),
-            size=dict(type='str', required=True),
-            blocksize=dict(type='str'),
+            size=dict(type='raw', required=True),
+            blocksize=dict(type='raw'),
             source=dict(type='path', default='/dev/zero'),
             sparse=dict(type='bool', default=False),
             force=dict(type='bool', default=False),
@@ -408,7 +417,10 @@ def main():
         module.fail_json(msg='parent directory of the file must exist prior to run this module')
     if not args['blocksize']:
         args['blocksize'] = str(os.statvfs(os.path.dirname(args['path'])).f_frsize)
+
     try:
+        args['size'] = size_string(args['size'])
+        args['blocksize'] = size_string(args['blocksize'])
         initial_filesize = current_size(args)
         size_descriptors = size_spec(args)
     except AssertionError as err:

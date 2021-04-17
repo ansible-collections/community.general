@@ -68,12 +68,22 @@
   ignore_errors: yes
 
 
+- name: Trigger an error due to invalid blocksize value type (dict)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 1M
+    blocksize:
+      bytes: 512
+  register: filesize_test_error_09
+  ignore_errors: yes
+
+
 - name: Trigger an error due to invalid source device (/dev/unexistent)
   community.general.filesize:
     path: "{{ filesize_testfile }}"
     size: 1M
     source: /dev/unexistent
-  register: filesize_test_error_09
+  register: filesize_test_error_10
   ignore_errors: yes
 
 
@@ -82,7 +92,7 @@
     path: "{{ filesize_testfile }}"
     size: 1M
     source: /dev/null
-  register: filesize_test_error_10
+  register: filesize_test_error_11
   ignore_errors: yes
 
 
@@ -106,9 +116,11 @@
       - "filesize_test_error_08 is failed"
       - "filesize_test_error_08.msg == 'invalid blocksize value: bytes require an integer value'"
       - "filesize_test_error_09 is failed"
-      - "filesize_test_error_09.msg == 'dd error while creating file %s with size 1M from source /dev/unexistent: see stderr for details' % filesize_testfile"
+      - "filesize_test_error_09.msg is match('invalid value type')"
       - "filesize_test_error_10 is failed"
-      - "filesize_test_error_10.msg == 'module error while creating file %s with size 1M from source /dev/null: file is 0 bytes long' % filesize_testfile"
+      - "filesize_test_error_10.msg == 'dd error while creating file %s with size 1M from source /dev/unexistent: see stderr for details' % filesize_testfile"
+      - "filesize_test_error_11 is failed"
+      - "filesize_test_error_11.msg == 'module error while creating file %s with size 1M from source /dev/null: file is 0 bytes long' % filesize_testfile"
 
 
 - name: Remove test file

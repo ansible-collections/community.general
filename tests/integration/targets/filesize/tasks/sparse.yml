@@ -4,7 +4,7 @@
 - name: Create a huge sparse file of 4TB (check mode)
   community.general.filesize:
     path: "{{ filesize_testfile }}"
-    size: "4TB"
+    size: 4TB
     sparse: yes
   register: filesize_test_sparse_01
   check_mode: yes
@@ -19,7 +19,7 @@
 - name: Create a huge sparse file of 4TB
   community.general.filesize:
     path: "{{ filesize_testfile }}"
-    size: "4TB"
+    size: 4TB
     sparse: yes
   register: filesize_test_sparse_02
 
@@ -33,7 +33,7 @@
 - name: Create a huge sparse file of 4TB (4000GB) (check mode, idempotency)
   community.general.filesize:
     path: "{{ filesize_testfile }}"
-    size: "4000GB"
+    size: 4000GB
     sparse: yes
   register: filesize_test_sparse_03
   check_mode: yes
@@ -41,14 +41,14 @@
 - name: Create a huge sparse file of 4TB (4000GB) (idempotency)
   community.general.filesize:
     path: "{{ filesize_testfile }}"
-    size: "4000GB"
+    size: 4000GB
     sparse: yes
   register: filesize_test_sparse_04
 
 - name: Create a huge sparse file of 4TB (4000000 × 1MB) (check mode, idempotency)
   community.general.filesize:
     path: "{{ filesize_testfile }}"
-    size: "4000000"
+    size: 4000000
     blocksize: 1MB
     sparse: yes
   register: filesize_test_sparse_05
@@ -57,7 +57,7 @@
 - name: Create a huge sparse file of 4TB (4000000 × 1MB) (idempotency)
   community.general.filesize:
     path: "{{ filesize_testfile }}"
-    size: "4000000"
+    size: 4000000
     blocksize: 1MB
     sparse: yes
   register: filesize_test_sparse_06
@@ -227,7 +227,7 @@
 - name: Change sparse file size to 4321×1GB (check mode, idempotency)
   community.general.filesize:
     path: "{{ filesize_testfile }}"
-    size: "4321"
+    size: 4321
     blocksize: 1GB
     sparse: yes
   register: filesize_test_sparse_23
@@ -236,7 +236,7 @@
 - name: Change sparse file size to 4321×1GB (idempotency)
   community.general.filesize:
     path: "{{ filesize_testfile }}"
-    size: "4321"
+    size: 4321
     blocksize: 1GB
     sparse: yes
   register: filesize_test_sparse_24
