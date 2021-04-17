@@ -1,3 +1,4 @@
 breaking_changes:
+  - terraform - add a fuction which check the used terraform version (https://github.com/ansible-collections/community.general/pull/2246).
   - terraform - fix issue that cause the execution fail because from Terraform 0.15 ``-var`` and ``-var-file`` options are no longer available on terraform validate (https://github.com/ansible-collections/community.general/pull/2246).
   - terraform - fix issue that cause the destroy to fail because from Terraform 0.15 ``terraform destroy -force`` option is replaced with ``terraform destry -auto-approve`` (https://github.com/ansible-collections/community.general/issues/2247).
