@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 module: keycloak_realm
 
 short_description: Allows administration of Keycloak realm via Keycloak API
-version_added: 2.5.0
+version_added: 3.0.0
 
 
 description:
@@ -571,11 +571,11 @@ def sanitize_cr(realmrep):
     """
     result = realmrep.copy()
     if 'secret' in result:
-        result['secret'] = 'no_log'
+        result['secret'] = '********'
     if 'attributes' in result:
         if 'saml.signing.private.key' in result['attributes']:
             result['attributes'] = result['attributes'].copy()
-            result['attributes']['saml.signing.private.key'] = 'no_log'
+            result['attributes']['saml.signing.private.key'] = '********'
     return result
 
 
