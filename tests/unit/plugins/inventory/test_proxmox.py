@@ -205,7 +205,7 @@ def get_json(url):
             "hotplug": "network,disk,usb",
             "scsi0": "local-lvm:vm-101-disk-0,size=8G",
             "net0": "virtio=ff:ff:ff:ff:ff:ff,bridge=vmbr0,firewall=1",
-            "agent": "1",
+            "agent": "1,fstrim_cloned_disks=1",
             "bios": "seabios",
             "ide0": "local-lvm:vm-101-cloudinit,media=cdrom,size=4M",
             "boot": "cdn",
