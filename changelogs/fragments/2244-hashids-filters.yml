@@ -1,0 +1,6 @@
+---
+add plugin.filter:
+  - name: hashids_encode
+    description: Encodes YouTube-like hashes from a sequence of integers
+  - name: hashids_decode
+    description: Decodes a sequence of numbers from a YouTube-like hash
