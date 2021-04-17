@@ -37,8 +37,8 @@ options:
         by a multiplicative suffix, that can be one of C(B) (bytes), C(KB) or
         C(kB) (= 1000B), C(MB) or C(mB) (= 1000kB), C(GB) or C(gB) (= 1000MB),
         and so on for C(T), C(P), C(E), C(Z) and C(Y); or alternatively one of
-        C(K), C(k), C(KiB) or C(kiB) (= 1024B); C(M), C(m), C(MiB) or C(miB)
-        (= 1024KiB); C(G), C(g), C(GiB) or C(giB) (= 1024MiB); and so on.
+        C(K), C(k) or C(KiB) (= 1024B); C(M), C(m) or C(MiB) (= 1024KiB);
+        C(G), C(g) or C(GiB) (= 1024MiB); and so on.
       - If the multiplicative suffix is not provided, the value is treated as
         an integer number of blocks of I(blocksize) bytes each (float values
         are rounded to the closest integer).
@@ -230,14 +230,14 @@ from ansible.module_utils._text import to_native
 # others (ls, df, lvresize, lsblk...).
 SIZE_UNITS = dict(
     B=1,
-    kB=1000**1, KB=1000**1, KiB=1024**1, kiB=1024**1, K=1024**1, k=1024**1,
-    MB=1000**2, mB=1000**2, MiB=1024**2, miB=1024**2, M=1024**2, m=1024**2,
-    GB=1000**3, gB=1000**3, GiB=1024**3, giB=1024**3, G=1024**3, g=1024**3,
-    TB=1000**4, tB=1000**4, TiB=1024**4, tiB=1024**4, T=1024**4, t=1024**4,
-    PB=1000**5, pB=1000**5, PiB=1024**5, piB=1024**5, P=1024**5, p=1024**5,
-    EB=1000**6, eB=1000**6, EiB=1024**6, eiB=1024**6, E=1024**6, e=1024**6,
-    ZB=1000**7, zB=1000**7, ZiB=1024**7, ziB=1024**7, Z=1024**7, z=1024**7,
-    YB=1000**8, yB=1000**8, YiB=1024**8, yiB=1024**8, Y=1024**8, y=1024**8,
+    kB=1000**1, KB=1000**1, KiB=1024**1, K=1024**1, k=1024**1,
+    MB=1000**2, mB=1000**2, MiB=1024**2, M=1024**2, m=1024**2,
+    GB=1000**3, gB=1000**3, GiB=1024**3, G=1024**3, g=1024**3,
+    TB=1000**4, tB=1000**4, TiB=1024**4, T=1024**4, t=1024**4,
+    PB=1000**5, pB=1000**5, PiB=1024**5, P=1024**5, p=1024**5,
+    EB=1000**6, eB=1000**6, EiB=1024**6, E=1024**6, e=1024**6,
+    ZB=1000**7, zB=1000**7, ZiB=1024**7, Z=1024**7, z=1024**7,
+    YB=1000**8, yB=1000**8, YiB=1024**8, Y=1024**8, y=1024**8,
 )
 
 
