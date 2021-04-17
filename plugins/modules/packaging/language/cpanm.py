@@ -51,7 +51,7 @@ options:
     default: no
   version:
     description:
-      - Version specification for the perl module. When I(mode) is (C(new), C(cpanm) version operators are accepted.
+      - Version specification for the perl module. When I(mode) is C(new), C(cpanm) version operators are accepted.
     type: str
   system_lib:
     description:
