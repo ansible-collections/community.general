@@ -291,12 +291,12 @@ class ConsulInventory(object):
         return consul_ok and service_ok
 
     def consul_get_kv_inmemory(self, key):
-        result = filter(lambda x: x['Key'] == key, self.inmemory_kv)
-        return list(result).pop() if list(result) else None
+        result = list(filter(lambda x: x['Key'] == key, self.inmemory_kv))
+        return result.pop() if result else None
 
     def consul_get_node_inmemory(self, node):
-        result = filter(lambda x: x['Node'] == node, self.inmemory_nodes)
-        return {"Node": list(result).pop(), "Services": {}} if list(result) else None
+        result = list(filter(lambda x: x['Node'] == node, self.inmemory_nodes))
+        return {"Node": result.pop(), "Services": {}} if result else None
 
     def load_data_for_datacenter(self, datacenter):
         '''processes all the nodes in a particular datacenter'''
@@ -475,7 +475,7 @@ class ConsulConfig(dict):
 
     def read_settings(self):
         ''' Reads the settings from the consul_io.ini file (or consul.ini for backwards compatibility)'''
-        config = configparser.ConfigParser()
+        config = configparser.SafeConfigParser()
         if os.path.isfile(os.path.dirname(os.path.realpath(__file__)) + '/consul_io.ini'):
             config.read(os.path.dirname(os.path.realpath(__file__)) + '/consul_io.ini')
         else:
