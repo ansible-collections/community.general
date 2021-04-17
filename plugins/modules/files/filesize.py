@@ -66,7 +66,7 @@ options:
   source:
     description:
       - Device or file that provides input data to provision the file.
-      - This parameter is ignored when I(sparse=yes).
+      - This parameter is ignored when I(sparse=true).
     type: path
     default: /dev/zero
   force:
@@ -74,7 +74,7 @@ options:
       - Whether or not to overwrite the file if it exists, in other words, to
         truncate it from 0. When C(true), the module is not idempotent, that
         means it always reports I(changed=true).
-      - I(force=yes) and I(sparse=yes) are mutually exclusive.
+      - I(force=true) and I(sparse=true) are mutually exclusive.
     type: bool
     default: false
   sparse:
@@ -83,12 +83,12 @@ options:
       - This option is effective only on newly created files, or when growing a
         file, only for the bytes to append.
       - This option is not supported on OpenBSD, Solaris and AIX.
-      - I(force=yes) and I(sparse=yes) are mutually exclusive.
+      - I(force=true) and I(sparse=true) are mutually exclusive.
     type: bool
     default: false
 
 notes:
-  - This module supports I(check_mode) and I(diff).
+  - This module supports C(check_mode) and C(diff).
 
 requirements:
   - dd (Data Duplicator) in PATH
@@ -439,7 +439,7 @@ def main():
         filesize=size_descriptors)
 
     dd_bin = module.get_bin_path('dd', True)
-    dd_cmd = list([dd_bin, 'if=%s' % args['source'], 'of=%s' % args['path']])
+    dd_cmd = [dd_bin, 'if=%s' % args['source'], 'of=%s' % args['path']]
 
     if expected_filesize != initial_filesize or args['force']:
         result['cmd'] = ' '.join(complete_dd_cmdline(args, dd_cmd))
