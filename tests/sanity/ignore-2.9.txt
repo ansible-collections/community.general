@@ -26,10 +26,6 @@ plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:undo
 plugins/modules/cloud/univention/udm_dns_record.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/univention/udm_dns_zone.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/univention/udm_dns_zone.py validate-modules:undocumented-parameter
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:doc-choices-do-not-match-spec
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:missing-suboption-docs
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/xenserver/xenserver_guest.py validate-modules:undocumented-parameter
 plugins/modules/clustering/consul/consul.py validate-modules:doc-missing-type
 plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parameter
 plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:doc-missing-type
