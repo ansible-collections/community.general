@@ -29,7 +29,7 @@ options:
            - When specified, will limit the information returned to the keys specified here.
         type: list
         elements: str
-        choices: ['freespace', 'usedspace', 'totalsize', 'mountpoint', 'fstype', 'capacity_percent']
+        choices: ['freespace', 'usedspace', 'totalsize', 'mountpoint', 'fstype', 'capacity_percent', 'inode_free', 'inode_used', 'inode_total']
 author:
     - Saranya Sridharan (@saranyasridharan)
     - Swetha M (@swetm)
@@ -53,6 +53,9 @@ EXAMPLES = '''
       - mountpoint
       - freespace
       - totalsize
+      - inode_used
+      - inode_total
+      - inode_free
 
 - name: Filter the output parameters for all disk
   community.general.disk_info:
@@ -99,11 +102,27 @@ disk_info:
             returned: when I(filter) is not specified, or when I(filter) contains C(mountpoint)
             type: str
             sample: /
+        inode_free:
+            description: Free inode space in bytes of the particular disk.
+            returned: when I(filter) is not specified, or when I(filter) contains C(inode_free)
+            type: int
+            sample: 2958330
+        inode_total:
+            description: Total inode space in bytes of the particular disk.
+            returned: when I(filter) is not specified, or when I(filter) contains C(inode_total)
+            type: int
+            sample: 3907584
+        inode_used:
+            description: Used inode space in bytes of the particular disk.
+            returned: when I(filter) is not specified, or when I(filter) contains C(inode_used)
+            type: int
+            sample: 949254
 '''
 
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 import traceback
+import os
 PSUTIL_IMP_ERR = None
 try:
     import psutil
@@ -129,9 +148,27 @@ def disk_info(devicename):
             # this can be catched due to the disk that
             # isn't ready
             continue
+        """Return disk usage associated with mountpoint."""
+        try:
+            st = os.statvfs(partition.mountpoint)
+        except UnicodeEncodeError:
+            if not PY3 and isinstance(partition.mountpoint, unicode):
+                try:
+                    path = path.encode(sys.getfilesystemencoding())
+                except UnicodeEncodeError:
+                    pass
+                st = os.statvfs(partition.mountpoint)
+            else:
+                raise
+        inode_free = (st.f_ffree)
+        inode_total = (st.f_files)
+        inode_used = (st.f_files - st.f_ffree)
         output[partition.device]['totalsize'] = partition_usage.total
         output[partition.device]['usedspace'] = partition_usage.used
         output[partition.device]['freespace'] = partition_usage.free
+        output[partition.device]['inode_free'] = inode_free
+        output[partition.device]['inode_used'] = inode_used
+        output[partition.device]['inode_total'] = inode_total
         output[partition.device]['capacity_percentage'] = partition_usage.percent
     if devicename is None:
         return output
@@ -151,7 +188,8 @@ def filter_result(output, filter):
 def main():
     module_args = dict(
         name=dict(type='str', required=False),
-        filter=dict(type='list', required=False, elements='str', choices=['freespace', 'usedspace', 'totalsize', 'mountpoint', 'fstype', 'capacity_percent'])
+        filter=dict(type='list', required=False, elements='str', choices=['freespace', 'usedspace', 'totalsize',
+                    'mountpoint', 'fstype', 'capacity_percent', 'inode_used', 'inode_total', 'inode_free'])
     )
 
     result = dict(
