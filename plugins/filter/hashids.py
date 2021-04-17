@@ -85,7 +85,7 @@ def hashids_decode(hashid, salt=None, alphabet=None, min_length=None):
         min_length=min_length
     )
     nums = hashids.decode(hashid)
-    return nums
+    return list(nums)
 
 
 class FilterModule(object):

@@ -6,23 +6,23 @@
 - name: Test valid hashable inputs
   assert:
     that:
-      - "single_int | community.general.hashids_encode | community.general.hashids_decode == (single_int,)"
+      - "single_int | community.general.hashids_encode | community.general.hashids_decode == [single_int]"
       - "int_list | community.general.hashids_encode | community.general.hashids_decode | list == int_list"
-      - "(1,2,3) | community.general.hashids_encode | community.general.hashids_decode == (1,2,3)"
+      - "(1,2,3) | community.general.hashids_encode | community.general.hashids_decode == [1,2,3]"
 
 - name: Test valid parameters
   assert:
     that:
-      - "single_int | community.general.hashids_encode(salt='test') | community.general.hashids_decode(salt='test') == (single_int,)"
-      - "single_int | community.general.hashids_encode(alphabet='1234567890abcdef') | community.general.hashids_decode(alphabet='1234567890abcdef') == (single_int,)"
-      - "single_int | community.general.hashids_encode(min_length=20) | community.general.hashids_decode(min_length=20) == (single_int,)"
+      - "single_int | community.general.hashids_encode(salt='test') | community.general.hashids_decode(salt='test') == [single_int]"
+      - "single_int | community.general.hashids_encode(alphabet='1234567890abcdef') | community.general.hashids_decode(alphabet='1234567890abcdef') == [single_int]"
+      - "single_int | community.general.hashids_encode(min_length=20) | community.general.hashids_decode(min_length=20) == [single_int]"
       - "single_int | community.general.hashids_encode(min_length=20) | length == 20"
 
 - name: Test valid unhashable inputs
   assert:
     that:
-      - "single_float | community.general.hashids_encode | community.general.hashids_decode == ()"
-      - "arbitrary_string | community.general.hashids_encode | community.general.hashids_decode == ()"
+      - "single_float | community.general.hashids_encode | community.general.hashids_decode == []"
+      - "arbitrary_string | community.general.hashids_encode | community.general.hashids_decode == []"
 
 - name: Register result of invalid salt
   debug:
