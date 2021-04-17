@@ -122,7 +122,7 @@ options:
     - A list of disks to add to VM.
     - All parameters are case sensitive.
     - Removing or detaching existing disks of VM is not supported.
-    - Entries are required to have either a I(size) or one of I(size_[tb,gb,mb,kb,b]) parameters.
+    - New disks are required to have either a I(size) or one of I(size_[tb,gb,mb,kb,b]) parameters specified.
     - VM needs to be shut down to reconfigure disk size.
     type: list
     elements: dict
@@ -131,6 +131,7 @@ options:
       size:
         description:
         - 'Disk size with unit. Unit must be: C(b), C(kb), C(mb), C(gb), C(tb). VM needs to be shut down to reconfigure this parameter.'
+        - If no unit is specified, size is assumed to be in bytes.
         type: str
       size_b:
         description:
@@ -182,8 +183,8 @@ options:
         choices: [ none, iso ]
       iso_name:
         description:
-          - 'The file name of an ISO image from one of the XenServer ISO Libraries (implies I(type): C(iso)).'
-          - Required if I(type) is set to C(iso).
+        - 'The file name of an ISO image from one of the XenServer ISO Libraries (implies I(type): C(iso)).'
+        - Required if I(type) is set to C(iso).
         type: str
   networks:
     description:
