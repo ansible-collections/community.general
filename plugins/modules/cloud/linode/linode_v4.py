@@ -59,6 +59,7 @@ options:
         assigned a private IPv4 address.
     type: bool
     default: false
+    version_added: 3.0.0
   tags:
     description:
       - The tags that the instance should be marked under. See
