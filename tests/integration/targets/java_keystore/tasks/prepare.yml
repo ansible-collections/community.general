@@ -1,0 +1,33 @@
+---
+- name: Create test directory
+  ansible.builtin.file:
+    path: "{{ output_dir }}"
+    state: directory
+
+- name: Create private keys
+  community.crypto.openssl_privatekey:
+    path: "{{ output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+    size: 2048  # this should work everywhere
+    # The following is more efficient, but might not work everywhere:
+    # type: ECC
+    # curve: secp384r1
+    cipher: "{{ 'auto' if item.passphrase is defined else omit }}"
+    passphrase: "{{ item.passphrase | default(omit) }}"
+  loop: "{{ java_keystore_certs }}"
+
+- name: Create CSRs
+  community.crypto.openssl_csr:
+    path: "{{ output_dir ~ '/' ~ item.name ~ '.csr' }}"
+    privatekey_path: "{{ output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+    privatekey_passphrase: "{{ item.passphrase | default(omit) }}"
+    commonName: "{{ item.commonName }}"
+  loop: "{{ java_keystore_certs + java_keystore_new_certs }}"
+
+- name: Create certificates
+  community.crypto.x509_certificate:
+    path: "{{ output_dir ~ '/' ~ item.name ~ '.pem' }}"
+    csr_path: "{{ output_dir ~ '/' ~ item.name ~ '.csr' }}"
+    privatekey_path: "{{ output_dir ~ '/' ~ (item.keyname | default(item.name)) ~ '.key' }}"
+    privatekey_passphrase: "{{ item.passphrase | default(omit) }}"
+    provider: selfsigned
+  loop: "{{ java_keystore_certs + java_keystore_new_certs }}"

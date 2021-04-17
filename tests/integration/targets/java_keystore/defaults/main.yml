@@ -1,0 +1,16 @@
+---
+java_keystore_certs:
+  - name: cert
+    commonName: example.com
+  - name: cert-pw
+    passphrase: hunter2
+    commonName: example.com
+
+java_keystore_new_certs:
+  - name: cert2
+    keyname: cert
+    commonName: example.org
+  - name: cert2-pw
+    keyname: cert-pw
+    passphrase: hunter2
+    commonName: example.org
