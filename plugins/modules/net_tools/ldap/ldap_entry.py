@@ -48,6 +48,7 @@ options:
       - The target state of the entry.
     choices: [present, absent]
     default: present
+    type: str
 extends_documentation_fragment:
 - community.general.ldap.documentation
 
