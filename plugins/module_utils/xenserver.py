@@ -20,7 +20,6 @@ except ImportError:
     XENAPI_IMP_ERR = traceback.format_exc()
 
 from ansible.module_utils.basic import env_fallback, missing_required_lib
-from ansible.module_utils.common.network import is_mac
 from ansible.module_utils.ansible_release import __version__ as ANSIBLE_VERSION
 
 
