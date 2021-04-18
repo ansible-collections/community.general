@@ -51,9 +51,10 @@ options:
           - password
 
     token:
-    description:
-        - Authentication token for Keycloak API.
-    type: str
+        description:
+            - Authentication token for Keycloak API.
+        type: str
+        version_added: 3.0.0
 
     validate_certs:
         description:
