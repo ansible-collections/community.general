@@ -520,6 +520,8 @@ def get_option(option):
         return 'proxmox_'
     elif option == 'want_facts':
         return True
+    elif option == 'want_proxmox_nodes_ansible_host':
+        return True
     else:
         return False
 
@@ -551,16 +553,12 @@ def test_populate(inventory, mocker):
     assert group_qemu.hosts == [host_qemu]
 
     # check if qemu-test has eth0 interface in agent_interfaces fact
-    assert 'eth0' in [d['name']
-                      for d in host_qemu.get_vars()['proxmox_agent_interfaces']]
+    assert 'eth0' in [d['name'] for d in host_qemu.get_vars()['proxmox_agent_interfaces']]
 
     # check if qemu-multi-nic has multiple network interfaces
-    assert 'eth0' in [d['name']
-                      for d in host_qemu_multi_nic.get_vars()['proxmox_agent_interfaces']]
-    assert 'eth1' in [d['name']
-                      for d in host_qemu_multi_nic.get_vars()['proxmox_agent_interfaces']]
-    assert 'weave' in [d['name']
-                      for d in host_qemu_multi_nic.get_vars()['proxmox_agent_interfaces']]
+    assert 'eth0' in [d['name'] for d in host_qemu_multi_nic.get_vars()['proxmox_agent_interfaces']]
+    assert 'eth1' in [d['name'] for d in host_qemu_multi_nic.get_vars()['proxmox_agent_interfaces']]
+    assert 'weave' in [d['name'] for d in host_qemu_multi_nic.get_vars()['proxmox_agent_interfaces']]
 
     # check to make sure qemu-windows doesn't have proxmox_agent_interfaces
     assert "proxmox_agent_interfaces" not in host_qemu_windows.get_vars()

@@ -70,6 +70,10 @@ DOCUMENTATION = '''
         description: Gather LXC/QEMU configuration facts.
         default: no
         type: bool
+      want_proxmox_nodes_ansible_host:
+        description: Do we want the ansible host set for the proxmox nodes
+        default: yes
+        type: bool
       strict:
         version_added: 2.5.0
       compose:
@@ -361,8 +365,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     self.inventory.add_child(nodes_group, node['node'])
 
                 # get node IP address
-                ip = self._get_node_ip(node['node'])
-                self.inventory.set_variable(node['node'], 'ansible_host', ip)
+                if self.get_option("want_proxmox_nodes_ansible_host"):
+                    ip = self._get_node_ip(node['node'])
+                    self.inventory.set_variable(node['node'], 'ansible_host', ip)
 
                 # get LXC containers for this node
                 node_lxc_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), ('%s_lxc' % node['node']).lower()))

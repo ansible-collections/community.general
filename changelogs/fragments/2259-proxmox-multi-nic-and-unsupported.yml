@@ -1,3 +1,5 @@
 ---
 bugfixes:
   - proxmox inventory - network interfaces without ip-addresses, multiple network interfaces and unsupported guest error (https://github.com/ansible-collections/community.general/pull/2263).
+minor_changes:
+  - proxmox inventory - allow us to select if we want ansible_host set for the proxmox nodes
