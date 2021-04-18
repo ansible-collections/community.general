@@ -87,7 +87,7 @@ def get_token(module_params):
     token = module_params.get('token')
     base_url = module_params.get('auth_keycloak_url')
 
-    if not base_url.lower().startswith(('http', 'https')):
+    if not None and not base_url.lower().startswith(('http', 'https')):
         raise KeycloakError("auth_url '%s' should either start with 'http' or 'https'." % base_url)
 
     if token is None:
