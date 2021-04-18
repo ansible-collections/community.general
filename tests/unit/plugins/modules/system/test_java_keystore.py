@@ -259,7 +259,7 @@ class TestCertChanged(ModuleTestCase):
             result = cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
             self.assertTrue(result, 'Alias mismatch detected')
 
-    def test_cert_changed_fail_password_mismatch(self):
+    def test_cert_changed_password_mismatch(self):
         set_module_args(dict(
             certificate='cert-foo',
             private_key='private-foo',
@@ -273,7 +273,6 @@ class TestCertChanged(ModuleTestCase):
             supports_check_mode=self.spec.supports_check_mode
         )
 
-        module.fail_json = Mock()
 
         with patch('os.remove', return_value=True):
             self.create_file.side_effect = ['/tmp/placeholder']
