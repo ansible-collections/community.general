@@ -534,8 +534,8 @@ EXAMPLES = '''
 
 
 - name: Create or update Keycloak client (minimal example), authentification with token
-  local_action:
-    module: keycloak_client
+  delegate_to: localhost
+  community.general.keycloak_client:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
