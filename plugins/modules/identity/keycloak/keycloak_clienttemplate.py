@@ -169,7 +169,7 @@ author:
 '''
 
 EXAMPLES = '''
-- name: Create or update Keycloak client template (minimal)
+- name: Create or update Keycloak client template (minimal), authentification with credentials
   local_action:
     module: keycloak_clienttemplate
     auth_client_id: admin-cli
@@ -177,6 +177,16 @@ EXAMPLES = '''
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
+    realm: master
+    name: this_is_a_test
+
+- name: Create or update Keycloak client template (minimal), authentification with token
+  local_action:
+    module: keycloak_clienttemplate
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    token: TOKEN
     realm: master
     name: this_is_a_test
 
@@ -302,15 +312,7 @@ def main():
 
     # Obtain access token, initialize API
     try:
-        connection_header = get_token(
-            base_url=module.params.get('auth_keycloak_url'),
-            validate_certs=module.params.get('validate_certs'),
-            auth_realm=module.params.get('auth_realm'),
-            client_id=module.params.get('auth_client_id'),
-            auth_username=module.params.get('auth_username'),
-            auth_password=module.params.get('auth_password'),
-            client_secret=module.params.get('auth_client_secret'),
-        )
+        connection_header = get_token(module.params)
     except KeycloakError as e:
         module.fail_json(msg=str(e))
     kc = KeycloakAPI(module, connection_header)
