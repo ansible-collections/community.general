@@ -215,7 +215,6 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 from ansible.module_utils.basic import AnsibleModule
 
 
-
 def main():
     """
     Module execution
