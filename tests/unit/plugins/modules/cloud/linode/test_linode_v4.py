@@ -175,6 +175,55 @@ def test_optional_image_is_validated(default_args, capfd, access_token):
     ))
 
 
+@pytest.mark.parametrize('value', [True, False])
+def test_private_ip_valid_values(default_args, access_token, value):
+    default_args.update({'private_ip': value})
+    set_module_args(default_args)
+
+    module = linode_v4.initialise_module()
+
+    assert module.params['private_ip'] is value
+
+
+@pytest.mark.parametrize('value', ['not-a-bool', 42])
+def test_private_ip_invalid_values(default_args, capfd, access_token, value):
+    default_args.update({'private_ip': value})
+    set_module_args(default_args)
+
+    with pytest.raises(SystemExit):
+        linode_v4.initialise_module()
+
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+
+    assert results['failed'] is True
+    assert 'not a valid boolean' in results['msg']
+
+
+def test_private_ip_default_value(default_args, access_token):
+    default_args.pop('private_ip', None)
+    set_module_args(default_args)
+
+    module = linode_v4.initialise_module()
+
+    assert module.params['private_ip'] is False
+
+
+def test_private_ip_is_forwarded_to_linode(default_args, mock_linode, access_token):
+    default_args.update({'private_ip': True})
+    set_module_args(default_args)
+
+    target = 'linode_api4.linode_client.LinodeGroup.instances'
+    with mock.patch(target, return_value=[]):
+        with pytest.raises(SystemExit):
+            target = 'linode_api4.linode_client.LinodeGroup.instance_create'
+            with mock.patch(target, return_value=(mock_linode, 'passw0rd')) as instance_create_mock:
+                linode_v4.main()
+
+    args, kwargs = instance_create_mock.call_args
+    assert kwargs['private_ip'] is True
+
+
 def test_instance_already_created(default_args,
                                   mock_linode,
                                   capfd,
