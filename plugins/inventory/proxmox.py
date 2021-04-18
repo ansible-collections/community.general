@@ -234,14 +234,21 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 )
             )['result']
 
+            if "error" in ifaces and "class" in ifaces["error"] and ifaces["error"]["class"] == "Unsupported":
+                # This happens on Windows, even though qemu agent is running, the IP address
+                # cannot be fetched, as it's unsupported
+                return result
+
             for iface in ifaces:
-                result.append({
+                iface_result = {
                     'name': iface['name'],
                     'mac-address': iface['hardware-address'],
-                    'ip-addresses': [
+                }
+                if "ip-addresses" in iface:
+                    iface_result["ip-addresses"] = [
                         "%s/%s" % (ip['ip-address'], ip['prefix']) for ip in iface['ip-addresses']
                     ]
-                })
+                result.append(iface_result)
         except requests.HTTPError:
             pass
 
