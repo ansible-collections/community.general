@@ -19,8 +19,9 @@ options:
   name:
     description:
       - Name of the certificate in the keystore.
-      - If the provided name does not exist in the keystore, the module fails.
-        This behavior will change in a next release.
+      - If the provided name does not exist in the keystore, the module
+        will re-create the keystore. This behavior changed in community.general 3.0.0,
+        before that the module would fail when the name did not match.
     type: str
     required: true
   certificate:
