@@ -60,7 +60,9 @@ options:
     description:
       - Password that should be used to secure the keystore.
       - If the provided password fails to unlock the keystore, the module
-        fails. This behavior will change in a next release.
+        will re-create the keystore with the new passphrase. This behavior
+        changed in community.general 3.0.0, before the module would fail
+        when the password did not match.
     type: str
     required: true
   dest:
