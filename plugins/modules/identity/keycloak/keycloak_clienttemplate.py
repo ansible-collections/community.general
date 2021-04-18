@@ -191,8 +191,8 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Create or update Keycloak client template (minimal), authentification with token
-  local_action:
-    module: keycloak_clienttemplate
+  delegate_to: localhost
+  community.general.keycloak_clienttemplate:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
