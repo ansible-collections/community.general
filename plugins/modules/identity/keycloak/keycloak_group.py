@@ -228,7 +228,6 @@ def main():
         id=dict(type='str'),
         name=dict(type='str'),
         attributes=dict(type='dict'),
-        token=dict(type='str'),
     )
 
     argument_spec.update(meta_args)
