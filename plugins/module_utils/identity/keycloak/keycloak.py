@@ -129,7 +129,11 @@ def get_token(module_params):
     return {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
+<<<<<<< HEAD
     }
+=======
+        }
+>>>>>>> Fix unit test and add new one for token as param
 
 
 class KeycloakAPI(object):
