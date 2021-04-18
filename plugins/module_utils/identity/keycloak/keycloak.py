@@ -81,6 +81,11 @@ def get_token(module_params):
         :return: connection header
     """
     token = module_params.get('token')
+    base_url = module_params.get('auth_keycloak_url')
+
+    if not base_url.lower().startswith(('http', 'https')):
+        raise KeycloakError("auth_url '%s' should either start with 'http' or 'https'." % base_url)
+
     if token is None:
         base_url = module_params.get('auth_keycloak_url')
         validate_certs = module_params.get('validate_certs')
@@ -89,8 +94,6 @@ def get_token(module_params):
         auth_username = module_params.get('auth_username')
         auth_password = module_params.get('auth_password')
         client_secret = module_params.get('auth_client_secret')
-        if not base_url.lower().startswith(('http', 'https')):
-            raise KeycloakError("auth_url '%s' should either start with 'http' or 'https'." % base_url)
         auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
         temp_payload = {
             'grant_type': 'password',
