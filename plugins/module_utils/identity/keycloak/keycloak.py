@@ -75,7 +75,7 @@ class KeycloakError(Exception):
 
 
 def get_token(module_params):
-    """ Obtains connection header with token for the authentication, 
+    """ Obtains connection header with token for the authentication,
         token already given or obtained from credentials
         :param module_params: parameters of the module
         :return: connection header
@@ -120,8 +120,8 @@ def get_token(module_params):
             raise KeycloakError(
                 'Could not obtain access token from %s' % auth_url)
     return {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
         }
 
 
