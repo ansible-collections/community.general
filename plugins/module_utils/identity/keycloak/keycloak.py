@@ -33,9 +33,9 @@ import json
 import traceback
 
 from ansible.module_utils.urls import open_url
-from ansible.module_utils.six.moves.urllib.parse import urlencode
+from ansible.module_utils.six.moves.urllib.parse import urlencode, quote
 from ansible.module_utils.six.moves.urllib.error import HTTPError
-from ansible.module_utils._text import to_native
+from ansible.module_utils._text import to_native, to_text
 
 URL_REALMS = "{url}/admin/realms"
 URL_REALM = "{url}/admin/realms/{realm}"
@@ -51,6 +51,17 @@ URL_CLIENTTEMPLATES = "{url}/admin/realms/{realm}/client-templates"
 URL_GROUPS = "{url}/admin/realms/{realm}/groups"
 URL_GROUP = "{url}/admin/realms/{realm}/groups/{groupid}"
 
+URL_AUTHENTICATION_FLOWS = "{url}/admin/realms/{realm}/authentication/flows"
+URL_AUTHENTICATION_FLOW = "{url}/admin/realms/{realm}/authentication/flows/{id}"
+URL_AUTHENTICATION_FLOW_COPY = "{url}/admin/realms/{realm}/authentication/flows/{copyfrom}/copy"
+URL_AUTHENTICATION_FLOW_EXECUTIONS = "{url}/admin/realms/{realm}/authentication/flows/{flowalias}/executions"
+URL_AUTHENTICATION_FLOW_EXECUTIONS_EXECUTION = "{url}/admin/realms/{realm}/authentication/flows/{flowalias}/executions/execution"
+URL_AUTHENTICATION_FLOW_EXECUTIONS_FLOW = "{url}/admin/realms/{realm}/authentication/flows/{flowalias}/executions/flow"
+URL_AUTHENTICATION_EXECUTION_CONFIG = "{url}/admin/realms/{realm}/authentication/executions/{id}/config"
+URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY = "{url}/admin/realms/{realm}/authentication/executions/{id}/raise-priority"
+URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY = "{url}/admin/realms/{realm}/authentication/executions/{id}/lower-priority"
+URL_AUTHENTICATION_CONFIG = "{url}/admin/realms/{realm}/authentication/config/{id}"
+
 
 def keycloak_argument_spec():
     """
@@ -59,7 +70,7 @@ def keycloak_argument_spec():
     :return: argument_spec dict
     """
     return dict(
-        auth_keycloak_url=dict(type='str', aliases=['url'], required=True),
+        auth_keycloak_url=dict(type='str', aliases=['url'], required=True, no_log=False),
         auth_client_id=dict(type='str', default='admin-cli'),
         auth_realm=dict(type='str'),
         auth_client_secret=dict(type='str', default=None, no_log=True),
@@ -130,6 +141,79 @@ def get_token(module_params):
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
     }
+
+
+def isDictEquals(dict1, dict2, exclude=None):
+    """
+    This function compare if tthe first parameter structure, is included in the second.
+    The function use every elements of dict1 and validates they are present in the dict2 structure.
+    The two structure does not need to be equals for that function to return true.
+    Each elements are compared recursively.
+    :param dict1:
+        type:
+            dict for the initial call, can be dict, list, bool, int or str for recursive calls
+        description:
+            reference structure
+    :param dict2:
+        type:
+            dict for the initial call, can be dict, list, bool, int or str for recursive calls
+        description:
+            structure to compare with first parameter.
+    :param exclude:
+        type:
+            list
+        description:
+            Key to exclude from the comparison.
+        default: None
+    :return:
+        type:
+            bool
+        description:
+            Return True if all element of dict 1 are present in dict 2, return false otherwise.
+    """
+    try:
+        if type(dict1) is list and type(dict2) is list:
+            if len(dict1) == 0 and len(dict2) == 0:
+                return True
+            found = False
+            for item1 in dict1:
+                found = False
+                if type(item1) is list:
+                    found1 = False
+                    for item2 in dict2:
+                        if isDictEquals(item1, item2, exclude):
+                            found1 = True
+                    if found1:
+                        found = True
+                elif type(item1) is dict:
+                    found1 = False
+                    for item2 in dict2:
+                        if isDictEquals(item1, item2, exclude):
+                            found1 = True
+                    if found1:
+                        found = True
+                else:
+                    if item1 not in dict2:
+                        return False
+                    else:
+                        found = True
+                if not found:
+                    return False
+            return found
+        elif type(dict1) is dict and type(dict2) is dict:
+            if len(dict1) == 0 and len(dict2) == 0:
+                return True
+            for key in dict1:
+                if not (exclude and key in exclude):
+                    if not isDictEquals(dict1[key], dict2[key], exclude):
+                        return False
+            return True
+        elif type(dict1) is bool and type(dict2) is bool:
+            return dict1 == dict2
+        else:
+            return to_text(dict1, 'utf-8') == to_text(dict2, 'utf-8')
+    except KeyError:
+        return False
 
 
 class KeycloakAPI(object):
@@ -571,3 +655,296 @@ class KeycloakAPI(object):
 
         except Exception as e:
             self.module.fail_json(msg="Unable to delete group %s: %s" % (groupid, str(e)))
+
+    def get_authentication_flow_by_alias(self, alias, realm='master'):
+        """
+        Get an authentication flow by it's alias
+        :param alias: Alias of the authentication flow to get.
+        :param realm: Realm.
+        :return: Authentication flow representation.
+        """
+        try:
+            authenticationFlow = {}
+            # Check if the authentication flow exists on the Keycloak serveraders
+            authentications = json.load(open_url(URL_AUTHENTICATION_FLOWS.format(url=self.baseurl, realm=realm), method='GET', headers=self.restheaders))
+            for authentication in authentications:
+                if authentication["alias"] == alias:
+                    authenticationFlow = authentication
+                    break
+            return authenticationFlow
+        except Exception as e:
+            self.module.fail_json(msg="Unable get authentication flow %s: %s" % (alias, str(e)))
+
+    def delete_authentication_flow_by_id(self, id, realm='master'):
+        """
+        Delete an authentication flow from Keycloak
+        :param id: id of authentication flow to be deleted
+        :param realm: realm of client to be deleted
+        :return: HTTPResponse object on success
+        """
+        flow_url = URL_AUTHENTICATION_FLOW.format(url=self.baseurl, realm=realm, id=id)
+
+        try:
+            return open_url(flow_url, method='DELETE', headers=self.restheaders,
+                            validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not delete authentication flow %s in realm %s: %s'
+                                  % (id, realm, str(e)))
+
+    def copy_auth_flow(self, config, realm='master'):
+        """
+        Create a new authentication flow from a copy of another.
+        :param config: Representation of the authentication flow to create.
+        :param realm: Realm.
+        :return: Representation of the new authentication flow.
+        """
+        try:
+            newName = dict(
+                newName=config["alias"]
+            )
+            open_url(
+                URL_AUTHENTICATION_FLOW_COPY.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    copyfrom=quote(config["copyFrom"])),
+                method='POST',
+                headers=self.restheaders,
+                data=json.dumps(newName))
+            flowList = json.load(
+                open_url(
+                    URL_AUTHENTICATION_FLOWS.format(url=self.baseurl,
+                                                    realm=realm),
+                    method='GET',
+                    headers=self.restheaders))
+            for flow in flowList:
+                if flow["alias"] == config["alias"]:
+                    return flow
+            return None
+        except Exception as e:
+            self.module.fail_json(msg='Could not copy authentication flow %s in realm %s: %s'
+                                  % (config["alias"], realm, str(e)))
+
+    def create_empty_auth_flow(self, config, realm='master'):
+        """
+        Create a new empty authentication flow.
+        :param config: Representation of the authentication flow to create.
+        :param realm: Realm.
+        :return: Representation of the new authentication flow.
+        """
+        try:
+            newFlow = dict(
+                alias=config["alias"],
+                providerId=config["providerId"],
+                description=config["description"],
+                topLevel=True
+            )
+            open_url(
+                URL_AUTHENTICATION_FLOWS.format(
+                    url=self.baseurl,
+                    realm=realm),
+                method='POST',
+                headers=self.restheaders,
+                data=json.dumps(newFlow))
+            flowList = json.load(
+                open_url(
+                    URL_AUTHENTICATION_FLOWS.format(
+                        url=self.baseurl,
+                        realm=realm),
+                    method='GET',
+                    headers=self.restheaders))
+            for flow in flowList:
+                if flow["alias"] == config["alias"]:
+                    return flow
+            return None
+        except Exception as e:
+            self.module.fail_json(msg='Could not create empty authentication flow %s in realm %s: %s'
+                                  % (config["alias"], realm, str(e)))
+
+    def create_or_update_executions(self, config, realm='master'):
+        """
+        Create or update executions for an authentication flow.
+        :param config: Representation of the authentication flow including it's executions.
+        :param realm: Realm
+        :return: True if executions have been modified. False otherwise.
+        """
+        try:
+            changed = False
+            if "authenticationExecutions" in config:
+                for newExecutionIndex, newExecution in enumerate(config["authenticationExecutions"], start=0):
+                    # Get existing executions on the Keycloak server for this alias
+                    existingExecutions = json.load(
+                        open_url(
+                            URL_AUTHENTICATION_FLOW_EXECUTIONS.format(
+                                url=self.baseurl,
+                                realm=realm,
+                                flowalias=quote(config["alias"])),
+                            method='GET',
+                            headers=self.restheaders))
+                    executionFound = False
+                    # Get flowalias parent if given
+                    if "flowAlias" in newExecution:
+                        flowAliasParent = newExecution["flowAlias"]
+                    else:
+                        flowAliasParent = config["alias"]
+                    for i, existingExecution in enumerate(existingExecutions, start=0):
+                        if ("providerId" in existingExecution and "providerId" in newExecution and
+                                existingExecution["providerId"] == newExecution["providerId"] or
+                                "displayName" in existingExecution and "displayName" in newExecution and
+                                existingExecution["displayName"] == newExecution["displayName"]):
+                            executionFound = True
+                            existingExecutionIndex = i
+                            break
+                    if executionFound:
+                        # Replace config id of the execution config by it's complete representation
+                        if "authenticationConfig" in existingExecution:
+                            execConfigId = existingExecution["authenticationConfig"]
+                            execConfig = json.load(
+                                open_url(
+                                    URL_AUTHENTICATION_CONFIG.format(
+                                        url=self.baseurl,
+                                        realm=realm,
+                                        id=execConfigId),
+                                    method='GET',
+                                    headers=self.restheaders))
+                            existingExecution["authenticationConfig"] = execConfig
+                        # Remove key that doesn't need to be compared with existingExecution
+                        newExecutionConfig = newExecution
+                        if "flowAlias" in newExecutionConfig:
+                            del newExecutionConfig["flowAlias"]
+                        # Compare the executions to see if it need changes
+                        if not isDictEquals(newExecutionConfig, existingExecution) or existingExecutionIndex != newExecutionIndex:
+                            changed = True
+                    elif "providerId" in newExecution:
+                        # Create the new execution
+                        newExec = {}
+                        newExec["provider"] = newExecution["providerId"]
+                        newExec["requirement"] = newExecution["requirement"]
+                        open_url(
+                            URL_AUTHENTICATION_FLOW_EXECUTIONS_EXECUTION.format(
+                                url=self.baseurl,
+                                realm=realm,
+                                flowalias=quote(flowAliasParent)),
+                            method='POST',
+                            headers=self.restheaders,
+                            data=json.dumps(newExec))
+                        changed = True
+                    elif "displayName" in newExecution:
+                        # Create the new subflow
+                        newSubFlow = {}
+                        newSubFlow["alias"] = newExecution["displayName"]
+                        newSubFlow["provider"] = "registration-page-form"
+                        newSubFlow["type"] = "basic-flow"
+                        open_url(
+                            URL_AUTHENTICATION_FLOW_EXECUTIONS_FLOW.format(
+                                url=self.baseurl,
+                                realm=realm,
+                                flowalias=quote(flowAliasParent)),
+                            method='POST',
+                            headers=self.restheaders,
+                            data=json.dumps(newSubFlow))
+                        changed = True
+                    if changed:
+                        # Get existing executions on the Keycloak server for this alias
+                        existingExecutions = json.load(
+                            open_url(
+                                URL_AUTHENTICATION_FLOW_EXECUTIONS.format(
+                                    url=self.baseurl,
+                                    realm=realm,
+                                    flowalias=quote(config["alias"])),
+                                method='GET',
+                                headers=self.restheaders))
+                        executionFound = False
+                        # Search for execution or flow to update
+                        for i, existingExecution in enumerate(existingExecutions, start=0):
+                            if ("providerId" in existingExecution and "providerId" in newExecution and
+                                    existingExecution["providerId"] == newExecution["providerId"] or
+                                    "displayName" in existingExecution and "displayName" in newExecution and
+                                    existingExecution["displayName"] == newExecution["displayName"]):
+                                executionFound = True
+                                existingExecutionIndex = i
+                                break
+                        if executionFound:
+                            # Update the existing execution
+                            updatedExec = {}
+                            updatedExec["id"] = existingExecution["id"]
+                            for key in newExecution:
+                                # create the execution configuration
+                                if key == "authenticationConfig":
+                                    # Add the autenticatorConfig to the execution
+                                    open_url(
+                                        URL_AUTHENTICATION_EXECUTION_CONFIG.format(
+                                            url=self.baseurl,
+                                            realm=realm,
+                                            id=existingExecution["id"]),
+                                        method='POST',
+                                        headers=self.restheaders,
+                                        data=json.dumps(newExecution["authenticationConfig"]))
+                                elif key != "flowAlias":
+                                    updatedExec[key] = newExecution[key]
+                            if "requirement" in newExecution:
+                                open_url(
+                                    URL_AUTHENTICATION_FLOW_EXECUTIONS.format(
+                                        url=self.baseurl,
+                                        realm=realm,
+                                        flowalias=quote(flowAliasParent)),
+                                    method='PUT',
+                                    headers=self.restheaders,
+                                    data=json.dumps(updatedExec))
+                            if existingExecutionIndex < newExecutionIndex:
+                                diff = newExecutionIndex - existingExecutionIndex
+                                for i in range(diff):
+                                    open_url(
+                                        URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY.format(
+                                            url=self.baseurl,
+                                            realm=realm,
+                                            id=existingExecution["id"]),
+                                        method='POST',
+                                        headers=self.restheaders)
+                            elif existingExecutionIndex > newExecutionIndex:
+                                diff = existingExecutionIndex - newExecutionIndex
+                                for i in range(diff):
+                                    open_url(
+                                        URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY.format(
+                                            url=self.baseurl,
+                                            realm=realm,
+                                            id=existingExecution["id"]),
+                                        method='POST',
+                                        headers=self.restheaders)
+            return changed
+        except Exception as e:
+            self.module.fail_json(msg='Could not create or update executions for authentication flow %s in realm %s: %s \n %s'
+                                  % (config["alias"], realm, str(e), updatedExec))
+
+    def get_executions_representation(self, config, realm='master'):
+        """
+        Get a representation of the executions for an authentication flow.
+        :param config: Representation of the authentication flow
+        :param realm: Realm
+        :return: Representation of the executions
+        """
+        try:
+            # Get executions created
+            executions = json.load(
+                open_url(
+                    URL_AUTHENTICATION_FLOW_EXECUTIONS.format(
+                        url=self.baseurl,
+                        realm=realm,
+                        flowalias=quote(config["alias"])),
+                    method='GET',
+                    headers=self.restheaders))
+            for execution in executions:
+                if "authenticationConfig" in execution:
+                    execConfigId = execution["authenticationConfig"]
+                    execConfig = json.load(
+                        open_url(
+                            URL_AUTHENTICATION_CONFIG.format(
+                                url=self.baseurl,
+                                realm=realm,
+                                id=execConfigId),
+                            method='GET',
+                            headers=self.restheaders))
+                    execution["authenticationConfig"] = execConfig
+            return executions
+        except Exception as e:
+            self.module.fail_json(msg='Could not get executions for authentication flow %s in realm %s: %s'
+                                  % (config["alias"], realm, str(e)))
