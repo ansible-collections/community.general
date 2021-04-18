@@ -78,7 +78,7 @@ def test_connect_to_keycloak_with_creds(mock_good_connection):
 
 def test_connect_to_keycloak_with_token(mock_good_connection):
     module_params_token = {
-        'base_url': 'http://keycloak.url/auth',
+        'auth_keycloak_url': 'http://keycloak.url/auth',
         'validate_certs': True,
         'client_id': 'admin-cli',
         'token': "alongtoken"
