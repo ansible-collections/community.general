@@ -36,9 +36,6 @@ plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-list-no-
 plugins/modules/clustering/consul/consul.py validate-modules:doc-missing-type
 plugins/modules/clustering/consul/consul.py validate-modules:undocumented-parameter
 plugins/modules/clustering/consul/consul_session.py validate-modules:parameter-state-invalid-choice
-plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:doc-missing-type
-plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:parameter-type-not-in-doc
-plugins/modules/net_tools/ldap/ldap_entry.py validate-modules:undocumented-parameter # Parameter removed but reason for removal is shown by custom code
 plugins/modules/notification/grove.py validate-modules:invalid-argument-name
 plugins/modules/packaging/language/composer.py validate-modules:parameter-invalid
 plugins/modules/packaging/os/apt_rpm.py validate-modules:parameter-invalid
