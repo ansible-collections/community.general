@@ -1,0 +1,64 @@
+# (c) 2020, Berkhan Berkdemir
+# (c) 2021, Alexei Znamensky
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: bail out for non-supported platforms
+  meta: end_play
+  when:
+    - (ansible_os_family != "RedHat" or ansible_distribution_major_version|int < 7)
+    - ansible_os_family != "Debian"
+
+- name: install perl development package for Red Hat family
+  package:
+    name:
+      - perl-devel
+      - perl-App-cpanminus
+    state: present
+  become: yes
+  when: ansible_os_family == "RedHat"
+
+- name: install perl development package for Debian family
+  package:
+    name:
+      - cpanminus
+    state: present
+  become: yes
+  when: ansible_os_family == "Debian"
+
+- name: install a Perl package
+  cpanm:
+    name: JSON
+    notest: yes
+  register: install_perl_package_result
+
+- name: assert package is installed
+  assert:
+    that:
+      - install_perl_package_result is changed
+      - install_perl_package_result is not failed
+
+- name: install same Perl package
+  cpanm:
+    name: JSON
+    notest: yes
+  register: install_same_perl_package_result
+
+- name: assert same package is installed
+  assert:
+    that:
+      - install_same_perl_package_result is not changed
+      - install_same_perl_package_result is not failed
+
+- name: install a Perl package with version operator
+  cpanm:
+    name: JSON
+    version: "@4.01"
+    notest: yes
+    mode: new
+  register: install_perl_package_with_version_op_result
+
+- name: assert package with version operator is installed
+  assert:
+    that:
+      - install_perl_package_with_version_op_result is changed
+      - install_perl_package_with_version_op_result is not failed
