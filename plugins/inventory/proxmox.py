@@ -71,7 +71,10 @@ DOCUMENTATION = '''
         default: no
         type: bool
       want_proxmox_nodes_ansible_host:
-        description: Do we want the ansible host set for the proxmox nodes
+        version_added: 2.5.1
+        description:
+          - Do we want the ansible host set for the proxmox nodes?
+          - Be careful with setting this to yes as it will randomly get the first available interface, in case of multiple network interface it will retrieve the first available IP address which may not be the correct one
         default: yes
         type: bool
       strict:
