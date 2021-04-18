@@ -122,7 +122,7 @@ def get_token(module_params):
     return {
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
-        }
+    }
 
 
 class KeycloakAPI(object):
