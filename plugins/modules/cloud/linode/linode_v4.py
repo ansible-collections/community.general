@@ -53,6 +53,13 @@ options:
          group labelling is deprecated but still supported. The encouraged
          method for marking instances is to use tags.
     type: str
+  private_ip:
+    description:
+      - If C(true), the created Linode will have private networking enabled and
+        assigned a private IPv4 address.
+    type: bool
+    default: false
+    version_added: 3.0.0
   tags:
     description:
       - The tags that the instance should be marked under. See
@@ -238,6 +245,7 @@ def initialise_module():
             authorized_keys=dict(type='list', elements='str', no_log=False),
             group=dict(type='str'),
             image=dict(type='str'),
+            private_ip=dict(type='bool', default=False),
             region=dict(type='str'),
             root_pass=dict(type='str', no_log=True),
             tags=dict(type='list', elements='str'),
@@ -283,6 +291,7 @@ def main():
             group=module.params['group'],
             image=module.params['image'],
             label=module.params['label'],
+            private_ip=module.params['private_ip'],
             region=module.params['region'],
             root_pass=module.params['root_pass'],
             tags=module.params['tags'],
