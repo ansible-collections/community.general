@@ -8,7 +8,7 @@ __metaclass__ = type
 
 import pytest
 
-from ansible_collections.community.general.plugins.modules.source_control.gitlab.gitlab_service import GitLabServices
+from ansible_collections.community.general.plugins.modules.source_control.gitlab.gitlab_integration import GitLabIntegrations
 
 
 def _dummy(x):
@@ -41,17 +41,17 @@ except ImportError:
     with_httmock = _dummy
 
 
-class TestGitlabService(GitlabModuleTestCase):
+class TestGitlabIntegration(GitlabModuleTestCase):
     def setUp(self):
-        super(TestGitlabService, self).setUp()
+        super(TestGitlabIntegration, self).setUp()
 
     @with_httmock(resp_get_project)
     @with_httmock(resp_get_project_by_name)
-    def test_exist_service(self):
+    def test_exist_integration(self):
         project = self.gitlab_instance.projects.get(1)
         self.assertEqual(type(project), Project)
 
-        remote_service = project.services.get(1)
+        remote_integration = project.services.get(1)
 
-        # self.moduleUtil = GitLabServices(module=self.mock_module, gitlab_instance=self.gitlab_instance)
-        self.moduleUtil = GitLabServices(module=self.mock_module, name="asana")
+        # self.moduleUtil = GitLabIntegrations(module=self.mock_module, gitlab_instance=self.gitlab_instance)
+        self.moduleUtil = GitLabIntegrations(module=self.mock_module, name="asana")

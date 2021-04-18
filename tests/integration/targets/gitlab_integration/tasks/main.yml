@@ -8,20 +8,20 @@
     name: python-gitlab
     state: present
 
-- name: Create a new service
-  gitlab_service:
+- name: Create a new integration
+  gitlab_integration:
     api_url: "{{ gitlab_host }}"
     api_token: "{{ gitlab_login_token }}"
     project: test/project
-    service: emails-on-push
+    integration: emails-on-push
     events:
       - push
     params:
       recipients: test@example.com
     state: present
-  register: gitlab_service_state
+  register: gitlab_integration_state
 
-- name: Check service has been created correctly
+- name: Check integration has been created correctly
   assert:
     that:
-      - gitlab_service_state is changed
+      - gitlab_integration_state is changed

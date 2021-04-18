@@ -9,8 +9,8 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: gitlab_service
-short_description: Setup or delete GitLab integration services
+module: gitlab_integration
+short_description: Setup or delete GitLab integration integrations
 version_added: '2.5.0'
 description:
   - Creates, updates, or deletes GitLab integrations formerly known as "services".
@@ -34,12 +34,12 @@ options:
   # TODO: Not yet supported (U(https://gitlab.com/gitlab-org/gitlab-ce/issues/41113)).
   # active:
   #   description:
-  #     - Whether the service is active or not.
+  #     - Whether the integration is active or not.
   #   type: bool
   #   default: true
-  service:
+  integration:
     description:
-      - The type of service.
+      - The type of integration.
     required: true
     type: str
     choices:
@@ -80,11 +80,11 @@ options:
       - youtrack
   params:
     description:
-      - The description of the service, see documentation at U(https://docs.gitlab.com/ee/api/services.html).
+      - The description of the integration, see documentation at U(https://docs.gitlab.com/ee/api/services.html).
     type: dict
   events:
     description:
-      - The events that trigger the service.
+      - The events that trigger the integration.
       - Required if I(state=present).
     choices: ["push", "issues", "confidential_issues", "merge_requests", "tag_push", "note", "confidential_note", "job", "pipeline", "wiki_page"]
     default: ["push", "issues", "confidential_issues", "merge_requests", "tag_push", "note", "confidential_note", "job", "pipeline", "wiki_page"]
@@ -92,7 +92,7 @@ options:
     elements: str
   state:
     description:
-      - Create or delete a service.
+      - Create or delete an integration.
       - Possible values are C(present) and C(absent).
     default: "present"
     choices: ["present", "absent"]
@@ -102,11 +102,11 @@ options:
 EXAMPLES = '''
 # Setup email on push for this project
 - name: Email me on push
-  community.general.gitlab_service:
+  community.general.gitlab_integration:
     api_url: https://gitlab.com
     api_token: foobar
     project: 123456
-    service: emails-on-push
+    integration: emails-on-push
     params:
       recipients: foo@example.com
       disable_diffs: true
@@ -115,11 +115,11 @@ EXAMPLES = '''
 
 # This will always be set to change because a non-null token is mandatory
 - name: Trigger packagist update on push events (only)
-  community.general.gitlab_service:
+  community.general.gitlab_integration:
     api_url: https://gitlab.com
     api_token: foobar
     project: foo/proj
-    service: packagist
+    integration: packagist
     events: ["push"]
     params:
       username: foo
@@ -135,8 +135,8 @@ EXAMPLES = '''
 
 RETURN = '''
 ---
-service:
-  description: A dict containing key/value pairs representing GitLab service
+integration:
+  description: A dict containing key/value pairs representing GitLab integration
   returned: success
   type: dict
   sample:
@@ -164,7 +164,7 @@ service:
       recipients: me@example.com
     project_id: 1234567
 state:
-  description: A string indicating whether the service was "created" or "changed"
+  description: A string indicating whether the integration was "created" or "changed"
   returned: success
   type: str
   sample: created
@@ -315,7 +315,7 @@ SRV_DEF = {"asana": {"api_key": {"required": 1, "type": "str", "no_log": True}, 
            "youtrack": {"project_url": {"required": 1, "type": "str"}, "issues_url": {"required": 1, "type": "str"}}}
 
 
-class GitLabServices(object):
+class GitLabIntegrations(object):
     HOOK_EVENTS = ['push', 'issues', 'confidential_issues', 'merge_requests', 'tag_push', 'note', 'confidential_note', 'job', 'pipeline', 'wiki_page']
     CREDENTIAL_PARAMS = ['password', 'token', 'api_key', 'webhook']
 
@@ -323,15 +323,15 @@ class GitLabServices(object):
         self._module = module
         self.name = name
 
-    # "create" can only happen once for this service during the life of the project)
+    # "create" can only happen once for this integration during the life of the project)
     # merge new attributes in the object retrieved from the server
-    def create(self, remote_service, active, params, events):
-        local_service = self.__as_api_object(active, params, events)
-        for k, v in local_service.items():
-            setattr(remote_service, k, v)
+    def create(self, remote_integration, active, params, events):
+        local_integration = self.__as_api_object(active, params, events)
+        for k, v in local_integration.items():
+            setattr(remote_integration, k, v)
         if not self._module.check_mode:
-            remote_service.save()
-        return {'before': {}, 'after': str(remote_service.attributes)}
+            remote_integration.save()
+        return {'before': {}, 'after': str(remote_integration.attributes)}
 
     def update(self, remote, active, params, events):
         diff = not self.__equals(remote.attributes, active, params, events)
@@ -385,7 +385,7 @@ class GitLabServices(object):
             self._module.debug("events differs: %s != %s" % (prev_attr, events))
             return False
         if prev_attr['properties'] != filtered_params:
-            self._module.debug("services attributes differs: %s != %s" % (prev_attr['properties'], filtered_params))
+            self._module.debug("integrations attributes differs: %s != %s" % (prev_attr['properties'], filtered_params))
             return False
         return True
 
@@ -399,10 +399,10 @@ def main():
     base_spec.update(dict(
         api_token=dict(type='str', no_log=True),
         project=dict(required=True),
-        service=dict(required=True, type='str', choices=list(SRV_DEF.keys())),
+        integration=dict(required=True, type='str', choices=list(SRV_DEF.keys())),
         # active=dict(required=False, default=True, type='bool'),
         params=dict(required=False, type='dict', no_log=True),
-        events=dict(required=False, type='list', elements='str', default=GitLabServices.HOOK_EVENTS, choices=GitLabServices.HOOK_EVENTS),
+        events=dict(required=False, type='list', elements='str', default=GitLabIntegrations.HOOK_EVENTS, choices=GitLabIntegrations.HOOK_EVENTS),
         state=dict(default='present', choices=['present', 'absent']),
     ))
 
@@ -424,14 +424,14 @@ def main():
     )
 
     stub_init = AnsibleModule(argument_spec=base_spec, **constraints)
-    service = stub_init.params['service']
+    integration = stub_init.params['integration']
     state = stub_init.params['state']
     if state == 'present':
-        # since we know the service (which has been validated), recreate a module_specs to validate suboptions
-        sub_arg_specs = dict((k, v) for k, v in SRV_DEF[service].items() if k != '_events')
+        # since we know the integration (which has been validated), recreate a module_specs to validate suboptions
+        sub_arg_specs = dict((k, v) for k, v in SRV_DEF[integration].items() if k != '_events')
         base_spec['params'] = dict(required=False, type='dict', options=sub_arg_specs)
-        if '_events' in SRV_DEF[service]:
-            base_spec['events'] = dict(required=True, type='list', elements='str', choices=SRV_DEF[service]['_events'])
+        if '_events' in SRV_DEF[integration]:
+            base_spec['events'] = dict(required=True, type='list', elements='str', choices=SRV_DEF[integration]['_events'])
         module = AnsibleModule(argument_spec=base_spec, **constraints)
     else:
         module = stub_init
@@ -453,48 +453,48 @@ def main():
         module.fail_json(msg='No such a project %s' % project, exception=to_native(e))
 
     try:
-        remote_service = project.services.get(service)
-        original_attributes = remote_service.attributes.copy()
+        remote_integration = project.services.get(integration)
+        original_attributes = remote_integration.attributes.copy()
     except gitlab.GitlabGetError as e:
-        module.fail_json(msg='No such service %s' % service, exception=to_native(e))
+        module.fail_json(msg='No such integration %s' % integration, exception=to_native(e))
 
-    services_helper = GitLabServices(module, service)
+    integrations_helper = GitLabIntegrations(module, integration)
     if state == 'absent':
-        if not remote_service or not remote_service.created_at:
-            module.exit_json(changed=False, service={}, msg='Service not found', details='Service %s not found' % service)
+        if not remote_integration or not remote_integration.created_at:
+            module.exit_json(changed=False, integration={}, msg='Integration not found', details='Integration %s not found' % integration)
         else:
             try:
                 if not module.check_mode:
-                    remote_service.delete()
+                    remote_integration.delete()
             except (gitlab.GitlabHttpError, gitlab.GitlabDeleteError) as e:
-                module.fail_json(msg='Failed to remove service %s' % service, exception=to_native(e))
+                module.fail_json(msg='Failed to remove integration %s' % integration, exception=to_native(e))
             else:
-                module.exit_json(changed=True, service=remote_service.attributes, msg='Successfully deleted service %s' % service)
+                module.exit_json(changed=True, integration=remote_integration.attributes, msg='Successfully deleted integration %s' % integration)
 
     else:
-        if remote_service.created_at:
+        if remote_integration.created_at:
             # update
             try:
-                h = services_helper.update(remote_service, active, params, events)
+                h = integrations_helper.update(remote_integration, active, params, events)
             except gitlab.GitlabUpdateError as e:
-                module.fail_json(changed=False, msg='Could not update service %s' % service, exception=to_native(e))
+                module.fail_json(changed=False, msg='Could not update integration %s' % integration, exception=to_native(e))
             else:
                 diff = {'before': original_attributes,
-                        'after': remote_service.attributes if module.check_mode else project.services.get(service).attributes} if module._diff else None
+                        'after': remote_integration.attributes if module.check_mode else project.services.get(integration).attributes} if module._diff else None
                 if h:
-                    module.exit_json(changed=True, service=remote_service.attributes, diff=diff, state='changed',
-                                     msg='Successfully updated service %s' % service)
+                    module.exit_json(changed=True, integration=remote_integration.attributes, diff=diff, state='changed',
+                                     msg='Successfully updated integration %s' % integration)
                 else:
                     module.exit_json(changed=False)
 
         else:
             try:
-                diff = services_helper.create(remote_service, active, params, events)
+                diff = integrations_helper.create(remote_integration, active, params, events)
             except (gitlab.GitlabCreateError, gitlab.GitlabUpdateError) as e:
-                module.fail_json(changed=False, msg='Could not create service %s' % service, exception=to_native(e))
+                module.fail_json(changed=False, msg='Could not create integration %s' % integration, exception=to_native(e))
             else:
-                module.exit_json(changed=True, service=remote_service.attributes, diff=diff, state='created',
-                                 msg='Successfully created service %s' % service)
+                module.exit_json(changed=True, integration=remote_integration.attributes, diff=diff, state='created',
+                                 msg='Successfully created integration %s' % integration)
 
 
 if __name__ == '__main__':
