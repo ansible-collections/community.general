@@ -1,0 +1,2 @@
+removed_features:
+- "ldap_entry - the ``params`` parameter is now completely removed. Using it already triggered an error since community.general 0.1.2 (https://github.com/ansible-collections/community.general/pull/2257)."
