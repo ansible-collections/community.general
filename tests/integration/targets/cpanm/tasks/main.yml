@@ -1,5 +1,12 @@
 # (c) 2020, Berkhan Berkdemir
+# (c) 2021, Alexei Znamensky
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: bail out for non-supported platforms
+  meta: end_play
+  when:
+    - (ansible_os_family != "RedHat" or ansible_distribution_major_version|int < 7)
+    - ansible_os_family != "Debian"
 
 - name: install perl development package for Red Hat family
   package:
