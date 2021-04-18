@@ -30,6 +30,18 @@
       - install_perl_package_result is changed
       - install_perl_package_result is not failed
 
+- name: install same Perl package
+  cpanm:
+    name: JSON
+    notest: yes
+  register: install_same_perl_package_result
+
+- name: assert same package is installed
+  assert:
+    that:
+      - install_same_perl_package_result is not changed
+      - install_same_perl_package_result is not failed
+
 - name: install a Perl package with version operator
   cpanm:
     name: JSON

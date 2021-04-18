@@ -32,7 +32,7 @@ TEST_CASES = [
             'id': 'install_dancer_compatibility',
             'run_command.calls': [
                 (
-                    ['perl', '-le', 'use Dancer None;'],
+                    ['perl', '-le', 'use Dancer;'],
                     {'environ_update': {}, 'check_rc': False},
                     (2, '', 'error, not installed',),  # output rc, out, err
                 ),
@@ -43,6 +43,20 @@ TEST_CASES = [
                 ),
             ],
             'changed': True,
+        }
+    ],
+    [
+        {'name': 'Dancer'},
+        {
+            'id': 'install_dancer_already_installed_compatibility',
+            'run_command.calls': [
+                (
+                    ['perl', '-le', 'use Dancer;'],
+                    {'environ_update': {}, 'check_rc': False},
+                    (0, '', '',),  # output rc, out, err
+                ),
+            ],
+            'changed': False,
         }
     ],
     [

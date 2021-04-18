@@ -1,1 +1,6 @@
-unsupported
+shippable/posix/group3
+destructive
+skip/macos
+skip/osx
+skip/freebsd
+skip/aix

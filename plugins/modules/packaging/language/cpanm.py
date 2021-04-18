@@ -181,15 +181,26 @@ class CPANMinus(CmdMixin, ModuleHelper):
     check_rc = True
 
     def __init_module__(self):
-        if self.vars.mode == "compatibility" and self.vars.name_check:
-            raise ModuleHelperException("Parameter name_check can only be used with mode=new")
+        v = self.vars
+        if v.mode == "compatibility":
+            if v.name_check:
+                raise ModuleHelperException("Parameter name_check can only be used with mode=new")
+        else:
+            if v.name and v.from_path:
+                raise ModuleHelperException("Parameters 'name' and 'from_path' are mutually exclusive when 'mode=new'")
+            if v.system_lib:
+                raise ModuleHelperException("Parameter 'system_lib' is invalid when 'mode=new'")
+
+        self.command = self.module.get_bin_path(v.executable if v.executable else self.command)
+        self.vars.set("binary", self.command)
 
     def _is_package_installed(self, name, locallib, version):
         if name is None or name.endswith('.tar.gz'):
             return False
+        version = "" if version is None else " " + version
 
         env = {"PERL5LIB": "%s/lib/perl5" % locallib} if locallib else {}
-        cmd = ['perl', '-le', 'use %s %s;' % (name, version)]
+        cmd = ['perl', '-le', 'use %s%s;' % (name, version)]
         rc, out, err = self.module.run_command(cmd, check_rc=False, environ_update=env)
 
         return rc == 0
@@ -212,28 +223,16 @@ class CPANMinus(CmdMixin, ModuleHelper):
 
     def __run__(self):
         v = self.vars
-
-        self.command = self.module.get_bin_path(v.executable if v.executable else self.command)
-        self.vars.set("binary", self.command)
-
         pkg_param = 'from_path' if v.from_path else 'name'
 
         if v.mode == 'compatibility':
-            if v.name_check:
-                raise ModuleHelperException("Parameter 'name_check' can only be used with 'mode=new'")
-            installed = self._is_package_installed(v.name, v.locallib, v.version)
-            if installed:
+            if self._is_package_installed(v.name, v.locallib, v.version):
                 return
             pkg_spec = v[pkg_param]
             self.changed = self.run_command(
                 params=['notest', 'locallib', 'mirror', 'mirror_only', 'installdeps', 'system_lib', {'name': pkg_spec}],
             )
         else:
-            if v.name and v.from_path:
-                raise ModuleHelperException("Parameters 'name' and 'from_path' are mutually exclusive when 'mode=new'")
-            if v.system_lib:
-                raise ModuleHelperException("Parameter 'system_lib' is invalid when 'mode=new'")
-
             installed = self._is_package_installed(v.name_check, v.locallib, v.version) if v.name_check else False
             if installed:
                 return
