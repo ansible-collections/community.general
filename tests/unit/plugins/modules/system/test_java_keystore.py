@@ -273,7 +273,6 @@ class TestCertChanged(ModuleTestCase):
             supports_check_mode=self.spec.supports_check_mode
         )
 
-
         with patch('os.remove', return_value=True):
             self.create_file.side_effect = ['/tmp/placeholder']
             self.run_commands.side_effect = [(0, 'foo=abcd:1234:efgh', ''),
