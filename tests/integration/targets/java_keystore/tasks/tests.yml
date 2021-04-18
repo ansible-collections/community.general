@@ -89,7 +89,6 @@
     password: hunter2
   loop: "{{ java_keystore_new_certs }}"
   register: result_pw_change
-  when: false  # FIXME: module currently crashes
 
 - name: Check that the remote certificates have not been removed
   ansible.builtin.file:
