@@ -75,7 +75,7 @@ DOCUMENTATION = '''
         description:
           - Do we want the ansible host set for the proxmox nodes?
           - Be careful with setting this to yes as it will randomly get the first available interface in the response.
-        default: yes
+        default: true
         type: bool
       strict:
         version_added: 2.5.0
