@@ -333,6 +333,8 @@ files:
     maintainers: dareko
   $modules/files/archive.py:
     maintainers: bendoh
+  $modules/files/filesize.py:
+    maintainers: quidame
   $modules/files/ini_file.py:
     maintainers: jpmens noseka1
   $modules/files/iso_extract.py:
