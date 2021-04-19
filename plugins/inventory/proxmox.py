@@ -73,8 +73,8 @@ DOCUMENTATION = '''
       want_proxmox_nodes_ansible_host:
         version_added: 2.5.1
         description:
-          - Do we want the ansible host set for the proxmox nodes?
-          - Be careful with setting this to yes as it will randomly get the first available interface in the response.
+          - Whether to set C(ansbile_host) for proxmox nodes.
+          - When set to C(true) (default), will use the first available interface. This can be different from what you expect.
         default: true
         type: bool
       strict:
