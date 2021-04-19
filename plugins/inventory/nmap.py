@@ -191,7 +191,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
                     host_ports = self.find_port.match(line)
                     if host is not None and host_ports:
-                        ports.append({'port': host_ports.group(1), 'protocol': host_ports.group(2), 'state': host_ports.group(3), 'service': host_ports.group(4)})
+                        ports.append({'port': host_ports.group(1),
+                                      'protocol': host_ports.group(2),
+                                      'state': host_ports.group(3),
+                                      'service': host_ports.group(4)})
                         continue
 
                 # if any leftovers
