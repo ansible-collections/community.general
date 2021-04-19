@@ -241,21 +241,23 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 )
             )['result']
 
-            if "error" in ifaces and "class" in ifaces["error"] and (ifaces["error"]["class"] in ["Unsupported", "CommandDisabled"]):
-                # This happens on Windows, even though qemu agent is running, the IP address
-                # cannot be fetched, as it's unsupported, also a command disabled can happen.
+            if "error" in ifaces:
+                if "class" in ifaces["error"]:
+                    # This happens on Windows, even though qemu agent is running, the IP address
+                    # cannot be fetched, as it's unsupported, also a command disabled can happen.
+                    errorClass = ifaces["error"]["class"]
+                    if errorClass in ["Unsupported"]:
+                        self.display.v("Retrieving network interfaces from guest agents on windows with older qemu-guest-agents is not supported")
+                    elif errorClass in ["CommandDisabled"]:
+                        self.display.v("Retrieving network interfaces from guest agents has been disabled")
                 return result
 
             for iface in ifaces:
-                iface_result = {
+                result.append({
                     'name': iface['name'],
-                    'mac-address': iface['hardware-address'],
-                }
-                if "ip-addresses" in iface:
-                    iface_result["ip-addresses"] = [
-                        "%s/%s" % (ip['ip-address'], ip['prefix']) for ip in iface['ip-addresses']
-                    ]
-                result.append(iface_result)
+                    'mac-address': iface['hardware-address'] if 'hardware-address' in iface else "00:00:00:00:00:00",
+                    'ip-addresses': ["%s/%s" % (ip['ip-address'], ip['prefix']) for ip in iface['ip-addresses']] if 'ip-addresses' in iface else []
+                })
         except requests.HTTPError:
             pass
 
