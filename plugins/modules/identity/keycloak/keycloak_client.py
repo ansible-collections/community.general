@@ -522,7 +522,7 @@ EXAMPLES = '''
     client_id: test
     state: present
 
-- name: Create or update Keycloak client (minimal example), authentification with token
+- name: Create or update Keycloak client (minimal example), authentication with token
   delegate_to: localhost
   community.general.keycloak_client:
     auth_client_id: admin-cli
