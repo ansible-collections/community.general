@@ -511,7 +511,7 @@ author:
 '''
 
 EXAMPLES = '''
-- name: Create or update Keycloak client (minimal example), authentification with credentials
+- name: Create or update Keycloak client (minimal example), authentication with credentials
   local_action:
     module: keycloak_client
     auth_client_id: admin-cli
