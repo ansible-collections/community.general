@@ -504,6 +504,9 @@ def get_json(url):
                 {
                     "hardware-address": "ff:ff:ff:ff:ff:ff",
                     "name": "vethwepl2ca477b"
+                },
+                {
+                    "name": "nomacorip",
                 }
             ]
         }
