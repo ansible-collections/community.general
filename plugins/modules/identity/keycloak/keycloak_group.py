@@ -81,7 +81,7 @@ author:
 '''
 
 EXAMPLES = '''
-- name: Create a Keycloak group, authentification with credentials
+- name: Create a Keycloak group, authentication with credentials
   community.general.keycloak_group:
     name: my-new-kc-group
     realm: MyCustomRealm
