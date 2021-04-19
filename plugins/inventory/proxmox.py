@@ -241,9 +241,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 )
             )['result']
 
-            if "error" in ifaces and "class" in ifaces["error"] and ifaces["error"]["class"] == "Unsupported":
+            if "error" in ifaces and "class" in ifaces["error"] and (ifaces["error"]["class"] in ["Unsupported", "CommandDisabled"]):
                 # This happens on Windows, even though qemu agent is running, the IP address
-                # cannot be fetched, as it's unsupported
+                # cannot be fetched, as it's unsupported, also a command disabled can happen.
                 return result
 
             for iface in ifaces:
