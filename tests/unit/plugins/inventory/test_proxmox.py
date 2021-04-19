@@ -556,9 +556,15 @@ def test_populate(inventory, mocker):
     assert 'eth0' in [d['name'] for d in host_qemu.get_vars()['proxmox_agent_interfaces']]
 
     # check if qemu-multi-nic has multiple network interfaces
-    assert 'eth0' in [d['name'] for d in host_qemu_multi_nic.get_vars()['proxmox_agent_interfaces']]
-    assert 'eth1' in [d['name'] for d in host_qemu_multi_nic.get_vars()['proxmox_agent_interfaces']]
-    assert 'weave' in [d['name'] for d in host_qemu_multi_nic.get_vars()['proxmox_agent_interfaces']]
+    for iface_name in ['eth0', 'eth1', 'weave']:
+        assert iface_name in [d['name'] for d in host_qemu_multi_nic.get_vars()['proxmox_agent_interfaces']]
+
+    # check if interface with no mac-address or ip-address defaults correctly
+    assert [iface for iface in host_qemu_multi_nic.get_vars()['proxmox_agent_interfaces']
+            if iface['name'] == 'nomacorip'
+            and iface['mac-address'] == "00:00:00:00:00:00"
+            and iface['ip-addresses'] == []
+            ]
 
     # check to make sure qemu-windows doesn't have proxmox_agent_interfaces
     assert "proxmox_agent_interfaces" not in host_qemu_windows.get_vars()
