@@ -250,19 +250,33 @@ class TestCertChanged(ModuleTestCase):
             supports_check_mode=self.spec.supports_check_mode
         )
 
-        module.fail_json = Mock()
-
         with patch('os.remove', return_value=True):
             self.create_file.side_effect = ['/tmp/placeholder']
             self.run_commands.side_effect = [(0, 'foo=abcd:1234:efgh', ''),
                                              (1, 'keytool error: java.lang.Exception: Alias <foo> does not exist', '')]
-            cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
-            module.fail_json.assert_called_once_with(
-                cmd=["keytool", "-list", "-alias", "foo", "-keystore", "/path/to/keystore.jks", "-storepass:env", "STOREPASS", "-v"],
-                msg='keytool error: java.lang.Exception: Alias <foo> does not exist',
-                err='',
-                rc=1
-            )
+            result = cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
+            self.assertTrue(result, 'Alias mismatch detected')
+
+    def test_cert_changed_password_mismatch(self):
+        set_module_args(dict(
+            certificate='cert-foo',
+            private_key='private-foo',
+            dest='/path/to/keystore.jks',
+            name='foo',
+            password='changeit'
+        ))
+
+        module = AnsibleModule(
+            argument_spec=self.spec.argument_spec,
+            supports_check_mode=self.spec.supports_check_mode
+        )
+
+        with patch('os.remove', return_value=True):
+            self.create_file.side_effect = ['/tmp/placeholder']
+            self.run_commands.side_effect = [(0, 'foo=abcd:1234:efgh', ''),
+                                             (1, 'keytool error: java.io.IOException: Keystore password was incorrect', '')]
+            result = cert_changed(module, "openssl", "keytool", "/path/to/keystore.jks", "changeit", 'foo')
+            self.assertTrue(result, 'Password mismatch detected')
 
     def test_cert_changed_fail_read_cert(self):
         set_module_args(dict(
