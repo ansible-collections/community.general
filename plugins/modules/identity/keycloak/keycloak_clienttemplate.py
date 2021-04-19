@@ -169,7 +169,7 @@ author:
 '''
 
 EXAMPLES = '''
-- name: Create or update Keycloak client template (minimal), authentification with credentials
+- name: Create or update Keycloak client template (minimal), authentication with credentials
   local_action:
     module: keycloak_clienttemplate
     auth_client_id: admin-cli
