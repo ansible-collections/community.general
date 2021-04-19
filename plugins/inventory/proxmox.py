@@ -71,7 +71,7 @@ DOCUMENTATION = '''
         default: no
         type: bool
       want_proxmox_nodes_ansible_host:
-        version_added: 2.5.1
+        version_added: 3.0.0
         description:
           - Whether to set C(ansbile_host) for proxmox nodes.
           - When set to C(true) (default), will use the first available interface. This can be different from what you expect.
