@@ -1,3 +1,3 @@
 ---
 minor_changes:
-- pids - new options `pattern` and `ignore_case` for retrieving PIDs for processes matching a supplied pattern (https://github.com/ansible-collections/community.general/pull/2280)."
+- pids - new options `pattern` and `ignore_case` for retrieving PIDs for processes matching a supplied pattern (https://github.com/ansible-collections/community.general/pull/2280).
