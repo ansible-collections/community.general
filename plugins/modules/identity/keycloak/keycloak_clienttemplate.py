@@ -180,7 +180,7 @@ EXAMPLES = '''
     realm: master
     name: this_is_a_test
 
-- name: Create or update Keycloak client template (minimal), authentification with token
+- name: Create or update Keycloak client template (minimal), authentication with token
   delegate_to: localhost
   community.general.keycloak_clienttemplate:
     auth_client_id: admin-cli
