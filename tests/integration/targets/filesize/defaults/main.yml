@@ -1,0 +1,4 @@
+---
+filesize_testdir: "/tmp/testdir"
+filesize_testfile: "{{ filesize_testdir }}/testfile"
+filesize_testlink: "{{ filesize_testdir }}/testlink"

@@ -1,0 +1,40 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Ensure the test dir is present
+  ansible.builtin.file:
+    path: "{{ filesize_testdir }}"
+    state: directory
+
+- name: Ensure the test file is absent
+  ansible.builtin.file:
+    path: "{{ filesize_testfile }}"
+    state: absent
+
+- name: Run all tests and remove the workspace anyway
+  block:
+    - name: Include tasks to test error handling
+      include_tasks: errors.yml
+
+    - name: Include tasks to test basic behaviours
+      include_tasks: basics.yml
+
+    - name: Include tasks to test playing with floating point numbers
+      include_tasks: floats.yml
+
+    - name: Include tasks to test playing with sparse files
+      include_tasks: sparse.yml
+      when:
+        - not (ansible_os_family == 'Darwin' and ansible_distribution_version is version('11', '<'))
+
+    - name: Include tasks to test playing with symlinks
+      include_tasks: symlinks.yml
+
+  always:
+    - name: Remove test dir
+      ansible.builtin.file:
+        path: "{{ filesize_testdir }}"
+        state: absent
