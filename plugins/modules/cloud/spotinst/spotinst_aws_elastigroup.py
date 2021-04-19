@@ -50,6 +50,7 @@ options:
         placement_group_name (String),
     required: true
     type: list
+    elements: dict
 
   block_device_mappings:
     description:
@@ -68,6 +69,7 @@ options:
         volume_type(String),
         volume_size(Integer))
     type: list
+    elements: dict
 
   chef:
     description:
@@ -98,6 +100,7 @@ options:
         volume_ids (List of Strings),
         device_name (String)
     type: list
+    elements: dict
 
   ecs:
     description:
@@ -110,6 +113,7 @@ options:
     description:
       - (List of Strings) List of ElasticIps Allocation Ids (Example C(eipalloc-9d4e16f8)) to associate to the group instances
     type: list
+    elements: str
 
   fallback_to_od:
     description:
@@ -181,6 +185,7 @@ options:
     description:
       - (List of Strings) List of classic ELB names
     type: list
+    elements: str
 
   max_size:
     description:
@@ -229,6 +234,7 @@ options:
         associate_ipv6_address (Boolean),
         private_ip_addresses (List of Objects, Keys are privateIpAddress (String, required) and primary (Boolean))
     type: list
+    elements: dict
 
   on_demand_count:
     description:
@@ -315,6 +321,7 @@ options:
         task_type (String, required),
         is_enabled (Boolean)
     type: list
+    elements: dict
 
   security_group_ids:
     description:
@@ -322,6 +329,7 @@ options:
         In case of update it will override the existing Security Group with the new given array
     required: true
     type: list
+    elements: str
 
   shutdown_script:
     description:
@@ -336,6 +344,7 @@ options:
         name (String, required),
         timeout (Integer)
     type: list
+    elements: dict
 
   spin_up_time:
     description:
@@ -347,6 +356,7 @@ options:
       - (List of Strings) Spot instance type that will be provisioned.
     required: true
     type: list
+    elements: str
 
   state:
     choices:
@@ -361,6 +371,7 @@ options:
     description:
       - (List of tagKey:tagValue pairs) a list of tags to configure in the elastigroup. Please specify list of keys and values (key colon value);
     type: list
+    elements: dict
 
   target:
     description:
@@ -372,6 +383,7 @@ options:
     description:
       - (List of Strings) List of target group arns instances should be registered to
     type: list
+    elements: str
 
   tenancy:
     description:
@@ -413,6 +425,7 @@ options:
         maximum (String),
         minimum (String)
     type: list
+    elements: dict
 
   down_scaling_policies:
     description:
@@ -437,6 +450,7 @@ options:
         maximum (String),
         minimum (String)
     type: list
+    elements: dict
 
   target_tracking_policies:
     description:
@@ -452,6 +466,7 @@ options:
         cooldown (String, required),
         target (String, required)
     type: list
+    elements: dict
 
   uniqueness_by:
     choices:
@@ -1428,18 +1443,18 @@ def main():
     fields = dict(
         account_id=dict(type='str'),
         availability_vs_cost=dict(type='str', required=True),
-        availability_zones=dict(type='list', required=True),
-        block_device_mappings=dict(type='list'),
+        availability_zones=dict(type='list', elements='dict', required=True),
+        block_device_mappings=dict(type='list', elements='dict'),
         chef=dict(type='dict'),
         credentials_path=dict(type='path', default="~/.spotinst/credentials"),
         do_not_update=dict(default=[], type='list'),
-        down_scaling_policies=dict(type='list'),
+        down_scaling_policies=dict(type='list', elements='dict'),
         draining_timeout=dict(type='int'),
         ebs_optimized=dict(type='bool'),
-        ebs_volume_pool=dict(type='list'),
+        ebs_volume_pool=dict(type='list', elements='dict'),
         ecs=dict(type='dict'),
         elastic_beanstalk=dict(type='dict'),
-        elastic_ips=dict(type='list'),
+        elastic_ips=dict(type='list', elements='str'),
         fallback_to_od=dict(type='bool'),
         id=dict(type='str'),
         health_check_grace_period=dict(type='int'),
@@ -1451,7 +1466,7 @@ def main():
         key_pair=dict(type='str', no_log=False),
         kubernetes=dict(type='dict'),
         lifetime_period=dict(type='int'),
-        load_balancers=dict(type='list'),
+        load_balancers=dict(type='list', elements='str'),
         max_size=dict(type='int', required=True),
         mesosphere=dict(type='dict'),
         min_size=dict(type='int', required=True),
@@ -1459,7 +1474,7 @@ def main():
         multai_load_balancers=dict(type='list'),
         multai_token=dict(type='str', no_log=True),
         name=dict(type='str', required=True),
-        network_interfaces=dict(type='list'),
+        network_interfaces=dict(type='list', elements='dict'),
         on_demand_count=dict(type='int'),
         on_demand_instance_type=dict(type='str'),
         opsworks=dict(type='dict'),
@@ -1469,16 +1484,16 @@ def main():
         right_scale=dict(type='dict'),
         risk=dict(type='int'),
         roll_config=dict(type='dict'),
-        scheduled_tasks=dict(type='list'),
-        security_group_ids=dict(type='list', required=True),
+        scheduled_tasks=dict(type='list', elements='dict'),
+        security_group_ids=dict(type='list', elements='str', required=True),
         shutdown_script=dict(type='str'),
-        signals=dict(type='list'),
+        signals=dict(type='list', elements='dict'),
         spin_up_time=dict(type='int'),
-        spot_instance_types=dict(type='list', required=True),
+        spot_instance_types=dict(type='list', elements='str', required=True),
         state=dict(default='present', choices=['present', 'absent']),
-        tags=dict(type='list'),
+        tags=dict(type='list', elements='dict'),
         target=dict(type='int', required=True),
-        target_group_arns=dict(type='list'),
+        target_group_arns=dict(type='list', elements='str'),
         tenancy=dict(type='str'),
         terminate_at_end_of_billing_hour=dict(type='bool'),
         token=dict(type='str', no_log=True),
@@ -1486,8 +1501,8 @@ def main():
         user_data=dict(type='str'),
         utilize_reserved_instances=dict(type='bool'),
         uniqueness_by=dict(default='name', choices=['name', 'id']),
-        up_scaling_policies=dict(type='list'),
-        target_tracking_policies=dict(type='list'),
+        up_scaling_policies=dict(type='list', elements='dict'),
+        target_tracking_policies=dict(type='list', elements='dict'),
         wait_for_instances=dict(type='bool', default=False),
         wait_timeout=dict(type='int')
     )
