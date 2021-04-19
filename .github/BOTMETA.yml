@@ -173,6 +173,8 @@ files:
     labels: become
   $callbacks/:
     labels: callbacks
+  $callbacks/loganalytics.py:
+    maintainers: zhcli
   $callbacks/logstash.py:
     maintainers: ujenmr
   $callbacks/say.py:
