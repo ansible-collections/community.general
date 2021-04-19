@@ -57,6 +57,7 @@ import re
 from os.path import basename
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.common.text.converters import to_native
 
 try:
     import psutil
@@ -97,9 +98,9 @@ def get_matching_pids(pattern, ignore_case):
 
     # See https://psutil.readthedocs.io/en/latest/#find-process-by-name for more information
     return [p.pid for p in psutil.process_iter(["name", "exe", "cmdline"])
-            if regex.search(p.info["name"])
-            or (p.info["exe"] and regex.search(basename(p.info["exe"])))
-            or (p.info["cmdline"] and regex.search(' '.join(p.cmdline())))
+            if regex.search(to_native(p.info["name"]))
+            or (p.info["exe"] and regex.search(basename(to_native(p.info["exe"]))))
+            or (p.info["cmdline"] and regex.search(to_native(' '.join(p.cmdline()))))
             ]
 
 
