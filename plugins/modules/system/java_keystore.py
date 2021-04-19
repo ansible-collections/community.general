@@ -19,8 +19,9 @@ options:
   name:
     description:
       - Name of the certificate in the keystore.
-      - If the provided name does not exist in the keystore, the module fails.
-        This behavior will change in a next release.
+      - If the provided name does not exist in the keystore, the module
+        will re-create the keystore. This behavior changed in community.general 3.0.0,
+        before that the module would fail when the name did not match.
     type: str
     required: true
   certificate:
@@ -60,7 +61,9 @@ options:
     description:
       - Password that should be used to secure the keystore.
       - If the provided password fails to unlock the keystore, the module
-        fails. This behavior will change in a next release.
+        will re-create the keystore with the new passphrase. This behavior
+        changed in community.general 3.0.0, before that the module would fail
+        when the password did not match.
     type: str
     required: true
   dest:
@@ -187,16 +190,11 @@ def read_stored_certificate_fingerprint(module, keytool_bin, alias, keystore_pat
     (rc, stored_certificate_fingerprint_out, stored_certificate_fingerprint_err) = run_commands(
         module, stored_certificate_fingerprint_cmd, environ_update=dict(STOREPASS=keystore_password))
     if rc != 0:
-        # First intention was to not fail, and overwrite the keystore instead,
-        # in case of alias mismatch; but an issue in error handling caused the
-        # module to fail anyway.
-        # See: https://github.com/ansible-collections/community.general/issues/1671
-        # And: https://github.com/ansible-collections/community.general/pull/2183
-        # if "keytool error: java.lang.Exception: Alias <%s> does not exist" % alias in stored_certificate_fingerprint_out:
-        #     return "alias mismatch"
-        # if re.match(r'keytool error: java\.io\.IOException: [Kk]eystore( was tampered with, or)? password was incorrect',
-        #             stored_certificate_fingerprint_out):
-        #    return "password mismatch"
+        if "keytool error: java.lang.Exception: Alias <%s> does not exist" % alias in stored_certificate_fingerprint_out:
+            return "alias mismatch"
+        if re.match(r'keytool error: java\.io\.IOException: [Kk]eystore( was tampered with, or)? password was incorrect',
+                    stored_certificate_fingerprint_out):
+            return "password mismatch"
         return module.fail_json(msg=stored_certificate_fingerprint_out,
                                 err=stored_certificate_fingerprint_err,
                                 cmd=stored_certificate_fingerprint_cmd,
