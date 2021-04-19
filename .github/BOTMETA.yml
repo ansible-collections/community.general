@@ -421,6 +421,8 @@ files:
     maintainers: andsens
   $modules/monitoring/spectrum_device.py:
     maintainers: orgito
+  $modules/monitoring/spectrum_model_attrs.py:
+    maintainers: tgates81
   $modules/monitoring/stackdriver.py:
     maintainers: bwhaley
   $modules/monitoring/statsd.py:
