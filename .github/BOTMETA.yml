@@ -67,6 +67,8 @@ files:
     maintainers: felixfontein
   $filters/time.py:
     maintainers: resmo
+  $filters/version_sort.py:
+    maintainers: ericzolf
   $httpapis/:
     maintainers: $team_networking
     labels: networking
