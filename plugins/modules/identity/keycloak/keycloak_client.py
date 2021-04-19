@@ -752,7 +752,7 @@ def main():
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
-                           required_one_of=([['id', 'name'],
+                           required_one_of=([['client_id', 'id'],
                                              ['token', 'auth_realm', 'auth_username', 'auth_password']]),
                            required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
