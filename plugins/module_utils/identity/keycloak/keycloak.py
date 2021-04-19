@@ -140,14 +140,14 @@ class KeycloakAPI(object):
             if e.code == 404:
                 return None
             else:
-                self.module.fail_json(msg='Could not obtain realm %s: %s'
-                                          % (realm, str(e)))
+                self.module.fail_json(msg='Could not obtain realm %s: %s' % (realm, str(e)),
+                                      exception=traceback.format_exc())
         except ValueError as e:
-            self.module.fail_json(msg='API returned incorrect JSON when trying to obtain realm %s: %s'
-                                      % (realm, str(e)))
+            self.module.fail_json(msg='API returned incorrect JSON when trying to obtain realm %s: %s' % (realm, str(e)),
+                                  exception=traceback.format_exc())
         except Exception as e:
             self.module.fail_json(msg='Could not obtain realm %s: %s' % (realm, str(e)),
-                                      exception=traceback.format_exc())
+                                  exception=traceback.format_exc())
 
     def update_realm(self, realmrep, realm="master"):
         """ Update an existing realm
@@ -162,7 +162,7 @@ class KeycloakAPI(object):
                             data=json.dumps(realmrep), validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg='Could not update realm %s: %s' % (realm, str(e)),
-                                      exception=traceback.format_exc())
+                                  exception=traceback.format_exc())
 
     def create_realm(self, realmrep):
         """ Create a realm in keycloak
@@ -176,7 +176,7 @@ class KeycloakAPI(object):
                             data=json.dumps(realmrep), validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg='Could not create realm %s: %s' % (realmrep['id'], str(e)),
-                                      exception=traceback.format_exc())
+                                  exception=traceback.format_exc())
 
     def delete_realm(self, realm="master"):
         """ Delete a realm from Keycloak
@@ -191,7 +191,7 @@ class KeycloakAPI(object):
                             validate_certs=self.validate_certs)
         except Exception as e:
             self.module.fail_json(msg='Could not delete realm %s: %s' % (realm, str(e)),
-                                      exception=traceback.format_exc())
+                                  exception=traceback.format_exc())
 
     def get_clients(self, realm='master', filter=None):
         """ Obtains client representations for clients in a realm
