@@ -59,6 +59,8 @@ files:
     maintainers: felixfontein
   $filters/dict_kv.py:
     maintainers: giner
+  $filters/from_csv.py:
+    maintainers: Ajpantuso
   $filters/jc.py:
     maintainers: kellyjonbrazil
   $filters/list.py:
