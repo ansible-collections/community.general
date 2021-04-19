@@ -28,10 +28,6 @@ plugins/modules/cloud/smartos/vmadm.py validate-modules:undocumented-parameter
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:parameter-type-not-in-doc
 plugins/modules/cloud/spotinst/spotinst_aws_elastigroup.py validate-modules:undocumented-parameter
-plugins/modules/cloud/univention/udm_dns_record.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/univention/udm_dns_zone.py validate-modules:parameter-list-no-elements
-plugins/modules/cloud/univention/udm_dns_zone.py validate-modules:parameter-type-not-in-doc
-plugins/modules/cloud/univention/udm_dns_zone.py validate-modules:undocumented-parameter
 plugins/modules/cloud/univention/udm_share.py validate-modules:parameter-list-no-elements
 plugins/modules/cloud/univention/udm_user.py validate-modules:parameter-list-no-elements
 plugins/modules/clustering/consul/consul.py validate-modules:doc-missing-type
