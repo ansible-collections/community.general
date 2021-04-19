@@ -1,0 +1,129 @@
+---
+# Check error handling of the module.
+# 1. Missing or unknown parameters
+# 2. Wrong values (missing source device, invalid size...)
+
+- name: Trigger an error due to missing parameter (path)
+  community.general.filesize:
+    size: 1kB
+  register: filesize_test_error_01
+  ignore_errors: yes
+
+
+- name: Trigger an error due to missing parameter (size)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+  register: filesize_test_error_02
+  ignore_errors: yes
+
+
+- name: Trigger an error due to conflicting parameters (force|sparse)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 1MB
+    force: yes
+    sparse: yes
+  register: filesize_test_error_03
+  ignore_errors: yes
+
+
+- name: Trigger an error due to invalid file path (not a file)
+  community.general.filesize:
+    path: "{{ filesize_testdir }}"
+    size: 4096B
+  register: filesize_test_error_04
+  ignore_errors: yes
+
+
+- name: Trigger an error due to invalid file path (unexisting parent dir)
+  community.general.filesize:
+    path: "/unexistent/{{ filesize_testfile }}"
+    size: 4096B
+  register: filesize_test_error_05
+  ignore_errors: yes
+
+
+- name: Trigger an error due to invalid size unit (b)"
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 4096b
+  register: filesize_test_error_06
+  ignore_errors: yes
+
+
+- name: Trigger an error due to invalid size value (bytes require integer)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 1000.5B
+  register: filesize_test_error_07
+  ignore_errors: yes
+
+
+- name: Trigger an error due to invalid blocksize value (not an integer)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 1M
+    blocksize: "12.5"
+  register: filesize_test_error_08
+  ignore_errors: yes
+
+
+- name: Trigger an error due to invalid blocksize value type (dict)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 1M
+    blocksize:
+      bytes: 512
+  register: filesize_test_error_09
+  ignore_errors: yes
+
+
+- name: Trigger an error due to invalid source device (/dev/unexistent)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 1M
+    source: /dev/unexistent
+  register: filesize_test_error_10
+  ignore_errors: yes
+
+
+- name: Trigger an error due to invalid source device (/dev/null)
+  community.general.filesize:
+    path: "{{ filesize_testfile }}"
+    size: 1M
+    source: /dev/null
+  register: filesize_test_error_11
+  ignore_errors: yes
+
+
+- name: Assert that expected errors have been triggered
+  ansible.builtin.assert:
+    that:
+      - "filesize_test_error_01 is failed"
+      - "filesize_test_error_01.msg == 'missing required arguments: path'"
+      - "filesize_test_error_02 is failed"
+      - "filesize_test_error_02.msg == 'missing required arguments: size'"
+      - "filesize_test_error_03 is failed"
+      - "filesize_test_error_03.msg == 'parameters values are mutually exclusive: force=true|sparse=true'"
+      - "filesize_test_error_04 is failed"
+      - "filesize_test_error_04.msg == '%s exists but is not a regular file' % filesize_testdir"
+      - "filesize_test_error_05 is failed"
+      - "filesize_test_error_05.msg == 'parent directory of the file must exist prior to run this module'"
+      - "filesize_test_error_06 is failed"
+      - "filesize_test_error_06.msg is match('invalid size unit')"
+      - "filesize_test_error_07 is failed"
+      - "filesize_test_error_07.msg == 'byte is the smallest unit and requires an integer value'"
+      - "filesize_test_error_08 is failed"
+      - "filesize_test_error_08.msg == 'invalid blocksize value: bytes require an integer value'"
+      - "filesize_test_error_09 is failed"
+      - "filesize_test_error_09.msg is match('invalid value type')"
+      - "filesize_test_error_10 is failed"
+      - "filesize_test_error_10.msg == 'dd error while creating file %s with size 1M from source /dev/unexistent: see stderr for details' % filesize_testfile"
+      - "filesize_test_error_11 is failed"
+      - "filesize_test_error_11.msg == 'module error while creating file %s with size 1M from source /dev/null: file is 0 bytes long' % filesize_testfile"
+
+
+- name: Remove test file
+  ansible.builtin.file:
+    path: "{{ filesize_testfile }}"
+    state: absent
