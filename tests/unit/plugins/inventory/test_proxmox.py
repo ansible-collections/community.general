@@ -565,7 +565,7 @@ def test_populate(inventory, mocker):
     # check if interface with no mac-address or ip-address defaults correctly
     assert [iface for iface in host_qemu_multi_nic.get_vars()['proxmox_agent_interfaces']
             if iface['name'] == 'nomacorip'
-            and iface['mac-address'] == "00:00:00:00:00:00"
+            and iface['mac-address'] is None
             and iface['ip-addresses'] == []
             ]
 
