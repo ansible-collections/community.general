@@ -93,7 +93,7 @@ EXAMPLES = '''
     auth_password: PASSWORD
   delegate_to: localhost
 
-- name: Create a Keycloak group, authentification with token
+- name: Create a Keycloak group, authentication with token
   community.general.keycloak_group:
     name: my-new-kc-group
     realm: MyCustomRealm
