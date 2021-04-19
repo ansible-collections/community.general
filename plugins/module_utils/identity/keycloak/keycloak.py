@@ -60,7 +60,7 @@ def keycloak_argument_spec():
         auth_realm=dict(type='str'),
         auth_client_secret=dict(type='str', default=None, no_log=True),
         auth_username=dict(type='str', aliases=['username']),
-        auth_password=dict(type='str', aliases=['password'], default=None, no_log=True),
+        auth_password=dict(type='str', aliases=['password'], no_log=True),
         validate_certs=dict(type='bool', default=True),
         token=dict(type='str', default=None, no_log=True),
     )
