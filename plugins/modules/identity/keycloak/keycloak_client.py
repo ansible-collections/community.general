@@ -512,18 +512,17 @@ author:
 
 EXAMPLES = '''
 - name: Create or update Keycloak client (minimal example), authentication with credentials
-  local_action:
-    module: keycloak_client
-    auth_client_id: admin-cli
+  community.general.keycloak_client:
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
     auth_username: USERNAME
     auth_password: PASSWORD
     client_id: test
     state: present
+  delegate_to: localhost
+
 
 - name: Create or update Keycloak client (minimal example), authentication with token
-  delegate_to: localhost
   community.general.keycloak_client:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
@@ -531,10 +530,11 @@ EXAMPLES = '''
     token: TOKEN
     client_id: test
     state: present
+  delegate_to: localhost
+
 
 - name: Delete a Keycloak client
-  local_action:
-    module: keycloak_client
+  community.general.keycloak_client:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -542,10 +542,11 @@ EXAMPLES = '''
     auth_password: PASSWORD
     client_id: test
     state: absent
+  delegate_to: localhost
+
 
 - name: Create or update a Keycloak client (with all the bells and whistles)
-  local_action:
-    module: keycloak_client
+  community.general.keycloak_client:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -629,6 +630,7 @@ EXAMPLES = '''
       use.jwks.url: true
       jwks.url: JWKS_URL_FOR_CLIENT_AUTH_JWT
       jwt.credential.certificate: JWT_CREDENTIAL_CERTIFICATE_FOR_CLIENT_AUTH
+  delegate_to: localhost
 '''
 
 RETURN = '''

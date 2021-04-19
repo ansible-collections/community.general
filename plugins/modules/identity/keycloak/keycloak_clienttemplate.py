@@ -170,8 +170,7 @@ author:
 
 EXAMPLES = '''
 - name: Create or update Keycloak client template (minimal), authentication with credentials
-  local_action:
-    module: keycloak_clienttemplate
+  community.general.keycloak_client:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -179,9 +178,9 @@ EXAMPLES = '''
     auth_password: PASSWORD
     realm: master
     name: this_is_a_test
+  delegate_to: localhost
 
 - name: Create or update Keycloak client template (minimal), authentication with token
-  delegate_to: localhost
   community.general.keycloak_clienttemplate:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
@@ -189,10 +188,10 @@ EXAMPLES = '''
     token: TOKEN
     realm: master
     name: this_is_a_test
+  delegate_to: localhost
 
 - name: Delete Keycloak client template
-  local_action:
-    module: keycloak_clienttemplate
+  community.general.keycloak_client:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -201,10 +200,10 @@ EXAMPLES = '''
     realm: master
     state: absent
     name: test01
+  delegate_to: localhost
 
 - name: Create or update Keycloak client template (with a protocol mapper)
-  local_action:
-    module: keycloak_clienttemplate
+  community.general.keycloak_client:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -227,6 +226,7 @@ EXAMPLES = '''
         protocolMapper: oidc-usermodel-property-mapper
     full_scope_allowed: false
     id: bce6f5e9-d7d3-4955-817e-c5b7f8d65b3f
+  delegate_to: localhost
 '''
 
 RETURN = '''
