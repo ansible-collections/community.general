@@ -255,7 +255,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             for iface in ifaces:
                 result.append({
                     'name': iface['name'],
-                    'mac-address': iface['hardware-address'] if 'hardware-address' in iface else None,
+                    'mac-address': iface['hardware-address'] if 'hardware-address' in iface else '',
                     'ip-addresses': ["%s/%s" % (ip['ip-address'], ip['prefix']) for ip in iface['ip-addresses']] if 'ip-addresses' in iface else []
                 })
         except requests.HTTPError:
