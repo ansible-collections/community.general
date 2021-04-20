@@ -1007,7 +1007,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         self.extract_information_from_container_configs()
 
-        #self.display.vvv(self.save_json_data([os.path.abspath(__file__)]))
+        # self.display.vvv(self.save_json_data([os.path.abspath(__file__)]))
 
         self.build_inventory()
 
