@@ -1193,9 +1193,13 @@ macros:
 =======
   team_suse: commel dcermak evrardjp lrupp toabctl AnderEnder alxgu andytom
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> fbc56c5a1d (Remove 'authors' from BOTMETA.yml (#1203))
   team_virt: joshainglis karmab Aversiste
 >>>>>>> 10fb2ffe5d (BOTMETA.yml: add a new team member to team_virt (#871))
 =======
   team_virt: joshainglis karmab Aversiste Thulium-Drake
 >>>>>>> 50aead4636 (BOTMETA.yml: add maintainers of proxmox_snap module (#1528))
+=======
+  team_virt: joshainglis karmab Aversiste Thulium-Drake Ajpantuso
+>>>>>>> fc12eca65d (BOTMETA.yml: update team_virt (#2286))
