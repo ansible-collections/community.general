@@ -1194,6 +1194,7 @@ macros:
   team_suse: commel dcermak evrardjp lrupp toabctl AnderEnder alxgu andytom
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> fbc56c5a1d (Remove 'authors' from BOTMETA.yml (#1203))
   team_virt: joshainglis karmab Aversiste
 >>>>>>> 10fb2ffe5d (BOTMETA.yml: add a new team member to team_virt (#871))
@@ -1203,3 +1204,6 @@ macros:
 =======
   team_virt: joshainglis karmab Aversiste Thulium-Drake Ajpantuso
 >>>>>>> fc12eca65d (BOTMETA.yml: update team_virt (#2286))
+=======
+  team_virt: joshainglis karmab tleguern Thulium-Drake Ajpantuso
+>>>>>>> f7928d3eb7 (Update BOTMETA.yml (#2304))
