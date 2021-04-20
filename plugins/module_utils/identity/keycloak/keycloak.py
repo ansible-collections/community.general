@@ -57,11 +57,12 @@ def keycloak_argument_spec():
     return dict(
         auth_keycloak_url=dict(type='str', aliases=['url'], required=True, no_log=False),
         auth_client_id=dict(type='str', default='admin-cli'),
-        auth_realm=dict(type='str', required=True),
+        auth_realm=dict(type='str'),
         auth_client_secret=dict(type='str', default=None, no_log=True),
-        auth_username=dict(type='str', aliases=['username'], required=True),
-        auth_password=dict(type='str', aliases=['password'], required=True, no_log=True),
-        validate_certs=dict(type='bool', default=True)
+        auth_username=dict(type='str', aliases=['username']),
+        auth_password=dict(type='str', aliases=['password'], no_log=True),
+        validate_certs=dict(type='bool', default=True),
+        token=dict(type='str', no_log=True),
     )
 
 
@@ -73,41 +74,58 @@ class KeycloakError(Exception):
     pass
 
 
-def get_token(base_url, validate_certs, auth_realm, client_id,
-              auth_username, auth_password, client_secret):
+def get_token(module_params):
+    """ Obtains connection header with token for the authentication,
+        token already given or obtained from credentials
+        :param module_params: parameters of the module
+        :return: connection header
+    """
+    token = module_params.get('token')
+    base_url = module_params.get('auth_keycloak_url')
+
     if not base_url.lower().startswith(('http', 'https')):
         raise KeycloakError("auth_url '%s' should either start with 'http' or 'https'." % base_url)
-    auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
-    temp_payload = {
-        'grant_type': 'password',
-        'client_id': client_id,
-        'client_secret': client_secret,
-        'username': auth_username,
-        'password': auth_password,
-    }
-    # Remove empty items, for instance missing client_secret
-    payload = dict(
-        (k, v) for k, v in temp_payload.items() if v is not None)
-    try:
-        r = json.loads(to_native(open_url(auth_url, method='POST',
-                                          validate_certs=validate_certs,
-                                          data=urlencode(payload)).read()))
-    except ValueError as e:
-        raise KeycloakError(
-            'API returned invalid JSON when trying to obtain access token from %s: %s'
-            % (auth_url, str(e)))
-    except Exception as e:
-        raise KeycloakError('Could not obtain access token from %s: %s'
-                            % (auth_url, str(e)))
 
-    try:
-        return {
-            'Authorization': 'Bearer ' + r['access_token'],
-            'Content-Type': 'application/json'
+    if token is None:
+        base_url = module_params.get('auth_keycloak_url')
+        validate_certs = module_params.get('validate_certs')
+        auth_realm = module_params.get('auth_realm')
+        client_id = module_params.get('auth_client_id')
+        auth_username = module_params.get('auth_username')
+        auth_password = module_params.get('auth_password')
+        client_secret = module_params.get('auth_client_secret')
+        auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
+        temp_payload = {
+            'grant_type': 'password',
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'username': auth_username,
+            'password': auth_password,
         }
-    except KeyError:
-        raise KeycloakError(
-            'Could not obtain access token from %s' % auth_url)
+        # Remove empty items, for instance missing client_secret
+        payload = dict(
+            (k, v) for k, v in temp_payload.items() if v is not None)
+        try:
+            r = json.loads(to_native(open_url(auth_url, method='POST',
+                                              validate_certs=validate_certs,
+                                              data=urlencode(payload)).read()))
+        except ValueError as e:
+            raise KeycloakError(
+                'API returned invalid JSON when trying to obtain access token from %s: %s'
+                % (auth_url, str(e)))
+        except Exception as e:
+            raise KeycloakError('Could not obtain access token from %s: %s'
+                                % (auth_url, str(e)))
+
+        try:
+            token = r['access_token']
+        except KeyError:
+            raise KeycloakError(
+                'Could not obtain access token from %s' % auth_url)
+    return {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+    }
 
 
 class KeycloakAPI(object):
