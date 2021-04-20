@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = r'''
-    name: lxd
+    name: community.general.lxd
     short_description: Returns Ansible inventory from lxd host
     description:
         - Get inventory from the lxd.
@@ -1007,7 +1007,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         self.extract_information_from_container_configs()
 
-        self.display.vvv(self.save_json_data(['.']))
+        #self.display.vvv(self.save_json_data([os.path.abspath(__file__)]))
 
         self.build_inventory()
 

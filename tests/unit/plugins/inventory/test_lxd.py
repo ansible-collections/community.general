@@ -42,7 +42,7 @@ def inventory():
 
     # Test Values
     inv.data = inv.load_json_data('tests/unit/plugins/inventory/fixtures/lxd_inventory.atd')  # Load Test Data
-    inv.groups = GROUP_Config
+    inv.dispose = GROUP_Config
     inv.prefered_container_network_interface = 'eth'
     inv.prefered_container_network_family = 'inet'
     inv.filter = 'running'
