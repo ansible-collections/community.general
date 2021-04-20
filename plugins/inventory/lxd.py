@@ -985,7 +985,6 @@ class InventoryModule(BaseInventoryPlugin):
 
         self.build_inventory_hosts()
         self.build_inventory_groups()
-        # import pdb; pdb. set_trace()
 
     def _populate(self):
         """Return the hosts and groups
