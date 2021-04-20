@@ -13,6 +13,7 @@ author:
     - Jeroen Hoekx (@jhoekx)
     - Alexander Bulimov (@abulimov)
     - Raoul Baudach (@unkaputtbar112)
+    - Ziga Kern (@zigaSRC)
 module: lvol
 short_description: Configure LVM logical volumes
 description:
@@ -32,9 +33,11 @@ options:
     description:
     - The size of the logical volume, according to lvcreate(8) --size, by
       default in megabytes or optionally with one of [bBsSkKmMgGtTpPeE] units; or
-      according to lvcreate(8) --extents as a percentage of [VG|PVS|FREE];
+      according to lvcreate(8) --extents as a percentage of [VG|PVS|FREE]; 
       Float values must begin with a digit.
-      Resizing using percentage values was not supported prior to 2.1.
+    - When resizing apart from specifying an absolute size you may, according to lvextend(8)|lvreduce(8) --size, specify the amount to extend the lv with the prefix [+] or the amount to reduce the lv by with prefix [-]. 
+    - Resizing using percentage values was not supported prior to 2.1.
+    - Resizing using [+-] was not supported prior to 2.5.2.
   state:
     type: str
     description:
@@ -138,7 +141,7 @@ EXAMPLES = '''
     size: +100%FREE
 
 - name: Extend the logical volume by given space
-  lvol:
+  community.general.lvol:
     vg: firefly
     lv: test
     size: +512M
@@ -163,6 +166,12 @@ EXAMPLES = '''
     lv: test
     size: 512
     force: yes
+    
+- name: Reduce the logical volume by given space
+  community.general.lvol:
+    vg: firefly
+    lv: test
+    size: -512M
 
 - name: Set the logical volume to 512m and do not try to shrink if size is lower than current one
   community.general.lvol:
@@ -332,7 +341,16 @@ def main():
         test_opt = ''
 
     if size:
-        # LVCREATE(8) -l --extents option with percentage
+        # LVEXTEND(8)/LVREDUCE(8) -l, -L options: Check for relative value for resizing
+        if '+' in size:
+            size_operator = '+'
+            size = size[1:]
+        elif '-' in size:
+            size_operator = '-'
+            size = size[1:]  
+        # LVCREATE(8) does not support [+-]
+    
+        # LVCREATE(8)/LVEXTEND(8)/LVREDUCE(8) -l --extents option with percentage
         if '%' in size:
             size_parts = size.split('%', 1)
             size_percent = int(size_parts[0])
@@ -346,24 +364,11 @@ def main():
             size_opt = 'l'
             size_unit = ''
 
-        # LVCREATE(8) -L --size option unit
+        # LVCREATE(8)/LVEXTEND(8)/LVREDUCE(8) -L --size option unit
         if '%' not in size:
-            if size[-1] in 'BSKMGTPE':
-                size_unit = size[-1].lower()
-                size = size[0:-1]
-                size_divisor = {'B': 1.000, 'S': 1.000, 'K': 1.024, 'M': 1.048, 'G': 1.047, 'T': 1.099, 'P': 1.126, 'E': 1.153}.get(size_unit.upper(), '1.000')
-                if '+' in size:
-                    size_operator = '+'
-                    size = str(float(size[1:]) / float(size_divisor))
-                else:
-                    size = str(float(size) / float(size_divisor))
-            elif size[-1] in 'bskmgtpe':
+            if size[-1].lower() in 'bskmgtpe':
                 size_unit = size[-1]
                 size = size[0:-1]
-                if '+' in size:
-                    size_operator = '+'
-                    size = size[1:]
-
             try:
                 float(size)
                 if not size[0].isdigit():
@@ -417,7 +422,6 @@ def main():
         else:
             module.fail_json(msg="Snapshot origin LV %s does not exist in volume group %s." % (lv, vg))
         check_lv = snapshot
-
     elif thinpool:
         if lv:
             # Check thin volume pre-conditions
@@ -442,9 +446,9 @@ def main():
     msg = ''
     if this_lv is None:
         if state == 'present':
-            # Require size argument except for snapshot of thin volumes
             if size_operator is not None:
                 module.fail_json(msg="Bad size specification of '%s%s' for creating LV" % (size_operator, size))
+            # Require size argument except for snapshot of thin volumes
             if (lv or thinpool) and not size:
                 for test_lv in lvs:
                     if test_lv['name'] == lv and test_lv['thinvol'] and snapshot:
@@ -498,9 +502,9 @@ def main():
                 size_requested = size_percent * this_vg['free'] / 100
 
             # Round down to the next lowest whole physical extent
-            size_requested -= (size_requested % this_vg['ext_size'])
+            size_requested -= (size_requested % this_vg['ext_size']) # I'm not sure why we are trying to calculate the size instead of letting the tool do it and pass it the VG|PVS|FREE options. In my opinion it will only lead to confusion since the module logic might not match the tools and descreptencies might arise (not actually taking all the free space but an extent less or some such scenario). We can leave the test/error logic, but the tool already does that as well. Besides you're not doing any checks for size for the -L option either, it keeps the code simple and I preffer that approach. Do you dissagree, any suggestions? At the very least we should use the same approach for both -l and -L for consistency. Will implement after a discussion. 
 
-            if '+' in size:
+            if '+' in size: # Was this supported on purpouse? Don't see anything for [-] and in the -L section 
                 size_requested += this_lv['size']
             if this_lv['size'] < size_requested:
                 if (size_free > 0) and (('+' not in size) or (size_free >= (size_requested - this_lv['size']))):
@@ -541,7 +545,7 @@ def main():
             tool = None
             if float(size) > this_lv['size'] or '+' in size_operator:
                 tool = module.get_bin_path("lvextend", required=True)
-            elif shrink and float(size) < this_lv['size']:
+            elif shrink and float(size) < this_lv['size'] or '-' in size_operator:
                 if float(size) == 0:
                     module.fail_json(msg="Sorry, no shrinking of %s to 0 permitted." % (this_lv['name']))
                 if not force:
