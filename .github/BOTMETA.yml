@@ -63,6 +63,8 @@ files:
     maintainers: giner
   $filters/from_csv.py:
     maintainers: Ajpantuso
+  $filters/hashids:
+    maintainers: Ajpantuso
   $filters/jc.py:
     maintainers: kellyjonbrazil
   $filters/list.py:
