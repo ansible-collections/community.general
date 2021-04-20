@@ -86,3 +86,13 @@
     - "pattern_pid_match.pids | join(' ')  == newpid.content | b64decode | trim"
     - "caseinsensitive_pattern_pid_match.pids | join(' ')  == newpid.content | b64decode | trim"
     - newpid.content | b64decode | trim | int in match_all.pids
+
+  - name: "Register output of bad input pattern"
+    pids:
+      pattern: (unterminated
+    register: bad_pattern_result
+
+  - name: "Verify that bad input pattern result is failed"
+    assert:
+      that:
+        - bad_pattern_result.status is failed

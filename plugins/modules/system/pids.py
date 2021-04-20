@@ -18,9 +18,7 @@ options:
     description: The name of the process(es) you want to get PID(s) for.
     type: str
   pattern:
-    description:
-    - The pattern to match the process(es) you want to get PID(s) for.
-    - If C(.*) is provided as the value for I(pattern), then PIDs will be returned for all processes.
+    description: The pattern (regular expression) to match the process(es) you want to get PID(s) for.
     type: str
     version_added: 3.0.0
   ignore_case:
@@ -43,7 +41,7 @@ EXAMPLES = r'''
 
 - name: Getting process IDs of processes matching pattern
   community.general.pids:
-    pattern: myapp.py
+    pattern: python(2(\.7)?|3(\.6)?)?\s+myapp\.py
   register: myapp_pids
 '''
 
@@ -88,16 +86,12 @@ def get_pid(name):
     return pids
 
 
-def get_matching_pids(pattern, ignore_case):
+def get_matching_command_pids(pattern, ignore_case):
     flags = 0
     if ignore_case:
         flags |= re.I
 
-    if pattern == '.*':
-        return psutil.pids()
-
-    regex = re.compile(re.escape(pattern), flags)
-
+    regex = re.compile(pattern, flags)
     # See https://psutil.readthedocs.io/en/latest/#find-process-by-name for more information
     return [p.pid for p in psutil.process_iter(["name", "exe", "cmdline"])
             if regex.search(to_native(p.info["name"]))
@@ -132,7 +126,10 @@ def main():
     if name:
         response = dict(pids=get_pid(name))
     else:
-        response = dict(pids=get_matching_pids(pattern, ignore_case))
+        try:
+            response = dict(pids=get_matching_command_pids(pattern, ignore_case))
+        except re.error as e:
+            module.fail_json(msg="'%s' is not a valid regular expression: %s" % (pattern, to_native(e)))
 
     module.exit_json(**response)
 
