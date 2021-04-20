@@ -830,7 +830,7 @@ files:
   $modules/system/iptables_state.py:
     maintainers: quidame
   $modules/system/java_cert.py:
-    maintainers: haad
+    maintainers: haad absynth76
   $modules/system/java_keystore.py:
     maintainers: Mogztter
   $modules/system/kernel_blacklist.py:
