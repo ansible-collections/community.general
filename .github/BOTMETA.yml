@@ -86,6 +86,8 @@ files:
     maintainers: $team_linode
     labels: cloud linode
     keywords: linode dynamic inventory script
+  $inventories/proxmox.py:
+    maintainers: $team_virt ilijamt
   $inventories/scaleway.py:
     maintainers: $team_scaleway
     labels: cloud scaleway
