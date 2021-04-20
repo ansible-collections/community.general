@@ -31,7 +31,7 @@ EXAMPLES = r"""
 - name: Template files (explicitly skip directories in order to use the 'src' attribute)
   ansible.builtin.template:
     src: '{{ item.src }}'
-    dest: /web/{{ item.path }}
+    dest: /web/{{ item.path | splitext | first }}
     mode: '{{ item.mode }}'
   with_community.general.filetree: web/
   when: item.state == 'file'
