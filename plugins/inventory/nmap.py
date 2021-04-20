@@ -9,7 +9,7 @@ DOCUMENTATION = '''
     name: nmap
     short_description: Uses nmap to find hosts to target
     description:
-        - Uses a YAML configuration file that ends with C(nmap.(yml|yaml)).
+        - Uses a YAML configuration file with a valid YAML extension.
     extends_documentation_fragment:
       - constructed
       - inventory_cache
