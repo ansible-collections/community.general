@@ -44,7 +44,6 @@ EXAMPLES = r"""
     dest: /web/{{ item.path }}
     state: link
     force: yes
-    mode: '{{ item.mode }}'
   with_community.general.filetree: web/
   when: item.state == 'link'
 
