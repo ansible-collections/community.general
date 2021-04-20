@@ -11,6 +11,16 @@ from ansible_collections.community.general.plugins.module_utils.identity.keycloa
 from ansible.module_utils.six import StringIO
 from ansible.module_utils.six.moves.urllib.error import HTTPError
 
+module_params_creds = {
+    'auth_keycloak_url': 'http://keycloak.url/auth',
+    'validate_certs': True,
+    'auth_realm': 'master',
+    'client_id': 'admin-cli',
+    'auth_username': 'admin',
+    'auth_password': 'admin',
+    'client_secret': None,
+}
+
 
 def build_mocked_request(get_id_user_count, response_dict):
     def _mocked_requests(*args, **kwargs):
@@ -58,16 +68,22 @@ def mock_good_connection(mocker):
     )
 
 
-def test_connect_to_keycloak(mock_good_connection):
-    keycloak_header = get_token(
-        base_url='http://keycloak.url/auth',
-        validate_certs=True,
-        auth_realm='master',
-        client_id='admin-cli',
-        auth_username='admin',
-        auth_password='admin',
-        client_secret=None
-    )
+def test_connect_to_keycloak_with_creds(mock_good_connection):
+    keycloak_header = get_token(module_params_creds)
+    assert keycloak_header == {
+        'Authorization': 'Bearer alongtoken',
+        'Content-Type': 'application/json'
+    }
+
+
+def test_connect_to_keycloak_with_token(mock_good_connection):
+    module_params_token = {
+        'auth_keycloak_url': 'http://keycloak.url/auth',
+        'validate_certs': True,
+        'client_id': 'admin-cli',
+        'token': "alongtoken"
+    }
+    keycloak_header = get_token(module_params_token)
     assert keycloak_header == {
         'Authorization': 'Bearer alongtoken',
         'Content-Type': 'application/json'
@@ -87,15 +103,7 @@ def mock_bad_json_returned(mocker):
 
 def test_bad_json_returned(mock_bad_json_returned):
     with pytest.raises(KeycloakError) as raised_error:
-        get_token(
-            base_url='http://keycloak.url/auth',
-            validate_certs=True,
-            auth_realm='master',
-            client_id='admin-cli',
-            auth_username='admin',
-            auth_password='admin',
-            client_secret=None
-        )
+        get_token(module_params_creds)
     # cannot check all the message, different errors message for the value
     # error in python 2.6, 2.7 and 3.*.
     assert (
@@ -125,15 +133,7 @@ def mock_401_returned(mocker):
 
 def test_error_returned(mock_401_returned):
     with pytest.raises(KeycloakError) as raised_error:
-        get_token(
-            base_url='http://keycloak.url/auth',
-            validate_certs=True,
-            auth_realm='master',
-            client_id='admin-cli',
-            auth_username='notadminuser',
-            auth_password='notadminpassword',
-            client_secret=None
-        )
+        get_token(module_params_creds)
     assert str(raised_error.value) == (
         'Could not obtain access token from http://keycloak.url'
         '/auth/realms/master/protocol/openid-connect/token: '
@@ -154,15 +154,7 @@ def mock_json_without_token_returned(mocker):
 
 def test_json_without_token_returned(mock_json_without_token_returned):
     with pytest.raises(KeycloakError) as raised_error:
-        get_token(
-            base_url='http://keycloak.url/auth',
-            validate_certs=True,
-            auth_realm='master',
-            client_id='admin-cli',
-            auth_username='admin',
-            auth_password='admin',
-            client_secret=None
-        )
+        get_token(module_params_creds)
     assert str(raised_error.value) == (
         'Could not obtain access token from http://keycloak.url'
         '/auth/realms/master/protocol/openid-connect/token'

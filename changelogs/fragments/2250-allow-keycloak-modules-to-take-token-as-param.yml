@@ -1,0 +1,5 @@
+---
+minor_changes:
+  - keycloak_* modules - allow the keycloak modules to use a token for the
+    authentication, the modules can take either a token or the credentials
+    (https://github.com/ansible-collections/community.general/pull/2250).
