@@ -39,6 +39,7 @@ options:
       - Plugin executables can be downloaded from https://releases.hashicorp.com/
       - When set, the plugin discovery and auto-download behavior of Terraform is disabled.
     type: list
+    elements: path
     required: false
   workspace:
     description:
