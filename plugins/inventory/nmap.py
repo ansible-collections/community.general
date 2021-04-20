@@ -49,6 +49,7 @@ strict: False
 address: 192.168.0.0/24
 '''
 
+import os
 import re
 
 from subprocess import Popen, PIPE
@@ -90,12 +91,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self._add_host_to_keyed_groups(self.get_option('keyed_groups'), host, hostname, strict=strict)
 
     def verify_file(self, path):
-        ''' return true/false if this is possibly a valid file for this plugin to consume '''
+
         valid = False
         if super(InventoryModule, self).verify_file(path):
-            # base class verifies that file exists and is readable by current user
-            if path.endswith(tuple(['nmap' + e for e in C.YAML_FILENAME_EXTENSIONS])):
+            file_name, ext = os.path.splitext(path)
+
+            if not ext or ext in C.YAML_FILENAME_EXTENSIONS:
                 valid = True
+
         return valid
 
     def parse(self, inventory, loader, path, cache=True):
