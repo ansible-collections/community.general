@@ -15,17 +15,19 @@ requirements:
   - psutil(python module)
 options:
   name:
-    description: the name of the process(es) you want to get PID(s) for.
+    description: The name of the process(es) you want to get PID(s) for.
     type: str
   pattern:
     description:
-    - the pattern to match the process(es) you want to get PID(s) for.
-    - if C(.*) is provided as the value for C(pattern), then PIDs will be returned for all processes.
+    - The pattern to match the process(es) you want to get PID(s) for.
+    - If C(.*) is provided as the value for I(pattern), then PIDs will be returned for all processes.
     type: str
+    version_added: 3.0.0
   ignore_case:
-    description: ignore case in pattern if using the C(pattern) option.
+    description: Ignore case in pattern if using the I(pattern) option.
     type: bool
     default: false
+    version_added: 3.0.0
 '''
 
 EXAMPLES = r'''
