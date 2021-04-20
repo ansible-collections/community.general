@@ -679,7 +679,7 @@ def main():
 
     # Obtain access token, initialize API
     try:
-         connection_header = get_token(module.params)
+        connection_header = get_token(module.params)
     except KeycloakError as e:
         module.fail_json(msg=str(e))
 
