@@ -1,0 +1,3 @@
+---
+minor_changes:
+  - terraform - add ``plugin_paths`` parameter which allows disabling Terraform from performing plugin discovery and auto-download (https://github.com/ansible-collections/community.general/pull/2308).
