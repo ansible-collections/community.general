@@ -5,8 +5,11 @@ description: Suggest an idea for this project
 =======
 name: Feature request
 description: Suggest an idea for this project
+<<<<<<< HEAD
 issue_body: false  # default: true, adds a classic WSYWIG textarea, if on
 >>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
+=======
+>>>>>>> 5ca19086a4 (Update feature_request.yml)
 
 body:
 - type: markdown
