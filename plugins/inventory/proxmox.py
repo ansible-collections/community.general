@@ -70,6 +70,13 @@ DOCUMENTATION = '''
         description: Gather LXC/QEMU configuration facts.
         default: no
         type: bool
+      want_proxmox_nodes_ansible_host:
+        version_added: 3.0.0
+        description:
+          - Whether to set C(ansbile_host) for proxmox nodes.
+          - When set to C(true) (default), will use the first available interface. This can be different from what you expect.
+        default: true
+        type: bool
       strict:
         version_added: 2.5.0
       compose:
@@ -234,13 +241,22 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 )
             )['result']
 
+            if "error" in ifaces:
+                if "class" in ifaces["error"]:
+                    # This happens on Windows, even though qemu agent is running, the IP address
+                    # cannot be fetched, as it's unsupported, also a command disabled can happen.
+                    errorClass = ifaces["error"]["class"]
+                    if errorClass in ["Unsupported"]:
+                        self.display.v("Retrieving network interfaces from guest agents on windows with older qemu-guest-agents is not supported")
+                    elif errorClass in ["CommandDisabled"]:
+                        self.display.v("Retrieving network interfaces from guest agents has been disabled")
+                return result
+
             for iface in ifaces:
                 result.append({
                     'name': iface['name'],
-                    'mac-address': iface['hardware-address'],
-                    'ip-addresses': [
-                        "%s/%s" % (ip['ip-address'], ip['prefix']) for ip in iface['ip-addresses']
-                    ]
+                    'mac-address': iface['hardware-address'] if 'hardware-address' in iface else '',
+                    'ip-addresses': ["%s/%s" % (ip['ip-address'], ip['prefix']) for ip in iface['ip-addresses']] if 'ip-addresses' in iface else []
                 })
         except requests.HTTPError:
             pass
@@ -354,8 +370,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     self.inventory.add_child(nodes_group, node['node'])
 
                 # get node IP address
-                ip = self._get_node_ip(node['node'])
-                self.inventory.set_variable(node['node'], 'ansible_host', ip)
+                if self.get_option("want_proxmox_nodes_ansible_host"):
+                    ip = self._get_node_ip(node['node'])
+                    self.inventory.set_variable(node['node'], 'ansible_host', ip)
 
                 # get LXC containers for this node
                 node_lxc_group = self.to_safe('%s%s' % (self.get_option('group_prefix'), ('%s_lxc' % node['node']).lower()))
