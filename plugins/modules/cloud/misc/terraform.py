@@ -40,7 +40,7 @@ options:
       - When set, the plugin discovery and auto-download behavior of Terraform is disabled.
     type: list
     elements: path
-    required: false
+    version_added: 3.0.0
   workspace:
     description:
       - The terraform workspace to work with.
