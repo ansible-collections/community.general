@@ -36,7 +36,7 @@ options:
   plugin_paths:
     description:
       - List of paths containing Terraform plugin executable files.
-      - Plugin executables can be downloaded from https://releases.hashicorp.com/
+      - Plugin executables can be downloaded from U(https://releases.hashicorp.com/).
       - When set, the plugin discovery and auto-download behavior of Terraform is disabled.
     type: list
     elements: path
