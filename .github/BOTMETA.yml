@@ -190,6 +190,8 @@ files:
     maintainers: zbal
   $modules/cloud/lxc/lxc_container.py:
     maintainers: cloudnull
+  $modules/cloud/lxc/lxc_profile.py:
+    maintainers: conloos
   $modules/cloud/lxd/:
     ignore: hnakamur
   $modules/cloud/memset/:
