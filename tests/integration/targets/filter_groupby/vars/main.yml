@@ -1,0 +1,14 @@
+---
+list1:
+  - name: a
+    x: y
+  - name: b
+    z: 1
+
+dict1:
+  a:
+    name: a
+    x: y
+  b:
+    name: b
+    z: 1

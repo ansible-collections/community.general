@@ -1,0 +1,5 @@
+---
+- name: Test functionality
+  assert:
+    that:
+      - list1 | community.general.groupby_as_dict('name') == dict1
