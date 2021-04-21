@@ -315,7 +315,7 @@ def main():
         argument_spec=dict(
             project_path=dict(required=True, type='path'),
             binary_path=dict(type='path'),
-            plugin_paths=dict(required=False, type='list', elements='path', default=None),
+            plugin_paths=dict(type='list', elements='path'),
             workspace=dict(required=False, type='str', default='default'),
             purge_workspace=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent', 'planned']),
