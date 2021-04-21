@@ -56,6 +56,22 @@
     name: "{{ random_name[0:5] }}"
   register: exactpidmatch
 
+- name: "Checking that patterns can be used with the pattern option"
+  pids:
+    pattern: "{{ random_name[0:5] }}"
+  register: pattern_pid_match
+
+- name: "Checking that case-insensitive patterns can be used with the pattern option"
+  pids:
+    pattern: "{{ random_name[0:5] | upper }}"
+    ignore_case: true
+  register: caseinsensitive_pattern_pid_match
+
+- name: "Checking that .* includes test pid"
+  pids:
+    pattern: .*
+  register: match_all
+
 - name: "Reading pid from the file"
   slurp:
     src:  "{{ output_dir }}/obtainpid.txt"
@@ -67,3 +83,17 @@
     - "pids.pids | join(' ')  == newpid.content | b64decode | trim"
     - "pids.pids | length > 0"
     - "exactpidmatch.pids == []"
+    - "pattern_pid_match.pids | join(' ')  == newpid.content | b64decode | trim"
+    - "caseinsensitive_pattern_pid_match.pids | join(' ')  == newpid.content | b64decode | trim"
+    - newpid.content | b64decode | trim | int in match_all.pids
+
+- name: "Register output of bad input pattern"
+  pids:
+    pattern: (unterminated
+  register: bad_pattern_result
+  ignore_errors: true
+
+- name: "Verify that bad input pattern result is failed"
+  assert:
+    that:
+      - bad_pattern_result is failed
