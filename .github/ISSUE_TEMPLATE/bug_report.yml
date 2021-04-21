@@ -272,8 +272,11 @@ about: Create a report to help us improve
 ---
 name: Bug report
 description: Create a report to help us improve
+<<<<<<< HEAD
 issue_body: false  # default: true, adds a classic WSYWIG textarea, if on
 >>>>>>> e9866a2ccd (bug_report issue form (#1966))
+=======
+>>>>>>> 32d071e349 (Update bug_report.yml)
 
 body:
 - type: markdown
