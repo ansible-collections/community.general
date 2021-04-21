@@ -33,6 +33,19 @@ options:
         vars.tf/main.tf/etc to use.
     type: path
     required: true
+  plugin_paths:
+    description:
+      - List of paths containing Terraform plugin executable files.
+      - Plugin executables can be downloaded from U(https://releases.hashicorp.com/).
+      - When set, the plugin discovery and auto-download behavior of Terraform is disabled.
+      - The directory structure in the plugin path can be tricky. The Terraform docs
+        U(https://learn.hashicorp.com/tutorials/terraform/automate-terraform#pre-installed-plugins)
+        show a simple directory of files, but actually, the directory structure
+        has to follow the same structure you would see if Terraform auto-downloaded the plugins.
+        See the examples below for a tree output of an example plugin directory.
+    type: list
+    elements: path
+    version_added: 3.0.0
   workspace:
     description:
       - The terraform workspace to work with.
@@ -141,6 +154,28 @@ EXAMPLES = """
     backend_config_files:
       - /path/to/backend_config_file_1
       - /path/to/backend_config_file_2
+
+- name: Disable plugin discovery and auto-download by setting plugin_paths
+  community.general.terraform:
+    project_path: 'project/'
+    state: "{{ state }}"
+    force_init: true
+    plugin_paths:
+      - /path/to/plugins_dir_1
+      - /path/to/plugins_dir_2
+
+### Example directory structure for plugin_paths example
+# $ tree /path/to/plugins_dir_1
+# /path/to/plugins_dir_1/
+# └── registry.terraform.io
+#     └── hashicorp
+#         └── vsphere
+#             ├── 1.24.0
+#             │   └── linux_amd64
+#             │       └── terraform-provider-vsphere_v1.24.0_x4
+#             └── 1.26.0
+#                 └── linux_amd64
+#                     └── terraform-provider-vsphere_v1.26.0_x4
 """
 
 RETURN = """
@@ -212,7 +247,7 @@ def _state_args(state_file):
     return []
 
 
-def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_reconfigure):
+def init_plugins(bin_path, project_path, backend_config, backend_config_files, init_reconfigure, plugin_paths):
     command = [bin_path, 'init', '-input=false']
     if backend_config:
         for key, val in backend_config.items():
@@ -225,6 +260,9 @@ def init_plugins(bin_path, project_path, backend_config, backend_config_files, i
             command.extend(['-backend-config', f])
     if init_reconfigure:
         command.extend(['-reconfigure'])
+    if plugin_paths:
+        for plugin_path in plugin_paths:
+            command.extend(['-plugin-dir', plugin_path])
     rc, out, err = module.run_command(command, check_rc=True, cwd=project_path)
 
 
@@ -295,6 +333,7 @@ def main():
         argument_spec=dict(
             project_path=dict(required=True, type='path'),
             binary_path=dict(type='path'),
+            plugin_paths=dict(type='list', elements='path'),
             workspace=dict(required=False, type='str', default='default'),
             purge_workspace=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent', 'planned']),
@@ -316,6 +355,7 @@ def main():
 
     project_path = module.params.get('project_path')
     bin_path = module.params.get('binary_path')
+    plugin_paths = module.params.get('plugin_paths')
     workspace = module.params.get('workspace')
     purge_workspace = module.params.get('purge_workspace')
     state = module.params.get('state')
@@ -343,7 +383,7 @@ def main():
         APPLY_ARGS = ('apply', '-no-color', '-input=false', '-auto-approve')
 
     if force_init:
-        init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure)
+        init_plugins(command[0], project_path, backend_config, backend_config_files, init_reconfigure, plugin_paths)
 
     workspace_ctx = get_workspace_context(command[0], project_path)
     if workspace_ctx["current"] != workspace:
