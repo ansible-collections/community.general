@@ -31,7 +31,9 @@ EXAMPLES = r"""
 - name: Template files (explicitly skip directories in order to use the 'src' attribute)
   ansible.builtin.template:
     src: '{{ item.src }}'
-    dest: /web/{{ item.path }}
+    # Your template files should be stored with a .j2 file extension,
+    # but should not be deployed with it. splitext|first removes it.
+    dest: /web/{{ item.path | splitext | first }}
     mode: '{{ item.mode }}'
   with_community.general.filetree: web/
   when: item.state == 'file'
@@ -41,6 +43,7 @@ EXAMPLES = r"""
     src: '{{ item.src }}'
     dest: /web/{{ item.path }}
     state: link
+    follow: false  # avoid corrupting target files if the link already exists
     force: yes
     mode: '{{ item.mode }}'
   with_community.general.filetree: web/
