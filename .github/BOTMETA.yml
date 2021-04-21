@@ -758,6 +758,8 @@ files:
     ignore: erydo
   $modules/source_control/github/github_release.py:
     maintainers: adrianmoisey
+  $modules/source_control/github/github_repo.py:
+    maintainers: atorrescogollo
   $modules/source_control/github/:
     maintainers: stpierre
   $modules/source_control/gitlab/:
