@@ -6,8 +6,11 @@ description: Ask us about docs
 name: Documentation Report
 description: Ask us about docs
 # NOTE: issue body is enabled to allow screenshots
+<<<<<<< HEAD
 issue_body: true  # default: true, adds a classic WSYWIG textarea, if on
 >>>>>>> f49cf2c22d (Add other GH Issue forms (#1968))
+=======
+>>>>>>> 96ad40ac1c (Update documentation_report.yml)
 
 body:
 - type: markdown
