@@ -38,6 +38,11 @@ options:
       - List of paths containing Terraform plugin executable files.
       - Plugin executables can be downloaded from U(https://releases.hashicorp.com/).
       - When set, the plugin discovery and auto-download behavior of Terraform is disabled.
+      - The directory structure in the plugin path can be tricky. The Terraform docs
+        U(https://learn.hashicorp.com/tutorials/terraform/automate-terraform#pre-installed-plugins)
+        show a simple directory of files, but in testing that doesn't work, the directory structure
+        has to follow the same structure you would see if Terraform auto-downloaded the plugins.
+        See the examples below for a tree output of an example plugin directory.
     type: list
     elements: path
     version_added: 3.0.0
@@ -158,6 +163,19 @@ EXAMPLES = """
     plugin_paths:
       - /path/to/plugins_dir_1
       - /path/to/plugins_dir_2
+
+### Example directory structure for plugin_paths example
+# $ tree /path/to/plugins_dir_1
+# /path/to/plugins_dir_1/
+# └── registry.terraform.io
+#     └── hashicorp
+#         └── vsphere
+#             ├── 1.24.0
+#             │   └── linux_amd64
+#             │       └── terraform-provider-vsphere_v1.24.0_x4
+#             └── 1.26.0
+#                 └── linux_amd64
+#                     └── terraform-provider-vsphere_v1.26.0_x4
 """
 
 RETURN = """
