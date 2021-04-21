@@ -2,7 +2,6 @@
 name: Documentation Report
 description: Ask us about docs
 # NOTE: issue body is enabled to allow screenshots
-issue_body: true  # default: true, adds a classic WSYWIG textarea, if on
 
 body:
 - type: markdown
