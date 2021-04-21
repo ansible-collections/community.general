@@ -30,7 +30,7 @@ options:
     description:
       - Restrict results to a specific user ID, which is a concatenation of a user and domain parts.
     type: str
-author: Tristan Le Guern (@Aversiste)
+author: Tristan Le Guern (@tleguern)
 extends_documentation_fragment: community.general.proxmox.documentation
 '''
 

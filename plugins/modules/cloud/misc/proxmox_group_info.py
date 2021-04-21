@@ -21,7 +21,7 @@ options:
       - Restrict results to a specific group.
     aliases: ['groupid', 'name']
     type: str
-author: Tristan Le Guern (@Aversiste)
+author: Tristan Le Guern (@tleguern)
 extends_documentation_fragment: community.general.proxmox.documentation
 '''
 
