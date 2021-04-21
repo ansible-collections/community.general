@@ -24,19 +24,16 @@ DOCUMENTATION = r'''
             - Sockets in filesystem have to start with C(unix:).
             - Mostly C(unix:/var/lib/lxd/unix.socket) or C(unix:/var/snap/lxd/common/lxd/unix.socket).
             default: unix:/var/snap/lxd/common/lxd/unix.socket
-            required: false
             type: str
         client_key:
             description:
             - The client certificate key file path.
-            required: false
             aliases: [ key_file ]
             default: $HOME/.config/lxc/client.key
             type: path
         client_cert:
             description:
             - The client certificate file path.
-            required: false
             aliases: [ cert_file ]
             default: $HOME/.config/lxc/client.crt
             type: path
@@ -48,11 +45,9 @@ DOCUMENTATION = r'''
                 C(lxc config set core.trust_password <some random password>)
                 See U(https://www.stgraber.org/2016/04/18/lxd-api-direct-interaction/).
             - If I(trust_password) is set, this module send a request for authentication before sending any requests.
-            required: false
             type: str
         state:
             description: Filter the container according to the current status.
-            required: false
             type: str
             default: none
             choices: [ 'STOPPED', 'STARTING', 'RUNNING', 'none' ]
@@ -60,14 +55,12 @@ DOCUMENTATION = r'''
             description:
             - If a container has multiple network interfaces, select which one is the prefered as pattern.
             - Combined with the first number that can be found e.g. 'eth' + 0.
-            required: false
             type: str
             default: eth
         prefered_container_network_family:
             description:
             - If a container has multiple network interfaces, which one is the prefered by family.
             - Specify C(inet) for IPv4 and C(inet6) for IPv6.
-            required: false
             type: str
             default: inet
             choices: [ 'inet', 'inet6' ]
@@ -75,9 +68,7 @@ DOCUMENTATION = r'''
             description:
             - Create groups by the following keywords C(location), C(pattern), C(network_range), C(os), C(release), C(profile), C(vlanid).
             - See example for syntax.
-            required: false
             type: json
-            default: none
 '''
 
 EXAMPLES = '''
@@ -466,8 +457,8 @@ class InventoryModule(BaseInventoryPlugin):
         vlan_ids = {}
         devices = self._get_data_entry('containers/{0}/containers/metadata/expanded_devices'.format(to_native(container_name)))
         for device in devices:
-            if 'network' in devices[device].keys():
-                if devices[device]['network'] in network_vlans.keys():
+            if 'network' in devices[device]:
+                if devices[device]['network'] in network_vlans:
                     vlan_ids[devices[device].get('network')] = network_vlans[devices[device].get('network')]
         if len(vlan_ids) == 0:
             return None
@@ -524,7 +515,7 @@ class InventoryModule(BaseInventoryPlugin):
             path[container_name] = {}
 
         try:
-            if isinstance(value, dict) and key in path[container_name].keys():
+            if isinstance(value, dict) and key in path[container_name]:
                 path[container_name] = dict_merge(value, path[container_name][key])
             else:
                 path[container_name][key] = value
@@ -548,7 +539,7 @@ class InventoryModule(BaseInventoryPlugin):
         if 'inventory' not in self.data:
             self.data['inventory'] = {}
 
-        for container_name in self.data['containers'].keys():
+        for container_name in self.data['containers']:
             self._set_data_entry(container_name, 'os', self._get_data_entry(
                 'containers/{0}/containers/metadata/config/image.os'.format(container_name)))
             self._set_data_entry(container_name, 'release', self._get_data_entry(
@@ -636,7 +627,7 @@ class InventoryModule(BaseInventoryPlugin):
             None
         Returns:
             None"""
-        for container_name in self.data['inventory'].keys():
+        for container_name in self.data['inventory']:
             # Only consider containers that match the "state" filter, if self.state is not None
             if self.filter:
                 if self.filter.lower() != self._get_data_entry('inventory/{0}/state'.format(container_name)).lower():
@@ -675,8 +666,8 @@ class InventoryModule(BaseInventoryPlugin):
         if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
-        for container_name in self.inventory.hosts.keys():
-            if 'ansible_lxd_location' in self.inventory.get_host(container_name).get_vars().keys():
+        for container_name in self.inventory.hosts:
+            if 'ansible_lxd_location' in self.inventory.get_host(container_name).get_vars():
                 self.inventory.add_child(group_name, container_name)
 
     def build_inventory_groups_pattern(self, group_name):
@@ -696,7 +687,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         regex_pattern = self.dispose[group_name].get('attribute')
 
-        for container_name in self.inventory.hosts.keys():
+        for container_name in self.inventory.hosts:
             result = re.search(regex_pattern, container_name)
             if result:
                 self.inventory.add_child(group_name, container_name)
@@ -810,7 +801,7 @@ class InventoryModule(BaseInventoryPlugin):
         if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
-        for container_name in self.inventory.hosts.keys():
+        for container_name in self.inventory.hosts:
             if self.data['inventory'][container_name].get('network_interfaces') is not None:
                 for interface in self.data['inventory'][container_name].get('network_interfaces'):
                     for interface_family in self.data['inventory'][container_name].get('network_interfaces')[interface]:
@@ -837,8 +828,8 @@ class InventoryModule(BaseInventoryPlugin):
             self.inventory.add_group(group_name)
 
         gen_containers = [
-            container_name for container_name in self.inventory.hosts.keys()
-            if 'ansible_lxd_os' in self.inventory.get_host(container_name).get_vars().keys()]
+            container_name for container_name in self.inventory.hosts
+            if 'ansible_lxd_os' in self.inventory.get_host(container_name).get_vars()]
         for container_name in gen_containers:
             if self.dispose[group_name].get('attribute').lower() == self.inventory.get_host(container_name).get_vars().get('ansible_lxd_os'):
                 self.inventory.add_child(group_name, container_name)
@@ -859,8 +850,8 @@ class InventoryModule(BaseInventoryPlugin):
             self.inventory.add_group(group_name)
 
         gen_containers = [
-            container_name for container_name in self.inventory.hosts.keys()
-            if 'ansible_lxd_release' in self.inventory.get_host(container_name).get_vars().keys()]
+            container_name for container_name in self.inventory.hosts
+            if 'ansible_lxd_release' in self.inventory.get_host(container_name).get_vars()]
         for container_name in gen_containers:
             if self.dispose[group_name].get('attribute').lower() == self.inventory.get_host(container_name).get_vars().get('ansible_lxd_release'):
                 self.inventory.add_child(group_name, container_name)
