@@ -64,7 +64,7 @@ DOCUMENTATION = r'''
             type: str
             default: inet
             choices: [ 'inet', 'inet6' ]
-        dispose:
+        groupby:
             description:
             - Create groups by the following keywords C(location), C(pattern), C(network_range), C(os), C(release), C(profile), C(vlanid).
             - See example for syntax.
@@ -133,7 +133,6 @@ class InventoryModule(BaseInventoryPlugin):
     NAME = 'community.general.lxd'
     SNAP_SOCKET_URL = 'unix:/var/snap/lxd/common/lxd/unix.socket'
     SOCKET_URL = 'unix:/var/lib/lxd/unix.socket'
-    SELFTEST = False
 
     @staticmethod
     def load_json_data(path):
@@ -264,7 +263,6 @@ class InventoryModule(BaseInventoryPlugin):
             None
         Returns:
             list(names): names of all network_configs"""
-        network_configs = self.socket.do('GET', '/1.0/networks')
         # e.g. {'type': 'sync',
         #       'status': 'Success',
         #       'status_code': 200,
@@ -272,11 +270,8 @@ class InventoryModule(BaseInventoryPlugin):
         #       'error_code': 0,
         #       'error': '',
         #       'metadata': ['/1.0/networks/lxdbr0']}
-        names = []
-        for index in network_configs['metadata']:
-            # e.g. ['', '1.0', 'networks', 'lxdbr0']
-            names.append(index.split('/')[3])
-        return names
+        network_configs = self.socket.do('GET', '/1.0/networks')
+        return [m.split('/')[3] for m in network_configs['metadata']]
 
     def _get_containers(self):
         """Get Containernames
@@ -299,11 +294,7 @@ class InventoryModule(BaseInventoryPlugin):
         #       'error': '',
         #       'metadata': ['/1.0/containers/udemy-ansible-ubuntu-2004']}
         containers = self.socket.do('GET', '/1.0/containers')
-        names = []
-        for index in containers['metadata']:
-            # e.g. ['', '1.0', 'containers', 'udemy-ansible-ubuntu-2004']
-            names.append(index.split('/')[3])
-        return names
+        return [m.split('/')[3] for m in containers['metadata']]
 
     def _get_config(self, branch, name):
         """Get inventory of container
@@ -322,7 +313,7 @@ class InventoryModule(BaseInventoryPlugin):
         Returns:
             dict(config): Config of the container"""
         config = {}
-        if isinstance(branch, tuple):
+        if isinstance(branch, (tuple, list)):
             config[name] = {branch[1]: self.socket.do('GET', '/1.0/{0}/{1}/{2}'.format(to_native(branch[0]), to_native(name), to_native(branch[1])))}
         else:
             config[name] = {branch: self.socket.do('GET', '/1.0/{0}/{1}'.format(to_native(branch), to_native(name)))}
@@ -421,7 +412,7 @@ class InventoryModule(BaseInventoryPlugin):
         container_network_interfaces = self._get_data_entry('inventory/{0}/network_interfaces'.format(container_name))
         prefered_interface = None  # init
         if container_network_interfaces:  # container have network interfaces
-            # generator if interfases which start with the desired pattern
+            # generator if interfaces which start with the desired pattern
             net_generator = [interface for interface in container_network_interfaces if interface.startswith(self.prefered_container_network_interface)]
             selected_interfaces = []  # init
             for interface in net_generator:
@@ -460,9 +451,7 @@ class InventoryModule(BaseInventoryPlugin):
             if 'network' in devices[device]:
                 if devices[device]['network'] in network_vlans:
                     vlan_ids[devices[device].get('network')] = network_vlans[devices[device].get('network')]
-        if len(vlan_ids) == 0:
-            return None
-        return vlan_ids
+        return vlan_ids if vlan_ids else None
 
     def _get_data_entry(self, path, data=None, delimiter='/'):
         """Helper to get data
@@ -685,7 +674,7 @@ class InventoryModule(BaseInventoryPlugin):
         if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
-        regex_pattern = self.dispose[group_name].get('attribute')
+        regex_pattern = self.groupby[group_name].get('attribute')
 
         for container_name in self.inventory.hosts:
             result = re.search(regex_pattern, container_name)
@@ -806,7 +795,7 @@ class InventoryModule(BaseInventoryPlugin):
                 for interface in self.data['inventory'][container_name].get('network_interfaces'):
                     for interface_family in self.data['inventory'][container_name].get('network_interfaces')[interface]:
                         try:
-                            if self.ip_in_subnetwork(interface_family['address'], self.dispose[group_name].get('attribute')):
+                            if self.ip_in_subnetwork(interface_family['address'], self.groupby[group_name].get('attribute')):
                                 self.inventory.add_child(group_name, container_name)
                         except ValueError:
                             # catch ipv4/ipv6 matching incompatibility errors
@@ -831,7 +820,7 @@ class InventoryModule(BaseInventoryPlugin):
             container_name for container_name in self.inventory.hosts
             if 'ansible_lxd_os' in self.inventory.get_host(container_name).get_vars()]
         for container_name in gen_containers:
-            if self.dispose[group_name].get('attribute').lower() == self.inventory.get_host(container_name).get_vars().get('ansible_lxd_os'):
+            if self.groupby[group_name].get('attribute').lower() == self.inventory.get_host(container_name).get_vars().get('ansible_lxd_os'):
                 self.inventory.add_child(group_name, container_name)
 
     def build_inventory_groups_release(self, group_name):
@@ -853,7 +842,7 @@ class InventoryModule(BaseInventoryPlugin):
             container_name for container_name in self.inventory.hosts
             if 'ansible_lxd_release' in self.inventory.get_host(container_name).get_vars()]
         for container_name in gen_containers:
-            if self.dispose[group_name].get('attribute').lower() == self.inventory.get_host(container_name).get_vars().get('ansible_lxd_release'):
+            if self.groupby[group_name].get('attribute').lower() == self.inventory.get_host(container_name).get_vars().get('ansible_lxd_release'):
                 self.inventory.add_child(group_name, container_name)
 
     def build_inventory_groups_profile(self, group_name):
@@ -875,7 +864,7 @@ class InventoryModule(BaseInventoryPlugin):
             container_name for container_name in self.inventory.hosts.keys()
             if 'ansible_lxd_profile' in self.inventory.get_host(container_name).get_vars().keys()]
         for container_name in gen_containers:
-            if self.dispose[group_name].get('attribute').lower() in self.inventory.get_host(container_name).get_vars().get('ansible_lxd_profile'):
+            if self.groupby[group_name].get('attribute').lower() in self.inventory.get_host(container_name).get_vars().get('ansible_lxd_profile'):
                 self.inventory.add_child(group_name, container_name)
 
     def build_inventory_groups_vlanid(self, group_name):
@@ -897,7 +886,7 @@ class InventoryModule(BaseInventoryPlugin):
             container_name for container_name in self.inventory.hosts.keys()
             if 'ansible_lxd_vlan_ids' in self.inventory.get_host(container_name).get_vars().keys()]
         for container_name in gen_containers:
-            if self.dispose[group_name].get('attribute') in self.inventory.get_host(container_name).get_vars().get('ansible_lxd_vlan_ids').values():
+            if self.groupby[group_name].get('attribute') in self.inventory.get_host(container_name).get_vars().get('ansible_lxd_vlan_ids').values():
                 self.inventory.add_child(group_name, container_name)
 
     def build_inventory_groups(self):
@@ -938,27 +927,30 @@ class InventoryModule(BaseInventoryPlugin):
                 None"""
 
             # Due to the compatibility with python 2 no use of map
-            if self.dispose[group_name].get('type') == 'location':
+            if self.groupby[group_name].get('type') == 'location':
                 self.build_inventory_groups_location(group_name)
-            elif self.dispose[group_name].get('type') == 'pattern':
+            elif self.groupby[group_name].get('type') == 'pattern':
                 self.build_inventory_groups_pattern(group_name)
-            elif self.dispose[group_name].get('type') == 'network_range':
+            elif self.groupby[group_name].get('type') == 'network_range':
                 self.build_inventory_groups_network_range(group_name)
-            elif self.dispose[group_name].get('type') == 'os':
+            elif self.groupby[group_name].get('type') == 'os':
                 self.build_inventory_groups_os(group_name)
-            elif self.dispose[group_name].get('type') == 'release':
+            elif self.groupby[group_name].get('type') == 'release':
                 self.build_inventory_groups_release(group_name)
-            elif self.dispose[group_name].get('type') == 'profile':
+            elif self.groupby[group_name].get('type') == 'profile':
                 self.build_inventory_groups_profile(group_name)
-            elif self.dispose[group_name].get('type') == 'vlanid':
+            elif self.groupby[group_name].get('type') == 'vlanid':
                 self.build_inventory_groups_vlanid(group_name)
             else:
                 raise AnsibleParserError('Unknown group type: {0}'.format(to_native(group_name)))
 
-        for group_name in self.dispose.keys():
-            if not group_name.isalnum():
-                raise AnsibleParserError('Invalid character(s) in groupname: {0}'.format(to_native(group_name)))
-            group_type(group_name)
+        try:
+            for group_name in self.groupby.keys():
+                if not group_name.isalnum():
+                    raise AnsibleParserError('Invalid character(s) in groupname: {0}'.format(to_native(group_name)))
+                group_type(group_name)
+        except Exception:
+            pass
 
     def build_inventory(self):
         """Build dynamic inventory
@@ -1029,11 +1021,10 @@ class InventoryModule(BaseInventoryPlugin):
             self.client_cert = self.get_option('client_cert')
             self.debug = self.DEBUG
             self.data = {}  # store for inventory-data
-            self.dispose = self.get_option('dispose')
+            self.groupby = self.get_option('groupby')
             self.plugin = self.get_option('plugin')
             self.prefered_container_network_family = self.get_option('prefered_container_network_family')
             self.prefered_container_network_interface = self.get_option('prefered_container_network_interface')
-            self.selftest = self.SELFTEST
             if self.get_option('state').lower() == 'none':  # none in config is str()
                 self.filter = None
             else:
