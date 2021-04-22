@@ -204,11 +204,14 @@ class IdracRedfishUtils(RedfishUtils):
             else:
                 attrs_to_patch.update({attr_name: attr_value})
 
-        if not attrs_to_patch:
+        warning = ""
+        if attrs_bad:
+            warning = "Incorrect attributes %s" % (attrs_bad)
 
+        if not attrs_to_patch:
             return {'ret': True, 'changed': False,
                     'msg': "No changes made. Manager attributes already set.",
-                    'warning': "Incorrect attributes %s" % (attrs_bad)}
+                    'warning': warning}
 
         payload = {"Attributes": attrs_to_patch}
         response = self.patch_request(self.root_uri + manager_uri + "/" + key, payload)
@@ -217,7 +220,7 @@ class IdracRedfishUtils(RedfishUtils):
 
         return {'ret': True, 'changed': True,
                 'msg': "%s: Modified Manager attributes %s" % (command, attrs_to_patch),
-                'warning': "Incorrect attributes skipped %s" % (attrs_bad)}
+                'warning': warning}
 
 
 CATEGORY_COMMANDS_ALL = {

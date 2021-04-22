@@ -1617,11 +1617,15 @@ class RedfishUtils(object):
             if data[u'Attributes'][attr_name] == attributes[attr_name]:
                 del attrs_to_patch[attr_name]
 
+        warning = ""
+        if attrs_bad:
+            warning = "Incorrect attributes %s" % (attrs_bad)
+
         # Return success w/ changed=False if no attrs need to be changed
         if not attrs_to_patch:
             return {'ret': True, 'changed': False,
                     'msg': "BIOS attributes already set",
-                    'warning': "Incorrect attributes %s" % (attrs_bad)}
+                    'warning': warning}
 
         # Get the SettingsObject URI
         set_bios_attr_uri = data["@Redfish.Settings"]["SettingsObject"]["@odata.id"]
@@ -1633,7 +1637,7 @@ class RedfishUtils(object):
             return response
         return {'ret': True, 'changed': True,
                 'msg': "Modified BIOS attributes %s" % (attrs_to_patch),
-                'warning': "Incorrect attributes %s" % (attrs_bad)}
+                'warning': warning}
 
     def set_boot_order(self, boot_list):
         if not boot_list:
