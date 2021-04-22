@@ -174,6 +174,7 @@ EXAMPLES = '''
     vg: firefly
     lv: test
     size: -512M
+    force: yes
 
 - name: Set the logical volume to 512m and do not try to shrink if size is lower than current one
   community.general.lvol:
@@ -512,9 +513,9 @@ def main():
             elif size_operator == '-':
                 size_requested = this_lv['size'] - size_requested
                 size_requested -= (size_requested % this_vg['ext_size'])
-            else
+            else:
                 size_requested += this_vg['ext_size'] - (size_requested % this_vg['ext_size'])
-            
+
             if this_lv['size'] < size_requested:
                 if (size_free > 0) and (size_free >= (size_requested - this_lv['size'])):
                     tool = module.get_bin_path("lvextend", required=True)
