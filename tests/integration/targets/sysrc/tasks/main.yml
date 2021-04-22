@@ -4,10 +4,6 @@
     - ansible_facts.virtualization_type != 'docker'
     - ansible_facts.distribution == 'FreeBSD'
   block:
-    - name: Cache original contents of /etc/rc.conf
-      shell: "cat /etc/rc.conf"
-      register: sysrc_original_content
-
     ##
     ## sysrc - example - set mysqlpidfile
     ##
@@ -316,3 +312,6 @@
           - not sysrc_value_absent_idempotent.changed
           - "'sysrc_delim=\"t1,t2\"' in sysrc_delim_content.stdout_lines"
           - "'sysrc_delim_delete' not in sysrc_delim_content.stdout_lines"
+  always:
+    - name: Cleanup test entries
+      import_tasks: cleanup-test-entries.yml
