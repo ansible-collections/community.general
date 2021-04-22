@@ -33,9 +33,11 @@ options:
     description:
     - The size of the logical volume, according to lvcreate(8) --size, by
       default in megabytes or optionally with one of [bBsSkKmMgGtTpPeE] units; or
-      according to lvcreate(8) --extents as a percentage of [VG|PVS|FREE]; 
+      according to lvcreate(8) --extents as a percentage of [VG|PVS|FREE];
       Float values must begin with a digit.
-    - When resizing apart from specifying an absolute size you may, according to lvextend(8)|lvreduce(8) --size, specify the amount to extend the lv with the prefix [+] or the amount to reduce the lv by with prefix [-]. 
+    - When resizing apart from specifying an absolute size you may, according to
+      lvextend(8)|lvreduce(8) --size, specify the amount to extend the lv with
+      the prefix [+] or the amount to reduce the lv by with prefix [-].
     - Resizing using percentage values was not supported prior to 2.1.
     - Resizing using [+-] was not supported prior to 2.5.2.
   state:
@@ -166,7 +168,7 @@ EXAMPLES = '''
     lv: test
     size: 512
     force: yes
-    
+
 - name: Reduce the logical volume by given space
   community.general.lvol:
     vg: firefly
@@ -342,14 +344,14 @@ def main():
 
     if size:
         # LVEXTEND(8)/LVREDUCE(8) -l, -L options: Check for relative value for resizing
-        if '+' in size:
+        if size.startswith('+'):
             size_operator = '+'
             size = size[1:]
-        elif '-' in size:
+        elif size.startswith('-'):
             size_operator = '-'
-            size = size[1:]  
+            size = size[1:]
         # LVCREATE(8) does not support [+-]
-    
+
         # LVCREATE(8)/LVEXTEND(8)/LVREDUCE(8) -l --extents option with percentage
         if '%' in size:
             size_parts = size.split('%', 1)
@@ -369,6 +371,7 @@ def main():
             if size[-1].lower() in 'bskmgtpe':
                 size_unit = size[-1]
                 size = size[0:-1]
+
             try:
                 float(size)
                 if not size[0].isdigit():
@@ -501,13 +504,19 @@ def main():
             else:  # size_whole == 'FREE':
                 size_requested = size_percent * this_vg['free'] / 100
 
-            # Round down to the next lowest whole physical extent
-            size_requested -= (size_requested % this_vg['ext_size']) # I'm not sure why we are trying to calculate the size instead of letting the tool do it and pass it the VG|PVS|FREE options. In my opinion it will only lead to confusion since the module logic might not match the tools and descreptencies might arise (not actually taking all the free space but an extent less or some such scenario). We can leave the test/error logic, but the tool already does that as well. Besides you're not doing any checks for size for the -L option either, it keeps the code simple and I preffer that approach. Do you dissagree, any suggestions? At the very least we should use the same approach for both -l and -L for consistency. Will implement after a discussion. 
-
-            if '+' in size: # Was this supported on purpouse? Don't see anything for [-] and in the -L section 
+            # from LVEXTEND(8) - The resulting value is rounded upward.
+            # from LVREDUCE(8) - The resulting value for the substraction is rounded downward, for the absolute size it is rounded upward.
+            if size_operator == '+':
                 size_requested += this_lv['size']
+                size_requested += this_vg['ext_size'] - (size_requested % this_vg['ext_size'])
+            elif size_operator == '-':
+                size_requested = this_lv['size'] - size_requested
+                size_requested -= (size_requested % this_vg['ext_size'])
+            else
+                size_requested += this_vg['ext_size'] - (size_requested % this_vg['ext_size'])
+            
             if this_lv['size'] < size_requested:
-                if (size_free > 0) and (('+' not in size) or (size_free >= (size_requested - this_lv['size']))):
+                if (size_free > 0) and (size_free >= (size_requested - this_lv['size'])):
                     tool = module.get_bin_path("lvextend", required=True)
                 else:
                     module.fail_json(
@@ -515,7 +524,7 @@ def main():
                             (this_lv['name'], (size_requested - this_lv['size']), unit, size_free, unit)
                     )
             elif shrink and this_lv['size'] > size_requested + this_vg['ext_size']:  # more than an extent too large
-                if size_requested == 0:
+                if size_requested < 1:
                     module.fail_json(msg="Sorry, no shrinking of %s to 0 permitted." % (this_lv['name']))
                 elif not force:
                     module.fail_json(msg="Sorry, no shrinking of %s without force=yes" % (this_lv['name']))
@@ -526,7 +535,10 @@ def main():
             if tool:
                 if resizefs:
                     tool = '%s %s' % (tool, '--resizefs')
-                cmd = "%s %s -%s %s%s %s/%s %s" % (tool, test_opt, size_opt, size, size_unit, vg, this_lv['name'], pvs)
+                if size_operator:
+                    cmd = "%s %s -%s %s%s%s %s/%s %s" % (tool, test_opt, size_opt, size_operator, size, size_unit, vg, this_lv['name'], pvs)
+                else:
+                    cmd = "%s %s -%s %s%s %s/%s %s" % (tool, test_opt, size_opt, size, size_unit, vg, this_lv['name'], pvs)
                 rc, out, err = module.run_command(cmd)
                 if "Reached maximum COW size" in out:
                     module.fail_json(msg="Unable to resize %s to %s%s" % (lv, size, size_unit), rc=rc, err=err, out=out)
@@ -543,9 +555,9 @@ def main():
         else:
             # resize LV based on absolute values
             tool = None
-            if float(size) > this_lv['size'] or '+' in size_operator:
+            if float(size) > this_lv['size'] or size_operator == '+':
                 tool = module.get_bin_path("lvextend", required=True)
-            elif shrink and float(size) < this_lv['size'] or '-' in size_operator:
+            elif shrink and float(size) < this_lv['size'] or size_operator == '-':
                 if float(size) == 0:
                     module.fail_json(msg="Sorry, no shrinking of %s to 0 permitted." % (this_lv['name']))
                 if not force:
