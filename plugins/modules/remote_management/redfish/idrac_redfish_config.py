@@ -176,6 +176,7 @@ class IdracRedfishUtils(RedfishUtils):
 
         attrs_to_patch = {}
         attrs_skipped = {}
+        attrs_bad = {}  # Store attrs which were not found in the system
 
         # Search for key entry and extract URI from it
         response = self.get_request(self.root_uri + manager_uri + "/" + key)
@@ -186,13 +187,15 @@ class IdracRedfishUtils(RedfishUtils):
 
         if key not in data:
             return {'ret': False,
-                    'msg': "%s: Key %s not found" % (command, key)}
+                    'msg': "%s: Key %s not found" % (command, key),
+                    'warning': ""}
 
         for attr_name, attr_value in attributes.items():
             # Check if attribute exists
             if attr_name not in data[u'Attributes']:
-                return {'ret': False,
-                        'msg': "%s: Manager attribute %s not found" % (command, attr_name)}
+                # Skip and proceed to next attribute if this isn't valid
+                attrs_bad.update({attr_name: attr_value})
+                continue
 
             # Find out if value is already set to what we want. If yes, exclude
             # those attributes
@@ -202,21 +205,26 @@ class IdracRedfishUtils(RedfishUtils):
                 attrs_to_patch.update({attr_name: attr_value})
 
         if not attrs_to_patch:
+
             return {'ret': True, 'changed': False,
-                    'msg': "Manager attributes already set"}
+                    'msg': "No changes made. Manager attributes already set.",
+                    'warning': "Incorrect attributes %s" % (attrs_bad)}
 
         payload = {"Attributes": attrs_to_patch}
         response = self.patch_request(self.root_uri + manager_uri + "/" + key, payload)
         if response['ret'] is False:
             return response
+
         return {'ret': True, 'changed': True,
-                'msg': "%s: Modified Manager attributes %s" % (command, attrs_to_patch)}
+                'msg': "%s: Modified Manager attributes %s" % (command, attrs_to_patch),
+                'warning': "Incorrect attributes skipped %s" % (attrs_bad)}
 
 
 CATEGORY_COMMANDS_ALL = {
     "Manager": ["SetManagerAttributes", "SetLifecycleControllerAttributes",
                 "SetSystemAttributes"]
 }
+
 
 # list of mutually exclusive commands for a category
 CATEGORY_COMMANDS_MUTUALLY_EXCLUSIVE = {
@@ -294,7 +302,7 @@ def main():
 
     # Return data back or fail with proper message
     if result['ret'] is True:
-        module.exit_json(changed=result['changed'], msg=to_native(result['msg']))
+        module.exit_json(changed=result['changed'], msg=to_native(result['msg']), warning=to_native(result['warning']))
     else:
         module.fail_json(msg=to_native(result['msg']))
 
