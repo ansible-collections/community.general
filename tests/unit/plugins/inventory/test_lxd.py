@@ -42,7 +42,7 @@ def inventory():
 
     # Test Values
     inv.data = inv.load_json_data('tests/unit/plugins/inventory/fixtures/lxd_inventory.atd')  # Load Test Data
-    inv.dispose = GROUP_Config
+    inv.groupby = GROUP_Config
     inv.prefered_container_network_interface = 'eth'
     inv.prefered_container_network_family = 'inet'
     inv.filter = 'running'
@@ -78,6 +78,23 @@ def test_build_inventory_groups(inventory):
 
     eq = True
     for key, value in GROUP_COMPARATIVE_DATA.items():
+        if generated_data[key] != value:
+            eq = False
+    assert eq
+
+
+def test_build_inventory_groups_with_no_groupselection(inventory):
+    """Load example data and start the inventory to test the group generation with groupby is none.
+
+    After the inventory plugin has run with the test data, the result of the host is checked."""
+    inventory.groupby = None
+    inventory._populate()
+    generated_data = inventory.inventory.get_groups_dict()
+    group_comparative_data = {'all': [], 'ungrouped': []}
+
+    eq = True
+    print("data: {0}".format(generated_data))
+    for key, value in group_comparative_data.items():
         if generated_data[key] != value:
             eq = False
     assert eq
