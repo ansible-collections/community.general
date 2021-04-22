@@ -123,6 +123,7 @@ disk_info:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 import traceback
 import os
+import sys
 PSUTIL_IMP_ERR = None
 try:
     import psutil
@@ -152,14 +153,11 @@ def disk_info(devicename):
         try:
             st = os.statvfs(partition.mountpoint)
         except UnicodeEncodeError:
-            if not PY3 and isinstance(partition.mountpoint, unicode):
-                try:
-                    path = path.encode(sys.getfilesystemencoding())
-                except UnicodeEncodeError:
-                    pass
-                st = os.statvfs(partition.mountpoint)
-            else:
-                raise
+            try:
+                path = partition.mountpoint.encode(sys.getfilesystemencoding())
+                st = os.statvfs(path)
+            except UnicodeEncodeError:
+                pass
         inode_free = (st.f_ffree)
         inode_total = (st.f_files)
         inode_used = (st.f_files - st.f_ffree)
