@@ -451,7 +451,7 @@ files:
   $modules/net_tools/dnsmadeeasy.py:
     maintainers: briceburg
   $modules/net_tools/haproxy.py:
-    maintainers: ravibhure
+    maintainers: ravibhure Normo
   $modules/net_tools/:
     maintainers: nerzhul
   $modules/net_tools/infinity/infinity.py:
