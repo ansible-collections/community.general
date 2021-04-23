@@ -190,16 +190,6 @@ EXAMPLES = '''
     name: this_is_a_test
   delegate_to: localhost
 
-- name: Create or update Keycloak client template (minimal), authentication with token
-  community.general.keycloak_clienttemplate:
-    auth_client_id: admin-cli
-    auth_keycloak_url: https://auth.example.com/auth
-    auth_realm: master
-    token: TOKEN
-    realm: master
-    name: this_is_a_test
-  delegate_to: localhost
-
 - name: Delete Keycloak client template
   community.general.keycloak_client:
     auth_client_id: admin-cli
