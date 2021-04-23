@@ -308,9 +308,9 @@ def main():
     # Return data back or fail with proper message
     if result['ret'] is True:
         if result.get('warning'):
-            module.exit_json(changed=result['changed'], msg=to_native(result['msg']), warning=to_native(result['warning']))
-        else:
-            module.exit_json(changed=result['changed'], msg=to_native(result['msg']))
+            module.warn(to_native(result['warning']))
+
+        module.exit_json(changed=result['changed'], msg=to_native(result['msg']))
     else:
         module.fail_json(msg=to_native(result['msg']))
 

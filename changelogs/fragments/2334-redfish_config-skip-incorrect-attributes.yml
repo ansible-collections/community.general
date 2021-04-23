@@ -1,0 +1,4 @@
+minor_changes:
+  - plugins/module_utils/redfish_utils.py - Modified set_bios_attributes function to skip invalid attribute instead of returning. Added skipped attributes to output (https://github.com/ansible-collections/community.general/issues/1995)
+  - plugins/modules/remote_management/redfish/idrac_redfish_config.py - Modified set_manager_attributes function to skip invalid attribute instead of returning. Added skipped attributes to output. Modified module exit to add warning variable (https://github.com/ansible-collections/community.general/issues/1995)
+  - plugins/modules/remote_management/redfish/redfish_config.py Modified module exit to add warning variable (https://github.com/ansible-collections/community.general/issues/1995)
