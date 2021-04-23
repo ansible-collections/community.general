@@ -533,17 +533,6 @@ EXAMPLES = '''
   delegate_to: localhost
 
 
-- name: Create or update Keycloak client (minimal example), authentication with token
-  community.general.keycloak_client:
-    auth_client_id: admin-cli
-    auth_keycloak_url: https://auth.example.com/auth
-    auth_realm: master
-    token: TOKEN
-    client_id: test
-    state: present
-  delegate_to: localhost
-
-
 - name: Delete a Keycloak client
   community.general.keycloak_client:
     auth_client_id: admin-cli
