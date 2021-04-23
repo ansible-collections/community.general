@@ -4,6 +4,14 @@
     - ansible_facts.virtualization_type != 'docker'
     - ansible_facts.distribution == 'FreeBSD'
   block:
+    - name: Cache original contents of /etc/rc.conf
+      shell: "cat /etc/rc.conf"
+      register: cached_etc_rcconf_content
+
+    - name: Cache original contents of /boot/loader.conf
+      shell: "cat /boot/loader.conf"
+      register: cached_boot_loaderconf_content
+
     ##
     ## sysrc - example - set mysqlpidfile
     ##
@@ -313,5 +321,12 @@
           - "'sysrc_delim=\"t1,t2\"' in sysrc_delim_content.stdout_lines"
           - "'sysrc_delim_delete' not in sysrc_delim_content.stdout_lines"
   always:
-    - name: Cleanup test entries
-      import_tasks: cleanup-test-entries.yml
+    - name: Restore /etc/rc.conf
+      copy:
+        content: "{{ cached_etc_rcconf_content }}"
+        dest: /etc/rc.conf
+
+    - name: Restore /boot/loader.conf
+      copy:
+        content: "{{ cached_boot_loaderconf_content }}"
+        dest: /boot/loader.conf

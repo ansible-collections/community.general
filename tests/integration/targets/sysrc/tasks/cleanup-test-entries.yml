@@ -20,4 +20,8 @@
   lineinfile:
     path: /boot/loader.conf
     state: absent
-    regexp: "^accf_http_load="
+    regexp: "^{{ pattern }}"
+  loop:
+    - "accf_http_load="
+  loop_control:
+    loop_var: pattern
