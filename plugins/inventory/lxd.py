@@ -697,15 +697,23 @@ class InventoryModule(BaseInventoryPlugin):
         if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
-        network = ipaddress.ip_network(to_text(self.groupby[group_name].get('attribute')))
+        try:
+            network = ipaddress.ip_network(to_text(self.groupby[group_name].get('attribute')))
+        except ValueError as err:
+            raise AnsibleParserError(
+                'Error while parsing network range {0}: {1}'.format(self.groupby[group_name].get('attribute'), to_native(err)))
 
         for container_name in self.inventory.hosts:
             if self.data['inventory'][container_name].get('network_interfaces') is not None:
                 for interface in self.data['inventory'][container_name].get('network_interfaces'):
                     for interface_family in self.data['inventory'][container_name].get('network_interfaces')[interface]:
-                        address = ipaddress.ip_address(to_text(interface_family['address']))
-                        if address.version == network.version and address in network:
-                            self.inventory.add_child(group_name, container_name)
+                        try:
+                            address = ipaddress.ip_address(to_text(interface_family['address']))
+                            if address.version == network.version and address in network:
+                                self.inventory.add_child(group_name, container_name)
+                        except ValueError:
+                            # Ignore invalid IP addresses returned by lxd
+                            pass
 
     def build_inventory_groups_os(self, group_name):
         """create group by attribute: os
