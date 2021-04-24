@@ -850,13 +850,10 @@ class InventoryModule(BaseInventoryPlugin):
             else:
                 raise AnsibleParserError('Unknown group type: {0}'.format(to_native(group_name)))
 
-        try:
-            for group_name in self.groupby.keys():
-                if not group_name.isalnum():
-                    raise AnsibleParserError('Invalid character(s) in groupname: {0}'.format(to_native(group_name)))
-                group_type(group_name)
-        except Exception:
-            pass
+        for group_name in self.groupby.keys():
+            if not group_name.isalnum():
+                raise AnsibleParserError('Invalid character(s) in groupname: {0}'.format(to_native(group_name)))
+            group_type(group_name)
 
     def build_inventory(self):
         """Build dynamic inventory
