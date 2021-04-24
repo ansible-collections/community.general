@@ -82,7 +82,7 @@ url: unix:/var/snap/lxd/common/lxd/unix.socket
 state: RUNNING
 
 # grouping lxd.yml
-dispose:
+groupby:
   testpattern:
     type: pattern
     attribute: test
