@@ -32,7 +32,7 @@ GROUP_Config = {
     'profileDefault': {'type': 'profile', 'attribute': 'default'},
     'profileX11': {'type': 'profile', 'attribute': 'x11'},
     'netRangeIPv4': {'type': 'network_range', 'attribute': '10.98.143.0/24'},
-    'netRangeIPv6': {'type': 'network_range', 'attribute': 'fd42:bd00:7b11:2167:216:3eff::/24'}}
+    'netRangeIPv6': {'type': 'network_range', 'attribute': 'fd42:bd00:7b11:2167:216:3eff::/96'}}
 
 
 @pytest.fixture
