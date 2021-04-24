@@ -920,7 +920,7 @@ class InventoryModule(BaseInventoryPlugin):
         Kwargs:
             None
         Raises:
-            AnsibleParseError
+            AnsibleParserError
         Returns:
             None"""
 
