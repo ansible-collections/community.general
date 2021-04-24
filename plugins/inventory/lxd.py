@@ -122,9 +122,10 @@ import time
 import os
 import socket
 from ansible.plugins.inventory import BaseInventoryPlugin
-from ansible.module_utils._text import to_native
+from ansible.module_utils._text import to_native, to_text
 from ansible.module_utils.common.dict_transformations import dict_merge
 from ansible.errors import AnsibleError, AnsibleParserError
+from ansible_collections.community.general.plugins.module_utils.compat import ipaddress
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
 
 
@@ -681,100 +682,6 @@ class InventoryModule(BaseInventoryPlugin):
             if result:
                 self.inventory.add_child(group_name, container_name)
 
-    def ip_in_subnetwork(self, ip_address, subnetwork):
-        """Test if IP is in IP-Subnet.
-
-        Both IPv4 addresses/subnetworks (e.g. "192.168.178.99" and "192.168.1.0/24") and
-             IPv6 addresses/subnetworks (e.g. "fd42:bd00:7b11:2167:216:3eff:fe21:e86b" and "fd42:bd00:7b11:2167:216:3eff::/44") are accepted.
-        Source: https://diego.assencio.com/?index=85e407d6c771ba2bc5f02b17714241e2
-
-        Args:
-            str(ip_address): IP-Address e.g. 192.168.178.99
-            str(subnetwork): IP-Subnet e.g. 192.168.178.0/24
-        Kwargs:
-            None
-        Raises:
-            None
-        Returns:
-            bool:   True if the given IP address belongs to the subnetwork expressed in CIDR notation, otherwise False.
-                    Both parameters are strings."""
-        (ip_integer, version1) = self.ip_to_integer(ip_address)
-        (ip_lower, ip_upper, version2) = self.subnetwork_to_ip_range(subnetwork)
-
-        if version1 != version2:
-            raise ValueError("incompatible IP versions")
-        return ip_lower <= ip_integer <= ip_upper
-
-    @staticmethod
-    def ip_to_integer(ip_address):
-        """Converts an IP address
-
-        Converts an IP address expressed as a string to its representation as an integer value and returns a tuple
-        (ip_integer, version), with version being the IP version (either 4 or 6).
-
-        Args:
-            str(ip_address): IP-Address e.g. 192.168.178.99 or fd42:bd00:7b11:2167:216:3eff:fe21:e86b
-        Kwargs:
-            None
-        Raises:
-            None
-        Returns:
-            tuple(
-                int(ip_integer): int ip representation
-                int(ip version): 4 for IPv4 or 6 for IPv6
-                )"""
-        # try parsing the IP address first as IPv4, then as IPv6
-        for version in (socket.AF_INET, socket.AF_INET6):
-            try:
-                ip_hex = socket.inet_pton(version, ip_address)
-                ip_integer = int(binascii.hexlify(ip_hex), 16)
-                return (ip_integer, 4 if version == socket.AF_INET else 6)
-            except Exception:
-                pass
-        raise ValueError("invalid IP address")
-
-    @staticmethod
-    def subnetwork_to_ip_range(subnetwork):
-        """Returns the uper and lower ip representations of the IP-Subnet.
-
-        Returns a tuple (ip_lower, ip_upper, version) containing the integer values of the lower and upper IP addresses respectively
-        in a subnetwork expressed in CIDR notation (as a string), with version being the subnetwork IP version (either 4 or 6).
-
-        Args:
-            str(subnetwork): IP-Subnet e.g. 192.168.178.0/24 or fd42:bd00:7b11:2167:216:3eff::/44
-        Kwargs:
-            None
-        Raises:
-            None
-        Returns:
-            tuple(
-                int(ip_lower): int ip representation lower subnet end
-                int(ip_upper): int ip representation upper subnet end
-                int(ip version): 4 for IPv4 or 6 for IPv6
-                )"""
-        try:
-            fragments = subnetwork.split('/')
-            network_prefix = fragments[0]
-            netmask_len = int(fragments[1])
-
-            # try parsing the subnetwork first as IPv4, then as IPv6
-            for version in (socket.AF_INET, socket.AF_INET6):
-                ip_len = 32 if version == socket.AF_INET else 128
-                try:
-                    suffix_mask = (1 << (ip_len - netmask_len)) - 1
-                    netmask = ((1 << ip_len) - 1) - suffix_mask
-                    ip_hex = socket.inet_pton(version, network_prefix)
-                    ip_lower = int(binascii.hexlify(ip_hex), 16) & netmask
-                    ip_upper = ip_lower + suffix_mask
-                    return (ip_lower,
-                            ip_upper,
-                            4 if version == socket.AF_INET else 6)
-                except Exception:
-                    pass
-        except Exception:
-            pass
-        raise ValueError("invalid subnetwork")
-
     def build_inventory_groups_network_range(self, group_name):
         """check if IP is in network-class
 
@@ -790,16 +697,15 @@ class InventoryModule(BaseInventoryPlugin):
         if group_name not in self.inventory.groups:
             self.inventory.add_group(group_name)
 
+        network = ipaddress.ip_network(to_text(self.groupby[group_name].get('attribute')))
+
         for container_name in self.inventory.hosts:
             if self.data['inventory'][container_name].get('network_interfaces') is not None:
                 for interface in self.data['inventory'][container_name].get('network_interfaces'):
                     for interface_family in self.data['inventory'][container_name].get('network_interfaces')[interface]:
-                        try:
-                            if self.ip_in_subnetwork(interface_family['address'], self.groupby[group_name].get('attribute')):
-                                self.inventory.add_child(group_name, container_name)
-                        except ValueError:
-                            # catch ipv4/ipv6 matching incompatibility errors
-                            continue
+                        address = ipaddress.ip_address(to_text(interface_family['address']))
+                        if address.version == network.version and address in network:
+                            self.inventory.add_child(group_name, container_name)
 
     def build_inventory_groups_os(self, group_name):
         """create group by attribute: os
