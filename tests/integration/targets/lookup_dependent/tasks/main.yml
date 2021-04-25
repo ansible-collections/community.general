@@ -1,28 +1,28 @@
 ---
 - name: "Test 1: using with with_dependent"
   debug:
-    msg: "{{ item.0 }} {{ item.1 }} {{ item.2 }}"
+    msg: "{{ item.key1 }} {{ item.key2 }} {{ item.key3 }}"
   with_community.general.dependent:
-    - [1, 2]
-    - "[item.0 + 3, item.0 + 6]"
-    - "[item.0 + item.1 * 10]"
+    - key1: [1, 2]
+    - key2: "[item.key1 + 3, item.key1 + 6]"
+    - key3: "[item.key1 + item.key2 * 10]"
 
 - name: "Test 2: using with loop"
   debug:
-    msg: "{{ item.0 }} {{ item.1 }} {{ item.2 }}"
+    msg: "{{ item.a }} {{ item.b }} {{ item.c }}"
   loop: >-
     {{ query('community.general.dependent',
-             [1, 2],
-             '[item.0 + 3, item.0 + 6]',
-             '[item.0 + item.1 * 10]') }}
+             dict([['a', [1, 2]]]),
+             dict([['b', '[item.a + 3, item.a + 6]']]),
+             dict([['c', '[item.a + item.b * 10]']])) }}
 
 - name: "Test 3: using with with_dependent, simplified loop label"
   debug:
     msg: "{{ item.0 }} {{ item.1 }} {{ item.2 }}"
   with_community.general.dependent:
-    - [1, 2]
-    - "[item.0 + 3, item.0 + 6]"
-    - "[item.0 + item.1 * 10]"
+    - 0: [1, 2]
+    - 1: "[item.0 + 3, item.0 + 6]"
+    - 2: "[item.0 + item.1 * 10]"
   loop_control:
     label: "{{ [item.0, item.1, item.2] }}"
 
@@ -31,9 +31,9 @@
     msg: "{{ item.0 }} {{ item.1 }} {{ item.2 }}"
   loop: >-
     {{ query('community.general.dependent',
-             [1, 2],
-             '[item.0 + 3, item.0 + 6]',
-             '[item.0 + item.1 * 10]') }}
+             dict([[0, [1, 2]]]),
+             dict([[1, '[item.0 + 3, item.0 + 6]']]),
+             dict([[2, '[item.0 + item.1 * 10]']])) }}
   loop_control:
     label: "{{ [item.0, item.1, item.2] }}"
 
@@ -41,16 +41,17 @@
   debug:
     var: item
   with_community.general.dependent:
-    - a:
-        - 1
-        - 2
-      b:
-        - 3
-        - 4
-    - 'item.0.value'
-    - 'dependent_lookup_test[item.0.key ~ "_" ~ item.1]'
+    - var1:
+        a:
+          - 1
+          - 2
+        b:
+          - 3
+          - 4
+    - var2: 'item.var1.value'
+    - var3: 'dependent_lookup_test[item.var1.key ~ "_" ~ item.var2]'
   loop_control:
-    label: "{{ [item.0.key, item.1, item.2] }}"
+    label: "{{ [item.var1.key, item.var2, item.var3] }}"
   register: dependent
   vars:
     dependent_lookup_test:
@@ -70,34 +71,36 @@
   assert:
     that:
       - (dependent.results | length) == 7
-      - dependent.results[0].item.0.key == "a"
-      - dependent.results[0].item.1 == 1
-      - dependent.results[0].item.2 == "A"
-      - dependent.results[1].item.0.key == "a"
-      - dependent.results[1].item.1 == 1
-      - dependent.results[1].item.2 == "B"
-      - dependent.results[2].item.0.key == "a"
-      - dependent.results[2].item.1 == 2
-      - dependent.results[2].item.2 == "C"
-      - dependent.results[3].item.0.key == "b"
-      - dependent.results[3].item.1 == 3
-      - dependent.results[3].item.2 == "D"
-      - dependent.results[4].item.0.key == "b"
-      - dependent.results[4].item.1 == 4
-      - dependent.results[4].item.2 == "E"
-      - dependent.results[5].item.0.key == "b"
-      - dependent.results[5].item.1 == 4
-      - dependent.results[5].item.2 == "F"
-      - dependent.results[6].item.0.key == "b"
-      - dependent.results[6].item.1 == 4
-      - dependent.results[6].item.2 == "G"
+      - dependent.results[0].item.var1.key == "a"
+      - dependent.results[0].item.var2 == 1
+      - dependent.results[0].item.var3 == "A"
+      - dependent.results[1].item.var1.key == "a"
+      - dependent.results[1].item.var2 == 1
+      - dependent.results[1].item.var3 == "B"
+      - dependent.results[2].item.var1.key == "a"
+      - dependent.results[2].item.var2 == 2
+      - dependent.results[2].item.var3 == "C"
+      - dependent.results[3].item.var1.key == "b"
+      - dependent.results[3].item.var2 == 3
+      - dependent.results[3].item.var3 == "D"
+      - dependent.results[4].item.var1.key == "b"
+      - dependent.results[4].item.var2 == 4
+      - dependent.results[4].item.var3 == "E"
+      - dependent.results[5].item.var1.key == "b"
+      - dependent.results[5].item.var2 == 4
+      - dependent.results[5].item.var3 == "F"
+      - dependent.results[6].item.var1.key == "b"
+      - dependent.results[6].item.var2 == 4
+      - dependent.results[6].item.var3 == "G"
 
-- name: "Test 5: failure"
+- name: "Test 5: template failure"
   debug:
-    msg: "{{ item.0 }} {{ item.1 }}"
+    msg: "{{ item }}"
   with_community.general.dependent:
-    - [1, 2]
-    - "[item.0 + foo]"
+    - a:
+        - 1
+        - 2
+    - b: "[item.a + foo]"
   ignore_errors: true
   register: eval_error
 
@@ -105,3 +108,48 @@
   assert:
     that:
       - eval_error is failed
+      - eval_error.msg == "Caught \"'foo' is undefined\" while evaluating 'b' with item == {'a': 1}"
+
+- name: "Test 6: same variable name reused"
+  debug:
+    msg: "{{ item }}"
+  with_community.general.dependent:
+    - a: x
+    - b: x
+  ignore_errors: true
+  register: eval_error
+
+- name: Check for failure
+  assert:
+    that:
+      - eval_error is failed
+      - eval_error.msg == "Caught \"'x' is undefined\" while evaluating 'a' with item == {}"
+
+- name: "Test 7: multi-value dict"
+  debug:
+    msg: "{{ item }}"
+  with_community.general.dependent:
+    - a: x
+      b: x
+  ignore_errors: true
+  register: eval_error
+
+- name: Check for failure
+  assert:
+    that:
+      - eval_error is failed
+      - eval_error.msg == 'Parameter 0 must be a one-element dictionary, got 2 elements'
+
+- name: "Test 8: empty dict"
+  debug:
+    msg: "{{ item }}"
+  with_community.general.dependent:
+    - {}
+  ignore_errors: true
+  register: eval_error
+
+- name: Check for failure
+  assert:
+    that:
+      - eval_error is failed
+      - eval_error.msg == 'Parameter 0 must be a one-element dictionary, got 0 elements'
