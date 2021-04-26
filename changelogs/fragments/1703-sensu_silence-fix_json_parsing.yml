@@ -1,2 +1,0 @@
-bugfixes:
-  - sensu-silence module - fix json parsing of sensu API responses on Python 3.5 (https://github.com/ansible-collections/community.general/pull/1703).

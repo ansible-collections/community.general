@@ -1,3 +1,0 @@
-add plugin.filter:
-  - name: path_join
-    description: Redirects to ansible.builtin.path_join for ansible-base 2.10 or newer, and provides a compatible implementation for Ansible 2.9

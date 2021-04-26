@@ -1,2 +1,0 @@
-bugfixes:
-  - jira - fixed calling of ``isinstance`` (https://github.com/ansible-collections/community.general/issues/2234).
