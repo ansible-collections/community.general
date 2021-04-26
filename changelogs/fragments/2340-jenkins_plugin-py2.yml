@@ -1,0 +1,2 @@
+bugfixes:
+- "jenkins_plugin - fixes Python 2 compatibility issue (https://github.com/ansible-collections/community.general/pull/2340)."
