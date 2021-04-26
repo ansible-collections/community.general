@@ -108,7 +108,7 @@
   assert:
     that:
       - eval_error is failed
-      - eval_error.msg == "Caught \"'foo' is undefined\" while evaluating 'b' with item == {'a': 1}"
+      - eval_error.msg.startswith("Caught \"'foo' is undefined\" while evaluating ")
 
 - name: "Test 6: same variable name reused"
   debug:
@@ -123,7 +123,7 @@
   assert:
     that:
       - eval_error is failed
-      - eval_error.msg == "Caught \"'x' is undefined\" while evaluating 'a' with item == {}"
+      - eval_error.msg.startswith("Caught \"'x' is undefined\" while evaluating ")
 
 - name: "Test 7: multi-value dict"
   debug:
