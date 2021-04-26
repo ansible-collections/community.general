@@ -37,8 +37,8 @@ from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.six.moves.urllib.error import HTTPError
 from ansible.module_utils._text import to_native
 
-URL_REALMS = "{url}/realms"
-URL_REALM = "{url}/realms/{realm}"
+URL_REALMS = "{url}/admin/realms"
+URL_REALM = "{url}/admin/realms/{realm}"
 
 URL_TOKEN = "{url}/realms/{realm}/protocol/openid-connect/token"
 URL_CLIENT = "{url}/admin/realms/{realm}/clients/{id}"
