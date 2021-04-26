@@ -1,5 +1,6 @@
 ---
-- community.general.jira:
+- name: create test ticket
+  community.general.jira:
     uri: "{{ uri }}"
     username: "{{ user }}"
     password: "{{ pasw }}"
@@ -9,10 +10,15 @@
     description: bla bla bla
     issuetype: Task
   register: issue
-
 - debug:
     msg: Issue={{ issue }}
-- name: Add comment bleep bleep
+- name: assert test ticket
+  assert:
+    that:
+      - issue is changed
+      - issue.meta.key.startswith(proj)
+
+- name: add comment bleep bleep
   community.general.jira:
     uri: "{{ uri }}"
     username: "{{ user }}"
@@ -20,7 +26,15 @@
     issue: "{{ issue.meta.key }}"
     operation: comment
     comment: bleep bleep!
-- name: Transition -> In Progress with comment
+  register: comment_bleep_bleep
+- name: assert comment bleep bleep
+  assert:
+    that:
+      - comment_bleep_bleep is changed
+      - comment_bleep_bleep.meta.body == "bleep bleep!"
+      - comment_bleep_bleep.meta.body != None
+
+- name: transition -> In Progress with comment
   community.general.jira:
     uri: "{{ uri }}"
     username: "{{ user }}"
@@ -29,15 +43,27 @@
     operation: transition
     status: Start Progress
     comment: -> in progress
-- name: Change assignee
+  register: transition_inprog
+- name: assert transition -> In Progress with comment
+  assert:
+    that:
+      - transition_inprog is changed
+
+- name: change assignee
   community.general.jira:
     uri: "{{ uri }}"
     username: "{{ user }}"
     password: "{{ pasw }}"
     issue: "{{ issue.meta.key }}"
     operation: edit
-    accountId: "{{ user2 }}"
-- name: Transition -> Resolved with comment
+    account_id: "{{ user2 }}"
+  register: assign
+- name: assert change assignee
+  assert:
+    that:
+      - assign is changed
+
+- name: transition -> Resolved with comment
   community.general.jira:
     uri: "{{ uri }}"
     username: "{{ user }}"
@@ -46,11 +72,16 @@
     operation: transition
     status: Resolve Issue
     comment: -> resolved
-    accountId: "{{ user1 }}"
+    account_id: "{{ user1 }}"
     fields:
       resolution:
         name: Done
       description: wakawakawakawaka
+  register: transition_resolved
+- name: assert transition -> Resolved with comment
+  assert:
+    that:
+      - transition_resolved is changed
 
 - debug:
     msg:
