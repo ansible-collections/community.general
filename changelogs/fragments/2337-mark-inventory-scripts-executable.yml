@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - inventory scripts - Change file permissions to make vendored inventory scripts exectuable.
