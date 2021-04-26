@@ -596,7 +596,7 @@ def _prepare_attachment(filename, content=None, mime_type=None):
             content = f.read()
     else:
         try:
-            content = base64.decode(content)
+            content = base64.b64decode(content)
         except binascii.Error as e:
             raise Exception("Unable to base64 decode file content: %s" % e)
 
