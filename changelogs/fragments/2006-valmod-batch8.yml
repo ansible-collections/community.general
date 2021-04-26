@@ -1,4 +1,0 @@
-minor_changes:
-  - rax - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/2006).
-  - rax_cdb_user - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/2006).
-  - rax_scaling_group - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/2006).
