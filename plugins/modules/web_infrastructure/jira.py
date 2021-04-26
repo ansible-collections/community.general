@@ -522,7 +522,7 @@ class JIRA(StateModuleHelper):
         self.vars.meta = self.post(url, data)
 
     @cause_changes(on_success=True)
-    def attach(self):
+    def operation_attach(self):
         v = self.vars
         filename = v.attachment.get('filename')
         content = v.attachment.get('content')
