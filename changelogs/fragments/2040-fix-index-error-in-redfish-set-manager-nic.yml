@@ -1,2 +1,0 @@
-bugfixes:
-  - redfish_config module, redfish_utils module utils - fix IndexError in ``SetManagerNic`` command (https://github.com/ansible-collections/community.general/issues/1692).
