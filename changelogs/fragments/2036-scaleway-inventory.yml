@@ -1,3 +1,0 @@
----
-bugfixes:
-  - scaleway inventory plugin - fix pagination on scaleway inventory plugin (https://github.com/ansible-collections/community.general/pull/2036).

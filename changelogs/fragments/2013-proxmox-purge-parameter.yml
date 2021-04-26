@@ -1,3 +1,0 @@
----
-minor_changes:
-- proxmox - added ``purge`` module parameter for use when deleting lxc's with HA options (https://github.com/ansible-collections/community.general/pull/2013).

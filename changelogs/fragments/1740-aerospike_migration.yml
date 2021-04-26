@@ -1,2 +1,0 @@
-bugfixes:
-- "aerospike_migration - fix typo that caused ``migrate_tx_key`` instead of ``migrate_rx_key`` being used (https://github.com/ansible-collections/community.general/pull/1739)."

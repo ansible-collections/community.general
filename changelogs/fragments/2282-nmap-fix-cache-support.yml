@@ -1,2 +1,0 @@
-bugfixes:
-  - nmap inventory plugin - fix cache and constructed group support (https://github.com/ansible-collections/community.general/issues/2242).

@@ -1,4 +1,0 @@
-bugfixes:
-  - influxdb_retention_policy - ensure idempotent module execution with different
-    duration and shard duration parameter values
-    (https://github.com/ansible-collections/community.general/issues/2281).

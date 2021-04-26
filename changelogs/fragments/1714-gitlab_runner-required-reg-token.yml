@@ -1,2 +1,0 @@
-bugfixes:
-  - gitlab_runner - parameter ``registration_token`` was required but is used only when ``state`` is ``present`` (https://github.com/ansible-collections/community.general/issues/1714).
