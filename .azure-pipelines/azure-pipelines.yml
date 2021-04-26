@@ -38,8 +38,19 @@ schedules:
         - devel
 =======
         - main
+<<<<<<< HEAD
 >>>>>>> 33126b7267 (AZP Bootstrap)
         - stable-*
+=======
+        - stable-2
+        - stable-3
+  - cron: 0 8 * * 0
+    displayName: Weekly (old branches)
+    always: true
+    branches:
+      include:
+        - stable-1
+>>>>>>> cd116120ad (Run CI for old branches only once per week.)
 
 variables:
   - name: checkoutPath
