@@ -6,12 +6,23 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException as _MHE
+from ansible_collections.community.general.plugins.module_utils.mh.deco import module_fails_on_exception
 
 
 class ModuleHelperBase(object):
     module = None
     ModuleHelperException = _MHE
+
+    def __init__(self, module=None):
+        self._changed = False
+
+        if module:
+            self.module = module
+
+        if not isinstance(self.module, AnsibleModule):
+            self.module = AnsibleModule(**self.module)
 
     def __init_module__(self):
         pass
@@ -21,3 +32,25 @@ class ModuleHelperBase(object):
 
     def __quit_module__(self):
         pass
+
+    @property
+    def changed(self):
+        return self._changed
+
+    @changed.setter
+    def changed(self, value):
+        self._changed = value
+
+    def has_changed(self):
+        raise NotImplementedError()
+
+    @property
+    def output(self):
+        raise NotImplementedError()
+
+    @module_fails_on_exception
+    def run(self):
+        self.__init_module__()
+        self.__run__()
+        self.__quit_module__()
+        self.module.exit_json(changed=self.has_changed(), **self.output)

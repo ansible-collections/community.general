@@ -6,10 +6,8 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase
 
-
-class StateMixin(ModuleHelperBase):
+class StateMixin(object):
     state_param = 'state'
     default_state = None
 

@@ -8,7 +8,7 @@ __metaclass__ = type
 
 
 from ansible_collections.community.general.plugins.module_utils.mh.module_helper import (
-    ModuleHelper, StateModuleHelper, CmdModuleHelper, CmdStateModuleHelper
+    ModuleHelper, StateModuleHelper, CmdModuleHelper, CmdStateModuleHelper, AnsibleModule
 )
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.cmd import CmdMixin, ArgFormat
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin

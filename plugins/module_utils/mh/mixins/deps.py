@@ -9,6 +9,7 @@ __metaclass__ = type
 import traceback
 
 from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase
+from ansible_collections.community.general.plugins.module_utils.mh.deco import module_fails_on_exception
 
 
 class DependencyCtxMgr(object):
@@ -50,3 +51,8 @@ class DependencyMixin(ModuleHelperBase):
                                       exception="\n".join(traceback.format_exception(d.exc_type, d.exc_val, d.exc_tb)),
                                       msg=d.text,
                                       **self.output)
+
+    @module_fails_on_exception
+    def run(self):
+        self.fail_on_missing_deps()
+        super(DependencyMixin, self).run()

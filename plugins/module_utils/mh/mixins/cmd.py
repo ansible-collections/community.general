@@ -8,8 +8,6 @@ __metaclass__ = type
 
 from functools import partial
 
-from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase
-
 
 class ArgFormat(object):
     """
@@ -84,7 +82,7 @@ class ArgFormat(object):
         return [str(p) for p in func(value)]
 
 
-class CmdMixin(ModuleHelperBase):
+class CmdMixin(object):
     """
     Mixin for mapping module options to running a CLI command with its arguments.
     """

@@ -6,8 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase
-
 
 class VarMeta(object):
     NOTHING = object()
@@ -121,4 +119,14 @@ class VarDict(object):
         return self._meta[v].has_changed
 
 
-# class VarsMixin(ModuleHelperBase, abc.ABC):
+class VarsMixin(object):
+
+    def __init__(self, module=None):
+        self.vars = VarDict()
+        super(VarsMixin, self).__init__(module)
+
+    def update_vars(self, meta=None, **kwargs):
+        if meta is None:
+            meta = {}
+        for k, v in kwargs.items():
+            self.vars.set(k, v, **meta)
