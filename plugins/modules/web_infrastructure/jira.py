@@ -355,271 +355,16 @@ import mimetypes
 import os
 import random
 import string
-import sys
 import traceback
 
+from ansible_collections.community.general.plugins.module_utils.module_helper import StateModuleHelper, cause_changes
 from ansible.module_utils.six.moves.urllib.request import pathname2url
-
 from ansible.module_utils._text import to_text, to_bytes, to_native
-
-from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
 
 
-def request(
-    url,
-    user,
-    passwd,
-    timeout,
-    data=None,
-    method=None,
-    content_type='application/json',
-    additional_headers=None
-):
-    if data and content_type == 'application/json':
-        data = json.dumps(data)
-
-    # NOTE: fetch_url uses a password manager, which follows the
-    # standard request-then-challenge basic-auth semantics. However as
-    # JIRA allows some unauthorised operations it doesn't necessarily
-    # send the challenge, so the request occurs as the anonymous user,
-    # resulting in unexpected results. To work around this we manually
-    # inject the basic-auth header up-front to ensure that JIRA treats
-    # the requests as authorized for this user.
-    auth = to_text(base64.b64encode(to_bytes('{0}:{1}'.format(user, passwd), errors='surrogate_or_strict')))
-
-    headers = {}
-    if isinstance(additional_headers, dict):
-        headers = additional_headers.copy()
-    headers.update({
-        "Content-Type": content_type,
-        "Authorization": "Basic %s" % auth,
-    })
-
-    response, info = fetch_url(
-        module, url, data=data, method=method, timeout=timeout, headers=headers
-    )
-
-    if info['status'] not in (200, 201, 204):
-        error = None
-        try:
-            error = json.loads(info['body'])
-        except Exception:
-            module.fail_json(msg=to_native(info['body']), exception=traceback.format_exc())
-        if error:
-            msg = []
-            for key in ('errorMessages', 'errors'):
-                if error.get(key):
-                    msg.append(to_native(error[key]))
-            if msg:
-                module.fail_json(msg=', '.join(msg))
-            module.fail_json(msg=to_native(error))
-        # Fallback print body, if it cant be decoded
-        module.fail_json(msg=to_native(info['body']))
-
-    body = response.read()
-
-    if body:
-        return json.loads(to_text(body, errors='surrogate_or_strict'))
-    return {}
-
-
-def post(url, user, passwd, timeout, data, content_type='application/json', additional_headers=None):
-    return request(url, user, passwd, timeout, data=data, method='POST', content_type=content_type, additional_headers=additional_headers)
-
-
-def put(url, user, passwd, timeout, data):
-    return request(url, user, passwd, timeout, data=data, method='PUT')
-
-
-def get(url, user, passwd, timeout):
-    return request(url, user, passwd, timeout)
-
-
-def create(restbase, user, passwd, params):
-    createfields = {
-        'project': {'key': params['project']},
-        'summary': params['summary'],
-        'issuetype': {'name': params['issuetype']}}
-
-    if params['description']:
-        createfields['description'] = params['description']
-
-    # Merge in any additional or overridden fields
-    if params['fields']:
-        createfields.update(params['fields'])
-
-    data = {'fields': createfields}
-
-    url = restbase + '/issue/'
-
-    return True, post(url, user, passwd, params['timeout'], data)
-
-
-def comment(restbase, user, passwd, params):
-    data = {
-        'body': params['comment']
-    }
-    url = restbase + '/issue/' + params['issue'] + '/comment'
-
-    return True, post(url, user, passwd, params['timeout'], data)
-
-
-def edit(restbase, user, passwd, params):
-    data = {
-        'fields': params['fields']
-    }
-    url = restbase + '/issue/' + params['issue']
-
-    return True, put(url, user, passwd, params['timeout'], data)
-
-
-def update(restbase, user, passwd, params):
-    data = {
-        "update": params['fields'],
-    }
-    url = restbase + '/issue/' + params['issue']
-
-    return True, put(url, user, passwd, params['timeout'], data)
-
-
-def fetch(restbase, user, passwd, params):
-    url = restbase + '/issue/' + params['issue']
-    return False, get(url, user, passwd, params['timeout'])
-
-
-def search(restbase, user, passwd, params):
-    url = restbase + '/search?jql=' + pathname2url(params['jql'])
-    if params['fields']:
-        fields = params['fields'].keys()
-        url = url + '&fields=' + '&fields='.join([pathname2url(f) for f in fields])
-    if params['maxresults']:
-        url = url + '&maxResults=' + str(params['maxresults'])
-    return False, get(url, user, passwd, params['timeout'])
-
-
-def transition(restbase, user, passwd, params):
-    # Find the transition id
-    turl = restbase + '/issue/' + params['issue'] + "/transitions"
-    tmeta = get(turl, user, passwd, params['timeout'])
-
-    target = params['status']
-    tid = None
-    for t in tmeta['transitions']:
-        if t['name'] == target:
-            tid = t['id']
-            break
-
-    if not tid:
-        raise ValueError("Failed find valid transition for '%s'" % target)
-
-    fields = dict(params['fields'])
-    if params['summary'] is not None:
-        fields.update({'summary': params['summary']})
-    if params['description'] is not None:
-        fields.update({'description': params['description']})
-
-    # Perform it
-    url = restbase + '/issue/' + params['issue'] + "/transitions"
-    data = {'transition': {"id": tid},
-            'fields': fields}
-    if params['comment'] is not None:
-        data.update({"update": {
-            "comment": [{
-                "add": {"body": params['comment']}
-            }],
-        }})
-
-    return True, post(url, user, passwd, params['timeout'], data)
-
-
-def link(restbase, user, passwd, params):
-    data = {
-        'type': {'name': params['linktype']},
-        'inwardIssue': {'key': params['inwardissue']},
-        'outwardIssue': {'key': params['outwardissue']},
-    }
-
-    url = restbase + '/issueLink/'
-
-    return True, post(url, user, passwd, params['timeout'], data)
-
-
-def attach(restbase, user, passwd, params):
-    filename = params['attachment'].get('filename')
-    content = params['attachment'].get('content')
-
-    if not any((filename, content)):
-        raise ValueError('at least one of filename or content must be provided')
-    mime = params['attachment'].get('mimetype')
-
-    if not os.path.isfile(filename):
-        raise ValueError('The provided filename does not exist: %s' % filename)
-
-    content_type, data = _prepare_attachment(filename, content, mime)
-
-    url = restbase + '/issue/' + params['issue'] + '/attachments'
-    return True, post(
-        url, user, passwd, params['timeout'], data, content_type=content_type,
-        additional_headers={"X-Atlassian-Token": "no-check"}
-    )
-
-
-# Ideally we'd just use prepare_multipart from ansible.module_utils.urls, but
-# unfortunately it does not support specifying the encoding and also defaults to
-# base64. Jira doesn't support base64 encoded attachments (and is therefore not
-# spec compliant. Go figure). I originally wrote this function as an almost
-# exact copypasta of prepare_multipart, but ran into some encoding issues when
-# using the noop encoder. Hand rolling the entire message body seemed to work
-# out much better.
-#
-# https://community.atlassian.com/t5/Jira-questions/Jira-dosen-t-decode-base64-attachment-request-REST-API/qaq-p/916427
-#
-# content is expected to be a base64 encoded string since Ansible doesn't
-# support passing raw bytes objects.
-def _prepare_attachment(filename, content=None, mime_type=None):
-    def escape_quotes(s):
-        return s.replace('"', '\\"')
-
-    boundary = "".join(random.choice(string.digits + string.ascii_letters) for i in range(30))
-    name = to_native(os.path.basename(filename))
-
-    if not mime_type:
-        try:
-            mime_type = mimetypes.guess_type(filename or '', strict=False)[0] or 'application/octet-stream'
-        except Exception:
-            mime_type = 'application/octet-stream'
-    main_type, sep, sub_type = mime_type.partition('/')
-
-    if not content and filename:
-        with open(to_bytes(filename, errors='surrogate_or_strict'), 'rb') as f:
-            content = f.read()
-    else:
-        try:
-            content = base64.b64decode(content)
-        except binascii.Error as e:
-            raise Exception("Unable to base64 decode file content: %s" % e)
-
-    lines = [
-        "--{0}".format(boundary),
-        'Content-Disposition: form-data; name="file"; filename={0}'.format(escape_quotes(name)),
-        "Content-Type: {0}".format("{0}/{1}".format(main_type, sub_type)),
-        '',
-        to_text(content),
-        "--{0}--".format(boundary),
-        ""
-    ]
-
-    return (
-        "multipart/form-data; boundary={0}".format(boundary),
-        "\r\n".join(lines)
-    )
-
-
-def main():
-
-    global module
-    module = AnsibleModule(
+class JIRA(StateModuleHelper):
+    module = dict(
         argument_spec=dict(
             attachment=dict(type='dict', options=dict(
                 content=dict(type='str'),
@@ -627,8 +372,11 @@ def main():
                 mimetype=dict(type='str')
             )),
             uri=dict(type='str', required=True),
-            operation=dict(type='str', choices=['attach', 'create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search'],
-                           aliases=['command'], required=True),
+            operation=dict(
+                type='str',
+                choices=['attach', 'create', 'comment', 'edit', 'update', 'fetch', 'transition', 'link', 'search'],
+                aliases=['command'], required=True
+            ),
             username=dict(type='str', required=True),
             password=dict(type='str', required=True, no_log=True),
             project=dict(type='str', ),
@@ -662,35 +410,258 @@ def main():
         supports_check_mode=False
     )
 
-    op = module.params['operation']
+    state_param = 'operation'
 
-    # Handle rest of parameters
-    uri = module.params['uri']
-    user = module.params['username']
-    passwd = module.params['password']
-    if module.params['assignee']:
-        module.params['fields']['assignee'] = {'name': module.params['assignee']}
-    if module.params['account_id']:
-        module.params['fields']['assignee'] = {'accountId': module.params['account_id']}
+    def __init_module__(self):
+        if self.vars.fields is None:
+            self.vars.fields = {}
+        if self.vars.assignee:
+            self.vars.fields['assignee'] = {'name': self.vars.assignee}
+        if self.vars.account_id:
+            self.vars.fields['assignee'] = {'accountId': self.vars.account_id}
+        self.vars.uri = self.vars.uri.strip('/')
+        self.vars.set('restbase', self.vars.uri + '/rest/api/2')
 
-    if not uri.endswith('/'):
-        uri = uri + '/'
-    restbase = uri + 'rest/api/2'
+    @cause_changes(on_success=True)
+    def operation_create(self):
+        createfields = {
+            'project': {'key': self.vars.project},
+            'summary': self.vars.summary,
+            'issuetype': {'name': self.vars.issuetype}}
 
-    # Dispatch
-    try:
+        if self.vars.description:
+            createfields['description'] = self.vars.description
 
-        # Lookup the corresponding method for this operation. This is
-        # safe as the AnsibleModule should remove any unknown operations.
-        thismod = sys.modules[__name__]
-        method = getattr(thismod, op)
+        # Merge in any additional or overridden fields
+        if self.vars.fields:
+            createfields.update(self.vars.fields)
 
-        changed, ret = method(restbase, user, passwd, module.params)
+        data = {'fields': createfields}
+        url = self.vars.restbase + '/issue/'
+        self.vars.meta = self.post(url, data)
 
-    except Exception as e:
-        return module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+    @cause_changes(on_success=True)
+    def operation_comment(self):
+        data = {
+            'body': self.vars.comment
+        }
+        url = self.vars.restbase + '/issue/' + self.vars.issue + '/comment'
+        self.vars.meta = self.post(url, data)
 
-    module.exit_json(changed=changed, meta=ret)
+    @cause_changes(on_success=True)
+    def operation_edit(self):
+        data = {
+            'fields': self.vars.fields
+        }
+        url = self.vars.restbase + '/issue/' + self.vars.issue
+        self.vars.meta = self.put(url, data)
+
+    @cause_changes(on_success=True)
+    def operation_update(self):
+        data = {
+            "update": self.vars.fields,
+        }
+        url = self.vars.restbase + '/issue/' + self.vars.issue
+        self.vars.meta = self.put(url, data)
+
+    def operation_fetch(self):
+        url = self.vars.restbase + '/issue/' + self.vars.issue
+        self.vars.meta = self.get(url)
+
+    def operation_search(self):
+        url = self.vars.restbase + '/search?jql=' + pathname2url(self.vars.jql)
+        if self.vars.fields:
+            fields = self.vars.fields.keys()
+            url = url + '&fields=' + '&fields='.join([pathname2url(f) for f in fields])
+        if self.vars.maxresults:
+            url = url + '&maxResults=' + str(self.vars.maxresults)
+
+        self.vars.meta = self.get(url)
+
+    @cause_changes(on_success=True)
+    def operation_transition(self):
+        # Find the transition id
+        turl = self.vars.restbase + '/issue/' + self.vars.issue + "/transitions"
+        tmeta = self.get(turl)
+
+        target = self.vars.status
+        tid = None
+        for t in tmeta['transitions']:
+            if t['name'] == target:
+                tid = t['id']
+                break
+        else:
+            raise ValueError("Failed find valid transition for '%s'" % target)
+
+        fields = dict(self.vars.fields)
+        if self.vars.summary is not None:
+            fields.update({'summary': self.vars.summary})
+        if self.vars.description is not None:
+            fields.update({'description': self.vars.description})
+
+        # Perform it
+        data = {'transition': {"id": tid},
+                'fields': fields}
+        if self.vars.comment is not None:
+            data.update({"update": {
+                "comment": [{
+                    "add": {"body": self.vars.comment}
+                }],
+            }})
+        url = self.vars.restbase + '/issue/' + self.vars.issue + "/transitions"
+        self.vars.meta = self.post(url, data)
+
+    @cause_changes(on_success=True)
+    def operation_link(self):
+        data = {
+            'type': {'name': self.vars.linktype},
+            'inwardIssue': {'key': self.vars.inwardissue},
+            'outwardIssue': {'key': self.vars.outwardissue},
+        }
+        url = self.vars.restbase + '/issueLink/'
+        self.vars.meta = self.post(url, data)
+
+    @cause_changes(on_success=True)
+    def operation_attach(self):
+        v = self.vars
+        filename = v.attachment.get('filename')
+        content = v.attachment.get('content')
+
+        if not any((filename, content)):
+            raise ValueError('at least one of filename or content must be provided')
+        mime = v.attachment.get('mimetype')
+
+        if not os.path.isfile(filename):
+            raise ValueError('The provided filename does not exist: %s' % filename)
+
+        content_type, data = self._prepare_attachment(filename, content, mime)
+
+        url = v.restbase + '/issue/' + v.issue + '/attachments'
+        return True, self.post(
+            url, data, content_type=content_type, additional_headers={"X-Atlassian-Token": "no-check"}
+        )
+
+    # Ideally we'd just use prepare_multipart from ansible.module_utils.urls, but
+    # unfortunately it does not support specifying the encoding and also defaults to
+    # base64. Jira doesn't support base64 encoded attachments (and is therefore not
+    # spec compliant. Go figure). I originally wrote this function as an almost
+    # exact copypasta of prepare_multipart, but ran into some encoding issues when
+    # using the noop encoder. Hand rolling the entire message body seemed to work
+    # out much better.
+    #
+    # https://community.atlassian.com/t5/Jira-questions/Jira-dosen-t-decode-base64-attachment-request-REST-API/qaq-p/916427
+    #
+    # content is expected to be a base64 encoded string since Ansible doesn't
+    # support passing raw bytes objects.
+    @staticmethod
+    def _prepare_attachment(filename, content=None, mime_type=None):
+        def escape_quotes(s):
+            return s.replace('"', '\\"')
+
+        boundary = "".join(random.choice(string.digits + string.ascii_letters) for dummy in range(30))
+        name = to_native(os.path.basename(filename))
+
+        if not mime_type:
+            try:
+                mime_type = mimetypes.guess_type(filename or '', strict=False)[0] or 'application/octet-stream'
+            except Exception:
+                mime_type = 'application/octet-stream'
+        main_type, sep, sub_type = mime_type.partition('/')
+
+        if not content and filename:
+            with open(to_bytes(filename, errors='surrogate_or_strict'), 'rb') as f:
+                content = f.read()
+        else:
+            try:
+                content = base64.b64decode(content)
+            except binascii.Error as e:
+                raise Exception("Unable to base64 decode file content: %s" % e)
+
+        lines = [
+            "--{0}".format(boundary),
+            'Content-Disposition: form-data; name="file"; filename={0}'.format(escape_quotes(name)),
+            "Content-Type: {0}".format("{0}/{1}".format(main_type, sub_type)),
+            '',
+            to_text(content),
+            "--{0}--".format(boundary),
+            ""
+        ]
+
+        return (
+            "multipart/form-data; boundary={0}".format(boundary),
+            "\r\n".join(lines)
+        )
+
+    def request(
+            self,
+            url,
+            data=None,
+            method=None,
+            content_type='application/json',
+            additional_headers=None
+    ):
+        if data and content_type == 'application/json':
+            data = json.dumps(data)
+
+        # NOTE: fetch_url uses a password manager, which follows the
+        # standard request-then-challenge basic-auth semantics. However as
+        # JIRA allows some unauthorised operations it doesn't necessarily
+        # send the challenge, so the request occurs as the anonymous user,
+        # resulting in unexpected results. To work around this we manually
+        # inject the basic-auth header up-front to ensure that JIRA treats
+        # the requests as authorized for this user.
+        auth = to_text(base64.b64encode(to_bytes('{0}:{1}'.format(self.vars.username, self.vars.password),
+                                                 errors='surrogate_or_strict')))
+
+        headers = {}
+        if isinstance(additional_headers, dict):
+            headers = additional_headers.copy()
+        headers.update({
+            "Content-Type": content_type,
+            "Authorization": "Basic %s" % auth,
+        })
+
+        response, info = fetch_url(
+            self.module, url, data=data, method=method, timeout=self.vars.timeout, headers=headers
+        )
+
+        if info['status'] not in (200, 201, 204):
+            error = None
+            try:
+                error = json.loads(info['body'])
+            except Exception:
+                self.module.fail_json(msg=to_native(info['body']), exception=traceback.format_exc())
+            if error:
+                msg = []
+                for key in ('errorMessages', 'errors'):
+                    if error.get(key):
+                        msg.append(to_native(error[key]))
+                if msg:
+                    self.module.fail_json(msg=', '.join(msg))
+                self.module.fail_json(msg=to_native(error))
+            # Fallback print body, if it cant be decoded
+            self.module.fail_json(msg=to_native(info['body']))
+
+        body = response.read()
+
+        if body:
+            return json.loads(to_text(body, errors='surrogate_or_strict'))
+        return {}
+
+    def post(self, url, data, content_type='application/json', additional_headers=None):
+        return self.request(url, data=data, method='POST', content_type=content_type,
+                            additional_headers=additional_headers)
+
+    def put(self, url, data):
+        return self.request(url, data=data, method='PUT')
+
+    def get(self, url):
+        return self.request(url)
+
+
+def main():
+    jira = JIRA()
+    jira.run()
 
 
 if __name__ == '__main__':
