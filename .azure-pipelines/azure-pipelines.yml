@@ -19,7 +19,14 @@ schedules:
     branches:
       include:
         - main
-        - stable-*
+        - stable-2
+        - stable-3
+  - cron: 0 8 * * 0
+    displayName: Weekly (old branches)
+    always: true
+    branches:
+      include:
+        - stable-1
 
 variables:
   - name: checkoutPath
