@@ -1,2 +1,0 @@
-bugfixes:
-- "nios* modules - fix modules to work with ansible-core 2.11 (https://github.com/ansible-collections/community.general/pull/2057)."

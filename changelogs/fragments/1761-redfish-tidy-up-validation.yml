@@ -1,2 +1,0 @@
-minor_changes:
-  - redfish modules - explicitly setting lists' elements to ``str`` (https://github.com/ansible-collections/community.general/pull/1761).

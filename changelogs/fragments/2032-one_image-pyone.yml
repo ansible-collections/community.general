@@ -1,2 +1,0 @@
-breaking_changes:
-  - one_image - use pyone instead of python-oca (https://github.com/ansible-collections/community.general/pull/2032).

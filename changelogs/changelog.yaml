@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 ancestor: 2.14.0
 releases: {}
 =======
@@ -865,5 +866,8 @@ ancestor: 1.0.0
 =======
 ancestor: 2.0.0
 >>>>>>> 83afe0f868 (Next expected release is 2.1.0. Next changelog ancestor is 2.0.0.)
+=======
+ancestor: 3.0.0
+>>>>>>> 9931cdc1e7 (stable-3 has been created, prepare for next 3.x.y release.)
 releases: {}
 >>>>>>> 711405507d (Reset changelog.)

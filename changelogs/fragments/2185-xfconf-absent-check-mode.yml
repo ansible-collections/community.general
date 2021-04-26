@@ -1,2 +1,0 @@
-bugfixes:
-  - xfconf - module was not honoring check mode when ``state`` was ``absent`` (https://github.com/ansible-collections/community.general/pull/2185).

@@ -1,2 +1,0 @@
-bugfixes:
-  - jira - fixed error when loading base64-encoded content as attachment (https://github.com/ansible-collections/community.general/pull/2349).
