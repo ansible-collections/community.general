@@ -276,6 +276,7 @@ from ansible.module_utils.six import text_type, binary_type
 from ansible.module_utils._text import to_native
 import base64
 import hashlib
+import io
 import json
 import os
 import tempfile
@@ -560,7 +561,7 @@ class JenkinsPlugin(object):
 
         # Open the updates file
         try:
-            f = open(updates_file, encoding='utf-8')
+            f = io.open(updates_file, encoding='utf-8')
         except IOError as e:
             self.module.fail_json(
                 msg="Cannot open temporal updates file.",
