@@ -379,6 +379,7 @@ files:
     maintainers: bvitnik
   $modules/clustering/consul/:
     maintainers: $team_consul
+    ignore: colin-nolan
   $modules/clustering/etcd3.py:
     maintainers: evrardjp
     ignore: vfauth
@@ -1105,7 +1106,7 @@ macros:
   terminals: plugins/terminal
   team_aix: MorrisA bcoca d-little flynn1973 gforster kairoaraujo marvin-sinister mator molekuul ramooncamacho wtcross
   team_bsd: JoergFiedler MacLemon bcoca dch jasperla mekanix opoplawski overhacked tuxillo
-  team_consul: colin-nolan sgargan
+  team_consul: sgargan
   team_cyberark_conjur: jvanderhoof ryanprior
   team_docker: DBendit WojciechowskiPiotr akshay196 danihodovic dariko felixfontein jwitko kassiansun tbouvet chouseknecht
   team_e_spirit: MatrixCrawler getjack
