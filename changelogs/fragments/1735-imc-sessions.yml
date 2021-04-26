@@ -1,2 +1,0 @@
-bugfixes:
-  - imc_rest - explicitly logging out instead of registering the call in ```atexit``` (https://github.com/ansible-collections/community.general/issues/1735).

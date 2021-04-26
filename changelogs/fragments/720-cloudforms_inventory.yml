@@ -1,2 +1,0 @@
-bugfixes:
-  - cloudforms inventory - fixed issue that non-existing (archived) VMs were synced (https://github.com/ansible-collections/community.general/pull/720).
