@@ -12,6 +12,8 @@ DOCUMENTATION = '''
 author:
     - Jeroen Hoekx (@jhoekx)
     - Alexander Bulimov (@abulimov)
+    - Raoul Baudach (@unkaputtbar112)
+    - Ziga Kern (@zigaSRC)
 module: lvol
 short_description: Configure LVM logical volumes
 description:
@@ -33,7 +35,11 @@ options:
       default in megabytes or optionally with one of [bBsSkKmMgGtTpPeE] units; or
       according to lvcreate(8) --extents as a percentage of [VG|PVS|FREE];
       Float values must begin with a digit.
-      Resizing using percentage values was not supported prior to 2.1.
+    - When resizing, apart from specifying an absolute size you may, according to
+      lvextend(8)|lvreduce(8) C(--size), specify the amount to extend the logical volume with
+      the prefix C(+) or the amount to reduce the logical volume by with prefix C(-).
+    - Resizing using C(+) or C(-) was not supported prior to community.general 3.0.0.
+    - Please note that when using C(+) or C(-), the module is B(not idempotent).
   state:
     type: str
     description:
@@ -136,6 +142,12 @@ EXAMPLES = '''
     lv: test
     size: +100%FREE
 
+- name: Extend the logical volume by given space
+  community.general.lvol:
+    vg: firefly
+    lv: test
+    size: +512M
+
 - name: Extend the logical volume to take all remaining space of the PVs and resize the underlying filesystem
   community.general.lvol:
     vg: firefly
@@ -155,6 +167,13 @@ EXAMPLES = '''
     vg: firefly
     lv: test
     size: 512
+    force: yes
+
+- name: Reduce the logical volume by given space
+  community.general.lvol:
+    vg: firefly
+    lv: test
+    size: -512M
     force: yes
 
 - name: Set the logical volume to 512m and do not try to shrink if size is lower than current one
@@ -208,7 +227,6 @@ EXAMPLES = '''
 import re
 
 from ansible.module_utils.basic import AnsibleModule
-
 
 LVOL_ENV_VARS = dict(
     # make sure we use the C locale when running lvol-related commands
@@ -307,6 +325,7 @@ def main():
     thinpool = module.params['thinpool']
     size_opt = 'L'
     size_unit = 'm'
+    size_operator = None
     snapshot = module.params['snapshot']
     pvs = module.params['pvs']
 
@@ -325,7 +344,16 @@ def main():
         test_opt = ''
 
     if size:
-        # LVCREATE(8) -l --extents option with percentage
+        # LVEXTEND(8)/LVREDUCE(8) -l, -L options: Check for relative value for resizing
+        if size.startswith('+'):
+            size_operator = '+'
+            size = size[1:]
+        elif size.startswith('-'):
+            size_operator = '-'
+            size = size[1:]
+        # LVCREATE(8) does not support [+-]
+
+        # LVCREATE(8)/LVEXTEND(8)/LVREDUCE(8) -l --extents option with percentage
         if '%' in size:
             size_parts = size.split('%', 1)
             size_percent = int(size_parts[0])
@@ -339,10 +367,10 @@ def main():
             size_opt = 'l'
             size_unit = ''
 
+        # LVCREATE(8)/LVEXTEND(8)/LVREDUCE(8) -L --size option unit
         if '%' not in size:
-            # LVCREATE(8) -L --size option unit
             if size[-1].lower() in 'bskmgtpe':
-                size_unit = size[-1].lower()
+                size_unit = size[-1]
                 size = size[0:-1]
 
             try:
@@ -398,7 +426,6 @@ def main():
         else:
             module.fail_json(msg="Snapshot origin LV %s does not exist in volume group %s." % (lv, vg))
         check_lv = snapshot
-
     elif thinpool:
         if lv:
             # Check thin volume pre-conditions
@@ -423,6 +450,8 @@ def main():
     msg = ''
     if this_lv is None:
         if state == 'present':
+            if size_operator is not None:
+                module.fail_json(msg="Bad size specification of '%s%s' for creating LV" % (size_operator, size))
             # Require size argument except for snapshot of thin volumes
             if (lv or thinpool) and not size:
                 for test_lv in lvs:
@@ -476,13 +505,19 @@ def main():
             else:  # size_whole == 'FREE':
                 size_requested = size_percent * this_vg['free'] / 100
 
-            # Round down to the next lowest whole physical extent
-            size_requested -= (size_requested % this_vg['ext_size'])
-
-            if '+' in size:
+            # from LVEXTEND(8) - The resulting value is rounded upward.
+            # from LVREDUCE(8) - The resulting value for the substraction is rounded downward, for the absolute size it is rounded upward.
+            if size_operator == '+':
                 size_requested += this_lv['size']
+                size_requested += this_vg['ext_size'] - (size_requested % this_vg['ext_size'])
+            elif size_operator == '-':
+                size_requested = this_lv['size'] - size_requested
+                size_requested -= (size_requested % this_vg['ext_size'])
+            else:
+                size_requested += this_vg['ext_size'] - (size_requested % this_vg['ext_size'])
+
             if this_lv['size'] < size_requested:
-                if (size_free > 0) and (('+' not in size) or (size_free >= (size_requested - this_lv['size']))):
+                if (size_free > 0) and (size_free >= (size_requested - this_lv['size'])):
                     tool = module.get_bin_path("lvextend", required=True)
                 else:
                     module.fail_json(
@@ -490,7 +525,7 @@ def main():
                             (this_lv['name'], (size_requested - this_lv['size']), unit, size_free, unit)
                     )
             elif shrink and this_lv['size'] > size_requested + this_vg['ext_size']:  # more than an extent too large
-                if size_requested == 0:
+                if size_requested < 1:
                     module.fail_json(msg="Sorry, no shrinking of %s to 0 permitted." % (this_lv['name']))
                 elif not force:
                     module.fail_json(msg="Sorry, no shrinking of %s without force=yes" % (this_lv['name']))
@@ -501,7 +536,10 @@ def main():
             if tool:
                 if resizefs:
                     tool = '%s %s' % (tool, '--resizefs')
-                cmd = "%s %s -%s %s%s %s/%s %s" % (tool, test_opt, size_opt, size, size_unit, vg, this_lv['name'], pvs)
+                if size_operator:
+                    cmd = "%s %s -%s %s%s%s %s/%s %s" % (tool, test_opt, size_opt, size_operator, size, size_unit, vg, this_lv['name'], pvs)
+                else:
+                    cmd = "%s %s -%s %s%s %s/%s %s" % (tool, test_opt, size_opt, size, size_unit, vg, this_lv['name'], pvs)
                 rc, out, err = module.run_command(cmd)
                 if "Reached maximum COW size" in out:
                     module.fail_json(msg="Unable to resize %s to %s%s" % (lv, size, size_unit), rc=rc, err=err, out=out)
@@ -518,9 +556,9 @@ def main():
         else:
             # resize LV based on absolute values
             tool = None
-            if float(size) > this_lv['size']:
+            if float(size) > this_lv['size'] or size_operator == '+':
                 tool = module.get_bin_path("lvextend", required=True)
-            elif shrink and float(size) < this_lv['size']:
+            elif shrink and float(size) < this_lv['size'] or size_operator == '-':
                 if float(size) == 0:
                     module.fail_json(msg="Sorry, no shrinking of %s to 0 permitted." % (this_lv['name']))
                 if not force:
@@ -532,7 +570,10 @@ def main():
             if tool:
                 if resizefs:
                     tool = '%s %s' % (tool, '--resizefs')
-                cmd = "%s %s -%s %s%s %s/%s %s" % (tool, test_opt, size_opt, size, size_unit, vg, this_lv['name'], pvs)
+                if size_operator:
+                    cmd = "%s %s -%s %s%s%s %s/%s %s" % (tool, test_opt, size_opt, size_operator, size, size_unit, vg, this_lv['name'], pvs)
+                else:
+                    cmd = "%s %s -%s %s%s %s/%s %s" % (tool, test_opt, size_opt, size, size_unit, vg, this_lv['name'], pvs)
                 rc, out, err = module.run_command(cmd)
                 if "Reached maximum COW size" in out:
                     module.fail_json(msg="Unable to resize %s to %s%s" % (lv, size, size_unit), rc=rc, err=err, out=out)
