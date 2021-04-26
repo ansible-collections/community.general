@@ -1,3 +1,0 @@
----
-bugfixes:
-  - proxmox inventory - added handling of extra trailing slashes in the URL (https://github.com/ansible-collections/community.general/pull/1914).

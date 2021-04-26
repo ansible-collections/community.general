@@ -1,2 +1,0 @@
-minor_changes:
-- timezone - add Gentoo and Alpine Linux support (https://github.com/ansible-collections/community.general/issues/781).

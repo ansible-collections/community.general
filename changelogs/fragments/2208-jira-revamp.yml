@@ -1,2 +1,0 @@
-minor_changes:
-  - jira - revamped the module as a class using ``ModuleHelper`` (https://github.com/ansible-collections/community.general/pull/2208).

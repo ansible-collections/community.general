@@ -1,2 +1,0 @@
-bugfixes:
-- "bigpanda - actually use the ``deployment_message`` option (https://github.com/ansible-collections/community.general/pull/1928)."

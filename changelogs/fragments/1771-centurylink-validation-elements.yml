@@ -1,2 +1,0 @@
-minor_changes:
-  - clc_* modules - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/1771).

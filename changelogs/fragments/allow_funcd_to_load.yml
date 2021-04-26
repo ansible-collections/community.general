@@ -1,2 +1,0 @@
-bugfixes:
-  - funcd connection plugin - can now load (https://github.com/ansible-collections/community.general/pull/2235).
