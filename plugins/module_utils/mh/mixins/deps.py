@@ -6,7 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-import abc
 import traceback
 
 from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase
@@ -36,7 +35,7 @@ class DependencyCtxMgr(object):
         return self.msg or str(self.exc_val)
 
 
-class DependencyMixin(ModuleHelperBase, abc.ABC):
+class DependencyMixin(ModuleHelperBase):
     _dependencies = []
 
     @classmethod

@@ -6,12 +6,10 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-import abc
-
 from ansible_collections.community.general.plugins.module_utils.mh.exceptions import ModuleHelperException as _MHE
 
 
-class ModuleHelperBase(abc.ABC):
+class ModuleHelperBase(object):
     module = None
     ModuleHelperException = _MHE
 

@@ -6,12 +6,10 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-import abc
-
 from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase
 
 
-class StateMixin(ModuleHelperBase, abc.ABC):
+class StateMixin(ModuleHelperBase):
     state_param = 'state'
     default_state = None
 

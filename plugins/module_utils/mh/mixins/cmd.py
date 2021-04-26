@@ -6,7 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-import abc
 from functools import partial
 
 from ansible_collections.community.general.plugins.module_utils.mh.base import ModuleHelperBase
@@ -85,7 +84,7 @@ class ArgFormat(object):
         return [str(p) for p in func(value)]
 
 
-class CmdMixin(ModuleHelperBase, abc.ABC):
+class CmdMixin(ModuleHelperBase):
     """
     Mixin for mapping module options to running a CLI command with its arguments.
     """

@@ -14,7 +14,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.mixins.cmd im
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deps import DependencyMixin
 from ansible_collections.community.general.plugins.module_utils.mh.deco import module_fails_on_exception
-from ansible_collections.community.general.plugins.module_utils.mh.vars import VarDict
+from ansible_collections.community.general.plugins.module_utils.mh.mixins.vars import VarDict
 
 
 class ModuleHelper(DependencyMixin, ModuleHelperBase):
