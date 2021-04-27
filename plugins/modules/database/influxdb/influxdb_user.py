@@ -230,8 +230,14 @@ def main():
         user = find_user(module, client, user_name)
     except influx.exceptions.InfluxDBClientError as e:
         if e.code == 403:
-            msg = json.loads(e.content)
-            if msg["error"] != INFLUX_AUTH_FIRST_USER_REQUIRED:
+            reason = None
+            try:
+                msg = json.loads(e.content)
+                reason = msg["error"]
+            except (json.decoder.JSONDecodeError, KeyError):
+                module.fail_json(msg=to_native(e))
+
+            if reason != INFLUX_AUTH_FIRST_USER_REQUIRED:
                 module.fail_json(msg=to_native(e))
         else:
             module.fail_json(msg=to_native(e))
