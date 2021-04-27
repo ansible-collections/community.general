@@ -23,26 +23,26 @@ options:
 
   credentials_path:
     description:
-      - (Path) Optional parameter that allows to set a non-default credentials path.
+      - Optional parameter that allows to set a non-default credentials path.
     default: ~/.spotinst/credentials
     type: path
 
   account_id:
     description:
-      - (String) Optional parameter that allows to set an account-id inside the module configuration
-       By default this is retrieved from the credentials path
+      - Optional parameter that allows to set an account-id inside the module configuration.
+        By default this is retrieved from the credentials path.
     type: str
 
   availability_vs_cost:
     description:
-      - (String) The strategy orientation.
+      - The strategy orientation.
       - "The choices available are: C(availabilityOriented), C(costOriented), C(balanced)."
     required: true
     type: str
 
   availability_zones:
     description:
-      - (List of Objects) a list of hash/dictionaries of Availability Zones that are configured in the elastigroup;
+      - A list of hash/dictionaries of Availability Zones that are configured in the elastigroup;
         '[{"key":"value", "key":"value"}]';
         keys allowed are
         name (String),
@@ -50,10 +50,11 @@ options:
         placement_group_name (String),
     required: true
     type: list
+    elements: dict
 
   block_device_mappings:
     description:
-      - (List of Objects) a list of hash/dictionaries of Block Device Mappings for elastigroup instances;
+      - A list of hash/dictionaries of Block Device Mappings for elastigroup instances;
         You can specify virtual devices and EBS volumes.;
         '[{"key":"value", "key":"value"}]';
         keys allowed are
@@ -68,10 +69,11 @@ options:
         volume_type(String),
         volume_size(Integer))
     type: list
+    elements: dict
 
   chef:
     description:
-      - (Object) The Chef integration configuration.;
+      - The Chef integration configuration.;
         Expects the following keys - chef_server (String),
         organization (String),
         user (String),
@@ -81,92 +83,94 @@ options:
 
   draining_timeout:
     description:
-      - (Integer) Time for instance to be drained from incoming requests and deregistered from ELB before termination.
+      - Time for instance to be drained from incoming requests and deregistered from ELB before termination.
     type: int
 
   ebs_optimized:
     description:
-      - (Boolean) Enable EBS optimization for supported instances which are not enabled by default.;
+      - Enable EBS optimization for supported instances which are not enabled by default.;
         Note - additional charges will be applied.
     type: bool
 
   ebs_volume_pool:
     description:
-      - (List of Objects) a list of hash/dictionaries of EBS devices to reattach to the elastigroup when available;
+      - A list of hash/dictionaries of EBS devices to reattach to the elastigroup when available;
         '[{"key":"value", "key":"value"}]';
         keys allowed are -
         volume_ids (List of Strings),
         device_name (String)
     type: list
+    elements: dict
 
   ecs:
     description:
-      - (Object) The ECS integration configuration.;
+      - The ECS integration configuration.;
         Expects the following key -
         cluster_name (String)
     type: dict
 
   elastic_ips:
     description:
-      - (List of Strings) List of ElasticIps Allocation Ids (Example C(eipalloc-9d4e16f8)) to associate to the group instances
+      - List of ElasticIps Allocation Ids (Example C(eipalloc-9d4e16f8)) to associate to the group instances
     type: list
+    elements: str
 
   fallback_to_od:
     description:
-      - (Boolean) In case of no spots available, Elastigroup will launch an On-demand instance instead
+      - In case of no spots available, Elastigroup will launch an On-demand instance instead
     type: bool
 
   health_check_grace_period:
     description:
-      - (Integer) The amount of time, in seconds, after the instance has launched to start and check its health.
+      - The amount of time, in seconds, after the instance has launched to start and check its health.
       - If not specified, it defaults to C(300).
     type: int
 
   health_check_unhealthy_duration_before_replacement:
     description:
-      - (Integer) Minimal mount of time instance should be unhealthy for us to consider it unhealthy.
+      - Minimal mount of time instance should be unhealthy for us to consider it unhealthy.
     type: int
 
   health_check_type:
     description:
-      - (String) The service to use for the health check.
+      - The service to use for the health check.
       - "The choices available are: C(ELB), C(HCS), C(TARGET_GROUP), C(MLB), C(EC2)."
     type: str
 
   iam_role_name:
     description:
-      - (String) The instance profile iamRole name
+      - The instance profile iamRole name
       - Only use iam_role_arn, or iam_role_name
     type: str
 
   iam_role_arn:
     description:
-      - (String) The instance profile iamRole arn
+      - The instance profile iamRole arn
       - Only use iam_role_arn, or iam_role_name
     type: str
 
   id:
     description:
-      - (String) The group id if it already exists and you want to update, or delete it.
+      - The group id if it already exists and you want to update, or delete it.
         This will not work unless the uniqueness_by field is set to id.
         When this is set, and the uniqueness_by field is set, the group will either be updated or deleted, but not created.
     type: str
 
   image_id:
     description:
-      - (String) The image Id used to launch the instance.;
+      - The image Id used to launch the instance.;
         In case of conflict between Instance type and image type, an error will be returned
     required: true
     type: str
 
   key_pair:
     description:
-      - (String) Specify a Key Pair to attach to the instances
+      - Specify a Key Pair to attach to the instances
     type: str
 
   kubernetes:
     description:
-      - (Object) The Kubernetes integration configuration.
+      - The Kubernetes integration configuration.
         Expects the following keys -
         api_server (String),
         token (String)
@@ -174,47 +178,48 @@ options:
 
   lifetime_period:
     description:
-      - (Integer) lifetime period
+      - Lifetime period
     type: int
 
   load_balancers:
     description:
-      - (List of Strings) List of classic ELB names
+      - List of classic ELB names
     type: list
+    elements: str
 
   max_size:
     description:
-      - (Integer) The upper limit number of instances that you can scale up to
+      - The upper limit number of instances that you can scale up to
     required: true
     type: int
 
   mesosphere:
     description:
-      - (Object) The Mesosphere integration configuration.
+      - The Mesosphere integration configuration.
         Expects the following key -
         api_server (String)
     type: dict
 
   min_size:
     description:
-      - (Integer) The lower limit number of instances that you can scale down to
+      - The lower limit number of instances that you can scale down to
     required: true
     type: int
 
   monitoring:
     description:
-      - (String) Describes whether instance Enhanced Monitoring is enabled
+      - Describes whether instance Enhanced Monitoring is enabled
     type: str
 
   name:
     description:
-      - (String) Unique name for elastigroup to be created, updated or deleted
+      - Unique name for elastigroup to be created, updated or deleted
     required: true
     type: str
 
   network_interfaces:
     description:
-      - (List of Objects) a list of hash/dictionaries of network interfaces to add to the elastigroup;
+      - A list of hash/dictionaries of network interfaces to add to the elastigroup;
         '[{"key":"value", "key":"value"}]';
         keys allowed are -
         description (String),
@@ -229,29 +234,30 @@ options:
         associate_ipv6_address (Boolean),
         private_ip_addresses (List of Objects, Keys are privateIpAddress (String, required) and primary (Boolean))
     type: list
+    elements: dict
 
   on_demand_count:
     description:
-      - (Integer) Required if risk is not set
+      - Required if risk is not set
       - Number of on demand instances to launch. All other instances will be spot instances.;
         Either set this parameter or the risk parameter
     type: int
 
   on_demand_instance_type:
     description:
-      - (String) On-demand instance type that will be provisioned
+      - On-demand instance type that will be provisioned
     type: str
 
   opsworks:
     description:
-      - (Object) The elastigroup OpsWorks integration configration.;
+      - The elastigroup OpsWorks integration configration.;
         Expects the following key -
         layer_id (String)
     type: dict
 
   persistence:
     description:
-      - (Object) The Stateful elastigroup configration.;
+      - The Stateful elastigroup configration.;
         Accepts the following keys -
         should_persist_root_device (Boolean),
         should_persist_block_devices (Boolean),
@@ -260,14 +266,14 @@ options:
 
   product:
     description:
-      - (String) Operation system type.
+      - Operation system type.
       - "Available choices are: C(Linux/UNIX), C(SUSE Linux), C(Windows), C(Linux/UNIX (Amazon VPC)), C(SUSE Linux (Amazon VPC))."
     required: true
     type: str
 
   rancher:
     description:
-      - (Object) The Rancher integration configuration.;
+      - The Rancher integration configuration.;
         Expects the following keys -
         version (String),
         access_key (String),
@@ -277,7 +283,7 @@ options:
 
   right_scale:
     description:
-      - (Object) The Rightscale integration configuration.;
+      - The Rightscale integration configuration.;
         Expects the following keys -
         account_id (String),
         refresh_token (String)
@@ -285,12 +291,12 @@ options:
 
   risk:
     description:
-      - (Integer) required if on demand is not set. The percentage of Spot instances to launch (0 - 100).
+      - Required if on demand is not set. The percentage of Spot instances to launch (0 - 100).
     type: int
 
   roll_config:
     description:
-      - (Object) Roll configuration.;
+      - Roll configuration.;
         If you would like the group to roll after updating, please use this feature.
         Accepts the following keys -
         batch_size_percentage(Integer, Required),
@@ -300,7 +306,7 @@ options:
 
   scheduled_tasks:
     description:
-      - (List of Objects) a list of hash/dictionaries of scheduled tasks to configure in the elastigroup;
+      - A list of hash/dictionaries of scheduled tasks to configure in the elastigroup;
         '[{"key":"value", "key":"value"}]';
         keys allowed are -
         adjustment (Integer),
@@ -315,84 +321,90 @@ options:
         task_type (String, required),
         is_enabled (Boolean)
     type: list
+    elements: dict
 
   security_group_ids:
     description:
-      - (List of Strings) One or more security group IDs. ;
+      - One or more security group IDs. ;
         In case of update it will override the existing Security Group with the new given array
     required: true
     type: list
+    elements: str
 
   shutdown_script:
     description:
-      - (String) The Base64-encoded shutdown script that executes prior to instance termination.
+      - The Base64-encoded shutdown script that executes prior to instance termination.
         Encode before setting.
     type: str
 
   signals:
     description:
-      - (List of Objects) a list of hash/dictionaries of signals to configure in the elastigroup;
+      - A list of hash/dictionaries of signals to configure in the elastigroup;
         keys allowed are -
         name (String, required),
         timeout (Integer)
     type: list
+    elements: dict
 
   spin_up_time:
     description:
-      - (Integer) spin up time, in seconds, for the instance
+      - Spin up time, in seconds, for the instance
     type: int
 
   spot_instance_types:
     description:
-      - (List of Strings) Spot instance type that will be provisioned.
+      - Spot instance type that will be provisioned.
     required: true
     type: list
+    elements: str
 
   state:
     choices:
       - present
       - absent
     description:
-      - (String) create or delete the elastigroup
+      - Create or delete the elastigroup
     default: present
     type: str
 
   tags:
     description:
-      - (List of tagKey:tagValue pairs) a list of tags to configure in the elastigroup. Please specify list of keys and values (key colon value);
+      - A list of tags to configure in the elastigroup. Please specify list of keys and values (key colon value);
     type: list
+    elements: dict
 
   target:
     description:
-      - (Integer) The number of instances to launch
+      - The number of instances to launch
     required: true
     type: int
 
   target_group_arns:
     description:
-      - (List of Strings) List of target group arns instances should be registered to
+      - List of target group arns instances should be registered to
     type: list
+    elements: str
 
   tenancy:
     description:
-      - (String) dedicated vs shared tenancy.
+      - Dedicated vs shared tenancy.
       - "The available choices are: C(default), C(dedicated)."
     type: str
 
   terminate_at_end_of_billing_hour:
     description:
-      - (Boolean) terminate at the end of billing hour
+      - Terminate at the end of billing hour
     type: bool
 
   unit:
     description:
-      - (String) The capacity unit to launch instances by.
+      - The capacity unit to launch instances by.
       - "The available choices are: C(instance), C(weight)."
     type: str
 
   up_scaling_policies:
     description:
-      - (List of Objects) a list of hash/dictionaries of scaling policies to configure in the elastigroup;
+      - A list of hash/dictionaries of scaling policies to configure in the elastigroup;
         '[{"key":"value", "key":"value"}]';
         keys allowed are -
         policy_name (String, required),
@@ -413,10 +425,11 @@ options:
         maximum (String),
         minimum (String)
     type: list
+    elements: dict
 
   down_scaling_policies:
     description:
-      - (List of Objects) a list of hash/dictionaries of scaling policies to configure in the elastigroup;
+      - A list of hash/dictionaries of scaling policies to configure in the elastigroup;
         '[{"key":"value", "key":"value"}]';
         keys allowed are -
         policy_name (String, required),
@@ -437,10 +450,11 @@ options:
         maximum (String),
         minimum (String)
     type: list
+    elements: dict
 
   target_tracking_policies:
     description:
-      - (List of Objects) a list of hash/dictionaries of target tracking policies to configure in the elastigroup;
+      - A list of hash/dictionaries of target tracking policies to configure in the elastigroup;
         '[{"key":"value", "key":"value"}]';
         keys allowed are -
         policy_name (String, required),
@@ -452,37 +466,38 @@ options:
         cooldown (String, required),
         target (String, required)
     type: list
+    elements: dict
 
   uniqueness_by:
     choices:
       - id
       - name
     description:
-      - (String) If your group names are not unique, you may use this feature to update or delete a specific group.
+      - If your group names are not unique, you may use this feature to update or delete a specific group.
         Whenever this property is set, you must set a group_id in order to update or delete a group, otherwise a group will be created.
     default: name
     type: str
 
   user_data:
     description:
-      - (String) Base64-encoded MIME user data. Encode before setting the value.
+      - Base64-encoded MIME user data. Encode before setting the value.
     type: str
 
   utilize_reserved_instances:
     description:
-      - (Boolean) In case of any available Reserved Instances,
+      - In case of any available Reserved Instances,
          Elastigroup will utilize your reservations before purchasing Spot instances.
     type: bool
 
   wait_for_instances:
     description:
-      - (Boolean) Whether or not the elastigroup creation / update actions should wait for the instances to spin
+      - Whether or not the elastigroup creation / update actions should wait for the instances to spin
     type: bool
     default: false
 
   wait_timeout:
     description:
-      - (Integer) How long the module should wait for instances before failing the action.;
+      - How long the module should wait for instances before failing the action.;
         Only works if wait_for_instances is True.
     type: int
 
@@ -1428,18 +1443,18 @@ def main():
     fields = dict(
         account_id=dict(type='str'),
         availability_vs_cost=dict(type='str', required=True),
-        availability_zones=dict(type='list', required=True),
-        block_device_mappings=dict(type='list'),
+        availability_zones=dict(type='list', elements='dict', required=True),
+        block_device_mappings=dict(type='list', elements='dict'),
         chef=dict(type='dict'),
         credentials_path=dict(type='path', default="~/.spotinst/credentials"),
         do_not_update=dict(default=[], type='list'),
-        down_scaling_policies=dict(type='list'),
+        down_scaling_policies=dict(type='list', elements='dict'),
         draining_timeout=dict(type='int'),
         ebs_optimized=dict(type='bool'),
-        ebs_volume_pool=dict(type='list'),
+        ebs_volume_pool=dict(type='list', elements='dict'),
         ecs=dict(type='dict'),
         elastic_beanstalk=dict(type='dict'),
-        elastic_ips=dict(type='list'),
+        elastic_ips=dict(type='list', elements='str'),
         fallback_to_od=dict(type='bool'),
         id=dict(type='str'),
         health_check_grace_period=dict(type='int'),
@@ -1451,7 +1466,7 @@ def main():
         key_pair=dict(type='str', no_log=False),
         kubernetes=dict(type='dict'),
         lifetime_period=dict(type='int'),
-        load_balancers=dict(type='list'),
+        load_balancers=dict(type='list', elements='str'),
         max_size=dict(type='int', required=True),
         mesosphere=dict(type='dict'),
         min_size=dict(type='int', required=True),
@@ -1459,7 +1474,7 @@ def main():
         multai_load_balancers=dict(type='list'),
         multai_token=dict(type='str', no_log=True),
         name=dict(type='str', required=True),
-        network_interfaces=dict(type='list'),
+        network_interfaces=dict(type='list', elements='dict'),
         on_demand_count=dict(type='int'),
         on_demand_instance_type=dict(type='str'),
         opsworks=dict(type='dict'),
@@ -1469,16 +1484,16 @@ def main():
         right_scale=dict(type='dict'),
         risk=dict(type='int'),
         roll_config=dict(type='dict'),
-        scheduled_tasks=dict(type='list'),
-        security_group_ids=dict(type='list', required=True),
+        scheduled_tasks=dict(type='list', elements='dict'),
+        security_group_ids=dict(type='list', elements='str', required=True),
         shutdown_script=dict(type='str'),
-        signals=dict(type='list'),
+        signals=dict(type='list', elements='dict'),
         spin_up_time=dict(type='int'),
-        spot_instance_types=dict(type='list', required=True),
+        spot_instance_types=dict(type='list', elements='str', required=True),
         state=dict(default='present', choices=['present', 'absent']),
-        tags=dict(type='list'),
+        tags=dict(type='list', elements='dict'),
         target=dict(type='int', required=True),
-        target_group_arns=dict(type='list'),
+        target_group_arns=dict(type='list', elements='str'),
         tenancy=dict(type='str'),
         terminate_at_end_of_billing_hour=dict(type='bool'),
         token=dict(type='str', no_log=True),
@@ -1486,8 +1501,8 @@ def main():
         user_data=dict(type='str'),
         utilize_reserved_instances=dict(type='bool'),
         uniqueness_by=dict(default='name', choices=['name', 'id']),
-        up_scaling_policies=dict(type='list'),
-        target_tracking_policies=dict(type='list'),
+        up_scaling_policies=dict(type='list', elements='dict'),
+        target_tracking_policies=dict(type='list', elements='dict'),
         wait_for_instances=dict(type='bool', default=False),
         wait_timeout=dict(type='int')
     )
