@@ -863,7 +863,8 @@ files:
     labels: zypper
     ignore: dirtyharrycallahan robinro
   $modules/packaging/os/zypper_repository.py:
-    maintainers: matze
+    maintainers: $team_suse matze
+    labels: zypper
   $modules/remote_management/cobbler/:
     maintainers: dagwieers
   $modules/remote_management/hpilo/:
@@ -1182,6 +1183,7 @@ macros:
   team_scaleway: QuentinBrosse abarbare jerome-quere kindermoumoute remyleone sieben
   team_solaris: bcoca fishman jasperla jpdasma mator scathatheworm troy2914 xen0l
 <<<<<<< HEAD
+<<<<<<< HEAD
   team_suse: commel dcermak evrardjp lrupp toabctl
 <<<<<<< HEAD
   team_virt: joshainglis karmab
@@ -1210,5 +1212,8 @@ macros:
   team_virt: joshainglis karmab Aversiste Thulium-Drake Ajpantuso
 >>>>>>> fc12eca65d (BOTMETA.yml: update team_virt (#2286))
 =======
+=======
+  team_suse: commel dcermak evrardjp lrupp toabctl AnderEnder alxgu andytom sealor
+>>>>>>> 9d13acd68e (BOTMETA.yml: team_suse - add a maintainer (#2354))
   team_virt: joshainglis karmab tleguern Thulium-Drake Ajpantuso
 >>>>>>> f7928d3eb7 (Update BOTMETA.yml (#2304))
