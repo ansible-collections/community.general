@@ -389,7 +389,7 @@ def main():
     # Get information on volume group requested
     vgs_cmd = module.get_bin_path("vgs", required=True)
     rc, current_vgs, err = module.run_command(
-        "%s --noheadings --nosuffix -o vg_name,size,free,vg_extent_size --units %s --separator ';' %s" % (vgs_cmd, unit, vg))
+        "%s --noheadings --nosuffix -o vg_name,size,free,vg_extent_size --units %s --separator ';' %s" % (vgs_cmd, unit.lower(), vg))
 
     if rc != 0:
         if state == 'absent':
@@ -403,7 +403,7 @@ def main():
     # Get information on logical volume requested
     lvs_cmd = module.get_bin_path("lvs", required=True)
     rc, current_lvs, err = module.run_command(
-        "%s -a --noheadings --nosuffix -o lv_name,size,lv_attr --units %s --separator ';' %s" % (lvs_cmd, unit, vg))
+        "%s -a --noheadings --nosuffix -o lv_name,size,lv_attr --units %s --separator ';' %s" % (lvs_cmd, unit.lower(), vg))
 
     if rc != 0:
         if state == 'absent':
