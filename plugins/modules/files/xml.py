@@ -285,6 +285,25 @@ EXAMPLES = r'''
       z: http://z.test
     attribute: z:my_namespaced_attribute
     value: 'false'
+
+- name: Creating xml file
+  copy:
+    dest: out.xml
+    content: |-
+      <?xml version='1.0' encoding='UTF-8'?>
+      <root>
+      </root>
+- name: 
+  xml:
+    path: out.xml
+    xpath: /root
+    add_children:
+      - node:
+          attribute: attribute_text
+          _:
+            - sub_node:
+      - node2: node2_text
+      - node3: "1"  # Only strings are valid
 '''
 
 RETURN = r'''
