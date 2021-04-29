@@ -22,7 +22,7 @@
   lineinfile:
     dest: /usr/local/etc/ezjail.conf
     regexp: ^ezjail_ftphost
-    line: ezjail_ftphost=ftp-archive.freebsd.org
+    line: ezjail_ftphost=http://ftp-archive.freebsd.org
 
 - name: Start ezjail
   ignore_errors: yes
