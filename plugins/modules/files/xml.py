@@ -287,14 +287,14 @@ EXAMPLES = r'''
     value: 'false'
 
 - name: Creating xml file
-  copy:
+  ansible.builtin.copy:
     dest: out.xml
     content: |-
       <?xml version='1.0' encoding='UTF-8'?>
       <root>
       </root>
 - name:
-  xml:
+  community.general.xml:
     path: out.xml
     xpath: /root
     add_children:
