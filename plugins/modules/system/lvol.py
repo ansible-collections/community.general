@@ -509,12 +509,12 @@ def main():
             # from LVREDUCE(8) - The resulting value for the substraction is rounded downward, for the absolute size it is rounded upward.
             if size_operator == '+':
                 size_requested += this_lv['size']
-                size_requested += this_vg['ext_size'] - (size_requested % this_vg['ext_size'])
+                size_requested = this_vg['ext_size'] * ceil(size_requested / this_vg['ext_size'])
             elif size_operator == '-':
                 size_requested = this_lv['size'] - size_requested
                 size_requested -= (size_requested % this_vg['ext_size'])
             else:
-                size_requested += this_vg['ext_size'] - (size_requested % this_vg['ext_size'])
+                size_requested = this_vg['ext_size'] * ceil(size_requested / this_vg['ext_size'])
 
             if this_lv['size'] < size_requested:
                 if (size_free > 0) and (size_free >= (size_requested - this_lv['size'])):
