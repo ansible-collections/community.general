@@ -509,10 +509,10 @@ def main():
                 size_requested += this_lv['size']
             elif size_operator == '-':
                 size_requested = this_lv['size'] - size_requested
-                
-            # According to latest documentation (LVM2-2.03.11) all tools round down 
+
+            # According to latest documentation (LVM2-2.03.11) all tools round down
             size_requested -= (size_requested % this_vg['ext_size'])
-            
+
             if this_lv['size'] < size_requested:
                 if (size_free > 0) and (size_free >= (size_requested - this_lv['size'])):
                     tool = module.get_bin_path("lvextend", required=True)
