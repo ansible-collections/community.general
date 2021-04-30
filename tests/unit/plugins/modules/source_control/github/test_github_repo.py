@@ -70,6 +70,7 @@ def get_repo_mock(url, request):
     content = json.dumps(content).encode("utf-8")
     return response(200, content, headers, None, 5, request)
 
+
 @urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/repos/.*/.*', method="get")
 def get_private_repo_mock(url, request):
     match = re.search(
@@ -148,6 +149,7 @@ def patch_repo_mock(url, request):
     }
     content = json.dumps(content).encode("utf-8")
     return response(200, content, headers, None, 5, request)
+
 
 @urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/repos/.*/.*', method="delete")
 def delete_repo_mock(url, request):
