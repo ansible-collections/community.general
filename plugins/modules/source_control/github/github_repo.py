@@ -117,7 +117,7 @@ import sys
 
 GITHUB_IMP_ERR = None
 try:
-    from github import Github, GithubException
+    from github import Github, GithubException, GithubObject
     from github.GithubException import UnknownObjectException
     HAS_GITHUB_PACKAGE = True
 except Exception:
@@ -135,7 +135,7 @@ def authenticate(username=None, password=None, access_token=None, api_url=None):
         return Github(base_url=api_url, login_or_token=username, password=password)
 
 
-def create_repo(gh, name, organization=None, private=False, description='', check_mode=False):
+def create_repo(gh, name, organization=None, private=None, description=None, check_mode=False):
     result = dict(
         changed=False,
         repo=dict())
@@ -151,16 +151,18 @@ def create_repo(gh, name, organization=None, private=False, description='', chec
     except UnknownObjectException:
         if not check_mode:
             repo = target.create_repo(
-                name=name, private=private, description=description)
+                name=name, private=private or GithubObject.NotSet, description=description or GithubObject.NotSet)
             result['repo'] = repo.raw_data
 
         result['changed'] = True
 
     changes = {}
-    if repo is None or repo.raw_data['private'] != private:
-        changes['private'] = private
-    if repo is None or repo.raw_data['description'] != description:
-        changes['description'] = description
+    if private is not None:
+        if repo is None or repo.raw_data['private'] != private:
+            changes['private'] = private
+    if description is not None:
+        if repo is None or (repo.raw_data['description'] or '') != description:
+            changes['description'] = description
 
     if changes:
         if not check_mode:

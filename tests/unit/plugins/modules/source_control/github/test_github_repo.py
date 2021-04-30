@@ -70,6 +70,27 @@ def get_repo_mock(url, request):
     content = json.dumps(content).encode("utf-8")
     return response(200, content, headers, None, 5, request)
 
+@urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/repos/.*/.*', method="get")
+def get_private_repo_mock(url, request):
+    match = re.search(
+        r"api\.github\.com(:[0-9]+)?/repos/(?P<org>[^/]+)/(?P<repo>[^/]+)", request.url)
+    org = match.group("org")
+    repo = match.group("repo")
+
+    # https://docs.github.com/en/rest/reference/repos#get-a-repository
+    headers = {'content-type': 'application/json'}
+    content = {
+        "name": repo,
+        "full_name": "{0}/{1}".format(org, repo),
+        "url": "https://api.github.com/repos/{0}/{1}".format(org, repo),
+        "private": True,
+        "description": "This your first repo!",
+        "default_branch": "master",
+        "allow_rebase_merge": True
+    }
+    content = json.dumps(content).encode("utf-8")
+    return response(200, content, headers, None, 5, request)
+
 
 @urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/orgs/.*/repos', method="post")
 def create_new_org_repo_mock(url, request):
@@ -83,8 +104,8 @@ def create_new_org_repo_mock(url, request):
     content = {
         "name": repo['name'],
         "full_name": "{0}/{1}".format(org, repo['name']),
-        "private": repo['private'],
-        "description": repo['description']
+        "private": repo.get('private', False),
+        "description": repo.get('description')
     }
     content = json.dumps(content).encode("utf-8")
     return response(201, content, headers, None, 5, request)
@@ -99,8 +120,8 @@ def create_new_user_repo_mock(url, request):
     content = {
         "name": repo['name'],
         "full_name": "{0}/{1}".format("octocat", repo['name']),
-        "private": repo['private'],
-        "description": repo['description']
+        "private": repo.get('private', False),
+        "description": repo.get('description')
     }
     content = json.dumps(content).encode("utf-8")
     return response(201, content, headers, None, 5, request)
@@ -120,14 +141,13 @@ def patch_repo_mock(url, request):
         "name": repo,
         "full_name": "{0}/{1}".format(org, repo),
         "url": "https://api.github.com/repos/{0}/{1}".format(org, repo),
-        "private": body['private'],
-        "description": body['description'],
+        "private": body.get('private', False),
+        "description": body.get('description'),
         "default_branch": "master",
         "allow_rebase_merge": True
     }
     content = json.dumps(content).encode("utf-8")
     return response(200, content, headers, None, 5, request)
-
 
 @urlmatch(netloc=r'api\.github\.com(:[0-9]+)?$', path=r'/repos/.*/.*', method="delete")
 def delete_repo_mock(url, request):
@@ -165,6 +185,26 @@ class TestGithubRepo(unittest.TestCase):
 
         self.assertEqual(result['changed'], True)
         self.assertEqual(result['repo']['private'], False)
+        self.assertEqual(result['repo']['description'], 'Just for fun')
+
+    @with_httmock(get_orgs_mock)
+    @with_httmock(get_repo_notfound_mock)
+    @with_httmock(create_new_org_repo_mock)
+    def test_create_new_org_repo_incomplete(self):
+        result = github_repo.run_module({
+            'username': None,
+            'password': None,
+            "access_token": "mytoken",
+            "organization": "MyOrganization",
+            "name": "myrepo",
+            "description": None,
+            "private": None,
+            "state": "present"
+        })
+
+        self.assertEqual(result['changed'], True)
+        self.assertEqual(result['repo']['private'], False)
+        self.assertEqual(result['repo']['description'], None)
 
     @with_httmock(get_user_mock)
     @with_httmock(get_repo_notfound_mock)
@@ -201,6 +241,23 @@ class TestGithubRepo(unittest.TestCase):
         })
         self.assertEqual(result['changed'], True)
         self.assertEqual(result['repo']['private'], True)
+
+    @with_httmock(get_orgs_mock)
+    @with_httmock(get_private_repo_mock)
+    def test_idempotency_existing_org_private_repo(self):
+        result = github_repo.run_module({
+            'username': None,
+            'password': None,
+            "access_token": "mytoken",
+            "organization": "MyOrganization",
+            "name": "myrepo",
+            "description": None,
+            "private": None,
+            "state": "present"
+        })
+        self.assertEqual(result['changed'], False)
+        self.assertEqual(result['repo']['private'], True)
+        self.assertEqual(result['repo']['description'], 'This your first repo!')
 
     @with_httmock(get_orgs_mock)
     @with_httmock(get_repo_mock)
