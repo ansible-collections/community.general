@@ -234,7 +234,7 @@ def main():
             try:
                 msg = json.loads(e.content)
                 reason = msg["error"]
-            except (json.decoder.JSONDecodeError, KeyError):
+            except (KeyError, ValueError):
                 module.fail_json(msg=to_native(e))
 
             if reason != INFLUX_AUTH_FIRST_USER_REQUIRED:
