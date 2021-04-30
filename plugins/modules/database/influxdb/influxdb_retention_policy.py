@@ -29,17 +29,23 @@ options:
             - Name of the retention policy.
         required: true
         type: str
+    state:
+        description:
+            - State of the retention policy.
+        choices: [ absent, present ]
+        default: present
+        type: str
     duration:
         description:
             - Determines how long InfluxDB should keep the data. If specified, it
               should be C(INF) or at least one hour. If not specified, C(INF) is
               assumed. Supports complex duration expressions with multiple units.
-        required: true
+            - Required only if C(state) is set to C(present).
         type: str
     replication:
         description:
             - Determines how many independent copies of each point are stored in the cluster.
-        required: true
+            - Required only if C(state) is set to C(present).
         type: int
     default:
         description:
@@ -70,6 +76,7 @@ EXAMPLES = r'''
       replication: 1
       ssl: yes
       validate_certs: yes
+      state: present
 
 - name: Create 1 day retention policy with 1 hour shard group duration
   community.general.influxdb_retention_policy:
@@ -79,6 +86,7 @@ EXAMPLES = r'''
       duration: 1d
       replication: 1
       shard_group_duration: 1h
+      state: present
 
 - name: Create 1 week retention policy with 1 day shard group duration
   community.general.influxdb_retention_policy:
@@ -88,6 +96,7 @@ EXAMPLES = r'''
       duration: 1w
       replication: 1
       shard_group_duration: 1d
+      state: present
 
 - name: Create infinite retention policy with 1 week of shard group duration
   community.general.influxdb_retention_policy:
@@ -99,6 +108,7 @@ EXAMPLES = r'''
       ssl: no
       validate_certs: no
       shard_group_duration: 1w
+      state: present
 
 - name: Create retention policy with complex durations
   community.general.influxdb_retention_policy:
@@ -110,6 +120,14 @@ EXAMPLES = r'''
       ssl: no
       validate_certs: no
       shard_group_duration: 1d10h30m
+      state: present
+
+- name: Drop retention policy
+  community.general.influxdb_retention_policy:
+      hostname: "{{influxdb_ip_address}}"
+      database_name: "{{influxdb_database_name}}"
+      policy_name: test
+      state: absent
 '''
 
 RETURN = r'''
@@ -272,30 +290,58 @@ def alter_retention_policy(module, client, retention_policy):
     module.exit_json(changed=changed)
 
 
+def drop_retention_policy(module, client):
+    database_name = module.params['database_name']
+    policy_name = module.params['policy_name']
+
+    changed = False
+
+    if not module.check_mode:
+        try:
+            client.drop_retention_policy(policy_name, database_name)
+        except exceptions.InfluxDBClientError as e:
+            module.fail_json(msg=e.content)
+        changed = True
+    module.exit_json(changed=changed)
+
+
 def main():
     argument_spec = InfluxDb.influxdb_argument_spec()
     argument_spec.update(
+        state=dict(default='present', type='str', choices=['present', 'absent']),
         database_name=dict(required=True, type='str'),
         policy_name=dict(required=True, type='str'),
-        duration=dict(required=True, type='str'),
-        replication=dict(required=True, type='int'),
+        duration=dict(required=False, type='str'),
+        replication=dict(required=False, type='int'),
         default=dict(default=False, type='bool'),
         shard_group_duration=dict(required=False, type='str'),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
-        supports_check_mode=True
+        supports_check_mode=True,
+        required_if=(
+            ('state', 'present', ['duration', 'replication']),
+        )
     )
+
+    state = module.params['state']
 
     influxdb = InfluxDb(module)
     client = influxdb.connect_to_influxdb()
 
     retention_policy = find_retention_policy(module, client)
 
-    if retention_policy:
-        alter_retention_policy(module, client, retention_policy)
-    else:
-        create_retention_policy(module, client)
+    if state == 'present':
+        if retention_policy:
+            alter_retention_policy(module, client, retention_policy)
+        else:
+            create_retention_policy(module, client)
+
+    if state == 'absent':
+        if retention_policy:
+            drop_retention_policy(module, client)
+        else:
+            module.exit_json(changed=False)
 
 
 if __name__ == '__main__':
