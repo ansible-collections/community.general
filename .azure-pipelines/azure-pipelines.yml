@@ -14,15 +14,20 @@ pr:
 
 schedules:
   - cron: 0 8 * * *
-    displayName: Nightly
+    displayName: Nightly (main)
     always: true
     branches:
       include:
         - main
+  - cron: 0 10 * * *
+    displayName: Nightly (active stable branches)
+    always: true
+    branches:
+      include:
         - stable-2
         - stable-3
-  - cron: 0 8 * * 0
-    displayName: Weekly (old branches)
+  - cron: 0 11 * * 0
+    displayName: Weekly (old stable branches)
     always: true
     branches:
       include:
