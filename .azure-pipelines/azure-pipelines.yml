@@ -29,8 +29,12 @@ schedules:
 >>>>>>> 33126b7267 (AZP Bootstrap)
 =======
   - cron: 0 8 * * *
+<<<<<<< HEAD
 >>>>>>> 2297f2f802 (AZP nightly at 0800)
     displayName: Nightly
+=======
+    displayName: Nightly (main)
+>>>>>>> 5fbe946c3a (Spread nightly runs out. (#2387))
     always: true
     branches:
       include:
@@ -39,13 +43,21 @@ schedules:
 =======
         - main
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 33126b7267 (AZP Bootstrap)
         - stable-*
 =======
+=======
+  - cron: 0 10 * * *
+    displayName: Nightly (active stable branches)
+    always: true
+    branches:
+      include:
+>>>>>>> 5fbe946c3a (Spread nightly runs out. (#2387))
         - stable-2
         - stable-3
-  - cron: 0 8 * * 0
-    displayName: Weekly (old branches)
+  - cron: 0 11 * * 0
+    displayName: Weekly (old stable branches)
     always: true
     branches:
       include:
