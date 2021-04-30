@@ -49,7 +49,7 @@ options:
   private:
     description:
     - Whether the repository should be private or not.
-    - Defaults to C(False) when creating a new repository.
+    - Defaults to C(false) when creating a new repository.
     - This is only used when I(state) is C(present).
     type: bool
     required: false
@@ -151,7 +151,10 @@ def create_repo(gh, name, organization=None, private=None, description=None, che
     except UnknownObjectException:
         if not check_mode:
             repo = target.create_repo(
-                name=name, private=private or GithubObject.NotSet, description=description or GithubObject.NotSet)
+                name=name,
+                private=GithubObject.NotSet if private is None else private,
+                description=GithubObject.NotSet if description is None else description,
+            )
             result['repo'] = repo.raw_data
 
         result['changed'] = True
@@ -218,10 +221,9 @@ def run_module(params, check_mode=False):
 
 def main():
     module_args = dict(
-        username=dict(type='str', required=False, default=None),
-        password=dict(type='str', required=False, default=None, no_log=True),
-        access_token=dict(type='str', required=False,
-                          default=None, no_log=True),
+        username=dict(type='str'),
+        password=dict(type='str', no_log=True),
+        access_token=dict(type='str', no_log=True),
         name=dict(type='str', required=True),
         state=dict(type='str', required=False, default="present",
                    choices=["present", "absent"]),
