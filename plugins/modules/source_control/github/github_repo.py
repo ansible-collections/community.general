@@ -42,16 +42,16 @@ options:
   description:
     description:
     - Description for the repository.
+    - Defaults to empty when creating a new repository.
     - This is only used when I(state) is C(present).
     type: str
-    default: ''
     required: false
   private:
     description:
-    - Whether the new repository should be private or not.
+    - Whether the repository should be private or not.
+    - Defaults to C(False) when creating a new repository.
     - This is only used when I(state) is C(present).
     type: bool
-    default: no
     required: false
   state:
     description:
