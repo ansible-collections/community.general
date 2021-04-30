@@ -153,6 +153,19 @@ DURATION_REGEX = re.compile(r'(\d+)(ns|u|µ|ms|s|m|h|d|w)')
 EXTENDED_DURATION_REGEX = re.compile(r'(?:(\d+)(ns|u|µ|ms|m|h|d|w)|(\d+(?:\.\d+)?)(s))')
 
 
+DURATION_UNIT_NANOSECS = {
+    'ns': 1,
+    'u': 1000,
+    'µ': 1000,
+    'ms': 1000 * 1000,
+    's': 1000 * 1000 * 1000,
+    'm': 1000 * 1000 * 1000 * 60,
+    'h': 1000 * 1000 * 1000 * 60 * 60,
+    'd': 1000 * 1000 * 1000 * 60 * 60 * 24,
+    'w': 1000 * 1000 * 1000 * 60 * 60 * 24 * 7,
+}
+
+
 def check_duration_literal(value):
     return VALID_DURATION_REGEX.search(value) is not None
 
@@ -166,28 +179,9 @@ def parse_duration_literal(value, extended=False):
     lookup = (EXTENDED_DURATION_REGEX if extended else DURATION_REGEX).findall(value)
 
     for duration_literal in lookup:
-        if extended and duration_literal[3] == 's':
-            duration_val = float(duration_literal[2])
-            duration += duration_val * 1000 * 1000 * 1000
-        else:
-            duration_val = int(duration_literal[0])
-
-            if duration_literal[1] == 'ns':
-                duration += duration_val
-            elif duration_literal[1] == 'u' or duration_literal[1] == 'µ':
-                duration += duration_val * 1000
-            elif duration_literal[1] == 'ms':
-                duration += duration_val * 1000 * 1000
-            elif duration_literal[1] == 's':
-                duration += duration_val * 1000 * 1000 * 1000
-            elif duration_literal[1] == 'm':
-                duration += duration_val * 1000 * 1000 * 1000 * 60
-            elif duration_literal[1] == 'h':
-                duration += duration_val * 1000 * 1000 * 1000 * 60 * 60
-            elif duration_literal[1] == 'd':
-                duration += duration_val * 1000 * 1000 * 1000 * 60 * 60 * 24
-            elif duration_literal[1] == 'w':
-                duration += duration_val * 1000 * 1000 * 1000 * 60 * 60 * 24 * 7
+        filtered_literal = list(filter(None, duration_literal))
+        duration_val = float(filtered_literal[0])
+        duration += duration_val * DURATION_UNIT_NANOSECS[filtered_literal[1]]
 
     return duration
 
@@ -226,7 +220,7 @@ def create_retention_policy(module, client):
         module.fail_json(msg="Failed to parse value of duration")
 
     influxdb_duration_format = parse_duration_literal(duration)
-    if influxdb_duration_format != 0 and influxdb_duration_format < 3600000000000:
+    if influxdb_duration_format != 0 and influxdb_duration_format < 1 * DURATION_UNIT_NANOSECS['h']:
         module.fail_json(msg="duration value must be at least 1h")
 
     if shard_group_duration is not None:
@@ -234,7 +228,7 @@ def create_retention_policy(module, client):
             module.fail_json(msg="Failed to parse value of shard_group_duration")
 
         influxdb_shard_group_duration_format = parse_duration_literal(shard_group_duration)
-        if influxdb_shard_group_duration_format < 3600000000000:
+        if influxdb_shard_group_duration_format < 1 * DURATION_UNIT_NANOSECS['h']:
             module.fail_json(msg="shard_group_duration value must be finite and at least 1h")
 
     if not module.check_mode:
@@ -263,7 +257,7 @@ def alter_retention_policy(module, client, retention_policy):
         module.fail_json(msg="Failed to parse value of duration")
 
     influxdb_duration_format = parse_duration_literal(duration)
-    if influxdb_duration_format != 0 and influxdb_duration_format < 3600000000000:
+    if influxdb_duration_format != 0 and influxdb_duration_format < 1 * DURATION_UNIT_NANOSECS['h']:
         module.fail_json(msg="duration value must be at least 1h")
 
     if shard_group_duration is None:
@@ -273,7 +267,7 @@ def alter_retention_policy(module, client, retention_policy):
             module.fail_json(msg="Failed to parse value of shard_group_duration")
 
         influxdb_shard_group_duration_format = parse_duration_literal(shard_group_duration)
-        if influxdb_shard_group_duration_format < 3600000000000:
+        if influxdb_shard_group_duration_format < 1 * DURATION_UNIT_NANOSECS['h']:
             module.fail_json(msg="shard_group_duration value must be finite and at least 1h")
 
     if (retention_policy['duration'] != influxdb_duration_format or
