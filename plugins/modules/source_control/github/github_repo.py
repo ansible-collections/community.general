@@ -164,7 +164,7 @@ def create_repo(gh, name, organization=None, private=None, description=None, che
         if repo is None or repo.raw_data['private'] != private:
             changes['private'] = private
     if description is not None:
-        if repo is None or (repo.raw_data['description'] or '') != description:
+        if repo is None or repo.raw_data['description'] not in (description, description or None):
             changes['description'] = description
 
     if changes:
