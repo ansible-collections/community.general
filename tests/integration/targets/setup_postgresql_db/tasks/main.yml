@@ -11,6 +11,10 @@
 - meta: end_play
   when: ansible_facts.distribution == 'CentOS' and ansible_facts.distribution_major_version == '8'
 
+# Temporary disable Fedora 34
+- meta: end_play
+  when: ansible_facts.distribution == 'Fedora' and ansible_facts.distribution_major_version == '34'
+
 - name: python 2
   set_fact:
     python_suffix: ''
