@@ -286,25 +286,21 @@ EXAMPLES = r'''
     attribute: z:my_namespaced_attribute
     value: 'false'
 
-- name: Creating a XML file form a variable
-  ansible.builtin.copy:
-    dest: out.xml
-    content: |-
-      <?xml version='1.0' encoding='UTF-8'?>
-      <root>
-      </root>
-
-- name: Adding a XML node with subnodes from a YAML variable
+- name: Adding building nodes with floor subnodes from a YAML variable
   community.general.xml:
-    path: out.xml
-    xpath: /root
+    path: /foo/bar.xml
+    xpath: /business
     add_children:
-      - node:
-          attribute: attribute_text
+      - building:
+          # Attributes
+          name: Scumm bar
+          location: Monkey island
+          # Subnodes
           _:
-            - sub_node:
-      - node2: node2_text
-      - node3: "1"  # Only strings are valid
+            - floor: Pirate hall
+            - floor: Grog storage
+            - construction_date: "1990"  # Only strings are valid
+      - building: Grog factory   
 '''
 
 RETURN = r'''
