@@ -300,7 +300,7 @@ EXAMPLES = r'''
             - floor: Pirate hall
             - floor: Grog storage
             - construction_date: "1990"  # Only strings are valid
-      - building: Grog factory   
+      - building: Grog factory
 '''
 
 RETURN = r'''
