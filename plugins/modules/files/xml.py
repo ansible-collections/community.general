@@ -286,14 +286,15 @@ EXAMPLES = r'''
     attribute: z:my_namespaced_attribute
     value: 'false'
 
-- name: Creating xml file
+- name: Creating a XML file form a variable
   ansible.builtin.copy:
     dest: out.xml
     content: |-
       <?xml version='1.0' encoding='UTF-8'?>
       <root>
       </root>
-- name:
+
+- name: Adding a XML node with subnodes from a YAML variable
   community.general.xml:
     path: out.xml
     xpath: /root
