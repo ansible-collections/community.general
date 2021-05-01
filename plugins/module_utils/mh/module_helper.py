@@ -64,6 +64,7 @@ class ModuleHelper(VarsMixin, DependencyMixin, ModuleHelperBase):
                 del result[varname]
         return result
 
+
 class StateModuleHelper(StateMixin, ModuleHelper):
     pass
 
