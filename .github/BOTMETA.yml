@@ -563,7 +563,8 @@ files:
   $modules/packaging/language/bundler.py:
     maintainers: thoiberg
   $modules/packaging/language/composer.py:
-    maintainers: dmtrs resmo
+    maintainers: dmtrs
+    ignore: resmo
   $modules/packaging/language/cpanm.py:
     maintainers: fcuny
   $modules/packaging/language/easy_install.py:
