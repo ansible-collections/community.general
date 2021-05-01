@@ -305,10 +305,10 @@ def main():
         state=dict(default='present', type='str', choices=['present', 'absent']),
         database_name=dict(required=True, type='str'),
         policy_name=dict(required=True, type='str'),
-        duration=dict(required=False, type='str'),
-        replication=dict(required=False, type='int'),
+        duration=dict(type='str'),
+        replication=dict(type='int'),
         default=dict(default=False, type='bool'),
-        shard_group_duration=dict(required=False, type='str'),
+        shard_group_duration=dict(type='str'),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
