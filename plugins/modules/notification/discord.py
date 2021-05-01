@@ -49,7 +49,7 @@ options:
       - Send messages as Embeds to the discord channel
       - Embeds can have a colored border, embedded images, text fields and more.
     type: list
-    elements: string
+    elements: str
 '''
 
 EXAMPLES = """
@@ -132,7 +132,7 @@ def main():
             content=dict(type='str'),
             username=dict(type='str'),
             avatar_url=dict(type='str'),
-            tts=dict(type='bool', elements='string', default=False),
+            tts=dict(type='bool', elements='str', default=False),
             embeds=dict(type='list'),
         ),
         required_one_of=[['content', 'embeds']],
