@@ -43,6 +43,7 @@ options:
     description:
       - Set this to C(true) if this is a TTS (Test to Speech) message.
     type: bool
+    default: false
   embeds:
     description:
       - Embedded rich content
@@ -69,13 +70,13 @@ EXAMPLES = """
   community.general.discord:
     webhook_id: "00000"
     webhook_token: "XXXYYY"
-      embeds:
-        - title: "Embedded message"
-          description: "This is an embedded message"
-          footer:
-            text: "Author: Ansible"
-          image:
-            url: "https://docs.ansible.com/ansible/latest/_static/images/logo_invert.png"
+    embeds:
+      - title: "Embedded message"
+        description: "This is an embedded message"
+        footer:
+          text: "Author: Ansible"
+        image:
+          url: "https://docs.ansible.com/ansible/latest/_static/images/logo_invert.png"
 """
 
 RETURN = """
@@ -127,11 +128,11 @@ def main():
         argument_spec=dict(
             webhook_id=dict(type='str', required=True),
             webhook_token=dict(type='str', required=True, no_log=True),
-            content=dict(type='str', required=False),
-            username=dict(type='str', required=False),
-            avatar_url=dict(type='str', required=False),
-            tts=dict(type='bool', required=False, default=False),
-            embeds=dict(type='list', required=False),
+            content=dict(type='str'),
+            username=dict(type='str'),
+            avatar_url=dict(type='str'),
+            tts=dict(type='bool', default=False),
+            embeds=dict(type='list'),
         ),
         required_one_of=[['content', 'embeds']],
         supports_check_mode=True
