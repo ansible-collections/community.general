@@ -31,7 +31,7 @@ options:
             - Desired state of the package.
         required: false
         default: present
-        choices: [ absent, present ]
+        choices: [ absent, present, enabled, disabled ]
         type: str
     classic:
         description:
