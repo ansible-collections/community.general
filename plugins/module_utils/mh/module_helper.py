@@ -12,7 +12,7 @@ from ansible_collections.community.general.plugins.module_utils.mh.base import M
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.cmd import CmdMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.state import StateMixin
 from ansible_collections.community.general.plugins.module_utils.mh.mixins.deps import DependencyMixin
-from ansible_collections.community.general.plugins.module_utils.mh.mixins.vars import VarsMixin
+from ansible_collections.community.general.plugins.module_utils.mh.mixins.vars import VarsMixin, VarDict as VD
 
 
 class ModuleHelper(VarsMixin, DependencyMixin, ModuleHelperBase):
@@ -22,6 +22,8 @@ class ModuleHelper(VarsMixin, DependencyMixin, ModuleHelperBase):
     diff_params = ()
     change_params = ()
     facts_params = ()
+
+    VarDict = VD  # for backward compatibility, will be deprecated at some point
 
     def __init__(self, module=None):
         super(ModuleHelper, self).__init__(module)
