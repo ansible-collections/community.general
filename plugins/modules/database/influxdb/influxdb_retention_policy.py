@@ -291,15 +291,12 @@ def drop_retention_policy(module, client):
     database_name = module.params['database_name']
     policy_name = module.params['policy_name']
 
-    changed = False
-
     if not module.check_mode:
         try:
             client.drop_retention_policy(policy_name, database_name)
         except exceptions.InfluxDBClientError as e:
             module.fail_json(msg=e.content)
-        changed = True
-    module.exit_json(changed=changed)
+    module.exit_json(changed=True)
 
 
 def main():
