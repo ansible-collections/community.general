@@ -318,7 +318,7 @@ def main():
         supports_check_mode=True,
         required_if=(
             ('state', 'present', ['duration', 'replication']),
-        )
+        ),
     )
 
     state = module.params['state']
