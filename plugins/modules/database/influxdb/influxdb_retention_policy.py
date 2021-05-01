@@ -129,7 +129,7 @@ from ansible_collections.community.general.plugins.module_utils.influxdb import 
 from ansible.module_utils._text import to_native
 
 
-VALID_DURATION_REGEX = re.compile(r'^(\d+(ns|u|µ|ms|s|m|h|d|w))+$')
+VALID_DURATION_REGEX = re.compile(r'^(INF|(\d+(ns|u|µ|ms|s|m|h|d|w)))+$')
 
 DURATION_REGEX = re.compile(r'(\d+)(ns|u|µ|ms|s|m|h|d|w)')
 EXTENDED_DURATION_REGEX = re.compile(r'(?:(\d+)(ns|u|µ|ms|m|h|d|w)|(\d+(?:\.\d+)?)(s))')
@@ -217,7 +217,7 @@ def create_retention_policy(module, client):
 
         influxdb_shard_group_duration_format = parse_duration_literal(shard_group_duration)
         if influxdb_shard_group_duration_format < 3600000000000:
-            module.fail_json(msg="shard_group_duration value must be at least 1h")
+            module.fail_json(msg="shard_group_duration value must be finite and at least 1h")
 
     if not module.check_mode:
         try:
@@ -256,7 +256,7 @@ def alter_retention_policy(module, client, retention_policy):
 
         influxdb_shard_group_duration_format = parse_duration_literal(shard_group_duration)
         if influxdb_shard_group_duration_format < 3600000000000:
-            module.fail_json(msg="shard_group_duration value must be at least 1h")
+            module.fail_json(msg="shard_group_duration value must be finite and at least 1h")
 
     if (retention_policy['duration'] != influxdb_duration_format or
             retention_policy['shardGroupDuration'] != influxdb_shard_group_duration_format or
