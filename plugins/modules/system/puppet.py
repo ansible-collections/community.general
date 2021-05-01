@@ -54,10 +54,10 @@ options:
   logdest:
     description:
     - Where the puppet logs should go, if puppet apply is being used.
-    - C(all) will go to both C(stdout) and C(syslog).
+    - C(all) will go to both C(console) and C(syslog).
     type: str
-    choices: [ all, stdout, syslog ]
-    default: stdout
+    choices: [ all, console, syslog ]
+    default: console
   certname:
     description:
       - The name to use when handling certificates.
@@ -127,7 +127,7 @@ EXAMPLES = r'''
   community.general.puppet:
     noop: yes
 
-- name: Run a manifest with debug, log to both syslog and stdout, specify module path
+- name: Run a manifest with debug, log to both syslog and console, specify module path
   community.general.puppet:
     modulepath: /etc/puppet/modules:/opt/stack/puppet-modules:/usr/share/openstack-puppet/modules
     logdest: all
@@ -172,7 +172,7 @@ def main():
             modulepath=dict(type='str'),
             manifest=dict(type='str'),
             noop=dict(type='bool'),
-            logdest=dict(type='str', default='stdout', choices=['all', 'stdout', 'syslog']),
+            logdest=dict(type='str', default='console', choices=['all', 'console', 'syslog']),
             show_diff=dict(
                 type='bool', default=False, aliases=['show-diff'],
                 removed_in_version='7.0.0', removed_from_collection='community.general'),
@@ -269,7 +269,7 @@ def main():
         if p['logdest'] == 'syslog':
             cmd += "--logdest syslog "
         if p['logdest'] == 'all':
-            cmd += " --logdest syslog --logdest stdout"
+            cmd += " --logdest syslog --logdest console"
         if p['modulepath']:
             cmd += "--modulepath='%s'" % p['modulepath']
         if p['environment']:
