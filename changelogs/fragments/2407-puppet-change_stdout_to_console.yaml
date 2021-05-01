@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - puppet - replace ``console` with ``stdout`` in ``logdest`` option (https://github.com/ansible-collections/community.general/issues/1190).
