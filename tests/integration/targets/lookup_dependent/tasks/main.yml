@@ -33,7 +33,8 @@
     loop_result: >-
       {{ query('community.general.dependent',
                dict([['a', [1, 2, 3]]]),
-               dict([['b', 'range(item.a, 5)']])) }}
+               dict([['b', '[1, 2, 3, 4] if item.a == 1 else [2, 3, 4] if item.a == 2 else [3, 4]']])) }}
+    # The last expression could have been `range(item.a, 5)`, but that's not supported by all Jinja2 versions used in CI
 
 - name: Check result of Test 2
   assert:
