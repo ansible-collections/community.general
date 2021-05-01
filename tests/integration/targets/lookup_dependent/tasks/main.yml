@@ -1,43 +1,66 @@
 ---
-- name: "Test 1: using with with_dependent"
-  debug:
-    msg: "{{ item.key1 }} {{ item.key2 }} {{ item.key3 }}"
-  with_community.general.dependent:
-    - key1: [1, 2]
-    - key2: "[item.key1 + 3, item.key1 + 6]"
-    - key3: "[item.key1 + item.key2 * 10]"
+- name: Test 1
+  set_fact:
+    loop_result: >-
+      {{
+        query('community.general.dependent',
+          dict(key1=[1, 2]),
+          dict(key2='[item.key1 + 3, item.key1 + 6]'),
+          dict(key3='[item.key1 + item.key2 * 10]'))
+      }}
 
-- name: "Test 2: using with loop"
-  debug:
-    msg: "{{ item.a }} {{ item.b }} {{ item.c }}"
-  loop: >-
-    {{ query('community.general.dependent',
-             dict([['a', [1, 2]]]),
-             dict([['b', '[item.a + 3, item.a + 6]']]),
-             dict([['c', '[item.a + item.b * 10]']])) }}
+- name: Check result of Test 1
+  assert:
+    that:
+      - loop_result == expected_result
+  vars:
+    expected_result:
+      - key1: 1
+        key2: 4
+        key3: 41
+      - key1: 1
+        key2: 7
+        key3: 71
+      - key1: 2
+        key2: 5
+        key3: 52
+      - key1: 2
+        key2: 8
+        key3: 82
 
-- name: "Test 3: using with with_dependent, simplified loop label"
-  debug:
-    msg: "{{ item.0 }} {{ item.1 }} {{ item.2 }}"
-  with_community.general.dependent:
-    - 0: [1, 2]
-    - 1: "[item.0 + 3, item.0 + 6]"
-    - 2: "[item.0 + item.1 * 10]"
-  loop_control:
-    label: "{{ [item.0, item.1, item.2] }}"
+- name: Test 2
+  set_fact:
+    loop_result: >-
+      {{ query('community.general.dependent',
+               dict([['a', [1, 2, 3]]]),
+               dict([['b', 'range(item.a, 5)']])) }}
 
-- name: "Test 4: using with loop, simplified loop label"
-  debug:
-    msg: "{{ item.0 }} {{ item.1 }} {{ item.2 }}"
-  loop: >-
-    {{ query('community.general.dependent',
-             dict([[0, [1, 2]]]),
-             dict([[1, '[item.0 + 3, item.0 + 6]']]),
-             dict([[2, '[item.0 + item.1 * 10]']])) }}
-  loop_control:
-    label: "{{ [item.0, item.1, item.2] }}"
+- name: Check result of Test 2
+  assert:
+    that:
+      - loop_result == expected_result
+  vars:
+    expected_result:
+      - a: 1
+        b: 1
+      - a: 1
+        b: 2
+      - a: 1
+        b: 3
+      - a: 1
+        b: 4
+      - a: 2
+        b: 2
+      - a: 2
+        b: 3
+      - a: 2
+        b: 4
+      - a: 3
+        b: 3
+      - a: 3
+        b: 4
 
-- name: Test dependent lookup
+- name: Test 3
   debug:
     var: item
   with_community.general.dependent:
@@ -67,7 +90,7 @@
         - F
         - G
 
-- name: Verify dependent lookup
+- name: Check result of Test 3
   assert:
     that:
       - (dependent.results | length) == 7
@@ -93,7 +116,7 @@
       - dependent.results[6].item.var2 == 4
       - dependent.results[6].item.var3 == "G"
 
-- name: "Test 5: template failure"
+- name: "Test 4: template failure"
   debug:
     msg: "{{ item }}"
   with_community.general.dependent:
@@ -104,13 +127,13 @@
   ignore_errors: true
   register: eval_error
 
-- name: Check for failure
+- name: Check result of Test 4
   assert:
     that:
       - eval_error is failed
       - eval_error.msg.startswith("Caught \"'foo' is undefined\" while evaluating ")
 
-- name: "Test 6: same variable name reused"
+- name: "Test 5: same variable name reused"
   debug:
     msg: "{{ item }}"
   with_community.general.dependent:
@@ -119,13 +142,13 @@
   ignore_errors: true
   register: eval_error
 
-- name: Check for failure
+- name: Check result of Test 5
   assert:
     that:
       - eval_error is failed
       - eval_error.msg.startswith("Caught \"'x' is undefined\" while evaluating ")
 
-- name: "Test 7: multi-value dict"
+- name: "Test 6: multi-value dict"
   debug:
     msg: "{{ item }}"
   with_community.general.dependent:
@@ -134,13 +157,13 @@
   ignore_errors: true
   register: eval_error
 
-- name: Check for failure
+- name: Check result of Test 6
   assert:
     that:
       - eval_error is failed
       - eval_error.msg == 'Parameter 0 must be a one-element dictionary, got 2 elements'
 
-- name: "Test 8: empty dict"
+- name: "Test 7: empty dict"
   debug:
     msg: "{{ item }}"
   with_community.general.dependent:
@@ -148,7 +171,7 @@
   ignore_errors: true
   register: eval_error
 
-- name: Check for failure
+- name: Check result of Test 7
   assert:
     that:
       - eval_error is failed
