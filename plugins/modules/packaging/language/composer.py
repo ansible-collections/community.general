@@ -169,7 +169,7 @@ def has_changed(string):
 
 def get_available_options(module, command='install'):
     # get all available options from a composer command using composer help to json
-    rc, out, err = composer_command(module, "help %s --format=json" % command)
+    rc, out, err = composer_command(module, "help %s" % command, arguments="--no-interaction --format=json")
     if rc != 0:
         output = parse_out(err)
         module.fail_json(msg=output)
