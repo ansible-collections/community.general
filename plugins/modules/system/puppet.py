@@ -172,7 +172,7 @@ def main():
             modulepath=dict(type='str'),
             manifest=dict(type='str'),
             noop=dict(type='bool'),
-            logdest=dict(type='str', default='console', choices=['all', 'console', 'syslog']),
+            logdest=dict(type='str', default='console', choices=['all', 'console', 'syslog', 'stdout']),
             show_diff=dict(
                 type='bool', default=False, aliases=['show-diff'],
                 removed_in_version='7.0.0', removed_from_collection='community.general'),
@@ -268,6 +268,8 @@ def main():
         cmd = "%s apply --detailed-exitcodes " % base_cmd
         if p['logdest'] == 'syslog':
             cmd += "--logdest syslog "
+        if p['logdest'] == 'stdout':
+            cmd += "--logdest console "
         if p['logdest'] == 'all':
             cmd += " --logdest syslog --logdest console"
         if p['modulepath']:
