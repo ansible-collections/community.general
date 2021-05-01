@@ -153,7 +153,6 @@ VALID_DURATION_REGEX = re.compile(r'^(INF|(\d+(ns|u|µ|ms|s|m|h|d|w)))+$')
 DURATION_REGEX = re.compile(r'(\d+)(ns|u|µ|ms|s|m|h|d|w)')
 EXTENDED_DURATION_REGEX = re.compile(r'(?:(\d+)(ns|u|µ|ms|m|h|d|w)|(\d+(?:\.\d+)?)(s))')
 
-
 DURATION_UNIT_NANOSECS = {
     'ns': 1,
     'u': 1000,
@@ -165,6 +164,9 @@ DURATION_UNIT_NANOSECS = {
     'd': 1000 * 1000 * 1000 * 60 * 60 * 24,
     'w': 1000 * 1000 * 1000 * 60 * 60 * 24 * 7,
 }
+
+MINIMUM_VALID_DURATION = 1 * DURATION_UNIT_NANOSECS['h']
+MINIMUM_VALID_SHARD_GROUP_DURATION = 1 * DURATION_UNIT_NANOSECS['h']
 
 
 def check_duration_literal(value):
@@ -221,7 +223,7 @@ def create_retention_policy(module, client):
         module.fail_json(msg="Failed to parse value of duration")
 
     influxdb_duration_format = parse_duration_literal(duration)
-    if influxdb_duration_format != 0 and influxdb_duration_format < 1 * DURATION_UNIT_NANOSECS['h']:
+    if influxdb_duration_format != 0 and influxdb_duration_format < MINIMUM_VALID_DURATION:
         module.fail_json(msg="duration value must be at least 1h")
 
     if shard_group_duration is not None:
@@ -229,7 +231,7 @@ def create_retention_policy(module, client):
             module.fail_json(msg="Failed to parse value of shard_group_duration")
 
         influxdb_shard_group_duration_format = parse_duration_literal(shard_group_duration)
-        if influxdb_shard_group_duration_format < 1 * DURATION_UNIT_NANOSECS['h']:
+        if influxdb_shard_group_duration_format < MINIMUM_VALID_SHARD_GROUP_DURATION:
             module.fail_json(msg="shard_group_duration value must be finite and at least 1h")
 
     if not module.check_mode:
@@ -258,7 +260,7 @@ def alter_retention_policy(module, client, retention_policy):
         module.fail_json(msg="Failed to parse value of duration")
 
     influxdb_duration_format = parse_duration_literal(duration)
-    if influxdb_duration_format != 0 and influxdb_duration_format < 1 * DURATION_UNIT_NANOSECS['h']:
+    if influxdb_duration_format != 0 and influxdb_duration_format < MINIMUM_VALID_DURATION:
         module.fail_json(msg="duration value must be at least 1h")
 
     if shard_group_duration is None:
@@ -268,7 +270,7 @@ def alter_retention_policy(module, client, retention_policy):
             module.fail_json(msg="Failed to parse value of shard_group_duration")
 
         influxdb_shard_group_duration_format = parse_duration_literal(shard_group_duration)
-        if influxdb_shard_group_duration_format < 1 * DURATION_UNIT_NANOSECS['h']:
+        if influxdb_shard_group_duration_format < MINIMUM_VALID_SHARD_GROUP_DURATION:
             module.fail_json(msg="shard_group_duration value must be finite and at least 1h")
 
     if (retention_policy['duration'] != influxdb_duration_format or
