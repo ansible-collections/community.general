@@ -1,0 +1,3 @@
+bugfixes:
+  - influxdb_retention_policy - fix bug where ``INF`` duration values failed parsing
+    (https://github.com/ansible-collections/community.general/pull/2385).
