@@ -5,8 +5,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from ansible.module_utils.urls import fetch_url
-from ansible.module_utils.basic import AnsibleModule
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -14,26 +12,24 @@ DOCUMENTATION = '''
 module: discord
 short_description: Send discord messages
 description:
-    - Send a messages to a discord channel via the discord webhook API.
+  - Send a messages to a discord channel via the discord webhook API.
 author: Christian Wollinger (@cwollinger)
 notes:
-  - Find the API documentation for Discord API here: U(https://discord.com/developers/docs/resources/webhook#execute-webhook).
+  - "Find the API documentation for Discord API here: U(https://discord.com/developers/docs/resources/webhook#execute-webhook)."
 options:
   webhook_id:
     description:
-      - The webhook id
-      - Format from discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token})
+      - "Format from discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token})."
     required: yes
     type: str
   webhook_token:
     description:
-      - The webhook token
-      - Format from discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token})
+      - "Format from discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token})."
     required: yes
     type: str
   content:
     description:
-      - The the message contents
+      - Content of the message to the discord channel
     type: str
   username:
     description:
@@ -45,14 +41,13 @@ options:
     type: str
   tts:
     description:
-      - True if this is a TTS message
-      - Text to speech message
+      - Set this to C(true) if this is a TTS (Test to Speech) message.
     type: bool
   embeds:
     description:
       - Embedded rich content
-      - Send messages as Embeds
-    type: str
+      - Send messages as Embeds to the discord channel
+    type: list
 '''
 
 EXAMPLES = """
@@ -91,6 +86,9 @@ http_code:
   type: int
   sample: 204
 """
+
+from ansible.module_utils.urls import fetch_url
+from ansible.module_utils.basic import AnsibleModule
 
 
 def discord_text_msg(module):
@@ -141,10 +139,7 @@ def main():
 
     result = dict(
         changed=False,
-        stdout='',
-        stderr='',
         http_code='',
-        rc=0
     )
 
     if module.check_mode:
@@ -154,13 +149,12 @@ def main():
 
     if info['status'] != 204:
         result['http_code'] = info['status']
-        result['stderr'] = info['msg']
+        result['msg'] = info['msg']
         result['failed'] = True
-        result['rc'] = 1
-        module.fail_json(msg="Failed to send message",
-                         info=info, response=response, result=result)
+        result['response'] = response
+        module.fail_json(**result)
     else:
-        result['stdout'] = info['msg']
+        result['msg'] = info['msg']
         result['failed'] = False
         result['changed'] = True
         result['http_code'] = info['status']

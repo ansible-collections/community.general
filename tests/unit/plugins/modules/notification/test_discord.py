@@ -30,7 +30,7 @@ class TestDiscordModule(ModuleTestCase):
             self.module.main()
 
     def test_without_content(self):
-        """Failure if content or embeds are missing"""
+        """Failure if content and embeds both are missing"""
         set_module_args({
             'webhook_id': 'xxx',
             'webhook_token': 'xxx'
