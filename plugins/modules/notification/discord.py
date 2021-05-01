@@ -132,8 +132,8 @@ def main():
             content=dict(type='str'),
             username=dict(type='str'),
             avatar_url=dict(type='str'),
-            tts=dict(type='bool', elements='str', default=False),
-            embeds=dict(type='list'),
+            tts=dict(type='bool', default=False),
+            embeds=dict(type='list', elements='str'),
         ),
         required_one_of=[['content', 'embeds']],
         supports_check_mode=True
