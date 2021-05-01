@@ -29,15 +29,15 @@ options:
     type: str
   content:
     description:
-      - Content of the message to the discord channel
+      - Content of the message to the discord channel.
     type: str
   username:
     description:
-      - Override the default username of the webhook
+      - Overrides the default username of the webhook.
     type: str
   avatar_url:
     description:
-      - Override the default avatar of the webhook
+      - Overrides the default avatar of the webhook.
     type: str
   tts:
     description:
@@ -46,7 +46,7 @@ options:
     default: false
   embeds:
     description:
-      - Send messages as Embeds to the discord channel
+      - Send messages as Embeds to the discord channel.
       - Embeds can have a colored border, embedded images, text fields and more.
     type: list
     elements: str
@@ -136,7 +136,7 @@ def main():
             embeds=dict(type='list', elements='str'),
         ),
         required_one_of=[['content', 'embeds']],
-        supports_check_mode=True
+        supports_check_mode=False
     )
 
     result = dict(
