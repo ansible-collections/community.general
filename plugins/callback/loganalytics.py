@@ -4,7 +4,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: loganalytics
+    name: loganalytics
     type: aggregate
     short_description: Posts task results to Azure Log Analytics
     author: "Cyrus Li (@zhcli) <cyrus1006@gmail.com>"
