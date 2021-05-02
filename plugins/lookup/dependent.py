@@ -19,7 +19,7 @@ options:
         The name is the index that is used in the result object. The value is iterated over as described below.
       - If the value is a list, it is simply iterated over.
       - If the value is a dictionary, it is iterated over and returned as if they would be processed by the
-        R(ansible.builtin.dict filter,ansible_collections.ansible.builtin.dict_filter).
+        R(ansible.builtin.dict2items filter,ansible_collections.ansible.builtin.dict2items_filter).
       - If the value is a string, it is evaluated as Jinja2 expressions which can access the previously chosen
         elements with C(item.<index_name>). The result must be a list or a dictionary.
     type: list
