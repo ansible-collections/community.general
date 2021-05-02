@@ -225,7 +225,7 @@ files:
   $modules/cloud/misc/:
     ignore: ryansb
   $modules/cloud/misc/terraform.py:
-    maintainers: m-yosefpor
+    maintainers: m-yosefpor rainerleber
   $modules/cloud/misc/xenserver_facts.py:
     maintainers: caphrim007 cheese
     labels: xenserver_facts
