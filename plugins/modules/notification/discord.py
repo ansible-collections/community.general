@@ -11,6 +11,7 @@ DOCUMENTATION = '''
 ---
 module: discord
 short_description: Send discord messages
+version_added: 3.1.0
 description:
   - Send a messages to a discord channel via the discord webhook API.
 author: Christian Wollinger (@cwollinger)
@@ -19,17 +20,20 @@ notes:
 options:
   webhook_id:
     description:
+      - The webhook ID.
       - "Format from discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token})."
     required: yes
     type: str
   webhook_token:
     description:
+      - The webhook Token.
       - "Format from discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token})."
     required: yes
     type: str
   content:
     description:
       - Content of the message to the discord channel.
+      - At least one of I(content) and I(embeds) must be specified.
     type: str
   username:
     description:
@@ -48,8 +52,9 @@ options:
     description:
       - Send messages as Embeds to the discord channel.
       - Embeds can have a colored border, embedded images, text fields and more.
+      - At least one of I(content) and I(embeds) must be specified.
     type: list
-    elements: str
+    elements: dict
 '''
 
 EXAMPLES = """
@@ -133,7 +138,7 @@ def main():
             username=dict(type='str'),
             avatar_url=dict(type='str'),
             tts=dict(type='bool', default=False),
-            embeds=dict(type='list', elements='str'),
+            embeds=dict(type='list', elements='dict'),
         ),
         required_one_of=[['content', 'embeds']],
         supports_check_mode=False
@@ -150,18 +155,9 @@ def main():
         response, info = discord_text_msg(module)
 
     if info['status'] != 204:
-        result['http_code'] = info['status']
-        result['msg'] = info['msg']
-        result['failed'] = True
-        result['response'] = response
-        module.fail_json(**result)
+        module.fail_json(http_code=info['status'], msg=info['msg'], response=response, info=info)
     else:
-        result['msg'] = info['msg']
-        result['failed'] = False
-        result['changed'] = True
-        result['http_code'] = info['status']
-
-    module.exit_json(**result)
+        module.exit_json(msg=info['msg'], changed=True, http_code=info['status'])
 
 
 if __name__ == "__main__":
