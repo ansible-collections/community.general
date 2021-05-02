@@ -55,7 +55,7 @@ options:
     description:
     - Where the puppet logs should go, if puppet apply is being used.
     - C(all) will go to both C(console) and C(syslog).
-    - C(stdout) is deprecated and has been replaced by C(console) since community.general 3.1.0.
+    - C(stdout) will be deprecated and replaced by C(console).
     type: str
     choices: [ all, console, syslog, stdout ]
     default: console
@@ -270,12 +270,7 @@ def main():
         if p['logdest'] == 'syslog':
             cmd += "--logdest syslog "
         if p['logdest'] == 'stdout':
-            cmd += "--logdest console "
-            module.warn(
-                'The "logdest" option has changed its default value from'
-                '"stdout" to "console" from community.general 3.0.1.'
-                'To remove this warning, please change its value to'
-                '"console" or nothing (default).')
+            cmd += "--logdest stdout "
         if p['logdest'] == 'all':
             cmd += " --logdest syslog --logdest console"
         if p['modulepath']:
