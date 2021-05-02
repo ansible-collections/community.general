@@ -57,8 +57,8 @@ options:
     - C(all) will go to both C(console) and C(syslog).
     - C(stdout) will be deprecated and replaced by C(console).
     type: str
-    choices: [ all, console, syslog, stdout ]
-    default: console
+    choices: [ all, stdout, syslog ]
+    default: stdout
   certname:
     description:
       - The name to use when handling certificates.
@@ -173,7 +173,7 @@ def main():
             modulepath=dict(type='str'),
             manifest=dict(type='str'),
             noop=dict(type='bool'),
-            logdest=dict(type='str', default='console', choices=['all', 'console', 'syslog', 'stdout']),
+            logdest=dict(type='str', default='stdout', choices=['all', 'stdout', 'syslog']),
             show_diff=dict(
                 type='bool', default=False, aliases=['show-diff'],
                 removed_in_version='7.0.0', removed_from_collection='community.general'),
@@ -269,8 +269,6 @@ def main():
         cmd = "%s apply --detailed-exitcodes " % base_cmd
         if p['logdest'] == 'syslog':
             cmd += "--logdest syslog "
-        if p['logdest'] == 'stdout':
-            cmd += "--logdest stdout "
         if p['logdest'] == 'all':
             cmd += " --logdest syslog --logdest console"
         if p['modulepath']:
