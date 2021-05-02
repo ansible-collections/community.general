@@ -1066,7 +1066,7 @@ class Nmcli(object):
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+)\s*}', r'\1 \2', route) for route in current_value]
                 if key == self.mac_setting:
                     # MAC addresses are case insensitive, nmcli always reports them in uppercase
-                    value = str.upper(value)
+                    value = value.upper()
             elif key in param_alias:
                 real_key = param_alias[key]
                 if real_key in conn_info:
