@@ -1,2 +1,2 @@
 bugfixes:
-  - nmcli - compare MAC addresses case insesitively to fix potentially non idempotency task (https://github.com/ansible-collections/community.general/issues/2409).
+  - nmcli - compare MAC addresses case insensitively to fix idempotency issue (https://github.com/ansible-collections/community.general/issues/2409).
