@@ -55,7 +55,7 @@ options:
     description:
     - Where the puppet logs should go, if puppet apply is being used.
     - C(all) will go to both C(console) and C(syslog).
-    - C(stdout) is deprecated and has been replaced by C(console) since 3.0.1.
+    - C(stdout) is deprecated and has been replaced by C(console) since community.general 3.1.0.
     type: str
     choices: [ all, console, syslog, stdout ]
     default: console
