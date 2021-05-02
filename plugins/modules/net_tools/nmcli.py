@@ -1067,6 +1067,8 @@ class Nmcli(object):
                 if key == self.mac_setting:
                     # MAC addresses are case insensitive, nmcli always reports them in uppercase
                     value = value.upper()
+                    # ensure current_value is also converted to uppercase in case nmcli changes behaviour
+                    current_value = current_value.upper()
             elif key in param_alias:
                 real_key = param_alias[key]
                 if real_key in conn_info:
