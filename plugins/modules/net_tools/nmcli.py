@@ -1064,7 +1064,7 @@ class Nmcli(object):
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+),\s*mt\s*=\s*([^} ]+)\s*}', r'\1 \2 \3',
                                      route) for route in current_value]
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+)\s*}', r'\1 \2', route) for route in current_value]
-                if key in ['bridge.mac-address', '802-3-ethernet.cloned-mac-address']:
+                if key == self.mac_setting:
                     # MAC addresses are case insensitive, nmcli always reports them in uppercase
                     value = str.upper(value)
             elif key in param_alias:
