@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = """
-lookup: dependent
+name: dependent
 short_description: Composes a list with nested elements of other lists or dicts which can depend on previous loop variables
 version_added: 3.1.0
 description:
