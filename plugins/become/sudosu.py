@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = """
-    become: sudosu
+    name: sudosu
     short_description: Run tasks using sudo su -
     description:
         - This become plugins allows your remote/login user to execute commands as another user via the C(sudo) and C(su) utilities combined.
