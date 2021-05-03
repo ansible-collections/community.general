@@ -324,10 +324,10 @@ class ConsulInventory(object):
 
         self.load_groups_from_kv(node_data)
         self.load_node_metadata_from_kv(node_data)
-        if self.config.bulk_load != 'true':
-            self.load_availability_groups(node_data, datacenter)
-            for name, service in node_data['Services'].items():
-                self.load_data_from_service(name, service, node_data)
+        
+        self.load_availability_groups(node_data, datacenter)
+        for name, service in node_data['Services'].items():
+            self.load_data_from_service(name, service, node_data)
 
     def load_node_metadata_from_kv(self, node_data):
         ''' load the json dict at the metadata path defined by the kv_metadata value
