@@ -23,7 +23,7 @@ class ModuleHelper(VarsMixin, DependencyMixin, ModuleHelperBase):
     change_params = ()
     facts_params = ()
 
-    VarDict = VD  # for backward compatibility, will be deprecated at some point
+    VarDict = _VD  # for backward compatibility, will be deprecated at some point
 
     def __init__(self, module=None):
         super(ModuleHelper, self).__init__(module)
