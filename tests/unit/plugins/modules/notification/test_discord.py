@@ -84,6 +84,6 @@ class TestDiscordModule(ModuleTestCase):
         })
 
         with patch.object(discord, "fetch_url") as fetch_url_mock:
-            fetch_url_mock.return_value = (None, {"status": 404, 'msg': 'HTTP Error 404: Not Found'})
+            fetch_url_mock.return_value = (None, {"status": 404, 'msg': 'HTTP Error 404: Not Found', 'body': '{"message": "Unknown Webhook", "code": 10015}'})
             with self.assertRaises(AnsibleFailJson):
                 self.module.main()
