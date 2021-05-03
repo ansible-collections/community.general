@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = r'''
-    name: community.general.lxd
+    name: lxd
     short_description: Returns Ansible inventory from lxd host
     description:
         - Get inventory from the lxd.
@@ -68,7 +68,7 @@ DOCUMENTATION = r'''
             description:
             - Create groups by the following keywords C(location), C(pattern), C(network_range), C(os), C(release), C(profile), C(vlanid).
             - See example for syntax.
-            type: json
+            type: dict
 '''
 
 EXAMPLES = '''
