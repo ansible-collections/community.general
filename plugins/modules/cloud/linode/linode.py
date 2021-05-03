@@ -91,7 +91,7 @@ options:
     type: int
   backupsenabled:
     description:
-    - Deprecated parameter, it should be removed in version C(5.0.0).
+    - Deprecated parameter, it will be removed in community.general C(5.0.0).
     - To enable backups pass values to either I(backupweeklyday) or I(backupwindow).
     type: int
   backupweeklyday:
