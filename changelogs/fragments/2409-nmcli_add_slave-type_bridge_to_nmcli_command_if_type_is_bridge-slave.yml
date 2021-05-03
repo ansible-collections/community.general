@@ -1,0 +1,2 @@
+bugfixes:
+  - nmcli - if type is ``bridge-slave`` add ``slave-type bridge`` to ``nmcli`` command (https://github.com/ansible-collections/community.general/issues/2408).
