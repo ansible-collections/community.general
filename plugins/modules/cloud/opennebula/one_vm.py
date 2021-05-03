@@ -753,17 +753,18 @@ def get_vm_info(client, vm):
         if isinstance(vm.TEMPLATE['NIC'], list):
             for nic in vm.TEMPLATE['NIC']:
                 networks_info.append({
-                    'ip': nic.get('IP',''),
+                    'ip': nic.get('IP', ''),
                     'mac': nic.get('MAC', ''),
                     'name': nic.get('NETWORK', ''),
                     'security_groups': nic.get('SECURITY_GROUPS', '')
                 })
         else:
             networks_info.append({
-                'ip': vm.TEMPLATE['NIC'].get('IP',''),
+                'ip': vm.TEMPLATE['NIC'].get('IP', ''),
                 'mac': vm.TEMPLATE['NIC'].get('MAC', ''),
                 'name': vm.TEMPLATE['NIC'].get('NETWORK', ''),
-                'security_groups': vm.TEMPLATE['NIC'].get('SECURITY_GROUPS', '')
+                'security_groups':
+                    vm.TEMPLATE['NIC'].get('SECURITY_GROUPS', '')
             })
     import time
 
