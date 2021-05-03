@@ -8,7 +8,7 @@ __metaclass__ = type
 
 from ansible.module_utils import basic
 from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock
-from ansible_collections.community.general.plugins.modules.database.misc import redis_info
+from ansible_collections.community.general.plugins.modules.clustering.pacemaker import pacemaker_cluster
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
 import re
@@ -39,6 +39,7 @@ class TestPacemakerClusterModule(ModuleTestCase):
 
     def setUp(self):
         super(TestPacemakerClusterModule, self).setUp()
+        self.module = pacemaker_cluster
         # needed to keep track of how many times different run_commands were called
         self.config_call_count = 0
         self.create_call_count = 0
