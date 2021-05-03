@@ -1,0 +1,2 @@
+bugfixes:
+  - linode_v4 - changed the error message to point to the correct bugtracker URL (https://github.com/ansible-collections/community.general/pull/2430).
