@@ -324,7 +324,7 @@ class ConsulInventory(object):
 
         self.load_groups_from_kv(node_data)
         self.load_node_metadata_from_kv(node_data)
-        
+
         self.load_availability_groups(node_data, datacenter)
         for name, service in node_data['Services'].items():
             self.load_data_from_service(name, service, node_data)
