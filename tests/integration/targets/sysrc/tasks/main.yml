@@ -6,7 +6,11 @@
   block:
     - name: Cache original contents of /etc/rc.conf
       shell: "cat /etc/rc.conf"
-      register: sysrc_original_content
+      register: cached_etc_rcconf_content
+
+    - name: Cache original contents of /boot/loader.conf
+      shell: "cat /boot/loader.conf"
+      register: cached_boot_loaderconf_content
 
     ##
     ## sysrc - example - set mysqlpidfile
@@ -130,6 +134,11 @@
     ## sysrc - example - Enable nginx in testjail
     ##
     - name: Test within jail
+      #
+      # NOTE: FreeBSD 12.0 test runner receives a "connection reset by peer" after ~20% downloaded so we are
+      #       only running this on 12.1 or higher
+      #
+      when: ansible_distribution_version is version('12.01', '>=')
       block:
         - name: Setup testjail
           include: setup-testjail.yml
@@ -316,3 +325,13 @@
           - not sysrc_value_absent_idempotent.changed
           - "'sysrc_delim=\"t1,t2\"' in sysrc_delim_content.stdout_lines"
           - "'sysrc_delim_delete' not in sysrc_delim_content.stdout_lines"
+  always:
+    - name: Restore /etc/rc.conf
+      copy:
+        content: "{{ cached_etc_rcconf_content }}"
+        dest: /etc/rc.conf
+
+    - name: Restore /boot/loader.conf
+      copy:
+        content: "{{ cached_boot_loaderconf_content }}"
+        dest: /boot/loader.conf
