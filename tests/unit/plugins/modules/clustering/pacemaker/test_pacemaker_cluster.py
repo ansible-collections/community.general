@@ -99,13 +99,3 @@ class TestPacemakerClusterModule(ModuleTestCase):
         with self.assertRaises(AnsibleFailJson):
             set_module_args({})
             self.module.main()
-
-    def test_without_parameters(self):
-        """Test without parameters"""
-        with self.patch_redis_client(side_effect=FakeRedisClient) as redis_client:
-            with self.assertRaises(AnsibleExitJson) as result:
-                set_module_args({})
-                self.module.main()
-            self.assertEqual(redis_client.call_count, 1)
-            self.assertEqual(redis_client.call_args, ({'host': 'localhost', 'port': 6379, 'password': None},))
-            self.assertEqual(result.exception.args[0]['info']['redis_version'], '999.999.999')
