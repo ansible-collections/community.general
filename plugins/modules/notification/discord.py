@@ -98,6 +98,22 @@ from ansible.module_utils.urls import fetch_url
 from ansible.module_utils.basic import AnsibleModule
 
 
+def discord_check_mode(module):
+
+    webhook_id = module.params['webhook_id']
+    webhook_token = module.params['webhook_token']
+
+    headers = {
+        'content-type': 'application/json'
+    }
+
+    url = "https://discord.com/api/webhooks/%s/%s" % (
+        webhook_id, webhook_token)
+
+    response, info = fetch_url(module, url, method='GET', headers=headers)
+    return response, info
+
+
 def discord_text_msg(module):
 
     webhook_id = module.params['webhook_id']
@@ -141,7 +157,7 @@ def main():
             embeds=dict(type='list', elements='dict'),
         ),
         required_one_of=[['content', 'embeds']],
-        supports_check_mode=False
+        supports_check_mode=True
     )
 
     result = dict(
@@ -150,14 +166,17 @@ def main():
     )
 
     if module.check_mode:
-        module.exit_json(changed=False)
+        response, info = discord_check_mode(module)
+        if info['status'] != 200:
+            module.fail_json(http_code=info['status'], msg=info['msg'], response=module.from_json(info['body']), info=info)
+        else:
+            module.exit_json(msg=info['msg'], changed=False, http_code=info['status'], response=module.from_json(response.read()))
     else:
         response, info = discord_text_msg(module)
-
-    if info['status'] != 204:
-        module.fail_json(http_code=info['status'], msg=info['msg'], response=response, info=info)
-    else:
-        module.exit_json(msg=info['msg'], changed=True, http_code=info['status'])
+        if info['status'] != 204:
+            module.fail_json(http_code=info['status'], msg=info['msg'], response=module.from_json(info['body']), info=info)
+        else:
+            module.exit_json(msg=info['msg'], changed=True, http_code=info['status'])
 
 
 if __name__ == "__main__":
