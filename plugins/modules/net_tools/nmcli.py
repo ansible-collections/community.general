@@ -780,6 +780,7 @@ class Nmcli(object):
             })
         elif self.type == 'bridge-slave':
             options.update({
+                'connection.slave-type': 'bridge',
                 'bridge-port.path-cost': self.path_cost,
                 'bridge-port.hairpin-mode': self.hairpin,
                 'bridge-port.priority': self.slavepriority,
