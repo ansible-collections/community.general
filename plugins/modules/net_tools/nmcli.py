@@ -1042,7 +1042,6 @@ class Nmcli(object):
             'con-name': 'connection.id',
             'autoconnect': 'connection.autoconnect',
             'ifname': 'connection.interface-name',
-            'mac': self.mac_setting,
             'master': 'connection.master',
             'slave-type': 'connection.slave-type',
             'zone': 'connection.zone',
@@ -1066,6 +1065,11 @@ class Nmcli(object):
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+),\s*mt\s*=\s*([^} ]+)\s*}', r'\1 \2 \3',
                                      route) for route in current_value]
                     current_value = [re.sub(r'^{\s*ip\s*=\s*([^, ]+),\s*nh\s*=\s*([^} ]+)\s*}', r'\1 \2', route) for route in current_value]
+                if key == self.mac_setting:
+                    # MAC addresses are case insensitive, nmcli always reports them in uppercase
+                    value = value.upper()
+                    # ensure current_value is also converted to uppercase in case nmcli changes behaviour
+                    current_value = current_value.upper()
             elif key in param_alias:
                 real_key = param_alias[key]
                 if real_key in conn_info:
