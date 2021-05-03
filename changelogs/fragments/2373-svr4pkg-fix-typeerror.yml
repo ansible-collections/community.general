@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - svr4pkg - convert string to a bytes-like object to avoid ``TypeError`` with Python 3 (https://github.com/ansible-collections/community.general/issues/2373).
