@@ -1,0 +1,3 @@
+bugfixes:
+  - lvol - fixed size unit capitalization to match units used between different tools for comparison (https://github.com/ansible-collections/community.general/issues/2360).
+  - lvol - fixed rounding errors (https://github.com/ansible-collections/community.general/issues/2370).
