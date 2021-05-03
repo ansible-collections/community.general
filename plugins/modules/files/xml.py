@@ -285,6 +285,22 @@ EXAMPLES = r'''
       z: http://z.test
     attribute: z:my_namespaced_attribute
     value: 'false'
+
+- name: Adding building nodes with floor subnodes from a YAML variable
+  community.general.xml:
+    path: /foo/bar.xml
+    xpath: /business
+    add_children:
+      - building:
+          # Attributes
+          name: Scumm bar
+          location: Monkey island
+          # Subnodes
+          _:
+            - floor: Pirate hall
+            - floor: Grog storage
+            - construction_date: "1990"  # Only strings are valid
+      - building: Grog factory
 '''
 
 RETURN = r'''
