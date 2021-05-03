@@ -54,7 +54,8 @@ options:
   logdest:
     description:
     - Where the puppet logs should go, if puppet apply is being used.
-    - C(all) will go to both C(stdout) and C(syslog).
+    - C(all) will go to both C(console) and C(syslog).
+    - C(stdout) will be deprecated and replaced by C(console).
     type: str
     choices: [ all, stdout, syslog ]
     default: stdout
@@ -127,7 +128,7 @@ EXAMPLES = r'''
   community.general.puppet:
     noop: yes
 
-- name: Run a manifest with debug, log to both syslog and stdout, specify module path
+- name: Run a manifest with debug, log to both syslog and console, specify module path
   community.general.puppet:
     modulepath: /etc/puppet/modules:/opt/stack/puppet-modules:/usr/share/openstack-puppet/modules
     logdest: all
@@ -269,7 +270,7 @@ def main():
         if p['logdest'] == 'syslog':
             cmd += "--logdest syslog "
         if p['logdest'] == 'all':
-            cmd += " --logdest syslog --logdest stdout"
+            cmd += " --logdest syslog --logdest console"
         if p['modulepath']:
             cmd += "--modulepath='%s'" % p['modulepath']
         if p['environment']:
