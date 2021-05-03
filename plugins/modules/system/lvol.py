@@ -389,7 +389,7 @@ def main():
     # Get information on volume group requested
     vgs_cmd = module.get_bin_path("vgs", required=True)
     rc, current_vgs, err = module.run_command(
-        "%s --noheadings --nosuffix -o vg_name,size,free,vg_extent_size --units %s --separator ';' %s" % (vgs_cmd, unit, vg))
+        "%s --noheadings --nosuffix -o vg_name,size,free,vg_extent_size --units %s --separator ';' %s" % (vgs_cmd, unit.lower(), vg))
 
     if rc != 0:
         if state == 'absent':
@@ -403,7 +403,7 @@ def main():
     # Get information on logical volume requested
     lvs_cmd = module.get_bin_path("lvs", required=True)
     rc, current_lvs, err = module.run_command(
-        "%s -a --noheadings --nosuffix -o lv_name,size,lv_attr --units %s --separator ';' %s" % (lvs_cmd, unit, vg))
+        "%s -a --noheadings --nosuffix -o lv_name,size,lv_attr --units %s --separator ';' %s" % (lvs_cmd, unit.lower(), vg))
 
     if rc != 0:
         if state == 'absent':
@@ -505,16 +505,13 @@ def main():
             else:  # size_whole == 'FREE':
                 size_requested = size_percent * this_vg['free'] / 100
 
-            # from LVEXTEND(8) - The resulting value is rounded upward.
-            # from LVREDUCE(8) - The resulting value for the substraction is rounded downward, for the absolute size it is rounded upward.
             if size_operator == '+':
                 size_requested += this_lv['size']
-                size_requested += this_vg['ext_size'] - (size_requested % this_vg['ext_size'])
             elif size_operator == '-':
                 size_requested = this_lv['size'] - size_requested
-                size_requested -= (size_requested % this_vg['ext_size'])
-            else:
-                size_requested += this_vg['ext_size'] - (size_requested % this_vg['ext_size'])
+
+            # According to latest documentation (LVM2-2.03.11) all tools round down
+            size_requested -= (size_requested % this_vg['ext_size'])
 
             if this_lv['size'] < size_requested:
                 if (size_free > 0) and (size_free >= (size_requested - this_lv['size'])):
