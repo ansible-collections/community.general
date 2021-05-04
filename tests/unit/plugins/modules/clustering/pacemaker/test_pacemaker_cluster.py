@@ -75,6 +75,24 @@ PCSD Status:
   host1: Online
 """
 
+nodes_status_template = """
+Corosync Nodes:
+ Online: %s
+ Offline:
+Pacemaker Nodes:
+ Online: %s
+ Standby:
+ Standby with resource(s) running:
+ Maintenance:
+ Offline:
+Pacemaker Remote Nodes:
+ Online:
+ Standby:
+ Standby with resource(s) running:
+ Maintenance:
+ Offline:
+"""
+
 class TestPacemakerClusterModule(ModuleTestCase):
 
     def setUp(self):
@@ -97,12 +115,11 @@ class TestPacemakerClusterModule(ModuleTestCase):
     def patch_redis_client(self, **kwds):
         return patch('ansible_collections.community.general.plugins.modules.database.misc.redis_info.redis_client', autospec=True, **kwds)
 
-    # returns no_cluster_status
-    # accepts cluster creation
+    # mock all the commands that pcs would be expected to handle
     def fake_run_command(self, cmd):
         # just for terseness
         initial_status = self.initial_status
-        # first time called -> getting config
+        # where needed for assertions, keep track of # of times pcs commands were called
         if cmd.startswith("pcs config"):
             self.config_call_count += 1
             # special case where cluster WAS down but was started up
@@ -131,6 +148,12 @@ class TestPacemakerClusterModule(ModuleTestCase):
             self.auth_call_count += 1
             # output when authing isn't really needed
             return (0, "", "")
+        elif cmd.startswith("pcs nodes status both"):
+            # missing node AND node wasn't added in a previous call
+            if initial_status == ClusterStatus.MISSING_NODES and self.add_nodes_call_count == 0:
+                return (0, nodes_status_template % (("host1",) * 2), "")
+            else:
+                return (0, nodes_status_template % (("host1 host2",) * 2), "")
 
     def test_new_cluster(self):
         set_module_args({
