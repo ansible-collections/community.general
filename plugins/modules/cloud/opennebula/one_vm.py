@@ -752,11 +752,20 @@ def get_vm_info(client, vm):
     if 'NIC' in vm.TEMPLATE:
         if isinstance(vm.TEMPLATE['NIC'], list):
             for nic in vm.TEMPLATE['NIC']:
-                networks_info.append({'ip': nic['IP'], 'mac': nic['MAC'], 'name': nic['NETWORK'], 'security_groups': nic['SECURITY_GROUPS']})
+                networks_info.append({
+                    'ip': nic.get('IP', ''),
+                    'mac': nic.get('MAC', ''),
+                    'name': nic.get('NETWORK', ''),
+                    'security_groups': nic.get('SECURITY_GROUPS', '')
+                })
         else:
-            networks_info.append(
-                {'ip': vm.TEMPLATE['NIC']['IP'], 'mac': vm.TEMPLATE['NIC']['MAC'],
-                    'name': vm.TEMPLATE['NIC']['NETWORK'], 'security_groups': vm.TEMPLATE['NIC']['SECURITY_GROUPS']})
+            networks_info.append({
+                'ip': vm.TEMPLATE['NIC'].get('IP', ''),
+                'mac': vm.TEMPLATE['NIC'].get('MAC', ''),
+                'name': vm.TEMPLATE['NIC'].get('NETWORK', ''),
+                'security_groups':
+                    vm.TEMPLATE['NIC'].get('SECURITY_GROUPS', '')
+            })
     import time
 
     current_time = time.localtime()
