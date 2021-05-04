@@ -22,10 +22,10 @@ options: {}
 
 EXAMPLES = '''
 - name: Gather facts from xenserver
-  xenserver_facts:
+  community.general.xenserver_facts:
 
 - name: Print running VMs
-  debug:
+  ansible.builtin.debug:
     msg: "{{ item }}"
   with_items: "{{ xs_vms.keys() }}"
   when: xs_vms[item]['power_state'] == "Running"

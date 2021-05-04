@@ -21,28 +21,36 @@ options:
       - name of the database to add or remove
     required: true
     aliases: [ db ]
+    type: str
   login_user:
     description:
       - The username used to authenticate with
+    type: str
   login_password:
     description:
       - The password used to authenticate with
+    type: str
   login_host:
     description:
       - Host running the database
+    type: str
+    required: true
   login_port:
     description:
       - Port of the MSSQL server. Requires login_host be defined as other than localhost if login_port is used
-    default: 1433
+    default: '1433'
+    type: str
   state:
     description:
       - The database state
     default: present
     choices: [ "present", "absent", "import" ]
+    type: str
   target:
     description:
       - Location, on the remote host, of the dump file to read from or write to. Uncompressed SQL
         files (C(.sql)) files are supported.
+    type: str
   autocommit:
     description:
       - Automatically commit the change only if the import succeed. Sometimes it is necessary to use autocommit=true, since some content can't be changed
@@ -51,7 +59,7 @@ options:
     default: 'no'
 notes:
    - Requires the pymssql Python package on the remote host. For Ubuntu, this
-     is as easy as pip install pymssql (See M(pip).)
+     is as easy as pip install pymssql (See M(ansible.builtin.pip).)
 requirements:
    - python >= 2.7
    - pymssql
@@ -60,18 +68,18 @@ author: Vedit Firat Arig (@vedit)
 
 EXAMPLES = '''
 - name: Create a new database with name 'jackdata'
-  mssql_db:
+  community.general.mssql_db:
     name: jackdata
     state: present
 
 # Copy database dump file to remote host and restore it to database 'my_db'
 - name: Copy database dump file to remote host
-  copy:
+  ansible.builtin.copy:
     src: dump.sql
     dest: /tmp
 
 - name: Restore the dump file to database 'my_db'
-  mssql_db:
+  community.general.mssql_db:
     name: my_db
     state: import
     target: /tmp/dump.sql

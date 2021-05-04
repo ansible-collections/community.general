@@ -23,32 +23,36 @@ options:
     name:
         description:
             - package name.
+        aliases: [pkg]
         required: true
+        type: str
     state:
         description:
             - whether to install (C(present), C(latest)), or remove (C(absent)) a package.
         required: true
         choices: [ 'present', 'latest', 'absent']
+        type: str
     depot:
         description:
             - The source repository from which install or upgrade a package.
+        type: str
 '''
 
 EXAMPLES = '''
 - name: Install a package
-  swdepot:
+  community.general.swdepot:
     name: unzip-6.0
     state: present
     depot: 'repository:/path'
 
 - name: Install the latest version of a package
-  swdepot:
+  community.general.swdepot:
     name: unzip
     state: latest
     depot: 'repository:/path'
 
 - name: Remove a package
-  swdepot:
+  community.general.swdepot:
     name: unzip
     state: absent
 '''

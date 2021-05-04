@@ -77,6 +77,7 @@ options:
               network of the NIC must belong to the VPC specified by vpc_id. A
               maximum of 12 NICs can be attached to an ECS.
         type: list
+        elements: dict
         required: true
         suboptions:
             ip_address:
@@ -150,6 +151,7 @@ options:
         description:
             - Specifies the data disks of ECS instance.
         type: list
+        elements: dict
         required: false
         suboptions:
             volume_id:
@@ -193,6 +195,7 @@ options:
               parameter is left blank, the default security group is bound to
               the ECS by default.
         type: list
+        elements: str
         required: false
     server_metadata:
         description:
@@ -256,7 +259,7 @@ EXAMPLES = '''
     size: 10
   register: disk
 - name: Create an instance
-  hwc_ecs_instance:
+  community.general.hwc_ecs_instance:
     data_volumes:
       - volume_id: "{{ disk.id }}"
     enable_auto_recovery: false
@@ -540,7 +543,7 @@ def build_module():
                 snapshot_id=dict(type='str')
             )),
             vpc_id=dict(type='str', required=True),
-            admin_pass=dict(type='str'),
+            admin_pass=dict(type='str', no_log=True),
             data_volumes=dict(type='list', elements='dict', options=dict(
                 volume_id=dict(type='str', required=True),
                 device=dict(type='str')

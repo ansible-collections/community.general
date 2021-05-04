@@ -43,13 +43,13 @@ author:
 
 EXAMPLES = r'''
 - name: Set cap_sys_chroot+ep on /foo
-  capabilities:
+  community.general.capabilities:
     path: /foo
     capability: cap_sys_chroot+ep
     state: present
 
 - name: Remove cap_net_bind_service from /bar
-  capabilities:
+  community.general.capabilities:
     path: /bar
     capability: cap_net_bind_service
     state: absent
@@ -108,12 +108,18 @@ class CapabilitiesModule(object):
         #   '/foo ='
         # If file xattrs are unset the output will be:
         #   '/foo'
-        # If the file does not exist the output will be (with rc == 0...):
+        # If the file does not exist, the stderr will be (with rc == 0...):
         #   '/foo (No such file or directory)'
-        if rc != 0 or (stdout.strip() != path and stdout.count(' =') != 1):
+        if rc != 0 or stderr != "":
             self.module.fail_json(msg="Unable to get capabilities of %s" % path, stdout=stdout.strip(), stderr=stderr)
         if stdout.strip() != path:
-            caps = stdout.split(' =')[1].strip().split()
+            if ' =' in stdout:
+                # process output of an older version of libcap
+                caps = stdout.split(' =')[1].strip().split()
+            else:
+                # otherwise, we have a newer version here
+                # see original commit message of cap/v0.2.40-18-g177cd41 in libcap.git
+                caps = stdout.split()[1].strip().split()
             for cap in caps:
                 cap = cap.lower()
                 # getcap condenses capabilities with the same op/flags into a

@@ -31,6 +31,8 @@ options:
             - special value '*' in conjunction with states C(latest) or
               C(rebuild) will update or rebuild the whole system respectively
         aliases: ["spell"]
+        type: list
+        elements: str
 
     state:
         description:
@@ -41,6 +43,7 @@ options:
               those existed before
         choices: ["present", "latest", "absent", "cast", "dispelled", "rebuild"]
         default: "present"
+        type: str
 
     depends:
         description:
@@ -51,18 +54,19 @@ options:
               contains more than one spell
             - providers must be supplied in the form recognized by Sorcery, e.g.
               'openssl(SSL)'
+        type: str
 
     update:
         description:
             - Whether or not to update sorcery scripts at the very first stage
         type: bool
-        default: 'no'
+        default: no
 
     update_cache:
         description:
             - Whether or not to update grimoire collection before casting spells
         type: bool
-        default: 'no'
+        default: no
         aliases: ["update_codex"]
 
     cache_valid_time:
@@ -70,40 +74,41 @@ options:
             - Time in seconds to invalidate grimoire collection on update
             - especially useful for SCM and rsync grimoires
             - makes sense only in pair with C(update_cache)
+        type: int
 '''
 
 
 EXAMPLES = '''
 - name: Make sure spell foo is installed
-  sorcery:
+  community.general.sorcery:
     spell: foo
     state: present
 
 - name: Make sure spells foo, bar and baz are removed
-  sorcery:
+  community.general.sorcery:
     spell: foo,bar,baz
     state: absent
 
 - name: Make sure spell foo with dependencies bar and baz is installed
-  sorcery:
+  community.general.sorcery:
     spell: foo
     depends: bar,baz
     state: present
 
 - name: Make sure spell foo with bar and without baz dependencies is installed
-  sorcery:
+  community.general.sorcery:
     spell: foo
     depends: +bar,-baz
     state: present
 
 - name: Make sure spell foo with libressl (providing SSL) dependency is installed
-  sorcery:
+  community.general.sorcery:
     spell: foo
     depends: libressl(SSL)
     state: present
 
 - name: Make sure spells with/without required dependencies (if any) are installed
-  sorcery:
+  community.general.sorcery:
     name: "{{ item.spell }}"
     depends: "{{ item.depends | default(None) }}"
     state: present
@@ -113,29 +118,29 @@ EXAMPLES = '''
     - { spell: 'pv,tnftp,tor' }
 
 - name: Install the latest version of spell foo using regular glossary
-  sorcery:
+  community.general.sorcery:
     name: foo
     state: latest
 
 - name: Rebuild spell foo
-  sorcery:
+  community.general.sorcery:
     spell: foo
     state: rebuild
 
 - name: Rebuild the whole system, but update Sorcery and Codex first
-  sorcery:
+  community.general.sorcery:
     spell: '*'
     state: rebuild
     update: yes
     update_cache: yes
 
 - name: Refresh the grimoire collection if it is 1 day old using native sorcerous alias
-  sorcery:
+  community.general.sorcery:
     update_codex: yes
     cache_valid_time: 86400
 
 - name: Update only Sorcery itself
-  sorcery:
+  community.general.sorcery:
     update: yes
 '''
 
@@ -593,7 +598,7 @@ def manage_spells(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(default=None, aliases=['spell'], type='list'),
+            name=dict(default=None, aliases=['spell'], type='list', elements='str'),
             state=dict(default='present', choices=['present', 'latest',
                                                    'absent', 'cast', 'dispelled', 'rebuild']),
             depends=dict(default=None),

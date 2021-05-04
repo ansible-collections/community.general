@@ -16,7 +16,7 @@ description:
     get information back.
   - For use with Dell EMC iDRAC operations that require Redfish OEM extensions
   - This module was called C(idrac_redfish_facts) before Ansible 2.9, returning C(ansible_facts).
-    Note that the M(idrac_redfish_info) module no longer returns C(ansible_facts)!
+    Note that the M(community.general.idrac_redfish_info) module no longer returns C(ansible_facts)!
 options:
   category:
     required: true
@@ -30,21 +30,25 @@ options:
       - C(GetManagerAttributes) returns the list of dicts containing iDRAC,
         LifecycleController and System attributes
     type: list
+    elements: str
   baseuri:
     required: true
     description:
       - Base URI of iDRAC controller
     type: str
   username:
-    required: true
     description:
       - User for authentication with iDRAC controller
     type: str
   password:
-    required: true
     description:
       - Password for authentication with iDRAC controller
     type: str
+  auth_token:
+    description:
+      - Security token for authentication with OOB controller
+    type: str
+    version_added: 2.3.0
   timeout:
     description:
       - Timeout in seconds for URL requests to OOB controller
@@ -56,7 +60,7 @@ author: "Jose Delarosa (@jose-delarosa)"
 
 EXAMPLES = '''
   - name: Get Manager attributes with a default of 20 seconds
-    idrac_redfish_info:
+    community.general.idrac_redfish_info:
       category: Manager
       command: GetManagerAttributes
       baseuri: "{{ baseuri }}"
@@ -67,41 +71,41 @@ EXAMPLES = '''
 
   # Examples to display the value of all or a single iDRAC attribute
   - name: Store iDRAC attributes as a fact variable
-    set_fact:
+    ansible.builtin.set_fact:
       idrac_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'iDRACAttributes') | list | first }}"
 
   - name: Display all iDRAC attributes
-    debug:
+    ansible.builtin.debug:
       var: idrac_attributes
 
   - name: Display the value of 'Syslog.1.SysLogEnable' iDRAC attribute
-    debug:
+    ansible.builtin.debug:
       var: idrac_attributes['Syslog.1.SysLogEnable']
 
   # Examples to display the value of all or a single LifecycleController attribute
   - name: Store LifecycleController attributes as a fact variable
-    set_fact:
+    ansible.builtin.set_fact:
       lc_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'LCAttributes') | list | first }}"
 
   - name: Display LifecycleController attributes
-    debug:
+    ansible.builtin.debug:
       var: lc_attributes
 
   - name: Display the value of 'CollectSystemInventoryOnRestart' attribute
-    debug:
+    ansible.builtin.debug:
       var: lc_attributes['LCAttributes.1.CollectSystemInventoryOnRestart']
 
   # Examples to display the value of all or a single System attribute
   - name: Store System attributes as a fact variable
-    set_fact:
+    ansible.builtin.set_fact:
       system_attributes: "{{ result.redfish_facts.entries | selectattr('Id', 'defined') | selectattr('Id', 'equalto', 'SystemAttributes') | list | first }}"
 
   - name: Display System attributes
-    debug:
+    ansible.builtin.debug:
       var: system_attributes
 
   - name: Display the value of 'PSRedPolicy'
-    debug:
+    ansible.builtin.debug:
       var: system_attributes['ServerPwr.1.PSRedPolicy']
 
 '''
@@ -171,25 +175,32 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             category=dict(required=True),
-            command=dict(required=True, type='list'),
+            command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(required=True),
-            password=dict(required=True, no_log=True),
+            username=dict(),
+            password=dict(no_log=True),
+            auth_token=dict(no_log=True),
             timeout=dict(type='int', default=10)
         ),
+        required_together=[
+            ('username', 'password'),
+        ],
+        required_one_of=[
+            ('username', 'auth_token'),
+        ],
+        mutually_exclusive=[
+            ('username', 'auth_token'),
+        ],
         supports_check_mode=False
     )
-    is_old_facts = module._name in ('idrac_redfish_facts', 'community.general.idrac_redfish_facts')
-    if is_old_facts:
-        module.deprecate("The 'idrac_redfish_facts' module has been renamed to 'idrac_redfish_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
 
     category = module.params['category']
     command_list = module.params['command']
 
     # admin credentials used for authentication
     creds = {'user': module.params['username'],
-             'pswd': module.params['password']}
+             'pswd': module.params['password'],
+             'token': module.params['auth_token']}
 
     # timeout
     timeout = module.params['timeout']
@@ -200,7 +211,7 @@ def main():
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, CATEGORY_COMMANDS_ALL.keys())))
+        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
 
     # Check that all commands are valid
     for cmd in command_list:
@@ -223,10 +234,7 @@ def main():
     # Return data back or fail with proper message
     if result['ret'] is True:
         del result['ret']
-        if is_old_facts:
-            module.exit_json(ansible_facts=dict(redfish_facts=result))
-        else:
-            module.exit_json(redfish_facts=result)
+        module.exit_json(redfish_facts=result)
     else:
         module.fail_json(msg=to_native(result['msg']))
 

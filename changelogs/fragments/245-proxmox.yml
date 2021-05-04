@@ -1,2 +1,0 @@
-minor_changes:
-  - proxmox - add the ``description`` and ``hookscript`` parameter (https://github.com/ansible-collections/community.general/pull/245).

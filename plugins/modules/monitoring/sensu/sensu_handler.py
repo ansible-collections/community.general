@@ -16,35 +16,44 @@ description:
   - 'For more information, refer to the Sensu documentation: U(https://sensuapp.org/docs/latest/reference/handlers.html)'
 options:
   state:
+    type: str
     description:
       - Whether the handler should be present or not
     choices: [ 'present', 'absent' ]
     default: present
   name:
+    type: str
     description:
       - A unique name for the handler. The name cannot contain special characters or spaces.
     required: True
   type:
+    type: str
     description:
       - The handler type
     choices: [ 'pipe', 'tcp', 'udp', 'transport', 'set' ]
-    required: True
   filter:
+    type: str
     description:
       - The Sensu event filter (name) to use when filtering events for the handler.
   filters:
+    type: list
+    elements: str
     description:
       - An array of Sensu event filters (names) to use when filtering events for the handler.
       - Each array item must be a string.
   severities:
+    type: list
+    elements: str
     description:
       - An array of check result severities the handler will handle.
       - 'NOTE: event resolution bypasses this filtering.'
-    choices: [ 'warning', 'critical', 'unknown' ]
+      - "Example: [ 'warning', 'critical', 'unknown' ]."
   mutator:
+    type: str
     description:
       - The Sensu event mutator (name) to use to mutate event data for the handler.
   timeout:
+    type: int
     description:
       - The handler execution duration timeout in seconds (hard stop).
       - Only used by pipe and tcp handler types.
@@ -60,22 +69,26 @@ options:
     type: bool
     default: 'no'
   command:
+    type: str
     description:
       - The handler command to be executed.
       - The event data is passed to the process via STDIN.
       - 'NOTE: the command attribute is only required for Pipe handlers (i.e. handlers configured with "type": "pipe").'
   socket:
+    type: dict
     description:
       - The socket definition scope, used to configure the TCP/UDP handler socket.
       - 'NOTE: the socket attribute is only required for TCP/UDP handlers (i.e. handlers configured with "type": "tcp" or "type": "udp").'
   pipe:
+    type: dict
     description:
       - The pipe definition scope, used to configure the Sensu transport pipe.
       - 'NOTE: the pipe attribute is only required for Transport handlers (i.e. handlers configured with "type": "transport").'
   handlers:
+    type: list
+    elements: str
     description:
       - An array of Sensu event handlers (names) to use for events using the handler set.
-      - Each array item must be a string.
       - 'NOTE: the handlers attribute is only required for handler sets (i.e. handlers configured with "type": "set").'
 notes:
   - Check mode is supported
@@ -84,7 +97,7 @@ notes:
 EXAMPLES = '''
 # Configure a handler that sends event data as STDIN (pipe)
 - name: Configure IRC Sensu handler
-  sensu_handler:
+  community.general.sensu_handler:
     name: "irc_handler"
     type: "pipe"
     command: "/usr/local/bin/notify-irc.sh"
@@ -100,13 +113,13 @@ EXAMPLES = '''
 
 # Delete a handler
 - name: Delete IRC Sensu handler
-  sensu_handler:
+  community.general.sensu_handler:
     name: "irc_handler"
     state: "absent"
 
 # Example of a TCP handler
 - name: Configure TCP Sensu handler
-  sensu_handler:
+  community.general.sensu_handler:
     name: "tcp_handler"
     type: "tcp"
     timeout: 30
@@ -119,7 +132,7 @@ EXAMPLES = '''
     - Restart sensu-server
 
 - name: Secure Sensu handler configuration file
-  file:
+  ansible.builtin.file:
     path: "{{ handler['file'] }}"
     owner: "sensu"
     group: "sensu"
@@ -154,20 +167,20 @@ def main():
     module = AnsibleModule(
         supports_check_mode=True,
         argument_spec=dict(
-            state=dict(type='str', required=False, choices=['present', 'absent'], default='present'),
+            state=dict(type='str', choices=['present', 'absent'], default='present'),
             name=dict(type='str', required=True),
-            type=dict(type='str', required=False, choices=['pipe', 'tcp', 'udp', 'transport', 'set']),
-            filter=dict(type='str', required=False),
-            filters=dict(type='list', required=False),
-            severities=dict(type='list', required=False),
-            mutator=dict(type='str', required=False),
-            timeout=dict(type='int', required=False, default=10),
-            handle_silenced=dict(type='bool', required=False, default=False),
-            handle_flapping=dict(type='bool', required=False, default=False),
-            command=dict(type='str', required=False),
-            socket=dict(type='dict', required=False),
-            pipe=dict(type='dict', required=False),
-            handlers=dict(type='list', required=False),
+            type=dict(type='str', choices=['pipe', 'tcp', 'udp', 'transport', 'set']),
+            filter=dict(type='str'),
+            filters=dict(type='list', elements='str'),
+            severities=dict(type='list', elements='str'),
+            mutator=dict(type='str'),
+            timeout=dict(type='int', default=10),
+            handle_silenced=dict(type='bool', default=False),
+            handle_flapping=dict(type='bool', default=False),
+            command=dict(type='str'),
+            socket=dict(type='dict'),
+            pipe=dict(type='dict'),
+            handlers=dict(type='list', elements='str'),
         ),
         required_if=[
             ['state', 'present', ['type']],

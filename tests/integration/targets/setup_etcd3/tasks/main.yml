@@ -1,4 +1,9 @@
 ---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 # setup etcd3 for integration tests on module/lookup
 # (c) 2017,  Jean-Philippe Evrard <jean-philippe@evrard.me>
 # 2020, SCC France, Eric Belhomme <ebelhomme@fr.scc.com>

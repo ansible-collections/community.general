@@ -36,7 +36,6 @@ options:
             - Should a 'down' file exist or not, if it exists it disables auto startup.
               Defaults to no. Downed does not imply stopped.
         type: bool
-        default: no
     enabled:
         description:
             - Whether the service is enabled or not, if disabled it also implies stopped.
@@ -56,32 +55,32 @@ options:
 
 EXAMPLES = '''
 - name: Start svc dnscache, if not running
-  svc:
+  community.general.svc:
     name: dnscache
     state: started
 
 - name: Stop svc dnscache, if running
-  svc:
+  community.general.svc:
     name: dnscache
     state: stopped
 
 - name: Kill svc dnscache, in all cases
-  svc:
+  community.general.svc:
     name: dnscache
     state: killed
 
 - name: Restart svc dnscache, in all cases
-  svc:
+  community.general.svc:
     name: dnscache
     state: restarted
 
 - name: Reload svc dnscache, in all cases
-  svc:
+  community.general.svc:
     name: dnscache
     state: reloaded
 
 - name: Using alternative svc directory location
-  svc:
+  community.general.svc:
     name: dnscache
     state: reloaded
     service_dir: /var/service

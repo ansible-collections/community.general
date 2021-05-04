@@ -15,23 +15,28 @@ short_description: Tweak settings in /etc/network/interfaces files
 extends_documentation_fragment: files
 description:
      - Manage (add, remove, change) individual interface options in an interfaces-style file without having
-       to manage the file as a whole with, say, M(template) or M(assemble). Interface has to be presented in a file.
+       to manage the file as a whole with, say, M(ansible.builtin.template) or M(ansible.builtin.assemble). Interface has to be presented in a file.
      - Read information about interfaces from interfaces-styled files
 options:
   dest:
+    type: path
     description:
       - Path to the interfaces file
     default: /etc/network/interfaces
   iface:
+    type: str
     description:
       - Name of the interface, required for value changes or option remove
   address_family:
+    type: str
     description:
       - Address family of the interface, useful if same interface name is used for both inet and inet6
   option:
+    type: str
     description:
       - Name of the option, required for value changes or option remove
   value:
+    type: str
     description:
       - If I(option) is not presented for the I(interface) and I(state) is C(present) option will be added.
         If I(option) already exists and is not C(pre-up), C(up), C(post-up) or C(down), it's value will be updated.
@@ -44,6 +49,7 @@ options:
     type: bool
     default: 'no'
   state:
+    type: str
     description:
       - If set to C(absent) the option or section will be removed if present instead of created.
     default: "present"
@@ -124,7 +130,7 @@ ifaces:
 
 EXAMPLES = '''
 - name: Set eth1 mtu configuration value to 8000
-  interfaces_file:
+  community.general.interfaces_file:
     dest: /etc/network/interfaces.d/eth1.cfg
     iface: eth1
     option: mtu
@@ -284,7 +290,7 @@ def setInterfaceOption(module, lines, iface, option, raw_value, state, address_f
                     address_family = target_option['address_family']
                     prefix_start = old_line.find(option)
                     optionLen = len(option)
-                    old_value_position = re.search(r"\s+".join(old_value.split()), old_line[prefix_start + optionLen:])
+                    old_value_position = re.search(r"\s+".join(map(re.escape, old_value.split())), old_line[prefix_start + optionLen:])
                     start = old_value_position.start() + prefix_start + optionLen
                     end = old_value_position.end() + prefix_start + optionLen
                     line = old_line[:start] + value + old_line[end:]
@@ -379,7 +385,7 @@ def main():
         changed, lines = setInterfaceOption(module, lines, iface, option, value, state, address_family)
 
     if changed:
-        _, ifaces = read_interfaces_lines(module, [d['line'] for d in lines if 'line' in d])
+        dummy, ifaces = read_interfaces_lines(module, [d['line'] for d in lines if 'line' in d])
 
     if changed and not module.check_mode:
         if backup:

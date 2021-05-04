@@ -17,23 +17,31 @@ options:
         description:
             - A list of ZooKeeper servers (format '[server]:[port]').
         required: true
+        type: str
     name:
         description:
             - The path of the znode.
         required: true
+        type: str
     value:
         description:
             - The value assigned to the znode.
+        type: str
     op:
         description:
             - An operation to perform. Mutually exclusive with state.
+        choices: [ get, wait, list ]
+        type: str
     state:
         description:
             - The state to enforce. Mutually exclusive with op.
+        choices: [ present, absent ]
+        type: str
     timeout:
         description:
             - The amount of time to wait for a node to appear.
         default: 300
+        type: int
     recursive:
         description:
             - Recursively delete node and all its children.
@@ -47,39 +55,39 @@ author: "Trey Perry (@treyperry)"
 
 EXAMPLES = """
 - name: Creating or updating a znode with a given value
-  znode:
+  community.general.znode:
     hosts: 'localhost:2181'
     name: /mypath
     value: myvalue
     state: present
 
 - name: Getting the value and stat structure for a znode
-  znode:
+  community.general.znode:
     hosts: 'localhost:2181'
     name: /mypath
     op: get
 
 - name: Listing a particular znode's children
-  znode:
+  community.general.znode:
     hosts: 'localhost:2181'
     name: /zookeeper
     op: list
 
 - name: Waiting 20 seconds for a znode to appear at path /mypath
-  znode:
+  community.general.znode:
     hosts: 'localhost:2181'
     name: /mypath
     op: wait
     timeout: 20
 
 - name: Deleting a znode at path /mypath
-  znode:
+  community.general.znode:
     hosts: 'localhost:2181'
     name: /mypath
     state: absent
 
 - name: Creating or updating a znode with a given value on a remote Zookeeper
-  znode:
+  community.general.znode:
     hosts: 'my-zookeeper-node:2181'
     name: /mypath
     value: myvalue
@@ -108,11 +116,11 @@ def main():
         argument_spec=dict(
             hosts=dict(required=True, type='str'),
             name=dict(required=True, type='str'),
-            value=dict(required=False, default=None, type='str'),
-            op=dict(required=False, default=None, choices=['get', 'wait', 'list']),
+            value=dict(type='str'),
+            op=dict(choices=['get', 'wait', 'list']),
             state=dict(choices=['present', 'absent']),
-            timeout=dict(required=False, default=300, type='int'),
-            recursive=dict(required=False, default=False, type='bool')
+            timeout=dict(default=300, type='int'),
+            recursive=dict(default=False, type='bool')
         ),
         supports_check_mode=False
     )

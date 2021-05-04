@@ -20,31 +20,40 @@ description:
 
 options:
   state:
+    type: str
     description:
       - absent - provider should not exist, present - provider should be present, refresh - provider will be refreshed
     choices: ['absent', 'present', 'refresh']
     default: 'present'
   name:
+    type: str
     description: The provider's name.
     required: true
   type:
+    type: str
     description: The provider's type.
-    required: true
     choices: ['Openshift', 'Amazon', 'oVirt', 'VMware', 'Azure', 'Director', 'OpenStack', 'GCE']
   zone:
+    type: str
     description: The ManageIQ zone name that will manage the provider.
     default: 'default'
   provider_region:
+    type: str
     description: The provider region name to connect to (e.g. AWS region for Amazon).
   host_default_vnc_port_start:
+    type: str
     description: The first port in the host VNC range. defaults to None.
   host_default_vnc_port_end:
+    type: str
     description: The last port in the host VNC range. defaults to None.
   subscription:
+    type: str
     description: Microsoft Azure subscription ID. defaults to None.
   project:
+    type: str
     description: Google Compute Engine Project ID. defaults to None.
   azure_tenant_id:
+    type: str
     description: Tenant ID. defaults to None.
     aliases: [ keystone_v3_domain_id ]
   tenant_mapping_enabled:
@@ -52,6 +61,7 @@ options:
     default: 'no'
     description: Whether to enable mapping of existing tenants. defaults to False.
   api_version:
+    type: str
     description: The OpenStack Keystone API version. defaults to None.
     choices: ['v2', 'v3']
 
@@ -59,91 +69,122 @@ options:
     description: Default endpoint connection information, required if state is true.
     suboptions:
       hostname:
+        type: str
         description: The provider's api hostname.
         required: true
       port:
+        type: int
         description: The provider's api port.
       userid:
+        type: str
         description: Provider's api endpoint authentication userid. defaults to None.
       password:
+        type: str
         description: Provider's api endpoint authentication password. defaults to None.
       auth_key:
+        type: str
         description: Provider's api endpoint authentication bearer token. defaults to None.
       validate_certs:
         description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
         type: bool
         default: 'yes'
       security_protocol:
+        type: str
         description: How SSL certificates should be used for HTTPS requests. defaults to None.
         choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation','non-ssl']
       certificate_authority:
+        type: str
         description: The CA bundle string with custom certificates. defaults to None.
 
   metrics:
     description: Metrics endpoint connection information.
     suboptions:
       hostname:
+        type: str
         description: The provider's api hostname.
         required: true
       port:
+        type: int
         description: The provider's api port.
       userid:
+        type: str
         description: Provider's api endpoint authentication userid. defaults to None.
       password:
+        type: str
         description: Provider's api endpoint authentication password. defaults to None.
       auth_key:
+        type: str
         description: Provider's api endpoint authentication bearer token. defaults to None.
       validate_certs:
         description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
         type: bool
         default: 'yes'
       security_protocol:
+        type: str
         choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation','non-ssl']
         description: How SSL certificates should be used for HTTPS requests. defaults to None.
       certificate_authority:
+        type: str
         description: The CA bundle string with custom certificates. defaults to None.
       path:
-        description: Database name for oVirt metrics. Defaults to ovirt_engine_history.
-        default: ovirt_engine_history
+        type: str
+        description: Database name for oVirt metrics. Defaults to C(ovirt_engine_history).
 
   alerts:
     description: Alerts endpoint connection information.
     suboptions:
       hostname:
+        type: str
         description: The provider's api hostname.
         required: true
       port:
+        type: int
         description: The provider's api port.
       userid:
+        type: str
         description: Provider's api endpoint authentication userid. defaults to None.
       password:
+        type: str
         description: Provider's api endpoint authentication password. defaults to None.
       auth_key:
+        type: str
         description: Provider's api endpoint authentication bearer token. defaults to None.
       validate_certs:
+        type: bool
         description: Whether SSL certificates should be verified for HTTPS requests (deprecated). defaults to True.
         default: true
       security_protocol:
-        choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation']
+        type: str
+        choices: ['ssl-with-validation','ssl-with-validation-custom-ca','ssl-without-validation', 'non-ssl']
         description: How SSL certificates should be used for HTTPS requests. defaults to None.
       certificate_authority:
+        type: str
         description: The CA bundle string with custom certificates. defaults to None.
 
   ssh_keypair:
     description: SSH key pair used for SSH connections to all hosts in this provider.
     suboptions:
       hostname:
+        type: str
         description: Director hostname.
         required: true
       userid:
+        type: str
         description: SSH username.
       auth_key:
+        type: str
         description: SSH private key.
+      validate_certs:
+        description:
+          - Whether certificates should be verified for connections.
+        type: bool
+        default: yes
+        aliases: [ verify_ssl ]
 '''
 
 EXAMPLES = '''
 - name: Create a new provider in ManageIQ ('Hawkular' metrics)
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngLab'
     type: 'OpenShift'
     state: 'present'
@@ -206,7 +247,7 @@ EXAMPLES = '''
 
 
 - name: Update an existing provider named 'EngLab' (defaults to 'Prometheus' metrics)
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngLab'
     type: 'Openshift'
     state: 'present'
@@ -268,7 +309,7 @@ EXAMPLES = '''
 
 
 - name: Delete a provider in ManageIQ
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngLab'
     type: 'Openshift'
     state: 'absent'
@@ -280,7 +321,7 @@ EXAMPLES = '''
 
 
 - name: Create a new Amazon provider in ManageIQ using token authentication
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngAmazon'
     type: 'Amazon'
     state: 'present'
@@ -295,7 +336,7 @@ EXAMPLES = '''
 
 
 - name: Create a new oVirt provider in ManageIQ
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'RHEV'
     type: 'oVirt'
     state: 'present'
@@ -355,7 +396,7 @@ EXAMPLES = '''
       validate_certs: true
 
 - name: Create a new VMware provider in ManageIQ
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngVMware'
     type: 'VMware'
     state: 'present'
@@ -371,7 +412,7 @@ EXAMPLES = '''
       validate_certs: true
 
 - name: Create a new Azure provider in ManageIQ
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngAzure'
     type: 'Azure'
     provider_region: 'northeurope'
@@ -389,7 +430,7 @@ EXAMPLES = '''
       validate_certs: false
 
 - name: Create a new OpenStack Director provider in ManageIQ with rsa keypair
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngDirector'
     type: 'Director'
     api_version: 'v3'
@@ -425,7 +466,7 @@ EXAMPLES = '''
       auth_key: 'SecretSSHPrivateKey'
 
 - name: Create a new OpenStack provider in ManageIQ with amqp metrics
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngOpenStack'
     type: 'OpenStack'
     api_version: 'v3'
@@ -468,7 +509,7 @@ EXAMPLES = '''
 
 
 - name: Create a new GCE provider in ManageIQ
-  manageiq_provider:
+  community.general.manageiq_provider:
     name: 'EngGoogle'
     type: 'GCE'
     provider_region: 'europe-west1'
@@ -528,7 +569,7 @@ def endpoint_list_spec():
         provider=dict(type='dict', options=endpoint_argument_spec()),
         metrics=dict(type='dict', options=endpoint_argument_spec()),
         alerts=dict(type='dict', options=endpoint_argument_spec()),
-        ssh_keypair=dict(type='dict', options=endpoint_argument_spec()),
+        ssh_keypair=dict(type='dict', options=endpoint_argument_spec(), no_log=False),
     )
 
 
@@ -788,7 +829,7 @@ def main():
         azure_tenant_id=dict(aliases=['keystone_v3_domain_id']),
         tenant_mapping_enabled=dict(default=False, type='bool'),
         api_version=dict(choices=['v2', 'v3']),
-        type=dict(choices=supported_providers().keys()),
+        type=dict(choices=list(supported_providers().keys())),
     )
     # add the manageiq connection arguments to the arguments
     argument_spec.update(manageiq_argument_spec())

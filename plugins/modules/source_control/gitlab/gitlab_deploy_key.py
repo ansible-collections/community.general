@@ -53,7 +53,6 @@ options:
     description:
       - When C(present) the deploy key added to the project if it doesn't exist.
       - When C(absent) it will be removed from the project if it exists.
-    required: true
     default: present
     type: str
     choices: [ "present", "absent" ]
@@ -61,7 +60,7 @@ options:
 
 EXAMPLES = '''
 - name: "Adding a project deploy key"
-  gitlab_deploy_key:
+  community.general.gitlab_deploy_key:
     api_url: https://gitlab.example.com/
     api_token: "{{ api_token }}"
     project: "my_group/my_project"
@@ -70,7 +69,7 @@ EXAMPLES = '''
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAIEAiPWx6WM4lhHNedGfBpPJNPpZ7yKu+dnn1SJejgt4596k6YjzGGphH2TUxwKzxcKDKKezwkpfnxPkSMkuEspGRt/aZZ9w..."
 
 - name: "Update the above deploy key to add push access"
-  gitlab_deploy_key:
+  community.general.gitlab_deploy_key:
     api_url: https://gitlab.example.com/
     api_token: "{{ api_token }}"
     project: "my_group/my_project"
@@ -79,7 +78,7 @@ EXAMPLES = '''
     can_push: yes
 
 - name: "Remove the previous deploy key from the project"
-  gitlab_deploy_key:
+  community.general.gitlab_deploy_key:
     api_url: https://gitlab.example.com/
     api_token: "{{ api_token }}"
     project: "my_group/my_project"
@@ -145,6 +144,13 @@ class GitLabDeployKey(object):
     '''
     def createOrUpdateDeployKey(self, project, key_title, key_key, options):
         changed = False
+
+        # note: unfortunately public key cannot be updated directly by
+        #   GitLab REST API, so for that case we need to delete and
+        #   than recreate the key
+        if self.deployKeyObject and self.deployKeyObject.key != key_key:
+            self.deployKeyObject.delete()
+            self.deployKeyObject = None
 
         # Because we have already call existsDeployKey in main()
         if self.deployKeyObject is None:
@@ -235,7 +241,7 @@ def main():
         api_token=dict(type='str', no_log=True),
         state=dict(type='str', default="present", choices=["absent", "present"]),
         project=dict(type='str', required=True),
-        key=dict(type='str', required=True),
+        key=dict(type='str', required=True, no_log=False),
         can_push=dict(type='bool', default=False),
         title=dict(type='str', required=True)
     ))

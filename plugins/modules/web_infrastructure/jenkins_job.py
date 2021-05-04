@@ -6,7 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-
 DOCUMENTATION = '''
 ---
 module: jenkins_job
@@ -18,6 +17,7 @@ requirements:
 author: "Sergio Millan Rodriguez (@sermilrod)"
 options:
   config:
+    type: str
     description:
       - config in XML format.
       - Required if job does not yet exist.
@@ -32,37 +32,52 @@ options:
     type: bool
     required: false
   name:
+    type: str
     description:
       - Name of the Jenkins job.
     required: true
   password:
+    type: str
     description:
       - Password to authenticate with the Jenkins server.
     required: false
   state:
+    type: str
     description:
       - Attribute that specifies if the job has to be created or deleted.
     required: false
     default: present
     choices: ['present', 'absent']
   token:
+    type: str
     description:
       - API token used to authenticate alternatively to password.
     required: false
   url:
+    type: str
     description:
       - URL where the Jenkins server is accessible.
     required: false
     default: http://localhost:8080
   user:
+    type: str
     description:
        - User to authenticate with the Jenkins server.
     required: false
+  validate_certs:
+    type: bool
+    default: yes
+    description:
+      - If set to C(no), the SSL certificates will not be validated.
+        This should only set to C(no) used on personally controlled sites
+        using self-signed certificates as it avoids verifying the source site.
+      - The C(python-jenkins) library only handles this by using the environment variable C(PYTHONHTTPSVERIFY).
+    version_added: 2.3.0
 '''
 
 EXAMPLES = '''
 - name: Create a jenkins job using basic authentication
-  jenkins_job:
+  community.general.jenkins_job:
     config: "{{ lookup('file', 'templates/test.xml') }}"
     name: test
     password: admin
@@ -70,7 +85,7 @@ EXAMPLES = '''
     user: admin
 
 - name: Create a jenkins job using the token
-  jenkins_job:
+  community.general.jenkins_job:
     config: "{{ lookup('template', 'templates/test.xml.j2') }}"
     name: test
     token: asdfasfasfasdfasdfadfasfasdfasdfc
@@ -78,7 +93,7 @@ EXAMPLES = '''
     user: admin
 
 - name: Delete a jenkins job using basic authentication
-  jenkins_job:
+  community.general.jenkins_job:
     name: test
     password: admin
     state: absent
@@ -86,7 +101,7 @@ EXAMPLES = '''
     user: admin
 
 - name: Delete a jenkins job using the token
-  jenkins_job:
+  community.general.jenkins_job:
     name: test
     token: asdfasfasfasdfasdfadfasfasdfasdfc
     state: absent
@@ -94,7 +109,7 @@ EXAMPLES = '''
     user: admin
 
 - name: Disable a jenkins job using basic authentication
-  jenkins_job:
+  community.general.jenkins_job:
     name: test
     password: admin
     enabled: False
@@ -102,7 +117,7 @@ EXAMPLES = '''
     user: admin
 
 - name: Disable a jenkins job using the token
-  jenkins_job:
+  community.general.jenkins_job:
     name: test
     token: asdfasfasfasdfasdfadfasfasdfasdfc
     enabled: False
@@ -139,6 +154,7 @@ url:
   sample: https://jenkins.mydomain.com
 '''
 
+import os
 import traceback
 import xml.etree.ElementTree as ET
 
@@ -154,7 +170,7 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils._text import to_native
 
 
-class JenkinsJob:
+class JenkinsJob(object):
 
     def __init__(self, module):
         self.module = module
@@ -182,14 +198,16 @@ class JenkinsJob:
         }
 
         self.EXCL_STATE = "excluded state"
+        if not module.params['validate_certs']:
+            os.environ['PYTHONHTTPSVERIFY'] = '0'
 
     def get_jenkins_connection(self):
         try:
-            if (self.user and self.password):
+            if self.user and self.password:
                 return jenkins.Jenkins(self.jenkins_url, self.user, self.password)
-            elif (self.user and self.token):
+            elif self.user and self.token:
                 return jenkins.Jenkins(self.jenkins_url, self.user, self.token)
-            elif (self.user and not (self.password or self.token)):
+            elif self.user and not (self.password or self.token):
                 return jenkins.Jenkins(self.jenkins_url, self.user)
             else:
                 return jenkins.Jenkins(self.jenkins_url)
@@ -249,9 +267,7 @@ class JenkinsJob:
         if self.enabled is None:
             return False
 
-        if ((self.enabled is False and status != "disabled") or (self.enabled is True and status == "disabled")):
-            return True
-        return False
+        return (self.enabled is False and status != "disabled") or (self.enabled is True and status == "disabled")
 
     def switch_state(self):
         if self.enabled is False:
@@ -270,7 +286,7 @@ class JenkinsJob:
                     self.server.reconfig_job(self.name, self.get_config())
 
             # Handle job disable/enable
-            elif (status != self.EXCL_STATE and self.has_state_changed(status)):
+            elif status != self.EXCL_STATE and self.has_state_changed(status):
                 self.result['changed'] = True
                 if not self.module.check_mode:
                     self.switch_state()
@@ -328,14 +344,15 @@ def job_config_to_string(xml_str):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            config=dict(required=False),
-            name=dict(required=True),
-            password=dict(required=False, no_log=True),
-            state=dict(required=False, choices=['present', 'absent'], default="present"),
+            config=dict(type='str', required=False),
+            name=dict(type='str', required=True),
+            password=dict(type='str', required=False, no_log=True),
+            state=dict(type='str', required=False, choices=['present', 'absent'], default="present"),
             enabled=dict(required=False, type='bool'),
-            token=dict(required=False, no_log=True),
-            url=dict(required=False, default="http://localhost:8080"),
-            user=dict(required=False)
+            token=dict(type='str', required=False, no_log=True),
+            url=dict(type='str', required=False, default="http://localhost:8080"),
+            user=dict(type='str', required=False),
+            validate_certs=dict(type='bool', default=True),
         ),
         mutually_exclusive=[
             ['password', 'token'],

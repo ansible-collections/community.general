@@ -24,11 +24,13 @@ options:
             - Indicates the desired state for the Logical Interconnect Group resource.
               C(absent) will remove the resource from OneView, if it exists.
               C(present) will ensure data properties are compliant with OneView.
+        type: str
         choices: [absent, present]
         default: present
     data:
         description:
             - List with the Logical Interconnect Group properties.
+        type: dict
         required: true
 extends_documentation_fragment:
 - community.general.oneview
@@ -38,7 +40,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Ensure that the Logical Interconnect Group is present
-  oneview_logical_interconnect_group:
+  community.general.oneview_logical_interconnect_group:
     config: /etc/oneview/oneview_config.json
     state: present
     data:
@@ -59,7 +61,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Ensure that the Logical Interconnect Group has the specified scopes
-  oneview_logical_interconnect_group:
+  community.general.oneview_logical_interconnect_group:
     config: /etc/oneview/oneview_config.json
     state: present
     data:
@@ -70,7 +72,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Ensure that the Logical Interconnect Group is present with name 'Test'
-  oneview_logical_interconnect_group:
+  community.general.oneview_logical_interconnect_group:
     config: /etc/oneview/oneview_config.json
     state: present
     data:
@@ -79,7 +81,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Ensure that the Logical Interconnect Group is absent
-  oneview_logical_interconnect_group:
+  community.general.oneview_logical_interconnect_group:
     config: /etc/oneview/oneview_config.json
     state: absent
     data:

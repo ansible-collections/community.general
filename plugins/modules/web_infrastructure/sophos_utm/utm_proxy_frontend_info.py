@@ -23,6 +23,7 @@ description:
 
 options:
     name:
+        type: str
         description:
           - The name of the object. Will be used to identify the entry
         required: true
@@ -34,7 +35,7 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Get utm proxy_frontend
-  utm_proxy_frontend_info:
+  community.general.utm_proxy_frontend_info:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestBackendEntry

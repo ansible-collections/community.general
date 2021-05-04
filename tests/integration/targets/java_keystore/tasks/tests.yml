@@ -1,0 +1,119 @@
+---
+- name: Create test directory
+  ansible.builtin.file:
+    path: "{{ output_dir }}"
+    state: directory
+
+- name: Ensure the Java keystore does not exist (cleanup between tests)
+  ansible.builtin.file:
+    path: "{{ output_dir ~ '/' ~ item.name ~ '.jks' }}"
+    state: absent
+  loop: "{{ java_keystore_certs }}"
+  loop_control:
+    label: "{{ output_dir ~ '/' ~ item.name ~ '.jks' }}"
+
+
+- name: Create a Java keystore for the given ({{ 'remote' if remote_cert else 'local' }}) certificates (check mode)
+  community.general.java_keystore: &java_keystore_params
+    name: example
+    dest: "{{ output_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.jks' }}"
+    certificate: "{{ omit if remote_cert else lookup('file', output_dir ~ '/' ~ item.name ~ '.pem') }}"
+    private_key: "{{ omit if remote_cert else lookup('file', output_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key') }}"
+    certificate_path: "{{ omit if not remote_cert else output_dir ~ '/' ~ item.name ~ '.pem' }}"
+    private_key_path: "{{ omit if not remote_cert else output_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key' }}"
+    private_key_passphrase: "{{ item.passphrase | d(omit) }}"
+    password: changeit
+  loop: "{{ java_keystore_certs }}"
+  check_mode: yes
+  register: result_check
+
+- name: Create a Java keystore for the given certificates
+  community.general.java_keystore: *java_keystore_params
+  loop: "{{ java_keystore_certs }}"
+  register: result
+
+
+- name: Create a Java keystore for the given certificates (idempotency, check mode)
+  community.general.java_keystore: *java_keystore_params
+  loop: "{{ java_keystore_certs }}"
+  check_mode: yes
+  register: result_idem_check
+
+- name: Create a Java keystore for the given certificates (idempotency)
+  community.general.java_keystore: *java_keystore_params
+  loop: "{{ java_keystore_certs }}"
+  register: result_idem
+
+
+- name: Create a Java keystore for the given certificates (certificate changed, check mode)
+  community.general.java_keystore: *java_keystore_params
+  loop: "{{ java_keystore_new_certs }}"
+  check_mode: yes
+  register: result_change_check
+
+- name: Create a Java keystore for the given certificates (certificate changed)
+  community.general.java_keystore: *java_keystore_params
+  loop: "{{ java_keystore_new_certs }}"
+  register: result_change
+
+
+- name: Create a Java keystore for the given certificates (alias changed, check mode)
+  community.general.java_keystore:
+    <<: *java_keystore_params
+    name: foobar
+  loop: "{{ java_keystore_new_certs }}"
+  check_mode: yes
+  register: result_alias_change_check
+
+- name: Create a Java keystore for the given certificates (alias changed)
+  community.general.java_keystore:
+    <<: *java_keystore_params
+    name: foobar
+  loop: "{{ java_keystore_new_certs }}"
+  register: result_alias_change
+
+
+- name: Create a Java keystore for the given certificates (password changed, check mode)
+  community.general.java_keystore:
+    <<: *java_keystore_params
+    name: foobar
+    password: hunter2
+  loop: "{{ java_keystore_new_certs }}"
+  check_mode: yes
+  register: result_pw_change_check
+
+- name: Create a Java keystore for the given certificates (password changed)
+  community.general.java_keystore:
+    <<: *java_keystore_params
+    name: foobar
+    password: hunter2
+  loop: "{{ java_keystore_new_certs }}"
+  register: result_pw_change
+
+- name: Check that the remote certificates have not been removed
+  ansible.builtin.file:
+    path: "{{ output_dir ~ '/' ~ item.name ~ '.pem' }}"
+    state: file
+  loop: "{{ java_keystore_certs + java_keystore_new_certs }}"
+  when: remote_cert
+
+- name: Check that the remote private keys have not been removed
+  ansible.builtin.file:
+    path: "{{ output_dir ~ '/' ~ item.name ~ '.key' }}"
+    state: file
+  loop: "{{ java_keystore_certs }}"
+  when: remote_cert
+
+- name: Validate results
+  assert:
+    that:
+      - result is changed
+      - result_check is changed
+      - result_idem is not changed
+      - result_idem_check is not changed
+      - result_change is changed
+      - result_change_check is changed
+      - result_alias_change is changed
+      - result_alias_change_check is changed
+      - result_pw_change is changed
+      - result_pw_change_check is changed

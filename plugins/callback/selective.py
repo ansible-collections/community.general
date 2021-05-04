@@ -6,8 +6,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: selective
-    callback_type: stdout
+    author: Unknown (!UNKNOWN)
+    name: selective
+    type: stdout
     requirements:
       - set as main display callback
     short_description: only print certain tasks
@@ -30,8 +31,8 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = """
-  - debug: msg="This will not be printed"
-  - debug: msg="But this will"
+  - ansible.builtin.debug: msg="This will not be printed"
+  - ansible.builtin.debug: msg="But this will"
     tags: [print_action]
 """
 
@@ -40,7 +41,16 @@ import difflib
 from ansible import constants as C
 from ansible.plugins.callback import CallbackBase
 from ansible.module_utils._text import to_text
-from ansible.utils.color import codeCodes
+
+try:
+    codeCodes = C.COLOR_CODES
+except AttributeError:
+    # This constant was moved to ansible.constants in
+    # https://github.com/ansible/ansible/commit/1202dd000f10b0e8959019484f1c3b3f9628fc67
+    # (will be included in ansible-core 2.11.0). For older Ansible/ansible-base versions,
+    # we include from the original location.
+    from ansible.utils.color import codeCodes
+
 
 DONT_COLORIZE = False
 COLORS = {
@@ -57,7 +67,7 @@ COLORS = {
 
 def dict_diff(prv, nxt):
     """Return a dict of keys that differ with another config object."""
-    keys = set(prv.keys() + nxt.keys())
+    keys = set(list(prv.keys()) + list(nxt.keys()))
     result = {}
     for k in keys:
         if prv.get(k) != nxt.get(k):
@@ -201,7 +211,7 @@ class CallbackModule(CallbackBase):
                                      )
             if 'results' in result._result:
                 for r in result._result['results']:
-                    failed = 'failed' in r
+                    failed = 'failed' in r and r['failed']
 
                     stderr = [r.get('exception', None), r.get('module_stderr', None)]
                     stderr = "\n".join([e for e in stderr if e]).strip()

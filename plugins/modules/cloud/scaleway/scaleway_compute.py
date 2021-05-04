@@ -25,6 +25,7 @@ extends_documentation_fragment:
 options:
 
   public_ip:
+    type: str
     description:
     - Manage public IP on a Scaleway server
     - Could be Scaleway IP address UUID
@@ -39,20 +40,24 @@ options:
     type: bool
 
   image:
+    type: str
     description:
       - Image identifier used to start the instance with
     required: true
 
   name:
+    type: str
     description:
       - Name of the instance
 
   organization:
+    type: str
     description:
       - Organization identifier
     required: true
 
   state:
+    type: str
     description:
      - Indicate desired state of the instance.
     default: present
@@ -64,12 +69,15 @@ options:
       - stopped
 
   tags:
+    type: list
+    elements: str
     description:
     - List of tags to apply to the instance (5 max)
     required: false
     default: []
 
   region:
+    type: str
     description:
     - Scaleway compute zone
     required: true
@@ -78,8 +86,13 @@ options:
       - EMEA-NL-EVS
       - par1
       - EMEA-FR-PAR1
+      - par2
+      - EMEA-FR-PAR2
+      - waw1
+      - EMEA-PL-WAW1
 
   commercial_type:
+    type: str
     description:
     - Commercial name of the compute node
     required: true
@@ -91,18 +104,21 @@ options:
     default: 'no'
 
   wait_timeout:
+    type: int
     description:
     - Time to wait for the server to reach the expected state
     required: false
     default: 300
 
   wait_sleep_time:
+    type: int
     description:
     - Time to wait before every attempt to check the state of the server
     required: false
     default: 3
 
   security_group:
+    type: str
     description:
     - Security group unique identifier
     - If no value provided, the default security group or current security group will be used
@@ -111,7 +127,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a server
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: foobar
     state: present
     image: 89ee4018-f8c3-4dc4-a6b5-bca14f985ebe
@@ -123,7 +139,7 @@ EXAMPLES = '''
       - www
 
 - name: Create a server attached to a security group
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: foobar
     state: present
     image: 89ee4018-f8c3-4dc4-a6b5-bca14f985ebe
@@ -136,7 +152,7 @@ EXAMPLES = '''
       - www
 
 - name: Destroy it right after
-  scaleway_compute:
+  community.general.scaleway_compute:
     name: foobar
     state: absent
     image: 89ee4018-f8c3-4dc4-a6b5-bca14f985ebe
@@ -632,12 +648,12 @@ def main():
     argument_spec.update(dict(
         image=dict(required=True),
         name=dict(),
-        region=dict(required=True, choices=SCALEWAY_LOCATION.keys()),
+        region=dict(required=True, choices=list(SCALEWAY_LOCATION.keys())),
         commercial_type=dict(required=True),
         enable_ipv6=dict(default=False, type="bool"),
         public_ip=dict(default="absent"),
-        state=dict(choices=state_strategy.keys(), default='present'),
-        tags=dict(type="list", default=[]),
+        state=dict(choices=list(state_strategy.keys()), default='present'),
+        tags=dict(type="list", elements="str", default=[]),
         organization=dict(required=True),
         wait=dict(type="bool", default=False),
         wait_timeout=dict(type="int", default=300),

@@ -6,7 +6,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: yaml
+    author: Unknown (!UNKNOWN)
+    name: yaml
     type: stdout
     short_description: yaml-ized Ansible screen output
     description:
@@ -49,7 +50,7 @@ def my_represent_scalar(self, tag, value, style=None):
             # ...no trailing space
             value = value.rstrip()
             # ...and non-printable characters
-            value = ''.join(x for x in value if x in string.printable)
+            value = ''.join(x for x in value if x in string.printable or ord(x) >= 0xA0)
             # ...tabs prevent blocks from expanding
             value = value.expandtabs()
             # ...and odd bits of whitespace

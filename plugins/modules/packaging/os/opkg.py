@@ -21,12 +21,15 @@ options:
     name:
         description:
             - name of package to install/remove
+        aliases: [pkg]
         required: true
+        type: str
     state:
         description:
             - state of the package
-        choices: [ 'present', 'absent' ]
+        choices: [ 'present', 'absent', 'installed', 'removed' ]
         default: present
+        type: str
     force:
         description:
             - opkg --force parameter used
@@ -42,10 +45,12 @@ options:
             - "remove"
             - "checksum"
             - "removal-of-dependent-packages"
-        default: absent
+        type: str
     update_cache:
         description:
             - update the package db first
+            - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
+        aliases: ['update-cache']
         default: "no"
         type: bool
 requirements:
@@ -54,28 +59,28 @@ requirements:
 '''
 EXAMPLES = '''
 - name: Install foo
-  opkg:
+  community.general.opkg:
     name: foo
     state: present
 
 - name: Update cache and install foo
-  opkg:
+  community.general.opkg:
     name: foo
     state: present
     update_cache: yes
 
 - name: Remove foo
-  opkg:
+  community.general.opkg:
     name: foo
     state: absent
 
 - name: Remove foo and bar
-  opkg:
+  community.general.opkg:
     name: foo,bar
     state: absent
 
 - name: Install foo using overwrite option forcibly
-  opkg:
+  community.general.opkg:
     name: foo
     state: present
     force: overwrite
@@ -169,7 +174,9 @@ def main():
             state=dict(default="present", choices=["present", "installed", "absent", "removed"]),
             force=dict(default="", choices=["", "depends", "maintainer", "reinstall", "overwrite", "downgrade", "space", "postinstall", "remove",
                                             "checksum", "removal-of-dependent-packages"]),
-            update_cache=dict(default="no", aliases=["update-cache"], type='bool')
+            update_cache=dict(
+                default="no", aliases=["update-cache"], type='bool',
+                deprecated_aliases=[dict(name='update-cache', version='5.0.0', collection_name='community.general')]),
         )
     )
 

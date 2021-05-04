@@ -18,18 +18,22 @@ requirements:
   - "python >= 2.6"
 options:
   token:
+    type: str
     description:
       - Log token.
     required: true
   msg:
+    type: str
     description:
       - The message body.
     required: true
   api:
+    type: str
     description:
       - API endpoint
     default: data.logentries.com
   port:
+    type: int
     description:
       - API endpoint port
     default: 80
@@ -40,7 +44,7 @@ RETURN = '''# '''
 
 EXAMPLES = '''
 - name: Send a message to logentries
-  logentries_msg:
+  community.general.logentries_msg:
     token=00000000-0000-0000-0000-000000000000
     msg="{{ ansible_hostname }}"
 '''
@@ -69,7 +73,7 @@ def send_msg(module, token, msg, api, port):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            token=dict(type='str', required=True),
+            token=dict(type='str', required=True, no_log=True),
             msg=dict(type='str', required=True),
             api=dict(type='str', default="data.logentries.com"),
             port=dict(type='int', default=80)),

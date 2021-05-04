@@ -16,49 +16,57 @@ options:
   datacenter:
     description:
       - The datacenter in which to create the volumes.
-    required: true
+    type: str
   name:
     description:
       - The name of the volumes. You can enumerate the names using auto_increment.
-    required: true
+    type: str
   size:
     description:
       - The size of the volume.
+    type: int
     required: false
     default: 10
   bus:
     description:
       - The bus type.
+    type: str
     required: false
     default: VIRTIO
     choices: [ "IDE", "VIRTIO"]
   image:
     description:
       - The system image ID for the volume, e.g. a3eae284-a2fe-11e4-b187-5f1f641608c8. This can also be a snapshot image ID.
-    required: true
+    type: str
   image_password:
     description:
       - Password set for the administrative user.
+    type: str
     required: false
   ssh_keys:
     description:
       - Public SSH keys allowing access to the virtual machine.
+    type: list
+    elements: str
     required: false
   disk_type:
     description:
       - The disk type of the volume.
+    type: str
     required: false
     default: HDD
     choices: [ "HDD", "SSD" ]
   licence_type:
     description:
       - The licence type for the volume. This is used when the image is non-standard.
+      - "The available choices are: C(LINUX), C(WINDOWS), C(UNKNOWN), C(OTHER)."
+    type: str
     required: false
     default: UNKNOWN
-    choices: ["LINUX", "WINDOWS", "UNKNOWN" , "OTHER"]
   count:
     description:
       - The number of volumes you wish to create.
+    type: int
     required: false
     default: 1
   auto_increment:
@@ -69,14 +77,18 @@ options:
   instance_ids:
     description:
       - list of instance ids, currently only used when state='absent' to remove instances.
+    type: list
+    elements: str
     required: false
   subscription_user:
     description:
       - The ProfitBricks username. Overrides the PB_SUBSCRIPTION_ID environment variable.
+    type: str
     required: false
   subscription_password:
     description:
       - THe ProfitBricks password. Overrides the PB_PASSWORD environment variable.
+    type: str
     required: false
   wait:
     description:
@@ -87,13 +99,19 @@ options:
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
+    type: int
     default: 600
   state:
     description:
       - create or terminate datacenters
+      - "The available choices are: C(present), C(absent)."
+    type: str
     required: false
     default: 'present'
-    choices: ["present", "absent"]
+  server:
+    description:
+      - Server name to attach the volume to.
+    type: str
 
 requirements: [ "profitbricks" ]
 author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
@@ -101,7 +119,7 @@ author: Matt Baldwin (@baldwinSPC) <baldwin@stackpointcloud.com>
 
 EXAMPLES = '''
 - name: Create multiple volumes
-  profitbricks_volume:
+  community.general.profitbricks_volume:
     datacenter: Tardis One
     name: vol%02d
     count: 5
@@ -110,7 +128,7 @@ EXAMPLES = '''
     state: present
 
 - name: Remove Volumes
-  profitbricks_volume:
+  community.general.profitbricks_volume:
     datacenter: Tardis One
     instance_ids:
       - 'vol01'
@@ -357,13 +375,13 @@ def main():
             size=dict(type='int', default=10),
             bus=dict(choices=['VIRTIO', 'IDE'], default='VIRTIO'),
             image=dict(),
-            image_password=dict(default=None, no_log=True),
-            ssh_keys=dict(type='list', default=[]),
+            image_password=dict(no_log=True),
+            ssh_keys=dict(type='list', elements='str', default=[], no_log=False),
             disk_type=dict(choices=['HDD', 'SSD'], default='HDD'),
             licence_type=dict(default='UNKNOWN'),
             count=dict(type='int', default=1),
             auto_increment=dict(type='bool', default=True),
-            instance_ids=dict(type='list', default=[]),
+            instance_ids=dict(type='list', elements='str', default=[]),
             subscription_user=dict(),
             subscription_password=dict(no_log=True),
             wait=dict(type='bool', default=True),

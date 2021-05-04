@@ -23,14 +23,12 @@ options:
     - This file must exist ahead of time.
     - This parameter is required, unless C(xmlstring) is given.
     type: path
-    required: yes
     aliases: [ dest, file ]
   xmlstring:
     description:
     - A string containing XML on which to operate.
     - This parameter is required, unless C(path) is given.
     type: str
-    required: yes
   xpath:
     description:
     - A valid XPath expression describing the item(s) you want to manipulate.
@@ -68,6 +66,7 @@ options:
       or a hash where the key is an element name and the value is the element value.
     - This parameter requires C(xpath) to be set.
     type: list
+    elements: raw
   set_children:
     description:
     - Set the child-element(s) of a selected element for a given C(xpath).
@@ -75,6 +74,7 @@ options:
     - Child elements must be specified as in C(add_children).
     - This parameter requires C(xpath) to be set.
     type: list
+    elements: raw
   count:
     description:
     - Search for a given C(xpath) and provide the count of any matches.
@@ -176,37 +176,37 @@ EXAMPLES = r'''
 # </business>
 
 - name: Remove the 'subjective' attribute of the 'rating' element
-  xml:
+  community.general.xml:
     path: /foo/bar.xml
     xpath: /business/rating/@subjective
     state: absent
 
 - name: Set the rating to '11'
-  xml:
+  community.general.xml:
     path: /foo/bar.xml
     xpath: /business/rating
     value: 11
 
 # Retrieve and display the number of nodes
 - name: Get count of 'beers' nodes
-  xml:
+  community.general.xml:
     path: /foo/bar.xml
     xpath: /business/beers/beer
     count: yes
   register: hits
 
-- debug:
+- ansible.builtin.debug:
     var: hits.count
 
 # Example where parent XML nodes are created automatically
 - name: Add a 'phonenumber' element to the 'business' element
-  xml:
+  community.general.xml:
     path: /foo/bar.xml
     xpath: /business/phonenumber
     value: 555-555-1234
 
 - name: Add several more beers to the 'beers' element
-  xml:
+  community.general.xml:
     path: /foo/bar.xml
     xpath: /business/beers
     add_children:
@@ -215,7 +215,7 @@ EXAMPLES = r'''
     - beer: Old Curmudgeon
 
 - name: Add several more beers to the 'beers' element and add them before the 'Rochefort 10' element
-  xml:
+  community.general.xml:
     path: /foo/bar.xml
     xpath: '/business/beers/beer[text()="Rochefort 10"]'
     insertbefore: yes
@@ -226,17 +226,17 @@ EXAMPLES = r'''
 
 # NOTE: The 'state' defaults to 'present' and 'value' defaults to 'null' for elements
 - name: Add a 'validxhtml' element to the 'website' element
-  xml:
+  community.general.xml:
     path: /foo/bar.xml
     xpath: /business/website/validxhtml
 
 - name: Add an empty 'validatedon' attribute to the 'validxhtml' element
-  xml:
+  community.general.xml:
     path: /foo/bar.xml
     xpath: /business/website/validxhtml/@validatedon
 
 - name: Add or modify an attribute, add element if needed
-  xml:
+  community.general.xml:
     path: /foo/bar.xml
     xpath: /business/website/validxhtml
     attribute: validatedon
@@ -244,24 +244,24 @@ EXAMPLES = r'''
 
 # How to read an attribute value and access it in Ansible
 - name: Read an element's attribute values
-  xml:
+  community.general.xml:
     path: /foo/bar.xml
     xpath: /business/website/validxhtml
     content: attribute
   register: xmlresp
 
 - name: Show an attribute value
-  debug:
+  ansible.builtin.debug:
     var: xmlresp.matches[0].validxhtml.validatedon
 
 - name: Remove all children from the 'website' element (option 1)
-  xml:
+  community.general.xml:
     path: /foo/bar.xml
     xpath: /business/website/*
     state: absent
 
 - name: Remove all children from the 'website' element (option 2)
-  xml:
+  community.general.xml:
     path: /foo/bar.xml
     xpath: /business/website
     children: []
@@ -276,7 +276,7 @@ EXAMPLES = r'''
 
 # NOTE: There is the prefix 'x' in front of the 'bar' element, too.
 - name: Set namespaced '/x:foo/x:bar/y:baz/@z:my_namespaced_attribute' to 'false'
-  xml:
+  community.general.xml:
     path: foo.xml
     xpath: /x:foo/x:bar/y:baz
     namespaces:
@@ -285,6 +285,22 @@ EXAMPLES = r'''
       z: http://z.test
     attribute: z:my_namespaced_attribute
     value: 'false'
+
+- name: Adding building nodes with floor subnodes from a YAML variable
+  community.general.xml:
+    path: /foo/bar.xml
+    xpath: /business
+    add_children:
+      - building:
+          # Attributes
+          name: Scumm bar
+          location: Monkey island
+          # Subnodes
+          _:
+            - floor: Pirate hall
+            - floor: Grog storage
+            - construction_date: "1990"  # Only strings are valid
+      - building: Grog factory
 '''
 
 RETURN = r'''
@@ -411,8 +427,10 @@ def xpath_matches(tree, xpath, namespaces):
 
 def delete_xpath_target(module, tree, xpath, namespaces):
     """ Delete an attribute or element from a tree """
+    changed = False
     try:
         for result in tree.xpath(xpath, namespaces=namespaces):
+            changed = True
             # Get the xpath for this result
             if is_attribute(tree, xpath, namespaces):
                 # Delete an attribute
@@ -429,7 +447,7 @@ def delete_xpath_target(module, tree, xpath, namespaces):
     except Exception as e:
         module.fail_json(msg="Couldn't delete xpath target: %s (%s)" % (xpath, e))
     else:
-        finish(module, tree, xpath, namespaces, changed=True)
+        finish(module, tree, xpath, namespaces, changed=changed)
 
 
 def replace_children_of(children, match):
@@ -809,8 +827,8 @@ def main():
             state=dict(type='str', default='present', choices=['absent', 'present'], aliases=['ensure']),
             value=dict(type='raw'),
             attribute=dict(type='raw'),
-            add_children=dict(type='list'),
-            set_children=dict(type='list'),
+            add_children=dict(type='list', elements='raw'),
+            set_children=dict(type='list', elements='raw'),
             count=dict(type='bool', default=False),
             print_match=dict(type='bool', default=False),
             pretty_print=dict(type='bool', default=False),
@@ -824,8 +842,7 @@ def main():
         supports_check_mode=True,
         required_by=dict(
             add_children=['xpath'],
-            # TODO: Reinstate this in Ansible v2.12 when we have deprecated the incorrect use below
-            # attribute=['value'],
+            attribute=['value'],
             content=['xpath'],
             set_children=['xpath'],
             value=['xpath'],
@@ -873,11 +890,6 @@ def main():
         module.fail_json(msg='The xml ansible module requires lxml 2.3.0 or newer installed on the managed machine')
     elif LooseVersion('.'.join(to_native(f) for f in etree.LXML_VERSION)) < LooseVersion('3.0.0'):
         module.warn('Using lxml version lower than 3.0.0 does not guarantee predictable element attribute order.')
-
-    # Report wrongly used attribute parameter when using content=attribute
-    # TODO: Remove this in Ansible v2.12 (and reinstate strict parameter test above) and remove the integration test example
-    if content == 'attribute' and attribute is not None:
-        module.deprecate("Parameter 'attribute=%s' is ignored when using 'content=attribute' only 'xpath' is used. Please remove entry." % attribute, '2.12')
 
     # Check if the file exists
     if xml_string:

@@ -22,7 +22,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
     author:
         - Jan-Piet Mens (@jpmens)
-    lookup: etcd
+    name: etcd
     short_description: get info from an etcd server
     description:
         - Retrieves data from an etcd server
@@ -53,14 +53,17 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = '''
-    - name: "a value from a locally running etcd"
-      debug: msg={{ lookup('etcd', 'foo/bar') }}
+- name: "a value from a locally running etcd"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.etcd', 'foo/bar') }}"
 
-    - name: "values from multiple folders on a locally running etcd"
-      debug: msg={{ lookup('etcd', 'foo', 'bar', 'baz') }}
+- name: "values from multiple folders on a locally running etcd"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.etcd', 'foo', 'bar', 'baz') }}"
 
-    - name: "since Ansible 2.5 you can set server options inline"
-      debug: msg="{{ lookup('etcd', 'foo', version='v2', url='http://192.168.0.27:4001') }}"
+- name: "since Ansible 2.5 you can set server options inline"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.etcd', 'foo', version='v2', url='http://192.168.0.27:4001') }}"
 '''
 
 RETURN = '''
@@ -68,7 +71,7 @@ RETURN = '''
         description:
             - list of values associated with input keys
         type: list
-        elements: strings
+        elements: string
 '''
 
 import json
@@ -82,7 +85,7 @@ from ansible.module_utils.urls import open_url
 # If etcd  v2 running on host 192.168.1.21 on port 2379
 # we can use the following in a playbook to retrieve /tfm/network/config key
 #
-# - debug: msg={{lookup('etcd','/tfm/network/config', url='http://192.168.1.21:2379' , version='v2')}}
+# - ansible.builtin.debug: msg={{lookup('etcd','/tfm/network/config', url='http://192.168.1.21:2379' , version='v2')}}
 #
 # Example Output:
 #

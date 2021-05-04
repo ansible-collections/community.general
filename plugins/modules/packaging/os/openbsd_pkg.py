@@ -24,39 +24,51 @@ options:
         description:
         - A name or a list of names of the packages.
         required: yes
+        type: list
+        elements: str
     state:
         description:
           - C(present) will make sure the package is installed.
             C(latest) will make sure the latest version of the package is installed.
             C(absent) will make sure the specified package is not installed.
-        choices: [ absent, latest, present ]
+        choices: [ absent, latest, present, installed, removed ]
         default: present
+        type: str
     build:
         description:
           - Build the package from source instead of downloading and installing
             a binary. Requires that the port source tree is already installed.
             Automatically builds and installs the 'sqlports' package, if it is
             not already installed.
+          - Mutually exclusive with I(snapshot).
         type: bool
-        default: 'no'
+        default: no
+    snapshot:
+        description:
+          - Force C(%c) and C(%m) to expand to C(snapshots), even on a release kernel.
+          - Mutually exclusive with I(build).
+        type: bool
+        default: no
+        version_added: 1.3.0
     ports_dir:
         description:
           - When used in combination with the C(build) option, allows overriding
             the default ports source directory.
         default: /usr/ports
+        type: path
     clean:
         description:
           - When updating or removing packages, delete the extra configuration
             file(s) in the old packages which are annotated with @extra in
             the packaging-list.
         type: bool
-        default: 'no'
+        default: no
     quick:
         description:
           - Replace or delete packages quickly; do not bother with checksums
             before removing normal files.
         type: bool
-        default: 'no'
+        default: no
 notes:
   - When used with a `loop:` each package will be processed individually,
     it is much more efficient to pass the list directly to the `name` option.
@@ -64,54 +76,54 @@ notes:
 
 EXAMPLES = '''
 - name: Make sure nmap is installed
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: nmap
     state: present
 
 - name: Make sure nmap is the latest version
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: nmap
     state: latest
 
 - name: Make sure nmap is not installed
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: nmap
     state: absent
 
 - name: Make sure nmap is installed, build it from source if it is not
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: nmap
     state: present
     build: yes
 
 - name: Specify a pkg flavour with '--'
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: vim--no_x11
     state: present
 
 - name: Specify the default flavour to avoid ambiguity errors
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: vim--
     state: present
 
 - name: Specify a package branch (requires at least OpenBSD 6.0)
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: python%3.5
     state: present
 
 - name: Update all packages on the system
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: '*'
     state: latest
 
 - name: Purge a package and it's configuration files
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: mpd
     clean: yes
     state: absent
 
 - name: Quickly remove a package without checking checksums
-  openbsd_pkg:
+  community.general.openbsd_pkg:
     name: qt5
     quick: yes
     state: absent
@@ -152,7 +164,7 @@ def get_package_state(names, pkg_spec, module):
         if stdout:
             # If the requested package name is just a stem, like "python", we may
             # find multiple packages with that name.
-            pkg_spec[name]['installed_names'] = [installed_name for installed_name in stdout.splitlines()]
+            pkg_spec[name]['installed_names'] = stdout.splitlines()
             module.debug("get_package_state(): installed_names = %s" % pkg_spec[name]['installed_names'])
             pkg_spec[name]['installed_state'] = True
         else:
@@ -192,6 +204,9 @@ def package_present(names, pkg_spec, module):
                     module.fail_json(msg="the port source directory %s does not exist" % (port_dir))
             else:
                 install_cmd = 'pkg_add -Im'
+
+        if module.params['snapshot'] is True:
+            install_cmd += ' -Dsnap'
 
         if pkg_spec[name]['installed_state'] is False:
 
@@ -264,6 +279,9 @@ def package_latest(names, pkg_spec, module):
 
     if module.params['quick']:
         upgrade_cmd += 'q'
+
+    if module.params['snapshot']:
+        upgrade_cmd += ' -Dsnap'
 
     for name in names:
         if pkg_spec[name]['installed_state'] is True:
@@ -485,6 +503,9 @@ def upgrade_packages(pkg_spec, module):
     else:
         upgrade_cmd = 'pkg_add -Imu'
 
+    if module.params['snapshot']:
+        upgrade_cmd += ' -Dsnap'
+
     # Create a minimal pkg_spec entry for '*' to store return values.
     pkg_spec['*'] = {}
 
@@ -513,13 +534,15 @@ def upgrade_packages(pkg_spec, module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='list', required=True),
+            name=dict(type='list', elements='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'installed', 'latest', 'present', 'removed']),
             build=dict(type='bool', default=False),
+            snapshot=dict(type='bool', default=False),
             ports_dir=dict(type='path', default='/usr/ports'),
             quick=dict(type='bool', default=False),
             clean=dict(type='bool', default=False),
         ),
+        mutually_exclusive=[['snapshot', 'build']],
         supports_check_mode=True
     )
 

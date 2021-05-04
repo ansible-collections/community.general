@@ -35,21 +35,21 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Query connections
-  influxdb_query:
+  community.general.influxdb_query:
     hostname: "{{ influxdb_ip_address }}"
     database_name: "{{ influxdb_database_name }}"
     query: "select mean(value) from connections"
   register: connection
 
 - name: Query connections with tags filters
-  influxdb_query:
+  community.general.influxdb_query:
     hostname: "{{ influxdb_ip_address }}"
     database_name: "{{ influxdb_database_name }}"
     query: "select mean(value) from connections where region='zue01' and host='server01'"
   register: connection
 
 - name: Print results from the query
-  debug:
+  ansible.builtin.debug:
     var: connection.query_results
 '''
 

@@ -16,10 +16,24 @@ short_description: Makes a filesystem
 description:
   - This module creates a filesystem.
 options:
+  state:
+    description:
+    - If C(state=present), the filesystem is created if it doesn't already
+      exist, that is the default behaviour if I(state) is omitted.
+    - If C(state=absent), filesystem signatures on I(dev) are wiped if it
+      contains a filesystem (as known by C(blkid)).
+    - When C(state=absent), all other options but I(dev) are ignored, and the
+      module doesn't fail if the device I(dev) doesn't actually exist.
+    - C(state=absent) is not supported and will fail on FreeBSD systems.
+    type: str
+    choices: [ present, absent ]
+    default: present
+    version_added: 1.3.0
   fstype:
     choices: [ btrfs, ext2, ext3, ext4, ext4dev, f2fs, lvm, ocfs2, reiserfs, xfs, vfat, swap ]
     description:
-    - Filesystem type to be created.
+    - Filesystem type to be created. This option is required with
+      C(state=present) (or if I(state) is omitted).
     - reiserfs support was added in 2.2.
     - lvm support was added in 2.5.
     - since 2.5, I(dev) can be an image file.
@@ -27,11 +41,12 @@ options:
     - ocfs2 support was added in 2.6
     - f2fs support was added in 2.7
     - swap support was added in 2.8
-    required: yes
+    type: str
     aliases: [type]
   dev:
     description:
     - Target path to device or image file.
+    type: path
     required: yes
     aliases: [device]
   force:
@@ -42,32 +57,42 @@ options:
   resizefs:
     description:
     - If C(yes), if the block device and filesystem size differ, grow the filesystem into the space.
-    - Supported for C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs), C(vfat), C(swap) filesystems.
-    - XFS Will only grow if mounted.
+    - Supported for C(ext2), C(ext3), C(ext4), C(ext4dev), C(f2fs), C(lvm), C(xfs) and C(vfat) filesystems.
+      Attempts to resize other filesystem types will fail.
+    - XFS Will only grow if mounted. Currently, the module is based on commands
+      from C(util-linux) package to perform operations, so resizing of XFS is
+      not supported on FreeBSD systems.
     - vFAT will likely fail if fatresize < 1.04.
     type: bool
     default: 'no'
   opts:
     description:
     - List of options to be passed to mkfs command.
+    type: str
 requirements:
   - Uses tools related to the I(fstype) (C(mkfs)) and C(blkid) command. When I(resizefs) is enabled, C(blockdev) command is required too.
 notes:
   - Potential filesystem on I(dev) are checked using C(blkid), in case C(blkid) isn't able to detect an existing filesystem,
     this filesystem is overwritten even if I(force) is C(no).
+  - This module supports I(check_mode).
 '''
 
 EXAMPLES = '''
 - name: Create a ext2 filesystem on /dev/sdb1
-  filesystem:
+  community.general.filesystem:
     fstype: ext2
     dev: /dev/sdb1
 
 - name: Create a ext4 filesystem on /dev/sdb1 and check disk blocks
-  filesystem:
+  community.general.filesystem:
     fstype: ext4
     dev: /dev/sdb1
     opts: -cc
+
+- name: Blank filesystem signature on /dev/sdb1
+  community.general.filesystem:
+    dev: /dev/sdb1
+    state: absent
 '''
 
 from distutils.version import LooseVersion
@@ -89,12 +114,26 @@ class Device(object):
         statinfo = os.stat(self.path)
         if stat.S_ISBLK(statinfo.st_mode):
             blockdev_cmd = self.module.get_bin_path("blockdev", required=True)
-            _, devsize_in_bytes, _ = self.module.run_command([blockdev_cmd, "--getsize64", self.path], check_rc=True)
+            dummy, devsize_in_bytes, dummy = self.module.run_command([blockdev_cmd, "--getsize64", self.path], check_rc=True)
             return int(devsize_in_bytes)
         elif os.path.isfile(self.path):
             return os.path.getsize(self.path)
         else:
             self.module.fail_json(changed=False, msg="Target device not supported: %s" % self)
+
+    def get_mountpoint(self):
+        """Return (first) mountpoint of device. Returns None when not mounted."""
+        cmd_findmnt = self.module.get_bin_path("findmnt", required=True)
+
+        # find mountpoint
+        rc, mountpoint, dummy = self.module.run_command([cmd_findmnt, "--mtab", "--noheadings", "--output",
+                                                        "TARGET", "--source", self.path], check_rc=False)
+        if rc != 0:
+            mountpoint = None
+        else:
+            mountpoint = mountpoint.split('\n')[0]
+
+        return mountpoint
 
     def __str__(self):
         return self.path
@@ -130,6 +169,22 @@ class Filesystem(object):
             cmd = "%s %s %s '%s'" % (mkfs, self.MKFS_FORCE_FLAGS, opts, dev)
         self.module.run_command(cmd, check_rc=True)
 
+    def wipefs(self, dev):
+        if platform.system() == 'FreeBSD':
+            msg = "module param state=absent is currently not supported on this OS (FreeBSD)."
+            self.module.fail_json(msg=msg)
+
+        if self.module.check_mode:
+            return
+
+        # wipefs comes with util-linux package (as 'blockdev' & 'findmnt' above)
+        # so it is not supported on FreeBSD. Even the use of dd as a fallback is
+        # not doable here if it needs get_mountpoint() (to prevent corruption of
+        # a mounted filesystem), since 'findmnt' is not available on FreeBSD.
+        wipefs = self.module.get_bin_path('wipefs', required=True)
+        cmd = [wipefs, "--all", dev.__str__()]
+        self.module.run_command(cmd, check_rc=True)
+
     def grow_cmd(self, dev):
         cmd = self.module.get_bin_path(self.GROW, required=True)
         return [cmd, str(dev)]
@@ -148,7 +203,7 @@ class Filesystem(object):
         elif self.module.check_mode:
             self.module.exit_json(changed=True, msg="Resizing filesystem %s on device %s" % (self.fstype, dev))
         else:
-            _, out, _ = self.module.run_command(self.grow_cmd(dev), check_rc=True)
+            dummy, out, dummy = self.module.run_command(self.grow_cmd(dev), check_rc=True)
             return out
 
 
@@ -159,7 +214,7 @@ class Ext(Filesystem):
     def get_fs_size(self, dev):
         cmd = self.module.get_bin_path('tune2fs', required=True)
         # Get Block count and Block size
-        _, size, _ = self.module.run_command([cmd, '-l', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
+        dummy, size, dummy = self.module.run_command([cmd, '-l', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
         for line in size.splitlines():
             if 'Block count:' in line:
                 block_count = int(line.split(':')[1].strip())
@@ -186,18 +241,43 @@ class XFS(Filesystem):
     GROW = 'xfs_growfs'
 
     def get_fs_size(self, dev):
-        cmd = self.module.get_bin_path('xfs_growfs', required=True)
-        _, size, _ = self.module.run_command([cmd, '-n', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
-        for line in size.splitlines():
+        cmd = self.module.get_bin_path('xfs_info', required=True)
+
+        mountpoint = dev.get_mountpoint()
+        if mountpoint:
+            rc, out, err = self.module.run_command([cmd, str(mountpoint)], environ_update=self.LANG_ENV)
+        else:
+            # Recent GNU/Linux distros support access to unmounted XFS filesystems
+            rc, out, err = self.module.run_command([cmd, str(dev)], environ_update=self.LANG_ENV)
+        if rc != 0:
+            self.module.fail_json(msg="Error while attempting to query size of XFS filesystem: %s" % err)
+
+        for line in out.splitlines():
             col = line.split('=')
             if col[0].strip() == 'data':
                 if col[1].strip() != 'bsize':
-                    self.module.fail_json(msg='Unexpected output format from xfs_growfs (could not locate "bsize")')
+                    self.module.fail_json(msg='Unexpected output format from xfs_info (could not locate "bsize")')
                 if col[2].split()[1] != 'blocks':
-                    self.module.fail_json(msg='Unexpected output format from xfs_growfs (could not locate "blocks")')
+                    self.module.fail_json(msg='Unexpected output format from xfs_info (could not locate "blocks")')
                 block_size = int(col[2].split()[0])
                 block_count = int(col[3].split(',')[0])
                 return block_size * block_count
+
+    def grow_cmd(self, dev):
+        # Check first if growing is needed, and then if it is doable or not.
+        devsize_in_bytes = dev.size()
+        fssize_in_bytes = self.get_fs_size(dev)
+        if not fssize_in_bytes < devsize_in_bytes:
+            self.module.exit_json(changed=False, msg="%s filesystem is using the whole device %s" % (self.fstype, dev))
+
+        mountpoint = dev.get_mountpoint()
+        if not mountpoint:
+            # xfs filesystem needs to be mounted
+            self.module.fail_json(msg="%s needs to be mounted for xfs operations" % dev)
+
+        cmd = self.module.get_bin_path(self.GROW, required=True)
+
+        return [cmd, str(mountpoint)]
 
 
 class Reiserfs(Filesystem):
@@ -210,7 +290,7 @@ class Btrfs(Filesystem):
 
     def __init__(self, module):
         super(Btrfs, self).__init__(module)
-        _, stdout, stderr = self.module.run_command('%s --version' % self.MKFS, check_rc=True)
+        dummy, stdout, stderr = self.module.run_command('%s --version' % self.MKFS, check_rc=True)
         match = re.search(r" v([0-9.]+)", stdout)
         if not match:
             # v0.20-rc1 use stderr
@@ -240,7 +320,7 @@ class F2fs(Filesystem):
     def MKFS_FORCE_FLAGS(self):
         mkfs = self.module.get_bin_path(self.MKFS, required=True)
         cmd = "%s %s" % (mkfs, os.devnull)
-        _, out, _ = self.module.run_command(cmd, check_rc=False, environ_update=self.LANG_ENV)
+        dummy, out, dummy = self.module.run_command(cmd, check_rc=False, environ_update=self.LANG_ENV)
         # Looking for "	F2FS-tools: mkfs.f2fs Ver: 1.10.0 (2018-01-30)"
         # mkfs.f2fs displays version since v1.2.0
         match = re.search(r"F2FS-tools: mkfs.f2fs Ver: ([0-9.]+) \(", out)
@@ -255,7 +335,7 @@ class F2fs(Filesystem):
     def get_fs_size(self, dev):
         cmd = self.module.get_bin_path('dump.f2fs', required=True)
         # Get sector count and sector size
-        _, dump, _ = self.module.run_command([cmd, str(dev)], check_rc=True, environ_update=self.LANG_ENV)
+        dummy, dump, dummy = self.module.run_command([cmd, str(dev)], check_rc=True, environ_update=self.LANG_ENV)
         sector_size = None
         sector_count = None
         for line in dump.splitlines():
@@ -284,7 +364,7 @@ class VFAT(Filesystem):
 
     def get_fs_size(self, dev):
         cmd = self.module.get_bin_path(self.GROW, required=True)
-        _, output, _ = self.module.run_command([cmd, '--info', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
+        dummy, output, dummy = self.module.run_command([cmd, '--info', str(dev)], check_rc=True, environ_update=self.LANG_ENV)
         for line in output.splitlines()[1:]:
             param, value = line.split(':', 1)
             if param.strip() == 'Size':
@@ -303,7 +383,7 @@ class LVM(Filesystem):
 
     def get_fs_size(self, dev):
         cmd = self.module.get_bin_path('pvs', required=True)
-        _, size, _ = self.module.run_command([cmd, '--noheadings', '-o', 'pv_size', '--units', 'b', '--nosuffix', str(dev)], check_rc=True)
+        dummy, size, dummy = self.module.run_command([cmd, '--noheadings', '-o', 'pv_size', '--units', 'b', '--nosuffix', str(dev)], check_rc=True)
         block_count = int(size)
         return block_count
 
@@ -339,34 +419,35 @@ def main():
     # There is no "single command" to manipulate filesystems, so we map them all out and their options
     module = AnsibleModule(
         argument_spec=dict(
-            fstype=dict(required=True, aliases=['type'],
-                        choices=list(fstypes)),
-            dev=dict(required=True, aliases=['device']),
-            opts=dict(),
+            state=dict(type='str', default='present', choices=['present', 'absent']),
+            fstype=dict(type='str', aliases=['type'], choices=list(fstypes)),
+            dev=dict(type='path', required=True, aliases=['device']),
+            opts=dict(type='str'),
             force=dict(type='bool', default=False),
             resizefs=dict(type='bool', default=False),
         ),
+        required_if=[
+            ('state', 'present', ['fstype'])
+        ],
         supports_check_mode=True,
     )
 
+    state = module.params['state']
     dev = module.params['dev']
     fstype = module.params['fstype']
     opts = module.params['opts']
     force = module.params['force']
     resizefs = module.params['resizefs']
 
-    if fstype in friendly_names:
-        fstype = friendly_names[fstype]
-
     changed = False
 
-    try:
-        klass = FILESYSTEMS[fstype]
-    except KeyError:
-        module.fail_json(changed=False, msg="module does not support this filesystem (%s) yet." % fstype)
-
     if not os.path.exists(dev):
-        module.fail_json(msg="Device %s not found." % dev)
+        msg = "Device %s not found." % dev
+        if state == "present":
+            module.fail_json(msg=msg)
+        else:
+            module.exit_json(msg=msg)
+
     dev = Device(module, dev)
 
     cmd = module.get_bin_path('blkid', required=True)
@@ -375,24 +456,39 @@ def main():
     # then this existing filesystem would be overwritten even if force isn't enabled.
     fs = raw_fs.strip()
 
-    filesystem = klass(module)
+    if state == "present":
+        if fstype in friendly_names:
+            fstype = friendly_names[fstype]
 
-    same_fs = fs and FILESYSTEMS.get(fs) == FILESYSTEMS[fstype]
-    if same_fs and not resizefs and not force:
-        module.exit_json(changed=False)
-    elif same_fs and resizefs:
-        if not filesystem.GROW:
-            module.fail_json(changed=False, msg="module does not support resizing %s filesystem yet." % fstype)
+        try:
+            klass = FILESYSTEMS[fstype]
+        except KeyError:
+            module.fail_json(changed=False, msg="module does not support this filesystem (%s) yet." % fstype)
 
-        out = filesystem.grow(dev)
+        filesystem = klass(module)
 
-        module.exit_json(changed=True, msg=out)
-    elif fs and not force:
-        module.fail_json(msg="'%s' is already used as %s, use force=yes to overwrite" % (dev, fs), rc=rc, err=err)
+        same_fs = fs and FILESYSTEMS.get(fs) == FILESYSTEMS[fstype]
+        if same_fs and not resizefs and not force:
+            module.exit_json(changed=False)
+        elif same_fs and resizefs:
+            if not filesystem.GROW:
+                module.fail_json(changed=False, msg="module does not support resizing %s filesystem yet." % fstype)
 
-    # create fs
-    filesystem.create(opts, dev)
-    changed = True
+            out = filesystem.grow(dev)
+
+            module.exit_json(changed=True, msg=out)
+        elif fs and not force:
+            module.fail_json(msg="'%s' is already used as %s, use force=yes to overwrite" % (dev, fs), rc=rc, err=err)
+
+        # create fs
+        filesystem.create(opts, dev)
+        changed = True
+
+    elif fs:
+        # wipe fs signatures
+        filesystem = Filesystem(module)
+        filesystem.wipefs(dev)
+        changed = True
 
     module.exit_json(changed=changed)
 

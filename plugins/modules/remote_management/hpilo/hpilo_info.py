@@ -19,7 +19,7 @@ description:
   for provisioning (e.g. macaddress, uuid).
 - This module requires the C(hpilo) python module.
 - This module was called C(hpilo_facts) before Ansible 2.9, returning C(ansible_facts).
-  Note that the M(hpilo_info) module no longer returns C(ansible_facts)!
+  Note that the M(community.general.hpilo_info) module no longer returns C(ansible_facts)!
 options:
   host:
     description:
@@ -47,7 +47,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Gather facts from a HP iLO interface only if the system is an HP server
-  hpilo_info:
+  community.general.hpilo_info:
     host: YOUR_ILO_ADDRESS
     login: YOUR_ILO_LOGIN
     password: YOUR_ILO_PASSWORD
@@ -55,7 +55,7 @@ EXAMPLES = r'''
   delegate_to: localhost
   register: results
 
-- fail:
+- ansible.builtin.fail:
     msg: 'CMDB serial ({{ cmdb_serialno }}) does not match hardware serial ({{ results.hw_system_serial }}) !'
   when: cmdb_serialno != results.hw_system_serial
 '''
@@ -159,10 +159,6 @@ def main():
         ),
         supports_check_mode=True,
     )
-    is_old_facts = module._name in ('hpilo_facts', 'community.general.hpilo_facts')
-    if is_old_facts:
-        module.deprecate("The 'hpilo_facts' module has been renamed to 'hpilo_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
 
     if not HAS_HPILO:
         module.fail_json(msg=missing_required_lib('python-hpilo'), exception=HPILO_IMP_ERR)
@@ -247,10 +243,7 @@ def main():
         # reformat into a text friendly format
         info['hw_memory_total'] = "{0} GB".format(info['hw_memory_total'])
 
-    if is_old_facts:
-        module.exit_json(ansible_facts=info)
-    else:
-        module.exit_json(**info)
+    module.exit_json(**info)
 
 
 if __name__ == '__main__':

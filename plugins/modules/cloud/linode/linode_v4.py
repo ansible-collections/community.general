@@ -27,23 +27,20 @@ options:
     description:
       - The region of the instance. This is a required parameter only when
         creating Linode instances. See
-        U(https://developers.linode.com/api/v4#tag/Regions).
-    required: false
+        U(https://www.linode.com/docs/api/regions/).
     type: str
   image:
     description:
       - The image of the instance. This is a required parameter only when
         creating Linode instances. See
-        U(https://developers.linode.com/api/v4#tag/Images).
+        U(https://www.linode.com/docs/api/images/).
     type: str
-    required: false
   type:
     description:
       - The type of the instance. This is a required parameter only when
         creating Linode instances. See
-        U(https://developers.linode.com/api/v4#tag/Linode-Types).
+        U(https://www.linode.com/docs/api/linode-types/).
     type: str
-    required: false
   label:
     description:
       - The instance label. This label is used as the main determiner for
@@ -56,25 +53,30 @@ options:
          group labelling is deprecated but still supported. The encouraged
          method for marking instances is to use tags.
     type: str
-    required: false
+  private_ip:
+    description:
+      - If C(true), the created Linode will have private networking enabled and
+        assigned a private IPv4 address.
+    type: bool
+    default: false
+    version_added: 3.0.0
   tags:
     description:
       - The tags that the instance should be marked under. See
-        U(https://developers.linode.com/api/v4#tag/Tags).
-    required: false
+        U(https://www.linode.com/docs/api/tags/).
     type: list
+    elements: str
   root_pass:
     description:
       - The password for the root user. If not specified, one will be
         generated. This generated password will be available in the task
         success JSON.
-    required: false
     type: str
   authorized_keys:
     description:
       - A list of SSH public key parts to deploy for the root user.
-    required: false
     type: list
+    elements: str
   state:
     description:
       - The desired instance state.
@@ -87,13 +89,28 @@ options:
     description:
       - The Linode API v4 access token. It may also be specified by exposing
         the C(LINODE_ACCESS_TOKEN) environment variable. See
-        U(https://developers.linode.com/api/v4#section/Access-and-Authentication).
+        U(https://www.linode.com/docs/api#access-and-authentication).
     required: true
+    type: str
+  stackscript_id:
+    description:
+      - The numeric ID of the StackScript to use when creating the instance.
+        See U(https://www.linode.com/docs/api/stackscripts/).
+    type: int
+    version_added: 1.3.0
+  stackscript_data:
+    description:
+      - An object containing arguments to any User Defined Fields present in
+        the StackScript used when creating the instance.
+        Only valid when a stackscript_id is provided.
+        See U(https://www.linode.com/docs/api/stackscripts/).
+    type: dict
+    version_added: 1.3.0
 '''
 
 EXAMPLES = """
 - name: Create a new Linode.
-  linode_v4:
+  community.general.linode_v4:
     label: new-linode
     type: g6-nanode-1
     region: eu-west
@@ -101,10 +118,13 @@ EXAMPLES = """
     root_pass: passw0rd
     authorized_keys:
       - "ssh-rsa ..."
+    stackscript_id: 1337
+    stackscript_data:
+      variable: value
     state: present
 
 - name: Delete that new Linode.
-  linode_v4:
+  community.general.linode_v4:
     label: new-linode
     state: absent
 """
@@ -188,9 +208,8 @@ def create_linode(module, client, **kwargs):
         else:
             return response._raw_json
     except TypeError:
-        module.fail_json(msg='Unable to parse Linode instance creation'
-                             ' response. Please raise a bug against this'
-                             ' module on https://github.com/ansible/ansible/issues'
+        module.fail_json(msg='Unable to parse Linode instance creation response. Please raise a bug against this'
+                             ' module on https://github.com/ansible-collections/community.general/issues'
                          )
 
 
@@ -222,13 +241,16 @@ def initialise_module():
                 no_log=True,
                 fallback=(env_fallback, ['LINODE_ACCESS_TOKEN']),
             ),
-            authorized_keys=dict(type='list', required=False),
-            group=dict(type='str', required=False),
-            image=dict(type='str', required=False),
-            region=dict(type='str', required=False),
-            root_pass=dict(type='str', required=False, no_log=True),
-            tags=dict(type='list', required=False),
-            type=dict(type='str', required=False),
+            authorized_keys=dict(type='list', elements='str', no_log=False),
+            group=dict(type='str'),
+            image=dict(type='str'),
+            private_ip=dict(type='bool', default=False),
+            region=dict(type='str'),
+            root_pass=dict(type='str', no_log=True),
+            tags=dict(type='list', elements='str'),
+            type=dict(type='str'),
+            stackscript_id=dict(type='int'),
+            stackscript_data=dict(type='dict'),
         ),
         supports_check_mode=False,
         required_one_of=(
@@ -268,10 +290,13 @@ def main():
             group=module.params['group'],
             image=module.params['image'],
             label=module.params['label'],
+            private_ip=module.params['private_ip'],
             region=module.params['region'],
             root_pass=module.params['root_pass'],
             tags=module.params['tags'],
             ltype=module.params['type'],
+            stackscript=module.params['stackscript_id'],
+            stackscript_data=module.params['stackscript_data'],
         )
         module.exit_json(changed=True, instance=instance_json)
 

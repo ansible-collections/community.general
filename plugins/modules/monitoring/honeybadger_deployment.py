@@ -16,23 +16,29 @@ description:
    - Notify Honeybadger.io about app deployments (see http://docs.honeybadger.io/article/188-deployment-tracking)
 options:
   token:
+    type: str
     description:
       - API token.
     required: true
   environment:
+    type: str
     description:
       - The environment name, typically 'production', 'staging', etc.
     required: true
   user:
+    type: str
     description:
       - The username of the person doing the deployment
   repo:
+    type: str
     description:
       - URL of the project repository
   revision:
+    type: str
     description:
       - A hash, number, tag, or other identifier showing what revision was deployed
   url:
+    type: str
     description:
       - Optional URL to submit the notification to.
     default: "https://api.honeybadger.io/v1/deploys"
@@ -47,7 +53,7 @@ options:
 
 EXAMPLES = '''
 - name: Notify Honeybadger.io about an app deployment
-  honeybadger_deployment:
+  community.general.honeybadger_deployment:
     token: AAAAAA
     environment: staging
     user: ansible
@@ -79,7 +85,7 @@ def main():
             repo=dict(required=False),
             revision=dict(required=False),
             url=dict(required=False, default='https://api.honeybadger.io/v1/deploys'),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         ),
         supports_check_mode=True
     )

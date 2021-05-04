@@ -1,6 +1,10 @@
 #
 # Copyright 2018 www.privaz.io Valletech AB
+#
 # Simplified BSD License (see licenses/simplified_bsd.txt or https://opensource.org/licenses/BSD-2-Clause)
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 
 import time
@@ -35,14 +39,16 @@ class OpenNebulaModule:
         wait_timeout=dict(type='int', default=300),
     )
 
-    def __init__(self, argument_spec, supports_check_mode=False, mutually_exclusive=None):
+    def __init__(self, argument_spec, supports_check_mode=False, mutually_exclusive=None, required_one_of=None, required_if=None):
 
-        module_args = OpenNebulaModule.common_args
+        module_args = OpenNebulaModule.common_args.copy()
         module_args.update(argument_spec)
 
         self.module = AnsibleModule(argument_spec=module_args,
                                     supports_check_mode=supports_check_mode,
-                                    mutually_exclusive=mutually_exclusive)
+                                    mutually_exclusive=mutually_exclusive,
+                                    required_one_of=required_one_of,
+                                    required_if=required_if)
         self.result = dict(changed=False,
                            original_message='',
                            message='')

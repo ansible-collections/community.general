@@ -76,11 +76,9 @@ options:
     description:
     - If set C("True") with state as C("absent"), then removes DNS records of the host managed by FreeIPA DNS.
     - This option has no effect for states other than "absent".
-    default: false
     type: bool
   random_password:
     description: Generate a random password to be used in bulk enrollment.
-    default: False
     type: bool
 extends_documentation_fragment:
 - community.general.ipa.documentation
@@ -89,7 +87,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure host is present
-  ipa_host:
+  community.general.ipa_host:
     name: host01.example.com
     description: Example host
     ip_address: 192.168.0.123
@@ -105,7 +103,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Generate a random password for bulk enrolment
-  ipa_host:
+  community.general.ipa_host:
     name: host01.example.com
     description: Example host
     ip_address: 192.168.0.123
@@ -117,7 +115,7 @@ EXAMPLES = r'''
     random_password: True
 
 - name: Ensure host is disabled
-  ipa_host:
+  community.general.ipa_host:
     name: host01.example.com
     state: disabled
     ipa_host: ipa.example.com
@@ -125,7 +123,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure that all user certificates are removed
-  ipa_host:
+  community.general.ipa_host:
     name: host01.example.com
     user_certificate: []
     ipa_host: ipa.example.com
@@ -133,7 +131,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure host is absent
-  ipa_host:
+  community.general.ipa_host:
     name: host01.example.com
     state: absent
     ipa_host: ipa.example.com
@@ -141,7 +139,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure host and its DNS record is absent
-  ipa_host:
+  community.general.ipa_host:
     name: host01.example.com
     state: absent
     ipa_host: ipa.example.com
@@ -284,7 +282,7 @@ def main():
                          mac_address=dict(type='list', aliases=['macaddress'], elements='str'),
                          update_dns=dict(type='bool'),
                          state=dict(type='str', default='present', choices=['present', 'absent', 'enabled', 'disabled']),
-                         random_password=dict(type='bool'),)
+                         random_password=dict(type='bool', no_log=False),)
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True)

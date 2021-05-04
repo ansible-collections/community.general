@@ -19,6 +19,7 @@ options:
   filter:
     description:
       - Filter facts
+    type: str
     choices: [ status, result ]
 notes:
   - See http://cloudinit.readthedocs.io/ for more information about cloud-init.
@@ -26,14 +27,14 @@ notes:
 
 EXAMPLES = '''
 - name: Gather all facts of cloud init
-  cloud_init_data_facts:
+  community.general.cloud_init_data_facts:
   register: result
 
-- debug:
+- ansible.builtin.debug:
     var: result
 
 - name: Wait for cloud init to finish
-  cloud_init_data_facts:
+  community.general.cloud_init_data_facts:
     filter: status
   register: res
   until: "res.cloud_init_data_facts.status.v1.stage is defined and not res.cloud_init_data_facts.status.v1.stage"

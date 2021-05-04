@@ -7,7 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-callback: mail
+name: mail
 type: notification
 short_description: Sends failure events via email
 description:
@@ -52,7 +52,7 @@ options:
     ini:
         - section: callback_mail
           key: bcc
-note:
+notes:
 - "TODO: expand configuration options now that plugins can leverage Ansible's configuration"
 '''
 

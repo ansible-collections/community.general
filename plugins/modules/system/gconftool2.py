@@ -18,25 +18,30 @@ description:
     gconftool-2.  Please see the gconftool-2(1) man pages for more details.
 options:
   key:
+    type: str
     description:
     - A GConf preference key is an element in the GConf repository
       that corresponds to an application preference. See man gconftool-2(1)
     required: yes
   value:
+    type: str
     description:
     - Preference keys typically have simple values such as strings,
       integers, or lists of strings and integers. This is ignored if the state
       is "get". See man gconftool-2(1)
   value_type:
+    type: str
     description:
     - The type of value being set. This is ignored if the state is "get".
     choices: [ bool, float, int, string ]
   state:
+    type: str
     description:
     - The action to take upon the key/value.
     required: yes
     choices: [ absent, get, present ]
   config_source:
+    type: str
     description:
     - Specify a configuration source to use rather than the default path.
       See man gconftool-2(1)
@@ -51,7 +56,7 @@ options:
 
 EXAMPLES = """
 - name: Change the widget font to "Serif 12"
-  gconftool2:
+  community.general.gconftool2:
     key: "/desktop/gnome/interface/font_name"
     value_type: "string"
     value: "Serif 12"
@@ -146,7 +151,7 @@ def main():
     # Setup the Ansible module
     module = AnsibleModule(
         argument_spec=dict(
-            key=dict(type='str', required=True),
+            key=dict(type='str', required=True, no_log=False),
             value_type=dict(type='str', choices=['bool', 'float', 'int', 'string']),
             value=dict(type='str'),
             state=dict(type='str', required=True, choices=['absent', 'get', 'present']),
@@ -195,7 +200,7 @@ def main():
     gconf_pref = GConf2Preference(module, key, value_type,
                                   value, direct, config_source)
     # Now we get the current value, if not found don't fail
-    _, current_value = gconf_pref.call("get", fail_onerr=False)
+    dummy, current_value = gconf_pref.call("get", fail_onerr=False)
 
     # Check if the current value equals the value we want to set.  If not, make
     # a change

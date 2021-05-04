@@ -16,7 +16,7 @@ description:
 author: "Kamil Szczygiel (@kamsz)"
 requirements:
     - "python >= 2.6"
-    - "influxdb >= 0.9 & <= 1.2.4"
+    - "influxdb >= 0.9"
     - requests
 options:
     database_name:
@@ -38,18 +38,18 @@ extends_documentation_fragment:
 EXAMPLES = r'''
 # Example influxdb_database command from Ansible Playbooks
 - name: Create database
-  influxdb_database:
+  community.general.influxdb_database:
       hostname: "{{influxdb_ip_address}}"
       database_name: "{{influxdb_database_name}}"
 
 - name: Destroy database
-  influxdb_database:
+  community.general.influxdb_database:
       hostname: "{{influxdb_ip_address}}"
       database_name: "{{influxdb_database_name}}"
       state: absent
 
 - name: Create database using custom credentials
-  influxdb_database:
+  community.general.influxdb_database:
       hostname: "{{influxdb_ip_address}}"
       username: "{{influxdb_username}}"
       password: "{{influxdb_password}}"

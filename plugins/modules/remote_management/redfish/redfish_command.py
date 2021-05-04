@@ -28,21 +28,30 @@ options:
     description:
       - List of commands to execute on OOB controller
     type: list
+    elements: str
   baseuri:
     required: true
     description:
       - Base URI of OOB controller
     type: str
   username:
-    required: true
     description:
       - Username for authentication with OOB controller
     type: str
   password:
-    required: true
     description:
       - Password for authentication with OOB controller
     type: str
+  auth_token:
+    description:
+      - Security token for authentication with OOB controller
+    type: str
+    version_added: 2.3.0
+  session_uri:
+    description:
+      - URI of the session resource
+    type: str
+    version_added: 2.3.0
   id:
     required: false
     aliases: [ account_id ]
@@ -198,7 +207,7 @@ author: "Jose Delarosa (@jose-delarosa)"
 
 EXAMPLES = '''
   - name: Restart system power gracefully
-    redfish_command:
+    community.general.redfish_command:
       category: Systems
       command: PowerGracefulRestart
       resource_id: 437XR1138R2
@@ -206,8 +215,38 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
 
+  - name: Turn system power off
+    community.general.redfish_command:
+      category: Systems
+      command: PowerForceOff
+      resource_id: 437XR1138R2
+
+  - name: Restart system power forcefully
+    community.general.redfish_command:
+      category: Systems
+      command: PowerForceRestart
+      resource_id: 437XR1138R2
+
+  - name: Shutdown system power gracefully
+    community.general.redfish_command:
+      category: Systems
+      command: PowerGracefulShutdown
+      resource_id: 437XR1138R2
+
+  - name: Turn system power on
+    community.general.redfish_command:
+      category: Systems
+      command: PowerOn
+      resource_id: 437XR1138R2
+
+  - name: Reboot system power
+    community.general.redfish_command:
+      category: Systems
+      command: PowerReboot
+      resource_id: 437XR1138R2
+
   - name: Set one-time boot device to {{ bootdevice }}
-    redfish_command:
+    community.general.redfish_command:
       category: Systems
       command: SetOneTimeBoot
       resource_id: 437XR1138R2
@@ -217,7 +256,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Set one-time boot device to UefiTarget of "/0x31/0x33/0x01/0x01"
-    redfish_command:
+    community.general.redfish_command:
       category: Systems
       command: SetOneTimeBoot
       resource_id: 437XR1138R2
@@ -228,7 +267,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Set one-time boot device to BootNext target of "Boot0001"
-    redfish_command:
+    community.general.redfish_command:
       category: Systems
       command: SetOneTimeBoot
       resource_id: 437XR1138R2
@@ -238,17 +277,23 @@ EXAMPLES = '''
       username: "{{ username }}"
       password: "{{ password }}"
 
-  - name: Set chassis indicator LED to blink
-    redfish_command:
-      category: Chassis
-      command: IndicatorLedBlink
-      resource_id: 1U
+  - name: Set persistent boot device override
+    community.general.redfish_command:
+      category: Systems
+      command: EnableContinuousBootOverride
+      resource_id: 437XR1138R2
+      bootdevice: "{{ bootdevice }}"
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
 
+  - name: Disable persistent boot device override
+    community.general.redfish_command:
+      category: Systems
+      command: DisableBootOverride
+
   - name: Add user
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: AddUser
       baseuri: "{{ baseuri }}"
@@ -259,7 +304,7 @@ EXAMPLES = '''
       roleid: "{{ roleid }}"
 
   - name: Add user using new option aliases
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: AddUser
       baseuri: "{{ baseuri }}"
@@ -270,7 +315,7 @@ EXAMPLES = '''
       account_roleid: "{{ account_roleid }}"
 
   - name: Delete user
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: DeleteUser
       baseuri: "{{ baseuri }}"
@@ -279,7 +324,7 @@ EXAMPLES = '''
       account_username: "{{ account_username }}"
 
   - name: Disable user
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: DisableUser
       baseuri: "{{ baseuri }}"
@@ -288,7 +333,7 @@ EXAMPLES = '''
       account_username: "{{ account_username }}"
 
   - name: Enable user
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: EnableUser
       baseuri: "{{ baseuri }}"
@@ -297,7 +342,7 @@ EXAMPLES = '''
       account_username: "{{ account_username }}"
 
   - name: Add and enable user
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: AddUser,EnableUser
       baseuri: "{{ baseuri }}"
@@ -308,7 +353,7 @@ EXAMPLES = '''
       roleid: "{{ roleid }}"
 
   - name: Update user password
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: UpdateUserPassword
       baseuri: "{{ baseuri }}"
@@ -318,7 +363,7 @@ EXAMPLES = '''
       account_password: "{{ account_password }}"
 
   - name: Update user role
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: UpdateUserRole
       baseuri: "{{ baseuri }}"
@@ -328,7 +373,7 @@ EXAMPLES = '''
       roleid: "{{ roleid }}"
 
   - name: Update user name
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: UpdateUserName
       baseuri: "{{ baseuri }}"
@@ -338,7 +383,7 @@ EXAMPLES = '''
       account_updatename: "{{ account_updatename }}"
 
   - name: Update user name
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: UpdateUserName
       baseuri: "{{ baseuri }}"
@@ -348,7 +393,7 @@ EXAMPLES = '''
       update_username: "{{ update_username }}"
 
   - name: Update AccountService properties
-    redfish_command:
+    community.general.redfish_command:
       category: Accounts
       command: UpdateAccountServiceProperties
       baseuri: "{{ baseuri }}"
@@ -359,7 +404,7 @@ EXAMPLES = '''
         AccountLockoutDuration: 600
 
   - name: Clear Manager Logs with a timeout of 20 seconds
-    redfish_command:
+    community.general.redfish_command:
       category: Manager
       command: ClearLogs
       resource_id: BMC
@@ -368,8 +413,33 @@ EXAMPLES = '''
       password: "{{ password }}"
       timeout: 20
 
+  - name: Create session
+    community.general.redfish_command:
+      category: Sessions
+      command: CreateSession
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+    register: result
+
+  - name: Set chassis indicator LED to blink using security token for auth
+    community.general.redfish_command:
+      category: Chassis
+      command: IndicatorLedBlink
+      resource_id: 1U
+      baseuri: "{{ baseuri }}"
+      auth_token: "{{ result.session.token }}"
+
+  - name: Delete session using security token created by CreateSesssion above
+    community.general.redfish_command:
+      category: Sessions
+      command: DeleteSession
+      baseuri: "{{ baseuri }}"
+      auth_token: "{{ result.session.token }}"
+      session_uri: "{{ result.session.uri }}"
+
   - name: Clear Sessions
-    redfish_command:
+    community.general.redfish_command:
       category: Sessions
       command: ClearSessions
       baseuri: "{{ baseuri }}"
@@ -377,7 +447,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Simple update
-    redfish_command:
+    community.general.redfish_command:
       category: Update
       command: SimpleUpdate
       baseuri: "{{ baseuri }}"
@@ -386,7 +456,7 @@ EXAMPLES = '''
       update_image_uri: https://example.com/myupdate.img
 
   - name: Simple update with additional options
-    redfish_command:
+    community.general.redfish_command:
       category: Update
       command: SimpleUpdate
       baseuri: "{{ baseuri }}"
@@ -401,7 +471,7 @@ EXAMPLES = '''
         password: supersecretpwd
 
   - name: Insert Virtual Media
-    redfish_command:
+    community.general.redfish_command:
       category: Manager
       command: VirtualMediaInsert
       baseuri: "{{ baseuri }}"
@@ -415,7 +485,7 @@ EXAMPLES = '''
       resource_id: BMC
 
   - name: Eject Virtual Media
-    redfish_command:
+    community.general.redfish_command:
       category: Manager
       command: VirtualMediaEject
       baseuri: "{{ baseuri }}"
@@ -423,6 +493,51 @@ EXAMPLES = '''
       password: "{{ password }}"
       virtual_media:
         image_url: 'http://example.com/images/SomeLinux-current.iso'
+      resource_id: BMC
+
+  - name: Restart manager power gracefully
+    community.general.redfish_command:
+      category: Manager
+      command: GracefulRestart
+      resource_id: BMC
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+
+  - name: Restart manager power gracefully
+    community.general.redfish_command:
+      category: Manager
+      command: PowerGracefulRestart
+      resource_id: BMC
+
+  - name: Turn manager power off
+    community.general.redfish_command:
+      category: Manager
+      command: PowerForceOff
+      resource_id: BMC
+
+  - name: Restart manager power forcefully
+    community.general.redfish_command:
+      category: Manager
+      command: PowerForceRestart
+      resource_id: BMC
+
+  - name: Shutdown manager power gracefully
+    community.general.redfish_command:
+      category: Manager
+      command: PowerGracefulShutdown
+      resource_id: BMC
+
+  - name: Turn manager power on
+    community.general.redfish_command:
+      category: Manager
+      command: PowerOn
+      resource_id: BMC
+
+  - name: Reboot manager power
+    community.general.redfish_command:
+      category: Manager
+      command: PowerReboot
       resource_id: BMC
 '''
 
@@ -442,14 +557,15 @@ from ansible.module_utils._text import to_native
 # More will be added as module features are expanded
 CATEGORY_COMMANDS_ALL = {
     "Systems": ["PowerOn", "PowerForceOff", "PowerForceRestart", "PowerGracefulRestart",
-                "PowerGracefulShutdown", "PowerReboot", "SetOneTimeBoot"],
+                "PowerGracefulShutdown", "PowerReboot", "SetOneTimeBoot", "EnableContinuousBootOverride", "DisableBootOverride"],
     "Chassis": ["IndicatorLedOn", "IndicatorLedOff", "IndicatorLedBlink"],
     "Accounts": ["AddUser", "EnableUser", "DeleteUser", "DisableUser",
                  "UpdateUserRole", "UpdateUserPassword", "UpdateUserName",
                  "UpdateAccountServiceProperties"],
-    "Sessions": ["ClearSessions"],
+    "Sessions": ["ClearSessions", "CreateSession", "DeleteSession"],
     "Manager": ["GracefulRestart", "ClearLogs", "VirtualMediaInsert",
-                "VirtualMediaEject"],
+                "VirtualMediaEject", "PowerOn", "PowerForceOff", "PowerForceRestart",
+                "PowerGracefulRestart", "PowerGracefulShutdown", "PowerReboot"],
     "Update": ["SimpleUpdate"]
 }
 
@@ -459,10 +575,12 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             category=dict(required=True),
-            command=dict(required=True, type='list'),
+            command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(required=True),
-            password=dict(required=True, no_log=True),
+            username=dict(),
+            password=dict(no_log=True),
+            auth_token=dict(no_log=True),
+            session_uri=dict(),
             id=dict(aliases=["account_id"]),
             new_username=dict(aliases=["account_username"]),
             new_password=dict(aliases=["account_password"], no_log=True),
@@ -481,7 +599,7 @@ def main():
                 type='dict',
                 options=dict(
                     username=dict(),
-                    password=dict()
+                    password=dict(no_log=True)
                 )
             ),
             virtual_media=dict(
@@ -498,6 +616,15 @@ def main():
                 )
             )
         ),
+        required_together=[
+            ('username', 'password'),
+        ],
+        required_one_of=[
+            ('username', 'auth_token'),
+        ],
+        mutually_exclusive=[
+            ('username', 'auth_token'),
+        ],
         supports_check_mode=False
     )
 
@@ -506,7 +633,8 @@ def main():
 
     # admin credentials used for authentication
     creds = {'user': module.params['username'],
-             'pswd': module.params['password']}
+             'pswd': module.params['password'],
+             'token': module.params['auth_token']}
 
     # user to add/modify/delete
     user = {'account_id': module.params['id'],
@@ -530,6 +658,13 @@ def main():
         'update_creds': module.params['update_creds']
     }
 
+    # Boot override options
+    boot_opts = {
+        'bootdevice': module.params['bootdevice'],
+        'uefi_target': module.params['uefi_target'],
+        'boot_next': module.params['boot_next']
+    }
+
     # VirtualMedia options
     virtual_media = module.params['virtual_media']
 
@@ -540,7 +675,7 @@ def main():
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, CATEGORY_COMMANDS_ALL.keys())))
+        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
 
     # Check that all commands are valid
     for cmd in command_list:
@@ -576,13 +711,17 @@ def main():
             module.fail_json(msg=to_native(result['msg']))
 
         for command in command_list:
-            if "Power" in command:
+            if command.startswith('Power'):
                 result = rf_utils.manage_system_power(command)
             elif command == "SetOneTimeBoot":
-                result = rf_utils.set_one_time_boot_device(
-                    module.params['bootdevice'],
-                    module.params['uefi_target'],
-                    module.params['boot_next'])
+                boot_opts['override_enabled'] = 'Once'
+                result = rf_utils.set_boot_override(boot_opts)
+            elif command == "EnableContinuousBootOverride":
+                boot_opts['override_enabled'] = 'Continuous'
+                result = rf_utils.set_boot_override(boot_opts)
+            elif command == "DisableBootOverride":
+                boot_opts['override_enabled'] = 'Disabled'
+                result = rf_utils.set_boot_override(boot_opts)
 
     elif category == "Chassis":
         result = rf_utils._find_chassis_resource()
@@ -609,6 +748,10 @@ def main():
         for command in command_list:
             if command == "ClearSessions":
                 result = rf_utils.clear_sessions()
+            elif command == "CreateSession":
+                result = rf_utils.create_session()
+            elif command == "DeleteSession":
+                result = rf_utils.delete_session(module.params['session_uri'])
 
     elif category == "Manager":
         # execute only if we find a Manager service resource
@@ -617,8 +760,13 @@ def main():
             module.fail_json(msg=to_native(result['msg']))
 
         for command in command_list:
+            # standardize on the Power* commands, but allow the the legacy
+            # GracefulRestart command
             if command == 'GracefulRestart':
-                result = rf_utils.restart_manager_gracefully()
+                command = 'PowerGracefulRestart'
+
+            if command.startswith('Power'):
+                result = rf_utils.manage_manager_power(command)
             elif command == 'ClearLogs':
                 result = rf_utils.clear_logs()
             elif command == 'VirtualMediaInsert':
@@ -640,7 +788,9 @@ def main():
     if result['ret'] is True:
         del result['ret']
         changed = result.get('changed', True)
-        module.exit_json(changed=changed, msg='Action was successful')
+        session = result.get('session', dict())
+        module.exit_json(changed=changed, session=session,
+                         msg='Action was successful')
     else:
         module.fail_json(msg=to_native(result['msg']))
 

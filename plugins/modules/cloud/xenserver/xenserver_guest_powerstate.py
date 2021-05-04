@@ -45,7 +45,6 @@ options:
     - In case of multiple VMs with same name, use C(uuid) to uniquely specify VM to manage.
     - This parameter is case sensitive.
     type: str
-    required: yes
     aliases: [ name_label ]
   uuid:
     description:
@@ -72,7 +71,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Power on VM
-  xenserver_guest_powerstate:
+  community.general.xenserver_guest_powerstate:
     hostname: "{{ xenserver_hostname }}"
     username: "{{ xenserver_username }}"
     password: "{{ xenserver_password }}"

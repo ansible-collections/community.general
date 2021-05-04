@@ -26,6 +26,7 @@ options:
     - One or more packages to install or remove.
     - Use C(all) to install all packages available on informed C(repository_path).
     type: list
+    elements: str
     required: true
     aliases: [ pkg ]
   repository_path:
@@ -44,35 +45,35 @@ notes:
 
 EXAMPLES = r'''
 - name: Install package foo
-  installp:
+  community.general.installp:
     name: foo
     repository_path: /repository/AIX71/installp/base
     accept_license: yes
     state: present
 
 - name: Install bos.sysmgt that includes bos.sysmgt.nim.master, bos.sysmgt.nim.spot
-  installp:
+  community.general.installp:
     name: bos.sysmgt
     repository_path: /repository/AIX71/installp/base
     accept_license: yes
     state: present
 
 - name: Install bos.sysmgt.nim.master only
-  installp:
+  community.general.installp:
     name: bos.sysmgt.nim.master
     repository_path: /repository/AIX71/installp/base
     accept_license: yes
     state: present
 
 - name: Install bos.sysmgt.nim.master and bos.sysmgt.nim.spot
-  installp:
+  community.general.installp:
     name: bos.sysmgt.nim.master, bos.sysmgt.nim.spot
     repository_path: /repository/AIX71/installp/base
     accept_license: yes
     state: present
 
 - name: Remove packages bos.sysmgt.nim.master
-  installp:
+  community.general.installp:
     name: bos.sysmgt.nim.master
     state: absent
 '''
@@ -257,7 +258,7 @@ def install(module, installp_cmd, packages, repository_path, accept_license):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='list', required=True, aliases=['pkg']),
+            name=dict(type='list', elements='str', required=True, aliases=['pkg']),
             repository_path=dict(type='path'),
             accept_license=dict(type='bool', default=False),
             state=dict(type='str', default='present', choices=['absent', 'present']),

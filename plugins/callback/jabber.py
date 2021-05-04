@@ -6,7 +6,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: jabber
+    author: Unknown (!UNKNOWN)
+    name: jabber
     type: notification
     short_description: post task events to a jabber server
     description:

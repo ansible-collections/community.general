@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: dnstxt
+    name: dnstxt
     author: Jan-Piet Mens (@jpmens) <jpmens(at)gmail.com>
     short_description: query a domain(s)'s DNS txt fields
     requirements:
@@ -21,18 +21,21 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: show txt entry
-  debug: msg="{{lookup('dnstxt', ['test.example.com'])}}"
+  ansible.builtin.debug:
+    msg: "{{lookup('community.general.dnstxt', ['test.example.com'])}}"
 
 - name: iterate over txt entries
-  debug: msg="{{item}}"
-  with_dnstxt:
+  ansible.builtin.debug:
+    msg: "{{item}}"
+  with_community.general.dnstxt:
     - 'test.example.com'
     - 'other.example.com'
     - 'last.example.com'
 
 - name: iterate of a comma delimited DNS TXT entry
-  debug: msg="{{item}}"
-  with_dnstxt: "{{lookup('dnstxt', ['test.example.com']).split(',')}}"
+  ansible.builtin.debug:
+    msg: "{{item}}"
+  with_community.general.dnstxt: "{{lookup('community.general.dnstxt', ['test.example.com']).split(',')}}"
 """
 
 RETURN = """

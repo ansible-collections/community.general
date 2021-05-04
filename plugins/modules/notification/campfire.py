@@ -17,22 +17,27 @@ description:
    - Messages with newlines will result in a "Paste" message being sent.
 options:
   subscription:
+    type: str
     description:
       - The subscription name to use.
     required: true
   token:
+    type: str
     description:
       - API token.
     required: true
   room:
+    type: str
     description:
       - Room number to which the message should be sent.
     required: true
   msg:
+    type: str
     description:
       - The message body.
     required: true
   notify:
+    type: str
     description:
       - Send a notification sound before the message.
     required: false
@@ -53,14 +58,14 @@ author: "Adam Garside (@fabulops)"
 
 EXAMPLES = '''
 - name: Send a message to Campfire
-  campfire:
+  community.general.campfire:
     subscription: foo
     token: 12345
     room: 123
     msg: Task completed.
 
 - name: Send a message to Campfire
-  campfire:
+  community.general.campfire:
     subscription: foo
     token: 12345
     room: 123

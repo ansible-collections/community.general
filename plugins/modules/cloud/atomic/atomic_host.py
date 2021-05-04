@@ -7,7 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: atomic_host
 short_description: Manage the atomic host platform
@@ -24,22 +24,24 @@ requirements:
 options:
     revision:
         description:
-          - The version number of the atomic host to be deployed. Providing C(latest) will upgrade to the latest available version.
-        default: latest
+          - The version number of the atomic host to be deployed.
+          - Providing C(latest) will upgrade to the latest available version.
+        default: 'latest'
         aliases: [ version ]
+        type: str
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Upgrade the atomic host platform to the latest version (atomic host upgrade)
-  atomic_host:
+  community.general.atomic_host:
     revision: latest
 
 - name: Deploy a specific revision as the atomic host (atomic host deploy 23.130)
-  atomic_host:
+  community.general.atomic_host:
     revision: 23.130
 '''
 
-RETURN = '''
+RETURN = r'''
 msg:
     description: The command standard output
     returned: always
@@ -55,18 +57,14 @@ from ansible.module_utils._text import to_native
 
 def core(module):
     revision = module.params['revision']
-    args = []
+    atomic_bin = module.get_bin_path('atomic', required=True)
 
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C')
 
     if revision == 'latest':
-        args = ['atomic', 'host', 'upgrade']
+        args = [atomic_bin, 'host', 'upgrade']
     else:
-        args = ['atomic', 'host', 'deploy', revision]
-
-    out = {}
-    err = {}
-    rc = 0
+        args = [atomic_bin, 'host', 'deploy', revision]
 
     rc, out, err = module.run_command(args, check_rc=False)
 

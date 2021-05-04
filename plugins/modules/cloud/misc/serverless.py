@@ -39,6 +39,7 @@ options:
       - A list of specific functions to deploy.
       - If this is not provided, all functions in the service will be deployed.
     type: list
+    elements: str
     default: []
   region:
     description:
@@ -74,19 +75,19 @@ author:
 
 EXAMPLES = r'''
 - name: Basic deploy of a service
-  serverless:
+  community.general.serverless:
     service_path: '{{ project_dir }}'
     state: present
 
 - name: Deploy specific functions
-  serverless:
+  community.general.serverless:
     service_path: '{{ project_dir }}'
     functions:
       - my_func_one
       - my_func_two
 
 - name: Deploy a project, then pull its resource list back into Ansible
-  serverless:
+  community.general.serverless:
     stage: dev
     region: us-east-1
     service_path: '{{ project_dir }}'
@@ -101,7 +102,7 @@ EXAMPLES = r'''
     stack_resources: true
 
 - name: Deploy a project using a locally installed serverless binary
-  serverless:
+  community.general.serverless:
     stage: dev
     region: us-east-1
     service_path: '{{ project_dir }}'
@@ -166,7 +167,7 @@ def main():
         argument_spec=dict(
             service_path=dict(type='path', required=True),
             state=dict(type='str', default='present', choices=['absent', 'present']),
-            functions=dict(type='list'),
+            functions=dict(type='list', elements='str'),
             region=dict(type='str', default=''),
             stage=dict(type='str', default=''),
             deploy=dict(type='bool', default=True),

@@ -6,8 +6,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    author: Joerg Thalheim <joerg@higgsboson.tk>
-    connection: lxc
+    author: Joerg Thalheim (!UNKNOWN) <joerg@higgsboson.tk>
+    name: lxc
     short_description: Run tasks in lxc containers via lxc python library
     description:
         - Run commands or put/fetch files to an existing lxc container using lxc python library
@@ -86,7 +86,7 @@ class Connection(ConnectionBase):
             write_fds = []
         while len(read_fds) > 0 or len(write_fds) > 0:
             try:
-                ready_reads, ready_writes, _ = select.select(read_fds, write_fds, [])
+                ready_reads, ready_writes, dummy = select.select(read_fds, write_fds, [])
             except select.error as e:
                 if e.args[0] == errno.EINTR:
                     continue

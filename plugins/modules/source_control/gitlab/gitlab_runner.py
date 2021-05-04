@@ -37,7 +37,6 @@ options:
   api_token:
     description:
       - Your private token to interact with the GitLab API.
-    required: True
     type: str
   description:
     description:
@@ -56,8 +55,14 @@ options:
   registration_token:
     description:
       - The registration token is used to register new runners.
-    required: True
+      - Required if I(state) is C(present).
     type: str
+  owned:
+    description:
+      - Searches only runners available to the user when searching for existing, when false admin token required.
+    default: no
+    type: bool
+    version_added: 2.0.0
   active:
     description:
       - Define if the runners is immediately active after creation.
@@ -94,11 +99,12 @@ options:
     required: False
     default: []
     type: list
+    elements: str
 '''
 
 EXAMPLES = '''
 - name: "Register runner"
-  gitlab_runner:
+  community.general.gitlab_runner:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     registration_token: 4gfdsg345
@@ -110,10 +116,18 @@ EXAMPLES = '''
     locked: False
 
 - name: "Delete runner"
-  gitlab_runner:
+  community.general.gitlab_runner:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     description: Docker Machine t1
+    state: absent
+
+- name: Delete an owned runner as a non-admin
+  community.general.gitlab_runner:
+    api_url: https://gitlab.example.com/
+    api_token: "{{ access_token }}"
+    description: Docker Machine t1
+    owned: yes
     state: absent
 '''
 
@@ -247,18 +261,28 @@ class GitLabRunner(object):
     '''
     @param description Description of the runner
     '''
-    def findRunner(self, description):
-        runners = self._gitlab.runners.all(as_list=False)
+    def findRunner(self, description, owned=False):
+        if owned:
+            runners = self._gitlab.runners.list(as_list=False)
+        else:
+            runners = self._gitlab.runners.all(as_list=False)
+
         for runner in runners:
-            if (runner['description'] == description):
-                return self._gitlab.runners.get(runner['id'])
+            # python-gitlab 2.2 through at least 2.5 returns a list of dicts for list() instead of a Runner
+            # object, so we need to handle both
+            if hasattr(runner, "description"):
+                if (runner.description == description):
+                    return self._gitlab.runners.get(runner.id)
+            else:
+                if (runner['description'] == description):
+                    return self._gitlab.runners.get(runner['id'])
 
     '''
     @param description Description of the runner
     '''
-    def existsRunner(self, description):
+    def existsRunner(self, description, owned=False):
         # When runner exists, object will be stored in self.runnerObject.
-        runner = self.findRunner(description)
+        runner = self.findRunner(description, owned)
 
         if runner:
             self.runnerObject = runner
@@ -280,12 +304,13 @@ def main():
         api_token=dict(type='str', no_log=True),
         description=dict(type='str', required=True, aliases=["name"]),
         active=dict(type='bool', default=True),
-        tag_list=dict(type='list', default=[]),
+        owned=dict(type='bool', default=False),
+        tag_list=dict(type='list', elements='str', default=[]),
         run_untagged=dict(type='bool', default=True),
         locked=dict(type='bool', default=False),
         access_level=dict(type='str', default='ref_protected', choices=["not_protected", "ref_protected"]),
         maximum_timeout=dict(type='int', default=3600),
-        registration_token=dict(type='str', required=True),
+        registration_token=dict(type='str', no_log=True),
         state=dict(type='str', default="present", choices=["absent", "present"]),
     ))
 
@@ -301,10 +326,14 @@ def main():
         required_one_of=[
             ['api_username', 'api_token'],
         ],
+        required_if=[
+            ('state', 'present', ['registration_token']),
+        ],
         supports_check_mode=True,
     )
 
     state = module.params['state']
+    owned = module.params['owned']
     runner_description = module.params['description']
     runner_active = module.params['active']
     tag_list = module.params['tag_list']
@@ -320,7 +349,7 @@ def main():
     gitlab_instance = gitlabAuthentication(module)
 
     gitlab_runner = GitLabRunner(module, gitlab_instance)
-    runner_exists = gitlab_runner.existsRunner(runner_description)
+    runner_exists = gitlab_runner.existsRunner(runner_description, owned)
 
     if state == 'absent':
         if runner_exists:

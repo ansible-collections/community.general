@@ -29,31 +29,25 @@ options:
         I(SetSystemAttributes) are mutually exclusive commands when C(category)
         is I(Manager)
     type: list
+    elements: str
   baseuri:
     required: true
     description:
       - Base URI of iDRAC
     type: str
   username:
-    required: true
     description:
       - User for authentication with iDRAC
     type: str
   password:
-    required: true
     description:
       - Password for authentication with iDRAC
     type: str
-  manager_attribute_name:
-    required: false
+  auth_token:
     description:
-      - (deprecated) name of iDRAC attribute to update
+      - Security token for authentication with OOB controller
     type: str
-  manager_attribute_value:
-    required: false
-    description:
-      - (deprecated) value of iDRAC attribute to update
-    type: str
+    version_added: 2.3.0
   manager_attributes:
     required: false
     description:
@@ -78,7 +72,7 @@ author: "Jose Delarosa (@jose-delarosa)"
 
 EXAMPLES = '''
   - name: Enable NTP and set NTP server and Time zone attributes in iDRAC
-    idrac_redfish_config:
+    community.general.idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
       resource_id: iDRAC.Embedded.1
@@ -91,7 +85,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Enable Syslog and set Syslog servers in iDRAC
-    idrac_redfish_config:
+    community.general.idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
       resource_id: iDRAC.Embedded.1
@@ -104,7 +98,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Configure SNMP community string, port, protocol and trap format
-    idrac_redfish_config:
+    community.general.idrac_redfish_config:
       category: Manager
       command: SetManagerAttributes
       resource_id: iDRAC.Embedded.1
@@ -120,7 +114,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Enable CSIOR
-    idrac_redfish_config:
+    community.general.idrac_redfish_config:
       category: Manager
       command: SetLifecycleControllerAttributes
       resource_id: iDRAC.Embedded.1
@@ -131,7 +125,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Set Power Supply Redundancy Policy to A/B Grid Redundant
-    idrac_redfish_config:
+    community.general.idrac_redfish_config:
       category: Manager
       command: SetSystemAttributes
       resource_id: iDRAC.Embedded.1
@@ -182,12 +176,6 @@ class IdracRedfishUtils(RedfishUtils):
         manager_uri = command_manager_attributes_uri_map.get(command, self.manager_uri)
 
         attributes = self.module.params['manager_attributes']
-        manager_attr_name = self.module.params.get('manager_attribute_name')
-        manager_attr_value = self.module.params.get('manager_attribute_value')
-
-        # manager attributes to update
-        if manager_attr_name:
-            attributes.update({manager_attr_name: manager_attr_value})
 
         attrs_to_patch = {}
         attrs_skipped = {}
@@ -245,16 +233,24 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             category=dict(required=True),
-            command=dict(required=True, type='list'),
+            command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(required=True),
-            password=dict(required=True, no_log=True),
-            manager_attribute_name=dict(default=None),
-            manager_attribute_value=dict(default=None),
+            username=dict(),
+            password=dict(no_log=True),
+            auth_token=dict(no_log=True),
             manager_attributes=dict(type='dict', default={}),
             timeout=dict(type='int', default=10),
             resource_id=dict()
         ),
+        required_together=[
+            ('username', 'password'),
+        ],
+        required_one_of=[
+            ('username', 'auth_token'),
+        ],
+        mutually_exclusive=[
+            ('username', 'auth_token'),
+        ],
         supports_check_mode=False
     )
 
@@ -263,7 +259,8 @@ def main():
 
     # admin credentials used for authentication
     creds = {'user': module.params['username'],
-             'pswd': module.params['password']}
+             'pswd': module.params['password'],
+             'token': module.params['auth_token']}
 
     # timeout
     timeout = module.params['timeout']
@@ -278,7 +275,7 @@ def main():
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, CATEGORY_COMMANDS_ALL.keys())))
+        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
 
     # Check that all commands are valid
     for cmd in command_list:
@@ -308,13 +305,6 @@ def main():
         for command in command_list:
             if command in ["SetManagerAttributes", "SetLifecycleControllerAttributes", "SetSystemAttributes"]:
                 result = rf_utils.set_manager_attributes(command)
-
-    if any((module.params['manager_attribute_name'], module.params['manager_attribute_value'])):
-        module.deprecate(msg='Arguments `manager_attribute_name` and '
-                             '`manager_attribute_value` are deprecated. '
-                             'Use `manager_attributes` instead for passing in '
-                             'the manager attribute name and value pairs',
-                             version='2.13')
 
     # Return data back or fail with proper message
     if result['ret'] is True:

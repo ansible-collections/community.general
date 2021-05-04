@@ -5,7 +5,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: cyberarkpassword
+    author: Unknown (!UNKNOWN)
+    name: cyberarkpassword
     short_description: get secrets from CyberArk AIM
     requirements:
       - CyberArk AIM tool installed
@@ -29,14 +30,15 @@ DOCUMENTATION = '''
           - "They could be: Password, PassProps.<property>, PasswordChangeInProcess"
         default: 'password'
       _extra:
-        description: for extra_parms values please check parameters for clipasswordsdk in CyberArk's "Credential Provider and ASCP Implementation Guide"
-    note:
-      - For Ansible on windows, please change the -parameters (-p, -d, and -o) to /parameters (/p, /d, and /o) and change the location of CLIPasswordSDK.exe
+        description: for extra_params values please check parameters for clipasswordsdk in CyberArk's "Credential Provider and ASCP Implementation Guide"
+    notes:
+      - For Ansible on Windows, please change the -parameters (-p, -d, and -o) to /parameters (/p, /d, and /o) and change the location of CLIPasswordSDK.exe.
 '''
 
 EXAMPLES = """
   - name: passing options to the lookup
-    debug: msg={{ lookup("cyberarkpassword", cyquery)}}
+    ansible.builtin.debug:
+        msg: '{{ lookup("community.general.cyberarkpassword", cyquery) }}'
     vars:
       cyquery:
         appid: "app_ansible"
@@ -45,8 +47,9 @@ EXAMPLES = """
 
 
   - name: used in a loop
-    debug: msg={{item}}
-    with_cyberarkpassword:
+    ansible.builtin.debug:
+        msg: "{{item}}"
+    with_community.general.cyberarkpassword:
         appid: 'app_ansible'
         query: 'safe=CyberArk_Passwords;folder=root;object=AdminPass'
         output: 'Password,PassProps.UserName,PassProps.Address,PasswordChangeInProcess'

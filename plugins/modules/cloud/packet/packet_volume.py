@@ -40,7 +40,7 @@ options:
 
   auth_token:
     description:
-      - Packet api token. You can also supply it in env var C(PACKET_API_TOKEN).
+      - Packet API token. You can also supply it in env var C(PACKET_API_TOKEN).
     type: str
 
   name:
@@ -128,7 +128,7 @@ EXAMPLES = '''
 
   tasks:
     - name: Create volume
-      packet_volume:
+      community.general.packet_volume:
         description: "{{ volname }}"
         project_id: "{{ project_id }}"
         facility: 'ewr1'
@@ -141,7 +141,7 @@ EXAMPLES = '''
       register: result_create
 
     - name: Delete volume
-      packet_volume:
+      community.general.packet_volume:
         id: "{{ result_create.id }}"
         project_id: "{{ project_id }}"
         state: absent

@@ -17,7 +17,7 @@ short_description: Tweak settings in INI files
 extends_documentation_fragment: files
 description:
      - Manage (add, remove, change) individual settings in an INI-style file without having
-       to manage the file as a whole with, say, M(template) or M(assemble).
+       to manage the file as a whole with, say, M(ansible.builtin.template) or M(ansible.builtin.assemble).
      - Adds missing sections if they don't exist.
      - Before Ansible 2.0, comments are discarded when the source file is read, and therefore will not show up in the destination file.
      - Since Ansible 2.3, this module adds missing ending newlines to files to keep in line with the POSIX standard, even when
@@ -87,7 +87,7 @@ author:
 EXAMPLES = r'''
 # Before Ansible 2.3, option 'dest' was used instead of 'path'
 - name: Ensure "fav=lemonade is in section "[drinks]" in specified file
-  ini_file:
+  community.general.ini_file:
     path: /etc/conf
     section: drinks
     option: fav
@@ -96,7 +96,7 @@ EXAMPLES = r'''
     backup: yes
 
 - name: Ensure "temperature=cold is in section "[drinks]" in specified file
-  ini_file:
+  community.general.ini_file:
     path: /etc/anotherconf
     section: drinks
     option: temperature
@@ -114,9 +114,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 def match_opt(option, line):
     option = re.escape(option)
-    return re.match('( |\t)*%s( |\t)*(=|$)' % option, line) \
-        or re.match('#( |\t)*%s( |\t)*(=|$)' % option, line) \
-        or re.match(';( |\t)*%s( |\t)*(=|$)' % option, line)
+    return re.match('[#;]?( |\t)*%s( |\t)*(=|$)' % option, line)
 
 
 def match_active_opt(option, line):
@@ -143,11 +141,8 @@ def do_ini(module, filename, section=None, option=None, value=None,
             os.makedirs(destpath)
         ini_lines = []
     else:
-        ini_file = open(filename, 'r')
-        try:
+        with open(filename, 'r') as ini_file:
             ini_lines = ini_file.readlines()
-        finally:
-            ini_file.close()
 
     if module._diff:
         diff['before'] = ''.join(ini_lines)
@@ -172,7 +167,7 @@ def do_ini(module, filename, section=None, option=None, value=None,
     # Insert it at the beginning
     ini_lines.insert(0, '[%s]' % fake_section_name)
 
-    # At botton:
+    # At bottom:
     ini_lines.append('[')
 
     # If no section is defined, fake section is used
@@ -198,12 +193,14 @@ def do_ini(module, filename, section=None, option=None, value=None,
                     for i in range(index, 0, -1):
                         # search backwards for previous non-blank or non-comment line
                         if not re.match(r'^[ \t]*([#;].*)?$', ini_lines[i - 1]):
-                            if not value and allow_no_value:
-                                ini_lines.insert(i, '%s\n' % option)
-                            else:
+                            if option and value:
                                 ini_lines.insert(i, assignment_format % (option, value))
-                            msg = 'option added'
-                            changed = True
+                                msg = 'option added'
+                                changed = True
+                            elif option and not value and allow_no_value:
+                                ini_lines.insert(i, '%s\n' % option)
+                                msg = 'option added'
+                                changed = True
                             break
                 elif state == 'absent' and not option:
                     # remove the entire section
@@ -249,14 +246,16 @@ def do_ini(module, filename, section=None, option=None, value=None,
     del ini_lines[0]
     del ini_lines[-1:]
 
-    if not within_section and option and state == 'present':
+    if not within_section and state == 'present':
         ini_lines.append('[%s]\n' % section)
-        if not value and allow_no_value:
+        msg = 'section and option added'
+        if option and value is not None:
+            ini_lines.append(assignment_format % (option, value))
+        elif option and value is None and allow_no_value:
             ini_lines.append('%s\n' % option)
         else:
-            ini_lines.append(assignment_format % (option, value))
+            msg = 'only section added'
         changed = True
-        msg = 'section and option added'
 
     if module._diff:
         diff['after'] = ''.join(ini_lines)
@@ -310,6 +309,9 @@ def main():
     no_extra_spaces = module.params['no_extra_spaces']
     allow_no_value = module.params['allow_no_value']
     create = module.params['create']
+
+    if state == 'present' and not allow_no_value and value is None:
+        module.fail_json("Parameter 'value' must not be empty if state=present and allow_no_value=False")
 
     (changed, backup_file, diff, msg) = do_ini(module, path, section, option, value, state, backup, no_extra_spaces, create, allow_no_value)
 

@@ -22,6 +22,7 @@ description:
 
 options:
   state:
+    type: str
     description:
       - absent - policy_profiles should not exist,
       - present - policy_profiles should exist,
@@ -29,25 +30,35 @@ options:
     choices: ['absent', 'present', 'list']
     default: 'present'
   policy_profiles:
+    type: list
+    elements: dict
     description:
       - list of dictionaries, each includes the policy_profile 'name' key.
       - required if state is present or absent.
   resource_type:
+    type: str
     description:
-      - the type of the resource to which the profile should be [un]assigned
+      - The type of the resource to which the profile should be [un]assigned.
     required: true
     choices: ['provider', 'host', 'vm', 'blueprint', 'category', 'cluster',
         'data store', 'group', 'resource pool', 'service', 'service template',
         'template', 'tenant', 'user']
   resource_name:
+    type: str
     description:
-      - the name of the resource to which the profile should be [un]assigned
-    required: true
+      - The name of the resource to which the profile should be [un]assigned.
+      - Must be specified if I(resource_id) is not set. Both options are mutually exclusive.
+  resource_id:
+    type: int
+    description:
+      - The ID of the resource to which the profile should be [un]assigned.
+      - Must be specified if I(resource_name) is not set. Both options are mutually exclusive.
+    version_added: 2.2.0
 '''
 
 EXAMPLES = '''
 - name: Assign new policy_profile for a provider in ManageIQ
-  manageiq_policies:
+  community.general.manageiq_policies:
     resource_name: 'EngLab'
     resource_type: 'provider'
     policy_profiles:
@@ -59,7 +70,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Unassign a policy_profile for a provider in ManageIQ
-  manageiq_policies:
+  community.general.manageiq_policies:
     state: absent
     resource_name: 'EngLab'
     resource_type: 'provider'
@@ -72,7 +83,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: List current policy_profile and policies for a provider in ManageIQ
-  manageiq_policies:
+  community.general.manageiq_policies:
     state: list
     resource_name: 'EngLab'
     resource_type: 'provider'
@@ -291,10 +302,11 @@ class ManageIQPolicies(object):
 def main():
     actions = {'present': 'assign', 'absent': 'unassign', 'list': 'list'}
     argument_spec = dict(
-        policy_profiles=dict(type='list'),
-        resource_name=dict(required=True, type='str'),
+        policy_profiles=dict(type='list', elements='dict'),
+        resource_id=dict(required=False, type='int'),
+        resource_name=dict(required=False, type='str'),
         resource_type=dict(required=True, type='str',
-                           choices=manageiq_entities().keys()),
+                           choices=list(manageiq_entities().keys())),
         state=dict(required=False, type='str',
                    choices=['present', 'absent', 'list'], default='present'),
     )
@@ -303,6 +315,8 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
+        mutually_exclusive=[["resource_id", "resource_name"]],
+        required_one_of=[["resource_id", "resource_name"]],
         required_if=[
             ('state', 'present', ['policy_profiles']),
             ('state', 'absent', ['policy_profiles'])
@@ -310,6 +324,7 @@ def main():
     )
 
     policy_profiles = module.params['policy_profiles']
+    resource_id = module.params['resource_id']
     resource_type_key = module.params['resource_type']
     resource_name = module.params['resource_name']
     state = module.params['state']
@@ -321,7 +336,8 @@ def main():
     manageiq = ManageIQ(module)
 
     # query resource id, fail if resource does not exist
-    resource_id = manageiq.find_collection_resource_or_fail(resource_type, name=resource_name)['id']
+    if resource_id is None:
+        resource_id = manageiq.find_collection_resource_or_fail(resource_type, name=resource_name)['id']
 
     manageiq_policies = ManageIQPolicies(manageiq, resource_type, resource_id)
 

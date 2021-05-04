@@ -8,13 +8,13 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: gitlab_project
 short_description: Creates/updates/deletes GitLab Projects
 description:
   - When the project does not exist in GitLab, it will be created.
-  - When the project does exists and state=absent, the project will be deleted.
+  - When the project does exists and I(state=absent), the project will be deleted.
   - When changes are made to the project, the project will be updated.
 author:
   - Werner Dijkerman (@dj-wasabi)
@@ -32,11 +32,11 @@ options:
     type: str
   group:
     description:
-      - Id or The full path of the group of which this projects belongs to.
+      - Id or the full path of the group of which this projects belongs to.
     type: str
   name:
     description:
-      - The name of the project
+      - The name of the project.
     required: true
     type: str
   path:
@@ -63,20 +63,18 @@ options:
   wiki_enabled:
     description:
       - If an wiki for this project should be available or not.
-      - Possible values are true and false.
     type: bool
     default: yes
   snippets_enabled:
     description:
       - If creating snippets should be available or not.
-      - Possible values are true and false.
     type: bool
     default: yes
   visibility:
     description:
-      - Private. Project access must be granted explicitly for each user.
-      - Internal. The project can be cloned by any logged in user.
-      - Public. The project can be cloned without any authentication.
+      - C(private) Project access must be granted explicitly for each user.
+      - C(internal) The project can be cloned by any logged in user.
+      - C(public) The project can be cloned without any authentication.
     default: private
     type: str
     choices: ["private", "internal", "public"]
@@ -90,16 +88,39 @@ options:
     type: str
   state:
     description:
-      - create or delete project.
+      - Create or delete project.
       - Possible values are present and absent.
     default: present
     type: str
     choices: ["present", "absent"]
+  merge_method:
+    description:
+      - What requirements are placed upon merges.
+      - Possible values are C(merge), C(rebase_merge) merge commit with semi-linear history, C(ff) fast-forward merges only.
+    type: str
+    choices: ["ff", "merge", "rebase_merge"]
+    default: merge
+    version_added: "1.0.0"
+  lfs_enabled:
+    description:
+      - Enable Git large file systems to manages large files such
+        as audio, video, and graphics files.
+    type: bool
+    required: false
+    default: false
+    version_added: "2.0.0"
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
+- name: Create GitLab Project
+  community.general.gitlab_project:
+    api_url: https://gitlab.example.com/
+    api_token: "{{ api_token }}"
+    name: my_first_project
+    group: "10481470"
+
 - name: Delete GitLab Project
-  gitlab_project:
+  community.general.gitlab_project:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     validate_certs: False
@@ -108,7 +129,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Create GitLab Project in group Ansible
-  gitlab_project:
+  community.general.gitlab_project:
     api_url: https://gitlab.example.com/
     validate_certs: True
     api_username: dj-wasabi
@@ -116,6 +137,7 @@ EXAMPLES = '''
     name: my_first_project
     group: ansible
     issues_enabled: False
+    merge_method: rebase_merge
     wiki_enabled: True
     snippets_enabled: True
     import_url: http://git.example.com/example/lab.git
@@ -123,26 +145,26 @@ EXAMPLES = '''
   delegate_to: localhost
 '''
 
-RETURN = '''
+RETURN = r'''
 msg:
-  description: Success or failure message
+  description: Success or failure message.
   returned: always
   type: str
   sample: "Success"
 
 result:
-  description: json parsed response from the server
+  description: json parsed response from the server.
   returned: always
   type: dict
 
 error:
-  description: the error message returned by the GitLab API
+  description: the error message returned by the GitLab API.
   returned: failed
   type: str
   sample: "400: path is already in use"
 
 project:
-  description: API object
+  description: API object.
   returned: always
   type: dict
 '''
@@ -177,29 +199,27 @@ class GitLabProject(object):
     '''
     def createOrUpdateProject(self, project_name, namespace, options):
         changed = False
-
+        project_options = {
+            'name': project_name,
+            'description': options['description'],
+            'issues_enabled': options['issues_enabled'],
+            'merge_requests_enabled': options['merge_requests_enabled'],
+            'merge_method': options['merge_method'],
+            'wiki_enabled': options['wiki_enabled'],
+            'snippets_enabled': options['snippets_enabled'],
+            'visibility': options['visibility'],
+            'lfs_enabled': options['lfs_enabled'],
+        }
         # Because we have already call userExists in main()
         if self.projectObject is None:
-            project = self.createProject(namespace, {
-                'name': project_name,
+            project_options.update({
                 'path': options['path'],
-                'description': options['description'],
-                'issues_enabled': options['issues_enabled'],
-                'merge_requests_enabled': options['merge_requests_enabled'],
-                'wiki_enabled': options['wiki_enabled'],
-                'snippets_enabled': options['snippets_enabled'],
-                'visibility': options['visibility'],
-                'import_url': options['import_url']})
+                'import_url': options['import_url'],
+            })
+            project = self.createProject(namespace, project_options)
             changed = True
         else:
-            changed, project = self.updateProject(self.projectObject, {
-                'name': project_name,
-                'description': options['description'],
-                'issues_enabled': options['issues_enabled'],
-                'merge_requests_enabled': options['merge_requests_enabled'],
-                'wiki_enabled': options['wiki_enabled'],
-                'snippets_enabled': options['snippets_enabled'],
-                'visibility': options['visibility']})
+            changed, project = self.updateProject(self.projectObject, project_options)
 
         self.projectObject = project
         if changed:
@@ -211,8 +231,7 @@ class GitLabProject(object):
             except Exception as e:
                 self._module.fail_json(msg="Failed update project: %s " % e)
             return True
-        else:
-            return False
+        return False
 
     '''
     @param namespace Namespace Object (User or Group)
@@ -276,11 +295,13 @@ def main():
         description=dict(type='str'),
         issues_enabled=dict(type='bool', default=True),
         merge_requests_enabled=dict(type='bool', default=True),
+        merge_method=dict(type='str', default='merge', choices=["merge", "rebase_merge", "ff"]),
         wiki_enabled=dict(type='bool', default=True),
         snippets_enabled=dict(default=True, type='bool'),
         visibility=dict(type='str', default="private", choices=["internal", "private", "public"], aliases=["visibility_level"]),
         import_url=dict(type='str'),
         state=dict(type='str', default="present", choices=["absent", "present"]),
+        lfs_enabled=dict(default=False, type='bool'),
     ))
 
     module = AnsibleModule(
@@ -304,11 +325,13 @@ def main():
     project_description = module.params['description']
     issues_enabled = module.params['issues_enabled']
     merge_requests_enabled = module.params['merge_requests_enabled']
+    merge_method = module.params['merge_method']
     wiki_enabled = module.params['wiki_enabled']
     snippets_enabled = module.params['snippets_enabled']
     visibility = module.params['visibility']
     import_url = module.params['import_url']
     state = module.params['state']
+    lfs_enabled = module.params['lfs_enabled']
 
     if not HAS_GITLAB_PACKAGE:
         module.fail_json(msg=missing_required_lib("python-gitlab"), exception=GITLAB_IMP_ERR)
@@ -321,24 +344,35 @@ def main():
 
     gitlab_project = GitLabProject(module, gitlab_instance)
 
+    namespace = None
+    user_group_id = None
     if group_identifier:
         group = findGroup(gitlab_instance, group_identifier)
         if group is None:
             module.fail_json(msg="Failed to create project: group %s doesn't exists" % group_identifier)
 
-        namespace = gitlab_instance.namespaces.get(group.id)
-        project_exists = gitlab_project.existsProject(namespace, project_path)
+        user_group_id = group.id
     else:
         user = gitlab_instance.users.list(username=gitlab_instance.user.username)[0]
-        namespace = gitlab_instance.namespaces.get(user.id)
-        project_exists = gitlab_project.existsProject(namespace, project_path)
+        user_group_id = user.id
+
+    if not user_group_id:
+        module.fail_json(msg="Failed to find the user/group id which required to find namespace")
+
+    try:
+        namespace = gitlab_instance.namespaces.get(user_group_id)
+    except gitlab.exceptions.GitlabGetError as e:
+        module.fail_json(msg="Failed to find the namespace for the given user: %s" % to_native(e))
+
+    if not namespace:
+        module.fail_json(msg="Failed to find the namespace for the project")
+    project_exists = gitlab_project.existsProject(namespace, project_path)
 
     if state == 'absent':
         if project_exists:
             gitlab_project.deleteProject()
             module.exit_json(changed=True, msg="Successfully deleted project %s" % project_name)
-        else:
-            module.exit_json(changed=False, msg="Project deleted or does not exists")
+        module.exit_json(changed=False, msg="Project deleted or does not exists")
 
     if state == 'present':
         if gitlab_project.createOrUpdateProject(project_name, namespace, {
@@ -346,14 +380,15 @@ def main():
                                                 "description": project_description,
                                                 "issues_enabled": issues_enabled,
                                                 "merge_requests_enabled": merge_requests_enabled,
+                                                "merge_method": merge_method,
                                                 "wiki_enabled": wiki_enabled,
                                                 "snippets_enabled": snippets_enabled,
                                                 "visibility": visibility,
-                                                "import_url": import_url}):
+                                                "import_url": import_url,
+                                                "lfs_enabled": lfs_enabled}):
 
             module.exit_json(changed=True, msg="Successfully created or updated the project %s" % project_name, project=gitlab_project.projectObject._attrs)
-        else:
-            module.exit_json(changed=False, msg="No need to update the project %s" % project_name, project=gitlab_project.projectObject._attrs)
+        module.exit_json(changed=False, msg="No need to update the project %s" % project_name, project=gitlab_project.projectObject._attrs)
 
 
 if __name__ == '__main__':

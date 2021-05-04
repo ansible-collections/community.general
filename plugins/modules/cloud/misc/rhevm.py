@@ -13,7 +13,7 @@ module: rhevm
 short_description: RHEV/oVirt automation
 description:
     - This module only supports oVirt/RHEV version 3.
-    - A newer module M(ovirt_vm) supports oVirt/RHV version 4.
+    - A newer module M(ovirt.ovirt.ovirt_vm) supports oVirt/RHV version 4.
     - Allows you to create/remove/update or powermanage virtual machines on a RHEV/oVirt platform.
 requirements:
     - ovirtsdk
@@ -29,6 +29,7 @@ options:
         description:
             - The password for user authentication.
         type: str
+        required: true
     server:
         description:
             - The name/IP of your RHEV-m/oVirt instance.
@@ -111,15 +112,18 @@ options:
         description:
             - This option uses complex arguments and is a list of disks with the options name, size and domain.
         type: list
+        elements: str
     ifaces:
         description:
             - This option uses complex arguments and is a list of interfaces with the options name and vlan.
         type: list
+        elements: str
         aliases: [ interfaces, nics ]
     boot_order:
         description:
             - This option uses complex arguments and is a list of items that specify the bootorder.
         type: list
+        elements: str
         default: [ hd, network ]
     del_prot:
         description:
@@ -207,7 +211,7 @@ vm:
 
 EXAMPLES = r'''
 - name: Basic get info from VM
-  rhevm:
+  community.general.rhevm:
     server: rhevm01
     user: '{{ rhev.admin.name }}'
     password: '{{ rhev.admin.pass }}'
@@ -215,7 +219,7 @@ EXAMPLES = r'''
     state: info
 
 - name: Basic create example from image
-  rhevm:
+  community.general.rhevm:
     server: rhevm01
     user: '{{ rhev.admin.name }}'
     password: '{{ rhev.admin.pass }}'
@@ -225,7 +229,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Power management
-  rhevm:
+  community.general.rhevm:
     server: rhevm01
     user: '{{ rhev.admin.name }}'
     password: '{{ rhev.admin.pass }}'
@@ -235,7 +239,7 @@ EXAMPLES = r'''
     state: down
 
 - name: Multi disk, multi nic create example
-  rhevm:
+  community.general.rhevm:
     server: rhevm01
     user: '{{ rhev.admin.name }}'
     password: '{{ rhev.admin.pass }}'
@@ -275,7 +279,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Add a CD to the disk cd_drive
-  rhevm:
+  community.general.rhevm:
     user: '{{ rhev.admin.name }}'
     password: '{{ rhev.admin.pass }}'
     name: server007
@@ -283,7 +287,7 @@ EXAMPLES = r'''
     state: cd
 
 - name: New host deployment + host network configuration
-  rhevm:
+  community.general.rhevm:
     password: '{{ rhevm.admin.pass }}'
     name: ovirt_node007
     type: host
@@ -1225,24 +1229,6 @@ class RHEV(object):
         self.__get_conn()
         return self.conn.set_VM_Host(vmname, vmhost)
 
-        # pylint: disable=unreachable
-        VM = self.conn.get_VM(vmname)
-        HOST = self.conn.get_Host(vmhost)
-
-        if VM.placement_policy.host is None:
-            self.conn.set_VM_Host(vmname, vmhost)
-        elif str(VM.placement_policy.host.id) != str(HOST.id):
-            self.conn.set_VM_Host(vmname, vmhost)
-        else:
-            setMsg("VM's startup host was already set to " + vmhost)
-        checkFail()
-
-        if str(VM.status.state) == "up":
-            self.conn.migrate_VM(vmname, vmhost)
-        checkFail()
-
-        return True
-
     def setHost(self, hostname, cluster, ifaces):
         self.__get_conn()
         return self.conn.set_Host(hostname, cluster, ifaces)
@@ -1480,14 +1466,14 @@ def main():
             vmhost=dict(type='str'),
             vmcpu=dict(type='int', default=2),
             vmmem=dict(type='int', default=1),
-            disks=dict(type='list'),
+            disks=dict(type='list', elements='str'),
             osver=dict(type='str', default="rhel_6x64"),
-            ifaces=dict(type='list', aliases=['interfaces', 'nics']),
+            ifaces=dict(type='list', elements='str', aliases=['interfaces', 'nics']),
             timeout=dict(type='int'),
             mempol=dict(type='int', default=1),
             vm_ha=dict(type='bool', default=True),
             cpu_share=dict(type='int', default=0),
-            boot_order=dict(type='list', default=['hd', 'network']),
+            boot_order=dict(type='list', elements='str', default=['hd', 'network']),
             del_prot=dict(type='bool', default=True),
             cd_drive=dict(type='str'),
         ),

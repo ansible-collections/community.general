@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    become: sesu
+    name: sesu
     short_description: CA Privileged Access Manager
     description:
         - This become plugins allows your remote/login user to execute commands as another user via the sesu utility.

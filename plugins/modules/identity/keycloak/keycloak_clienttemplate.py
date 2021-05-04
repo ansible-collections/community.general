@@ -36,27 +36,34 @@ options:
             - On C(absent), the client template will be removed if it exists
         choices: ['present', 'absent']
         default: 'present'
+        type: str
 
     id:
         description:
             - Id of client template to be worked on. This is usually a UUID.
+        type: str
 
     realm:
         description:
             - Realm this client template is found in.
+        type: str
+        default: master
 
     name:
         description:
             - Name of the client template
+        type: str
 
     description:
         description:
             - Description of the client template in Keycloak
+        type: str
 
     protocol:
         description:
             - Type of client template (either C(openid-connect) or C(saml).
         choices: ['openid-connect', 'saml']
+        type: str
 
     full_scope_allowed:
         description:
@@ -68,28 +75,35 @@ options:
         description:
             - a list of dicts defining protocol mappers for this client template.
               This is 'protocolMappers' in the Keycloak REST API.
+        type: list
+        elements: dict
         suboptions:
             consentRequired:
                 description:
                     - Specifies whether a user needs to provide consent to a client for this mapper to be active.
+                type: bool
 
             consentText:
                 description:
                     - The human-readable name of the consent the user is presented to accept.
+                type: str
 
             id:
                 description:
                     - Usually a UUID specifying the internal ID of this protocol mapper instance.
+                type: str
 
             name:
                 description:
                     - The name of this protocol mapper.
+                type: str
 
             protocol:
                 description:
                     - is either 'openid-connect' or 'saml', this specifies for which protocol this protocol mapper
                       is active.
                 choices: ['openid-connect', 'saml']
+                type: str
 
             protocolMapper:
                 description:
@@ -121,6 +135,7 @@ options:
                     - An exhaustive list of available mappers on your installation can be obtained on
                       the admin console by going to Server Info -> Providers and looking under
                       'protocol-mapper'.
+                type: str
 
             config:
                 description:
@@ -129,12 +144,14 @@ options:
                       other than by the source of the mappers and its parent class(es). An example is given
                       below. It is easiest to obtain valid config values by dumping an already-existing
                       protocol mapper configuration through check-mode in the "existing" field.
+                type: dict
 
     attributes:
         description:
             - A dict of further attributes for this client template. This can contain various
               configuration settings, though in the default installation of Keycloak as of 3.4, none
               are documented or known, so this is usually empty.
+        type: dict
 
 notes:
 - The Keycloak REST API defines further fields (namely I(bearerOnly), I(consentRequired), I(standardFlowEnabled),
@@ -152,9 +169,8 @@ author:
 '''
 
 EXAMPLES = '''
-- name: Create or update Keycloak client template (minimal)
-  local_action:
-    module: keycloak_clienttemplate
+- name: Create or update Keycloak client template (minimal), authentication with credentials
+  community.general.keycloak_client:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -162,10 +178,20 @@ EXAMPLES = '''
     auth_password: PASSWORD
     realm: master
     name: this_is_a_test
+  delegate_to: localhost
+
+- name: Create or update Keycloak client template (minimal), authentication with token
+  community.general.keycloak_clienttemplate:
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    auth_realm: master
+    token: TOKEN
+    realm: master
+    name: this_is_a_test
+  delegate_to: localhost
 
 - name: Delete Keycloak client template
-  local_action:
-    module: keycloak_clienttemplate
+  community.general.keycloak_client:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -174,10 +200,10 @@ EXAMPLES = '''
     realm: master
     state: absent
     name: test01
+  delegate_to: localhost
 
 - name: Create or update Keycloak client template (with a protocol mapper)
-  local_action:
-    module: keycloak_clienttemplate
+  community.general.keycloak_client:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -200,6 +226,7 @@ EXAMPLES = '''
         protocolMapper: oidc-usermodel-property-mapper
     full_scope_allowed: false
     id: bce6f5e9-d7d3-4955-817e-c5b7f8d65b3f
+  delegate_to: localhost
 '''
 
 RETURN = '''
@@ -279,21 +306,15 @@ def main():
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
-                           required_one_of=([['id', 'name']]))
+                           required_one_of=([['id', 'name'],
+                                             ['token', 'auth_realm', 'auth_username', 'auth_password']]),
+                           required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
     result = dict(changed=False, msg='', diff={}, proposed={}, existing={}, end_state={})
 
     # Obtain access token, initialize API
     try:
-        connection_header = get_token(
-            base_url=module.params.get('auth_keycloak_url'),
-            validate_certs=module.params.get('validate_certs'),
-            auth_realm=module.params.get('auth_realm'),
-            client_id=module.params.get('auth_client_id'),
-            auth_username=module.params.get('auth_username'),
-            auth_password=module.params.get('auth_password'),
-            client_secret=module.params.get('auth_client_secret'),
-        )
+        connection_header = get_token(module.params)
     except KeycloakError as e:
         module.fail_json(msg=str(e))
     kc = KeycloakAPI(module, connection_header)

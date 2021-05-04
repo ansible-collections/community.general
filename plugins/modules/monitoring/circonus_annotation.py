@@ -21,44 +21,51 @@ notes:
     - Check mode isn't supported.
 options:
     api_key:
+        type: str
         description:
            - Circonus API key
         required: true
     category:
+        type: str
         description:
            - Annotation Category
         required: true
     description:
+        type: str
         description:
             - Description of annotation
         required: true
     title:
+        type: str
         description:
             - Title of annotation
         required: true
     start:
+        type: int
         description:
             - Unix timestamp of event start
-        default: I(now)
+            - If not specified, it defaults to I(now).
     stop:
+        type: int
         description:
             - Unix timestamp of event end
-        default: I(now) + I(duration)
+            - If not specified, it defaults to I(now) + I(duration).
     duration:
+        type: int
         description:
             - Duration in seconds of annotation
         default: 0
 '''
 EXAMPLES = '''
 - name: Create a simple annotation event with a source, defaults to start and end time of now
-  circonus_annotation:
+  community.general.circonus_annotation:
     api_key: XXXXXXXXXXXXXXXXX
     title: App Config Change
     description: This is a detailed description of the config change
     category: This category groups like annotations
 
 - name: Create an annotation with a duration of 5 minutes and a default start time of now
-  circonus_annotation:
+  community.general.circonus_annotation:
     api_key: XXXXXXXXXXXXXXXXX
     title: App Config Change
     description: This is a detailed description of the config change
@@ -66,7 +73,7 @@ EXAMPLES = '''
     duration: 300
 
 - name: Create an annotation with a start_time and end_time
-  circonus_annotation:
+  community.general.circonus_annotation:
     api_key: XXXXXXXXXXXXXXXXX
     title: App Config Change
     description: This is a detailed description of the config change

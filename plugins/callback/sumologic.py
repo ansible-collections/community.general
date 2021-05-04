@@ -18,7 +18,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-callback: sumologic
+name: sumologic
 type: aggregate
 short_description: Sends task result events to Sumologic
 author: "Ryan Currah (@ryancurrah)"
@@ -42,7 +42,7 @@ EXAMPLES = '''
 examples: >
   To enable, add this to your ansible.cfg file in the defaults block
     [defaults]
-    callback_whitelist = sumologic
+    callback_whitelist = community.general.sumologic
 
   Set the environment variable
     export SUMOLOGIC_URL=https://endpoint1.collection.us2.sumologic.com/receiver/v1/http/R8moSv1d8EW9LAUFZJ6dbxCFxwLH6kfCdcBfddlfxCbLuL-BN5twcTpMk__pYy_cDmp==

@@ -24,12 +24,14 @@ options:
                 - C(present) ensures data properties are compliant with OneView.
                 - C(absent) removes the resource from OneView, if it exists.
                 - C(connection_information_set) updates the connection information for the SAN Manager. This operation is non-idempotent.
+        type: str
         default: present
         choices: [present, absent, connection_information_set]
     data:
-      description:
-        - List with SAN Manager properties.
-      required: true
+        description:
+            - List with SAN Manager properties.
+        type: dict
+        required: true
 
 extends_documentation_fragment:
 - community.general.oneview
@@ -39,7 +41,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Creates a Device Manager for the Brocade SAN provider with the given hostname and credentials
-  oneview_san_manager:
+  community.general.oneview_san_manager:
     config: /etc/oneview/oneview_config.json
     state: present
     data:
@@ -58,7 +60,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Ensure a Device Manager for the Cisco SAN Provider is present
-  oneview_san_manager:
+  community.general.oneview_san_manager:
     config: /etc/oneview/oneview_config.json
     state: present
     data:
@@ -80,7 +82,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Sets the SAN Manager connection information
-  oneview_san_manager:
+  community.general.oneview_san_manager:
     config: /etc/oneview/oneview_config.json
     state: connection_information_set
     data:
@@ -98,7 +100,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Refreshes the SAN Manager
-  oneview_san_manager:
+  community.general.oneview_san_manager:
     config: /etc/oneview/oneview_config.json
     state: present
     data:
@@ -107,7 +109,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Delete the SAN Manager recently created
-  oneview_san_manager:
+  community.general.oneview_san_manager:
     config: /etc/oneview/oneview_config.json
     state: absent
     data:

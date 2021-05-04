@@ -33,6 +33,14 @@ options:
     - If option is omitted commands will not be checked or changed.
     type: list
     elements: str
+  cmdgroup:
+    description:
+    - List of command groups assigned to the rule.
+    - If an empty list is passed all command groups will be removed from the rule.
+    - If option is omitted command groups will not be checked or changed.
+    type: list
+    elements: str
+    version_added: 2.0.0
   description:
     description:
     - Description of the sudo rule.
@@ -60,6 +68,12 @@ options:
     - Option C(hostcategory) must be omitted to assign host groups.
     type: list
     elements: str
+  runasextusers:
+    description:
+      - List of external RunAs users
+    type: list
+    elements: str
+    version_added: 2.3.0
   runasusercategory:
     description:
     - RunAs User category the rule applies to.
@@ -106,7 +120,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Ensure sudo rule is present that's allows all every body to execute any command on any host without being asked for a password.
-  ipa_sudorule:
+  community.general.ipa_sudorule:
     name: sudo_all_nopasswd
     cmdcategory: all
     description: Allow to run every command with sudo without password
@@ -119,7 +133,7 @@ EXAMPLES = r'''
     ipa_pass: topsecret
 
 - name: Ensure user group developers can run every command on host group db-server as well as on host db01.example.com.
-  ipa_sudorule:
+  community.general.ipa_sudorule:
     name: sudo_dev_dbserver
     description: Allow developers to run every command with sudo on all database server
     cmdcategory: all
@@ -131,6 +145,23 @@ EXAMPLES = r'''
     - '!authenticate'
     usergroup:
     - developers
+    ipa_host: ipa.example.com
+    ipa_user: admin
+    ipa_pass: topsecret
+
+- name: Ensure user group operations can run any commands that is part of operations-cmdgroup on any host as user root.
+  community.general.ipa_sudorule:
+    name: sudo_operations_all
+    description: Allow operators to run any commands that is part of operations-cmdgroup on any host as user root.
+    cmdgroup:
+    - operations-cmdgroup
+    hostcategory: all
+    runasextusers:
+    - root
+    sudoopt:
+    - '!authenticate'
+    usergroup:
+    - operators
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
@@ -159,6 +190,12 @@ class SudoRuleIPAClient(IPAClient):
 
     def sudorule_add(self, name, item):
         return self._post_json(method='sudorule_add', name=name, item=item)
+
+    def sudorule_add_runasuser(self, name, item):
+        return self._post_json(method='sudorule_add_runasuser', name=name, item={'user': item})
+
+    def sudorule_remove_runasuser(self, name, item):
+        return self._post_json(method='sudorule_remove_runasuser', name=name, item={'user': item})
 
     def sudorule_mod(self, name, item):
         return self._post_json(method='sudorule_mod', name=name, item=item)
@@ -198,6 +235,9 @@ class SudoRuleIPAClient(IPAClient):
 
     def sudorule_add_allow_command(self, name, item):
         return self._post_json(method='sudorule_add_allow_command', name=name, item={'sudocmd': item})
+
+    def sudorule_add_allow_command_group(self, name, item):
+        return self._post_json(method='sudorule_add_allow_command_group', name=name, item={'sudocmdgroup': item})
 
     def sudorule_remove_allow_command(self, name, item):
         return self._post_json(method='sudorule_remove_allow_command', name=name, item=item)
@@ -254,12 +294,14 @@ def ensure(module, client):
     state = module.params['state']
     name = module.params['cn']
     cmd = module.params['cmd']
+    cmdgroup = module.params['cmdgroup']
     cmdcategory = module.params['cmdcategory']
     host = module.params['host']
     hostcategory = module.params['hostcategory']
     hostgroup = module.params['hostgroup']
     runasusercategory = module.params['runasusercategory']
     runasgroupcategory = module.params['runasgroupcategory']
+    runasextusers = module.params['runasextusers']
 
     if state in ['present', 'enabled']:
         ipaenabledflag = 'TRUE'
@@ -305,6 +347,11 @@ def ensure(module, client):
             if not module.check_mode:
                 client.sudorule_add_allow_command(name=name, item=cmd)
 
+        if cmdgroup is not None:
+            changed = category_changed(module, client, 'cmdcategory', ipa_sudorule) or changed
+            if not module.check_mode:
+                client.sudorule_add_allow_command_group(name=name, item=cmdgroup)
+
         if runasusercategory is not None:
             changed = category_changed(module, client, 'iparunasusercategory', ipa_sudorule) or changed
 
@@ -339,6 +386,21 @@ def ensure(module, client):
                     for item in diff:
                         client.sudorule_add_option_ipasudoopt(name, item)
 
+        if runasextusers is not None:
+            ipa_sudorule_run_as_user = ipa_sudorule.get('ipasudorunasextuser', [])
+            diff = list(set(ipa_sudorule_run_as_user) - set(runasextusers))
+            if len(diff) > 0:
+                changed = True
+                if not module.check_mode:
+                    for item in diff:
+                        client.sudorule_remove_runasuser(name=name, item=item)
+            diff = list(set(runasextusers) - set(ipa_sudorule_run_as_user))
+            if len(diff) > 0:
+                changed = True
+                if not module.check_mode:
+                    for item in diff:
+                        client.sudorule_add_runasuser(name=name, item=item)
+
         if user is not None:
             changed = category_changed(module, client, 'usercategory', ipa_sudorule) or changed
             changed = client.modify_if_diff(name, ipa_sudorule.get('memberuser_user', []), user,
@@ -361,6 +423,7 @@ def ensure(module, client):
 def main():
     argument_spec = ipa_argument_spec()
     argument_spec.update(cmd=dict(type='list', elements='str'),
+                         cmdgroup=dict(type='list', elements='str'),
                          cmdcategory=dict(type='str', choices=['all']),
                          cn=dict(type='str', required=True, aliases=['name']),
                          description=dict(type='str'),
@@ -373,10 +436,11 @@ def main():
                          state=dict(type='str', default='present', choices=['present', 'absent', 'enabled', 'disabled']),
                          user=dict(type='list', elements='str'),
                          usercategory=dict(type='str', choices=['all']),
-                         usergroup=dict(type='list', elements='str'))
-
+                         usergroup=dict(type='list', elements='str'),
+                         runasextusers=dict(type='list', elements='str'))
     module = AnsibleModule(argument_spec=argument_spec,
                            mutually_exclusive=[['cmdcategory', 'cmd'],
+                                               ['cmdcategory', 'cmdgroup'],
                                                ['hostcategory', 'host'],
                                                ['hostcategory', 'hostgroup'],
                                                ['usercategory', 'user'],

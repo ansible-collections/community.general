@@ -5,8 +5,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: shelvefile
-    author: Alejandro Guirao <lekumberri@gmail.com>
+    name: shelvefile
+    author: Alejandro Guirao (!UNKNOWN) <lekumberri@gmail.com>
     short_description: read keys from Python shelve file
     description:
       - Read keys from Python shelve file.
@@ -23,12 +23,14 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: retrieve a string value corresponding to a key inside a Python shelve file
-  debug: msg="{{ lookup('shelvefile', 'file=path_to_some_shelve_file.db key=key_to_retrieve') }}
+  ansible.builtin.debug: msg="{{ lookup('community.general.shelvefile', 'file=path_to_some_shelve_file.db key=key_to_retrieve') }}
 """
 
 RETURN = """
 _list:
   description: value(s) of key(s) in shelve file(s)
+  type: list
+  elements: str
 """
 import shelve
 

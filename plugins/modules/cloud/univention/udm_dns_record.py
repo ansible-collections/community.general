@@ -23,30 +23,33 @@ requirements:
     - Univention
 options:
     state:
-        required: false
+        type: str
         default: "present"
         choices: [ present, absent ]
         description:
             - Whether the dns record is present or not.
     name:
+        type: str
         required: true
         description:
             - "Name of the record, this is also the DNS record. E.g. www for
                www.example.com."
     zone:
+        type: str
         required: true
         description:
             - Corresponding DNS zone for this record, e.g. example.com.
     type:
+        type: str
         required: true
-        choices: [ host_record, alias, ptr_record, srv_record, txt_record ]
         description:
             - "Define the record type. C(host_record) is a A or AAAA record,
                C(alias) is a CNAME, C(ptr_record) is a PTR record, C(srv_record)
                is a SRV record and C(txt_record) is a TXT record."
+            - "The available choices are: C(host_record), C(alias), C(ptr_record), C(srv_record), C(txt_record)."
     data:
-        required: false
-        default: []
+        type: dict
+        default: {}
         description:
             - "Additional data for this record, e.g. ['a': '192.0.2.1'].
                Required if C(state=present)."
@@ -55,7 +58,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a DNS record on a UCS
-  udm_dns_record:
+  community.general.udm_dns_record:
     name: www
     zone: example.com
     type: host_record
@@ -98,7 +101,7 @@ def main():
                       type='str'),
             name=dict(required=True,
                       type='str'),
-            data=dict(default=[],
+            data=dict(default={},
                       type='dict'),
             state=dict(default='present',
                        choices=['present', 'absent'],

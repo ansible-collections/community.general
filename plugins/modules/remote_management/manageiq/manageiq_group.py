@@ -37,32 +37,38 @@ requirements:
 
 options:
   state:
+    type: str
     description:
     - absent - group should not exist, present - group should be.
     choices: ['absent', 'present']
     default: 'present'
   description:
+    type: str
     description:
     - The group description.
     required: true
     default: null
   role_id:
+    type: int
     description:
     - The the group role id
     required: false
     default: null
   role:
+    type: str
     description:
     - The the group role name
     - The C(role_id) has precedence over the C(role) when supplied.
     required: false
     default: null
   tenant_id:
+    type: int
     description:
     - The tenant for the group identified by the tenant id.
     required: false
     default: null
   tenant:
+    type: str
     description:
     - The tenant for the group identified by the tenant name.
     - The C(tenant_id) has precedence over the C(tenant) when supplied.
@@ -75,6 +81,7 @@ options:
     required: false
     default: null
   managed_filters_merge_mode:
+    type: str
     description:
     - In merge mode existing categories are kept or updated, new categories are added.
     - In replace mode all categories will be replaced with the supplied C(managed_filters).
@@ -83,9 +90,11 @@ options:
   belongsto_filters:
     description: A list of strings with a reference to the allowed host, cluster or folder
     type: list
+    elements: str
     required: false
     default: null
   belongsto_filters_merge_mode:
+    type: str
     description:
     - In merge mode existing settings are merged with the supplied C(belongsto_filters).
     - In replace mode current values are replaced with the supplied C(belongsto_filters).
@@ -95,7 +104,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a group in ManageIQ with the role EvmRole-user and tenant 'my_tenant'
-  manageiq_group:
+  community.general.manageiq_group:
     description: 'MyGroup-user'
     role: 'EvmRole-user'
     tenant: 'my_tenant'
@@ -106,7 +115,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Create a group in ManageIQ with the role EvmRole-user and tenant with tenant_id 4
-  manageiq_group:
+  community.general.manageiq_group:
     description: 'MyGroup-user'
     role: 'EvmRole-user'
     tenant_id: 4
@@ -120,7 +129,7 @@ EXAMPLES = '''
   - Create or update a group in ManageIQ with the role EvmRole-user and tenant my_tenant.
   - Apply 3 prov_max_cpu and 2 department tags to the group.
   - Limit access to a cluster for the group.
-  manageiq_group:
+  community.general.manageiq_group:
     description: 'MyGroup-user'
     role: 'EvmRole-user'
     tenant: my_tenant
@@ -143,7 +152,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Delete a group in ManageIQ
-  manageiq_group:
+  community.general.manageiq_group:
     state: 'absent'
     description: 'MyGroup-user'
     manageiq_connection:
@@ -152,7 +161,7 @@ EXAMPLES = '''
       password: 'smartvm'
 
 - name: Delete a group in ManageIQ using a token
-  manageiq_group:
+  community.general.manageiq_group:
     state: 'absent'
     description: 'MyGroup-user'
     manageiq_connection:

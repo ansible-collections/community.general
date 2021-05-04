@@ -38,7 +38,7 @@ options:
             - "A ':' separated list of paths to search for 'brew' executable.
               Since a package (I(formula) in homebrew parlance) location is prefixed relative to the actual path of I(brew) command,
               providing an alternative I(brew) path enables managing different set of packages in an alternative location in the system."
-        default: '/usr/local/bin'
+        default: '/usr/local/bin:/opt/homebrew/bin'
         type: path
     state:
         description:
@@ -49,14 +49,15 @@ options:
     update_homebrew:
         description:
             - update homebrew itself first.
+            - Alias C(update-brew) has been deprecated and will be removed in community.general 5.0.0.
         type: bool
-        default: 'no'
+        default: no
         aliases: ['update-brew']
     upgrade_all:
         description:
             - upgrade all homebrew packages.
         type: bool
-        default: 'no'
+        default: no
         aliases: ['upgrade']
     install_options:
         description:
@@ -76,58 +77,58 @@ notes:
 '''
 
 EXAMPLES = '''
-# Install formula foo with 'brew' in default path (C(/usr/local/bin))
-- homebrew:
+# Install formula foo with 'brew' in default path
+- community.general.homebrew:
     name: foo
     state: present
 
 # Install formula foo with 'brew' in alternate path C(/my/other/location/bin)
-- homebrew:
+- community.general.homebrew:
     name: foo
     path: /my/other/location/bin
     state: present
 
 # Update homebrew first and install formula foo with 'brew' in default path
-- homebrew:
+- community.general.homebrew:
     name: foo
     state: present
     update_homebrew: yes
 
 # Update homebrew first and upgrade formula foo to latest available with 'brew' in default path
-- homebrew:
+- community.general.homebrew:
     name: foo
     state: latest
     update_homebrew: yes
 
 # Update homebrew and upgrade all packages
-- homebrew:
+- community.general.homebrew:
     update_homebrew: yes
     upgrade_all: yes
 
 # Miscellaneous other examples
-- homebrew:
+- community.general.homebrew:
     name: foo
     state: head
 
-- homebrew:
+- community.general.homebrew:
     name: foo
     state: linked
 
-- homebrew:
+- community.general.homebrew:
     name: foo
     state: absent
 
-- homebrew:
+- community.general.homebrew:
     name: foo,bar
     state: absent
 
-- homebrew:
+- community.general.homebrew:
     name: foo
     state: present
     install_options: with-baz,enable-debug
 
 - name: Use ignored-pinned option while upgrading all
-  homebrew:
+  community.general.homebrew:
     upgrade_all: yes
     upgrade_options: ignored-pinned
 '''
@@ -168,7 +169,7 @@ class HomebrewException(Exception):
 
 
 # utils ------------------------------------------------------------------- {{{
-def _create_regex_group(s):
+def _create_regex_group_complement(s):
     lines = (line.strip() for line in s.split('\n') if line.strip())
     chars = filter(None, (line.split('#')[0].strip() for line in lines))
     group = r'[^' + r''.join(chars) + r']'
@@ -186,7 +187,7 @@ class Homebrew(object):
         :                   # colons
         {sep}               # the OS-specific path separator
         .                   # dots
-        -                   # dashes
+        \-                  # dashes
     '''.format(sep=os.path.sep)
 
     VALID_BREW_PATH_CHARS = r'''
@@ -194,7 +195,7 @@ class Homebrew(object):
         \s                  # spaces
         {sep}               # the OS-specific path separator
         .                   # dots
-        -                   # dashes
+        \-                  # dashes
     '''.format(sep=os.path.sep)
 
     VALID_PACKAGE_CHARS = r'''
@@ -202,14 +203,14 @@ class Homebrew(object):
         .                   # dots
         /                   # slash (for taps)
         \+                  # plusses
-        -                   # dashes
+        \-                  # dashes
         :                   # colons (for URLs)
         @                   # at-sign
     '''
 
-    INVALID_PATH_REGEX = _create_regex_group(VALID_PATH_CHARS)
-    INVALID_BREW_PATH_REGEX = _create_regex_group(VALID_BREW_PATH_CHARS)
-    INVALID_PACKAGE_REGEX = _create_regex_group(VALID_PACKAGE_CHARS)
+    INVALID_PATH_REGEX = _create_regex_group_complement(VALID_PATH_CHARS)
+    INVALID_BREW_PATH_REGEX = _create_regex_group_complement(VALID_BREW_PATH_CHARS)
+    INVALID_PACKAGE_REGEX = _create_regex_group_complement(VALID_PACKAGE_CHARS)
     # /class regexes ----------------------------------------------- }}}
 
     # class validations -------------------------------------------- {{{
@@ -871,7 +872,7 @@ def main():
                 elements='str',
             ),
             path=dict(
-                default="/usr/local/bin",
+                default="/usr/local/bin:/opt/homebrew/bin",
                 required=False,
                 type='path',
             ),
@@ -888,6 +889,7 @@ def main():
                 default=False,
                 aliases=["update-brew"],
                 type='bool',
+                deprecated_aliases=[dict(name='update-brew', version='5.0.0', collection_name='community.general')],
             ),
             upgrade_all=dict(
                 default=False,

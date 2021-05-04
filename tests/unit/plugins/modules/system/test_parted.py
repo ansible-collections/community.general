@@ -1,23 +1,12 @@
 # (c) 2017 Red Hat Inc.
-#
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
+
 from ansible_collections.community.general.tests.unit.compat.mock import patch, call
 from ansible_collections.community.general.plugins.modules.system import parted as parted_module
+from ansible_collections.community.general.plugins.modules.system.parted import parse_parted_version
 from ansible_collections.community.general.plugins.modules.system.parted import parse_partition_info
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
 
@@ -28,6 +17,32 @@ BYT;
 1:1.05MB:106MB:105MB:fat32::esp;
 2:106MB:368MB:262MB:ext2::;
 3:368MB:256061MB:255692MB:::;"""
+
+parted_version_info = {"""
+        parted (GNU parted) 3.3
+        Copyright (C) 2019 Free Software Foundation, Inc.
+        License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+        This is free software: you are free to change and redistribute it.
+        There is NO WARRANTY, to the extent permitted by law.
+
+        Written by <http://git.debian.org/?p=parted/parted.git;a=blob_plain;f=AUTHORS>.
+        """: (3, 3, 0), """
+        parted (GNU parted) 3.4.5
+        Copyright (C) 2019 Free Software Foundation, Inc.
+        License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+        This is free software: you are free to change and redistribute it.
+        There is NO WARRANTY, to the extent permitted by law.
+
+        Written by <http://git.debian.org/?p=parted/parted.git;a=blob_plain;f=AUTHORS>.
+        """: (3, 4, 5), """
+        parted (GNU parted) 3.3.14-dfc61
+        Copyright (C) 2019 Free Software Foundation, Inc.
+        License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>.
+        This is free software: you are free to change and redistribute it.
+        There is NO WARRANTY, to the extent permitted by law.
+
+        Written by <http://git.debian.org/?p=parted/parted.git;a=blob_plain;f=AUTHORS>.
+        """: (3, 3, 14)}
 
 # corresponding dictionary after parsing by parse_partition_info
 parted_dict1 = {
@@ -198,6 +213,17 @@ class TestParted(ModuleTestCase):
         with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
             self.execute_module(changed=True, script='unit KiB mkpart primary 0% 1GiB')
 
+    def test_create_new_partition_minus_1G(self):
+        set_module_args({
+            'device': '/dev/sdb',
+            'number': 4,
+            'state': 'present',
+            'fs_type': 'ext2',
+            'part_start': '-1GiB',
+        })
+        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+            self.execute_module(changed=True, script='unit KiB mkpart primary ext2 -1GiB 100%')
+
     def test_remove_partition_number_1(self):
         set_module_args({
             'device': '/dev/sdb',
@@ -206,6 +232,17 @@ class TestParted(ModuleTestCase):
         })
         with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
             self.execute_module(changed=True, script='rm 1')
+
+    def test_resize_partition(self):
+        set_module_args({
+            'device': '/dev/sdb',
+            'number': 3,
+            'state': 'present',
+            'part_end': '100%',
+            'resize': True
+        })
+        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+            self.execute_module(changed=True, script='resizepart 3 100%')
 
     def test_change_flag(self):
         # Flags are set in a second run of parted().
@@ -263,6 +300,19 @@ class TestParted(ModuleTestCase):
         with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict2):
             self.execute_module(changed=True, script='unit KiB mklabel gpt mkpart primary 0% 100% unit KiB name 1 \'"lvmpartition"\' set 1 lvm on')
 
+    def test_change_label_gpt(self):
+        # When partitions already exists and label is changed, mkpart should be called even when partition already exists,
+        # because new empty label will be created anyway
+        set_module_args({
+            'device': '/dev/sdb',
+            'number': 1,
+            'state': 'present',
+            'label': 'gpt',
+            '_ansible_check_mode': True,
+        })
+        with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict1):
+            self.execute_module(changed=True, script='unit KiB mklabel gpt mkpart primary 0% 100%')
+
     def test_check_mode_unchanged(self):
         # Test that get_device_info result is checked in check mode too
         # No change on partition 1
@@ -288,3 +338,8 @@ class TestParted(ModuleTestCase):
         })
         with patch('ansible_collections.community.general.plugins.modules.system.parted.get_device_info', return_value=parted_dict3):
             self.execute_module(changed=True)
+
+    def test_version_info(self):
+        """Test that the parse_parted_version returns the expected tuple"""
+        for key, value in parted_version_info.items():
+            self.assertEqual(parse_parted_version(key), value)

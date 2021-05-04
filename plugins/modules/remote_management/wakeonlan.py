@@ -19,14 +19,17 @@ options:
     description:
     - MAC address to send Wake-on-LAN broadcast packet for.
     required: true
+    type: str
   broadcast:
     description:
     - Network broadcast address to use for broadcasting magic Wake-on-LAN packet.
     default: 255.255.255.255
+    type: str
   port:
     description:
     - UDP port to use for magic Wake-on-LAN packet.
     default: 7
+    type: int
 todo:
   - Add arping support to check whether the system is up (before and after)
   - Enable check-mode support (when we have arping support)
@@ -43,12 +46,12 @@ author:
 
 EXAMPLES = r'''
 - name: Send a magic Wake-on-LAN packet to 00:00:5E:00:53:66
-  wakeonlan:
+  community.general.wakeonlan:
     mac: '00:00:5E:00:53:66'
     broadcast: 192.0.2.23
   delegate_to: localhost
 
-- wakeonlan:
+- community.general.wakeonlan:
     mac: 00:00:5E:00:53:66
     port: 9
   delegate_to: localhost

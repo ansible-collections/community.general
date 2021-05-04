@@ -18,30 +18,40 @@ description:
    - This module sends push notifications via Pushbullet to channels or devices.
 options:
     api_key:
+        type: str
         description:
             - Push bullet API token
         required: true
     channel:
+        type: str
         description:
             - The channel TAG you wish to broadcast a push notification,
               as seen on the "My Channels" > "Edit your channel" at
               Pushbullet page.
     device:
+        type: str
         description:
             - The device NAME you wish to send a push notification,
               as seen on the Pushbullet main page.
     push_type:
+        type: str
         description:
           - Thing you wish to push.
         default: note
         choices: [ "note", "link" ]
     title:
+        type: str
         description:
           - Title of the notification.
         required: true
     body:
+        type: str
         description:
           - Body of the notification, e.g. Details of the fault you're alerting.
+    url:
+        type: str
+        description:
+          - URL field, used when I(push_type) is C(link).
 
 notes:
    - Requires pushbullet.py Python package on the remote host.
@@ -51,13 +61,13 @@ notes:
 
 EXAMPLES = '''
 - name: Sends a push notification to a device
-  pushbullet:
+  community.general.pushbullet:
     api_key: "ABC123abc123ABC123abc123ABC123ab"
     device: "Chrome"
     title: "You may see this on Google Chrome"
 
 - name: Sends a link to a device
-  pushbullet:
+  community.general.pushbullet:
     api_key: ABC123abc123ABC123abc123ABC123ab
     device: Chrome
     push_type: link
@@ -65,13 +75,13 @@ EXAMPLES = '''
     body: https://docs.ansible.com/
 
 - name: Sends a push notification to a channel
-  pushbullet:
+  community.general.pushbullet:
     api_key: ABC123abc123ABC123abc123ABC123ab
     channel: my-awesome-channel
     title: Broadcasting a message to the #my-awesome-channel folks
 
 - name: Sends a push notification with title and body to a channel
-  pushbullet:
+  community.general.pushbullet:
     api_key: ABC123abc123ABC123abc123ABC123ab
     channel: my-awesome-channel
     title: ALERT! Signup service is down

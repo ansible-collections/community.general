@@ -36,32 +36,38 @@ requirements:
 - manageiq-client
 options:
   state:
+    type: str
     description:
     - absent - tenant should not exist, present - tenant should be.
     choices: ['absent', 'present']
     default: 'present'
   name:
+    type: str
     description:
       - The tenant name.
     required: true
     default: null
   description:
+    type: str
     description:
     - The tenant description.
     required: true
     default: null
   parent_id:
+    type: int
     description:
     - The id of the parent tenant. If not supplied the root tenant is used.
     - The C(parent_id) takes president over C(parent) when supplied
     required: false
     default: null
   parent:
+    type: str
     description:
     - The name of the parent tenant. If not supplied and no C(parent_id) is supplied the root tenant is used.
     required: false
     default: null
   quotas:
+    type: dict
     description:
     - The tenant quotas.
     - All parameters case sensitive.
@@ -77,7 +83,7 @@ options:
 
 EXAMPLES = '''
 - name: Update the root tenant in ManageIQ
-  manageiq_tenant:
+  community.general.manageiq_tenant:
     name: 'My Company'
     description: 'My company name'
     manageiq_connection:
@@ -87,7 +93,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Create a tenant in ManageIQ
-  manageiq_tenant:
+  community.general.manageiq_tenant:
     name: 'Dep1'
     description: 'Manufacturing department'
     parent_id: 1
@@ -98,7 +104,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Delete a tenant in ManageIQ
-  manageiq_tenant:
+  community.general.manageiq_tenant:
     state: 'absent'
     name: 'Dep1'
     parent_id: 1
@@ -109,7 +115,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Set tenant quota for cpu_allocated, mem_allocated, remove quota for vms_allocated
-  manageiq_tenant:
+  community.general.manageiq_tenant:
     name: 'Dep1'
     parent_id: 1
     quotas:
@@ -124,7 +130,7 @@ EXAMPLES = '''
 
 
 - name: Delete a tenant in ManageIQ using a token
-  manageiq_tenant:
+  community.general.manageiq_tenant:
     state: 'absent'
     name: 'Dep1'
     parent_id: 1

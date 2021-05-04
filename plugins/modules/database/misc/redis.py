@@ -20,47 +20,57 @@ options:
             - C(config) (new in 1.6), ensures a configuration setting on an instance.
             - C(flush) flushes all the instance or a specified db.
             - C(slave) sets a redis instance in slave or master mode.
-        required: true
         choices: [ config, flush, slave ]
+        type: str
     login_password:
         description:
             - The password used to authenticate with (usually not used)
+        type: str
     login_host:
         description:
             - The host running the database
         default: localhost
+        type: str
     login_port:
         description:
             - The port to connect to
         default: 6379
+        type: int
     master_host:
         description:
             - The host of the master instance [slave command]
+        type: str
     master_port:
         description:
             - The port of the master instance [slave command]
+        type: int
     slave_mode:
         description:
             - the mode of the redis instance [slave command]
         default: slave
         choices: [ master, slave ]
+        type: str
     db:
         description:
             - The database to flush (used in db mode) [flush command]
+        type: int
     flush_mode:
         description:
             - Type of flush (all the dbs in a redis instance or a specific one)
               [flush command]
         default: all
         choices: [ all, db ]
+        type: str
     name:
         description:
             - A redis config key.
+        type: str
     value:
         description:
             - A redis config value. When memory size is needed, it is possible
               to specify it in the usal form of 1KB, 2M, 400MB where the base is 1024.
               Units are case insensitive i.e. 1m = 1mb = 1M = 1MB.
+        type: str
 
 notes:
    - Requires the redis-py Python package on the remote host. You can
@@ -70,48 +80,48 @@ notes:
      this needs to be in the redis.conf in the masterauth variable
 
 seealso:
-    - module: redis_info
+    - module: community.general.redis_info
 requirements: [ redis ]
 author: "Xabier Larrakoetxea (@slok)"
 '''
 
 EXAMPLES = '''
 - name: Set local redis instance to be slave of melee.island on port 6377
-  redis:
+  community.general.redis:
     command: slave
     master_host: melee.island
     master_port: 6377
 
 - name: Deactivate slave mode
-  redis:
+  community.general.redis:
     command: slave
     slave_mode: master
 
 - name: Flush all the redis db
-  redis:
+  community.general.redis:
     command: flush
     flush_mode: all
 
 - name: Flush only one db in a redis instance
-  redis:
+  community.general.redis:
     command: flush
     db: 1
     flush_mode: db
 
 - name: Configure local redis to have 10000 max clients
-  redis:
+  community.general.redis:
     command: config
     name: maxclients
     value: 10000
 
 - name: Configure local redis maxmemory to 4GB
-  redis:
+  community.general.redis:
     command: config
     name: maxmemory
     value: 4GB
 
 - name: Configure local redis to have lua time limit of 100 ms
-  redis:
+  community.general.redis:
     command: config
     name: lua-time-limit
     value: 100
@@ -131,6 +141,7 @@ else:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.common.text.formatters import human_to_bytes
 from ansible.module_utils._text import to_native
+import re
 
 
 # Redis module specific support methods.
@@ -277,7 +288,10 @@ def main():
         name = module.params['name']
 
         try:  # try to parse the value as if it were the memory size
-            value = str(human_to_bytes(module.params['value'].upper()))
+            if re.match(r'^\s*(\d*\.?\d*)\s*([A-Za-z]+)?\s*$', module.params['value'].upper()):
+                value = str(human_to_bytes(module.params['value'].upper()))
+            else:
+                value = module.params['value']
         except ValueError:
             value = module.params['value']
 

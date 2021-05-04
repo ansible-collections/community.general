@@ -18,20 +18,24 @@ options:
     description:
       - Name of repository from which issue needs to be retrieved.
     required: true
+    type: str
   organization:
     description:
       - Name of the GitHub organization in which the repository is hosted.
     required: true
+    type: str
   issue:
     description:
       - Issue number for which information is required.
     required: true
+    type: int
   action:
     description:
         - Get various details about issue depending upon action specified.
     default: 'get_status'
     choices:
         - 'get_status'
+    type: str
 author:
     - Abhijeet Kasurde (@Akasurde)
 '''
@@ -46,7 +50,7 @@ get_status:
 
 EXAMPLES = '''
 - name: Check if GitHub issue is closed or not
-  github_issue:
+  community.general.github_issue:
     organization: ansible
     repo: ansible
     issue: 23642
@@ -54,7 +58,7 @@ EXAMPLES = '''
   register: r
 
 - name: Take action depending upon issue status
-  debug:
+  ansible.builtin.debug:
     msg: Do something when issue 23642 is open
   when: r.issue_status == 'open'
 '''

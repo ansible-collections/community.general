@@ -51,28 +51,35 @@ notes:
 
 EXAMPLES = '''
 - name: Install Keynote
-  mas:
+  community.general.mas:
     id: 409183694
     state: present
 
+- name: Install Divvy with command mas installed in /usr/local/bin
+  community.general.mas:
+    id: 413857545
+    state: present
+  environment:
+    PATH: /usr/local/bin:{{ ansible_facts.env.PATH }}
+
 - name: Install a list of apps
-  mas:
+  community.general.mas:
     id:
       - 409183694 # Keynote
       - 413857545 # Divvy
     state: present
 
 - name: Ensure the latest Keynote version is installed
-  mas:
+  community.general.mas:
     id: 409183694
     state: latest
 
 - name: Upgrade all installed Mac App Store apps
-  mas:
+  community.general.mas:
     upgrade_all: yes
 
 - name: Install specific apps and also upgrade all others
-  mas:
+  community.general.mas:
     id:
       - 409183694 # Keynote
       - 413857545 # Divvy
@@ -80,7 +87,7 @@ EXAMPLES = '''
     upgrade_all: yes
 
 - name: Uninstall Divvy
-  mas:
+  community.general.mas:
     id: 413857545
     state: absent
   become: yes # Uninstallation requires root permissions
@@ -176,6 +183,8 @@ class Mas(object):
 
         rc, raw_apps, err = self.run([command])
         rows = raw_apps.split("\n")
+        if rows[0] == "No installed apps found":
+            rows = []
         apps = []
         for r in rows:
             # Format: "123456789 App Name"

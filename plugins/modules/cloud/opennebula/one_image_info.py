@@ -40,18 +40,23 @@ options:
       - It is recommended to use HTTPS so that the username/password are not
       - transferred over the network unencrypted.
       - If not set then the value of the C(ONE_URL) environment variable is used.
+    type: str
   api_username:
     description:
       - Name of the user to login into the OpenNebula RPC server. If not set
       - then the value of the C(ONE_USERNAME) environment variable is used.
+    type: str
   api_password:
     description:
       - Password of the user to login into OpenNebula RPC server. If not set
       - then the value of the C(ONE_PASSWORD) environment variable is used.
+    type: str
   ids:
     description:
       - A list of images ids whose facts you want to gather.
     aliases: ['id']
+    type: list
+    elements: str
   name:
     description:
       - A C(name) of the image whose facts will be gathered.
@@ -59,6 +64,7 @@ options:
       - which restricts the list of images (whose facts will be returned) whose names match specified regex.
       - Also, if the C(name) begins with '~*' case-insensitive matching will be performed.
       - See examples for more details.
+    type: str
 author:
     - "Milan Ilic (@ilicmilan)"
     - "Jan Meerkamp (@meerkampdvv)"
@@ -66,30 +72,30 @@ author:
 
 EXAMPLES = '''
 - name: Gather facts about all images
-  one_image_info:
+  community.general.one_image_info:
   register: result
 
 - name: Print all images facts
-  debug:
+  ansible.builtin.debug:
     msg: result
 
 - name: Gather facts about an image using ID
-  one_image_info:
+  community.general.one_image_info:
     ids:
       - 123
 
 - name: Gather facts about an image using the name
-  one_image_info:
+  community.general.one_image_info:
     name: 'foo-image'
   register: foo_image
 
 - name: Gather facts about all IMAGEs whose name matches regex 'app-image-.*'
-  one_image_info:
+  community.general.one_image_info:
     name: '~app-image-.*'
   register: app_images
 
 - name: Gather facts about all IMAGEs whose name matches regex 'foo-image-.*' ignoring cases
-  one_image_info:
+  community.general.one_image_info:
     name: '~*foo-image-.*'
   register: foo_images
 '''
@@ -248,15 +254,13 @@ def main():
         "api_url": {"required": False, "type": "str"},
         "api_username": {"required": False, "type": "str"},
         "api_password": {"required": False, "type": "str", "no_log": True},
-        "ids": {"required": False, "aliases": ['id'], "type": "list"},
+        "ids": {"required": False, "aliases": ['id'], "type": "list", "elements": "str"},
         "name": {"required": False, "type": "str"},
     }
 
     module = AnsibleModule(argument_spec=fields,
                            mutually_exclusive=[['ids', 'name']],
                            supports_check_mode=True)
-    if module._name in ('one_image_facts', 'community.general.one_image_facts'):
-        module.deprecate("The 'one_image_facts' module has been renamed to 'one_image_info'", version='2.13')
 
     if not HAS_PYONE:
         module.fail_json(msg='This module requires pyone to work!')
@@ -267,9 +271,6 @@ def main():
     name = params.get('name')
     client = pyone.OneServer(auth.url, session=auth.username + ':' + auth.password)
 
-    result = {'images': []}
-    images = []
-
     if ids:
         images = get_images_by_ids(module, client, ids)
     elif name:
@@ -277,8 +278,9 @@ def main():
     else:
         images = get_all_images(client).IMAGE
 
-    for image in images:
-        result['images'].append(get_image_info(image))
+    result = {
+        'images': [get_image_info(image) for image in images],
+    }
 
     module.exit_json(**result)
 

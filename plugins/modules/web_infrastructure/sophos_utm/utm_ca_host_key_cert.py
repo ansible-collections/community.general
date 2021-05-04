@@ -26,21 +26,26 @@ options:
         description:
           - The name of the object. Will be used to identify the entry.
         required: true
+        type: str
     ca:
         description:
           - A reference to an existing utm_ca_signing_ca or utm_ca_verification_ca object.
         required: true
+        type: str
     meta:
         description:
           - A reference to an existing utm_ca_meta_x509 object.
         required: true
+        type: str
     certificate:
         description:
           - The certificate in PEM format.
         required: true
+        type: str
     comment:
         description:
           - Optional comment string.
+        type: str
     encrypted:
         description:
           - Optionally enable encryption.
@@ -49,6 +54,7 @@ options:
     key:
         description:
           - Optional private key in PEM format.
+        type: str
 
 extends_documentation_fragment:
 - community.general.utm
@@ -57,7 +63,7 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Create a ca_host_key_cert entry
-  utm_ca_host_key_cert:
+  community.general.utm_ca_host_key_cert:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestHostKeyCertEntry
@@ -72,14 +78,14 @@ EXAMPLES = """
     state: present
 
 - name: Remove a ca_host_key_cert entry
-  utm_ca_host_key_cert:
+  community.general.utm_ca_host_key_cert:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestHostKeyCertEntry
     state: absent
 
 - name: Read a ca_host_key_cert entry
-  utm_ca_host_key_cert:
+  community.general.utm_ca_host_key_cert:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestHostKeyCertEntry

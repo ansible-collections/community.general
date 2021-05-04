@@ -81,8 +81,8 @@ author:
 '''
 
 EXAMPLES = '''
-- name: Create a Keycloak group
-  keycloak_group:
+- name: Create a Keycloak group, authentication with credentials
+  community.general.keycloak_group:
     name: my-new-kc-group
     realm: MyCustomRealm
     state: present
@@ -93,8 +93,18 @@ EXAMPLES = '''
     auth_password: PASSWORD
   delegate_to: localhost
 
+- name: Create a Keycloak group, authentication with token
+  community.general.keycloak_group:
+    name: my-new-kc-group
+    realm: MyCustomRealm
+    state: present
+    auth_client_id: admin-cli
+    auth_keycloak_url: https://auth.example.com/auth
+    token: TOKEN
+  delegate_to: localhost
+
 - name: Delete a keycloak group
-  keycloak_group:
+  community.general.keycloak_group:
     id: '9d59aa76-2755-48c6-b1af-beb70a82c3cd'
     state: absent
     realm: MyCustomRealm
@@ -106,7 +116,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Delete a Keycloak group based on name
-  keycloak_group:
+  community.general.keycloak_group:
     name: my-group-for-deletion
     state: absent
     auth_client_id: admin-cli
@@ -117,7 +127,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Update the name of a Keycloak group
-  keycloak_group:
+  community.general.keycloak_group:
     id: '9d59aa76-2755-48c6-b1af-beb70a82c3cd'
     name: an-updated-kc-group-name
     state: present
@@ -129,7 +139,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Create a keycloak group with some custom attributes
-  keycloak_group:
+  community.general.keycloak_group:
     auth_client_id: admin-cli
     auth_keycloak_url: https://auth.example.com/auth
     auth_realm: master
@@ -217,30 +227,25 @@ def main():
         realm=dict(default='master'),
         id=dict(type='str'),
         name=dict(type='str'),
-        attributes=dict(type='dict')
+        attributes=dict(type='dict'),
     )
 
     argument_spec.update(meta_args)
 
     module = AnsibleModule(argument_spec=argument_spec,
                            supports_check_mode=True,
-                           required_one_of=([['id', 'name']]))
+                           required_one_of=([['id', 'name'],
+                                             ['token', 'auth_realm', 'auth_username', 'auth_password']]),
+                           required_together=([['auth_realm', 'auth_username', 'auth_password']]))
 
     result = dict(changed=False, msg='', diff={}, group='')
 
     # Obtain access token, initialize API
     try:
-        connection_header = get_token(
-            base_url=module.params.get('auth_keycloak_url'),
-            validate_certs=module.params.get('validate_certs'),
-            auth_realm=module.params.get('auth_realm'),
-            client_id=module.params.get('auth_client_id'),
-            auth_username=module.params.get('auth_username'),
-            auth_password=module.params.get('auth_password'),
-            client_secret=module.params.get('auth_client_secret'),
-        )
+        connection_header = get_token(module.params)
     except KeycloakError as e:
         module.fail_json(msg=str(e))
+
     kc = KeycloakAPI(module, connection_header)
 
     realm = module.params.get('realm')

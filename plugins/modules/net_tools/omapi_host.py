@@ -63,6 +63,7 @@ options:
         description:
             - Attach a list of OMAPI DHCP statements with host lease (without ending semicolon).
         type: list
+        elements: str
         default: []
     ddns:
         description:
@@ -73,7 +74,7 @@ options:
 '''
 EXAMPLES = r'''
 - name: Add a host using OMAPI
-  omapi_host:
+  community.general.omapi_host:
     key_name: defomapi
     key: +bFQtBCta6j2vWkjPkNFtgA==
     host: 10.98.4.55
@@ -87,7 +88,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Remove a host using OMAPI
-  omapi_host:
+  community.general.omapi_host:
     key_name: defomapi
     key: +bFQtBCta6j2vWkjPkNFtgA==
     host: 10.1.1.1
@@ -150,7 +151,7 @@ class OmapiHostManager:
 
     def connect(self):
         try:
-            self.omapi = Omapi(self.module.params['host'], self.module.params['port'], self.module.params['key_name'],
+            self.omapi = Omapi(self.module.params['host'], self.module.params['port'], to_bytes(self.module.params['key_name']),
                                self.module.params['key'])
         except binascii.Error:
             self.module.fail_json(msg="Unable to open OMAPI connection. 'key' is not a valid base64 key.")
@@ -173,13 +174,13 @@ class OmapiHostManager:
     def unpack_facts(obj):
         result = dict(obj)
         if 'hardware-address' in result:
-            result['hardware-address'] = unpack_mac(result['hardware-address'])
+            result['hardware-address'] = to_native(unpack_mac(result[to_bytes('hardware-address')]))
 
         if 'ip-address' in result:
-            result['ip-address'] = unpack_ip(result['ip-address'])
+            result['ip-address'] = to_native(unpack_ip(result[to_bytes('ip-address')]))
 
         if 'hardware-type' in result:
-            result['hardware-type'] = struct.unpack("!I", result['hardware-type'])
+            result['hardware-type'] = struct.unpack("!I", result[to_bytes('hardware-type')])
 
         return result
 
@@ -192,11 +193,11 @@ class OmapiHostManager:
         # If host was not found using macaddr, add create message
         if host_response is None:
             msg = OmapiMessage.open(to_bytes('host', errors='surrogate_or_strict'))
-            msg.message.append(('create', struct.pack('!I', 1)))
-            msg.message.append(('exclusive', struct.pack('!I', 1)))
-            msg.obj.append(('hardware-address', pack_mac(self.module.params['macaddr'])))
-            msg.obj.append(('hardware-type', struct.pack('!I', 1)))
-            msg.obj.append(('name', self.module.params['hostname']))
+            msg.message.append((to_bytes('create'), struct.pack('!I', 1)))
+            msg.message.append((to_bytes('exclusive'), struct.pack('!I', 1)))
+            msg.obj.append((to_bytes('hardware-address'), pack_mac(self.module.params['macaddr'])))
+            msg.obj.append((to_bytes('hardware-type'), struct.pack('!I', 1)))
+            msg.obj.append((to_bytes('name'), to_bytes(self.module.params['hostname'])))
             if self.module.params['ip'] is not None:
                 msg.obj.append((to_bytes("ip-address", errors='surrogate_or_strict'), pack_ip(self.module.params['ip'])))
 
@@ -212,7 +213,7 @@ class OmapiHostManager:
                 self.module.fail_json(msg="Invalid statements found: %s" % to_native(e))
 
             if len(stmt_join) > 0:
-                msg.obj.append(('statements', stmt_join))
+                msg.obj.append((to_bytes('statements'), to_bytes(stmt_join)))
 
             try:
                 response = self.omapi.query_server(msg)
@@ -282,7 +283,7 @@ def main():
             hostname=dict(type='str', aliases=['name']),
             ip=dict(type='str'),
             ddns=dict(type='bool', default=False),
-            statements=dict(type='list', default=[]),
+            statements=dict(type='list', elements='str', default=[]),
         ),
         supports_check_mode=False,
     )

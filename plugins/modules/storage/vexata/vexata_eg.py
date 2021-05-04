@@ -50,7 +50,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Create export group named db_export.
-  vexata_eg:
+  community.general.vexata_eg:
     name: db_export
     vg: dbvols
     ig: dbhosts
@@ -61,7 +61,7 @@ EXAMPLES = r'''
     password: secret
 
 - name: Delete export group named db_export
-  vexata_eg:
+  community.general.vexata_eg:
     name: db_export
     state: absent
     array: vx100_ultra.test.com

@@ -18,34 +18,43 @@ options:
     token:
         description:
             - GitHub Personal Access Token for authenticating. Mutually exclusive with C(password).
+        type: str
     user:
         description:
             - The GitHub account that owns the repository
+        type: str
         required: true
     password:
         description:
             - The GitHub account password for the user. Mutually exclusive with C(token).
+        type: str
     repo:
         description:
             - Repository name
+        type: str
         required: true
     action:
         description:
             - Action to perform
+        type: str
         required: true
         choices: [ 'latest_release', 'create_release' ]
     tag:
         description:
             - Tag name when creating a release. Required when using action is set to C(create_release).
+        type: str
     target:
         description:
             - Target of release when creating a release
+        type: str
     name:
         description:
             - Name of release when creating a release
+        type: str
     body:
         description:
             - Description of the release when creating a release
+        type: str
     draft:
         description:
             - Sets if the release is a draft or not. (boolean)
@@ -65,27 +74,27 @@ requirements:
 
 EXAMPLES = '''
 - name: Get latest release of a public repository
-  github_release:
+  community.general.github_release:
     user: ansible
     repo: ansible
     action: latest_release
 
 - name: Get latest release of testuseer/testrepo
-  github_release:
+  community.general.github_release:
     token: tokenabc1234567890
     user: testuser
     repo: testrepo
     action: latest_release
 
 - name: Get latest release of test repo using username and password. Ansible 2.4.
-  github_release:
+  community.general.github_release:
     user: testuser
     password: secret123
     repo: testrepo
     action: latest_release
 
 - name: Create a new release
-  github_release:
+  community.general.github_release:
     token: tokenabc1234567890
     user: testuser
     repo: testrepo

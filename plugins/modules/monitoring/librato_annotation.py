@@ -18,50 +18,59 @@ author: "Seth Edwards (@Sedward)"
 requirements: []
 options:
     user:
+        type: str
         description:
            - Librato account username
         required: true
     api_key:
+        type: str
         description:
            - Librato account api key
         required: true
     name:
+        type: str
         description:
             - The annotation stream name
             - If the annotation stream does not exist, it will be created automatically
         required: false
     title:
+        type: str
         description:
             - The title of an annotation is a string and may contain spaces
             - The title should be a short, high-level summary of the annotation e.g. v45 Deployment
         required: true
     source:
+        type: str
         description:
             - A string which describes the originating source of an annotation when that annotation is tracked across multiple members of a population
         required: false
     description:
+        type: str
         description:
             - The description contains extra metadata about a particular annotation
             - The description should contain specifics on the individual annotation e.g. Deployed 9b562b2 shipped new feature foo!
         required: false
     start_time:
+        type: int
         description:
             - The unix timestamp indicating the time at which the event referenced by this annotation started
         required: false
     end_time:
+        type: int
         description:
             - The unix timestamp indicating the time at which the event referenced by this annotation ended
             - For events that have a duration, this is a useful way to annotate the duration of the event
         required: false
     links:
+        type: list
+        elements: dict
         description:
             - See examples
-        required: true
 '''
 
 EXAMPLES = '''
 - name: Create a simple annotation event with a source
-  librato_annotation:
+  community.general.librato_annotation:
     user: user@example.com
     api_key: XXXXXXXXXXXXXXXXX
     title: App Config Change
@@ -69,7 +78,7 @@ EXAMPLES = '''
     description: This is a detailed description of the config change
 
 - name: Create an annotation that includes a link
-  librato_annotation:
+  community.general.librato_annotation:
     user: user@example.com
     api_key: XXXXXXXXXXXXXXXXXX
     name: code.deploy
@@ -80,7 +89,7 @@ EXAMPLES = '''
         href: http://www.example.com/deploy
 
 - name: Create an annotation with a start_time and end_time
-  librato_annotation:
+  community.general.librato_annotation:
     user: user@example.com
     api_key: XXXXXXXXXXXXXXXXXX
     name: maintenance
@@ -140,14 +149,14 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             user=dict(required=True),
-            api_key=dict(required=True),
+            api_key=dict(required=True, no_log=True),
             name=dict(required=False),
             title=dict(required=True),
             source=dict(required=False),
             description=dict(required=False),
             start_time=dict(required=False, default=None, type='int'),
             end_time=dict(required=False, default=None, type='int'),
-            links=dict(type='list')
+            links=dict(type='list', elements='dict')
         )
     )
 

@@ -65,39 +65,41 @@ options:
           to manual, hence combined with C(auto_node_startup=yes) will always return
           a changed state.
         type: bool
+        default: false
     show_nodes:
         description:
         - Whether the list of nodes in the persistent iSCSI database should be returned by the module.
         type: bool
+        default: false
 '''
 
 EXAMPLES = r'''
 - name: Perform a discovery on sun.com and show available target nodes
-  open_iscsi:
+  community.general.open_iscsi:
     show_nodes: yes
     discover: yes
     portal: sun.com
 
 - name: Perform a discovery on 10.1.2.3 and show available target nodes
-  open_iscsi:
+  community.general.open_iscsi:
     show_nodes: yes
     discover: yes
     ip: 10.1.2.3
 
 # NOTE: Only works if exactly one target is exported to the initiator
 - name: Discover targets on portal and login to the one available
-  open_iscsi:
+  community.general.open_iscsi:
     portal: '{{ iscsi_target }}'
     login: yes
     discover: yes
 
 - name: Connect to the named target, after updating the local persistent database (cache)
-  open_iscsi:
+  community.general.open_iscsi:
     login: yes
     target: iqn.1986-03.com.sun:02:f8c1f9e0-c3ec-ec84-c9c9-8bfb0cd5de3d
 
 - name: Disconnect from the cached named target
-  open_iscsi:
+  community.general.open_iscsi:
     login: no
     target: iqn.1986-03.com.sun:02:f8c1f9e0-c3ec-ec84-c9c9-8bfb0cd5de3d
 '''
@@ -267,8 +269,7 @@ def main():
             show_nodes=dict(type='bool', default=False),
         ),
 
-        required_together=[['discover_user', 'discover_pass'],
-                           ['node_user', 'node_pass']],
+        required_together=[['node_user', 'node_pass']],
         supports_check_mode=True,
     )
 

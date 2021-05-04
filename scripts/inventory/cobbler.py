@@ -41,20 +41,10 @@ Changelog:
 
 # (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>
 #
-# This file is part of Ansible,
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <https://www.gnu.org/licenses/>.
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 ######################################################################
 
@@ -62,7 +52,10 @@ import argparse
 import os
 import re
 from time import time
-import xmlrpclib
+try:  # Python 3
+    from xmlrpc.client import Server
+except ImportError:  # Python 2
+    from xmlrpclib import Server
 
 import json
 
@@ -116,7 +109,7 @@ class CobblerInventory(object):
 
     def _connect(self):
         if not self.conn:
-            self.conn = xmlrpclib.Server(self.cobbler_host, allow_none=True)
+            self.conn = Server(self.cobbler_host, allow_none=True)
             self.token = None
             if self.cobbler_username is not None:
                 self.token = self.conn.login(self.cobbler_username, self.cobbler_password)

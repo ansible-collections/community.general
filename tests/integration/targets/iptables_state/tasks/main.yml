@@ -1,0 +1,34 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: ensure iptables package is installed
+  package:
+    name:
+      - iptables
+  become: yes
+
+
+- name: include tasks
+  vars:
+    iptables_saved: "/tmp/test_iptables_state.saved"
+    iptables_tests: "/tmp/test_iptables_state.tests"
+
+  block:
+    - name: include tasks to perform basic tests (check_mode, async, idempotency)
+      include_tasks: tests/00-basic.yml
+
+    - name: include tasks to test tables handling
+      include_tasks: tests/01-tables.yml
+      when:
+        - xtables_lock is undefined
+
+    - name: include tasks to test rollbacks
+      include_tasks: tests/10-rollback.yml
+      when:
+        - xtables_lock is undefined
+        - ansible_connection in ['ssh', 'paramiko', 'smart']
+
+  become: yes

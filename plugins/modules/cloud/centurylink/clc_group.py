@@ -17,23 +17,28 @@ options:
   name:
     description:
       - The name of the Server Group
+    type: str
     required: True
   description:
     description:
       - A description of the Server Group
+    type: str
     required: False
   parent:
     description:
       - The parent group of the server group. If parent is not provided, it creates the group at top level.
+    type: str
     required: False
   location:
     description:
       - Datacenter to create the group in. If location is not provided, the group gets created in the default datacenter
         associated with the account
+    type: str
     required: False
   state:
     description:
       - Whether to create or delete the group
+    type: str
     default: present
     choices: ['present', 'absent']
   wait:
@@ -70,33 +75,31 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create / Verify a Server Group at CenturyLink Cloud
-      clc_group:
+      community.general.clc_group:
         name: My Cool Server Group
         parent: Default Group
         state: present
       register: clc
 
     - name: Debug
-      debug:
+      ansible.builtin.debug:
         var: clc
 
 # Delete a Server Group
-
----
 - name: Delete Server Group
   hosts: localhost
   gather_facts: False
   connection: local
   tasks:
     - name: Delete / Verify Absent a Server Group at CenturyLink Cloud
-      clc_group:
+      community.general.clc_group:
         name: My Cool Server Group
         parent: Default Group
         state: absent
       register: clc
 
     - name: Debug
-      debug:
+      ansible.builtin.debug:
         var: clc
 '''
 

@@ -5,8 +5,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: flattened
-    author: Serge van Ginderachter <serge@vanginderachter.be>
+    name: flattened
+    author: Serge van Ginderachter (!UNKNOWN) <serge@vanginderachter.be>
     short_description: return single list completely flattened
     description:
       - given one or more lists, this lookup will flatten any list elements found recursively until only 1 list is left.
@@ -21,7 +21,8 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: "'unnest' all elements into single list"
-  debug: msg="all in one list {{lookup('flattened', [1,2,3,[5,6]], [a,b,c], [[5,6,1,3], [34,a,b,c]])}}"
+  ansible.builtin.debug:
+    msg: "all in one list {{lookup('community.general.flattened', [1,2,3,[5,6]], [a,b,c], [[5,6,1,3], [34,a,b,c]])}}"
 """
 
 RETURN = """

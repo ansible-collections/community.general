@@ -40,4 +40,4 @@
     action: "{{ action_prefix }}file path={{ remote_tmp }}-汉语 state=absent"
 
   ### test wait_for_connection plugin
-  - wait_for_connection:
+  - ansible.builtin.wait_for_connection:

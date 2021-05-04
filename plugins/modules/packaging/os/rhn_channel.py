@@ -22,26 +22,34 @@ options:
         description:
             - Name of the software channel.
         required: true
+        type: str
     sysname:
         description:
             - Name of the system as it is known in RHN/Satellite.
         required: true
+        type: str
     state:
         description:
             - Whether the channel should be present or not, taking action if the state is different from what is stated.
         default: present
+        choices: [ present, absent ]
+        type: str
     url:
         description:
             - The full URL to the RHN/Satellite API.
         required: true
+        type: str
     user:
         description:
             - RHN/Satellite login.
         required: true
+        type: str
     password:
         description:
             - RHN/Satellite password.
+        aliases: [pwd]
         required: true
+        type: str
     validate_certs:
         description:
             - If C(False), SSL certificates will not be validated.
@@ -55,7 +63,7 @@ options:
 
 EXAMPLES = '''
 - name: Add a Red Hat software channel
-  rhn_channel:
+  community.general.rhn_channel:
     name: rhel-x86_64-server-v2vwin-6
     sysname: server01
     url: https://rhn.redhat.com/rpc/api
@@ -127,7 +135,7 @@ def main():
         try:  # Python 2.7.9 and newer
             ssl_context = ssl.create_unverified_context()
         except AttributeError:  # Legacy Python that doesn't verify HTTPS certificates by default
-            ssl._create_default_context = ssl._create_unverified_context
+            ssl_context = ssl._create_unverified_context()
         else:  # Python 2.7.8 and older
             ssl._create_default_https_context = ssl._create_unverified_https_context
 

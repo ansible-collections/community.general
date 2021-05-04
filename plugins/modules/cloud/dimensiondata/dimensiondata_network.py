@@ -29,32 +29,36 @@ options:
     description:
       - The name of the network domain to create.
     required: true
+    type: str
   description:
     description:
       - Additional description of the network domain.
     required: false
+    type: str
   service_plan:
     description:
       - The service plan, either "ESSENTIALS" or "ADVANCED".
       - MCP 2.0 Only.
     choices: [ESSENTIALS, ADVANCED]
     default: ESSENTIALS
+    type: str
   state:
     description:
       - Should the resource be present or absent.
     choices: [present, absent]
     default: present
+    type: str
 '''
 
 EXAMPLES = '''
 - name: Create an MCP 1.0 network
-  dimensiondata_network:
+  community.general.dimensiondata_network:
     region: na
     location: NA5
     name: mynet
 
 - name: Create an MCP 2.0 network
-  dimensiondata_network:
+  community.general.dimensiondata_network:
     region: na
     mcp_user: my_user
     mcp_password: my_password
@@ -63,7 +67,7 @@ EXAMPLES = '''
     service_plan: ADVANCED
 
 - name: Delete a network
-  dimensiondata_network:
+  community.general.dimensiondata_network:
     region: na
     location: NA1
     name: mynet
@@ -256,7 +260,7 @@ class DimensionDataNetworkModule(DimensionDataModule):
                 )
 
             self.module.fail_json(
-                "Unexpected failure deleting network with id %s", network.id
+                "Unexpected failure deleting network with id %s" % network.id
             )
 
         except DimensionDataAPIException as e:

@@ -23,39 +23,50 @@ requirements:
     - PagerDuty API access
 options:
     state:
+        type: str
         description:
             - Create a maintenance window or get a list of ongoing windows.
         required: true
         choices: [ "running", "started", "ongoing", "absent" ]
     name:
+        type: str
         description:
             - PagerDuty unique subdomain. Obsolete. It is not used with PagerDuty REST v2 API.
     user:
+        type: str
         description:
             - PagerDuty user ID. Obsolete. Please, use I(token) for authorization.
     token:
+        type: str
         description:
             - A pagerduty token, generated on the pagerduty site. It is used for authorization.
         required: true
     requester_id:
+        type: str
         description:
             - ID of user making the request. Only needed when creating a maintenance_window.
     service:
+        type: list
+        elements: str
         description:
             - A comma separated list of PagerDuty service IDs.
         aliases: [ services ]
     window_id:
+        type: str
         description:
             - ID of maintenance window. Only needed when absent a maintenance_window.
     hours:
+        type: str
         description:
             - Length of maintenance window in hours.
-        default: 1
+        default: '1'
     minutes:
+        type: str
         description:
             - Maintenance window in minutes (this is added to the hours).
-        default: 0
+        default: '0'
     desc:
+        type: str
         description:
             - Short description of maintenance window.
         default: Created by Ansible
@@ -69,13 +80,13 @@ options:
 
 EXAMPLES = '''
 - name: List ongoing maintenance windows using a token
-  pagerduty:
+  community.general.pagerduty:
     name: companyabc
     token: xxxxxxxxxxxxxx
     state: ongoing
 
 - name: Create a 1 hour maintenance window for service FOO123
-  pagerduty:
+  community.general.pagerduty:
     name: companyabc
     user: example@example.com
     token: yourtoken
@@ -83,7 +94,7 @@ EXAMPLES = '''
     service: FOO123
 
 - name: Create a 5 minute maintenance window for service FOO123
-  pagerduty:
+  community.general.pagerduty:
     name: companyabc
     token: xxxxxxxxxxxxxx
     hours: 0
@@ -93,7 +104,7 @@ EXAMPLES = '''
 
 
 - name: Create a 4 hour maintenance window for service FOO123 with the description "deployment"
-  pagerduty:
+  community.general.pagerduty:
     name: companyabc
     user: example@example.com
     state: running
@@ -103,7 +114,7 @@ EXAMPLES = '''
   register: pd_window
 
 - name: Delete the previous maintenance window
-  pagerduty:
+  community.general.pagerduty:
     name: companyabc
     user: example@example.com
     state: absent
@@ -112,14 +123,14 @@ EXAMPLES = '''
 # Delete a maintenance window from a separate playbook than its creation,
 # and if it is the only existing maintenance window
 - name: Check
-  pagerduty:
+  community.general.pagerduty:
     requester_id: XXXXXXX
     token: yourtoken
     state: ongoing
   register: pd_window
 
 - name: Delete
-  pagerduty:
+  community.general.pagerduty:
     requester_id: XXXXXXX
     token: yourtoken
     state: absent
@@ -128,11 +139,9 @@ EXAMPLES = '''
 
 import datetime
 import json
-import base64
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
-from ansible.module_utils._text import to_bytes
 
 
 class PagerDutyRequest(object):
@@ -225,13 +234,13 @@ def main():
             name=dict(required=False),
             user=dict(required=False),
             token=dict(required=True, no_log=True),
-            service=dict(required=False, type='list', aliases=["services"]),
+            service=dict(required=False, type='list', elements='str', aliases=["services"]),
             window_id=dict(required=False),
             requester_id=dict(required=False),
-            hours=dict(default='1', required=False),
-            minutes=dict(default='0', required=False),
+            hours=dict(default='1', required=False),   # @TODO change to int?
+            minutes=dict(default='0', required=False),   # @TODO change to int?
             desc=dict(default='Created by Ansible', required=False),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         )
     )
 

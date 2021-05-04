@@ -1,3 +1,8 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
 - name: record constraints.txt path on remote host
   set_fact:
     remote_constraints: "{{ remote_tmp_dir }}/constraints.txt"

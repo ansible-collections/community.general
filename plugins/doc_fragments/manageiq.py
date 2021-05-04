@@ -3,6 +3,9 @@
 # Copyright: (c) 2017, Daniel Korn <korndaniel1@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 
 class ModuleDocFragment(object):
 
@@ -12,14 +15,14 @@ options:
   manageiq_connection:
     description:
       - ManageIQ connection configuration information.
-    required: true
+    required: false
     type: dict
     suboptions:
       url:
         description:
           - ManageIQ environment url. C(MIQ_URL) env var if set. otherwise, it is required to pass it.
         type: str
-        required: true
+        required: false
       username:
         description:
           - ManageIQ username. C(MIQ_USERNAME) env var if set. otherwise, required if no token is passed in.
@@ -41,7 +44,7 @@ options:
       ca_cert:
         description:
           - The path to a CA bundle file or directory with certificates. defaults to None.
-        type: path
+        type: str
         aliases: [ ca_bundle_path ]
 
 requirements:

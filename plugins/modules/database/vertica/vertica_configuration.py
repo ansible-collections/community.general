@@ -14,33 +14,39 @@ short_description: Updates Vertica configuration parameters.
 description:
     - Updates Vertica configuration parameters.
 options:
-  name:
+  parameter:
     description:
         - Name of the parameter to update.
     required: true
-    aliases: [parameter]
+    aliases: [name]
+    type: str
   value:
     description:
         - Value of the parameter to be set.
-    required: true
+    type: str
   db:
     description:
         - Name of the Vertica database.
+    type: str
   cluster:
     description:
         - Name of the Vertica cluster.
     default: localhost
+    type: str
   port:
     description:
         - Vertica cluster port to connect to.
-    default: 5433
+    default: '5433'
+    type: str
   login_user:
     description:
         - The username used to authenticate with.
     default: dbadmin
+    type: str
   login_password:
     description:
         - The password used to authenticate with.
+    type: str
 notes:
   - The default authentication assumes that you are either logging in as or sudo'ing
     to the C(dbadmin) account on the host.
@@ -56,7 +62,7 @@ author: "Dariusz Owczarek (@dareko)"
 
 EXAMPLES = """
 - name: Updating load_balance_policy
-  vertica_configuration: name=failovertostandbyafter value='8 hours'
+  community.general.vertica_configuration: name=failovertostandbyafter value='8 hours'
 """
 import traceback
 

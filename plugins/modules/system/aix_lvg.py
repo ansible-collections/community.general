@@ -31,6 +31,7 @@ options:
     - Required when creating or extending (C(present) state) the volume group.
     - If not informed reducing (C(absent) state) the volume group will be removed.
     type: list
+    elements: str
   state:
     description:
     - Control if the volume group exists and volume group AIX state varyonvg C(varyon) or varyoffvg C(varyoff).
@@ -55,25 +56,25 @@ notes:
 
 EXAMPLES = r'''
 - name: Create a volume group datavg
-  aix_lvg:
+  community.general.aix_lvg:
     vg: datavg
     pp_size: 128
     vg_type: scalable
     state: present
 
 - name: Removing a volume group datavg
-  aix_lvg:
+  community.general.aix_lvg:
     vg: datavg
     state: absent
 
 - name: Extending rootvg
-  aix_lvg:
+  community.general.aix_lvg:
     vg: rootvg
     pvs: hdisk1
     state: present
 
 - name: Reducing rootvg
-  aix_lvg:
+  community.general.aix_lvg:
     vg: rootvg
     pvs: hdisk1
     state: absent
@@ -315,7 +316,7 @@ def main():
         argument_spec=dict(
             force=dict(type='bool', default=False),
             pp_size=dict(type='int'),
-            pvs=dict(type='list'),
+            pvs=dict(type='list', elements='str'),
             state=dict(type='str', default='present', choices=['absent', 'present', 'varyoff', 'varyon']),
             vg=dict(type='str', required=True),
             vg_type=dict(type='str', default='normal', choices=['big', 'normal', 'scalable'])

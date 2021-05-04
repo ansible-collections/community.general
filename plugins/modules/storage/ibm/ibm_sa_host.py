@@ -22,16 +22,18 @@ options:
         description:
             - Host name.
         required: true
+        type: str
     state:
         description:
             - Host state.
-        required: true
         default: "present"
         choices: [ "present", "absent" ]
+        type: str
     cluster:
         description:
             - The name of the cluster to include the host.
         required: false
+        type: str
     domain:
         description:
             - The domains the cluster will be attached to.
@@ -39,15 +41,18 @@ options:
                 separate domain names with commas.
                 To include all existing domains, use an asterisk ("*").
         required: false
+        type: str
     iscsi_chap_name:
         description:
             - The host's CHAP name identifier
         required: false
+        type: str
     iscsi_chap_secret:
         description:
             - The password of the initiator used to
                 authenticate to the system when CHAP is enable
         required: false
+        type: str
 
 extends_documentation_fragment:
 - community.general.ibm_storage
@@ -59,7 +64,7 @@ author:
 
 EXAMPLES = '''
 - name: Define new host.
-  ibm_sa_host:
+  community.general.ibm_sa_host:
     host: host_name
     state: present
     username: admin
@@ -67,7 +72,7 @@ EXAMPLES = '''
     endpoints: hostdev-system
 
 - name: Delete host.
-  ibm_sa_host:
+  community.general.ibm_sa_host:
     host: host_name
     state: absent
     username: admin
@@ -91,7 +96,7 @@ def main():
             cluster=dict(),
             domain=dict(),
             iscsi_chap_name=dict(),
-            iscsi_chap_secret=dict()
+            iscsi_chap_secret=dict(no_log=True),
         )
     )
 

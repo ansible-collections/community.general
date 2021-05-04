@@ -57,7 +57,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Create or update SSH key pair
-  bitbucket_pipeline_key_pair:
+  community.general.bitbucket_pipeline_key_pair:
     repository: 'bitbucket-repo'
     username: bitbucket_username
     public_key: '{{lookup("file", "bitbucket.pub") }}'
@@ -65,7 +65,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Remove SSH key pair
-  bitbucket_pipeline_key_pair:
+  community.general.bitbucket_pipeline_key_pair:
     repository: bitbucket-repo
     username: bitbucket_username
     state: absent

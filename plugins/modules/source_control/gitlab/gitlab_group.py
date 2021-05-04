@@ -65,7 +65,7 @@ options:
 
 EXAMPLES = '''
 - name: "Delete GitLab Group"
-  gitlab_group:
+  community.general.gitlab_group:
     api_url: https://gitlab.example.com/
     api_token: "{{ access_token }}"
     validate_certs: False
@@ -73,7 +73,7 @@ EXAMPLES = '''
     state: absent
 
 - name: "Create GitLab Group"
-  gitlab_group:
+  community.general.gitlab_group:
     api_url: https://gitlab.example.com/
     validate_certs: True
     api_username: dj-wasabi
@@ -84,7 +84,7 @@ EXAMPLES = '''
 
 # The group will by created at https://gitlab.dj-wasabi.local/super_parent/parent/my_first_group
 - name: "Create GitLab SubGroup"
-  gitlab_group:
+  community.general.gitlab_group:
     api_url: https://gitlab.example.com/
     validate_certs: True
     api_username: dj-wasabi
@@ -162,11 +162,15 @@ class GitLabGroup(object):
         if self.groupObject is None:
             parent_id = self.getGroupId(parent)
 
-            group = self.createGroup({
+            payload = {
                 'name': name,
                 'path': options['path'],
                 'parent_id': parent_id,
-                'visibility': options['visibility']})
+                'visibility': options['visibility']
+            }
+            if options.get('description'):
+                payload['description'] = options['description']
+            group = self.createGroup(payload)
             changed = True
         else:
             changed, group = self.updateGroup(self.groupObject, {

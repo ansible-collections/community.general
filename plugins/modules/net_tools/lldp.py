@@ -23,10 +23,10 @@ notes:
 EXAMPLES = '''
 # Retrieve switch/port information
  - name: Gather information from lldp
-   lldp:
+   community.general.lldp:
 
  - name: Print each switch/port
-   debug:
+   ansible.builtin.debug:
     msg: "{{ lldp[item]['chassis']['name'] }} / {{ lldp[item]['port']['ifname'] }}"
    with_items: "{{ lldp.keys() }}"
 
@@ -41,7 +41,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def gather_lldp(module):
-    cmd = ['lldpctl', '-f', 'keyvalue']
+    cmd = [module.get_bin_path('lldpctl'), '-f', 'keyvalue']
     rc, output, err = module.run_command(cmd)
     if output:
         output_dict = {}

@@ -18,46 +18,58 @@ description:
    - Needs python etcd3 lib to work
 options:
     key:
+        type: str
         description:
             - the key where the information is stored in the cluster
         required: true
     value:
+        type: str
         description:
             - the information stored
         required: true
     host:
+        type: str
         description:
             - the IP address of the cluster
         default: 'localhost'
     port:
+        type: int
         description:
             - the port number used to connect to the cluster
         default: 2379
     state:
+        type: str
         description:
             - the state of the value for the key.
             - can be present or absent
         required: true
+        choices: [ present, absent ]
     user:
+        type: str
         description:
             - The etcd user to authenticate with.
     password:
+        type: str
         description:
             - The password to use for authentication.
             - Required if I(user) is defined.
     ca_cert:
+        type: path
         description:
             - The Certificate Authority to use to verify the etcd host.
             - Required if I(client_cert) and I(client_key) are defined.
     client_cert:
+        type: path
         description:
             - PEM formatted certificate chain file to be used for SSL client authentication.
             - Required if I(client_key) is defined.
     client_key:
+        type: path
         description:
             - PEM formatted file that contains your private key to be used for SSL client authentication.
             - Required if I(client_cert) is defined.
     timeout:
+        type: int
         description:
             - The socket level timeout in seconds.
 author:
@@ -67,7 +79,7 @@ author:
 
 EXAMPLES = """
 - name: Store a value "bar" under the key "foo" for a cluster located "http://localhost:2379"
-  etcd3:
+  community.general.etcd3:
     key: "foo"
     value: "baz3"
     host: "localhost"
@@ -75,7 +87,7 @@ EXAMPLES = """
     state: "present"
 
 - name: Authenticate using user/password combination with a timeout of 10 seconds
-  etcd3:
+  community.general.etcd3:
     key: "foo"
     value: "baz3"
     state: "present"
@@ -84,7 +96,7 @@ EXAMPLES = """
     timeout: 10
 
 - name: Authenticate using TLS certificates
-  etcd3:
+  community.general.etcd3:
     key: "foo"
     value: "baz3"
     state: "present"
@@ -122,7 +134,7 @@ def run_module():
     # define the available arguments/parameters that a user can pass to
     # the module
     module_args = dict(
-        key=dict(type='str', required=True),
+        key=dict(type='str', required=True, no_log=False),
         value=dict(type='str', required=True),
         host=dict(type='str', default='localhost'),
         port=dict(type='int', default=2379),

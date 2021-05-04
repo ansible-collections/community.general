@@ -24,11 +24,13 @@ options:
       - The publisher's name.
     required: true
     aliases: [ publisher ]
+    type: str
   state:
     description:
       - Whether to ensure that a publisher is present or absent.
     default: present
     choices: [ present, absent ]
+    type: str
   sticky:
     description:
       - Packages installed from a sticky repository can only receive updates
@@ -42,20 +44,24 @@ options:
     description:
       - A path or URL to the repository.
       - Multiple values may be provided.
+    type: list
+    elements: str
   mirror:
     description:
       - A path or URL to the repository mirror.
       - Multiple values may be provided.
+    type: list
+    elements: str
 '''
 EXAMPLES = '''
 - name: Fetch packages for the solaris publisher direct from Oracle
-  pkg5_publisher:
+  community.general.pkg5_publisher:
     name: solaris
     sticky: true
     origin: https://pkg.oracle.com/solaris/support/
 
 - name: Configure a publisher for locally-produced packages
-  pkg5_publisher:
+  community.general.pkg5_publisher:
     name: site
     origin: 'https://pkg.example.com/site/'
 '''
@@ -72,8 +78,8 @@ def main():
             enabled=dict(type='bool'),
             # search_after=dict(),
             # search_before=dict(),
-            origin=dict(type='list'),
-            mirror=dict(type='list'),
+            origin=dict(type='list', elements='str'),
+            mirror=dict(type='list', elements='str'),
         )
     )
 

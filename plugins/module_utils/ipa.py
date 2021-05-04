@@ -6,26 +6,11 @@
 # to the complete work.
 #
 # Copyright (c) 2016 Thomas Krahn (@Nosmoht)
-# All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without modification,
-# are permitted provided that the following conditions are met:
-#
-#    * Redistributions of source code must retain the above copyright
-#      notice, this list of conditions and the following disclaimer.
-#    * Redistributions in binary form must reproduce the above copyright notice,
-#      this list of conditions and the following disclaimer in the documentation
-#      and/or other materials provided with the distribution.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-# USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# Simplified BSD License (see licenses/simplified_bsd.txt or https://opensource.org/licenses/BSD-2-Clause)
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 import json
 import os
@@ -43,7 +28,9 @@ from ansible.module_utils.basic import env_fallback, AnsibleFallbackNotFound
 def _env_then_dns_fallback(*args, **kwargs):
     ''' Load value from environment or DNS in that order'''
     try:
-        return env_fallback(*args, **kwargs)
+        result = env_fallback(*args, **kwargs)
+        if result == '':
+            raise AnsibleFallbackNotFound
     except AnsibleFallbackNotFound:
         # If no host was given, we try to guess it from IPA.
         # The ipa-ca entry is a standard entry that IPA will have set for
@@ -96,7 +83,7 @@ class IPAClient(object):
                 if status_code not in [200, 201, 204]:
                     self._fail('login', info['msg'])
 
-                self.headers = {'Cookie': resp.info().get('Set-Cookie')}
+                self.headers = {'Cookie': info.get('set-cookie')}
             except Exception as e:
                 self._fail('login', to_native(e))
         if not self.headers:
@@ -132,9 +119,9 @@ class IPAClient(object):
         data = dict(method=method)
 
         # TODO: We should probably handle this a little better.
-        if method in ('ping', 'config_show'):
+        if method in ('ping', 'config_show', 'otpconfig_show'):
             data['params'] = [[], {}]
-        elif method == 'config_mod':
+        elif method in ('config_mod', 'otpconfig_mod'):
             data['params'] = [[], item]
         else:
             data['params'] = [[name], item]

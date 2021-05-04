@@ -16,18 +16,22 @@ description:
   - Send a message to typetalk using typetalk API
 options:
   client_id:
+    type: str
     description:
       - OAuth2 client ID
     required: true
   client_secret:
+    type: str
     description:
       - OAuth2 client secret
     required: true
   topic:
+    type: int
     description:
       - topic id to post message
     required: true
   msg:
+    type: str
     description:
       - message body
     required: true
@@ -37,7 +41,7 @@ author: "Takashi Someda (@tksmd)"
 
 EXAMPLES = '''
 - name: Send a message to typetalk
-  typetalk:
+  community.general.typetalk:
     client_id: 12345
     client_secret: 12345
     topic: 1

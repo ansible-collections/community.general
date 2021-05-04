@@ -18,26 +18,32 @@ description:
 
 options:
   group:
+    type: str
     description:
       - Name of the Jenkins group on the OS.
     default: jenkins
   jenkins_home:
+    type: path
     description:
       - Home directory of the Jenkins user.
     default: /var/lib/jenkins
   mode:
+    type: raw
     description:
       - File mode applied on versioned plugins.
     default: '0644'
   name:
+    type: str
     description:
       - Plugin name.
     required: yes
   owner:
+    type: str
     description:
       - Name of the Jenkins user on the OS.
     default: jenkins
   state:
+    type: str
     description:
       - Desired plugin state.
       - If the C(latest) is set, the check for new version will be performed
@@ -45,10 +51,12 @@ options:
     choices: [absent, present, pinned, unpinned, enabled, disabled, latest]
     default: present
   timeout:
+    type: int
     description:
       - Server connection timeout in secs.
     default: 30
   updates_expiration:
+    type: int
     description:
       - Number of seconds after which a new copy of the I(update-center.json)
         file is downloaded. This is used to avoid the need to download the
@@ -58,16 +66,19 @@ options:
         C(latest) is specified.
     default: 86400
   updates_url:
+    type: str
     description:
       - URL of the Update Centre.
       - Used as the base URL to download the plugins and the
         I(update-center.json) JSON file.
     default: https://updates.jenkins.io
   url:
+    type: str
     description:
       - URL of the Jenkins server.
     default: http://localhost:8080
   version:
+    type: str
     description:
       - Plugin version number.
       - If this option is specified, all plugin dependencies must be installed
@@ -95,54 +106,53 @@ notes:
   - It is not possible to run the module remotely by changing the I(url)
     parameter to point to the Jenkins server. The module must be used on the
     host where Jenkins runs as it needs direct access to the plugin files.
-  - "The C(params) option was removed in Ansible 2.5 due to circumventing Ansible's
-    option handling"
 extends_documentation_fragment:
   - url
+  - files
 '''
 
 EXAMPLES = '''
 - name: Install plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: build-pipeline-plugin
 
 - name: Install plugin without its dependencies
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: build-pipeline-plugin
     with_dependencies: no
 
 - name: Make sure the plugin is always up-to-date
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: token-macro
     state: latest
 
 - name: Install specific version of the plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: token-macro
     version: "1.15"
 
 - name: Pin the plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: token-macro
     state: pinned
 
 - name: Unpin the plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: token-macro
     state: unpinned
 
 - name: Enable the plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: token-macro
     state: enabled
 
 - name: Disable the plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: token-macro
     state: disabled
 
 - name: Uninstall plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: build-pipeline-plugin
     state: absent
 
@@ -150,7 +160,7 @@ EXAMPLES = '''
 # Example of how to authenticate
 #
 - name: Install plugin
-  jenkins_plugin:
+  community.general.jenkins_plugin:
     name: build-pipeline-plugin
     url_username: admin
     url_password: p4ssw0rd
@@ -171,7 +181,7 @@ EXAMPLES = '''
         enabled: yes
   tasks:
     - name: Install plugins without a specific version
-      jenkins_plugin:
+      community.general.jenkins_plugin:
         name: "{{ item.key }}"
       register: my_jenkins_plugin_unversioned
       when: >
@@ -179,7 +189,7 @@ EXAMPLES = '''
       with_dict: "{{ my_jenkins_plugins }}"
 
     - name: Install plugins with a specific version
-      jenkins_plugin:
+      community.general.jenkins_plugin:
         name: "{{ item.key }}"
         version: "{{ item.value['version'] }}"
       register: my_jenkins_plugin_versioned
@@ -188,29 +198,29 @@ EXAMPLES = '''
       with_dict: "{{ my_jenkins_plugins }}"
 
     - name: Initiate the fact
-      set_fact:
+      ansible.builtin.set_fact:
         jenkins_restart_required: no
 
     - name: Check if restart is required by any of the versioned plugins
-      set_fact:
+      ansible.builtin.set_fact:
         jenkins_restart_required: yes
       when: item.changed
       with_items: "{{ my_jenkins_plugin_versioned.results }}"
 
     - name: Check if restart is required by any of the unversioned plugins
-      set_fact:
+      ansible.builtin.set_fact:
         jenkins_restart_required: yes
       when: item.changed
       with_items: "{{ my_jenkins_plugin_unversioned.results }}"
 
     - name: Restart Jenkins if required
-      service:
+      ansible.builtin.service:
         name: jenkins
         state: restarted
       when: jenkins_restart_required
 
     - name: Wait for Jenkins to start up
-      uri:
+      ansible.builtin.uri:
         url: http://localhost:8080
         status_code: 200
         timeout: 5
@@ -224,12 +234,12 @@ EXAMPLES = '''
       when: jenkins_restart_required
 
     - name: Reset the fact
-      set_fact:
+      ansible.builtin.set_fact:
         jenkins_restart_required: no
       when: jenkins_restart_required
 
     - name: Plugin pinning
-      jenkins_plugin:
+      community.general.jenkins_plugin:
         name: "{{ item.key }}"
         state: "{{ 'pinned' if item.value['pinned'] else 'unpinned'}}"
       when: >
@@ -237,7 +247,7 @@ EXAMPLES = '''
       with_dict: "{{ my_jenkins_plugins }}"
 
     - name: Plugin enabling
-      jenkins_plugin:
+      community.general.jenkins_plugin:
         name: "{{ item.key }}"
         state: "{{ 'enabled' if item.value['enabled'] else 'disabled'}}"
       when: >
@@ -266,6 +276,7 @@ from ansible.module_utils.six import text_type, binary_type
 from ansible.module_utils._text import to_native
 import base64
 import hashlib
+import io
 import json
 import os
 import tempfile
@@ -429,12 +440,12 @@ class JenkinsPlugin(object):
                 self.module.fail_json(
                     msg="Jenkins home directory doesn't exist.")
 
-            md5sum_old = None
+            checksum_old = None
             if os.path.isfile(plugin_file):
                 # Make the checksum of the currently installed plugin
-                with open(plugin_file, 'rb') as md5_plugin_fh:
-                    md5_plugin_content = md5_plugin_fh.read()
-                md5sum_old = hashlib.md5(md5_plugin_content).hexdigest()
+                with open(plugin_file, 'rb') as plugin_fh:
+                    plugin_content = plugin_fh.read()
+                checksum_old = hashlib.sha1(plugin_content).hexdigest()
 
             if self.params['version'] in [None, 'latest']:
                 # Take latest version
@@ -454,13 +465,13 @@ class JenkinsPlugin(object):
             if (
                     self.params['updates_expiration'] == 0 or
                     self.params['version'] not in [None, 'latest'] or
-                    md5sum_old is None):
+                    checksum_old is None):
 
                 # Download the plugin file directly
                 r = self._download_plugin(plugin_url)
 
                 # Write downloaded plugin into file if checksums don't match
-                if md5sum_old is None:
+                if checksum_old is None:
                     # No previously installed plugin
                     if not self.module.check_mode:
                         self._write_file(plugin_file, r)
@@ -471,11 +482,11 @@ class JenkinsPlugin(object):
                     data = r.read()
 
                     # Make new checksum
-                    md5sum_new = hashlib.md5(data).hexdigest()
+                    checksum_new = hashlib.sha1(data).hexdigest()
 
                     # If the checksum is different from the currently installed
                     # plugin, store the new plugin
-                    if md5sum_old != md5sum_new:
+                    if checksum_old != checksum_new:
                         if not self.module.check_mode:
                             self._write_file(plugin_file, data)
 
@@ -484,19 +495,8 @@ class JenkinsPlugin(object):
                 # Check for update from the updates JSON file
                 plugin_data = self._download_updates()
 
-                try:
-                    with open(plugin_file, 'rb') as sha1_plugin_fh:
-                        sha1_plugin_content = sha1_plugin_fh.read()
-                    sha1_old = hashlib.sha1(sha1_plugin_content)
-                except Exception as e:
-                    self.module.fail_json(
-                        msg="Cannot calculate SHA1 of the old plugin.",
-                        details=to_native(e))
-
-                sha1sum_old = base64.b64encode(sha1_old.digest())
-
                 # If the latest version changed, download it
-                if sha1sum_old != to_bytes(plugin_data['sha1']):
+                if checksum_old != to_bytes(plugin_data['sha1']):
                     if not self.module.check_mode:
                         r = self._download_plugin(plugin_url)
                         self._write_file(plugin_file, r)
@@ -561,7 +561,7 @@ class JenkinsPlugin(object):
 
         # Open the updates file
         try:
-            f = open(updates_file, encoding='utf-8')
+            f = io.open(updates_file, encoding='utf-8')
         except IOError as e:
             self.module.fail_json(
                 msg="Cannot open temporal updates file.",
@@ -703,12 +703,11 @@ def main():
     # Module arguments
     argument_spec = url_argument_spec()
     argument_spec.update(
-        group=dict(default='jenkins'),
-        jenkins_home=dict(default='/var/lib/jenkins'),
+        group=dict(type='str', default='jenkins'),
+        jenkins_home=dict(type='path', default='/var/lib/jenkins'),
         mode=dict(default='0644', type='raw'),
-        name=dict(required=True),
-        owner=dict(default='jenkins'),
-        params=dict(type='dict'),
+        name=dict(type='str', required=True),
+        owner=dict(type='str', default='jenkins'),
         state=dict(
             choices=[
                 'present',
@@ -733,11 +732,6 @@ def main():
         add_file_common_args=True,
         supports_check_mode=True,
     )
-
-    # Params was removed
-    # https://meetbot.fedoraproject.org/ansible-meeting/2017-09-28/ansible_dev_meeting.2017-09-28-15.00.log.html
-    if module.params['params']:
-        module.fail_json(msg="The params option to jenkins_plugin was removed in Ansible 2.5 since it circumvents Ansible's option handling")
 
     # Force basic authentication
     module.params['force_basic_auth'] = True

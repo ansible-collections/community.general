@@ -29,12 +29,15 @@ except ImportError:
 
 def json_query(data, expr):
     '''Query data using jmespath query language ( http://jmespath.org ). Example:
-    - debug: msg="{{ instance | json_query(tagged_instances[*].block_device_mapping.*.volume_id') }}"
+    - ansible.builtin.debug: msg="{{ instance | json_query(tagged_instances[*].block_device_mapping.*.volume_id') }}"
     '''
     if not HAS_LIB:
         raise AnsibleError('You need to install "jmespath" prior to running '
                            'json_query filter')
 
+    # Hack to handle Ansible String Types
+    # See issue: https://github.com/ansible-collections/community.general/issues/320
+    jmespath.functions.REVERSE_TYPES_MAP['string'] = jmespath.functions.REVERSE_TYPES_MAP['string'] + ('AnsibleUnicode', 'AnsibleUnsafeText', )
     try:
         return jmespath.search(expr, data)
     except jmespath.exceptions.JMESPathError as e:

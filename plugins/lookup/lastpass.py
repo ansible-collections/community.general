@@ -5,9 +5,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: lastpass
+    name: lastpass
     author:
-      -  Andrew Zenk <azenk@umn.edu>
+      - Andrew Zenk (!UNKNOWN) <azenk@umn.edu>
     requirements:
       - lpass (command line utility)
       - must have already logged into lastpass
@@ -25,13 +25,15 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: get 'custom_field' from lastpass entry 'entry-name'
-  debug:
-    msg: "{{ lookup('lastpass', 'entry-name', field='custom_field') }}"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.lastpass', 'entry-name', field='custom_field') }}"
 """
 
 RETURN = """
   _raw:
     description: secrets stored
+    type: list
+    elements: str
 """
 
 from subprocess import Popen, PIPE

@@ -21,17 +21,19 @@ description:
 options:
     api_key:
         required: true
+        type: str
         description:
             - The API key obtained from the Memset control panel.
     name:
         required: true
+        type: str
         description:
             - The server product name (i.e. C(testyaa1)).
 '''
 
 EXAMPLES = '''
 - name: Get details for testyaa1
-  memset_server_info:
+  community.general.memset_server_info:
     name: testyaa1
     api_key: 5eb86c9896ab03919abcf03857163741
   delegate_to: localhost
@@ -274,8 +276,6 @@ def main():
         ),
         supports_check_mode=False
     )
-    if module._name in ('memset_server_facts', 'community.general.memset_server_facts'):
-        module.deprecate("The 'memset_server_facts' module has been renamed to 'memset_server_info'", version='2.13')
 
     # populate the dict with the user-provided vars.
     args = dict()

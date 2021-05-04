@@ -20,6 +20,7 @@ options:
     default: ['pip']
     required: False
     type: list
+    elements: path
 requirements:
     - The requested pip executables must be installed on the target.
 author:
@@ -30,14 +31,14 @@ author:
 
 EXAMPLES = '''
 - name: Just get the list from default pip
-  pip_package_info:
+  community.general.pip_package_info:
 
 - name: Get the facts for default pip, pip2 and pip3.6
-  pip_package_info:
+  community.general.pip_package_info:
     clients: ['pip', 'pip2', 'pip3.6']
 
 - name: Get from specific paths (virtualenvs?)
-  pip_package_info:
+  community.general.pip_package_info:
     clients: '/home/me/projec42/python/pip3.5'
 '''
 
@@ -115,7 +116,11 @@ def main():
 
     # start work
     global module
-    module = AnsibleModule(argument_spec=dict(clients={'type': 'list', 'default': ['pip']},), supports_check_mode=True)
+    module = AnsibleModule(
+        argument_spec=dict(
+            clients=dict(type='list', elements='path', default=['pip']),
+        ),
+        supports_check_mode=True)
     packages = {}
     results = {'packages': {}}
     clients = module.params['clients']

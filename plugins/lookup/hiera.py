@@ -7,7 +7,7 @@ __metaclass__ = type
 DOCUMENTATION = '''
     author:
       - Juan Manuel Parrilla (@jparrill)
-    lookup: hiera
+    name: hiera
     short_description: get info from hiera data
     requirements:
       - hiera (command line utility)
@@ -18,7 +18,7 @@ DOCUMENTATION = '''
             description:
                 - The list of keys to lookup on the Puppetmaster
             type: list
-            element_type: string
+            elements: string
             required: True
       _bin_file:
             description:
@@ -39,26 +39,31 @@ EXAMPLES = """
 # All this examples depends on hiera.yml that describes the hierarchy
 
 - name: "a value from Hiera 'DB'"
-  debug: msg={{ lookup('hiera', 'foo') }}
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.hiera', 'foo') }}"
 
 - name: "a value from a Hiera 'DB' on other environment"
-  debug: msg={{ lookup('hiera', 'foo environment=production') }}
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.hiera', 'foo environment=production') }}"
 
 - name: "a value from a Hiera 'DB' for a concrete node"
-  debug: msg={{ lookup('hiera', 'foo fqdn=puppet01.localdomain') }}
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.hiera', 'foo fqdn=puppet01.localdomain') }}"
 """
 
 RETURN = """
     _raw:
         description:
             - a value associated with input key
-        type: strings
+        type: list
+        elements: str
 """
 
 import os
 
 from ansible.plugins.lookup import LookupBase
 from ansible.utils.cmd_functions import run_cmd
+from ansible.module_utils._text import to_text
 
 ANSIBLE_HIERA_CFG = os.getenv('ANSIBLE_HIERA_CFG', '/etc/hiera.yaml')
 ANSIBLE_HIERA_BIN = os.getenv('ANSIBLE_HIERA_BIN', '/usr/bin/hiera')
@@ -74,13 +79,11 @@ class Hiera(object):
         rc, output, err = run_cmd("{0} -c {1} {2}".format(
             ANSIBLE_HIERA_BIN, ANSIBLE_HIERA_CFG, hiera_key[0]))
 
-        return output.strip()
+        return to_text(output.strip())
 
 
 class LookupModule(LookupBase):
     def run(self, terms, variables=''):
         hiera = Hiera()
-        ret = []
-
-        ret.append(hiera.get(terms))
+        ret = [hiera.get(terms)]
         return ret

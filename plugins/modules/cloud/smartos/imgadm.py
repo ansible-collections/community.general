@@ -26,10 +26,12 @@ options:
         default: zones
         description:
           - zpool to import to or delete images from.
+        type: str
     source:
         required: false
         description:
           - URI for the image source.
+        type: str
     state:
         required: true
         choices: [ present, absent, deleted, imported, updated, vacuumed ]
@@ -37,54 +39,60 @@ options:
           - State the object operated on should be in. C(imported) is an alias for
             for C(present) and C(deleted) for C(absent). When set to C(vacuumed)
             and C(uuid) to C(*), it will remove all unused images.
+        type: str
+
     type:
         required: false
         choices: [ imgapi, docker, dsapi ]
         default: imgapi
         description:
           - Type for image sources.
+        type: str
+
     uuid:
         required: false
         description:
           - Image UUID. Can either be a full UUID or C(*) for all images.
+        type: str
+
 requirements:
     - python >= 2.6
 '''
 
 EXAMPLES = '''
 - name: Import an image
-  imgadm:
+  community.general.imgadm:
     uuid: '70e3ae72-96b6-11e6-9056-9737fd4d0764'
     state: imported
 
 - name: Delete an image
-  imgadm:
+  community.general.imgadm:
     uuid: '70e3ae72-96b6-11e6-9056-9737fd4d0764'
     state: deleted
 
 - name: Update all images
-  imgadm:
+  community.general.imgadm:
     uuid: '*'
     state: updated
 
 - name: Update a single image
-  imgadm:
+  community.general.imgadm:
     uuid: '70e3ae72-96b6-11e6-9056-9737fd4d0764'
     state: updated
 
 - name: Add a source
-  imgadm:
+  community.general.imgadm:
     source: 'https://datasets.project-fifo.net'
     state: present
 
 - name: Add a Docker source
-  imgadm:
+  community.general.imgadm:
     source: 'https://docker.io'
     type: docker
     state: present
 
 - name: Remove a source
-  imgadm:
+  community.general.imgadm:
     source: 'https://docker.io'
     state: absent
 '''
@@ -260,12 +268,12 @@ class Imgadm(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            force=dict(default=None, type='bool'),
+            force=dict(type='bool'),
             pool=dict(default='zones'),
-            source=dict(default=None),
-            state=dict(default=None, required=True, choices=['present', 'absent', 'deleted', 'imported', 'updated', 'vacuumed']),
+            source=dict(),
+            state=dict(required=True, choices=['present', 'absent', 'deleted', 'imported', 'updated', 'vacuumed']),
             type=dict(default='imgapi', choices=['imgapi', 'docker', 'dsapi']),
-            uuid=dict(default=None)
+            uuid=dict()
         ),
         # This module relies largely on imgadm(1M) to enforce idempotency, which does not
         # provide a "noop" (or equivalent) mode to do a dry-run.

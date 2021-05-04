@@ -16,19 +16,25 @@ options:
   protocol:
     description:
       - The protocol that the public IP will listen for.
+    type: str
     default: TCP
     choices: ['TCP', 'UDP', 'ICMP']
   ports:
     description:
       - A list of ports to expose. This is required when state is 'present'
+    type: list
+    elements: int
   server_ids:
     description:
       - A list of servers to create public ips on.
+    type: list
     required: True
+    elements: str
   state:
     description:
       - Determine whether to create or delete public IPs. If present module will not create a second public ip if one
         already exists.
+    type: str
     default: present
     choices: ['present', 'absent']
   wait:
@@ -62,7 +68,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create Public IP For Servers
-      clc_publicip:
+      community.general.clc_publicip:
         protocol: TCP
         ports:
           - 80
@@ -73,7 +79,7 @@ EXAMPLES = '''
       register: clc
 
     - name: Debug
-      debug:
+      ansible.builtin.debug:
         var: clc
 
 - name: Delete Public IP from Server
@@ -82,7 +88,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create Public IP For Servers
-      clc_publicip:
+      community.general.clc_publicip:
         server_ids:
           - UC1TEST-SVR01
           - UC1TEST-SVR02
@@ -90,7 +96,7 @@ EXAMPLES = '''
       register: clc
 
     - name: Debug
-      debug:
+      ansible.builtin.debug:
         var: clc
 '''
 
@@ -189,9 +195,9 @@ class ClcPublicIp(object):
         :return: argument spec dictionary
         """
         argument_spec = dict(
-            server_ids=dict(type='list', required=True),
+            server_ids=dict(type='list', required=True, elements='str'),
             protocol=dict(default='TCP', choices=['TCP', 'UDP', 'ICMP']),
-            ports=dict(type='list'),
+            ports=dict(type='list', elements='int'),
             wait=dict(type='bool', default=True),
             state=dict(default='present', choices=['present', 'absent']),
         )

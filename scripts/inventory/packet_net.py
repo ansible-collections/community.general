@@ -21,20 +21,10 @@ different path to packet_net.ini, define the PACKET_NET_INI_PATH environment var
 # (c) 2016, Peter Sankauskas
 # (c) 2017, Tomas Karasek
 #
-# This file is part of Ansible,
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 ######################################################################
 
@@ -356,9 +346,9 @@ class PacketInventory(object):
 
         # Inventory: Group by OS
         if self.group_by_operating_system:
-            self.push(self.inventory, device.operating_system['slug'], dest)
+            self.push(self.inventory, device.operating_system.slug, dest)
             if self.nested_groups:
-                self.push_group(self.inventory, 'operating_systems', device.operating_system['slug'])
+                self.push_group(self.inventory, 'operating_systems', device.operating_system.slug)
 
         # Inventory: Group by plan type
         if self.group_by_plan_type:
@@ -405,7 +395,7 @@ class PacketInventory(object):
             elif key == 'packet_facility':
                 device_vars[key] = value['code']
             elif key == 'packet_operating_system':
-                device_vars[key] = value['slug']
+                device_vars[key] = value.slug
             elif key == 'packet_plan':
                 device_vars[key] = value['slug']
             elif key == 'packet_tags':

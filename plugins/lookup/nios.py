@@ -22,7 +22,8 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-lookup: nios
+author: Unknown (!UNKNOWN)
+name: nios
 short_description: Query Infoblox NIOS objects
 description:
   - Uses the Infoblox WAPI API to fetch NIOS specified objects.  This lookup
@@ -47,12 +48,14 @@ options:
 
 EXAMPLES = """
 - name: fetch all networkview objects
-  set_fact:
-    networkviews: "{{ lookup('nios', 'networkview', provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
+  ansible.builtin.set_fact:
+    networkviews: "{{ lookup('community.general.nios', 'networkview',
+                         provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
 
 - name: fetch the default dns view
-  set_fact:
-    dns_views: "{{ lookup('nios', 'view', filter={'name': 'default'}, provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
+  ansible.builtin.set_fact:
+    dns_views: "{{ lookup('community.general.nios', 'view', filter={'name': 'default'},
+                      provider={'host': 'nios01', 'username': 'admin', 'password': 'password'}) }}"
 
 # all of the examples below use credentials that are  set using env variables
 # export INFOBLOX_HOST=nios01
@@ -60,29 +63,28 @@ EXAMPLES = """
 # export INFOBLOX_PASSWORD=admin
 
 - name: fetch all host records and include extended attributes
-  set_fact:
-    host_records: "{{ lookup('nios', 'record:host', return_fields=['extattrs', 'name', 'view', 'comment']}) }}"
+  ansible.builtin.set_fact:
+    host_records: "{{ lookup('community.general.nios', 'record:host', return_fields=['extattrs', 'name', 'view', 'comment']}) }}"
 
 
 - name: use env variables to pass credentials
-  set_fact:
-    networkviews: "{{ lookup('nios', 'networkview') }}"
+  ansible.builtin.set_fact:
+    networkviews: "{{ lookup('community.general.nios', 'networkview') }}"
 
 - name: get a host record
-  set_fact:
-    host: "{{ lookup('nios', 'record:host', filter={'name': 'hostname.ansible.com'}) }}"
+  ansible.builtin.set_fact:
+    host: "{{ lookup('community.general.nios', 'record:host', filter={'name': 'hostname.ansible.com'}) }}"
 
 - name: get the authoritative zone from a non default dns view
-  set_fact:
-    host: "{{ lookup('nios', 'zone_auth', filter={'fqdn': 'ansible.com', 'view': 'ansible-dns'}) }}"
+  ansible.builtin.set_fact:
+    host: "{{ lookup('community.general.nios', 'zone_auth', filter={'fqdn': 'ansible.com', 'view': 'ansible-dns'}) }}"
 """
 
 RETURN = """
 obj_type:
   description:
     - The object type specified in the terms argument
-  returned: always
-  type: complex
+  type: dictionary
   contains:
     obj_field:
       description:

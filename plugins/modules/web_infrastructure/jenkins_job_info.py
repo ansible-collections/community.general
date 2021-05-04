@@ -18,27 +18,34 @@ requirements:
   - "python-jenkins >= 0.4.12"
 options:
   name:
+    type: str
     description:
       - Exact name of the Jenkins job to fetch information about.
   glob:
+    type: str
     description:
       - A shell glob of Jenkins job names to fetch information about.
   color:
+    type: str
     description:
       - Only fetch jobs with the given status color.
   password:
+    type: str
     description:
       - Password to authenticate with the Jenkins server.
       - This is a required parameter, if C(token) is not provided.
   token:
+    type: str
     description:
       - API token used to authenticate with the Jenkins server.
       - This is a required parameter, if C(password) is not provided.
   url:
+    type: str
     description:
       - URL where the Jenkins server is accessible.
     default: http://localhost:8080
   user:
+    type: str
     description:
        - User to authenticate with the Jenkins server.
   validate_certs:
@@ -53,47 +60,47 @@ author:
 
 EXAMPLES = '''
 # Get all Jenkins jobs using basic auth
-- jenkins_job_info:
+- community.general.jenkins_job_info:
     user: admin
     password: hunter2
   register: my_jenkins_job_info
 
 # Get all Jenkins jobs using the token
-- jenkins_job_info:
+- community.general.jenkins_job_info:
     user: admin
     token: abcdefghijklmnop
   register: my_jenkins_job_info
 
 # Get info about a single job using basic auth
-- jenkins_job_info:
+- community.general.jenkins_job_info:
     name: some-job-name
     user: admin
     password: hunter2
   register: my_jenkins_job_info
 
 # Get info about a single job in a folder using basic auth
-- jenkins_job_info:
+- community.general.jenkins_job_info:
     name: some-folder-name/some-job-name
     user: admin
     password: hunter2
   register: my_jenkins_job_info
 
 # Get info about jobs matching a shell glob using basic auth
-- jenkins_job_info:
+- community.general.jenkins_job_info:
     glob: some-job-*
     user: admin
     password: hunter2
   register: my_jenkins_job_info
 
 # Get info about all failing jobs using basic auth
-- jenkins_job_info:
+- community.general.jenkins_job_info:
     color: red
     user: admin
     password: hunter2
   register: my_jenkins_job_info
 
 # Get info about passing jobs matching a shell glob using basic auth
-- jenkins_job_info:
+- community.general.jenkins_job_info:
     name: some-job-*
     color: blue
     user: admin
@@ -101,7 +108,7 @@ EXAMPLES = '''
   register: my_jenkins_job_info
 
 - name: Get the info from custom URL with token and validate_certs=False
-  jenkins_job_info:
+  community.general.jenkins_job_info:
     user: admin
     token: 126df5c60d66c66e3b75b11104a16a8a
     url: https://jenkins.example.com
@@ -212,13 +219,13 @@ def get_jobs(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(),
-            glob=dict(),
-            color=dict(),
-            password=dict(no_log=True),
-            token=dict(no_log=True),
-            url=dict(default="http://localhost:8080"),
-            user=dict(),
+            name=dict(type='str'),
+            glob=dict(type='str'),
+            color=dict(type='str'),
+            password=dict(type='str', no_log=True),
+            token=dict(type='str', no_log=True),
+            url=dict(type='str', default="http://localhost:8080"),
+            user=dict(type='str'),
             validate_certs=dict(type='bool', default=True),
         ),
         mutually_exclusive=[
@@ -230,8 +237,6 @@ def main():
         ],
         supports_check_mode=True,
     )
-    if module._name in ('jenkins_job_facts', 'community.general.jenkins_job_facts'):
-        module.deprecate("The 'jenkins_job_facts' module has been renamed to 'jenkins_job_info'", version='2.13')
 
     test_dependencies(module)
     jobs = list()

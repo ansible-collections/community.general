@@ -31,22 +31,24 @@ options:
         required: false
         description:
             - Name of the namespace
+        type: str
     state:
         required: false
         default: "present"
         choices: [ present, absent ]
         description:
             - Whether the namespace should exist
+        type: str
 '''
 
 EXAMPLES = '''
 - name: Create a namespace named mario
-  ip_netns:
+  community.general.ip_netns:
     name: mario
     state: present
 
 - name: Delete a namespace named luigi
-  ip_netns:
+  community.general.ip_netns:
     name: luigi
     state: absent
 '''

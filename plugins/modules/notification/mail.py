@@ -28,16 +28,18 @@ description:
   one or more people in a team that a specific action has been
   (successfully) taken.
 options:
-  from:
+  sender:
     description:
     - The email-address the mail is sent from. May contain address and phrase.
     type: str
     default: root
+    aliases: [ from ]
   to:
     description:
     - The email-address(es) the mail is being sent to.
     - This is a list, which may contain address and phrase portions.
     type: list
+    elements: str
     default: root
     aliases: [ recipients ]
   cc:
@@ -45,21 +47,23 @@ options:
     - The email-address(es) the mail is being copied to.
     - This is a list, which may contain address and phrase portions.
     type: list
+    elements: str
   bcc:
     description:
     - The email-address(es) the mail is being 'blind' copied to.
     - This is a list, which may contain address and phrase portions.
     type: list
+    elements: str
   subject:
     description:
     - The subject of the email being sent.
     required: yes
     type: str
+    aliases: [ msg ]
   body:
     description:
     - The body of the email being sent.
     type: str
-    default: $subject
   username:
     description:
     - If SMTP requires username.
@@ -84,12 +88,14 @@ options:
     - A list of pathnames of files to attach to the message.
     - Attached files will have their content-type set to C(application/octet-stream).
     type: list
+    elements: path
     default: []
   headers:
     description:
     - A list of headers which should be added to the message.
     - Each individual header is specified as C(header=value) (see example below).
     type: list
+    elements: str
     default: []
   charset:
     description:
@@ -123,12 +129,12 @@ options:
 
 EXAMPLES = r'''
 - name: Example playbook sending mail to root
-  mail:
+  community.general.mail:
     subject: System {{ ansible_hostname }} has been successfully provisioned.
   delegate_to: localhost
 
 - name: Sending an e-mail using Gmail SMTP servers
-  mail:
+  community.general.mail:
     host: smtp.gmail.com
     port: 587
     username: username@gmail.com
@@ -139,7 +145,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Send e-mail to a bunch of users, attaching files
-  mail:
+  community.general.mail:
     host: 127.0.0.1
     port: 2025
     subject: Ansible-report
@@ -159,7 +165,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Sending an e-mail using the remote machine, not the Ansible controller node
-  mail:
+  community.general.mail:
     host: localhost
     port: 25
     to: John Smith <john.smith@example.com>
@@ -167,7 +173,7 @@ EXAMPLES = r'''
     body: System {{ ansible_hostname }} has been successfully provisioned.
 
 - name: Sending an e-mail using Legacy SSL to the remote machine
-  mail:
+  community.general.mail:
     host: localhost
     port: 25
     to: John Smith <john.smith@example.com>
@@ -176,7 +182,7 @@ EXAMPLES = r'''
     secure: always
 
 - name: Sending an e-mail using StartTLS to the remote machine
-  mail:
+  community.general.mail:
     host: localhost
     port: 25
     to: John Smith <john.smith@example.com>
@@ -210,13 +216,13 @@ def main():
             host=dict(type='str', default='localhost'),
             port=dict(type='int', default=25),
             sender=dict(type='str', default='root', aliases=['from']),
-            to=dict(type='list', default=['root'], aliases=['recipients']),
-            cc=dict(type='list', default=[]),
-            bcc=dict(type='list', default=[]),
+            to=dict(type='list', elements='str', default=['root'], aliases=['recipients']),
+            cc=dict(type='list', elements='str', default=[]),
+            bcc=dict(type='list', elements='str', default=[]),
             subject=dict(type='str', required=True, aliases=['msg']),
             body=dict(type='str'),
-            attach=dict(type='list', default=[]),
-            headers=dict(type='list', default=[]),
+            attach=dict(type='list', elements='path', default=[]),
+            headers=dict(type='list', elements='str', default=[]),
             charset=dict(type='str', default='utf-8'),
             subtype=dict(type='str', default='plain', choices=['html', 'plain']),
             secure=dict(type='str', default='try', choices=['always', 'never', 'starttls', 'try']),
@@ -360,7 +366,7 @@ def main():
             part.add_header('Content-disposition', 'attachment', filename=os.path.basename(filename))
             msg.attach(part)
         except Exception as e:
-            module.fail_json(rc=1, msg="Failed to send mail: can't attach file %s: %s" %
+            module.fail_json(rc=1, msg="Failed to send community.general.mail: can't attach file %s: %s" %
                              (filename, to_native(e)), exception=traceback.format_exc())
 
     composed = msg.as_string()

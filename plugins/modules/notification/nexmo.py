@@ -16,22 +16,28 @@ description:
 author: "Matt Martz (@sivel)"
 options:
   api_key:
+    type: str
     description:
       - Nexmo API Key
     required: true
   api_secret:
+    type: str
     description:
       - Nexmo API Secret
     required: true
   src:
+    type: int
     description:
        - Nexmo Number to send from
     required: true
   dest:
+    type: list
+    elements: int
     description:
       - Phone number(s) to send SMS message to
     required: true
   msg:
+    type: str
     description:
       - Message to text to send. Messages longer than 160 characters will be
         split into multiple messages
@@ -48,7 +54,7 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Send notification message via Nexmo
-  nexmo:
+  community.general.nexmo:
     api_key: 640c8a53
     api_secret: 0ce239a6
     src: 12345678901
@@ -114,7 +120,7 @@ def main():
             api_key=dict(required=True, no_log=True),
             api_secret=dict(required=True, no_log=True),
             src=dict(required=True, type='int'),
-            dest=dict(required=True, type='list'),
+            dest=dict(required=True, type='list', elements='int'),
             msg=dict(required=True),
         ),
     )

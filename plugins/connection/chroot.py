@@ -9,8 +9,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    author: Maykel Moya <mmoya@speedyrails.com>
-    connection: chroot
+    author: Maykel Moya (!UNKNOWN) <mmoya@speedyrails.com>
+    name: chroot
     short_description: Interact with local chroot
     description:
         - Run commands or put/fetch files to an existing chroot on the Ansible controller.

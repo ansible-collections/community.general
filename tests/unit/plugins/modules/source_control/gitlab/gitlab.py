@@ -3,7 +3,8 @@
 # Copyright: (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 import sys
 
@@ -352,7 +353,7 @@ PROJECT API
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects", method="get")
 def resp_find_project(url, request):
     headers = {'content-type': 'application/json'}
-    content = ('[{"id": 1,"description": null, "default_branch": "master",'
+    content = ('[{"id": 1,"description": null, "default_branch": "master", "merge_method": "merge",'
                '"ssh_url_to_repo": "git@example.com:diaspora/diaspora-client.git",'
                '"http_url_to_repo": "http://example.com/diaspora/diaspora-client.git",'
                '"web_url": "http://example.com/diaspora/diaspora-client",'
@@ -370,7 +371,7 @@ def resp_find_project(url, request):
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/1", method="get")
 def resp_get_project(url, request):
     headers = {'content-type': 'application/json'}
-    content = ('{"id": 1,"description": null, "default_branch": "master",'
+    content = ('{"id": 1,"description": null, "default_branch": "master", "merge_method": "merge",'
                '"ssh_url_to_repo": "git@example.com:diaspora/diaspora-client.git",'
                '"http_url_to_repo": "http://example.com/diaspora/diaspora-client.git",'
                '"web_url": "http://example.com/diaspora/diaspora-client",'
@@ -388,7 +389,7 @@ def resp_get_project(url, request):
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects/foo-bar%2Fdiaspora-client", method="get")
 def resp_get_project_by_name(url, request):
     headers = {'content-type': 'application/json'}
-    content = ('{"id": 1,"description": null, "default_branch": "master",'
+    content = ('{"id": 1,"description": null, "default_branch": "master", "merge_method": "merge",'
                '"ssh_url_to_repo": "git@example.com:diaspora/diaspora-client.git",'
                '"http_url_to_repo": "http://example.com/diaspora/diaspora-client.git",'
                '"web_url": "http://example.com/diaspora/diaspora-client",'
@@ -406,7 +407,7 @@ def resp_get_project_by_name(url, request):
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/groups/1/projects", method="get")
 def resp_find_group_project(url, request):
     headers = {'content-type': 'application/json'}
-    content = ('[{"id": 1,"description": null, "default_branch": "master",'
+    content = ('[{"id": 1,"description": null, "default_branch": "master", "merge_method": "merge",'
                '"ssh_url_to_repo": "git@example.com:diaspora/diaspora-client.git",'
                '"http_url_to_repo": "http://example.com/diaspora/diaspora-client.git",'
                '"web_url": "http://example.com/diaspora/diaspora-client",'
@@ -424,7 +425,7 @@ def resp_find_group_project(url, request):
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/groups/1/projects/1", method="get")
 def resp_get_group_project(url, request):
     headers = {'content-type': 'application/json'}
-    content = ('{"id": 1,"description": null, "default_branch": "master",'
+    content = ('{"id": 1,"description": null, "default_branch": "master", "merge_method": "merge",'
                '"ssh_url_to_repo": "git@example.com:diaspora/diaspora-client.git",'
                '"http_url_to_repo": "http://example.com/diaspora/diaspora-client.git",'
                '"web_url": "http://example.com/diaspora/diaspora-client",'
@@ -442,7 +443,7 @@ def resp_get_group_project(url, request):
 @urlmatch(scheme="http", netloc="localhost", path="/api/v4/projects", method="post")
 def resp_create_project(url, request):
     headers = {'content-type': 'application/json'}
-    content = ('{"id": 1,"description": null, "default_branch": "master",'
+    content = ('{"id": 1,"description": null, "default_branch": "master", "merge_method": "merge",'
                '"ssh_url_to_repo": "git@example.com:diaspora/diaspora-client.git",'
                '"http_url_to_repo": "http://example.com/diaspora/diaspora-client.git",'
                '"web_url": "http://example.com/diaspora/diaspora-client",'
@@ -523,20 +524,8 @@ RUNNER API
 '''
 
 
-@urlmatch(scheme="http", netloc="localhost", path="/api/v4/runners/all", method="get")
+@urlmatch(scheme="http", netloc="localhost", path=r'/api/v4/runners/all$', method="get")
 def resp_find_runners_all(url, request):
-    headers = {'content-type': 'application/json'}
-    content = ('[{"active": true,"description": "test-1-20150125","id": 1,'
-               '"is_shared": false,"ip_address": "127.0.0.1","name": null,'
-               '"online": true,"status": "online"},{"active": true,'
-               '"description": "test-2-20150125","id": 2,"ip_address": "127.0.0.1",'
-               '"is_shared": false,"name": null,"online": false,"status": "offline"}]')
-    content = content.encode("utf-8")
-    return response(200, content, headers, None, 5, request)
-
-
-@urlmatch(scheme="http", netloc="localhost", path="/api/v4/runners", method="get")
-def resp_find_runners_list(url, request):
     headers = {'content-type': 'application/json',
                "X-Page": 1,
                "X-Next-Page": 2,
@@ -552,7 +541,41 @@ def resp_find_runners_list(url, request):
     return response(200, content, headers, None, 5, request)
 
 
-@urlmatch(scheme="http", netloc="localhost", path="/api/v4/runners/1", method="get")
+@urlmatch(scheme="http", netloc="localhost", path=r'/api/v4/runners$', method="get")
+def resp_find_runners_list(url, request):
+    headers = {'content-type': 'application/json',
+               "X-Page": 1,
+               "X-Next-Page": 2,
+               "X-Per-Page": 1,
+               "X-Total-Pages": 1,
+               "X-Total": 2}
+    content = ('[{"active": true,"description": "test-1-20201214","id": 1,'
+               '"is_shared": false,"ip_address": "127.0.0.1","name": null,'
+               '"online": true,"status": "online"},{"active": true,'
+               '"description": "test-2-20201214","id": 2,"ip_address": "127.0.0.1",'
+               '"is_shared": false,"name": null,"online": false,"status": "offline"}]')
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path=r'/api/v4/runners/1$', method="put")
+def resp_update_runner(url, request):
+    headers = {'content-type': 'application/json',
+               "X-Page": 1,
+               "X-Next-Page": 2,
+               "X-Per-Page": 1,
+               "X-Total-Pages": 1,
+               "X-Total": 2}
+    content = ('[{"active": true,"description": "test-1-20201214","id": 1,'
+               '"is_shared": false,"ip_address": "127.0.0.1","name": null,'
+               '"online": true,"status": "online"},{"active": true,'
+               '"description": "test-2-20201214","id": 2,"ip_address": "127.0.0.1",'
+               '"is_shared": false,"name": null,"online": false,"status": "offline"}]')
+    content = content.encode("utf-8")
+    return response(200, content, headers, None, 5, request)
+
+
+@urlmatch(scheme="http", netloc="localhost", path=r'/api/v4/runners/1$', method="get")
 def resp_get_runner(url, request):
     headers = {'content-type': 'application/json'}
     content = ('{"active": true,"description": "test-1-20150125","id": 1,'
@@ -562,7 +585,7 @@ def resp_get_runner(url, request):
     return response(200, content, headers, None, 5, request)
 
 
-@urlmatch(scheme="http", netloc="localhost", path="/api/v4/runners", method="post")
+@urlmatch(scheme="http", netloc="localhost", path=r'/api/v4/runners$', method="post")
 def resp_create_runner(url, request):
     headers = {'content-type': 'application/json'}
     content = ('{"active": true,"description": "test-1-20150125","id": 1,'
@@ -572,7 +595,7 @@ def resp_create_runner(url, request):
     return response(201, content, headers, None, 5, request)
 
 
-@urlmatch(scheme="http", netloc="localhost", path="/api/v4/runners/1", method="delete")
+@urlmatch(scheme="http", netloc="localhost", path=r'/api/v4/runners/1$', method="delete")
 def resp_delete_runner(url, request):
     headers = {'content-type': 'application/json'}
     content = ('{}')

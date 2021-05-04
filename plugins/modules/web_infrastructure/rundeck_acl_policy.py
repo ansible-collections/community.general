@@ -20,32 +20,39 @@ description:
 author: "Loic Blot (@nerzhul)"
 options:
     state:
+        type: str
         description:
             - Create or remove Rundeck project.
         choices: ['present', 'absent']
         default: 'present'
     name:
+        type: str
         description:
             - Sets the project name.
         required: True
     url:
+        type: str
         description:
             - Sets the rundeck instance URL.
         required: True
     api_version:
+        type: int
         description:
             - Sets the API version used by module.
             - API version must be at least 14.
         default: 14
     token:
+        type: str
         description:
             - Sets the token to authenticate against Rundeck API.
         required: True
     project:
+        type: str
         description:
             - Sets the project which receive the ACL policy.
             - If unset, it's a system ACL policy.
     policy:
+        type: str
         description:
             - Sets the ACL policy content.
             - ACL policy content is a YAML object as described in http://rundeck.org/docs/man5/aclpolicy.html.
@@ -73,7 +80,7 @@ extends_documentation_fragment: url
 
 EXAMPLES = '''
 - name: Create or update a rundeck ACL policy in project Ansible
-  rundeck_acl_policy:
+  community.general.rundeck_acl_policy:
     name: "Project_01"
     api_version: 18
     url: "https://rundeck.example.org"
@@ -91,7 +98,7 @@ EXAMPLES = '''
         group: "build"
 
 - name: Remove a rundeck system policy
-  rundeck_acl_policy:
+  community.general.rundeck_acl_policy:
     name: "Project_02"
     url: "https://rundeck.example.org"
     token: "mytoken"
@@ -118,6 +125,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url, url_argument_spec
 from ansible.module_utils._text import to_text
 import json
+import re
 
 
 class RundeckACLManager:
@@ -165,9 +173,9 @@ class RundeckACLManager:
             if self.module.check_mode:
                 self.module.exit_json(changed=True, before={}, after=self.module.params["policy"])
 
-            _, info = self.request_rundeck_api("system/acl/%s.aclpolicy" % self.module.params["name"],
-                                               method="POST",
-                                               data={"contents": self.module.params["policy"]})
+            dummy, info = self.request_rundeck_api("system/acl/%s.aclpolicy" % self.module.params["name"],
+                                                   method="POST",
+                                                   data={"contents": self.module.params["policy"]})
 
             if info["status"] == 201:
                 self.module.exit_json(changed=True, before={}, after=self.get_acl())
@@ -186,9 +194,9 @@ class RundeckACLManager:
             if self.module.check_mode:
                 self.module.exit_json(changed=True, before=facts, after=facts)
 
-            _, info = self.request_rundeck_api("system/acl/%s.aclpolicy" % self.module.params["name"],
-                                               method="PUT",
-                                               data={"contents": self.module.params["policy"]})
+            dummy, info = self.request_rundeck_api("system/acl/%s.aclpolicy" % self.module.params["name"],
+                                                   method="PUT",
+                                                   data={"contents": self.module.params["policy"]})
 
             if info["status"] == 200:
                 self.module.exit_json(changed=True, before=facts, after=self.get_acl())
@@ -229,6 +237,9 @@ def main():
         ],
         supports_check_mode=True
     )
+
+    if not bool(re.match("[a-zA-Z0-9,.+_-]+", module.params["name"])):
+        module.fail_json(msg="Name contains forbidden characters. The policy can contain the characters: a-zA-Z0-9,.+_-")
 
     if module.params["api_version"] < 14:
         module.fail_json(msg="API version should be at least 14")

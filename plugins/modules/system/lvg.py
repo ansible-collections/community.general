@@ -28,6 +28,7 @@ options:
     - Required when creating or resizing volume group.
     - The module will take care of running pvcreate if needed.
     type: list
+    elements: str
   pesize:
     description:
     - "The size of the physical extent. I(pesize) must be a power of 2 of at least 1 sector
@@ -62,22 +63,22 @@ options:
     type: bool
     default: no
 seealso:
-- module: filesystem
-- module: lvol
-- module: parted
+- module: community.general.filesystem
+- module: community.general.lvol
+- module: community.general.parted
 notes:
   - This module does not modify PE size for already present volume group.
 '''
 
 EXAMPLES = r'''
 - name: Create a volume group on top of /dev/sda1 with physical extent size = 32MB
-  lvg:
+  community.general.lvg:
     vg: vg.services
     pvs: /dev/sda1
     pesize: 32
 
 - name: Create a volume group on top of /dev/sdb with physical extent size = 128KiB
-  lvg:
+  community.general.lvg:
     vg: vg.services
     pvs: /dev/sdb
     pesize: 128K
@@ -87,17 +88,17 @@ EXAMPLES = r'''
 # top of /dev/sda5, we first extend it with /dev/sdb1 and /dev/sdc5,
 # and then reduce by /dev/sda5.
 - name: Create or resize a volume group on top of /dev/sdb1 and /dev/sdc5.
-  lvg:
+  community.general.lvg:
     vg: vg.services
     pvs: /dev/sdb1,/dev/sdc5
 
 - name: Remove a volume group with name vg.services
-  lvg:
+  community.general.lvg:
     vg: vg.services
     state: absent
 
 - name: Create a volume group on top of /dev/sda3 and resize the volume group /dev/sda3 to the maximum possible
-  lvg:
+  community.general.lvg:
     vg: resizableVG
     pvs: /dev/sda3
     pvresize: yes
@@ -149,7 +150,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             vg=dict(type='str', required=True),
-            pvs=dict(type='list'),
+            pvs=dict(type='list', elements='str'),
             pesize=dict(type='str', default='4'),
             pv_options=dict(type='str', default=''),
             pvresize=dict(type='bool', default=False),
@@ -231,13 +232,13 @@ def main():
                 # create PV
                 pvcreate_cmd = module.get_bin_path('pvcreate', True)
                 for current_dev in dev_list:
-                    rc, _, err = module.run_command([pvcreate_cmd] + pvoptions + ['-f', str(current_dev)])
+                    rc, dummy, err = module.run_command([pvcreate_cmd] + pvoptions + ['-f', str(current_dev)])
                     if rc == 0:
                         changed = True
                     else:
                         module.fail_json(msg="Creating physical volume '%s' failed" % current_dev, rc=rc, err=err)
                 vgcreate_cmd = module.get_bin_path('vgcreate')
-                rc, _, err = module.run_command([vgcreate_cmd] + vgoptions + ['-s', pesize, vg] + dev_list)
+                rc, dummy, err = module.run_command([vgcreate_cmd] + vgoptions + ['-s', pesize, vg] + dev_list)
                 if rc == 0:
                     changed = True
                 else:
@@ -250,7 +251,7 @@ def main():
                 if this_vg['lv_count'] == 0 or force:
                     # remove VG
                     vgremove_cmd = module.get_bin_path('vgremove', True)
-                    rc, _, err = module.run_command("%s --force %s" % (vgremove_cmd, vg))
+                    rc, dummy, err = module.run_command("%s --force %s" % (vgremove_cmd, vg))
                     if rc == 0:
                         module.exit_json(changed=True)
                     else:
@@ -282,7 +283,7 @@ def main():
                         if module.check_mode:
                             changed = True
                         else:
-                            rc, _, err = module.run_command([pvresize_cmd, device])
+                            rc, dummy, err = module.run_command([pvresize_cmd, device])
                             if rc != 0:
                                 module.fail_json(msg="Failed executing pvresize command.", rc=rc, err=err)
                             else:
@@ -297,14 +298,14 @@ def main():
                     # create PV
                     pvcreate_cmd = module.get_bin_path('pvcreate', True)
                     for current_dev in devs_to_add:
-                        rc, _, err = module.run_command([pvcreate_cmd] + pvoptions + ['-f', str(current_dev)])
+                        rc, dummy, err = module.run_command([pvcreate_cmd] + pvoptions + ['-f', str(current_dev)])
                         if rc == 0:
                             changed = True
                         else:
                             module.fail_json(msg="Creating physical volume '%s' failed" % current_dev, rc=rc, err=err)
                     # add PV to our VG
                     vgextend_cmd = module.get_bin_path('vgextend', True)
-                    rc, _, err = module.run_command("%s %s %s" % (vgextend_cmd, vg, devs_to_add_string))
+                    rc, dummy, err = module.run_command("%s %s %s" % (vgextend_cmd, vg, devs_to_add_string))
                     if rc == 0:
                         changed = True
                     else:
@@ -314,7 +315,7 @@ def main():
                 if devs_to_remove:
                     devs_to_remove_string = ' '.join(devs_to_remove)
                     vgreduce_cmd = module.get_bin_path('vgreduce', True)
-                    rc, _, err = module.run_command("%s --force %s %s" % (vgreduce_cmd, vg, devs_to_remove_string))
+                    rc, dummy, err = module.run_command("%s --force %s %s" % (vgreduce_cmd, vg, devs_to_remove_string))
                     if rc == 0:
                         changed = True
                     else:

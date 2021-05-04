@@ -24,11 +24,13 @@ options:
                 - C(present) will ensure data properties are compliant with OneView.
                 - C(absent) will remove the resource from OneView, if it exists.
                 - C(default_bandwidth_reset) will reset the network connection template to the default.
+        type: str
         default: present
         choices: [present, absent, default_bandwidth_reset]
     data:
         description:
             - List with Ethernet Network properties.
+        type: dict
         required: true
 extends_documentation_fragment:
 - community.general.oneview
@@ -38,7 +40,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Ensure that the Ethernet Network is present using the default configuration
-  oneview_ethernet_network:
+  community.general.oneview_ethernet_network:
     config: '/etc/oneview/oneview_config.json'
     state: present
     data:
@@ -47,7 +49,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Update the Ethernet Network changing bandwidth and purpose
-  oneview_ethernet_network:
+  community.general.oneview_ethernet_network:
     config: '/etc/oneview/oneview_config.json'
     state: present
     data:
@@ -59,7 +61,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Ensure that the Ethernet Network is present with name 'Renamed Ethernet Network'
-  oneview_ethernet_network:
+  community.general.oneview_ethernet_network:
     config: '/etc/oneview/oneview_config.json'
     state: present
     data:
@@ -68,7 +70,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Ensure that the Ethernet Network is absent
-  oneview_ethernet_network:
+  community.general.oneview_ethernet_network:
     config: '/etc/oneview/oneview_config.json'
     state: absent
     data:
@@ -76,7 +78,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Create Ethernet networks in bulk
-  oneview_ethernet_network:
+  community.general.oneview_ethernet_network:
     config: '/etc/oneview/oneview_config.json'
     state: present
     data:
@@ -91,7 +93,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Reset to the default network connection template
-  oneview_ethernet_network:
+  community.general.oneview_ethernet_network:
     config: '/etc/oneview/oneview_config.json'
     state: default_bandwidth_reset
     data:

@@ -22,39 +22,50 @@ notes:
 author: Benjamin Copeland (@bhcopeland) <ben@copeland.me.uk>
 options:
     title:
+        type: str
         description:
             - A descriptive title for the maintenance window
         default: "A new maintenance window"
     desc:
+        type: str
         description:
             - Message describing the maintenance window
         default: "Created by Ansible"
     state:
+        type: str
         description:
             - Desired state of the package.
         default: "present"
         choices: ["present", "absent"]
     api_id:
+        type: str
         description:
             - Your unique API ID from status.io
         required: true
     api_key:
+        type: str
         description:
             - Your unique API Key from status.io
         required: true
     statuspage:
+        type: str
         description:
             - Your unique StatusPage ID from status.io
         required: true
     url:
+        type: str
         description:
             - Status.io API URL. A private apiary can be used instead.
         default: "https://api.status.io"
     components:
+        type: list
+        elements: str
         description:
             - The given name of your component (server name)
         aliases: ['component']
     containers:
+        type: list
+        elements: str
         description:
             - The given name of your container (data center)
         aliases: ['container']
@@ -89,18 +100,22 @@ options:
         type: bool
         default: 'no'
     maintenance_id:
+        type: str
         description:
             - The maintenance id number when deleting a maintenance window
     minutes:
+        type: int
         description:
             - The length of time in UTC that the maintenance will run
               (starting from playbook runtime)
         default: 10
     start_date:
+        type: str
         description:
             - Date maintenance is expected to start (Month/Day/Year) (UTC)
             - End Date is worked out from start_date + minutes
     start_time:
+        type: str
         description:
             - Time maintenance is expected to start (Hour:Minutes) (UTC)
             - End Time is worked out from start_time + minutes
@@ -108,7 +123,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a maintenance window for 10 minutes on server1, with automation to stop the maintenance
-  statusio_maintenance:
+  community.general.statusio_maintenance:
     title: Router Upgrade from ansible
     desc: Performing a Router Upgrade
     components: server1.example.com
@@ -119,7 +134,7 @@ EXAMPLES = '''
     automation: True
 
 - name: Create a maintenance window for 60 minutes on server1 and server2
-  statusio_maintenance:
+  community.general.statusio_maintenance:
     title: Routine maintenance
     desc: Some security updates
     components:
@@ -134,7 +149,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Create a future maintenance window for 24 hours to all hosts inside the Primary Data Center
-  statusio_maintenance:
+  community.general.statusio_maintenance:
     title: Data center downtime
     desc: Performing a Upgrade to our data center
     components: Primary Data Center
@@ -146,7 +161,7 @@ EXAMPLES = '''
     minutes: 1440
 
 - name: Delete a maintenance window
-  statusio_maintenance:
+  community.general.statusio_maintenance:
     title: Remove a maintenance window
     maintenance_id: 561f90faf74bc94a4700087b
     statuspage: statuspage_id
@@ -326,9 +341,9 @@ def main():
             state=dict(required=False, default='present',
                        choices=['present', 'absent']),
             url=dict(default='https://api.status.io', required=False),
-            components=dict(type='list', required=False, default=None,
+            components=dict(type='list', elements='str', required=False, default=None,
                             aliases=['component']),
-            containers=dict(type='list', required=False, default=None,
+            containers=dict(type='list', elements='str', required=False, default=None,
                             aliases=['container']),
             all_infrastructure_affected=dict(type='bool', default=False,
                                              required=False),
@@ -410,7 +425,7 @@ def main():
         if module.check_mode:
             module.exit_json(changed=True)
         else:
-            (rc, _, error) = create_maintenance(
+            (rc, dummy, error) = create_maintenance(
                 auth_headers, url, statuspage, host_ids,
                 all_infrastructure_affected, automation,
                 title, desc, returned_date, maintenance_notify_now,
@@ -436,7 +451,7 @@ def main():
         if module.check_mode:
             module.exit_json(changed=True)
         else:
-            (rc, _, error) = delete_maintenance(
+            (rc, dummy, error) = delete_maintenance(
                 auth_headers, url, statuspage, maintenance_id)
             if rc == 0:
                 module.exit_json(

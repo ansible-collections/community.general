@@ -16,7 +16,7 @@ description:
     get information back.
   - Information retrieved is placed in a location specified by the user.
   - This module was called C(redfish_facts) before Ansible 2.9, returning C(ansible_facts).
-    Note that the M(redfish_info) module no longer returns C(ansible_facts)!
+    Note that the M(community.general.redfish_info) module no longer returns C(ansible_facts)!
 options:
   category:
     required: false
@@ -24,26 +24,31 @@ options:
       - List of categories to execute on OOB controller
     default: ['Systems']
     type: list
+    elements: str
   command:
     required: false
     description:
       - List of commands to execute on OOB controller
     type: list
+    elements: str
   baseuri:
     required: true
     description:
       - Base URI of OOB controller
     type: str
   username:
-    required: true
     description:
       - User for authentication with OOB controller
     type: str
   password:
-    required: true
     description:
       - Password for authentication with OOB controller
     type: str
+  auth_token:
+    description:
+      - Security token for authentication with OOB controller
+    type: str
+    version_added: 2.3.0
   timeout:
     description:
       - Timeout in seconds for URL requests to OOB controller
@@ -55,29 +60,29 @@ author: "Jose Delarosa (@jose-delarosa)"
 
 EXAMPLES = '''
   - name: Get CPU inventory
-    redfish_info:
+    community.general.redfish_info:
       category: Systems
       command: GetCpuInventory
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
     register: result
-  - debug:
+  - ansible.builtin.debug:
       msg: "{{ result.redfish_facts.cpu.entries | to_nice_json }}"
 
   - name: Get CPU model
-    redfish_info:
+    community.general.redfish_info:
       category: Systems
       command: GetCpuInventory
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
     register: result
-  - debug:
+  - ansible.builtin.debug:
       msg: "{{ result.redfish_facts.cpu.entries.0.Model }}"
 
   - name: Get memory inventory
-    redfish_info:
+    community.general.redfish_info:
       category: Systems
       command: GetMemoryInventory
       baseuri: "{{ baseuri }}"
@@ -86,7 +91,7 @@ EXAMPLES = '''
     register: result
 
   - name: Get fan inventory with a timeout of 20 seconds
-    redfish_info:
+    community.general.redfish_info:
       category: Chassis
       command: GetFanInventory
       baseuri: "{{ baseuri }}"
@@ -96,49 +101,49 @@ EXAMPLES = '''
     register: result
 
   - name: Get Virtual Media information
-    redfish_info:
+    community.general.redfish_info:
       category: Manager
       command: GetVirtualMedia
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
     register: result
-  - debug:
+  - ansible.builtin.debug:
       msg: "{{ result.redfish_facts.virtual_media.entries | to_nice_json }}"
 
   - name: Get Volume Inventory
-    redfish_info:
+    community.general.redfish_info:
       category: Systems
       command: GetVolumeInventory
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
     register: result
-  - debug:
+  - ansible.builtin.debug:
       msg: "{{ result.redfish_facts.volume.entries | to_nice_json }}"
 
   - name: Get Session information
-    redfish_info:
+    community.general.redfish_info:
       category: Sessions
       command: GetSessions
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
     register: result
-  - debug:
+  - ansible.builtin.debug:
       msg: "{{ result.redfish_facts.session.entries | to_nice_json }}"
 
   - name: Get default inventory information
-    redfish_info:
+    community.general.redfish_info:
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
     register: result
-  - debug:
+  - ansible.builtin.debug:
       msg: "{{ result.redfish_facts | to_nice_json }}"
 
   - name: Get several inventories
-    redfish_info:
+    community.general.redfish_info:
       category: Systems
       command: GetNicInventory,GetBiosAttributes
       baseuri: "{{ baseuri }}"
@@ -146,21 +151,21 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Get default system inventory and user information
-    redfish_info:
+    community.general.redfish_info:
       category: Systems,Accounts
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
 
   - name: Get default system, user and firmware information
-    redfish_info:
+    community.general.redfish_info:
       category: ["Systems", "Accounts", "Update"]
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
 
   - name: Get Manager NIC inventory information
-    redfish_info:
+    community.general.redfish_info:
       category: Manager
       command: GetManagerNicInventory
       baseuri: "{{ baseuri }}"
@@ -168,7 +173,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Get boot override information
-    redfish_info:
+    community.general.redfish_info:
       category: Systems
       command: GetBootOverride
       baseuri: "{{ baseuri }}"
@@ -176,7 +181,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Get chassis inventory
-    redfish_info:
+    community.general.redfish_info:
       category: Chassis
       command: GetChassisInventory
       baseuri: "{{ baseuri }}"
@@ -184,7 +189,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Get all information available in the Manager category
-    redfish_info:
+    community.general.redfish_info:
       category: Manager
       command: all
       baseuri: "{{ baseuri }}"
@@ -192,7 +197,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Get firmware update capability information
-    redfish_info:
+    community.general.redfish_info:
       category: Update
       command: GetFirmwareUpdateCapabilities
       baseuri: "{{ baseuri }}"
@@ -200,7 +205,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Get firmware inventory
-    redfish_info:
+    community.general.redfish_info:
       category: Update
       command: GetFirmwareInventory
       baseuri: "{{ baseuri }}"
@@ -208,7 +213,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Get software inventory
-    redfish_info:
+    community.general.redfish_info:
       category: Update
       command: GetSoftwareInventory
       baseuri: "{{ baseuri }}"
@@ -216,7 +221,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Get Manager Services
-    redfish_info:
+    community.general.redfish_info:
       category: Manager
       command: GetNetworkProtocols
       baseuri: "{{ baseuri }}"
@@ -224,7 +229,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Get all information available in all categories
-    redfish_info:
+    community.general.redfish_info:
       category: all
       command: all
       baseuri: "{{ baseuri }}"
@@ -232,7 +237,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Get system health report
-    redfish_info:
+    community.general.redfish_info:
       category: Systems
       command: GetHealthReport
       baseuri: "{{ baseuri }}"
@@ -240,7 +245,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Get chassis health report
-    redfish_info:
+    community.general.redfish_info:
       category: Chassis
       command: GetHealthReport
       baseuri: "{{ baseuri }}"
@@ -248,7 +253,7 @@ EXAMPLES = '''
       password: "{{ password }}"
 
   - name: Get manager health report
-    redfish_info:
+    community.general.redfish_info:
       category: Manager
       command: GetHealthReport
       baseuri: "{{ baseuri }}"
@@ -296,23 +301,30 @@ def main():
     category_list = []
     module = AnsibleModule(
         argument_spec=dict(
-            category=dict(type='list', default=['Systems']),
-            command=dict(type='list'),
+            category=dict(type='list', elements='str', default=['Systems']),
+            command=dict(type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(required=True),
-            password=dict(required=True, no_log=True),
+            username=dict(),
+            password=dict(no_log=True),
+            auth_token=dict(no_log=True),
             timeout=dict(type='int', default=10)
         ),
+        required_together=[
+            ('username', 'password'),
+        ],
+        required_one_of=[
+            ('username', 'auth_token'),
+        ],
+        mutually_exclusive=[
+            ('username', 'auth_token'),
+        ],
         supports_check_mode=False
     )
-    is_old_facts = module._name in ('redfish_facts', 'community.general.redfish_facts')
-    if is_old_facts:
-        module.deprecate("The 'redfish_facts' module has been renamed to 'redfish_info', "
-                         "and the renamed one no longer returns ansible_facts", version='2.13')
 
     # admin credentials used for authentication
     creds = {'user': module.params['username'],
-             'pswd': module.params['password']}
+             'pswd': module.params['password'],
+             'token': module.params['auth_token']}
 
     # timeout
     timeout = module.params['timeout']
@@ -455,10 +467,7 @@ def main():
                     result["health_report"] = rf_utils.get_multi_manager_health_report()
 
     # Return data back
-    if is_old_facts:
-        module.exit_json(ansible_facts=dict(redfish_facts=result))
-    else:
-        module.exit_json(redfish_facts=result)
+    module.exit_json(redfish_facts=result)
 
 
 if __name__ == '__main__':

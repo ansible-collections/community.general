@@ -16,16 +16,19 @@ description:
   - Manage which I(sensu channels) a machine should subscribe to
 options:
   name:
+    type: str
     description:
       - The name of the channel
     required: true
   state:
+    type: str
     description:
       - Whether the machine should subscribe or unsubscribe from the channel
     choices: [ 'present', 'absent' ]
     required: false
     default: present
   path:
+    type: str
     description:
       - Path to the subscriptions json file
     required: false
@@ -52,11 +55,11 @@ reasons:
 EXAMPLES = '''
 # Subscribe to the nginx channel
 - name: Subscribe to nginx checks
-  sensu_subscription: name=nginx
+  community.general.sensu_subscription: name=nginx
 
 # Unsubscribe from the common checks channel
 - name: Unsubscribe from common checks
-  sensu_subscription: name=common state=absent
+  community.general.sensu_subscription: name=common state=absent
 '''
 
 import json

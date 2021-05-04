@@ -5,15 +5,25 @@ set -o pipefail -eux
 declare -a args
 IFS='/:' read -ra args <<< "$1"
 
-script="${args[0]}"
+ansible_version="${args[0]}"
+script="${args[1]}"
 
-test="$1"
+function join {
+    local IFS="$1";
+    shift;
+    echo "$*";
+}
+
+# Ensure we can write other collections to this dir
+sudo chown "$(whoami)" "${PWD}/../../"
+
+test="$(join / "${args[@]:1}")"
 
 docker images ansible/ansible
 docker images quay.io/ansible/*
 docker ps
 
-for container in $(docker ps --format '{{.Image}} {{.ID}}' | grep -v '^drydock/' | sed 's/^.* //'); do
+for container in $(docker ps --format '{{.Image}} {{.ID}}' | grep -v -e '^drydock/' -e '^quay.io/ansible/azure-pipelines-test-container:' | sed 's/^.* //'); do
     docker rm -f "${container}" || true  # ignore errors
 done
 
@@ -46,23 +56,40 @@ function retry
 command -v pip
 pip --version
 pip list --disable-pip-version-check
-retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+if [ "${ansible_version}" == "devel" ]; then
+    retry pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+else
+    retry pip install "https://github.com/ansible/ansible/archive/stable-${ansible_version}.tar.gz" --disable-pip-version-check
+fi
 
-export ANSIBLE_COLLECTIONS_PATHS="${HOME}/.ansible"
-SHIPPABLE_RESULT_DIR="$(pwd)/shippable"
-TEST_DIR="${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/general"
-mkdir -p "${TEST_DIR}"
-cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
-cd "${TEST_DIR}"
+if [ "${SHIPPABLE_BUILD_ID:-}" ]; then
+    export ANSIBLE_COLLECTIONS_PATHS="${HOME}/.ansible"
+    SHIPPABLE_RESULT_DIR="$(pwd)/shippable"
+    TEST_DIR="${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/general"
+    mkdir -p "${TEST_DIR}"
+    cp -aT "${SHIPPABLE_BUILD_DIR}" "${TEST_DIR}"
+    cd "${TEST_DIR}"
+else
+    export ANSIBLE_COLLECTIONS_PATHS="${PWD}/../../../"
+fi
 
 # START: HACK install dependencies
-retry ansible-galaxy -vvv collection install ansible.netcommon
-retry ansible-galaxy -vvv collection install ansible.posix
-retry ansible-galaxy -vvv collection install community.crypto
-# retry ansible-galaxy -vvv collection install community.internal_test_tools - we need git checkout until 0.2.0 has been released
-retry git clone https://github.com/ansible-collections/community.internal_test_tools.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/internal_test_tools"
-retry ansible-galaxy -vvv collection install community.kubernetes
-retry ansible-galaxy -vvv collection install google.cloud
+if [ "${script}" != "sanity" ] || [ "${test}" == "sanity/extra" ]; then
+    # Nothing further should be added to this list.
+    # This is to prevent modules or plugins in this collection having a runtime dependency on other collections.
+    retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.internal_test_tools.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/internal_test_tools"
+    # NOTE: we're installing with git to work around Galaxy being a huge PITA (https://github.com/ansible/galaxy/issues/2429)
+    # retry ansible-galaxy -vvv collection install community.internal_test_tools
+fi
+
+if [ "${script}" != "sanity" ] && [ "${script}" != "units" ]; then
+    # To prevent Python dependencies on other collections only install other collections for integration tests
+    retry git clone --depth=1 --single-branch https://github.com/ansible-collections/ansible.posix.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/ansible/posix"
+    retry git clone --depth=1 --single-branch https://github.com/ansible-collections/community.crypto.git "${ANSIBLE_COLLECTIONS_PATHS}/ansible_collections/community/crypto"
+    # NOTE: we're installing with git to work around Galaxy being a huge PITA (https://github.com/ansible/galaxy/issues/2429)
+    # retry ansible-galaxy -vvv collection install ansible.posix
+    # retry ansible-galaxy -vvv collection install community.crypto
+fi
 
 # END: HACK
 
@@ -135,11 +162,13 @@ function cleanup
             set -ux
 
             # shellcheck disable=SC2086
-            ansible-test coverage xml --color --requirements --group-by command --group-by version ${stub:+"$stub"}
+            ansible-test coverage xml --color -v --requirements --group-by command --group-by version ${stub:+"$stub"}
             cp -a tests/output/reports/coverage=*.xml "$SHIPPABLE_RESULT_DIR/codecoverage/"
 
-            # analyze and capture code coverage aggregated by integration test target
-            ansible-test coverage analyze targets generate -v "$SHIPPABLE_RESULT_DIR/testresults/coverage-analyze-targets.json"
+            if [ "${ansible_version}" != "2.9" ]; then
+                # analyze and capture code coverage aggregated by integration test target
+                ansible-test coverage analyze targets generate -v "$SHIPPABLE_RESULT_DIR/testresults/coverage-analyze-targets.json"
+            fi
 
             # upload coverage report to codecov.io only when using complete on-demand coverage
             if [ "${COVERAGE}" == "--coverage" ] && [ "${CHANGED}" == "" ]; then
@@ -152,7 +181,7 @@ function cleanup
                     flags="${flags//=/,}"
                     flags="${flags//[^a-zA-Z0-9_,]/_}"
 
-                    bash <(curl -s https://codecov.io/bash) \
+                    bash <(curl -s https://ansible-ci-files.s3.us-east-1.amazonaws.com/codecov/codecov.sh) \
                         -f "${file}" \
                         -F "${flags}" \
                         -n "${test}" \
@@ -181,7 +210,7 @@ function cleanup
     fi
 }
 
-trap cleanup EXIT
+if [ "${SHIPPABLE_BUILD_ID:-}" ]; then trap cleanup EXIT; fi
 
 if [[ "${COVERAGE:-}" == "--coverage" ]]; then
     timeout=60
@@ -191,5 +220,5 @@ fi
 
 ansible-test env --dump --show --timeout "${timeout}" --color -v
 
-"tests/utils/shippable/check_matrix.py"
+if [ "${SHIPPABLE_BUILD_ID:-}" ]; then "tests/utils/shippable/check_matrix.py"; fi
 "tests/utils/shippable/${script}.sh" "${test}"

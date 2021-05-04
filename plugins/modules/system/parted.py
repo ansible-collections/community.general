@@ -19,7 +19,8 @@ description:
     command line tool. For a full description of the fields and the options
     check the GNU parted manual.
 requirements:
-  - This module requires parted version 1.8.3 and above.
+  - This module requires parted version 1.8.3 and above
+  - align option (except 'undefined') requires parted 2.1 and above
   - If the version of parted is below 3.1, it requires a Linux version running
     the sysfs file system C(/sys/).
 options:
@@ -28,9 +29,9 @@ options:
     type: str
     required: True
   align:
-    description: Set alignment for newly created partitions.
+    description: Set alignment for newly created partitions. Use 'undefined' for parted default aligment.
     type: str
-    choices: [ cylinder, minimal, none, optimal ]
+    choices: [ cylinder, minimal, none, optimal, undefined ]
     default: optimal
   number:
     description:
@@ -48,7 +49,9 @@ options:
     choices: [ s, B, KB, KiB, MB, MiB, GB, GiB, TB, TiB, '%', cyl, chs, compact ]
     default: KiB
   label:
-    description: Creates a new disk label.
+    description:
+     - Disk label type to use.
+     - If C(device) already contains different label, it will be changed to C(label) and any previous partitions will be lost.
     type: str
     choices: [ aix, amiga, bsd, dvh, gpt, loop, mac, msdos, pc98, sun ]
     default: msdos
@@ -63,15 +66,18 @@ options:
   part_start:
     description:
     - Where the partition will start as offset from the beginning of the disk,
-      that is, the "distance" from the start of the disk.
+      that is, the "distance" from the start of the disk. Negative numbers
+      specify distance from the end of the disk.
     - The distance can be specified with all the units supported by parted
       (except compat) and it is case sensitive, e.g. C(10GiB), C(15%).
+    - Using negative values may require setting of C(fs_type) (see notes).
     type: str
     default: 0%
-  part_end :
+  part_end:
     description:
     - Where the partition will end as offset from the beginning of the disk,
-      that is, the "distance" from the start of the disk.
+      that is, the "distance" from the start of the disk. Negative numbers
+      specify distance from the end of the disk.
     - The distance can be specified with all the units supported by parted
       (except compat) and it is case sensitive, e.g. C(10GiB), C(15%).
     type: str
@@ -83,6 +89,7 @@ options:
   flags:
     description: A list of the flags that has to be set on the partition.
     type: list
+    elements: str
   state:
     description:
     - Whether to create or delete a partition.
@@ -93,13 +100,24 @@ options:
   fs_type:
     description:
      - If specified and the partition does not exist, will set filesystem type to given partition.
+     - Parameter optional, but see notes below about negative negative C(part_start) values.
     type: str
     version_added: '0.2.0'
+  resize:
+    description:
+      - Call C(resizepart) on existing partitions to match the size specified by I(part_end).
+    type: bool
+    default: false
+    version_added: '1.3.0'
+
 notes:
   - When fetching information about a new disk and when the version of parted
     installed on the system is before version 3.1, the module queries the kernel
     through C(/sys/) to obtain disk information. In this case the units CHS and
     CYL are not supported.
+  - Negative C(part_start) start values were rejected if C(fs_type) was not given.
+    This bug was fixed in parted 3.2.153. If you want to use negative C(part_start),
+    specify C(fs_type) as well or make sure your system contains newer parted.
 '''
 
 RETURN = r'''
@@ -150,44 +168,60 @@ partition_info:
 
 EXAMPLES = r'''
 - name: Create a new ext4 primary partition
-  parted:
+  community.general.parted:
     device: /dev/sdb
     number: 1
     state: present
     fs_type: ext4
 
 - name: Remove partition number 1
-  parted:
+  community.general.parted:
     device: /dev/sdb
     number: 1
     state: absent
 
 - name: Create a new primary partition with a size of 1GiB
-  parted:
+  community.general.parted:
     device: /dev/sdb
     number: 1
     state: present
     part_end: 1GiB
 
 - name: Create a new primary partition for LVM
-  parted:
+  community.general.parted:
     device: /dev/sdb
     number: 2
     flags: [ lvm ]
     state: present
     part_start: 1GiB
 
+- name: Create a new primary partition with a size of 1GiB at disk's end
+  community.general.parted:
+    device: /dev/sdb
+    number: 3
+    state: present
+    fs_type: ext3
+    part_start: -1GiB
+
 # Example on how to read info and reuse it in subsequent task
 - name: Read device information (always use unit when probing)
-  parted: device=/dev/sdb unit=MiB
+  community.general.parted: device=/dev/sdb unit=MiB
   register: sdb_info
 
 - name: Remove all partitions from disk
-  parted:
+  community.general.parted:
     device: /dev/sdb
     number: '{{ item.num }}'
     state: absent
   loop: '{{ sdb_info.partitions }}'
+
+- name: Extend an existing partition to fill all available space
+  community.general.parted:
+    device: /dev/sdb
+    number: "{{ sdb_info.partitions | length }}"
+    part_end: "100%"
+    resize: true
+    state: present
 '''
 
 
@@ -205,9 +239,9 @@ parted_units = units_si + units_iec + ['s', '%', 'cyl', 'chs', 'compact']
 
 def parse_unit(size_str, unit=''):
     """
-    Parses a string containing a size of information
+    Parses a string containing a size or boundary information
     """
-    matches = re.search(r'^([\d.]+)([\w%]+)?$', size_str)
+    matches = re.search(r'^(-?[\d.]+) *([\w%]+)?$', size_str)
     if matches is None:
         # "<cylinder>,<head>,<sector>" format
         matches = re.search(r'^(\d+),(\d+),(\d+)$', size_str)
@@ -373,6 +407,21 @@ def format_disk_size(size_bytes, unit):
     return round(output, precision), unit
 
 
+def convert_to_bytes(size_str, unit):
+    size = float(size_str)
+    multiplier = 1.0
+    if unit in units_si:
+        multiplier = 1000.0 ** units_si.index(unit)
+    elif unit in units_iec:
+        multiplier = 1024.0 ** (units_iec.index(unit) + 1)
+    elif unit in ['', 'compact', 'cyl', 'chs']:
+        # As per format_disk_size, default to compact, which defaults to megabytes
+        multiplier = 1000.0 ** units_si.index("MB")
+
+    output = size * multiplier
+    return int(output)
+
+
 def get_unlabeled_device_info(device, unit):
     """
     Fetches device information directly from the kernel and it is used when
@@ -439,7 +488,7 @@ def check_parted_label(device):
     global parted_exec
 
     # Check the version
-    parted_major, parted_minor, _ = parted_version()
+    parted_major, parted_minor, dummy = parted_version()
     if (parted_major == 3 and parted_minor >= 1) or parted_major > 3:
         return False
 
@@ -449,6 +498,33 @@ def check_parted_label(device):
         return True
 
     return False
+
+
+def parse_parted_version(out):
+    """
+    Returns version tuple from the output of "parted --version" command
+    """
+    lines = [x for x in out.split('\n') if x.strip() != '']
+    if len(lines) == 0:
+        return None, None, None
+
+    # Sample parted versions (see as well test unit):
+    # parted (GNU parted) 3.3
+    # parted (GNU parted) 3.4.5
+    # parted (GNU parted) 3.3.14-dfc61
+    matches = re.search(r'^parted.+\s(\d+)\.(\d+)(?:\.(\d+))?', lines[0].strip())
+
+    if matches is None:
+        return None, None, None
+
+    # Convert version to numbers
+    major = int(matches.group(1))
+    minor = int(matches.group(2))
+    rev = 0
+    if matches.group(3) is not None:
+        rev = int(matches.group(3))
+
+    return major, minor, rev
 
 
 def parted_version():
@@ -463,20 +539,9 @@ def parted_version():
             msg="Failed to get parted version.", rc=rc, out=out, err=err
         )
 
-    lines = [x for x in out.split('\n') if x.strip() != '']
-    if len(lines) == 0:
+    (major, minor, rev) = parse_parted_version(out)
+    if major is None:
         module.fail_json(msg="Failed to get parted version.", rc=0, out=out)
-
-    matches = re.search(r'^parted.+(\d+)\.(\d+)(?:\.(\d+))?$', lines[0])
-    if matches is None:
-        module.fail_json(msg="Failed to get parted version.", rc=0, out=out)
-
-    # Convert version to numbers
-    major = int(matches.group(1))
-    minor = int(matches.group(2))
-    rev = 0
-    if matches.group(3) is not None:
-        rev = int(matches.group(3))
 
     return major, minor, rev
 
@@ -487,8 +552,12 @@ def parted(script, device, align):
     """
     global module, parted_exec
 
+    align_option = '-a %s' % align
+    if align == 'undefined':
+        align_option = ''
+
     if script and not module.check_mode:
-        command = "%s -s -m -a %s %s -- %s" % (parted_exec, align, device, script)
+        command = "%s -s -m %s %s -- %s" % (parted_exec, align_option, device, script)
         rc, out, err = module.run_command(command)
 
         if rc != 0:
@@ -540,7 +609,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             device=dict(type='str', required=True),
-            align=dict(type='str', default='optimal', choices=['cylinder', 'minimal', 'none', 'optimal']),
+            align=dict(type='str', default='optimal', choices=['cylinder', 'minimal', 'none', 'optimal', 'undefined']),
             number=dict(type='int'),
 
             # unit <unit> command
@@ -559,10 +628,13 @@ def main():
             name=dict(type='str'),
 
             # set <partition> <flag> <state> command
-            flags=dict(type='list'),
+            flags=dict(type='list', elements='str'),
 
             # rm/mkpart command
             state=dict(type='str', default='info', choices=['absent', 'info', 'present']),
+
+            # resize part
+            resize=dict(type='bool', default=False),
         ),
         required_if=[
             ['state', 'present', ['number']],
@@ -585,6 +657,7 @@ def main():
     state = module.params['state']
     flags = module.params['flags']
     fs_type = module.params['fs_type']
+    resize = module.params['resize']
 
     # Parted executable
     parted_exec = module.get_bin_path('parted', True)
@@ -612,11 +685,12 @@ def main():
     if state == 'present':
 
         # Assign label if required
-        if current_device['generic'].get('table', None) != label:
+        mklabel_needed = current_device['generic'].get('table', None) != label
+        if mklabel_needed:
             script += "mklabel %s " % label
 
         # Create partition if required
-        if part_type and not part_exists(current_parts, 'num', number):
+        if part_type and (mklabel_needed or not part_exists(current_parts, 'num', number)):
             script += "mkpart %s %s%s %s " % (
                 part_type,
                 '%s ' % fs_type if fs_type is not None else '',
@@ -627,6 +701,25 @@ def main():
         # Set the unit of the run
         if unit and script:
             script = "unit %s %s" % (unit, script)
+
+        # If partition exists, try to resize
+        if resize and part_exists(current_parts, 'num', number):
+            # Ensure new end is different to current
+            partition = [p for p in current_parts if p['num'] == number][0]
+            current_part_end = convert_to_bytes(partition['end'], unit)
+
+            size, parsed_unit = parse_unit(part_end, unit)
+            if parsed_unit == "%":
+                size = int((int(current_device['generic']['size']) * size) / 100)
+                parsed_unit = unit
+
+            desired_part_end = convert_to_bytes(size, parsed_unit)
+
+            if current_part_end != desired_part_end:
+                script += "resizepart %s %s " % (
+                    number,
+                    part_end
+                )
 
         # Execute the script and update the data structure.
         # This will create the partition for the next steps

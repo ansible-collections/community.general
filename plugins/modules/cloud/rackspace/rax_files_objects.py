@@ -21,22 +21,27 @@ options:
     type: bool
     default: 'no'
   container:
+    type: str
     description:
       - The container to use for file object operations.
     required: true
   dest:
+    type: str
     description:
       - The destination of a "get" operation; i.e. a local directory, "/home/user/myfolder".
         Used to specify the destination of an operation on a remote object; i.e. a file name,
         "file1", or a comma-separated list of remote objects, "file1,file2,file17"
   expires:
+    type: int
     description:
       - Used to set an expiration on a file or folder uploaded to Cloud Files.
         Requires an integer, specifying expiration in seconds
   meta:
+    type: dict
     description:
       - A hash of items to set as metadata values on an uploaded file or folder
   method:
+    type: str
     description:
       - The method of operation to be performed.  For example, put to upload files
         to Cloud Files, get to download files from Cloud Files or delete to delete
@@ -47,6 +52,7 @@ options:
       - delete
     default: get
   src:
+    type: str
     description:
       - Source from which to upload files.  Used to specify a remote object as a source for
         an operation, i.e. a file name, "file1", or a comma-separated list of remote objects,
@@ -58,12 +64,8 @@ options:
         flat directory
     type: bool
     default: 'yes'
-  state:
-    description:
-      - Indicate desired state of the resource
-    choices: ['present', 'absent']
-    default: present
   type:
+    type: str
     description:
       - Type of object to do work on
       - Metadata object or a file object
@@ -84,53 +86,53 @@ EXAMPLES = '''
   gather_facts: False
   tasks:
     - name: "Get objects from test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         dest: ~/Downloads/testcont
 
     - name: "Get single object from test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         src: file1
         dest: ~/Downloads/testcont
 
     - name: "Get several objects from test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         src: file1,file2,file3
         dest: ~/Downloads/testcont
 
     - name: "Delete one object in test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: delete
         dest: file1
 
     - name: "Delete several objects in test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: delete
         dest: file2,file3,file4
 
     - name: "Delete all objects in test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: delete
 
     - name: "Upload all files to test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: put
         src: ~/Downloads/onehundred
 
     - name: "Upload one file to test container"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: put
         src: ~/Downloads/testcont/file1
 
     - name: "Upload one file to test container with metadata"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         src: ~/Downloads/testcont/file2
         method: put
@@ -139,14 +141,14 @@ EXAMPLES = '''
           who_uploaded_this: someuser@example.com
 
     - name: "Upload one file to test container with TTL of 60 seconds"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: put
         src: ~/Downloads/testcont/file3
         expires: 60
 
     - name: "Attempt to get remote object that does not exist"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: get
         src: FileThatDoesNotExist.jpg
@@ -154,7 +156,7 @@ EXAMPLES = '''
       ignore_errors: yes
 
     - name: "Attempt to delete remote object that does not exist"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         method: delete
         dest: FileThatDoesNotExist.jpg
@@ -165,19 +167,19 @@ EXAMPLES = '''
   gather_facts: false
   tasks:
     - name: "Get metadata on one object"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         type: meta
         dest: file2
 
     - name: "Get metadata on several objects"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         type: meta
         src: file2,file1
 
     - name: "Set metadata on an object"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         type: meta
         dest: file17
@@ -188,13 +190,13 @@ EXAMPLES = '''
         clear_meta: true
 
     - name: "Verify metadata is set"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         type: meta
         src: file17
 
     - name: "Delete metadata"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         type: meta
         dest: file17
@@ -204,7 +206,7 @@ EXAMPLES = '''
           key2: ''
 
     - name: "Get metadata on all objects"
-      rax_files_objects:
+      community.general.rax_files_objects:
         container: testcont
         type: meta
 '''

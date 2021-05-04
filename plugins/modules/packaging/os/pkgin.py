@@ -35,78 +35,87 @@ options:
         description:
             - Name of package to install/remove;
             - multiple names may be given, separated by commas
+        aliases: [pkg]
+        type: list
+        elements: str
     state:
         description:
             - Intended state of the package
         choices: [ 'present', 'absent' ]
         default: present
+        type: str
     update_cache:
         description:
           - Update repository database. Can be run with other steps or on it's own.
         type: bool
-        default: 'no'
+        default: no
     upgrade:
         description:
           - Upgrade main packages to their newer versions
         type: bool
-        default: 'no'
+        default: no
     full_upgrade:
         description:
           - Upgrade all packages to their newer versions
         type: bool
-        default: 'no'
+        default: no
     clean:
         description:
           - Clean packages cache
         type: bool
-        default: 'no'
+        default: no
     force:
         description:
           - Force package reinstall
         type: bool
-        default: 'no'
+        default: no
 '''
 
 EXAMPLES = '''
 - name: Install package foo
-  pkgin:
+  community.general.pkgin:
     name: foo
     state: present
 
+- name: Install specific version of foo package
+  community.general.pkgin:
+    name: foo-2.0.1
+    state: present
+
 - name: Update cache and install foo package
-  pkgin:
+  community.general.pkgin:
     name: foo
     update_cache: yes
 
 - name: Remove package foo
-  pkgin:
+  community.general.pkgin:
     name: foo
     state: absent
 
 - name: Remove packages foo and bar
-  pkgin:
+  community.general.pkgin:
     name: foo,bar
     state: absent
 
 - name: Update repositories as a separate step
-  pkgin:
+  community.general.pkgin:
     update_cache: yes
 
 - name: Upgrade main packages (equivalent to pkgin upgrade)
-  pkgin:
+  community.general.pkgin:
     upgrade: yes
 
 - name: Upgrade all packages (equivalent to pkgin full-upgrade)
-  pkgin:
+  community.general.pkgin:
     full_upgrade: yes
 
 - name: Force-upgrade all packages (equivalent to pkgin -F full-upgrade)
-  pkgin:
+  community.general.pkgin:
     full_upgrade: yes
     force: yes
 
 - name: Clean packages cache (equivalent to pkgin clean)
-  pkgin:
+  community.general.pkgin:
     clean: yes
 '''
 
@@ -116,13 +125,15 @@ import re
 from ansible.module_utils.basic import AnsibleModule
 
 
-def query_package(module, name):
-    """Search for the package by name.
+class PackageState(object):
+    PRESENT = 1
+    NOT_INSTALLED = 2
+    OUTDATED = 4
+    NOT_FOUND = 8
 
-    Possible return values:
-    * "present"  - installed, no upgrade needed
-    * "outdated" - installed, but can be upgraded
-    * False      - not installed or not found
+
+def query_package(module, name):
+    """Search for the package by name and return state of the package.
     """
 
     # test whether '-p' (parsable) flag is supported.
@@ -168,20 +179,24 @@ def query_package(module, name):
             # Grab matched string
             pkgname_without_version = pkg_search_obj.group(1)
 
-            if name != pkgname_without_version:
+            if name not in (pkgname_with_version, pkgname_without_version):
                 continue
 
             # The package was found; now return its state
             if raw_state == '<':
-                return 'outdated'
+                return PackageState.OUTDATED
             elif raw_state == '=' or raw_state == '>':
-                return 'present'
+                return PackageState.PRESENT
             else:
-                return False
+                # Package found but not installed
+                return PackageState.NOT_INSTALLED
             # no fall-through
 
-        # No packages were matched, so return False
-        return False
+        # No packages were matched
+        return PackageState.NOT_FOUND
+
+    # Search failed
+    return PackageState.NOT_FOUND
 
 
 def format_action_message(module, action, count):
@@ -229,13 +244,13 @@ def remove_packages(module, packages):
     # Using a for loop in case of error, we can report the package that failed
     for package in packages:
         # Query the package first, to see if we even need to remove
-        if not query_package(module, package):
+        if query_package(module, package) in [PackageState.NOT_INSTALLED, PackageState.NOT_FOUND]:
             continue
 
         rc, out, err = module.run_command(
             format_pkgin_command(module, "remove", package))
 
-        if not module.check_mode and query_package(module, package):
+        if not module.check_mode and query_package(module, package) in [PackageState.PRESENT, PackageState.OUTDATED]:
             module.fail_json(msg="failed to remove %s: %s" % (package, out))
 
         remove_c += 1
@@ -251,13 +266,16 @@ def install_packages(module, packages):
     install_c = 0
 
     for package in packages:
-        if query_package(module, package):
+        query_result = query_package(module, package)
+        if query_result in [PackageState.PRESENT, PackageState.OUTDATED]:
             continue
+        elif query_result is PackageState.NOT_FOUND:
+            module.fail_json(msg="failed to find package %s for installation" % package)
 
         rc, out, err = module.run_command(
             format_pkgin_command(module, "install", package))
 
-        if not module.check_mode and not query_package(module, package):
+        if not module.check_mode and not query_package(module, package) in [PackageState.PRESENT, PackageState.OUTDATED]:
             module.fail_json(msg="failed to install %s: %s" % (package, out))
 
         install_c += 1
@@ -321,12 +339,12 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             state=dict(default="present", choices=["present", "absent"]),
-            name=dict(aliases=["pkg"], type='list'),
-            update_cache=dict(default='no', type='bool'),
-            upgrade=dict(default='no', type='bool'),
-            full_upgrade=dict(default='no', type='bool'),
-            clean=dict(default='no', type='bool'),
-            force=dict(default='no', type='bool')),
+            name=dict(aliases=["pkg"], type='list', elements='str'),
+            update_cache=dict(default=False, type='bool'),
+            upgrade=dict(default=False, type='bool'),
+            full_upgrade=dict(default=False, type='bool'),
+            clean=dict(default=False, type='bool'),
+            force=dict(default=False, type='bool')),
         required_one_of=[['name', 'update_cache', 'upgrade', 'full_upgrade', 'clean']],
         supports_check_mode=True)
 

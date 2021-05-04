@@ -14,6 +14,27 @@ from ansible import context
 from .helper import call_become_plugin
 
 
+def test_pbrun_basic(mocker, parser, reset_cli_args):
+    options = parser.parse_args([])
+    context._init_global_context(options)
+
+    default_cmd = "/bin/foo"
+    default_exe = "/bin/bash"
+    pbrun_exe = 'pbrun'
+    pbrun_flags = ''
+
+    success = 'BECOME-SUCCESS-.+?'
+
+    task = {
+        'become_method': 'community.general.pbrun',
+    }
+    var_options = {}
+    cmd = call_become_plugin(task, var_options, cmd=default_cmd, executable=default_exe)
+    print(cmd)
+    assert re.match("""%s %s  'echo %s; %s'""" % (pbrun_exe, pbrun_flags,
+                                                  success, default_cmd), cmd) is not None
+
+
 def test_pbrun(mocker, parser, reset_cli_args):
     options = parser.parse_args([])
     context._init_global_context(options)

@@ -26,20 +26,26 @@ options:
         description:
             - name of package to install/remove
         required: true
+        type: list
+        elements: str
+        aliases: [pkg]
 
     state:
         description:
             - state of the package, you can use "installed" as an alias for C(present) and removed as one for C(absent).
-        choices: [ 'present', 'absent', 'latest' ]
+        choices: [ 'present', 'absent', 'latest', 'installed', 'removed' ]
         required: false
         default: present
+        type: str
 
     update_cache:
         description:
             - update the package database first
+            - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
         required: false
         default: false
         type: bool
+        aliases: [update-cache]
 
 author: Kim Nørgaard (@KimNorgaard)
 requirements: [ "Slackware >= 12.2" ]
@@ -47,17 +53,17 @@ requirements: [ "Slackware >= 12.2" ]
 
 EXAMPLES = '''
 - name: Install package foo
-  slackpkg:
+  community.general.slackpkg:
     name: foo
     state: present
 
 - name: Remove packages foo and bar
-  slackpkg:
+  community.general.slackpkg:
     name: foo,bar
     state: absent
 
 - name: Make sure that it is the most updated package
-  slackpkg:
+  community.general.slackpkg:
     name: foo
     state: latest
 '''
@@ -72,7 +78,10 @@ def query_package(module, slackpkg_path, name):
     import re
 
     machine = platform.machine()
-    pattern = re.compile('^%s-[^-]+-(%s|noarch)-[^-]+$' % (re.escape(name), re.escape(machine)))
+    # Exception for kernel-headers package on x86_64
+    if name == 'kernel-headers' and machine == 'x86_64':
+        machine = 'x86'
+    pattern = re.compile('^%s-[^-]+-(%s|noarch|fw)-[^-]+$' % (re.escape(name), re.escape(machine)))
     packages = [f for f in os.listdir('/var/log/packages') if pattern.match(f)]
 
     if len(packages) > 0:
@@ -167,10 +176,11 @@ def update_cache(module, slackpkg_path):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(default="installed", choices=['installed', 'removed', 'absent', 'present', 'latest']),
-            name=dict(aliases=["pkg"], required=True, type='list'),
-            update_cache=dict(default=False, aliases=["update-cache"],
-                              type='bool'),
+            state=dict(default="present", choices=['installed', 'removed', 'absent', 'present', 'latest']),
+            name=dict(aliases=["pkg"], required=True, type='list', elements='str'),
+            update_cache=dict(
+                default=False, aliases=["update-cache"], type='bool',
+                deprecated_aliases=[dict(name='update-cache', version='5.0.0', collection_name='community.general')]),
         ),
         supports_check_mode=True)
 

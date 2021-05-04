@@ -5,8 +5,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
+    author: Unknown (!UNKNOWN)
     name: virtualbox
-    plugin_type: inventory
     short_description: virtualbox inventory source
     description:
         - Get inventory hosts from the local virtualbox installation.
@@ -19,7 +19,7 @@ DOCUMENTATION = '''
         plugin:
             description: token that ensures this is a source file for the 'virtualbox' plugin
             required: True
-            choices: ['virtualbox']
+            choices: ['virtualbox', 'community.general.virtualbox']
         running_only:
             description: toggles showing all vms vs only those currently running
             type: boolean
@@ -38,7 +38,7 @@ DOCUMENTATION = '''
 EXAMPLES = '''
 # file must be named vbox.yaml or vbox.yml
 simple_config_file:
-    plugin: virtualbox
+    plugin: community.general.virtualbox
     settings_password_file: /etc/virtulbox/secrets
     query:
       logged_in_users: /VirtualBox/GuestInfo/OS/LoggedInUsersList
@@ -46,7 +46,7 @@ simple_config_file:
       ansible_connection: ('indows' in vbox_Guest_OS)|ternary('winrm', 'ssh')
 
 # add hosts (all match with minishift vm) to the group container if any of the vms are in ansible_inventory'
-plugin: virtualbox
+plugin: community.general.virtualbox
 groups:
   container: "'minis' in (inventory_hostname)"
 '''
@@ -216,7 +216,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     yield host not in v
             yield True
 
-        return all([found_host for found_host in find_host(host, inventory)])
+        return all(find_host(host, inventory))
 
     def verify_file(self, path):
 

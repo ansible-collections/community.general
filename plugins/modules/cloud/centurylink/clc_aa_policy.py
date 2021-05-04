@@ -16,21 +16,20 @@ options:
   name:
     description:
       - The name of the Anti Affinity Policy.
+    type: str
     required: True
   location:
     description:
       - Datacenter in which the policy lives/should live.
+    type: str
     required: True
   state:
     description:
       - Whether to create or delete the policy.
+    type: str
     required: False
     default: present
     choices: ['present','absent']
-  wait:
-    description:
-      - This option does nothing and will be removed in Ansible 2.14.
-    type: bool
 requirements:
     - python = 2.7
     - requests >= 2.5.0
@@ -58,31 +57,30 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create an Anti Affinity Policy
-      clc_aa_policy:
+      community.general.clc_aa_policy:
         name: Hammer Time
         location: UK3
         state: present
       register: policy
 
-    - name: debug
-      debug:
+    - name: Debug
+      ansible.builtin.debug:
         var: policy
 
----
 - name: Delete AA Policy
   hosts: localhost
   gather_facts: False
   connection: local
   tasks:
     - name: Delete an Anti Affinity Policy
-      clc_aa_policy:
+      community.general.clc_aa_policy:
         name: Hammer Time
         location: UK3
         state: absent
       register: policy
 
     - name: Debug
-      debug:
+      ansible.builtin.debug:
         var: policy
 '''
 
@@ -183,7 +181,6 @@ class ClcAntiAffinityPolicy:
         argument_spec = dict(
             name=dict(required=True),
             location=dict(required=True),
-            wait=dict(type='bool', removed_in_version='2.14'),
             state=dict(default='present', choices=['present', 'absent']),
         )
         return argument_spec

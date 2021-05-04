@@ -21,10 +21,11 @@ options:
     type: bool
     default: "no"
   container:
+    type: str
     description:
       - The container to use for container or metadata operations.
-    required: true
   meta:
+    type: dict
     description:
       - A hash of items to set as metadata values on a container
   private:
@@ -33,34 +34,41 @@ options:
         Private containers, if previously made public, can have live objects
         available until the TTL on cached objects expires
     type: bool
+    default: false
   public:
     description:
       - Used to set a container as public, available via the Cloud Files CDN
     type: bool
+    default: false
   region:
+    type: str
     description:
       - Region to create an instance in
-    default: DFW
   state:
+    type: str
     description:
       - Indicate desired state of the resource
-    choices: ['present', 'absent']
+    choices: ['present', 'absent', 'list']
     default: present
   ttl:
+    type: int
     description:
       - In seconds, set a container-wide TTL for all objects cached on CDN edge nodes.
         Setting a TTL is only appropriate for containers that are public
   type:
+    type: str
     description:
       - Type of object to do work on, i.e. metadata object or a container object
     choices:
-      - file
+      - container
       - meta
-    default: file
+    default: container
   web_error:
+    type: str
     description:
        - Sets an object to be presented as the HTTP error page when accessed by the CDN URL
   web_index:
+    type: str
     description:
        - Sets an object to be presented as the HTTP index page when accessed by the CDN URL
 author: "Paul Durivage (@angstwad)"
@@ -76,43 +84,43 @@ EXAMPLES = '''
   gather_facts: no
   tasks:
     - name: "List all containers"
-      rax_files:
+      community.general.rax_files:
         state: list
 
     - name: "Create container called 'mycontainer'"
-      rax_files:
+      community.general.rax_files:
         container: mycontainer
 
     - name: "Create container 'mycontainer2' with metadata"
-      rax_files:
+      community.general.rax_files:
         container: mycontainer2
         meta:
           key: value
           file_for: someuser@example.com
 
     - name: "Set a container's web index page"
-      rax_files:
+      community.general.rax_files:
         container: mycontainer
         web_index: index.html
 
     - name: "Set a container's web error page"
-      rax_files:
+      community.general.rax_files:
         container: mycontainer
         web_error: error.html
 
     - name: "Make container public"
-      rax_files:
+      community.general.rax_files:
         container: mycontainer
         public: yes
 
     - name: "Make container public with a 24 hour TTL"
-      rax_files:
+      community.general.rax_files:
         container: mycontainer
         public: yes
         ttl: 86400
 
     - name: "Make container private"
-      rax_files:
+      community.general.rax_files:
         container: mycontainer
         private: yes
 
@@ -121,19 +129,19 @@ EXAMPLES = '''
   gather_facts: no
   tasks:
     - name: "Get mycontainer2 metadata"
-      rax_files:
+      community.general.rax_files:
         container: mycontainer2
         type: meta
 
     - name: "Set mycontainer2 metadata"
-      rax_files:
+      community.general.rax_files:
         container: mycontainer2
         type: meta
         meta:
           uploaded_by: someuser@example.com
 
     - name: "Remove mycontainer2 metadata"
-      rax_files:
+      community.general.rax_files:
         container: "mycontainer2"
         type: meta
         state: absent

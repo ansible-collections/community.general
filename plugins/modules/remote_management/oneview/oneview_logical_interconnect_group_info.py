@@ -13,7 +13,7 @@ short_description: Retrieve information about one or more of the OneView Logical
 description:
     - Retrieve information about one or more of the Logical Interconnect Groups from OneView
     - This module was called C(oneview_logical_interconnect_group_facts) before Ansible 2.9, returning C(ansible_facts).
-      Note that the M(oneview_logical_interconnect_group_info) module no longer returns C(ansible_facts)!
+      Note that the M(community.general.oneview_logical_interconnect_group_info) module no longer returns C(ansible_facts)!
 requirements:
     - hpOneView >= 2.0.1
 author:
@@ -24,6 +24,7 @@ options:
     name:
       description:
         - Logical Interconnect Group name.
+      type: str
 extends_documentation_fragment:
 - community.general.oneview
 - community.general.oneview.factsparams
@@ -32,7 +33,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Gather information about all Logical Interconnect Groups
-  oneview_logical_interconnect_group_info:
+  community.general.oneview_logical_interconnect_group_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -41,11 +42,11 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.logical_interconnect_groups }}"
 
 - name: Gather paginated, filtered and sorted information about Logical Interconnect Groups
-  oneview_logical_interconnect_group_info:
+  community.general.oneview_logical_interconnect_group_info:
     params:
       start: 0
       count: 3
@@ -59,11 +60,11 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.logical_interconnect_groups }}"
 
 - name: Gather information about a Logical Interconnect Group by name
-  oneview_logical_interconnect_group_info:
+  community.general.oneview_logical_interconnect_group_info:
     name: logical interconnect group name
     hostname: 172.16.101.48
     username: administrator
@@ -73,7 +74,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.logical_interconnect_groups }}"
 '''
 
@@ -96,10 +97,6 @@ class LogicalInterconnectGroupInfoModule(OneViewModuleBase):
         )
 
         super(LogicalInterconnectGroupInfoModule, self).__init__(additional_arg_spec=argument_spec)
-        self.is_old_facts = self.module._name in ('oneview_logical_interconnect_group_facts', 'community.general.oneview_logical_interconnect_group_facts')
-        if self.is_old_facts:
-            self.module.deprecate("The 'oneview_logical_interconnect_group_facts' module has been renamed to 'oneview_logical_interconnect_group_info', "
-                                  "and the renamed one no longer returns ansible_facts", version='2.13')
 
     def execute_module(self):
         if self.module.params.get('name'):
@@ -107,10 +104,7 @@ class LogicalInterconnectGroupInfoModule(OneViewModuleBase):
         else:
             ligs = self.oneview_client.logical_interconnect_groups.get_all(**self.facts_params)
 
-        if self.is_old_facts:
-            return dict(changed=False, ansible_facts=dict(logical_interconnect_groups=ligs))
-        else:
-            return dict(changed=False, logical_interconnect_groups=ligs)
+        return dict(changed=False, logical_interconnect_groups=ligs)
 
 
 def main():

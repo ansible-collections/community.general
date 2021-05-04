@@ -7,8 +7,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: slack
-    callback_type: notification
+    author: Unknown (!UNKNOWN)
+    name: slack
+    type: notification
     requirements:
       - whitelist in configuration
       - prettytable (python library)

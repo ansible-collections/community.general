@@ -17,38 +17,47 @@ description:
    - Notify newrelic about app deployments (see https://docs.newrelic.com/docs/apm/new-relic-apm/maintenance/deployment-notifications#api)
 options:
   token:
+    type: str
     description:
       - API token, to place in the x-api-key header.
     required: true
   app_name:
+    type: str
     description:
       - (one of app_name or application_id are required) The value of app_name in the newrelic.yml file used by the application
     required: false
   application_id:
+    type: str
     description:
       - (one of app_name or application_id are required) The application id, found in the URL when viewing the application in RPM
     required: false
   changelog:
+    type: str
     description:
       - A list of changes for this deployment
     required: false
   description:
+    type: str
     description:
       - Text annotation for the deployment - notes for you
     required: false
   revision:
+    type: str
     description:
       - A revision number (e.g., git commit SHA)
     required: false
   user:
+    type: str
     description:
       - The name of the user/process that triggered this deployment
     required: false
   appname:
+    type: str
     description:
       - Name of the application
     required: false
   environment:
+    type: str
     description:
       - The environment for this deployment
     required: false
@@ -65,7 +74,7 @@ requirements: []
 
 EXAMPLES = '''
 - name:  Notify newrelic about an app deployment
-  newrelic_deployment:
+  community.general.newrelic_deployment:
     token: AAAAAA
     app_name: myapp
     user: ansible deployment
@@ -94,7 +103,7 @@ def main():
             user=dict(required=False),
             appname=dict(required=False),
             environment=dict(required=False),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         ),
         required_one_of=[['app_name', 'application_id']],
         supports_check_mode=True

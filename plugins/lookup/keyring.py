@@ -6,9 +6,9 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: keyring
+    name: keyring
     author:
-      - Samuel Boucher <boucher.samuel.c@gmail.com>
+      - Samuel Boucher (!UNKNOWN) <boucher.samuel.c@gmail.com>
     requirements:
       - keyring (python library)
     short_description: grab secrets from the OS keyring
@@ -18,18 +18,20 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name : output secrets to screen (BAD IDEA)
-  debug:
+  ansible.builtin.debug:
     msg: "Password: {{item}}"
-  with_keyring:
+  with_community.general.keyring:
     - 'servicename username'
 
 - name: access mysql with password from keyring
-  mysql_db: login_password={{lookup('keyring','mysql joe')}} login_user=joe
+  mysql_db: login_password={{lookup('community.general.keyring','mysql joe')}} login_user=joe
 """
 
 RETURN = """
   _raw:
-    description: secrets stored
+    description: Secrets stored.
+    type: list
+    elements: str
 """
 
 HAS_KEYRING = True

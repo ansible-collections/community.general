@@ -22,10 +22,10 @@ short_description: Gather facts on processes listening on TCP and UDP ports.
 
 EXAMPLES = r'''
 - name: Gather facts on listening ports
-  listen_ports_facts:
+  community.general.listen_ports_facts:
 
 - name: TCP whitelist violation
-  debug:
+  ansible.builtin.debug:
     msg: TCP port {{ item.port }} by pid {{ item.pid }} violates the whitelist
   vars:
     tcp_listen_violations: "{{ ansible_facts.tcp_listen | selectattr('port', 'in', tcp_whitelist) | list }}"
@@ -35,15 +35,15 @@ EXAMPLES = r'''
   loop: "{{ tcp_listen_violations }}"
 
 - name: List TCP ports
-  debug:
+  ansible.builtin.debug:
     msg: "{{ ansible_facts.tcp_listen  | map(attribute='port') | sort | list }}"
 
 - name: List UDP ports
-  debug:
+  ansible.builtin.debug:
     msg: "{{ ansible_facts.udp_listen | map(attribute='port') | sort | list }}"
 
 - name: List all ports
-  debug:
+  ansible.builtin.debug:
     msg: "{{ (ansible_facts.tcp_listen + ansible_facts.udp_listen) | map(attribute='port') | unique | sort | list }}"
 '''
 

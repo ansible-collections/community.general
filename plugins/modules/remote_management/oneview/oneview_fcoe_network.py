@@ -21,11 +21,13 @@ options:
             - Indicates the desired state for the FCoE Network resource.
               C(present) will ensure data properties are compliant with OneView.
               C(absent) will remove the resource from OneView, if it exists.
+        type: str
         default: present
         choices: ['present', 'absent']
     data:
         description:
             - List with FCoE Network properties.
+        type: dict
         required: true
 
 extends_documentation_fragment:
@@ -36,7 +38,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Ensure that FCoE Network is present using the default configuration
-  oneview_fcoe_network:
+  community.general.oneview_fcoe_network:
     config: '/etc/oneview/oneview_config.json'
     state: present
     data:
@@ -45,7 +47,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Update the FCOE network scopes
-  oneview_fcoe_network:
+  community.general.oneview_fcoe_network:
     config: '/etc/oneview/oneview_config.json'
     state: present
     data:
@@ -56,7 +58,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Ensure that FCoE Network is absent
-  oneview_fcoe_network:
+  community.general.oneview_fcoe_network:
     config: '/etc/oneview/oneview_config.json'
     state: absent
     data:

@@ -6,8 +6,8 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author:
-        - Kyrylo Galanov (galanoff@gmail.com)
-    lookup: manifold
+        - Kyrylo Galanov (!UNKNOWN) <galanoff@gmail.com>
+    name: manifold
     short_description: get credentials from Manifold.co
     description:
         - Retrieves resources' credentials from Manifold.co
@@ -40,11 +40,14 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
     - name: all available resources
-      debug: msg="{{ lookup('manifold', api_token='SecretToken') }}"
+      ansible.builtin.debug:
+        msg: "{{ lookup('community.general.manifold', api_token='SecretToken') }}"
     - name: all available resources for a specific project in specific team
-      debug: msg="{{ lookup('manifold', api_token='SecretToken', project='poject-1', team='team-2') }}"
+      ansible.builtin.debug:
+        msg: "{{ lookup('community.general.manifold', api_token='SecretToken', project='poject-1', team='team-2') }}"
     - name: two specific resources
-      debug: msg="{{ lookup('manifold', 'resource-1', 'resource-2') }}"
+      ansible.builtin.debug:
+        msg: "{{ lookup('community.general.manifold', 'resource-1', 'resource-2') }}"
 '''
 
 RETURN = '''

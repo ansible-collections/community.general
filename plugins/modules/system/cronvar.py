@@ -75,17 +75,17 @@ author:
 
 EXAMPLES = r'''
 - name: Ensure entry like "EMAIL=doug@ansibmod.con.com" exists
-  cronvar:
+  community.general.cronvar:
     name: EMAIL
     value: doug@ansibmod.con.com
 
 - name: Ensure a variable does not exist. This may remove any variable named "LEGACY"
-  cronvar:
+  community.general.cronvar:
     name: LEGACY
     state: absent
 
 - name: Add a variable to a file under /etc/cron.d
-  cronvar:
+  community.general.cronvar:
     name: LOGFILE
     value: /var/log/yum-autoupdate.log
     user: root
@@ -228,7 +228,7 @@ class CronVar(object):
         var_names = []
         for l in self.lines:
             try:
-                (var_name, _) = self.parse_for_var(l)
+                var_name, dummy = self.parse_for_var(l)
                 var_names.append(var_name)
             except CronVarError:
                 pass
@@ -242,7 +242,7 @@ class CronVar(object):
             newlines = []
             for l in self.lines:
                 try:
-                    (varname, _) = self.parse_for_var(l)  # Throws if not a var line
+                    varname, dummy = self.parse_for_var(l)  # Throws if not a var line
                     if varname == insertbefore:
                         newlines.append("%s=%s" % (name, value))
                         newlines.append(l)
@@ -263,7 +263,7 @@ class CronVar(object):
         newlines = []
         for l in self.lines:
             try:
-                (varname, _) = self.parse_for_var(l)  # Throws if not a var line
+                varname, dummy = self.parse_for_var(l)  # Throws if not a var line
                 if varname != name:
                     raise CronVarError  # Append.
                 if not remove:
@@ -318,13 +318,13 @@ class CronVar(object):
 def main():
     # The following example playbooks:
     #
-    # - cronvar: name="SHELL" value="/bin/bash"
+    # - community.general.cronvar: name="SHELL" value="/bin/bash"
     #
     # - name: Set the email
-    #   cronvar: name="EMAILTO" value="doug@ansibmod.con.com"
+    #   community.general.cronvar: name="EMAILTO" value="doug@ansibmod.con.com"
     #
     # - name: Get rid of the old new host variable
-    #   cronvar: name="NEW_HOST" state=absent
+    #   community.general.cronvar: name="NEW_HOST" state=absent
     #
     # Would produce:
     # SHELL = /bin/bash
@@ -377,7 +377,7 @@ def main():
 
     # if requested make a backup before making a change
     if backup:
-        (_, backup_file) = tempfile.mkstemp(prefix='cronvar')
+        dummy, backup_file = tempfile.mkstemp(prefix='cronvar')
         cronvar.write(backup_file)
 
     if cronvar.cron_file and not name and not ensure_present:

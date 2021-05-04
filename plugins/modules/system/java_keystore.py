@@ -1,7 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2016, Guillaume Grossetie <ggrossetie@yuzutech.fr>
+# Copyright: (c) 2016, Guillaume Grossetie <ggrossetie@yuzutech.fr>
+# Copyright: (c) 2021, quidame <quidame@poivron.org>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
@@ -11,61 +12,102 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: java_keystore
-short_description: Create or delete a Java keystore in JKS format.
+short_description: Create a Java keystore in JKS format
 description:
-     - Create or delete a Java keystore in JKS format for a given certificate.
+  - Bundle a x509 certificate and its private key into a Java Keystore in JKS format.
 options:
-    name:
-        description:
-          - Name of the certificate.
-        required: true
-    certificate:
-        description:
-          - Certificate that should be used to create the key store.
-        required: true
-    private_key:
-        description:
-          - Private key that should be used to create the key store.
-        required: true
-    private_key_passphrase:
-        description:
-          - Pass phrase for reading the private key, if required.
-        type: str
-        required: false
-        version_added: '0.2.0'
-    password:
-        description:
-          - Password that should be used to secure the key store.
-        required: true
-    dest:
-        description:
-          - Absolute path where the jks should be generated.
-        required: true
-    owner:
-        description:
-          - Name of the user that should own jks file.
-        required: false
-    group:
-        description:
-          - Name of the group that should own jks file.
-        required: false
-    mode:
-        description:
-          - Mode the file should be.
-        required: false
-    force:
-        description:
-          - Key store will be created even if it already exists.
-        required: false
-        type: bool
-        default: 'no'
-requirements: [openssl, keytool]
-author: Guillaume Grossetie (@Mogztter)
+  name:
+    description:
+      - Name of the certificate in the keystore.
+      - If the provided name does not exist in the keystore, the module
+        will re-create the keystore. This behavior changed in community.general 3.0.0,
+        before that the module would fail when the name did not match.
+    type: str
+    required: true
+  certificate:
+    description:
+      - Content of the certificate used to create the keystore.
+      - If the fingerprint of the provided certificate does not match the
+        fingerprint of the certificate bundled in the keystore, the keystore
+        is regenerated with the provided certificate.
+      - Exactly one of I(certificate) or I(certificate_path) is required.
+    type: str
+  certificate_path:
+    description:
+      - Location of the certificate used to create the keystore.
+      - If the fingerprint of the provided certificate does not match the
+        fingerprint of the certificate bundled in the keystore, the keystore
+        is regenerated with the provided certificate.
+      - Exactly one of I(certificate) or I(certificate_path) is required.
+    type: path
+    version_added: '3.0.0'
+  private_key:
+    description:
+      - Content of the private key used to create the keystore.
+      - Exactly one of I(private_key) or I(private_key_path) is required.
+    type: str
+  private_key_path:
+    description:
+      - Location of the private key used to create the keystore.
+      - Exactly one of I(private_key) or I(private_key_path) is required.
+    type: path
+    version_added: '3.0.0'
+  private_key_passphrase:
+    description:
+      - Passphrase used to read the private key, if required.
+    type: str
+    version_added: '0.2.0'
+  password:
+    description:
+      - Password that should be used to secure the keystore.
+      - If the provided password fails to unlock the keystore, the module
+        will re-create the keystore with the new passphrase. This behavior
+        changed in community.general 3.0.0, before that the module would fail
+        when the password did not match.
+    type: str
+    required: true
+  dest:
+    description:
+      - Absolute path of the generated keystore.
+    type: path
+    required: true
+  force:
+    description:
+      - Keystore is created even if it already exists.
+    type: bool
+    default: 'no'
+  owner:
+    description:
+      - Name of the user that should own jks file.
+    required: false
+  group:
+    description:
+      - Name of the group that should own jks file.
+    required: false
+  mode:
+    description:
+      - Mode the file should be.
+    required: false
+requirements:
+  - openssl in PATH
+  - keytool in PATH
+author:
+  - Guillaume Grossetie (@Mogztter)
+  - quidame (@quidame)
+extends_documentation_fragment:
+  - files
+seealso:
+  - module: community.general.java_cert
+notes:
+  - I(certificate) and I(private_key) require that their contents are available
+    on the controller (either inline in a playbook, or with the C(file) lookup),
+    while I(certificate_path) and I(private_key_path) require that the files are
+    available on the target host.
 '''
 
 EXAMPLES = '''
-- name: Create a key store for the given certificate (inline)
-  java_keystore:
+- name: Create a keystore for the given certificate/private key pair (inline)
+  community.general.java_keystore:
     name: example
     certificate: |
       -----BEGIN CERTIFICATE-----
@@ -80,11 +122,19 @@ EXAMPLES = '''
     password: changeit
     dest: /etc/security/keystore.jks
 
-- name: Create a key store for the given certificate (lookup)
-  java_keystore:
+- name: Create a keystore for the given certificate/private key pair (with files on controller)
+  community.general.java_keystore:
     name: example
-    certificate: "{{lookup('file', '/path/to/certificate.crt') }}"
-    private_key: "{{lookup('file', '/path/to/private.key') }}"
+    certificate: "{{ lookup('file', '/path/to/certificate.crt') }}"
+    private_key: "{{ lookup('file', '/path/to/private.key') }}"
+    password: changeit
+    dest: /etc/security/keystore.jks
+
+- name: Create a keystore for the given certificate/private key pair (with files on target host)
+  community.general.java_keystore:
+    name: snakeoil
+    certificate_path: /etc/ssl/certs/ssl-cert-snakeoil.pem
+    private_key_path: /etc/ssl/private/ssl-cert-snakeoil.key
     password: changeit
     dest: /etc/security/keystore.jks
 '''
@@ -106,13 +156,15 @@ cmd:
   description: Executed command to get action done
   returned: changed and failure
   type: str
-  sample: "openssl x509 -noout -in /tmp/cert.crt -fingerprint -sha256"
+  sample: "/usr/bin/openssl x509 -noout -in /tmp/user/1000/tmp8jd_lh23 -fingerprint -sha256"
 '''
 
 
-from ansible.module_utils.basic import AnsibleModule
 import os
 import re
+import tempfile
+
+from ansible.module_utils.basic import AnsibleModule
 
 
 def read_certificate_fingerprint(module, openssl_bin, certificate_path):
@@ -121,133 +173,149 @@ def read_certificate_fingerprint(module, openssl_bin, certificate_path):
     if rc != 0:
         return module.fail_json(msg=current_certificate_fingerprint_out,
                                 err=current_certificate_fingerprint_err,
-                                rc=rc,
-                                cmd=current_certificate_fingerprint_cmd)
+                                cmd=current_certificate_fingerprint_cmd,
+                                rc=rc)
 
     current_certificate_match = re.search(r"=([\w:]+)", current_certificate_fingerprint_out)
     if not current_certificate_match:
-        return module.fail_json(
-            msg="Unable to find the current certificate fingerprint in %s" % current_certificate_fingerprint_out,
-            rc=rc,
-            cmd=current_certificate_fingerprint_err
-        )
+        return module.fail_json(msg="Unable to find the current certificate fingerprint in %s" % current_certificate_fingerprint_out,
+                                cmd=current_certificate_fingerprint_cmd,
+                                rc=rc)
 
     return current_certificate_match.group(1)
 
 
 def read_stored_certificate_fingerprint(module, keytool_bin, alias, keystore_path, keystore_password):
-    stored_certificate_fingerprint_cmd = [keytool_bin, "-list", "-alias", alias, "-keystore", keystore_path, "-storepass", keystore_password, "-v"]
-    (rc, stored_certificate_fingerprint_out, stored_certificate_fingerprint_err) = run_commands(module, stored_certificate_fingerprint_cmd)
+    stored_certificate_fingerprint_cmd = [keytool_bin, "-list", "-alias", alias, "-keystore", keystore_path, "-storepass:env", "STOREPASS", "-v"]
+    (rc, stored_certificate_fingerprint_out, stored_certificate_fingerprint_err) = run_commands(
+        module, stored_certificate_fingerprint_cmd, environ_update=dict(STOREPASS=keystore_password))
     if rc != 0:
-        if "keytool error: java.lang.Exception: Alias <%s> does not exist" % alias not in stored_certificate_fingerprint_out:
-            return module.fail_json(msg=stored_certificate_fingerprint_out,
-                                    err=stored_certificate_fingerprint_err,
-                                    rc=rc,
-                                    cmd=stored_certificate_fingerprint_cmd)
-        else:
-            return None
-    else:
-        stored_certificate_match = re.search(r"SHA256: ([\w:]+)", stored_certificate_fingerprint_out)
-        if not stored_certificate_match:
-            return module.fail_json(
-                msg="Unable to find the stored certificate fingerprint in %s" % stored_certificate_fingerprint_out,
-                rc=rc,
-                cmd=stored_certificate_fingerprint_cmd
-            )
+        if "keytool error: java.lang.Exception: Alias <%s> does not exist" % alias in stored_certificate_fingerprint_out:
+            return "alias mismatch"
+        if re.match(r'keytool error: java\.io\.IOException: [Kk]eystore( was tampered with, or)? password was incorrect',
+                    stored_certificate_fingerprint_out):
+            return "password mismatch"
+        return module.fail_json(msg=stored_certificate_fingerprint_out,
+                                err=stored_certificate_fingerprint_err,
+                                cmd=stored_certificate_fingerprint_cmd,
+                                rc=rc)
 
-        return stored_certificate_match.group(1)
+    stored_certificate_match = re.search(r"SHA256: ([\w:]+)", stored_certificate_fingerprint_out)
+    if not stored_certificate_match:
+        return module.fail_json(msg="Unable to find the stored certificate fingerprint in %s" % stored_certificate_fingerprint_out,
+                                cmd=stored_certificate_fingerprint_cmd,
+                                rc=rc)
 
-
-def run_commands(module, cmd, data=None, check_rc=True):
-    return module.run_command(cmd, check_rc=check_rc, data=data)
+    return stored_certificate_match.group(1)
 
 
-def create_file(path, content):
-    with open(path, 'w') as f:
+def run_commands(module, cmd, data=None, environ_update=None, check_rc=False):
+    return module.run_command(cmd, check_rc=check_rc, data=data, environ_update=environ_update)
+
+
+def create_path():
+    dummy, tmpfile = tempfile.mkstemp()
+    os.remove(tmpfile)
+    return tmpfile
+
+
+def create_file(content):
+    tmpfd, tmpfile = tempfile.mkstemp()
+    with os.fdopen(tmpfd, 'w') as f:
         f.write(content)
-    return path
+    return tmpfile
 
 
 def create_tmp_certificate(module):
-    return create_file("/tmp/%s.crt" % module.params['name'], module.params['certificate'])
+    return create_file(module.params['certificate'])
 
 
 def create_tmp_private_key(module):
-    return create_file("/tmp/%s.key" % module.params['name'], module.params['private_key'])
+    return create_file(module.params['private_key'])
 
 
 def cert_changed(module, openssl_bin, keytool_bin, keystore_path, keystore_pass, alias):
-    certificate_path = create_tmp_certificate(module)
+    certificate_path = module.params['certificate_path']
+    if certificate_path is None:
+        certificate_path = create_tmp_certificate(module)
     try:
         current_certificate_fingerprint = read_certificate_fingerprint(module, openssl_bin, certificate_path)
         stored_certificate_fingerprint = read_stored_certificate_fingerprint(module, keytool_bin, alias, keystore_path, keystore_pass)
         return current_certificate_fingerprint != stored_certificate_fingerprint
     finally:
-        os.remove(certificate_path)
+        if module.params['certificate_path'] is None:
+            os.remove(certificate_path)
 
 
 def create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password, keypass):
     if module.check_mode:
-        module.exit_json(changed=True)
-    else:
+        return module.exit_json(changed=True)
+
+    certificate_path = module.params['certificate_path']
+    if certificate_path is None:
         certificate_path = create_tmp_certificate(module)
+
+    private_key_path = module.params['private_key_path']
+    if private_key_path is None:
         private_key_path = create_tmp_private_key(module)
-        try:
-            if os.path.exists(keystore_path):
-                os.remove(keystore_path)
 
-            keystore_p12_path = "/tmp/keystore.p12"
-            if os.path.exists(keystore_p12_path):
-                os.remove(keystore_p12_path)
+    keystore_p12_path = create_path()
 
-            export_p12_cmd = [openssl_bin, "pkcs12", "-export", "-name", name, "-in", certificate_path,
-                              "-inkey", private_key_path, "-out",
-                              keystore_p12_path, "-passout", "stdin"]
+    try:
+        if os.path.exists(keystore_path):
+            os.remove(keystore_path)
 
-            # when keypass is provided, add -passin
-            cmd_stdin = ""
-            if keypass:
-                export_p12_cmd.append("-passin")
-                export_p12_cmd.append("stdin")
-                cmd_stdin = "%s\n" % keypass
+        export_p12_cmd = [openssl_bin, "pkcs12", "-export", "-name", name, "-in", certificate_path,
+                          "-inkey", private_key_path, "-out", keystore_p12_path, "-passout", "stdin"]
 
-            cmd_stdin += "%s\n%s" % (password, password)
-            (rc, export_p12_out, export_p12_err) = run_commands(module, export_p12_cmd, data=cmd_stdin)
-            if rc != 0:
-                return module.fail_json(msg=export_p12_out,
-                                        rc=rc,
-                                        cmd=export_p12_cmd)
+        # when keypass is provided, add -passin
+        cmd_stdin = ""
+        if keypass:
+            export_p12_cmd.append("-passin")
+            export_p12_cmd.append("stdin")
+            cmd_stdin = "%s\n" % keypass
+        cmd_stdin += "%s\n%s" % (password, password)
 
-            import_keystore_cmd = [keytool_bin, "-importkeystore",
-                                   "-destkeystore", keystore_path,
-                                   "-srckeystore", keystore_p12_path,
-                                   "-srcstoretype", "pkcs12",
-                                   "-alias", name,
-                                   "-deststorepass", password,
-                                   "-srcstorepass", password,
-                                   "-noprompt"]
-            (rc, import_keystore_out, import_keystore_err) = run_commands(module, import_keystore_cmd, data=None)
-            if rc == 0:
-                update_jks_perm(module, keystore_path)
-                return module.exit_json(changed=True,
-                                        msg=import_keystore_out,
-                                        rc=rc,
-                                        cmd=import_keystore_cmd,
-                                        stdout_lines=import_keystore_out)
-            else:
-                return module.fail_json(msg=import_keystore_out,
-                                        rc=rc,
-                                        cmd=import_keystore_cmd)
-        finally:
+        (rc, export_p12_out, dummy) = run_commands(module, export_p12_cmd, data=cmd_stdin)
+        if rc != 0:
+            return module.fail_json(msg=export_p12_out,
+                                    cmd=export_p12_cmd,
+                                    rc=rc)
+
+        import_keystore_cmd = [keytool_bin, "-importkeystore",
+                               "-destkeystore", keystore_path,
+                               "-srckeystore", keystore_p12_path,
+                               "-srcstoretype", "pkcs12",
+                               "-alias", name,
+                               "-deststorepass:env", "STOREPASS",
+                               "-srcstorepass:env", "STOREPASS",
+                               "-noprompt"]
+
+        (rc, import_keystore_out, dummy) = run_commands(module, import_keystore_cmd, data=None,
+                                                        environ_update=dict(STOREPASS=password))
+        if rc != 0:
+            return module.fail_json(msg=import_keystore_out,
+                                    cmd=import_keystore_cmd,
+                                    rc=rc)
+
+        update_jks_perm(module, keystore_path)
+        return module.exit_json(changed=True,
+                                msg=import_keystore_out,
+                                cmd=import_keystore_cmd,
+                                rc=rc)
+    finally:
+        if module.params['certificate_path'] is None:
             os.remove(certificate_path)
+        if module.params['private_key_path'] is None:
             os.remove(private_key_path)
+        os.remove(keystore_p12_path)
 
 
 def update_jks_perm(module, keystore_path):
     try:
         file_args = module.load_file_common_arguments(module.params, path=keystore_path)
     except TypeError:
-        # The path argument is only supported in Ansible 2.10+. Fall back to
+        # The path argument is only supported in Ansible-base 2.10+. Fall back to
         # pre-2.10 behavior for older Ansible versions.
         module.params['path'] = keystore_path
         file_args = module.load_file_common_arguments(module.params)
@@ -272,7 +340,7 @@ def process_jks(module):
             else:
                 if not module.check_mode:
                     update_jks_perm(module, keystore_path)
-                return module.exit_json(changed=False)
+                module.exit_json(changed=False)
     else:
         create_jks(module, name, openssl_bin, keytool_bin, keystore_path, password, keypass)
 
@@ -282,24 +350,35 @@ class ArgumentSpec(object):
         self.supports_check_mode = True
         self.add_file_common_args = True
         argument_spec = dict(
-            name=dict(required=True),
-            certificate=dict(required=True, no_log=True),
-            private_key=dict(required=True, no_log=True),
-            password=dict(required=True, no_log=True),
-            dest=dict(required=True),
-            force=dict(required=False, default=False, type='bool'),
-            private_key_passphrase=dict(required=False, no_log=True, type='str')
+            name=dict(type='str', required=True),
+            dest=dict(type='path', required=True),
+            certificate=dict(type='str', no_log=True),
+            certificate_path=dict(type='path'),
+            private_key=dict(type='str', no_log=True),
+            private_key_path=dict(type='path', no_log=False),
+            private_key_passphrase=dict(type='str', no_log=True),
+            password=dict(type='str', required=True, no_log=True),
+            force=dict(type='bool', default=False),
+        )
+        choose_between = (
+            ['certificate', 'certificate_path'],
+            ['private_key', 'private_key_path'],
         )
         self.argument_spec = argument_spec
+        self.required_one_of = choose_between
+        self.mutually_exclusive = choose_between
 
 
 def main():
     spec = ArgumentSpec()
     module = AnsibleModule(
         argument_spec=spec.argument_spec,
+        required_one_of=spec.required_one_of,
+        mutually_exclusive=spec.mutually_exclusive,
+        supports_check_mode=spec.supports_check_mode,
         add_file_common_args=spec.add_file_common_args,
-        supports_check_mode=spec.supports_check_mode
     )
+    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C')
     process_jks(module)
 
 

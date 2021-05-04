@@ -16,13 +16,14 @@ requirements:
    - python >= 2.6
 short_description: Manage Cloudflare DNS records
 description:
-   - "Manages dns records via the Cloudflare API, see the docs: U(https://api.cloudflare.com/)"
+   - "Manages dns records via the Cloudflare API, see the docs: U(https://api.cloudflare.com/)."
 options:
   api_token:
     description:
     - API token.
     - Required for api token authentication.
-    - "You can obtain your API token from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)"
+    - "You can obtain your API token from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)."
+    - Can be specified in C(CLOUDFLARE_TOKEN) environment variable since community.general 2.0.0.
     type: str
     required: false
     version_added: '0.2.0'
@@ -30,13 +31,13 @@ options:
     description:
     - Account API key.
     - Required for api keys authentication.
-    - "You can obtain your API key from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)"
+    - "You can obtain your API key from the bottom of the Cloudflare 'My Account' page, found here: U(https://dash.cloudflare.com/)."
     type: str
     required: false
     aliases: [ account_api_token ]
   account_email:
     description:
-    - Account email. Required for api keys authentication.
+    - Account email. Required for API keys authentication.
     type: str
     required: false
   algorithm:
@@ -71,6 +72,7 @@ options:
     - Record priority.
     - Required for C(type=MX) and C(type=SRV)
     default: 1
+    type: int
   proto:
     description:
     - Service protocol. Required for C(type=SRV) and C(type=TLSA).
@@ -99,7 +101,8 @@ options:
   service:
     description:
     - Record service.
-    - Required for C(type=SRV)
+    - Required for I(type=SRV).
+    type: str
   solo:
     description:
     - Whether the record should be the only one for that record type and record name.
@@ -152,7 +155,7 @@ options:
 
 EXAMPLES = r'''
 - name: Create a test.example.net A record to point to 127.0.0.1
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.net
     record: test
     type: A
@@ -162,7 +165,7 @@ EXAMPLES = r'''
   register: record
 
 - name: Create a record using api token
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.net
     record: test
     type: A
@@ -170,7 +173,7 @@ EXAMPLES = r'''
     api_token: dummyapitoken
 
 - name: Create a example.net CNAME record to example.com
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.net
     type: CNAME
     value: example.com
@@ -179,7 +182,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Change its TTL
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.net
     type: CNAME
     value: example.com
@@ -189,7 +192,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Delete the record
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.net
     type: CNAME
     value: example.com
@@ -198,7 +201,7 @@ EXAMPLES = r'''
     state: absent
 
 - name: Create a example.net CNAME record to example.com and proxy through Cloudflare's network
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.net
     type: CNAME
     value: example.com
@@ -209,7 +212,7 @@ EXAMPLES = r'''
 
 # This deletes all other TXT records named "test.example.net"
 - name: Create TXT record "test.example.net" with value "unique value"
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     domain: example.net
     record: test
     type: TXT
@@ -220,7 +223,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Create an SRV record _foo._tcp.example.net
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     domain: example.net
     service: foo
     proto: tcp
@@ -231,7 +234,7 @@ EXAMPLES = r'''
     value: fooserver.example.net
 
 - name: Create a SSHFP record login.example.com
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.com
     record: login
     type: SSHFP
@@ -240,7 +243,7 @@ EXAMPLES = r'''
     value: 9dc1d6742696d2f51ca1f1a78b3d16a840f7d111eb9454239e70db31363f33e1
 
 - name: Create a TLSA record _25._tcp.mail.example.com
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.com
     record: mail
     port: 25
@@ -252,7 +255,7 @@ EXAMPLES = r'''
     value: 6b76d034492b493e15a7376fccd08e63befdad0edab8e442562f532338364bf3
 
 - name: Create a DS record for subdomain.example.com
-  cloudflare_dns:
+  community.general.cloudflare_dns:
     zone: example.com
     record: subdomain
     type: DS
@@ -355,7 +358,7 @@ record:
 
 import json
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils._text import to_native, to_text
 from ansible.module_utils.urls import fetch_url
@@ -452,7 +455,7 @@ class CloudflareAPI(object):
                                timeout=self.timeout)
 
         if info['status'] not in [200, 304, 400, 401, 403, 429, 405, 415]:
-            self.module.fail_json(msg="Failed API call {0}; got unexpected HTTP code {1}".format(api_call, info['status']))
+            self.module.fail_json(msg="Failed API call {0}; got unexpected HTTP code {1}: {2}".format(api_call, info['status'], info.get('msg')))
 
         error_msg = ''
         if info['status'] == 401:
@@ -786,13 +789,18 @@ class CloudflareAPI(object):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            api_token=dict(type='str', required=False, no_log=True),
+            api_token=dict(
+                type="str",
+                required=False,
+                no_log=True,
+                fallback=(env_fallback, ["CLOUDFLARE_TOKEN"]),
+            ),
             account_api_key=dict(type='str', required=False, no_log=True, aliases=['account_api_token']),
             account_email=dict(type='str', required=False),
             algorithm=dict(type='int'),
             cert_usage=dict(type='int', choices=[0, 1, 2, 3]),
             hash_type=dict(type='int', choices=[1, 2]),
-            key_tag=dict(type='int'),
+            key_tag=dict(type='int', no_log=False),
             port=dict(type='int'),
             priority=dict(type='int', default=1),
             proto=dict(type='str'),

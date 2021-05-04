@@ -5,7 +5,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    callback: logentries
+    author: Unknown (!UNKNOWN)
+    name: logentries
     type: notification
     short_description: Sends events to Logentries
     description:
@@ -75,7 +76,7 @@ examples: >
   To enable, add this to your ansible.cfg file in the defaults block
 
     [defaults]
-    callback_whitelist = logentries
+    callback_whitelist = community.general.logentries
 
   Either set the environment variables
     export LOGENTRIES_API=data.logentries.com

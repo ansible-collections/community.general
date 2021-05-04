@@ -22,28 +22,33 @@ options:
         description:
             - Pool name.
         required: true
+        type: str
     state:
         description:
             - Pool state.
-        required: true
         default: "present"
         choices: [ "present", "absent" ]
+        type: str
     size:
         description:
             - Pool size in GB
         required: false
+        type: str
     snapshot_size:
         description:
             - Pool snapshot size in GB
         required: false
+        type: str
     domain:
         description:
             - Adds the pool to the specified domain.
         required: false
+        type: str
     perf_class:
         description:
             - Assigns a perf_class to the pool.
         required: false
+        type: str
 
 extends_documentation_fragment:
 - community.general.ibm_storage
@@ -55,7 +60,7 @@ author:
 
 EXAMPLES = '''
 - name: Create new pool.
-  ibm_sa_pool:
+  community.general.ibm_sa_pool:
     name: pool_name
     size: 300
     state: present
@@ -64,7 +69,7 @@ EXAMPLES = '''
     endpoints: hostdev-system
 
 - name: Delete pool.
-  ibm_sa_pool:
+  community.general.ibm_sa_pool:
     name: pool_name
     state: absent
     username: admin

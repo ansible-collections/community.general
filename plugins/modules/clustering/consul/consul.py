@@ -33,6 +33,7 @@ requirements:
 author: "Steve Gargan (@sgargan)"
 options:
     state:
+        type: str
         description:
           - register or deregister the consul service, defaults to present
         default: present
@@ -86,6 +87,7 @@ options:
             documentation for further details.
     tags:
         type: list
+        elements: str
         description:
           - tags that will be attached to the service registration.
     script:
@@ -120,6 +122,14 @@ options:
             Similar to the interval this is a number with a s or m suffix to
             signify the units of seconds or minutes e.g C(15s) or C(1m). If no suffix
             is supplied, C(m) will be used by default e.g. C(1) will be C(1m)
+    tcp:
+        type: str
+        description:
+          - Checks can be registered with a TCP port. This means that consul
+            will check if the connection attempt to that port is successful (that is, the port is currently accepting connections).
+            The format is C(host:port), for example C(localhost:80).
+            I(interval) must also be provided with this option.
+        version_added: '1.3.0'
     http:
         type: str
         description:
@@ -140,32 +150,39 @@ options:
 
 EXAMPLES = '''
 - name: Register nginx service with the local consul agent
-  consul:
+  community.general.consul:
     service_name: nginx
     service_port: 80
 
 - name: Register nginx service with curl check
-  consul:
+  community.general.consul:
     service_name: nginx
     service_port: 80
     script: curl http://localhost
     interval: 60s
 
+- name: register nginx with a tcp check
+  community.general.consul:
+    service_name: nginx
+    service_port: 80
+    interval: 60s
+    tcp: localhost:80
+
 - name: Register nginx with an http check
-  consul:
+  community.general.consul:
     service_name: nginx
     service_port: 80
     interval: 60s
     http: http://localhost:80/status
 
 - name: Register external service nginx available at 10.1.5.23
-  consul:
+  community.general.consul:
     service_name: nginx
     service_port: 80
     service_address: 10.1.5.23
 
 - name: Register nginx with some service tags
-  consul:
+  community.general.consul:
     service_name: nginx
     service_port: 80
     tags:
@@ -173,26 +190,26 @@ EXAMPLES = '''
       - webservers
 
 - name: Remove nginx service
-  consul:
+  community.general.consul:
     service_name: nginx
     state: absent
 
 - name: Register celery worker service
-  consul:
+  community.general.consul:
     service_name: celery-worker
     tags:
       - prod
       - worker
 
 - name: Create a node level check to test disk usage
-  consul:
+  community.general.consul:
     check_name: Disk usage
     check_id: disk_usage
     script: /opt/disk_usage.py
     interval: 5m
 
 - name: Register an http check against a service that's already registered
-  consul:
+  community.general.consul:
     check_name: nginx-check2
     check_id: nginx-check2
     service_id: nginx
@@ -217,6 +234,7 @@ try:
 except ImportError:
     python_consul_installed = False
 
+import re
 from ansible.module_utils.basic import AnsibleModule
 
 
@@ -274,6 +292,7 @@ def add_check(module, check):
                      script=check.script,
                      interval=check.interval,
                      ttl=check.ttl,
+                     tcp=check.tcp,
                      http=check.http,
                      timeout=check.timeout,
                      service_id=check.service_id)
@@ -328,7 +347,7 @@ def remove_service(module, service_id):
     module.exit_json(changed=False, id=service_id)
 
 
-def get_consul_api(module, token=None):
+def get_consul_api(module):
     consulClient = consul.Consul(host=module.params.get('host'),
                                  port=module.params.get('port'),
                                  scheme=module.params.get('scheme'),
@@ -346,11 +365,11 @@ def get_service_by_id_or_name(consul_api, service_id_or_name):
 
 
 def parse_check(module):
-    if len([p for p in (module.params.get('script'), module.params.get('ttl'), module.params.get('http')) if p]) > 1:
+    if len([p for p in (module.params.get('script'), module.params.get('ttl'), module.params.get('tcp'), module.params.get('http')) if p]) > 1:
         module.fail_json(
-            msg='checks are either script, http or ttl driven, supplying more than one does not make sense')
+            msg='checks are either script, tcp, http or ttl driven, supplying more than one does not make sense')
 
-    if module.params.get('check_id') or module.params.get('script') or module.params.get('ttl') or module.params.get('http'):
+    if module.params.get('check_id') or module.params.get('script') or module.params.get('ttl') or module.params.get('tcp') or module.params.get('http'):
 
         return ConsulCheck(
             module.params.get('check_id'),
@@ -361,6 +380,7 @@ def parse_check(module):
             module.params.get('interval'),
             module.params.get('ttl'),
             module.params.get('notes'),
+            module.params.get('tcp'),
             module.params.get('http'),
             module.params.get('timeout'),
             module.params.get('service_id'),
@@ -380,7 +400,7 @@ def parse_service(module):
         module.fail_json(msg="service_name is required to configure a service.")
 
 
-class ConsulService():
+class ConsulService(object):
 
     def __init__(self, service_id=None, name=None, address=None, port=-1,
                  tags=None, loaded=None):
@@ -446,7 +466,7 @@ class ConsulService():
 class ConsulCheck(object):
 
     def __init__(self, check_id, name, node=None, host='localhost',
-                 script=None, interval=None, ttl=None, notes=None, http=None, timeout=None, service_id=None):
+                 script=None, interval=None, ttl=None, notes=None, tcp=None, http=None, timeout=None, service_id=None):
         self.check_id = self.name = name
         if check_id:
             self.check_id = check_id
@@ -458,6 +478,7 @@ class ConsulCheck(object):
         self.interval = self.validate_duration('interval', interval)
         self.ttl = self.validate_duration('ttl', ttl)
         self.script = script
+        self.tcp = tcp
         self.http = http
         self.timeout = self.validate_duration('timeout', timeout)
 
@@ -474,6 +495,18 @@ class ConsulCheck(object):
                 raise Exception('http check must specify interval')
 
             self.check = consul.Check.http(http, self.interval, self.timeout)
+
+        if tcp:
+            if interval is None:
+                raise Exception('tcp check must specify interval')
+
+            regex = r"(?P<host>.*)(?::)(?P<port>(?:[0-9]+))$"
+            match = re.match(regex, tcp)
+
+            if match is None:
+                raise Exception('tcp check must be in host:port format')
+
+            self.check = consul.Check.tcp(match.group('host').strip('[]'), int(match.group('port')), self.interval)
 
     def validate_duration(self, name, duration):
         if duration:
@@ -508,6 +541,7 @@ class ConsulCheck(object):
         self._add(data, 'host')
         self._add(data, 'interval')
         self._add(data, 'ttl')
+        self._add(data, 'tcp')
         self._add(data, 'http')
         self._add(data, 'timeout')
         self._add(data, 'service_id')
@@ -532,25 +566,26 @@ def main():
         argument_spec=dict(
             host=dict(default='localhost'),
             port=dict(default=8500, type='int'),
-            scheme=dict(required=False, default='http'),
-            validate_certs=dict(required=False, default=True, type='bool'),
-            check_id=dict(required=False),
-            check_name=dict(required=False),
-            check_node=dict(required=False),
-            check_host=dict(required=False),
-            notes=dict(required=False),
-            script=dict(required=False),
-            service_id=dict(required=False),
-            service_name=dict(required=False),
-            service_address=dict(required=False, type='str', default=None),
-            service_port=dict(required=False, type='int', default=None),
+            scheme=dict(default='http'),
+            validate_certs=dict(default=True, type='bool'),
+            check_id=dict(),
+            check_name=dict(),
+            check_node=dict(),
+            check_host=dict(),
+            notes=dict(),
+            script=dict(),
+            service_id=dict(),
+            service_name=dict(),
+            service_address=dict(type='str'),
+            service_port=dict(type='int'),
             state=dict(default='present', choices=['present', 'absent']),
-            interval=dict(required=False, type='str'),
-            ttl=dict(required=False, type='str'),
-            http=dict(required=False, type='str'),
-            timeout=dict(required=False, type='str'),
-            tags=dict(required=False, type='list'),
-            token=dict(required=False, no_log=True)
+            interval=dict(type='str'),
+            ttl=dict(type='str'),
+            tcp=dict(type='str'),
+            http=dict(type='str'),
+            timeout=dict(type='str'),
+            tags=dict(type='list', elements='str'),
+            token=dict(no_log=True)
         ),
         supports_check_mode=False,
     )

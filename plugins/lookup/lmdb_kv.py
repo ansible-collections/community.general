@@ -5,7 +5,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: lmdb_kv
+    name: lmdb_kv
     author:
       - Jan-Piet Mens (@jpmens)
     version_added: '0.2.0'
@@ -24,30 +24,32 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: query LMDB for a list of country codes
-  debug:
-    msg: "{{ query('lmdb_kv', 'nl', 'be', 'lu', db='jp.mdb') }}"
+  ansible.builtin.debug:
+    msg: "{{ query('community.general.lmdb_kv', 'nl', 'be', 'lu', db='jp.mdb') }}"
 
 - name: use list of values in a loop by key wildcard
-  debug:
+  ansible.builtin.debug:
     msg: "Hello from {{ item.0 }} a.k.a. {{ item.1 }}"
   vars:
     - lmdb_kv_db: jp.mdb
-  with_lmdb_kv:
+  with_community.general.lmdb_kv:
      - "n*"
 
 - name: get an item by key
-  assert:
+  ansible.builtin.assert:
     that:
       - item == 'Belgium'
     vars:
       - lmdb_kv_db: jp.mdb
-    with_lmdb_kv:
+    with_community.general.lmdb_kv:
       - be
 """
 
 RETURN = """
 _raw:
   description: value(s) stored in LMDB
+  type: list
+  elements: raw
 """
 
 

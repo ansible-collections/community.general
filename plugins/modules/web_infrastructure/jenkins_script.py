@@ -20,11 +20,13 @@ description:
 
 options:
   script:
+    type: str
     description:
       - The groovy script to be executed.
         This gets passed as a string Template if args is defined.
     required: true
   url:
+    type: str
     description:
       - The jenkins server to execute the script against. The default is a local
         jenkins instance that is not being proxied through a webserver.
@@ -37,16 +39,20 @@ options:
     type: bool
     default: 'yes'
   user:
+    type: str
     description:
       - The username to connect to the jenkins server with.
   password:
+    type: str
     description:
       - The password to connect to the jenkins server with.
   timeout:
+    type: int
     description:
       - The request timeout in seconds
     default: 10
   args:
+    type: dict
     description:
       - A dict of key-value pairs used in formatting the script using string.Template (see https://docs.python.org/2/library/string.html#template-strings).
 
@@ -59,13 +65,13 @@ notes:
 
 EXAMPLES = '''
 - name: Obtaining a list of plugins
-  jenkins_script:
+  community.general.jenkins_script:
     script: 'println(Jenkins.instance.pluginManager.plugins)'
     user: admin
     password: admin
 
 - name: Setting master using a variable to hold a more complicate script
-  set_fact:
+  ansible.builtin.set_fact:
     setmaster_mode: |
         import jenkins.model.*
         instance = Jenkins.getInstance()
@@ -73,13 +79,13 @@ EXAMPLES = '''
         instance.save()
 
 - name: Use the variable as the script
-  jenkins_script:
+  community.general.jenkins_script:
     script: "{{ setmaster_mode }}"
     args:
       jenkins_mode: Node.Mode.EXCLUSIVE
 
 - name: Interacting with an untrusted HTTPS connection
-  jenkins_script:
+  community.general.jenkins_script:
     script: "println(Jenkins.instance.pluginManager.plugins)"
     user: admin
     password: admin

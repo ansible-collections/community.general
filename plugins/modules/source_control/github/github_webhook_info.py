@@ -19,24 +19,29 @@ options:
   repository:
     description:
       - Full name of the repository to configure a hook for
+    type: str
     required: true
     aliases:
       - repo
   user:
     description:
       - User to authenticate to GitHub as
+    type: str
     required: true
   password:
     description:
       - Password to authenticate to GitHub with
+    type: str
     required: false
   token:
     description:
       - Token to authenticate to GitHub with
+    type: str
     required: false
   github_url:
     description:
       - Base URL of the github api
+    type: str
     required: false
     default: https://api.github.com
 
@@ -46,14 +51,14 @@ author:
 
 EXAMPLES = '''
 - name: List hooks for a repository (password auth)
-  github_webhook_info:
+  community.general.github_webhook_info:
     repository: ansible/ansible
     user: "{{ github_user }}"
     password: "{{ github_password }}"
   register: ansible_webhooks
 
 - name: List hooks for a repository on GitHub Enterprise (token auth)
-  github_webhook_info:
+  community.general.github_webhook_info:
     repository: myorg/myrepo
     user: "{{ github_user }}"
     token: "{{ github_user_api_token }}"
@@ -120,8 +125,6 @@ def main():
         mutually_exclusive=(('password', 'token'), ),
         required_one_of=(("password", "token"), ),
         supports_check_mode=True)
-    if module._name in ('github_webhook_facts', 'community.general.github_webhook_facts'):
-        module.deprecate("The 'github_webhook_facts' module has been renamed to 'github_webhook_info'", version='2.13')
 
     if not HAS_GITHUB:
         module.fail_json(msg=missing_required_lib('PyGithub'),

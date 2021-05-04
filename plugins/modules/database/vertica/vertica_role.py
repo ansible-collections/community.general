@@ -15,37 +15,46 @@ short_description: Adds or removes Vertica database roles and assigns roles to t
 description:
   - Adds or removes Vertica database role and, optionally, assign other roles.
 options:
-  name:
+  role:
     description:
       - Name of the role to add or remove.
     required: true
+    type: str
+    aliases: ['name']
   assigned_roles:
     description:
       - Comma separated list of roles to assign to the role.
     aliases: ['assigned_role']
+    type: str
   state:
     description:
       - Whether to create C(present), drop C(absent) or lock C(locked) a role.
     choices: ['present', 'absent']
     default: present
+    type: str
   db:
     description:
       - Name of the Vertica database.
+    type: str
   cluster:
     description:
       - Name of the Vertica cluster.
     default: localhost
+    type: str
   port:
     description:
       - Vertica cluster port to connect to.
     default: 5433
+    type: str
   login_user:
     description:
       - The username used to authenticate with.
     default: dbadmin
+    type: str
   login_password:
     description:
       - The password used to authenticate with.
+    type: str
 notes:
   - The default authentication assumes that you are either logging in as or sudo'ing
     to the C(dbadmin) account on the host.
@@ -61,10 +70,10 @@ author: "Dariusz Owczarek (@dareko)"
 
 EXAMPLES = """
 - name: Creating a new vertica role
-  vertica_role: name=role_name db=db_name state=present
+  community.general.vertica_role: name=role_name db=db_name state=present
 
 - name: Creating a new vertica role with other role assigned
-  vertica_role: name=role_name assigned_role=other_role_name state=present
+  community.general.vertica_role: name=role_name assigned_role=other_role_name state=present
 """
 import traceback
 
@@ -168,11 +177,11 @@ def main():
             role=dict(required=True, aliases=['name']),
             assigned_roles=dict(default=None, aliases=['assigned_role']),
             state=dict(default='present', choices=['absent', 'present']),
-            db=dict(default=None),
+            db=dict(),
             cluster=dict(default='localhost'),
             port=dict(default='5433'),
             login_user=dict(default='dbadmin'),
-            login_password=dict(default=None, no_log=True),
+            login_password=dict(no_log=True),
         ), supports_check_mode=True)
 
     if not pyodbc_found:

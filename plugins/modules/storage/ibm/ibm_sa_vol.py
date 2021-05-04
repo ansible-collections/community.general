@@ -22,20 +22,23 @@ options:
         description:
             - Volume name.
         required: true
+        type: str
     pool:
         description:
             - Volume pool.
         required: false
+        type: str
     state:
         description:
             - Volume state.
-        required: true
         default: "present"
         choices: [ "present", "absent" ]
+        type: str
     size:
         description:
             - Volume size.
         required: false
+        type: str
 
 extends_documentation_fragment:
 - community.general.ibm_storage
@@ -47,7 +50,7 @@ author:
 
 EXAMPLES = '''
 - name: Create a new volume.
-  ibm_sa_vol:
+  community.general.ibm_sa_vol:
     vol: volume_name
     pool: pool_name
     size: 17
@@ -57,7 +60,7 @@ EXAMPLES = '''
     endpoints: hostdev-system
 
 - name: Delete an existing volume.
-  ibm_sa_vol:
+  community.general.ibm_sa_vol:
     vol: volume_name
     state: absent
     username: admin

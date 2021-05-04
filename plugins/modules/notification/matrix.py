@@ -16,28 +16,35 @@ description:
     - This module sends html formatted notifications to matrix rooms.
 options:
     msg_plain:
+        type: str
         description:
             - Plain text form of the message to send to matrix, usually markdown
         required: true
     msg_html:
+        type: str
         description:
             - HTML form of the message to send to matrix
         required: true
     room_id:
+        type: str
         description:
             - ID of the room to send the notification to
         required: true
     hs_url:
+        type: str
         description:
             - URL of the homeserver, where the CS-API is reachable
         required: true
     token:
+        type: str
         description:
             - Authentication token for the API call. If provided, user_id and password are not required
     user_id:
+        type: str
         description:
             - The user id of the user
     password:
+        type: str
         description:
             - The password to log in with
 requirements:
@@ -46,7 +53,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Send matrix notification with token
-  matrix:
+  community.general.matrix:
     msg_plain: "**hello world**"
     msg_html: "<b>hello world</b>"
     room_id: "!12345678:server.tld"
@@ -54,7 +61,7 @@ EXAMPLES = '''
     token: "{{ matrix_auth_token }}"
 
 - name: Send matrix notification with user_id and password
-  matrix:
+  community.general.matrix:
     msg_plain: "**hello world**"
     msg_html: "<b>hello world</b>"
     room_id: "!12345678:server.tld"

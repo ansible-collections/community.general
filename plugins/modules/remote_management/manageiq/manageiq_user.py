@@ -35,27 +35,34 @@ description:
 
 options:
   state:
+    type: str
     description:
       - absent - user should not exist, present - user should be.
     choices: ['absent', 'present']
     default: 'present'
   userid:
+    type: str
     description:
       - The unique userid in manageiq, often mentioned as username.
     required: true
   name:
+    type: str
     description:
       - The users' full name.
   password:
+    type: str
     description:
       - The users' password.
   group:
+    type: str
     description:
       - The name of the group to which the user belongs.
   email:
+    type: str
     description:
       - The users' E-mail address.
   update_password:
+    type: str
     default: always
     choices: ['always', 'on_create']
     description:
@@ -64,7 +71,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a new user in ManageIQ
-  manageiq_user:
+  community.general.manageiq_user:
     userid: 'jdoe'
     name: 'Jane Doe'
     password: 'VerySecret'
@@ -77,7 +84,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Create a new user in ManageIQ using a token
-  manageiq_user:
+  community.general.manageiq_user:
     userid: 'jdoe'
     name: 'Jane Doe'
     password: 'VerySecret'
@@ -89,7 +96,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Delete a user in ManageIQ
-  manageiq_user:
+  community.general.manageiq_user:
     state: 'absent'
     userid: 'jdoe'
     manageiq_connection:
@@ -99,7 +106,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Delete a user in ManageIQ using a token
-  manageiq_user:
+  community.general.manageiq_user:
     state: 'absent'
     userid: 'jdoe'
     manageiq_connection:
@@ -108,7 +115,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Update email of user in ManageIQ
-  manageiq_user:
+  community.general.manageiq_user:
     userid: 'jdoe'
     email: 'jaustine@example.com'
     manageiq_connection:
@@ -118,7 +125,7 @@ EXAMPLES = '''
       validate_certs: False
 
 - name: Update email of user in ManageIQ using a token
-  manageiq_user:
+  community.general.manageiq_user:
     userid: 'jdoe'
     email: 'jaustine@example.com'
     manageiq_connection:

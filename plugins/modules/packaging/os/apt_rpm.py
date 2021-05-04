@@ -17,43 +17,56 @@ short_description: apt_rpm package manager
 description:
   - Manages packages with I(apt-rpm). Both low-level (I(rpm)) and high-level (I(apt-get)) package manager binaries required.
 options:
-  pkg:
+  package:
     description:
-      - name of package to install, upgrade or remove.
+      - list of packages to install, upgrade or remove.
     required: true
+    aliases: [ name, pkg ]
+    type: list
+    elements: str
   state:
     description:
       - Indicates the desired package state.
-    choices: [ absent, present ]
+    choices: [ absent, present, installed, removed ]
     default: present
+    type: str
   update_cache:
     description:
       - update the package database first C(apt-get update).
+      - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
+    aliases: [ 'update-cache' ]
     type: bool
-    default: 'no'
+    default: no
 author:
 - Evgenii Terechkov (@evgkrsk)
 '''
 
 EXAMPLES = '''
 - name: Install package foo
-  apt_rpm:
+  community.general.apt_rpm:
     pkg: foo
     state: present
 
+- name: Install packages foo and bar
+  community.general.apt_rpm:
+    pkg:
+      - foo
+      - bar
+    state: present
+
 - name: Remove package foo
-  apt_rpm:
+  community.general.apt_rpm:
     pkg: foo
     state: absent
 
 - name: Remove packages foo and bar
-  apt_rpm:
+  community.general.apt_rpm:
     pkg: foo,bar
     state: absent
 
 # bar will be the updated if a newer version exists
 - name: Update the package database and install bar
-  apt_rpm:
+  community.general.apt_rpm:
     name: bar
     state: present
     update_cache: yes
@@ -144,9 +157,11 @@ def install_packages(module, pkgspec):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='installed', choices=['absent', 'installed', 'present', 'removed']),
-            update_cache=dict(type='bool', default=False, aliases=['update-cache']),
-            package=dict(type='str', required=True, aliases=['name', 'pkg']),
+            state=dict(type='str', default='present', choices=['absent', 'installed', 'present', 'removed']),
+            update_cache=dict(
+                type='bool', default=False, aliases=['update-cache'],
+                deprecated_aliases=[dict(name='update-cache', version='5.0.0', collection_name='community.general')]),
+            package=dict(type='list', elements='str', required=True, aliases=['name', 'pkg']),
         ),
     )
 
@@ -158,7 +173,7 @@ def main():
     if p['update_cache']:
         update_package_db(module)
 
-    packages = p['package'].split(',')
+    packages = p['package']
 
     if p['state'] in ['installed', 'present']:
         install_packages(module, packages)

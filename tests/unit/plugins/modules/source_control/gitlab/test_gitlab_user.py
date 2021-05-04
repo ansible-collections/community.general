@@ -3,7 +3,8 @@
 # Copyright: (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 import pytest
 
@@ -87,15 +88,32 @@ class TestGitlabUser(GitlabModuleTestCase):
     @with_httmock(resp_get_user)
     def test_update_user(self):
         user = self.gitlab_instance.users.get(1)
-        changed, newUser = self.moduleUtil.updateUser(user, {'name': "Jack Smith", "is_admin": "true"})
+
+        changed, newUser = self.moduleUtil.updateUser(
+            user,
+            {'name': {'value': "Jack Smith"}, "is_admin": {'value': "true", 'setter': 'admin'}}, {}
+        )
 
         self.assertEqual(changed, True)
         self.assertEqual(newUser.name, "Jack Smith")
-        self.assertEqual(newUser.is_admin, "true")
+        self.assertEqual(newUser.admin, "true")
 
-        changed, newUser = self.moduleUtil.updateUser(user, {'name': "Jack Smith"})
+        changed, newUser = self.moduleUtil.updateUser(user, {'name': {'value': "Jack Smith"}}, {})
 
         self.assertEqual(changed, False)
+
+        changed, newUser = self.moduleUtil.updateUser(
+            user,
+            {}, {
+                'skip_reconfirmation': {'value': True},
+                'password': {'value': 'super_secret-super_secret'},
+            }
+        )
+
+        # note: uncheckable parameters dont set changed state
+        self.assertEqual(changed, False)
+        self.assertEqual(newUser.skip_reconfirmation, True)
+        self.assertEqual(newUser.password, 'super_secret-super_secret')
 
     @with_httmock(resp_find_user)
     @with_httmock(resp_delete_user)

@@ -8,13 +8,13 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author:
-    - Eric Belhomme <ebelhomme@fr.scc.com>
+    - Eric Belhomme (@eric-belhomme) <ebelhomme@fr.scc.com>
     version_added: '0.2.0'
-    lookup: etcd3
+    name: etcd3
     short_description: Get key values from etcd3 server
     description:
     - Retrieves key values and/or key prefixes from etcd3 server using its native gRPC API.
-    - Try to reuse M(etcd3) options for connection parameters, but add support for some C(ETCDCTL_*) environment variables.
+    - Try to reuse M(community.general.etcd3) options for connection parameters, but add support for some C(ETCDCTL_*) environment variables.
     - See U(https://github.com/etcd-io/etcd/tree/master/Documentation/op-guide) for etcd overview.
 
     options:
@@ -31,7 +31,7 @@ DOCUMENTATION = '''
             default: False
         endpoints:
             description:
-            - Counterpart of C(ETCDCTL_ENDPOINTS) enviroment variable.
+            - Counterpart of C(ETCDCTL_ENDPOINTS) environment variable.
               Specify the etcd3 connection with and URL form eg. C(https://hostname:2379)  or C(<host>:<port>) form.
             - The C(host) part is overwritten by I(host) option, if defined.
             - The C(port) part is overwritten by I(port) option, if defined.
@@ -76,45 +76,46 @@ DOCUMENTATION = '''
             type: int
         user:
             description:
-            - Authentified user name.
+            - Authenticated user name.
             env:
             - name: ETCDCTL_USER
             type: str
         password:
             description:
-            - Authentified user password.
+            - Authenticated user password.
             env:
             - name: ETCDCTL_PASSWORD
             type: str
 
     notes:
     - I(host) and I(port) options take precedence over (endpoints) option.
-    - The recommanded way to connect to etcd3 server is using C(ETCDCTL_ENDPOINT)
+    - The recommended way to connect to etcd3 server is using C(ETCDCTL_ENDPOINT)
       environment variable and keep I(endpoints), I(host), and I(port) unused.
     seealso:
-    - module: etcd3
+    - module: community.general.etcd3
     - ref: etcd_lookup
+      description: The etcd v2 lookup.
 
     requirements:
     - "etcd3 >= 0.10"
 '''
 
 EXAMPLES = '''
-    - name: "a value from a locally running etcd"
-      debug:
-        msg: "{{ lookup('community.general.etcd3', 'foo/bar') }}"
+- name: "a value from a locally running etcd"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.etcd3', 'foo/bar') }}"
 
-    - name: "values from multiple folders on a locally running etcd"
-      debug:
-        msg: "{{ lookup('community.general.etcd3', 'foo', 'bar', 'baz') }}"
+- name: "values from multiple folders on a locally running etcd"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.etcd3', 'foo', 'bar', 'baz') }}"
 
-    - name: "look for a key prefix"
-      debug:
-        msg: "{{ lookup('community.general.etcd3', '/foo/bar', prefix=True) }}"
+- name: "look for a key prefix"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.etcd3', '/foo/bar', prefix=True) }}"
 
-    - name: "connect to etcd3 with a client certificate"
-      debug:
-        msg: "{{ lookup('community.general.etcd3', 'foo/bar', cert_cert='/etc/ssl/etcd/client.pem', cert_key='/etc/ssl/etcd/client.key') }}"
+- name: "connect to etcd3 with a client certificate"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.etcd3', 'foo/bar', cert_cert='/etc/ssl/etcd/client.pem', cert_key='/etc/ssl/etcd/client.key') }}"
 '''
 
 RETURN = '''

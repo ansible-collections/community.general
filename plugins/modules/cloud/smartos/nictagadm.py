@@ -52,14 +52,14 @@ options:
 
 EXAMPLES = r'''
 - name: Create 'storage0' on '00:1b:21:a3:f5:4d'
-  nictagadm:
+  community.general.nictagadm:
     name: storage0
     mac: 00:1b:21:a3:f5:4d
     mtu: 9000
     state: present
 
 - name: Remove 'storage0' nic tag
-  nictagadm:
+  community.general.nictagadm:
     name: storage0
     state: absent
 '''
@@ -119,20 +119,13 @@ class NicTag(object):
         return is_mac(self.mac.lower())
 
     def nictag_exists(self):
-        cmd = [self.nictagadm_bin]
-
-        cmd.append('exists')
-        cmd.append(self.name)
-
+        cmd = [self.nictagadm_bin, 'exists', self.name]
         (rc, dummy, dummy) = self.module.run_command(cmd)
 
         return rc == 0
 
     def add_nictag(self):
-        cmd = [self.nictagadm_bin]
-
-        cmd.append('-v')
-        cmd.append('add')
+        cmd = [self.nictagadm_bin, '-v', 'add']
 
         if self.etherstub:
             cmd.append('-l')
@@ -150,10 +143,7 @@ class NicTag(object):
         return self.module.run_command(cmd)
 
     def delete_nictag(self):
-        cmd = [self.nictagadm_bin]
-
-        cmd.append('-v')
-        cmd.append('delete')
+        cmd = [self.nictagadm_bin, '-v', 'delete']
 
         if self.force:
             cmd.append('-f')

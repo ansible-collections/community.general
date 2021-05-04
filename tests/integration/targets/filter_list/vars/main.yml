@@ -1,0 +1,27 @@
+list1:
+  - name: myname01
+    param01: myparam01
+  - name: myname02
+    param01: myparam02
+
+list2:
+  - name: myname01
+    param01: myparam03
+  - name: myname02
+    param02: myparam04
+  - name: myname03
+    param03: myparam03
+
+list3:
+  - name: myname01
+    param01: myparam03
+  - name: myname02
+    param01: myparam02
+    param02: myparam04
+  - name: myname03
+    param03: myparam03
+
+list4:
+  - name: myname01
+    param01: myparam01
+  - myname02

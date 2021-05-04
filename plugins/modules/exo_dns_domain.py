@@ -1,1 +1,0 @@
-./net_tools/exoscale/exo_dns_domain.py

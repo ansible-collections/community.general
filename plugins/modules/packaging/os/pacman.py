@@ -32,7 +32,8 @@ options:
         description:
             - Desired state of the package.
         default: present
-        choices: [ absent, latest, present ]
+        choices: [ absent, latest, present, installed, removed ]
+        type: str
 
     force:
         description:
@@ -47,11 +48,13 @@ options:
         description:
             - Additional option to pass to pacman when enforcing C(state).
         default:
+        type: str
 
     update_cache:
         description:
             - Whether or not to refresh the master package lists.
             - This can be run as part of a package installation or as a separate step.
+            - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
         default: no
         type: bool
         aliases: [ update-cache ]
@@ -60,6 +63,7 @@ options:
         description:
             - Additional option to pass to pacman when enforcing C(update_cache).
         default:
+        type: str
 
     upgrade:
         description:
@@ -72,6 +76,7 @@ options:
         description:
             - Additional option to pass to pacman when enforcing C(upgrade).
         default:
+        type: str
 
 notes:
   - When used with a `loop:` each package will be processed individually,
@@ -88,56 +93,56 @@ packages:
 
 EXAMPLES = '''
 - name: Install package foo from repo
-  pacman:
+  community.general.pacman:
     name: foo
     state: present
 
 - name: Install package bar from file
-  pacman:
+  community.general.pacman:
     name: ~/bar-1.0-1-any.pkg.tar.xz
     state: present
 
 - name: Install package foo from repo and bar from file
-  pacman:
+  community.general.pacman:
     name:
       - foo
       - ~/bar-1.0-1-any.pkg.tar.xz
     state: present
 
 - name: Upgrade package foo
-  pacman:
+  community.general.pacman:
     name: foo
     state: latest
     update_cache: yes
 
 - name: Remove packages foo and bar
-  pacman:
+  community.general.pacman:
     name:
       - foo
       - bar
     state: absent
 
 - name: Recursively remove package baz
-  pacman:
+  community.general.pacman:
     name: baz
     state: absent
     extra_args: --recursive
 
 - name: Run the equivalent of "pacman -Sy" as a separate step
-  pacman:
+  community.general.pacman:
     update_cache: yes
 
 - name: Run the equivalent of "pacman -Su" as a separate step
-  pacman:
+  community.general.pacman:
     upgrade: yes
 
 - name: Run the equivalent of "pacman -Syu" as a separate step
-  pacman:
+  community.general.pacman:
     update_cache: yes
     upgrade: yes
 
 - name: Run the equivalent of "pacman -Rdd", force remove package baz
-  pacman:
+  community.general.pacman:
     name: baz
     state: absent
     force: yes
@@ -392,17 +397,16 @@ def check_packages(module, pacman_path, packages, state):
 def expand_package_groups(module, pacman_path, pkgs):
     expanded = []
 
+    __, stdout, __ = module.run_command([pacman_path, "--sync", "--groups", "--quiet"], check_rc=True)
+    available_groups = stdout.splitlines()
+
     for pkg in pkgs:
         if pkg:  # avoid empty strings
-            cmd = "%s --sync --groups --quiet %s" % (pacman_path, pkg)
-            rc, stdout, stderr = module.run_command(cmd, check_rc=False)
-
-            if rc == 0:
-                # A group was found matching the name, so expand it
-                for name in stdout.split('\n'):
-                    name = name.strip()
-                    if name:
-                        expanded.append(name)
+            if pkg in available_groups:
+                # A group was found matching the package name: expand it
+                cmd = [pacman_path, "--sync", "--groups", "--quiet", pkg]
+                rc, stdout, stderr = module.run_command(cmd, check_rc=True)
+                expanded.extend([name.strip() for name in stdout.splitlines()])
             else:
                 expanded.append(pkg)
 
@@ -418,7 +422,9 @@ def main():
             extra_args=dict(type='str', default=''),
             upgrade=dict(type='bool', default=False),
             upgrade_extra_args=dict(type='str', default=''),
-            update_cache=dict(type='bool', default=False, aliases=['update-cache']),
+            update_cache=dict(
+                type='bool', default=False, aliases=['update-cache'],
+                deprecated_aliases=[dict(name='update-cache', version='5.0.0', collection_name='community.general')]),
             update_cache_extra_args=dict(type='str', default=''),
         ),
         required_one_of=[['name', 'update_cache', 'upgrade']],
@@ -455,7 +461,7 @@ def main():
         for i, pkg in enumerate(pkgs):
             if not pkg:  # avoid empty strings
                 continue
-            elif re.match(r".*\.pkg\.tar(\.(gz|bz2|xz|lrz|lzo|Z))?$", pkg):
+            elif re.match(r".*\.pkg\.tar(\.(gz|bz2|xz|lrz|lzo|Z|zst))?$", pkg):
                 # The package given is a filename, extract the raw pkg name from
                 # it and store the filename
                 pkg_files.append(pkg)

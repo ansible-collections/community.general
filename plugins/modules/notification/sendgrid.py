@@ -1,14 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# (c) 2015, Matt Makai <matthew.makai@gmail.com>
+# Copyright: (c) 2015, Matt Makai <matthew.makai@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: sendgrid
 short_description: Sends an email with the SendGrid API
@@ -23,59 +23,79 @@ notes:
      account."
    - "In order to use api_key, cc, bcc, attachments, from_name, html_body, headers
      you must pip install sendgrid"
-   - "since 2.2 username and password are not required if you supply an api_key"
+   - "since 2.2 I(username) and I(password) are not required if you supply an I(api_key)"
 requirements:
-  - sendgrid python library
+  - sendgrid Python library 1.6.22 or lower (Sendgrid API V2 supported)
 options:
   username:
+    type: str
     description:
-      - username for logging into the SendGrid account.
-      - Since 2.2 it is only required if api_key is not supplied.
+      - Username for logging into the SendGrid account.
+      - Since 2.2 it is only required if I(api_key) is not supplied.
   password:
+    type: str
     description:
-      - password that corresponds to the username
-      - Since 2.2 it is only required if api_key is not supplied.
+      - Password that corresponds to the username.
+      - Since 2.2 it is only required if I(api_key) is not supplied.
   from_address:
+    type: str
     description:
-      - the address in the "from" field for the email
+      - The address in the "from" field for the email.
     required: true
   to_addresses:
+    type: list
+    elements: str
     description:
-      - a list with one or more recipient email addresses
+      - A list with one or more recipient email addresses.
     required: true
   subject:
+    type: str
     description:
-      - the desired subject for the email
+      - The desired subject for the email.
     required: true
   api_key:
+    type: str
     description:
-      - sendgrid API key to use instead of username/password
+      - Sendgrid API key to use instead of username/password.
   cc:
+    type: list
+    elements: str
     description:
-      - a list of email addresses to cc
+      - A list of email addresses to cc.
   bcc:
+    type: list
+    elements: str
     description:
-      - a list of email addresses to bcc
+      - A list of email addresses to bcc.
   attachments:
+    type: list
+    elements: path
     description:
-      - a list of relative or explicit paths of files you want to attach (7MB limit as per SendGrid docs)
+      - A list of relative or explicit paths of files you want to attach (7MB limit as per SendGrid docs).
   from_name:
+    type: str
     description:
-      - the name you want to appear in the from field, i.e 'John Doe'
+      - The name you want to appear in the from field, i.e 'John Doe'.
   html_body:
     description:
-      - whether the body is html content that should be rendered
+      - Whether the body is html content that should be rendered.
     type: bool
     default: 'no'
   headers:
+    type: dict
     description:
-      - a dict to pass on as headers
+      - A dict to pass on as headers.
+  body:
+    type: str
+    description:
+      - The e-mail body content.
+    required: yes
 author: "Matt Makai (@makaimc)"
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Send an email to a single recipient that the deployment was successful
-  sendgrid:
+  community.general.sendgrid:
     username: "{{ sendgrid_username }}"
     password: "{{ sendgrid_password }}"
     from_address: "ansible@mycompany.com"
@@ -86,7 +106,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Send an email to more than one recipient that the build failed
-  sendgrid:
+  community.general.sendgrid:
       username: "{{ sendgrid_username }}"
       password: "{{ sendgrid_password }}"
       from_address: "build@mycompany.com"
@@ -103,6 +123,8 @@ EXAMPLES = '''
 #
 import os
 import traceback
+
+from distutils.version import LooseVersion
 
 SENDGRID_IMP_ERR = None
 try:
@@ -139,6 +161,9 @@ def post_sendgrid_api(module, username, password, from_address, to_addresses,
                    'Accept': 'application/json'}
         return fetch_url(module, SENDGRID_URI, data=encoded_data, headers=headers, method='POST')
     else:
+        # Remove this check when adding Sendgrid API v3 support
+        if LooseVersion(sendgrid.version.__version__) > LooseVersion("1.6.22"):
+            module.fail_json(msg="Please install sendgrid==1.6.22 or lower since module uses Sendgrid V2 APIs.")
 
         if api_key:
             sg = sendgrid.SendGridClient(api_key)
@@ -188,16 +213,16 @@ def main():
             username=dict(required=False),
             password=dict(required=False, no_log=True),
             api_key=dict(required=False, no_log=True),
-            bcc=dict(required=False, type='list'),
-            cc=dict(required=False, type='list'),
+            bcc=dict(required=False, type='list', elements='str'),
+            cc=dict(required=False, type='list', elements='str'),
             headers=dict(required=False, type='dict'),
             from_address=dict(required=True),
             from_name=dict(required=False),
-            to_addresses=dict(required=True, type='list'),
+            to_addresses=dict(required=True, type='list', elements='str'),
             subject=dict(required=True),
             body=dict(required=True),
             html_body=dict(required=False, default=False, type='bool'),
-            attachments=dict(required=False, type='list')
+            attachments=dict(required=False, type='list', elements='path')
         ),
         supports_check_mode=True,
         mutually_exclusive=[

@@ -17,7 +17,7 @@ short_description: Add or remove LDAP entries.
 description:
   - Add or remove LDAP entries. This module only asserts the existence or
     non-existence of an LDAP entry, not its attributes. To assert the
-    attribute values of an entry, see M(ldap_attr).
+    attribute values of an entry, see M(community.general.ldap_attrs).
 notes:
   - The default authentication settings will attempt to use a SASL EXTERNAL
     bind over a UNIX domain socket. This works well with the default Ubuntu
@@ -25,9 +25,6 @@ notes:
     rule allowing root to modify the server configuration. If you need to use
     a simple bind to access your server, pass the credentials in I(bind_dn)
     and I(bind_pw).
-  - "The I(params) parameter was removed due to circumventing Ansible's parameter
-     handling.  The I(params) parameter started disallowing setting the I(bind_pw) parameter in
-     Ansible-2.7 as it was insecure to set the parameter that way."
 author:
   - Jiri Tyr (@jtyr)
 requirements:
@@ -37,17 +34,21 @@ options:
     description:
       - If I(state=present), attributes necessary to create an entry. Existing
         entries are never modified. To assert specific attribute values on an
-        existing entry, use M(ldap_attr) module instead.
+        existing entry, use M(community.general.ldap_attrs) module instead.
+    type: dict
   objectClass:
     description:
       - If I(state=present), value or list of values to use when creating
         the entry. It can either be a string or an actual list of
         strings.
+    type: list
+    elements: str
   state:
     description:
       - The target state of the entry.
     choices: [present, absent]
     default: present
+    type: str
 extends_documentation_fragment:
 - community.general.ldap.documentation
 
@@ -56,12 +57,12 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Make sure we have a parent entry for users
-  ldap_entry:
+  community.general.ldap_entry:
     dn: ou=users,dc=example,dc=com
     objectClass: organizationalUnit
 
 - name: Make sure we have an admin user
-  ldap_entry:
+  community.general.ldap_entry:
     dn: cn=admin,dc=example,dc=com
     objectClass:
       - simpleSecurityObject
@@ -71,7 +72,7 @@ EXAMPLES = """
       userPassword: "{SSHA}tabyipcHzhwESzRaGA7oQ/SDoBZQOGND"
 
 - name: Get rid of an old entry
-  ldap_entry:
+  community.general.ldap_entry:
     dn: ou=stuff,dc=example,dc=com
     state: absent
     server_uri: ldap://localhost/
@@ -89,7 +90,7 @@ EXAMPLES = """
 #
 # In the example below, 'args' is a task keyword, passed at the same level as the module
 - name: Get rid of an old entry
-  ldap_entry:
+  community.general.ldap_entry:
     dn: ou=stuff,dc=example,dc=com
     state: absent
   args: "{{ ldap_auth }}"
@@ -103,7 +104,6 @@ RETURN = """
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.six import string_types
 from ansible.module_utils._text import to_native, to_bytes
 from ansible_collections.community.general.plugins.module_utils.ldap import LdapGeneric, gen_specs
 
@@ -137,13 +137,10 @@ class LdapEntry(LdapGeneric):
         attrs = {}
 
         for name, value in self.module.params['attributes'].items():
-            if name not in attrs:
-                attrs[name] = []
-
             if isinstance(value, list):
                 attrs[name] = list(map(to_bytes, value))
             else:
-                attrs[name].append(to_bytes(value))
+                attrs[name] = [to_bytes(value)]
 
         return attrs
 
@@ -187,10 +184,10 @@ def main():
     module = AnsibleModule(
         argument_spec=gen_specs(
             attributes=dict(default={}, type='dict'),
-            objectClass=dict(type='raw'),
-            params=dict(type='dict'),
+            objectClass=dict(type='list', elements='str'),
             state=dict(default='present', choices=['present', 'absent']),
         ),
+        required_if=[('state', 'present', ['objectClass'])],
         supports_check_mode=True,
     )
 
@@ -198,21 +195,7 @@ def main():
         module.fail_json(msg=missing_required_lib('python-ldap'),
                          exception=LDAP_IMP_ERR)
 
-    if module.params['params']:
-        module.fail_json(msg="The `params` option to ldap_attr was removed since it circumvents Ansible's option handling")
-
     state = module.params['state']
-
-    # Check if objectClass is present when needed
-    if state == 'present' and module.params['objectClass'] is None:
-        module.fail_json(msg="At least one objectClass must be provided.")
-
-    # Check if objectClass is of the correct type
-    if (
-            module.params['objectClass'] is not None and not (
-                isinstance(module.params['objectClass'], string_types) or
-                isinstance(module.params['objectClass'], list))):
-        module.fail_json(msg="objectClass must be either a string or a list.")
 
     # Instantiate the LdapEntry object
     ldap = LdapEntry(module)

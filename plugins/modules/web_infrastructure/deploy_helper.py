@@ -32,6 +32,7 @@ description:
 
 options:
   path:
+    type: path
     required: True
     aliases: ['dest']
     description:
@@ -39,6 +40,7 @@ options:
         Returned in the C(deploy_helper.project_path) fact.
 
   state:
+    type: str
     description:
       - the state of the project.
         C(query) will only gather facts,
@@ -46,23 +48,26 @@ options:
         C(finalize) will remove the unfinished_filename file, create a symlink to the newly
           deployed release and optionally clean old releases,
         C(clean) will remove failed & old releases,
-        C(absent) will remove the project folder (synonymous to the M(file) module with C(state=absent))
+        C(absent) will remove the project folder (synonymous to the M(ansible.builtin.file) module with C(state=absent))
     choices: [ present, finalize, absent, clean, query ]
     default: present
 
   release:
+    type: str
     description:
       - the release version that is being deployed. Defaults to a timestamp format %Y%m%d%H%M%S (i.e. '20141119223359').
         This parameter is optional during C(state=present), but needs to be set explicitly for C(state=finalize).
         You can use the generated fact C(release={{ deploy_helper.new_release }}).
 
   releases_path:
+    type: str
     description:
       - the name of the folder that will hold the releases. This can be relative to C(path) or absolute.
         Returned in the C(deploy_helper.releases_path) fact.
     default: releases
 
   shared_path:
+    type: path
     description:
       - the name of the folder that will hold the shared resources. This can be relative to C(path) or absolute.
         If this is set to an empty string, no shared folder will be created.
@@ -70,12 +75,14 @@ options:
     default: shared
 
   current_path:
+    type: path
     description:
       - the name of the symlink that is created when the deploy is finalized. Used in C(finalize) and C(clean).
         Returned in the C(deploy_helper.current_path) fact.
     default: current
 
   unfinished_filename:
+    type: str
     description:
       - the name of the file that indicates a deploy has not finished. All folders in the releases_path that
         contain this file will be deleted on C(state=finalize) with clean=True, or C(state=clean). This file is
@@ -89,6 +96,7 @@ options:
     default: 'yes'
 
   keep_releases:
+    type: int
     description:
       - the number of old releases to keep when cleaning. Used in C(finalize) and C(clean). Any unfinished builds
         will be deleted first, so only correct releases will count. The current version will not count.
@@ -102,6 +110,7 @@ notes:
   - Because of the default behaviour of generating the I(new_release) fact, this module will not be idempotent
     unless you pass your own release name with C(release). Due to the nature of deploying software, this should not
     be much of a problem.
+extends_documentation_fragment: files
 '''
 
 EXAMPLES = '''
@@ -145,15 +154,15 @@ EXAMPLES = '''
 
 # Typical usage
 - name: Initialize the deploy root and gather facts
-  deploy_helper:
+  community.general.deploy_helper:
     path: /path/to/root
 - name: Clone the project to the new release folder
-  git:
-    repo: git://foosball.example.org/path/to/repo.git
+  ansible.builtin.git:
+    repo: ansible.builtin.git://foosball.example.org/path/to/repo.git
     dest: '{{ deploy_helper.new_release_path }}'
     version: v1.1.1
 - name: Add an unfinished file, to allow cleanup on successful finalize
-  file:
+  ansible.builtin.file:
     path: '{{ deploy_helper.new_release_path }}/{{ deploy_helper.unfinished_filename }}'
     state: touch
 - name: Perform some build steps, like running your dependency manager for example
@@ -161,14 +170,14 @@ EXAMPLES = '''
     command: install
     working_dir: '{{ deploy_helper.new_release_path }}'
 - name: Create some folders in the shared folder
-  file:
+  ansible.builtin.file:
     path: '{{ deploy_helper.shared_path }}/{{ item }}'
     state: directory
   with_items:
     - sessions
     - uploads
 - name: Add symlinks from the new release to the shared folder
-  file:
+  ansible.builtin.file:
     path: '{{ deploy_helper.new_release_path }}/{{ item.path }}'
     src: '{{ deploy_helper.shared_path }}/{{ item.src }}'
     state: link
@@ -178,85 +187,85 @@ EXAMPLES = '''
       - path: web/uploads
         src: uploads
 - name: Finalize the deploy, removing the unfinished file and switching the symlink
-  deploy_helper:
+  community.general.deploy_helper:
     path: /path/to/root
     release: '{{ deploy_helper.new_release }}'
     state: finalize
 
 # Retrieving facts before running a deploy
 - name: Run 'state=query' to gather facts without changing anything
-  deploy_helper:
+  community.general.deploy_helper:
     path: /path/to/root
     state: query
 # Remember to set the 'release' parameter when you actually call 'state=present' later
 - name: Initialize the deploy root
-  deploy_helper:
+  community.general.deploy_helper:
     path: /path/to/root
     release: '{{ deploy_helper.new_release }}'
     state: present
 
 # all paths can be absolute or relative (to the 'path' parameter)
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     releases_path: /var/www/project/releases
     shared_path: /var/www/shared
     current_path: /var/www/active
 
 # Using your own naming strategy for releases (a version tag in this case):
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     release: v1.1.1
     state: present
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     release: '{{ deploy_helper.new_release }}'
     state: finalize
 
 # Using a different unfinished_filename:
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     unfinished_filename: README.md
     release: '{{ deploy_helper.new_release }}'
     state: finalize
 
 # Postponing the cleanup of older builds:
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     release: '{{ deploy_helper.new_release }}'
     state: finalize
     clean: False
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     state: clean
 # Or running the cleanup ahead of the new deploy
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     state: clean
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     state: present
 
 # Keeping more old releases:
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     release: '{{ deploy_helper.new_release }}'
     state: finalize
     keep_releases: 10
 # Or, if you use 'clean=false' on finalize:
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     state: clean
     keep_releases: 10
 
 # Removing the entire project root folder
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
     state: absent
 
 # Debugging the facts returned by the module
-- deploy_helper:
+- community.general.deploy_helper:
     path: /path/to/root
-- debug:
+- ansible.builtin.debug:
     var: deploy_helper
 '''
 import os
@@ -398,6 +407,9 @@ class DeployHelper(object):
 
     def remove_unfinished_link(self, path):
         changed = False
+
+        if not self.release:
+            return changed
 
         tmp_link_name = os.path.join(path, self.release + '.' + self.unfinished_filename)
         if not self.module.check_mode and os.path.exists(tmp_link_name):

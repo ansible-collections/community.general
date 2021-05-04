@@ -2,34 +2,37 @@
 #
 # (c) 2018, Red Hat, Inc.
 #
-# This file is part of Ansible
-#
-# Ansible is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
-#
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import os
 import sys
 import json
 import argparse
 
 from ansible.parsing.dataloader import DataLoader
-from ansible.module_utils.six import iteritems
+from ansible.module_utils.six import iteritems, raise_from
 from ansible.module_utils._text import to_text
-from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiInventory
-from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_extattrs, flatten_extattrs
+try:
+    from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiInventory
+    from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_extattrs, flatten_extattrs
+except ImportError as exc:
+    try:
+        # Fallback for Ansible 2.9
+        from ansible.module_utils.net_tools.nios.api import WapiInventory
+        from ansible.module_utils.net_tools.nios.api import normalize_extattrs, flatten_extattrs
+    except ImportError:
+        raise_from(
+            Exception(
+                'This inventory plugin only works with Ansible 2.9, 2.10, or 3, or when community.general is installed correctly in PYTHONPATH.'
+                ' Try using the inventory plugin from infoblox.nios_modules instead.'),
+            exc)
 
 
 CONFIG_FILES = [
+    os.environ.get('INFOBLOX_CONFIG_FILE', ''),
     '/etc/ansible/infoblox.yaml',
     '/etc/ansible/infoblox.yml'
 ]
@@ -54,7 +57,7 @@ def main():
         if os.path.exists(config_file):
             break
     else:
-        sys.stdout.write('unable to locate config file at /etc/ansible/infoblox.yaml\n')
+        sys.stderr.write('unable to locate config file at /etc/ansible/infoblox.yaml\n')
         sys.exit(-1)
 
     try:
@@ -63,7 +66,7 @@ def main():
         provider = config.get('provider') or {}
         wapi = WapiInventory(provider)
     except Exception as exc:
-        sys.stdout.write(to_text(exc))
+        sys.stderr.write(to_text(exc))
         sys.exit(-1)
 
     if args.host:

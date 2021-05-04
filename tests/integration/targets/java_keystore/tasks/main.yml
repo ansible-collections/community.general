@@ -1,0 +1,25 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+- when: has_java_keytool
+  connection: local
+  block:
+    - name: Include tasks to create ssl materials on the controller
+      include_tasks: prepare.yml
+
+- when: has_java_keytool
+  block:
+    - name: Include tasks to play with 'certificate' and 'private_key' contents
+      include_tasks: tests.yml
+      vars:
+        remote_cert: false
+
+    - name: Include tasks to create ssl materials on the remote host
+      include_tasks: prepare.yml
+
+    - name: Include tasks to play with 'certificate_path' and 'private_key_path' locations
+      include_tasks: tests.yml
+      vars:
+        remote_cert: true

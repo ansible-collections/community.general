@@ -31,7 +31,6 @@ options:
     description:
     - Action what the init has to do with this entry.
     type: str
-    required: yes
     choices:
     - boot
     - bootwait
@@ -71,7 +70,7 @@ requirements:
 EXAMPLES = '''
 # Add service startmyservice to the inittab, directly after service existingservice.
 - name: Add startmyservice to inittab
-  aix_inittab:
+  community.general.aix_inittab:
     name: startmyservice
     runlevel: 4
     action: once
@@ -82,7 +81,7 @@ EXAMPLES = '''
 
 # Change inittab entry startmyservice to runlevel "2" and processaction "wait".
 - name: Change startmyservice to inittab
-  aix_inittab:
+  community.general.aix_inittab:
     name: startmyservice
     runlevel: 2
     action: wait
@@ -91,7 +90,7 @@ EXAMPLES = '''
   become: yes
 
 - name: Remove startmyservice from inittab
-  aix_inittab:
+  community.general.aix_inittab:
     name: startmyservice
     runlevel: 2
     action: wait
@@ -237,7 +236,7 @@ def main():
                     [rmitab, module.params['name']])
                 if rc != 0:
                     module.fail_json(
-                        msg="could not remove entry grom inittab)", rc=rc, err=err)
+                        msg="could not remove entry from inittab)", rc=rc, err=err)
             result['msg'] = "removed inittab entry" + " " + current_entry['name']
             result['changed'] = True
 

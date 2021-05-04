@@ -16,15 +16,19 @@ options:
   server_ids:
     description:
       - The list of CLC server Ids.
+    type: list
     required: True
+    elements: str
   expiration_days:
     description:
       - The number of days to keep the server snapshot before it expires.
+    type: int
     default: 7
     required: False
   state:
     description:
       - The state to insure that the provided resources are in.
+    type: str
     default: 'present'
     required: False
     choices: ['present', 'absent', 'restore']
@@ -33,7 +37,7 @@ options:
       - Whether to wait for the provisioning tasks to finish before returning.
     default: True
     required: False
-    type: bool
+    type: str
 requirements:
     - python = 2.7
     - requests >= 2.5.0
@@ -55,7 +59,7 @@ EXAMPLES = '''
 # Note - You must set the CLC_V2_API_USERNAME And CLC_V2_API_PASSWD Environment variables before running these examples
 
 - name: Create server snapshot
-  clc_server_snapshot:
+  community.general.clc_server_snapshot:
     server_ids:
         - UC1TEST-SVR01
         - UC1TEST-SVR02
@@ -64,7 +68,7 @@ EXAMPLES = '''
     state: present
 
 - name: Restore server snapshot
-  clc_server_snapshot:
+  community.general.clc_server_snapshot:
     server_ids:
         - UC1TEST-SVR01
         - UC1TEST-SVR02
@@ -72,7 +76,7 @@ EXAMPLES = '''
     state: restore
 
 - name: Delete server snapshot
-  clc_server_snapshot:
+  community.general.clc_server_snapshot:
     server_ids:
         - UC1TEST-SVR01
         - UC1TEST-SVR02
@@ -327,7 +331,7 @@ class ClcSnapshot:
         :return: the package dictionary object
         """
         argument_spec = dict(
-            server_ids=dict(type='list', required=True),
+            server_ids=dict(type='list', required=True, elements='str'),
             expiration_days=dict(default=7, type='int'),
             wait=dict(default=True),
             state=dict(

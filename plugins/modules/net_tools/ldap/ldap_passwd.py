@@ -15,7 +15,7 @@ short_description: Set passwords in LDAP.
 description:
   - Set a password for an LDAP entry.  This module only asserts that
     a given password is valid for a given entry.  To assert the
-    existence of an entry, see M(ldap_entry).
+    existence of an entry, see M(community.general.ldap_entry).
 notes:
   - The default authentication settings will attempt to use a SASL EXTERNAL
     bind over a UNIX domain socket. This works well with the default Ubuntu
@@ -29,9 +29,9 @@ requirements:
   - python-ldap
 options:
   passwd:
-    required: true
     description:
       - The (plaintext) password to be set for I(dn).
+    type: str
 extends_documentation_fragment:
 - community.general.ldap.documentation
 
@@ -39,12 +39,12 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Set a password for the admin user
-  ldap_passwd:
+  community.general.ldap_passwd:
     dn: cn=admin,dc=example,dc=com
     passwd: "{{ vault_secret }}"
 
 - name: Setting passwords in bulk
-  ldap_passwd:
+  community.general.ldap_passwd:
     dn: "{{ item.key }}"
     passwd: "{{ item.value }}"
   with_dict:

@@ -38,13 +38,14 @@ options:
 
   auth_token:
     description:
-      - Packet api token. You can also supply it in env var C(PACKET_API_TOKEN).
+      - Packet API token. You can also supply it in env var C(PACKET_API_TOKEN).
     type: str
 
   project_id:
     description:
       - UUID of the project to which the device and volume belong.
     type: str
+    required: true
 
   volume:
     description:
@@ -52,6 +53,7 @@ options:
       - It can be a UUID, an API-generated volume name, or user-defined description string.
       - 'Example values: 4a347482-b546-4f67-8300-fb5018ef0c5, volume-4a347482, "my volume"'
     type: str
+    required: true
 
   device:
     description:
@@ -100,13 +102,13 @@ EXAMPLES = '''
         state: present
 
     - name: Attach testvol to testdev
-      packet_volume_attachment:
+      community.general.packet_volume_attachment:
         project_id: "{{ project_id }}"
         volume: "{{ volname }}"
         device: "{{ devname }}"
 
     - name: Detach testvol from testdev
-      packet_volume_attachment:
+      community.general.packet_volume_attachment:
         project_id: "{{ project_id }}"
         volume: "{{ volname }}"
         device: "{{ devname }}"
@@ -179,7 +181,6 @@ def do_detach(packet_conn, vol, dev_id=None):
         return (dev_id is None) or (a['device']['id'] == dev_id)
     for a in vol['attachments']:
         if dev_match(a):
-            print(a['href'])
             packet_conn.call_api(a['href'], type="DELETE")
 
 

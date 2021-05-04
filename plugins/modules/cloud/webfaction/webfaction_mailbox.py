@@ -29,32 +29,37 @@ options:
         description:
             - The name of the mailbox
         required: true
+        type: str
 
     mailbox_password:
         description:
             - The password for the mailbox
         required: true
+        type: str
 
     state:
         description:
             - Whether the mailbox should exist
         choices: ['present', 'absent']
         default: "present"
+        type: str
 
     login_name:
         description:
             - The webfaction account to use
         required: true
+        type: str
 
     login_password:
         description:
             - The webfaction password to use
         required: true
+        type: str
 '''
 
 EXAMPLES = '''
   - name: Create a mailbox
-    webfaction_mailbox:
+    community.general.webfaction_mailbox:
       mailbox_name="mybox"
       mailbox_password="myboxpw"
       state=present

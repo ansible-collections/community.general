@@ -28,56 +28,69 @@ options:
             - Manage DNS record.
         choices: ['present', 'absent']
         default: 'present'
+        type: str
     server:
         description:
             - Apply DNS modification on this server, specified by IPv4 or IPv6 address.
         required: true
+        type: str
     port:
         description:
             - Use this TCP port when connecting to C(server).
         default: 53
+        type: int
     key_name:
         description:
             - Use TSIG key name to authenticate against DNS C(server)
+        type: str
     key_secret:
         description:
             - Use TSIG key secret, associated with C(key_name), to authenticate against C(server)
+        type: str
     key_algorithm:
         description:
             - Specify key algorithm used by C(key_secret).
         choices: ['HMAC-MD5.SIG-ALG.REG.INT', 'hmac-md5', 'hmac-sha1', 'hmac-sha224', 'hmac-sha256', 'hmac-sha384',
                   'hmac-sha512']
         default: 'hmac-md5'
+        type: str
     zone:
         description:
             - DNS record will be modified on this C(zone).
             - When omitted DNS will be queried to attempt finding the correct zone.
             - Starting with Ansible 2.7 this parameter is optional.
+        type: str
     record:
         description:
             - Sets the DNS record to modify. When zone is omitted this has to be absolute (ending with a dot).
         required: true
+        type: str
     type:
         description:
             - Sets the record type.
         default: 'A'
+        type: str
     ttl:
         description:
             - Sets the record TTL.
         default: 3600
+        type: int
     value:
         description:
             - Sets the record value.
+        type: list
+        elements: str
     protocol:
         description:
             - Sets the transport protocol (TCP or UDP). TCP is the recommended and a more robust option.
         default: 'tcp'
         choices: ['tcp', 'udp']
+        type: str
 '''
 
 EXAMPLES = '''
 - name: Add or modify ansible.example.org A to 192.168.1.1"
-  nsupdate:
+  community.general.nsupdate:
     key_name: "nsupdate"
     key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
     server: "10.1.1.1"
@@ -86,7 +99,7 @@ EXAMPLES = '''
     value: "192.168.1.1"
 
 - name: Add or modify ansible.example.org A to 192.168.1.1, 192.168.1.2 and 192.168.1.3"
-  nsupdate:
+  community.general.nsupdate:
     key_name: "nsupdate"
     key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
     server: "10.1.1.1"
@@ -95,7 +108,7 @@ EXAMPLES = '''
     value: ["192.168.1.1", "192.168.1.2", "192.168.1.3"]
 
 - name: Remove puppet.example.org CNAME
-  nsupdate:
+  community.general.nsupdate:
     key_name: "nsupdate"
     key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
     server: "10.1.1.1"
@@ -105,7 +118,7 @@ EXAMPLES = '''
     state: absent
 
 - name: Add 1.1.168.192.in-addr.arpa. PTR for ansible.example.org
-  nsupdate:
+  community.general.nsupdate:
     key_name: "nsupdate"
     key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
     server: "10.1.1.1"
@@ -115,7 +128,7 @@ EXAMPLES = '''
     state: present
 
 - name: Remove 1.1.168.192.in-addr.arpa. PTR
-  nsupdate:
+  community.general.nsupdate:
     key_name: "nsupdate"
     key_secret: "+bFQtBCta7j2vWkjPkAFtgA=="
     server: "10.1.1.1"
@@ -432,7 +445,7 @@ def main():
             record=dict(required=True, type='str'),
             type=dict(required=False, default='A', type='str'),
             ttl=dict(required=False, default=3600, type='int'),
-            value=dict(required=False, default=None, type='list'),
+            value=dict(required=False, default=None, type='list', elements='str'),
             protocol=dict(required=False, default='tcp', choices=['tcp', 'udp'], type='str')
         ),
         supports_check_mode=True

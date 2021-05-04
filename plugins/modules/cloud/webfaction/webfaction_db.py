@@ -32,36 +32,43 @@ options:
         description:
             - The name of the database
         required: true
+        type: str
 
     state:
         description:
             - Whether the database should exist
         choices: ['present', 'absent']
         default: "present"
+        type: str
 
     type:
         description:
             - The type of database to create.
         required: true
         choices: ['mysql', 'postgresql']
+        type: str
 
     password:
         description:
             - The password for the new database user.
+        type: str
 
     login_name:
         description:
             - The webfaction account to use
         required: true
+        type: str
 
     login_password:
         description:
             - The webfaction password to use
         required: true
+        type: str
 
     machine:
         description:
             - The machine name to use (optional for accounts with only one machine)
+        type: str
 '''
 
 EXAMPLES = '''
@@ -69,7 +76,7 @@ EXAMPLES = '''
   # name as the database, and the specified password.
 
   - name: Create a database
-    webfaction_db:
+    community.general.webfaction_db:
       name: "{{webfaction_user}}_db1"
       password: mytestsql
       type: mysql

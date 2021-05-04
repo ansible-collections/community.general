@@ -21,17 +21,19 @@ description:
 options:
     api_key:
         required: true
+        type: str
         description:
             - The API key obtained from the Memset control panel.
     name:
         required: true
+        type: str
         description:
             - The Memstore product name (i.e. C(mstestyaa1)).
 '''
 
 EXAMPLES = '''
 - name: Get usage for mstestyaa1
-  memset_memstore_info:
+  community.general.memset_memstore_info:
     name: mstestyaa1
     api_key: 5eb86c9896ab03919abcf03857163741
   delegate_to: localhost
@@ -149,8 +151,6 @@ def main():
         ),
         supports_check_mode=False
     )
-    if module._name in ('memset_memstore_facts', 'community.general.memset_memstore_facts'):
-        module.deprecate("The 'memset_memstore_facts' module has been renamed to 'memset_memstore_info'", version='2.13')
 
     # populate the dict with the user-provided vars.
     args = dict()

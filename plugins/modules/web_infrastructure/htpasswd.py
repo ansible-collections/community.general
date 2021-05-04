@@ -16,30 +16,35 @@ description:
   - This is used by web servers such as Apache and Nginx for basic authentication.
 options:
   path:
+    type: path
     required: true
     aliases: [ dest, destfile ]
     description:
       - Path to the file that contains the usernames and passwords
   name:
+    type: str
     required: true
     aliases: [ username ]
     description:
       - User name to add or remove
   password:
+    type: str
     required: false
     description:
       - Password associated with user.
       - Must be specified if user does not exist yet.
   crypt_scheme:
+    type: str
     required: false
-    choices: ["apr_md5_crypt", "des_crypt", "ldap_sha1", "plaintext"]
     default: "apr_md5_crypt"
     description:
       - Encryption scheme to be used.  As well as the four choices listed
         here, you can also use any other hash supported by passlib, such as
         md5_crypt and sha256_crypt, which are linux passwd hashes.  If you
         do so the password file will not be compatible with Apache or Nginx
+      - 'Some of the available choices might be: C(apr_md5_crypt), C(des_crypt), C(ldap_sha1), C(plaintext)'
   state:
+    type: str
     required: false
     choices: [ present, absent ]
     default: "present"
@@ -64,7 +69,7 @@ extends_documentation_fragment: files
 
 EXAMPLES = """
 - name: Add a user to a password file and ensure permissions are set
-  htpasswd:
+  community.general.htpasswd:
     path: /etc/nginx/passwdfile
     name: janedoe
     password: '9s36?;fyNp'
@@ -73,13 +78,13 @@ EXAMPLES = """
     mode: 0640
 
 - name: Remove a user from a password file
-  htpasswd:
+  community.general.htpasswd:
     path: /etc/apache2/passwdfile
     name: foobar
     state: absent
 
 - name: Add a user to a password file suitable for use by libpam-pwdfile
-  htpasswd:
+  community.general.htpasswd:
     path: /etc/mail/passwords
     name: alex
     password: oedu2eGh
@@ -195,12 +200,12 @@ def check_file_attrs(module, changed, message):
 
 def main():
     arg_spec = dict(
-        path=dict(required=True, aliases=["dest", "destfile"]),
-        name=dict(required=True, aliases=["username"]),
-        password=dict(required=False, default=None, no_log=True),
-        crypt_scheme=dict(required=False, default="apr_md5_crypt"),
-        state=dict(required=False, default="present"),
-        create=dict(type='bool', default='yes'),
+        path=dict(type='path', required=True, aliases=["dest", "destfile"]),
+        name=dict(type='str', required=True, aliases=["username"]),
+        password=dict(type='str', required=False, default=None, no_log=True),
+        crypt_scheme=dict(type='str', required=False, default="apr_md5_crypt"),
+        state=dict(type='str', required=False, default="present", choices=["present", "absent"]),
+        create=dict(type='bool', default=True),
 
     )
     module = AnsibleModule(argument_spec=arg_spec,

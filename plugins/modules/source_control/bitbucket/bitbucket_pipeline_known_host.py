@@ -61,7 +61,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Create known hosts from the list
-  bitbucket_pipeline_known_host:
+  community.general.bitbucket_pipeline_known_host:
     repository: 'bitbucket-repo'
     username: bitbucket_username
     name: '{{ item }}'
@@ -71,14 +71,14 @@ EXAMPLES = r'''
     - example.com
 
 - name: Remove known host
-  bitbucket_pipeline_known_host:
+  community.general.bitbucket_pipeline_known_host:
     repository: bitbucket-repo
     username: bitbucket_username
     name: bitbucket.org
     state: absent
 
 - name: Specify public key file
-  bitbucket_pipeline_known_host:
+  community.general.bitbucket_pipeline_known_host:
     repository: bitbucket-repo
     username: bitbucket_username
     name: bitbucket.org
@@ -263,7 +263,7 @@ def main():
         repository=dict(type='str', required=True),
         username=dict(type='str', required=True),
         name=dict(type='str', required=True),
-        key=dict(type='str'),
+        key=dict(type='str', no_log=False),
         state=dict(type='str', choices=['present', 'absent'], required=True),
     )
     module = AnsibleModule(

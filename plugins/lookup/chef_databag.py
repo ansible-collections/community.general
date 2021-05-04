@@ -5,7 +5,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: chef_databag
+    author: Unknown (!UNKNOWN)
+    name: chef_databag
     short_description: fetches data from a Chef Databag
     description:
        - "This is a lookup plugin to provide access to chef data bags using the pychef package.
@@ -27,14 +28,16 @@ DOCUMENTATION = '''
 '''
 
 EXAMPLES = """
-    - debug:
-        msg: "{{ lookup('chef_databag', 'name=data_bag_name item=data_bag_item') }}"
+    - ansible.builtin.debug:
+        msg: "{{ lookup('community.general.chef_databag', 'name=data_bag_name item=data_bag_item') }}"
 """
 
 RETURN = """
   _raw:
     description:
-      - The value from the databag
+      - The value from the databag.
+    type: list
+    elements: dict
 """
 
 from ansible.errors import AnsibleError
@@ -78,7 +81,7 @@ class LookupModule(LookupBase):
                 )
         if args:
             raise AnsibleError(
-                "unrecognized arguments to with_sequence: %r" % args.keys()
+                "unrecognized arguments to with_sequence: %r" % list(args.keys())
             )
 
     def run(self, terms, variables=None, **kwargs):

@@ -67,6 +67,7 @@ options:
     - Furthermore, if the module argument takes a value denoted by C(=),
       the value will be changed to that specified in module_arguments.
     type: list
+    elements: str
   state:
     description:
     - The default of C(updated) will modify an existing rule if type,
@@ -96,7 +97,7 @@ options:
 
 EXAMPLES = r'''
 - name: Update pamd rule's control in /etc/pam.d/system-auth
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: auth
     control: required
@@ -104,7 +105,7 @@ EXAMPLES = r'''
     new_control: sufficient
 
 - name: Update pamd rule's complex control in /etc/pam.d/system-auth
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: session
     control: '[success=1 default=ignore]'
@@ -112,7 +113,7 @@ EXAMPLES = r'''
     new_control: '[success=2 default=ignore]'
 
 - name: Insert a new rule before an existing rule
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: auth
     control: required
@@ -124,7 +125,7 @@ EXAMPLES = r'''
 
 - name: Insert a new rule pam_wheel.so with argument 'use_uid' after an \
         existing rule pam_rootok.so
-  pamd:
+  community.general.pamd:
     name: su
     type: auth
     control: sufficient
@@ -136,7 +137,7 @@ EXAMPLES = r'''
     state: after
 
 - name: Remove module arguments from an existing rule
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: auth
     control: required
@@ -145,7 +146,7 @@ EXAMPLES = r'''
     state: updated
 
 - name: Replace all module arguments in an existing rule
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: auth
     control: required
@@ -158,7 +159,7 @@ EXAMPLES = r'''
     state: updated
 
 - name: Remove specific arguments from a rule
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: session
     control: '[success=1 default=ignore]'
@@ -167,7 +168,7 @@ EXAMPLES = r'''
     state: args_absent
 
 - name: Ensure specific arguments are present in a rule
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: session
     control: '[success=1 default=ignore]'
@@ -176,7 +177,7 @@ EXAMPLES = r'''
     state: args_present
 
 - name: Ensure specific arguments are present in a rule (alternative)
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: session
     control: '[success=1 default=ignore]'
@@ -187,7 +188,7 @@ EXAMPLES = r'''
     state: args_present
 
 - name: Module arguments requiring commas must be listed as a Yaml list
-  pamd:
+  community.general.pamd:
     name: special-module
     type: account
     control: required
@@ -197,7 +198,7 @@ EXAMPLES = r'''
     state: args_present
 
 - name: Update specific argument value in a rule
-  pamd:
+  community.general.pamd:
     name: system-auth
     type: auth
     control: required
@@ -206,7 +207,7 @@ EXAMPLES = r'''
     state: args_present
 
 - name: Add pam common-auth rule for duo
-  pamd:
+  community.general.pamd:
     name: common-auth
     new_type: auth
     new_control: '[success=1 default=ignore]'
@@ -286,7 +287,7 @@ class PamdLine(object):
 
     @property
     def is_valid(self):
-        if self.line == '':
+        if self.line.strip() == '':
             return True
         return False
 
@@ -301,6 +302,10 @@ class PamdLine(object):
 
     def __str__(self):
         return str(self.line)
+
+
+class PamdEmptyLine(PamdLine):
+    pass
 
 
 class PamdComment(PamdLine):
@@ -444,8 +449,8 @@ class PamdService(object):
                 pamd_line = PamdComment(line)
             elif line.lstrip().startswith('@include'):
                 pamd_line = PamdInclude(line)
-            elif line == '':
-                pamd_line = PamdLine(line)
+            elif line.strip() == '':
+                pamd_line = PamdEmptyLine(line)
             else:
                 pamd_line = PamdRule.rule_from_string(line)
 
@@ -544,7 +549,7 @@ class PamdService(object):
 
             # Next we may have to loop backwards if the previous line is a comment.  If it
             # is, we'll get the previous "rule's" previous.
-            while previous_rule is not None and isinstance(previous_rule, PamdComment):
+            while previous_rule is not None and isinstance(previous_rule, (PamdComment, PamdEmptyLine)):
                 previous_rule = previous_rule.prev
             # Next we'll see if the previous rule matches what we are trying to insert.
             if previous_rule is not None and not previous_rule.matches(new_type, new_control, new_path):
@@ -588,7 +593,7 @@ class PamdService(object):
             next_rule = current_rule.next
             # Next we may have to loop forwards if the next line is a comment.  If it
             # is, we'll get the next "rule's" next.
-            while next_rule is not None and isinstance(next_rule, PamdComment):
+            while next_rule is not None and isinstance(next_rule, (PamdComment, PamdEmptyLine)):
                 next_rule = next_rule.next
 
             # First we create a new rule
@@ -770,7 +775,7 @@ def main():
             new_type=dict(type='str', choices=VALID_TYPES),
             new_control=dict(type='str'),
             new_module_path=dict(type='str'),
-            module_arguments=dict(type='list'),
+            module_arguments=dict(type='list', elements='str'),
             state=dict(type='str', default='updated', choices=['absent', 'after', 'args_absent', 'args_present', 'before', 'updated']),
             path=dict(type='path', default='/etc/pam.d'),
             backup=dict(type='bool', default=False),
@@ -779,13 +784,8 @@ def main():
         required_if=[
             ("state", "args_present", ["module_arguments"]),
             ("state", "args_absent", ["module_arguments"]),
-            ("state", "before", ["new_control"]),
-            ("state", "before", ["new_type"]),
-            ("state", "before", ["new_module_path"]),
-            ("state", "after", ["new_control"]),
-            ("state", "after", ["new_type"]),
-            ("state", "after", ["new_module_path"]),
-
+            ("state", "before", ["new_control", "new_type", "new_module_path"]),
+            ("state", "after", ["new_control", "new_type", "new_module_path"]),
         ],
     )
     content = str()
@@ -797,9 +797,7 @@ def main():
             content = service_file_obj.read()
     except IOError as e:
         # If unable to read the file, fail out
-        module.fail_json(msg='Unable to open/read PAM module \
-                            file %s with error %s.' %
-                         (fname, str(e)))
+        module.fail_json(msg='Unable to open/read PAM module file %s with error %s.' % (fname, str(e)))
 
     # Assuming we didn't fail, create the service
     service = PamdService(content)

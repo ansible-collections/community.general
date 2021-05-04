@@ -19,6 +19,7 @@ options:
     description:
       - File system, snapshot or volume name e.g. C(rpool/myfs).
     required: true
+    type: str
   state:
     description:
       - Whether to create (C(present)), or remove (C(absent)) a
@@ -26,52 +27,55 @@ options:
         will be created/destroyed as needed to reach the desired state.
     choices: [ absent, present ]
     required: true
+    type: str
   origin:
     description:
       - Snapshot from which to create a clone.
+    type: str
   extra_zfs_properties:
     description:
       - A dictionary of zfs properties to be set.
       - See the zfs(8) man page for more information.
+    type: dict
 author:
 - Johan Wiren (@johanwiren)
 '''
 
 EXAMPLES = '''
 - name: Create a new file system called myfs in pool rpool with the setuid property turned off
-  zfs:
+  community.general.zfs:
     name: rpool/myfs
     state: present
     extra_zfs_properties:
       setuid: off
 
 - name: Create a new volume called myvol in pool rpool.
-  zfs:
+  community.general.zfs:
     name: rpool/myvol
     state: present
     extra_zfs_properties:
       volsize: 10M
 
 - name: Create a snapshot of rpool/myfs file system.
-  zfs:
+  community.general.zfs:
     name: rpool/myfs@mysnapshot
     state: present
 
 - name: Create a new file system called myfs2 with snapdir enabled
-  zfs:
+  community.general.zfs:
     name: rpool/myfs2
     state: present
     extra_zfs_properties:
       snapdir: enabled
 
 - name: Create a new file system by cloning a snapshot
-  zfs:
+  community.general.zfs:
     name: rpool/cloned_fs
     state: present
     origin: rpool/myfs@mysnapshot
 
 - name: Destroy a filesystem
-  zfs:
+  community.general.zfs:
     name: rpool/myfs
     state: absent
 '''
@@ -90,7 +94,7 @@ class Zfs(object):
         self.changed = False
         self.zfs_cmd = module.get_bin_path('zfs', True)
         self.zpool_cmd = module.get_bin_path('zpool', True)
-        self.pool = name.split('/')[0]
+        self.pool = name.split('/')[0].split('@')[0]
         self.is_solaris = os.uname()[0] == 'SunOS'
         self.is_openzfs = self.check_openzfs()
         self.enhanced_sharing = self.check_enhanced_sharing()
@@ -199,7 +203,10 @@ class Zfs(object):
         rc, out, err = self.module.run_command(" ".join(cmd))
         properties = dict()
         for prop, value, source in [l.split('\t')[1:4] for l in out.splitlines()]:
-            if source == 'local':
+            # include source '-' so that creation-only properties are not removed
+            # to avoids errors when the dataset already exists and the property is not changed
+            # this scenario is most likely when the same playbook is run more than once
+            if source == 'local' or source == '-':
                 properties[prop] = value
         # Add alias for enhanced sharing properties
         if self.enhanced_sharing:

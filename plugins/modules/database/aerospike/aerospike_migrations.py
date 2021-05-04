@@ -106,7 +106,7 @@ options:
 EXAMPLES = '''
 # check for migrations on local node
 - name: Wait for migrations on local node before proceeding
-  aerospike_migrations:
+  community.general.aerospike_migrations:
     host: "localhost"
     connect_timeout: 2000
     consecutive_good_checks: 5
@@ -115,21 +115,20 @@ EXAMPLES = '''
     local_only: False
 
 # example playbook:
----
 - name: Upgrade aerospike
   hosts: all
   become: true
   serial: 1
   tasks:
     - name: Install dependencies
-      apt:
+      ansible.builtin.apt:
         name:
             - python
             - python-pip
             - python-setuptools
         state: latest
     - name: Setup aerospike
-      pip:
+      ansible.builtin.pip:
           name: aerospike
 # check for migrations every (sleep_between_checks)
 # If at least (consecutive_good_checks) checks come back OK in a row, then return OK.
@@ -138,7 +137,7 @@ EXAMPLES = '''
 # Maximum runtime before giving up in this case will be:
 # Tries Limit * Sleep Between Checks * delay * retries
     - name: Wait for aerospike migrations
-      aerospike_migrations:
+      community.general.aerospike_migrations:
           local_only: True
           sleep_between_checks: 1
           tries_limit: 5
@@ -152,10 +151,10 @@ EXAMPLES = '''
       delay: 60
       retries: 120
     - name: Another thing
-      shell: |
+      ansible.builtin.shell: |
           echo foo
     - name: Reboot
-      reboot:
+      ansible.builtin.reboot:
 '''
 
 RETURN = '''
@@ -191,9 +190,9 @@ def run_module():
         min_cluster_size=dict(type='int', required=False, default=1),
         target_cluster_size=dict(type='int', required=False, default=None),
         fail_on_cluster_change=dict(type='bool', required=False, default=True),
-        migrate_tx_key=dict(type='str', required=False,
+        migrate_tx_key=dict(type='str', required=False, no_log=False,
                             default="migrate_tx_partitions_remaining"),
-        migrate_rx_key=dict(type='str', required=False,
+        migrate_rx_key=dict(type='str', required=False, no_log=False,
                             default="migrate_rx_partitions_remaining")
     )
 
@@ -338,7 +337,7 @@ class Migrations:
             namespace_tx = \
                 int(namespace_stats[self.module.params['migrate_tx_key']])
             namespace_rx = \
-                int(namespace_stats[self.module.params['migrate_tx_key']])
+                int(namespace_stats[self.module.params['migrate_rx_key']])
         except KeyError:
             self.module.fail_json(
                 msg="Did not find partition remaining key:" +
@@ -439,7 +438,12 @@ class Migrations:
         if target_cluster_size is not None:
             cmd = cmd + "size=" + str(target_cluster_size) + ";"
         for node in self._nodes:
-            cluster_key.add(self._info_cmd_helper(cmd, node))
+            try:
+                cluster_key.add(self._info_cmd_helper(cmd, node))
+            except aerospike.exception.ServerError as e:  # unstable-cluster is returned in form of Exception
+                if 'unstable-cluster' in e.msg:
+                    return False
+                raise e
         if len(cluster_key) == 1:
             return True
         return False

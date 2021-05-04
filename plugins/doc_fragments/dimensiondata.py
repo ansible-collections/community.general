@@ -3,6 +3,9 @@
 # Copyright: (c) 2016, Dimension Data
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 # Authors:
 #   - Adam Friedman  <tintoy@tintoy.io>
 
@@ -16,7 +19,6 @@ options:
   region:
     description:
       - The target region.
-    choices:
       - Regions are defined in Apache libcloud project [libcloud/common/dimensiondata.py]
       - They are also listed in U(https://libcloud.readthedocs.io/en/latest/compute/drivers/dimensiondata.html)
       - Note that the default value "na" stands for "North America".

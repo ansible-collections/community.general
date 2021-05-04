@@ -9,9 +9,8 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     name: gitlab_runners
-    plugin_type: inventory
-    authors:
-      - Stefan Heitmüller (stefan.heitmueller@gmx.com)
+    author:
+      - Stefan Heitmüller (@morph027) <stefan.heitmueller@gmx.com>
     short_description: Ansible dynamic inventory plugin for GitLab runners.
     requirements:
         - python >= 2.7
@@ -28,19 +27,29 @@ DOCUMENTATION = '''
             required: true
             choices:
               - gitlab_runners
+              - community.general.gitlab_runners
         server_url:
             description: The URL of the GitLab server, with protocol (i.e. http or https).
+            env:
+              - name: GITLAB_SERVER_URL
+                version_added: 1.0.0
             type: str
             required: true
             default: https://gitlab.com
         api_token:
             description: GitLab token for logging in.
+            env:
+              - name: GITLAB_API_TOKEN
+                version_added: 1.0.0
             type: str
             aliases:
               - private_token
               - access_token
         filter:
             description: filter runners from GitLab API
+            env:
+              - name: GITLAB_FILTER
+                version_added: 1.0.0
             type: str
             choices: ['active', 'paused', 'online', 'specific', 'shared']
         verbose_output:
@@ -51,11 +60,11 @@ DOCUMENTATION = '''
 
 EXAMPLES = '''
 # gitlab_runners.yml
-plugin: gitlab_runners
+plugin: community.general.gitlab_runners
 host: https://gitlab.com
 
 # Example using constructed features to create groups and set ansible_host
-plugin: gitlab_runners
+plugin: community.general.gitlab_runners
 host: https://gitlab.com
 strict: False
 keyed_groups:

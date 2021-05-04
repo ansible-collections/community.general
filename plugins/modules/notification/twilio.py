@@ -22,27 +22,34 @@ notes:
      a purchased or verified phone number to send the text message.
 options:
   account_sid:
+    type: str
     description:
       user's Twilio account token found on the account page
     required: true
   auth_token:
+    type: str
     description: user's Twilio authentication token
     required: true
   msg:
+    type: str
     description:
       the body of the text message
     required: true
   to_numbers:
+    type: list
+    elements: str
     description:
       one or more phone numbers to send the text message to,
       format +15551112222
     required: true
     aliases: [ to_number ]
   from_number:
+    type: str
     description:
       the Twilio number to send the text message from, format +15551112222
     required: true
   media_url:
+    type: str
     description:
       a URL with a picture, video or sound clip to send with an MMS
       (multimedia message) instead of a plain SMS
@@ -56,7 +63,7 @@ EXAMPLES = '''
 # note: replace account_sid and auth_token values with your credentials
 # and you have to have the 'from_number' on your Twilio account
 - name: Send a text message to a mobile phone through Twilio
-  twilio:
+  community.general.twilio:
     msg: All servers with webserver role are now configured.
     account_sid: ACXXXXXXXXXXXXXXXXX
     auth_token: ACXXXXXXXXXXXXXXXXX
@@ -68,7 +75,7 @@ EXAMPLES = '''
 # note: replace account_sid and auth_token values with your credentials
 # and you have to have the 'from_number' on your Twilio account
 - name: Send a text message to a mobile phone through Twilio
-  twilio:
+  community.general.twilio:
     msg: This server configuration is now complete.
     account_sid: ACXXXXXXXXXXXXXXXXX
     auth_token: ACXXXXXXXXXXXXXXXXX
@@ -84,7 +91,7 @@ EXAMPLES = '''
 # note: replace account_sid and auth_token values with your credentials
 # and you have to have the 'from_number' on your Twilio account
 - name: Send a text message to a mobile phone through Twilio
-  twilio:
+  community.general.twilio:
     msg: Deployment complete!
     account_sid: ACXXXXXXXXXXXXXXXXX
     auth_token: ACXXXXXXXXXXXXXXXXX
@@ -137,7 +144,7 @@ def main():
             auth_token=dict(required=True, no_log=True),
             msg=dict(required=True),
             from_number=dict(required=True),
-            to_numbers=dict(required=True, aliases=['to_number'], type='list'),
+            to_numbers=dict(required=True, aliases=['to_number'], type='list', elements='str'),
             media_url=dict(default=None, required=False),
         ),
         supports_check_mode=True

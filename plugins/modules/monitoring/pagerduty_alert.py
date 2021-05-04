@@ -19,21 +19,25 @@ requirements:
     - PagerDuty API access
 options:
     name:
+        type: str
         description:
             - PagerDuty unique subdomain. Obsolete. It is not used with PagerDuty REST v2 API.
     service_id:
+        type: str
         description:
             - ID of PagerDuty service when incidents will be triggered, acknowledged or resolved.
         required: true
     service_key:
+        type: str
         description:
             - The GUID of one of your "Generic API" services. Obsolete. Please use I(integration_key).
     integration_key:
+        type: str
         description:
             - The GUID of one of your "Generic API" services.
             - This is the "integration key" listed on a "Integrations" tab of PagerDuty service.
-        required: true
     state:
+        type: str
         description:
             - Type of event to be sent.
         required: true
@@ -42,10 +46,12 @@ options:
             - 'acknowledged'
             - 'resolved'
     api_key:
+        type: str
         description:
             - The pagerduty API key (readonly access), generated on the pagerduty site.
         required: true
     desc:
+        type: str
         description:
             - For C(triggered) I(state) - Required. Short description of the problem that led to this trigger. This field (or a truncated version)
               will be used when generating phone calls, SMS messages and alert emails. It will also appear on the incidents tables in the PagerDuty UI.
@@ -54,6 +60,7 @@ options:
         required: false
         default: Created via Ansible
     incident_key:
+        type: str
         description:
             - Identifies the incident to which this I(state) should be applied.
             - For C(triggered) I(state) - If there's no open (i.e. unresolved) incident with this key, a new one will be created. If there's already an
@@ -63,10 +70,12 @@ options:
               trigger event. Acknowledge events referencing resolved or nonexistent incidents will be discarded.
         required: false
     client:
+        type: str
         description:
         - The name of the monitoring client that is triggering this event.
         required: false
     client_url:
+        type: str
         description:
         -  The URL of the monitoring client that is triggering this event.
         required: false
@@ -74,7 +83,7 @@ options:
 
 EXAMPLES = '''
 - name: Trigger an incident with just the basic options
-  pagerduty_alert:
+  community.general.pagerduty_alert:
     name: companyabc
     integration_key: xxx
     api_key: yourapikey
@@ -83,7 +92,7 @@ EXAMPLES = '''
     desc: problem that led to this trigger
 
 - name: Trigger an incident with more options
-  pagerduty_alert:
+  community.general.pagerduty_alert:
     integration_key: xxx
     api_key: yourapikey
     service_id: PDservice
@@ -94,7 +103,7 @@ EXAMPLES = '''
     client_url: http://service.example.com
 
 - name: Acknowledge an incident based on incident_key
-  pagerduty_alert:
+  community.general.pagerduty_alert:
     integration_key: xxx
     api_key: yourapikey
     service_id: PDservice
@@ -103,7 +112,7 @@ EXAMPLES = '''
     desc: "some text for incident's log"
 
 - name: Resolve an incident based on incident_key
-  pagerduty_alert:
+  community.general.pagerduty_alert:
     integration_key: xxx
     api_key: yourapikey
     service_id: PDservice
@@ -188,15 +197,15 @@ def main():
         argument_spec=dict(
             name=dict(required=False),
             service_id=dict(required=True),
-            service_key=dict(required=False),
-            integration_key=dict(required=False),
-            api_key=dict(required=True),
+            service_key=dict(required=False, no_log=True),
+            integration_key=dict(required=False, no_log=True),
+            api_key=dict(required=True, no_log=True),
             state=dict(required=True,
                        choices=['triggered', 'acknowledged', 'resolved']),
             client=dict(required=False, default=None),
             client_url=dict(required=False, default=None),
             desc=dict(required=False, default='Created via Ansible'),
-            incident_key=dict(required=False, default=None)
+            incident_key=dict(required=False, default=None, no_log=False)
         ),
         supports_check_mode=True
     )

@@ -40,7 +40,7 @@ description:
   formats.
 - Currently, remote addition is only supported via I(flatpakrepo) file URLs.
 - Existing remotes will not be updated.
-- See the M(flatpak) module for managing flatpaks.
+- See the M(community.general.flatpak) module for managing flatpaks.
 author:
 - John Kwiatkoski (@JayKayy)
 - Alexander Bethke (@oolongbrothers)
@@ -87,26 +87,26 @@ options:
 
 EXAMPLES = r'''
 - name: Add the Gnome flatpak remote to the system installation
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: gnome
     state: present
     flatpakrepo_url: https://sdk.gnome.org/gnome-apps.flatpakrepo
 
 - name: Add the flathub flatpak repository remote to the user installation
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flathub
     state: present
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
     method: user
 
 - name: Remove the Gnome flatpak remote from the user installation
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: gnome
     state: absent
     method: user
 
 - name: Remove the flathub remote from the system installation
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flathub
     state: absent
 '''

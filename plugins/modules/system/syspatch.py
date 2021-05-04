@@ -1,12 +1,12 @@
 #!/usr/bin/python
 
-# Copyright: (c) 2019, Andrew Klaus <andrewklaus@gmail.com>
+# Copyright: (c) 2019-2020, Andrew Klaus <andrewklaus@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: syspatch
 
@@ -14,18 +14,12 @@ short_description: Manage OpenBSD system patches
 
 
 description:
-    - "Manage OpenBSD system patches using syspatch"
+    - "Manage OpenBSD system patches using syspatch."
 
 options:
-    apply:
-        description:
-            - Apply all available system patches
-        default: False
-        required: false
     revert:
         description:
-            - Revert system patches
-        required: false
+            - Revert system patches.
         type: str
         choices: [ all, one ]
 
@@ -35,25 +29,23 @@ author:
 
 EXAMPLES = '''
 - name: Apply all available system patches
-  syspatch:
-    apply: true
+  community.general.syspatch:
 
 - name: Revert last patch
-  syspatch:
+  community.general.syspatch:
     revert: one
 
 - name: Revert all patches
-  syspatch:
+  community.general.syspatch:
     revert: all
 
 # NOTE: You can reboot automatically if a patch requires it:
 - name: Apply all patches and store result
-  syspatch:
-    apply: true
+  community.general.syspatch:
   register: syspatch
 
 - name: Reboot if patch requires it
-  reboot:
+  ansible.builtin.reboot:
   when: syspatch.reboot_needed
 '''
 
@@ -63,17 +55,17 @@ rc:
   returned: always
   type: int
 stdout:
-  description: syspatch standard output
+  description: syspatch standard output.
   returned: always
   type: str
   sample: "001_rip6cksum"
 stderr:
-  description: syspatch standard error
+  description: syspatch standard error.
   returned: always
   type: str
   sample: "syspatch: need root privileges"
 reboot_needed:
-  description: Whether or not a reboot is required after an update
+  description: Whether or not a reboot is required after an update.
   returned: always
   type: bool
   sample: True
@@ -85,14 +77,12 @@ from ansible.module_utils.basic import AnsibleModule
 def run_module():
     # define available arguments/parameters a user can pass to the module
     module_args = dict(
-        apply=dict(type='bool'),
         revert=dict(type='str', choices=['all', 'one'])
     )
 
     module = AnsibleModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        required_one_of=[['apply', 'revert']]
     )
 
     result = syspatch_run(module)
@@ -116,7 +106,7 @@ def syspatch_run(module):
             run_flag = ['-R']
         else:
             run_flag = ['-r']
-    elif module.params['apply']:
+    else:
         check_flag = ['-c']
         run_flag = []
 
@@ -142,10 +132,10 @@ def syspatch_run(module):
         # http://openbsd-archive.7691.n7.nabble.com/Warning-applying-latest-syspatch-td354250.html
         if rc != 0 and err != 'ln: /usr/X11R6/bin/X: No such file or directory\n':
             module.fail_json(msg="Command %s failed rc=%d, out=%s, err=%s" % (cmd, rc, out, err))
-        elif out.lower().find('create unique kernel') > 0:
+        elif out.lower().find('create unique kernel') >= 0:
             # Kernel update applied
             reboot_needed = True
-        elif out.lower().find('syspatch updated itself') > 0:
+        elif out.lower().find('syspatch updated itself') >= 0:
             warnings.append('Syspatch was updated. Please run syspatch again.')
 
         # If no stdout, then warn user

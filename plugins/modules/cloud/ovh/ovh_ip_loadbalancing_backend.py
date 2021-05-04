@@ -25,46 +25,56 @@ options:
         required: true
         description:
             - Name of the LoadBalancing internal name (ip-X.X.X.X)
+        type: str
     backend:
         required: true
         description:
             - The IP address of the backend to update / modify / delete
+        type: str
     state:
         default: present
         choices: ['present', 'absent']
         description:
             - Determines whether the backend is to be created/modified
               or deleted
+        type: str
     probe:
         default: 'none'
         choices: ['none', 'http', 'icmp' , 'oco']
         description:
             - Determines the type of probe to use for this backend
+        type: str
     weight:
         default: 8
         description:
             - Determines the weight for this backend
+        type: int
     endpoint:
         required: true
         description:
             - The endpoint to use ( for instance ovh-eu)
+        type: str
     application_key:
         required: true
         description:
             - The applicationKey to use
+        type: str
     application_secret:
         required: true
         description:
             - The application secret to use
+        type: str
     consumer_key:
         required: true
         description:
             - The consumer key to use
+        type: str
     timeout:
         default: 120
         description:
             - The timeout in seconds used to wait for a task to be
               completed.
+        type: int
 
 '''
 

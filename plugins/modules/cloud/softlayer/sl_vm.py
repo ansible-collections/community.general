@@ -18,18 +18,63 @@ options:
   instance_id:
     description:
       - Instance Id of the virtual instance to perform action option.
+    type: str
   hostname:
     description:
       - Hostname to be provided to a virtual instance.
+    type: str
   domain:
     description:
       - Domain name to be provided to a virtual instance.
+    type: str
   datacenter:
     description:
       - Datacenter for the virtual instance to be deployed.
+    type: str
+    choices:
+      - ams01
+      - ams03
+      - che01
+      - dal01
+      - dal05
+      - dal06
+      - dal09
+      - dal10
+      - dal12
+      - dal13
+      - fra02
+      - fra04
+      - fra05
+      - hkg02
+      - hou02
+      - lon02
+      - lon04
+      - lon06
+      - mel01
+      - mex01
+      - mil01
+      - mon01
+      - osl01
+      - par01
+      - sao01
+      - sea01
+      - seo01
+      - sjc01
+      - sjc03
+      - sjc04
+      - sng01
+      - syd01
+      - syd04
+      - tok02
+      - tor01
+      - wdc01
+      - wdc04
+      - wdc06
+      - wdc07
   tags:
     description:
       - Tag or list of tags to be provided to a virtual instance.
+    type: str
   hourly:
     description:
       - Flag to determine if the instance should be hourly billed.
@@ -53,48 +98,61 @@ options:
   cpus:
     description:
       - Count of cpus to be assigned to new virtual instance.
-    required: true
+    type: int
+    choices: [1, 2, 4, 8, 16, 32, 56]
   memory:
     description:
       - Amount of memory to be assigned to new virtual instance.
-    required: true
+    type: int
+    choices: [1024, 2048, 4096, 6144, 8192, 12288, 16384, 32768, 49152, 65536, 131072, 247808]
   flavor:
     description:
       - Specify which SoftLayer flavor template to use instead of cpus and memory.
     version_added: '0.2.0'
+    type: str
   disks:
     description:
       - List of disk sizes to be assigned to new virtual instance.
-    required: true
     default: [ 25 ]
+    type: list
+    elements: int
   os_code:
     description:
       - OS Code to be used for new virtual instance.
+    type: str
   image_id:
     description:
       - Image Template to be used for new virtual instance.
+    type: str
   nic_speed:
     description:
       - NIC Speed to be assigned to new virtual instance.
-    default: 10
+    choices: [10, 100, 1000]
+    type: int
   public_vlan:
     description:
       - VLAN by its Id to be assigned to the public NIC.
+    type: str
   private_vlan:
     description:
       - VLAN by its Id to be assigned to the private NIC.
+    type: str
   ssh_keys:
     description:
       - List of ssh keys by their Id to be assigned to a virtual instance.
+    type: list
+    elements: str
   post_uri:
     description:
       - URL of a post provisioning script to be loaded and executed on virtual instance.
+    type: str
   state:
     description:
       - Create, or cancel a virtual instance.
       - Specify C(present) for create, C(absent) to cancel.
     choices: [ absent, present ]
     default: present
+    type: str
   wait:
     description:
       - Flag used to wait for active status before returning.
@@ -104,6 +162,7 @@ options:
     description:
       - Time in seconds before wait returns.
     default: 600
+    type: int
 requirements:
     - python >= 2.6
     - softlayer >= 4.1.1
@@ -117,7 +176,7 @@ EXAMPLES = '''
   gather_facts: no
   tasks:
   - name: Build instance request
-    sl_vm:
+    community.general.sl_vm:
       hostname: instance-1
       domain: anydomain.com
       datacenter: dal09
@@ -137,7 +196,7 @@ EXAMPLES = '''
   gather_facts: no
   tasks:
   - name: Build instances request
-    sl_vm:
+    community.general.sl_vm:
       hostname: "{{ item.hostname }}"
       domain: "{{ item.domain }}"
       datacenter: "{{ item.datacenter }}"
@@ -195,7 +254,7 @@ EXAMPLES = '''
   gather_facts: no
   tasks:
   - name: Cancel by tag
-    sl_vm:
+    community.general.sl_vm:
       state: absent
       tags: ansible-module-test
 '''
@@ -339,13 +398,13 @@ def main():
             cpus=dict(type='int', choices=CPU_SIZES),
             memory=dict(type='int', choices=MEMORY_SIZES),
             flavor=dict(type='str'),
-            disks=dict(type='list', default=[25]),
+            disks=dict(type='list', elements='int', default=[25]),
             os_code=dict(type='str'),
             image_id=dict(type='str'),
             nic_speed=dict(type='int', choices=NIC_SPEEDS),
             public_vlan=dict(type='str'),
             private_vlan=dict(type='str'),
-            ssh_keys=dict(type='list', default=[]),
+            ssh_keys=dict(type='list', elements='str', default=[], no_log=False),
             post_uri=dict(type='str'),
             state=dict(type='str', default='present', choices=STATES),
             wait=dict(type='bool', default=True),

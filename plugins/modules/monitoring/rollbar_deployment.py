@@ -18,30 +18,37 @@ description:
     (see https://rollbar.com/docs/deploys_other/)
 options:
   token:
+    type: str
     description:
       - Your project access token.
     required: true
   environment:
+    type: str
     description:
       - Name of the environment being deployed, e.g. 'production'.
     required: true
   revision:
+    type: str
     description:
       - Revision number/sha being deployed.
     required: true
   user:
+    type: str
     description:
       - User who deployed.
     required: false
   rollbar_user:
+    type: str
     description:
       - Rollbar username of the user who deployed.
     required: false
   comment:
+    type: str
     description:
       - Deploy comment (e.g. what is being deployed).
     required: false
   url:
+    type: str
     description:
       - Optional URL to submit the notification to.
     required: false
@@ -58,7 +65,7 @@ options:
 
 EXAMPLES = '''
   - name: Rollbar deployment notification
-    rollbar_deployment:
+    community.general.rollbar_deployment:
     token: AAAAAA
     environment: staging
     user: ansible
@@ -67,7 +74,7 @@ EXAMPLES = '''
     comment: Test Deploy
 
   - name: Notify rollbar about current git revision deployment by current user
-    rollbar_deployment:
+    community.general.rollbar_deployment:
     token: "{{ rollbar_access_token }}"
     environment: production
     revision: "{{ lookup('pipe', 'git rev-parse HEAD') }}"
@@ -85,7 +92,7 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            token=dict(required=True),
+            token=dict(required=True, no_log=True),
             environment=dict(required=True),
             revision=dict(required=True),
             user=dict(required=False),
@@ -95,7 +102,7 @@ def main():
                 required=False,
                 default='https://api.rollbar.com/api/1/deploy/'
             ),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         ),
         supports_check_mode=True
     )

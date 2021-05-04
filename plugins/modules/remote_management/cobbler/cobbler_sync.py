@@ -18,18 +18,21 @@ options:
     description:
     - The name or IP address of the Cobbler system.
     default: 127.0.0.1
+    type: str
   port:
     description:
     - Port number to be used for REST connection.
     - The default value depends on parameter C(use_ssl).
+    type: int
   username:
     description:
     - The username to log in to Cobbler.
     default: cobbler
+    type: str
   password:
     description:
     - The password to log in to Cobbler.
-    required: yes
+    type: str
   use_ssl:
     description:
     - If C(no), an HTTP connection will be used instead of the default HTTPS connection.
@@ -52,7 +55,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Commit Cobbler changes
-  cobbler_sync:
+  community.general.cobbler_sync:
     host: cobbler01
     username: cobbler
     password: MySuperSecureP4sswOrd
@@ -103,12 +106,14 @@ def main():
 
     ssl_context = None
     if not validate_certs:
-        try:  # Python 2.7.9 and newer
-            ssl_context = ssl.create_unverified_context()
-        except AttributeError:  # Legacy Python that doesn't verify HTTPS certificates by default
-            ssl._create_default_context = ssl._create_unverified_context
-        else:  # Python 2.7.8 and older
-            ssl._create_default_https_context = ssl._create_unverified_https_context
+        try:
+            ssl_context = ssl._create_unverified_context()
+        except AttributeError:
+            # Legacy Python that doesn't verify HTTPS certificates by default
+            pass
+        else:
+            # Handle target environment that doesn't support HTTPS verification
+            ssl._create_default_https_context = ssl._create_unverified_context
 
     url = '{proto}://{host}:{port}/cobbler_api'.format(**module.params)
     if ssl_context:

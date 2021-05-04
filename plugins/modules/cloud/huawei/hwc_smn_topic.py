@@ -51,7 +51,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Create a smn topic
-  hwc_smn_topic:
+  community.general.hwc_smn_topic:
       identity_endpoint: "{{ identity_endpoint }}"
       user_name: "{{ user_name }}"
       password: "{{ password }}"

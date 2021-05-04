@@ -3,24 +3,11 @@
 #
 # Copyright (C) 2016 Guido Günther <agx@sigxcpu.org>
 #
-# This script is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# Ansible is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with it.  If not, see <http://www.gnu.org/licenses/>.
-#
-# This is loosely based on the foreman inventory script
-# -- Josh Preston <jpreston@redhat.com>
-#
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import print_function
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import argparse
 from ansible.module_utils.six.moves import configparser as ConfigParser
 import os
@@ -229,9 +216,9 @@ class CloudFormsInventory(object):
         parser.add_argument('--debug', action='store_true', default=False, help='Show debug output while running (default: False)')
         self.args = parser.parse_args()
 
-    def _get_json(self, url):
+    def _http_request(self, url):
         """
-        Make a request and return the JSON
+        Make a request and return the result converted from JSON
         """
         results = []
 
@@ -244,7 +231,8 @@ class CloudFormsInventory(object):
         try:
             results = json.loads(ret.text)
         except ValueError:
-            warnings.warn("Unexpected response from {0} ({1}): {2}".format(self.cloudforms_url, ret.status_code, ret.reason))
+            warnings.warn(
+                "Unexpected response from {0} ({1}): {2}".format(self.cloudforms_url, ret.status_code, ret.reason))
             results = {}
 
         if self.args.debug:
@@ -258,11 +246,18 @@ class CloudFormsInventory(object):
 
         return results
 
-    def _get_hosts(self):
+    def _get_json(self, endpoint, url_suffix):
         """
-        Get all hosts by paging through the results
+        Make a request by given url, split request by configured limit,
+        go through all sub-requests and return the aggregated data received
+        by cloudforms
+
+        :param endpoint: api endpoint to access
+        :param url_suffix: additional api parameters
+
         """
-        limit = self.cloudforms_limit
+
+        limit = int(self.cloudforms_limit)
 
         page = 0
         last_page = False
@@ -271,13 +266,34 @@ class CloudFormsInventory(object):
 
         while not last_page:
             offset = page * limit
-            ret = self._get_json("%s/api/vms?offset=%s&limit=%s&expand=resources,tags,hosts,&attributes=ipaddresses" % (self.cloudforms_url, offset, limit))
-            results += ret['resources']
-            if ret['subcount'] < limit:
+            url = "%s%s?offset=%s&limit=%s%s" % (
+                self.cloudforms_url, endpoint, offset, limit, url_suffix)
+
+            if self.args.debug:
+                print("Connecting to url '%s'" % url)
+
+            ret = self._http_request(url)
+            results += [ret]
+
+            if 'subcount' in ret:
+                if ret['subcount'] < limit:
+                    last_page = True
+                page += 1
+            else:
                 last_page = True
-            page += 1
 
         return results
+
+    def _get_hosts(self):
+        """
+        Get all hosts
+        """
+        endpoint = "/api/vms"
+        url_suffix = "&expand=resources,tags,hosts,&attributes=active,ipaddresses&filter[]=active=true"
+        results = self._get_json(endpoint, url_suffix)
+        resources = [item for sublist in results for item in sublist['resources']]
+
+        return resources
 
     def update_cache(self):
         """

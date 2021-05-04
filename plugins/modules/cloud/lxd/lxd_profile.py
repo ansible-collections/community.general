@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 # Copyright: (c) 2016, Hiroaki Nakamura <hnakamur@gmail.com>
+# Copyright: (c) 2020, Frank Dornheim <dornheim@posteo.de>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
-
 
 DOCUMENTATION = '''
 ---
@@ -20,9 +20,11 @@ options:
         description:
           - Name of a profile.
         required: true
+        type: str
     description:
         description:
           - Description of the profile.
+        type: str
     config:
         description:
           - 'The config for the container (e.g. {"limits.memory": "4GB"}).
@@ -35,18 +37,29 @@ options:
           - Not all config values are supported to apply the existing profile.
             Maybe you need to delete and recreate a profile.
         required: false
+        type: dict
     devices:
         description:
           - 'The devices for the profile
             (e.g. {"rootfs": {"path": "/dev/kvm", "type": "unix-char"}).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#patch-3)'
         required: false
+        type: dict
     new_name:
         description:
           - A new name of a profile.
           - If this parameter is specified a profile will be renamed to this name.
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-11)
         required: false
+        type: str
+    merge_profile:
+        description:
+            - Merge the configuration of the present profile with the new desired configuration,
+              instead of replacing it.
+        required: false
+        default: false
+        type: bool
+        version_added: 2.1.0
     state:
         choices:
           - present
@@ -55,28 +68,33 @@ options:
           - Define the state of a profile.
         required: false
         default: present
+        type: str
     url:
         description:
           - The unix domain socket path or the https URL for the LXD server.
         required: false
         default: unix:/var/lib/lxd/unix.socket
+        type: str
     snap_url:
         description:
           - The unix domain socket path when LXD is installed by snap package manager.
         required: false
         default: unix:/var/snap/lxd/common/lxd/unix.socket
+        type: str
     client_key:
         description:
           - The client certificate key file path.
+          - If not specified, it defaults to C($HOME/.config/lxc/client.key).
         required: false
-        default: '"{}/.config/lxc/client.key" .format(os.environ["HOME"])'
         aliases: [ key_file ]
+        type: path
     client_cert:
         description:
           - The client certificate file path.
+          - If not specified, it defaults to C($HOME/.config/lxc/client.crt).
         required: false
-        default: '"{}/.config/lxc/client.crt" .format(os.environ["HOME"])'
         aliases: [ cert_file ]
+        type: path
     trust_password:
         description:
           - The client trusted password.
@@ -87,6 +105,7 @@ options:
           - If trust_password is set, this module send a request for
             authentication before sending any requests.
         required: false
+        type: str
 notes:
   - Profiles must have a unique name. If you attempt to create a profile
     with a name that already existed in the users namespace the module will
@@ -99,7 +118,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create a profile
-      lxd_profile:
+      community.general.lxd_profile:
         name: macvlan
         state: present
         config: {}
@@ -115,7 +134,7 @@ EXAMPLES = '''
   connection: local
   tasks:
   - name: Create macvlan profile
-    lxd_profile:
+    community.general.lxd_profile:
       url: https://127.0.0.1:8443
       # These client_cert and client_key values are equal to the default values.
       #client_cert: "{{ lookup('env', 'HOME') }}/.config/lxc/client.crt"
@@ -131,12 +150,29 @@ EXAMPLES = '''
           parent: br0
           type: nic
 
+# An example for modify/merge a profile
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: Merge a profile
+      community.general.lxd_profile:
+        merge_profile: true
+        name: macvlan
+        state: present
+        config: {}
+        description: my macvlan profile
+        devices:
+          eth0:
+            nictype: macvlan
+            parent: br0
+            type: nic
+
 # An example for deleting a profile
 - hosts: localhost
   connection: local
   tasks:
     - name: Delete a profile
-      lxd_profile:
+      community.general.lxd_profile:
         name: macvlan
         state: absent
 
@@ -145,7 +181,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Rename a profile
-      lxd_profile:
+      community.general.lxd_profile:
         name: macvlan
         new_name: macvlan2
         state: present
@@ -170,7 +206,6 @@ actions:
 '''
 
 import os
-
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
 
@@ -201,8 +236,12 @@ class LXDProfileManagement(object):
         self.state = self.module.params['state']
         self.new_name = self.module.params.get('new_name', None)
 
-        self.key_file = self.module.params.get('client_key', None)
-        self.cert_file = self.module.params.get('client_cert', None)
+        self.key_file = self.module.params.get('client_key')
+        if self.key_file is None:
+            self.key_file = '{0}/.config/lxc/client.key'.format(os.environ['HOME'])
+        self.cert_file = self.module.params.get('client_cert')
+        if self.cert_file is None:
+            self.cert_file = '{0}/.config/lxc/client.crt'.format(os.environ['HOME'])
         self.debug = self.module._verbosity >= 4
 
         try:
@@ -251,7 +290,7 @@ class LXDProfileManagement(object):
                     self._create_profile()
                 else:
                     self.module.fail_json(
-                        msg='new_name must not be set when the profile does not exist and the specified state is present',
+                        msg='new_name must not be set when the profile does not exist and the state is present',
                         changed=False)
             else:
                 if self.new_name is not None and self.new_name != self.name:
@@ -292,10 +331,96 @@ class LXDProfileManagement(object):
             self._needs_to_change_profile_config('devices')
         )
 
-    def _apply_profile_configs(self):
-        config = self.old_profile_json.copy()
+    def _merge_dicts(self, source, destination):
+        """Merge Dictionarys
+
+        Get a list of filehandle numbers from logger to be handed to
+        DaemonContext.files_preserve
+
+        Args:
+            dict(source): source dict
+            dict(destination): destination dict
+        Kwargs:
+            None
+        Raises:
+            None
+        Returns:
+            dict(destination): merged dict"""
+        for key, value in source.items():
+            if isinstance(value, dict):
+                # get node or create one
+                node = destination.setdefault(key, {})
+                self._merge_dicts(value, node)
+            else:
+                destination[key] = value
+        return destination
+
+    def _merge_config(self, config):
+        """ merge profile
+
+        Merge Configuration of the present profile and the new desired configitems
+
+        Args:
+            dict(config): Dict with the old config in 'metadata' and new config in 'config'
+        Kwargs:
+            None
+        Raises:
+            None
+        Returns:
+            dict(config): new config"""
+        # merge or copy the sections from the existing profile to 'config'
+        for item in ['config', 'description', 'devices', 'name', 'used_by']:
+            if item in config:
+                config[item] = self._merge_dicts(config['metadata'][item], config[item])
+            else:
+                config[item] = config['metadata'][item]
+        # merge or copy the sections from the ansible-task to 'config'
+        return self._merge_dicts(self.config, config)
+
+    def _generate_new_config(self, config):
+        """ rebuild profile
+
+        Rebuild the Profile by the configuration provided in the play.
+        Existing configurations are discarded.
+
+        This ist the default behavior.
+
+        Args:
+            dict(config): Dict with the old config in 'metadata' and new config in 'config'
+        Kwargs:
+            None
+        Raises:
+            None
+        Returns:
+            dict(config): new config"""
         for k, v in self.config.items():
             config[k] = v
+        return config
+
+    def _apply_profile_configs(self):
+        """ Selection of the procedure: rebuild or merge
+
+        The standard behavior is that all information not contained
+        in the play is discarded.
+
+        If "merge_profile" is provides in the play and "True", then existing
+        configurations from the profile and new ones defined are merged.
+
+        Args:
+            None
+        Kwargs:
+            None
+        Raises:
+            None
+        Returns:
+            None"""
+        config = self.old_profile_json.copy()
+        if self.module.params['merge_profile']:
+            config = self._merge_config(config)
+        else:
+            config = self._generate_new_config(config)
+
+        # upload config to lxd
         self.client.do('PUT', '/1.0/profiles/{0}'.format(self.name), config)
         self.actions.append('apply_profile_configs')
 
@@ -356,6 +481,10 @@ def main():
             devices=dict(
                 type='dict',
             ),
+            merge_profile=dict(
+                type='bool',
+                default=False
+            ),
             state=dict(
                 choices=PROFILES_STATES,
                 default='present'
@@ -369,13 +498,11 @@ def main():
                 default='unix:/var/snap/lxd/common/lxd/unix.socket'
             ),
             client_key=dict(
-                type='str',
-                default='{0}/.config/lxc/client.key'.format(os.environ['HOME']),
+                type='path',
                 aliases=['key_file']
             ),
             client_cert=dict(
-                type='str',
-                default='{0}/.config/lxc/client.crt'.format(os.environ['HOME']),
+                type='path',
                 aliases=['cert_file']
             ),
             trust_password=dict(type='str', no_log=True)

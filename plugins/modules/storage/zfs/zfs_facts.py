@@ -21,6 +21,7 @@ options:
             - ZFS dataset name.
         required: yes
         aliases: [ "ds", "dataset" ]
+        type: str
     recurse:
         description:
             - Specifies if properties for any children should be recursively
@@ -38,30 +39,32 @@ options:
             - Specifies which dataset properties should be queried in comma-separated format.
               For more information about dataset properties, check zfs(1M) man page.
         default: all
-        aliases: [ "props" ]
+        type: str
     type:
         description:
             - Specifies which datasets types to display. Multiple values have to be
               provided in comma-separated form.
         choices: [ 'all', 'filesystem', 'volume', 'snapshot', 'bookmark' ]
         default: all
+        type: str
     depth:
         description:
             - Specifies recursion depth.
+        type: int
 '''
 
 EXAMPLES = '''
 - name: Gather facts about ZFS dataset rpool/export/home
-  zfs_facts:
+  community.general.zfs_facts:
     dataset: rpool/export/home
 
 - name: Report space usage on ZFS filesystems under data/home
-  zfs_facts:
+  community.general.zfs_facts:
     name: data/home
     recurse: yes
     type: filesystem
 
-- debug:
+- ansible.builtin.debug:
     msg: 'ZFS dataset {{ item.name }} consumes {{ item.used }} of disk space.'
   with_items: '{{ ansible_zfs_datasets }}'
 '''
@@ -172,10 +175,7 @@ class ZFSFacts(object):
         self.facts = []
 
     def dataset_exists(self):
-        cmd = [self.module.get_bin_path('zfs')]
-
-        cmd.append('list')
-        cmd.append(self.name)
+        cmd = [self.module.get_bin_path('zfs'), 'list', self.name]
 
         (rc, out, err) = self.module.run_command(cmd)
 
@@ -185,10 +185,7 @@ class ZFSFacts(object):
             return False
 
     def get_facts(self):
-        cmd = [self.module.get_bin_path('zfs')]
-
-        cmd.append('get')
-        cmd.append('-H')
+        cmd = [self.module.get_bin_path('zfs'), 'get', '-H']
         if self.parsable:
             cmd.append('-p')
         if self.recurse:
@@ -199,10 +196,7 @@ class ZFSFacts(object):
         if self.type:
             cmd.append('-t')
             cmd.append(self.type)
-        cmd.append('-o')
-        cmd.append('name,property,value')
-        cmd.append(self.properties)
-        cmd.append(self.name)
+        cmd.extend(['-o', 'name,property,value', self.properties, self.name])
 
         (rc, out, err) = self.module.run_command(cmd)
 

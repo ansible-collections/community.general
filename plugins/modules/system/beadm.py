@@ -58,41 +58,41 @@ options:
 
 EXAMPLES = r'''
 - name: Create ZFS boot environment
-  beadm:
+  community.general.beadm:
     name: upgrade-be
     state: present
 
 - name: Create ZFS boot environment from existing inactive boot environment
-  beadm:
+  community.general.beadm:
     name: upgrade-be
     snapshot: be@old
     state: present
 
 - name: Create ZFS boot environment with compression enabled and description "upgrade"
-  beadm:
+  community.general.beadm:
     name: upgrade-be
     options: "compression=on"
     description: upgrade
     state: present
 
 - name: Delete ZFS boot environment
-  beadm:
+  community.general.beadm:
     name: old-be
     state: absent
 
 - name: Mount ZFS boot environment on /tmp/be
-  beadm:
+  community.general.beadm:
     name: BE
     mountpoint: /tmp/be
     state: mounted
 
 - name: Unmount ZFS boot environment
-  beadm:
+  community.general.beadm:
     name: BE
     state: unmounted
 
 - name: Activate ZFS boot environment
-  beadm:
+  community.general.beadm:
     name: upgrade-be
     state: activated
 '''
@@ -154,9 +154,7 @@ class BE(object):
         self.is_freebsd = os.uname()[0] == 'FreeBSD'
 
     def _beadm_list(self):
-        cmd = [self.module.get_bin_path('beadm')]
-        cmd.append('list')
-        cmd.append('-H')
+        cmd = [self.module.get_bin_path('beadm'), 'list', '-H']
         if '@' in self.name:
             cmd.append('-s')
         return self.module.run_command(cmd)
@@ -165,24 +163,33 @@ class BE(object):
         if '@' in self.name:
             for line in out.splitlines():
                 if self.is_freebsd:
-                    check = re.match(r'.+/({0})\s+\-'.format(self.name), line)
-                    if check:
+                    check = line.split()
+                    if(check == []):
+                        continue
+                    full_name = check[0].split('/')
+                    if(full_name == []):
+                        continue
+                    check[0] = full_name[len(full_name) - 1]
+                    if check[0] == self.name:
                         return check
                 else:
                     check = line.split(';')
-                    if check[1] == self.name:
+                    if check[0] == self.name:
                         return check
         else:
-            splitter = '\t' if self.is_freebsd else ';'
             for line in out.splitlines():
-                check = line.split(splitter)
-                if check[0] == self.name:
-                    return check
-
+                if self.is_freebsd:
+                    check = line.split()
+                    if check[0] == self.name:
+                        return check
+                else:
+                    check = line.split(';')
+                    if check[0] == self.name:
+                        return check
         return None
 
     def exists(self):
-        (rc, out, _) = self._beadm_list()
+        (rc, out, dummy) = self._beadm_list()
 
         if rc == 0:
             if self._find_be_by_name(out):
@@ -193,81 +200,65 @@ class BE(object):
             return False
 
     def is_activated(self):
-        (rc, out, _) = self._beadm_list()
+        (rc, out, dummy) = self._beadm_list()
 
         if rc == 0:
             line = self._find_be_by_name(out)
+            if line is None:
+                return False
             if self.is_freebsd:
-                if line is not None and 'R' in line.split('\t')[1]:
+                if 'R' in line[1]:
                     return True
             else:
-                if 'R' in line.split(';')[2]:
+                if 'R' in line[2]:
                     return True
 
         return False
 
     def activate_be(self):
-        cmd = [self.module.get_bin_path('beadm')]
-
-        cmd.append('activate')
-        cmd.append(self.name)
-
+        cmd = [self.module.get_bin_path('beadm'), 'activate', self.name]
         return self.module.run_command(cmd)
 
     def create_be(self):
-        cmd = [self.module.get_bin_path('beadm')]
-
-        cmd.append('create')
+        cmd = [self.module.get_bin_path('beadm'), 'create']
 
         if self.snapshot:
-            cmd.append('-e')
-            cmd.append(self.snapshot)
-
+            cmd.extend(['-e', self.snapshot])
         if not self.is_freebsd:
             if self.description:
-                cmd.append('-d')
-                cmd.append(self.description)
-
+                cmd.extend(['-d', self.description])
             if self.options:
-                cmd.append('-o')
-                cmd.append(self.options)
+                cmd.extend(['-o', self.options])
 
         cmd.append(self.name)
 
         return self.module.run_command(cmd)
 
     def destroy_be(self):
-        cmd = [self.module.get_bin_path('beadm')]
-
-        cmd.append('destroy')
-        cmd.append('-F')
-        cmd.append(self.name)
-
+        cmd = [self.module.get_bin_path('beadm'), 'destroy', '-F', self.name]
         return self.module.run_command(cmd)
 
     def is_mounted(self):
-        (rc, out, _) = self._beadm_list()
+        (rc, out, dummy) = self._beadm_list()
 
         if rc == 0:
             line = self._find_be_by_name(out)
+            if line is None:
+                return False
             if self.is_freebsd:
                 # On FreeBSD, we exclude currently mounted BE on /, as it is
                 # special and can be activated even if it is mounted. That is not
                 # possible with non-root BEs.
-                if line.split('\t')[2] != '-' and \
-                        line.split('\t')[2] != '/':
+                if line[2] != '-' and line[2] != '/':
                     return True
             else:
-                if line.split(';')[3]:
+                if line[3]:
                     return True
 
         return False
 
     def mount_be(self):
-        cmd = [self.module.get_bin_path('beadm')]
-
-        cmd.append('mount')
-        cmd.append(self.name)
+        cmd = [self.module.get_bin_path('beadm'), 'mount', self.name]
 
         if self.mountpoint:
             cmd.append(self.mountpoint)
@@ -275,9 +266,7 @@ class BE(object):
         return self.module.run_command(cmd)
 
     def unmount_be(self):
-        cmd = [self.module.get_bin_path('beadm')]
-
-        cmd.append('unmount')
+        cmd = [self.module.get_bin_path('beadm'), 'unmount']
         if self.force:
             cmd.append('-f')
         cmd.append(self.name)

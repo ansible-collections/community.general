@@ -65,51 +65,52 @@ options:
     description:
     - A list of physical volumes e.g. C(hdisk1,hdisk2).
     type: list
+    elements: str
 '''
 
 EXAMPLES = r'''
 - name: Create a logical volume of 512M
-  aix_lvol:
+  community.general.aix_lvol:
     vg: testvg
     lv: testlv
     size: 512M
 
 - name: Create a logical volume of 512M with disks hdisk1 and hdisk2
-  aix_lvol:
+  community.general.aix_lvol:
     vg: testvg
     lv: test2lv
     size: 512M
     pvs: [ hdisk1, hdisk2 ]
 
 - name: Create a logical volume of 512M mirrored
-  aix_lvol:
+  community.general.aix_lvol:
     vg: testvg
     lv: test3lv
     size: 512M
     copies: 2
 
 - name: Create a logical volume of 1G with a minimum placement policy
-  aix_lvol:
+  community.general.aix_lvol:
     vg: rootvg
     lv: test4lv
     size: 1G
     policy: minimum
 
 - name: Create a logical volume with special options like mirror pool
-  aix_lvol:
+  community.general.aix_lvol:
     vg: testvg
     lv: testlv
     size: 512M
     opts: -p copy1=poolA -p copy2=poolB
 
 - name: Extend the logical volume to 1200M
-  aix_lvol:
+  community.general.aix_lvol:
     vg: testvg
     lv: test4lv
     size: 1200M
 
 - name: Remove the logical volume
-  aix_lvol:
+  community.general.aix_lvol:
     vg: testvg
     lv: testlv
     state: absent
@@ -214,7 +215,7 @@ def main():
             copies=dict(type='int', default=1),
             state=dict(type='str', default='present', choices=['absent', 'present']),
             policy=dict(type='str', default='maximum', choices=['maximum', 'minimum']),
-            pvs=dict(type='list', default=list())
+            pvs=dict(type='list', elements='str', default=list())
         ),
         supports_check_mode=True,
     )

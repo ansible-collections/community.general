@@ -1,3 +1,6 @@
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock
 from ansible.utils.path import unfrackpath
 

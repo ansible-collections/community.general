@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Copyright: (c) 2014, GeekChimp - Franck Nijhof <franck@geekchimp.com>
+# Copyright: (c) 2014, GeekChimp - Franck Nijhof <franck@geekchimp.com> (DO NOT CONTACT!)
 # Copyright: (c) 2019, Ansible project
 # Copyright: (c) 2019, Abhijeet Kasurde <akasurde@redhat.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -13,7 +13,8 @@ DOCUMENTATION = r'''
 ---
 module: osx_defaults
 author:
-- Franck Nijhof (@frenck)
+# DO NOT RE-ADD GITHUB HANDLE!
+- Franck Nijhof (!UNKNOWN)
 short_description: Manage macOS user defaults
 description:
   - osx_defaults allows users to read, write, and delete macOS user defaults from Ansible scripts.
@@ -35,7 +36,6 @@ options:
     description:
       - The key of the user preference.
     type: str
-    required: true
   type:
     description:
       - The type of value to write.
@@ -72,47 +72,47 @@ notes:
 EXAMPLES = r'''
 # TODO: Describe what happens in each example
 
-- osx_defaults:
+- community.general.osx_defaults:
     domain: com.apple.Safari
     key: IncludeInternalDebugMenu
     type: bool
     value: true
     state: present
 
-- osx_defaults:
+- community.general.osx_defaults:
     domain: NSGlobalDomain
     key: AppleMeasurementUnits
     type: string
     value: Centimeters
     state: present
 
-- osx_defaults:
+- community.general.osx_defaults:
     domain: /Library/Preferences/com.apple.SoftwareUpdate
     key: AutomaticCheckEnabled
     type: int
     value: 1
   become: yes
 
-- osx_defaults:
+- community.general.osx_defaults:
     domain: com.apple.screensaver
     host: currentHost
     key: showClock
     type: int
     value: 1
 
-- osx_defaults:
+- community.general.osx_defaults:
     key: AppleMeasurementUnits
     type: string
     value: Centimeters
 
-- osx_defaults:
+- community.general.osx_defaults:
     key: AppleLanguages
     type: array
     value:
       - en
       - nl
 
-- osx_defaults:
+- community.general.osx_defaults:
     domain: com.geekchimp.macable
     key: ExampleKeyToRemove
     state: absent
@@ -170,6 +170,14 @@ class OSXDefaults(object):
 
     # tools --------------------------------------------------------------- {{{
     @staticmethod
+    def is_int(value):
+        as_str = str(value)
+        if (as_str.startswith("-")):
+            return as_str[1:].isdigit()
+        else:
+            return as_str.isdigit()
+
+    @staticmethod
     def _convert_type(data_type, value):
         """ Converts value to given type """
         if data_type == "string":
@@ -190,7 +198,7 @@ class OSXDefaults(object):
                     "Invalid date value: {0}. Required format yyy-mm-dd hh:mm:ss.".format(repr(value))
                 )
         elif data_type in ["int", "integer"]:
-            if not str(value).isdigit():
+            if not OSXDefaults.is_int(value):
                 raise OSXDefaultsException("Invalid integer value: {0}".format(repr(value)))
             return int(value)
         elif data_type == "float":
@@ -229,8 +237,8 @@ class OSXDefaults(object):
         value.pop(0)
         value.pop(-1)
 
-        # Remove extra spaces and comma (,) at the end of values
-        value = [re.sub(',$', '', x.strip(' ')) for x in value]
+        # Remove spaces at beginning and comma (,) at the end, unquote and unescape double quotes
+        value = [re.sub('^ *"?|"?,? *$', '', x.replace('\\"', '"')) for x in value]
 
         return value
 
@@ -361,7 +369,7 @@ def main():
         argument_spec=dict(
             domain=dict(type='str', default='NSGlobalDomain'),
             host=dict(type='str'),
-            key=dict(type='str'),
+            key=dict(type='str', no_log=False),
             type=dict(type='str', default='string', choices=['array', 'bool', 'boolean', 'date', 'float', 'int', 'integer', 'string']),
             array_add=dict(type='bool', default=False),
             value=dict(type='raw'),

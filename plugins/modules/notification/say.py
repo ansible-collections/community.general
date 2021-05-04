@@ -15,15 +15,17 @@ short_description: Makes a computer to speak.
 description:
    - makes a computer speak! Amuse your friends, annoy your coworkers!
 notes:
-   - In 2.5, this module has been renamed from C(osx_say) to M(say).
+   - In 2.5, this module has been renamed from C(osx_say) to M(community.general.say).
    - If you like this module, you may also be interested in the osx_say callback plugin.
    - A list of available voices, with language, can be found by running C(say -v ?) on a OSX host and C(espeak --voices) on a Linux host.
 options:
   msg:
+    type: str
     description:
       What to say
     required: true
   voice:
+    type: str
     description:
       What voice to use
     required: false
@@ -35,7 +37,7 @@ author:
 
 EXAMPLES = '''
 - name: Makes a computer to speak
-  say:
+  community.general.say:
     msg: '{{ inventory_hostname }} is all done'
     voice: Zarvox
   delegate_to: localhost

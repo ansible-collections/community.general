@@ -16,32 +16,40 @@ description:
      - Manage the state of a program or group of programs running via supervisord
 options:
   name:
+    type: str
     description:
       - The name of the supervisord program or group to manage.
       - The name will be taken as group name when it ends with a colon I(:)
       - Group support is only available in Ansible version 1.6 or later.
     required: true
   config:
+    type: path
     description:
       - The supervisor configuration file path
   server_url:
+    type: str
     description:
       - URL on which supervisord server is listening
   username:
+    type: str
     description:
       - username to use for authentication
   password:
+    type: str
     description:
       - password to use for authentication
   state:
+    type: str
     description:
       - The desired state of program/group.
     required: true
     choices: [ "present", "started", "stopped", "restarted", "absent", "signalled" ]
   signal:
+    type: str
     description:
       - The signal to send to the program/group, when combined with the 'signalled' state. Required when l(state=signalled).
   supervisorctl_path:
+    type: path
     description:
       - path to supervisorctl executable
 notes:
@@ -56,23 +64,23 @@ author:
 
 EXAMPLES = '''
 - name: Manage the state of program to be in started state
-  supervisorctl:
+  community.general.supervisorctl:
     name: my_app
     state: started
 
 - name: Manage the state of program group to be in started state
-  supervisorctl:
+  community.general.supervisorctl:
     name: 'my_apps:'
     state: started
 
 - name: Restart my_app, reading supervisorctl configuration from a specified file
-  supervisorctl:
+  community.general.supervisorctl:
     name: my_app
     state: restarted
     config: /var/opt/my_project/supervisord.conf
 
 - name: Restart my_app, connecting to supervisord with credentials and server URL
-  supervisorctl:
+  community.general.supervisorctl:
     name: my_app
     state: restarted
     username: test
@@ -80,7 +88,7 @@ EXAMPLES = '''
     server_url: http://localhost:9001
 
 - name: Send a signal to my_app via supervisorctl
-  supervisorctl:
+  community.general.supervisorctl:
     name: my_app
     state: signalled
     signal: USR1
@@ -92,14 +100,14 @@ from ansible.module_utils.basic import AnsibleModule, is_executable
 
 def main():
     arg_spec = dict(
-        name=dict(required=True),
+        name=dict(type='str', required=True),
         config=dict(required=False, type='path'),
-        server_url=dict(required=False),
-        username=dict(required=False),
-        password=dict(required=False, no_log=True),
+        server_url=dict(type='str', required=False),
+        username=dict(type='str', required=False),
+        password=dict(type='str', required=False, no_log=True),
         supervisorctl_path=dict(required=False, type='path'),
-        state=dict(required=True, choices=['present', 'started', 'restarted', 'stopped', 'absent', 'signalled']),
-        signal=dict(required=False)
+        state=dict(type='str', required=True, choices=['present', 'started', 'restarted', 'stopped', 'absent', 'signalled']),
+        signal=dict(type='str', required=False)
     )
 
     module = AnsibleModule(argument_spec=arg_spec, supports_check_mode=True)

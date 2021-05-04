@@ -42,7 +42,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Example hponcfg configuration XML
-  copy:
+  ansible.builtin.copy:
     content: |
       <ribcl VERSION="2.0">
         <login USER_LOGIN="user" PASSWORD="password">
@@ -60,11 +60,11 @@ EXAMPLES = r'''
     dest: /tmp/enable-ssh.xml
 
 - name: Configure HP iLO using enable-ssh.xml
-  hponcfg:
+  community.general.hponcfg:
     src: /tmp/enable-ssh.xml
 
 - name: Configure HP iLO on VMware ESXi hypervisor
-  hponcfg:
+  community.general.hponcfg:
     src: /tmp/enable-ssh.xml
     executable: /opt/hp/tools/hponcfg
 '''

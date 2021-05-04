@@ -12,7 +12,7 @@ short_description: Retrieve the information about one or more of the OneView Eth
 description:
     - Retrieve the information about one or more of the Ethernet Networks from OneView.
     - This module was called C(oneview_ethernet_network_facts) before Ansible 2.9, returning C(ansible_facts).
-      Note that the M(oneview_ethernet_network_info) module no longer returns C(ansible_facts)!
+      Note that the M(community.general.oneview_ethernet_network_info) module no longer returns C(ansible_facts)!
 requirements:
     - hpOneView >= 2.0.1
 author:
@@ -23,10 +23,13 @@ options:
     name:
       description:
         - Ethernet Network name.
+      type: str
     options:
       description:
         - "List with options to gather additional information about an Ethernet Network and related resources.
           Options allowed: C(associatedProfiles) and C(associatedUplinkGroups)."
+      type: list
+      elements: str
 extends_documentation_fragment:
 - community.general.oneview
 - community.general.oneview.factsparams
@@ -35,16 +38,16 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Gather information about all Ethernet Networks
-  oneview_ethernet_network_info:
+  community.general.oneview_ethernet_network_info:
     config: /etc/oneview/oneview_config.json
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.ethernet_networks }}"
 
 - name: Gather paginated and filtered information about Ethernet Networks
-  oneview_ethernet_network_info:
+  community.general.oneview_ethernet_network_info:
     config: /etc/oneview/oneview_config.json
     params:
       start: 1
@@ -54,21 +57,21 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.ethernet_networks }}"
 
 - name: Gather information about an Ethernet Network by name
-  oneview_ethernet_network_info:
+  community.general.oneview_ethernet_network_info:
     config: /etc/oneview/oneview_config.json
     name: Ethernet network name
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.ethernet_networks }}"
 
 - name: Gather information about an Ethernet Network by name with options
-  oneview_ethernet_network_info:
+  community.general.oneview_ethernet_network_info:
     config: /etc/oneview/oneview_config.json
     name: eth1
     options:
@@ -77,9 +80,9 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.enet_associated_profiles }}"
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.enet_associated_uplink_groups }}"
 '''
 
@@ -106,16 +109,12 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 class EthernetNetworkInfoModule(OneViewModuleBase):
     argument_spec = dict(
         name=dict(type='str'),
-        options=dict(type='list'),
+        options=dict(type='list', elements='str'),
         params=dict(type='dict')
     )
 
     def __init__(self):
         super(EthernetNetworkInfoModule, self).__init__(additional_arg_spec=self.argument_spec)
-        self.is_old_facts = self.module._name in ('oneview_ethernet_network_facts', 'community.general.oneview_ethernet_network_facts')
-        if self.is_old_facts:
-            self.module.deprecate("The 'oneview_ethernet_network_facts' module has been renamed to 'oneview_ethernet_network_info', "
-                                  "and the renamed one no longer returns ansible_facts", version='2.13')
 
         self.resource_client = self.oneview_client.ethernet_networks
 
@@ -131,10 +130,7 @@ class EthernetNetworkInfoModule(OneViewModuleBase):
 
         info['ethernet_networks'] = ethernet_networks
 
-        if self.is_old_facts:
-            return dict(changed=False, ansible_facts=info)
-        else:
-            return dict(changed=False, **info)
+        return dict(changed=False, **info)
 
     def __gather_optional_info(self, ethernet_network):
 

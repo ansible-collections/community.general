@@ -25,34 +25,38 @@ options:
       - Specifies the fully qualified hostname to add or remove from
         the system
     required: true
+    type: str
   view:
     description:
       - Sets the DNS view to associate this tst record with.  The DNS
         view must already be configured on the system
-    required: true
     default: default
     aliases:
       - dns_view
+    type: str
   text:
     description:
       - Text associated with the record. It can contain up to 255 bytes
         per substring, up to a total of 512 bytes. To enter leading,
         trailing, or embedded spaces in the text, add quotes around the
         text to preserve the spaces.
-    required: true
+    type: str
   ttl:
     description:
       - Configures the TTL to be associated with this tst record
+    type: int
   extattrs:
     description:
       - Allows for the configuration of Extensible Attributes on the
         instance of the object.  This argument accepts a set of key / value
         pairs for configuration.
+    type: dict
   comment:
     description:
       - Configures a text string comment to be associated with the instance
         of this object.  The provided text string will be configured on the
         object instance.
+    type: str
   state:
     description:
       - Configures the intended state of the instance of the object on
@@ -63,11 +67,12 @@ options:
     choices:
       - present
       - absent
+    type: str
 '''
 
 EXAMPLES = '''
     - name: Ensure a text Record Exists
-      nios_txt_record:
+      community.general.nios_txt_record:
         name: fqdn.txt.record.com
         text: mytext
         state: present
@@ -78,7 +83,7 @@ EXAMPLES = '''
           password: admin
 
     - name: Ensure a text Record does not exist
-      nios_txt_record:
+      community.general.nios_txt_record:
         name: fqdn.txt.record.com
         text: mytext
         state: absent
@@ -92,8 +97,8 @@ EXAMPLES = '''
 RETURN = ''' # '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import iteritems
 from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import WapiModule
+from ansible_collections.community.general.plugins.module_utils.net_tools.nios.api import normalize_ib_spec
 
 
 def main():
@@ -114,7 +119,7 @@ def main():
         state=dict(default='present', choices=['present', 'absent'])
     )
 
-    argument_spec.update(ib_spec)
+    argument_spec.update(normalize_ib_spec(ib_spec))
     argument_spec.update(WapiModule.provider_spec)
 
     module = AnsibleModule(argument_spec=argument_spec,

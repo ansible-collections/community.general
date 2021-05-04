@@ -24,34 +24,43 @@ options:
       - During upgrade, reset versioned world dependencies and change logic to prefer replacing or downgrading packages (instead of holding them)
         if the currently installed package is no longer available from any repository.
     type: bool
-    default: 'no'
+    default: no
   name:
     description:
       - A package name, like C(foo), or multiple packages, like C(foo, bar).
     type: list
     elements: str
+  no_cache:
+    description:
+      - Do not use any local cache path.
+    type: bool
+    default: no
+    version_added: 1.0.0
   repository:
     description:
       - A package repository or multiple repositories.
         Unlike with the underlying apk command, this list will override the system repositories rather than supplement them.
+    type: list
+    elements: str
   state:
     description:
       - Indicates the desired package(s) state.
-      - C(present) ensures the package(s) is/are present.
-      - C(absent) ensures the package(s) is/are absent.
+      - C(present) ensures the package(s) is/are present. C(installed) can be used as an alias.
+      - C(absent) ensures the package(s) is/are absent. C(removed) can be used as an alias.
       - C(latest) ensures the package(s) is/are present and the latest version(s).
     default: present
-    choices: [ "present", "absent", "latest" ]
+    choices: [ "present", "absent", "latest", "installed", "removed" ]
+    type: str
   update_cache:
     description:
       - Update repository indexes. Can be run with other steps or on it's own.
     type: bool
-    default: 'no'
+    default: no
   upgrade:
     description:
       - Upgrade all installed packages to their latest version.
     type: bool
-    default: 'no'
+    default: no
 notes:
   - '"name" and "upgrade" are mutually exclusive.'
   - When used with a `loop:` each package will be processed individually, it is much more efficient to pass the list directly to the `name` option.
@@ -59,66 +68,72 @@ notes:
 
 EXAMPLES = '''
 - name: Update repositories and install foo package
-  apk:
+  community.general.apk:
     name: foo
     update_cache: yes
 
 - name: Update repositories and install foo and bar packages
-  apk:
+  community.general.apk:
     name: foo,bar
     update_cache: yes
 
 - name: Remove foo package
-  apk:
+  community.general.apk:
     name: foo
     state: absent
 
 - name: Remove foo and bar packages
-  apk:
+  community.general.apk:
     name: foo,bar
     state: absent
 
 - name: Install the package foo
-  apk:
+  community.general.apk:
     name: foo
     state: present
 
 - name: Install the packages foo and bar
-  apk:
+  community.general.apk:
     name: foo,bar
     state: present
 
 - name: Update repositories and update package foo to latest version
-  apk:
+  community.general.apk:
     name: foo
     state: latest
     update_cache: yes
 
 - name: Update repositories and update packages foo and bar to latest versions
-  apk:
+  community.general.apk:
     name: foo,bar
     state: latest
     update_cache: yes
 
 - name: Update all installed packages to the latest versions
-  apk:
+  community.general.apk:
     upgrade: yes
 
 - name: Upgrade / replace / downgrade / uninstall all installed packages to the latest versions available
-  apk:
+  community.general.apk:
     available: yes
     upgrade: yes
 
 - name: Update repositories as a separate step
-  apk:
+  community.general.apk:
     update_cache: yes
 
 - name: Install package from a specific repository
-  apk:
+  community.general.apk:
     name: foo
     state: latest
     update_cache: yes
     repository: http://dl-3.alpinelinux.org/alpine/edge/main
+
+- name: Install package without using cache
+  community.general.apk:
+    name: foo
+    state: latest
+    no_cache: yes
 '''
 
 RETURN = '''
@@ -293,10 +308,11 @@ def main():
         argument_spec=dict(
             state=dict(default='present', choices=['present', 'installed', 'absent', 'removed', 'latest']),
             name=dict(type='list', elements='str'),
-            repository=dict(type='list'),
-            update_cache=dict(default='no', type='bool'),
-            upgrade=dict(default='no', type='bool'),
-            available=dict(default='no', type='bool'),
+            no_cache=dict(default=False, type='bool'),
+            repository=dict(type='list', elements='str'),
+            update_cache=dict(default=False, type='bool'),
+            upgrade=dict(default=False, type='bool'),
+            available=dict(default=False, type='bool'),
         ),
         required_one_of=[['name', 'update_cache', 'upgrade']],
         mutually_exclusive=[['name', 'upgrade']],
@@ -310,6 +326,9 @@ def main():
     APK_PATH = module.get_bin_path('apk', required=True)
 
     p = module.params
+
+    if p['no_cache']:
+        APK_PATH = "%s --no-cache" % (APK_PATH, )
 
     # add repositories to the APK_PATH
     if p['repository']:

@@ -19,40 +19,53 @@ options:
     description:
      - Name of the host to be added to Stacki.
     required: True
+    type: str
   stacki_user:
     description:
      - Username for authenticating with Stacki API, but if not
        specified, the environment variable C(stacki_user) is used instead.
     required: True
+    type: str
   stacki_password:
     description:
      - Password for authenticating with Stacki API, but if not
        specified, the environment variable C(stacki_password) is used instead.
     required: True
+    type: str
   stacki_endpoint:
     description:
      - URL for the Stacki API Endpoint.
     required: True
+    type: str
   prim_intf_mac:
     description:
      - MAC Address for the primary PXE boot network interface.
+    type: str
   prim_intf_ip:
     description:
      - IP Address for the primary network interface.
+    type: str
   prim_intf:
     description:
      - Name of the primary network interface.
+    type: str
   force_install:
     description:
      - Set value to True to force node into install state if it already exists in stacki.
     type: bool
+    default: no
+  state:
+    description:
+      - Set value to the desired state for the specified host.
+    type: str
+    choices: [ absent, present ]
 author:
 - Hugh Ma (@bbyhuy) <Hugh.Ma@flextronics.com>
 '''
 
 EXAMPLES = '''
 - name: Add a host named test-1
-  stacki_host:
+  community.general.stacki_host:
     name: test-1
     stacki_user: usr
     stacki_password: pwd
@@ -62,7 +75,7 @@ EXAMPLES = '''
     prim_intf: eth0
 
 - name: Remove a host named test-1
-  stacki_host:
+  community.general.stacki_host:
     name: test-1
     stacki_user: usr
     stacki_password: pwd
@@ -91,9 +104,8 @@ stdout_lines:
 '''
 
 import json
-import os
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.urls import fetch_url
 
@@ -223,9 +235,9 @@ def main():
             prim_intf_ip=dict(type='str'),
             network=dict(type='str', default='private'),
             prim_intf_mac=dict(type='str'),
-            stacki_user=dict(type='str', required=True, default=os.environ.get('stacki_user')),
-            stacki_password=dict(type='str', required=True, default=os.environ.get('stacki_password'), no_log=True),
-            stacki_endpoint=dict(type='str', required=True, default=os.environ.get('stacki_endpoint')),
+            stacki_user=dict(type='str', required=True, fallback=(env_fallback, ['stacki_user'])),
+            stacki_password=dict(type='str', required=True, fallback=(env_fallback, ['stacki_password']), no_log=True),
+            stacki_endpoint=dict(type='str', required=True, fallback=(env_fallback, ['stacki_endpoint'])),
             force_install=dict(type='bool', default=False),
         ),
         supports_check_mode=False,
@@ -250,7 +262,7 @@ def main():
                       'prim_intf_ip', 'network', 'prim_intf_mac']:
             if not module.params[param]:
                 missing_params.append(param)
-        if len(missing_params) > 0:
+        if len(missing_params) > 0:   # @FIXME replace with required_if
             module.fail_json(msg="missing required arguments: {0}".format(missing_params))
 
         stacki.stack_add(result)

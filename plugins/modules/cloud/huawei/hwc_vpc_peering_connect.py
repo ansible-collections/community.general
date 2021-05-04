@@ -91,7 +91,7 @@ EXAMPLES = '''
     name: "ansible_network_vpc_test_peering"
   register: vpc2
 - name: Create a peering connect
-  hwc_vpc_peering_connect:
+  community.general.hwc_vpc_peering_connect:
     local_vpc_id: "{{ vpc1.id }}"
     name: "ansible_network_peering_test"
     peering_vpc:

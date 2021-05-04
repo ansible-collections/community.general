@@ -19,6 +19,7 @@ options:
     name:
         description:
             - ZFS pool name.
+        type: str
         aliases: [ "pool", "zpool" ]
         required: false
     parsable:
@@ -32,20 +33,20 @@ options:
         description:
             - Specifies which dataset properties should be queried in comma-separated format.
               For more information about dataset properties, check zpool(1M) man page.
-        aliases: [ "props" ]
+        type: str
         default: all
         required: false
 '''
 
 EXAMPLES = '''
 - name: Gather facts about ZFS pool rpool
-  zpool_facts: pool=rpool
+  community.general.zpool_facts: pool=rpool
 
 - name: Gather space usage about all imported ZFS pools
-  zpool_facts: properties='free,size'
+  community.general.zpool_facts: properties='free,size'
 
 - name: Print gathered information
-  debug:
+  ansible.builtin.debug:
     msg: 'ZFS pool {{ item.name }} has {{ item.free }} free space out of {{ item.size }}.'
   with_items: '{{ ansible_zfs_pools }}'
 '''
@@ -133,10 +134,7 @@ class ZPoolFacts(object):
         self.facts = []
 
     def pool_exists(self):
-        cmd = [self.module.get_bin_path('zpool')]
-
-        cmd.append('list')
-        cmd.append(self.name)
+        cmd = [self.module.get_bin_path('zpool'), 'list', self.name]
 
         (rc, out, err) = self.module.run_command(cmd)
 
@@ -146,10 +144,7 @@ class ZPoolFacts(object):
             return False
 
     def get_facts(self):
-        cmd = [self.module.get_bin_path('zpool')]
-
-        cmd.append('get')
-        cmd.append('-H')
+        cmd = [self.module.get_bin_path('zpool'), 'get', '-H']
         if self.parsable:
             cmd.append('-p')
         cmd.append('-o')

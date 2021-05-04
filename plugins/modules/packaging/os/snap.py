@@ -24,12 +24,15 @@ options:
         description:
             - Name of the snap to install or remove. Can be a list of snaps.
         required: true
+        type: list
+        elements: str
     state:
         description:
             - Desired state of the package.
         required: false
         default: present
         choices: [ absent, present ]
+        type: str
     classic:
         description:
             - Confinement policy. The classic confinement allows a snap to have
@@ -38,7 +41,7 @@ options:
               This option can only be specified if there is a single snap in the task.
         type: bool
         required: false
-        default: False
+        default: no
     channel:
         description:
             - Define which release of a snap is installed and tracked for updates.
@@ -55,26 +58,26 @@ author:
 EXAMPLES = '''
 # Install "foo" and "bar" snap
 - name: Install foo
-  snap:
+  community.general.snap:
     name:
       - foo
       - bar
 
 # Remove "foo" snap
 - name: Remove foo
-  snap:
+  community.general.snap:
     name: foo
     state: absent
 
 # Install a snap with classic confinement
 - name: Install "foo" with option --classic
-  snap:
+  community.general.snap:
     name: foo
     classic: yes
 
 # Install a snap with from a specific channel
 - name: Install "foo" with option --channel=latest/edge
-  snap:
+  community.general.snap:
     name: foo
     channel: latest/edge
 '''
@@ -233,7 +236,7 @@ def execute_action(module):
 
 def main():
     module_args = {
-        'name': dict(type='list', required=True),
+        'name': dict(type='list', elements='str', required=True),
         'state': dict(type='str', required=False, default='present', choices=['absent', 'present']),
         'classic': dict(type='bool', required=False, default=False),
         'channel': dict(type='str', required=False, default='stable'),

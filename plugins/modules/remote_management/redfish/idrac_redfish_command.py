@@ -26,21 +26,25 @@ options:
     description:
       - List of commands to execute on OOB controller
     type: list
+    elements: str
   baseuri:
     required: true
     description:
       - Base URI of OOB controller
     type: str
   username:
-    required: true
     description:
       - User for authentication with OOB controller
     type: str
   password:
-    required: true
     description:
       - Password for authentication with OOB controller
     type: str
+  auth_token:
+    description:
+      - Security token for authentication with OOB controller
+    type: str
+    version_added: 2.3.0
   timeout:
     description:
       - Timeout in seconds for URL requests to OOB controller
@@ -58,7 +62,7 @@ author: "Jose Delarosa (@jose-delarosa)"
 
 EXAMPLES = '''
   - name: Create BIOS configuration job (schedule BIOS setting update)
-    idrac_redfish_command:
+    community.general.idrac_redfish_command:
       category: Systems
       command: CreateBiosConfigJob
       resource_id: System.Embedded.1
@@ -134,13 +138,23 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             category=dict(required=True),
-            command=dict(required=True, type='list'),
+            command=dict(required=True, type='list', elements='str'),
             baseuri=dict(required=True),
-            username=dict(required=True),
-            password=dict(required=True, no_log=True),
+            username=dict(),
+            password=dict(no_log=True),
+            auth_token=dict(no_log=True),
             timeout=dict(type='int', default=10),
             resource_id=dict()
         ),
+        required_together=[
+            ('username', 'password'),
+        ],
+        required_one_of=[
+            ('username', 'auth_token'),
+        ],
+        mutually_exclusive=[
+            ('username', 'auth_token'),
+        ],
         supports_check_mode=False
     )
 
@@ -149,7 +163,8 @@ def main():
 
     # admin credentials used for authentication
     creds = {'user': module.params['username'],
-             'pswd': module.params['password']}
+             'pswd': module.params['password'],
+             'token': module.params['auth_token']}
 
     # timeout
     timeout = module.params['timeout']
@@ -164,7 +179,7 @@ def main():
 
     # Check that Category is valid
     if category not in CATEGORY_COMMANDS_ALL:
-        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, CATEGORY_COMMANDS_ALL.keys())))
+        module.fail_json(msg=to_native("Invalid Category '%s'. Valid Categories = %s" % (category, list(CATEGORY_COMMANDS_ALL.keys()))))
 
     # Check that all commands are valid
     for cmd in command_list:

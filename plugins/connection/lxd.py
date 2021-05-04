@@ -6,15 +6,15 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    author: Matt Clay <matt@mystile.com>
-    connection: lxd
+    author: Matt Clay (@mattclay) <matt@mystile.com>
+    name: lxd
     short_description: Run tasks in lxc containers via lxc CLI
     description:
         - Run commands or put/fetch files to an existing lxc container using lxc CLI
     options:
       remote_addr:
         description:
-            - Container identifier
+            - Container identifier.
         default: inventory_hostname
         vars:
             - name: ansible_host
@@ -26,6 +26,19 @@ DOCUMENTATION = '''
         vars:
             - name: ansible_executable
             - name: ansible_lxd_executable
+      remote:
+        description:
+            - Name of the LXD remote to use.
+        default: local
+        vars:
+            - name: ansible_lxd_remote
+        version_added: 2.0.0
+      project:
+        description:
+            - Name of the LXD project to use.
+        vars:
+            - name: ansible_lxd_project
+        version_added: 2.0.0
 '''
 
 import os
@@ -70,7 +83,15 @@ class Connection(ConnectionBase):
 
         self._display.vvv(u"EXEC {0}".format(cmd), host=self._host)
 
-        local_cmd = [self._lxc_cmd, "exec", self._host, "--", self._play_context.executable, "-c", cmd]
+        local_cmd = [self._lxc_cmd]
+        if self.get_option("project"):
+            local_cmd.extend(["--project", self.get_option("project")])
+        local_cmd.extend([
+            "exec",
+            "%s:%s" % (self.get_option("remote"), self._host),
+            "--",
+            self._play_context.executable, "-c", cmd
+        ])
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
         in_data = to_bytes(in_data, errors='surrogate_or_strict', nonstring='passthru')
@@ -98,7 +119,14 @@ class Connection(ConnectionBase):
         if not os.path.isfile(to_bytes(in_path, errors='surrogate_or_strict')):
             raise AnsibleFileNotFound("input path is not a file: %s" % in_path)
 
-        local_cmd = [self._lxc_cmd, "file", "push", in_path, self._host + "/" + out_path]
+        local_cmd = [self._lxc_cmd]
+        if self.get_option("project"):
+            local_cmd.extend(["--project", self.get_option("project")])
+        local_cmd.extend([
+            "file", "push",
+            in_path,
+            "%s:%s/%s" % (self.get_option("remote"), self._host, out_path)
+        ])
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
 
@@ -111,7 +139,14 @@ class Connection(ConnectionBase):
 
         self._display.vvv(u"FETCH {0} TO {1}".format(in_path, out_path), host=self._host)
 
-        local_cmd = [self._lxc_cmd, "file", "pull", self._host + "/" + in_path, out_path]
+        local_cmd = [self._lxc_cmd]
+        if self.get_option("project"):
+            local_cmd.extend(["--project", self.get_option("project")])
+        local_cmd.extend([
+            "file", "pull",
+            "%s:%s/%s" % (self.get_option("remote"), self._host, in_path),
+            out_path
+        ])
 
         local_cmd = [to_bytes(i, errors='surrogate_or_strict') for i in local_cmd]
 

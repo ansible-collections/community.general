@@ -22,10 +22,12 @@ description:
 author: "Loic Blot (@nerzhul)"
 options:
     name:
+      type: str
       description:
       - This is the feature name to enable or disable.
       required: True
     state:
+      type: str
       description:
       - If set to C(present) and feature is disabled, then feature is enabled.
       - If set to C(present) and feature is already enabled, then nothing is changed.
@@ -37,12 +39,12 @@ options:
 
 EXAMPLES = '''
 - name: Enable ido-pgsql feature
-  icinga2_feature:
+  community.general.icinga2_feature:
     name: ido-pgsql
     state: present
 
 - name: Disable api feature
-  icinga2_feature:
+  community.general.icinga2_feature:
     name: api
     state: absent
 '''

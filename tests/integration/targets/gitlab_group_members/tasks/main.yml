@@ -1,0 +1,30 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for gitlab_group_members module
+#
+# Copyright: (c) 2020, Zainab Alsaffar <Zainab.Alsaffar@mail.rit.edu>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+- name: Install required library
+  pip:
+    name: python-gitlab
+    state: present
+
+- name: Add a User to A GitLab Group
+  gitlab_group_members:  
+    api_url: '{{ gitlab_server_url }}'
+    api_token: '{{ gitlab_api_access_token }}'
+    gitlab_group: '{{ gitlab_group_name }}'
+    gitlab_user: '{{ username }}'
+    access_level: '{{ gitlab_access_level }}'
+    state: present
+
+- name: Remove a User from A GitLab Group
+  gitlab_group_members:
+    api_url: '{{ gitlab_server_url }}'
+    api_token: '{{ gitlab_api_access_token }}'
+    gitlab_group: '{{ gitlab_group_name }}'
+    gitlab_user: '{{ username }}'
+    state: absent

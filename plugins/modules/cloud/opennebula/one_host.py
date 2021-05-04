@@ -26,6 +26,7 @@ options:
         description:
             - Hostname of the machine to manage.
         required: true
+        type: str
     state:
         description:
             - Takes the host to the desired lifecycle state.
@@ -41,29 +42,37 @@ options:
             - disabled
             - offline
         default: present
+        type: str
     im_mad_name:
         description:
             - The name of the information manager, this values are taken from the oned.conf with the tag name IM_MAD (name)
         default: kvm
+        type: str
     vmm_mad_name:
         description:
             - The name of the virtual machine manager mad name, this values are taken from the oned.conf with the tag name VM_MAD (name)
         default: kvm
+        type: str
     cluster_id:
         description:
             - The cluster ID.
         default: 0
+        type: int
     cluster_name:
         description:
             - The cluster specified by name.
+        type: str
     labels:
         description:
             - The labels for this host.
+        type: list
+        elements: str
     template:
         description:
             - The template or attribute changes to merge into the host template.
         aliases:
             - attributes
+        type: dict
 
 extends_documentation_fragment:
 - community.general.opennebula
@@ -75,13 +84,13 @@ author:
 
 EXAMPLES = '''
 - name: Create a new host in OpenNebula
-  one_host:
+  community.general.one_host:
     name: host1
     cluster_id: 1
     api_url: http://127.0.0.1:2633/RPC2
 
 - name: Create a host and adjust its template
-  one_host:
+  community.general.one_host:
     name: host2
     cluster_name: default
     template:
@@ -122,7 +131,7 @@ class HostModule(OpenNebulaModule):
             vmm_mad_name=dict(type='str', default="kvm"),
             cluster_id=dict(type='int', default=0),
             cluster_name=dict(type='str'),
-            labels=dict(type='list'),
+            labels=dict(type='list', elements='str'),
             template=dict(type='dict', aliases=['attributes']),
         )
 

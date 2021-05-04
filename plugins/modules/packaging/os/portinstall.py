@@ -21,13 +21,16 @@ options:
     name:
         description:
             - name of package to install/remove
+        aliases: [pkg]
         required: true
+        type: str
     state:
         description:
             - state of the package
         choices: [ 'present', 'absent' ]
         required: false
         default: present
+        type: str
     use_packages:
         description:
             - use packages instead of ports whenever available
@@ -39,17 +42,17 @@ author: "berenddeboer (@berenddeboer)"
 
 EXAMPLES = '''
 - name: Install package foo
-  portinstall:
+  community.general.portinstall:
     name: foo
     state: present
 
 - name: Install package security/cyrus-sasl2-saslauthd
-  portinstall:
+  community.general.portinstall:
     name: security/cyrus-sasl2-saslauthd
     state: present
 
 - name: Remove packages foo and bar
-  portinstall:
+  community.general.portinstall:
     name: foo,bar
     state: absent
 '''
@@ -190,7 +193,7 @@ def main():
         argument_spec=dict(
             state=dict(default="present", choices=["present", "absent"]),
             name=dict(aliases=["pkg"], required=True),
-            use_packages=dict(type='bool', default='yes')))
+            use_packages=dict(type='bool', default=True)))
 
     p = module.params
 

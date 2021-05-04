@@ -59,7 +59,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Create access key
-  bitbucket_access_key:
+  community.general.bitbucket_access_key:
     repository: 'bitbucket-repo'
     username: bitbucket_username
     key: '{{lookup("file", "bitbucket.pub") }}'
@@ -67,7 +67,7 @@ EXAMPLES = r'''
     state: present
 
 - name: Delete access key
-  bitbucket_access_key:
+  community.general.bitbucket_access_key:
     repository: bitbucket-repo
     username: bitbucket_username
     label: Bitbucket
@@ -224,7 +224,7 @@ def main():
     argument_spec.update(
         repository=dict(type='str', required=True),
         username=dict(type='str', required=True),
-        key=dict(type='str'),
+        key=dict(type='str', no_log=False),
         label=dict(type='str', required=True),
         state=dict(type='str', choices=['present', 'absent'], required=True),
     )

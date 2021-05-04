@@ -8,7 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: onepassword
+    name: onepassword
     author:
       - Scott Buchanan (@scottsb)
       - Andrew Zenk (@azenk)
@@ -55,27 +55,27 @@ DOCUMENTATION = '''
 EXAMPLES = """
 # These examples only work when already signed in to 1Password
 - name: Retrieve password for KITT when already signed in to 1Password
-  debug:
-    var: lookup('onepassword', 'KITT')
+  ansible.builtin.debug:
+    var: lookup('community.general.onepassword', 'KITT')
 
 - name: Retrieve password for Wintermute when already signed in to 1Password
-  debug:
-    var: lookup('onepassword', 'Tessier-Ashpool', section='Wintermute')
+  ansible.builtin.debug:
+    var: lookup('community.general.onepassword', 'Tessier-Ashpool', section='Wintermute')
 
 - name: Retrieve username for HAL when already signed in to 1Password
-  debug:
-    var: lookup('onepassword', 'HAL 9000', field='username', vault='Discovery')
+  ansible.builtin.debug:
+    var: lookup('community.general.onepassword', 'HAL 9000', field='username', vault='Discovery')
 
 - name: Retrieve password for HAL when not signed in to 1Password
-  debug:
-    var: lookup('onepassword'
+  ansible.builtin.debug:
+    var: lookup('community.general.onepassword'
                 'HAL 9000'
                 subdomain='Discovery'
                 master_password=vault_master_password)
 
 - name: Retrieve password for HAL when never signed in to 1Password
-  debug:
-    var: lookup('onepassword'
+  ansible.builtin.debug:
+    var: lookup('community.general.onepassword'
                 'HAL 9000'
                 subdomain='Discovery'
                 master_password=vault_master_password
@@ -86,6 +86,8 @@ EXAMPLES = """
 RETURN = """
   _raw:
     description: field data requested
+    type: list
+    elements: str
 """
 
 import errno
@@ -185,8 +187,63 @@ class OnePass(object):
         return rc, out, err
 
     def _parse_field(self, data_json, field_name, section_title=None):
+        """
+        Retrieves the desired field from the `op` response payload
+
+        When the item is a `password` type, the password is a key within the `details` key:
+
+        $ op get item 'test item' | jq
+        {
+          [...]
+          "templateUuid": "005",
+          "details": {
+            "notesPlain": "",
+            "password": "foobar",
+            "passwordHistory": [],
+            "sections": [
+              {
+                "name": "linked items",
+                "title": "Related Items"
+              }
+            ]
+          },
+          [...]
+        }
+
+        However, when the item is a `login` type, the password is within a fields array:
+
+        $ op get item 'test item' | jq
+        {
+          [...]
+          "details": {
+            "fields": [
+              {
+                "designation": "username",
+                "name": "username",
+                "type": "T",
+                "value": "foo"
+              },
+              {
+                "designation": "password",
+                "name": "password",
+                "type": "P",
+                "value": "bar"
+              }
+            ],
+            [...]
+          },
+          [...]
+        """
         data = json.loads(data_json)
         if section_title is None:
+            # https://github.com/ansible-collections/community.general/pull/1610:
+            # check the details dictionary for `field_name` and return it immediately if it exists
+            # when the entry is a "password" instead of a "login" item, the password field is a key
+            # in the `details` dictionary:
+            if field_name in data['details']:
+                return data['details'][field_name]
+
+            # when the field is not found above, iterate through the fields list in the object details
             for field_data in data['details'].get('fields', []):
                 if field_data.get('name', '').lower() == field_name.lower():
                     return field_data.get('value', '')

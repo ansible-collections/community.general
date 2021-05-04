@@ -40,10 +40,11 @@ options:
     description:
       - List of records to ensure they either exist or do not exist.
     type: list
+    elements: str
   type:
     description:
       - The type of DNS record to create.
-    choices: [ 'A', 'ALIAS', 'CNAME', 'MX', 'SPF', 'URL', 'TXT', 'NS', 'SRV', 'NAPTR', 'PTR', 'AAAA', 'SSHFP', 'HINFO', 'POOL' ]
+    choices: [ 'A', 'ALIAS', 'CNAME', 'MX', 'SPF', 'URL', 'TXT', 'NS', 'SRV', 'NAPTR', 'PTR', 'AAAA', 'SSHFP', 'HINFO', 'POOL', 'CAA' ]
     type: str
   ttl:
     description:
@@ -78,26 +79,26 @@ author: "Alex Coomans (@drcapulet)"
 
 EXAMPLES = '''
 - name: Authenticate using email and API token and fetch all domains
-  dnsimple:
+  community.general.dnsimple:
     account_email: test@example.com
     account_api_token: dummyapitoken
   delegate_to: localhost
 
 - name: Fetch my.com domain records
-  dnsimple:
+  community.general.dnsimple:
     domain: my.com
     state: present
   delegate_to: localhost
   register: records
 
 - name: Delete a domain
-  dnsimple:
+  community.general.dnsimple:
     domain: my.com
     state: absent
   delegate_to: localhost
 
 - name: Create a test.my.com A record to point to 127.0.0.1
-  dnsimple:
+  community.general.dnsimple:
     domain: my.com
     record: test
     type: A
@@ -106,14 +107,14 @@ EXAMPLES = '''
   register: record
 
 - name: Delete record using record_ids
-  dnsimple:
+  community.general.dnsimple:
     domain: my.com
     record_ids: '{{ record["id"] }}'
     state: absent
   delegate_to: localhost
 
 - name: Create a my.com CNAME record to example.com
-  dnsimple:
+  community.general.dnsimple:
     domain: my.com
     record: ''
     type: CNAME
@@ -122,7 +123,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Change TTL value for a record
-  dnsimple:
+  community.general.dnsimple:
     domain: my.com
     record: ''
     type: CNAME
@@ -132,7 +133,7 @@ EXAMPLES = '''
   delegate_to: localhost
 
 - name: Delete the record
-  dnsimple:
+  community.general.dnsimple:
     domain: my.com
     record: ''
     type: CNAME
@@ -167,9 +168,9 @@ def main():
             account_api_token=dict(type='str', no_log=True),
             domain=dict(type='str'),
             record=dict(type='str'),
-            record_ids=dict(type='list'),
+            record_ids=dict(type='list', elements='str'),
             type=dict(type='str', choices=['A', 'ALIAS', 'CNAME', 'MX', 'SPF', 'URL', 'TXT', 'NS', 'SRV', 'NAPTR', 'PTR', 'AAAA', 'SSHFP', 'HINFO',
-                                           'POOL']),
+                                           'POOL', 'CAA']),
             ttl=dict(type='int', default=3600),
             value=dict(type='str'),
             priority=dict(type='int'),

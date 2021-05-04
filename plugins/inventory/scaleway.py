@@ -7,7 +7,6 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     name: scaleway
-    plugin_type: inventory
     author:
       - Remy Leone (@sieben)
     short_description: Scaleway inventory source
@@ -17,13 +16,15 @@ DOCUMENTATION = '''
         plugin:
             description: token that ensures this is a source file for the 'scaleway' plugin.
             required: True
-            choices: ['scaleway']
+            choices: ['scaleway', 'community.general.scaleway']
         regions:
             description: Filter results on a specific Scaleway region
             type: list
             default:
                 - ams1
                 - par1
+                - par2
+                - waw1
         tags:
             description: Filter results on a specific tag
             type: list
@@ -60,7 +61,7 @@ EXAMPLES = '''
 
 # use hostname as inventory_hostname
 # use the private IP address to connect to the host
-plugin: scaleway
+plugin: community.general.scaleway
 regions:
   - ams1
   - par1
@@ -73,7 +74,7 @@ variables:
   state: state
 
 # use hostname as inventory_hostname and public IP address to connect to the host
-plugin: scaleway
+plugin: community.general.scaleway
 hostnames:
   - hostname
 regions:

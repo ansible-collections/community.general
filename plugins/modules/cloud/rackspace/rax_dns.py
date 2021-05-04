@@ -14,15 +14,19 @@ description:
      - Manage domains on Rackspace Cloud DNS
 options:
   comment:
+    type: str
     description:
       - Brief description of the domain. Maximum length of 160 characters
   email:
+    type: str
     description:
       - Email address of the domain administrator
   name:
+    type: str
     description:
       - Domain name to create
   state:
+    type: str
     description:
       - Indicate desired state of the resource
     choices:
@@ -30,6 +34,7 @@ options:
       - absent
     default: present
   ttl:
+    type: int
     description:
       - Time to live of domain in seconds
     default: 3600

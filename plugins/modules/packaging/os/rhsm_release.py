@@ -23,6 +23,7 @@ options:
     description:
       - RHSM release version to use (use null to unset)
     required: true
+    type: str
 author:
   - Sean Myers (@seandst)
 '''
@@ -30,17 +31,17 @@ author:
 EXAMPLES = '''
 # Set release version to 7.1
 - name: Set RHSM release version
-  rhsm_release:
+  community.general.rhsm_release:
       release: "7.1"
 
 # Set release version to 6Server
 - name: Set RHSM release version
-  rhsm_release:
+  community.general.rhsm_release:
       release: "6Server"
 
 # Unset release version
 - name: Unset RHSM release release
-  rhsm_release:
+  community.general.rhsm_release:
       release: null
 '''
 

@@ -20,31 +20,40 @@ requirements: ['git']
 short_description: Read and write git configuration
 description:
   - The C(git_config) module changes git configuration by invoking 'git config'.
-    This is needed if you don't want to use M(template) for the entire git
+    This is needed if you don't want to use M(ansible.builtin.template) for the entire git
     config file (e.g. because you need to change just C(user.email) in
-    /etc/.git/config).  Solutions involving M(command) are cumbersome or
+    /etc/.git/config).  Solutions involving M(ansible.builtin.command) are cumbersome or
     don't work correctly in check mode.
 options:
   list_all:
     description:
-      - List all settings (optionally limited to a given I(scope))
+      - List all settings (optionally limited to a given I(scope)).
     type: bool
     default: 'no'
   name:
     description:
       - The name of the setting. If no value is supplied, the value will
         be read from the config if it has been set.
+    type: str
   repo:
     description:
       - Path to a git repository for reading and writing values from a
         specific repo.
+    type: path
+  file:
+    description:
+      - Path to an adhoc git configuration file to be managed using the C(file) scope.
+    type: path
+    version_added: 2.0.0
   scope:
     description:
-      - Specify which scope to read/set values from. This is required
-        when setting config values. If this is set to local, you must
-        also specify the repo parameter. It defaults to system only when
-        not using I(list_all)=yes.
-    choices: [ "local", "global", "system" ]
+      - Specify which scope to read/set values from.
+      - This is required when setting config values.
+      - If this is set to C(local), you must also specify the C(repo) parameter.
+      - If this is set to C(file), you must also specify the C(file) parameter.
+      - It defaults to system only when not using I(list_all)=C(yes).
+    choices: [ "file", "local", "global", "system" ]
+    type: str
   state:
     description:
       - "Indicates the setting should be set/unset.
@@ -52,80 +61,82 @@ options:
         when I(state)=absent and I(value) is defined, I(value) is discarded."
     choices: [ 'present', 'absent' ]
     default: 'present'
+    type: str
   value:
     description:
       - When specifying the name of a single setting, supply a value to
         set that setting to the given value.
+    type: str
 '''
 
 EXAMPLES = '''
 - name: Add a setting to ~/.gitconfig
-  git_config:
+  community.general.git_config:
     name: alias.ci
     scope: global
     value: commit
 
 - name: Add a setting to ~/.gitconfig
-  git_config:
+  community.general.git_config:
     name: alias.st
     scope: global
     value: status
 
 - name: Remove a setting from ~/.gitconfig
-  git_config:
+  community.general.git_config:
     name: alias.ci
     scope: global
     state: absent
 
 - name: Add a setting to ~/.gitconfig
-  git_config:
+  community.general.git_config:
     name: core.editor
     scope: global
     value: vim
 
 - name: Add a setting system-wide
-  git_config:
+  community.general.git_config:
     name: alias.remotev
     scope: system
     value: remote -v
 
 - name: Add a setting to a system scope (default)
-  git_config:
+  community.general.git_config:
     name: alias.diffc
     value: diff --cached
 
 - name: Add a setting to a system scope (default)
-  git_config:
+  community.general.git_config:
     name: color.ui
     value: auto
 
 - name: Make etckeeper not complaining when it is invoked by cron
-  git_config:
+  community.general.git_config:
     name: user.email
     repo: /etc
     scope: local
     value: 'root@{{ ansible_fqdn }}'
 
 - name: Read individual values from git config
-  git_config:
+  community.general.git_config:
     name: alias.ci
     scope: global
 
 - name: Scope system is also assumed when reading values, unless list_all=yes
-  git_config:
+  community.general.git_config:
     name: alias.diffc
 
 - name: Read all values from git config
-  git_config:
+  community.general.git_config:
     list_all: yes
     scope: global
 
 - name: When list_all is yes and no scope is specified, you get configuration from all scopes
-  git_config:
+  community.general.git_config:
     list_all: yes
 
 - name: Specify a repository to include local settings
-  git_config:
+  community.general.git_config:
     list_all: yes
     repo: /path/to/repo.git
 '''
@@ -148,8 +159,9 @@ config_values:
     alias.diffc: "diff --cached"
     alias.remotev: "remote -v"
 '''
+import os
+
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves import shlex_quote
 
 
 def main():
@@ -158,12 +170,16 @@ def main():
             list_all=dict(required=False, type='bool', default=False),
             name=dict(type='str'),
             repo=dict(type='path'),
-            scope=dict(required=False, type='str', choices=['local', 'global', 'system']),
+            file=dict(type='path'),
+            scope=dict(required=False, type='str', choices=['file', 'local', 'global', 'system']),
             state=dict(required=False, type='str', default='present', choices=['present', 'absent']),
-            value=dict(required=False)
+            value=dict(required=False),
         ),
         mutually_exclusive=[['list_all', 'name'], ['list_all', 'value'], ['list_all', 'state']],
-        required_if=[('scope', 'local', ['repo'])],
+        required_if=[
+            ('scope', 'local', ['repo']),
+            ('scope', 'file', ['file'])
+        ],
         required_one_of=[['list_all', 'name']],
         supports_check_mode=True,
     )
@@ -200,7 +216,10 @@ def main():
     args = [git_path, "config", "--includes"]
     if params['list_all']:
         args.append('-l')
-    if scope:
+    if scope == 'file':
+        args.append('-f')
+        args.append(params['file'])
+    elif scope:
         args.append("--" + scope)
     if name:
         args.append(name)
@@ -214,7 +233,7 @@ def main():
         # Run from root directory to avoid accidentally picking up any local config settings
         dir = "/"
 
-    (rc, out, err) = module.run_command(' '.join(args), cwd=dir)
+    (rc, out, err) = module.run_command(args, cwd=dir, expand_user_and_vars=False)
     if params['list_all'] and scope and rc == 128 and 'unable to read config file' in err:
         # This just means nothing has been set at the given scope
         module.exit_json(changed=False, msg='', config_values={})
@@ -241,11 +260,16 @@ def main():
     if not module.check_mode:
         if unset:
             args.insert(len(args) - 1, "--" + unset)
-            cmd = ' '.join(args)
+            cmd = args
         else:
-            new_value_quoted = shlex_quote(new_value)
-            cmd = ' '.join(args + [new_value_quoted])
-        (rc, out, err) = module.run_command(cmd, cwd=dir)
+            cmd = args + [new_value]
+        try:  # try using extra parameter from ansible-base 2.10.4 onwards
+            (rc, out, err) = module.run_command(cmd, cwd=dir, ignore_invalid_cwd=False, expand_user_and_vars=False)
+        except TypeError:
+            # @TODO remove try/except when community.general drop support for 2.10.x
+            if not os.path.isdir(dir):
+                module.fail_json(msg="Cannot find directory '{0}'".format(dir))
+            (rc, out, err) = module.run_command(cmd, cwd=dir, expand_user_and_vars=False)
         if err:
             module.fail_json(rc=rc, msg=err, cmd=cmd)
 

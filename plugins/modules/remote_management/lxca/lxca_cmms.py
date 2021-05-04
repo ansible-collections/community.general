@@ -20,6 +20,7 @@ options:
   uuid:
     description:
       uuid of device, this is string with length greater than 16.
+    type: str
 
   command_options:
     description:
@@ -29,10 +30,12 @@ options:
         - cmms
         - cmms_by_uuid
         - cmms_by_chassis_uuid
+    type: str
 
   chassis:
     description:
       uuid of chassis, this is string with length greater than 16.
+    type: str
 
 extends_documentation_fragment:
 - community.general.lxca_common
@@ -42,14 +45,14 @@ extends_documentation_fragment:
 EXAMPLES = '''
 # get all cmms info
 - name: Get nodes data from LXCA
-  lxca_cmms:
+  community.general.lxca_cmms:
     login_user: USERID
     login_password: Password
     auth_url: "https://10.243.15.168"
 
 # get specific cmms info by uuid
 - name: Get nodes data from LXCA
-  lxca_cmms:
+  community.general.lxca_cmms:
     login_user: USERID
     login_password: Password
     auth_url: "https://10.243.15.168"
@@ -58,7 +61,7 @@ EXAMPLES = '''
 
 # get specific cmms info by chassis uuid
 - name: Get nodes data from LXCA
-  lxca_cmms:
+  community.general.lxca_cmms:
     login_user: USERID
     login_password: Password
     auth_url: "https://10.243.15.168"

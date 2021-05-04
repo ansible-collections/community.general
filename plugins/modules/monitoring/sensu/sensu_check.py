@@ -19,16 +19,19 @@ description:
   - they are simply specified for your convenience.
 options:
   name:
+    type: str
     description:
       - The name of the check
       - This is the key that is used to determine whether a check exists
     required: true
   state:
+    type: str
     description:
       - Whether the check should be present or not
     choices: [ 'present', 'absent' ]
     default: present
   path:
+    type: str
     description:
       - Path to the json file of the check to be added/removed.
       - Will be created if it does not exist (unless I(state=absent)).
@@ -41,43 +44,53 @@ options:
     type: bool
     default: 'no'
   command:
+    type: str
     description:
       - Path to the sensu check to run (not required when I(state=absent))
-    required: true
   handlers:
+    type: list
+    elements: str
     description:
       - List of handlers to notify when the check fails
     default: []
   subscribers:
+    type: list
+    elements: str
     description:
       - List of subscribers/channels this check should run for
       - See sensu_subscribers to subscribe a machine to a channel
     default: []
   interval:
+    type: int
     description:
       - Check interval in seconds
   timeout:
+    type: int
     description:
       - Timeout for the check
-    default: 10
+      - If not specified, it defaults to 10.
   ttl:
+    type: int
     description:
       - Time to live in seconds until the check is considered stale
   handle:
     description:
       - Whether the check should be handled or not
+      - Default is C(false).
     type: bool
-    default: 'yes'
   subdue_begin:
+    type: str
     description:
       - When to disable handling of check failures
   subdue_end:
+    type: str
     description:
       - When to enable handling of check failures
   dependencies:
+    type: list
+    elements: str
     description:
-      - Other checks this check depends on, if dependencies fail,
-      - handling of this check will be disabled
+      - Other checks this check depends on, if dependencies fail handling of this check will be disabled
     default: []
   metric:
     description:
@@ -88,39 +101,45 @@ options:
     description:
       - Whether the check should be scheduled by the sensu client or server
       - This option obviates the need for specifying the I(subscribers) option
+      - Default is C(false).
     type: bool
-    default: 'no'
   publish:
     description:
       - Whether the check should be scheduled at all.
       - You can still issue it via the sensu api
+      - Default is C(false).
     type: bool
-    default: 'yes'
   occurrences:
+    type: int
     description:
       - Number of event occurrences before the handler should take action
-    default: 1
+      - If not specified, defaults to 1.
   refresh:
+    type: int
     description:
       - Number of seconds handlers should wait before taking second action
   aggregate:
     description:
       - Classifies the check as an aggregate check,
       - making it available via the aggregate API
+      - Default is C(false).
     type: bool
-    default: 'no'
   low_flap_threshold:
+    type: int
     description:
       - The low threshold for flap detection
   high_flap_threshold:
+    type: int
     description:
       - The high threshold for flap detection
   custom:
+    type: dict
     description:
       - A hash/dictionary of custom parameters for mixing to the configuration.
       - You can't rewrite others module parameters using this
     default: {}
   source:
+    type: str
     description:
       - The check source, used to create a JIT Sensu client for an external resource (e.g. a network switch).
 author: "Anders Ingemann (@andsens)"
@@ -130,7 +149,7 @@ EXAMPLES = '''
 # Fetch metrics about the CPU load every 60 seconds,
 # the sensu server has a handler called 'relay' which forwards stats to graphite
 - name: Get cpu metrics
-  sensu_check:
+  community.general.sensu_check:
     name: cpu_load
     command: /etc/sensu/plugins/system/cpu-mpstat-metrics.rb
     metric: yes
@@ -140,7 +159,7 @@ EXAMPLES = '''
 
 # Check whether nginx is running
 - name: Check nginx process
-  sensu_check:
+  community.general.sensu_check:
     name: nginx_running
     command: /etc/sensu/plugins/processes/check-procs.rb -f /var/run/nginx.pid
     handlers: default
@@ -151,7 +170,7 @@ EXAMPLES = '''
 # Note that the check will still show up in the sensu dashboard,
 # to remove it completely you need to issue a DELETE request to the sensu api.
 - name: Check disk
-  sensu_check:
+  community.general.sensu_check:
     name: check_disk_capacity
     state: absent
 '''
@@ -310,15 +329,15 @@ def main():
                 'state': {'type': 'str', 'default': 'present', 'choices': ['present', 'absent']},
                 'backup': {'type': 'bool', 'default': 'no'},
                 'command': {'type': 'str'},
-                'handlers': {'type': 'list'},
-                'subscribers': {'type': 'list'},
+                'handlers': {'type': 'list', 'elements': 'str'},
+                'subscribers': {'type': 'list', 'elements': 'str'},
                 'interval': {'type': 'int'},
                 'timeout': {'type': 'int'},
                 'ttl': {'type': 'int'},
                 'handle': {'type': 'bool'},
                 'subdue_begin': {'type': 'str'},
                 'subdue_end': {'type': 'str'},
-                'dependencies': {'type': 'list'},
+                'dependencies': {'type': 'list', 'elements': 'str'},
                 'metric': {'type': 'bool', 'default': 'no'},
                 'standalone': {'type': 'bool'},
                 'publish': {'type': 'bool'},

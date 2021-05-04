@@ -22,56 +22,62 @@ options:
       - A list of package names to install, upgrade or remove.
     required: yes
     aliases: [ package, pkg ]
+    type: list
+    elements: str
   state:
     description:
       - Indicates the desired package state.
-    choices: [ absent, present ]
+    choices: [ absent, present, installed, removed ]
     default: present
+    type: str
   update_cache:
     description:
       - Update the package database first C(urpmi.update -a).
+      - Alias C(update-cache) has been deprecated and will be removed in community.general 5.0.0.
     type: bool
-    default: 'no'
-  no-recommends:
+    default: no
+    aliases: ['update-cache']
+  no_recommends:
     description:
       - Corresponds to the C(--no-recommends) option for I(urpmi).
+      - Alias C(no-recommends) has been deprecated and will be removed in community.general 5.0.0.
     type: bool
-    default: 'yes'
+    default: yes
     aliases: ['no-recommends']
   force:
     description:
       - Assume "yes" is the answer to any question urpmi has to ask.
         Corresponds to the C(--force) option for I(urpmi).
     type: bool
-    default: 'yes'
+    default: yes
   root:
     description:
       - Specifies an alternative install root, relative to which all packages will be installed.
         Corresponds to the C(--root) option for I(urpmi).
-    default: /
     aliases: [ installroot ]
+    type: str
 author:
 - Philippe Makowski (@pmakowski)
 '''
 
 EXAMPLES = '''
 - name: Install package foo
-  urpmi:
+  community.general.urpmi:
     pkg: foo
     state: present
 
 - name: Remove package foo
-  urpmi:
+  community.general.urpmi:
     pkg: foo
     state: absent
 
 - name: Remove packages foo and bar
-  urpmi:
+  community.general.urpmi:
     pkg: foo,bar
     state: absent
 
 - name: Update the package database (urpmi.update -a -q) and install bar (bar will be the updated if a newer version exists)
-- urpmi:
+- community.general.urpmi:
     name: bar
     state: present
     update_cache: yes
@@ -189,12 +195,16 @@ def root_option(root):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(type='str', default='installed',
+            state=dict(type='str', default='present',
                        choices=['absent', 'installed', 'present', 'removed']),
-            update_cache=dict(type='bool', default=False, aliases=['update-cache']),
+            update_cache=dict(
+                type='bool', default=False, aliases=['update-cache'],
+                deprecated_aliases=[dict(name='update-cache', version='5.0.0', collection_name='community.general')]),
             force=dict(type='bool', default=True),
-            no_recommends=dict(type='bool', default=True, aliases=['no-recommends']),
-            name=dict(type='list', required=True, aliases=['package', 'pkg']),
+            no_recommends=dict(
+                type='bool', default=True, aliases=['no-recommends'],
+                deprecated_aliases=[dict(name='no-recommends', version='5.0.0', collection_name='community.general')]),
+            name=dict(type='list', elements='str', required=True, aliases=['package', 'pkg']),
             root=dict(type='str', aliases=['installroot']),
         ),
     )

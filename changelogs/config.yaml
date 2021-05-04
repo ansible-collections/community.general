@@ -1,9 +1,10 @@
-changelog_filename_template: CHANGELOG.rst
+changelog_filename_template: ../CHANGELOG.rst
 changelog_filename_version_depth: 0
 changes_file: changelog.yaml
 changes_format: combined
 keep_fragments: false
 mention_ancestor: true
+flatmap: true
 new_plugins_after_name: removed_features
 notesdir: fragments
 prelude_section_name: release_summary

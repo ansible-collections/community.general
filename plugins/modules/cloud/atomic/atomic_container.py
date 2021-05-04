@@ -8,13 +8,13 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: atomic_container
 short_description: Manage the containers on the atomic host platform
 description:
-    - Manage the containers on the atomic host platform
-    - Allows to manage the lifecycle of a container on the atomic host platform
+    - Manage the containers on the atomic host platform.
+    - Allows to manage the lifecycle of a container on the atomic host platform.
 author: "Giuseppe Scrivano (@giuseppe)"
 notes:
     - Host should support C(atomic) command
@@ -24,41 +24,48 @@ requirements:
 options:
     backend:
         description:
-          - Define the backend to use for the container
+          - Define the backend to use for the container.
         required: True
         choices: ["docker", "ostree"]
+        type: str
     name:
         description:
-          - Name of the container
+          - Name of the container.
         required: True
+        type: str
     image:
         description:
-          - The image to use to install the container
+          - The image to use to install the container.
         required: True
+        type: str
     rootfs:
         description:
-          - Define the rootfs of the image
+          - Define the rootfs of the image.
+        type: str
     state:
         description:
-          - State of the container
-        required: True
-        choices: ["latest", "present", "absent", "rollback"]
+          - State of the container.
+        choices: ["absent", "latest", "present", "rollback"]
         default: "latest"
+        type: str
     mode:
         description:
-          - Define if it is an user or a system container
-        required: True
+          - Define if it is an user or a system container.
         choices: ["user", "system"]
+        type: str
     values:
         description:
-            - Values for the installation of the container.  This option is permitted only with mode 'user' or 'system'.
-              The values specified here will be used at installation time as --set arguments for atomic install.
+            - Values for the installation of the container.
+            - This option is permitted only with mode 'user' or 'system'.
+            - The values specified here will be used at installation time as --set arguments for atomic install.
+        type: list
+        elements: str
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 
 - name: Install the etcd system container
-  atomic_container:
+  community.general.atomic_container:
     name: etcd
     image: rhel/etcd
     backend: ostree
@@ -68,7 +75,7 @@ EXAMPLES = '''
         - ETCD_NAME=etcd.server
 
 - name: Uninstall the etcd system container
-  atomic_container:
+  community.general.atomic_container:
     name: etcd
     image: rhel/etcd
     backend: ostree
@@ -76,7 +83,7 @@ EXAMPLES = '''
     mode: system
 '''
 
-RETURN = '''
+RETURN = r'''
 msg:
     description: The command standard output
     returned: always
@@ -95,7 +102,8 @@ def do_install(module, mode, rootfs, container, image, values_list, backend):
     system_list = ["--system"] if mode == 'system' else []
     user_list = ["--user"] if mode == 'user' else []
     rootfs_list = ["--rootfs=%s" % rootfs] if rootfs else []
-    args = ['atomic', 'install', "--storage=%s" % backend, '--name=%s' % container] + system_list + user_list + rootfs_list + values_list + [image]
+    atomic_bin = module.get_bin_path('atomic')
+    args = [atomic_bin, 'install', "--storage=%s" % backend, '--name=%s' % container] + system_list + user_list + rootfs_list + values_list + [image]
     rc, out, err = module.run_command(args, check_rc=False)
     if rc != 0:
         module.fail_json(rc=rc, msg=err)
@@ -105,7 +113,8 @@ def do_install(module, mode, rootfs, container, image, values_list, backend):
 
 
 def do_update(module, container, image, values_list):
-    args = ['atomic', 'containers', 'update', "--rebase=%s" % image] + values_list + [container]
+    atomic_bin = module.get_bin_path('atomic')
+    args = [atomic_bin, 'containers', 'update', "--rebase=%s" % image] + values_list + [container]
     rc, out, err = module.run_command(args, check_rc=False)
     if rc != 0:
         module.fail_json(rc=rc, msg=err)
@@ -115,7 +124,8 @@ def do_update(module, container, image, values_list):
 
 
 def do_uninstall(module, name, backend):
-    args = ['atomic', 'uninstall', "--storage=%s" % backend, name]
+    atomic_bin = module.get_bin_path('atomic')
+    args = [atomic_bin, 'uninstall', "--storage=%s" % backend, name]
     rc, out, err = module.run_command(args, check_rc=False)
     if rc != 0:
         module.fail_json(rc=rc, msg=err)
@@ -123,7 +133,8 @@ def do_uninstall(module, name, backend):
 
 
 def do_rollback(module, name):
-    args = ['atomic', 'containers', 'rollback', name]
+    atomic_bin = module.get_bin_path('atomic')
+    args = [atomic_bin, 'containers', 'rollback', name]
     rc, out, err = module.run_command(args, check_rc=False)
     if rc != 0:
         module.fail_json(rc=rc, msg=err)
@@ -141,14 +152,12 @@ def core(module):
     backend = module.params['backend']
     state = module.params['state']
 
+    atomic_bin = module.get_bin_path('atomic')
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C')
-    out = {}
-    err = {}
-    rc = 0
 
     values_list = ["--set=%s" % x for x in values] if values else []
 
-    args = ['atomic', 'containers', 'list', '--no-trunc', '-n', '--all', '-f', 'backend=%s' % backend, '-f', 'container=%s' % name]
+    args = [atomic_bin, 'containers', 'list', '--no-trunc', '-n', '--all', '-f', 'backend=%s' % backend, '-f', 'container=%s' % name]
     rc, out, err = module.run_command(args, check_rc=False)
     if rc != 0:
         module.fail_json(rc=rc, msg=err)
@@ -174,12 +183,12 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             mode=dict(default=None, choices=['user', 'system']),
-            name=dict(default=None, required=True),
-            image=dict(default=None, required=True),
+            name=dict(required=True),
+            image=dict(required=True),
             rootfs=dict(default=None),
             state=dict(default='latest', choices=['present', 'absent', 'latest', 'rollback']),
-            backend=dict(default=None, required=True, choices=['docker', 'ostree']),
-            values=dict(type='list', default=[]),
+            backend=dict(required=True, choices=['docker', 'ostree']),
+            values=dict(type='list', default=[], elements='str'),
         ),
     )
 
@@ -187,9 +196,7 @@ def main():
         module.fail_json(msg="values is supported only with user or system mode")
 
     # Verify that the platform supports atomic command
-    rc, out, err = module.run_command('atomic -v', check_rc=False)
-    if rc != 0:
-        module.fail_json(msg="Error in running atomic command", err=err)
+    dummy = module.get_bin_path('atomic', required=True)
 
     try:
         core(module)

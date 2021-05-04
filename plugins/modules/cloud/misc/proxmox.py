@@ -12,101 +12,108 @@ short_description: management of instances in Proxmox VE cluster
 description:
   - allows you to create/delete/stop instances in Proxmox VE cluster
   - Starting in Ansible 2.1, it automatically detects containerization type (lxc for PVE 4, openvz for older)
+  - From community.general 4.0.0 on, there will be no default values, see I(proxmox_default_behavior).
 options:
-  api_host:
-    description:
-      - the host of the Proxmox VE cluster
-    required: true
-  api_user:
-    description:
-      - the user to authenticate with
-    required: true
-  api_password:
-    description:
-      - the password to authenticate with
-      - you can use PROXMOX_PASSWORD environment variable
-  vmid:
-    description:
-      - the instance id
-      - if not set, the next available VM ID will be fetched from ProxmoxAPI.
-      - if not set, will be fetched from PromoxAPI based on the hostname
-  validate_certs:
-    description:
-      - enable / disable https certificate verification
-    type: bool
-    default: 'no'
-  node:
-    description:
-      - Proxmox VE node, when new VM will be created
-      - required only for C(state=present)
-      - for another states will be autodiscovered
-  pool:
-    description:
-      - Proxmox VE resource pool
   password:
     description:
       - the instance root password
-      - required only for C(state=present)
+    type: str
   hostname:
     description:
       - the instance hostname
       - required only for C(state=present)
       - must be unique if vmid is not passed
+    type: str
   ostemplate:
     description:
       - the template for VM creating
       - required only for C(state=present)
+    type: str
   disk:
     description:
       - hard disk size in GB for instance
-    default: 3
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(3). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
+    type: str
   cores:
     description:
       - Specify number of cores per socket.
-    default: 1
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
+    type: int
   cpus:
     description:
       - numbers of allocated cpus for instance
-    default: 1
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(1). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
+    type: int
   memory:
     description:
       - memory size in MB for instance
-    default: 512
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(512). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
+    type: int
   swap:
     description:
       - swap memory size in MB for instance
-    default: 0
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(0). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
+    type: int
   netif:
     description:
       - specifies network interfaces for the container. As a hash/dictionary defining interfaces.
+    type: dict
+  features:
+    description:
+      - Specifies a list of features to be enabled. For valid options, see U(https://pve.proxmox.com/wiki/Linux_Container#pct_options).
+      - Some features require the use of a privileged container.
+    type: list
+    elements: str
+    version_added: 2.0.0
   mounts:
     description:
       - specifies additional mounts (separate disks) for the container. As a hash/dictionary defining mount points
+    type: dict
   ip_address:
     description:
       - specifies the address the container will be assigned
+    type: str
   onboot:
     description:
       - specifies whether a VM will be started during system bootup
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(no). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
     type: bool
-    default: 'no'
   storage:
     description:
       - target storage
+    type: str
     default: 'local'
   cpuunits:
     description:
       - CPU weight for a VM
-    default: 1000
+      - If I(proxmox_default_behavior) is set to C(compatiblity) (the default value), this
+        option has a default of C(1000). Note that the default value of I(proxmox_default_behavior)
+        changes in community.general 4.0.0.
+    type: int
   nameserver:
     description:
       - sets DNS server IP address for a container
+    type: str
   searchdomain:
     description:
       - sets DNS search domain for a container
+    type: str
   timeout:
     description:
       - timeout for operations
+    type: int
     default: 30
   force:
     description:
@@ -116,14 +123,25 @@ options:
       - with states C(stopped) , C(restarted) allow to force stop instance
     type: bool
     default: 'no'
+  purge:
+    description:
+      - Remove container from all related configurations.
+      - For example backup jobs, replication jobs, or HA.
+      - Related ACLs and Firewall entries will always be removed.
+      - Used with state C(absent).
+    type: bool
+    default: false
+    version_added: 2.3.0
   state:
     description:
      - Indicate desired state of the instance
+    type: str
     choices: ['present', 'started', 'absent', 'stopped', 'restarted']
     default: present
   pubkey:
     description:
       - Public key to add to /root/.ssh/authorized_keys. This was added on Proxmox 4.2, it is ignored for earlier versions
+    type: str
   unprivileged:
     description:
       - Indicate if the container should be unprivileged
@@ -140,16 +158,31 @@ options:
       - Script that will be executed during various steps in the containers lifetime.
     type: str
     version_added: '0.2.0'
-
-notes:
-  - Requires proxmoxer and requests modules on host. This modules can be installed with pip.
-requirements: [ "proxmoxer", "python >= 2.7", "requests" ]
+  proxmox_default_behavior:
+    description:
+      - Various module options used to have default values. This cause problems when
+        user expects different behavior from proxmox by default or fill options which cause
+        problems when they have been set.
+      - The default value is C(compatibility), which will ensure that the default values
+        are used when the values are not explicitly specified by the user.
+      - From community.general 4.0.0 on, the default value will switch to C(no_defaults). To avoid
+        deprecation warnings, please set I(proxmox_default_behavior) to an explicit
+        value.
+      - This affects the I(disk), I(cores), I(cpus), I(memory), I(onboot), I(swap), I(cpuunits) options.
+    type: str
+    choices:
+      - compatibility
+      - no_defaults
+    version_added: "1.3.0"
 author: Sergei Antipov (@UnderGreen)
+extends_documentation_fragment:
+  - community.general.proxmox.documentation
+  - community.general.proxmox.selection
 '''
 
 EXAMPLES = r'''
 - name: Create new container with minimal options
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -160,7 +193,7 @@ EXAMPLES = r'''
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
 - name: Create new container with hookscript and description
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -173,7 +206,7 @@ EXAMPLES = r'''
     description: created with ansible
 
 - name: Create new container automatically selecting the next available vmid.
-  proxmox:
+  community.general.proxmox:
     node: 'uk-mc02'
     api_user: 'root@pam'
     api_password: '1q2w3e'
@@ -183,7 +216,7 @@ EXAMPLES = r'''
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
 - name: Create new container with minimal options with force(it will rewrite existing container)
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -195,7 +228,7 @@ EXAMPLES = r'''
     force: yes
 
 - name: Create new container with minimal options use environment PROXMOX_PASSWORD variable(you should export it before)
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -205,7 +238,7 @@ EXAMPLES = r'''
     ostemplate: 'local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
 
 - name: Create new container with minimal options defining network interface with dhcp
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -217,7 +250,7 @@ EXAMPLES = r'''
     netif: '{"net0":"name=eth0,ip=dhcp,ip6=dhcp,bridge=vmbr0"}'
 
 - name: Create new container with minimal options defining network interface with static ip
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -229,7 +262,7 @@ EXAMPLES = r'''
     netif: '{"net0":"name=eth0,gw=192.168.0.1,ip=192.168.0.2/24,bridge=vmbr0"}'
 
 - name: Create new container with minimal options defining a mount with 8GB
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -241,7 +274,7 @@ EXAMPLES = r'''
     mounts: '{"mp0":"local:8,mp=/mnt/test/"}'
 
 - name: Create new container with minimal options defining a cpu core limit
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     node: uk-mc02
     api_user: root@pam
@@ -252,8 +285,23 @@ EXAMPLES = r'''
     ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
     cores: 2
 
+- name: Create a new container with nesting enabled and allows the use of CIFS/NFS inside the container.
+  community.general.proxmox:
+    vmid: 100
+    node: uk-mc02
+    api_user: root@pam
+    api_password: 1q2w3e
+    api_host: node1
+    password: 123456
+    hostname: example.org
+    ostemplate: local:vztmpl/ubuntu-14.04-x86_64.tar.gz'
+    features:
+     - nesting=1
+     - mount=cifs,nfs
+
+
 - name: Start container
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -263,7 +311,7 @@ EXAMPLES = r'''
 - name: >
     Start container with mount. You should enter a 90-second timeout because servers
     with additional disks take longer to boot
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -272,7 +320,7 @@ EXAMPLES = r'''
     timeout: 90
 
 - name: Stop container
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -280,7 +328,7 @@ EXAMPLES = r'''
     state: stopped
 
 - name: Stop container with force
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -289,7 +337,7 @@ EXAMPLES = r'''
     state: stopped
 
 - name: Restart container(stopped or mounted container you can't restart)
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -297,7 +345,7 @@ EXAMPLES = r'''
     state: restarted
 
 - name: Remove container
-  proxmox:
+  community.general.proxmox:
     vmid: 100
     api_user: root@pam
     api_password: 1q2w3e
@@ -305,7 +353,6 @@ EXAMPLES = r'''
     state: absent
 '''
 
-import os
 import time
 import traceback
 from distutils.version import LooseVersion
@@ -316,7 +363,7 @@ try:
 except ImportError:
     HAS_PROXMOXER = False
 
-from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible.module_utils._text import to_native
 
 
@@ -441,45 +488,55 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             api_host=dict(required=True),
+            api_password=dict(no_log=True, fallback=(env_fallback, ['PROXMOX_PASSWORD'])),
+            api_token_id=dict(no_log=True),
+            api_token_secret=dict(no_log=True),
             api_user=dict(required=True),
-            api_password=dict(no_log=True),
-            vmid=dict(required=False),
-            validate_certs=dict(type='bool', default='no'),
+            vmid=dict(type='int', required=False),
+            validate_certs=dict(type='bool', default=False),
             node=dict(),
             pool=dict(),
             password=dict(no_log=True),
             hostname=dict(),
             ostemplate=dict(),
-            disk=dict(type='str', default='3'),
-            cores=dict(type='int', default=1),
-            cpus=dict(type='int', default=1),
-            memory=dict(type='int', default=512),
-            swap=dict(type='int', default=0),
+            disk=dict(type='str'),
+            cores=dict(type='int'),
+            cpus=dict(type='int'),
+            memory=dict(type='int'),
+            swap=dict(type='int'),
             netif=dict(type='dict'),
             mounts=dict(type='dict'),
             ip_address=dict(),
-            onboot=dict(type='bool', default='no'),
+            onboot=dict(type='bool'),
+            features=dict(type='list', elements='str'),
             storage=dict(default='local'),
-            cpuunits=dict(type='int', default=1000),
+            cpuunits=dict(type='int'),
             nameserver=dict(),
             searchdomain=dict(),
             timeout=dict(type='int', default=30),
-            force=dict(type='bool', default='no'),
+            force=dict(type='bool', default=False),
+            purge=dict(type='bool', default=False),
             state=dict(default='present', choices=['present', 'absent', 'stopped', 'started', 'restarted']),
             pubkey=dict(type='str', default=None),
-            unprivileged=dict(type='bool', default='no'),
+            unprivileged=dict(type='bool', default=False),
             description=dict(type='str'),
             hookscript=dict(type='str'),
-        )
+            proxmox_default_behavior=dict(type='str', choices=['compatibility', 'no_defaults']),
+        ),
+        required_if=[('state', 'present', ['node', 'hostname', 'ostemplate'])],
+        required_together=[('api_token_id', 'api_token_secret')],
+        required_one_of=[('api_password', 'api_token_id')],
     )
 
     if not HAS_PROXMOXER:
         module.fail_json(msg='proxmoxer required for this module')
 
     state = module.params['state']
-    api_user = module.params['api_user']
     api_host = module.params['api_host']
     api_password = module.params['api_password']
+    api_token_id = module.params['api_token_id']
+    api_token_secret = module.params['api_token_secret']
+    api_user = module.params['api_user']
     vmid = module.params['vmid']
     validate_certs = module.params['validate_certs']
     node = module.params['node']
@@ -493,18 +550,38 @@ def main():
         template_store = module.params['ostemplate'].split(":")[0]
     timeout = module.params['timeout']
 
-    # If password not set get it from PROXMOX_PASSWORD env
-    if not api_password:
-        try:
-            api_password = os.environ['PROXMOX_PASSWORD']
-        except KeyError as e:
-            module.fail_json(msg='You should set api_password param or use PROXMOX_PASSWORD environment variable')
+    if module.params['proxmox_default_behavior'] is None:
+        module.params['proxmox_default_behavior'] = 'compatibility'
+        module.deprecate(
+            'The proxmox_default_behavior option will change its default value from "compatibility" to '
+            '"no_defaults" in community.general 4.0.0. To remove this warning, please specify an explicit value for it now',
+            version='4.0.0', collection_name='community.general'
+        )
+    if module.params['proxmox_default_behavior'] == 'compatibility':
+        old_default_values = dict(
+            disk="3",
+            cores=1,
+            cpus=1,
+            memory=512,
+            swap=0,
+            onboot=False,
+            cpuunits=1000,
+        )
+        for param, value in old_default_values.items():
+            if module.params[param] is None:
+                module.params[param] = value
+
+    auth_args = {'user': api_user}
+    if not api_token_id:
+        auth_args['password'] = api_password
+    else:
+        auth_args['token_name'] = api_token_id
+        auth_args['token_value'] = api_token_secret
 
     try:
-        proxmox = ProxmoxAPI(api_host, user=api_user, password=api_password, verify_ssl=validate_certs)
+        proxmox = ProxmoxAPI(api_host, verify_ssl=validate_certs, **auth_args)
         global VZ_TYPE
         VZ_TYPE = 'openvz' if proxmox_version(proxmox) < LooseVersion('4.0') else 'lxc'
-
     except Exception as e:
         module.fail_json(msg='authorization on proxmox cluster failed with exception: %s' % e)
 
@@ -527,8 +604,6 @@ def main():
             # If no vmid was passed, there cannot be another VM named 'hostname'
             if not module.params['vmid'] and get_vmid(proxmox, hostname) and not module.params['force']:
                 module.exit_json(changed=False, msg="VM with hostname %s already exists and has ID number %s" % (hostname, get_vmid(proxmox, hostname)[0]))
-            elif not (node, module.params['hostname'] and module.params['password'] and module.params['ostemplate']):
-                module.fail_json(msg='node, hostname, password and ostemplate are mandatory for creating vm')
             elif not node_check(proxmox, node):
                 module.fail_json(msg="node '%s' not exists in cluster" % node)
             elif not content_check(proxmox, node, module.params['ostemplate'], template_store):
@@ -550,6 +625,7 @@ def main():
                             searchdomain=module.params['searchdomain'],
                             force=int(module.params['force']),
                             pubkey=module.params['pubkey'],
+                            features=",".join(module.params['features']) if module.params['features'] is not None else None,
                             unprivileged=int(module.params['unprivileged']),
                             description=module.params['description'],
                             hookscript=module.params['hookscript'])
@@ -620,7 +696,13 @@ def main():
             if getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE)(vmid).status.current.get()['status'] == 'mounted':
                 module.exit_json(changed=False, msg="VM %s is mounted. Stop it with force option before deletion." % vmid)
 
-            taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE).delete(vmid)
+            delete_params = {}
+
+            if module.params['purge']:
+                delete_params['purge'] = 1
+
+            taskid = getattr(proxmox.nodes(vm[0]['node']), VZ_TYPE).delete(vmid, **delete_params)
+
             while timeout:
                 if (proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['status'] == 'stopped' and
                         proxmox.nodes(vm[0]['node']).tasks(taskid).status.get()['exitstatus'] == 'OK'):

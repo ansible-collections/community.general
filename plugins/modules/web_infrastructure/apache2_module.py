@@ -20,10 +20,12 @@ description:
    - Enables or disables a specified module of the Apache2 webserver.
 options:
    name:
+     type: str
      description:
         - Name of the module to enable/disable as given to C(a2enmod/a2dismod).
      required: true
    identifier:
+     type: str
      description:
          - Identifier of the module as listed by C(apache2ctl -M).
            This is optional and usually determined automatically by the common convention of
@@ -36,6 +38,7 @@ options:
      type: bool
      default: False
    state:
+     type: str
      description:
         - Desired state of the module.
      choices: ['present', 'absent']
@@ -50,29 +53,29 @@ requirements: ["a2enmod","a2dismod"]
 
 EXAMPLES = '''
 - name: Enable the Apache2 module wsgi
-  apache2_module:
+  community.general.apache2_module:
     state: present
     name: wsgi
 
 - name: Disables the Apache2 module wsgi
-  apache2_module:
+  community.general.apache2_module:
     state: absent
     name: wsgi
 
 - name: Disable default modules for Debian
-  apache2_module:
+  community.general.apache2_module:
     state: absent
     name: autoindex
     force: True
 
 - name: Disable mpm_worker and ignore warnings about missing mpm module
-  apache2_module:
+  community.general.apache2_module:
     state: absent
     name: mpm_worker
     ignore_configcheck: True
 
 - name: Enable dump_io module, which is identified as dumpio_module inside apache2
-  apache2_module:
+  community.general.apache2_module:
     state: present
     name: dump_io
     identifier: dumpio_module
@@ -158,6 +161,7 @@ def create_apache_identifier(name):
 
     # a2enmod name replacement to apache2ctl -M names
     text_workarounds = [
+        ('shib', 'mod_shib'),
         ('shib2', 'mod_shib'),
         ('evasive', 'evasive20_module'),
     ]

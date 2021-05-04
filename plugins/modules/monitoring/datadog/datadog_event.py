@@ -24,36 +24,47 @@ author:
 - "Naoya Nakazawa (@n0ts)"
 options:
     api_key:
+        type: str
         description: ["Your DataDog API key."]
         required: true
     app_key:
+        type: str
         description: ["Your DataDog app key."]
         required: true
     title:
+        type: str
         description: ["The event title."]
         required: true
     text:
+        type: str
         description: ["The body of the event."]
         required: true
     date_happened:
+        type: int
         description:
         - POSIX timestamp of the event.
         - Default value is now.
-        default: now
     priority:
+        type: str
         description: ["The priority of the event."]
         default: normal
         choices: [normal, low]
     host:
-        description: ["Host name to associate with the event."]
-        default: "{{ ansible_hostname }}"
+        type: str
+        description:
+        - Host name to associate with the event.
+        - If not specified, it defaults to the remote system's hostname.
     tags:
+        type: list
+        elements: str
         description: ["Comma separated list of tags to apply to the event."]
     alert_type:
+        type: str
         description: ["Type of alert."]
         default: info
         choices: ['error', 'warning', 'info', 'success']
     aggregation_key:
+        type: str
         description: ["An arbitrary string to use for aggregation."]
     validate_certs:
         description:
@@ -65,7 +76,7 @@ options:
 
 EXAMPLES = '''
 - name: Post an event with low priority
-  datadog_event:
+  community.general.datadog_event:
     title: Testing from ansible
     text: Test
     priority: low
@@ -73,7 +84,7 @@ EXAMPLES = '''
     app_key: j4JyCYfefWHhgFgiZUqRm63AXHNZQyPGBfJtAzmN
 
 - name: Post an event with several tags
-  datadog_event:
+  community.general.datadog_event:
     title: Testing from ansible
     text: Test
     api_key: 9775a026f1ca7d1c6c5af9d94d9595a4
@@ -104,18 +115,13 @@ def main():
             app_key=dict(required=True, no_log=True),
             title=dict(required=True),
             text=dict(required=True),
-            date_happened=dict(required=False, default=None, type='int'),
-            priority=dict(
-                required=False, default='normal', choices=['normal', 'low']
-            ),
-            host=dict(required=False, default=None),
-            tags=dict(required=False, default=None, type='list'),
-            alert_type=dict(
-                required=False, default='info',
-                choices=['error', 'warning', 'info', 'success']
-            ),
-            aggregation_key=dict(required=False, default=None),
-            validate_certs=dict(default='yes', type='bool'),
+            date_happened=dict(type='int'),
+            priority=dict(default='normal', choices=['normal', 'low']),
+            host=dict(),
+            tags=dict(type='list', elements='str'),
+            alert_type=dict(default='info', choices=['error', 'warning', 'info', 'success']),
+            aggregation_key=dict(no_log=False),
+            validate_certs=dict(default=True, type='bool'),
         )
     )
 

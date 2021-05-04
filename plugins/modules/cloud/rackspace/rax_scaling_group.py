@@ -19,52 +19,67 @@ options:
     type: bool
     default: 'no'
   cooldown:
+    type: int
     description:
       - The period of time, in seconds, that must pass before any scaling can
         occur after the previous scaling. Must be an integer between 0 and
         86400 (24 hrs).
+    default: 300
   disk_config:
+    type: str
     description:
       - Disk partitioning strategy
+      - If not specified, it will fallback to C(auto).
     choices:
       - auto
       - manual
-    default: auto
   files:
+    type: dict
     description:
       - 'Files to insert into the instance. Hash of C(remotepath: localpath)'
   flavor:
+    type: str
     description:
       - flavor to use for the instance
     required: true
   image:
+    type: str
     description:
       - image to use for the instance. Can be an C(id), C(human_id) or C(name)
     required: true
   key_name:
+    type: str
     description:
       - key pair to use on the instance
   loadbalancers:
+    type: list
+    elements: dict
     description:
       - List of load balancer C(id) and C(port) hashes
   max_entities:
+    type: int
     description:
       - The maximum number of entities that are allowed in the scaling group.
         Must be an integer between 0 and 1000.
     required: true
   meta:
+    type: dict
     description:
       - A hash of metadata to associate with the instance
   min_entities:
+    type: int
     description:
       - The minimum number of entities that are allowed in the scaling group.
         Must be an integer between 0 and 1000.
     required: true
   name:
+    type: str
     description:
       - Name to give the scaling group
     required: true
   networks:
+    type: list
+    elements: str
     description:
       - The network to attach to the instances. If specified, you must include
         ALL networks including the public and private interfaces. Can be C(id)
@@ -73,10 +88,12 @@ options:
       - public
       - private
   server_name:
+    type: str
     description:
       - The base name for servers created by Autoscale
     required: true
   state:
+    type: str
     description:
       - Indicate desired state of the resource
     choices:
@@ -84,6 +101,7 @@ options:
       - absent
     default: present
   user_data:
+    type: str
     description:
       - Data to be uploaded to the servers config drive. This option implies
         I(config_drive). Can be a file path or a string
@@ -94,6 +112,7 @@ options:
     type: bool
     default: 'no'
   wait_timeout:
+    type: int
     description:
       - how long before wait gives up, in seconds
     default: 300
@@ -110,7 +129,7 @@ EXAMPLES = '''
   gather_facts: false
   connection: local
   tasks:
-    - rax_scaling_group:
+    - community.general.rax_scaling_group:
         credentials: ~/.raxpub
         region: ORD
         cooldown: 300
@@ -359,12 +378,12 @@ def main():
             flavor=dict(required=True),
             image=dict(required=True),
             key_name=dict(),
-            loadbalancers=dict(type='list'),
+            loadbalancers=dict(type='list', elements='dict'),
             meta=dict(type='dict', default={}),
             min_entities=dict(type='int', required=True),
             max_entities=dict(type='int', required=True),
             name=dict(required=True),
-            networks=dict(type='list', default=['public', 'private']),
+            networks=dict(type='list', elements='str', default=['public', 'private']),
             server_name=dict(required=True),
             state=dict(default='present', choices=['present', 'absent']),
             user_data=dict(no_log=True),

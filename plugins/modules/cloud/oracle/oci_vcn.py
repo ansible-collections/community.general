@@ -17,6 +17,7 @@ description:
 options:
     cidr_block:
         description: The CIDR IP address block of the VCN. Required when creating a VCN with I(state=present).
+        type: str
         required: false
     compartment_id:
         description: The OCID of the compartment to contain the VCN. Required when creating a VCN with I(state=present).
@@ -54,19 +55,19 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Create a VCN
-  oci_vcn:
+  community.general.oci_vcn:
     cidr_block: '10.0.0.0/16'
     compartment_id: 'ocid1.compartment.oc1..xxxxxEXAMPLExxxxx'
     display_name: my_vcn
     dns_label: ansiblevcn
 
 - name: Updates the specified VCN's display name
-  oci_vcn:
+  community.general.oci_vcn:
     vcn_id: ocid1.vcn.oc1.phx.xxxxxEXAMPLExxxxx
     display_name: ansible_vcn
 
 - name: Delete the specified VCN
-  oci_vcn:
+  community.general.oci_vcn:
     vcn_id: ocid1.vcn.oc1.phx.xxxxxEXAMPLExxxxx
     state: absent
 """
@@ -127,7 +128,7 @@ def update_vcn(virtual_network_client, module):
         primitive_params_update=["vcn_id"],
         kwargs_non_primitive_update={UpdateVcnDetails: "update_vcn_details"},
         module=module,
-        update_attributes=UpdateVcnDetails().attribute_map.keys(),
+        update_attributes=list(UpdateVcnDetails().attribute_map.keys()),
     )
     return result
 

@@ -8,7 +8,7 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: onepassword_raw
+    name: onepassword_raw
     author:
       - Scott Buchanan (@scottsb)
       - Andrew Zenk (@azenk)
@@ -51,17 +51,19 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: Retrieve all data about Wintermute
-  debug:
-    var: lookup('onepassword_raw', 'Wintermute')
+  ansible.builtin.debug:
+    var: lookup('community.general.onepassword_raw', 'Wintermute')
 
 - name: Retrieve all data about Wintermute when not signed in to 1Password
-  debug:
-    var: lookup('onepassword_raw', 'Wintermute', subdomain='Turing', vault_password='DmbslfLvasjdl')
+  ansible.builtin.debug:
+    var: lookup('community.general.onepassword_raw', 'Wintermute', subdomain='Turing', vault_password='DmbslfLvasjdl')
 """
 
 RETURN = """
   _raw:
     description: field data requested
+    type: list
+    elements: dict
 """
 
 import json

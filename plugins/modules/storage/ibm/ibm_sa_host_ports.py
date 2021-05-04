@@ -23,28 +23,31 @@ options:
         description:
             - Host name.
         required: true
+        type: str
     state:
         description:
             - Host ports state.
-        required: true
         default: "present"
         choices: [ "present", "absent" ]
+        type: str
     iscsi_name:
         description:
             - iSCSI initiator name.
         required: false
+        type: str
     fcaddress:
         description:
             - Fiber channel address.
         required: false
+        type: str
     num_of_visible_targets:
         description:
             - Number of visible targets.
         required: false
+        type: str
 
 extends_documentation_fragment:
 - community.general.ibm_storage
-
 
 author:
     - Tzur Eliyahu (@tzure)
@@ -52,7 +55,7 @@ author:
 
 EXAMPLES = '''
 - name: Add ports for host.
-  ibm_sa_host_ports:
+  community.general.ibm_sa_host_ports:
     host: test_host
     iscsi_name: iqn.1994-05.com***
     username: admin
@@ -61,7 +64,7 @@ EXAMPLES = '''
     state: present
 
 - name: Remove ports for host.
-  ibm_sa_host_ports:
+  community.general.ibm_sa_host_ports:
     host: test_host
     iscsi_name: iqn.1994-05.com***
     username: admin

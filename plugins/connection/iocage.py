@@ -9,8 +9,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    author: Stephan Lohse <dev-github@ploek.org>
-    connection: iocage
+    author: Stephan Lohse (!UNKNOWN) <dev-github@ploek.org>
+    name: iocage
     short_description: Run tasks in iocage jails
     description:
         - Run commands or put/fetch files to an existing iocage jail

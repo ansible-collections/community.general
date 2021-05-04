@@ -4,8 +4,8 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-DOCUMENTATION = '''
-lookup: filetree
+DOCUMENTATION = r'''
+name: filetree
 author: Dag Wieers (@dagwieers) <dag@wieers.com>
 short_description: recursively match all files in a directory tree
 description:
@@ -19,72 +19,97 @@ options:
     required: True
 '''
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Create directories
-  file:
+  ansible.builtin.file:
     path: /web/{{ item.path }}
     state: directory
     mode: '{{ item.mode }}'
-  with_filetree: web/
+  with_community.general.filetree: web/
   when: item.state == 'directory'
 
 - name: Template files (explicitly skip directories in order to use the 'src' attribute)
-  template:
+  ansible.builtin.template:
     src: '{{ item.src }}'
-    dest: /web/{{ item.path }}
+    # Your template files should be stored with a .j2 file extension,
+    # but should not be deployed with it. splitext|first removes it.
+    dest: /web/{{ item.path | splitext | first }}
     mode: '{{ item.mode }}'
-  with_filetree: web/
+  with_community.general.filetree: web/
   when: item.state == 'file'
 
 - name: Recreate symlinks
-  file:
+  ansible.builtin.file:
     src: '{{ item.src }}'
     dest: /web/{{ item.path }}
     state: link
+    follow: false  # avoid corrupting target files if the link already exists
     force: yes
     mode: '{{ item.mode }}'
-  with_filetree: web/
+  with_community.general.filetree: web/
   when: item.state == 'link'
+
+- name: list all files under web/
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.filetree', 'web/') }}"
 """
 
-RETURN = """
+RETURN = r"""
   _raw:
-    description: list of dictionaries with file information
+    description: List of dictionaries with file information.
+    type: list
+    elements: dict
     contains:
         src:
           description:
-          - full path to file
-          - not returned when C(item.state) is set to C(directory)
+          - Full path to file.
+          - Not returned when I(item.state) is set to C(directory).
+          type: path
         root:
-          description: allows filtering by original location
+          description: Allows filtering by original location.
+          type: path
         path:
-          description: contains the relative path to root
+          description: Contains the relative path to root.
+          type: path
         mode:
-          description: TODO
+          description: The permissions the resulting file or directory.
+          type: str
         state:
           description: TODO
+          type: str
         owner:
-          description: TODO
+          description: Name of the user that owns the file/directory.
+          type: raw
         group:
-          description: TODO
+          description: Name of the group that owns the file/directory.
+          type: raw
         seuser:
-          description: TODO
+          description: The user part of the SELinux file context.
+          type: raw
         serole:
-          description: TODO
+          description: The role part of the SELinux file context.
+          type: raw
         setype:
-          description: TODO
+          description: The type part of the SELinux file context.
+          type: raw
         selevel:
-          description: TODO
+          description: The level part of the SELinux file context.
+          type: raw
         uid:
-          description: TODO
+          description: Owner ID of the file/directory.
+          type: int
         gid:
-          description: TODO
+          description: Group ID of the file/directory.
+          type: int
         size:
-          description: TODO
+          description: Size of the target.
+          type: int
         mtime:
-          description: TODO
+          description: Time of last modification.
+          type: float
         ctime:
-          description: TODO
+          description: Time of last metadata update or creation (depends on OS).
+          type: float
 """
 import os
 import pwd

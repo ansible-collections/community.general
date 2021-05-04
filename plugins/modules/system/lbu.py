@@ -26,10 +26,12 @@ options:
     description:
     - List of paths to exclude.
     type: list
+    elements: str
   include:
     description:
     - List of paths to include.
     type: list
+    elements: str
 
 author:
 - Kaarle Ritvanen (@kunkku)
@@ -38,19 +40,19 @@ author:
 EXAMPLES = '''
 # Commit changed files (if any)
 - name: Commit
-  lbu:
+  community.general.lbu:
     commit: true
 
 # Exclude path and commit
 - name: Exclude directory
-  lbu:
+  community.general.lbu:
     commit: true
     exclude:
     - /etc/opt
 
 # Include paths without committing
 - name: Include file and directory
-  lbu:
+  community.general.lbu:
     include:
     - /root/.ssh/authorized_keys
     - /var/lib/misc

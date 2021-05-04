@@ -21,17 +21,20 @@ options:
     description:
       - Account API Key.
     required: true
+    type: str
 
   account_secret:
     description:
       - Account Secret Key.
     required: true
+    type: str
 
   domain:
     description:
       - Domain to work with. Can be the domain name (e.g. "mydomain.com") or the numeric ID of the domain in DNS Made Easy (e.g. "839989") for faster
         resolution
     required: true
+    type: str
 
   sandbox:
     description:
@@ -43,11 +46,13 @@ options:
     description:
       - Record name to get/create/delete/update. If record_name is not specified; all records for the domain will be returned in "result" regardless
         of the state argument.
+    type: str
 
   record_type:
     description:
       - Record type.
     choices: [ 'A', 'AAAA', 'CNAME', 'ANAME', 'HTTPRED', 'MX', 'NS', 'PTR', 'SRV', 'TXT' ]
+    type: str
 
   record_value:
     description:
@@ -57,17 +62,20 @@ options:
       - >
         If record_value is not specified; no changes will be made and the record will be returned in 'result'
         (in other words, this module can be used to fetch a record's current id, type, and ttl)
+    type: str
 
   record_ttl:
     description:
       - record's "Time to live".  Number of seconds the record remains cached in DNS servers.
     default: 1800
+    type: int
 
   state:
     description:
       - whether the record should exist or not
     required: true
     choices: [ 'present', 'absent' ]
+    type: str
 
   validate_certs:
     description:
@@ -85,53 +93,56 @@ options:
   systemDescription:
     description:
       - Description used by the monitor.
-    required: true
     default: ''
+    type: str
 
   maxEmails:
     description:
       - Number of emails sent to the contact list by the monitor.
-    required: true
     default: 1
+    type: int
 
   protocol:
     description:
       - Protocol used by the monitor.
-    required: true
     default: 'HTTP'
     choices: ['TCP', 'UDP', 'HTTP', 'DNS', 'SMTP', 'HTTPS']
+    type: str
 
   port:
     description:
       - Port used by the monitor.
-    required: true
     default: 80
+    type: int
 
   sensitivity:
     description:
       - Number of checks the monitor performs before a failover occurs where Low = 8, Medium = 5,and High = 3.
-    required: true
     default: 'Medium'
     choices: ['Low', 'Medium', 'High']
+    type: str
 
   contactList:
     description:
       - Name or id of the contact list that the monitor will notify.
       - The default C('') means the Account Owner.
-    required: true
     default: ''
+    type: str
 
   httpFqdn:
     description:
       - The fully qualified domain name used by the monitor.
+    type: str
 
   httpFile:
     description:
       - The file at the Fqdn that the monitor queries for HTTP or HTTPS.
+    type: str
 
   httpQueryString:
     description:
       - The string in the httpFile that the monitor queries for HTTP or HTTPS.
+    type: str
 
   failover:
     description:
@@ -150,23 +161,28 @@ options:
     description:
       - Primary IP address for the failover.
       - Required if adding or changing the monitor or failover.
+    type: str
 
   ip2:
     description:
       - Secondary IP address for the failover.
       - Required if adding or changing the failover.
+    type: str
 
   ip3:
     description:
       - Tertiary IP address for the failover.
+    type: str
 
   ip4:
     description:
       - Quaternary IP address for the failover.
+    type: str
 
   ip5:
     description:
       - Quinary IP address for the failover.
+    type: str
 
 notes:
   - The DNS Made Easy service requires that machines interacting with the API have the proper time and timezone set. Be sure you are within a few
@@ -184,7 +200,7 @@ author: "Brice Burgess (@briceburg)"
 
 EXAMPLES = '''
 - name: Fetch my.com domain records
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -192,7 +208,7 @@ EXAMPLES = '''
   register: response
 
 - name: Create a record
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -202,7 +218,7 @@ EXAMPLES = '''
     record_value: 127.0.0.1
 
 - name: Update the previously created record
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -211,7 +227,7 @@ EXAMPLES = '''
     record_value: 192.0.2.23
 
 - name: Fetch a specific record
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -220,7 +236,7 @@ EXAMPLES = '''
   register: response
 
 - name: Delete a record
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -229,7 +245,7 @@ EXAMPLES = '''
     record_name: test
 
 - name: Add a failover
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -242,7 +258,7 @@ EXAMPLES = '''
     ip2: 127.0.0.3
 
 - name: Add a failover
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -258,7 +274,7 @@ EXAMPLES = '''
     ip5: 127.0.0.6
 
 - name: Add a monitor
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -275,7 +291,7 @@ EXAMPLES = '''
     contactList: my contact list
 
 - name: Add a monitor with http options
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -295,7 +311,7 @@ EXAMPLES = '''
     httpQueryString: some string
 
 - name: Add a monitor and a failover
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -314,7 +330,7 @@ EXAMPLES = '''
     contactList: emergencycontacts
 
 - name: Remove a failover
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -325,7 +341,7 @@ EXAMPLES = '''
     failover: no
 
 - name: Remove a monitor
-  dnsmadeeasy:
+  community.general.dnsmadeeasy:
     account_key: key
     account_secret: secret
     domain: my.com
@@ -451,6 +467,9 @@ class DME2(object):
             for result in self.all_records:
                 if record_type == "MX":
                     value = record_value.split(" ")[1]
+                # Note that TXT records are surrounded by quotes in the API response.
+                elif record_type == "TXT":
+                    value = '"{0}"'.format(record_value)
                 elif record_type == "SRV":
                     value = record_value.split(" ")[3]
                 else:
@@ -527,17 +546,17 @@ def main():
 
     module = AnsibleModule(
         argument_spec=dict(
-            account_key=dict(required=True),
+            account_key=dict(required=True, no_log=True),
             account_secret=dict(required=True, no_log=True),
             domain=dict(required=True),
-            sandbox=dict(default='no', type='bool'),
+            sandbox=dict(default=False, type='bool'),
             state=dict(required=True, choices=['present', 'absent']),
             record_name=dict(required=False),
             record_type=dict(required=False, choices=[
                              'A', 'AAAA', 'CNAME', 'ANAME', 'HTTPRED', 'MX', 'NS', 'PTR', 'SRV', 'TXT']),
             record_value=dict(required=False),
             record_ttl=dict(required=False, default=1800, type='int'),
-            monitor=dict(default='no', type='bool'),
+            monitor=dict(default=False, type='bool'),
             systemDescription=dict(default=''),
             maxEmails=dict(default=1, type='int'),
             protocol=dict(default='HTTP', choices=['TCP', 'UDP', 'HTTP', 'DNS', 'SMTP', 'HTTPS']),
@@ -547,14 +566,14 @@ def main():
             httpFqdn=dict(required=False),
             httpFile=dict(required=False),
             httpQueryString=dict(required=False),
-            failover=dict(default='no', type='bool'),
-            autoFailover=dict(default='no', type='bool'),
+            failover=dict(default=False, type='bool'),
+            autoFailover=dict(default=False, type='bool'),
             ip1=dict(required=False),
             ip2=dict(required=False),
             ip3=dict(required=False),
             ip4=dict(required=False),
             ip5=dict(required=False),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         ),
         required_together=[
             ['record_value', 'record_ttl', 'record_type']
@@ -635,7 +654,9 @@ def main():
     record_changed = False
     if current_record:
         for i in new_record:
-            if str(current_record[i]) != str(new_record[i]):
+            # Remove leading and trailing quote character from values because TXT records
+            # are surrounded by quotes.
+            if str(current_record[i]).strip('"') != str(new_record[i]):
                 record_changed = True
         new_record['id'] = str(current_record['id'])
 
@@ -657,8 +678,11 @@ def main():
         # create record and monitor as the record does not exist
         if not current_record:
             record = DME.createRecord(DME.prepareRecord(new_record))
-            monitor = DME.updateMonitor(record['id'], DME.prepareMonitor(new_monitor))
-            module.exit_json(changed=True, result=dict(record=record, monitor=monitor))
+            if new_monitor.get('monitor') and record_type == "A":
+                monitor = DME.updateMonitor(record['id'], DME.prepareMonitor(new_monitor))
+                module.exit_json(changed=True, result=dict(record=record, monitor=monitor))
+            else:
+                module.exit_json(changed=True, result=dict(record=record, monitor=current_monitor))
 
         # update the record
         updated = False

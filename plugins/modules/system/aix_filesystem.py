@@ -28,6 +28,7 @@ options:
     description:
       - Specifies attributes for files system separated by comma.
     type: list
+    elements: str
     default: agblksize='4096',isnapshot='no'
   auto_mount:
     description:
@@ -90,7 +91,6 @@ options:
       - C(mounted) checks if the file system is mounted or mount the file system.
       - C(unmounted) check if the file system is unmounted or unmount the file system.
     type: str
-    required: true
     choices: [ absent, mounted, present, unmounted ]
     default: present
   vg:
@@ -103,57 +103,57 @@ notes:
 
 EXAMPLES = r'''
 - name: Create filesystem in a previously defined logical volume.
-  aix_filesystem:
+  community.general.aix_filesystem:
     device: testlv
-    filesystem: /testfs
+    community.general.filesystem: /testfs
     state: present
 
 - name: Creating NFS filesystem from nfshost.
-  aix_filesystem:
+  community.general.aix_filesystem:
     device: /home/ftp
     nfs_server: nfshost
-    filesystem: /home/ftp
+    community.general.filesystem: /home/ftp
     state: present
 
 - name: Creating a new file system without a previously logical volume.
-  aix_filesystem:
-    filesystem: /newfs
+  community.general.aix_filesystem:
+    community.general.filesystem: /newfs
     size: 1G
     state: present
     vg: datavg
 
 - name: Unmounting /testfs.
-  aix_filesystem:
-    filesystem: /testfs
+  community.general.aix_filesystem:
+    community.general.filesystem: /testfs
     state: unmounted
 
 - name: Resizing /mksysb to +512M.
-  aix_filesystem:
-    filesystem: /mksysb
+  community.general.aix_filesystem:
+    community.general.filesystem: /mksysb
     size: +512M
     state: present
 
 - name: Resizing /mksysb to 11G.
-  aix_filesystem:
-    filesystem: /mksysb
+  community.general.aix_filesystem:
+    community.general.filesystem: /mksysb
     size: 11G
     state: present
 
 - name: Resizing /mksysb to -2G.
-  aix_filesystem:
-    filesystem: /mksysb
+  community.general.aix_filesystem:
+    community.general.filesystem: /mksysb
     size: -2G
     state: present
 
 - name: Remove NFS filesystem /home/ftp.
-  aix_filesystem:
-    filesystem: /home/ftp
+  community.general.aix_filesystem:
+    community.general.filesystem: /home/ftp
     rm_mount_point: yes
     state: absent
 
 - name: Remove /newfs.
-  aix_filesystem:
-    filesystem: /newfs
+  community.general.aix_filesystem:
+    community.general.filesystem: /newfs
     rm_mount_point: yes
     state: absent
 '''
@@ -170,7 +170,7 @@ msg:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.ansible.posix.plugins.module_utils.ismount import ismount
+from ansible_collections.community.general.plugins.module_utils._mount import ismount
 import re
 
 
@@ -179,7 +179,7 @@ def _fs_exists(module, filesystem):
     Check if file system already exists on /etc/filesystems.
 
     :param module: Ansible module.
-    :param filesystem: filesystem name.
+    :param community.general.filesystem: filesystem name.
     :return: True or False.
     """
     lsfs_cmd = module.get_bin_path('lsfs', True)
@@ -455,7 +455,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             account_subsystem=dict(type='bool', default=False),
-            attributes=dict(type='list', default=["agblksize='4096'", "isnapshot='no'"]),
+            attributes=dict(type='list', elements='str', default=["agblksize='4096'", "isnapshot='no'"]),
             auto_mount=dict(type='bool', default=True),
             device=dict(type='str'),
             filesystem=dict(type='str', required=True),

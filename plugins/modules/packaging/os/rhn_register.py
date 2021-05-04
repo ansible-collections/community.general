@@ -16,7 +16,7 @@ description:
 author:
 - James Laska (@jlaska)
 notes:
-    - This is for older Red Hat products. You probably want the M(redhat_subscription) module instead.
+    - This is for older Red Hat products. You probably want the M(community.general.redhat_subscription) module instead.
     - In order to register a system, C(rhnreg_ks) requires either a username and password, or an activationkey.
 requirements:
     - rhnreg_ks
@@ -49,6 +49,12 @@ options:
         description:
             - Supply an profilename for use with registration.
         type: str
+    force:
+        description:
+            - Force registration, even if system is already registered.
+        type: bool
+        default: no
+        version_added: 2.0.0
     ca_cert:
         description:
             - Supply a custom ssl CA certificate file for use with registration.
@@ -62,6 +68,7 @@ options:
         description:
             - Optionally specify a list of channels to subscribe to upon successful registration.
         type: list
+        elements: str
         default: []
     enable_eus:
         description:
@@ -77,42 +84,50 @@ options:
 
 EXAMPLES = r'''
 - name: Unregister system from RHN
-  rhn_register:
+  community.general.rhn_register:
     state: absent
     username: joe_user
     password: somepass
 
 - name: Register as user with password and auto-subscribe to available content
-  rhn_register:
+  community.general.rhn_register:
     state: present
     username: joe_user
     password: somepass
 
 - name: Register with activationkey and enable extended update support
-  rhn_register:
+  community.general.rhn_register:
     state: present
     activationkey: 1-222333444
     enable_eus: yes
 
 - name: Register with activationkey and set a profilename which may differ from the hostname
-  rhn_register:
+  community.general.rhn_register:
     state: present
     activationkey: 1-222333444
     profilename: host.example.com.custom
 
 - name: Register as user with password against a satellite server
-  rhn_register:
+  community.general.rhn_register:
     state: present
     username: joe_user
     password: somepass
     server_url: https://xmlrpc.my.satellite/XMLRPC
 
 - name: Register as user with password and enable channels
-  rhn_register:
+  community.general.rhn_register:
     state: present
     username: joe_user
     password: somepass
     channels: rhel-x86_64-server-6-foo-1,rhel-x86_64-server-6-bar-1
+
+- name: Force-register as user with password to ensure registration is current on server
+  community.general.rhn_register:
+    state: present
+    username: joe_user
+    password: somepass
+    server_url: https://xmlrpc.my.satellite/XMLRPC
+    force: yes
 '''
 
 RETURN = r'''
@@ -345,8 +360,9 @@ def main():
             ca_cert=dict(type='path', aliases=['sslcacert']),
             systemorgid=dict(type='str'),
             enable_eus=dict(type='bool', default=False),
+            force=dict(type='bool', default=False),
             nopackages=dict(type='bool', default=False),
-            channels=dict(type='list', default=[]),
+            channels=dict(type='list', elements='str', default=[]),
         ),
         # username/password is required for state=absent, or if channels is not empty
         # (basically anything that uses self.api requires username/password) but it doesn't
@@ -364,6 +380,7 @@ def main():
     password = module.params['password']
 
     state = module.params['state']
+    force = module.params['force']
     activationkey = module.params['activationkey']
     profilename = module.params['profilename']
     sslcacert = module.params['ca_cert']
@@ -394,7 +411,7 @@ def main():
             module.fail_json(msg="Missing arguments, If registering without an activationkey, must supply username or password")
 
         # Register system
-        if rhn.is_registered:
+        if rhn.is_registered and not force:
             module.exit_json(changed=False, msg="System already registered.")
 
         try:

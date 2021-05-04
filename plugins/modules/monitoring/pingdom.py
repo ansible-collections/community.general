@@ -20,23 +20,28 @@ requirements:
     - "This pingdom python library: https://github.com/mbabineau/pingdom-python"
 options:
     state:
+        type: str
         description:
             - Define whether or not the check should be running or paused.
         required: true
-        choices: [ "running", "paused" ]
+        choices: [ "running", "paused", "started", "stopped" ]
     checkid:
+        type: str
         description:
             - Pingdom ID of the check.
         required: true
     uid:
+        type: str
         description:
             - Pingdom user ID.
         required: true
     passwd:
+        type: str
         description:
             - Pingdom user password.
         required: true
     key:
+        type: str
         description:
             - Pingdom API key.
         required: true
@@ -46,7 +51,7 @@ notes:
 
 EXAMPLES = '''
 - name: Pause the check with the ID of 12345
-  pingdom:
+  community.general.pingdom:
     uid: example@example.com
     passwd: password123
     key: apipassword123
@@ -54,7 +59,7 @@ EXAMPLES = '''
     state: paused
 
 - name: Unpause the check with the ID of 12345
-  pingdom:
+  community.general.pingdom:
     uid: example@example.com
     passwd: password123
     key: apipassword123
@@ -107,7 +112,7 @@ def main():
             checkid=dict(required=True),
             uid=dict(required=True),
             passwd=dict(required=True, no_log=True),
-            key=dict(required=True)
+            key=dict(required=True, no_log=True),
         )
     )
 

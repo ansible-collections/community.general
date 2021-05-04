@@ -78,27 +78,27 @@ EXAMPLES = '''
 - name: Create new project
   hosts: localhost
   tasks:
-    packet_project:
+    community.general.packet_project:
       name: "new project"
 
 - name: Create new project within non-default organization
   hosts: localhost
   tasks:
-    packet_project:
+    community.general.packet_project:
       name: "my org project"
       org_id: a4cc87f9-e00f-48c2-9460-74aa60beb6b0
 
 - name: Remove project by id
   hosts: localhost
   tasks:
-    packet_project:
+    community.general.packet_project:
       state: absent
       id: eef49903-7a09-4ca1-af67-4087c29ab5b6
 
 - name: Create new project with non-default billing method
   hosts: localhost
   tasks:
-    packet_project:
+    community.general.packet_project:
       name: "newer project"
       payment_method: "the other visa"
 '''

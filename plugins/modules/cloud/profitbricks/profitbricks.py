@@ -22,52 +22,65 @@ options:
   name:
     description:
       - The name of the virtual machine.
-    required: true
+    type: str
   image:
     description:
       - The system image ID for creating the virtual machine, e.g. a3eae284-a2fe-11e4-b187-5f1f641608c8.
-    required: true
+    type: str
   image_password:
     description:
       - Password set for the administrative user.
+    type: str
   ssh_keys:
     description:
       - Public SSH keys allowing access to the virtual machine.
+    type: list
+    elements: str
   datacenter:
     description:
       - The datacenter to provision this virtual machine.
+    type: str
   cores:
     description:
       - The number of CPU cores to allocate to the virtual machine.
     default: 2
+    type: int
   ram:
     description:
       - The amount of memory to allocate to the virtual machine.
     default: 2048
+    type: int
   cpu_family:
     description:
       - The CPU family type to allocate to the virtual machine.
+    type: str
     default: AMD_OPTERON
     choices: [ "AMD_OPTERON", "INTEL_XEON" ]
   volume_size:
     description:
       - The size in GB of the boot volume.
+    type: int
     default: 10
   bus:
     description:
       - The bus type for the volume.
+    type: str
     default: VIRTIO
     choices: [ "IDE", "VIRTIO"]
   instance_ids:
     description:
       - list of instance ids, currently only used when state='absent' to remove instances.
+    type: list
+    elements: str
   count:
     description:
       - The number of virtual machines to create.
+    type: int
     default: 1
   location:
     description:
       - The datacenter location. Use only if you want to create the Datacenter or else this value is ignored.
+    type: str
     default: us/las
     choices: [ "us/las", "de/fra", "de/fkb" ]
   assign_public_ip:
@@ -78,13 +91,16 @@ options:
   lan:
     description:
       - The ID of the LAN you wish to add the servers to.
+    type: int
     default: 1
   subscription_user:
     description:
       - The ProfitBricks username. Overrides the PB_SUBSCRIPTION_ID environment variable.
+    type: str
   subscription_password:
     description:
       - THe ProfitBricks password. Overrides the PB_PASSWORD environment variable.
+    type: str
   wait:
     description:
       - wait for the instance to be in state 'running' before returning
@@ -93,6 +109,7 @@ options:
   wait_timeout:
     description:
       - how long before wait gives up, in seconds
+    type: int
     default: 600
   remove_boot_volume:
     description:
@@ -102,8 +119,15 @@ options:
   state:
     description:
       - create or terminate instances
+      - 'The choices available are: C(running), C(stopped), C(absent), C(present).'
+    type: str
     default: 'present'
-    choices: [ "running", "stopped", "absent", "present" ]
+  disk_type:
+    description:
+      - the type of disk to be allocated.
+    type: str
+    choices: [SSD, HDD]
+    default: HDD
 
 requirements:
      - "profitbricks"
@@ -117,7 +141,7 @@ EXAMPLES = '''
 
 # Provisioning example
 - name: Create three servers and enumerate their names
-  profitbricks:
+  community.general.profitbricks:
     datacenter: Tardis One
     name: web%02d.stackpointcloud.com
     cores: 4
@@ -130,7 +154,7 @@ EXAMPLES = '''
     assign_public_ip: true
 
 - name: Remove virtual machines
-  profitbricks:
+  community.general.profitbricks:
     datacenter: Tardis One
     instance_ids:
       - 'web001.stackpointcloud.com'
@@ -140,7 +164,7 @@ EXAMPLES = '''
     state: absent
 
 - name: Start virtual machines
-  profitbricks:
+  community.general.profitbricks:
     datacenter: Tardis One
     instance_ids:
       - 'web001.stackpointcloud.com'
@@ -150,7 +174,7 @@ EXAMPLES = '''
     state: running
 
 - name: Stop virtual machines
-  profitbricks:
+  community.general.profitbricks:
     datacenter: Tardis One
     instance_ids:
       - 'web001.stackpointcloud.com'
@@ -326,7 +350,7 @@ def create_virtual_machine(module, profitbricks):
     Create new virtual machine
 
     module : AnsibleModule object
-    profitbricks: authenticated profitbricks object
+    community.general.profitbricks: authenticated profitbricks object
 
     Returns:
         True if a new virtual machine was created, false otherwise
@@ -413,7 +437,7 @@ def remove_virtual_machine(module, profitbricks):
     This will remove the virtual machine along with the bootVolume.
 
     module : AnsibleModule object
-    profitbricks: authenticated profitbricks object.
+    community.general.profitbricks: authenticated profitbricks object.
 
     Not yet supported: handle deletion of attached data disks.
 
@@ -472,7 +496,7 @@ def startstop_machine(module, profitbricks, state):
     Starts or Stops a virtual machine.
 
     module : AnsibleModule object
-    profitbricks: authenticated profitbricks object.
+    community.general.profitbricks: authenticated profitbricks object.
 
     Returns:
         True when the servers process the action successfully, false otherwise.
@@ -559,12 +583,12 @@ def main():
             volume_size=dict(type='int', default=10),
             disk_type=dict(choices=['HDD', 'SSD'], default='HDD'),
             image_password=dict(default=None, no_log=True),
-            ssh_keys=dict(type='list', default=[]),
+            ssh_keys=dict(type='list', elements='str', default=[], no_log=False),
             bus=dict(choices=['VIRTIO', 'IDE'], default='VIRTIO'),
             lan=dict(type='int', default=1),
             count=dict(type='int', default=1),
             auto_increment=dict(type='bool', default=True),
-            instance_ids=dict(type='list', default=[]),
+            instance_ids=dict(type='list', elements='str', default=[]),
             subscription_user=dict(),
             subscription_password=dict(no_log=True),
             location=dict(choices=LOCATIONS, default='us/las'),

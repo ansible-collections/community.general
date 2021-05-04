@@ -36,24 +36,31 @@ options:
       - URL of the OpenNebula OneFlow API server.
       - It is recommended to use HTTPS so that the username/password are not transferred over the network unencrypted.
       - If not set then the value of the ONEFLOW_URL environment variable is used.
+    type: str
   api_username:
     description:
       - Name of the user to login into the OpenNebula OneFlow API server. If not set then the value of the C(ONEFLOW_USERNAME) environment variable is used.
+    type: str
   api_password:
     description:
       - Password of the user to login into OpenNebula OneFlow API server. If not set then the value of the C(ONEFLOW_PASSWORD) environment variable is used.
+    type: str
   template_name:
     description:
       - Name of service template to use to create a new instance of a service
+    type: str
   template_id:
     description:
       - ID of a service template to use to create a new instance of a service
+    type: int
   service_id:
     description:
       - ID of a service instance that you would like to manage
+    type: int
   service_name:
     description:
       - Name of a service instance that you would like to manage
+    type: str
   unique:
     description:
       - Setting C(unique=yes) will make sure that there is only one service instance running with a name set with C(service_name) when
@@ -66,15 +73,19 @@ options:
       - C(absent) - terminate an instance of a service specified with C(service_id)/C(service_name).
     choices: ["present", "absent"]
     default: present
+    type: str
   mode:
     description:
       - Set permission mode of a service instance in octet format, e.g. C(600) to give owner C(use) and C(manage) and nothing to group and others.
+    type: str
   owner_id:
     description:
       - ID of the user which will be set as the owner of the service
+    type: int
   group_id:
     description:
       - ID of the group which will be set as the group of the service
+    type: int
   wait:
     description:
       - Wait for the instance to reach RUNNING state after DEPLOYING or COOLDOWN state after SCALING
@@ -84,16 +95,20 @@ options:
     description:
       - How long before wait gives up, in seconds
     default: 300
+    type: int
   custom_attrs:
     description:
       - Dictionary of key/value custom attributes which will be used when instantiating a new service.
     default: {}
+    type: dict
   role:
     description:
       - Name of the role whose cardinality should be changed
+    type: str
   cardinality:
     description:
       - Number of VMs for the specified role
+    type: int
   force:
     description:
       - Force the new cardinality even if it is outside the limits
@@ -105,69 +120,69 @@ author:
 
 EXAMPLES = '''
 - name: Instantiate a new service
-  one_service:
+  community.general.one_service:
     template_id: 90
   register: result
 
 - name: Print service properties
-  debug:
+  ansible.builtin.debug:
     msg: result
 
 - name: Instantiate a new service with specified service_name, service group and mode
-  one_service:
+  community.general.one_service:
     template_name: 'app1_template'
     service_name: 'app1'
     group_id: 1
     mode: '660'
 
 - name: Instantiate a new service with template_id and pass custom_attrs dict
-  one_service:
+  community.general.one_service:
     template_id: 90
     custom_attrs:
       public_network_id: 21
       private_network_id: 26
 
 - name: Instantiate a new service 'foo' if the service doesn't already exist, otherwise do nothing
-  one_service:
+  community.general.one_service:
     template_id: 53
     service_name: 'foo'
     unique: yes
 
 - name: Delete a service by ID
-  one_service:
+  community.general.one_service:
     service_id: 153
     state: absent
 
 - name: Get service info
-  one_service:
+  community.general.one_service:
     service_id: 153
   register: service_info
 
 - name: Change service owner, group and mode
-  one_service:
+  community.general.one_service:
     service_name: 'app2'
     owner_id: 34
     group_id: 113
     mode: '600'
 
 - name: Instantiate service and wait for it to become RUNNING
-  one_service:
+  community.general.one_service:
     template_id: 43
     service_name: 'foo1'
 
 - name: Wait service to become RUNNING
-  one_service:
+  community.general.one_service:
     service_id: 112
     wait: yes
 
 - name: Change role cardinality
-  one_service:
+  community.general.one_service:
     service_id: 153
     role: bar
     cardinality: 5
 
 - name: Change role cardinality and wait for it to be applied
-  one_service:
+  community.general.one_service:
     service_id: 112
     role: foo
     cardinality: 7

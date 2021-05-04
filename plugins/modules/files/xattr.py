@@ -60,30 +60,30 @@ author:
 
 EXAMPLES = '''
 - name: Obtain the extended attributes  of /etc/foo.conf
-  xattr:
+  community.general.xattr:
     path: /etc/foo.conf
 
 - name: Set the key 'user.foo' to value 'bar'
-  xattr:
+  community.general.xattr:
     path: /etc/foo.conf
     key: foo
     value: bar
 
 - name: Set the key 'trusted.glusterfs.volume-id' to value '0x817b94343f164f199e5b573b4ea1f914'
-  xattr:
+  community.general.xattr:
     path: /mnt/bricks/brick1
     namespace: trusted
     key: glusterfs.volume-id
     value: "0x817b94343f164f199e5b573b4ea1f914"
 
 - name: Remove the key 'user.foo'
-  xattr:
+  community.general.xattr:
     path: /etc/foo.conf
     key: foo
     state: absent
 
 - name: Remove the key 'trusted.glusterfs.volume-id'
-  xattr:
+  community.general.xattr:
     path: /mnt/bricks/brick1
     namespace: trusted
     key: glusterfs.volume-id
@@ -98,9 +98,8 @@ from ansible.module_utils._text import to_native
 
 
 def get_xattr_keys(module, path, follow):
-    cmd = [module.get_bin_path('getfattr', True)]
-    # prevents warning and not sure why it's not default
-    cmd.append('--absolute-names')
+    cmd = [module.get_bin_path('getfattr', True), '--absolute-names']
+
     if not follow:
         cmd.append('-h')
     cmd.append(path)
@@ -109,10 +108,8 @@ def get_xattr_keys(module, path, follow):
 
 
 def get_xattr(module, path, key, follow):
+    cmd = [module.get_bin_path('getfattr', True), '--absolute-names']
 
-    cmd = [module.get_bin_path('getfattr', True)]
-    # prevents warning and not sure why it's not default
-    cmd.append('--absolute-names')
     if not follow:
         cmd.append('-h')
     if key is None:
@@ -172,7 +169,7 @@ def main():
         argument_spec=dict(
             path=dict(type='path', required=True, aliases=['name']),
             namespace=dict(type='str', default='user'),
-            key=dict(type='str'),
+            key=dict(type='str', no_log=False),
             value=dict(type='str'),
             state=dict(type='str', default='read', choices=['absent', 'all', 'keys', 'present', 'read']),
             follow=dict(type='bool', default=True),

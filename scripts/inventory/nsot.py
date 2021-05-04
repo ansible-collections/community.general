@@ -136,7 +136,9 @@ Here are some examples shown from just calling the command directly::
 
 '''
 
-from __future__ import print_function
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import sys
 import os
 import pkg_resources
@@ -179,7 +181,7 @@ class NSoTInventory(object):
                     sys.exit('%s\n' % e)
         else:  # Use defaults if env var missing
             self._config_default()
-        self.groups = self.config.keys()
+        self.groups = list(self.config.keys())
         self.client = get_api_client()
         self._meta = {'hostvars': dict()}
 

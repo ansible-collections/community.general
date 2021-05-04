@@ -119,14 +119,14 @@ author:
 
 EXAMPLES = '''
 - name: Create A record
-  ipwcli_dns:
+  community.general.ipwcli_dns:
     dnsname: example.com
     type: A
     container: ZoneOne
     address: 127.0.0.1
 
 - name: Remove SRV record if exists
-  ipwcli_dns:
+  community.general.ipwcli_dns:
     dnsname: _sip._tcp.test.example.com
     type: SRV
     container: ZoneOne
@@ -136,7 +136,7 @@ EXAMPLES = '''
     port: 5060
 
 - name: Create NAPTR record
-  ipwcli_dns:
+  community.general.ipwcli_dns:
     dnsname: test.example.com
     type: NAPTR
     preference: 10
@@ -205,9 +205,11 @@ class ResourceRecord(object):
     def list_record(self, record):
         # check if the record exists via list on ipwcli
         search = 'list %s' % (record.replace(';', '&&').replace('set', 'where'))
-        cmd = [self.module.get_bin_path('ipwcli', True)]
-        cmd.append('-user=%s' % (self.user))
-        cmd.append('-password=%s' % (self.password))
+        cmd = [
+            self.module.get_bin_path('ipwcli', True),
+            '-user=%s' % self.user,
+            '-password=%s' % self.password,
+        ]
         rc, out, err = self.module.run_command(cmd, data=search)
 
         if 'Invalid username or password' in out:
@@ -222,9 +224,11 @@ class ResourceRecord(object):
     def deploy_record(self, record):
         # check what happens if create fails on ipworks
         stdin = 'create %s' % (record)
-        cmd = [self.module.get_bin_path('ipwcli', True)]
-        cmd.append('-user=%s' % (self.user))
-        cmd.append('-password=%s' % (self.password))
+        cmd = [
+            self.module.get_bin_path('ipwcli', True),
+            '-user=%s' % self.user,
+            '-password=%s' % self.password,
+        ]
         rc, out, err = self.module.run_command(cmd, data=stdin)
 
         if 'Invalid username or password' in out:
@@ -238,9 +242,11 @@ class ResourceRecord(object):
     def delete_record(self, record):
         # check what happens if create fails on ipworks
         stdin = 'delete %s' % (record.replace(';', '&&').replace('set', 'where'))
-        cmd = [self.module.get_bin_path('ipwcli', True)]
-        cmd.append('-user=%s' % (self.user))
-        cmd.append('-password=%s' % (self.password))
+        cmd = [
+            self.module.get_bin_path('ipwcli', True),
+            '-user=%s' % self.user,
+            '-password=%s' % self.password,
+        ]
         rc, out, err = self.module.run_command(cmd, data=stdin)
 
         if 'Invalid username or password' in out:

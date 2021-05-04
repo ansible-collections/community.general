@@ -46,10 +46,12 @@ options:
           - A list of tags to associate with your monitor when creating or updating.
           - This can help you categorize and filter monitors.
         type: list
+        elements: str
     type:
         description:
           - The type of the monitor.
-        choices: ['metric alert', 'service check', 'event alert', 'process alert', 'log alert']
+          - The types C(query alert), C(trace-analytics alert) and C(rum alert) were added in community.general 2.1.0.
+        choices: ['metric alert', 'service check', 'event alert', 'process alert', 'log alert', 'query alert', 'trace-analytics alert', 'rum alert']
         type: str
     query:
         description:
@@ -66,10 +68,9 @@ options:
           - A message to include with notifications for this monitor.
           - Email notifications can be sent to specific users by using the same '@username' notation as events.
           - Monitor message template variables can be accessed by using double square brackets, i.e '[[' and ']]'.
-          - C(message) alias is deprecated in Ansible 2.10, since it is used internally by Ansible Core Engine.
         type: str
-        aliases: [ 'message' ]
     silenced:
+        type: dict
         description:
           - Dictionary of scopes to silence, with timestamps or None.
           - Each scope will be muted until the given POSIX timestamp or forever if the value is None.
@@ -83,7 +84,7 @@ options:
         description:
           - The number of minutes before a monitor will notify when data stops reporting.
           - Must be at least 2x the monitor timeframe for metric alerts or 2 minutes for service checks.
-        default: 2x timeframe for metric, 2 minutes for service
+          - If not specified, it defaults to 2x timeframe for metric, 2 minutes for service.
         type: str
     timeout_h:
         description:
@@ -105,11 +106,12 @@ options:
         type: bool
         default: 'no'
     thresholds:
+        type: dict
         description:
           - A dictionary of thresholds by status.
           - Only available for service checks and metric alerts.
           - Because each of them can have multiple thresholds, we do not define them directly in the query.
-        default: {'ok': 1, 'critical': 1, 'warning': 1}
+          - "If not specified, it defaults to: C({'ok': 1, 'critical': 1, 'warning': 1})."
     locked:
         description:
           - Whether changes to this monitor should be restricted to the creator or admins.
@@ -135,11 +137,17 @@ options:
           - The ID of the alert.
           - If set, will be used instead of the name to locate the alert.
         type: str
+    include_tags:
+        description:
+          - Whether notifications from this monitor automatically inserts its triggering tags into the title.
+        type: bool
+        default: yes
+        version_added: 1.3.0
 '''
 
 EXAMPLES = '''
 - name: Create a metric monitor
-  datadog_monitor:
+  community.general.datadog_monitor:
     type: "metric alert"
     name: "Test monitor"
     state: "present"
@@ -149,14 +157,14 @@ EXAMPLES = '''
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
 - name: Deletes a monitor
-  datadog_monitor:
+  community.general.datadog_monitor:
     name: "Test monitor"
     state: "absent"
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
 - name: Mutes a monitor
-  datadog_monitor:
+  community.general.datadog_monitor:
     name: "Test monitor"
     state: "mute"
     silenced: '{"*":None}'
@@ -164,14 +172,14 @@ EXAMPLES = '''
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
 - name: Unmutes a monitor
-  datadog_monitor:
+  community.general.datadog_monitor:
     name: "Test monitor"
     state: "unmute"
     api_key: "9775a026f1ca7d1c6c5af9d94d9595a4"
     app_key: "87ce4a24b5553d2e482ea8a8500e71b8ad4554ff"
 
 - name: Use datadoghq.eu platform instead of datadoghq.com
-  datadog_monitor:
+  community.general.datadog_monitor:
     name: "Test monitor"
     state: "absent"
     api_host: https://api.datadoghq.eu
@@ -197,36 +205,35 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             api_key=dict(required=True, no_log=True),
-            api_host=dict(required=False),
+            api_host=dict(),
             app_key=dict(required=True, no_log=True),
             state=dict(required=True, choices=['present', 'absent', 'mute', 'unmute']),
-            type=dict(required=False, choices=['metric alert', 'service check', 'event alert', 'process alert', 'log alert']),
+            type=dict(choices=['metric alert', 'service check', 'event alert', 'process alert',
+                               'log alert', 'query alert', 'trace-analytics alert', 'rum alert']),
             name=dict(required=True),
-            query=dict(required=False),
-            notification_message=dict(required=False, default=None, aliases=['message'], deprecated_aliases=[dict(name='message', version='2.14')]),
-            silenced=dict(required=False, default=None, type='dict'),
-            notify_no_data=dict(required=False, default=False, type='bool'),
-            no_data_timeframe=dict(required=False, default=None),
-            timeout_h=dict(required=False, default=None),
-            renotify_interval=dict(required=False, default=None),
-            escalation_message=dict(required=False, default=None),
-            notify_audit=dict(required=False, default=False, type='bool'),
-            thresholds=dict(required=False, type='dict', default=None),
-            tags=dict(required=False, type='list', default=None),
-            locked=dict(required=False, default=False, type='bool'),
-            require_full_window=dict(required=False, default=None, type='bool'),
-            new_host_delay=dict(required=False, default=None),
-            evaluation_delay=dict(required=False, default=None),
-            id=dict(required=False)
+            query=dict(),
+            notification_message=dict(no_log=True),
+            silenced=dict(type='dict'),
+            notify_no_data=dict(default=False, type='bool'),
+            no_data_timeframe=dict(),
+            timeout_h=dict(),
+            renotify_interval=dict(),
+            escalation_message=dict(),
+            notify_audit=dict(default=False, type='bool'),
+            thresholds=dict(type='dict', default=None),
+            tags=dict(type='list', elements='str', default=None),
+            locked=dict(default=False, type='bool'),
+            require_full_window=dict(type='bool'),
+            new_host_delay=dict(),
+            evaluation_delay=dict(),
+            id=dict(),
+            include_tags=dict(required=False, default=True, type='bool'),
         )
     )
 
     # Prepare Datadog
     if not HAS_DATADOG:
         module.fail_json(msg=missing_required_lib('datadogpy'), exception=DATADOG_IMP_ERR)
-
-    if 'message' in module.params:
-        module.fail_json(msg="'message' is reserved keyword, please change this parameter to 'notification_message'")
 
     options = {
         'api_key': module.params['api_key'],
@@ -331,12 +338,13 @@ def install_monitor(module):
         "locked": module.boolean(module.params['locked']),
         "require_full_window": module.params['require_full_window'],
         "new_host_delay": module.params['new_host_delay'],
-        "evaluation_delay": module.params['evaluation_delay']
+        "evaluation_delay": module.params['evaluation_delay'],
+        "include_tags": module.params['include_tags'],
     }
 
     if module.params['type'] == "service check":
         options["thresholds"] = module.params['thresholds'] or {'ok': 1, 'critical': 1, 'warning': 1}
-    if module.params['type'] in ["metric alert", "log alert"] and module.params['thresholds'] is not None:
+    if module.params['type'] in ["metric alert", "log alert", "query alert", "trace-analytics alert", "rum alert"] and module.params['thresholds'] is not None:
         options["thresholds"] = module.params['thresholds']
 
     monitor = _get_monitor(module)

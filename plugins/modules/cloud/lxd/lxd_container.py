@@ -19,11 +19,13 @@ options:
     name:
         description:
           - Name of a container.
+        type: str
         required: true
     architecture:
         description:
           - The architecture for the container (e.g. "x86_64" or "i686").
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)
+        type: str
         required: false
     config:
         description:
@@ -37,12 +39,19 @@ options:
           - The key starts with 'volatile.' are ignored for this comparison.
           - Not all config values are supported to apply the existing container.
             Maybe you need to delete and recreate a container.
+        type: dict
         required: false
+    profiles:
+        description:
+          - Profile to be used by the container
+        type: list
+        elements: str
     devices:
         description:
           - 'The devices for the container
             (e.g. { "rootfs": { "path": "/dev/kvm", "type": "unix-char" }).
             See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1)'
+        type: dict
         required: false
     ephemeral:
         description:
@@ -61,6 +70,7 @@ options:
           - 'See U(https://github.com/lxc/lxd/blob/master/doc/rest-api.md#post-1) for complete API documentation.'
           - 'Note that C(protocol) accepts two choices: C(lxd) or C(simplestreams)'
         required: false
+        type: dict
     state:
         choices:
           - started
@@ -72,6 +82,15 @@ options:
           - Define the state of a container.
         required: false
         default: started
+        type: str
+    target:
+        description:
+          - For cluster deployments. Will attempt to create a container on a target node.
+            If container exists elsewhere in a cluster, then container will not be replaced or moved.
+            The name should respond to same name of the node you see in C(lxc cluster list).
+        type: str
+        required: false
+        version_added: 1.0.0
     timeout:
         description:
           - A timeout for changing the state of the container.
@@ -80,6 +99,7 @@ options:
             starting or restarting.
         required: false
         default: 30
+        type: int
     wait_for_ipv4_addresses:
         description:
           - If this is true, the C(lxd_container) waits until IPv4 addresses
@@ -100,23 +120,27 @@ options:
           - The unix domain socket path or the https URL for the LXD server.
         required: false
         default: unix:/var/lib/lxd/unix.socket
+        type: str
     snap_url:
         description:
           - The unix domain socket path when LXD is installed by snap package manager.
         required: false
         default: unix:/var/snap/lxd/common/lxd/unix.socket
+        type: str
     client_key:
         description:
           - The client certificate key file path.
+          - If not specified, it defaults to C(${HOME}/.config/lxc/client.key).
         required: false
-        default: '"{}/.config/lxc/client.key" .format(os.environ["HOME"])'
         aliases: [ key_file ]
+        type: path
     client_cert:
         description:
           - The client certificate file path.
+          - If not specified, it defaults to C(${HOME}/.config/lxc/client.crt).
         required: false
-        default: '"{}/.config/lxc/client.crt" .format(os.environ["HOME"])'
         aliases: [ cert_file ]
+        type: path
     trust_password:
         description:
           - The client trusted password.
@@ -127,6 +151,7 @@ options:
           - If trust_password is set, this module send a request for
             authentication before sending any requests.
         required: false
+        type: str
 notes:
   - Containers must have a unique name. If you attempt to create a container
     with a name that already existed in the users namespace the module will
@@ -136,7 +161,7 @@ notes:
     2.1, the later requires python to be installed in the container which can
     be done with the command module.
   - You can copy a file from the host to the container
-    with the Ansible M(copy) and M(template) module and the `lxd` connection plugin.
+    with the Ansible M(ansible.builtin.copy) and M(ansible.builtin.template) module and the `lxd` connection plugin.
     See the example below.
   - You can copy a file in the created container to the localhost
     with `command=lxc file pull container_name/dir/filename filename`.
@@ -149,7 +174,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create a started container
-      lxd_container:
+      community.general.lxd_container:
         name: mycontainer
         state: started
         source:
@@ -164,14 +189,14 @@ EXAMPLES = '''
 
     - name: Check python is installed in container
       delegate_to: mycontainer
-      raw: dpkg -s python
+      ansible.builtin.raw: dpkg -s python
       register: python_install_check
       failed_when: python_install_check.rc not in [0, 1]
       changed_when: false
 
     - name: Install python in container
       delegate_to: mycontainer
-      raw: apt-get install -y python
+      ansible.builtin.raw: apt-get install -y python
       when: python_install_check.rc == 1
 
 # An example for creating an Ubuntu 14.04 container using an image fingerprint.
@@ -182,7 +207,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Create a started container
-      lxd_container:
+      community.general.lxd_container:
         name: mycontainer
         state: started
         source:
@@ -203,7 +228,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Delete a container
-      lxd_container:
+      community.general.lxd_container:
         name: mycontainer
         state: absent
 
@@ -212,7 +237,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Restart a container
-      lxd_container:
+      community.general.lxd_container:
         name: mycontainer
         state: restarted
 
@@ -221,7 +246,7 @@ EXAMPLES = '''
   connection: local
   tasks:
     - name: Restart a container
-      lxd_container:
+      community.general.lxd_container:
         url: https://127.0.0.1:8443
         # These client_cert and client_key values are equal to the default values.
         #client_cert: "{{ lookup('env', 'HOME') }}/.config/lxc/client.crt"
@@ -239,10 +264,37 @@ EXAMPLES = '''
     - mycontainer
   tasks:
     - name: Copy /etc/hosts in the created container to localhost with name "mycontainer-hosts"
-      fetch:
+      ansible.builtin.fetch:
         src: /etc/hosts
         dest: /tmp/mycontainer-hosts
         flat: true
+
+# An example for LXD cluster deployments. This example will create two new container on specific
+# nodes - 'node01' and 'node02'. In 'target:', 'node01' and 'node02' are names of LXD cluster
+# members that LXD cluster recognizes, not ansible inventory names, see: 'lxc cluster list'.
+# LXD API calls can be made to any LXD member, in this example, we send API requests to
+#'node01.example.com', which matches ansible inventory name.
+- hosts: node01.example.com
+  tasks:
+    - name: Create LXD container
+      community.general.lxd_container:
+        name: new-container-1
+        state: started
+        source:
+          type: image
+          mode: pull
+          alias: ubuntu/xenial/amd64
+        target: node01
+
+    - name: Create container on another node
+      community.general.lxd_container:
+        name: new-container-2
+        state: started
+        source:
+          type: image
+          mode: pull
+          alias: ubuntu/xenial/amd64
+        target: node02
 '''
 
 RETURN = '''
@@ -273,7 +325,7 @@ import time
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
-
+from ansible.module_utils.six.moves.urllib.parse import urlencode
 
 # LXD_ANSIBLE_STATES is a map of states that contain values of methods used
 # when a particular state is evoked.
@@ -319,9 +371,14 @@ class LXDContainerManagement(object):
         self.wait_for_ipv4_addresses = self.module.params['wait_for_ipv4_addresses']
         self.force_stop = self.module.params['force_stop']
         self.addresses = None
+        self.target = self.module.params['target']
 
-        self.key_file = self.module.params.get('client_key', None)
-        self.cert_file = self.module.params.get('client_cert', None)
+        self.key_file = self.module.params.get('client_key')
+        if self.key_file is None:
+            self.key_file = '{0}/.config/lxc/client.key'.format(os.environ['HOME'])
+        self.cert_file = self.module.params.get('client_cert')
+        if self.cert_file is None:
+            self.cert_file = '{0}/.config/lxc/client.crt'.format(os.environ['HOME'])
         self.debug = self.module._verbosity >= 4
 
         try:
@@ -378,7 +435,10 @@ class LXDContainerManagement(object):
     def _create_container(self):
         config = self.config.copy()
         config['name'] = self.name
-        self.client.do('POST', '/1.0/containers', config)
+        if self.target:
+            self.client.do('POST', '/1.0/containers?' + urlencode(dict(target=self.target)), config)
+        else:
+            self.client.do('POST', '/1.0/containers', config)
         self.actions.append('create')
 
     def _start_container(self):
@@ -599,13 +659,17 @@ def main():
             ),
             profiles=dict(
                 type='list',
+                elements='str',
             ),
             source=dict(
                 type='dict',
             ),
             state=dict(
-                choices=LXD_ANSIBLE_STATES.keys(),
+                choices=list(LXD_ANSIBLE_STATES.keys()),
                 default='started'
+            ),
+            target=dict(
+                type='str',
             ),
             timeout=dict(
                 type='int',
@@ -628,13 +692,11 @@ def main():
                 default='unix:/var/snap/lxd/common/lxd/unix.socket'
             ),
             client_key=dict(
-                type='str',
-                default='{0}/.config/lxc/client.key'.format(os.environ['HOME']),
+                type='path',
                 aliases=['key_file']
             ),
             client_cert=dict(
-                type='str',
-                default='{0}/.config/lxc/client.crt'.format(os.environ['HOME']),
+                type='path',
                 aliases=['cert_file']
             ),
             trust_password=dict(type='str', no_log=True)

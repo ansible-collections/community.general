@@ -20,10 +20,13 @@ options:
             - Indicates the desired state for the Fibre Channel Network resource.
               C(present) will ensure data properties are compliant with OneView.
               C(absent) will remove the resource from OneView, if it exists.
+        type: str
         choices: ['present', 'absent']
+        required: true
     data:
         description:
             - List with the Fibre Channel Network properties.
+        type: dict
         required: true
 
 extends_documentation_fragment:
@@ -34,14 +37,14 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Ensure that the Fibre Channel Network is present using the default configuration
-  oneview_fc_network:
+  community.general.oneview_fc_network:
     config: "{{ config_file_path }}"
     state: present
     data:
       name: 'New FC Network'
 
 - name: Ensure that the Fibre Channel Network is present with fabricType 'DirectAttach'
-  oneview_fc_network:
+  community.general.oneview_fc_network:
     config: "{{ config_file_path }}"
     state: present
     data:
@@ -49,7 +52,7 @@ EXAMPLES = '''
       fabricType: 'DirectAttach'
 
 - name: Ensure that the Fibre Channel Network is present and is inserted in the desired scopes
-  oneview_fc_network:
+  community.general.oneview_fc_network:
     config: "{{ config_file_path }}"
     state: present
     data:
@@ -59,7 +62,7 @@ EXAMPLES = '''
         - '/rest/scopes/01SC123456'
 
 - name: Ensure that the Fibre Channel Network is absent
-  oneview_fc_network:
+  community.general.oneview_fc_network:
     config: "{{ config_file_path }}"
     state: absent
     data:

@@ -34,52 +34,60 @@ options:
       - "Not required if C(cache) contains result of previous module call (in
       same play)."
     required: false
+    type: str
   password:
     description:
       - Password which match to account to which specified C(email) belong.
       - "Not required if C(cache) contains result of previous module call (in
       same play)."
     required: false
+    type: str
   cache:
     description: >
        In case if single play use blocks management module few times it is
        preferred to enabled 'caching' by making previous module to share
        gathered artifacts and pass them to this parameter.
     required: false
+    type: dict
     default: {}
   account:
     description:
       - "Name of PubNub account for from which C(application) will be used to
       manage blocks."
       - "User's account will be used if value not set or empty."
+    type: str
     required: false
   application:
     description:
       - "Name of target PubNub application for which blocks configuration on
       specific C(keyset) will be done."
+    type: str
     required: true
   keyset:
     description:
       - Name of application's keys set which is bound to managed blocks.
+    type: str
     required: true
   state:
     description:
       - "Intended block state after event handlers creation / update process
       will be completed."
     required: false
-    default: 'started'
+    default: 'present'
     choices: ['started', 'stopped', 'present', 'absent']
+    type: str
   name:
     description:
       - Name of managed block which will be later visible on admin.pubnub.com.
     required: true
+    type: str
   description:
     description:
         - Short block description which will be later visible on
           admin.pubnub.com. Used only if block doesn't exists and won't change
           description for existing block.
     required: false
-    default: 'New block'
+    type: str
   event_handlers:
     description:
       - "List of event handlers which should be updated for specified block
@@ -102,6 +110,8 @@ options:
       it to C(absent) and it will be removed."
     required: false
     default: []
+    type: list
+    elements: dict
   changes:
     description:
       - "List of fields which should be changed by block itself (doesn't
@@ -109,6 +119,7 @@ options:
       - "Possible options for change is: C(name)."
     required: false
     default: {}
+    type: dict
   validate_certs:
     description:
       - "This key allow to try skip certificates check when performing REST API
@@ -123,7 +134,7 @@ options:
 EXAMPLES = '''
 # Event handler create example.
 - name: Create single event handler
-  pubnub_blocks:
+  community.general.pubnub_blocks:
     email: '{{ email }}'
     password: '{{ password }}'
     application: '{{ app_name }}'
@@ -138,7 +149,7 @@ EXAMPLES = '''
 
 # Change event handler trigger event type.
 - name: Change event handler 'event'
-  pubnub_blocks:
+  community.general.pubnub_blocks:
     email: '{{ email }}'
     password: '{{ password }}'
     application: '{{ app_name }}'
@@ -151,7 +162,7 @@ EXAMPLES = '''
 
 # Stop block and event handlers.
 - name: Stopping block
-  pubnub_blocks:
+  community.general.pubnub_blocks:
     email: '{{ email }}'
     password: '{{ password }}'
     application: '{{ app_name }}'
@@ -162,7 +173,7 @@ EXAMPLES = '''
 # Multiple module calls with cached result passing
 - name: Create '{{ block_name }}' block
   register: module_cache
-  pubnub_blocks:
+  community.general.pubnub_blocks:
     email: '{{ email }}'
     password: '{{ password }}'
     application: '{{ app_name }}'
@@ -171,7 +182,7 @@ EXAMPLES = '''
     state: present
 - name: Add '{{ event_handler_1_name }}' handler to '{{ block_name }}'
   register: module_cache
-  pubnub_blocks:
+  community.general.pubnub_blocks:
     cache: '{{ module_cache }}'
     application: '{{ app_name }}'
     keyset: '{{ keyset_name }}'
@@ -185,7 +196,7 @@ EXAMPLES = '''
         event: 'js-before-publish'
 - name: Add '{{ event_handler_2_name }}' handler to '{{ block_name }}'
   register: module_cache
-  pubnub_blocks:
+  community.general.pubnub_blocks:
     cache: '{{ module_cache }}'
     application: '{{ app_name }}'
     keyset: '{{ keyset_name }}'
@@ -199,7 +210,7 @@ EXAMPLES = '''
         event: 'js-before-publish'
 - name: Start '{{ block_name }}' block
   register: module_cache
-  pubnub_blocks:
+  community.general.pubnub_blocks:
     cache: '{{ module_cache }}'
     application: '{{ app_name }}'
     keyset: '{{ keyset_name }}'
@@ -538,11 +549,11 @@ def main():
         password=dict(default='', required=False, type='str', no_log=True),
         account=dict(default='', required=False, type='str'),
         application=dict(required=True, type='str'),
-        keyset=dict(required=True, type='str'),
+        keyset=dict(required=True, type='str', no_log=False),
         state=dict(default='present', type='str',
                    choices=['started', 'stopped', 'present', 'absent']),
         name=dict(required=True, type='str'), description=dict(type='str'),
-        event_handlers=dict(default=list(), type='list'),
+        event_handlers=dict(default=list(), type='list', elements='dict'),
         changes=dict(default=dict(), type='dict'),
         cache=dict(default=dict(), type='dict'),
         validate_certs=dict(default=True, type='bool'))

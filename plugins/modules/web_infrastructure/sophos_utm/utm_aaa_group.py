@@ -30,6 +30,7 @@ options:
         description:
           - List of adirectory group strings.
         type: list
+        elements: str
     adirectory_groups_sids:
         description:
           - Dictionary of group sids.
@@ -64,6 +65,7 @@ options:
         description:
           - List of edirectory group strings.
         type: list
+        elements: str
     ipsec_dn:
         description:
           - The ipsec dn string.
@@ -80,6 +82,7 @@ options:
         description:
           - A list of user ref names (aaa/user).
         type: list
+        elements: str
         default: []
     network:
         description:
@@ -90,11 +93,13 @@ options:
         description:
           - A list of radius group strings.
         type: list
+        elements: str
         default: []
     tacacs_groups:
         description:
           - A list of tacacs group strings.
         type: list
+        elements: str
         default: []
 
 extends_documentation_fragment:
@@ -104,7 +109,7 @@ extends_documentation_fragment:
 
 EXAMPLES = """
 - name: Create UTM aaa_group
-  utm_aaa_group:
+  community.general.utm_aaa_group:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestAAAGroupEntry
@@ -116,7 +121,7 @@ EXAMPLES = """
     state: present
 
 - name: Remove UTM aaa_group
-  utm_aaa_group:
+  community.general.utm_aaa_group:
     utm_host: sophos.host.name
     utm_token: abcdefghijklmno1234
     name: TestAAAGroupEntry

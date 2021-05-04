@@ -35,6 +35,7 @@ options:
       - Continue only after the status changes to 'MAINT'.
       - This overrides the shutdown_sessions option.
     type: bool
+    default: false
   host:
     description:
       - Name of the backend host to change.
@@ -62,6 +63,18 @@ options:
     type: str
     required: true
     choices: [ disabled, drain, enabled ]
+  agent:
+    description:
+      - Disable/enable agent checks (depending on I(state) value).
+    type: bool
+    default: no
+    version_added: 1.0.0
+  health:
+    description:
+      - Disable/enable health checks (depending on I(state) value).
+    type: bool
+    default: no
+    version_added: "1.0.0"
   fail_on_not_found:
     description:
       - Fail whenever trying to enable/disable a backend host that does not exist
@@ -95,25 +108,32 @@ options:
 
 EXAMPLES = r'''
 - name: Disable server in 'www' backend pool
-  haproxy:
+  community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
     backend: www
 
+- name: Disable server in 'www' backend pool, also stop health/agent checks
+  community.general.haproxy:
+    state: disabled
+    host: '{{ inventory_hostname }}'
+    health: yes
+    agent: yes
+
 - name: Disable server without backend pool name (apply to all available backend pool)
-  haproxy:
+  community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
 
 - name: Disable server, provide socket file
-  haproxy:
+  community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
     socket: /var/run/haproxy.sock
     backend: www
 
 - name: Disable server, provide socket file, wait until status reports in maintenance
-  haproxy:
+  community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
     socket: /var/run/haproxy.sock
@@ -123,7 +143,7 @@ EXAMPLES = r'''
 # Place server in drain mode, providing a socket file.  Then check the server's
 # status every minute to see if it changes to maintenance mode, continuing if it
 # does in an hour and failing otherwise.
-- haproxy:
+- community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
     socket: /var/run/haproxy.sock
@@ -134,7 +154,7 @@ EXAMPLES = r'''
     wait_retries: 60
 
 - name: Disable backend server in 'www' backend pool and drop open sessions to it
-  haproxy:
+  community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
     backend: www
@@ -142,26 +162,26 @@ EXAMPLES = r'''
     shutdown_sessions: yes
 
 - name: Disable server without backend pool name (apply to all available backend pool) but fail when the backend host is not found
-  haproxy:
+  community.general.haproxy:
     state: disabled
     host: '{{ inventory_hostname }}'
     fail_on_not_found: yes
 
 - name: Enable server in 'www' backend pool
-  haproxy:
+  community.general.haproxy:
     state: enabled
     host: '{{ inventory_hostname }}'
     backend: www
 
 - name: Enable server in 'www' backend pool wait until healthy
-  haproxy:
+  community.general.haproxy:
     state: enabled
     host: '{{ inventory_hostname }}'
     backend: www
     wait: yes
 
 - name: Enable server in 'www' backend pool wait until healthy. Retry 10 times with intervals of 5 seconds to retrieve the health
-  haproxy:
+  community.general.haproxy:
     state: enabled
     host: '{{ inventory_hostname }}'
     backend: www
@@ -170,7 +190,7 @@ EXAMPLES = r'''
     wait_interval: 5
 
 - name: Enable server in 'www' backend pool with change server(s) weight
-  haproxy:
+  community.general.haproxy:
     state: enabled
     host: '{{ inventory_hostname }}'
     socket: /var/run/haproxy.sock
@@ -178,7 +198,7 @@ EXAMPLES = r'''
     backend: www
 
 - name: Set the server in 'www' backend pool to drain mode
-  haproxy:
+  community.general.haproxy:
     state: drain
     host: '{{ inventory_hostname }}'
     socket: /var/run/haproxy.sock
@@ -228,6 +248,8 @@ class HAProxy(object):
         self.socket = self.module.params['socket']
         self.shutdown_sessions = self.module.params['shutdown_sessions']
         self.fail_on_not_found = self.module.params['fail_on_not_found']
+        self.agent = self.module.params['agent']
+        self.health = self.module.params['health']
         self.wait = self.module.params['wait']
         self.wait_retries = self.module.params['wait_retries']
         self.wait_interval = self.module.params['wait_interval']
@@ -345,10 +367,9 @@ class HAProxy(object):
             # We can assume there will only be 1 element in state because both svname and pxname are always set when we get here
             # When using track we get a status like this: MAINT (via pxname/svname) so we need to do substring matching
             if status in state[0]['status']:
-                if not self._drain or (state[0]['scur'] == '0' and 'MAINT' in state):
+                if not self._drain or state[0]['scur'] == '0':
                     return True
-            else:
-                time.sleep(self.wait_interval)
+            time.sleep(self.wait_interval)
 
         self.module.fail_json(msg="server %s/%s not status '%s' after %d retries. Aborting." %
                               (pxname, svname, status, self.wait_retries))
@@ -360,6 +381,10 @@ class HAProxy(object):
         set the weight for haproxy backend server when provides.
         """
         cmd = "get weight $pxname/$svname; enable server $pxname/$svname"
+        if self.agent:
+            cmd += "; enable agent $pxname/$svname"
+        if self.health:
+            cmd += "; enable health $pxname/$svname"
         if weight:
             cmd += "; set weight $pxname/$svname %s" % weight
         self.execute_for_backends(cmd, backend, host, 'UP')
@@ -370,7 +395,12 @@ class HAProxy(object):
         performed on the server until it leaves maintenance,
         also it shutdown sessions while disabling backend host server.
         """
-        cmd = "get weight $pxname/$svname; disable server $pxname/$svname"
+        cmd = "get weight $pxname/$svname"
+        if self.agent:
+            cmd += "; disable agent $pxname/$svname"
+        if self.health:
+            cmd += "; disable health $pxname/$svname"
+        cmd += "; disable server $pxname/$svname"
         if shutdown_sessions:
             cmd += "; shutdown sessions server $pxname/$svname"
         self.execute_for_backends(cmd, backend, host, 'MAINT')
@@ -378,15 +408,17 @@ class HAProxy(object):
     def drain(self, host, backend, status='DRAIN'):
         """
         Drain action, sets the server to DRAIN mode.
-        In this mode mode, the server will not accept any new connections
+        In this mode, the server will not accept any new connections
         other than those that are accepted via persistence.
         """
         haproxy_version = self.discover_version()
 
-        # check if haproxy version suppots DRAIN state (starting with 1.5)
+        # check if haproxy version supports DRAIN state (starting with 1.5)
         if haproxy_version and (1, 5) <= haproxy_version:
             cmd = "set server $pxname/$svname state drain"
-            self.execute_for_backends(cmd, backend, host, status)
+            self.execute_for_backends(cmd, backend, host, "DRAIN")
+            if status == "MAINT":
+                self.disabled(host, backend, self.shutdown_sessions)
 
     def act(self):
         """
@@ -395,7 +427,7 @@ class HAProxy(object):
         # Get the state before the run
         self.command_results['state_before'] = self.get_state_for(self.backend, self.host)
 
-        # toggle enable/disbale server
+        # toggle enable/disable server
         if self.state == 'enabled':
             self.enabled(self.host, self.backend, self.weight)
         elif self.state == 'disabled' and self._drain:
@@ -428,6 +460,8 @@ def main():
             socket=dict(type='path', default=DEFAULT_SOCKET_LOCATION),
             shutdown_sessions=dict(type='bool', default=False),
             fail_on_not_found=dict(type='bool', default=False),
+            health=dict(type='bool', default=False),
+            agent=dict(type='bool', default=False),
             wait=dict(type='bool', default=False),
             wait_retries=dict(type='int', default=WAIT_RETRIES),
             wait_interval=dict(type='int', default=WAIT_INTERVAL),

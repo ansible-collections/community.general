@@ -46,20 +46,19 @@ options:
     - A list of files to extract from the image.
     - Extracting directories does not work.
     type: list
+    elements: str
     required: yes
   force:
     description:
     - If C(yes), which will replace the remote file when contents are different than the source.
     - If C(no), the file will only be extracted and copied if the destination does not already exist.
-    - Alias C(thirsty) has been deprecated and will be removed in 2.13.
     type: bool
     default: yes
-    aliases: [ thirsty ]
   executable:
     description:
     - The path to the C(7z) executable to use for extracting files from the ISO.
+    - If not provided, it will assume the value C(7z).
     type: path
-    default: '7z'
 notes:
 - Only the file checksum (content) is taken into account when extracting files
   from the ISO image. If C(force=no), only checks the presence of the file.
@@ -70,7 +69,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Extract kernel and ramdisk from a LiveCD
-  iso_extract:
+  community.general.iso_extract:
     image: /tmp/rear-test.iso
     dest: /tmp/virt-rear/
     files:
@@ -99,8 +98,8 @@ def main():
         argument_spec=dict(
             image=dict(type='path', required=True, aliases=['path', 'src']),
             dest=dict(type='path', required=True),
-            files=dict(type='list', required=True),
-            force=dict(type='bool', default=True, aliases=['thirsty']),
+            files=dict(type='list', elements='str', required=True),
+            force=dict(type='bool', default=True),
             executable=dict(type='path'),  # No default on purpose
         ),
         supports_check_mode=True,
@@ -110,9 +109,6 @@ def main():
     files = module.params['files']
     force = module.params['force']
     executable = module.params['executable']
-
-    if module.params.get('thirsty'):
-        module.deprecate('The alias "thirsty" has been deprecated and will be removed, use "force" instead', version='2.13')
 
     result = dict(
         changed=False,

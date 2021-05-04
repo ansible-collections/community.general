@@ -23,11 +23,14 @@ options:
       - An FRMI of the package(s) to be installed/removed/updated.
       - Multiple packages may be specified, separated by C(,).
     required: true
+    type: list
+    elements: str
   state:
     description:
       - Whether to install (I(present), I(latest)), or remove (I(absent)) a package.
-    choices: [ absent, latest, present ]
+    choices: [ absent, latest, present, installed, removed, uninstalled ]
     default: present
+    type: str
   accept_licenses:
     description:
       - Accept any licences.
@@ -46,21 +49,21 @@ options:
 '''
 EXAMPLES = '''
 - name: Install Vim
-  pkg5:
+  community.general.pkg5:
     name: editor/vim
 
 - name: Install Vim without refreshing publishers
-  pkg5:
+  community.general.pkg5:
     name: editor/vim
     refresh: no
 
 - name: Remove finger daemon
-  pkg5:
+  community.general.pkg5:
     name: service/network/finger
     state: absent
 
 - name: Install several packages at once
-  pkg5:
+  community.general.pkg5:
     name:
     - /file/gnu-findutils
     - /text/gnu-grep
@@ -74,7 +77,7 @@ from ansible.module_utils.basic import AnsibleModule
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(type='list', required=True),
+            name=dict(type='list', elements='str', required=True),
             state=dict(type='str', default='present', choices=['absent', 'installed', 'latest', 'present', 'removed', 'uninstalled']),
             accept_licenses=dict(type='bool', default=False, aliases=['accept', 'accept_licences']),
             be_name=dict(type='str'),
@@ -145,7 +148,7 @@ def ensure(module, state, packages, params):
     else:
         no_refresh = ['--no-refresh']
 
-    to_modify = filter(behaviour[state]['filter'], packages)
+    to_modify = list(filter(behaviour[state]['filter'], packages))
     if to_modify:
         rc, out, err = module.run_command(['pkg', behaviour[state]['subcommand']] + dry_run + accept_licenses + beadm + no_refresh + ['-q', '--'] + to_modify)
         response['rc'] = rc

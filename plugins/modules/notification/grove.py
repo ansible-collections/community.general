@@ -17,23 +17,31 @@ description:
        channel.
 options:
   channel_token:
+    type: str
     description:
       - Token of the channel to post to.
     required: true
   service:
+    type: str
     description:
       - Name of the service (displayed as the "user" in the message)
     required: false
     default: ansible
-  message:
+  message_content:
+    type: str
     description:
-      - Message content
+      - Message content.
+      - The alias I(message) is deprecated and will be removed in community.general 4.0.0.
     required: true
+    aliases:
+      - message
   url:
+    type: str
     description:
       - Service URL for the web client
     required: false
   icon_url:
+    type: str
     description:
       -  Icon for the service
     required: false
@@ -48,7 +56,7 @@ author: "Jonas Pfenniger (@zimbatm)"
 
 EXAMPLES = '''
 - name: Sends a notification to a grove.io channel
-  grove:
+  community.general.grove:
     channel_token: 6Ph62VBBJOccmtTPZbubiPzdrhipZXtg
     service: my-app
     message: 'deployed {{ target }}'
@@ -87,17 +95,19 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             channel_token=dict(type='str', required=True, no_log=True),
-            message=dict(type='str', required=True),
+            message_content=dict(type='str', required=True, aliases=['message'],
+                                 deprecated_aliases=[dict(name='message', version='4.0.0',
+                                                          collection_name='community.general')]),
             service=dict(type='str', default='ansible'),
             url=dict(type='str', default=None),
             icon_url=dict(type='str', default=None),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         )
     )
 
     channel_token = module.params['channel_token']
     service = module.params['service']
-    message = module.params['message']
+    message = module.params['message_content']
     url = module.params['url']
     icon_url = module.params['icon_url']
 

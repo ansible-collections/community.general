@@ -1,1 +1,0 @@
-./database/postgresql/postgresql_user_obj_stat_info.py

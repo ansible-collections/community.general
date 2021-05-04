@@ -2,6 +2,9 @@
 # Copyright (c) 2017 Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 import argparse
 from distutils.version import LooseVersion
 import json
@@ -64,10 +67,10 @@ def list_groups(api):
         members = []
 
         if 'member_host' in hostgroup:
-            members = [host for host in hostgroup['member_host']]
+            members = list(hostgroup['member_host'])
         if 'memberindirect_host' in hostgroup:
             members += (host for host in hostgroup['memberindirect_host'])
-        inventory[hostgroup['cn'][0]] = {'hosts': [host for host in members]}
+        inventory[hostgroup['cn'][0]] = {'hosts': list(members)}
 
         for member in members:
             hostvars[member] = {}

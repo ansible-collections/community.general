@@ -12,7 +12,7 @@ short_description: Retrieve information about the OneView Network Sets
 description:
     - Retrieve information about the Network Sets from OneView.
     - This module was called C(oneview_network_set_facts) before Ansible 2.9, returning C(ansible_facts).
-      Note that the M(oneview_network_set_info) module no longer returns C(ansible_facts)!
+      Note that the M(community.general.oneview_network_set_info) module no longer returns C(ansible_facts)!
 requirements:
     - hpOneView >= 2.0.1
 author:
@@ -23,12 +23,15 @@ options:
     name:
       description:
         - Network Set name.
+      type: str
 
     options:
       description:
         - "List with options to gather information about Network Set.
           Option allowed: C(withoutEthernet).
           The option C(withoutEthernet) retrieves the list of network_sets excluding Ethernet networks."
+      type: list
+      elements: str
 
 extends_documentation_fragment:
 - community.general.oneview
@@ -38,7 +41,7 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Gather information about all Network Sets
-  oneview_network_set_info:
+  community.general.oneview_network_set_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -47,11 +50,11 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 
 - name: Gather paginated, filtered, and sorted information about Network Sets
-  oneview_network_set_info:
+  community.general.oneview_network_set_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -65,11 +68,11 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 
 - name: Gather information about all Network Sets, excluding Ethernet networks
-  oneview_network_set_info:
+  community.general.oneview_network_set_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -80,11 +83,11 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 
 - name: Gather information about a Network Set by name
-  oneview_network_set_info:
+  community.general.oneview_network_set_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -94,11 +97,11 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 
 - name: Gather information about a Network Set by name, excluding Ethernet networks
-  oneview_network_set_info:
+  community.general.oneview_network_set_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -110,7 +113,7 @@ EXAMPLES = '''
   delegate_to: localhost
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.network_sets }}"
 '''
 
@@ -127,16 +130,12 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 class NetworkSetInfoModule(OneViewModuleBase):
     argument_spec = dict(
         name=dict(type='str'),
-        options=dict(type='list'),
+        options=dict(type='list', elements='str'),
         params=dict(type='dict'),
     )
 
     def __init__(self):
         super(NetworkSetInfoModule, self).__init__(additional_arg_spec=self.argument_spec)
-        self.is_old_facts = self.module._name in ('oneview_network_set_facts', 'community.general.oneview_network_set_facts')
-        if self.is_old_facts:
-            self.module.deprecate("The 'oneview_network_set_facts' module has been renamed to 'oneview_network_set_info', "
-                                  "and the renamed one no longer returns ansible_facts", version='2.13')
 
     def execute_module(self):
 
@@ -150,11 +149,7 @@ class NetworkSetInfoModule(OneViewModuleBase):
         else:
             network_sets = self.oneview_client.network_sets.get_all(**self.facts_params)
 
-        if self.is_old_facts:
-            return dict(changed=False,
-                        ansible_facts=dict(network_sets=network_sets))
-        else:
-            return dict(changed=False, network_sets=network_sets)
+        return dict(changed=False, network_sets=network_sets)
 
 
 def main():

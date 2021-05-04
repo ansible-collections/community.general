@@ -69,7 +69,7 @@ options:
     default: no
 notes:
 - The changes are persistent across reboots.
-- The M(sefcontext) module does not modify existing files to the new
+- The M(community.general.sefcontext) module does not modify existing files to the new
   SELinux context(s), so it is advisable to first create the SELinux
   file contexts before creating files, or run C(restorecon) manually
   for the existing files that require the new SELinux file contexts.
@@ -86,13 +86,13 @@ author:
 
 EXAMPLES = r'''
 - name: Allow apache to modify files in /srv/git_repos
-  sefcontext:
+  community.general.sefcontext:
     target: '/srv/git_repos(/.*)?'
     setype: httpd_git_rw_content_t
     state: present
 
 - name: Apply new SELinux file context to filesystem
-  command: restorecon -irv /srv/git_repos
+  ansible.builtin.command: restorecon -irv /srv/git_repos
 '''
 
 RETURN = r'''
@@ -250,7 +250,7 @@ def main():
         argument_spec=dict(
             ignore_selinux_state=dict(type='bool', default=False),
             target=dict(type='str', required=True, aliases=['path']),
-            ftype=dict(type='str', default='a', choices=option_to_file_type_str.keys()),
+            ftype=dict(type='str', default='a', choices=list(option_to_file_type_str.keys())),
             setype=dict(type='str', required=True),
             seuser=dict(type='str'),
             selevel=dict(type='str', aliases=['serange']),

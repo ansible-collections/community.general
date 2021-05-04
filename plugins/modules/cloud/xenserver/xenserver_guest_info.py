@@ -38,7 +38,6 @@ options:
     - In case of multiple VMs with same name, use C(uuid) to uniquely specify VM to manage.
     - This parameter is case sensitive.
     type: str
-    required: yes
     aliases: [ name_label ]
   uuid:
     description:
@@ -52,7 +51,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Gather facts
-  xenserver_guest_info:
+  community.general.xenserver_guest_info:
     hostname: "{{ xenserver_hostname }}"
     username: "{{ xenserver_username }}"
     password: "{{ xenserver_password }}"
@@ -204,9 +203,6 @@ def main():
                                ['name', 'uuid'],
                            ],
                            )
-
-    if module._name in ('xenserver_guest_facts', 'community.general.xenserver_guest_facts'):
-        module.deprecate("The 'xenserver_guest_facts' module has been renamed to 'xenserver_guest_info'", version='2.13')
 
     result = {'failed': False, 'changed': False}
 

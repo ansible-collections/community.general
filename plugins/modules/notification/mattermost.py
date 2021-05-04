@@ -22,10 +22,12 @@ description:
 author: "Benjamin Jolivot (@bjolivot)"
 options:
   url:
+    type: str
     description:
       - Mattermost url (i.e. http://mattermost.yourcompany.com).
     required: true
   api_key:
+    type: str
     description:
       - Mattermost webhook api key. Log into your mattermost site, go to
         Menu -> Integration -> Incoming Webhook -> Add Incoming Webhook.
@@ -33,17 +35,21 @@ options:
         http://mattermost.example.com/hooks/C(API_KEY)
     required: true
   text:
+    type: str
     description:
       - Text to send. Note that the module does not handle escaping characters.
     required: true
   channel:
+    type: str
     description:
       - Channel to send the message to. If absent, the message goes to the channel selected for the I(api_key).
   username:
+    type: str
     description:
       - This is the sender of the message (Username Override need to be enabled by mattermost admin, see mattermost doc.
     default: Ansible
   icon_url:
+    type: str
     description:
       - Url for the message sender's icon.
     default: https://www.ansible.com/favicon.ico
@@ -57,13 +63,13 @@ options:
 
 EXAMPLES = """
 - name: Send notification message via Mattermost
-  mattermost:
+  community.general.mattermost:
     url: http://mattermost.example.com
     api_key: my_api_key
     text: '{{ inventory_hostname }} completed'
 
 - name: Send notification message via Mattermost all options
-  mattermost:
+  community.general.mattermost:
     url: http://mattermost.example.com
     api_key: my_api_key
     text: '{{ inventory_hostname }} completed'
@@ -97,7 +103,7 @@ def main():
             channel=dict(type='str', default=None),
             username=dict(type='str', default='Ansible'),
             icon_url=dict(type='str', default='https://www.ansible.com/favicon.ico'),
-            validate_certs=dict(default='yes', type='bool'),
+            validate_certs=dict(default=True, type='bool'),
         )
     )
     # init return dict

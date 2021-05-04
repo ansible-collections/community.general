@@ -5,7 +5,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: cartesian
+    author: Unknown (!UNKNOWN)
+    name: cartesian
     short_description: returns the cartesian product of lists
     description:
         - Takes the input lists and returns a list that represents the product of the input lists.
@@ -20,11 +21,13 @@ DOCUMENTATION = '''
 
 EXAMPLES = """
 - name: Example of the change in the description
-  debug: msg="{{ lookup('cartesian', [1,2,3], [a, b])}}"
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.cartesian', [1,2,3], [a, b])}}"
 
 - name: loops over the cartesian product of the supplied lists
-  debug: msg="{{item}}"
-  with_cartesian:
+  ansible.builtin.debug:
+    msg: "{{item}}"
+  with_community.general.cartesian:
     - "{{list1}}"
     - "{{list2}}"
     - [1,2,3,4,5,6]
@@ -34,7 +37,8 @@ RETURN = """
   _list:
     description:
       - list of lists composed of elements of the input lists
-    type: lists
+    type: list
+    elements: list
 """
 
 from itertools import product

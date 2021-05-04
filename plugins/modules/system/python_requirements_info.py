@@ -13,6 +13,8 @@ description:
     - This module was called C(python_requirements_facts) before Ansible 2.9. The usage did not change.
 options:
   dependencies:
+    type: list
+    elements: str
     description: >
       A list of version-likes or module names to check for installation.
       Supported operators: <, >, <=, >=, or ==. The bare module name like
@@ -25,10 +27,10 @@ author:
 
 EXAMPLES = '''
 - name: Show python lib/site paths
-  python_requirements_info:
+  community.general.python_requirements_info:
 
 - name: Check for modern boto3 and botocore versions
-  python_requirements_info:
+  community.general.python_requirements_info:
     dependencies:
     - boto3>1.6
     - botocore<2
@@ -107,12 +109,10 @@ operations = {
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            dependencies=dict(type='list')
+            dependencies=dict(type='list', elements='str')
         ),
         supports_check_mode=True,
     )
-    if module._name in ('python_requirements_facts', 'community.general.python_requirements_facts'):
-        module.deprecate("The 'python_requirements_facts' module has been renamed to 'python_requirements_info'", version='2.13')
     if not HAS_DISTUTILS:
         module.fail_json(
             msg='Could not import "distutils" and "pkg_resources" libraries to introspect python environment.',

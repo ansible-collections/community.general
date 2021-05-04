@@ -6,7 +6,8 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
-    lookup: consul_kv
+    author: Unknown (!UNKNOWN)
+    name: consul_kv
     short_description: Fetch metadata from a Consul key value store.
     description:
       - Lookup metadata for a playbook from the key value store in a Consul cluster.
@@ -18,7 +19,6 @@ DOCUMENTATION = '''
       _raw:
         description: List of key(s) to retrieve.
         type: list
-        required: True
       recurse:
         type: boolean
         description: If true, will retrieve all the values that have the given key as prefix.
@@ -28,7 +28,7 @@ DOCUMENTATION = '''
           - If the key has a value with the specified index then this is returned allowing access to historical values.
       datacenter:
         description:
-          - Retrieve the key from a consul datatacenter other than the default for the consul host.
+          - Retrieve the key from a consul datacenter other than the default for the consul host.
       token:
         description: The acl token to allow access to restricted values.
       host:
@@ -67,29 +67,39 @@ DOCUMENTATION = '''
         ini:
           - section: lookup_consul
             key: client_cert
+      url:
+        description: "The target to connect to, should look like this: C(https://my.consul.server:8500)."
+        type: str
+        version_added: 1.0.0
+        env:
+          - name: ANSIBLE_CONSUL_URL
+        ini:
+          - section: lookup_consul
+            key: url
 '''
 
 EXAMPLES = """
-  - debug:
+  - ansible.builtin.debug:
       msg: 'key contains {{item}}'
-    with_consul_kv:
+    with_community.general.consul_kv:
       - 'key/to/retrieve'
 
   - name: Parameters can be provided after the key be more specific about what to retrieve
-    debug:
+    ansible.builtin.debug:
       msg: 'key contains {{item}}'
-    with_consul_kv:
+    with_community.general.consul_kv:
       - 'key/to recurse=true token=E6C060A9-26FB-407A-B83E-12DDAFCB4D98'
 
   - name: retrieving a KV from a remote cluster on non default port
-    debug:
-      msg: "{{ lookup('consul_kv', 'my/key', host='10.10.10.10', port='2000') }}"
+    ansible.builtin.debug:
+      msg: "{{ lookup('community.general.consul_kv', 'my/key', host='10.10.10.10', port='2000') }}"
 """
 
 RETURN = """
   _raw:
     description:
       - Value(s) stored in consul.
+    type: dict
 """
 
 import os
@@ -114,25 +124,29 @@ class LookupModule(LookupBase):
             raise AnsibleError(
                 'python-consul is required for consul_kv lookup. see http://python-consul.readthedocs.org/en/latest/#installation')
 
+        # get options
+        self.set_options(direct=kwargs)
+
+        scheme = self.get_option('scheme')
+        host = self.get_option('host')
+        port = self.get_option('port')
+        url = self.get_option('url')
+        if url is not None:
+            u = urlparse(url)
+            if u.scheme:
+                scheme = u.scheme
+            host = u.hostname
+            if u.port is not None:
+                port = u.port
+
+        validate_certs = self.get_option('validate_certs')
+        client_cert = self.get_option('client_cert')
+
         values = []
         try:
             for term in terms:
                 params = self.parse_params(term)
-                try:
-                    url = os.environ['ANSIBLE_CONSUL_URL']
-                    validate_certs = os.environ['ANSIBLE_CONSUL_VALIDATE_CERTS'] or True
-                    client_cert = os.environ['ANSIBLE_CONSUL_CLIENT_CERT'] or None
-                    u = urlparse(url)
-                    consul_api = consul.Consul(host=u.hostname, port=u.port, scheme=u.scheme, verify=validate_certs,
-                                               cert=client_cert)
-                except KeyError:
-                    port = kwargs.get('port', '8500')
-                    host = kwargs.get('host', 'localhost')
-                    scheme = kwargs.get('scheme', 'http')
-                    validate_certs = kwargs.get('validate_certs', True)
-                    client_cert = kwargs.get('client_cert', None)
-                    consul_api = consul.Consul(host=host, port=port, scheme=scheme, verify=validate_certs,
-                                               cert=client_cert)
+                consul_api = consul.Consul(host=host, port=port, scheme=scheme, verify=validate_certs, cert=client_cert)
 
                 results = consul_api.kv.get(params['key'],
                                             token=params['token'],

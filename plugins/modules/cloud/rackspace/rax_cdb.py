@@ -16,27 +16,35 @@ description:
     unique since it's used to identify the instance.
 options:
   name:
+    type: str
     description:
       - Name of the databases server instance
+    required: yes
   flavor:
+    type: int
     description:
       - flavor to use for the instance 1 to 6 (i.e. 512MB to 16GB)
     default: 1
   volume:
+    type: int
     description:
       - Volume size of the database 1-150GB
     default: 2
   cdb_type:
+    type: str
     description:
       - type of instance (i.e. MySQL, MariaDB, Percona)
     default: MySQL
     aliases: ['type']
   cdb_version:
+    type: str
     description:
       - version of database (MySQL supports 5.1 and 5.6, MariaDB supports 10, Percona supports 5.6)
-    choices: ['5.1', '5.6', '10']
+      - "The available choices are: C(5.1), C(5.6) and  C(10)."
+    default: 5.6
     aliases: ['version']
   state:
+    type: str
     description:
       - Indicate desired state of the resource
     choices: ['present', 'absent']
@@ -47,6 +55,7 @@ options:
     type: bool
     default: 'no'
   wait_timeout:
+    type: int
     description:
       - how long before wait gives up, in seconds
     default: 300

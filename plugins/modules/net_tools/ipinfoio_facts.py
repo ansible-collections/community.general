@@ -21,11 +21,13 @@ options:
       - HTTP connection timeout in seconds
     required: false
     default: 10
+    type: int
   http_agent:
     description:
       - Set http user agent
     required: false
     default: "ansible-ipinfoio-module/0.0.1"
+    type: str
 notes:
   - "Check http://ipinfo.io/ for more information"
 '''
@@ -33,7 +35,7 @@ notes:
 EXAMPLES = '''
 # Retrieve geolocation data of a host's IP address
 - name: Get IP geolocation data
-  ipinfoio_facts:
+  community.general.ipinfoio_facts:
 '''
 
 RETURN = '''

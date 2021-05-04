@@ -27,33 +27,39 @@ options:
     - IP Address or hostname of Cisco IMC, resolvable by Ansible control host.
     required: true
     aliases: [ host, ip ]
+    type: str
   username:
     description:
     - Username used to login to the switch.
     default: admin
     aliases: [ user ]
+    type: str
   password:
     description:
     - The password to use for authentication.
     default: password
+    type: str
   path:
     description:
     - Name of the absolute path of the filename that includes the body
       of the http request being sent to the Cisco IMC REST API.
     - Parameter C(path) is mutual exclusive with parameter C(content).
     aliases: [ 'src', 'config_file' ]
+    type: path
   content:
     description:
     - When used instead of C(path), sets the content of the API requests directly.
-    - This may be convenient to template simple requests, for anything complex use the M(template) module.
+    - This may be convenient to template simple requests, for anything complex use the M(ansible.builtin.template) module.
     - You can collate multiple IMC XML fragments and they will be processed sequentially in a single stream,
       the Cisco IMC output is subsequently merged.
     - Parameter C(content) is mutual exclusive with parameter C(path).
+    type: str
   protocol:
     description:
     - Connection protocol to use.
     default: https
     choices: [ http, https ]
+    type: str
   timeout:
     description:
     - The socket level timeout in seconds.
@@ -61,6 +67,7 @@ options:
       If this C(timeout) is reached, the module will fail with a
       C(Connection failure) indicating that C(The read operation timed out).
     default: 60
+    type: int
   validate_certs:
     description:
     - If C(no), SSL certificates will not be validated.
@@ -81,7 +88,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Power down server
-  imc_rest:
+  community.general.imc_rest:
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
@@ -93,7 +100,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Configure IMC using multiple XML fragments
-  imc_rest:
+  community.general.imc_rest:
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
@@ -118,7 +125,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Enable PXE boot and power-cycle server
-  imc_rest:
+  community.general.imc_rest:
     hostname: '{{ imc_hostname }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
@@ -136,7 +143,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Reconfigure IMC to boot from storage
-  imc_rest:
+  community.general.imc_rest:
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
@@ -148,7 +155,7 @@ EXAMPLES = r'''
   delegate_to: localhost
 
 - name: Add customer description to server
-  imc_rest:
+  community.general.imc_rest:
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
@@ -160,7 +167,7 @@ EXAMPLES = r'''
     delegate_to: localhost
 
 - name: Disable HTTP and increase session timeout to max value 10800 secs
-  imc_rest:
+  community.general.imc_rest:
     hostname: '{{ imc_host }}'
     username: '{{ imc_username }}'
     password: '{{ imc_password }}'
@@ -253,11 +260,11 @@ output:
       errorDescr="XML PARSING ERROR: Element 'computeRackUnit', attribute 'admin_Power': The attribute 'admin_Power' is not allowed.\n"/>
 '''
 
-import atexit
 import datetime
 import itertools
 import os
 import traceback
+from functools import partial
 
 LXML_ETREE_IMP_ERR = None
 try:
@@ -317,7 +324,6 @@ def merge(one, two):
 
 
 def main():
-
     module = AnsibleModule(
         argument_spec=dict(
             hostname=dict(type='str', required=True, aliases=['host', 'ip']),
@@ -374,53 +380,54 @@ def main():
     result.update(imc_response(module, resp.read()))
 
     # Store cookie for future requests
+    cookie = ''
     try:
         cookie = result['aaaLogin']['attributes']['outCookie']
     except Exception:
         module.fail_json(msg='Could not find cookie in output', **result)
 
-    # If we would not log out properly, we run out of sessions quickly
-    atexit.register(logout, module, url, cookie, timeout)
+    try:
+        # Prepare request data
+        if content:
+            rawdata = content
+        elif file_exists:
+            with open(path, 'r') as config_object:
+                rawdata = config_object.read()
 
-    # Prepare request data
-    if content:
-        rawdata = content
-    elif file_exists:
-        with open(path, 'r') as config_object:
-            rawdata = config_object.read()
+        # Wrap the XML documents in a <root> element
+        xmldata = lxml.etree.fromstring('<root>%s</root>' % rawdata.replace('\n', ''))
 
-    # Wrap the XML documents in a <root> element
-    xmldata = lxml.etree.fromstring('<root>%s</root>' % rawdata.replace('\n', ''))
+        # Handle each XML document separately in the same session
+        for xmldoc in list(xmldata):
+            if xmldoc.tag is lxml.etree.Comment:
+                continue
+            # Add cookie to XML
+            xmldoc.set('cookie', cookie)
+            data = lxml.etree.tostring(xmldoc)
 
-    # Handle each XML document separately in the same session
-    for xmldoc in list(xmldata):
-        if xmldoc.tag is lxml.etree.Comment:
-            continue
-        # Add cookie to XML
-        xmldoc.set('cookie', cookie)
-        data = lxml.etree.tostring(xmldoc)
+            # Perform actual request
+            resp, info = fetch_url(module, url, data=data, method='POST', timeout=timeout)
+            if resp is None or info['status'] != 200:
+                result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
+                module.fail_json(msg='Task failed with error %(status)s: %(msg)s' % info, **result)
 
-        # Perform actual request
-        resp, info = fetch_url(module, url, data=data, method='POST', timeout=timeout)
-        if resp is None or info['status'] != 200:
-            result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
-            module.fail_json(msg='Task failed with error %(status)s: %(msg)s' % info, **result)
+            # Merge results with previous results
+            rawoutput = resp.read()
+            result = merge(result, imc_response(module, rawoutput, rawinput=data))
+            result['response'] = info['msg']
+            result['status'] = info['status']
 
-        # Merge results with previous results
-        rawoutput = resp.read()
-        result = merge(result, imc_response(module, rawoutput, rawinput=data))
-        result['response'] = info['msg']
-        result['status'] = info['status']
+            # Check for any changes
+            # NOTE: Unfortunately IMC API always report status as 'modified'
+            xmloutput = lxml.etree.fromstring(rawoutput)
+            results = xmloutput.xpath('/configConfMo/outConfig/*/@status')
+            result['changed'] = ('modified' in results)
 
-        # Check for any changes
-        # NOTE: Unfortunately IMC API always report status as 'modified'
-        xmloutput = lxml.etree.fromstring(rawoutput)
-        results = xmloutput.xpath('/configConfMo/outConfig/*/@status')
-        result['changed'] = ('modified' in results)
-
-    # Report success
-    result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
-    module.exit_json(**result)
+        # Report success
+        result['elapsed'] = (datetime.datetime.utcnow() - start).seconds
+        module.exit_json(**result)
+    finally:
+        logout(module, url, cookie, timeout)
 
 
 if __name__ == '__main__':

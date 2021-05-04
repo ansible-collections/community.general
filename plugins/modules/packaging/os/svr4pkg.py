@@ -25,6 +25,7 @@ options:
     description:
       - Package name, e.g. C(SUNWcsr)
     required: true
+    type: str
 
   state:
     description:
@@ -33,19 +34,23 @@ options:
       - The SVR4 package system doesn't provide an upgrade operation. You need to uninstall the old, then install the new package.
     required: true
     choices: ["present", "absent"]
+    type: str
 
   src:
     description:
       - Specifies the location to install the package from. Required when C(state=present).
       - "Can be any path acceptable to the C(pkgadd) command's C(-d) option. e.g.: C(somefile.pkg), C(/dir/with/pkgs), C(http:/server/mypkgs.pkg)."
-      - If using a file or directory, they must already be accessible by the host. See the M(copy) module for a way to get them there.
+      - If using a file or directory, they must already be accessible by the host. See the M(ansible.builtin.copy) module for a way to get them there.
+    type: str
   proxy:
     description:
       - HTTP[s] proxy to be used if C(src) is a URL.
+    type: str
   response_file:
     description:
       - Specifies the location of a response file to be used if package expects input on install. (added in Ansible 1.4)
     required: false
+    type: str
   zone:
     description:
       - Whether to install the package only in the current zone, or install it into all zones.
@@ -53,41 +58,43 @@ options:
     required: false
     default: "all"
     choices: ["current", "all"]
+    type: str
   category:
     description:
       - Install/Remove category instead of a single package.
     required: false
     type: bool
+    default: false
 '''
 
 EXAMPLES = '''
 - name: Install a package from an already copied file
-  svr4pkg:
+  community.general.svr4pkg:
     name: CSWcommon
     src: /tmp/cswpkgs.pkg
     state: present
 
 - name: Install a package directly from an http site
-  svr4pkg:
+  community.general.svr4pkg:
     name: CSWpkgutil
     src: 'http://get.opencsw.org/now'
     state: present
     zone: current
 
 - name: Install a package with a response file
-  svr4pkg:
+  community.general.svr4pkg:
     name: CSWggrep
     src: /tmp/third-party.pkg
     response_file: /tmp/ggrep.response
     state: present
 
 - name: Ensure that a package is not installed
-  svr4pkg:
+  community.general.svr4pkg:
     name: SUNWgnome-sound-recorder
     state: absent
 
 - name: Ensure that a category is not installed
-  svr4pkg:
+  community.general.svr4pkg:
     name: FIREFOX
     state: absent
     category: true
@@ -101,8 +108,7 @@ from ansible.module_utils.basic import AnsibleModule
 
 
 def package_installed(module, name, category):
-    cmd = [module.get_bin_path('pkginfo', True)]
-    cmd.append('-q')
+    cmd = [module.get_bin_path('pkginfo', True), '-q']
     if category:
         cmd.append('-c')
     cmd.append(name)
@@ -115,7 +121,7 @@ def package_installed(module, name, category):
 
 def create_admin_file():
     (desc, filename) = tempfile.mkstemp(prefix='ansible_svr4pkg', text=True)
-    fullauto = '''
+    fullauto = b'''
 mail=
 instance=unique
 partial=nocheck

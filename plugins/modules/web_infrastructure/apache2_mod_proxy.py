@@ -21,26 +21,30 @@ description:
     python module.
 options:
   balancer_url_suffix:
+    type: str
     description:
       - Suffix of the balancer pool url required to access the balancer pool
         status page (e.g. balancer_vhost[:port]/balancer_url_suffix).
     default: /balancer-manager/
   balancer_vhost:
+    type: str
     description:
       - (ipv4|ipv6|fqdn):port of the Apache httpd 2.4 mod_proxy balancer pool.
     required: true
   member_host:
+    type: str
     description:
       - (ipv4|ipv6|fqdn) of the balancer member to get or to set attributes to.
         Port number is autodetected and should not be specified here.
         If undefined, apache2_mod_proxy module will return a members list of
         dictionaries of all the current balancer pool members' attributes.
   state:
+    type: str
     description:
       - Desired state of the member host.
         (absent|disabled),drained,hot_standby,ignore_errors can be
         simultaneously invoked by separating them with a comma (e.g. state=drained,ignore_errors).
-    choices: ["present", "absent", "enabled", "disabled", "drained", "hot_standby", "ignore_errors"]
+      - 'Accepted state values: ["present", "absent", "enabled", "disabled", "drained", "hot_standby", "ignore_errors"]'
   tls:
     description:
       - Use https to access balancer management page.
@@ -55,23 +59,23 @@ options:
 
 EXAMPLES = '''
 - name: Get all current balancer pool members attributes
-  apache2_mod_proxy:
+  community.general.apache2_mod_proxy:
     balancer_vhost: 10.0.0.2
 
 - name: Get a specific member attributes
-  apache2_mod_proxy:
+  community.general.apache2_mod_proxy:
     balancer_vhost: myws.mydomain.org
     balancer_suffix: /lb/
     member_host: node1.myws.mydomain.org
 
 # Enable all balancer pool members:
 - name: Get attributes
-  apache2_mod_proxy:
+  community.general.apache2_mod_proxy:
     balancer_vhost: '{{ myloadbalancer_host }}'
   register: result
 
 - name: Enable all balancer pool members
-  apache2_mod_proxy:
+  community.general.apache2_mod_proxy:
     balancer_vhost: '{{ myloadbalancer_host }}'
     member_host: '{{ item.host }}'
     state: present
@@ -79,21 +83,21 @@ EXAMPLES = '''
 
 # Gracefully disable a member from a loadbalancer node:
 - name: Step 1
-  apache2_mod_proxy:
+  community.general.apache2_mod_proxy:
     balancer_vhost: '{{ vhost_host }}'
     member_host: '{{ member.host }}'
     state: drained
   delegate_to: myloadbalancernode
 
 - name: Step 2
-  wait_for:
+  ansible.builtin.wait_for:
     host: '{{ member.host }}'
     port: '{{ member.port }}'
     state: drained
   delegate_to: myloadbalancernode
 
 - name: Step 3
-  apache2_mod_proxy:
+  community.general.apache2_mod_proxy:
     balancer_vhost: '{{ vhost_host }}'
     member_host: '{{ member.host }}'
     state: absent
@@ -194,6 +198,10 @@ members:
 import re
 import traceback
 
+from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.urls import fetch_url
+from ansible.module_utils.six import iteritems
+
 BEAUTIFUL_SOUP_IMP_ERR = None
 try:
     from BeautifulSoup import BeautifulSoup
@@ -269,13 +277,8 @@ class BalancerMember(object):
                           'drained': 'Drn',
                           'hot_standby': 'Stby',
                           'ignore_errors': 'Ign'}
-        status = {}
         actual_status = str(self.attributes['Status'])
-        for mode in status_mapping.keys():
-            if re.search(pattern=status_mapping[mode], string=actual_status):
-                status[mode] = True
-            else:
-                status[mode] = False
+        status = dict((mode, patt in actual_status) for mode, patt in iteritems(status_mapping))
         return status
 
     def set_member_status(self, values):
@@ -286,13 +289,10 @@ class BalancerMember(object):
                           'ignore_errors': '&w_status_I'}
 
         request_body = regexp_extraction(self.management_url, EXPRESSION, 1)
-        for k in values_mapping.keys():
-            if values[str(k)]:
-                request_body = request_body + str(values_mapping[k]) + '=1'
-            else:
-                request_body = request_body + str(values_mapping[k]) + '=0'
+        values_url = "".join("{0}={1}".format(url_param, 1 if values[mode] else 0) for mode, url_param in iteritems(values_mapping))
+        request_body = "{0}{1}".format(request_body, values_url)
 
-        response = fetch_url(self.module, self.management_url, data=str(request_body))
+        response = fetch_url(self.module, self.management_url, data=request_body)
         if response[1]['status'] != 200:
             self.module.fail_json(msg="Could not set the member status! " + self.host + " " + response[1]['status'])
 
@@ -305,11 +305,11 @@ class Balancer(object):
 
     def __init__(self, host, suffix, module, members=None, tls=False):
         if tls:
-            self.base_url = str(str('https://') + str(host))
-            self.url = str(str('https://') + str(host) + str(suffix))
+            self.base_url = 'https://' + str(host)
+            self.url = 'https://' + str(host) + str(suffix)
         else:
-            self.base_url = str(str('http://') + str(host))
-            self.url = str(str('http://') + str(host) + str(suffix))
+            self.base_url = 'http://' + str(host)
+            self.url = 'http://' + str(host) + str(suffix)
         self.module = module
         self.page = self.fetch_balancer_page()
         if members is None:
@@ -351,7 +351,7 @@ def main():
     """ Initiates module."""
     module = AnsibleModule(
         argument_spec=dict(
-            balancer_vhost=dict(required=True, default=None, type='str'),
+            balancer_vhost=dict(required=True, type='str'),
             balancer_url_suffix=dict(default="/balancer-manager/", type='str'),
             member_host=dict(type='str'),
             state=dict(type='str'),
@@ -440,7 +440,5 @@ def main():
             module.fail_json(msg=str(module.params['member_host']) + ' is not a member of the balancer ' + str(module.params['balancer_vhost']) + '!')
 
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.urls import fetch_url
 if __name__ == '__main__':
     main()

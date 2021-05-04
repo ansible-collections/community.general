@@ -12,7 +12,7 @@ short_description: Retrieve information about the OneView Data Centers
 description:
     - Retrieve information about the OneView Data Centers.
     - This module was called C(oneview_datacenter_facts) before Ansible 2.9, returning C(ansible_facts).
-      Note that the M(oneview_datacenter_info) module no longer returns C(ansible_facts)!
+      Note that the M(community.general.oneview_datacenter_info) module no longer returns C(ansible_facts)!
 requirements:
     - "hpOneView >= 2.0.1"
 author:
@@ -24,9 +24,12 @@ options:
     name:
       description:
         - Data Center name.
+      type: str
     options:
       description:
         - "Retrieve additional information. Options available: 'visualContent'."
+      type: list
+      elements: str
 
 extends_documentation_fragment:
 - community.general.oneview
@@ -36,18 +39,18 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Gather information about all Data Centers
-  oneview_datacenter_info:
+  community.general.oneview_datacenter_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
     api_version: 500
   delegate_to: localhost
   register: result
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.datacenters }}"
 
 - name: Gather paginated, filtered and sorted information about Data Centers
-  oneview_datacenter_info:
+  community.general.oneview_datacenter_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -58,11 +61,11 @@ EXAMPLES = '''
       sort: 'name:descending'
       filter: 'state=Unmanaged'
   register: result
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.datacenters }}"
 
 - name: Gather information about a Data Center by name
-  oneview_datacenter_info:
+  community.general.oneview_datacenter_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -70,11 +73,11 @@ EXAMPLES = '''
     name: "My Data Center"
   delegate_to: localhost
   register: result
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.datacenters }}"
 
 - name: Gather information about the Data Center Visual Content
-  oneview_datacenter_info:
+  community.general.oneview_datacenter_info:
     hostname: 172.16.101.48
     username: administrator
     password: my_password
@@ -84,9 +87,9 @@ EXAMPLES = '''
       - visualContent
   delegate_to: localhost
   register: result
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.datacenters }}"
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.datacenter_visual_content }}"
 '''
 
@@ -108,16 +111,12 @@ from ansible_collections.community.general.plugins.module_utils.oneview import O
 class DatacenterInfoModule(OneViewModuleBase):
     argument_spec = dict(
         name=dict(type='str'),
-        options=dict(type='list'),
+        options=dict(type='list', elements='str'),
         params=dict(type='dict')
     )
 
     def __init__(self):
         super(DatacenterInfoModule, self).__init__(additional_arg_spec=self.argument_spec)
-        self.is_old_facts = self.module._name in ('oneview_datacenter_facts', 'community.general.oneview_datacenter_facts')
-        if self.is_old_facts:
-            self.module.deprecate("The 'oneview_datacenter_facts' module has been renamed to 'oneview_datacenter_info', "
-                                  "and the renamed one no longer returns ansible_facts", version='2.13')
 
     def execute_module(self):
 
@@ -137,11 +136,7 @@ class DatacenterInfoModule(OneViewModuleBase):
         else:
             info['datacenters'] = client.get_all(**self.facts_params)
 
-        if self.is_old_facts:
-            return dict(changed=False,
-                        ansible_facts=info)
-        else:
-            return dict(changed=False, **info)
+        return dict(changed=False, **info)
 
 
 def main():

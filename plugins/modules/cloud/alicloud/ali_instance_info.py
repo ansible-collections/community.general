@@ -82,23 +82,23 @@ EXAMPLES = '''
 # Fetch instances details according to setting different filters
 
 - name: Find all instances in the specified region
-  ali_instance_info:
+  community.general.ali_instance_info:
   register: all_instances
 
 - name: Find all instances based on the specified ids
-  ali_instance_info:
+  community.general.ali_instance_info:
     instance_ids:
       - "i-35b333d9"
       - "i-ddav43kd"
   register: instances_by_ids
 
 - name: Find all instances based on the specified name_prefix
-  ali_instance_info:
+  community.general.ali_instance_info:
     name_prefix: "ecs_instance_"
   register: instances_by_name_prefix
 
 - name: Find instances based on tags
-  ali_instance_info:
+  community.general.ali_instance_info:
     tags:
       Test: "add"
 '''
@@ -383,8 +383,6 @@ def main():
     )
     )
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name in ('ali_instance_facts', 'community.general.ali_instance_facts'):
-        module.deprecate("The 'ali_instance_facts' module has been renamed to 'ali_instance_info'", version='2.13')
 
     if HAS_FOOTMARK is False:
         module.fail_json(msg=missing_required_lib('footmark'), exception=FOOTMARK_IMP_ERR)

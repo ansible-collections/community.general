@@ -3,7 +3,8 @@
 # Copyright: (c) 2019, Guillaume Martinez (lunik@tiwabbit.fr)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
 
 import pytest
 
@@ -65,11 +66,14 @@ class TestGitlabGroup(GitlabModuleTestCase):
 
     @with_httmock(resp_create_group)
     def test_create_group(self):
-        group = self.moduleUtil.createGroup({'name': "Foobar Group", 'path': "foo-bar"})
+        group = self.moduleUtil.createGroup({'name': "Foobar Group",
+                                             'path': "foo-bar",
+                                             'description': "An interesting group"})
 
         self.assertEqual(type(group), Group)
         self.assertEqual(group.name, "Foobar Group")
         self.assertEqual(group.path, "foo-bar")
+        self.assertEqual(group.description, "An interesting group")
         self.assertEqual(group.id, 1)
 
     @with_httmock(resp_create_subgroup)

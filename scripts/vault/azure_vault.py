@@ -10,6 +10,9 @@
 # Altered/Added for Vault functionality:
 #                    Austin Hobbs, GitHub: @OxHobbs
 
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 '''
 Ansible Vault Password with Azure Key Vault Secret Script
 =========================================================

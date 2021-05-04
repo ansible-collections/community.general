@@ -35,8 +35,9 @@ options:
     state:
         description:
             - Indicates the desired state of the port.
-        choices: [ 'present', 'absent', 'active', 'inactive' ]
+        choices: [ 'present', 'absent', 'active', 'inactive', 'installed', 'removed']
         default: present
+        type: str
     upgrade:
         description:
             - Upgrade all outdated ports, either prior to installing ports or as a separate step.
@@ -48,19 +49,20 @@ options:
             - A port variant specification.
             - 'C(variant) is only supported with state: I(installed)/I(present).'
         aliases: ['variants']
+        type: str
 '''
 EXAMPLES = '''
 - name: Install the foo port
-  macports:
+  community.general.macports:
     name: foo
 
 - name: Install the universal, x11 variant of the foo port
-  macports:
+  community.general.macports:
     name: foo
     variant: +universal+x11
 
 - name: Install a list of ports
-  macports:
+  community.general.macports:
     name: "{{ ports }}"
   vars:
     ports:
@@ -68,27 +70,27 @@ EXAMPLES = '''
     - foo-tools
 
 - name: Update Macports and the ports tree, then upgrade all outdated ports
-  macports:
+  community.general.macports:
     selfupdate: yes
     upgrade: yes
 
 - name: Update Macports and the ports tree, then install the foo port
-  macports:
+  community.general.macports:
     name: foo
     selfupdate: yes
 
 - name: Remove the foo port
-  macports:
+  community.general.macports:
     name: foo
     state: absent
 
 - name: Activate the foo port
-  macports:
+  community.general.macports:
     name: foo
     state: active
 
 - name: Deactivate the foo port
-  macports:
+  community.general.macports:
     name: foo
     state: inactive
 '''
@@ -146,17 +148,18 @@ def query_port(module, port_path, name, state="present"):
 
     if state == "present":
 
-        rc, out, err = module.run_command("%s installed | grep -q ^.*%s" % (shlex_quote(port_path), shlex_quote(name)), use_unsafe_shell=True)
-        if rc == 0:
+        rc, out, err = module.run_command([port_path, "-q", "installed", name])
+
+        if rc == 0 and out.strip().startswith(name + " "):
             return True
 
         return False
 
     elif state == "active":
 
-        rc, out, err = module.run_command("%s installed %s | grep -q active" % (shlex_quote(port_path), shlex_quote(name)), use_unsafe_shell=True)
+        rc, out, err = module.run_command([port_path, "-q", "installed", name])
 
-        if rc == 0:
+        if rc == 0 and "(active)" in out:
             return True
 
         return False

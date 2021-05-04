@@ -4,6 +4,9 @@
 # Copyright: (c) 2017, Abhijeet Kasurde (akasurde@redhat.com)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 
 class ModuleDocFragment(object):
     # Parameters for influxdb modules
@@ -37,6 +40,7 @@ options:
   path:
     description:
     - The path on which InfluxDB server is accessible
+    - Only available when using python-influxdb >= 5.1.0
     type: str
     version_added: '0.2.0'
   validate_certs:
@@ -49,6 +53,7 @@ options:
     description:
     - Use https instead of http to connect to InfluxDB server.
     type: bool
+    default: false
   timeout:
     description:
     - Number of seconds Requests will wait for client to establish a connection.
@@ -57,12 +62,14 @@ options:
     description:
     - Number of retries client will try before aborting.
     - C(0) indicates try until success.
+    - Only available when using python-influxdb >= 4.1.0
     type: int
     default: 3
   use_udp:
     description:
     - Use UDP to connect to InfluxDB server.
     type: bool
+    default: false
   udp_port:
     description:
     - UDP port to connect to InfluxDB server.

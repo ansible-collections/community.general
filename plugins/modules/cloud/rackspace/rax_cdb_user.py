@@ -14,25 +14,35 @@ description:
   - create / delete a database in the Cloud Databases.
 options:
   cdb_id:
+    type: str
     description:
       - The databases server UUID
+    required: yes
   db_username:
+    type: str
     description:
       - Name of the database user
+    required: yes
   db_password:
+    type: str
     description:
       - Database user password
+    required: yes
   databases:
+    type: list
+    elements: str
     description:
       - Name of the databases that the user can access
     default: []
   host:
+    type: str
     description:
       - Specifies the host from which a user is allowed to connect to
         the database. Possible values are a string containing an IPv4 address
         or "%" to allow connecting from any host
     default: '%'
   state:
+    type: str
     description:
       - Indicate desired state of the resource
     choices: ['present', 'absent']
@@ -180,7 +190,7 @@ def main():
             cdb_id=dict(type='str', required=True),
             db_username=dict(type='str', required=True),
             db_password=dict(type='str', required=True, no_log=True),
-            databases=dict(type='list', default=[]),
+            databases=dict(type='list', elements='str', default=[]),
             host=dict(type='str', default='%'),
             state=dict(default='present', choices=['present', 'absent'])
         )

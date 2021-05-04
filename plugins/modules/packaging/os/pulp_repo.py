@@ -16,38 +16,39 @@ author: "Joe Adams (@sysadmind)"
 short_description: Add or remove Pulp repos from a remote host.
 description:
   - Add or remove Pulp repos from a remote host.
+  - Note, this is for Pulp 2 only.
 options:
   add_export_distributor:
     description:
       - Whether or not to add the export distributor to new C(rpm) repositories.
     type: bool
-    default: 'no'
+    default: no
   feed:
     description:
       - Upstream feed URL to receive updates from.
+    type: str
   force_basic_auth:
     description:
-      - httplib2, the library used by the M(uri) module only sends
+      - httplib2, the library used by the M(ansible.builtin.uri) module only sends
         authentication information when a webservice responds to an initial
         request with a 401 status. Since some basic auth services do not
         properly send a 401, logins will fail. This option forces the sending of
         the Basic authentication header upon initial request.
     type: bool
-    default: 'no'
+    default: no
   generate_sqlite:
     description:
       - Boolean flag to indicate whether sqlite files should be generated during
         a repository publish.
     required: false
     type: bool
-    default: 'no'
+    default: no
   feed_ca_cert:
     description:
       - CA certificate string used to validate the feed source SSL certificate.
         This can be the file content or the path to the file.
-        The ca_cert alias will be removed in Ansible 2.14.
     type: str
-    aliases: [ importer_ssl_ca_cert, ca_cert ]
+    aliases: [ importer_ssl_ca_cert ]
   feed_client_cert:
     description:
       - Certificate used as the client certificate when synchronizing the
@@ -56,8 +57,6 @@ options:
         certificate. The specified file may be the certificate itself or a
         single file containing both the certificate and private key. This can be
         the file content or the path to the file.
-      - If not specified the default value will come from client_cert. Which will
-        change in Ansible 2.14.
     type: str
     aliases: [ importer_ssl_client_cert ]
   feed_client_key:
@@ -65,68 +64,75 @@ options:
       - Private key to the certificate specified in I(importer_ssl_client_cert),
         assuming it is not included in the certificate file itself. This can be
         the file content or the path to the file.
-      - If not specified the default value will come from client_key. Which will
-        change in Ansible 2.14.
     type: str
     aliases: [ importer_ssl_client_key ]
   name:
     description:
       - Name of the repo to add or remove. This correlates to repo-id in Pulp.
     required: true
+    type: str
+    aliases: [ repo ]
   proxy_host:
     description:
       - Proxy url setting for the pulp repository importer. This is in the
         format scheme://host.
     required: false
     default: null
+    type: str
   proxy_port:
     description:
       - Proxy port setting for the pulp repository importer.
     required: false
     default: null
+    type: str
   proxy_username:
     description:
       - Proxy username for the pulp repository importer.
     required: false
     default: null
+    type: str
   proxy_password:
     description:
       - Proxy password for the pulp repository importer.
     required: false
     default: null
+    type: str
   publish_distributor:
     description:
       - Distributor to use when state is C(publish). The default is to
         publish all distributors.
+    type: str
   pulp_host:
     description:
       - URL of the pulp server to connect to.
-    default: http://127.0.0.1
+    default: https://127.0.0.1
+    type: str
   relative_url:
     description:
-      - Relative URL for the local repository.
-    required: true
+      - Relative URL for the local repository. It's required when state=present.
+    type: str
   repo_type:
     description:
       - Repo plugin type to use (i.e. C(rpm), C(docker)).
     default: rpm
+    type: str
   repoview:
     description:
       - Whether to generate repoview files for a published repository. Setting
         this to "yes" automatically activates `generate_sqlite`.
     required: false
     type: bool
-    default: 'no'
+    default: no
   serve_http:
     description:
       - Make the repo available over HTTP.
     type: bool
-    default: 'no'
+    default: no
   serve_https:
     description:
       - Make the repo available over HTTPS.
     type: bool
-    default: 'yes'
+    default: yes
   state:
     description:
       - The repo state. A state of C(sync) will queue a sync of the repo.
@@ -134,6 +140,7 @@ options:
         C(publish) will use the repository's distributor to publish the content.
     default: present
     choices: [ "present", "absent", "sync", "publish" ]
+    type: str
   url_password:
     description:
       - The password for use in HTTP basic authentication to the pulp API.
@@ -147,12 +154,12 @@ options:
       - If C(no), SSL certificates will not be validated. This should only be
         used on personally controlled sites using self-signed certificates.
     type: bool
-    default: 'yes'
+    default: yes
   wait_for_completion:
     description:
       - Wait for asynchronous tasks to complete before returning.
     type: bool
-    default: 'no'
+    default: no
 notes:
   - This module can currently only create distributors and importers on rpm
     repositories. Contributions to support other repo types are welcome.
@@ -162,13 +169,13 @@ extends_documentation_fragment:
 
 EXAMPLES = '''
 - name: Create a new repo with name 'my_repo'
-  pulp_repo:
+  community.general.pulp_repo:
     name: my_repo
     relative_url: my/repo
     state: present
 
 - name: Create a repo with a feed and a relative URL
-  pulp_repo:
+  community.general.pulp_repo:
     name: my_centos_updates
     repo_type: rpm
     feed: http://mirror.centos.org/centos/6/updates/x86_64/
@@ -179,7 +186,7 @@ EXAMPLES = '''
     state: present
 
 - name: Remove a repo from the pulp server
-  pulp_repo:
+  community.general.pulp_repo:
     name: my_old_repo
     repo_type: rpm
     state: absent
@@ -530,9 +537,9 @@ def main():
         add_export_distributor=dict(default=False, type='bool'),
         feed=dict(),
         generate_sqlite=dict(default=False, type='bool'),
-        feed_ca_cert=dict(aliases=['importer_ssl_ca_cert', 'ca_cert'], deprecated_aliases=[dict(name='ca_cert', version='2.14')]),
+        feed_ca_cert=dict(aliases=['importer_ssl_ca_cert']),
         feed_client_cert=dict(aliases=['importer_ssl_client_cert']),
-        feed_client_key=dict(aliases=['importer_ssl_client_key']),
+        feed_client_key=dict(aliases=['importer_ssl_client_key'], no_log=True),
         name=dict(required=True, aliases=['repo']),
         proxy_host=dict(),
         proxy_port=dict(),
@@ -558,16 +565,7 @@ def main():
     generate_sqlite = module.params['generate_sqlite']
     importer_ssl_ca_cert = module.params['feed_ca_cert']
     importer_ssl_client_cert = module.params['feed_client_cert']
-    if importer_ssl_client_cert is None and module.params['client_cert'] is not None:
-        importer_ssl_client_cert = module.params['client_cert']
-        module.deprecate("To specify client certificates to be used with the repo to sync, and not for communication with the "
-                         "Pulp instance, use the new options `feed_client_cert` and `feed_client_key` (available since "
-                         "Ansible 2.9.2). Until Ansible 2.14, the default value for `feed_client_cert` will be taken from "
-                         "`client_cert` if only the latter is specified", version="2.14")
     importer_ssl_client_key = module.params['feed_client_key']
-    if importer_ssl_client_key is None and module.params['client_key'] is not None:
-        importer_ssl_client_key = module.params['client_key']
-        module.deprecate("In Ansible 2.9.2 `feed_client_key` option was added. Until 2.14 the default value will come from client_key option", version="2.14")
     proxy_host = module.params['proxy_host']
     proxy_port = module.params['proxy_port']
     proxy_username = module.params['proxy_username']

@@ -1,2 +1,0 @@
-deprecated_features:
-  - "helm - Put ``helm`` module to deprecated. New implementation is available in community.kubernetes collection."

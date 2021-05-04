@@ -39,6 +39,8 @@ options:
         - When using state=latest, this can be '*', which updates all installed packages.
         required: true
         aliases: [ 'pkg' ]
+        type: list
+        elements: str
     state:
         description:
           - C(present) will make sure the package is installed.
@@ -47,19 +49,22 @@ options:
             C(dist-upgrade) will make sure the latest version of all installed packages from all enabled repositories is installed.
           - When using C(dist-upgrade), I(name) should be C('*').
         required: false
-        choices: [ present, latest, absent, dist-upgrade ]
+        choices: [ present, latest, absent, dist-upgrade, installed, removed ]
         default: "present"
+        type: str
     type:
         description:
           - The type of package to be operated on.
         required: false
         choices: [ package, patch, pattern, product, srcpackage, application ]
         default: "package"
+        type: str
     extra_args_precommand:
        required: false
        description:
          - Add additional global target options to C(zypper).
          - Options should be supplied in a single line as if given in the command line.
+       type: str
     disable_gpg_check:
         description:
           - Whether to disable to GPG signature checking of the package
@@ -107,6 +112,7 @@ options:
         description:
           - Add additional options to C(zypper) command.
           - Options should be supplied in a single line as if given in the command line.
+        type: str
     allow_vendor_change:
         type: bool
         required: false
@@ -133,74 +139,74 @@ requirements:
 
 EXAMPLES = '''
 - name: Install nmap
-  zypper:
+  community.general.zypper:
     name: nmap
     state: present
 
 - name: Install apache2 with recommended packages
-  zypper:
+  community.general.zypper:
     name: apache2
     state: present
     disable_recommends: no
 
 - name: Apply a given patch
-  zypper:
+  community.general.zypper:
     name: openSUSE-2016-128
     state: present
     type: patch
 
 - name: Remove the nmap package
-  zypper:
+  community.general.zypper:
     name: nmap
     state: absent
 
 - name: Install the nginx rpm from a remote repo
-  zypper:
+  community.general.zypper:
     name: 'http://nginx.org/packages/sles/12/x86_64/RPMS/nginx-1.8.0-1.sles12.ngx.x86_64.rpm'
     state: present
 
 - name: Install local rpm file
-  zypper:
+  community.general.zypper:
     name: /tmp/fancy-software.rpm
     state: present
 
 - name: Update all packages
-  zypper:
+  community.general.zypper:
     name: '*'
     state: latest
 
 - name: Apply all available patches
-  zypper:
+  community.general.zypper:
     name: '*'
     state: latest
     type: patch
 
 - name: Perform a dist-upgrade with additional arguments
-  zypper:
+  community.general.zypper:
     name: '*'
     state: dist-upgrade
     allow_vendor_change: true
     extra_args: '--allow-arch-change'
 
 - name: Perform a installaion of nmap with the install option replacefiles
-  zypper:
+  community.general.zypper:
     name: 'nmap'
     state: latest
     replacefiles: true
 
 - name: Refresh repositories and update package openssl
-  zypper:
+  community.general.zypper:
     name: openssl
     state: present
     update_cache: yes
 
 - name: "Install specific version (possible comparisons: <, >, <=, >=, =)"
-  zypper:
+  community.general.zypper:
     name: 'docker>=1.10'
     state: present
 
 - name: Wait 20 seconds to acquire the lock before failing
-  zypper:
+  community.general.zypper:
     name: mosh
     state: present
   environment:
@@ -330,7 +336,7 @@ def get_cmd(m, subcommand):
     "puts together the basic zypper command arguments with those passed to the module"
     is_install = subcommand in ['install', 'update', 'patch', 'dist-upgrade']
     is_refresh = subcommand == 'refresh'
-    cmd = ['/usr/bin/zypper', '--quiet', '--non-interactive', '--xmlout']
+    cmd = [m.get_bin_path('zypper', required=True), '--quiet', '--non-interactive', '--xmlout']
     if m.params['extra_args_precommand']:
         args_list = m.params['extra_args_precommand'].split()
         cmd.extend(args_list)
@@ -492,22 +498,24 @@ def repo_refresh(m):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            name=dict(required=True, aliases=['pkg'], type='list'),
+            name=dict(required=True, aliases=['pkg'], type='list', elements='str'),
             state=dict(required=False, default='present', choices=['absent', 'installed', 'latest', 'present', 'removed', 'dist-upgrade']),
             type=dict(required=False, default='package', choices=['package', 'patch', 'pattern', 'product', 'srcpackage', 'application']),
             extra_args_precommand=dict(required=False, default=None),
-            disable_gpg_check=dict(required=False, default='no', type='bool'),
-            disable_recommends=dict(required=False, default='yes', type='bool'),
-            force=dict(required=False, default='no', type='bool'),
-            force_resolution=dict(required=False, default='no', type='bool'),
-            update_cache=dict(required=False, aliases=['refresh'], default='no', type='bool'),
-            oldpackage=dict(required=False, default='no', type='bool'),
+            disable_gpg_check=dict(required=False, default=False, type='bool'),
+            disable_recommends=dict(required=False, default=True, type='bool'),
+            force=dict(required=False, default=False, type='bool'),
+            force_resolution=dict(required=False, default=False, type='bool'),
+            update_cache=dict(required=False, aliases=['refresh'], default=False, type='bool'),
+            oldpackage=dict(required=False, default=False, type='bool'),
             extra_args=dict(required=False, default=None),
             allow_vendor_change=dict(required=False, default=False, type='bool'),
             replacefiles=dict(required=False, default=False, type='bool')
         ),
         supports_check_mode=True
     )
+
+    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C')
 
     name = module.params['name']
     state = module.params['state']

@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     author: Michael Scherer (@msherer) <misc@zarb.org>
-    connection: funcd
+    name: funcd
     short_description: Use funcd to connect to target
     description:
         - This transport permits you to use Ansible over Func.
@@ -37,12 +37,13 @@ import tempfile
 import shutil
 
 from ansible.errors import AnsibleError
+from ansible.plugins.connection import ConnectionBase
 from ansible.utils.display import Display
 
 display = Display()
 
 
-class Connection(object):
+class Connection(ConnectionBase):
     ''' Func-based connections '''
 
     has_pipelining = False

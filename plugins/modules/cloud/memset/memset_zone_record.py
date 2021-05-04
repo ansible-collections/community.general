@@ -26,30 +26,37 @@ options:
         default: present
         description:
             - Indicates desired state of resource.
+        type: str
         choices: [ absent, present ]
     api_key:
         required: true
         description:
             - The API key obtained from the Memset control panel.
+        type: str
     address:
         required: true
         description:
             - The address for this record (can be IP or text string depending on record type).
+        type: str
         aliases: [ ip, data ]
     priority:
         description:
             - C(SRV) and C(TXT) record priority, in the range 0 > 999 (inclusive).
+        type: int
     record:
         required: false
         description:
             - The subdomain to create.
+        type: str
     type:
         required: true
         description:
             - The type of DNS record to create.
         choices: [ A, AAAA, CNAME, MX, NS, SRV, TXT ]
+        type: str
     relative:
         type: bool
+        default: false
         description:
             - If set then the current domain is added onto the address field for C(CNAME), C(MX), C(NS)
               and C(SRV)record types.
@@ -58,16 +65,18 @@ options:
             - The record's TTL in seconds (will inherit zone's TTL if not explicitly set). This must be a
               valid int from U(https://www.memset.com/apidocs/methods_dns.html#dns.zone_record_create).
         choices: [ 0, 300, 600, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400 ]
+        type: int
     zone:
         required: true
         description:
             - The name of the zone to which to add the record to.
+        type: str
 '''
 
 EXAMPLES = '''
 # Create DNS record for www.domain.com
 - name: Create DNS record
-  memset_zone_record:
+  community.general.memset_zone_record:
     api_key: dcf089a2896940da9ffefb307ef49ccd
     state: present
     zone: domain.com
@@ -80,7 +89,7 @@ EXAMPLES = '''
 
 # create an SPF record for domain.com
 - name: Create SPF record for domain.com
-  memset_zone_record:
+  community.general.memset_zone_record:
     api_key: dcf089a2896940da9ffefb307ef49ccd
     state: present
     zone: domain.com
@@ -90,7 +99,7 @@ EXAMPLES = '''
 
 # create multiple DNS records
 - name: Create multiple DNS records
-  memset_zone_record:
+  community.general.memset_zone_record:
     api_key: dcf089a2896940da9ffefb307ef49ccd
     zone: "{{ item.zone }}"
     type: "{{ item.type }}"

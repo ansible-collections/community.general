@@ -6,25 +6,11 @@
 #
 # (c) 2018 Red Hat Inc.
 #
-# Redistribution and use in source and binary forms, with or without modification,
-# are permitted provided that the following conditions are met:
-#
-#    * Redistributions of source code must retain the above copyright
-#      notice, this list of conditions and the following disclaimer.
-#    * Redistributions in binary form must reproduce the above copyright notice,
-#      this list of conditions and the following disclaimer in the documentation
-#      and/or other materials provided with the distribution.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-# USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
+# Simplified BSD License (see licenses/simplified_bsd.txt or https://opensource.org/licenses/BSD-2-Clause)
+
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
 
 import os
 from functools import partial
@@ -32,6 +18,7 @@ from ansible.module_utils._text import to_native
 from ansible.module_utils.six import iteritems
 from ansible.module_utils._text import to_text
 from ansible.module_utils.basic import env_fallback
+from ansible.module_utils.common.validation import check_type_dict
 
 try:
     from infoblox_client.connector import Connector
@@ -158,7 +145,7 @@ def member_normalize(member_spec):
                        'pre_provisioning', 'network_setting', 'v6_network_setting',
                        'ha_port_setting', 'lan_port_setting', 'lan2_physical_setting',
                        'lan_ha_port_setting', 'mgmt_network_setting', 'v6_mgmt_network_setting']
-    for key in member_spec.keys():
+    for key in list(member_spec.keys()):
         if key in member_elements and member_spec[key] is not None:
             member_spec[key] = member_spec[key][0]
         if isinstance(member_spec[key], dict):
@@ -170,6 +157,15 @@ def member_normalize(member_spec):
         elif member_spec[key] is None:
             del member_spec[key]
     return member_spec
+
+
+def normalize_ib_spec(ib_spec):
+    result = {}
+    for arg in ib_spec:
+        result[arg] = dict([(k, v)
+                            for k, v in iteritems(ib_spec[arg])
+                            if k not in ('ib_req', 'transform', 'update')])
+    return result
 
 
 class WapiBase(object):
@@ -265,13 +261,10 @@ class WapiModule(WapiBase):
                 else:
                     proposed_object[key] = self.module.params[key]
 
-        # If configure_by_dns is set to False, then delete the default dns set in the param else throw exception
+        # If configure_by_dns is set to False and view is 'default', then delete the default dns
         if not proposed_object.get('configure_for_dns') and proposed_object.get('view') == 'default'\
                 and ib_obj_type == NIOS_HOST_RECORD:
             del proposed_object['view']
-        elif not proposed_object.get('configure_for_dns') and proposed_object.get('view') != 'default'\
-                and ib_obj_type == NIOS_HOST_RECORD:
-            self.module.fail_json(msg='DNS Bypass is not allowed if DNS view is set other than \'default\'')
 
         if ib_obj_ref:
             if len(ib_obj_ref) > 1:
@@ -407,11 +400,11 @@ class WapiModule(WapiBase):
 
         if 'ipv4addrs' in proposed_object:
             if 'nios_next_ip' in proposed_object['ipv4addrs'][0]['ipv4addr']:
-                ip_range = self.module._check_type_dict(proposed_object['ipv4addrs'][0]['ipv4addr'])['nios_next_ip']
+                ip_range = check_type_dict(proposed_object['ipv4addrs'][0]['ipv4addr'])['nios_next_ip']
                 proposed_object['ipv4addrs'][0]['ipv4addr'] = NIOS_NEXT_AVAILABLE_IP + ':' + ip_range
         elif 'ipv4addr' in proposed_object:
             if 'nios_next_ip' in proposed_object['ipv4addr']:
-                ip_range = self.module._check_type_dict(proposed_object['ipv4addr'])['nios_next_ip']
+                ip_range = check_type_dict(proposed_object['ipv4addr'])['nios_next_ip']
                 proposed_object['ipv4addr'] = NIOS_NEXT_AVAILABLE_IP + ':' + ip_range
 
         return proposed_object
@@ -469,6 +462,9 @@ class WapiModule(WapiBase):
                 return False
 
             elif isinstance(proposed_item, list):
+                if key == 'aliases':
+                    if set(current_item) != set(proposed_item):
+                        return False
                 for subitem in proposed_item:
                     if not self.issubset(subitem, current_item):
                         return False
@@ -490,7 +486,7 @@ class WapiModule(WapiBase):
         if ('name' in obj_filter):
             # gets and returns the current object based on name/old_name passed
             try:
-                name_obj = self.module._check_type_dict(obj_filter['name'])
+                name_obj = check_type_dict(obj_filter['name'])
                 old_name = name_obj['old_name']
                 new_name = name_obj['new_name']
             except TypeError:
@@ -504,12 +500,12 @@ class WapiModule(WapiBase):
                 else:
                     test_obj_filter = dict([('name', old_name)])
                 # get the object reference
-                ib_obj = self.get_object(ib_obj_type, test_obj_filter, return_fields=ib_spec.keys())
+                ib_obj = self.get_object(ib_obj_type, test_obj_filter, return_fields=list(ib_spec.keys()))
                 if ib_obj:
                     obj_filter['name'] = new_name
                 else:
                     test_obj_filter['name'] = new_name
-                    ib_obj = self.get_object(ib_obj_type, test_obj_filter, return_fields=ib_spec.keys())
+                    ib_obj = self.get_object(ib_obj_type, test_obj_filter, return_fields=list(ib_spec.keys()))
                 update = True
                 return ib_obj, update, new_name
             if (ib_obj_type == NIOS_HOST_RECORD):
@@ -526,7 +522,7 @@ class WapiModule(WapiBase):
                 test_obj_filter['name'] = test_obj_filter['name'].lower()
                 # resolves issue where multiple a_records with same name and different IP address
                 try:
-                    ipaddr_obj = self.module._check_type_dict(obj_filter['ipv4addr'])
+                    ipaddr_obj = check_type_dict(obj_filter['ipv4addr'])
                     ipaddr = ipaddr_obj['old_ipv4addr']
                 except TypeError:
                     ipaddr = obj_filter['ipv4addr']
@@ -535,7 +531,7 @@ class WapiModule(WapiBase):
                 # resolves issue where multiple txt_records with same name and different text
                 test_obj_filter = obj_filter
                 try:
-                    text_obj = self.module._check_type_dict(obj_filter['text'])
+                    text_obj = check_type_dict(obj_filter['text'])
                     txt = text_obj['old_text']
                 except TypeError:
                     txt = obj_filter['text']
@@ -543,32 +539,32 @@ class WapiModule(WapiBase):
             # check if test_obj_filter is empty copy passed obj_filter
             else:
                 test_obj_filter = obj_filter
-            ib_obj = self.get_object(ib_obj_type, test_obj_filter.copy(), return_fields=ib_spec.keys())
+            ib_obj = self.get_object(ib_obj_type, test_obj_filter.copy(), return_fields=list(ib_spec.keys()))
         elif (ib_obj_type == NIOS_A_RECORD):
             # resolves issue where multiple a_records with same name and different IP address
             test_obj_filter = obj_filter
             try:
-                ipaddr_obj = self.module._check_type_dict(obj_filter['ipv4addr'])
+                ipaddr_obj = check_type_dict(obj_filter['ipv4addr'])
                 ipaddr = ipaddr_obj['old_ipv4addr']
             except TypeError:
                 ipaddr = obj_filter['ipv4addr']
             test_obj_filter['ipv4addr'] = ipaddr
-            ib_obj = self.get_object(ib_obj_type, test_obj_filter.copy(), return_fields=ib_spec.keys())
+            ib_obj = self.get_object(ib_obj_type, test_obj_filter.copy(), return_fields=list(ib_spec.keys()))
         elif (ib_obj_type == NIOS_TXT_RECORD):
             # resolves issue where multiple txt_records with same name and different text
             test_obj_filter = obj_filter
             try:
-                text_obj = self.module._check_type_dict(obj_filter['text'])
+                text_obj = check_type_dict(obj_filter['text'])
                 txt = text_obj['old_text']
             except TypeError:
                 txt = obj_filter['text']
             test_obj_filter['text'] = txt
-            ib_obj = self.get_object(ib_obj_type, test_obj_filter.copy(), return_fields=ib_spec.keys())
+            ib_obj = self.get_object(ib_obj_type, test_obj_filter.copy(), return_fields=list(ib_spec.keys()))
         elif (ib_obj_type == NIOS_ZONE):
             # del key 'restart_if_needed' as nios_zone get_object fails with the key present
             temp = ib_spec['restart_if_needed']
             del ib_spec['restart_if_needed']
-            ib_obj = self.get_object(ib_obj_type, obj_filter.copy(), return_fields=ib_spec.keys())
+            ib_obj = self.get_object(ib_obj_type, obj_filter.copy(), return_fields=list(ib_spec.keys()))
             # reinstate restart_if_needed if ib_obj is none, meaning there's no existing nios_zone ref
             if not ib_obj:
                 ib_spec['restart_if_needed'] = temp
@@ -576,12 +572,12 @@ class WapiModule(WapiBase):
             # del key 'create_token' as nios_member get_object fails with the key present
             temp = ib_spec['create_token']
             del ib_spec['create_token']
-            ib_obj = self.get_object(ib_obj_type, obj_filter.copy(), return_fields=ib_spec.keys())
+            ib_obj = self.get_object(ib_obj_type, obj_filter.copy(), return_fields=list(ib_spec.keys()))
             if temp:
                 # reinstate 'create_token' key
                 ib_spec['create_token'] = temp
         else:
-            ib_obj = self.get_object(ib_obj_type, obj_filter.copy(), return_fields=ib_spec.keys())
+            ib_obj = self.get_object(ib_obj_type, obj_filter.copy(), return_fields=list(ib_spec.keys()))
         return ib_obj, update, new_name
 
     def on_update(self, proposed_object, ib_spec):

@@ -46,6 +46,10 @@ options:
       - EMEA-NL-EVS
       - par1
       - EMEA-FR-PAR1
+      - par2
+      - EMEA-FR-PAR2
+      - waw1
+      - EMEA-PL-WAW1
 
   name:
     description:
@@ -84,7 +88,7 @@ options:
 
 EXAMPLES = '''
 - name: Create a Security Group
-  scaleway_security_group:
+  community.general.scaleway_security_group:
     state: present
     region: par1
     name: security_group
@@ -215,7 +219,7 @@ def main():
         organization=dict(type='str', required=True),
         name=dict(type='str', required=True),
         description=dict(type='str'),
-        region=dict(type='str', required=True, choices=SCALEWAY_LOCATION.keys()),
+        region=dict(type='str', required=True, choices=list(SCALEWAY_LOCATION.keys())),
         stateful=dict(type='bool', required=True),
         inbound_default_policy=dict(type='str', choices=['accept', 'drop']),
         outbound_default_policy=dict(type='str', choices=['accept', 'drop']),

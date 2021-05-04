@@ -19,37 +19,52 @@ options:
     description:
       - Hostname or ip address of the BMC.
     required: true
+    type: str
   port:
     description:
       - Remote RMCP port.
     default: 623
+    type: int
   user:
     description:
       - Username to use to connect to the BMC.
     required: true
+    type: str
   password:
     description:
       - Password to connect to the BMC.
     required: true
+    type: str
   bootdev:
     description:
       - Set boot device to use on next reboot
+      - "The choices for the device are:
+          - network -- Request network boot
+          - floppy -- Boot from floppy
+          - hd -- Boot from hard drive
+          - safe -- Boot from hard drive, requesting 'safe mode'
+          - optical -- boot from CD/DVD/BD drive
+          - setup -- Boot into setup utility
+          - default -- remove any IPMI directed boot device request"
     required: true
     choices:
-      - network -- Request network boot
-      - floppy -- Boot from floppy
-      - hd -- Boot from hard drive
-      - safe -- Boot from hard drive, requesting 'safe mode'
-      - optical -- boot from CD/DVD/BD drive
-      - setup -- Boot into setup utility
-      - default -- remove any IPMI directed boot device request
+      - network
+      - floppy
+      - hd
+      - safe
+      - optical
+      - setup
+      - default
+    type: str
   state:
     description:
       - Whether to ensure that boot devices is desired.
+      - "The choices for the state are:
+            - present -- Request system turn on
+            - absent -- Request system turn on"
     default: present
-    choices:
-        - present -- Request system turn on
-        - absent -- Request system turn on
+    choices: [ present, absent ]
+    type: str
   persistent:
     description:
       - If set, ask that system firmware uses this device beyond next boot.
@@ -89,14 +104,14 @@ uefimode:
 
 EXAMPLES = '''
 - name: Ensure bootdevice is HD
-  ipmi_boot:
+  community.general.ipmi_boot:
     name: test.testdomain.com
     user: admin
     password: password
     bootdev: hd
 
 - name: Ensure bootdevice is not Network
-  ipmi_boot:
+  community.general.ipmi_boot:
     name: test.testdomain.com
     user: admin
     password: password

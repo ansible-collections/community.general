@@ -16,26 +16,31 @@ options:
   server_ids:
     description:
       - A list of server Ids to deploy the blue print package.
+    type: list
     required: True
+    elements: str
   package_id:
     description:
       - The package id of the blue print.
+    type: str
     required: True
   package_params:
     description:
       - The dictionary of arguments required to deploy the blue print.
+    type: dict
     default: {}
     required: False
   state:
     description:
       - Whether to install or uninstall the package. Currently it supports only "present" for install action.
+    type: str
     required: False
     default: present
     choices: ['present']
   wait:
     description:
       - Whether to wait for the tasks to finish before returning.
-    type: bool
+    type: str
     default: True
     required: False
 requirements:
@@ -59,7 +64,7 @@ EXAMPLES = '''
 # Note - You must set the CLC_V2_API_USERNAME And CLC_V2_API_PASSWD Environment variables before running these examples
 
 - name: Deploy package
-  clc_blueprint_package:
+  community.general.clc_blueprint_package:
         server_ids:
             - UC1TEST-SERVER1
             - UC1TEST-SERVER2
@@ -160,10 +165,10 @@ class ClcBlueprintPackage:
         :return: the package dictionary object
         """
         argument_spec = dict(
-            server_ids=dict(type='list', required=True),
+            server_ids=dict(type='list', elements='str', required=True),
             package_id=dict(required=True),
             package_params=dict(type='dict', default={}),
-            wait=dict(default=True),
+            wait=dict(default=True),   # @FIXME should be bool?
             state=dict(default='present', choices=['present'])
         )
         return argument_spec

@@ -24,29 +24,35 @@ options:
         description:
             - Volume name.
         required: true
+        type: str
     state:
         default: "present"
         choices: [ "present", "absent" ]
         description:
             - When the state is present the volume is mapped.
                 When the state is absent, the volume is meant to be unmapped.
-        required: true
+        type: str
+
     cluster:
         description:
             - Maps the volume to a cluster.
         required: false
+        type: str
     host:
         description:
             - Maps the volume to a host.
         required: false
+        type: str
     lun:
         description:
             - The LUN identifier.
         required: false
+        type: str
     override:
         description:
             - Overrides the existing volume mapping.
         required: false
+        type: str
 
 extends_documentation_fragment:
 - community.general.ibm_storage
@@ -58,7 +64,7 @@ author:
 
 EXAMPLES = '''
 - name: Map volume to host.
-  ibm_sa_vol_map:
+  community.general.ibm_sa_vol_map:
     vol: volume_name
     lun: 1
     host: host_name
@@ -68,7 +74,7 @@ EXAMPLES = '''
     state: present
 
 - name: Map volume to cluster.
-  ibm_sa_vol_map:
+  community.general.ibm_sa_vol_map:
     vol: volume_name
     lun: 1
     cluster: cluster_name
@@ -78,7 +84,7 @@ EXAMPLES = '''
     state: present
 
 - name: Unmap volume.
-  ibm_sa_vol_map:
+  community.general.ibm_sa_vol_map:
     host: host_name
     username: admin
     password: secret

@@ -30,11 +30,15 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 import json
+import traceback
 
 from ansible.module_utils.urls import open_url
 from ansible.module_utils.six.moves.urllib.parse import urlencode
 from ansible.module_utils.six.moves.urllib.error import HTTPError
 from ansible.module_utils._text import to_native
+
+URL_REALMS = "{url}/admin/realms"
+URL_REALM = "{url}/admin/realms/{realm}"
 
 URL_TOKEN = "{url}/realms/{realm}/protocol/openid-connect/token"
 URL_CLIENT = "{url}/admin/realms/{realm}/clients/{id}"
@@ -55,13 +59,14 @@ def keycloak_argument_spec():
     :return: argument_spec dict
     """
     return dict(
-        auth_keycloak_url=dict(type='str', aliases=['url'], required=True),
+        auth_keycloak_url=dict(type='str', aliases=['url'], required=True, no_log=False),
         auth_client_id=dict(type='str', default='admin-cli'),
-        auth_realm=dict(type='str', required=True),
-        auth_client_secret=dict(type='str', default=None),
-        auth_username=dict(type='str', aliases=['username'], required=True),
-        auth_password=dict(type='str', aliases=['password'], required=True, no_log=True),
-        validate_certs=dict(type='bool', default=True)
+        auth_realm=dict(type='str'),
+        auth_client_secret=dict(type='str', default=None, no_log=True),
+        auth_username=dict(type='str', aliases=['username']),
+        auth_password=dict(type='str', aliases=['password'], no_log=True),
+        validate_certs=dict(type='bool', default=True),
+        token=dict(type='str', no_log=True),
     )
 
 
@@ -73,39 +78,58 @@ class KeycloakError(Exception):
     pass
 
 
-def get_token(base_url, validate_certs, auth_realm, client_id,
-              auth_username, auth_password, client_secret):
-    auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
-    temp_payload = {
-        'grant_type': 'password',
-        'client_id': client_id,
-        'client_secret': client_secret,
-        'username': auth_username,
-        'password': auth_password,
-    }
-    # Remove empty items, for instance missing client_secret
-    payload = dict(
-        (k, v) for k, v in temp_payload.items() if v is not None)
-    try:
-        r = json.loads(to_native(open_url(auth_url, method='POST',
-                                          validate_certs=validate_certs,
-                                          data=urlencode(payload)).read()))
-    except ValueError as e:
-        raise KeycloakError(
-            'API returned invalid JSON when trying to obtain access token from %s: %s'
-            % (auth_url, str(e)))
-    except Exception as e:
-        raise KeycloakError('Could not obtain access token from %s: %s'
-                            % (auth_url, str(e)))
+def get_token(module_params):
+    """ Obtains connection header with token for the authentication,
+        token already given or obtained from credentials
+        :param module_params: parameters of the module
+        :return: connection header
+    """
+    token = module_params.get('token')
+    base_url = module_params.get('auth_keycloak_url')
 
-    try:
-        return {
-            'Authorization': 'Bearer ' + r['access_token'],
-            'Content-Type': 'application/json'
+    if not base_url.lower().startswith(('http', 'https')):
+        raise KeycloakError("auth_url '%s' should either start with 'http' or 'https'." % base_url)
+
+    if token is None:
+        base_url = module_params.get('auth_keycloak_url')
+        validate_certs = module_params.get('validate_certs')
+        auth_realm = module_params.get('auth_realm')
+        client_id = module_params.get('auth_client_id')
+        auth_username = module_params.get('auth_username')
+        auth_password = module_params.get('auth_password')
+        client_secret = module_params.get('auth_client_secret')
+        auth_url = URL_TOKEN.format(url=base_url, realm=auth_realm)
+        temp_payload = {
+            'grant_type': 'password',
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'username': auth_username,
+            'password': auth_password,
         }
-    except KeyError:
-        raise KeycloakError(
-            'Could not obtain access token from %s' % auth_url)
+        # Remove empty items, for instance missing client_secret
+        payload = dict(
+            (k, v) for k, v in temp_payload.items() if v is not None)
+        try:
+            r = json.loads(to_native(open_url(auth_url, method='POST',
+                                              validate_certs=validate_certs,
+                                              data=urlencode(payload)).read()))
+        except ValueError as e:
+            raise KeycloakError(
+                'API returned invalid JSON when trying to obtain access token from %s: %s'
+                % (auth_url, str(e)))
+        except Exception as e:
+            raise KeycloakError('Could not obtain access token from %s: %s'
+                                % (auth_url, str(e)))
+
+        try:
+            token = r['access_token']
+        except KeyError:
+            raise KeycloakError(
+                'Could not obtain access token from %s' % auth_url)
+    return {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+    }
 
 
 class KeycloakAPI(object):
@@ -117,6 +141,75 @@ class KeycloakAPI(object):
         self.baseurl = self.module.params.get('auth_keycloak_url')
         self.validate_certs = self.module.params.get('validate_certs')
         self.restheaders = connection_header
+
+    def get_realm_by_id(self, realm='master'):
+        """ Obtain realm representation by id
+
+        :param realm: realm id
+        :return: dict of real, representation or None if none matching exist
+        """
+        realm_url = URL_REALM.format(url=self.baseurl, realm=realm)
+
+        try:
+            return json.loads(to_native(open_url(realm_url, method='GET', headers=self.restheaders,
+                                                 validate_certs=self.validate_certs).read()))
+
+        except HTTPError as e:
+            if e.code == 404:
+                return None
+            else:
+                self.module.fail_json(msg='Could not obtain realm %s: %s' % (realm, str(e)),
+                                      exception=traceback.format_exc())
+        except ValueError as e:
+            self.module.fail_json(msg='API returned incorrect JSON when trying to obtain realm %s: %s' % (realm, str(e)),
+                                  exception=traceback.format_exc())
+        except Exception as e:
+            self.module.fail_json(msg='Could not obtain realm %s: %s' % (realm, str(e)),
+                                  exception=traceback.format_exc())
+
+    def update_realm(self, realmrep, realm="master"):
+        """ Update an existing realm
+        :param realmrep: corresponding (partial/full) realm representation with updates
+        :param realm: realm to be updated in Keycloak
+        :return: HTTPResponse object on success
+        """
+        realm_url = URL_REALM.format(url=self.baseurl, realm=realm)
+
+        try:
+            return open_url(realm_url, method='PUT', headers=self.restheaders,
+                            data=json.dumps(realmrep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not update realm %s: %s' % (realm, str(e)),
+                                  exception=traceback.format_exc())
+
+    def create_realm(self, realmrep):
+        """ Create a realm in keycloak
+        :param realmrep: Realm representation of realm to be created.
+        :return: HTTPResponse object on success
+        """
+        realm_url = URL_REALMS.format(url=self.baseurl)
+
+        try:
+            return open_url(realm_url, method='POST', headers=self.restheaders,
+                            data=json.dumps(realmrep), validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not create realm %s: %s' % (realmrep['id'], str(e)),
+                                  exception=traceback.format_exc())
+
+    def delete_realm(self, realm="master"):
+        """ Delete a realm from Keycloak
+
+        :param realm: realm to be deleted
+        :return: HTTPResponse object on success
+        """
+        realm_url = URL_REALM.format(url=self.baseurl, realm=realm)
+
+        try:
+            return open_url(realm_url, method='DELETE', headers=self.restheaders,
+                            validate_certs=self.validate_certs)
+        except Exception as e:
+            self.module.fail_json(msg='Could not delete realm %s: %s' % (realm, str(e)),
+                                  exception=traceback.format_exc())
 
     def get_clients(self, realm='master', filter=None):
         """ Obtains client representations for clients in a realm

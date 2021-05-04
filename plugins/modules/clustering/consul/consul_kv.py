@@ -37,6 +37,7 @@ options:
             'release' respectively. a valid session must be supplied to make the
             attempt changed will be true if the attempt is successful, false
             otherwise.
+        type: str
         choices: [ absent, acquire, present, release ]
         default: present
     key:
@@ -49,13 +50,11 @@ options:
           - The value should be associated with the given key, required if C(state)
             is C(present).
         type: str
-        required: yes
     recurse:
         description:
           - If the key represents a prefix, each entry with the prefix can be
             retrieved by setting this to C(yes).
         type: bool
-        default: 'no'
     retrieve:
         description:
             - If the I(state) is C(present) and I(value) is set, perform a
@@ -110,27 +109,27 @@ EXAMPLES = '''
 # If the key does not exist, the value associated to the "data" property in `retrieved_key` will be `None`
 # If the key value is empty string, `retrieved_key["data"]["Value"]` will be `None`
 - name: Retrieve a value from the key/value store
-  consul_kv:
+  community.general.consul_kv:
     key: somekey
   register: retrieved_key
 
 - name: Add or update the value associated with a key in the key/value store
-  consul_kv:
+  community.general.consul_kv:
     key: somekey
     value: somevalue
 
 - name: Remove a key from the store
-  consul_kv:
+  community.general.consul_kv:
     key: somekey
     state: absent
 
 - name: Add a node to an arbitrary group via consul inventory (see consul.ini)
-  consul_kv:
+  community.general.consul_kv:
     key: ansible/groups/dc1/somenode
     value: top_secret
 
 - name: Register a key/value pair with an associated session
-  consul_kv:
+  community.general.consul_kv:
     key: stg/node/server_birthday
     value: 20160509
     session: "{{ sessionid }}"
@@ -298,7 +297,7 @@ def main():
         argument_spec=dict(
             cas=dict(type='str'),
             flags=dict(type='str'),
-            key=dict(type='str', required=True),
+            key=dict(type='str', required=True, no_log=False),
             host=dict(type='str', default='localhost'),
             scheme=dict(type='str', default='http'),
             validate_certs=dict(type='bool', default=True),

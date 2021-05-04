@@ -21,9 +21,12 @@ requirements:
   - heroku3
 options:
   api_key:
+    type: str
     description:
       - Heroku API key
   apps:
+    type: list
+    elements: str
     description:
       - List of Heroku App names
     required: true
@@ -33,10 +36,12 @@ options:
     type: bool
     default: "no"
   user:
+    type: str
     description:
       - User ID or e-mail
     required: true
   state:
+    type: str
     description:
       - Create or remove the heroku collaborator
     choices: ["present", "absent"]
@@ -48,14 +53,14 @@ notes:
 
 EXAMPLES = '''
 - name: Create a heroku collaborator
-  heroku_collaborator:
+  community.general.heroku_collaborator:
     api_key: YOUR_API_KEY
     user: max.mustermann@example.com
     apps: heroku-example-app
     state: present
 
 - name: An example of using the module in loop
-  heroku_collaborator:
+  community.general.heroku_collaborator:
     api_key: YOUR_API_KEY
     user: '{{ item.user }}'
     apps: '{{ item.apps | default(apps) }}'
@@ -105,7 +110,7 @@ def main():
     argument_spec = HerokuHelper.heroku_argument_spec()
     argument_spec.update(
         user=dict(required=True, type='str'),
-        apps=dict(required=True, type='list'),
+        apps=dict(required=True, type='list', elements='str'),
         suppress_invitation=dict(default=False, type='bool'),
         state=dict(default='present', type='str', choices=['present', 'absent']),
     )

@@ -16,33 +16,40 @@ description:
   - 'For more information, refer to the Sensu documentation: U(https://sensuapp.org/docs/latest/reference/clients.html)'
 options:
   state:
+    type: str
     description:
       - Whether the client should be present or not
     choices: [ 'present', 'absent' ]
     default: present
   name:
+    type: str
     description:
       - A unique name for the client. The name cannot contain special characters or spaces.
-    default: System hostname as determined by Ruby Socket.gethostname (provided by Sensu)
+      - If not specified, it defaults to the system hostname as determined by Ruby Socket.gethostname (provided by Sensu).
   address:
+    type: str
     description:
       - An address to help identify and reach the client. This is only informational, usually an IP address or hostname.
-    default: Non-loopback IPv4 address as determined by Ruby Socket.ip_address_list (provided by Sensu)
+      - If not specified it defaults to non-loopback IPv4 address as determined by Ruby Socket.ip_address_list (provided by Sensu).
   subscriptions:
+    type: list
+    elements: str
     description:
       - An array of client subscriptions, a list of roles and/or responsibilities assigned to the system (e.g. webserver).
       - These subscriptions determine which monitoring checks are executed by the client, as check requests are sent to subscriptions.
       - The subscriptions array items must be strings.
-    required: True
   safe_mode:
     description:
       - If safe mode is enabled for the client. Safe mode requires local check definitions in order to accept a check request and execute the check.
     type: bool
     default: 'no'
   redact:
+    type: list
+    elements: str
     description:
       - Client definition attributes to redact (values) when logging and sending client keepalives.
   socket:
+    type: dict
     description:
       - The socket definition scope, used to configure the Sensu client socket.
   keepalives:
@@ -51,29 +58,36 @@ options:
     type: bool
     default: 'yes'
   keepalive:
+    type: dict
     description:
       - The keepalive definition scope, used to configure Sensu client keepalives behavior (e.g. keepalive thresholds, etc).
   registration:
+    type: dict
     description:
       - The registration definition scope, used to configure Sensu registration event handlers.
   deregister:
     description:
       - If a deregistration event should be created upon Sensu client process stop.
+      - Default is C(false).
     type: bool
-    default: 'no'
   deregistration:
+    type: dict
     description:
       - The deregistration definition scope, used to configure automated Sensu client de-registration.
   ec2:
+    type: dict
     description:
       - The ec2 definition scope, used to configure the Sensu Enterprise AWS EC2 integration (Sensu Enterprise users only).
   chef:
+    type: dict
     description:
       - The chef definition scope, used to configure the Sensu Enterprise Chef integration (Sensu Enterprise users only).
   puppet:
+    type: dict
     description:
       - The puppet definition scope, used to configure the Sensu Enterprise Puppet integration (Sensu Enterprise users only).
   servicenow:
+    type: dict
     description:
       - The servicenow definition scope, used to configure the Sensu Enterprise ServiceNow integration (Sensu Enterprise users only).
 notes:
@@ -83,13 +97,13 @@ notes:
 EXAMPLES = '''
 # Minimum possible configuration
 - name: Configure Sensu client
-  sensu_client:
+  community.general.sensu_client:
     subscriptions:
       - default
 
 # With customization
 - name: Configure Sensu client
-  sensu_client:
+  community.general.sensu_client:
     name: "{{ ansible_fqdn }}"
     address: "{{ ansible_default_ipv4['address'] }}"
     subscriptions:
@@ -114,14 +128,14 @@ EXAMPLES = '''
     - Restart sensu-client
 
 - name: Secure Sensu client configuration file
-  file:
+  ansible.builtin.file:
     path: "{{ client['file'] }}"
     owner: "sensu"
     group: "sensu"
     mode: "0600"
 
 - name: Delete the Sensu client configuration
-  sensu_client:
+  community.general.sensu_client:
     state: "absent"
 '''
 
@@ -148,22 +162,22 @@ def main():
     module = AnsibleModule(
         supports_check_mode=True,
         argument_spec=dict(
-            state=dict(type='str', required=False, choices=['present', 'absent'], default='present'),
-            name=dict(type='str', required=False),
-            address=dict(type='str', required=False),
-            subscriptions=dict(type='list', required=False),
-            safe_mode=dict(type='bool', required=False, default=False),
-            redact=dict(type='list', required=False),
-            socket=dict(type='dict', required=False),
-            keepalives=dict(type='bool', required=False, default=True),
-            keepalive=dict(type='dict', required=False),
-            registration=dict(type='dict', required=False),
-            deregister=dict(type='bool', required=False),
-            deregistration=dict(type='dict', required=False),
-            ec2=dict(type='dict', required=False),
-            chef=dict(type='dict', required=False),
-            puppet=dict(type='dict', required=False),
-            servicenow=dict(type='dict', required=False)
+            state=dict(type='str', choices=['present', 'absent'], default='present'),
+            name=dict(type='str', ),
+            address=dict(type='str', ),
+            subscriptions=dict(type='list', elements="str"),
+            safe_mode=dict(type='bool', default=False),
+            redact=dict(type='list', elements="str"),
+            socket=dict(type='dict'),
+            keepalives=dict(type='bool', default=True),
+            keepalive=dict(type='dict'),
+            registration=dict(type='dict'),
+            deregister=dict(type='bool'),
+            deregistration=dict(type='dict'),
+            ec2=dict(type='dict'),
+            chef=dict(type='dict'),
+            puppet=dict(type='dict'),
+            servicenow=dict(type='dict')
         ),
         required_if=[
             ['state', 'present', ['subscriptions']]

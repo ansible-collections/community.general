@@ -28,9 +28,5 @@ from ansible_collections.community.general.plugins.cache.redis import CacheModul
 
 
 def test_redis_cachemodule():
-    assert isinstance(RedisCache(), RedisCache)
-
-
-def test_redis_cachemodule_with_loader():
     # The _uri option is required for the redis plugin
     assert isinstance(cache_loader.get('community.general.redis', **{'_uri': '127.0.0.1:6379:1'}), RedisCache)

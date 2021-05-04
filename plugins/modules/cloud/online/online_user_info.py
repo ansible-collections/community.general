@@ -21,10 +21,10 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Gather Online user info
-  online_user_info:
+  community.general.online_user_info:
   register: result
 
-- debug:
+- ansible.builtin.debug:
     msg: "{{ result.online_user_info }}"
 '''
 
