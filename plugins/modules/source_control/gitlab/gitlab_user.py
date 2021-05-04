@@ -63,10 +63,15 @@ options:
     description:
       - The ssh key itself.
     type: str
+  sshkey_expires_at:
+    description:
+      - The expiration date of the SSH key in ISO 8601 format C(YYYY-MM-DDTHH:MM:SSZ).
+    type: str
+    version_added: 3.1.0
   group:
     description:
       - Id or Full path of parent group in the form of group/name.
-      - Add user as an member to this group.
+      - Add user as a member to this group.
     type: str
   access_level:
     description:
@@ -254,7 +259,8 @@ class GitLabUser(object):
         if options['sshkey_name'] and options['sshkey_file']:
             key_changed = self.addSshKeyToUser(user, {
                 'name': options['sshkey_name'],
-                'file': options['sshkey_file']})
+                'file': options['sshkey_file'],
+                'expires_at': options['sshkey_expires_at']})
             changed = changed or key_changed
 
         # Assign group
@@ -471,6 +477,7 @@ def main():
         email=dict(type='str'),
         sshkey_name=dict(type='str'),
         sshkey_file=dict(type='str', no_log=False),
+        sshkey_expires_at=dict(type='str', no_log=False),
         group=dict(type='str'),
         access_level=dict(type='str', default="guest", choices=["developer", "guest", "maintainer", "master", "owner", "reporter"]),
         confirm=dict(type='bool', default=True),
@@ -503,6 +510,7 @@ def main():
     user_email = module.params['email']
     user_sshkey_name = module.params['sshkey_name']
     user_sshkey_file = module.params['sshkey_file']
+    user_sshkey_expires_at = module.params['sshkey_expires_at']
     group_path = module.params['group']
     access_level = module.params['access_level']
     confirm = module.params['confirm']
@@ -549,6 +557,7 @@ def main():
                                           "email": user_email,
                                           "sshkey_name": user_sshkey_name,
                                           "sshkey_file": user_sshkey_file,
+                                          "sshkey_expires_at": user_sshkey_expires_at,
                                           "group_path": group_path,
                                           "access_level": access_level,
                                           "confirm": confirm,
