@@ -87,6 +87,7 @@ class TestPacemakerClusterModule(ModuleTestCase):
         self.property_call_count = 0
         self.property_call = ""
         self.start_call_count = 0
+        self.auth_call_count = 0
         # the initial pcs configuration will be different
         self.initial_status = None
 
@@ -123,6 +124,10 @@ class TestPacemakerClusterModule(ModuleTestCase):
                 return (1, "", _PCS_NO_CLUSTER)
             else:
                 return (0, status_ok, "")
+        elif cmd.startswith("pcs host auth"):
+            self.auth_call_count += 1
+            # output when authing isn't really needed
+            return (0, "", "")
 
     def test_new_cluster(self):
         set_module_args({
@@ -140,9 +145,9 @@ class TestPacemakerClusterModule(ModuleTestCase):
                 self.module.main()
 
         # make sure the right number of pcs calls were made
-        self.assertEqual(self.config_call_count, 1)
         self.assertEqual(self.create_call_count, 1)
         self.assertEqual(self.property_call_count, 1)
+        self.assertEqual(self.auth_call_count, 1)
         # and make sure the proper creation command was called
         self.assertTrue(re.search(r'pcs cluster setup lbcluster', self.create_call) is not None)
 
