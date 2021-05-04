@@ -41,7 +41,7 @@ class ClusterStatus(Enum):
 
 configs = {}
 configs[ClusterStatus.DOESNT_EXIST] = """
-Cluster Name:
+Cluster Name: 
 """
 configs[ClusterStatus.DOWN] = """
 Cluster Name: mycluster
@@ -99,11 +99,13 @@ class TestPacemakerClusterModule(ModuleTestCase):
     # returns no_cluster_status
     # accepts cluster creation
     def fake_run_command(self, cmd):
+        # just for terseness
+        initial_status = self.initial_status
         # first time called -> getting config
         if cmd.startswith("pcs config"):
             self.config_call_count += 1
             # special case where cluster WAS down but was started up
-            if self.initial_status == ClusterStatus.DOWN and self.start_call_count > 0:
+            if initial_status == ClusterStatus.DOWN and self.start_call_count > 0:
                 return (0, configs[ClusterStatus.OK], "")
             return (1 if initial_status in [ClusterStatus.DOWN, ClusterStatus.DOESNT_EXIST] else 0, configs[initial_status], config_errors[initial_status])
         elif cmd.startswith("pcs cluster setup"):
@@ -117,7 +119,7 @@ class TestPacemakerClusterModule(ModuleTestCase):
             # output when setting properties isn't really needed
             return (1, "", "")
         elif cmd.startswith("pcs cluster status"):
-            if self.initial_status in [ClusterStatus.DOWN, ClusterStatus.DOESNT_EXIST]:
+            if initial_status in [ClusterStatus.DOWN, ClusterStatus.DOESNT_EXIST]:
                 return (1, "", _PCS_NO_CLUSTER)
             else:
                 return (0, status_ok, "")
