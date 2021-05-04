@@ -57,7 +57,7 @@ options:
     type: str
   sshkey_name:
     description:
-      - The name of the sshkey
+      - The name of the sshkey.
     type: str
   sshkey_file:
     description:
@@ -301,7 +301,7 @@ class GitLabUser(object):
 
     '''
     @param user User object
-    @param sshkey Dict containing sshkey infos {"name": "", "file": ""}
+    @param sshkey Dict containing sshkey infos {"name": "", "file": "", "expires_at": ""}
     '''
     def addSshKeyToUser(self, user, sshkey):
         if not self.sshKeyExists(user, sshkey['name']):
@@ -311,7 +311,8 @@ class GitLabUser(object):
             try:
                 user.keys.create({
                     'title': sshkey['name'],
-                    'key': sshkey['file']})
+                    'key': sshkey['file'],
+                    'expires_at': sshkey['expires_at']})
             except gitlab.exceptions.GitlabCreateError as e:
                 self._module.fail_json(msg="Failed to assign sshkey to user: %s" % to_native(e))
             return True
