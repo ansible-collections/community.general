@@ -108,22 +108,25 @@ class TestPacemakerClusterModule(ModuleTestCase):
             # special case where cluster WAS down but was started up
             if initial_status == ClusterStatus.DOWN and self.start_call_count > 0:
                 return (0, configs[ClusterStatus.OK], "")
+            elif initial_status == ClusterStatus.DOESNT_EXIST and self.create_call_count > 0:
+                return (0, configs[ClusterStatus.OK], "")
             return (1 if initial_status in [ClusterStatus.DOWN, ClusterStatus.DOESNT_EXIST] else 0, configs[initial_status], config_errors[initial_status])
         elif cmd.startswith("pcs cluster setup"):
             self.create_call_count += 1
             self.create_call = cmd
             # output for cluster creation isn't really needed
-            return (1, "", "")
+            return (0, "", "")
         elif cmd.startswith("pcs property"):
             self.property_call_count += 1
             self.property_call = cmd
             # output when setting properties isn't really needed
-            return (1, "", "")
+            return (0, "", "")
         elif cmd.startswith("pcs cluster status"):
-            if initial_status in [ClusterStatus.DOWN, ClusterStatus.DOESNT_EXIST]:
-                return (1, "", _PCS_NO_CLUSTER)
-            else:
+            if not(initial_status in [ClusterStatus.DOWN, ClusterStatus.DOESNT_EXIST]) or \
+                initial_status == ClusterStatus.DOESNT_EXIST and self.create_call_count > 0:
                 return (0, status_ok, "")
+            else:
+                return (1, "", _PCS_NO_CLUSTER)
         elif cmd.startswith("pcs host auth"):
             self.auth_call_count += 1
             # output when authing isn't really needed
