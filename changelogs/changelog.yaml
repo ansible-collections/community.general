@@ -973,3 +973,40 @@ releases:
         name: lxd
         namespace: null
     release_date: '2021-04-26'
+  3.0.1:
+    changes:
+      bugfixes:
+      - composer - use ``no-interaction`` option when discovering available options
+        to avoid an issue where composer hangs (https://github.com/ansible-collections/community.general/pull/2348).
+      - influxdb_retention_policy - fix bug where ``INF`` duration values failed parsing
+        (https://github.com/ansible-collections/community.general/pull/2385).
+      - inventory and vault scripts - change file permissions to make vendored inventory
+        and vault scripts exectuable (https://github.com/ansible-collections/community.general/pull/2337).
+      - linode_v4 - changed the error message to point to the correct bugtracker URL
+        (https://github.com/ansible-collections/community.general/pull/2430).
+      - lvol - fixed rounding errors (https://github.com/ansible-collections/community.general/issues/2370).
+      - lvol - fixed size unit capitalization to match units used between different
+        tools for comparison (https://github.com/ansible-collections/community.general/issues/2360).
+      - nmcli - compare MAC addresses case insensitively to fix idempotency issue
+        (https://github.com/ansible-collections/community.general/issues/2409).
+      - nmcli - if type is ``bridge-slave`` add ``slave-type bridge`` to ``nmcli``
+        command (https://github.com/ansible-collections/community.general/issues/2408).
+      - one_vm - Allow missing NIC keys (https://github.com/ansible-collections/community.general/pull/2435).
+      - puppet - replace ``console` with ``stdout`` in ``logdest`` option when ``all``
+        has been chosen (https://github.com/ansible-collections/community.general/issues/1190).
+      - svr4pkg - convert string to a bytes-like object to avoid ``TypeError`` with
+        Python 3 (https://github.com/ansible-collections/community.general/issues/2373).
+      release_summary: Bugfix release for the next Ansible 4.0.0 beta.
+    fragments:
+    - 2284-influxdb_retention_policy-fix_duration_parsing.yml
+    - 2337-mark-inventory-scripts-executable.yml
+    - 2348-composer-no-interaction-option-discovery-to-avoid-hang.yaml
+    - 2369-lvol_size_bug_fixes.yml
+    - 2373-svr4pkg-fix-typeerror.yml
+    - 2407-puppet-change_stdout_to_console.yaml
+    - 2409-nmcli_add_slave-type_bridge_to_nmcli_command_if_type_is_bridge-slave.yml
+    - 2416-nmcli_compare_mac_addresses_case_insensitively.yml
+    - 2430-linodev4-error-message.yml
+    - 2435-one_vm-fix_missing_keys.yml
+    - 3.0.1.yml
+    release_date: '2021-05-04'
