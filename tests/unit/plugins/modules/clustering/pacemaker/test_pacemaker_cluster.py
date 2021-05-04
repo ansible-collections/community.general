@@ -99,13 +99,13 @@ class TestPacemakerClusterModule(ModuleTestCase):
         super(TestPacemakerClusterModule, self).setUp()
         self.module = pacemaker_cluster
         # needed to keep track of how many times different run_commands were called
-        self.config_call_count = 0
         self.create_call_count = 0
         self.create_call = ""
         self.property_call_count = 0
         self.property_call = ""
         self.start_call_count = 0
         self.auth_call_count = 0
+        self.add_nodes_call_count = 0
         # the initial pcs configuration will be different
         self.initial_status = None
 
@@ -148,7 +148,7 @@ class TestPacemakerClusterModule(ModuleTestCase):
             self.auth_call_count += 1
             # output when authing isn't really needed
             return (0, "", "")
-        elif cmd.startswith("pcs nodes status both"):
+        elif cmd.startswith("pcs status nodes both"):
             # missing node AND node wasn't added in a previous call
             if initial_status == ClusterStatus.MISSING_NODES and self.add_nodes_call_count == 0:
                 return (0, nodes_status_template % (("host1",) * 2), "")
