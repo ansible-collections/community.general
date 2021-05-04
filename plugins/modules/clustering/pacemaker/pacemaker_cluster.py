@@ -12,6 +12,7 @@ DOCUMENTATION = '''
 module: pacemaker_cluster
 short_description: Manage pacemaker clusters
 author:
+- Mathieu Bultel (@mbultel)
 - Hani Audah (@haudah)
 description:
    - This module can manage a pacemaker cluster and nodes from Ansible using
@@ -106,7 +107,7 @@ _PCS_NO_CLUSTER = "Error: unable to get crm_config"
 def get_cluster_status(module):
     cmd = "pcs cluster status"
     rc, out, err = module.run_command(cmd)
-    if out in _PCS_CLUSTER_DOWN:
+    if _PCS_CLUSTER_DOWN in err:
         return 'offline'
     else:
         return 'online'

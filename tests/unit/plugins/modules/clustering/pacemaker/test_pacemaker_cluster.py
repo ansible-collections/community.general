@@ -4,6 +4,7 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+from enum import Enum
 __metaclass__ = type
 
 from ansible.module_utils import basic
@@ -31,9 +32,48 @@ Cluster Properties:
 
 """
 
-_PCS_CLUSTER_CONFIG_OK = config_template % (("host1 host2",)*2)
-_PCS_CLUSTER_CONFIG_MISSING_NODE = config_template % (("host1",)*2)
+class ClusterStatus(Enum):
+    DOESNT_EXIST = 0
+    DOWN = 1
+    MISSING_NODE = 2
+    MISSING_PROPERTIES = 3
+    OK = 4
 
+configs = {}
+configs[ClusterStatus.DOESNT_EXIST] = """
+Cluster Name:
+"""
+configs[ClusterStatus.DOWN] = """
+Cluster Name: mycluster
+"""
+configs[ClusterStatus.MISSING_NODE] = config_template % (("host1",)*2)
+configs[ClusterStatus.OK] = config_template % (("host1 host2",)*2)
+
+config_errors = {}
+config_errors[ClusterStatus.DOWN] = """
+Error error running crm_mon, is pacemaker running?
+"""
+config_errors[ClusterStatus.DOESNT_EXIST] = """
+Error: unable to get crm_config
+
+Error: error running crm_mon, is pacemaker running?
+"""
+
+status_ok = """
+Cluster Status:
+ Cluster Summary:
+   * Stack: corosync
+   * Current DC: host1 (version 2.0.4-6.el8_3.1-2deceaa3ae) - partition with quorum
+   * Last updated: Tue May  4 19:36:12 2021
+   * Last change:  Mon May  3 21:13:39 2021 by hacluster via crmd on lb02.haramco.org
+   * 1 node configured
+   * 0 resource instances configured
+ Node List:
+   * Online: [ host1 ]
+
+PCSD Status:
+  host1: Online
+"""
 
 class TestPacemakerClusterModule(ModuleTestCase):
 
@@ -46,8 +86,9 @@ class TestPacemakerClusterModule(ModuleTestCase):
         self.create_call = ""
         self.property_call_count = 0
         self.property_call = ""
+        self.start_call_count = 0
         # the initial pcs configuration will be different
-        self.initial_config = ""
+        self.initial_status = None
 
     def tearDown(self):
         super(TestPacemakerClusterModule, self).tearDown()
@@ -61,16 +102,25 @@ class TestPacemakerClusterModule(ModuleTestCase):
         # first time called -> getting config
         if cmd.startswith("pcs config"):
             self.config_call_count += 1
-            return (1, "", self.initial_config)
+            # special case where cluster WAS down but was started up
+            if self.initial_status == ClusterStatus.DOWN and self.start_call_count > 0:
+                return (0, configs[ClusterStatus.OK], "")
+            return (1 if initial_status in [ClusterStatus.DOWN, ClusterStatus.DOESNT_EXIST] else 0, configs[initial_status], config_errors[initial_status])
         elif cmd.startswith("pcs cluster setup"):
             self.create_call_count += 1
             self.create_call = cmd
-            # std out for cluster creation isn't really needed
+            # output for cluster creation isn't really needed
             return (1, "", "")
         elif cmd.startswith("pcs property"):
             self.property_call_count += 1
             self.property_call = cmd
+            # output when setting properties isn't really needed
             return (1, "", "")
+        elif cmd.startswith("pcs cluster status"):
+            if self.initial_status in [ClusterStatus.DOWN, ClusterStatus.DOESNT_EXIST]:
+                return (1, "", _PCS_NO_CLUSTER)
+            else:
+                return (0, status_ok, "")
 
     def test_new_cluster(self):
         set_module_args({
@@ -81,7 +131,7 @@ class TestPacemakerClusterModule(ModuleTestCase):
             'pcs_password': 'dummy_pass',
         })
 
-        self.initial_config = _PCS_NO_CLUSTER
+        self.initial_status = ClusterStatus.DOESNT_EXIST
 
         with patch.object(basic.AnsibleModule, 'run_command', side_effect=self.fake_run_command) as run_command:
             with self.assertRaises(AnsibleExitJson) as result:
