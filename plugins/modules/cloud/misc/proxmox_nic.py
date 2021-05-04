@@ -11,22 +11,23 @@ DOCUMENTATION = r'''
 ---
 module: proxmox_nic
 short_description: Management of NIC's for Qemu(KVM) VM's in a Proxmox VE cluster.
+version_added: 3.1.0
 description:
   - Allows you to create/update/delete NIC's on Qemu(KVM) Virtual Machines in a Proxmox VE cluster.
 author: "Lammert Hellinga (@Kogelvis) <lammert@hellinga.it>"
 options:
   bridge:
     description:
-      - Add this interface to the specified bridge device. The Proxmox VE standard bridge is called 'vmbr0'
+      - Add this interface to the specified bridge device. The Proxmox VE standard bridge is called C(vmbr0).
     type: str
   firewall:
     description:
       - Whether this interface should be protected by the firewall.
     type: bool
-    default: False
+    default: false
   interface:
     description:
-      - Name of the interface, should be C(net[n]) where C(1 ≤ n ≤ 31)
+      - Name of the interface, should be C(net[n]) where C(1 ≤ n ≤ 31).
     type: str
     required: True
   link_down:
@@ -41,25 +42,25 @@ options:
     type: str
   model:
     description:
-      - Model is one of C(e1000 e1000-82540em e1000-82544gc e1000-82545em i82551 i82557b i82559er ne2k_isa ne2k_pci pcnet rtl8139 virtio vmxnet3)
+      - The model.
     type: str
     choices: ['e1000', 'e1000-82540em', 'e1000-82544gc', 'e1000-82545em', 'i82551', 'i82557b', 'i82559er', 'ne2k_isa', 'ne2k_pci', 'pcnet',
               'rtl8139', 'virtio', 'vmxnet3']
     default: virtio
   mtu:
     description:
-      - Force MTU, for C(virtio) model only. Set to '1' to use the bridge MTU
-      - Value should be C(1 ≤ n ≤ 65520)
+      - Force MTU, for C(virtio) model only. Set to C(1) to use the bridge MTU.
+      - Value should be C(1 ≤ n ≤ 65520).
     type: int
   name:
     description:
       - Specifies the VM name. Only used on the configuration web interface.
-      - Required only for C(state=present).
+      - Required only for I(state=present).
     type: str
   queues:
     description:
       - Number of packet queues to be used on the device.
-      - Value should be C(0 ≤ n ≤ 16)
+      - Value should be C(0 ≤ n ≤ 16).
     type: int
   rate:
     description:
@@ -109,7 +110,7 @@ EXAMPLES = '''
     interface: net0
     bridge: vmbr0
     mac: "12:34:56:C0:FF:EE"
-    firewall: True
+    firewall: true
 
 - name: Delete NIC net0 targeting the vm by name
   community.general.proxmox_nic:
