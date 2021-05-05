@@ -105,6 +105,7 @@ class TestPacemakerClusterModule(ModuleTestCase):
         self.property_call = ""
         self.start_call_count = 0
         self.auth_call_count = 0
+        self.auth_call = 0
         self.add_nodes_call_count = 0
         # the initial pcs configuration will be different
         self.initial_status = None
@@ -112,16 +113,12 @@ class TestPacemakerClusterModule(ModuleTestCase):
     def tearDown(self):
         super(TestPacemakerClusterModule, self).tearDown()
 
-    def patch_redis_client(self, **kwds):
-        return patch('ansible_collections.community.general.plugins.modules.database.misc.redis_info.redis_client', autospec=True, **kwds)
-
     # mock all the commands that pcs would be expected to handle
     def fake_run_command(self, cmd):
         # just for terseness
         initial_status = self.initial_status
         # where needed for assertions, keep track of # of times pcs commands were called
         if cmd.startswith("pcs config"):
-            self.config_call_count += 1
             # special case where cluster WAS down but was started up
             if initial_status == ClusterStatus.DOWN and self.start_call_count > 0:
                 return (0, configs[ClusterStatus.OK], "")
@@ -146,11 +143,12 @@ class TestPacemakerClusterModule(ModuleTestCase):
                 return (1, "", _PCS_NO_CLUSTER)
         elif cmd.startswith("pcs host auth"):
             self.auth_call_count += 1
+            self.auth_call = cmd
             # output when authing isn't really needed
             return (0, "", "")
         elif cmd.startswith("pcs status nodes both"):
             # missing node AND node wasn't added in a previous call
-            if initial_status == ClusterStatus.MISSING_NODES and self.add_nodes_call_count == 0:
+            if initial_status == ClusterStatus.MISSING_NODE and self.add_nodes_call_count == 0:
                 return (0, nodes_status_template % (("host1",) * 2), "")
             else:
                 return (0, nodes_status_template % (("host1 host2",) * 2), "")
@@ -172,10 +170,33 @@ class TestPacemakerClusterModule(ModuleTestCase):
 
         # make sure the right number of pcs calls were made
         self.assertEqual(self.create_call_count, 1)
-        self.assertEqual(self.property_call_count, 1)
         self.assertEqual(self.auth_call_count, 1)
-        # and make sure the proper creation command was called
-        self.assertTrue(re.search(r'pcs cluster setup lbcluster', self.create_call) is not None)
+        # and make sure the creation commands called were "correct"
+        self.assertTrue(re.search(r'pcs cluster setup lbcluster --start host1 host2', self.create_call) is not None)
+        self.assertTrue(re.search(r'pcs host auth host1 host2 -u dummy_user -p dummy_pass', self.create_call) is not None)
+
+    def test_missing_properties(self):
+        set_module_args({
+            'name': 'lbcluster',
+            'state': 'online',
+            'nodes': ['host1', 'host2'],
+            'pcs_user': 'dummy_user',
+            'pcs_password': 'dummy_pass',
+            'properties': {'prop1': 'prop1val', 'prop2': 'prop2val'},
+        })
+
+        self.initial_status = ClusterStatus.OK
+
+        with patch.object(basic.AnsibleModule, 'run_command', side_effect=self.fake_run_command) as run_command:
+            with self.assertRaises(AnsibleExitJson) as result:
+                self.module.main()
+
+        # make sure the right number of pcs calls were made
+        self.assertEqual(self.create_call_count, 0)
+        self.assertEqual(self.auth_call_count, 0)
+        self.assertEqual(self.property_call_count, 1)
+        # and make sure the property command called was correct
+        self.assertTrue(re.search(r'pcs property set prop1=prop1val prop2=prop2val', self.property_call) is not None)
 
     def test_without_required_parameters(self):
         """Failure must occur when any required parameters are missing"""
