@@ -1,0 +1,4 @@
+deprecated_features:
+- "The vendored copy of ``ipaddress`` will be removed in community.general 4.0.0. Please switch to ``ipaddress`` from the Python 3 standard library, or `from pypi <https://pypi.org/project/ipaddress/>`_, if your code relies on the vendored version of ``ipaddress`` (https://github.com/ansible-collections/community.general/pull/2459)."
+- "scaleway_security_group_rule - the module will require ``ipaddress`` installed when used with Python 2 from community.general 4.0.0 on. ``ipaddress`` is part of the Python 3 standard library, but can be installed for Python 2 from pypi (https://github.com/ansible-collections/community.general/pull/2459)."
+- "lxd inventory plugin - the plugin will require ``ipaddress`` installed when used with Python 2 from community.general 4.0.0 on. ``ipaddress`` is part of the Python 3 standard library, but can be installed for Python 2 from pypi (https://github.com/ansible-collections/community.general/pull/2459)."
