@@ -49,7 +49,7 @@ Cluster Name: mycluster
 configs[ClusterStatus.MISSING_NODE] = config_template % (("host1",)*2)
 configs[ClusterStatus.OK] = config_template % (("host1 host2",)*2)
 
-config_errors = {}
+config_errors = {ClusterStatus.OK: "", ClusterStatus.MISSING_NODE: "", ClusterStatus.MISSING_PROPERTIES: "",}
 config_errors[ClusterStatus.DOWN] = """
 Error error running crm_mon, is pacemaker running?
 """
