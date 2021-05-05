@@ -46,7 +46,7 @@ Cluster Name:
 configs[ClusterStatus.DOWN] = """
 Cluster Name: lbcluster
 """
-configs[ClusterStatus.MISSING_NODE] = config_template % (("host1",)*2)
+configs[ClusterStatus.MISSING_NODE] = config_template % (("host1 host2",)*2)
 configs[ClusterStatus.OK] = config_template % (("host1 host2",)*2)
 
 config_errors = {ClusterStatus.OK: "", ClusterStatus.MISSING_NODE: "", ClusterStatus.MISSING_PROPERTIES: "",}
