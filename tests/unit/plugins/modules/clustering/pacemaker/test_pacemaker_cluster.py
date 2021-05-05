@@ -155,7 +155,7 @@ class TestPacemakerClusterModule(ModuleTestCase):
                 return (0, nodes_status_template % (("host1 host2 host3 host4",) * 2), "")
         elif cmd.startswith("pcs cluster node add"):
             self.add_nodes_call_count += 1
-            self.add_nodes_call += (cmd,)
+            self.add_nodes_calls += (cmd,)
             # output when adding nodes isn't really needed
             return (0, "", "")
 
