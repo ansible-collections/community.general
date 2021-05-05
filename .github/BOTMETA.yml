@@ -88,6 +88,8 @@ files:
     maintainers: $team_linode
     labels: cloud linode
     keywords: linode dynamic inventory script
+  $inventories/lxd.py:
+    maintainers: conloos
   $inventories/proxmox.py:
     maintainers: $team_virt ilijamt
   $inventories/scaleway.py:
@@ -373,6 +375,8 @@ files:
     maintainers: $team_keycloak
   $modules/identity/keycloak/keycloak_group.py:
     maintainers: adamgoossens
+  $modules/identity/keycloak/keycloak_realm.py:
+    maintainers: kris2kris
   $modules/identity/onepassword_info.py:
     maintainers: Rylon
   $modules/identity/opendj/opendj_backendprop.py:
