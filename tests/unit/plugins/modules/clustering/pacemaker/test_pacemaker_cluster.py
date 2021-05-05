@@ -18,7 +18,7 @@ import re
 _PCS_NO_CLUSTER = "Error: cluster is not currently running on this node"
 
 config_template = """
-Cluster Name: mycluster
+Cluster Name: lbcluster
 Corosync Nodes:
  %s
 Pacemaker Nodes:
@@ -26,7 +26,7 @@ Pacemaker Nodes:
 
 Cluster Properties:
  cluster-infrastructure: corosync
- cluster-name: mycluster
+ cluster-name: lbcluster
  dc-version: 2.0.4-6.el8_3.1-2deceaa3ae
  have-watchdog: false
 
@@ -44,7 +44,7 @@ configs[ClusterStatus.DOESNT_EXIST] = """
 Cluster Name: 
 """
 configs[ClusterStatus.DOWN] = """
-Cluster Name: mycluster
+Cluster Name: lbcluster
 """
 configs[ClusterStatus.MISSING_NODE] = config_template % (("host1",)*2)
 configs[ClusterStatus.OK] = config_template % (("host1 host2",)*2)
