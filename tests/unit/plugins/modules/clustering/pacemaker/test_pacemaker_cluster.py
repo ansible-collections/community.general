@@ -156,6 +156,8 @@ class TestPacemakerClusterModule(ModuleTestCase):
         elif cmd.startswith("pcs cluster node add"):
             self.add_nodes_call_count += 1
             self.add_nodes_call = cmd
+            # output when adding nodes isn't really needed
+            return (0, "", "")
 
     def test_new_cluster(self):
         set_module_args({
