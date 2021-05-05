@@ -52,7 +52,7 @@ options:
     description:
       - Send messages as Embeds to the discord channel.
       - Embeds can have a colored border, embedded images, text fields and more.
-      - Allowed parameters are described in the Discord Docs: U(https://discord.com/developers/docs/resources/channel#embed-object)
+      - "Allowed parameters are described in the Discord Docs: U(https://discord.com/developers/docs/resources/channel#embed-object)"
       - At least one of I(content) and I(embeds) must be specified.
     type: list
     elements: dict
