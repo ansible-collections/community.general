@@ -52,6 +52,7 @@ options:
     description:
       - Send messages as Embeds to the discord channel.
       - Embeds can have a colored border, embedded images, text fields and more.
+      - Allowed parameters are described in the Discord Docs: U(https://discord.com/developers/docs/resources/channel#embed-object)
       - At least one of I(content) and I(embeds) must be specified.
     type: list
     elements: dict
@@ -83,6 +84,29 @@ EXAMPLES = """
           text: "Author: Ansible"
         image:
           url: "https://docs.ansible.com/ansible/latest/_static/images/logo_invert.png"
+
+- name: Send two embedded messages
+  community.general.discord:
+    webhook_id: "00000"
+    webhook_token: "XXXYYY"
+    embeds:
+      - title: "First message"
+        description: "This is my first embedded message"
+        footer:
+          text: "Author: Ansible"
+        image:
+          url: "https://docs.ansible.com/ansible/latest/_static/images/logo_invert.png"
+      - title: "Second message"
+        description: "This is my first second message"
+        footer:
+          text: "Author: Ansible"
+          icon_url: "https://docs.ansible.com/ansible/latest/_static/images/logo_invert.png"
+        fields:
+          - name: "Field 1"
+            value: "Value of my first field"
+          - name: "Field 2"
+            value: "Value of my second field"
+        timestamp: "{{ ansible_date_time.iso8601 }}"
 """
 
 RETURN = """
@@ -141,7 +165,7 @@ def discord_text_msg(module):
 
     payload = module.jsonify(payload)
 
-    response, info = fetch_url(module, url, data=payload, headers=headers)
+    response, info = fetch_url(module, url, data=payload, headers=headers, method='POST')
     return response, info
 
 
@@ -168,13 +192,19 @@ def main():
     if module.check_mode:
         response, info = discord_check_mode(module)
         if info['status'] != 200:
-            module.fail_json(http_code=info['status'], msg=info['msg'], response=module.from_json(info['body']), info=info)
+            try:
+                module.fail_json(http_code=info['status'], msg=info['msg'], response=module.from_json(info['body']), info=info)
+            except Exception:
+                module.fail_json(http_code=info['status'], msg=info['msg'], info=info)
         else:
             module.exit_json(msg=info['msg'], changed=False, http_code=info['status'], response=module.from_json(response.read()))
     else:
         response, info = discord_text_msg(module)
         if info['status'] != 204:
-            module.fail_json(http_code=info['status'], msg=info['msg'], response=module.from_json(info['body']), info=info)
+            try:
+                module.fail_json(http_code=info['status'], msg=info['msg'], response=module.from_json(info['body']), info=info)
+            except Exception:
+                module.fail_json(http_code=info['status'], msg=info['msg'], info=info)
         else:
             module.exit_json(msg=info['msg'], changed=True, http_code=info['status'])
 
