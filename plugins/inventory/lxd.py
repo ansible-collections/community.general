@@ -13,6 +13,8 @@ DOCUMENTATION = r'''
         - Uses a YAML configuration file that ends with 'lxd.(yml|yaml)'.
     version_added: "3.0.0"
     author: "Frank Dornheim (@conloos)"
+    requirements:
+        - ipaddress
     options:
         plugin:
             description: Token that ensures this is a source file for the 'lxd' plugin.
@@ -124,9 +126,16 @@ import socket
 from ansible.plugins.inventory import BaseInventoryPlugin
 from ansible.module_utils._text import to_native, to_text
 from ansible.module_utils.common.dict_transformations import dict_merge
+from ansible.module_utils.six import raise_from
 from ansible.errors import AnsibleError, AnsibleParserError
-from ansible_collections.community.general.plugins.module_utils.compat import ipaddress
 from ansible_collections.community.general.plugins.module_utils.lxd import LXDClient, LXDClientException
+
+try:
+    import ipaddress
+except ImportError as exc:
+    IPADDRESS_IMPORT_ERROR = exc
+else:
+    IPADDRESS_IMPORT_ERROR = None
 
 
 class InventoryModule(BaseInventoryPlugin):
@@ -924,6 +933,10 @@ class InventoryModule(BaseInventoryPlugin):
             AnsibleParserError
         Returns:
             None"""
+        if IPADDRESS_IMPORT_ERROR:
+            raise_from(
+                AnsibleError('another_library must be installed to use this plugin'),
+                IPADDRESS_IMPORT_ERROR)
 
         super(InventoryModule, self).parse(inventory, loader, path, cache=False)
         # Read the inventory YAML file
