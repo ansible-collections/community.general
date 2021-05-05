@@ -184,9 +184,7 @@ class Zfs(object):
             return
         cmd = [self.zfs_cmd, 'set', prop + '=' + str(value), self.name]
         (rc, out, err) = self.module.run_command(cmd)
-        if rc == 0:
-            self.changed = True
-        else:
+        if rc != 0:
             self.module.fail_json(msg=err)
 
     def set_properties_if_changed(self):
@@ -194,15 +192,25 @@ class Zfs(object):
         for prop, value in self.properties.items():
             if current_properties.get(prop, None) != value:
                 self.set_property(prop, value)
+        if self.module.check_mode:
+            return
+        updated_properties = self.get_current_properties()
+        for prop in self.properties:
+            value = updated_properties.get(prop, None)
+            if value is None:
+                self.module.fail_json(msg="zfsprop was not present after being successfully set: " + prop)
+            if current_properties.get(prop, None) != value:
+                self.changed = True
 
     def get_current_properties(self):
-        cmd = [self.zfs_cmd, 'get', '-H']
+        cmd = [self.zfs_cmd, 'get', '-H', '-p', '-o', "property,value,source"]
         if self.enhanced_sharing:
             cmd += ['-e']
         cmd += ['all', self.name]
         rc, out, err = self.module.run_command(" ".join(cmd))
         properties = dict()
-        for prop, value, source in [l.split('\t')[1:4] for l in out.splitlines()]:
+        for line in out.splitlines():
+            prop, value, source = line.split('\t')
             # include source '-' so that creation-only properties are not removed
             # to avoids errors when the dataset already exists and the property is not changed
             # this scenario is most likely when the same playbook is run more than once
