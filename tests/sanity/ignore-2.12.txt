@@ -1,5 +1,3 @@
-plugins/module_utils/compat/ipaddress.py no-assert
-plugins/module_utils/compat/ipaddress.py no-unicode-literals
 plugins/module_utils/_mount.py future-import-boilerplate
 plugins/module_utils/_mount.py metaclass-boilerplate
 plugins/modules/cloud/linode/linode.py validate-modules:parameter-list-no-elements
