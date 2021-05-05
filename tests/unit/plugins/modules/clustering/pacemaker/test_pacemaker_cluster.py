@@ -224,11 +224,11 @@ class TestPacemakerClusterModule(ModuleTestCase):
         self.assertEqual(self.create_call_count, 0)
         self.assertEqual(self.auth_call_count, 1)
         self.assertEqual(self.property_call_count, 1)
-        self.assertEqual(self.add_node_call_count, 2)
+        self.assertEqual(self.add_nodes_call_count, 2)
         # and make sure the property command called was correct
         self.assertTrue(re.search(r'pcs host auth host3 host4 -u dummy_user -p dummy_pass', self.auth_call) is not None)
-        self.assertTrue('pcs cluster node add --start host3' in self.add_node_calls)
-        self.assertTrue('pcs cluster node add --start host4' in self.add_node_calls)
+        self.assertTrue('pcs cluster node add --start host3' in self.add_nodes_calls)
+        self.assertTrue('pcs cluster node add --start host4' in self.add_nodes_calls)
 
     def test_without_required_parameters(self):
         """Failure must occur when any required parameters are missing"""
