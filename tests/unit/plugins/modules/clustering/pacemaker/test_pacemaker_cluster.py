@@ -150,9 +150,9 @@ class TestPacemakerClusterModule(ModuleTestCase):
         elif cmd.startswith("pcs status nodes both"):
             # missing node AND node wasn't added in a previous call
             if initial_status == ClusterStatus.MISSING_NODE and self.add_nodes_call_count == 0:
-                return (0, nodes_status_template % (("host1",) * 2), "")
-            else:
                 return (0, nodes_status_template % (("host1 host2",) * 2), "")
+            else:
+                return (0, nodes_status_template % (("host1 host2 host3 host4",) * 2), "")
         elif cmd.startswith("pcs cluster node add"):
             self.add_nodes_call_count += 1
             self.add_nodes_call = cmd
