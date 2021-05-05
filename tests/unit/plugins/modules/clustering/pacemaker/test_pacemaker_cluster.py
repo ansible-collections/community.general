@@ -173,7 +173,7 @@ class TestPacemakerClusterModule(ModuleTestCase):
         self.assertEqual(self.auth_call_count, 1)
         # and make sure the creation commands called were "correct"
         self.assertTrue(re.search(r'pcs cluster setup lbcluster --start host1 host2', self.create_call) is not None)
-        self.assertTrue(re.search(r'pcs host auth host1 host2 -u dummy_user -p dummy_pass', self.create_call) is not None)
+        self.assertTrue(re.search(r'pcs host auth host1 host2 -u dummy_user -p dummy_pass', self.auth_call) is not None)
 
     def test_missing_properties(self):
         set_module_args({
