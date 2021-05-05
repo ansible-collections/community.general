@@ -262,7 +262,7 @@ def create_cluster(module, timeout, name, cluster_nodes, pcs_user, pcs_password,
             authenticate_nodes(module, nodes, pcs_user, pcs_password)
             for node in nodes:
                 cmd = "pcs cluster node add --start %s" % node
-                rc, out, err = module.run_command(cmd)
+                rc, out_node, err = module.run_command(cmd)
                 if rc == 1:
                     module.fail_json(msg="Failed to add node to cluster.\nCommand: `%s`\nError: %s" % (cmd, err))
 
