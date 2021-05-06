@@ -38,10 +38,10 @@ options:
       - See the zfs(8) man page for more information.
     type: dict
 notes:
-  - check_mode is supported, but in certain situations it may report a task
-    as changed that would not reported as changed if check_mode were disabled.
-    For example, this might occur when the zpool altroot option is set or when
-    a size is written using human-readable notation such as '1024M' or '2G'.
+  - C(check_mode) is supported, but in certain situations it may report a task
+    as changed that would not reported as changed if C(check_mode) were disabled.
+    For example, this might occur when the zpool C(altroot) option is set or when
+    a size is written using human-readable notation such as C(1024M) or C(2G).
 author:
 - Johan Wiren (@johanwiren)
 '''
