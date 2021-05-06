@@ -651,8 +651,6 @@ plugin_routing:
     postgresql:
       redirect: community.postgresql.postgresql
   module_utils:
-    remote_management.dellemc.dellemc_idrac:
-      redirect: dellemc.openmanage.dellemc_idrac
     docker.common:
       redirect: community.docker.common
     docker.swarm:
@@ -667,6 +665,12 @@ plugin_routing:
       redirect: community.hrobot.robot
     kubevirt:
       redirect: community.kubevirt.kubevirt
+    net_tools.nios.api:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.net_tools.nios.api module_utils has been deprecated. Please use infoblox.nios_modules.api instead.
+    remote_management.dellemc.dellemc_idrac:
+      redirect: dellemc.openmanage.dellemc_idrac
     remote_management.dellemc.ome:
       redirect: dellemc.openmanage.ome
     postgresql:
