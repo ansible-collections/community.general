@@ -106,13 +106,13 @@ def create_connection():
     config_path = os.environ.get('OVIRT_INI_PATH', default_path)
 
     # Create parser and add ovirt section if it doesn't exist:
-    config = configparser.SafeConfigParser(
+    config = configparser.ConfigParser(
         defaults={
             'ovirt_url': os.environ.get('OVIRT_URL'),
             'ovirt_username': os.environ.get('OVIRT_USERNAME'),
             'ovirt_password': os.environ.get('OVIRT_PASSWORD'),
             'ovirt_ca_file': os.environ.get('OVIRT_CAFILE', ''),
-        }
+        }, allow_no_value=True
     )
     if not config.has_section('ovirt'):
         config.add_section('ovirt')
