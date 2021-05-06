@@ -29,12 +29,12 @@ options:
     description:
       - Name of the interface, should be C(net[n]) where C(1 ≤ n ≤ 31).
     type: str
-    required: True
+    required: true
   link_down:
     description:
       - Whether this interface should be disconnected (like pulling the plug).
     type: bool
-    default: False
+    default: false
   mac:
     description:
       - C(XX:XX:XX:XX:XX:XX) should be a unique MAC address. This is automatically generated if not specified.
@@ -42,7 +42,7 @@ options:
     type: str
   model:
     description:
-      - The model.
+      - The NIC emulator model.
     type: str
     choices: ['e1000', 'e1000-82540em', 'e1000-82544gc', 'e1000-82545em', 'i82551', 'i82557b', 'i82559er', 'ne2k_isa', 'ne2k_pci', 'pcnet',
               'rtl8139', 'virtio', 'vmxnet3']
@@ -75,13 +75,13 @@ options:
   tag:
     description:
       - VLAN tag to apply to packets on this interface.
-      - Value should be C(1 ≤ n ≤ 4094)
+      - Value should be C(1 ≤ n ≤ 4094).
     type: int
   trunks:
     description:
-      - VLAN trunks to pass through this interface.
-      - Format as C(vlanid[;vlanid...])
-    type: str
+      - List of VLAN trunks to pass through this interface.
+    type: list
+    elements: int
   vmid:
     description:
       - Specifies the instance ID.
@@ -180,7 +180,7 @@ def update_nic(module, proxmox, vmid, interface, model, **kwargs):
                   'i82559er', 'ne2k_isa', 'ne2k_pci', 'pcnet', 'rtl8139', 'virtio', 'vmxnet3']
         current_model = set(models) & set(config_current.keys())
         current_model = current_model.pop()
-        current_mac = config_current[model]
+        current_mac = config_current[current_model]
 
         # build nic config string
         config_provided = "{0}={1}".format(model, current_mac)
@@ -200,7 +200,13 @@ def update_nic(module, proxmox, vmid, interface, model, **kwargs):
         config_provided += ',link_down=1'
 
     if kwargs['mtu']:
-        config_provided += ",mtu={0}".format(kwargs['mtu'])
+        if model == 'virtio':
+            config_provided += ",mtu={0}".format(kwargs['mtu'])
+        else:
+            module.fail_json(
+                vmid=vmid,
+                msg='Unable to set MTU for nic {0} on VM with vmid {1}, model should'
+                    ' be set to \'virtio\': '.format(interface, vmid))
 
     if kwargs['queues']:
         config_provided += ",queues={0}".format(kwargs['queues'])
@@ -212,24 +218,30 @@ def update_nic(module, proxmox, vmid, interface, model, **kwargs):
         config_provided += ",tag={0}".format(kwargs['tag'])
 
     if kwargs['trunks']:
-        config_provided += ",trunks={0}".format(kwargs['trunks'])
+        config_provided += ",trunks={0}".format(';'.join(str(x) for x in kwargs['trunks']))
 
     net = {interface: config_provided}
     vm = get_vm(proxmox, vmid)
 
     if ((interface not in vminfo) or (vminfo[interface] != config_provided)):
-        if proxmox.nodes(vm[0]['node']).qemu(vmid).config.set(**net) is None:
+        if not module.check_mode:
+            if proxmox.nodes(vm[0]['node']).qemu(vmid).config.set(**net) is None:
+                return True
+        else:
             return True
 
     return False
 
 
-def delete_nic(proxmox, vmid, interface):
+def delete_nic(module, proxmox, vmid, interface):
     vm = get_vm(proxmox, vmid)
     vminfo = proxmox.nodes(vm[0]['node']).qemu(vmid).config.get()
 
     if interface in vminfo:
-        if proxmox.nodes(vm[0]['node']).qemu(vmid).config.set(vmid=vmid, delete=interface) is None:
+        if not module.check_mode:
+            if proxmox.nodes(vm[0]['node']).qemu(vmid).config.set(vmid=vmid, delete=interface) is None:
+                return True
+        else:
             return True
 
     return False
@@ -257,12 +269,13 @@ def main():
             rate=dict(type='float'),
             state=dict(default='present', choices=['present', 'absent']),
             tag=dict(type='int'),
-            trunks=dict(type='str'),
+            trunks=dict(type='list', elements='int'),
             validate_certs=dict(type='bool', default=False),
             vmid=dict(type='int'),
         ),
         required_together=[('api_token_id', 'api_token_secret')],
         required_one_of=[('name', 'vmid'), ('api_password', 'api_token_id')],
+        supports_check_mode=True,
     )
 
     if not HAS_PROXMOXER:
@@ -323,7 +336,7 @@ def main():
 
     elif state == 'absent':
         try:
-            if delete_nic(proxmox, vmid, interface):
+            if delete_nic(module, proxmox, vmid, interface):
                 module.exit_json(changed=True, vmid=vmid, msg="Nic {0} deleted on VM with vmid {1}".format(interface, vmid))
             else:
                 module.exit_json(vmid=vmid, msg="Nic {0} does not exit on Vm with vmid {1}".format(interface, vmid))
