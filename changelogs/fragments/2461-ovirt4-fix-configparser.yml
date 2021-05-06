@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - scripts/inventory/ovir4.py - fix configparser creation (https://github.com/ansible-collections/community.general/issues/674).
