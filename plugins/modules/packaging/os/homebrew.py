@@ -127,7 +127,8 @@ EXAMPLES = '''
     state: present
     install_options: with-baz,enable-debug
 
-- community.general.homebrew:
+- name: Install formula foo with 'brew' from cask 
+  community.general.homebrew:
     name: homebrew/cask/foo
     state: present
 
