@@ -103,6 +103,7 @@ class CallbackModule(CallbackBase):
 
     def v2_runner_on_ok(self, result):
         self.log(result, 'OK')
+        # Don't merge me, just testing Ansibullbot
 
     def v2_runner_on_skipped(self, result):
         self.log(result, 'SKIPPED')
