@@ -10,6 +10,10 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+from ansible.module_utils.six import iteritems, string_types
+from ansible.module_utils.basic import AnsibleModule
+import re
+import os.path
 __metaclass__ = type
 
 
@@ -127,7 +131,7 @@ EXAMPLES = '''
     state: present
     install_options: with-baz,enable-debug
 
-- name: Install formula foo with 'brew' from cask 
+- name: Install formula foo with 'brew' from cask
   community.general.homebrew:
     name: homebrew/cask/foo
     state: present
@@ -159,12 +163,6 @@ changed_pkgs:
     sample: ['git', 'git-cola']
     version_added: '0.2.0'
 '''
-
-import os.path
-import re
-
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import iteritems, string_types
 
 
 # exceptions -------------------------------------------------------------- {{{
@@ -214,7 +212,8 @@ class Homebrew(object):
     '''
 
     INVALID_PATH_REGEX = _create_regex_group_complement(VALID_PATH_CHARS)
-    INVALID_BREW_PATH_REGEX = _create_regex_group_complement(VALID_BREW_PATH_CHARS)
+    INVALID_BREW_PATH_REGEX = _create_regex_group_complement(
+        VALID_BREW_PATH_CHARS)
     INVALID_PACKAGE_REGEX = _create_regex_group_complement(VALID_PACKAGE_CHARS)
     # /class regexes ----------------------------------------------- }}}
 
@@ -634,7 +633,8 @@ class Homebrew(object):
             self.changed_count += 1
             self.changed_pkgs.append(self.current_package)
             self.changed = True
-            self.message = 'Package installed: {0}'.format(self.current_package)
+            self.message = 'Package installed: {0}'.format(
+                self.current_package)
             return True
         else:
             self.failed = True
@@ -756,7 +756,8 @@ class Homebrew(object):
             self.changed_count += 1
             self.changed_pkgs.append(self.current_package)
             self.changed = True
-            self.message = 'Package uninstalled: {0}'.format(self.current_package)
+            self.message = 'Package uninstalled: {0}'.format(
+                self.current_package)
             return True
         else:
             self.failed = True
@@ -780,7 +781,8 @@ class Homebrew(object):
 
         if not self._current_package_is_installed():
             self.failed = True
-            self.message = 'Package not installed: {0}.'.format(self.current_package)
+            self.message = 'Package not installed: {0}.'.format(
+                self.current_package)
             raise HomebrewException(self.message)
 
         if self.module.check_mode:
@@ -807,7 +809,8 @@ class Homebrew(object):
             return True
         else:
             self.failed = True
-            self.message = 'Package could not be linked: {0}.'.format(self.current_package)
+            self.message = 'Package could not be linked: {0}.'.format(
+                self.current_package)
             raise HomebrewException(self.message)
 
     def _link_packages(self):
@@ -827,7 +830,8 @@ class Homebrew(object):
 
         if not self._current_package_is_installed():
             self.failed = True
-            self.message = 'Package not installed: {0}.'.format(self.current_package)
+            self.message = 'Package not installed: {0}.'.format(
+                self.current_package)
             raise HomebrewException(self.message)
 
         if self.module.check_mode:
@@ -854,7 +858,8 @@ class Homebrew(object):
             return True
         else:
             self.failed = True
-            self.message = 'Package could not be unlinked: {0}.'.format(self.current_package)
+            self.message = 'Package could not be unlinked: {0}.'.format(
+                self.current_package)
             raise HomebrewException(self.message)
 
     def _unlink_packages(self):
@@ -894,7 +899,8 @@ def main():
                 default=False,
                 aliases=["update-brew"],
                 type='bool',
-                deprecated_aliases=[dict(name='update-brew', version='5.0.0', collection_name='community.general')],
+                deprecated_aliases=[
+                    dict(name='update-brew', version='5.0.0', collection_name='community.general')],
             ),
             upgrade_all=dict(
                 default=False,
@@ -916,7 +922,8 @@ def main():
         supports_check_mode=True,
     )
 
-    module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
+    module.run_command_environ_update = dict(
+        LANG='C', LC_ALL='C', LC_MESSAGES='C', LC_CTYPE='C')
 
     p = module.params
 
