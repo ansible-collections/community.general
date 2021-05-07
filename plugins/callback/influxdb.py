@@ -75,7 +75,7 @@ examples: >
   Set the ansible.cfg variable in the callback_influxdb block
     [callback_influxdb]
     INFLUXDB_ADDR = localhost:8086
-    INFLUXDB_DB = test 
+    INFLUXDB_DB = test
     INFLUXDB_TLS = false
 '''
 
