@@ -203,7 +203,7 @@ class Zfs(object):
         for prop in self.properties:
             value = updated_properties.get(prop, None)
             if value is None:
-                self.module.fail_json(msg="zfsprop was not present after being successfully set: " + prop)
+                self.module.fail_json(msg="zfsprop was not present after being successfully set: %s" % prop)
             if current_properties.get(prop, None) != value:
                 self.changed = True
 
