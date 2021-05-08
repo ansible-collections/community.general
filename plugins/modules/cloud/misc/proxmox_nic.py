@@ -224,11 +224,9 @@ def update_nic(module, proxmox, vmid, interface, model, **kwargs):
     vm = get_vm(proxmox, vmid)
 
     if ((interface not in vminfo) or (vminfo[interface] != config_provided)):
-        if not module.check_mode:
-            if proxmox.nodes(vm[0]['node']).qemu(vmid).config.set(**net) is None:
-                return True
-        else:
+        if module.check_mode:
             return True
+        return proxmox.nodes(vm[0]['node']).qemu(vmid).config.set(**net) is None
 
     return False
 
@@ -238,11 +236,9 @@ def delete_nic(module, proxmox, vmid, interface):
     vminfo = proxmox.nodes(vm[0]['node']).qemu(vmid).config.get()
 
     if interface in vminfo:
-        if not module.check_mode:
-            if proxmox.nodes(vm[0]['node']).qemu(vmid).config.set(vmid=vmid, delete=interface) is None:
-                return True
-        else:
+        if module.check_mode:
             return True
+        return proxmox.nodes(vm[0]['node']).qemu(vmid).config.set(vmid=vmid, delete=interface) is None
 
     return False
 
