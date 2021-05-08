@@ -127,6 +127,11 @@ EXAMPLES = '''
     state: present
     install_options: with-baz,enable-debug
 
+- name: Install formula foo with 'brew' from cask
+  community.general.homebrew:
+    name: homebrew/cask/foo
+    state: present
+
 - name: Use ignored-pinned option while upgrading all
   community.general.homebrew:
     upgrade_all: yes
