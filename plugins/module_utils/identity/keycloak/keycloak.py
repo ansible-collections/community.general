@@ -772,20 +772,14 @@ class KeycloakAPI(object):
             if "authenticationExecutions" in config:
                 for newExecutionIndex, newExecution in enumerate(config["authenticationExecutions"], start=0):
                     # Get existing executions on the Keycloak server for this alias
-                    existingExecutions = json.load(
-                        open_url(
-                            URL_AUTHENTICATION_FLOW_EXECUTIONS.format(
-                                url=self.baseurl,
-                                realm=realm,
-                                flowalias=quote(config["alias"])),
-                            method='GET',
-                            headers=self.restheaders))
+                    existingExecutions = self.get_executions_representation(config, realm=realm)
                     executionFound = False
                     # Get flowalias parent if given
                     if "flowAlias" in newExecution:
                         flowAliasParent = newExecution["flowAlias"]
                     else:
                         flowAliasParent = config["alias"]
+                    # Check if same providerId or displayName name between existing and new execution
                     for i, existingExecution in enumerate(existingExecutions, start=0):
                         if ("providerId" in existingExecution and "providerId" in newExecution and
                                 existingExecution["providerId"] == newExecution["providerId"] or
@@ -795,18 +789,6 @@ class KeycloakAPI(object):
                             existingExecutionIndex = i
                             break
                     if executionFound:
-                        # Replace config id of the execution config by it's complete representation
-                        if "authenticationConfig" in existingExecution:
-                            execConfigId = existingExecution["authenticationConfig"]
-                            execConfig = json.load(
-                                open_url(
-                                    URL_AUTHENTICATION_CONFIG.format(
-                                        url=self.baseurl,
-                                        realm=realm,
-                                        id=execConfigId),
-                                    method='GET',
-                                    headers=self.restheaders))
-                            existingExecution["authenticationConfig"] = execConfig
                         # Remove key that doesn't need to be compared with existingExecution
                         newExecutionConfig = newExecution
                         if "flowAlias" in newExecutionConfig:
@@ -815,46 +797,14 @@ class KeycloakAPI(object):
                         if not isDictEquals(newExecutionConfig, existingExecution) or existingExecutionIndex != newExecutionIndex:
                             changed = True
                     elif "providerId" in newExecution:
-                        # Create the new execution
-                        newExec = {}
-                        newExec["provider"] = newExecution["providerId"]
-                        newExec["requirement"] = newExecution["requirement"]
-                        open_url(
-                            URL_AUTHENTICATION_FLOW_EXECUTIONS_EXECUTION.format(
-                                url=self.baseurl,
-                                realm=realm,
-                                flowalias=quote(flowAliasParent)),
-                            method='POST',
-                            headers=self.restheaders,
-                            data=json.dumps(newExec))
+                        self.create_execution(newExecution, flowAlias=flowAliasParent, realm=realm)
                         changed = True
                     elif "displayName" in newExecution:
-                        # Create the new subflow
-                        newSubFlow = {}
-                        newSubFlow["alias"] = newExecution["displayName"]
-                        newSubFlow["provider"] = "registration-page-form"
-                        newSubFlow["type"] = "basic-flow"
-                        open_url(
-                            URL_AUTHENTICATION_FLOW_EXECUTIONS_FLOW.format(
-                                url=self.baseurl,
-                                realm=realm,
-                                flowalias=quote(flowAliasParent)),
-                            method='POST',
-                            headers=self.restheaders,
-                            data=json.dumps(newSubFlow))
+                        self.create_subflow(newExecution["displayName"], flowAliasParent, realm=realm)
                         changed = True
                     if changed:
                         # Get existing executions on the Keycloak server for this alias
-                        existingExecutions = json.load(
-                            open_url(
-                                URL_AUTHENTICATION_FLOW_EXECUTIONS.format(
-                                    url=self.baseurl,
-                                    realm=realm,
-                                    flowalias=quote(config["alias"])),
-                                method='GET',
-                                headers=self.restheaders))
-                        executionFound = False
-                        # Search for execution or flow to update
+                        existingExecutions = self.get_executions_representation(config, realm=realm)
                         for i, existingExecution in enumerate(existingExecutions, start=0):
                             if ("providerId" in existingExecution and "providerId" in newExecution and
                                     existingExecution["providerId"] == newExecution["providerId"] or
@@ -870,50 +820,132 @@ class KeycloakAPI(object):
                             for key in newExecution:
                                 # create the execution configuration
                                 if key == "authenticationConfig":
-                                    # Add the autenticatorConfig to the execution
-                                    open_url(
-                                        URL_AUTHENTICATION_EXECUTION_CONFIG.format(
-                                            url=self.baseurl,
-                                            realm=realm,
-                                            id=existingExecution["id"]),
-                                        method='POST',
-                                        headers=self.restheaders,
-                                        data=json.dumps(newExecution["authenticationConfig"]))
+                                    self.add_authenticationConfig_to_execution(existingExecution["id"], newExecution["authenticationConfig"], realm=realm)
+                                # remove potential flowAlias for the next API call
                                 elif key != "flowAlias":
                                     updatedExec[key] = newExecution[key]
                             if "requirement" in newExecution:
-                                open_url(
-                                    URL_AUTHENTICATION_FLOW_EXECUTIONS.format(
-                                        url=self.baseurl,
-                                        realm=realm,
-                                        flowalias=quote(flowAliasParent)),
-                                    method='PUT',
-                                    headers=self.restheaders,
-                                    data=json.dumps(updatedExec))
-                            if existingExecutionIndex < newExecutionIndex:
-                                diff = newExecutionIndex - existingExecutionIndex
-                                for i in range(diff):
-                                    open_url(
-                                        URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY.format(
-                                            url=self.baseurl,
-                                            realm=realm,
-                                            id=existingExecution["id"]),
-                                        method='POST',
-                                        headers=self.restheaders)
-                            elif existingExecutionIndex > newExecutionIndex:
-                                diff = existingExecutionIndex - newExecutionIndex
-                                for i in range(diff):
-                                    open_url(
-                                        URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY.format(
-                                            url=self.baseurl,
-                                            realm=realm,
-                                            id=existingExecution["id"]),
-                                        method='POST',
-                                        headers=self.restheaders)
+                                self.update_authentication_executions(flowAliasParent, updatedExec, realm=realm)
+                            diff = existingExecutionIndex - newExecutionIndex
+                            self.change_execution_priority(existingExecution["id"], diff, realm=realm)
             return changed
         except Exception as e:
             self.module.fail_json(msg='Could not create or update executions for authentication flow %s in realm %s: %s \n %s'
                                   % (config["alias"], realm, str(e), updatedExec))
+
+    def update_authentication_executions(self, flowAlias, updatedExec, realm='master'):
+        """ Add autenticatorConfig to the execution
+
+        :param executionId: id of execution
+        :param authenticationConfig: config to add to the execution
+        :return: HTTPResponse object on success
+        """
+        try:
+            open_url(
+                URL_AUTHENTICATION_FLOW_EXECUTIONS.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    flowalias=quote(flowAlias)),
+                method='PUT',
+                headers=self.restheaders,
+                data=json.dumps(updatedExec))
+        except Exception as e:
+            self.module.fail_json(msg="Unable to add authenticationConfig %s: %s" % (executionId, str(e)))
+
+    def add_authenticationConfig_to_execution(self, executionId, authenticationConfig, realm='master'):
+        """ Add autenticatorConfig to the execution
+
+        :param executionId: id of execution
+        :param authenticationConfig: config to add to the execution
+        :return: HTTPResponse object on success
+        """
+        try:
+            open_url(
+                URL_AUTHENTICATION_EXECUTION_CONFIG.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    id=executionId),
+                method='POST',
+                headers=self.restheaders,
+                data=json.dumps(authenticationConfig))
+        except Exception as e:
+            self.module.fail_json(msg="Unable to add authenticationConfig %s: %s" % (executionId, str(e)))
+
+    def create_subflow(self, subflowName, flowAlias, realm='master'):
+        """ Create new sublow on the flow
+
+        :param subflowName: name of the subflow to create
+        :param flowAlias: name of the parent flow
+        :return: HTTPResponse object on success
+        """
+        try:
+            newSubFlow = {}
+            newSubFlow["alias"] = subflowName
+            newSubFlow["provider"] = "registration-page-form"
+            newSubFlow["type"] = "basic-flow"
+            open_url(
+                URL_AUTHENTICATION_FLOW_EXECUTIONS_FLOW.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    flowalias=quote(flowAlias)),
+                method='POST',
+                headers=self.restheaders,
+                data=json.dumps(newSubFlow))
+        except Exception as e:
+            self.module.fail_json(msg="Unable to create new subflow %s: %s" % (subflowName, str(e)))
+
+    def create_execution(self, execution, flowAlias, realm='master'):
+        """ Create new execution on the flow
+
+        :param execution: name of execution to create
+        :param flowAlias: name of the parent flow
+        :return: HTTPResponse object on success
+        """
+        try:
+            newExec = {}
+            newExec["provider"] = execution["providerId"]
+            newExec["requirement"] = execution["requirement"]
+            open_url(
+                URL_AUTHENTICATION_FLOW_EXECUTIONS_EXECUTION.format(
+                    url=self.baseurl,
+                    realm=realm,
+                    flowalias=quote(flowAlias)),
+                method='POST',
+                headers=self.restheaders,
+                data=json.dumps(newExec))
+        except Exception as e:
+            self.module.fail_json(msg="Unable to create new execution %s: %s" % (execution["provider"], str(e)))
+
+    def change_execution_priority(self, executionId, diff, realm='master'):
+        """ Raise or lower execution priority of diff time
+
+        :param executionId: id of execution to lower priority
+        :param realm: realm the client is in
+        :param diff: Integer number, raise of diff time if positive lower of diff time if negative
+        :return: HTTPResponse object on success
+        """
+        try:
+            if diff > 0:
+                for i in range(diff):
+                    open_url(
+                        URL_AUTHENTICATION_EXECUTION_RAISE_PRIORITY.format(
+                            url=self.baseurl,
+                            realm=realm,
+                            id=executionId),
+                        method='POST',
+                        headers=self.restheaders)
+            elif diff < 0:
+                for i in range(-diff):
+                    open_url(
+                        URL_AUTHENTICATION_EXECUTION_LOWER_PRIORITY.format(
+                            url=self.baseurl,
+                            realm=realm,
+                            id=executionId),
+                        method='POST',
+                        headers=self.restheaders)
+            return None
+        except Exception as e:
+            self.module.fail_json(msg="Unable to change execution priority %s: %s" % (executionId, str(e)))
 
     def get_executions_representation(self, config, realm='master'):
         """

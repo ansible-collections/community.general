@@ -6,11 +6,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
 module: keycloak_authentication
@@ -18,7 +13,7 @@ short_description: Configure authentication in Keycloak
 description:
     - This module actually can only make a copy of an existing authentication flow, add an execution to it and configure it.
     - It can also delete the flow.
-version_added: "3.0.0"
+version_added: "3.1.0"
 options:
     realm:
         description:
@@ -27,7 +22,7 @@ options:
         type: str
     alias:
         description:
-            - Alias for the authentication flow
+            - Alias for the authentication flow.
         required: true
         type: str
     description:
@@ -50,7 +45,7 @@ options:
             - Configuration structure for the executions.
         required: false
         type: list
-        elements: str
+        elements: dict
         suboptions:
             providerId:
                 description:
@@ -75,7 +70,7 @@ options:
                 type: str
     state:
         description:
-            - Control if the authentication flow must exists or not
+            - Control if the authentication flow must exists or not.
         choices: [ "present", "absent" ]
         default: present
         required: false
@@ -96,7 +91,7 @@ author:
 
 EXAMPLES = '''
     - name: Create an authentication flow from first broker login and add an execution to it.
-      keycloak_authentication:
+      community.general.keycloak_authentication:
         auth_keycloak_url: http://localhost:8080/auth
         auth_sername: admin
         auth_password: password
@@ -195,7 +190,7 @@ def main():
         providerId=dict(type='str'),
         description=dict(type='str'),
         copyFrom=dict(type='str'),
-        authenticationExecutions=dict(type='list', elements='str'),
+        authenticationExecutions=dict(type='list', elements='dict'),
         state=dict(choices=["absent", "present"], default='present'),
         force=dict(type='bool', default=False),
     )
