@@ -142,11 +142,18 @@ except ImportError:
     HAS_PROXMOXER = False
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible.module_utils._text import to_native
 
 
-def get_vmid(proxmox, name):
-    return [vm['vmid'] for vm in proxmox.cluster.resources.get(type='vm') if vm.get('name') == name]
+def get_vmid(module, proxmox, name):
+    try:
+        vms = [vm['vmid'] for vm in proxmox.cluster.resources.get(type='vm') if vm.get('name') == name]
+    except Exception:
+        module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
+
+    if len(vms) > 1:
+        module.fail_json(msg='Multiple VMs found with name: %s, provide vmid instead' % name)
+
+    return vms
 
 
 def get_vm(proxmox, vmid):
@@ -303,10 +310,7 @@ def main():
 
     # If vmid is not defined then retrieve its value from the vm name,
     if not vmid:
-        try:
-            vmid = get_vmid(proxmox, name)[0]
-        except Exception:
-            module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
+        vmid = get_vmid(module, proxmox, name)[0]
 
     # Ensure VM id exists
     if not get_vm(proxmox, vmid):
@@ -335,7 +339,7 @@ def main():
             if delete_nic(module, proxmox, vmid, interface):
                 module.exit_json(changed=True, vmid=vmid, msg="Nic {0} deleted on VM with vmid {1}".format(interface, vmid))
             else:
-                module.exit_json(vmid=vmid, msg="Nic {0} does not exit on Vm with vmid {1}".format(interface, vmid))
+                module.exit_json(vmid=vmid, msg="Nic {0} does not exist on VM with vmid {1}".format(interface, vmid))
         except Exception as e:
             module.fail_json(vmid=vmid, msg='Unable to delete nic {0} on VM with vmid {1}: '.format(interface, vmid) + str(e))
 
