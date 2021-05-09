@@ -114,7 +114,7 @@ EXAMPLES = '''
         state: present
 
     - name: Re-create the authentication flow
-      keycloak_authentication:
+      community.general.keycloak_authentication:
         auth_keycloak_url: http://localhost:8080/auth
         auth_sername: admin
         auth_password: password
@@ -132,7 +132,7 @@ EXAMPLES = '''
         force: yes
 
     - name: Create an authentication flow with subflow containing an execution.
-      keycloak_authentication:
+      community.general.keycloak_authentication:
         auth_keycloak_url: http://localhost:8080/auth
         auth_sername: admin
         auth_password: password
@@ -150,7 +150,7 @@ EXAMPLES = '''
         state: present
 
     - name: Remove authentication.
-      keycloak_authentication:
+      community.general.keycloak_authentication:
         auth_keycloak_url: http://localhost:8080/auth
         auth_sername: admin
         auth_password: password

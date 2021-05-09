@@ -172,26 +172,26 @@ def isDictEquals(dict1, dict2, exclude=None):
             Return True if all element of dict 1 are present in dict 2, return false otherwise.
     """
     try:
-        if type(dict1) is list and type(dict2) is list:
+        if isinstance(dict1, list) and isinstance(dict2, list):
             if len(dict1) == 0 and len(dict2) == 0:
                 return True
             found = False
             for item1 in dict1:
                 found = False
-                if type(item1) is list:
+                if isinstance(item1, list):
                     found1 = False
                     for item2 in dict2:
                         if isDictEquals(item1, item2, exclude):
                             found1 = True
-                    if found1:
-                        found = True
-                elif type(item1) is dict:
+                    if not found1:
+                        return False
+                elif isinstance(item1, dict):
                     found1 = False
                     for item2 in dict2:
                         if isDictEquals(item1, item2, exclude):
                             found1 = True
-                    if found1:
-                        found = True
+                    if not found1:
+                        return False
                 else:
                     if item1 not in dict2:
                         return False
@@ -834,10 +834,10 @@ class KeycloakAPI(object):
                                   % (config["alias"], realm, str(e), updatedExec))
 
     def update_authentication_executions(self, flowAlias, updatedExec, realm='master'):
-        """ Add autenticatorConfig to the execution
+        """ Update authentication executions
 
-        :param executionId: id of execution
-        :param authenticationConfig: config to add to the execution
+        :param flowAlias: name of the parent flow
+        :param updatedExec: JSON containing updated execution
         :return: HTTPResponse object on success
         """
         try:
@@ -850,7 +850,7 @@ class KeycloakAPI(object):
                 headers=self.restheaders,
                 data=json.dumps(updatedExec))
         except Exception as e:
-            self.module.fail_json(msg="Unable to add authenticationConfig %s: %s" % (executionId, str(e)))
+            self.module.fail_json(msg="Unable to update executions %s: %s" % (updatedExec, str(e)))
 
     def add_authenticationConfig_to_execution(self, executionId, authenticationConfig, realm='master'):
         """ Add autenticatorConfig to the execution
@@ -943,7 +943,6 @@ class KeycloakAPI(object):
                             id=executionId),
                         method='POST',
                         headers=self.restheaders)
-            return None
         except Exception as e:
             self.module.fail_json(msg="Unable to change execution priority %s: %s" % (executionId, str(e)))
 
