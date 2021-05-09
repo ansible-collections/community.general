@@ -1,0 +1,2 @@
+bugfixes:
+- "stackpath_compute inventory script - fix broken validation checks for client ID and client secret (https://github.com/ansible-collections/community.general/pull/2448)."

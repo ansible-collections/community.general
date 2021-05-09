@@ -102,13 +102,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             raise AnsibleError("plugin doesn't match this plugin")
         try:
             client_id = config['client_id']
-            if client_id != 32:
+            if len(client_id) != 32:
                 raise AnsibleError("client_id must be 32 characters long")
         except KeyError:
             raise AnsibleError("config missing client_id, a required option")
         try:
             client_secret = config['client_secret']
-            if client_secret != 64:
+            if len(client_secret) != 64:
                 raise AnsibleError("client_secret must be 64 characters long")
         except KeyError:
             raise AnsibleError("config missing client_id, a required option")
