@@ -1,1 +1,0 @@
-./clustering/pacemaker/pacemaker_resource_group.py

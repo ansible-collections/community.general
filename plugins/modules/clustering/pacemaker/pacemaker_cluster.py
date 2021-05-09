@@ -46,7 +46,7 @@ options:
       description:
         - Force the change of the cluster state
       type: bool
-      default: 'yes'
+      default: true
     properties:
       description:
         - Properties to be applied onto the pacemaker cluster
@@ -55,7 +55,7 @@ options:
       description:
         - Enable automatic cluster startup on the specified nodes
       type: bool
-      default: 'yes'
+      default: true
 '''
 EXAMPLES = '''
 ---
