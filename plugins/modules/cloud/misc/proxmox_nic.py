@@ -13,12 +13,12 @@ module: proxmox_nic
 short_description: Management of NIC's for Qemu(KVM) VM's in a Proxmox VE cluster.
 version_added: 3.1.0
 description:
-  - Allows you to create/update/delete NIC's on Qemu(KVM) Virtual Machines in a Proxmox VE cluster.
+  - Allows you to create/update/delete a NIC on Qemu(KVM) Virtual Machines in a Proxmox VE cluster.
 author: "Lammert Hellinga (@Kogelvis) <lammert@hellinga.it>"
 options:
   bridge:
     description:
-      - Add this interface to the specified bridge device. The Proxmox VE standard bridge is called C(vmbr0).
+      - Add this interface to the specified bridge device. The Proxmox VE default bridge is called C(vmbr0).
     type: str
   firewall:
     description:
@@ -147,13 +147,15 @@ from ansible.module_utils.basic import AnsibleModule, env_fallback
 def get_vmid(module, proxmox, name):
     try:
         vms = [vm['vmid'] for vm in proxmox.cluster.resources.get(type='vm') if vm.get('name') == name]
-    except Exception:
-        module.fail_json(msg='VM with name = %s does not exist in cluster' % name)
+    except Exception as e:
+        module.fail_json(msg='Error: %s occurred while retrieving VM with name = %s' % (e, name))
 
-    if len(vms) > 1:
+    if not vms:
+        module.fail_json(msg='No VM found with name: %s' % name)
+    elif len(vms) > 1:
         module.fail_json(msg='Multiple VMs found with name: %s, provide vmid instead' % name)
 
-    return vms
+    return vms[0]
 
 
 def get_vm(proxmox, vmid):
@@ -310,7 +312,7 @@ def main():
 
     # If vmid is not defined then retrieve its value from the vm name,
     if not vmid:
-        vmid = get_vmid(module, proxmox, name)[0]
+        vmid = get_vmid(module, proxmox, name)
 
     # Ensure VM id exists
     if not get_vm(proxmox, vmid):
