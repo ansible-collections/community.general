@@ -17,8 +17,8 @@ description:
 author: Christian Wollinger (@cwollinger)
 seealso:
   - name: API documentation
-      description: Documentation for Discord API
-      link: https://discord.com/developers/docs/resources/webhook#execute-webhook
+    description: Documentation for Discord API
+    link: https://discord.com/developers/docs/resources/webhook#execute-webhook
 options:
   webhook_id:
     description:
