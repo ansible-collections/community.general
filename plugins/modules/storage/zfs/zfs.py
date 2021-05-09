@@ -39,7 +39,7 @@ options:
     type: dict
 notes:
   - C(check_mode) is supported, but in certain situations it may report a task
-    as changed that would not reported as changed if C(check_mode) were disabled.
+    as changed that will not be reported as changed when C(check_mode) is disabled.
     For example, this might occur when the zpool C(altroot) option is set or when
     a size is written using human-readable notation, such as C(1M) or C(1024K),
     instead of as an unqualified byte count, such as C(1048576).
