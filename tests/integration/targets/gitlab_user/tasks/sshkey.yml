@@ -10,6 +10,7 @@
     email: "{{ gitlab_user_email }}"
     name: "{{ gitlab_user }}"
     username: "{{ gitlab_user }}"
+    password: "{{ gitlab_user_pass }}"
     validate_certs: false
     sshkey_name: "{{ gitlab_sshkey_name }}"
     sshkey_file: "{{ gitlab_sshkey_file }}"
@@ -28,6 +29,7 @@
     email: "{{ gitlab_user_email }}"
     name: "{{ gitlab_user }}"
     username: "{{ gitlab_user }}"
+    password: "{{ gitlab_user_pass }}"
     validate_certs: false
     sshkey_name: "{{ gitlab_sshkey_name }}"
     sshkey_file: "{{ gitlab_sshkey_file }}"
@@ -62,6 +64,7 @@
     email: "{{ gitlab_user_email }}"
     name: "{{ gitlab_user }}"
     username: "{{ gitlab_user }}"
+    password: "{{ gitlab_user_pass }}"
     validate_certs: false
     sshkey_name: "{{ gitlab_sshkey_name }}"
     sshkey_file: "{{ gitlab_sshkey_file }}"
@@ -81,6 +84,7 @@
     email: "{{ gitlab_user_email }}"
     name: "{{ gitlab_user }}"
     username: "{{ gitlab_user }}"
+    password: "{{ gitlab_user_pass }}"
     validate_certs: false
     sshkey_name: "{{ gitlab_sshkey_name }}"
     sshkey_file: "{{ gitlab_sshkey_file }}"
