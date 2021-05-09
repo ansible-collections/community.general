@@ -10,29 +10,31 @@ __metaclass__ = type
 DOCUMENTATION = '''
 ---
 module: discord
-short_description: Send discord messages
+short_description: Send Discord messages
 version_added: 3.1.0
 description:
-  - Send a messages to a discord channel via the discord webhook API.
+  - Sends a message to a Discord channel using the Discord webhook API.
 author: Christian Wollinger (@cwollinger)
-notes:
-  - "Find the API documentation for Discord API here: U(https://discord.com/developers/docs/resources/webhook#execute-webhook)."
+seealso:
+  - name: API documentation
+      description: Documentation for Discord API
+      link: https://discord.com/developers/docs/resources/webhook#execute-webhook
 options:
   webhook_id:
     description:
       - The webhook ID.
-      - "Format from discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token})."
+      - "Format from Discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token})."
     required: yes
     type: str
   webhook_token:
     description:
-      - The webhook Token.
-      - "Format from discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token})."
+      - The webhook token.
+      - "Format from Discord webhook URL: C(/webhooks/{webhook.id}/{webhook.token})."
     required: yes
     type: str
   content:
     description:
-      - Content of the message to the discord channel.
+      - Content of the message to the Discord channel.
       - At least one of I(content) and I(embeds) must be specified.
     type: str
   username:
@@ -45,12 +47,12 @@ options:
     type: str
   tts:
     description:
-      - Set this to C(true) if this is a TTS (Test to Speech) message.
+      - Set this to C(true) if this is a TTS (Text to Speech) message.
     type: bool
     default: false
   embeds:
     description:
-      - Send messages as Embeds to the discord channel.
+      - Send messages as Embeds to the Discord channel.
       - Embeds can have a colored border, embedded images, text fields and more.
       - "Allowed parameters are described in the Discord Docs: U(https://discord.com/developers/docs/resources/channel#embed-object)"
       - At least one of I(content) and I(embeds) must be specified.
@@ -59,13 +61,13 @@ options:
 '''
 
 EXAMPLES = """
-- name: Send a message to the discord channel
+- name: Send a message to the Discord channel
   community.general.discord:
     webhook_id: "00000"
     webhook_token: "XXXYYY"
     content: "This is a message from ansible"
 
-- name: Send a message to the discord channel with specific username and avatar
+- name: Send a message to the Discord channel with specific username and avatar
   community.general.discord:
     webhook_id: "00000"
     webhook_token: "XXXYYY"
@@ -73,7 +75,7 @@ EXAMPLES = """
     username: Ansible
     avatar_url: "https://docs.ansible.com/ansible/latest/_static/images/logo_invert.png"
 
-- name: Send a embedded message to the discord channel
+- name: Send a embedded message to the Discord channel
   community.general.discord:
     webhook_id: "00000"
     webhook_token: "XXXYYY"
@@ -112,7 +114,7 @@ EXAMPLES = """
 RETURN = """
 http_code:
   description:
-    - Response Code returned by discord API.
+    - Response Code returned by Discord API.
   returned: always
   type: int
   sample: 204
