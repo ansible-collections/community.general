@@ -83,17 +83,7 @@ RETURN = '''
 changed:
     description: True if the cluster state has changed
     type: bool
-    returned: always
-out:
-    description: The output of the current state of the cluster. It return a
-                 list of the nodes state.
-    type: str
-    sample: 'out: [["  overcloud-controller-0", " Online"]]}'
-    returned: always
-rc:
-    description: exit code of the module
-    type: bool
-    returned: always
+    returned: success
 '''
 
 import time
@@ -226,6 +216,8 @@ def create_cluster(module, timeout, name, cluster_nodes, pcs_user, pcs_password,
 
     # if the cluster needs to be created, no need to check existing config
     if len(existing_name) == 0:
+        if module.check_mode:
+            module.exit_json(changed=changed)
         # first authenticate with all nodes
         authenticate_nodes(module, nodes, pcs_user, pcs_password)
         cmd = "pcs cluster setup %s --start %s" % (name, " ".join(nodes))
@@ -242,6 +234,8 @@ def create_cluster(module, timeout, name, cluster_nodes, pcs_user, pcs_password,
         # if cluster is offline but with same name, start it up to configure it
         if status == 'offline':
             changed = True
+            if module.check_mode:
+                module.exit_json(changed=changed)
             set_cluster(module, 'online', timeout, False)
             cmd = "pcs config"
             rc, out, err = module.run_command(cmd)
@@ -261,6 +255,8 @@ def create_cluster(module, timeout, name, cluster_nodes, pcs_user, pcs_password,
         # if there are still nodes unaccounted for, add them to the cluster
         if len(nodes) > 0:
             changed = True
+            if module.check_mode:
+                module.exit_json(changed=changed)
             authenticate_nodes(module, nodes, pcs_user, pcs_password)
             for node in nodes:
                 cmd = "pcs cluster node add --start %s" % node
@@ -280,6 +276,8 @@ def create_cluster(module, timeout, name, cluster_nodes, pcs_user, pcs_password,
 
         if len(properties) > 0:
             changed = True
+            if module.check_mode:
+                module.exit_json(changed=changed)
             cmd = "pcs property set %s" % " ".join(["%s=%s" % props for props in properties.items()])
             rc, out, err = module.run_command(cmd)
             if rc == 1:
@@ -294,7 +292,6 @@ def clean_cluster(module, timeout):
     rc, out, err = module.run_command(cmd)
     if rc == 1:
         module.fail_json(msg="Command execution failed.\nCommand: `%s`\nError: %s" % (cmd, err))
-
 
 def main():
     argument_spec = dict(
@@ -333,6 +330,8 @@ def main():
             if state == 'online':
                 if cluster_state == 'offline':
                     changed = True
+                    if module.check_mode:
+                        module.exit_json(changed=changed)
                     # start them all
                     set_nodes(module, state, nodes, timeout, force)
                 else:
@@ -340,15 +339,21 @@ def main():
                     online_nodes, offline_nodes = get_nodes_status(module)
                     if len(online_nodes) < len(nodes):
                         changed = True
+                        if module.check_mode:
+                            module.exit_json(changed=changed)
                         set_nodes(module, state, nodes, timeout, force)
             elif state == 'offline':
                 # cluster must still be online otherwise we wouldn't be here
                 # so no need to check node status just stop all nodes
                 changed = True
+                if module.check_mode:
+                    module.exit_json(changed=changed)
                 set_nodes(module, state, nodes, timeout, force)
 
     if state in ['restart']:
         changed = True
+        if module.check_mode:
+            module.exit_json(changed=changed)
         set_cluster(module, 'offline', timeout, force)
         cluster_state = get_cluster_status(module)
         if cluster_state == 'offline':
@@ -361,6 +366,8 @@ def main():
 
     if state in ['cleanup']:
         changed = True
+        if module.check_mode:
+            module.exit_json(changed=changed)
         clean_cluster(module, timeout)
         cluster_state = get_cluster_status(module)
 
