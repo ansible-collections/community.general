@@ -73,7 +73,7 @@ options:
       - List of options to be passed to mkfs command.
     type: str
 requirements:
-  - Uses tools related to the I(fstype) (C(mkfs)) and C(blkid) command.
+  - Uses tools related to the I(fstype) (C(mkfs)) and the C(blkid) command.
   - When I(resizefs) is enabled, C(blockdev) command is required too.
 notes:
   - Potential filesystem on I(dev) are checked using C(blkid). In case C(blkid)
