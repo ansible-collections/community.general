@@ -234,7 +234,7 @@ def create_cluster(module, timeout, name, cluster_nodes, pcs_user, pcs_password,
             # if the cluster is up but still failed to get cluster config => error
             module.fail_json(msg="Failed to set cluster properties.\nCommand: `%s`\nError: %s" % (cmd, err))
         return True
-    else::
+    else:
         # if cluster is offline but with same name, start it up to configure it
         if status == 'offline':
             changed = True
