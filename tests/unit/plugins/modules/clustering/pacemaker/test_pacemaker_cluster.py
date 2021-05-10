@@ -104,7 +104,7 @@ class TestPacemakerClusterModule(ModuleTestCase):
         self.property_call_count = 0
         self.property_call = ""
         self.start_call_count = 0
-        self.start_calls = ""
+        self.start_calls = []
         self.auth_call_count = 0
         self.auth_call = 0
         self.add_nodes_call_count = 0
@@ -139,7 +139,8 @@ class TestPacemakerClusterModule(ModuleTestCase):
             return (0, "", "")
         elif cmd.startswith("pcs cluster status"):
             if not(initial_status in [ClusterStatus.DOWN, ClusterStatus.DOESNT_EXIST]) or \
-                initial_status == ClusterStatus.DOESNT_EXIST and self.create_call_count > 0:
+                initial_status == ClusterStatus.DOESNT_EXIST and self.create_call_count > 0 or \
+                initial_status == ClusterStatus.DOWN and "pcs cluster start" in self.start_calls:
                 return (0, status_ok, "")
             else:
                 return (1, "", _PCS_NO_CLUSTER)
@@ -160,7 +161,8 @@ class TestPacemakerClusterModule(ModuleTestCase):
             # output when adding nodes isn't really needed
             return (0, "", "")
         elif cmd.startswith("pcs cluster start"):
-            self.start_calls += cmd
+            self.start_call_count += 1
+            self.start_calls += (cmd,)
             # output when starting nodes isn't really needed
             return (0, "", "")
 
@@ -255,7 +257,7 @@ class TestPacemakerClusterModule(ModuleTestCase):
         # make sure the right number of pcs calls were made
         self.assertEqual(self.create_call_count, 0)
         self.assertEqual(self.auth_call_count, 0)
-        self.assertEqual(self.property_call_count, 0)
+        self.assertEqual(self.property_call_count, 1)
         self.assertEqual(self.add_nodes_call_count, 0)
         self.assertEqual(self.start_call_count, 1)
         # and make sure the start command was called correctly
