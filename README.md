@@ -7,6 +7,8 @@ This repo contains the `community.general` Ansible Collection. The collection in
 
 You can find [documentation for this collection on the Ansible docs site](https://docs.ansible.com/ansible/latest/collections/community/general/).
 
+Please note that this collection does **not** support Windows targets. Only connection plugins included in this collection might support Windows targets, and will explicitly mention that in their documentation if they do so.
+
 ## Tested with Ansible
 
 Tested with the current Ansible 2.9, ansible-base 2.10 and ansible-core 2.11 releases and the current development version of ansible-core. Ansible versions before 2.9.10 are not supported.
