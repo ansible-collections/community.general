@@ -57,7 +57,7 @@ options:
     type: str
   sshkey_name:
     description:
-      - The name of the sshkey.
+      - The name of the SSH public key.
     type: str
   sshkey_file:
     description:
@@ -66,7 +66,7 @@ options:
   sshkey_expires_at:
     description:
       - The expiration date of the SSH key in ISO 8601 format C(YYYY-MM-DDTHH:MM:SSZ).
-      - It does not get added on an already present ssh key.
+      - This is only used when adding new SSH keys.
     type: str
     version_added: 3.1.0
   group:
