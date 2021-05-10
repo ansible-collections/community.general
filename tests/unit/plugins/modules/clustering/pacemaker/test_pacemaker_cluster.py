@@ -104,6 +104,7 @@ class TestPacemakerClusterModule(ModuleTestCase):
         self.property_call_count = 0
         self.property_call = ""
         self.start_call_count = 0
+        self.start_calls = ""
         self.auth_call_count = 0
         self.auth_call = 0
         self.add_nodes_call_count = 0
@@ -121,7 +122,7 @@ class TestPacemakerClusterModule(ModuleTestCase):
         # where needed for assertions, keep track of # of times pcs commands were called
         if cmd.startswith("pcs config"):
             # special case where cluster WAS down but was started up
-            if initial_status == ClusterStatus.DOWN and self.start_call_count > 0:
+            if initial_status == ClusterStatus.DOWN and "pcs cluster start" in self.start_calls:
                 return (0, configs[ClusterStatus.OK], "")
             elif initial_status == ClusterStatus.DOESNT_EXIST and self.create_call_count > 0:
                 return (0, configs[ClusterStatus.OK], "")
@@ -157,6 +158,10 @@ class TestPacemakerClusterModule(ModuleTestCase):
             self.add_nodes_call_count += 1
             self.add_nodes_calls += (cmd,)
             # output when adding nodes isn't really needed
+            return (0, "", "")
+        elif cmd.startswith("pcs cluster start"):
+            self.start_calls += cmd
+            # output when starting nodes isn't really needed
             return (0, "", "")
 
     def test_new_cluster(self):
@@ -229,6 +234,32 @@ class TestPacemakerClusterModule(ModuleTestCase):
         self.assertTrue(re.search(r'pcs host auth host3 host4 -u dummy_user -p dummy_pass', self.auth_call) is not None)
         self.assertTrue('pcs cluster node add --start host3' in self.add_nodes_calls)
         self.assertTrue('pcs cluster node add --start host4' in self.add_nodes_calls)
+
+    def test_cluster_down(self):
+        set_module_args({
+            'name': 'lbcluster',
+            'state': 'online',
+            'nodes': ['host1', 'host2'],
+            'pcs_user': 'dummy_user',
+            'pcs_password': 'dummy_pass',
+            'properties': {'prop1': 'prop1val', 'prop2': 'prop2val'},
+            'force': False,
+        })
+
+        self.initial_status = ClusterStatus.DOWN
+
+        with patch.object(basic.AnsibleModule, 'run_command', side_effect=self.fake_run_command) as run_command:
+            with self.assertRaises(AnsibleExitJson) as result:
+                self.module.main()
+
+        # make sure the right number of pcs calls were made
+        self.assertEqual(self.create_call_count, 0)
+        self.assertEqual(self.auth_call_count, 0)
+        self.assertEqual(self.property_call_count, 0)
+        self.assertEqual(self.add_nodes_call_count, 0)
+        self.assertEqual(self.start_call_count, 1)
+        # and make sure the start command was called correctly
+        self.assertTrue('pcs cluster start' in self.start_calls)
 
     def test_without_required_parameters(self):
         """Failure must occur when any required parameters are missing"""

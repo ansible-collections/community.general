@@ -84,6 +84,11 @@ changed:
     description: True if the cluster state has changed
     type: bool
     returned: success
+out:
+    description: The state of the cluster after the cluster operations
+                 are performed.
+    type: str
+    returned: success
 '''
 
 import time
@@ -94,7 +99,6 @@ from ansible.module_utils.basic import AnsibleModule
 
 _PCS_CLUSTER_DOWN = "Error: cluster is not currently running on this node"
 _PCS_NO_CLUSTER = "Error: unable to get crm_config"
-
 
 def get_cluster_status(module):
     cmd = "pcs cluster status"
@@ -230,7 +234,7 @@ def create_cluster(module, timeout, name, cluster_nodes, pcs_user, pcs_password,
             # if the cluster is up but still failed to get cluster config => error
             module.fail_json(msg="Failed to set cluster properties.\nCommand: `%s`\nError: %s" % (cmd, err))
         return True
-    else:
+    else::
         # if cluster is offline but with same name, start it up to configure it
         if status == 'offline':
             changed = True
@@ -369,10 +373,17 @@ def main():
         if module.check_mode:
             module.exit_json(changed=changed)
         clean_cluster(module, timeout)
-        cluster_state = get_cluster_status(module)
 
-    module.exit_json(changed=changed)
-
+    # get cluster and node status for output
+    cluster_state = get_cluster_status(module)
+    out = "%s: [%s]\n" % (name, cluster_state)
+    if cluster_state != 'offline':
+        online_nodes, offline_nodes = get_nodes_status(module)
+        for online_node in online_nodes:
+            out += "%s: [online]\n"
+        for offline_node in offline_nodes:
+            out += "%s: [offline]\n"
+    module.exit_json(changed=changed, out=out)
 
 if __name__ == '__main__':
     main()
