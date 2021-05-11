@@ -152,10 +152,10 @@ class Device(object):
 class Filesystem(object):
 
     MKFS = None
-    MKFS_FORCE_FLAGS = ''
+    MKFS_FORCE_FLAGS = []
     INFO = None
     GROW = None
-    GROW_MAX_SPACE_FLAGS = ''
+    GROW_MAX_SPACE_FLAGS = []
     GROW_MOUNTPOINT_ONLY = False
 
     LANG_ENV = {'LANG': 'C', 'LC_ALL': 'C', 'LC_MESSAGES': 'C'}
@@ -180,10 +180,7 @@ class Filesystem(object):
             return
 
         mkfs = self.module.get_bin_path(self.MKFS, required=True)
-        cmd = [mkfs] + self.MKFS_FORCE_FLAGS.split()
-        if opts is not None:
-            cmd += opts.split()
-        cmd += [str(dev)]
+        cmd = [mkfs] + self.MKFS_FORCE_FLAGS + opts + [str(dev)]
         self.module.run_command(cmd, check_rc=True)
 
     def wipefs(self, dev):
@@ -202,8 +199,7 @@ class Filesystem(object):
     def grow_cmd(self, target):
         """Build and return the resizefs commandline as list."""
         cmdline = [self.module.get_bin_path(self.GROW, required=True)]
-        cmdline += self.GROW_MAX_SPACE_FLAGS.split()
-        cmdline += [target]
+        cmdline += self.GROW_MAX_SPACE_FLAGS + [target]
         return cmdline
 
     def grow(self, dev):
@@ -236,7 +232,7 @@ class Filesystem(object):
 
 
 class Ext(Filesystem):
-    MKFS_FORCE_FLAGS = '-F'
+    MKFS_FORCE_FLAGS = ['-F']
     INFO = 'tune2fs'
     GROW = 'resize2fs'
 
@@ -273,7 +269,7 @@ class Ext4(Ext):
 
 class XFS(Filesystem):
     MKFS = 'mkfs.xfs'
-    MKFS_FORCE_FLAGS = '-f'
+    MKFS_FORCE_FLAGS = ['-f']
     INFO = 'xfs_info'
     GROW = 'xfs_growfs'
     GROW_MOUNTPOINT_ONLY = True
@@ -312,7 +308,7 @@ class XFS(Filesystem):
 
 class Reiserfs(Filesystem):
     MKFS = 'mkfs.reiserfs'
-    MKFS_FORCE_FLAGS = '-q'
+    MKFS_FORCE_FLAGS = ['-q']
 
 
 class Btrfs(Filesystem):
@@ -329,16 +325,16 @@ class Btrfs(Filesystem):
         if match:
             # v0.20-rc1 doesn't have --force parameter added in following version v3.12
             if LooseVersion(match.group(1)) >= LooseVersion('3.12'):
-                self.MKFS_FORCE_FLAGS = '-f'
+                self.MKFS_FORCE_FLAGS = ['-f']
         else:
             # assume version is greater or equal to 3.12
-            self.MKFS_FORCE_FLAGS = '-f'
+            self.MKFS_FORCE_FLAGS = ['-f']
             self.module.warn('Unable to identify mkfs.btrfs version (%r, %r)' % (stdout, stderr))
 
 
 class Ocfs2(Filesystem):
     MKFS = 'mkfs.ocfs2'
-    MKFS_FORCE_FLAGS = '-Fx'
+    MKFS_FORCE_FLAGS = ['-Fx']
 
 
 class F2fs(Filesystem):
@@ -357,7 +353,7 @@ class F2fs(Filesystem):
             # Since 1.9.0, mkfs.f2fs check overwrite before make filesystem
             # before that version -f switch wasn't used
             if LooseVersion(match.group(1)) >= LooseVersion('1.9.0'):
-                self.MKFS_FORCE_FLAGS = '-f'
+                self.MKFS_FORCE_FLAGS = ['-f']
 
     def get_fs_size(self, dev):
         """Get sector size and total FS sectors and return their product."""
@@ -382,7 +378,7 @@ class F2fs(Filesystem):
 class VFAT(Filesystem):
     INFO = 'fatresize'
     GROW = 'fatresize'
-    GROW_MAX_SPACE_FLAGS = '-s max'
+    GROW_MAX_SPACE_FLAGS = ['-s', 'max']
 
     def __init__(self, module):
         super(VFAT, self).__init__(module)
@@ -409,7 +405,7 @@ class VFAT(Filesystem):
 
 class LVM(Filesystem):
     MKFS = 'pvcreate'
-    MKFS_FORCE_FLAGS = '-f'
+    MKFS_FORCE_FLAGS = ['-f']
     INFO = 'pvs'
     GROW = 'pvresize'
 
@@ -423,7 +419,7 @@ class LVM(Filesystem):
 
 class Swap(Filesystem):
     MKFS = 'mkswap'
-    MKFS_FORCE_FLAGS = '-f'
+    MKFS_FORCE_FLAGS = ['-f']
 
 
 FILESYSTEMS = {
@@ -472,6 +468,10 @@ def main():
     force = module.params['force']
     resizefs = module.params['resizefs']
 
+    mkfs_opts = []
+    if opts is not None:
+        mkfs_opts = opts.split()
+
     changed = False
 
     if not os.path.exists(dev):
@@ -514,7 +514,7 @@ def main():
             module.fail_json(msg="'%s' is already used as %s, use force=yes to overwrite" % (dev, fs), rc=rc, err=err)
 
         # create fs
-        filesystem.create(opts, dev)
+        filesystem.create(mkfs_opts, dev)
         changed = True
 
     elif fs:
