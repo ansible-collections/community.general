@@ -123,13 +123,14 @@ class Device(object):
         statinfo = os.stat(self.path)
         if stat.S_ISBLK(statinfo.st_mode):
             blockdev_cmd = self.module.get_bin_path("blockdev", required=True)
-            dummy, devsize_in_bytes, dummy = self.module.run_command([blockdev_cmd, "--getsize64", self.path], check_rc=True)
+            dummy, out, dummy = self.module.run_command([blockdev_cmd, "--getsize64", self.path], check_rc=True)
+            devsize_in_bytes = int(out)
         elif os.path.isfile(self.path):
             devsize_in_bytes = os.path.getsize(self.path)
         else:
             self.module.fail_json(changed=False, msg="Target device not supported: %s" % self)
 
-        return int(devsize_in_bytes)
+        return devsize_in_bytes
 
     def get_mountpoint(self):
         """Return (first) mountpoint of device. Returns None when not mounted."""
