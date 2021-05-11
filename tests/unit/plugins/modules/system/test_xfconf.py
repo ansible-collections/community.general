@@ -21,7 +21,7 @@ def patch_xfconf(mocker):
     """
     Function used for mocking some parts of redhat_subscribtion module
     """
-    mocker.patch('ansible_collections.community.general.plugins.module_utils.module_helper.AnsibleModule.get_bin_path',
+    mocker.patch('ansible_collections.community.general.plugins.module_utils.mh.module_helper.AnsibleModule.get_bin_path',
                  return_value='/testbin/xfconf-query')
 
 
@@ -332,7 +332,7 @@ def test_xfconf(mocker, capfd, patch_xfconf, testcase):
     # Mock function used for running commands first
     call_results = [item[2] for item in testcase['run_command.calls']]
     mock_run_command = mocker.patch(
-        'ansible_collections.community.general.plugins.module_utils.module_helper.AnsibleModule.run_command',
+        'ansible_collections.community.general.plugins.module_utils.mh.module_helper.AnsibleModule.run_command',
         side_effect=call_results)
 
     # Try to run test case
