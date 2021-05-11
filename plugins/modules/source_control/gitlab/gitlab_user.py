@@ -310,15 +310,13 @@ class GitLabUser(object):
                 return True
 
             try:
-                if sshkey['expires_at'] is None:
-                    user.keys.create({
-                        'title': sshkey['name'],
-                        'key': sshkey['file']})
-                else:
-                    user.keys.create({
-                        'title': sshkey['name'],
-                        'key': sshkey['file'],
-                        'expires_at': sshkey['expires_at']})
+                parameter = {
+                    'title': sshkey['name'],
+                    'key': sshkey['file'],
+                }
+                if sshkey['expires_at'] is not None:
+                    parameter['expires_at'] = sshkey['expires_at']
+                user.keys.create(parameter)
             except gitlab.exceptions.GitlabCreateError as e:
                 self._module.fail_json(msg="Failed to assign sshkey to user: %s" % to_native(e))
             return True
