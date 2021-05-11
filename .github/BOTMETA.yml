@@ -142,6 +142,9 @@ files:
   $module_utils/memset.py:
     maintainers: glitchcrab
     labels: cloud memset
+  $module_utils/mh/:
+    maintainers: russoz
+    labels: module_helper
   $module_utils/module_helper.py:
     maintainers: russoz
     labels: module_helper
