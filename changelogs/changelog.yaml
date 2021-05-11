@@ -1010,3 +1010,17 @@ releases:
     - 2435-one_vm-fix_missing_keys.yml
     - 3.0.1.yml
     release_date: '2021-05-04'
+  3.0.2:
+    changes:
+      bugfixes:
+      - stackpath_compute inventory script - fix broken validation checks for client
+        ID and client secret (https://github.com/ansible-collections/community.general/pull/2448).
+      - zfs - certain ZFS properties, especially sizes, would lead to a task being
+        falsely marked as "changed" even when no actual change was made (https://github.com/ansible-collections/community.general/issues/975,
+        https://github.com/ansible-collections/community.general/pull/2454).
+      release_summary: Bugfix release for the first Ansible 4.0.0 release candidate.
+    fragments:
+    - 2448-stackpath_compute-fix.yml
+    - 2454-detect_zfs_changed.yml
+    - 3.0.2.yml
+    release_date: '2021-05-11'

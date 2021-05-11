@@ -6,6 +6,20 @@ Community General Release Notes
 
 This changelog describes changes after version 2.0.0.
 
+v3.0.2
+======
+
+Release Summary
+---------------
+
+Bugfix release for the first Ansible 4.0.0 release candidate.
+
+Bugfixes
+--------
+
+- stackpath_compute inventory script - fix broken validation checks for client ID and client secret (https://github.com/ansible-collections/community.general/pull/2448).
+- zfs - certain ZFS properties, especially sizes, would lead to a task being falsely marked as "changed" even when no actual change was made (https://github.com/ansible-collections/community.general/issues/975, https://github.com/ansible-collections/community.general/pull/2454).
+
 v3.0.1
 ======
 
