@@ -1,0 +1,179 @@
+---
+- name: Test 1
+  set_fact:
+    loop_result: >-
+      {{
+        query('community.general.dependent',
+          dict(key1=[1, 2]),
+          dict(key2='[item.key1 + 3, item.key1 + 6]'),
+          dict(key3='[item.key1 + item.key2 * 10]'))
+      }}
+
+- name: Check result of Test 1
+  assert:
+    that:
+      - loop_result == expected_result
+  vars:
+    expected_result:
+      - key1: 1
+        key2: 4
+        key3: 41
+      - key1: 1
+        key2: 7
+        key3: 71
+      - key1: 2
+        key2: 5
+        key3: 52
+      - key1: 2
+        key2: 8
+        key3: 82
+
+- name: Test 2
+  set_fact:
+    loop_result: >-
+      {{ query('community.general.dependent',
+               dict([['a', [1, 2, 3]]]),
+               dict([['b', '[1, 2, 3, 4] if item.a == 1 else [2, 3, 4] if item.a == 2 else [3, 4]']])) }}
+    # The last expression could have been `range(item.a, 5)`, but that's not supported by all Jinja2 versions used in CI
+
+- name: Check result of Test 2
+  assert:
+    that:
+      - loop_result == expected_result
+  vars:
+    expected_result:
+      - a: 1
+        b: 1
+      - a: 1
+        b: 2
+      - a: 1
+        b: 3
+      - a: 1
+        b: 4
+      - a: 2
+        b: 2
+      - a: 2
+        b: 3
+      - a: 2
+        b: 4
+      - a: 3
+        b: 3
+      - a: 3
+        b: 4
+
+- name: Test 3
+  debug:
+    var: item
+  with_community.general.dependent:
+    - var1:
+        a:
+          - 1
+          - 2
+        b:
+          - 3
+          - 4
+    - var2: 'item.var1.value'
+    - var3: 'dependent_lookup_test[item.var1.key ~ "_" ~ item.var2]'
+  loop_control:
+    label: "{{ [item.var1.key, item.var2, item.var3] }}"
+  register: dependent
+  vars:
+    dependent_lookup_test:
+      a_1:
+        - A
+        - B
+      a_2:
+        - C
+      b_3:
+        - D
+      b_4:
+        - E
+        - F
+        - G
+
+- name: Check result of Test 3
+  assert:
+    that:
+      - (dependent.results | length) == 7
+      - dependent.results[0].item.var1.key == "a"
+      - dependent.results[0].item.var2 == 1
+      - dependent.results[0].item.var3 == "A"
+      - dependent.results[1].item.var1.key == "a"
+      - dependent.results[1].item.var2 == 1
+      - dependent.results[1].item.var3 == "B"
+      - dependent.results[2].item.var1.key == "a"
+      - dependent.results[2].item.var2 == 2
+      - dependent.results[2].item.var3 == "C"
+      - dependent.results[3].item.var1.key == "b"
+      - dependent.results[3].item.var2 == 3
+      - dependent.results[3].item.var3 == "D"
+      - dependent.results[4].item.var1.key == "b"
+      - dependent.results[4].item.var2 == 4
+      - dependent.results[4].item.var3 == "E"
+      - dependent.results[5].item.var1.key == "b"
+      - dependent.results[5].item.var2 == 4
+      - dependent.results[5].item.var3 == "F"
+      - dependent.results[6].item.var1.key == "b"
+      - dependent.results[6].item.var2 == 4
+      - dependent.results[6].item.var3 == "G"
+
+- name: "Test 4: template failure"
+  debug:
+    msg: "{{ item }}"
+  with_community.general.dependent:
+    - a:
+        - 1
+        - 2
+    - b: "[item.a + foo]"
+  ignore_errors: true
+  register: eval_error
+
+- name: Check result of Test 4
+  assert:
+    that:
+      - eval_error is failed
+      - eval_error.msg.startswith("Caught \"'foo' is undefined\" while evaluating ")
+
+- name: "Test 5: same variable name reused"
+  debug:
+    msg: "{{ item }}"
+  with_community.general.dependent:
+    - a: x
+    - b: x
+  ignore_errors: true
+  register: eval_error
+
+- name: Check result of Test 5
+  assert:
+    that:
+      - eval_error is failed
+      - eval_error.msg.startswith("Caught \"'x' is undefined\" while evaluating ")
+
+- name: "Test 6: multi-value dict"
+  debug:
+    msg: "{{ item }}"
+  with_community.general.dependent:
+    - a: x
+      b: x
+  ignore_errors: true
+  register: eval_error
+
+- name: Check result of Test 6
+  assert:
+    that:
+      - eval_error is failed
+      - eval_error.msg == 'Parameter 0 must be a one-element dictionary, got 2 elements'
+
+- name: "Test 7: empty dict"
+  debug:
+    msg: "{{ item }}"
+  with_community.general.dependent:
+    - {}
+  ignore_errors: true
+  register: eval_error
+
+- name: Check result of Test 7
+  assert:
+    that:
+      - eval_error is failed
+      - eval_error.msg == 'Parameter 0 must be a one-element dictionary, got 0 elements'
