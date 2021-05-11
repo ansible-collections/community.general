@@ -189,11 +189,15 @@ stages:
             - test: 3.9
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
             - test: '3.10'
             - test: 3.11
   - stage: Windows
 =======
 =======
+=======
+            - test: '3.10'
+>>>>>>> 624eb7171e (Run unit tests also with Python 3.10. (#2486))
   - stage: Units_2_11
     displayName: Units 2.11
     dependsOn: []
