@@ -6,12 +6,10 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-from collections import namedtuple
-
 import pytest
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    ArgFormat, DependencyCtxMgr, ModuleHelper, VarMeta, cause_changes
+    ArgFormat, DependencyCtxMgr, VarMeta, VarDict, cause_changes
 )
 
 
@@ -144,7 +142,7 @@ def test_variable_meta_diff():
 
 
 def test_vardict():
-    vd = ModuleHelper.VarDict()
+    vd = VarDict()
     vd.set('a', 123)
     assert vd['a'] == 123
     assert vd.a == 123
