@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: proxmox_nic
-short_description: Management of NIC's for Qemu(KVM) VM's in a Proxmox VE cluster.
+short_description: Management of a NIC of a Qemu(KVM) VM in a Proxmox VE cluster.
 version_added: 3.1.0
 description:
   - Allows you to create/update/delete a NIC on Qemu(KVM) Virtual Machines in a Proxmox VE cluster.
@@ -49,7 +49,8 @@ options:
     default: virtio
   mtu:
     description:
-      - Force MTU, for C(virtio) model only. Set to C(1) to use the bridge MTU.
+      - Force MTU, for C(virtio) model only, setting will be ignored otherwise.
+      - Set to C(1) to use the bridge MTU.
       - Value should be C(1 ≤ n ≤ 65520).
     type: int
   name:
@@ -212,10 +213,9 @@ def update_nic(module, proxmox, vmid, interface, model, **kwargs):
         if model == 'virtio':
             config_provided += ",mtu={0}".format(kwargs['mtu'])
         else:
-            module.fail_json(
-                vmid=vmid,
-                msg='Unable to set MTU for nic {0} on VM with vmid {1}, model should'
-                    ' be set to \'virtio\': '.format(interface, vmid))
+            module.warn(
+                'Ignoring MTU for nic {0} on VM with vmid {1}, '
+                'model should be set to \'virtio\': '.format(interface, vmid))
 
     if kwargs['queues']:
         config_provided += ",queues={0}".format(kwargs['queues'])
