@@ -1671,19 +1671,31 @@ class RedfishUtils(object):
 
         # Make a copy of the attributes dict
         attrs_to_patch = dict(attributes)
+        # List to hold attributes not found
+        attrs_bad = {}
 
         # Check the attributes
-        for attr in attributes:
-            if attr not in data[u'Attributes']:
-                return {'ret': False, 'msg': "BIOS attribute %s not found" % attr}
+        for attr_name, attr_value in attributes.items():
+            # Check if attribute exists
+            if attr_name not in data[u'Attributes']:
+                # Remove and proceed to next attribute if this isn't valid
+                attrs_bad.update({attr_name: attr_value})
+                del attrs_to_patch[attr_name]
+                continue
+
             # If already set to requested value, remove it from PATCH payload
-            if data[u'Attributes'][attr] == attributes[attr]:
-                del attrs_to_patch[attr]
+            if data[u'Attributes'][attr_name] == attributes[attr_name]:
+                del attrs_to_patch[attr_name]
+
+        warning = ""
+        if attrs_bad:
+            warning = "Incorrect attributes %s" % (attrs_bad)
 
         # Return success w/ changed=False if no attrs need to be changed
         if not attrs_to_patch:
             return {'ret': True, 'changed': False,
-                    'msg': "BIOS attributes already set"}
+                    'msg': "BIOS attributes already set",
+                    'warning': warning}
 
         # Get the SettingsObject URI
         set_bios_attr_uri = data["@Redfish.Settings"]["SettingsObject"]["@odata.id"]
@@ -1693,7 +1705,9 @@ class RedfishUtils(object):
         response = self.patch_request(self.root_uri + set_bios_attr_uri, payload)
         if response['ret'] is False:
             return response
-        return {'ret': True, 'changed': True, 'msg': "Modified BIOS attribute"}
+        return {'ret': True, 'changed': True,
+                'msg': "Modified BIOS attributes %s" % (attrs_to_patch),
+                'warning': warning}
 
     def set_boot_order(self, boot_list):
         if not boot_list:
