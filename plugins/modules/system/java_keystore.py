@@ -350,14 +350,32 @@ class JavaKeystore:
                     password=to_bytes(self.keypass),
                     backend=backend
                 )
+        except TypeError:
+            # Re-attempt with no password to match existing behavior
+            try:
+                with open(self.private_key_path, 'rb') as key_file:
+                    private_key = key_loader(
+                        key_file.read(),
+                        password=None,
+                        backend=backend
+                    )
+            except (OSError, TypeError, ValueError, UnsupportedAlgorithm) as e:
+                self.module.fail_json(
+                    msg="The following error occurred while loading the provided private_key: %s" % to_native(e)
+                )
+        except (OSError, ValueError, UnsupportedAlgorithm) as e:
+            self.module.fail_json(
+                msg="The following error occurred while loading the provided private_key: %s" % to_native(e)
+            )
+        try:
             with open(self.certificate_path, 'rb') as cert_file:
                 cert = cert_loader(
                     cert_file.read(),
                     backend=backend
                 )
-        except (OSError, TypeError, ValueError, UnsupportedAlgorithm) as e:
+        except (OSError, ValueError, UnsupportedAlgorithm) as e:
             self.module.fail_json(
-                msg="The following error occurred while loading the provided private_key/certificate: %s" % to_native(e)
+                msg="The following error occurred while loading the provided certificate: %s" % to_native(e)
             )
 
         if self.password:
