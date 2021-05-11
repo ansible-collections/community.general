@@ -61,12 +61,12 @@ options:
     type: str
   sshkey_file:
     description:
-      - The ssh key itself.
+      - The SSH public key itself.
     type: str
   sshkey_expires_at:
     description:
-      - The expiration date of the SSH key in ISO 8601 format C(YYYY-MM-DDTHH:MM:SSZ).
-      - This is only used when adding new SSH keys.
+      - The expiration date of the SSH public key in ISO 8601 format C(YYYY-MM-DDTHH:MM:SSZ).
+      - This is only used when adding new SSH public keys.
     type: str
     version_added: 3.1.0
   group:
