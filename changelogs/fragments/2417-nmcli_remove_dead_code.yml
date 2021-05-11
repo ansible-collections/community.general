@@ -1,0 +1,2 @@
+minor_changes:
+  - nmcli - remove dead code, ``options`` never contains keys from ``param_alias`` (https://github.com/ansible-collections/community.general/pull/2417).

@@ -1036,17 +1036,6 @@ class Nmcli(object):
         return conn_info
 
     def _compare_conn_params(self, conn_info, options):
-        # See nmcli(1) for details
-        param_alias = {
-            'type': 'connection.type',
-            'con-name': 'connection.id',
-            'autoconnect': 'connection.autoconnect',
-            'ifname': 'connection.interface-name',
-            'master': 'connection.master',
-            'slave-type': 'connection.slave-type',
-            'zone': 'connection.zone',
-        }
-
         changed = False
         diff_before = dict()
         diff_after = dict()
@@ -1070,13 +1059,6 @@ class Nmcli(object):
                     value = value.upper()
                     # ensure current_value is also converted to uppercase in case nmcli changes behaviour
                     current_value = current_value.upper()
-            elif key in param_alias:
-                real_key = param_alias[key]
-                if real_key in conn_info:
-                    current_value = conn_info[real_key]
-                else:
-                    # alias parameter does not exist
-                    current_value = None
             else:
                 # parameter does not exist
                 current_value = None
