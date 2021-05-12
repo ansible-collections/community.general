@@ -96,10 +96,11 @@ options:
     choices:
       - openssl
       - cryptography
+    version_added: 3.1.0
 requirements:
-  - openssl in PATH
+  - openssl in PATH (when I(ssl_backend=openssl))
   - keytool in PATH
-  - cryptography >= 3.0 (When I(ssl_backend=cryptography))
+  - cryptography >= 3.0 (when I(ssl_backend=cryptography))
 author:
   - Guillaume Grossetie (@Mogztter)
   - quidame (@quidame)
@@ -200,7 +201,6 @@ except ImportError:
 class JavaKeystore:
     def __init__(self, module):
         self.module = module
-        self.temp_files = []
 
         self.keytool_bin = module.get_bin_path('keytool', True)
 
@@ -220,20 +220,15 @@ class JavaKeystore:
 
         if module.params['certificate_path'] is None:
             self.certificate_path = create_file(self.certificate)
-            self.temp_files.append(self.certificate_path)
+            self.module.add_cleanup_file(self.certificate_path)
         else:
             self.certificate_path = module.params['certificate_path']
 
         if module.params['private_key_path'] is None:
             self.private_key_path = create_file(self.private_key)
-            self.temp_files.append(self.private_key_path)
+            self.module.add_cleanup_file(self.private_key_path)
         else:
             self.private_key_path = module.params['private_key_path']
-
-    def __del__(self):
-        for file in self.temp_files:
-            if os.path.exists(file):
-                os.remove(file)
 
     def update_permissions(self):
         try:
@@ -243,7 +238,7 @@ class JavaKeystore:
             # pre-2.10 behavior for older Ansible versions.
             self.module.params['path'] = self.keystore_path
             file_args = self.module.load_file_common_arguments(self.module.params)
-        self.module.set_fs_attributes_if_different(file_args, False)
+        return self.module.set_fs_attributes_if_different(file_args, False)
 
     def read_certificate_fingerprint(self, cert_format='PEM'):
         if self.ssl_backend == 'cryptography':
@@ -421,7 +416,7 @@ class JavaKeystore:
             os.remove(self.keystore_path)
 
         keystore_p12_path = create_path()
-        self.temp_files.append(keystore_p12_path)
+        self.module.add_cleanup_file(keystore_p12_path)
 
         if self.ssl_backend == 'cryptography':
             self.cryptography_create_pkcs12_bundle(keystore_p12_path)
@@ -515,15 +510,10 @@ def main():
     jks = JavaKeystore(module)
 
     if jks.exists():
-        if module.params['force']:
+        if module.params['force'] or jks.cert_changed():
             jks.create()
         else:
-            if jks.cert_changed():
-                jks.create()
-            else:
-                if not module.check_mode:
-                    jks.update_permissions()
-                module.exit_json(changed=False)
+            module.exit_json(changed=jks.update_permissions())
     else:
         jks.create()
 
