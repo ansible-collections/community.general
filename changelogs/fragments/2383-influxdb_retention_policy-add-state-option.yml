@@ -1,0 +1,6 @@
+minor_changes:
+  - influxdb_retention_policy - add ``state`` parameter with allowed values
+    ``present`` and ``absent`` to support deletion of existing retention policies
+    (https://github.com/ansible-collections/community.general/issues/2383).
+  - influxdb_retention_policy - simplify duration logic parsing
+    (https://github.com/ansible-collections/community.general/pull/2385).
