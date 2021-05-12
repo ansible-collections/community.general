@@ -70,8 +70,8 @@ EXAMPLES = r'''
 # Example influxdb_retention_policy command from Ansible Playbooks
 - name: Create 1 hour retention policy
   community.general.influxdb_retention_policy:
-      hostname: "{{influxdb_ip_address}}"
-      database_name: "{{influxdb_database_name}}"
+      hostname: "{{ influxdb_ip_address }}"
+      database_name: "{{ influxdb_database_name }}"
       policy_name: test
       duration: 1h
       replication: 1
@@ -81,8 +81,8 @@ EXAMPLES = r'''
 
 - name: Create 1 day retention policy with 1 hour shard group duration
   community.general.influxdb_retention_policy:
-      hostname: "{{influxdb_ip_address}}"
-      database_name: "{{influxdb_database_name}}"
+      hostname: "{{ influxdb_ip_address }}"
+      database_name: "{{ influxdb_database_name }}"
       policy_name: test
       duration: 1d
       replication: 1
@@ -91,8 +91,8 @@ EXAMPLES = r'''
 
 - name: Create 1 week retention policy with 1 day shard group duration
   community.general.influxdb_retention_policy:
-      hostname: "{{influxdb_ip_address}}"
-      database_name: "{{influxdb_database_name}}"
+      hostname: "{{ influxdb_ip_address }}"
+      database_name: "{{ influxdb_database_name }}"
       policy_name: test
       duration: 1w
       replication: 1
@@ -101,8 +101,8 @@ EXAMPLES = r'''
 
 - name: Create infinite retention policy with 1 week of shard group duration
   community.general.influxdb_retention_policy:
-      hostname: "{{influxdb_ip_address}}"
-      database_name: "{{influxdb_database_name}}"
+      hostname: "{{ influxdb_ip_address }}"
+      database_name: "{{ influxdb_database_name }}"
       policy_name: test
       duration: INF
       replication: 1
@@ -113,8 +113,8 @@ EXAMPLES = r'''
 
 - name: Create retention policy with complex durations
   community.general.influxdb_retention_policy:
-      hostname: "{{influxdb_ip_address}}"
-      database_name: "{{influxdb_database_name}}"
+      hostname: "{{ influxdb_ip_address }}"
+      database_name: "{{ influxdb_database_name }}"
       policy_name: test
       duration: 5d1h30m
       replication: 1
@@ -125,8 +125,8 @@ EXAMPLES = r'''
 
 - name: Drop retention policy
   community.general.influxdb_retention_policy:
-      hostname: "{{influxdb_ip_address}}"
-      database_name: "{{influxdb_database_name}}"
+      hostname: "{{ influxdb_ip_address }}"
+      database_name: "{{ influxdb_database_name }}"
       policy_name: test
       state: absent
 '''
