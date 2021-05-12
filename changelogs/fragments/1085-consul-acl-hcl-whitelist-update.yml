@@ -1,0 +1,2 @@
+bugfixes:
+  - consul_acl - update the hcl whitelist to include all supported options
