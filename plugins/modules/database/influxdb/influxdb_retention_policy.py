@@ -29,17 +29,24 @@ options:
             - Name of the retention policy.
         required: true
         type: str
+    state:
+        description:
+            - State of the retention policy.
+        choices: [ absent, present ]
+        default: present
+        type: str
+        version_added: 3.1.0
     duration:
         description:
             - Determines how long InfluxDB should keep the data. If specified, it
               should be C(INF) or at least one hour. If not specified, C(INF) is
               assumed. Supports complex duration expressions with multiple units.
-        required: true
+            - Required only if I(state) is set to C(present).
         type: str
     replication:
         description:
             - Determines how many independent copies of each point are stored in the cluster.
-        required: true
+            - Required only if I(state) is set to C(present).
         type: int
     default:
         description:
@@ -63,53 +70,65 @@ EXAMPLES = r'''
 # Example influxdb_retention_policy command from Ansible Playbooks
 - name: Create 1 hour retention policy
   community.general.influxdb_retention_policy:
-      hostname: "{{influxdb_ip_address}}"
-      database_name: "{{influxdb_database_name}}"
+      hostname: "{{ influxdb_ip_address }}"
+      database_name: "{{ influxdb_database_name }}"
       policy_name: test
       duration: 1h
       replication: 1
       ssl: yes
       validate_certs: yes
+      state: present
 
 - name: Create 1 day retention policy with 1 hour shard group duration
   community.general.influxdb_retention_policy:
-      hostname: "{{influxdb_ip_address}}"
-      database_name: "{{influxdb_database_name}}"
+      hostname: "{{ influxdb_ip_address }}"
+      database_name: "{{ influxdb_database_name }}"
       policy_name: test
       duration: 1d
       replication: 1
       shard_group_duration: 1h
+      state: present
 
 - name: Create 1 week retention policy with 1 day shard group duration
   community.general.influxdb_retention_policy:
-      hostname: "{{influxdb_ip_address}}"
-      database_name: "{{influxdb_database_name}}"
+      hostname: "{{ influxdb_ip_address }}"
+      database_name: "{{ influxdb_database_name }}"
       policy_name: test
       duration: 1w
       replication: 1
       shard_group_duration: 1d
+      state: present
 
 - name: Create infinite retention policy with 1 week of shard group duration
   community.general.influxdb_retention_policy:
-      hostname: "{{influxdb_ip_address}}"
-      database_name: "{{influxdb_database_name}}"
+      hostname: "{{ influxdb_ip_address }}"
+      database_name: "{{ influxdb_database_name }}"
       policy_name: test
       duration: INF
       replication: 1
       ssl: no
       validate_certs: no
       shard_group_duration: 1w
+      state: present
 
 - name: Create retention policy with complex durations
   community.general.influxdb_retention_policy:
-      hostname: "{{influxdb_ip_address}}"
-      database_name: "{{influxdb_database_name}}"
+      hostname: "{{ influxdb_ip_address }}"
+      database_name: "{{ influxdb_database_name }}"
       policy_name: test
       duration: 5d1h30m
       replication: 1
       ssl: no
       validate_certs: no
       shard_group_duration: 1d10h30m
+      state: present
+
+- name: Drop retention policy
+  community.general.influxdb_retention_policy:
+      hostname: "{{ influxdb_ip_address }}"
+      database_name: "{{ influxdb_database_name }}"
+      policy_name: test
+      state: absent
 '''
 
 RETURN = r'''
@@ -134,6 +153,21 @@ VALID_DURATION_REGEX = re.compile(r'^(INF|(\d+(ns|u|µ|ms|s|m|h|d|w)))+$')
 DURATION_REGEX = re.compile(r'(\d+)(ns|u|µ|ms|s|m|h|d|w)')
 EXTENDED_DURATION_REGEX = re.compile(r'(?:(\d+)(ns|u|µ|ms|m|h|d|w)|(\d+(?:\.\d+)?)(s))')
 
+DURATION_UNIT_NANOSECS = {
+    'ns': 1,
+    'u': 1000,
+    'µ': 1000,
+    'ms': 1000 * 1000,
+    's': 1000 * 1000 * 1000,
+    'm': 1000 * 1000 * 1000 * 60,
+    'h': 1000 * 1000 * 1000 * 60 * 60,
+    'd': 1000 * 1000 * 1000 * 60 * 60 * 24,
+    'w': 1000 * 1000 * 1000 * 60 * 60 * 24 * 7,
+}
+
+MINIMUM_VALID_DURATION = 1 * DURATION_UNIT_NANOSECS['h']
+MINIMUM_VALID_SHARD_GROUP_DURATION = 1 * DURATION_UNIT_NANOSECS['h']
+
 
 def check_duration_literal(value):
     return VALID_DURATION_REGEX.search(value) is not None
@@ -148,28 +182,9 @@ def parse_duration_literal(value, extended=False):
     lookup = (EXTENDED_DURATION_REGEX if extended else DURATION_REGEX).findall(value)
 
     for duration_literal in lookup:
-        if extended and duration_literal[3] == 's':
-            duration_val = float(duration_literal[2])
-            duration += duration_val * 1000 * 1000 * 1000
-        else:
-            duration_val = int(duration_literal[0])
-
-            if duration_literal[1] == 'ns':
-                duration += duration_val
-            elif duration_literal[1] == 'u' or duration_literal[1] == 'µ':
-                duration += duration_val * 1000
-            elif duration_literal[1] == 'ms':
-                duration += duration_val * 1000 * 1000
-            elif duration_literal[1] == 's':
-                duration += duration_val * 1000 * 1000 * 1000
-            elif duration_literal[1] == 'm':
-                duration += duration_val * 1000 * 1000 * 1000 * 60
-            elif duration_literal[1] == 'h':
-                duration += duration_val * 1000 * 1000 * 1000 * 60 * 60
-            elif duration_literal[1] == 'd':
-                duration += duration_val * 1000 * 1000 * 1000 * 60 * 60 * 24
-            elif duration_literal[1] == 'w':
-                duration += duration_val * 1000 * 1000 * 1000 * 60 * 60 * 24 * 7
+        filtered_literal = list(filter(None, duration_literal))
+        duration_val = float(filtered_literal[0])
+        duration += duration_val * DURATION_UNIT_NANOSECS[filtered_literal[1]]
 
     return duration
 
@@ -208,7 +223,7 @@ def create_retention_policy(module, client):
         module.fail_json(msg="Failed to parse value of duration")
 
     influxdb_duration_format = parse_duration_literal(duration)
-    if influxdb_duration_format != 0 and influxdb_duration_format < 3600000000000:
+    if influxdb_duration_format != 0 and influxdb_duration_format < MINIMUM_VALID_DURATION:
         module.fail_json(msg="duration value must be at least 1h")
 
     if shard_group_duration is not None:
@@ -216,7 +231,7 @@ def create_retention_policy(module, client):
             module.fail_json(msg="Failed to parse value of shard_group_duration")
 
         influxdb_shard_group_duration_format = parse_duration_literal(shard_group_duration)
-        if influxdb_shard_group_duration_format < 3600000000000:
+        if influxdb_shard_group_duration_format < MINIMUM_VALID_SHARD_GROUP_DURATION:
             module.fail_json(msg="shard_group_duration value must be finite and at least 1h")
 
     if not module.check_mode:
@@ -245,7 +260,7 @@ def alter_retention_policy(module, client, retention_policy):
         module.fail_json(msg="Failed to parse value of duration")
 
     influxdb_duration_format = parse_duration_literal(duration)
-    if influxdb_duration_format != 0 and influxdb_duration_format < 3600000000000:
+    if influxdb_duration_format != 0 and influxdb_duration_format < MINIMUM_VALID_DURATION:
         module.fail_json(msg="duration value must be at least 1h")
 
     if shard_group_duration is None:
@@ -255,7 +270,7 @@ def alter_retention_policy(module, client, retention_policy):
             module.fail_json(msg="Failed to parse value of shard_group_duration")
 
         influxdb_shard_group_duration_format = parse_duration_literal(shard_group_duration)
-        if influxdb_shard_group_duration_format < 3600000000000:
+        if influxdb_shard_group_duration_format < MINIMUM_VALID_SHARD_GROUP_DURATION:
             module.fail_json(msg="shard_group_duration value must be finite and at least 1h")
 
     if (retention_policy['duration'] != influxdb_duration_format or
@@ -272,30 +287,55 @@ def alter_retention_policy(module, client, retention_policy):
     module.exit_json(changed=changed)
 
 
+def drop_retention_policy(module, client):
+    database_name = module.params['database_name']
+    policy_name = module.params['policy_name']
+
+    if not module.check_mode:
+        try:
+            client.drop_retention_policy(policy_name, database_name)
+        except exceptions.InfluxDBClientError as e:
+            module.fail_json(msg=e.content)
+    module.exit_json(changed=True)
+
+
 def main():
     argument_spec = InfluxDb.influxdb_argument_spec()
     argument_spec.update(
+        state=dict(default='present', type='str', choices=['present', 'absent']),
         database_name=dict(required=True, type='str'),
         policy_name=dict(required=True, type='str'),
-        duration=dict(required=True, type='str'),
-        replication=dict(required=True, type='int'),
+        duration=dict(type='str'),
+        replication=dict(type='int'),
         default=dict(default=False, type='bool'),
-        shard_group_duration=dict(required=False, type='str'),
+        shard_group_duration=dict(type='str'),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
-        supports_check_mode=True
+        supports_check_mode=True,
+        required_if=(
+            ('state', 'present', ['duration', 'replication']),
+        ),
     )
+
+    state = module.params['state']
 
     influxdb = InfluxDb(module)
     client = influxdb.connect_to_influxdb()
 
     retention_policy = find_retention_policy(module, client)
 
-    if retention_policy:
-        alter_retention_policy(module, client, retention_policy)
-    else:
-        create_retention_policy(module, client)
+    if state == 'present':
+        if retention_policy:
+            alter_retention_policy(module, client, retention_policy)
+        else:
+            create_retention_policy(module, client)
+
+    if state == 'absent':
+        if retention_policy:
+            drop_retention_policy(module, client)
+        else:
+            module.exit_json(changed=False)
 
 
 if __name__ == '__main__':
