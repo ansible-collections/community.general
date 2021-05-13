@@ -20,7 +20,7 @@ from ansible.module_utils.six import StringIO
 
 
 @contextmanager
-def patch_keycloak_api(get_authentication_flow_by_alias=None, copy_auth_flow=None, create_empty_auth_flow=None, create_or_update_executions=None,
+def patch_keycloak_api(get_authentication_flow_by_alias=None, copy_auth_flow=None, create_empty_auth_flow=None,
                        get_executions_representation=None, delete_authentication_flow_by_id=None):
     """Mock context manager for patching the methods in PwPolicyIPAClient that contact the IPA server
 
@@ -43,14 +43,12 @@ def patch_keycloak_api(get_authentication_flow_by_alias=None, copy_auth_flow=Non
                 as mock_copy_auth_flow:
             with patch.object(obj, 'create_empty_auth_flow', side_effect=create_empty_auth_flow) \
                     as mock_create_empty_auth_flow:
-                with patch.object(obj, 'create_or_update_executions', side_effect=create_or_update_executions) \
-                        as mock_create_or_update_executions:
-                    with patch.object(obj, 'get_executions_representation', side_effect=get_executions_representation) \
-                            as mock_get_executions_representation:
-                        with patch.object(obj, 'delete_authentication_flow_by_id', side_effect=delete_authentication_flow_by_id) \
-                                as mock_delete_authentication_flow_by_id:
-                            yield mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow, \
-                                mock_create_or_update_executions, mock_get_executions_representation, mock_delete_authentication_flow_by_id
+                with patch.object(obj, 'get_executions_representation', return_value=get_executions_representation) \
+                        as mock_get_executions_representation:
+                    with patch.object(obj, 'delete_authentication_flow_by_id', side_effect=delete_authentication_flow_by_id) \
+                            as mock_delete_authentication_flow_by_id:
+                        yield mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow, \
+                            mock_get_executions_representation, mock_delete_authentication_flow_by_id
 
 
 def get_response(object_with_future_response, method, get_id_call_count):
@@ -114,12 +112,6 @@ class TestKeycloakAuthentication(ModuleTestCase):
                 {
                     'providerId': 'identity-provider-redirector',
                     'requirement': 'ALTERNATIVE',
-                    'authenticationConfig': {
-                        'alias': 'name',
-                        'config': {
-                            'defaultProvider': 'value'
-                        },
-                    },
                 },
             ],
             'state': 'present',
@@ -142,11 +134,10 @@ class TestKeycloakAuthentication(ModuleTestCase):
                 },
             ],
         }]
-        return_value_created_exec = [True]
         return_value_executions_after = [
             {
                 'id': 'b678e30c-8469-40a7-8c21-8d0cda76a591',
-                'requirement': 'DISABLED',
+                'requirement': 'ALTERNATIVE',
                 'displayName': 'Identity Provider Redirector',
                 'requirementChoices': ['REQUIRED', 'DISABLED'],
                 'configurable': True,
@@ -177,9 +168,9 @@ class TestKeycloakAuthentication(ModuleTestCase):
 
         with mock_good_connection():
             with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before, copy_auth_flow=return_value_copied,
-                                    create_or_update_executions=return_value_created_exec, get_executions_representation=return_value_executions_after) \
+                                    get_executions_representation=return_value_executions_after) \
                     as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_create_or_update_executions, mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
 
@@ -187,8 +178,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
         self.assertEqual(len(mock_copy_auth_flow.mock_calls), 1)
         self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_create_or_update_executions.mock_calls), 1)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 1)
+        self.assertEqual(len(mock_get_executions_representation.mock_calls), 2)
         self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
 
         # Verify that the module's changed status matches what is expected
@@ -209,12 +199,6 @@ class TestKeycloakAuthentication(ModuleTestCase):
                 {
                     'providerId': 'identity-provider-redirector',
                     'requirement': 'ALTERNATIVE',
-                    'authenticationConfig': {
-                        'alias': 'name',
-                        'config': {
-                            'defaultProvider': 'value'
-                        },
-                    },
                 },
             ],
             'state': 'present',
@@ -229,7 +213,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
             'authenticationExecutions': [
                 {
                     'authenticator': 'identity-provider-redirector',
-                    'requirement': 'DISABLED',
+                    'requirement': 'ALTERNATIVE',
                     'priority': 0,
                     'userSetupAllowed': False,
                     'autheticatorFlow': False
@@ -243,11 +227,10 @@ class TestKeycloakAuthentication(ModuleTestCase):
                 },
             ],
         }]
-        return_value_created_exec = [False]
         return_value_executions_after = [
             {
                 'id': 'b678e30c-8469-40a7-8c21-8d0cda76a591',
-                'requirement': 'DISABLED',
+                'requirement': 'ALTERNATIVE',
                 'displayName': 'Identity Provider Redirector',
                 'requirementChoices': ['REQUIRED', 'DISABLED'],
                 'configurable': True,
@@ -277,10 +260,10 @@ class TestKeycloakAuthentication(ModuleTestCase):
         # Run the module
 
         with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before, create_or_update_executions=return_value_created_exec,
+            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
                                     get_executions_representation=return_value_executions_after) \
                     as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_create_or_update_executions, mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
 
@@ -288,8 +271,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
         self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
         self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_create_or_update_executions.mock_calls), 1)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 1)
+        self.assertEqual(len(mock_get_executions_representation.mock_calls), 2)
         self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
 
         # Verify that the module's changed status matches what is expected
@@ -331,7 +313,6 @@ class TestKeycloakAuthentication(ModuleTestCase):
                 "topLevel": True
             },
         ]
-        return_value_created_exec = [True]
         return_value_executions_after = [
             {
                 'id': 'b678e30c-8469-40a7-8c21-8d0cda76a591',
@@ -351,10 +332,10 @@ class TestKeycloakAuthentication(ModuleTestCase):
         # Run the module
 
         with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before, create_or_update_executions=return_value_created_exec,
+            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
                                     get_executions_representation=return_value_executions_after, create_empty_auth_flow=return_value_created_empty_flow) \
                     as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_create_or_update_executions, mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
 
@@ -362,8 +343,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
         self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
         self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 1)
-        self.assertEqual(len(mock_create_or_update_executions.mock_calls), 1)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 1)
+        self.assertEqual(len(mock_get_executions_representation.mock_calls), 3)
         self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
 
         # Verify that the module's changed status matches what is expected
@@ -410,7 +390,6 @@ class TestKeycloakAuthentication(ModuleTestCase):
                 },
             ],
         }]
-        return_value_created_exec = [True]
         return_value_executions_after = [
             {
                 'id': 'b678e30c-8469-40a7-8c21-8d0cda76a591',
@@ -444,10 +423,10 @@ class TestKeycloakAuthentication(ModuleTestCase):
         # Run the module
 
         with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before, create_or_update_executions=return_value_created_exec,
+            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
                                     get_executions_representation=return_value_executions_after) \
                     as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_create_or_update_executions, mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
 
@@ -455,8 +434,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
         self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
         self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_create_or_update_executions.mock_calls), 1)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 1)
+        self.assertEqual(len(mock_get_executions_representation.mock_calls), 3)
         self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
 
         # Verify that the module's changed status matches what is expected
@@ -500,7 +478,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         with mock_good_connection():
             with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before) \
                     as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_create_or_update_executions, mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
 
@@ -508,7 +486,6 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
         self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
         self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_create_or_update_executions.mock_calls), 0)
         self.assertEqual(len(mock_get_executions_representation.mock_calls), 0)
         self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 1)
 
@@ -537,7 +514,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         with mock_good_connection():
             with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before) \
                     as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_create_or_update_executions, mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
 
@@ -545,7 +522,6 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
         self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
         self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 0)
-        self.assertEqual(len(mock_create_or_update_executions.mock_calls), 0)
         self.assertEqual(len(mock_get_executions_representation.mock_calls), 0)
         self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 0)
 
@@ -605,7 +581,6 @@ class TestKeycloakAuthentication(ModuleTestCase):
                 "topLevel": True
             },
         ]
-        return_value_created_exec = [True]
         return_value_executions_after = [
             {
                 'id': 'b678e30c-8469-40a7-8c21-8d0cda76a591',
@@ -625,10 +600,10 @@ class TestKeycloakAuthentication(ModuleTestCase):
         # Run the module
 
         with mock_good_connection():
-            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before, create_or_update_executions=return_value_created_exec,
+            with patch_keycloak_api(get_authentication_flow_by_alias=return_value_auth_flow_before,
                                     get_executions_representation=return_value_executions_after, create_empty_auth_flow=return_value_created_empty_flow) \
                     as (mock_get_authentication_flow_by_alias, mock_copy_auth_flow, mock_create_empty_auth_flow,
-                        mock_create_or_update_executions, mock_get_executions_representation, mock_delete_authentication_flow_by_id):
+                        mock_get_executions_representation, mock_delete_authentication_flow_by_id):
                 with self.assertRaises(AnsibleExitJson) as exec_info:
                     self.module.main()
 
@@ -636,8 +611,7 @@ class TestKeycloakAuthentication(ModuleTestCase):
         self.assertEqual(len(mock_get_authentication_flow_by_alias.mock_calls), 1)
         self.assertEqual(len(mock_copy_auth_flow.mock_calls), 0)
         self.assertEqual(len(mock_create_empty_auth_flow.mock_calls), 1)
-        self.assertEqual(len(mock_create_or_update_executions.mock_calls), 1)
-        self.assertEqual(len(mock_get_executions_representation.mock_calls), 1)
+        self.assertEqual(len(mock_get_executions_representation.mock_calls), 3)
         self.assertEqual(len(mock_delete_authentication_flow_by_id.mock_calls), 1)
 
         # Verify that the module's changed status matches what is expected

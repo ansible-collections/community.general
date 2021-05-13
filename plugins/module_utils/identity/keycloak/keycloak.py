@@ -143,18 +143,18 @@ def get_token(module_params):
     }
 
 
-def is_dict_equals(dict1, dict2, exclude=None):
+def is_struct_included(struct1, struct2, exclude=None):
     """
-    This function compare if tthe first parameter structure, is included in the second.
-    The function use every elements of dict1 and validates they are present in the dict2 structure.
+    This function compare if the first parameter structure is included in the second.
+    The function use every elements of struct1 and validates they are present in the struct2 structure.
     The two structure does not need to be equals for that function to return true.
     Each elements are compared recursively.
-    :param dict1:
+    :param struct1:
         type:
             dict for the initial call, can be dict, list, bool, int or str for recursive calls
         description:
             reference structure
-    :param dict2:
+    :param struct2:
         type:
             dict for the initial call, can be dict, list, bool, int or str for recursive calls
         description:
@@ -171,49 +171,29 @@ def is_dict_equals(dict1, dict2, exclude=None):
         description:
             Return True if all element of dict 1 are present in dict 2, return false otherwise.
     """
-    try:
-        if isinstance(dict1, list) and isinstance(dict2, list):
-            if len(dict1) == 0 and len(dict2) == 0:
-                return True
-            found = False
-            for item1 in dict1:
-                found = False
-                if isinstance(item1, list):
-                    found1 = False
-                    for item2 in dict2:
-                        if is_dict_equals(item1, item2, exclude):
-                            found1 = True
-                    if not found1:
+    if isinstance(struct1, list) and isinstance(struct2, list):
+        for item1 in struct1:
+            if isinstance(item1, (list, dict)):
+                for item2 in struct2:
+                    if not is_struct_included(item1, item2, exclude):
                         return False
-                elif isinstance(item1, dict):
-                    found1 = False
-                    for item2 in dict2:
-                        if is_dict_equals(item1, item2, exclude):
-                            found1 = True
-                    if not found1:
-                        return False
-                else:
-                    if item1 not in dict2:
-                        return False
-                    else:
-                        found = True
-                if not found:
+            else:
+                if item1 not in struct2:
                     return False
-            return found
-        elif type(dict1) is dict and type(dict2) is dict:
-            if len(dict1) == 0 and len(dict2) == 0:
-                return True
-            for key in dict1:
+        return True
+    elif isinstance(struct1, dict) and isinstance(struct2, dict):
+        try:
+            for key in struct1:
                 if not (exclude and key in exclude):
-                    if not is_dict_equals(dict1[key], dict2[key], exclude):
+                    if not is_struct_included(struct1[key], struct2[key], exclude):
                         return False
             return True
-        elif type(dict1) is bool and type(dict2) is bool:
-            return dict1 == dict2
-        else:
-            return to_text(dict1, 'utf-8') == to_text(dict2, 'utf-8')
-    except KeyError:
-        return False
+        except KeyError:
+            return False
+    elif isinstance(struct1, bool) and isinstance(struct2, bool):
+        return struct1 == struct2
+    else:
+        return to_text(struct1, 'utf-8') == to_text(struct2, 'utf-8')
 
 
 class KeycloakAPI(object):
@@ -759,79 +739,6 @@ class KeycloakAPI(object):
         except Exception as e:
             self.module.fail_json(msg='Could not create empty authentication flow %s in realm %s: %s'
                                   % (config["alias"], realm, str(e)))
-
-    def create_or_update_executions(self, config, realm='master'):
-        """
-        Create or update executions for an authentication flow.
-        :param config: Representation of the authentication flow including it's executions.
-        :param realm: Realm
-        :return: True if executions have been modified. False otherwise.
-        """
-        try:
-            changed = False
-            if "authenticationExecutions" in config:
-                for newExecutionIndex, newExecution in enumerate(config["authenticationExecutions"], start=0):
-                    # Get existing executions on the Keycloak server for this alias
-                    existingExecutions = self.get_executions_representation(config, realm=realm)
-                    executionFound = False
-                    # Get flowalias parent if given
-                    if "flowAlias" in newExecution:
-                        flowAliasParent = newExecution["flowAlias"]
-                    else:
-                        flowAliasParent = config["alias"]
-                    # Check if same providerId or displayName name between existing and new execution
-                    for i, existingExecution in enumerate(existingExecutions, start=0):
-                        if ("providerId" in existingExecution and "providerId" in newExecution and
-                                existingExecution["providerId"] == newExecution["providerId"] or
-                                "displayName" in existingExecution and "displayName" in newExecution and
-                                existingExecution["displayName"] == newExecution["displayName"]):
-                            executionFound = True
-                            existingExecutionIndex = i
-                            break
-                    if executionFound:
-                        # Remove key that doesn't need to be compared with existingExecution
-                        newExecutionConfig = newExecution
-                        if "flowAlias" in newExecutionConfig:
-                            del newExecutionConfig["flowAlias"]
-                        # Compare the executions to see if it need changes
-                        if not is_dict_equals(newExecutionConfig, existingExecution) or existingExecutionIndex != newExecutionIndex:
-                            changed = True
-                    elif "providerId" in newExecution:
-                        self.create_execution(newExecution, flowAlias=flowAliasParent, realm=realm)
-                        changed = True
-                    elif "displayName" in newExecution:
-                        self.create_subflow(newExecution["displayName"], flowAliasParent, realm=realm)
-                        changed = True
-                    if changed:
-                        # Get existing executions on the Keycloak server for this alias
-                        existingExecutions = self.get_executions_representation(config, realm=realm)
-                        for i, existingExecution in enumerate(existingExecutions, start=0):
-                            if ("providerId" in existingExecution and "providerId" in newExecution and
-                                    existingExecution["providerId"] == newExecution["providerId"] or
-                                    "displayName" in existingExecution and "displayName" in newExecution and
-                                    existingExecution["displayName"] == newExecution["displayName"]):
-                                executionFound = True
-                                existingExecutionIndex = i
-                                break
-                        if executionFound:
-                            # Update the existing execution
-                            updatedExec = {}
-                            updatedExec["id"] = existingExecution["id"]
-                            for key in newExecution:
-                                # create the execution configuration
-                                if key == "authenticationConfig":
-                                    self.add_authenticationConfig_to_execution(existingExecution["id"], newExecution["authenticationConfig"], realm=realm)
-                                # remove potential flowAlias for the next API call
-                                elif key != "flowAlias":
-                                    updatedExec[key] = newExecution[key]
-                            if "requirement" in newExecution:
-                                self.update_authentication_executions(flowAliasParent, updatedExec, realm=realm)
-                            diff = existingExecutionIndex - newExecutionIndex
-                            self.change_execution_priority(existingExecution["id"], diff, realm=realm)
-            return changed
-        except Exception as e:
-            self.module.fail_json(msg='Could not create or update executions for authentication flow %s in realm %s: %s \n %s'
-                                  % (config["alias"], realm, str(e), updatedExec))
 
     def update_authentication_executions(self, flowAlias, updatedExec, realm='master'):
         """ Update authentication executions
