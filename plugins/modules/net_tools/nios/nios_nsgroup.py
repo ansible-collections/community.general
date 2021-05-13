@@ -11,6 +11,10 @@ DOCUMENTATION = '''
 ---
 module: nios_nsgroup
 short_description: Configure InfoBlox DNS Nameserver Groups
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding module from it.
+    alternative: infoblox.nios_modules.nios_nsgroup
+    removed_in: 5.0.0
 extends_documentation_fragment:
 - community.general.nios
 

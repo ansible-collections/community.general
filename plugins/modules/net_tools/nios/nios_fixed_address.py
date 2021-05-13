@@ -10,6 +10,10 @@ DOCUMENTATION = '''
 module: nios_fixed_address
 author: "Sumit Jaiswal (@sjaiswal)"
 short_description: Configure Infoblox NIOS DHCP Fixed Address
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding module from it.
+    alternative: infoblox.nios_modules.nios_fixed_address
+    removed_in: 5.0.0
 description:
   - A fixed address is a specific IP address that a DHCP server
     always assigns when a lease request comes from a particular

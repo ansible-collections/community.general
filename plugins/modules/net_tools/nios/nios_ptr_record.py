@@ -11,6 +11,10 @@ DOCUMENTATION = '''
 module: nios_ptr_record
 author: "Trebuchet Clement (@clementtrebuchet)"
 short_description: Configure Infoblox NIOS PTR records
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding module from it.
+    alternative: infoblox.nios_modules.nios_ptr_record
+    removed_in: 5.0.0
 description:
   - Adds and/or removes instances of PTR record objects from
     Infoblox NIOS servers.  This module manages NIOS C(record:ptr) objects
