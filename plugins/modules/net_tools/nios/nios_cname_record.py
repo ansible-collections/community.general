@@ -10,6 +10,10 @@ DOCUMENTATION = '''
 module: nios_cname_record
 author: "Blair Rampling (@brampling)"
 short_description: Configure Infoblox NIOS CNAME records
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding module from it.
+    alternative: infoblox.nios_modules.nios_cname_record
+    removed_in: 5.0.0
 description:
   - Adds and/or removes instances of CNAME record objects from
     Infoblox NIOS servers.  This module manages NIOS C(record:cname) objects
