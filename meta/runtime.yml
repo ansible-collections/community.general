@@ -37,6 +37,18 @@ plugin_routing:
       redirect: community.google.gcp_storage_file
     hashi_vault:
       redirect: community.hashi_vault.hashi_vault
+    nios:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios lookup plugin has been deprecated. Please use infoblox.nios_modules.nios_lookup instead.
+    nios_next_ip:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_next_ip lookup plugin has been deprecated. Please use infoblox.nios_modules.nios_next_ip instead.
+    nios_next_network:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_next_network lookup plugin has been deprecated. Please use infoblox.nios_modules.nios_next_network instead.
   modules:
     ali_instance_facts:
       tombstone:
@@ -283,6 +295,70 @@ plugin_routing:
       tombstone:
         removal_version: 3.0.0
         warning_text: Use netapp.ontap.na_ontap_info instead.
+    nios_a_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_a_record module has been deprecated. Please use infoblox.nios_modules.nios_a_record instead.
+    nios_aaaa_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_aaaa_record module has been deprecated. Please use infoblox.nios_modules.nios_aaaa_record instead.
+    nios_cname_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_cname_record module has been deprecated. Please use infoblox.nios_modules.nios_cname_record instead.
+    nios_dns_view:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_dns_view module has been deprecated. Please use infoblox.nios_modules.nios_dns_view instead.
+    nios_fixed_address:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_fixed_address module has been deprecated. Please use infoblox.nios_modules.nios_fixed_address instead.
+    nios_host_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_host_record module has been deprecated. Please use infoblox.nios_modules.nios_host_record instead.
+    nios_member:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_member module has been deprecated. Please use infoblox.nios_modules.nios_member instead.
+    nios_mx_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_mx_record module has been deprecated. Please use infoblox.nios_modules.nios_mx_record instead.
+    nios_naptr_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_naptr_record module has been deprecated. Please use infoblox.nios_modules.nios_naptr_record instead.
+    nios_network:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_network module has been deprecated. Please use infoblox.nios_modules.nios_network instead.
+    nios_network_view:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_network_view module has been deprecated. Please use infoblox.nios_modules.nios_network_view instead.
+    nios_nsgroup:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_nsgroup module has been deprecated. Please use infoblox.nios_modules.nios_nsgroup instead.
+    nios_ptr_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_ptr_record module has been deprecated. Please use infoblox.nios_modules.nios_ptr_record instead.
+    nios_srv_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_srv_record module has been deprecated. Please use infoblox.nios_modules.nios_srv_record instead.
+    nios_txt_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_txt_record module has been deprecated. Please use infoblox.nios_modules.nios_txt_record instead.
+    nios_zone:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_zone module has been deprecated. Please use infoblox.nios_modules.nios_zone instead.
     nginx_status_facts:
       tombstone:
         removal_version: 3.0.0
@@ -568,11 +644,13 @@ plugin_routing:
       redirect: community.kubevirt.kubevirt_common_options
     kubevirt_vm_options:
       redirect: community.kubevirt.kubevirt_vm_options
+    nios:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios document fragment has been deprecated. Please use infoblox.nios_modules.nios instead.
     postgresql:
       redirect: community.postgresql.postgresql
   module_utils:
-    remote_management.dellemc.dellemc_idrac:
-      redirect: dellemc.openmanage.dellemc_idrac
     docker.common:
       redirect: community.docker.common
     docker.swarm:
@@ -587,6 +665,12 @@ plugin_routing:
       redirect: community.hrobot.robot
     kubevirt:
       redirect: community.kubevirt.kubevirt
+    net_tools.nios.api:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.net_tools.nios.api module_utils has been deprecated. Please use infoblox.nios_modules.api instead.
+    remote_management.dellemc.dellemc_idrac:
+      redirect: dellemc.openmanage.dellemc_idrac
     remote_management.dellemc.ome:
       redirect: dellemc.openmanage.ome
     postgresql:

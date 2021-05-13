@@ -10,6 +10,10 @@ DOCUMENTATION = '''
 module: nios_aaaa_record
 author: "Blair Rampling (@brampling)"
 short_description: Configure Infoblox NIOS AAAA records
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding module from it.
+    alternative: infoblox.nios_modules.nios_aaaa_record
+    removed_in: 5.0.0
 description:
   - Adds and/or removes instances of AAAA record objects from
     Infoblox NIOS servers.  This module manages NIOS C(record:aaaa) objects

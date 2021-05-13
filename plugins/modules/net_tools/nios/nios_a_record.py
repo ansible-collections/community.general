@@ -10,6 +10,10 @@ DOCUMENTATION = '''
 module: nios_a_record
 author: "Blair Rampling (@brampling)"
 short_description: Configure Infoblox NIOS A records
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding module from it.
+    alternative: infoblox.nios_modules.nios_a_record
+    removed_in: 5.0.0
 description:
   - Adds and/or removes instances of A record objects from
     Infoblox NIOS servers.  This module manages NIOS C(record:a) objects
