@@ -145,6 +145,7 @@ except ImportError:
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.general.plugins.module_utils.proxmox import proxmox_auth_argument_spec
 
+
 def get_vmid(module, proxmox, name):
     try:
         vms = [vm['vmid'] for vm in proxmox.cluster.resources.get(type='vm') if vm.get('name') == name]
