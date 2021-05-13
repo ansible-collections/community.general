@@ -143,7 +143,7 @@ def get_token(module_params):
     }
 
 
-def isDictEquals(dict1, dict2, exclude=None):
+def is_dict_equals(dict1, dict2, exclude=None):
     """
     This function compare if tthe first parameter structure, is included in the second.
     The function use every elements of dict1 and validates they are present in the dict2 structure.
@@ -181,14 +181,14 @@ def isDictEquals(dict1, dict2, exclude=None):
                 if isinstance(item1, list):
                     found1 = False
                     for item2 in dict2:
-                        if isDictEquals(item1, item2, exclude):
+                        if is_dict_equals(item1, item2, exclude):
                             found1 = True
                     if not found1:
                         return False
                 elif isinstance(item1, dict):
                     found1 = False
                     for item2 in dict2:
-                        if isDictEquals(item1, item2, exclude):
+                        if is_dict_equals(item1, item2, exclude):
                             found1 = True
                     if not found1:
                         return False
@@ -205,7 +205,7 @@ def isDictEquals(dict1, dict2, exclude=None):
                 return True
             for key in dict1:
                 if not (exclude and key in exclude):
-                    if not isDictEquals(dict1[key], dict2[key], exclude):
+                    if not is_dict_equals(dict1[key], dict2[key], exclude):
                         return False
             return True
         elif type(dict1) is bool and type(dict2) is bool:
@@ -664,14 +664,14 @@ class KeycloakAPI(object):
         :return: Authentication flow representation.
         """
         try:
-            authenticationFlow = {}
+            authentication_flow = {}
             # Check if the authentication flow exists on the Keycloak serveraders
             authentications = json.load(open_url(URL_AUTHENTICATION_FLOWS.format(url=self.baseurl, realm=realm), method='GET', headers=self.restheaders))
             for authentication in authentications:
                 if authentication["alias"] == alias:
-                    authenticationFlow = authentication
+                    authentication_flow = authentication
                     break
-            return authenticationFlow
+            return authentication_flow
         except Exception as e:
             self.module.fail_json(msg="Unable get authentication flow %s: %s" % (alias, str(e)))
 
@@ -699,7 +699,7 @@ class KeycloakAPI(object):
         :return: Representation of the new authentication flow.
         """
         try:
-            newName = dict(
+            new_name = dict(
                 newName=config["alias"]
             )
             open_url(
@@ -709,14 +709,14 @@ class KeycloakAPI(object):
                     copyfrom=quote(config["copyFrom"])),
                 method='POST',
                 headers=self.restheaders,
-                data=json.dumps(newName))
-            flowList = json.load(
+                data=json.dumps(new_name))
+            flow_list = json.load(
                 open_url(
                     URL_AUTHENTICATION_FLOWS.format(url=self.baseurl,
                                                     realm=realm),
                     method='GET',
                     headers=self.restheaders))
-            for flow in flowList:
+            for flow in flow_list:
                 if flow["alias"] == config["alias"]:
                     return flow
             return None
@@ -732,7 +732,7 @@ class KeycloakAPI(object):
         :return: Representation of the new authentication flow.
         """
         try:
-            newFlow = dict(
+            new_flow = dict(
                 alias=config["alias"],
                 providerId=config["providerId"],
                 description=config["description"],
@@ -744,15 +744,15 @@ class KeycloakAPI(object):
                     realm=realm),
                 method='POST',
                 headers=self.restheaders,
-                data=json.dumps(newFlow))
-            flowList = json.load(
+                data=json.dumps(new_flow))
+            flow_list = json.load(
                 open_url(
                     URL_AUTHENTICATION_FLOWS.format(
                         url=self.baseurl,
                         realm=realm),
                     method='GET',
                     headers=self.restheaders))
-            for flow in flowList:
+            for flow in flow_list:
                 if flow["alias"] == config["alias"]:
                     return flow
             return None
@@ -794,7 +794,7 @@ class KeycloakAPI(object):
                         if "flowAlias" in newExecutionConfig:
                             del newExecutionConfig["flowAlias"]
                         # Compare the executions to see if it need changes
-                        if not isDictEquals(newExecutionConfig, existingExecution) or existingExecutionIndex != newExecutionIndex:
+                        if not is_dict_equals(newExecutionConfig, existingExecution) or existingExecutionIndex != newExecutionIndex:
                             changed = True
                     elif "providerId" in newExecution:
                         self.create_execution(newExecution, flowAlias=flowAliasParent, realm=realm)

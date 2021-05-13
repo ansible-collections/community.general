@@ -211,40 +211,41 @@ def main():
     state = module.params.get('state')
     force = module.params.get('force')
 
-    newAuthenticationRepresentation = {}
-    newAuthenticationRepresentation["alias"] = module.params.get("alias")
-    newAuthenticationRepresentation["copyFrom"] = module.params.get("copyFrom")
-    newAuthenticationRepresentation["providerId"] = module.params.get("providerId")
-    newAuthenticationRepresentation["authenticationExecutions"] = module.params.get("authenticationExecutions")
-    newAuthenticationRepresentation["description"] = module.params.get("description")
-    newAuthenticationRepresentation["builtIn"] = module.params.get("builtIn")
-    newAuthenticationRepresentation["subflow"] = module.params.get("subflow")
+    new_auth_repr = {
+        "alias": module.params.get("alias"),
+        "copyFrom": module.params.get("copyFrom"),
+        "providerId": module.params.get("providerId"),
+        "authenticationExecutions": module.params.get("authenticationExecutions"),
+        "description": module.params.get("description"),
+        "builtIn": module.params.get("builtIn"),
+        "subflow": module.params.get("subflow"),
+    }
 
     changed = False
 
-    authenticationRepresentation = kc.get_authentication_flow_by_alias(alias=newAuthenticationRepresentation["alias"], realm=realm)
+    authenticationRepresentation = kc.get_authentication_flow_by_alias(alias=new_auth_repr["alias"], realm=realm)
     if authenticationRepresentation == {}:  # Authentication flow does not exist
-        if (state == 'present'):  # If desired state is prenset
+        if state == 'present':  # If desired state is prenset
             # If copyFrom is defined, create authentication flow from a copy
-            if "copyFrom" in newAuthenticationRepresentation and newAuthenticationRepresentation["copyFrom"] is not None:
-                authenticationRepresentation = kc.copy_auth_flow(config=newAuthenticationRepresentation, realm=realm)
+            if "copyFrom" in new_auth_repr and new_auth_repr["copyFrom"] is not None:
+                authenticationRepresentation = kc.copy_auth_flow(config=new_auth_repr, realm=realm)
             else:  # Create an empty authentication flow
-                authenticationRepresentation = kc.create_empty_auth_flow(config=newAuthenticationRepresentation, realm=realm)
+                authenticationRepresentation = kc.create_empty_auth_flow(config=new_auth_repr, realm=realm)
             # If the authentication still not exist on the server, raise an exception.
             if authenticationRepresentation is None:
-                result['msg'] = "Authentication just created not found: " + str(newAuthenticationRepresentation)
+                result['msg'] = "Authentication just created not found: " + str(new_auth_repr)
                 module.fail_json(**result)
             # Configure the executions for the flow
-            kc.create_or_update_executions(config=newAuthenticationRepresentation, realm=realm)
+            kc.create_or_update_executions(config=new_auth_repr, realm=realm)
             changed = True
             # Get executions created
-            executionsRepresentation = kc.get_executions_representation(config=newAuthenticationRepresentation, realm=realm)
+            executionsRepresentation = kc.get_executions_representation(config=new_auth_repr, realm=realm)
             if executionsRepresentation is not None:
                 authenticationRepresentation["authenticationExecutions"] = executionsRepresentation
             result['changed'] = changed
             result['flow'] = authenticationRepresentation
         elif state == 'absent':  # If desired state is absent.
-            result['msg'] = newAuthenticationRepresentation["alias"] + ' absent'
+            result['msg'] = new_auth_repr["alias"] + ' absent'
     else:  # The authentication flow already exist
         if (state == 'present'):  # if desired state is present
             if force:  # If force option is true
@@ -252,20 +253,20 @@ def main():
                 kc.delete_authentication_flow_by_id(id=authenticationRepresentation["id"], realm=realm)
                 changed = True
                 # If copyFrom is defined, create authentication flow from a copy
-                if "copyFrom" in newAuthenticationRepresentation and newAuthenticationRepresentation["copyFrom"] is not None:
-                    authenticationRepresentation = kc.copy_auth_flow(config=newAuthenticationRepresentation, realm=realm)
+                if "copyFrom" in new_auth_repr and new_auth_repr["copyFrom"] is not None:
+                    authenticationRepresentation = kc.copy_auth_flow(config=new_auth_repr, realm=realm)
                 else:  # Create an empty authentication flow
-                    authenticationRepresentation = kc.create_empty_auth_flow(config=newAuthenticationRepresentation, realm=realm)
+                    authenticationRepresentation = kc.create_empty_auth_flow(config=new_auth_repr, realm=realm)
                 # If the authentication still not exist on the server, raise an exception.
                 if authenticationRepresentation is None:
-                    result['msg'] = "Authentication just created not found: " + str(newAuthenticationRepresentation)
+                    result['msg'] = "Authentication just created not found: " + str(new_auth_repr)
                     result['changed'] = changed
                     module.fail_json(**result)
             # Configure the executions for the flow
-            if kc.create_or_update_executions(config=newAuthenticationRepresentation, realm=realm):
+            if kc.create_or_update_executions(config=new_auth_repr, realm=realm):
                 changed = True
             # Get executions created
-            executionsRepresentation = kc.get_executions_representation(config=newAuthenticationRepresentation, realm=realm)
+            executionsRepresentation = kc.get_executions_representation(config=new_auth_repr, realm=realm)
             if executionsRepresentation is not None:
                 authenticationRepresentation["authenticationExecutions"] = executionsRepresentation
             result['flow'] = authenticationRepresentation
@@ -274,7 +275,8 @@ def main():
             # Delete the authentication flow alias.
             kc.delete_authentication_flow_by_id(id=authenticationRepresentation["id"], realm=realm)
             changed = True
-            result['msg'] = 'Authentication flow: ' + newAuthenticationRepresentation['alias'] + ' id: ' + authenticationRepresentation["id"] + ' is deleted'
+            result['msg'] = 'Authentication flow: {alias} id: {id} is deleted'.format(alias=new_auth_repr['alias'],
+                                                                                      id=authenticationRepresentation["id"])
             result['changed'] = changed
 
     module.exit_json(**result)
