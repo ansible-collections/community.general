@@ -10,6 +10,10 @@ DOCUMENTATION = '''
 module: nios_member
 author: "Krishna Vasudevan (@krisvasudevan)"
 short_description: Configure Infoblox NIOS members
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding module from it.
+    alternative: infoblox.nios_modules.nios_member
+    removed_in: 5.0.0
 description:
   - Adds and/or removes Infoblox NIOS servers.  This module manages NIOS C(member) objects using the Infoblox WAPI interface over REST.
 requirements:

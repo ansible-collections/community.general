@@ -10,6 +10,10 @@ DOCUMENTATION = '''
 module: nios_host_record
 author: "Peter Sprygada (@privateip)"
 short_description: Configure Infoblox NIOS host records
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding module from it.
+    alternative: infoblox.nios_modules.nios_host_record
+    removed_in: 5.0.0
 description:
   - Adds and/or removes instances of host record objects from
     Infoblox NIOS servers.  This module manages NIOS C(record:host) objects

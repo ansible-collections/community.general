@@ -25,6 +25,10 @@ DOCUMENTATION = '''
 author: Unknown (!UNKNOWN)
 name: nios
 short_description: Query Infoblox NIOS objects
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding lookup from it.
+    alternative: infoblox.nios_modules.nios_lookup
+    removed_in: 5.0.0
 description:
   - Uses the Infoblox WAPI API to fetch NIOS specified objects.  This lookup
     supports adding additional keywords to filter the return data and specify

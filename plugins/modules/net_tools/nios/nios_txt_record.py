@@ -10,6 +10,10 @@ DOCUMENTATION = '''
 module: nios_txt_record
 author: "Corey Wanless (@coreywan)"
 short_description: Configure Infoblox NIOS txt records
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding module from it.
+    alternative: infoblox.nios_modules.nios_txt_record
+    removed_in: 5.0.0
 description:
   - Adds and/or removes instances of txt record objects from
     Infoblox NIOS servers.  This module manages NIOS C(record:txt) objects
