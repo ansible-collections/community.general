@@ -1,0 +1,31 @@
+---
+list1:
+  - name: a
+    x: y
+  - name: b
+    z: 1
+
+dict1:
+  a:
+    name: a
+    x: y
+  b:
+    name: b
+    z: 1
+
+list_no_list:
+  a:
+    name: a
+
+list_no_dict:
+  - []
+  - 1
+
+list_no_attribute:
+  - name: a
+    foo: baz
+  - foo: bar
+
+list_collision:
+  - name: a
+  - name: a
