@@ -25,6 +25,10 @@ DOCUMENTATION = '''
 author: Unknown (!UNKNOWN)
 name: nios_next_network
 short_description: Return the next available network range for a network-container
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding lookup from it.
+    alternative: infoblox.nios_modules.nios_next_network
+    removed_in: 5.0.0
 description:
   - Uses the Infoblox WAPI API to return the next available network addresses for
     a given network CIDR
