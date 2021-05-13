@@ -10,6 +10,10 @@ DOCUMENTATION = '''
 module: nios_network
 author: "Peter Sprygada (@privateip)"
 short_description: Configure Infoblox NIOS network object
+deprecated:
+    why: Please install the infoblox.nios_modules collection and use the corresponding module from it.
+    alternative: infoblox.nios_modules.nios_network
+    removed_in: 5.0.0
 description:
   - Adds and/or removes instances of network objects from
     Infoblox NIOS servers.  This module manages NIOS C(network) objects
