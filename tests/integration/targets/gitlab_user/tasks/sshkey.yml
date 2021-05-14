@@ -1,0 +1,134 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Create gitlab user with sshkey credentials
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    password: "{{ gitlab_user_pass }}"
+    validate_certs: false
+    sshkey_name: "{{ gitlab_sshkey_name }}"
+    sshkey_file: "{{ gitlab_sshkey_file }}"
+    state: present
+  register: gitlab_user_sshkey
+
+- name: Check user has been created correctly
+  assert:
+    that:
+      - gitlab_user_sshkey is changed
+
+- name: Create gitlab user again
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    password: "{{ gitlab_user_pass }}"
+    validate_certs: false
+    sshkey_name: "{{ gitlab_sshkey_name }}"
+    sshkey_file: "{{ gitlab_sshkey_file }}"
+    state: present
+  register: gitlab_user_sshkey_again
+
+- name: Check state is not changed
+  assert:
+    that:
+      - gitlab_user_sshkey_again is not changed
+
+- name: Add expires_at to an already created gitlab user with ssh key
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    password: "{{ gitlab_user_pass }}"
+    validate_certs: false
+    sshkey_name: "{{ gitlab_sshkey_name }}"
+    sshkey_file: "{{ gitlab_sshkey_file }}"
+    sshkey_expires_at: "{{ gitlab_sshkey_expires_at }}"
+    state: present
+  register: gitlab_user_created_user_sshkey_expires_at
+
+- name: Check expires_at will not be added to a present ssh key
+  assert:
+    that:
+      - gitlab_user_created_user_sshkey_expires_at is not changed
+
+- name: Remove created gitlab user
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    validate_certs: false
+    state: absent
+  register: gitlab_user_sshkey_remove
+
+- name: Check user has been removed correctly
+  assert:
+    that:
+      - gitlab_user_sshkey_remove is changed
+
+- name: Create gitlab user with sshkey and expires_at
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    password: "{{ gitlab_user_pass }}"
+    validate_certs: false
+    sshkey_name: "{{ gitlab_sshkey_name }}"
+    sshkey_file: "{{ gitlab_sshkey_file }}"
+    sshkey_expires_at: "{{ gitlab_sshkey_expires_at }}"
+    state: present
+  register: gitlab_user_sshkey_expires_at
+
+- name: Check user has been created correctly
+  assert:
+    that:
+      - gitlab_user_sshkey_expires_at is changed
+
+- name: Create gitlab user with sshkey and expires_at again
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    password: "{{ gitlab_user_pass }}"
+    validate_certs: false
+    sshkey_name: "{{ gitlab_sshkey_name }}"
+    sshkey_file: "{{ gitlab_sshkey_file }}"
+    sshkey_expires_at: "{{ gitlab_sshkey_expires_at }}"
+    state: present
+  register: gitlab_user_sshkey_expires_at_again
+
+- name: Check state is not changed
+  assert:
+    that:
+      - gitlab_user_sshkey_expires_at_again is not changed
+
+- name: Remove created gitlab user
+  gitlab_user:
+    api_url: "{{ gitlab_host }}"
+    api_token: "{{ gitlab_login_token }}"
+    email: "{{ gitlab_user_email }}"
+    name: "{{ gitlab_user }}"
+    username: "{{ gitlab_user }}"
+    validate_certs: false
+    state: absent
+  register: gitlab_user_sshkey_expires_at_remove
+
+- name: Check user has been removed correctly
+  assert:
+    that:
+      - gitlab_user_sshkey_expires_at_remove is changed
