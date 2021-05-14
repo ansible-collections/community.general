@@ -1,3 +1,0 @@
----
-bugfixes:
-  - proxmox_nic - set mtu on interface even if it is not virtio(https://github.com/ansible-collections/community.general/pull/2505).
