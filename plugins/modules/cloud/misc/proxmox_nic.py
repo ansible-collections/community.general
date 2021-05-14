@@ -211,9 +211,8 @@ def update_nic(module, proxmox, vmid, interface, model, **kwargs):
         config_provided += ',link_down=1'
 
     if kwargs['mtu']:
-        if model == 'virtio':
-            config_provided += ",mtu={0}".format(kwargs['mtu'])
-        else:
+        config_provided += ",mtu={0}".format(kwargs['mtu'])
+        if model != 'virtio':
             module.warn(
                 'Ignoring MTU for nic {0} on VM with vmid {1}, '
                 'model should be set to \'virtio\': '.format(interface, vmid))
