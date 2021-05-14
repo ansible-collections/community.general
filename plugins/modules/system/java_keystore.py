@@ -254,7 +254,7 @@ class JavaKeystore:
                         backend=backend
                     )
             except (OSError, ValueError) as e:
-                self.module.fail_json(msg="Unable to read the provided certificate:%s" % to_native(e))
+                self.module.fail_json(msg="Unable to read the provided certificate: %s" % to_native(e))
 
             fp = hex_decode(cert.fingerprint(hashes.SHA256())).upper()
             fingerprint = ':'.join([fp[i:i + 2] for i in range(0, len(fp), 2)])
@@ -410,7 +410,7 @@ class JavaKeystore:
 
     def create(self):
         if self.module.check_mode:
-            return self.module.exit_json(changed=True)
+            return {'changed': True}
 
         if os.path.exists(self.keystore_path):
             os.remove(self.keystore_path)
@@ -439,12 +439,12 @@ class JavaKeystore:
             return self.module.fail_json(msg=import_keystore_out, cmd=import_keystore_cmd, rc=rc)
 
         self.update_permissions()
-        return self.module.exit_json(
-            changed=True,
-            msg=import_keystore_out,
-            cmd=import_keystore_cmd,
-            rc=rc
-        )
+        return {
+            'changed': True,
+            'msg': import_keystore_out,
+            'cmd': import_keystore_cmd,
+            'rc': rc
+        }
 
     def exists(self):
         return os.path.exists(self.keystore_path)
@@ -507,15 +507,18 @@ def main():
     )
     module.run_command_environ_update = dict(LANG='C', LC_ALL='C', LC_MESSAGES='C')
 
+    result = dict()
     jks = JavaKeystore(module)
 
     if jks.exists():
         if module.params['force'] or jks.cert_changed():
-            jks.create()
+            result = jks.create()
         else:
-            module.exit_json(changed=jks.update_permissions())
+            result['changed'] = jks.update_permissions()
     else:
-        jks.create()
+        result = jks.create()
+
+    module.exit_json(**result)
 
 
 if __name__ == '__main__':

@@ -69,24 +69,21 @@ class TestCreateJavaKeystore(ModuleTestCase):
             supports_check_mode=self.spec.supports_check_mode
         )
 
-        module.exit_json = Mock()
-
         with patch('os.remove', return_value=True):
             self.create_path.side_effect = ['/tmp/tmpgrzm2ah7']
             self.create_file.side_effect = ['/tmp/etacifitrec', '/tmp/yek_etavirp', '']
             self.run_command.side_effect = [(0, '', ''), (0, '', '')]
             self.get_bin_path.side_effect = ['keytool', 'openssl', '']
             jks = JavaKeystore(module)
-            jks.create()
-            module.exit_json.assert_called_once_with(
-                changed=True,
-                cmd=["keytool", "-importkeystore",
-                     "-destkeystore", "/path/to/keystore.jks",
-                     "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
-                     "-deststorepass:env", "STOREPASS", "-srcstorepass:env", "STOREPASS", "-noprompt"],
-                msg='',
-                rc=0
-            )
+            assert jks.create() == {
+                'changed': True,
+                'cmd': ["keytool", "-importkeystore",
+                        "-destkeystore", "/path/to/keystore.jks",
+                        "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
+                        "-deststorepass:env", "STOREPASS", "-srcstorepass:env", "STOREPASS", "-noprompt"],
+                'msg': '',
+                'rc': 0
+            }
 
     def test_create_jks_keypass_fail_export_pkcs12(self):
         set_module_args(dict(
