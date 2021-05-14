@@ -88,7 +88,7 @@ EXAMPLES = '''
     state: present
 
 - name: Import a key via url
-  pacman_key:
+  community.general.pacman_key:
     id: 01234567890ABCDE01234567890ABCDE12345678
     url: https://domain.tld/keys/keyfile.asc
     state: present
