@@ -22,6 +22,7 @@ notes:
 - By default, keys will be locally signed after being imported into the keyring.
 - If the specified key id exists in the keyring, the key will not be added.
 - I(data), I(file), and I(url) are mutually exclusive.
+- Supports C(check_mode).
 requirements:
 - gpg
 - pacman-key
