@@ -12,7 +12,7 @@ DOCUMENTATION = '''
 module: pacman_key
 author:
 - George Rawlinson (@grawlinson) <george@rawlinson.net.nz>
-version_added: "1.1.0"
+version_added: "1.3.0"
 short_description: Manage pacman's list of trusted keys
 description:
 - Add or remove gpg keys from the pacman keyring.
