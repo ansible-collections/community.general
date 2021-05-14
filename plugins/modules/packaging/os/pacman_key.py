@@ -78,7 +78,7 @@ options:
 
 EXAMPLES = '''
 - name: Import a key via local file
-  pacman_key:
+  community.general.pacman_key:
     data: "{{ lookup('file', 'keyfile.asc') }}"
     state: present
 
