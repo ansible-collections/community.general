@@ -1,0 +1,2 @@
+bugfixes:
+  - jenkins_plugin - Use POST method for enable/disable request to jenkins api (https://github.com/ansible-collections/community.general/issues/2510)
