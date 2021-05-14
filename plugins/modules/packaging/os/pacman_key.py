@@ -105,7 +105,7 @@ EXAMPLES = '''
     keyring: /etc/pacman.d/gnupg-alternative
 
 - name: Remove a key from the keyring
-  pacman_key:
+  community.general.pacman_key:
     id: 01234567890ABCDE01234567890ABCDE12345678
     state: absent
 '''
