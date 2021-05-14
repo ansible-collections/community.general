@@ -23,6 +23,7 @@
     private_key_path: "{{ omit if not remote_cert else output_dir ~ '/' ~ (item.keyname | d(item.name)) ~ '.key' }}"
     private_key_passphrase: "{{ item.passphrase | d(omit) }}"
     password: changeit
+    ssl_backend: "{{ ssl_backend }}"
   loop: "{{ java_keystore_certs }}"
   check_mode: yes
   register: result_check
