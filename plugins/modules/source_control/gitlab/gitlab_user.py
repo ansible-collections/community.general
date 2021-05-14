@@ -57,16 +57,22 @@ options:
     type: str
   sshkey_name:
     description:
-      - The name of the sshkey
+      - The name of the SSH public key.
     type: str
   sshkey_file:
     description:
-      - The ssh key itself.
+      - The SSH public key itself.
     type: str
+  sshkey_expires_at:
+    description:
+      - The expiration date of the SSH public key in ISO 8601 format C(YYYY-MM-DDTHH:MM:SSZ).
+      - This is only used when adding new SSH public keys.
+    type: str
+    version_added: 3.1.0
   group:
     description:
       - Id or Full path of parent group in the form of group/name.
-      - Add user as an member to this group.
+      - Add user as a member to this group.
     type: str
   access_level:
     description:
@@ -254,7 +260,8 @@ class GitLabUser(object):
         if options['sshkey_name'] and options['sshkey_file']:
             key_changed = self.addSshKeyToUser(user, {
                 'name': options['sshkey_name'],
-                'file': options['sshkey_file']})
+                'file': options['sshkey_file'],
+                'expires_at': options['sshkey_expires_at']})
             changed = changed or key_changed
 
         # Assign group
@@ -295,7 +302,7 @@ class GitLabUser(object):
 
     '''
     @param user User object
-    @param sshkey Dict containing sshkey infos {"name": "", "file": ""}
+    @param sshkey Dict containing sshkey infos {"name": "", "file": "", "expires_at": ""}
     '''
     def addSshKeyToUser(self, user, sshkey):
         if not self.sshKeyExists(user, sshkey['name']):
@@ -303,9 +310,13 @@ class GitLabUser(object):
                 return True
 
             try:
-                user.keys.create({
+                parameter = {
                     'title': sshkey['name'],
-                    'key': sshkey['file']})
+                    'key': sshkey['file'],
+                }
+                if sshkey['expires_at'] is not None:
+                    parameter['expires_at'] = sshkey['expires_at']
+                user.keys.create(parameter)
             except gitlab.exceptions.GitlabCreateError as e:
                 self._module.fail_json(msg="Failed to assign sshkey to user: %s" % to_native(e))
             return True
@@ -471,6 +482,7 @@ def main():
         email=dict(type='str'),
         sshkey_name=dict(type='str'),
         sshkey_file=dict(type='str', no_log=False),
+        sshkey_expires_at=dict(type='str', no_log=False),
         group=dict(type='str'),
         access_level=dict(type='str', default="guest", choices=["developer", "guest", "maintainer", "master", "owner", "reporter"]),
         confirm=dict(type='bool', default=True),
@@ -503,6 +515,7 @@ def main():
     user_email = module.params['email']
     user_sshkey_name = module.params['sshkey_name']
     user_sshkey_file = module.params['sshkey_file']
+    user_sshkey_expires_at = module.params['sshkey_expires_at']
     group_path = module.params['group']
     access_level = module.params['access_level']
     confirm = module.params['confirm']
@@ -549,6 +562,7 @@ def main():
                                           "email": user_email,
                                           "sshkey_name": user_sshkey_name,
                                           "sshkey_file": user_sshkey_file,
+                                          "sshkey_expires_at": user_sshkey_expires_at,
                                           "group_path": group_path,
                                           "access_level": access_level,
                                           "confirm": confirm,
