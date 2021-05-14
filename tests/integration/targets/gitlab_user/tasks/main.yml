@@ -56,7 +56,7 @@
       - gitlab_user_state_again.user.is_admin == False
 
 
-- name: Update User Test => Make User Admin 
+- name: Update User Test => Make User Admin
   gitlab_user:
     api_url: "{{ gitlab_host }}"
     email: "{{ gitlab_user_email }}"
@@ -189,8 +189,8 @@
     api_url: "{{ gitlab_host }}"
     validate_certs: False
 
-    # note: the only way to check if a password really is what it is expected 
-    #   to be is to use it for login, so we use it here instead of the 
+    # note: the only way to check if a password really is what it is expected
+    #   to be is to use it for login, so we use it here instead of the
     #   default token assuming that a user can always change its own password
     api_username: "{{ gitlab_user }}"
     api_password: "{{ gitlab_user_pass }}"
@@ -205,8 +205,8 @@
 - name: Check PW setting return state
   assert:
     that:
-        # note: there is no way to determine if a password has changed or 
-        #   not, so it can only be always yellow or always green, we 
+        # note: there is no way to determine if a password has changed or
+        #   not, so it can only be always yellow or always green, we
         #   decided for always green for now
       - gitlab_user_state is not changed
 
@@ -248,3 +248,5 @@
   assert:
     that:
       - gitlab_user_state is not changed
+
+- include_tasks: sshkey.yml
