@@ -83,7 +83,7 @@ EXAMPLES = '''
     state: present
 
 - name: Import a key via remote file
-  pacman_key:
+  community.general.pacman_key:
     file: /tmp/keyfile.asc
     state: present
 
