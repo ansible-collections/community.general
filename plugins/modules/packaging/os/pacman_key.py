@@ -94,7 +94,7 @@ EXAMPLES = '''
     state: present
 
 - name: Import a key via keyserver
-  pacman_key:
+  community.general.pacman_key:
     id: 01234567890ABCDE01234567890ABCDE12345678
     keyserver: keyserver.domain.tld
 
