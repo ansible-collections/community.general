@@ -99,7 +99,7 @@ EXAMPLES = '''
     keyserver: keyserver.domain.tld
 
 - name: Import a key into an alternative keyring
-  pacman_key:
+  community.general.pacman_key:
     id: 01234567890ABCDE01234567890ABCDE12345678
     file: /tmp/keyfile.asc
     keyring: /etc/pacman.d/gnupg-alternative
