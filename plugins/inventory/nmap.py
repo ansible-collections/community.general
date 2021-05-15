@@ -130,7 +130,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 # This occurs if the cache_key is not in the cache or if the cache_key expired, so the cache needs to be updated
                 cache_needs_update = True
 
-        if cache_needs_update:
+        if not user_cache_setting or cache_needs_update:
             # setup command
             cmd = [self._nmap]
             if not self._options['ports']:
@@ -207,6 +207,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             except Exception as e:
                 raise AnsibleParserError("failed to parse %s: %s " % (to_native(path), to_native(e)))
 
+        if cache_needs_update:
             self._cache[cache_key] = results
 
         self._populate(results)
