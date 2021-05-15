@@ -1,0 +1,2 @@
+minor_changes:
+  - cmd (Module Helper) module utils - ``CmdMixin`` now pulls the value for ``run_command()`` params from ``self.vars``, as opposed to previously retrieving those from ``self.module.params``.
