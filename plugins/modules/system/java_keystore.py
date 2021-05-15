@@ -425,6 +425,7 @@ class JavaKeystore:
 
         import_keystore_cmd = [self.keytool_bin, "-importkeystore",
                                "-destkeystore", self.keystore_path,
+                               "-deststoretype", "jks",
                                "-srckeystore", keystore_p12_path,
                                "-srcstoretype", "pkcs12",
                                "-alias", self.name,

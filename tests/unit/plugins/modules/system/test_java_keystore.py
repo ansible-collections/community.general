@@ -78,7 +78,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
             assert jks.create() == {
                 'changed': True,
                 'cmd': ["keytool", "-importkeystore",
-                        "-destkeystore", "/path/to/keystore.jks",
+                        "-destkeystore", "/path/to/keystore.jks", "-deststoretype", "jks",
                         "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
                         "-noprompt"],
                 'msg': '',
@@ -181,7 +181,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
             jks.create()
             module.fail_json.assert_called_once_with(
                 cmd=["keytool", "-importkeystore",
-                     "-destkeystore", "/path/to/keystore.jks",
+                     "-destkeystore", "/path/to/keystore.jks", "-deststoretype", "jks",
                      "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
                      "-noprompt"],
                 msg='',
@@ -254,7 +254,7 @@ class TestCertChanged(ModuleTestCase):
             result = jks.cert_changed()
             self.assertTrue(result, 'Fingerprint mismatch')
 
-    def test_cert_changed_fail_alias_does_not_exist(self):
+    def test_cert_changed_alias_does_not_exist(self):
         set_module_args(dict(
             certificate='cert-foo',
             private_key='private-foo',
