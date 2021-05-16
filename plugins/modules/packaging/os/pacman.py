@@ -44,6 +44,11 @@ options:
         default: no
         type: bool
 
+    bin:
+        description:
+            - Name of pacman binary or AUR helper that shares the same interface as pacman.
+        default: pacman
+
     extra_args:
         description:
             - Additional option to pass to pacman when enforcing C(state).
@@ -108,6 +113,13 @@ EXAMPLES = '''
       - foo
       - ~/bar-1.0-1-any.pkg.tar.xz
     state: present
+
+- name: Install package from AUR using a Pacman compatible AUR helper
+  pacman:
+    name: foo
+    state: present
+    bin: yay
+    extra_args: --noconfirm --builddir /tmp/yay-build
 
 - name: Upgrade package foo
   community.general.pacman:
@@ -419,6 +431,7 @@ def main():
             name=dict(type='list', elements='str', aliases=['pkg', 'package']),
             state=dict(type='str', default='present', choices=['present', 'installed', 'latest', 'absent', 'removed']),
             force=dict(type='bool', default=False),
+            bin=dict(type='str', default='pacman'),
             extra_args=dict(type='str', default=''),
             upgrade=dict(type='bool', default=False),
             upgrade_extra_args=dict(type='str', default=''),
@@ -432,10 +445,12 @@ def main():
         supports_check_mode=True,
     )
 
-    pacman_path = module.get_bin_path('pacman', True)
     module.run_command_environ_update = dict(LC_ALL='C')
 
     p = module.params
+
+    # find pacman binary
+    pacman_path = module.get_bin_path(p['bin'], True)
 
     # normalize the state parameter
     if p['state'] in ['present', 'installed']:
