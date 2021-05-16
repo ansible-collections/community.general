@@ -34,7 +34,7 @@ class ModuleHelperBase(object):
         pass
 
     def __changed__(self):
-        return NotImplementedError()
+        raise NotImplementedError()
 
     @property
     def changed(self):
