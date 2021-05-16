@@ -313,12 +313,9 @@ def initialize_from_null_state(initializer, initcommand, table):
     if table is None:
         table = 'filter'
 
-    tmpfd, tmpfile = tempfile.mkstemp()
-    with os.fdopen(tmpfd, 'w') as f:
-        f.write('*%s\nCOMMIT\n' % table)
-
-    initializer.append(tmpfile)
-    (rc, out, err) = module.run_command(initializer, check_rc=True)
+    commandline = list(initializer)
+    commandline += ['-t', table]
+    (rc, out, err) = module.run_command(commandline, check_rc=True)
     (rc, out, err) = module.run_command(initcommand, check_rc=True)
     return (rc, out, err)
 
@@ -402,7 +399,7 @@ def main():
     changed = False
     COMMANDARGS = []
     INITCOMMAND = [bin_iptables_save]
-    INITIALIZER = [bin_iptables_restore]
+    INITIALIZER = [bin_iptables, '-L', '-n']
     TESTCOMMAND = [bin_iptables_restore, '--test']
 
     if counters:
