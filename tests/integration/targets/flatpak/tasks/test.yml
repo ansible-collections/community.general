@@ -155,7 +155,7 @@
 - name: Verify addition with list test result - {{ method }}
   assert:
     that:
-      - "addition_result.changed == true"
+      - addition_result is changed
     msg: "state=present shall add flatpak when absent"
 
 - name: Test idempotency of addition with list - {{ method }}
@@ -171,7 +171,7 @@
 - name: Verify idempotency of addition with list test result - {{ method }}
   assert:
     that:
-      - "double_addition_result.changed == false"
+      - double_addition_result is not changed
     msg: "state=present shall not do anything when flatpak is already present"
 
 - name: Test addition with list partially installed - {{ method }}
@@ -188,7 +188,7 @@
 - name: Verify addition with list partially installed test result - {{ method }}
   assert:
     that:
-      - "addition_result.changed == true"
+      - addition_result is changed
     msg: "state=present shall add flatpak when absent"
 
 - name: Test idempotency of addition with list partially installed - {{ method }}
@@ -205,7 +205,7 @@
 - name: Verify idempotency of addition with list partially installed test result - {{ method }}
   assert:
     that:
-      - "double_addition_result.changed == false"
+      - double_addition_result is not changed
     msg: "state=present shall not do anything when flatpak is already present"
 
 # state=absent with list of packages
@@ -222,7 +222,7 @@
 - name: Verify removal with list test result - {{ method }}
   assert:
     that:
-      - "removal_result.changed == true"
+      - removal_result is changed
     msg: "state=absent shall remove flatpak when present"
 
 - name: Test idempotency of removal with list - {{ method }}
@@ -237,7 +237,7 @@
 - name: Verify idempotency of removal with list test result - {{ method }}
   assert:
     that:
-      - "double_removal_result.changed == false"
+      - double_removal_result is not changed
     msg: "state=absent shall not do anything when flatpak is not present"
 
 - name: Test removal with list partially removed - {{ method }}
@@ -253,7 +253,7 @@
 - name: Verify removal with list partially removed test result - {{ method }}
   assert:
     that:
-      - "removal_result.changed == true"
+      - removal_result is changed
     msg: "state=absent shall remove flatpak when present"
 
 - name: Test idempotency of removal with list partially removed - {{ method }}
@@ -269,5 +269,5 @@
 - name: Verify idempotency of removal with list partially removed test result - {{ method }}
   assert:
     that:
-      - "double_removal_result.changed == false"
+      - double_removal_result is not changed
     msg: "state=absent shall not do anything when flatpak is not present"
