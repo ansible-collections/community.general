@@ -85,15 +85,12 @@ RETURN = '''
 '''
 
 from ansible_collections.community.general.plugins.module_utils.module_helper import (
-    CmdModuleHelper, ArgFormat
+    CmdModuleHelper, ArgFormat, ModuleHelperException
 )
 
 
 class AnsibleGalaxyInstall(CmdModuleHelper):
-    change_params = 'value',
-    diff_params = 'value',
-    output_params = ('property', 'channel', 'value')
-    facts_params = ('property', 'channel', 'value')
+    output_params = ('type', 'name', 'value')
     module = dict(
         argument_spec=dict(
             type=dict(type='str', choices=('collection', 'role'), default='collection'),
@@ -118,6 +115,17 @@ class AnsibleGalaxyInstall(CmdModuleHelper):
     def __run__(self):
         params = ('type', 'force', 'dest', 'requirements_file', 'name')
         self.run_command(params=params)
+
+    def process_command_output(self, rc, out, err):
+        if rc != 0:
+            raise ModuleHelperException(msg="Unable to install: {0}".format(err))
+
+        if "was installed successfully" in out:
+            self.changed = True
+        elif "is already installed" in out:
+            self.changed = False
+        else:
+            raise ModuleHelperException(msg="Unknown outcome from ansible-galaxy: {0}".format(err))
 
 
 def main():
