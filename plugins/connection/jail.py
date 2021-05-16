@@ -35,7 +35,6 @@ import os
 import os.path
 import subprocess
 import traceback
-import ansible.constants as C
 
 from ansible.errors import AnsibleError
 from ansible.module_utils.six.moves import shlex_quote
@@ -47,7 +46,7 @@ display = Display()
 
 
 class Connection(ConnectionBase):
-    ''' Local BSD Jail based connections '''
+    """ Local BSD Jail based connections """
 
     modified_jailname_key = 'conn_jail_name'
 
@@ -90,20 +89,20 @@ class Connection(ConnectionBase):
         return to_text(stdout, errors='surrogate_or_strict').split()
 
     def _connect(self):
-        ''' connect to the jail; nothing to do here '''
+        """ connect to the jail; nothing to do here """
         super(Connection, self)._connect()
         if not self._connected:
             display.vvv(u"ESTABLISH JAIL CONNECTION FOR USER: {0}".format(self._play_context.remote_user), host=self.jail)
             self._connected = True
 
     def _buffered_exec_command(self, cmd, stdin=subprocess.PIPE):
-        ''' run a command on the jail.  This is only needed for implementing
+        """ run a command on the jail.  This is only needed for implementing
         put_file() get_file() so that we don't have to read the whole file
         into memory.
 
         compared to exec_command() it looses some niceties like being able to
         return the process's exit code immediately.
-        '''
+        """
 
         local_cmd = [self.jexec_cmd]
         set_env = ''
@@ -123,16 +122,17 @@ class Connection(ConnectionBase):
         return p
 
     def exec_command(self, cmd, in_data=None, sudoable=False):
-        ''' run a command on the jail '''
+        """ run a command on the jail """
         super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         p = self._buffered_exec_command(cmd)
 
         stdout, stderr = p.communicate(in_data)
-        return (p.returncode, stdout, stderr)
+        return p.returncode, stdout, stderr
 
-    def _prefix_login_path(self, remote_path):
-        ''' Make sure that we put files into a standard path
+    @staticmethod
+    def _prefix_login_path(remote_path):
+        """ Make sure that we put files into a standard path
 
             If a path is relative, then we need to choose where to put it.
             ssh chooses $HOME but we aren't guaranteed that a home dir will
@@ -140,13 +140,13 @@ class Connection(ConnectionBase):
             This also happens to be the former default.
 
             Can revisit using $HOME instead if it's a problem
-        '''
+        """
         if not remote_path.startswith(os.path.sep):
             remote_path = os.path.join(os.path.sep, remote_path)
         return os.path.normpath(remote_path)
 
     def put_file(self, in_path, out_path):
-        ''' transfer a file from local to jail '''
+        """ transfer a file from local to jail """
         super(Connection, self).put_file(in_path, out_path)
         display.vvv("PUT %s TO %s" % (in_path, out_path), host=self.jail)
 
@@ -172,7 +172,7 @@ class Connection(ConnectionBase):
             raise AnsibleError("file or module does not exist at: %s" % in_path)
 
     def fetch_file(self, in_path, out_path):
-        ''' fetch a file from jail to local '''
+        """ fetch a file from jail to local """
         super(Connection, self).fetch_file(in_path, out_path)
         display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self.jail)
 
@@ -196,6 +196,6 @@ class Connection(ConnectionBase):
                 raise AnsibleError("failed to transfer file %s to %s:\n%s\n%s" % (in_path, out_path, to_native(stdout), to_native(stderr)))
 
     def close(self):
-        ''' terminate the connection; nothing to do here '''
+        """ terminate the connection; nothing to do here """
         super(Connection, self).close()
         self._connected = False
