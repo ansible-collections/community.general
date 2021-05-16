@@ -97,6 +97,23 @@ options:
       - openssl
       - cryptography
     version_added: 3.1.0
+  keystore_type:
+    description:
+      - Type of the Java keystore.
+      - When this option is omitted and the keystore doesn't already exist, the
+        behavior is to follow C(keytool) default store type, that depends on
+        Java version, and is C(pkcs12) since Java 9, and C(jks) before (may also
+        be C(pkcs12) if new default has been backported to this version).
+      - When this option is omitted and the keystore already exists, the current
+        type is left untouched, unless another option leads to overwrite the
+        keystore (in that case, this option behaves like for keystore creation).
+      - When I(keystore_type) is set, the keystore is created with this type if
+        it doesn't exist, or is converted to the given type in case of mismatch.
+    type: str
+    choices:
+      - jks
+      - pkcs12
+    version_added: 3.2.0
 requirements:
   - openssl in PATH (when I(ssl_backend=openssl))
   - keytool in PATH
@@ -107,6 +124,7 @@ author:
 extends_documentation_fragment:
   - files
 seealso:
+  - module: community.crypto.openssl_pkcs12
   - module: community.general.java_cert
 notes:
   - I(certificate) and I(private_key) require that their contents are available
