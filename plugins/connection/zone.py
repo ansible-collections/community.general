@@ -31,7 +31,6 @@ import os.path
 import subprocess
 import traceback
 
-from ansible import constants as C
 from ansible.errors import AnsibleError
 from ansible.module_utils.six.moves import shlex_quote
 from ansible.module_utils._text import to_bytes
@@ -42,7 +41,7 @@ display = Display()
 
 
 class Connection(ConnectionBase):
-    ''' Local zone based connections '''
+    """ Local zone based connections """
 
     transport = 'community.general.zone'
     has_pipelining = True
@@ -75,9 +74,9 @@ class Connection(ConnectionBase):
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         zones = []
-        for l in process.stdout.readlines():
+        for line in process.stdout.readlines():
             # 1:work:running:/zones/work:3126dc59-9a07-4829-cde9-a816e4c5040e:native:shared
-            s = l.split(':')
+            s = line.split(':')
             if s[1] != 'global':
                 zones.append(s[1])
 
@@ -95,20 +94,20 @@ class Connection(ConnectionBase):
         return path + '/root'
 
     def _connect(self):
-        ''' connect to the zone; nothing to do here '''
+        """ connect to the zone; nothing to do here """
         super(Connection, self)._connect()
         if not self._connected:
             display.vvv("THIS IS A LOCAL ZONE DIR", host=self.zone)
             self._connected = True
 
     def _buffered_exec_command(self, cmd, stdin=subprocess.PIPE):
-        ''' run a command on the zone.  This is only needed for implementing
+        """ run a command on the zone.  This is only needed for implementing
         put_file() get_file() so that we don't have to read the whole file
         into memory.
 
         compared to exec_command() it looses some niceties like being able to
         return the process's exit code immediately.
-        '''
+        """
         # NOTE: zlogin invokes a shell (just like ssh does) so we do not pass
         # this through /bin/sh -c here.  Instead it goes through the shell
         # that zlogin selects.
@@ -122,16 +121,16 @@ class Connection(ConnectionBase):
         return p
 
     def exec_command(self, cmd, in_data=None, sudoable=False):
-        ''' run a command on the zone '''
+        """ run a command on the zone """
         super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         p = self._buffered_exec_command(cmd)
 
         stdout, stderr = p.communicate(in_data)
-        return (p.returncode, stdout, stderr)
+        return p.returncode, stdout, stderr
 
     def _prefix_login_path(self, remote_path):
-        ''' Make sure that we put files into a standard path
+        """ Make sure that we put files into a standard path
 
             If a path is relative, then we need to choose where to put it.
             ssh chooses $HOME but we aren't guaranteed that a home dir will
@@ -139,13 +138,13 @@ class Connection(ConnectionBase):
             This also happens to be the former default.
 
             Can revisit using $HOME instead if it's a problem
-        '''
+        """
         if not remote_path.startswith(os.path.sep):
             remote_path = os.path.join(os.path.sep, remote_path)
         return os.path.normpath(remote_path)
 
     def put_file(self, in_path, out_path):
-        ''' transfer a file from local to zone '''
+        """ transfer a file from local to zone """
         super(Connection, self).put_file(in_path, out_path)
         display.vvv("PUT %s TO %s" % (in_path, out_path), host=self.zone)
 
@@ -171,7 +170,7 @@ class Connection(ConnectionBase):
             raise AnsibleError("file or module does not exist at: %s" % in_path)
 
     def fetch_file(self, in_path, out_path):
-        ''' fetch a file from zone to local '''
+        """ fetch a file from zone to local """
         super(Connection, self).fetch_file(in_path, out_path)
         display.vvv("FETCH %s TO %s" % (in_path, out_path), host=self.zone)
 
@@ -195,6 +194,6 @@ class Connection(ConnectionBase):
                 raise AnsibleError("failed to transfer file %s to %s:\n%s\n%s" % (in_path, out_path, stdout, stderr))
 
     def close(self):
-        ''' terminate the connection; nothing to do here '''
+        """ terminate the connection; nothing to do here """
         super(Connection, self).close()
         self._connected = False

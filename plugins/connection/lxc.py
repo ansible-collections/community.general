@@ -42,14 +42,13 @@ try:
 except ImportError:
     pass
 
-from ansible import constants as C
 from ansible import errors
 from ansible.module_utils._text import to_bytes, to_native
 from ansible.plugins.connection import ConnectionBase
 
 
 class Connection(ConnectionBase):
-    ''' Local lxc based connections '''
+    """ Local lxc based connections """
 
     transport = 'community.general.lxc'
     has_pipelining = True
@@ -62,7 +61,7 @@ class Connection(ConnectionBase):
         self.container = None
 
     def _connect(self):
-        ''' connect to the lxc; nothing to do here '''
+        """ connect to the lxc; nothing to do here """
         super(Connection, self)._connect()
 
         if not HAS_LIBLXC:
@@ -77,7 +76,8 @@ class Connection(ConnectionBase):
         if self.container.state == "STOPPED":
             raise errors.AnsibleError("%s is not running" % self.container_name)
 
-    def _communicate(self, pid, in_data, stdin, stdout, stderr):
+    @staticmethod
+    def _communicate(pid, in_data, stdin, stdout, stderr):
         buf = {stdout: [], stderr: []}
         read_fds = [stdout, stderr]
         if in_data:
@@ -111,7 +111,7 @@ class Connection(ConnectionBase):
         return fd
 
     def exec_command(self, cmd, in_data=None, sudoable=False):
-        ''' run a command on the chroot '''
+        """ run a command on the chroot """
         super(Connection, self).exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
         # python2-lxc needs bytes. python3-lxc needs text.

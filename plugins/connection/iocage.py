@@ -40,7 +40,7 @@ display = Display()
 
 
 class Connection(Jail):
-    ''' Local iocage based connections '''
+    """ Local iocage based connections """
 
     transport = 'community.general.iocage'
 
