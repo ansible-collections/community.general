@@ -1,0 +1,2 @@
+minor_changes:
+  - zfs_delegate_admin - drop choices from permissions, allowing any permission supported by the underlying zfs commands (https://github.com/ansible-collections/community.general/pull/2540).
