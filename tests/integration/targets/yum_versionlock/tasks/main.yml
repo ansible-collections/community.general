@@ -24,7 +24,7 @@
           register: lock_all_packages
 
         - name: Update all packages
-          command: yum update --setopt=obsoletes=0
+          command: yum update --assumeyes --setopt=obsoletes=0
           register: update_all_locked_packages
           changed_when:
             - '"No packages marked for update" not in update_all_locked_packages.stdout'
