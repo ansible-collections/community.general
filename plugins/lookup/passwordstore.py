@@ -25,9 +25,9 @@ DOCUMENTATION = '''
         env:
           - name: PASSWORD_STORE_DIR
       create:
-        description: Create the password if it does not already exist.
+        description: Create the password if it does not already exist. Takes precedence over C(missing).
         type: bool
-        default: 'no'
+        default: false
       overwrite:
         description: Overwrite the password if it does already exist.
         type: bool
@@ -60,6 +60,22 @@ DOCUMENTATION = '''
         description: use alphanumeric characters.
         type: bool
         default: 'no'
+      missing:
+        description:
+          - List of preference about what to do if the password file is missing.
+          - If I(create=true), the value for this option is ignored and assumed to be C(create).
+          - If set to C(error), the lookup will error out if the passname does not exist.
+          - If set to C(create), the passname will be created with the provided length I(length) if it does not exist.
+          - If set to C(empty) or C(warn), will return a C(none) in case the passname does not exist.
+            When using C(lookup) and not C(query), this will be translated to an empty string.
+        version_added: 3.1.0
+        type: str
+        default: error
+        choices:
+          - error
+          - warn
+          - empty
+          - create
 '''
 EXAMPLES = """
 # Debug is used for examples, BAD IDEA to show passwords on screen
@@ -67,11 +83,27 @@ EXAMPLES = """
   ansible.builtin.debug:
     msg: "{{ lookup('community.general.passwordstore', 'example/test')}}"
 
+- name: Basic lookup. Warns if example/test does not exist and returns empty string
+  ansible.builtin.debug:
+    msg: "{{ lookup('community.general.passwordstore', 'example/test missing=warn')}}"
+
 - name: Create pass with random 16 character password. If password exists just give the password
   ansible.builtin.debug:
     var: mypassword
   vars:
     mypassword: "{{ lookup('community.general.passwordstore', 'example/test create=true')}}"
+
+- name: Create pass with random 16 character password. If password exists just give the password
+  ansible.builtin.debug:
+    var: mypassword
+  vars:
+    mypassword: "{{ lookup('community.general.passwordstore', 'example/test missing=create')}}"
+
+- name: Prints 'abc' if example/test does not exist, just give the password otherwise
+  ansible.builtin.debug:
+    var: mypassword
+  vars:
+    mypassword: "{{ lookup('community.general.passwordstore', 'example/test missing=empty') | default('abc', true) }}"
 
 - name: Different size password
   ansible.builtin.debug:
@@ -111,9 +143,12 @@ import yaml
 from distutils import util
 from ansible.errors import AnsibleError, AnsibleAssertionError
 from ansible.module_utils._text import to_bytes, to_native, to_text
+from ansible.utils.display import Display
 from ansible.utils.encrypt import random_password
 from ansible.plugins.lookup import LookupBase
 from ansible import constants as C
+
+display = Display()
 
 
 # backhacked check_output with input for python 2.7
@@ -178,11 +213,16 @@ class LookupModule(LookupBase):
                         self.paramvals[key] = util.strtobool(self.paramvals[key])
             except (ValueError, AssertionError) as e:
                 raise AnsibleError(e)
+            if self.paramvals['missing'] not in ['error', 'warn', 'create', 'empty']:
+                raise AnsibleError("{0} is not a valid option for missing".format(self.paramvals['missing']))
             if not isinstance(self.paramvals['length'], int):
                 if self.paramvals['length'].isdigit():
                     self.paramvals['length'] = int(self.paramvals['length'])
                 else:
                     raise AnsibleError("{0} is not a correct value for length".format(self.paramvals['length']))
+
+            if self.paramvals['create']:
+                self.paramvals['missing'] = 'create'
 
             # Collect pass environment variables from the plugin's parameters.
             self.env = os.environ.copy()
@@ -224,9 +264,11 @@ class LookupModule(LookupBase):
             if e.returncode != 0 and 'not in the password store' in e.output:
                 # if pass returns 1 and return string contains 'is not in the password store.'
                 # We need to determine if this is valid or Error.
-                if not self.paramvals['create']:
-                    raise AnsibleError('passname: {0} not found, use create=True'.format(self.passname))
+                if self.paramvals['missing'] == 'error':
+                    raise AnsibleError('passwordstore: passname {0} not found and missing=error is set'.format(self.passname))
                 else:
+                    if self.paramvals['missing'] == 'warn':
+                        display.warning('passwordstore: passname {0} not found'.format(self.passname))
                     return False
             else:
                 raise AnsibleError(e)
@@ -294,6 +336,7 @@ class LookupModule(LookupBase):
             'userpass': '',
             'length': 16,
             'backup': False,
+            'missing': 'error',
         }
 
         for term in terms:
@@ -304,6 +347,9 @@ class LookupModule(LookupBase):
                 else:
                     result.append(self.get_passresult())
             else:                     # password does not exist
-                if self.paramvals['create']:
+                if self.paramvals['missing'] == 'create':
                     result.append(self.generate_password())
+                else:
+                    result.append(None)
+
         return result
