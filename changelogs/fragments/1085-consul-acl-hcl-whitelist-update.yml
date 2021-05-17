@@ -1,0 +1,2 @@
+bugfixes:
+  - consul_acl - update the hcl allowlist to include all supported options (https://github.com/ansible-collections/community.general/pull/2495).
