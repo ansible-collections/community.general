@@ -1,0 +1,2 @@
+bugfixes:
+  - influxdb_user - fix bug where an influxdb user has no privileges for 2 or more databases (https://github.com/ansible-collections/community.general/pull/2499).
