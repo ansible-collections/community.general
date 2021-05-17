@@ -100,6 +100,8 @@ RETURN = r'''
 #only defaults
 '''
 
+import json
+
 from ansible.module_utils.urls import ConnectionError
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
@@ -115,7 +117,7 @@ def find_user(module, client, user_name):
             if user['user'] == user_name:
                 user_result = user
                 break
-    except (ConnectionError, influx.exceptions.InfluxDBClientError) as e:
+    except ConnectionError as e:
         module.fail_json(msg=to_native(e))
     return user_result
 
@@ -198,6 +200,9 @@ def set_user_grants(module, client, user_name, grants):
     return changed
 
 
+INFLUX_AUTH_FIRST_USER_REQUIRED = "error authorizing query: create admin user first or disable authentication"
+
+
 def main():
     argument_spec = influx.InfluxDb.influxdb_argument_spec()
     argument_spec.update(
@@ -219,7 +224,23 @@ def main():
     grants = module.params['grants']
     influxdb = influx.InfluxDb(module)
     client = influxdb.connect_to_influxdb()
-    user = find_user(module, client, user_name)
+
+    user = None
+    try:
+        user = find_user(module, client, user_name)
+    except influx.exceptions.InfluxDBClientError as e:
+        if e.code == 403:
+            reason = None
+            try:
+                msg = json.loads(e.content)
+                reason = msg["error"]
+            except (KeyError, ValueError):
+                module.fail_json(msg=to_native(e))
+
+            if reason != INFLUX_AUTH_FIRST_USER_REQUIRED:
+                module.fail_json(msg=to_native(e))
+        else:
+            module.fail_json(msg=to_native(e))
 
     changed = False
 
