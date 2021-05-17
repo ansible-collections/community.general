@@ -51,8 +51,9 @@ options:
   permissions:
     description:
       - The list of permission(s) to delegate (required if C(state) is C(present)).
+      - Supported permissions depend on the ZFS version in use. See for example
+        U(https://openzfs.github.io/openzfs-docs/man/8/zfs-allow.8.html) for OpenZFS.
     type: list
-    choices: [ allow, clone, create, destroy, diff, hold, mount, promote, readonly, receive, release, rename, rollback, send, share, snapshot, unallow ]
     elements: str
   local:
     description:
@@ -248,10 +249,7 @@ def main():
             users=dict(type='list', elements='str'),
             groups=dict(type='list', elements='str'),
             everyone=dict(type='bool', default=False),
-            permissions=dict(type='list', elements='str',
-                             choices=['allow', 'clone', 'create', 'destroy', 'diff', 'hold', 'mount', 'promote',
-                                      'readonly', 'receive', 'release', 'rename', 'rollback', 'send', 'share',
-                                      'snapshot', 'unallow']),
+            permissions=dict(type='list', elements='str'),
             local=dict(type='bool'),
             descendents=dict(type='bool'),
             recursive=dict(type='bool', default=False),
