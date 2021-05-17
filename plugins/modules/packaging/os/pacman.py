@@ -46,8 +46,11 @@ options:
 
     bin:
         description:
-            - Name of pacman binary or AUR helper that shares the same interface as pacman.
+            - Name of binary to use. This can either be C(pacman) or a pacman compatible AUR helper.
+            - Beware that AUR helpers might behave unexpectedly and are therefore not recommended.
         default: pacman
+        type: str
+        version_added: 3.1.0
 
     extra_args:
         description:
@@ -86,6 +89,8 @@ options:
 notes:
   - When used with a `loop:` each package will be processed individually,
     it is much more efficient to pass the list directly to the `name` option.
+  - To use an AUR helper (`bin` option), a few extra setup steps might be required beforehand.
+    For example, a dedicated build user with permissions to install packages could be necessary.
 '''
 
 RETURN = '''
@@ -115,11 +120,11 @@ EXAMPLES = '''
     state: present
 
 - name: Install package from AUR using a Pacman compatible AUR helper
-  pacman:
+  community.general.pacman:
     name: foo
     state: present
     bin: yay
-    extra_args: --noconfirm --builddir /tmp/yay-build
+    extra_args: --builddir /var/cache/yay
 
 - name: Upgrade package foo
   community.general.pacman:
