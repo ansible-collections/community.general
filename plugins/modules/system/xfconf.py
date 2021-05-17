@@ -258,7 +258,7 @@ class XFConfProperty(CmdMixin, StateMixin, ModuleHelper):
 
         params = ['channel', 'property', {'create': True}]
         if self.vars.is_array:
-            params.append({'is_array': True})
+            params.append('is_array')
         params.append({'values_and_types': (self.vars.value, value_type)})
 
         if not self.module.check_mode:

@@ -120,7 +120,7 @@ class CmdMixin(object):
             cmd_args[0] = self.module.get_bin_path(cmd_args[0], required=True)
         except ValueError:
             pass
-        param_list = params if params else self.module.params.keys()
+        param_list = params if params else self.vars.keys()
 
         for param in param_list:
             if isinstance(param, dict):
@@ -131,9 +131,9 @@ class CmdMixin(object):
                 fmt = find_format(_param)
                 value = param[_param]
             elif isinstance(param, str):
-                if param in self.module.argument_spec:
+                if param in self.vars.keys():
                     fmt = find_format(param)
-                    value = self.module.params[param]
+                    value = self.vars[param]
                 elif param in extra_params:
                     fmt = find_format(param)
                     value = extra_params[param]
