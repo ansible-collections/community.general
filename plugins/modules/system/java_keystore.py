@@ -290,11 +290,11 @@ class JavaKeystore:
 
     def read_stored_certificate_fingerprint(self):
         stored_certificate_fingerprint_cmd = [
-            self.keytool_bin, "-list", "-alias", self.name, "-keystore",
-            self.keystore_path, "-storepass:env", "STOREPASS", "-v"
+            self.keytool_bin, "-list", "-alias", self.name,
+            "-keystore", self.keystore_path, "-v"
         ]
         (rc, stored_certificate_fingerprint_out, stored_certificate_fingerprint_err) = self.module.run_command(
-            stored_certificate_fingerprint_cmd, environ_update=dict(STOREPASS=self.password), check_rc=False)
+            stored_certificate_fingerprint_cmd, data=self.password, check_rc=False)
         if rc != 0:
             if "keytool error: java.lang.Exception: Alias <%s> does not exist" % self.name \
                     in stored_certificate_fingerprint_out:
@@ -428,12 +428,10 @@ class JavaKeystore:
                                "-srckeystore", keystore_p12_path,
                                "-srcstoretype", "pkcs12",
                                "-alias", self.name,
-                               "-deststorepass:env", "STOREPASS",
-                               "-srcstorepass:env", "STOREPASS",
                                "-noprompt"]
 
         (rc, import_keystore_out, dummy) = self.module.run_command(
-            import_keystore_cmd, data=None, environ_update=dict(STOREPASS=self.password), check_rc=False
+            import_keystore_cmd, data='%s\n%s\n%s' % (self.password, self.password, self.password), check_rc=False
         )
         if rc != 0:
             return self.module.fail_json(msg=import_keystore_out, cmd=import_keystore_cmd, rc=rc)
