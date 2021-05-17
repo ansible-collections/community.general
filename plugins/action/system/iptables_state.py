@@ -163,9 +163,9 @@ class ActionModule(ActionBase):
                         del result[key]
 
                 if result.get('invocation', {}).get('module_args'):
-                    if '_timeout' in result['invocation']['module_args']:
-                        del result['invocation']['module_args']['_back']
-                        del result['invocation']['module_args']['_timeout']
+                    for key in ('_back', '_timeout', '_async_dir', 'jid'):
+                        if result['invocation']['module_args'].get(key):
+                            del result['invocation']['module_args'][key]
 
                 async_status_args['mode'] = 'cleanup'
                 dummy = self._execute_module(
