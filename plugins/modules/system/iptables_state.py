@@ -325,9 +325,9 @@ def filter_and_format_state(string):
     Remove timestamps to ensure idempotence between runs. Also remove counters
     by default. And return the result as a list.
     '''
-    string = re.sub('((^|\n)# (Generated|Completed)[^\n]*) on [^\n]*', '\\1', string)
+    string = re.sub(r'((^|\n)# (Generated|Completed)[^\n]*) on [^\n]*', r'\1', string)
     if not module.params['counters']:
-        string = re.sub('[[][0-9]+:[0-9]+[]]', '[0:0]', string)
+        string = re.sub(r'\[[0-9]+:[0-9]+\]', r'[0:0]', string)
     lines = string.splitlines()
     while '' in lines:
         lines.remove('')
@@ -345,8 +345,8 @@ def per_table_state(command, state):
         if '*%s' % t in state.splitlines():
             COMMAND.extend(['--table', t])
             (rc, out, err) = module.run_command(COMMAND, check_rc=True)
-            out = re.sub('(^|\n)(# Generated|# Completed|[*]%s|COMMIT)[^\n]*' % t, '', out)
-            out = re.sub(' *[[][0-9]+:[0-9]+[]] *', '', out)
+            out = re.sub(r'(^|\n)(# Generated|# Completed|[*]%s|COMMIT)[^\n]*' % t, r'', out)
+            out = re.sub(r' *\[[0-9]+:[0-9]+\] *', r'', out)
             table = out.splitlines()
             while '' in table:
                 table.remove('')
