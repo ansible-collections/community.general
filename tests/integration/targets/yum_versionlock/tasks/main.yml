@@ -24,7 +24,7 @@
           register: lock_all_packages
 
           # This should fail when it needs user interaction and missing -y is on purpose.
-        - name: Update all packages
+        - name: Update all packages (not really)
           command: yum update --setopt=obsoletes=0
           register: update_all_locked_packages
           changed_when:
