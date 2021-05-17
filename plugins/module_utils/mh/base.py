@@ -33,9 +33,15 @@ class ModuleHelperBase(object):
     def __quit_module__(self):
         pass
 
+    def __changed__(self):
+        raise NotImplementedError()
+
     @property
     def changed(self):
-        return self._changed
+        try:
+            return self.__changed__()
+        except NotImplementedError:
+            return self._changed
 
     @changed.setter
     def changed(self, value):
