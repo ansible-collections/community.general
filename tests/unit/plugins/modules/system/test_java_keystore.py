@@ -80,7 +80,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
                 'cmd': ["keytool", "-importkeystore",
                         "-destkeystore", "/path/to/keystore.jks",
                         "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
-                        "-deststorepass:env", "STOREPASS", "-srcstorepass:env", "STOREPASS", "-noprompt"],
+                        "-noprompt"],
                 'msg': '',
                 'rc': 0
             }
@@ -183,7 +183,7 @@ class TestCreateJavaKeystore(ModuleTestCase):
                 cmd=["keytool", "-importkeystore",
                      "-destkeystore", "/path/to/keystore.jks",
                      "-srckeystore", "/tmp/tmpgrzm2ah7", "-srcstoretype", "pkcs12", "-alias", "test",
-                     "-deststorepass:env", "STOREPASS", "-srcstorepass:env", "STOREPASS", "-noprompt"],
+                     "-noprompt"],
                 msg='',
                 rc=1
             )
@@ -354,7 +354,7 @@ class TestCertChanged(ModuleTestCase):
             jks = JavaKeystore(module)
             jks.cert_changed()
             module.fail_json.assert_called_with(
-                cmd=["keytool", "-list", "-alias", "foo", "-keystore", "/path/to/keystore.jks", "-storepass:env", "STOREPASS", "-v"],
+                cmd=["keytool", "-list", "-alias", "foo", "-keystore", "/path/to/keystore.jks", "-v"],
                 msg='',
                 err='Oops',
                 rc=1
