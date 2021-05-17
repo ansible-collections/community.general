@@ -1,0 +1,5 @@
+bugfixes:
+  - influxdb_user - allow creation of admin users when InfluxDB authentication
+    is enabled but no other user exists on the database. In this scenario,
+    InfluxDB 1.x allows only ``CREATE USER`` queries and rejects any other query
+    (https://github.com/ansible-collections/community.general/issues/2364).
