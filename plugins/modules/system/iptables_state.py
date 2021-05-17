@@ -232,7 +232,7 @@ import filecmp
 import shutil
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_bytes, to_native, to_text
+from ansible.module_utils._text import to_bytes, to_native
 
 
 IPTABLES = dict(
@@ -262,7 +262,7 @@ def read_state(b_path):
     lines = text.splitlines()
     while '' in lines:
         lines.remove('')
-    return (lines)
+    return lines
 
 
 def write_state(b_path, lines, changed):
@@ -282,9 +282,9 @@ def write_state(b_path, lines, changed):
         if b_destdir and not os.path.exists(b_destdir) and not module.check_mode:
             try:
                 os.makedirs(b_destdir)
-            except Exception as e:
+            except Exception as err:
                 module.fail_json(
-                    msg='Error creating %s. Error code: %s. Error description: %s' % (destdir, e[0], e[1]),
+                    msg='Error creating %s: %s' % (destdir, to_native(err)),
                     initial_state=lines)
         changed = True
 
@@ -295,10 +295,10 @@ def write_state(b_path, lines, changed):
     if changed and not module.check_mode:
         try:
             shutil.copyfile(tmpfile, b_path)
-        except Exception as e:
+        except Exception as err:
             path = to_native(b_path, errors='surrogate_or_strict')
             module.fail_json(
-                msg='Error saving state into %s. Error code: %s. Error description: %s' % (path, e[0], e[1]),
+                msg='Error saving state into %s: %s' % (path, to_native(err)),
                 initial_state=lines)
 
     return changed
@@ -317,7 +317,7 @@ def initialize_from_null_state(initializer, initcommand, table):
     commandline += ['-t', table]
     (rc, out, err) = module.run_command(commandline, check_rc=True)
     (rc, out, err) = module.run_command(initcommand, check_rc=True)
-    return (rc, out, err)
+    return rc, out, err
 
 
 def filter_and_format_state(string):
@@ -331,7 +331,7 @@ def filter_and_format_state(string):
     lines = string.splitlines()
     while '' in lines:
         lines.remove('')
-    return (lines)
+    return lines
 
 
 def per_table_state(command, state):
@@ -344,14 +344,14 @@ def per_table_state(command, state):
         COMMAND = list(command)
         if '*%s' % t in state.splitlines():
             COMMAND.extend(['--table', t])
-            (rc, out, err) = module.run_command(COMMAND, check_rc=True)
+            dummy, out, dummy = module.run_command(COMMAND, check_rc=True)
             out = re.sub(r'(^|\n)(# Generated|# Completed|[*]%s|COMMIT)[^\n]*' % t, r'', out)
             out = re.sub(r' *\[[0-9]+:[0-9]+\] *', r'', out)
             table = out.splitlines()
             while '' in table:
                 table.remove('')
             tables[t] = table
-    return (tables)
+    return tables
 
 
 def main():
@@ -499,7 +499,7 @@ def main():
 
     if _back is not None:
         b_back = to_bytes(_back, errors='surrogate_or_strict')
-        garbage = write_state(b_back, initref_state, changed)
+        dummy = write_state(b_back, initref_state, changed)
         BACKCOMMAND = list(MAINCOMMAND)
         BACKCOMMAND.append(_back)
 
@@ -556,9 +556,7 @@ def main():
                 if os.path.exists(b_starter):
                     os.remove(b_starter)
                     break
-                else:
-                    time.sleep(0.01)
-                    continue
+                time.sleep(0.01)
 
         (rc, stdout, stderr) = module.run_command(MAINCOMMAND)
         if 'Another app is currently holding the xtables lock' in stderr:
@@ -576,7 +574,7 @@ def main():
         (rc, stdout, stderr) = module.run_command(SAVECOMMAND, check_rc=True)
         restored_state = filter_and_format_state(stdout)
 
-    if restored_state != initref_state and restored_state != initial_state:
+    if restored_state not in (initref_state, initial_state):
         if module.check_mode:
             changed = True
         else:
@@ -606,7 +604,7 @@ def main():
     #   timeout
     # * task attribute 'poll' equals 0
     #
-    for x in range(_timeout):
+    for dummy in range(_timeout):
         if os.path.exists(b_back):
             time.sleep(1)
             continue
