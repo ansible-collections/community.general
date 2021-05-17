@@ -1,0 +1,2 @@
+bugfixes:
+  - nmap inventory plugin - fix local variable error when cache is disabled (https://github.com/ansible-collections/community.general/issues/2512).
