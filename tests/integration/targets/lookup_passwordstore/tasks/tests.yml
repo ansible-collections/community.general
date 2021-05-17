@@ -61,6 +61,37 @@
     that:
       - readpass == newpass
 
+- name: Create a password using missing=create
+  set_fact:
+    newpass: "{{ lookup('community.general.passwordstore', 'test-missing-create missing=create length=8') }}"
+
+- name: Fetch password from an existing file
+  set_fact:
+    readpass: "{{ lookup('community.general.passwordstore', 'test-missing-create') }}"
+
+- name: Verify password
+  assert:
+    that:
+      - readpass == newpass
+
+- name: Fetch password from existing file using missing=empty
+  set_fact:
+    readpass: "{{ lookup('community.general.passwordstore', 'test-missing-create missing=empty') }}"
+
+- name: Verify password
+  assert:
+    that:
+      - readpass == newpass
+
+- name: Fetch password from non-existing file using missing=empty
+  set_fact:
+    readpass: "{{ query('community.general.passwordstore', 'test-missing-pass missing=empty') }}"
+
+- name: Verify password
+  assert:
+    that:
+      - readpass == [ none ]
+
 # As inserting multiline passwords on the commandline would require something
 # like expect, simply create it by using default gpg on a file with the correct
 # structure.
