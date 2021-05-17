@@ -23,8 +23,9 @@
             state: present
           register: lock_all_packages
 
-        - name: Update all packages
-          command: yum update --assumeyes --setopt=obsoletes=0
+          # This should fail when it needs user interaction and missing -y is on purpose.
+        - name: Update all packages (not really)
+          command: yum update --setopt=obsoletes=0
           register: update_all_locked_packages
           changed_when:
             - '"No packages marked for update" not in update_all_locked_packages.stdout'
@@ -59,4 +60,4 @@
         state: absent
       when: yum_versionlock_install is changed
   when: (ansible_distribution in ['CentOS', 'RedHat'] and ansible_distribution_major_version is version('7', '>=')) or
-        (ansible_distribution == 'Fedora')
+        (ansible_distribution == 'Fedora' and ansible_distribution_major_version is version('33', '<='))
