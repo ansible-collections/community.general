@@ -419,7 +419,7 @@ class JIRA(StateModuleHelper):
             comment_visibility=dict(type='dict', suboptions=dict(
                 type=dict(type='str', choices=['group', 'role'], required=True),
                 value=dict(type='str', required=True),
-            )),            
+            )),
             status=dict(type='str', ),
             assignee=dict(type='str', ),
             fields=dict(default={}, type='dict'),
@@ -481,8 +481,8 @@ class JIRA(StateModuleHelper):
             'body': self.vars.comment
         }
         # if comment_visibility is specified restrict visibility
-        if params['comment_visibility'] is not None:
-            data['visibility'] = params['comment_visibility']
+        if self.vars.comment_visibility is not None:
+            data['visibility'] = self.vars.comment_visibility
 
         url = self.vars.restbase + '/issue/' + self.vars.issue + '/comment'
         self.vars.meta = self.post(url, data)
