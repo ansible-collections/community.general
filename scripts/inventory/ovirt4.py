@@ -114,7 +114,7 @@ def create_connection():
                 'ovirt_username': os.environ.get('OVIRT_USERNAME'),
                 'ovirt_password': os.environ.get('OVIRT_PASSWORD'),
                 'ovirt_ca_file': os.environ.get('OVIRT_CAFILE', ''),
-            }
+            }, allow_no_value=True
         )
     else:
         config = configparser.ConfigParser(
