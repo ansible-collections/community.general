@@ -93,17 +93,17 @@ options:
      - Used to specify comment comment visibility.
      - See U(https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-comments/#api-rest-api-2-issue-issueidorkey-comment-post) for details.
     options:
-    type:
-      description:
-       - Use type to specify which if the visibility restriction types will be used.
-      type: str
-      required: true
-      choices: [group, role]
-    value:
-      description:
-       - Use value to specify value corresponding to the type of visibility restriction. E.g. name of the group or role.
-      type: str
-      required: true
+      type:
+        description:
+         - Use type to specify which if the visibility restriction types will be used.
+        type: str
+        required: true
+        choices: [group, role]
+      value:
+        description:
+         - Use value to specify value corresponding to the type of visibility restriction. E.g. name of the group or role.
+        type: str
+        required: true
     version_added: '3.2.0'
 
   status:
