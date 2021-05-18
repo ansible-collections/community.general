@@ -416,11 +416,9 @@ class JIRA(StateModuleHelper):
             issuetype=dict(type='str', ),
             issue=dict(type='str', aliases=['ticket']),
             comment=dict(type='str', ),
-            comment_visibility=dict(
-                type='dict',
-                options=dict(
-                    type=dict(type='str', choices=['group', 'role'], required=True),
-                    value=dict(type='str', required=True),
+            comment_visibility=dict(type='dict', options=dict(
+                type=dict(type='str', choices=['group', 'role'], required=True),
+                value=dict(type='str', required=True),
             )),
             status=dict(type='str', ),
             assignee=dict(type='str', ),
