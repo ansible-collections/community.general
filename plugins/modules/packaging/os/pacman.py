@@ -87,9 +87,9 @@ options:
         type: str
 
 notes:
-  - When used with a `loop:` each package will be processed individually,
-    it is much more efficient to pass the list directly to the `name` option.
-  - To use an AUR helper (`bin` option), a few extra setup steps might be required beforehand.
+  - When used with a C(loop:) each package will be processed individually,
+    it is much more efficient to pass the list directly to the I(name) option.
+  - To use an AUR helper (I(bin) option), a few extra setup steps might be required beforehand.
     For example, a dedicated build user with permissions to install packages could be necessary.
 '''
 
