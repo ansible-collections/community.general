@@ -91,10 +91,10 @@ options:
     description:
      - Used to specify comment comment visibility.
      - See U(https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-comments/#api-rest-api-2-issue-issueidorkey-comment-post) for details.
-    options:
+    suboptions:
       type:
         description:
-         - Use type to specify which if the visibility restriction types will be used.
+         - Use type to specify which of the JIRA visibility restriction types will be used.
         type: str
         required: true
         choices: [group, role]
@@ -418,7 +418,7 @@ class JIRA(StateModuleHelper):
             comment=dict(type='str', ),
             comment_visibility=dict(type='dict', options=dict(
                 type=dict(type='str', choices=['group', 'role'], required=True),
-                value=dict(type='str', required=True),
+                value=dict(type='str', required=True)
             )),
             status=dict(type='str', ),
             assignee=dict(type='str', ),
