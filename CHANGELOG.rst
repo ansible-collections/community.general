@@ -6,6 +6,95 @@ Community General Release Notes
 
 This changelog describes changes after version 2.0.0.
 
+v3.1.0
+======
+
+Release Summary
+---------------
+
+Regular feature and bugfix release.
+
+Minor Changes
+-------------
+
+- ModuleHelper module utils - improved mechanism for customizing the calculation of ``changed`` (https://github.com/ansible-collections/community.general/pull/2514).
+- chroot connection - minor refactor to make lints and IDEs happy (https://github.com/ansible-collections/community.general/pull/2520).
+- cmd (Module Helper) module utils - ``CmdMixin`` now pulls the value for ``run_command()`` params from ``self.vars``, as opposed to previously retrieving those from ``self.module.params`` (https://github.com/ansible-collections/community.general/pull/2517).
+- filesystem - cleanup and revamp module, tests and doc. Pass all commands to ``module.run_command()`` as lists. Move the device-vs-mountpoint logic to ``grow()`` method. Give to all ``get_fs_size()`` the same logic and error handling. (https://github.com/ansible-collections/community.general/pull/2472).
+- funcd connection - minor refactor to make lints and IDEs happy (https://github.com/ansible-collections/community.general/pull/2520).
+- gitlab_user - add ``expires_at`` option (https://github.com/ansible-collections/community.general/issues/2325).
+- idrac_redfish_config - modified set_manager_attributes function to skip invalid attribute instead of returning. Added skipped attributes to output. Modified module exit to add warning variable (https://github.com/ansible-collections/community.general/issues/1995).
+- influxdb_retention_policy - add ``state`` parameter with allowed values ``present`` and ``absent`` to support deletion of existing retention policies (https://github.com/ansible-collections/community.general/issues/2383).
+- influxdb_retention_policy - simplify duration logic parsing (https://github.com/ansible-collections/community.general/pull/2385).
+- iocage connection - minor refactor to make lints and IDEs happy (https://github.com/ansible-collections/community.general/pull/2520).
+- jail connection - minor refactor to make lints and IDEs happy (https://github.com/ansible-collections/community.general/pull/2520).
+- java_keystore - added ``ssl_backend`` parameter for using the cryptography library instead of the OpenSSL binary (https://github.com/ansible-collections/community.general/pull/2485).
+- java_keystore - replace envvar by stdin to pass secret to ``keytool`` (https://github.com/ansible-collections/community.general/pull/2526).
+- linode - added proper traceback when failing due to exceptions (https://github.com/ansible-collections/community.general/pull/2410).
+- linode - parameter ``additional_disks`` is now validated as a list of dictionaries (https://github.com/ansible-collections/community.general/pull/2410).
+- lxc connection - minor refactor to make lints and IDEs happy (https://github.com/ansible-collections/community.general/pull/2520).
+- module_helper module utils - break down of the long file into smaller pieces (https://github.com/ansible-collections/community.general/pull/2393).
+- nmcli - remove dead code, ``options`` never contains keys from ``param_alias`` (https://github.com/ansible-collections/community.general/pull/2417).
+- pacman - add ``executable`` option to use an alternative pacman binary (https://github.com/ansible-collections/community.general/issues/2524).
+- passwordstore lookup - add option ``missing`` to choose what to do if the password file is missing (https://github.com/ansible-collections/community.general/pull/2500).
+- qubes connection - minor refactor to make lints and IDEs happy (https://github.com/ansible-collections/community.general/pull/2520).
+- redfish_config - modified module exit to add warning variable (https://github.com/ansible-collections/community.general/issues/1995).
+- redfish_utils module utils - modified set_bios_attributes function to skip invalid attribute instead of returning. Added skipped attributes to output (https://github.com/ansible-collections/community.general/issues/1995).
+- saltstack connection - minor refactor to make lints and IDEs happy (https://github.com/ansible-collections/community.general/pull/2520).
+- spotinst_aws_elastigroup - elements of list parameters are now validated (https://github.com/ansible-collections/community.general/pull/2355).
+- zfs_delegate_admin - drop choices from permissions, allowing any permission supported by the underlying zfs commands (https://github.com/ansible-collections/community.general/pull/2540).
+- zone connection - minor refactor to make lints and IDEs happy (https://github.com/ansible-collections/community.general/pull/2520).
+
+Deprecated Features
+-------------------
+
+- The nios, nios_next_ip, nios_next_network lookup plugins, the nios documentation fragment, and the nios_host_record, nios_ptr_record, nios_mx_record, nios_fixed_address, nios_zone, nios_member, nios_a_record, nios_aaaa_record, nios_network, nios_dns_view, nios_txt_record, nios_naptr_record, nios_srv_record, nios_cname_record, nios_nsgroup, and nios_network_view module have been deprecated and will be removed from community.general 5.0.0. Please install the `infoblox.nios_modules <https://galaxy.ansible.com/infoblox/nios_modules>`_ collection instead and use its plugins and modules (https://github.com/ansible-collections/community.general/pull/2458).
+- The vendored copy of ``ipaddress`` will be removed in community.general 4.0.0. Please switch to ``ipaddress`` from the Python 3 standard library, or `from pypi <https://pypi.org/project/ipaddress/>`_, if your code relies on the vendored version of ``ipaddress`` (https://github.com/ansible-collections/community.general/pull/2459).
+- linode - parameter ``backupsenabled`` is deprecated and will be removed in community.general 5.0.0 (https://github.com/ansible-collections/community.general/pull/2410).
+- lxd inventory plugin - the plugin will require ``ipaddress`` installed when used with Python 2 from community.general 4.0.0 on. ``ipaddress`` is part of the Python 3 standard library, but can be installed for Python 2 from pypi (https://github.com/ansible-collections/community.general/pull/2459).
+- scaleway_security_group_rule - the module will require ``ipaddress`` installed when used with Python 2 from community.general 4.0.0 on. ``ipaddress`` is part of the Python 3 standard library, but can be installed for Python 2 from pypi (https://github.com/ansible-collections/community.general/pull/2459).
+
+Bugfixes
+--------
+
+- consul_acl - update the hcl allowlist to include all supported options (https://github.com/ansible-collections/community.general/pull/2495).
+- filesystem - repair ``reiserfs`` fstype support after adding it to integration tests (https://github.com/ansible-collections/community.general/pull/2472).
+- influxdb_user - allow creation of admin users when InfluxDB authentication is enabled but no other user exists on the database. In this scenario, InfluxDB 1.x allows only ``CREATE USER`` queries and rejects any other query (https://github.com/ansible-collections/community.general/issues/2364).
+- influxdb_user - fix bug where an influxdb user has no privileges for 2 or more databases (https://github.com/ansible-collections/community.general/pull/2499).
+- iptables_state - fix a 'FutureWarning' in a regex and do some basic code clean up (https://github.com/ansible-collections/community.general/pull/2525).
+- iptables_state - fix initialization of iptables from null state when adressing more than one table (https://github.com/ansible-collections/community.general/issues/2523).
+- nmap inventory plugin - fix local variable error when cache is disabled (https://github.com/ansible-collections/community.general/issues/2512).
+
+New Plugins
+-----------
+
+Filter
+~~~~~~
+
+- groupby_as_dict - Transform a sequence of dictionaries to a dictionary where the dictionaries are indexed by an attribute
+
+Lookup
+~~~~~~
+
+- dependent - Composes a list with nested elements of other lists or dicts which can depend on previous loop variables
+- random_pet - Generates random pet names
+
+New Modules
+-----------
+
+Cloud
+~~~~~
+
+misc
+^^^^
+
+- proxmox_nic - Management of a NIC of a Qemu(KVM) VM in a Proxmox VE cluster.
+
+Notification
+~~~~~~~~~~~~
+
+- discord - Send Discord messages
+
 v3.0.2
 ======
 

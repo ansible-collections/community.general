@@ -1,3 +1,0 @@
-add plugin.filter:
-  - name: groupby_as_dict
-    description: Transform a sequence of dictionaries to a dictionary where the dictionaries are indexed by an attribute
