@@ -19,6 +19,7 @@
         - testrefresh
         - testprio
         - Apache_PHP_Modules
+        - zerotier
 
     - name: collect repo configuration after test
       shell: "grep . /etc/zypp/repos.d/*"

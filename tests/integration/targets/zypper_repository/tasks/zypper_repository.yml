@@ -125,3 +125,37 @@
     priority: 100
     auto_import_keys: true
     state: "present"
+
+- name: Test adding a repo with GPG signature options
+  community.general.zypper_repository:
+    name: zerotier
+    repo: https://download.zerotier.com/redhat/el/8/
+    gpg_signature_check: "{{ item }}"
+    state: present
+  with_items:
+    - default
+    - enable
+    - disable
+    - allow_unsigned
+    - allow_unsigned_repo
+    - allow_unsigned_package
+
+- name: Add repo with GPG signature option
+  community.general.zypper_repository:
+    name: zerotier
+    repo: https://download.zerotier.com/redhat/el/8/
+    gpg_signature_check: allow_unsigned
+    state: present
+
+- name: Add a repo with identical options
+  community.general.zypper_repository:
+    name: zerotier
+    repo: https://download.zerotier.com/redhat/el/8/
+    gpg_signature_check: allow_unsigned
+    state: present
+  register: zypper_result
+
+- name: Verify result didn't change
+  assert:
+    that:
+      - "not zypper_result.changed"
