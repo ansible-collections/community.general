@@ -1,0 +1,9 @@
+---
+minor_changes:
+  - "filesystem - cleanup and revamp module, tests and doc. Pass all commands to
+    ``module.run_command()`` as lists. Move the device-vs-mountpoint logic to
+    ``grow()`` method. Give to all ``get_fs_size()`` the same logic and error
+    handling. (https://github.com/ansible-collections/community.general/pull/2472)."
+bugfixes:
+  - "filesystem - repair ``reiserfs`` fstype support after adding it to integration
+    tests (https://github.com/ansible-collections/community.general/pull/2472)."

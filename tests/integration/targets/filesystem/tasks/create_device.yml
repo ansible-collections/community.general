@@ -1,6 +1,9 @@
 ---
 - name: 'Create a "disk" file'
-  command: 'dd if=/dev/zero of={{ image_file }} bs=1M count={{ fssize }}'
+  community.general.filesize:
+    path: '{{ image_file }}'
+    size: '{{ fssize }}M'
+    force: true
 
 - vars:
     dev: '{{ image_file }}'
@@ -8,26 +11,29 @@
     - when: fstype == 'lvm'
       block:
         - name: 'Create a loop device for LVM'
-          command: 'losetup --show -f {{ dev }}'
+          ansible.builtin.command:
+            cmd: 'losetup --show -f {{ dev }}'
           register: loop_device_cmd
 
-        - set_fact:
+        - name: 'Switch to loop device target for further tasks'
+          ansible.builtin.set_fact:
             dev: "{{ loop_device_cmd.stdout }}"
 
     - include_tasks: '{{ action }}.yml'
 
   always:
     - name: 'Detach loop device used for LVM'
-      command: 'losetup -d {{ dev }}'
-      args:
+      ansible.builtin.command:
+        cmd: 'losetup -d {{ dev }}'
         removes: '{{ dev }}'
       when: fstype == 'lvm'
 
     - name: 'Clean correct device for LVM'
-      set_fact:
+      ansible.builtin.set_fact:
         dev: '{{ image_file }}'
       when: fstype == 'lvm'
 
-    - file:
+    - name: 'Remove disk image file'
+      ansible.builtin.file:
         name: '{{ image_file }}'
         state: absent
