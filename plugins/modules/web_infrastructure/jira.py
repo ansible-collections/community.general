@@ -477,7 +477,7 @@ class JIRA(StateModuleHelper):
             'body': self.vars.comment
         }
         # if comment_visibility is specified restrict visibility
-        if params['comment_visibility'] != None:
+        if params['comment_visibility'] is not None:
             data['visibility'] = params['comment_visibility']
 
         url = self.vars.restbase + '/issue/' + self.vars.issue + '/comment'
