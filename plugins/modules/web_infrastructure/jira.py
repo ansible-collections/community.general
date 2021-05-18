@@ -88,7 +88,6 @@ options:
 
   comment_visibility:
     type: dict
-    required: false
     description:
      - Used to specify comment comment visibility.
      - See U(https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-comments/#api-rest-api-2-issue-issueidorkey-comment-post) for details.
