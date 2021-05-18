@@ -1,98 +1,98 @@
 ---
 # We assume 'create_fs' tests have passed.
 
-- name: filesystem creation
-  filesystem:
+- name: "Create filesystem"
+  community.general.filesystem:
     dev: '{{ dev }}'
     fstype: '{{ fstype }}'
 
-- name: get filesystem UUID with 'blkid'
-  command:
+- name: "Get filesystem UUID with 'blkid'"
+  ansible.builtin.command:
     cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
   changed_when: false
   register: blkid_ref
 
-- name: Assert that a filesystem exists on top of the device
-  assert:
+- name: "Assert that a filesystem exists on top of the device"
+  ansible.builtin.assert:
     that:
       - blkid_ref.stdout | length > 0
 
 
 # Test check_mode first
-- name: filesystem removal (check mode)
-  filesystem:
+- name: "Remove filesystem (check mode)"
+  community.general.filesystem:
     dev: '{{ dev }}'
     state: absent
   register: wipefs
   check_mode: yes
 
-- name: get filesystem UUID with 'blkid' (should remain the same)
-  command:
+- name: "Get filesystem UUID with 'blkid' (should remain the same)"
+  ansible.builtin.command:
     cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
   changed_when: false
   register: blkid
 
-- name: Assert that the state changed but the filesystem still exists
-  assert:
+- name: "Assert that the state changed but the filesystem still exists"
+  ansible.builtin.assert:
     that:
       - wipefs is changed
       - blkid.stdout == blkid_ref.stdout
 
 # Do it
-- name: filesystem removal
-  filesystem:
+- name: "Remove filesystem"
+  community.general.filesystem:
     dev: '{{ dev }}'
     state: absent
   register: wipefs
 
-- name: get filesystem UUID with 'blkid' (should be empty)
-  command:
+- name: "Get filesystem UUID with 'blkid' (should be empty)"
+  ansible.builtin.command:
     cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
   changed_when: false
   failed_when: false
   register: blkid
 
-- name: Assert that the state changed and the device has no filesystem
-  assert:
+- name: "Assert that the state changed and the device has no filesystem"
+  ansible.builtin.assert:
     that:
       - wipefs is changed
       - blkid.stdout | length == 0
       - blkid.rc == 2
 
 # Do it again
-- name: filesystem removal (idempotency)
-  filesystem:
+- name: "Remove filesystem (idempotency)"
+  community.general.filesystem:
     dev: '{{ dev }}'
     state: absent
   register: wipefs
 
-- name: Assert that the state did not change
-  assert:
+- name: "Assert that the state did not change"
+  ansible.builtin.assert:
     that:
       - wipefs is not changed
 
 # and again
-- name: filesystem removal (idempotency, check mode)
-  filesystem:
+- name: "Remove filesystem (idempotency, check mode)"
+  community.general.filesystem:
     dev: '{{ dev }}'
     state: absent
   register: wipefs
   check_mode: yes
 
-- name: Assert that the state did not change
-  assert:
+- name: "Assert that the state did not change"
+  ansible.builtin.assert:
     that:
       - wipefs is not changed
 
 
 # By the way, test removal of a filesystem on unexistent device
-- name: filesystem removal (unexistent device)
-  filesystem:
+- name: "Remove filesystem (unexistent device)"
+  community.general.filesystem:
     dev: '/dev/unexistent_device'
     state: absent
   register: wipefs
 
-- name: Assert that the state did not change
-  assert:
+- name: "Assert that the state did not change"
+  ansible.builtin.assert:
     that:
       - wipefs is not changed
