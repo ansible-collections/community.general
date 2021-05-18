@@ -44,7 +44,7 @@ options:
         default: no
         type: bool
 
-    bin:
+    executable:
         description:
             - Name of binary to use. This can either be C(pacman) or a pacman compatible AUR helper.
             - Beware that AUR helpers might behave unexpectedly and are therefore not recommended.
@@ -89,7 +89,7 @@ options:
 notes:
   - When used with a C(loop:) each package will be processed individually,
     it is much more efficient to pass the list directly to the I(name) option.
-  - To use an AUR helper (I(bin) option), a few extra setup steps might be required beforehand.
+  - To use an AUR helper (I(executable) option), a few extra setup steps might be required beforehand.
     For example, a dedicated build user with permissions to install packages could be necessary.
 '''
 
@@ -123,7 +123,7 @@ EXAMPLES = '''
   community.general.pacman:
     name: foo
     state: present
-    bin: yay
+    executable: yay
     extra_args: --builddir /var/cache/yay
 
 - name: Upgrade package foo
@@ -436,7 +436,7 @@ def main():
             name=dict(type='list', elements='str', aliases=['pkg', 'package']),
             state=dict(type='str', default='present', choices=['present', 'installed', 'latest', 'absent', 'removed']),
             force=dict(type='bool', default=False),
-            bin=dict(type='str', default='pacman'),
+            executable=dict(type='str', default='pacman'),
             extra_args=dict(type='str', default=''),
             upgrade=dict(type='bool', default=False),
             upgrade_extra_args=dict(type='str', default=''),
@@ -455,7 +455,7 @@ def main():
     p = module.params
 
     # find pacman binary
-    pacman_path = module.get_bin_path(p['bin'], True)
+    pacman_path = module.get_bin_path(p['executable'], True)
 
     # normalize the state parameter
     if p['state'] in ['present', 'installed']:
