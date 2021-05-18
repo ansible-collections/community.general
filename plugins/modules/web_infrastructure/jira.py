@@ -86,6 +86,26 @@ options:
      - The comment text to add.
      - Note that JIRA may not allow changing field values on specific transitions or states.
 
+  comment_visibility:
+    type: dict
+    required: false
+    description:
+     - Used to specify comment comment visibility.
+     - See U(https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issue-comments/#api-rest-api-2-issue-issueidorkey-comment-post) for details.
+    options:
+    type:
+      description:
+       - Use type to specify which if the visibility restriction types will be used.
+      type: str
+      required: true
+      choices: [group, role]
+    value:
+      description:
+       - Use value to specify value corresponding to the type of visibility restriction. E.g. name of the group or role.
+      type: str
+      required: true
+    version_added: '3.2.0'
+
   status:
     type: str
     required: false
@@ -222,6 +242,18 @@ EXAMPLES = r"""
     issue: '{{ issue.meta.key }}'
     operation: comment
     comment: A comment added by Ansible
+
+- name: Comment on issue with restricted visibility
+  community.general.jira:
+    uri: '{{ server }}'
+    username: '{{ user }}'
+    password: '{{ pass }}'
+    issue: '{{ issue.meta.key }}'
+    operation: comment
+    comment: A comment added by Ansible
+    comment_visibility:
+      type: role
+      value: Developers
 
 # Assign an existing issue using edit
 - name: Assign an issue using free-form fields
@@ -445,6 +477,10 @@ class JIRA(StateModuleHelper):
         data = {
             'body': self.vars.comment
         }
+        # if comment_visibility is specified restrict visibility
+        if params['comment_visibility'] != None:
+            data['visibility'] = params['comment_visibility']
+
         url = self.vars.restbase + '/issue/' + self.vars.issue + '/comment'
         self.vars.meta = self.post(url, data)
 
