@@ -182,7 +182,6 @@ def main():
 
     service_path = module.params.get('service_path')
     state = module.params.get('state')
-    functions = module.params.get('functions')
     region = module.params.get('region')
     stage = module.params.get('stage')
     deploy = module.params.get('deploy', True)
@@ -193,7 +192,7 @@ def main():
     if serverless_bin_path is not None:
         command = serverless_bin_path + " "
     else:
-        command = "serverless "
+        command = module.get_bin_path("serverless") + " "
 
     if state == 'present':
         command += 'deploy '
