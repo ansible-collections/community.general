@@ -914,7 +914,7 @@ def create_vm(module, proxmox, vmid, newid, node, name, memory, cpu, cores, sock
 
     # Convert all dict in kwargs to elements.
     # For hostpci[n], ide[n], net[n], numa[n], parallel[n], sata[n], scsi[n], serial[n], virtio[n], ipconfig[n]
-    for k in kwargs.keys():
+    for k in list(kwargs.keys()):
         if isinstance(kwargs[k], dict):
             kwargs.update(kwargs[k])
             del kwargs[k]
