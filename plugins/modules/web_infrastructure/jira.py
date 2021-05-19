@@ -100,7 +100,7 @@ options:
         choices: [group, role]
       value:
         description:
-         - Use value to specify value corresponding to the type of visibility restriction. E.g. name of the group or role.
+         - Use value to specify value corresponding to the type of visibility restriction. For example name of the group or role.
         type: str
         required: true
     version_added: '3.2.0'
