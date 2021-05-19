@@ -55,3 +55,4 @@ wrapt == 1.11.1
 
 # Restrict docker versions depending on Python version
 docker < 5.0.0 ; python_version <= '3.6'
+websocket-client < 1.0.0 ; python_version <= '3.6'
