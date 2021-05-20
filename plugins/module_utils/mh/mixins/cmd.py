@@ -166,8 +166,6 @@ class CmdMixin(object):
         self.update_output(rc=rc, stdout=out, stderr=err)
         if process_output is None:
             _process = self.process_command_output
-        elif isinstance(process_output, str):
-            _process = getattr(self, process_output)
         else:
             _process = process_output
 
