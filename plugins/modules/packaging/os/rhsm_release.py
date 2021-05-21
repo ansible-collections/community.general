@@ -57,7 +57,7 @@ from ansible.module_utils.basic import AnsibleModule
 import re
 
 # Matches release-like values such as 7.2, 5.10, 6Server, 8
-# but rejects unlikely values, like 100Server, 100.0, 1.100 etc.
+# but rejects unlikely values, like 100Server, 1.100, 7server etc.
 release_matcher = re.compile(r'\b\d{1,2}(?:\.\d{1,2}|Server|Client|Workstation|)\b')
 
 

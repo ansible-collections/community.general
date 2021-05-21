@@ -129,8 +129,6 @@ class RhsmRepositoryReleaseModuleTestCase(ModuleTestCase):
         insane_values = [
             '6server',    # lowercase 's'
             '100Server',  # excessively long 'x' component
-            '100.0',      # excessively long 'x' component
-            '+.10',       # illegal character
             '100.100',    # excessively long 'x' and 'y' components
         ]
 
