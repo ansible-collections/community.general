@@ -215,8 +215,8 @@
 - name: Check that shot name host is added and full name host is not updated
   assert:
     that:
-      - not full_name.changed
       - short_name.changed
+      - not short_name.hosts_changed
       - "'full' in short_name.hosts_added"
       - short_name.hosts_changed is defined
       - short_name.hosts_removed is defined
