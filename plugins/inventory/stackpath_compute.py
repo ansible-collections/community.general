@@ -11,6 +11,8 @@ DOCUMENTATION = '''
     plugin_type: inventory
     short_description: StackPath Edge Computing inventory source
     version_added: 1.2.0
+    author:
+        - UNKNOWN (@shayrybak)
     extends_documentation_fragment:
         - inventory_cache
         - constructed
