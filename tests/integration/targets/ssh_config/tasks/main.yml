@@ -198,7 +198,7 @@
   assert:
     that:
       - full_name.changed
-      - "'full_name.com' in full_name.hosts_added"
+      - "'full_name' in full_name.hosts_added"
       - full_name.hosts_changed is defined
       - full_name.hosts_removed is defined
 
@@ -217,7 +217,6 @@
     that:
       - not full_name.changed
       - short_name.changed
-      - "'full_name.com' in full_name.hosts_added"
-      - "'full.com' in short_name.hosts_added"
+      - "'full' in short_name.hosts_added"
       - short_name.hosts_changed is defined
       - short_name.hosts_removed is defined
