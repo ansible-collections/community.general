@@ -15,5 +15,5 @@
   - name: Test expected result
     assert:
       that:
-      - beers.changed == false
+      - beers is not changed
       - beers.count == 2

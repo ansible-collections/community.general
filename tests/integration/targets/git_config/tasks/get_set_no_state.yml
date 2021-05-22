@@ -17,9 +17,9 @@
 - name: assert set changed and value is correct
   assert:
     that:
-      - set_result.changed == true
+      - set_result is changed
       - set_result.diff.before == "\n"
       - set_result.diff.after == option_value + "\n"
-      - get_result.changed == false
+      - get_result is not changed
       - get_result.config_value == option_value
 ...

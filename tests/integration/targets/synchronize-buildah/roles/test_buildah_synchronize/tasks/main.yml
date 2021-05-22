@@ -40,7 +40,7 @@
 - assert:
     that:
         - "'changed' in sync_result"
-        - "sync_result.changed == true"
+        - sync_result is changed
         - "'cmd' in sync_result"
         - "'rsync' in sync_result.cmd"
         - "'msg' in sync_result"
@@ -63,7 +63,7 @@
 
 - assert:
     that:
-     - "sync_result.changed == False"
+     - sync_result is not changed
 
 - name: cleanup old files
   file:

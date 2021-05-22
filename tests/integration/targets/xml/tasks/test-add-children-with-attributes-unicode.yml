@@ -26,6 +26,6 @@
   - name: Test expected result
     assert:
       that:
-      - add_children_with_attributes_unicode.changed == true
-      - comparison.changed == false  # identical
+      - add_children_with_attributes_unicode is changed
+      - comparison is not changed  # identical
     #command: diff -u {{ role_path }}/results/test-add-children-with-attributes-unicode.xml /tmp/ansible-xml-beers.xml

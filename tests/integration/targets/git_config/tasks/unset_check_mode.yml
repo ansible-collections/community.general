@@ -18,7 +18,7 @@
 - name: assert unset changed but dit not delete value
   assert:
     that:
-      - unset_result.changed == true
+      - unset_result is changed
       - unset_result.diff.before == option_value + "\n"
       - unset_result.diff.after == "\n"
       - get_result.config_value == option_value
