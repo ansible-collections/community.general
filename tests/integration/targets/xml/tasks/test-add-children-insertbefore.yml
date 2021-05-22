@@ -28,5 +28,5 @@
   - name: Test expected result
     assert:
       that:
-      - add_children_insertbefore.changed == true
-      - comparison.changed == false  # identical
+      - add_children_insertbefore is changed
+      - comparison is not changed  # identical

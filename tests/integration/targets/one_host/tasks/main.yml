@@ -177,7 +177,7 @@
 - name: "assert test_{{test_number}} worked"
   assert:
     that:
-    - result.changed == false
+    - result is not changed
 
 # HOST DISABLEMENT
 

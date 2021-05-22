@@ -78,8 +78,8 @@
 - name: assert changed is false
   assert:
     that:
-      - result.failed == 0
-      - result.changed == false
+      - result is not failed
+      - result is not changed
 #----------------------------------------------------------
 - name: delete a peering connect (check mode)
   hwc_vpc_peering_connect:
@@ -133,8 +133,8 @@
 - name: assert changed is false
   assert:
     that:
-      - result.failed == 0
-      - result.changed == false
+      - result is not failed
+      - result is not changed
 #---------------------------------------------------------
 # Post-test teardown
 - name: delete a vpc

@@ -81,8 +81,8 @@
 - name: assert changed is false
   assert:
     that:
-      - result.failed == 0
-      - result.changed == false
+      - result is not failed
+      - result is not changed
 #----------------------------------------------------------
 - name: delete a route (check mode)
   hwc_vpc_route:
@@ -127,8 +127,8 @@
 - name: assert changed is false
   assert:
     that:
-      - result.failed == 0
-      - result.changed == false
+      - result is not failed
+      - result is not changed
 #---------------------------------------------------------
 # Post-test teardown
 - name: delete a peering connect

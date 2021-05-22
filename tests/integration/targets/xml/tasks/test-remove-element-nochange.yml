@@ -23,6 +23,6 @@
   - name: Test expected result
     assert:
       that:
-      - remove_element.changed == false
-      - comparison.changed == false  # identical
+      - remove_element is not changed
+      - comparison is not changed  # identical
     #command: diff -u {{ role_path }}/results/test-remove-element.xml /tmp/ansible-xml-beers.xml

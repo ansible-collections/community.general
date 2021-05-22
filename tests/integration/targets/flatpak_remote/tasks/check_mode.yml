@@ -13,7 +13,7 @@
 - name: Verify addition of absent flatpak remote test result (check mode)
   assert:
     that:
-      - "addition_result.changed == true"
+      - addition_result is changed
     msg: "Adding an absent flatpak remote shall mark module execution as changed"
 
 - name: Test non-existent idempotency of addition of absent flatpak remote (check mode)
@@ -29,7 +29,7 @@
       test result (check mode)
   assert:
     that:
-      - "double_addition_result.changed == true"
+      - double_addition_result is changed
     msg: |
         Adding an absent flatpak remote a second time shall still mark module execution
         as changed in check mode
@@ -46,7 +46,7 @@
 - name: Verify removal of absent flatpak remote test result (check mode)
   assert:
     that:
-      - "removal_result.changed == false"
+      - removal_result is not changed
     msg: "Removing an absent flatpak remote shall mark module execution as not changed"
 
 
@@ -65,7 +65,7 @@
 - name: Verify addition of present flatpak remote test result (check mode)
   assert:
     that:
-      - "addition_result.changed == false"
+      - addition_result is not changed
     msg: "Adding a present flatpak remote shall mark module execution as not changed"
 
 # state=absent
@@ -80,7 +80,7 @@
 - name: Verify removal of present flatpak remote test result (check mode)
   assert:
     that:
-      - "removal_result.changed == true"
+      - removal_result is changed
     msg: "Removing a present flatpak remote shall mark module execution as changed"
 
 - name: Test non-existent idempotency of removal of present flatpak remote (check mode)
@@ -95,7 +95,7 @@
       test result (check mode)
   assert:
     that:
-      - "double_removal_result.changed == true"
+      - double_removal_result is changed
     msg: |
         Removing a present flatpak remote a second time shall still mark module execution
         as changed in check mode

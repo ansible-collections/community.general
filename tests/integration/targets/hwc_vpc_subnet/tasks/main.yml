@@ -77,8 +77,8 @@
 - name: assert changed is false
   assert:
     that:
-      - result.failed == 0
-      - result.changed == false
+      - result is not failed
+      - result is not changed
 #----------------------------------------------------------
 - name: delete a subnet (check mode)
   hwc_vpc_subnet:
@@ -136,8 +136,8 @@
 - name: assert changed is false
   assert:
     that:
-      - result.failed == 0
-      - result.changed == false
+      - result is not failed
+      - result is not changed
 #---------------------------------------------------------
 # Post-test teardown
 - name: delete a vpc

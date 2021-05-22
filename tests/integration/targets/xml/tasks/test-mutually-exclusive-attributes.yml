@@ -18,5 +18,5 @@
   - name: Test expected result
     assert:
       that:
-      - module_output.changed == false
-      - module_output.failed == true
+      - module_output is not changed
+      - module_output is failed

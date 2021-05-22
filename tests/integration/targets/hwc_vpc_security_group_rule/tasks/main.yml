@@ -85,8 +85,8 @@
 - name: assert changed is false
   assert:
     that:
-      - result.failed == 0
-      - result.changed == false
+      - result is not failed
+      - result is not changed
 #----------------------------------------------------------
 - name: delete a security group rule (check mode)
   hwc_vpc_security_group_rule:
@@ -151,8 +151,8 @@
 - name: assert changed is false
   assert:
     that:
-      - result.failed == 0
-      - result.changed == false
+      - result is not failed
+      - result is not changed
 #---------------------------------------------------------
 # Post-test teardown
 - name: delete a security group
