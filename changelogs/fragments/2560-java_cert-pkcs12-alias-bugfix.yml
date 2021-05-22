@@ -1,0 +1,2 @@
+bugfixes:
+  - "java_cert - fix issue with incorrect alias used on PKCS#12 certificate import (https://github.com/ansible-collections/community.general/pull/2560)."

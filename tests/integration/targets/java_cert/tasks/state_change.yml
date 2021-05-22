@@ -4,51 +4,10 @@
   args:
     creates: "{{ test_key_path }}"
 
-- name: Create the test keystore
-  java_keystore:
-    name: placeholder
-    dest: "{{ test_keystore2_path }}"
-    password: "{{ test_keystore2_password }}"
-    private_key: "{{ lookup('file', '{{ test_key_path }}') }}"
-    certificate: "{{ lookup('file', '{{ test_cert_path }}') }}"
-
 - name: Generate the self signed cert we will use for testing
   command: openssl req -x509 -newkey rsa:4096 -keyout '{{ test_key2_path }}' -out '{{ test_cert2_path }}' -days 365 -nodes -subj '/CN=localhost'
   args:
     creates: "{{ test_key2_path }}"
-
-- name: |
-    Import the newly created certificate. This is our main test.
-    If the java_cert has been updated properly, then this task will report changed each time
-    since the module will be comparing the hash of the certificate instead of validating that the alias
-    simply exists
-  java_cert:
-    cert_alias: test_cert
-    cert_path: "{{ test_cert2_path }}"
-    keystore_path: "{{ test_keystore2_path }}"
-    keystore_pass: "{{ test_keystore2_password }}"
-    state: present
-  register: result_x509_changed
-
-- name: Verify the x509 status has changed
-  assert:
-    that:
-      - result_x509_changed is changed
-
-- name: |
-    We also want to make sure that the status doesnt change if we import the same cert
-  java_cert:
-    cert_alias: test_cert
-    cert_path: "{{ test_cert2_path }}"
-    keystore_path: "{{ test_keystore2_path }}"
-    keystore_pass: "{{ test_keystore2_password }}"
-    state: present
-  register: result_x509_succeeded
-
-- name: Verify the x509 status is ok
-  assert:
-    that:
-      - result_x509_succeeded is succeeded
 
 - name: Create the pkcs12 archive from the test x509 cert
   command: >
@@ -70,6 +29,97 @@
     -out {{ test_pkcs2_path }}
     -passout pass:"{{ test_keystore2_password }}"
 
+- name: try to create the test keystore based on the just created pkcs12, keystore_create flag not enabled
+  java_cert:
+    cert_alias: test_pkcs12_cert
+    pkcs12_alias: test_pkcs12_cert
+    pkcs12_path: "{{ test_pkcs_path }}"
+    pkcs12_password: "{{ test_keystore2_password }}"
+    keystore_path: "{{ test_keystore2_path }}"
+    keystore_pass: "{{ test_keystore2_password }}"
+  ignore_errors: true
+  register: result_x509_changed
+
+- name: Verify the x509 status is failed
+  assert:
+    that:
+      - result_x509_changed is failed
+
+- name: Create the test keystore based on the just created pkcs12
+  java_cert:
+    cert_alias: test_pkcs12_cert
+    pkcs12_alias: test_pkcs12_cert
+    pkcs12_path: "{{ test_pkcs_path }}"
+    pkcs12_password: "{{ test_keystore2_password }}"
+    keystore_path: "{{ test_keystore2_path }}"
+    keystore_pass: "{{ test_keystore2_password }}"
+    keystore_create: yes
+
+- name: try to import from pkcs12 a non existing alias
+  java_cert:
+    cert_alias: test_pkcs12_cert
+    pkcs12_alias: non_existing_alias
+    pkcs12_path: "{{ test_pkcs_path }}"
+    pkcs12_password: "{{ test_keystore2_password }}"
+    keystore_path: "{{ test_keystore2_path }}"
+    keystore_pass: "{{ test_keystore2_password }}"
+    keystore_create: yes
+  ignore_errors: yes
+  register: result_x509_changed
+
+- name: Verify the x509 status is failed
+  assert:
+    that:
+      - result_x509_changed is failed
+
+- name:  import initial test certificate from file path
+  java_cert:
+    cert_alias: test_cert
+    cert_path: "{{ test_cert_path }}"
+    keystore_path: "{{ test_keystore2_path }}"
+    keystore_pass: "{{ test_keystore2_password }}"
+    keystore_create: yes
+    state: present
+  register: result_x509_changed
+
+- name: Verify the x509 status is changed
+  assert:
+    that:
+      - result_x509_changed is changed
+
+- name: |
+    Import the newly created certificate. This is our main test.
+    If the java_cert has been updated properly, then this task will report changed each time
+    since the module will be comparing the hash of the certificate instead of validating that the alias
+    simply exists
+  java_cert:
+    cert_alias: test_cert
+    cert_path: "{{ test_cert2_path }}"
+    keystore_path: "{{ test_keystore2_path }}"
+    keystore_pass: "{{ test_keystore2_password }}"
+    state: present
+  register: result_x509_changed
+
+- name: Verify the x509 status is changed
+  assert:
+    that:
+      - result_x509_changed is changed
+
+- name: |
+    We also want to make sure that the status doesnt change if we import the same cert
+  java_cert:
+    cert_alias: test_cert
+    cert_path: "{{ test_cert2_path }}"
+    keystore_path: "{{ test_keystore2_path }}"
+    keystore_pass: "{{ test_keystore2_password }}"
+    state: present
+  register: result_x509_succeeded
+
+- name: Verify the x509 status is ok
+  assert:
+    that:
+      - result_x509_succeeded is succeeded
+
 - name: >
     Ensure the original pkcs12 cert is in the keystore
   java_cert:
@@ -83,7 +133,7 @@
 
 - name: |
     Perform the same test, but we will now be testing the pkcs12 functionality
-    If we add a different pkcs12 cert with the same alias, we should have a chnaged result, NOT the same
+    If we add a different pkcs12 cert with the same alias, we should have a changed result, NOT the same
   java_cert:
     cert_alias: test_pkcs12_cert
     pkcs12_alias: test_pkcs12_cert
@@ -94,7 +144,7 @@
     state: present
   register: result_pkcs12_changed
 
-- name: Verify the pkcs12 status has changed
+- name: Verify the pkcs12 status is changed
   assert:
     that:
       - result_pkcs12_changed is changed
@@ -155,7 +205,7 @@
     that:
       - result_x509_absent is changed
 
-- name: Ensure we can remove the pkcs12 archive
+- name: Ensure we can remove the certificate imported from pkcs12 archive
   java_cert:
     cert_alias: test_pkcs12_cert
     keystore_path: "{{ test_keystore2_path }}"
