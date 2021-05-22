@@ -21,12 +21,12 @@
       src: results/test-add-namespaced-children-elements.xml
       dest: /tmp/ansible-xml-namespaced-beers.xml
     check_mode: yes
-    diff: yes 
+    diff: yes
     register: comparison
 
   - name: Test expected result
     assert:
       that:
-      - add_namespaced_children_elements.changed == true
-      - comparison.changed == false  # identical
+      - add_namespaced_children_elements is changed
+      - comparison is not changed  # identical
     #command: diff -u {{ role_path }}/results/test-add-namespaced-children-elements.xml /tmp/ansible-xml-namespaced-beers.xml

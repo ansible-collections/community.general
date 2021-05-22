@@ -13,7 +13,7 @@
 - name: Verify addition of absent flatpak test result (check mode)
   assert:
     that:
-      - "addition_result.changed == true"
+      - addition_result is changed
     msg: "Adding an absent flatpak shall mark module execution as changed"
 
 - name: Test non-existent idempotency of addition of absent flatpak (check mode)
@@ -27,7 +27,7 @@
 - name: Verify non-existent idempotency of addition of absent flatpak test result (check mode)
   assert:
     that:
-      - "double_addition_result.changed == true"
+      - double_addition_result is changed
     msg: |
         Adding an absent flatpak a second time shall still mark module execution
         as changed in check mode
@@ -44,7 +44,7 @@
 - name: Verify removal of absent flatpak test result (check mode)
   assert:
     that:
-      - "removal_result.changed == false"
+      - removal_result is not changed
     msg: "Removing an absent flatpak shall mark module execution as not changed"
 
 # state=present with url on absent flatpak
@@ -60,7 +60,7 @@
 - name: Verify addition of absent flatpak with url test result (check mode)
   assert:
     that:
-      - "url_addition_result.changed == true"
+      - url_addition_result is changed
     msg: "Adding an absent flatpak from URL shall mark module execution as changed"
 
 - name: Test non-existent idempotency of addition of absent flatpak with url (check mode)
@@ -76,7 +76,7 @@
       result (check mode)
   assert:
     that:
-      - "double_url_addition_result.changed == true"
+      - double_url_addition_result is changed
     msg: |
         Adding an absent flatpak from URL a second time shall still mark module execution
         as changed in check mode
@@ -93,7 +93,7 @@
 - name: Verify removal of absent flatpak with url test result (check mode)
   assert:
     that:
-      - "url_removal_result.changed == false"
+      - url_removal_result is not changed
     msg: "Removing an absent flatpak shall mark module execution as not changed"
 
 
@@ -112,7 +112,7 @@
 - name: Verify addition test result of present flatpak (check mode)
   assert:
     that:
-      - "addition_present_result.changed == false"
+      - addition_present_result is not changed
     msg: "Adding an present flatpak shall mark module execution as not changed"
 
 # state=absent on present flatpak
@@ -127,7 +127,7 @@
 - name: Verify removal of present flatpak test result (check mode)
   assert:
     that:
-      - "removal_present_result.changed == true"
+      - removal_present_result is changed
     msg: "Removing a present flatpak shall mark module execution as changed"
 
 - name: Test non-existent idempotency of removal (check mode)
@@ -140,7 +140,7 @@
 - name: Verify non-existent idempotency of removal (check mode)
   assert:
     that:
-      - "double_removal_present_result.changed == true"
+      - double_removal_present_result is changed
     msg: |
         Removing a present flatpak a second time shall still mark module execution
         as changed in check mode
@@ -158,7 +158,7 @@
 - name: Verify addition with url of present flatpak test result (check mode)
   assert:
     that:
-      - "url_addition_present_result.changed == false"
+      - url_addition_present_result is not changed
     msg: "Adding a present flatpak from URL shall mark module execution as not changed"
 
 # state=absent with url on present flatpak
@@ -173,7 +173,7 @@
 - name: Verify removal with url of present flatpak test result (check mode)
   assert:
     that:
-      - "url_removal_present_result.changed == true"
+      - url_removal_present_result is changed
     msg: "Removing an absent flatpak shall mark module execution as not changed"
 
 - name: Test non-existent idempotency of removal with url of present flatpak (check mode)
@@ -189,5 +189,5 @@
       flatpak test result (check mode)
   assert:
     that:
-      - "double_url_removal_present_result.changed == true"
+      - double_url_removal_present_result is changed
     msg: Removing an absent flatpak a second time shall still mark module execution as changed

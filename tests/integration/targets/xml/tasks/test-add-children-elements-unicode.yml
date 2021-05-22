@@ -24,6 +24,6 @@
   - name: Test expected result
     assert:
       that:
-      - add_children_elements_unicode.changed == true
-      - comparison.changed == false  # identical
+      - add_children_elements_unicode is changed
+      - comparison is not changed  # identical
     #command: diff -u {{ role_path }}/results/test-add-children-elements-unicode.xml /tmp/ansible-xml-beers.xml

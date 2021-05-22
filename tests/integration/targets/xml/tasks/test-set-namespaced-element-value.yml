@@ -41,6 +41,6 @@
   - name: Test expected result
     assert:
       that:
-      - set_element_first_run.changed == true
-      - set_element_second_run.changed == false
-      - comparison.changed == false  # identical
+      - set_element_first_run is changed
+      - set_element_second_run is not changed
+      - comparison is not changed  # identical

@@ -50,8 +50,8 @@
 - name: assert changed is false
   assert:
     that:
-      - result.failed == 0
-      - result.changed == false
+      - result is not failed
+      - result is not changed
 #----------------------------------------------------------
 - name: delete a disk (check mode)
   hwc_evs_disk:
@@ -92,7 +92,7 @@
 - name: assert changed is false
   assert:
     that:
-      - result.changed == false
+      - result is not changed
 # ----------------------------------------------------------------------------
 - name: delete a disk that does not exist
   hwc_evs_disk:
@@ -105,5 +105,5 @@
 - name: assert changed is false
   assert:
     that:
-      - result.failed == 0
-      - result.changed == false
+      - result is not failed
+      - result is not changed

@@ -40,8 +40,8 @@
   - name: Verify executable override test result
     assert:
       that:
-        - "executable_override_result.failed == true"
-        - "executable_override_result.changed == false"
+        - executable_override_result is failed
+        - executable_override_result is not changed
       msg: "Specifying non-existing executable shall fail module execution"
 
   - import_tasks: check_mode.yml

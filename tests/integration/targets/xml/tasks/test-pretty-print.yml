@@ -25,6 +25,6 @@
   - name: Test expected result
     assert:
       that:
-      - pretty_print.changed == true
-      - comparison.changed == false  # identical
+      - pretty_print is changed
+      - comparison is not changed  # identical
     #command: diff -u {{ role_path }}/results/test-pretty-print.xml /tmp/ansible-xml-beers.xml
