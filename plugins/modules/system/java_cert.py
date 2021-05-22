@@ -278,7 +278,7 @@ def _export_public_cert_from_pkcs12(module, executable, pkcs_file, alias, passwo
     (export_rc, export_stdout, export_err) = module.run_command(export_cmd, data=password, check_rc=False)
 
     if export_rc != 0:
-        module.fail_json(msg="Internal module failure, cannot extract public certificate from pkcs12, error: %s" % export_err,
+        module.fail_json(msg="Internal module failure, cannot extract public certificate from pkcs12, error: %s" % export_stdout,
                          rc=export_rc)
 
     with open(dest, 'w') as f:
@@ -498,7 +498,7 @@ def main():
 
         if pkcs12_path:
             # Extracting certificate with openssl
-            _export_public_cert_from_pkcs12(module, executable, pkcs12_path, cert_alias, pkcs12_pass, new_certificate)
+            _export_public_cert_from_pkcs12(module, executable, pkcs12_path, pkcs12_alias, pkcs12_pass, new_certificate)
 
         elif path:
             # Extracting the X509 digest is a bit easier. Keytool will print the PEM
