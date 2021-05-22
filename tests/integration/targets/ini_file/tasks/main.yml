@@ -508,7 +508,8 @@
   set_fact:
     expected16: "[section1]\nvar1=aaa\nvar2=bbb\nvar4 = 0\n[section2]\nvar3=ccc\n"
     content16: "{{ output_content.content | b64decode }}"
-- debug: var=content16
+- debug:
+    var: content16
 - name: Verify content of ini file is as expected
   assert:
     that:
