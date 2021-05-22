@@ -102,14 +102,14 @@ EXAMPLES = r'''
 '''
 
 import io
-import csv 
-import json 
+import csv
+import json
 from ansible.module_utils.basic import AnsibleModule
 
-def csv_to_json(rawcsv):   
+
+def csv_to_json(rawcsv):
     lines = rawcsv[:rawcsv.rfind('\n')]
     reader_raw = csv.DictReader(io.StringIO(lines))
-    #strip values
     reader = [dict((k, v.strip()) for k, v in row.items()) for row in reader_raw]
     tolist = list(reader)
     return json.dumps(tolist)
@@ -125,7 +125,7 @@ def main():
             encrypted=dict(type='bool', required=False, default=False),
             host=dict(type='str', required=False),
             user=dict(type='str', required=False, default="SYSTEM"),
-            password=dict(type='str', required=True),
+            password=dict(type='str', required=True, no_log=True),
             database=dict(type='str', required=False),
             query=dict(type='raw', required=False),
             filepath=dict(type='raw', required=False),
