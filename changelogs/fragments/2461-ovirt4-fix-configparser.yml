@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - ovir4 inventory script - improve configparser creation to avoid crashes for options without values (https://github.com/ansible-collections/community.general/issues/674).
