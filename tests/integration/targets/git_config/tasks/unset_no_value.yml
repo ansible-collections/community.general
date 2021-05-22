@@ -17,7 +17,7 @@
 - name: assert unsetting didn't change
   assert:
     that:
-      - unset_result.changed == false
+      - unset_result is not changed
       - unset_result.msg == 'no setting to unset'
       - get_result.config_value == ''
 ...

@@ -23,6 +23,6 @@
   - name: Test expected result
     assert:
       that:
-      - set_element_value_empty.changed == true
-      - comparison.changed == false  # identical
+      - set_element_value_empty is changed
+      - comparison is not changed  # identical
     #command: diff -u {{ role_path }}/results/test-set-element-value-empty.xml /tmp/ansible-xml-beers.xml
