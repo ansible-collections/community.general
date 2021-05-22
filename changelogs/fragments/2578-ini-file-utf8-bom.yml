@@ -1,0 +1,2 @@
+minor_changes:
+  - ini_file - opening file with encoding ``utf-8-sig`` (https://github.com/ansible-collections/community.general/issues/2189).
