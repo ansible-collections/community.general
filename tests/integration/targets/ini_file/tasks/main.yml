@@ -480,3 +480,37 @@
   assert:
     that:
       - content15 == expected15
+
+- name: Create starting ini file
+  copy:
+    # The content below is the following text file with BOM:
+    # [section1]
+    # var1=aaa
+    # var2=bbb
+    # [section2]
+    # var3=ccc
+    content: !!binary |
+      77u/W3NlY3Rpb24xXQp2YXIxPWFhYQp2YXIyPWJiYgpbc2VjdGlvbjJdCnZhcjM9Y2NjCg==
+    dest: "{{ output_file }}"
+- name: Test ini breakage
+  ini_file:
+    path: "{{ output_file }}"
+    section: section1
+    option: var4
+    value: 0
+
+- name: read content from output file
+  slurp:
+    src: "{{ output_file }}"
+  register: output_content
+
+- name: set expected content and get current ini file content
+  set_fact:
+    expected16: "[section1]\nvar1=aaa\nvar2=bbb\nvar4 = 0\n[section2]\nvar3=ccc\n"
+    content16: "{{ output_content.content | b64decode }}"
+- debug:
+    var: content16
+- name: Verify content of ini file is as expected
+  assert:
+    that:
+      - content16 == expected16
