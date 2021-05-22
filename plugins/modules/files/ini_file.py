@@ -141,7 +141,7 @@ def do_ini(module, filename, section=None, option=None, value=None,
             os.makedirs(destpath)
         ini_lines = []
     else:
-        with open(filename, 'r') as ini_file:
+        with open(filename, 'r', encoding="utf-8-sig") as ini_file:
             ini_lines = ini_file.readlines()
 
     if module._diff:
