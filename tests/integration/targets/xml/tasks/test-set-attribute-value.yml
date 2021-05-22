@@ -24,6 +24,6 @@
   - name: Test expected result
     assert:
       that:
-      - set_attribute_value.changed == true
-      - comparison.changed == false  # identical
+      - set_attribute_value is changed
+      - comparison is not changed  # identical
     #command: diff -u {{ role_path }}/results/test-set-attribute-value.xml /tmp/ansible-xml-beers.xml
