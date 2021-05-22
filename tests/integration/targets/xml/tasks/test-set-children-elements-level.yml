@@ -47,8 +47,8 @@
   - name: Test expected result
     assert:
       that:
-      - set_children_elements_level.changed == true
-      - comparison.changed == false  # identical
+      - set_children_elements_level is changed
+      - comparison is not changed  # identical
     #command: diff -u {{ role_path }}/results/test-set-children-elements-level.xml /tmp/ansible-xml-beers.xml
 
 
@@ -70,5 +70,5 @@
   - name: Test expected result
     assert:
       that:
-      - set_children_again.changed == false
-      - comparison.changed == false  # identical
+      - set_children_again is not changed
+      - comparison is not changed   # identical
