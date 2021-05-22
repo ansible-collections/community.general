@@ -174,7 +174,7 @@
 - name: Test that the file modes were changed
   assert:
     that:
-      - archive_02_gz_stat is not changed "
+      - archive_02_gz_stat is not changed
       - "archive_02_gz_stat.stat.mode == '0600'"
       - "'archived' in archive_bz2_result_02"
       - "{{ archive_bz2_result_02['archived']| length}} == 3"
