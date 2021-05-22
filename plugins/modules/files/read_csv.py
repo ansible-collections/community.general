@@ -137,6 +137,8 @@ list:
     gid: 500
 '''
 
+import io
+
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
@@ -178,7 +180,7 @@ def main():
         module.fail_json(msg=to_native(e))
 
     try:
-        with open(path, 'rb') as f:
+        with io.open(path, 'rb', encoding='utf-8-sig') as f:
             data = f.read()
     except (IOError, OSError) as e:
         module.fail_json(msg="Unable to open file: %s" % to_native(e))
