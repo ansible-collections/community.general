@@ -55,7 +55,7 @@ def initialize_dialect(dialect, **kwargs):
 
 def read_csv(data, dialect, fieldnames=None):
 
-    data = to_native(data, errors='surrogate_or_strict')
+    data = to_native(data, encoding="utf-8-sig", errors='surrogate_or_strict')
 
     if PY3:
         fake_fh = StringIO(data)
