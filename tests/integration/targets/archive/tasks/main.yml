@@ -174,7 +174,7 @@
 - name: Test that the file modes were changed
   assert:
     that:
-      - "archive_02_gz_stat.changed == False "
+      - archive_02_gz_stat is not changed
       - "archive_02_gz_stat.stat.mode == '0600'"
       - "'archived' in archive_bz2_result_02"
       - "{{ archive_bz2_result_02['archived']| length}} == 3"
@@ -199,7 +199,7 @@
 - name: Test that the file modes were changed
   assert:
     that:
-      - "archive_02_zip_stat.changed == False"
+      - archive_02_zip_stat is not changed
       - "archive_02_zip_stat.stat.mode == '0600'"
       - "'archived' in archive_zip_result_02"
       - "{{ archive_zip_result_02['archived']| length}} == 3"
@@ -224,7 +224,7 @@
 - name: Test that the file modes were changed
   assert:
     that:
-      - "archive_02_bz2_stat.changed == False"
+      - archive_02_bz2_stat is not changed
       - "archive_02_bz2_stat.stat.mode == '0600'"
       - "'archived' in archive_bz2_result_02"
       - "{{ archive_bz2_result_02['archived']| length}} == 3"
@@ -248,7 +248,7 @@
 - name: Test that the file modes were changed
   assert:
     that:
-      - "archive_02_xz_stat.changed == False"
+      - archive_02_xz_stat is not changed
       - "archive_02_xz_stat.stat.mode == '0600'"
       - "'archived' in archive_xz_result_02"
       - "{{ archive_xz_result_02['archived']| length}} == 3"
@@ -294,7 +294,7 @@
 - name: Assert that nonascii tests succeeded
   assert:
     that:
-      - "nonascii_result_0.changed == true"
+      - nonascii_result_0 is changed
       - "nonascii_stat0.stat.exists == true"
 
 - name: remove nonascii test
@@ -315,7 +315,7 @@
 - name: Assert that nonascii tests succeeded
   assert:
     that:
-      - "nonascii_result_1.changed == true"
+      - nonascii_result_1 is changed
       - "nonascii_stat_1.stat.exists == true"
 
 - name: remove nonascii test
@@ -336,7 +336,7 @@
 - name: Assert that nonascii tests succeeded
   assert:
     that:
-      - "nonascii_result_1.changed == true"
+      - nonascii_result_1 is changed
       - "nonascii_stat_1.stat.exists == true"
 
 - name: remove nonascii test
@@ -357,7 +357,7 @@
 - name: Assert that nonascii tests succeeded
   assert:
     that:
-      - "nonascii_result_2.changed == true"
+      - nonascii_result_2 is changed
       - "nonascii_stat_2.stat.exists == true"
 
 - name: remove nonascii test

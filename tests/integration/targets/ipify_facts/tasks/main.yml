@@ -41,6 +41,6 @@
 - name: check if task was successful
   assert:
     that:
-      - "{{ external_ip.changed == false }}"
-      - "{{ external_ip['ansible_facts'] is defined }}"
-      - "{{ external_ip['ansible_facts']['ipify_public_ip'] is defined }}"
+      - external_ip is not changed
+      - external_ip.ansible_facts is defined
+      - external_ip.ansible_facts.ipify_public_ip is defined

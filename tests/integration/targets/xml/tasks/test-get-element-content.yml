@@ -15,7 +15,7 @@
   - name: Test expected result
     assert:
       that:
-      - get_element_attribute.changed == false
+      - get_element_attribute is not changed
       - get_element_attribute.matches[0]['rating'] is defined
       - get_element_attribute.matches[0]['rating']['subjective'] == 'true'
 
@@ -43,5 +43,5 @@
   - name: Test expected result
     assert:
       that:
-      - get_element_text.changed == false
+      - get_element_text is not changed
       - get_element_text.matches[0]['rating'] == '10'

@@ -29,6 +29,6 @@
   - name: Test expected result
     assert:
       that:
-      - set_namespaced_attribute_value.changed == true
-      - comparison.changed == false  # identical
+      - set_namespaced_attribute_value is changed
+      - comparison is not changed  # identical
     #command: diff -u {{ role_path }}/results/test-set-namespaced-attribute-value.xml /tmp/ansible-xml-namespaced-beers.xml

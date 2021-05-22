@@ -13,7 +13,7 @@
     - name: Check that admin user adding succeeds with a change
       assert:
         that:
-          - add_admin_user.changed == true
+          - add_admin_user is changed
 
 - name: Test add admin user
   block:
@@ -24,7 +24,7 @@
     - name: Check that admin user adding succeeds with a change
       assert:
         that:
-          - add_admin_user.changed == true
+          - add_admin_user is changed
 
 - name: Test add admin user idempotence
   block:
@@ -35,7 +35,7 @@
     - name: Check that admin user adding succeeds without a change
       assert:
         that:
-          - add_admin_user.changed == false
+          - add_admin_user is not changed
 
 - name: Enable authentication and restart service
   block:
@@ -58,7 +58,7 @@
     - name: Check that adding user with enabled authentication succeeds with a change
       assert:
         that:
-          - add_user_with_auth_enabled.changed == true
+          - add_user_with_auth_enabled is changed
 
 - name: Test add user when authentication enabled
   block:
@@ -69,7 +69,7 @@
     - name: Check that adding user with enabled authentication succeeds with a change
       assert:
         that:
-          - add_user_with_auth_enabled.changed == true
+          - add_user_with_auth_enabled is changed
 
 - name: Test add user when authentication enabled idempotence
   block:
@@ -80,7 +80,7 @@
     - name: Check that adding same user succeeds without a change
       assert:
         that:
-          - same_user.changed == false
+          - same_user is not changed
 
 - name: Test change user password in check mode
   block:
@@ -92,7 +92,7 @@
     - name: Check that password changing succeeds with a change
       assert:
         that:
-          - change_password.changed == true
+          - change_password is changed
 
 - name: Test change user password
   block:
@@ -103,7 +103,7 @@
     - name: Check that password changing succeeds with a change
       assert:
         that:
-          - change_password.changed == true
+          - change_password is changed
 
 - name: Test remove user in check mode
   block:
@@ -115,7 +115,7 @@
     - name: Check that removing user succeeds with a change
       assert:
         that:
-          - remove_user.changed == true
+          - remove_user is changed
 
 - name: Test remove user
   block:
@@ -126,7 +126,7 @@
     - name: Check that removing user succeeds with a change
       assert:
         that:
-          - remove_user.changed == true
+          - remove_user is changed
 
 - name: Test remove user idempotence
   block:
@@ -137,4 +137,4 @@
     - name: Check that removing user succeeds without a change
       assert:
         that:
-          - remove_user.changed == false
+          - remove_user is not changed

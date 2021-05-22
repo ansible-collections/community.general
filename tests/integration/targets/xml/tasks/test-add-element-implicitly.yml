@@ -108,7 +108,7 @@
 - name: Test expected result
   assert:
     that:
-    - comparison.changed == false  # identical
+    - comparison is not changed  # identical
   #command: diff -u {{ role_path }}/results/test-add-element-implicitly.yml /tmp/ansible-xml-beers-implicit.xml
 
 

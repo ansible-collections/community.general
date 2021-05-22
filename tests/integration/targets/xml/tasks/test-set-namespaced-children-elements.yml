@@ -52,6 +52,6 @@
   - name: Test expected result
     assert:
       that:
-      - set_children_again.changed == false  # idempotency
-      - set_namespaced_attribute_value.changed == true
-      - comparison.changed == false  # identical
+      - set_children_again is not changed  # idempotency
+      - set_namespaced_attribute_value is changed
+      - comparison is not changed  # identical
