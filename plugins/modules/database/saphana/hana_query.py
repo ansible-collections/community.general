@@ -7,61 +7,51 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: hdbsql
+module: hana_query
 
 short_description: Execute SQL on HANA.
 
-version_added: "1.0.0"
+version_added: "3.2.0"
 
 description: This module executes SQL statements on HANA with hdbsql.
 
 options:
     sid:
         description: The system ID.
-        required: true
         type: str
     instance:
         description: The instance number.
-        required: false
         type: str
     user:
         description: A dedicated username. Defaults to SYSTEM.
-        required: false
         type: str
         default: SYSTEM
     password:
         description: The password to connect to the database.
-        required: true
         type: str
     autocommit:
         description: Autocommit the statement.
-        required: false
         type: bool
         default: True
     host:
         description: The Host ip address. The port can be defined as well.
-        required: false
         type: str
     database:
         description: Define the database on which to connect.
-        required: false
         type: str
     encrypted:
         description: Use encrypted connection. Defaults to false.
-        required: false
         type: bool
         default: false
     filepath:
         description:
         - SQL query in file to run. Multiple files can be passed using YAML list syntax.
-        - Must be a string or YAML list containing strings.
-        required: false
+        - Must be a string or list containing strings.
         type: raw
     query:
         description:
         - SQL query to run. Multiple queries can be passed using YAML list syntax.
-        - Must be a string or YAML list containing strings.
-        required: false
+        - Must be a string or list containing strings.
         type: raw
 
 author:
@@ -71,14 +61,14 @@ author:
 EXAMPLES = r'''
 
 - name: Simple select query
-  community.general.hdbsql:
+  community.general.hana_query:
     sid: "hdb"
     instance: "01"
     password: "Test123"
     query: "select user_name from users"
 
 - name: Run several queries
-  community.general.hdbsql:
+  community.general.hana_query:
     sid: "hdb"
     instance: "01"
     password: "Test123"
@@ -89,7 +79,7 @@ EXAMPLES = r'''
     autocommit: False
 
 - name: Run several queries from file
-  community.general.hdbsql:
+  community.general.hana_query:
     sid: "hdb"
     instance: "01"
     password: "Test123"
@@ -130,10 +120,9 @@ def main():
             query=dict(type='raw', required=False),
             filepath=dict(type='raw', required=False),
             autocommit=dict(type='bool', required=False, default=True)
-        ),
-        supports_check_mode=True,
+        )
     )
-    rc, out, err, out_raw = ["", "", "", ""]
+    rc, out, err, out_raw = [0, "", "", ""]
 
     params = module.params
 
@@ -194,14 +183,14 @@ def main():
                     # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# -I /tmp/HANA_CPU_UtilizationPerCore_2.00.020+.txt,
                     # iterates through files and append the output to var out.
                     command.extend([p])
-                    (rc, out_raw, err) = module.run_command(command, check_rc=True)
+                    (rc, out_raw, err) = module.run_command(command)
                     del command[-1]
 
                     out = out + csv_to_json(out_raw)
             else:
                 # single file without yaml list
                 command.extend([filepath])
-                (rc, out_raw, err) = module.run_command(command, check_rc=True)
+                (rc, out_raw, err) = module.run_command(command)
                 out = csv_to_json(out_raw)
         if query is not None:
             if isinstance(query, list):
@@ -209,19 +198,19 @@ def main():
                     command.extend([q])
                     # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# "select user_name from users",
                     # iterates through multiple commands and append the output to var out.
-                    (rc, out_raw, err) = module.run_command(command, check_rc=True)
+                    (rc, out_raw, err) = module.run_command(command)
                     del command[-1]
 
                     out = out + csv_to_json(out_raw)
             else:
                 # single command without yaml list
                 command.extend([query])
-                (rc, out_raw, err) = module.run_command(command, check_rc=True)
+                (rc, out_raw, err) = module.run_command(command)
                 out = csv_to_json(out_raw)
         changed = True
     else:
         changed = False
-        rc = "nothing to do, no command provided"
+        out = "nothing to do, no command provided"
 
     module.exit_json(changed=changed, message=rc, stdout=out,
                      stderr=err, command=' '.join(command))

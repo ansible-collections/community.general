@@ -7,45 +7,39 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
-module: sapcar
+module: sapcar_extract
 short_description: Manages SAPCAR from SAP
-version_added: "1.0.0"
+version_added: "3.2.0"
 description:
     - Provides support for unpacking sar/car files with the SAPCAR binary from SAP and pulling
       information back into Ansible.
 options:
   path:
     description: The path to the SAR/CAR file.
-    required: true
     type: path
   dest:
     description:
       - The destination where SAPCAR extracts the SAR file. Missing folders will be created.
         If this parameter is not provided it will unpack in the same folder as the SAR file.
-    required: false
     type: path
   binary_path:
     description:
       - The path to the SAPCAR binary e.g. /home/dummy/sapcar or https://myserver/SAPCAR.
         If this parameter is not provided the module will try excute from application binary e.g /usr/local/bin.
-    required: false
     type: path
   signature:
     description:
-      - If true the Signature will be extracted.
-    required: false
+      - If true the Signature will be extracted
     default: false
     type: bool
   manifest:
     description:
       - The Name of the manifest defaults to SIGNATURE.SMF.
-    required: false
     default: "SIGNATURE.SMF"
     type: str
   remove:
     description:
       - If true the SAR/CAR file will be removed - !!!This should be used with caution!!!.
-    required: false
     default: false
     type: bool
 author:
@@ -54,43 +48,43 @@ author:
 
 EXAMPLES = """
 # Extract SAR file - simple
-  - name: run sapcar
-    community.general.sapcar:
+  - name: Run sapcar extract
+    community.general.sapcar_extract:
       path: "~/source/hana.sar"
     register: sapcar
 
 # Extract SAR file with destination
-  - name: run sapcar
-    community.general.sapcar:
+  - name: Run sapcar extract
+    community.general.sapcar_extract:
       path: "~/source/hana.sar"
       dest: "~/test/"
     register: sapcar
 
 # Extract SAR file with destination and download from webserver can be a fileshare as well
-  - name: run sapcar
-    community.general.sapcar:
+  - name: Run sapcar extract
+    community.general.sapcar_extract:
       path: "~/source/hana.sar"
       dest: "~/dest/"
       binary_path: "https://myserver/SAPCAR"
     register: sapcar
 
 # Extract SAR file and delete SAR after extract
-  - name: run sapcar
-    community.general.sapcar:
+  - name: Run sapcar extract
+    community.general.sapcar_extract:
       path: "~/source/hana.sar"
       remove: true
     register: sapcar
 
 # Extract SAR file with manifest
-  - name: run sapcar
-    community.general.sapcar:
+  - name: Run sapcar extract
+    community.general.sapcar_extract:
       path: "~/source/hana.sar"
       signature: true
     register: sapcar
 
 # Extract SAR file with manifest and rename it
-  - name: run sapcar
-    community.general.sapcar:
+  - name: Run sapcar extract
+    community.general.sapcar_extract:
       path: "~/source/hana.sar"
       manifest: "MyNewSignature.SMF"
       signature: true
@@ -178,7 +172,7 @@ def main():
         ),
         supports_check_mode=True,
     )
-    rc, out, err = ["", "", ""]
+    rc, out, err = [0, "", ""]
     params = module.params
     check_mode = module.check_mode
 
@@ -194,7 +188,8 @@ def main():
         dest_head_tail = os.path.split(path)
         dest = dest_head_tail[0] + '/'
     else:
-        os.makedirs(dest, 0o755, True)
+        if not os.path.exists(dest):
+            os.makedirs(dest, 0o755)
 
     try:
         if bin_path is not None:
@@ -220,7 +215,7 @@ def main():
         changed = True
     else:
         changed = False
-        rc = "allready unpacked"
+        out = "allready unpacked"
 
     if remove:
         os.remove(path)
