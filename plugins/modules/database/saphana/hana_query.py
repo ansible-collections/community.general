@@ -48,6 +48,7 @@ options:
         - SQL query in file to run. Multiple files can be passed using YAML list syntax.
         - Must be a string or list containing strings.
         type: list
+        elements: path
     query:
         description:
         - SQL query to run. Multiple queries can be passed using YAML list syntax.
