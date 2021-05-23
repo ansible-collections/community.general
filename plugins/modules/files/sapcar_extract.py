@@ -17,6 +17,7 @@ options:
   path:
     description: The path to the SAR/CAR file.
     type: path
+    required: true
   dest:
     description:
       - The destination where SAPCAR extracts the SAR file. Missing folders will be created.
