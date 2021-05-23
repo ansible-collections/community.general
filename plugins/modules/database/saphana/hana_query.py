@@ -118,8 +118,8 @@ def main():
             user=dict(type='str', required=False, default="SYSTEM"),
             password=dict(type='str', required=True, no_log=True),
             database=dict(type='str', required=False),
-            query=dict(type='list', required=False),
-            filepath=dict(type='list', required=False),
+            query=dict(type='list', elements='str', required=False),
+            filepath=dict(type='list', elements='path', required=False),
             autocommit=dict(type='bool', required=False, default=True)
         )
     )
@@ -139,15 +139,14 @@ def main():
     filepath = params['filepath']
     query = params['query']
 
-    bin_path = f"/usr/sap/{sid}/HDB{instance}/exe/hdbsql"
+    bin_path = "/usr/sap/{sid}/HDB{instance}/exe/hdbsql".format(sid=sid, instance=instance)
 
     present = filepath is not None or query is not None
 
     try:
         command = [module.get_bin_path(bin_path, required=True)]
     except Exception:
-        'hdbsql not found {0}. \r\nSTDOUT: {1}\r\n\r\nSTDERR: {2}'.format(
-            rc, out, err)
+        module.fail_json(msg='hdbsql not found at "{0}". Please check SID and instance number.'.format(bin_path))
 
     if present:
         if encrypted is True:
@@ -168,24 +167,20 @@ def main():
                 # iterates through files and append the output to var out.
                 query_command = command + [p]
                 (rc, out_raw, err) = module.run_command(query_command)
-
                 out = out + csv_to_json(out_raw)
         if query is not None:
             for q in query:
-                command.extend([q])
                 # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# "select user_name from users",
                 # iterates through multiple commands and append the output to var out.
-                (rc, out_raw, err) = module.run_command(command)
-                del command[-1]
-
+                query_command = command + [q]
+                (rc, out_raw, err) = module.run_command(query_command)
                 out = out + csv_to_json(out_raw)
         changed = True
     else:
         changed = False
         out = "nothing to do, no command provided"
 
-    module.exit_json(changed=changed, message=rc, stdout=out,
-                     stderr=err, command=' '.join(command))
+    module.exit_json(changed=changed, message=rc, stdout=out, stderr=err)
 
 
 if __name__ == '__main__':
