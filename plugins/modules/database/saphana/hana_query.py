@@ -166,9 +166,8 @@ def main():
             for p in filepath:
                 # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# -I /tmp/HANA_CPU_UtilizationPerCore_2.00.020+.txt,
                 # iterates through files and append the output to var out.
-                command.extend([p])
-                (rc, out_raw, err) = module.run_command(command)
-                del command[-1]
+                query_command = command + [p]
+                (rc, out_raw, err) = module.run_command(query_command)
 
                 out = out + csv_to_json(out_raw)
         if query is not None:
