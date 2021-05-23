@@ -40,7 +40,7 @@ options:
         description: Define the database on which to connect.
         type: str
     encrypted:
-        description: Use encrypted connection. Defaults to false.
+        description: Use encrypted connection. Defaults to C(false).
         type: bool
         default: false
     filepath:
