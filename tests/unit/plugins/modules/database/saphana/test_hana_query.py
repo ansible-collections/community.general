@@ -8,11 +8,12 @@ __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.plugins.modules.database.saphana import hana_query
+from ansible_collections.community.general.plugins.modules import hana_query
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, set_module_args
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
 import json
+
 
 def set_module_args(args):
     """prepare arguments so that they will be picked up during module creation"""
@@ -67,7 +68,6 @@ class Testhana_query(unittest.TestCase):
             set_module_args({})
             self.module.main()
 
-
     def test_ensure_command_called(self):
         set_module_args({
             'sid': "HDB",
@@ -88,6 +88,6 @@ class Testhana_query(unittest.TestCase):
 
             with self.assertRaises(AnsibleExitJson) as result:
                 hana_query.main()
-            self.assertFalse(result.exception.args[0]['changed']) # ensure result is changed
+            self.assertFalse(result.exception.args[0]['changed'])  # ensure result is changed
 
         mock_run_command.assert_called_once_with('/usr/sap/HDB/HDB01/exe/hdbsql')

@@ -19,9 +19,11 @@ options:
     sid:
         description: The system ID.
         type: str
+        required: true
     instance:
         description: The instance number.
         type: str
+        required: true
     user:
         description: A dedicated username. Defaults to C(SYSTEM).
         type: str
@@ -29,10 +31,11 @@ options:
     password:
         description: The password to connect to the database.
         type: str
+        required: true
     autocommit:
         description: Autocommit the statement.
         type: bool
-        default: True
+        default: true
     host:
         description: The Host IP address. The port can be defined as well.
         type: str
@@ -54,6 +57,7 @@ options:
         - SQL query to run. Multiple queries can be passed using YAML list syntax.
         - Must be a string or list containing strings.
         type: list
+        elements: str
 
 author:
     - Rainer Leber (@rainerleber)
@@ -74,8 +78,8 @@ EXAMPLES = r'''
     instance: "01"
     password: "Test123"
     query:
-    - "select user_name from users"
-    - select user_name from users
+    - "select user_name from users;"
+    - select * from SYSTEM;
     host: "localhost"
     autocommit: False
 
@@ -112,7 +116,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             sid=dict(type='str', required=True),
-            instance=dict(type='str', required=False),
+            instance=dict(type='str', required=True),
             encrypted=dict(type='bool', required=False, default=False),
             host=dict(type='str', required=False),
             user=dict(type='str', required=False, default="SYSTEM"),
@@ -120,8 +124,9 @@ def main():
             database=dict(type='str', required=False),
             query=dict(type='list', elements='str', required=False),
             filepath=dict(type='list', elements='path', required=False),
-            autocommit=dict(type='bool', required=False, default=True)
-        )
+            autocommit=dict(type='bool', required=False, default=True),
+        ),
+        require_one_of=[('query', 'filepath')],
     )
     rc, out, err, out_raw = [0, "", "", ""]
 
