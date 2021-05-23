@@ -23,7 +23,7 @@ options:
         description: The instance number.
         type: str
     user:
-        description: A dedicated username. Defaults to SYSTEM.
+        description: A dedicated username. Defaults to C(SYSTEM).
         type: str
         default: SYSTEM
     password:
@@ -34,20 +34,21 @@ options:
         type: bool
         default: True
     host:
-        description: The Host ip address. The port can be defined as well.
+        description: The Host IP address. The port can be defined as well.
         type: str
     database:
         description: Define the database on which to connect.
         type: str
     encrypted:
-        description: Use encrypted connection. Defaults to false.
+        description: Use encrypted connection. Defaults to C(false).
         type: bool
         default: false
     filepath:
         description:
-        - SQL query in file to run. Multiple files can be passed using YAML list syntax.
+        - One or more files each containing one SQL query to run.
         - Must be a string or list containing strings.
         type: list
+        elements: path
     query:
         description:
         - SQL query to run. Multiple queries can be passed using YAML list syntax.
@@ -148,19 +149,6 @@ def main():
         'hdbsql not found {0}. \r\nSTDOUT: {1}\r\n\r\nSTDERR: {2}'.format(
             rc, out, err)
 
-    if query is not None:
-        if not isinstance(query, (str, list)):
-            module.fail_json(msg="the query option value must be a string or list, passed %s" % type(query))
-
-        for elem in query:
-            if not isinstance(elem, str):
-                module.fail_json(msg="the elements in query list must be strings, passed '%s' %s" % (elem, type(elem)))
-    if filepath is not None:
-        if not isinstance(filepath, (str, list)):
-            module.fail_json(msg="the query option value must be a string or list, passed %s" % type(filepath))
-        for elem in filepath:
-            if not isinstance(elem, str):
-                module.fail_json(msg="the elements in query list must be strings, passed '%s' %s" % (elem, type(elem)))
     if present:
         if encrypted is True:
             command.extend(['-attemptencrypt'])
@@ -178,9 +166,8 @@ def main():
             for p in filepath:
                 # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# -I /tmp/HANA_CPU_UtilizationPerCore_2.00.020+.txt,
                 # iterates through files and append the output to var out.
-                command.extend([p])
-                (rc, out_raw, err) = module.run_command(command)
-                del command[-1]
+                query_command = command + [p]
+                (rc, out_raw, err) = module.run_command(query_command)
 
                 out = out + csv_to_json(out_raw)
         if query is not None:
