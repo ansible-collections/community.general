@@ -118,8 +118,8 @@ def main():
             user=dict(type='str', required=False, default="SYSTEM"),
             password=dict(type='str', required=True, no_log=True),
             database=dict(type='str', required=False),
-            query=dict(type='list', required=False),
-            filepath=dict(type='list', required=False),
+            query=dict(type='list', elements='str', required=False),
+            filepath=dict(type='list', elements='path', required=False),
             autocommit=dict(type='bool', required=False, default=True)
         )
     )
