@@ -23,7 +23,7 @@ options:
         description: The instance number.
         type: str
     user:
-        description: A dedicated username. Defaults to SYSTEM.
+        description: A dedicated username. Defaults to C(SYSTEM).
         type: str
         default: SYSTEM
     password:
