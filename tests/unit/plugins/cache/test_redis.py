@@ -33,7 +33,7 @@ def test_redis_cachemodule():
     # The _uri option is required for the redis plugin
     connection = 'ni 127.0.0.1:6379:1'
     if ansible_version.startswith('2.9.'):
-        C.CACHE_PLUGIN_CONNECTION = "c." + connection
+        C.CACHE_PLUGIN_CONNECTION = connection
     assert isinstance(cache_loader.get('community.general.redis', **{'_uri': connection}), RedisCache)
 
 
@@ -41,5 +41,5 @@ def test_redis_cachemodule():
     # The _uri option is required for the redis plugin
     connection = '[::1]:6379:1'
     if ansible_version.startswith('2.9.'):
-        C.CACHE_PLUGIN_CONNECTION = "c." + connection
+        C.CACHE_PLUGIN_CONNECTION = connection
     assert isinstance(cache_loader.get('community.general.redis', **{'_uri': connection}), RedisCache)
