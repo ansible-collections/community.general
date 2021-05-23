@@ -28,7 +28,7 @@ pytest.importorskip('redis')
 from ansible.plugins.loader import cache_loader
 from ansible_collections.community.general.plugins.cache.redis import CacheModule as RedisCache
 from ansible import constants as C
-from ansible.release import __version__ as av
+from ansible.release import __version__ as ansible_version
 
 version = tuple(int(x) for x in av.split('.')[0:2])
 
