@@ -45,7 +45,7 @@ options:
         default: false
     filepath:
         description:
-        - SQL query in file to run. Multiple files can be passed using YAML list syntax.
+        - One or more files each containing one SQL query to run.
         - Must be a string or list containing strings.
         type: list
         elements: path
