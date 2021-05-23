@@ -47,12 +47,12 @@ options:
         description:
         - SQL query in file to run. Multiple files can be passed using YAML list syntax.
         - Must be a string or list containing strings.
-        type: raw
+        type: list
     query:
         description:
         - SQL query to run. Multiple queries can be passed using YAML list syntax.
         - Must be a string or list containing strings.
-        type: raw
+        type: list
 
 author:
     - Rainer Leber (@rainerleber)
@@ -117,8 +117,8 @@ def main():
             user=dict(type='str', required=False, default="SYSTEM"),
             password=dict(type='str', required=True, no_log=True),
             database=dict(type='str', required=False),
-            query=dict(type='raw', required=False),
-            filepath=dict(type='raw', required=False),
+            query=dict(type='list', required=False),
+            filepath=dict(type='list', required=False),
             autocommit=dict(type='bool', required=False, default=True)
         )
     )
@@ -178,35 +178,23 @@ def main():
 
         if filepath is not None:
             command.extend(['-I'])
-            if isinstance(filepath, list):
-                for p in filepath:
-                    # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# -I /tmp/HANA_CPU_UtilizationPerCore_2.00.020+.txt,
-                    # iterates through files and append the output to var out.
-                    command.extend([p])
-                    (rc, out_raw, err) = module.run_command(command)
-                    del command[-1]
-
-                    out = out + csv_to_json(out_raw)
-            else:
-                # single file without yaml list
-                command.extend([filepath])
+            for p in filepath:
+                # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# -I /tmp/HANA_CPU_UtilizationPerCore_2.00.020+.txt,
+                # iterates through files and append the output to var out.
+                command.extend([p])
                 (rc, out_raw, err) = module.run_command(command)
-                out = csv_to_json(out_raw)
+                del command[-1]
+
+                out = out + csv_to_json(out_raw)
         if query is not None:
-            if isinstance(query, list):
-                for q in query:
-                    command.extend([q])
-                    # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# "select user_name from users",
-                    # iterates through multiple commands and append the output to var out.
-                    (rc, out_raw, err) = module.run_command(command)
-                    del command[-1]
-
-                    out = out + csv_to_json(out_raw)
-            else:
-                # single command without yaml list
-                command.extend([query])
+            for q in query:
+                command.extend([q])
+                # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# "select user_name from users",
+                # iterates through multiple commands and append the output to var out.
                 (rc, out_raw, err) = module.run_command(command)
-                out = csv_to_json(out_raw)
+                del command[-1]
+
+                out = out + csv_to_json(out_raw)
         changed = True
     else:
         changed = False
