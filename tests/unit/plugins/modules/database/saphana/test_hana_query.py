@@ -66,7 +66,7 @@ class Testhana_query(unittest.TestCase):
     def test_module_fail_when_required_args_missing(self):
         with self.assertRaises(AnsibleFailJson):
             set_module_args({})
-            #self.module.main()
+            self.module.main()
 
     def test_ensure_command_called(self):
         set_module_args({
