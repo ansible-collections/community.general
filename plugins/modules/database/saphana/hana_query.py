@@ -19,9 +19,11 @@ options:
     sid:
         description: The system ID.
         type: str
+        required: true
     instance:
         description: The instance number.
         type: str
+        required: true
     user:
         description: A dedicated username. Defaults to C(SYSTEM).
         type: str
@@ -29,6 +31,7 @@ options:
     password:
         description: The password to connect to the database.
         type: str
+        required: true
     autocommit:
         description: Autocommit the statement.
         type: bool
@@ -54,6 +57,7 @@ options:
         - SQL query to run. Multiple queries can be passed using YAML list syntax.
         - Must be a string or list containing strings.
         type: list
+        elements: str
 
 author:
     - Rainer Leber (@rainerleber)
@@ -112,7 +116,7 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             sid=dict(type='str', required=True),
-            instance=dict(type='str', required=False),
+            instance=dict(type='str', required=True),
             encrypted=dict(type='bool', required=False, default=False),
             host=dict(type='str', required=False),
             user=dict(type='str', required=False, default="SYSTEM"),
