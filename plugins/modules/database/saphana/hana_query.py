@@ -149,19 +149,6 @@ def main():
         'hdbsql not found {0}. \r\nSTDOUT: {1}\r\n\r\nSTDERR: {2}'.format(
             rc, out, err)
 
-    if query is not None:
-        if not isinstance(query, (str, list)):
-            module.fail_json(msg="the query option value must be a string or list, passed %s" % type(query))
-
-        for elem in query:
-            if not isinstance(elem, str):
-                module.fail_json(msg="the elements in query list must be strings, passed '%s' %s" % (elem, type(elem)))
-    if filepath is not None:
-        if not isinstance(filepath, (str, list)):
-            module.fail_json(msg="the query option value must be a string or list, passed %s" % type(filepath))
-        for elem in filepath:
-            if not isinstance(elem, str):
-                module.fail_json(msg="the elements in query list must be strings, passed '%s' %s" % (elem, type(elem)))
     if present:
         if encrypted is True:
             command.extend(['-attemptencrypt'])
