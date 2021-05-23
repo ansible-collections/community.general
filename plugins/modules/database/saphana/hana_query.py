@@ -74,8 +74,8 @@ EXAMPLES = r'''
     instance: "01"
     password: "Test123"
     query:
-    - "select user_name from users"
-    - select user_name from users
+    - "select user_name from users;"
+    - select * from SYSTEM;
     host: "localhost"
     autocommit: False
 
