@@ -140,10 +140,7 @@ def main():
 
     bin_path = f"/usr/sap/{sid}/HDB{instance}/exe/hdbsql"
 
-    if filepath is not None or query is not None:
-        present = True
-    else:
-        present = False
+    present = filepath is not None or query is not None
 
     try:
         command = [module.get_bin_path(bin_path, required=True)]
