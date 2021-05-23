@@ -8,7 +8,7 @@ __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
-from ansible_collections.community.general.plugins.modules.database.saphana import hana_query
+from ansible_collections.community.general.plugins.modules import hana_query
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, set_module_args
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
