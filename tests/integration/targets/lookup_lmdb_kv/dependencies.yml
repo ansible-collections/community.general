@@ -1,0 +1,12 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Install LMDB Python package
+      pip:
+        name: lmdb
+      environment:
+        LMDB_PURE: "1"
+    - name: Setup test data
+      script: test_db.py
+      args:
+        executable: "{{ ansible_python.executable }}"

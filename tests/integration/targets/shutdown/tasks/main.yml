@@ -1,0 +1,89 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Install systemd-sysv on ubuntu 18
+  apt:
+    name: systemd-sysv
+    state: present
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_major_version is version('18', '>=')
+  register: systemd_sysv_install
+
+- name: Execute shutdown with custom message and delay
+  community.general.shutdown:
+    delay: 100
+    msg: "Custom Message"
+  register: shutdown_result
+  check_mode: yes
+
+- name: Execute shutdown with minus delay
+  community.general.shutdown:
+    delay: -100
+  register: shutdown_result_minus
+  check_mode: yes
+
+- name: Verify Custom Message except Alpine, AIX
+  assert:
+    that:
+      - '"Custom Message" in shutdown_result["shutdown_command"]'
+      - '"Shut down initiated by Ansible" in shutdown_result_minus["shutdown_command"]'
+      - '"Custom Message" not in shutdown_result_minus["shutdown_command"]'
+  when: ansible_os_family not in ['Alpine', 'AIX']
+
+- name: Verify shutdown command is present except Alpine, VMKernel
+  assert:
+    that: '"shutdown" in shutdown_result["shutdown_command"]'
+  when: ansible_os_family != 'Alpine' and ansible_system != 'VMKernel'
+
+- name: Verify shutdown command is present in Alpine
+  assert:
+    that: '"poweroff" in shutdown_result["shutdown_command"]'
+  when: ansible_os_family == 'Alpine'
+
+- name: Verify shutdown command is present in VMKernel
+  assert:
+    that: '"halt" in shutdown_result["shutdown_command"]'
+  when: ansible_system == 'VMKernel'
+
+- name: Verify shutdown delay is present in minutes in Linux
+  assert:
+    that:
+      - '"-h 1" in shutdown_result["shutdown_command"]'
+      - '"-h 0" in shutdown_result_minus["shutdown_command"]'
+  when: ansible_system == 'Linux' and ansible_os_family != 'Alpine'
+
+- name: Verify shutdown delay is present in minutes in Void, MacOSX, OpenBSD
+  assert:
+    that:
+      - '"-h +1" in shutdown_result["shutdown_command"]'
+      - '"-h +0" in shutdown_result_minus["shutdown_command"]'
+  when: ansible_system in ['Void', 'Darwin', 'OpenBSD']
+
+- name: Verify shutdown delay is present in seconds in FreeBSD
+  assert:
+    that:
+      - '"-h +100s" in shutdown_result["shutdown_command"]'
+      - '"-h +0s" in shutdown_result_minus["shutdown_command"]'
+  when: ansible_system == 'FreeBSD'
+
+- name: Verify shutdown delay is present in seconds in Solaris, SunOS
+  assert:
+    that:
+      - '"-g 100" in shutdown_result["shutdown_command"]'
+      - '"-g 0" in shutdown_result_minus["shutdown_command"]'
+  when: ansible_system in ['Solaris', 'SunOS']
+
+- name: Verify shutdown delay is present in seconds, VMKernel
+  assert:
+    that:
+      - '"-d 100" in shutdown_result["shutdown_command"]'
+      - '"-d 0" in shutdown_result_minus["shutdown_command"]'
+  when: ansible_system == 'VMKernel'
+
+- name: Remove systemd-sysv in ubuntu 18 in case it has been installed in test
+  apt:
+    name: systemd-sysv
+    state: absent
+  when: systemd_sysv_install is changed

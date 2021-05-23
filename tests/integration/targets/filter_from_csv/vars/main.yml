@@ -1,0 +1,26 @@
+valid_comma_separated: |
+  id,name,role
+  1,foo,bar
+  2,bar,baz
+valid_comma_separated_spaces: |
+  id,name,role
+  1, foo, bar
+  2, bar, baz
+valid_comma_separated_no_headers: |
+  1,foo,bar
+  2,bar,baz
+valid_pipe_separated: |
+  id|name|role
+  1|foo|bar
+  2|bar|baz
+invalid_comma_separated: |
+  id,name,role
+  1,foo,bar
+  2,"b"ar",baz
+expected_result:
+  - id: '1'
+    name: foo
+    role: bar
+  - id: '2'
+    name: bar
+    role: baz

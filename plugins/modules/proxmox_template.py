@@ -1,0 +1,1 @@
+./cloud/misc/proxmox_template.py

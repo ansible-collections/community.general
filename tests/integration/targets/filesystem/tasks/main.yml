@@ -1,0 +1,61 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- ansible.builtin.debug:
+    msg: '{{ role_name }}'
+- ansible.builtin.debug:
+    msg: '{{ role_path|basename }}'
+- import_tasks: setup.yml
+
+- include_vars: "{{ lookup('first_found', search) }}"
+  vars:
+    search:
+      files:
+        - '{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml'
+        - 'default.yml'
+      paths:
+        - '../vars/'
+
+- include_tasks: create_device.yml
+  vars:
+    image_file: '{{ remote_tmp_dir }}/img'
+    fstype: '{{ item.0.key }}'
+    fssize: '{{ item.0.value.fssize }}'
+    grow: '{{ item.0.value.grow }}'
+    action: '{{ item.1 }}'
+  when:
+    # FreeBSD limited support
+    # Not available: btrfs, lvm, f2fs, ocfs2
+    # All BSD systems use swap fs, but only Linux needs mkswap
+    # Supported: ext2/3/4 (e2fsprogs), xfs (xfsprogs), reiserfs (progsreiserfs), vfat
+    - 'not (ansible_system == "FreeBSD" and item.0.key in ["btrfs", "f2fs", "swap", "lvm", "ocfs2"])'
+    # Available on FreeBSD but not on testbed (util-linux conflicts with e2fsprogs): wipefs, mkfs.minix
+    - 'not (ansible_system == "FreeBSD" and item.1 in ["overwrite_another_fs", "remove_fs"])'
+
+    # Other limitations and corner cases
+
+    # f2fs-tools and reiserfs-utils packages not available with RHEL/CentOS on CI
+    - 'not (ansible_distribution in ["CentOS", "RedHat"] and item.0.key in ["f2fs", "reiserfs"])'
+    - 'not (ansible_os_family == "RedHat" and ansible_distribution_major_version is version("8", ">=") and
+            item.0.key == "btrfs")'
+    # ocfs2 only available on Debian based distributions
+    - 'not (item.0.key == "ocfs2" and ansible_os_family != "Debian")'
+    # Tests use losetup which can not be used inside unprivileged container
+    - 'not (item.0.key == "lvm" and ansible_virtualization_type in ["docker", "container", "containerd"])'
+
+    # On CentOS 6 shippable containers, wipefs seems unable to remove vfat signatures
+    - 'not (ansible_distribution == "CentOS" and ansible_distribution_version is version("7.0", "<") and
+            item.1 == "remove_fs" and item.0.key == "vfat")'
+    # On same systems, mkfs.minix (unhandled by the module) can't find the device/file
+    - 'not (ansible_distribution == "CentOS" and ansible_distribution_version is version("7.0", "<") and
+            item.1 == "overwrite_another_fs")'
+
+    # The xfsprogs package on newer versions of OpenSUSE (15+) require Python 3, we skip this on our Python 2 container
+    # OpenSUSE 42.3 Python2 and the other py3 containers are not affected so we will continue to run that
+    - 'not (ansible_os_family == "Suse" and ansible_distribution_major_version|int != 42 and
+            item.0.key == "xfs" and ansible_python.version.major == 2)'
+
+  loop: "{{ query('dict', tested_filesystems)|product(['create_fs', 'overwrite_another_fs', 'remove_fs'])|list }}"

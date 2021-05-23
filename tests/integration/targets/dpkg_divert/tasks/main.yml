@@ -1,0 +1,9 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: "include tasks for Debian family"
+  include_tasks: prepare.yml
+  when: ansible_pkg_mgr == "apt"

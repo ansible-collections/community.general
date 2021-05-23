@@ -1,0 +1,154 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for iso_create module
+# Copyright: (c) 2020, Diane Wang (Tomorrow9) <dianew@vmware.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+- name: install pycdlib
+  pip:
+    name: pycdlib
+    # state: latest
+  register: install_pycdlib
+- debug: var=install_pycdlib
+
+- set_fact:
+    output_dir_test: '{{ output_dir }}/test_iso_create'
+
+# - include_tasks: prepare_dest_dir.yml
+
+- name: Test check mode
+  iso_create:
+    src_files:
+      - "{{ role_path }}/files/test1.cfg"
+    dest_iso: "{{ output_dir_test }}/test.iso"
+    interchange_level: 3
+  register: iso_result
+  check_mode: yes
+- debug: var=iso_result
+
+- name: Check if iso file created
+  stat:
+    path: "{{ output_dir_test }}/test.iso"
+  register: iso_file
+- debug: var=iso_file
+- assert:
+    that:
+    - iso_result is changed
+    - iso_file.stat.exists == False
+
+- name: Create iso file with a specified file
+  iso_create:
+    src_files:
+      - "{{ role_path }}/files/test1.cfg"
+    dest_iso: "{{ output_dir_test }}/test.iso"
+    interchange_level: 3
+  register: iso_result
+- debug: var=iso_result
+
+- name: Check if iso file created
+  stat:
+    path: "{{ output_dir_test }}/test.iso"
+  register: iso_file
+
+- assert:
+    that:
+    - iso_result is changed
+    - iso_file.stat.exists == True
+
+- name: Create iso file with a specified file and folder
+  iso_create:
+    src_files:
+      - "{{ role_path }}/files/test1.cfg"
+      - "{{ role_path }}/files/test_dir"
+    dest_iso: "{{ output_dir_test }}/test1.iso"
+    interchange_level: 3
+  register: iso_result
+- debug: var=iso_result
+
+- name: Check if iso file created
+  stat:
+    path: "{{ output_dir_test }}/test1.iso"
+  register: iso_file
+
+- assert:
+    that:
+    - iso_result is changed
+    - iso_file.stat.exists == True
+
+- name: Create iso file with volume identification string
+  iso_create:
+    src_files:
+      - "{{ role_path }}/files/test1.cfg"
+    dest_iso: "{{ output_dir_test }}/test2.iso"
+    vol_ident: "OEMDRV"
+  register: iso_result
+- debug: var=iso_result
+
+- name: Check if iso file created
+  stat:
+    path: "{{ output_dir_test }}/test2.iso"
+  register: iso_file
+
+- assert:
+    that:
+    - iso_result is changed
+    - iso_file.stat.exists == True
+
+- name: Create iso file with Rock Ridge extention
+  iso_create:
+    src_files:
+      - "{{ role_path }}/files/test1.cfg"
+    dest_iso: "{{ output_dir_test }}/test3.iso"
+    rock_ridge: "1.09"
+  register: iso_result
+- debug: var=iso_result
+
+- name: Check if iso file created
+  stat:
+    path: "{{ output_dir_test }}/test3.iso"
+  register: iso_file
+
+- assert:
+    that:
+    - iso_result is changed
+    - iso_file.stat.exists == True
+
+- name: Create iso file with Joliet extention
+  iso_create:
+    src_files:
+      - "{{ role_path }}/files/test1.cfg"
+    dest_iso: "{{ output_dir_test }}/test4.iso"
+    joliet: 3
+  register: iso_result
+- debug: var=iso_result
+
+- name: Check if iso file created
+  stat:
+    path: "{{ output_dir_test }}/test4.iso"
+  register: iso_file
+
+- assert:
+    that:
+    - iso_result is changed
+    - iso_file.stat.exists == True
+
+- name: Create iso file with UDF enabled
+  iso_create:
+    src_files:
+      - "{{ role_path }}/files/test1.cfg"
+    dest_iso: "{{ output_dir_test }}/test5.iso"
+    udf: True
+  register: iso_result
+- debug: var=iso_result
+
+- name: Check if iso file created
+  stat:
+    path: "{{ output_dir_test }}/test5.iso"
+  register: iso_file
+
+- assert:
+    that:
+    - iso_result is changed
+    - iso_file.stat.exists == True

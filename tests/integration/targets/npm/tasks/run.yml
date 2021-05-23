@@ -1,0 +1,3 @@
+- include_tasks: setup.yml
+- include_tasks: test.yml
+- include_tasks: no_bin_links.yml

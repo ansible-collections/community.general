@@ -1,0 +1,16 @@
+namespace: community
+name: general
+version: 3.2.0
+readme: README.md
+authors:
+  - Ansible (https://github.com/ansible)
+description: null
+license_file: COPYING
+tags: [community]
+# NOTE: No dependencies are expected to be added here
+# dependencies:
+repository: https://github.com/ansible-collections/community.general
+documentation: https://docs.ansible.com/ansible/latest/collections/community/general/
+homepage: https://github.com/ansible-collections/community.general
+issues: https://github.com/ansible-collections/community.general/issues
+#type: flatmap

@@ -1,0 +1,5 @@
+integration_tests_dependencies:
+- ansible.posix
+- community.crypto
+unit_tests_dependencies:
+- community.internal_test_tools

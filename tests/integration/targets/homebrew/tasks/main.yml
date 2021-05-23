@@ -1,0 +1,85 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Test code for the homebrew module.
+# Copyright: (c) 2020, Abhijeet Kasurde <akasurde@redhat.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+---
+- name: Find brew binary
+  command: which brew
+  register: brew_which
+  when: ansible_distribution in ['MacOSX']
+
+- name: Get owner of brew binary
+  stat:
+    path: "{{ brew_which.stdout }}"
+  register: brew_stat
+  when: ansible_distribution in ['MacOSX']
+
+#- name: Use ignored-pinned option while upgrading all
+#  homebrew:
+#    upgrade_all: yes
+#    upgrade_options: ignore-pinned
+#  become: yes
+#  become_user: "{{ brew_stat.stat.pw_name }}"
+#  register: upgrade_option_result
+#  environment:
+#    HOMEBREW_NO_AUTO_UPDATE: True
+
+#- assert:
+#    that:
+#      - upgrade_option_result.changed
+
+- name: Install xz package using homebrew
+  homebrew:
+    name: xz
+    state: present
+    update_homebrew: no
+  become: yes
+  become_user: "{{ brew_stat.stat.pw_name }}"
+  register: xz_result
+
+- assert:
+    that:
+      - xz_result.changed
+
+- name: Again install xz package using homebrew
+  homebrew:
+    name: xz
+    state: present
+    update_homebrew: no
+  become: yes
+  become_user: "{{ brew_stat.stat.pw_name }}"
+  register: xz_result
+
+- assert:
+    that:
+      - not xz_result.changed
+
+- name: Uninstall xz package using homebrew
+  homebrew:
+    name: xz
+    state: absent
+    update_homebrew: no
+  become: yes
+  become_user: "{{ brew_stat.stat.pw_name }}"
+  register: xz_result
+
+- assert:
+    that:
+      - xz_result.changed
+
+- name: Again uninstall xz package using homebrew
+  homebrew:
+    name: xz
+    state: absent
+    update_homebrew: no
+  become: yes
+  become_user: "{{ brew_stat.stat.pw_name }}"
+  register: xz_result
+
+- assert:
+    that:
+      - not xz_result.changed

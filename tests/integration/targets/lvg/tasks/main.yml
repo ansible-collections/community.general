@@ -1,0 +1,22 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Install required packages (Linux)
+  package:
+    name: lvm2
+    state: present
+  when: ansible_system == 'Linux'
+
+- name: Test lvg module
+  block:
+    - import_tasks: setup.yml
+
+    - import_tasks: test_indempotency.yml
+
+    - import_tasks: test_grow_reduce.yml
+
+    - import_tasks: test_pvresize.yml
+  always:
+    - import_tasks: teardown.yml

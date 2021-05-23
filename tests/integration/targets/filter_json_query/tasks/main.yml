@@ -1,0 +1,9 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Test json_query filter
+  assert:
+    that:
+      - "users | community.general.json_query('[*].hosts[].host') == ['host_a', 'host_b', 'host_c', 'host_d']"

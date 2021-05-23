@@ -1,0 +1,3 @@
+pyopenssl_package_name: py27-openssl
+pyopenssl_package_name_python3: "py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-openssl"
+openssl_package_name: openssl

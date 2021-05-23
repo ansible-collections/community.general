@@ -1,0 +1,105 @@
+# We run two servers listening different ports
+# to be able to check replication (one server for master, another for slave).
+
+- name: Install redis server apt dependencies
+  apt:
+    name: "{{ redis_packages[ansible_distribution] }}"
+    state: latest
+    policy_rc_d: 101
+  when:
+  - ansible_facts.pkg_mgr == 'apt'
+  notify: cleanup redis
+
+- name: Install redis server rpm dependencies
+  yum:
+    name: "{{ redis_packages[ansible_distribution] }}"
+    state: latest
+  when:
+  - ansible_facts.pkg_mgr == 'yum'
+  notify: cleanup redis
+
+- name: Install redis rpm dependencies
+  dnf:
+    name: "{{ redis_packages[ansible_distribution] }}"
+    state: latest
+  when: ansible_facts.pkg_mgr == 'dnf'
+  notify: cleanup redis
+
+- name: Install redis server zypper dependencies
+  zypper:
+    name: "{{ redis_packages[ansible_distribution] }}"
+    state: latest
+  when:
+  - ansible_facts.pkg_mgr == 'community.general.zypper'
+  notify: cleanup redis
+
+- name: Install redis FreeBSD dependencies
+  community.general.pkgng:
+    name: "{{ redis_packages[ansible_distribution] }}"
+    state: latest
+  when:
+  - ansible_facts.pkg_mgr == 'community.general.pkgng'
+  notify: cleanup redis
+
+- name: Install redis module
+  pip:
+    name: "{{ redis_module }}"
+    state: present
+  notify: cleanup redis
+
+- name: Create redis directories
+  file:                                                                                                                                                                                                 
+    path: "{{ item }}"
+    state: directory                                                                                                                                                                                    
+    owner: redis
+    group: redis
+  loop:
+  - "{{ master_datadir }}"
+  - "{{ master_logdir }}"
+  - "{{ slave_datadir }}"
+  - "{{ slave_logdir }}"
+
+- name: Create redis configs
+  copy:
+    dest: "{{ item.file }}"
+    content: |
+      daemonize yes
+      port {{ item.port }}
+      pidfile /var/run/redis_{{ item.port }}.pid
+      logfile {{ item.logdir }}/redis.log
+      dir {{ item.datadir }}
+      requirepass {{ redis_password }}
+      masterauth {{ redis_password }}
+  loop:
+  - file: "{{ master_conf }}"
+    port: "{{ master_port }}"
+    logdir: "{{ master_logdir }}"
+    datadir: "{{ master_datadir }}"
+  - file: "{{ slave_conf }}"
+    port: "{{ slave_port }}"
+    logdir: "{{ slave_logdir }}"
+    datadir: "{{ slave_datadir }}"
+
+- name: Start redis master
+  shell: "{{ redis_bin[ansible_distribution] }} {{ master_conf }}"
+
+- name: Start redis slave
+  shell: "{{ redis_bin[ansible_distribution] }} {{ slave_conf }} --slaveof 127.0.0.1 {{ master_port }}"
+
+- name: Wait for redis master to be started
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: "{{ master_port }}"
+    state: started
+    delay: 1
+    connect_timeout: 5
+    timeout: 30
+
+- name: Wait for redis slave to be started
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: "{{ slave_port }}"
+    state: started
+    delay: 1
+    connect_timeout: 5
+    timeout: 30

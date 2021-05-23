@@ -1,0 +1,1 @@
+./cloud/scaleway/scaleway_compute.py

@@ -1,0 +1,84 @@
+# test code for the hg module
+# Copyright: (c) 2018, Ansible Project
+#
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+
+- name: set where to extract the repo
+  set_fact:
+    checkout_dir: "{{ output_dir }}/hg_project_test"
+
+- name: set what repo to use
+  set_fact:
+    repo: "http://hg.pf.osdn.net/view/a/ak/akasurde/hg_project_test"
+
+- name: clean out the output_dir
+  shell: rm -rf {{ output_dir }}/*
+
+- name: verify that mercurial is installed so this test can continue
+  shell: which hg
+
+- name: initial checkout
+  hg:
+    repo: "{{ repo }}"
+    dest: "{{ checkout_dir }}"
+  register: hg_result
+
+- debug: var=hg_result
+
+- shell: ls {{ checkout_dir }}
+
+- name: verify information about the initial clone
+  assert:
+    that:
+      - "'before' in hg_result"
+      - "'after' in hg_result"
+      - "not hg_result.before"
+      - "hg_result.changed"
+
+- name: repeated checkout
+  hg:
+    repo: "{{ repo }}"
+    dest: "{{ checkout_dir }}"
+  register: hg_result2
+
+- debug: var=hg_result2
+
+- name: check for tags
+  stat:
+    path: "{{ checkout_dir }}/.hgtags"
+  register: tags
+
+- name: check for remotes
+  stat:
+    path: "{{ checkout_dir }}/.hg/branch"
+  register: branches
+
+- debug: var=tags
+- debug: var=branches
+
+- name: assert presence of tags/trunk/branches
+  assert:
+    that:
+      - "tags.stat.isreg"
+      - "branches.stat.isreg"
+
+- name: verify on a re-clone things are marked unchanged
+  assert:
+    that:
+      - "not hg_result2.changed"
+
+- name: Checkout non-existent repo clone
+  hg:
+    repo: "http://hg.pf.osdn.net/view/a/ak/akasurde/hg_project_test_1"
+    clone: no
+    update: no
+  register: hg_result3
+  ignore_errors: true
+
+- name: Verify result of non-existent repo clone
+  assert:
+    that:
+      - hg_result3.msg
+      - "'abort: HTTP Error 404: Not Found' in hg_result3.msg"
+      - "not hg_result3.changed"

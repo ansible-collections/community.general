@@ -1,0 +1,3 @@
+# The 7z executable moved from p7zip to p7zip-full;
+# see https://build.opensuse.org/package/view_file/openSUSE:Leap:15.2/p7zip/p7zip.changes?expand=1
+iso_extract_7zip_package: p7zip-full

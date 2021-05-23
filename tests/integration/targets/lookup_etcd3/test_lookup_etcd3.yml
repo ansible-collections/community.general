@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Test lookup etcd3
+      import_role:
+        name: lookup_etcd3

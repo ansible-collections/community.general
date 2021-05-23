@@ -1,0 +1,22 @@
+dn: ou=users,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: users
+
+dn: uid=ldaptest,ou=users,dc=example,dc=com
+uid: ldaptest
+uidNumber: 1111
+gidNUmber: 100
+objectClass: top
+objectClass: posixAccount
+objectClass: shadowAccount
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+loginShell: /bin/sh
+homeDirectory: /home/ldaptest
+cn: LDAP Test
+gecos: LDAP Test
+displayName: LDAP Test
+mail: ldap.test@example.com
+sn: Test

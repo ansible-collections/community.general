@@ -1,0 +1,17 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Get organization informations and register it in a variable
+  scaleway_organization_info:
+  register: organizations
+
+- name: Display organizations variable
+  debug:
+    var: organizations
+
+- name: Ensure retrieval of organizations info is success
+  assert:
+    that:
+      - organizations is success

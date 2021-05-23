@@ -1,0 +1,94 @@
+---
+# test code for the etcd3 module
+# (c) 2017,  Jean-Philippe Evrard <jean-philippe@evrard.me>
+# 2020, SCC France, Eric Belhomme <ebelhomme@fr.scc.com>
+
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+
+# ============================================================
+
+# Integration tests
+- name: Check mode, show need change
+  etcd3:
+    key: "foo"
+    value: "bar"
+    state: "present"
+  register: _etcd3_prst_chktst
+  check_mode: true
+
+- name: Change to new value
+  etcd3:
+    key: "foo"
+    value: "bar"
+    state: "present"
+  register: _etcd3_prst_chgtst
+
+- name: Idempotency test, show unchanged.
+  etcd3:
+    key: "foo"
+    value: "bar"
+    state: "present"
+  register: _etcd3_prst_idmptnttst
+
+- name: Idempotency test in check mode, show unchanged
+  etcd3:
+    key: "foo"
+    value: "bar"
+    state: "present"
+  register: _etcd3_prst_idmptntchktst
+  check_mode: true
+
+- name: Check mode, show need removal of key
+  etcd3:
+    key: "foo"
+    value: "baz"
+    state: "absent"
+  register: _etcd3_absnt_chktst
+  check_mode: true
+
+- name: Remove foo key
+  etcd3:
+    key: "foo"
+    value: "baz"
+    state: "absent"
+  register: _etcd3_absnt_chgtst
+
+- name: Idempotency test in check mode, show unchanged
+  etcd3:
+    key: "foo"
+    value: "baz"
+    state: "absent"
+  register: _etcd3_absnt_idmptnttst
+  check_mode: true
+
+- name: Idempotency test, show unchanged
+  etcd3:
+    key: "foo"
+    value: "baz"
+    state: "absent"
+  register: _etcd3_absnt_idmptntchktst
+
+- name: Checking the status are expected
+  assert:
+    that:
+      - _etcd3_prst_chktst is changed
+      - _etcd3_prst_chgtst is changed
+      - _etcd3_prst_idmptnttst is not changed
+      - _etcd3_prst_idmptntchktst is not changed
+      - _etcd3_absnt_chktst is changed
+      - _etcd3_absnt_chgtst is changed
+      - _etcd3_absnt_idmptnttst is not changed
+      - _etcd3_absnt_idmptntchktst is not changed

@@ -1,0 +1,11 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Run LDAP search module tests
+  block:
+    - include_tasks: "{{ item }}"
+      with_fileglob:
+        - 'tests/*.yml'
+  when: ansible_os_family in ['Ubuntu', 'Debian']

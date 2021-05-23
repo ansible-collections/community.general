@@ -1,0 +1,704 @@
+---
+requires_ansible: '>=2.9.10'
+action_groups:
+  ovirt:
+  - ovirt_affinity_label_facts
+  - ovirt_api_facts
+  - ovirt_cluster_facts
+  - ovirt_datacenter_facts
+  - ovirt_disk_facts
+  - ovirt_event_facts
+  - ovirt_external_provider_facts
+  - ovirt_group_facts
+  - ovirt_host_facts
+  - ovirt_host_storage_facts
+  - ovirt_network_facts
+  - ovirt_nic_facts
+  - ovirt_permission_facts
+  - ovirt_quota_facts
+  - ovirt_scheduling_policy_facts
+  - ovirt_snapshot_facts
+  - ovirt_storage_domain_facts
+  - ovirt_storage_template_facts
+  - ovirt_storage_vm_facts
+  - ovirt_tag_facts
+  - ovirt_template_facts
+  - ovirt_user_facts
+  - ovirt_vm_facts
+  - ovirt_vmpool_facts
+plugin_routing:
+  connection:
+    docker:
+      redirect: community.docker.docker
+    oc:
+      redirect: community.okd.oc
+  lookup:
+    gcp_storage_file:
+      redirect: community.google.gcp_storage_file
+    hashi_vault:
+      redirect: community.hashi_vault.hashi_vault
+    nios:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios lookup plugin has been deprecated. Please use infoblox.nios_modules.nios_lookup instead.
+    nios_next_ip:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_next_ip lookup plugin has been deprecated. Please use infoblox.nios_modules.nios_next_ip instead.
+    nios_next_network:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_next_network lookup plugin has been deprecated. Please use infoblox.nios_modules.nios_next_network instead.
+  modules:
+    ali_instance_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.ali_instance_info instead.
+    docker_compose:
+      redirect: community.docker.docker_compose
+    docker_config:
+      redirect: community.docker.docker_config
+    docker_container:
+      redirect: community.docker.docker_container
+    docker_container_info:
+      redirect: community.docker.docker_container_info
+    docker_host_info:
+      redirect: community.docker.docker_host_info
+    docker_image:
+      redirect: community.docker.docker_image
+    docker_image_facts:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use community.docker.docker_image_info instead.
+    docker_image_info:
+      redirect: community.docker.docker_image_info
+    docker_login:
+      redirect: community.docker.docker_login
+    docker_network:
+      redirect: community.docker.docker_network
+    docker_network_info:
+      redirect: community.docker.docker_network_info
+    docker_node:
+      redirect: community.docker.docker_node
+    docker_node_info:
+      redirect: community.docker.docker_node_info
+    docker_prune:
+      redirect: community.docker.docker_prune
+    docker_secret:
+      redirect: community.docker.docker_secret
+    docker_service:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use community.docker.docker_compose instead.
+    docker_stack:
+      redirect: community.docker.docker_stack
+    docker_stack_info:
+      redirect: community.docker.docker_stack_info
+    docker_stack_task_info:
+      redirect: community.docker.docker_stack_task_info
+    docker_swarm:
+      redirect: community.docker.docker_swarm
+    docker_swarm_info:
+      redirect: community.docker.docker_swarm_info
+    docker_swarm_service:
+      redirect: community.docker.docker_swarm_service
+    docker_swarm_service_info:
+      redirect: community.docker.docker_swarm_service_info
+    docker_volume:
+      redirect: community.docker.docker_volume
+    docker_volume_info:
+      redirect: community.docker.docker_volume_info
+    foreman:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use the modules from the theforeman.foreman collection instead.
+    gc_storage:
+      redirect: community.google.gc_storage
+    gcdns_record:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use google.cloud.gcp_dns_resource_record_set instead.
+    gcdns_zone:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use google.cloud.gcp_dns_managed_zone instead.
+    gce:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use google.cloud.gcp_compute_instance instead.
+    gce_eip:
+      redirect: community.google.gce_eip
+    gce_img:
+      redirect: community.google.gce_img
+    gce_instance_template:
+      redirect: community.google.gce_instance_template
+    gce_labels:
+      redirect: community.google.gce_labels
+    gce_lb:
+      redirect: community.google.gce_lb
+    gce_mig:
+      redirect: community.google.gce_mig
+    gce_net:
+      redirect: community.google.gce_net
+    gce_pd:
+      redirect: community.google.gce_pd
+    gce_snapshot:
+      redirect: community.google.gce_snapshot
+    gce_tag:
+      redirect: community.google.gce_tag
+    gcp_backend_service:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use google.cloud.gcp_compute_backend_service instead.
+    gcp_forwarding_rule:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use google.cloud.gcp_compute_forwarding_rule or google.cloud.gcp_compute_global_forwarding_rule instead.
+    gcp_healthcheck:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use google.cloud.gcp_compute_health_check, google.cloud.gcp_compute_http_health_check or google.cloud.gcp_compute_https_health_check instead.
+    gcp_target_proxy:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use google.cloud.gcp_compute_target_http_proxy instead.
+    gcp_url_map:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use google.cloud.gcp_compute_url_map instead.
+    gcpubsub:
+      redirect: community.google.gcpubsub
+    gcpubsub_info:
+      redirect: community.google.gcpubsub_info
+    gcpubsub_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.google.gcpubsub_info instead.
+    gcspanner:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use google.cloud.gcp_spanner_database and/or google.cloud.gcp_spanner_instance instead.
+    github_hooks:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use community.general.github_webhook and community.general.github_webhook_info instead.
+    # Adding tombstones burns the old name, so we simply remove the entries:
+    # gluster_heal_info:
+    #   tombstone:
+    #     removal_version: 3.0.0
+    #     warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_heal_info instead.
+    # gluster_peer:
+    #   tombstone:
+    #     removal_version: 3.0.0
+    #     warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_peer instead.
+    # gluster_volume:
+    #   tombstone:
+    #     removal_version: 3.0.0
+    #     warning_text: The gluster modules have migrated to the gluster.gluster collection. Use gluster.gluster.gluster_volume instead.
+    # helm:
+    #   tombstone:
+    #     removal_version: 3.0.0
+    #     warning_text: Use community.kubernetes.helm instead.
+    hetzner_failover_ip:
+      redirect: community.hrobot.failover_ip
+    hetzner_failover_ip_info:
+      redirect: community.hrobot.failover_ip_info
+    hetzner_firewall:
+      redirect: community.hrobot.firewall
+    hetzner_firewall_info:
+      redirect: community.hrobot.firewall_info
+    hpilo_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.hpilo_info instead.
+    idrac_firmware:
+      redirect: dellemc.openmanage.idrac_firmware
+    idrac_redfish_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.idrac_redfish_info instead.
+    idrac_server_config_profile:
+      redirect: dellemc.openmanage.idrac_server_config_profile
+    jenkins_job_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.jenkins_job_info instead.
+    katello:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use the modules from the theforeman.foreman collection instead.
+    kubevirt_cdi_upload:
+      redirect: community.kubevirt.kubevirt_cdi_upload
+    kubevirt_preset:
+      redirect: community.kubevirt.kubevirt_preset
+    kubevirt_pvc:
+      redirect: community.kubevirt.kubevirt_pvc
+    kubevirt_rs:
+      redirect: community.kubevirt.kubevirt_rs
+    kubevirt_template:
+      redirect: community.kubevirt.kubevirt_template
+    kubevirt_vm:
+      redirect: community.kubevirt.kubevirt_vm
+    ldap_attr:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.ldap_attrs instead.
+    logicmonitor:
+      tombstone:
+        removal_version: 1.0.0
+        warning_text: The logicmonitor_facts module is no longer maintained and the API used has been disabled in 2017.
+    logicmonitor_facts:
+      tombstone:
+        removal_version: 1.0.0
+        warning_text: The logicmonitor_facts module is no longer maintained and the API used has been disabled in 2017.
+    memset_memstore_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.memset_memstore_info instead.
+    memset_server_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.memset_server_info instead.
+    na_cdot_aggregate:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use netapp.ontap.na_ontap_aggregate instead.
+    na_cdot_license:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use netapp.ontap.na_ontap_license instead.
+    na_cdot_lun:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use netapp.ontap.na_ontap_lun instead.
+    na_cdot_qtree:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use netapp.ontap.na_ontap_qtree instead.
+    na_cdot_svm:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use netapp.ontap.na_ontap_svm instead.
+    na_cdot_user:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use netapp.ontap.na_ontap_user instead.
+    na_cdot_user_role:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use netapp.ontap.na_ontap_user_role instead.
+    na_cdot_volume:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use netapp.ontap.na_ontap_volume instead.
+    na_ontap_gather_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use netapp.ontap.na_ontap_info instead.
+    nios_a_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_a_record module has been deprecated. Please use infoblox.nios_modules.nios_a_record instead.
+    nios_aaaa_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_aaaa_record module has been deprecated. Please use infoblox.nios_modules.nios_aaaa_record instead.
+    nios_cname_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_cname_record module has been deprecated. Please use infoblox.nios_modules.nios_cname_record instead.
+    nios_dns_view:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_dns_view module has been deprecated. Please use infoblox.nios_modules.nios_dns_view instead.
+    nios_fixed_address:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_fixed_address module has been deprecated. Please use infoblox.nios_modules.nios_fixed_address instead.
+    nios_host_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_host_record module has been deprecated. Please use infoblox.nios_modules.nios_host_record instead.
+    nios_member:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_member module has been deprecated. Please use infoblox.nios_modules.nios_member instead.
+    nios_mx_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_mx_record module has been deprecated. Please use infoblox.nios_modules.nios_mx_record instead.
+    nios_naptr_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_naptr_record module has been deprecated. Please use infoblox.nios_modules.nios_naptr_record instead.
+    nios_network:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_network module has been deprecated. Please use infoblox.nios_modules.nios_network instead.
+    nios_network_view:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_network_view module has been deprecated. Please use infoblox.nios_modules.nios_network_view instead.
+    nios_nsgroup:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_nsgroup module has been deprecated. Please use infoblox.nios_modules.nios_nsgroup instead.
+    nios_ptr_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_ptr_record module has been deprecated. Please use infoblox.nios_modules.nios_ptr_record instead.
+    nios_srv_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_srv_record module has been deprecated. Please use infoblox.nios_modules.nios_srv_record instead.
+    nios_txt_record:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_txt_record module has been deprecated. Please use infoblox.nios_modules.nios_txt_record instead.
+    nios_zone:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios_zone module has been deprecated. Please use infoblox.nios_modules.nios_zone instead.
+    nginx_status_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.nginx_status_info instead.
+    ome_device_info:
+      redirect: dellemc.openmanage.ome_device_info
+    one_image_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.one_image_info instead.
+    onepassword_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.onepassword_info instead.
+    oneview_datacenter_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.oneview_datacenter_info instead.
+    oneview_enclosure_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.oneview_enclosure_info instead.
+    oneview_ethernet_network_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.oneview_ethernet_network_info instead.
+    oneview_fc_network_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.oneview_fc_network_info instead.
+    oneview_fcoe_network_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.oneview_fcoe_network_info instead.
+    oneview_logical_interconnect_group_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.oneview_logical_interconnect_group_info instead.
+    oneview_network_set_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.oneview_network_set_info instead.
+    oneview_san_manager_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.oneview_san_manager_info instead.
+    online_server_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.online_server_info instead.
+    online_user_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.online_user_info instead.
+    ovirt:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_vm instead.
+    ovirt_affinity_label_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_affinity_label_info instead.
+    ovirt_api_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_api_info instead.
+    ovirt_cluster_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_cluster_info instead.
+    ovirt_datacenter_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_datacenter_info instead.
+    ovirt_disk_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_disk_info instead.
+    ovirt_event_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_event_info instead.
+    ovirt_external_provider_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_external_provider_info instead.
+    ovirt_group_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_group_info instead.
+    ovirt_host_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_host_info instead.
+    ovirt_host_storage_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_host_storage_info instead.
+    ovirt_network_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_network_info instead.
+    ovirt_nic_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_nic_info instead.
+    ovirt_permission_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_permission_info instead.
+    ovirt_quota_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_quota_info instead.
+    ovirt_scheduling_policy_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_scheduling_policy_info instead.
+    ovirt_snapshot_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_snapshot_info instead.
+    ovirt_storage_domain_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_storage_domain_info instead.
+    ovirt_storage_template_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_storage_template_info instead.
+    ovirt_storage_vm_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_storage_vm_info instead.
+    ovirt_tag_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_tag_info instead.
+    ovirt_template_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_template_info instead.
+    ovirt_user_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_user_info instead.
+    ovirt_vm_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_vm_info instead.
+    ovirt_vmpool_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use ovirt.ovirt.ovirt_vmpool_info instead.
+    postgresql_copy:
+      redirect: community.postgresql.postgresql_copy
+    postgresql_db:
+      redirect: community.postgresql.postgresql_db
+    postgresql_ext:
+      redirect: community.postgresql.postgresql_ext
+    postgresql_idx:
+      redirect: community.postgresql.postgresql_idx
+    postgresql_info:
+      redirect: community.postgresql.postgresql_info
+    postgresql_lang:
+      redirect: community.postgresql.postgresql_lang
+    postgresql_membership:
+      redirect: community.postgresql.postgresql_membership
+    postgresql_owner:
+      redirect: community.postgresql.postgresql_owner
+    postgresql_pg_hba:
+      redirect: community.postgresql.postgresql_pg_hba
+    postgresql_ping:
+      redirect: community.postgresql.postgresql_ping
+    postgresql_privs:
+      redirect: community.postgresql.postgresql_privs
+    postgresql_publication:
+      redirect: community.postgresql.postgresql_publication
+    postgresql_query:
+      redirect: community.postgresql.postgresql_query
+    postgresql_schema:
+      redirect: community.postgresql.postgresql_schema
+    postgresql_sequence:
+      redirect: community.postgresql.postgresql_sequence
+    postgresql_set:
+      redirect: community.postgresql.postgresql_set
+    postgresql_slot:
+      redirect: community.postgresql.postgresql_slot
+    postgresql_subscription:
+      redirect: community.postgresql.postgresql_subscription
+    postgresql_table:
+      redirect: community.postgresql.postgresql_table
+    postgresql_tablespace:
+      redirect: community.postgresql.postgresql_tablespace
+    postgresql_user_obj_stat_info:
+      redirect: community.postgresql.postgresql_user_obj_stat_info
+    postgresql_user:
+      redirect: community.postgresql.postgresql_user
+    purefa_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use purestorage.flasharray.purefa_info instead.
+    purefb_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use purestorage.flashblade.purefb_info instead.
+    python_requirements_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.python_requirements_info instead.
+    redfish_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.redfish_info instead.
+    scaleway_image_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.scaleway_image_info instead.
+    scaleway_ip_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.scaleway_ip_info instead.
+    scaleway_organization_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.scaleway_organization_info instead.
+    scaleway_security_group_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.scaleway_security_group_info instead.
+    scaleway_server_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.scaleway_server_info instead.
+    scaleway_snapshot_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.scaleway_snapshot_info instead.
+    scaleway_volume_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.scaleway_volume_info instead.
+    sf_account_manager:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use netapp.elementsw.na_elementsw_account instead.
+    sf_check_connections:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use netapp.elementsw.na_elementsw_check_connections instead.
+    sf_snapshot_schedule_manager:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use netapp.elementsw.na_elementsw_snapshot_schedule instead.
+    sf_volume_access_group_manager:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use netapp.elementsw.na_elementsw_access_group instead.
+    sf_volume_manager:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use netapp.elementsw.na_elementsw_volume instead.
+    smartos_image_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.smartos_image_info instead.
+    vertica_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.vertica_info instead.
+    xenserver_guest_facts:
+      tombstone:
+        removal_version: 3.0.0
+        warning_text: Use community.general.xenserver_guest_info instead.
+  doc_fragments:
+    _gcp:
+      redirect: community.google._gcp
+    docker:
+      redirect: community.docker.docker
+    hetzner:
+      redirect: community.hrobot.robot
+    kubevirt_common_options:
+      redirect: community.kubevirt.kubevirt_common_options
+    kubevirt_vm_options:
+      redirect: community.kubevirt.kubevirt_vm_options
+    nios:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.nios document fragment has been deprecated. Please use infoblox.nios_modules.nios instead.
+    postgresql:
+      redirect: community.postgresql.postgresql
+  module_utils:
+    docker.common:
+      redirect: community.docker.common
+    docker.swarm:
+      redirect: community.docker.swarm
+    gcdns:
+      redirect: community.google.gcdns
+    gce:
+      redirect: community.google.gce
+    gcp:
+      redirect: community.google.gcp
+    hetzner:
+      redirect: community.hrobot.robot
+    kubevirt:
+      redirect: community.kubevirt.kubevirt
+    net_tools.nios.api:
+      deprecation:
+        removal_version: 5.0.0
+        warning_text: The community.general.net_tools.nios.api module_utils has been deprecated. Please use infoblox.nios_modules.api instead.
+    remote_management.dellemc.dellemc_idrac:
+      redirect: dellemc.openmanage.dellemc_idrac
+    remote_management.dellemc.ome:
+      redirect: dellemc.openmanage.ome
+    postgresql:
+      redirect: community.postgresql.postgresql
+  callback:
+    actionable:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use the 'default' callback plugin with 'display_skipped_hosts = no' and 'display_ok_hosts = no' options.
+    full_skip:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use the 'default' callback plugin with 'display_skipped_hosts = no' option.
+    stderr:
+      tombstone:
+        removal_version: 2.0.0
+        warning_text: Use the 'default' callback plugin with 'display_failed_stderr = yes' option.
+  inventory:
+    docker_machine:
+      redirect: community.docker.docker_machine
+    docker_swarm:
+      redirect: community.docker.docker_swarm
+    kubevirt:
+      redirect: community.kubevirt.kubevirt
+  filter:
+    path_join:
+      # The ansible.builtin.path_join filter has been added in ansible-base 2.10.
+      # Since plugin routing is only available since ansible-base 2.10, this
+      # redirect will be used for ansible-base 2.10 or later, and the included
+      # path_join filter will be used for Ansible 2.9 or earlier.
+      redirect: ansible.builtin.path_join

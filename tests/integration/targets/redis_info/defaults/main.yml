@@ -1,0 +1,4 @@
+---
+redis_password: PASS
+master_port: 6379
+slave_port: 6380

@@ -1,0 +1,110 @@
+---
+- name: "Create filesystem"
+  community.general.filesystem:
+    dev: '{{ dev }}'
+    fstype: '{{ fstype }}'
+  register: fs_result
+
+- name: "Assert that results are as expected"
+  ansible.builtin.assert:
+    that:
+      - 'fs_result is changed'
+      - 'fs_result is success'
+
+- name: "Get UUID of created filesystem"
+  ansible.builtin.command:
+    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
+  changed_when: false
+  register: uuid
+
+- name: "Check that filesystem isn't created if force isn't used"
+  community.general.filesystem:
+    dev: '{{ dev }}'
+    fstype: '{{ fstype }}'
+  register: fs2_result
+
+- name: "Get UUID of the filesystem"
+  ansible.builtin.command:
+    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
+  changed_when: false
+  register: uuid2
+
+- name: "Assert that filesystem UUID is not changed"
+  ansible.builtin.assert:
+    that:
+      - 'fs2_result is not changed'
+      - 'fs2_result is success'
+      - 'uuid.stdout == uuid2.stdout'
+
+- name: "Check that filesystem is recreated if force is used"
+  community.general.filesystem:
+    dev: '{{ dev }}'
+    fstype: '{{ fstype }}'
+    force: yes
+  register: fs3_result
+
+- name: "Get UUID of the new filesystem"
+  ansible.builtin.command:
+    cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
+  changed_when: false
+  register: uuid3
+
+- name: "Assert that filesystem UUID is changed"
+  # libblkid gets no UUID at all for this fstype on FreeBSD
+  when: not (ansible_system == 'FreeBSD' and fstype == 'reiserfs')
+  ansible.builtin.assert:
+    that:
+      - 'fs3_result is changed'
+      - 'fs3_result is success'
+      - 'uuid.stdout != uuid3.stdout'
+
+
+- when: 'grow|bool and (fstype != "vfat" or resize_vfat)'
+  block:
+    - name: "Increase fake device"
+      community.general.filesize:
+        path: '{{ image_file }}'
+        size: '{{ fssize | int + 1 }}M'
+
+    - name: "Resize loop device for LVM"
+      ansible.builtin.command:
+        cmd: 'losetup -c {{ dev }}'
+      when: fstype == 'lvm'
+
+    - name: "Expand filesystem"
+      community.general.filesystem:
+        dev: '{{ dev }}'
+        fstype: '{{ fstype }}'
+        resizefs: yes
+      register: fs4_result
+
+    - name: "Get UUID of the filesystem"
+      ansible.builtin.command:
+        cmd: 'blkid -c /dev/null -o value -s UUID {{ dev }}'
+      changed_when: false
+      register: uuid4
+
+    - name: "Assert that filesystem UUID is not changed"
+      ansible.builtin.assert:
+        that:
+          - 'fs4_result is changed'
+          - 'fs4_result is success'
+          - 'uuid3.stdout == uuid4.stdout' # unchanged
+
+- when:
+    - (grow | bool and (fstype != "vfat" or resize_vfat)) or
+      (fstype == "xfs" and ansible_system == "Linux" and
+      ansible_distribution not in ["CentOS", "Ubuntu"])
+  block:
+    - name: "Check that resizefs does nothing if device size is not changed"
+      community.general.filesystem:
+        dev: '{{ dev }}'
+        fstype: '{{ fstype }}'
+        resizefs: yes
+      register: fs5_result
+
+    - name: "Assert that the state did not change"
+      ansible.builtin.assert:
+        that:
+          - 'fs5_result is not changed'
+          - 'fs5_result is succeeded'

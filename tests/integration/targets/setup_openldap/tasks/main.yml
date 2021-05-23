@@ -1,0 +1,68 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Setup OpenLDAP on Debian or Ubuntu
+  block:
+    - name: Include OS-specific variables
+      include_vars: '{{ ansible_os_family }}.yml'
+
+    - name: Install OpenLDAP server and tools
+      become: True
+      package:
+        name: '{{ item }}'
+      loop: '{{ openldap_packages_name }}'
+
+    - name: Install python-ldap (Python 3)
+      become: True
+      package:
+        name: '{{ python_ldap_package_name_python3 }}'
+      when: ansible_python_version is version('3.0', '>=')
+
+    - name: Install python-ldap (Python 2)
+      become: True
+      package:
+        name: '{{ python_ldap_package_name }}'
+      when: ansible_python_version is version('3.0', '<')
+
+    - name: Make sure OpenLDAP service is stopped
+      become: True
+      shell: 'cat /var/run/slapd/slapd.pid | xargs -r kill -9 '
+
+    - name: Debconf
+      shell: 'echo "slapd {{ item.question }} {{ item.vtype }} {{ item.value }}" >> /root/debconf-slapd.conf'
+      loop: "{{ openldap_debconfs }}"
+
+    - name: Dpkg reconfigure
+      shell:
+        cmd: "export DEBIAN_FRONTEND=noninteractive; cat /root/debconf-slapd.conf | debconf-set-selections; dpkg-reconfigure -f noninteractive slapd"
+        creates: "/root/slapd_configured"
+
+    - name: Start OpenLDAP service
+      become: True
+      service:
+        name: '{{ openldap_service_name }}'
+        enabled: True
+        state: started
+
+    - name: Copy initial config ldif file
+      become: True
+      copy:
+        src: 'files/{{ item }}'
+        dest: '/tmp/{{ item }}'
+        owner: root
+        group: root
+        mode: '0644'
+      loop:
+        - rootpw_cnconfig.ldif
+        - initial_config.ldif
+
+    - name: Configure admin password for cn=config
+      shell: "ldapmodify -Y EXTERNAL -H ldapi:/// -f /tmp/rootpw_cnconfig.ldif"
+
+    - name: Add initial config
+      become: True
+      shell: 'ldapadd -H ldapi:/// -x -D "cn=admin,dc=example,dc=com" -w Test1234! -f /tmp/initial_config.ldif'
+  when: ansible_os_family in ['Ubuntu', 'Debian']

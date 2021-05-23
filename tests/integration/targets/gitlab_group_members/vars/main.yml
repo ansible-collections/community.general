@@ -1,0 +1,5 @@
+gitlab_server_url: https://gitlabserver.example.com
+gitlab_api_access_token: 126hngbscx890cv09b
+gitlab_group_name: groupname1
+username: username1
+gitlab_access_level: developer

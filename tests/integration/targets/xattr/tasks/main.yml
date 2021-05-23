@@ -1,0 +1,16 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: Setup
+  include: setup.yml
+
+- name: Check availability of xattr support
+  command: setfattr -n user.foo {{ test_file }}
+  ignore_errors: yes
+  register: xattr
+
+- name: Test
+  include: test.yml
+  when: xattr is not failed

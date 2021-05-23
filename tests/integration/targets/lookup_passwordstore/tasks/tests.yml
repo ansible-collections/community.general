@@ -1,0 +1,153 @@
+- name: Check name of gpg2 binary
+  command: which gpg2
+  register: gpg2_check
+  ignore_errors: true
+
+- name: Set gpg2 binary name
+  set_fact:
+    gpg2_bin: '{{ "gpg2" if gpg2_check is successful else "gpg" }}'
+
+- name: Stop gpg-agent so we can remove any locks on the GnuPG dir
+  command: gpgconf --kill gpg-agent
+  ignore_errors: yes
+
+- name: Remove previous password files and directory
+  file:
+    dest: "{{ item }}"
+    state: absent
+  loop:
+    - "~/.gnupg"
+    - "~/.password-store"
+
+# How to generate a new GPG key:
+#   gpg2 --batch --gen-key input  # See templates/input
+#   gpg2 --list-secret-keys --keyid-format LONG
+#   gpg2 --armor --export-secret-keys [key id]
+#   # Get the fingerprint
+#   gpg2 --fingerprint --keyid-format LONG | grep [key id] -A 1 | tail -1 | tr -d '[:space:]' | awk -F '=' '{print $2":6:"}'
+
+- name: Import GPG private key
+  shell: echo "{{ passwordstore_privkey }}" | {{ gpg2_bin }} --import --allow-secret-key-import -
+
+- name: Trust  key
+  shell: echo "D3E1CC8934E97270CEB066023AF1BD3619AB496A:6:" | {{ gpg2_bin }} --import-ownertrust
+
+- name: Initialise passwordstore
+  command: pass init ansible-test
+
+- name: Create a password
+  set_fact:
+    newpass: "{{ lookup('community.general.passwordstore', 'test-pass length=8 create=yes') }}"
+
+- name: Fetch password from an existing file
+  set_fact:
+    readpass: "{{ lookup('community.general.passwordstore', 'test-pass') }}"
+
+- name: Verify password
+  assert:
+    that:
+      - readpass == newpass
+
+- name: Create a password with equal sign
+  set_fact:
+    newpass: "{{ lookup('community.general.passwordstore', 'test-pass-equal userpass=SimpleSample= create=yes') }}"
+
+- name: Fetch a password with equal sign
+  set_fact:
+    readpass: "{{ lookup('community.general.passwordstore', 'test-pass-equal') }}"
+
+- name: Verify password
+  assert:
+    that:
+      - readpass == newpass
+
+- name: Create a password using missing=create
+  set_fact:
+    newpass: "{{ lookup('community.general.passwordstore', 'test-missing-create missing=create length=8') }}"
+
+- name: Fetch password from an existing file
+  set_fact:
+    readpass: "{{ lookup('community.general.passwordstore', 'test-missing-create') }}"
+
+- name: Verify password
+  assert:
+    that:
+      - readpass == newpass
+
+- name: Fetch password from existing file using missing=empty
+  set_fact:
+    readpass: "{{ lookup('community.general.passwordstore', 'test-missing-create missing=empty') }}"
+
+- name: Verify password
+  assert:
+    that:
+      - readpass == newpass
+
+- name: Fetch password from non-existing file using missing=empty
+  set_fact:
+    readpass: "{{ query('community.general.passwordstore', 'test-missing-pass missing=empty') }}"
+
+- name: Verify password
+  assert:
+    that:
+      - readpass == [ none ]
+
+# As inserting multiline passwords on the commandline would require something
+# like expect, simply create it by using default gpg on a file with the correct
+# structure.
+- name: Create the YAML password content
+  copy:
+    dest: "~/.password-store/test-yaml-pass"
+    content: |
+      testpassword
+      key: |
+        multi
+        line
+
+- name: Read .gpg-id from .password-store
+  set_fact:
+    gpgid: "{{ lookup('file', '~/.password-store/.gpg-id') }}"
+
+- name: Encrypt the file using the gpg key
+  command: "{{ gpg2_bin }} --batch --encrypt -r {{ gpgid }} ~/.password-store/test-yaml-pass"
+
+- name: Fetch a password with YAML subkey
+  set_fact:
+    readyamlpass: "{{ lookup('community.general.passwordstore', 'test-yaml-pass subkey=key') }}"
+
+- name: Read a yaml subkey
+  assert:
+    that:
+      - readyamlpass == 'multi\nline'
+
+- name: Create a non-YAML multiline file
+  copy:
+    dest: "~/.password-store/test-multiline-pass"
+    content: |
+      testpassword
+      random additional line
+
+- name: Read .gpg-id from .password-store
+  set_fact:
+    gpgid: "{{ lookup('file', '~/.password-store/.gpg-id') }}"
+
+- name: Encrypt the file using the gpg key
+  command: "{{ gpg2_bin }} --batch --encrypt -r {{ gpgid }} ~/.password-store/test-multiline-pass"
+
+- name: Fetch password from multiline file
+  set_fact:
+    readyamlpass: "{{ lookup('community.general.passwordstore', 'test-multiline-pass') }}"
+
+- name: Multiline pass only returns first line
+  assert:
+    that:
+      - readyamlpass == 'testpassword'
+
+- name: Fetch all from multiline file
+  set_fact:
+    readyamlpass: "{{ lookup('community.general.passwordstore', 'test-multiline-pass returnall=yes') }}"
+
+- name: Multiline pass returnall returns everything in the file
+  assert:
+    that:
+      - readyamlpass == 'testpassword\nrandom additional line'

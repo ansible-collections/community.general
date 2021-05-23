@@ -1,0 +1,3 @@
+needs/root
+shippable/posix/group3
+skip/macos # Skipped due to limitation of macOS 10.15 SIP, please read https://github.com/ansible-collections/community.general/issues/1017#issuecomment-755088895

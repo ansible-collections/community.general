@@ -1,0 +1,4 @@
+shippable/posix/group2
+destructive
+skip/aix
+skip/macos  # cannot simply create binaries in system locations on newer macOS versions

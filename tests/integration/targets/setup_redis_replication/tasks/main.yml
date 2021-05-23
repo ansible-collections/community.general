@@ -1,0 +1,11 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright: (c) 2020, Pavlo Bashynskyi (@levonet) <levonet@gmail.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- import_tasks: setup_redis_cluster.yml
+  when:
+  - ansible_distribution in ['CentOS', 'Fedora', 'FreeBSD', 'openSUSE Leap', 'Ubuntu']

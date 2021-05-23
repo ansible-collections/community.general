@@ -1,0 +1,10 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+- name: test jc key/value parser
+  assert:
+    that:
+      - "('key1=value1\nkey2=value2' | community.general.jc('kv')) == {'key1': 'value1', 'key2': 'value2'}"

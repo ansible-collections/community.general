@@ -1,0 +1,382 @@
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# Copyright: (c) 2020, Tristan Le Guern <tleguern at bouledef.eu>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: List domains
+  proxmox_domain_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+  register: results
+
+- assert:
+    that:
+    - results is not changed
+    - results.proxmox_domains is defined
+
+- name: Retrieve info about pve
+  proxmox_domain_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+    domain: pve
+  register: results
+
+- assert:
+    that:
+    - results is not changed
+    - results.proxmox_domains is defined
+    - results.proxmox_domains|length == 1
+    - results.proxmox_domains[0].type == 'pve'
+
+- name: List groups
+  proxmox_group_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+  register: results
+
+- assert:
+    that:
+    - results is not changed
+    - results.proxmox_groups is defined
+
+- name: List users
+  proxmox_user_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+  register: results
+
+- assert:
+    that:
+    - results is not changed
+    - results.proxmox_users is defined
+
+- name: Retrieve info about api_user using name and domain
+  proxmox_user_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+    user: "{{ user }}"
+    domain: "{{ domain }}"
+  register: results_user_domain
+
+- assert:
+    that:
+    - results_user_domain is not changed
+    - results_user_domain.proxmox_users is defined
+    - results_user_domain.proxmox_users|length == 1
+    - results_user_domain.proxmox_users[0].domain == "{{ domain }}"
+    - results_user_domain.proxmox_users[0].user == "{{ user }}"
+    - results_user_domain.proxmox_users[0].userid == "{{ user }}@{{ domain }}"
+
+- name: Retrieve info about api_user using userid
+  proxmox_user_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+    userid: "{{ user }}@{{ domain }}"
+  register: results_userid
+
+- assert:
+    that:
+    - results_userid is not changed
+    - results_userid.proxmox_users is defined
+    - results_userid.proxmox_users|length == 1
+    - results_userid.proxmox_users[0].domain == "{{ domain }}"
+    - results_userid.proxmox_users[0].user == "{{ user }}"
+    - results_userid.proxmox_users[0].userid == "{{ user }}@{{ domain }}"
+
+- name: Retrieve info about storage
+  proxmox_storage_info:
+    api_host: "{{ api_host }}"
+    api_user: "{{ user }}@{{ domain }}"
+    api_password: "{{ api_password | default(omit) }}"
+    api_token_id: "{{ api_token_id | default(omit) }}"
+    api_token_secret: "{{ api_token_secret | default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
+    storage: "{{ storage }}"
+  register: results_storage
+
+- assert:
+    that:
+    - results_storage is not changed
+    - results_storage.proxmox_storages is defined
+    - results_storage.proxmox_storages|length == 1
+    - results_storage.proxmox_storages[0].storage == "{{ storage }}"
+
+- name: VM creation
+  tags: [ 'create' ]
+  block:
+    - name: Create test vm test-instance
+      proxmox_kvm:
+        api_host: "{{ api_host }}"
+        api_user: "{{ user }}@{{ domain }}"
+        api_password: "{{ api_password | default(omit) }}"
+        api_token_id: "{{ api_token_id | default(omit) }}"
+        api_token_secret: "{{ api_token_secret | default(omit) }}"
+        validate_certs: "{{ validate_certs }}"
+        node: "{{ node }}"
+        storage: "{{ storage }}"
+        vmid: "{{ from_vmid }}"
+        name: test-instance
+        clone: 'yes'
+        state: present
+        timeout: 500
+      register: results_kvm
+
+    - set_fact:
+        vmid: "{{ results_kvm.msg.split(' ')[-7] }}"
+
+    - assert:
+        that:
+        - results_kvm is changed
+        - results_kvm.vmid == from_vmid
+        - results_kvm.msg == "VM test-instance with newid {{ vmid }} cloned from vm with vmid {{ from_vmid }}"
+
+    - pause:
+        seconds: 30
+
+- name: VM start
+  tags: [ 'start' ]
+  block:
+    - name: Start test VM
+      proxmox_kvm:
+        api_host: "{{ api_host }}"
+        api_user: "{{ user }}@{{ domain }}"
+        api_password: "{{ api_password | default(omit) }}"
+        api_token_id: "{{ api_token_id | default(omit) }}"
+        api_token_secret: "{{ api_token_secret | default(omit) }}"
+        validate_certs: "{{ validate_certs }}"
+        node: "{{ node }}"
+        vmid: "{{ vmid }}"
+        state: started
+      register: results_action_start
+
+    - assert:
+        that:
+        - results_action_start is changed
+        - results_action_start.status == 'stopped'
+        - results_action_start.vmid == {{ vmid }}
+        - results_action_start.msg == "VM {{ vmid }} started"
+
+    - pause:
+        seconds: 90
+
+    - name: Try to start test VM again
+      proxmox_kvm:
+        api_host: "{{ api_host }}"
+        api_user: "{{ user }}@{{ domain }}"
+        api_password: "{{ api_password | default(omit) }}"
+        api_token_id: "{{ api_token_id | default(omit) }}"
+        api_token_secret: "{{ api_token_secret | default(omit) }}"
+        validate_certs: "{{ validate_certs }}"
+        node: "{{ node }}"
+        vmid: "{{ vmid }}"
+        state: started
+      register: results_action_start_again
+
+    - assert:
+        that:
+        - results_action_start_again is not changed
+        - results_action_start_again.status == 'running'
+        - results_action_start_again.vmid == {{ vmid }}
+        - results_action_start_again.msg == "VM {{ vmid }} is already running"
+
+    - name: Check current status
+      proxmox_kvm:
+        api_host: "{{ api_host }}"
+        api_user: "{{ user }}@{{ domain }}"
+        api_password: "{{ api_password | default(omit) }}"
+        api_token_id: "{{ api_token_id | default(omit) }}"
+        api_token_secret: "{{ api_token_secret | default(omit) }}"
+        validate_certs: "{{ validate_certs }}"
+        node: "{{ node }}"
+        vmid: "{{ vmid }}"
+        state: current
+      register: results_action_current
+
+    - assert:
+        that:
+        - results_action_current is not changed
+        - results_action_current.status == 'running'
+        - results_action_current.vmid == {{ vmid }}
+        - results_action_current.msg == "VM test-instance with vmid = {{ vmid }} is running"
+
+- name: VM add/change/delete NIC
+  tags: [ 'nic' ]
+  block:
+    - name: Add NIC to test VM
+      proxmox_nic:
+        api_host: "{{ api_host }}"
+        api_user: "{{ user }}@{{ domain }}"
+        api_password: "{{ api_password | default(omit) }}"
+        api_token_id: "{{ api_token_id | default(omit) }}"
+        api_token_secret: "{{ api_token_secret | default(omit) }}"
+        validate_certs: "{{ validate_certs }}"
+        vmid: "{{ vmid }}"
+        state: present
+        interface: net5
+        bridge: vmbr0
+        tag: 42
+      register: results
+
+    - assert:
+        that:
+        - results is changed
+        - results.vmid == {{ vmid }}
+        - results.msg == "Nic net5 updated on VM with vmid {{ vmid }}"
+
+    - name: Update NIC no changes
+      proxmox_nic:
+        api_host: "{{ api_host }}"
+        api_user: "{{ user }}@{{ domain }}"
+        api_password: "{{ api_password | default(omit) }}"
+        api_token_id: "{{ api_token_id | default(omit) }}"
+        api_token_secret: "{{ api_token_secret | default(omit) }}"
+        validate_certs: "{{ validate_certs }}"
+        vmid: "{{ vmid }}"
+        state: present
+        interface: net5
+        bridge: vmbr0
+        tag: 42
+      register: results
+
+    - assert:
+        that:
+        - results is not changed
+        - results.vmid == {{ vmid }}
+        - results.msg == "Nic net5 unchanged on VM with vmid {{ vmid }}"
+
+    - name: Update NIC with changes
+      proxmox_nic:
+        api_host: "{{ api_host }}"
+        api_user: "{{ user }}@{{ domain }}"
+        api_password: "{{ api_password | default(omit) }}"
+        api_token_id: "{{ api_token_id | default(omit) }}"
+        api_token_secret: "{{ api_token_secret | default(omit) }}"
+        validate_certs: "{{ validate_certs }}"
+        vmid: "{{ vmid }}"
+        state: present
+        interface: net5
+        bridge: vmbr0
+        tag: 24
+        firewall: True
+      register: results
+
+    - assert:
+        that:
+        - results is changed
+        - results.vmid == {{ vmid }}
+        - results.msg == "Nic net5 updated on VM with vmid {{ vmid }}"
+
+    - name: Delete NIC
+      proxmox_nic:
+        api_host: "{{ api_host }}"
+        api_user: "{{ user }}@{{ domain }}"
+        api_password: "{{ api_password | default(omit) }}"
+        api_token_id: "{{ api_token_id | default(omit) }}"
+        api_token_secret: "{{ api_token_secret | default(omit) }}"
+        validate_certs: "{{ validate_certs }}"
+        vmid: "{{ vmid }}"
+        state: absent
+        interface: net5
+      register: results
+
+    - assert:
+        that:
+        - results is changed
+        - results.vmid == {{ vmid }}
+        - results.msg == "Nic net5 deleted on VM with vmid {{ vmid }}"
+
+- name: VM stop
+  tags: [ 'stop' ]
+  block:
+    - name: Stop test VM
+      proxmox_kvm:
+        api_host: "{{ api_host }}"
+        api_user: "{{ user }}@{{ domain }}"
+        api_password: "{{ api_password | default(omit) }}"
+        api_token_id: "{{ api_token_id | default(omit) }}"
+        api_token_secret: "{{ api_token_secret | default(omit) }}"
+        validate_certs: "{{ validate_certs }}"
+        node: "{{ node }}"
+        vmid: "{{ vmid }}"
+        state: stopped
+      register: results_action_stop
+
+    - assert:
+        that:
+        - results_action_stop is changed
+        - results_action_stop.status == 'running'
+        - results_action_stop.vmid == {{ vmid }}
+        - results_action_stop.msg == "VM {{ vmid }} is shutting down"
+
+    - pause:
+        seconds: 5
+
+    - name: Check current status again
+      proxmox_kvm:
+        api_host: "{{ api_host }}"
+        api_user: "{{ user }}@{{ domain }}"
+        api_password: "{{ api_password | default(omit) }}"
+        api_token_id: "{{ api_token_id | default(omit) }}"
+        api_token_secret: "{{ api_token_secret | default(omit) }}"
+        validate_certs: "{{ validate_certs }}"
+        node: "{{ node }}"
+        vmid: "{{ vmid }}"
+        state: current
+      register: results_action_current
+
+    - assert:
+        that:
+        - results_action_current is not changed
+        - results_action_current.status == 'stopped'
+        - results_action_current.vmid == {{ vmid }}
+        - results_action_current.msg == "VM test-instance with vmid = {{  vmid }} is stopped"
+
+- name: VM destroy
+  tags: [ 'destroy' ]
+  block:
+    - name: Destroy test VM
+      proxmox_kvm:
+        api_host: "{{ api_host }}"
+        api_user: "{{ user }}@{{ domain }}"
+        api_password: "{{ api_password | default(omit) }}"
+        api_token_id: "{{ api_token_id | default(omit) }}"
+        api_token_secret: "{{ api_token_secret | default(omit) }}"
+        validate_certs: "{{ validate_certs }}"
+        proxmox_default_behavior: "no_defaults"
+        node: "{{ node }}"
+        vmid: "{{ vmid }}"
+        state: absent
+      register: results_kvm_destroy
+
+    - assert:
+        that:
+        - results_kvm_destroy is changed
+        - results_kvm_destroy.vmid == {{ vmid }}
+        - results_kvm_destroy.msg == "VM {{ vmid }} removed"

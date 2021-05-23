@@ -1,0 +1,9 @@
+shippable/posix/group3
+destructive
+skip/aix
+skip/freebsd
+skip/osx
+skip/macos
+skip/rhel
+needs/root
+disabled  # FIXME

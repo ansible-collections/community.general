@@ -1,0 +1,6 @@
+# DO NOT MODIFY
+
+# Settings: https://probot.github.io/apps/settings/
+# Pull settings from https://github.com/ansible-collections/.github/blob/master/.github/settings.yml
+
+_extends: ".github"

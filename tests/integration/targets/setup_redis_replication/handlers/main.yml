@@ -1,0 +1,34 @@
+- name: stop redis services
+  shell: |
+    kill -TERM $(cat /var/run/redis_{{ master_port }}.pid)
+    kill -TERM $(cat /var/run/redis_{{ slave_port }}.pid)
+  listen: cleanup redis
+
+- name: remove redis packages
+  action: "{{ ansible_facts.pkg_mgr }}"
+  args:
+    name: "{{ item }}"
+    state: absent
+  loop: "{{ redis_packages[ansible_distribution] }}"
+  listen: cleanup redis
+
+- name: remove pip packages
+  pip:
+    name: redis
+    state: absent
+  listen: cleanup redis
+
+- name: remove redis data
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+  - "{{ master_conf }}"
+  - "{{ master_datadir }}"
+  - "{{ master_logdir }}"
+  - /var/run/redis_{{ master_port }}.pid
+  - "{{ slave_conf }}"
+  - "{{ slave_datadir }}"
+  - "{{ slave_logdir }}"
+  - /var/run/redis_{{ slave_port }}.pid
+  listen: cleanup redis

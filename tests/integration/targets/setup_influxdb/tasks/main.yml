@@ -1,0 +1,9 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+
+- include: setup.yml
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty'

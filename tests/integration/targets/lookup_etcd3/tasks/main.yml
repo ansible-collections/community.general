@@ -1,0 +1,27 @@
+---
+####################################################################
+# WARNING: These are designed specifically for Ansible tests       #
+# and should not be used as examples of how to write Ansible roles #
+####################################################################
+
+# lookup_etcd3 integration tests
+# 2020, SCC France, Eric Belhomme <ebelhomme@fr.scc.com>
+# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+- name: put key/values with an etcd prefix
+  etcd3:
+    key: "{{ etcd3_prefix }}foo{{ item }}"
+    value: "bar{{ item }}"
+    state: present
+  loop:
+  - 1
+  - 2
+  - 3
+
+- name: put a single key/values in etcd
+  etcd3:
+    key: "{{ etcd3_singlekey }}"
+    value: "foobar"
+    state: present
+
+- import_tasks: tests.yml
