@@ -139,7 +139,7 @@ def main():
     filepath = params['filepath']
     query = params['query']
 
-    bin_path = f"/usr/sap/{sid}/HDB{instance}/exe/hdbsql"
+    bin_path = "/usr/sap/{sid}/HDB{instance}/exe/hdbsql".format(sid=sid, instance=instance)
 
     present = filepath is not None or query is not None
 
