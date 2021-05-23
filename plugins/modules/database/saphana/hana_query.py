@@ -34,7 +34,7 @@ options:
         type: bool
         default: True
     host:
-        description: The Host ip address. The port can be defined as well.
+        description: The Host IP address. The port can be defined as well.
         type: str
     database:
         description: Define the database on which to connect.
