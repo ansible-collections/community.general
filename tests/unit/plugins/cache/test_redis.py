@@ -36,7 +36,7 @@ version = tuple(int(x) for x in av.split('.')[0:2])
 def test_redis_cachemodule():
     # The _uri option is required for the redis plugin
     connection = 'ni 127.0.0.1:6379:1'
-    if version == (2, 9):
+    if ansible_version.startswith('2.9.'):
         C.CACHE_PLUGIN_CONNECTION = "c." + connection
     assert isinstance(cache_loader.get('community.general.redis', **{'_uri': connection}), RedisCache)
 
