@@ -6,83 +6,48 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-from ansible_collections.community.general.tests.unit.compat import unittest
-from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules.files import sapcar_extract
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
+from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible.module_utils import basic
-from ansible.module_utils.common.text.converters import to_bytes
-import json
 
 
-def set_module_args(args):
-    """prepare arguments so that they will be picked up during module creation"""
-    args = json.dumps({'ANSIBLE_MODULE_ARGS': args})
-    basic._ANSIBLE_ARGS = to_bytes(args)
+def get_bin_path(*args, **kwargs):
+    """Function to return path of SAPCAR"""
+    return "/tmp/SAPCAR_1010-70006178.EXE"
 
 
-class AnsibleExitJson(Exception):
-    """Exception class to be raised by module.exit_json and caught by the test case"""
-    pass
-
-
-class AnsibleFailJson(Exception):
-    """Exception class to be raised by module.fail_json and caught by the test case"""
-    pass
-
-
-def exit_json(*args, **kwargs):
-    """function to patch over exit_json; package return data into an exception"""
-    if 'changed' not in kwargs:
-        kwargs['changed'] = False
-    raise AnsibleExitJson(kwargs)
-
-
-def fail_json(*args, **kwargs):
-    """function to patch over fail_json; package return data into an exception"""
-    kwargs['failed'] = True
-    raise AnsibleFailJson(kwargs)
-
-
-def get_bin_path(self, arg, required=False):
-    """Mock AnsibleModule.get_bin_path"""
-    if arg.endswith('SAPCAR_1010-70006178.EXE'):
-        return '/tmp/SAPCAR_1010-70006178.EXE'
-    else:
-        if required:
-            fail_json(msg='%r not found !' % arg)
-
-
-class Testsapcar_extract(unittest.TestCase):
+class Testsapcar_extract(ModuleTestCase):
+    """Main class for testing sapcar_extract module."""
 
     def setUp(self):
-        self.mock_module_helper = patch.multiple(basic.AnsibleModule,
-                                                 exit_json=exit_json,
-                                                 fail_json=fail_json,
-                                                 get_bin_path=get_bin_path)
-        self.mock_module_helper.start()
-        self.addCleanup(self.mock_module_helper.stop)
+        """Setup."""
+        super(Testsapcar_extract, self).setUp()
+        self.module = sapcar_extract
+        self.mock_get_bin_path = patch.object(basic.AnsibleModule, 'get_bin_path', get_bin_path)
+        self.mock_get_bin_path.start()
+        self.addCleanup(self.mock_get_bin_path.stop)  # ensure that the patching is 'undone'
 
-    def test_module_fail_when_required_args_missing(self):
+    def tearDown(self):
+        """Teardown."""
+        super(Testsapcar_extract, self).tearDown()
+
+    def test_without_required_parameters(self):
+        """Failure must occurs when all parameters are missing."""
         with self.assertRaises(AnsibleFailJson):
             set_module_args({})
             self.module.main()
 
-    def test_ensure_command_called(self):
+    def test_sapcar_extract(self):
+        """Check that result is changed."""
         set_module_args({
             'path': "/tmp/HANA_CLIENT_REV2_00_053_00_LINUX_X86_64.SAR",
             'dest': "/tmp/test2",
             'binary_path': "/tmp/SAPCAR_1010-70006178.EXE"
         })
-
-        with patch.object(basic.AnsibleModule, 'run_command') as mock_run_command:
-            stdout = 'configuration updated'
-            stderr = ''
-            rc = 0
-            mock_run_command.return_value = rc, stdout, stderr  # successful execution
-
+        with patch.object(basic.AnsibleModule, 'run_command') as run_command:
+            run_command.return_value = 0, '', ''  # successful execution, no output
             with self.assertRaises(AnsibleExitJson) as result:
                 sapcar_extract.main()
-            self.assertFalse(result.exception.args[0]['changed'])  # ensure result is changed
-
-        mock_run_command.assert_called_once_with('/tmp/SAPCAR_1010-70006178.EXE')
+                self.assertTrue(result.exception.args[0]['changed'])
+        self.assertEqual(run_command.call_count, 1)
