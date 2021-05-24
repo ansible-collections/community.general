@@ -101,7 +101,7 @@ RETURN = r'''
 
 stdout:
     type: str
-    description: A json string of the returned value from the SQL query.
+    description: A JSON string of the returned values from the SQL queries.
     returned: on success
     sample: '{ "AVG_TIME_S": "0.65", "CHECK_ACTION": "CHECK", "CHECK_PROCEDURE_NAME": "CHECK_TABLE_CONSISTENCY", "ERROR_DETAILS": "0" }'
 
