@@ -96,6 +96,17 @@ EXAMPLES = r'''
 
 '''
 
+RETURN = r'''
+
+stdout:
+    type: str
+    description: A json string of the returned value from the SQL query.
+    returned: on success
+    sample: '{ "AVG_TIME_S": "0.65", "CHECK_ACTION": "CHECK", "CHECK_PROCEDURE_NAME": "CHECK_TABLE_CONSISTENCY", "ERROR_DETAILS": "0" }'
+
+
+'''
+
 import io
 import csv
 import json
@@ -126,7 +137,7 @@ def main():
             filepath=dict(type='list', elements='path', required=False),
             autocommit=dict(type='bool', required=False, default=True),
         ),
-        require_one_of=[('query', 'filepath')],
+        required_one_of=[('query', 'filepath')],
     )
     rc, out, err, out_raw = [0, "", "", ""]
 
@@ -146,44 +157,38 @@ def main():
 
     bin_path = "/usr/sap/{sid}/HDB{instance}/exe/hdbsql".format(sid=sid, instance=instance)
 
-    present = filepath is not None or query is not None
-
     try:
         command = [module.get_bin_path(bin_path, required=True)]
     except Exception:
         module.fail_json(msg='hdbsql not found at "{0}". Please check SID and instance number.'.format(bin_path))
 
-    if present:
-        if encrypted is True:
-            command.extend(['-attemptencrypt'])
-        if autocommit is False:
-            command.extend(['-z'])
-        if host is not None:
-            command.extend(['-n', host])
-        if database is not None:
-            command.extend(['-d', database])
-        # -x Suppresses additional output, such as the number of selected rows in a result set.
-        command.extend(['-x', '-i', instance, '-u', user, '-p', password])
+    if encrypted is True:
+        command.extend(['-attemptencrypt'])
+    if autocommit is False:
+        command.extend(['-z'])
+    if host is not None:
+        command.extend(['-n', host])
+    if database is not None:
+        command.extend(['-d', database])
+    # -x Suppresses additional output, such as the number of selected rows in a result set.
+    command.extend(['-x', '-i', instance, '-u', user, '-p', password])
 
-        if filepath is not None:
-            command.extend(['-I'])
-            for p in filepath:
-                # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# -I /tmp/HANA_CPU_UtilizationPerCore_2.00.020+.txt,
-                # iterates through files and append the output to var out.
-                query_command = command + [p]
-                (rc, out_raw, err) = module.run_command(query_command)
-                out = out + csv_to_json(out_raw)
-        if query is not None:
-            for q in query:
-                # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# "select user_name from users",
-                # iterates through multiple commands and append the output to var out.
-                query_command = command + [q]
-                (rc, out_raw, err) = module.run_command(query_command)
-                out = out + csv_to_json(out_raw)
-        changed = True
-    else:
-        changed = False
-        out = "nothing to do, no command provided"
+    if filepath is not None:
+        command.extend(['-I'])
+        for p in filepath:
+            # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# -I /tmp/HANA_CPU_UtilizationPerCore_2.00.020+.txt,
+            # iterates through files and append the output to var out.
+            query_command = command + [p]
+            (rc, out_raw, err) = module.run_command(query_command)
+            out = out + csv_to_json(out_raw)
+    if query is not None:
+        for q in query:
+            # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# "select user_name from users",
+            # iterates through multiple commands and append the output to var out.
+            query_command = command + [q]
+            (rc, out_raw, err) = module.run_command(query_command)
+            out = out + csv_to_json(out_raw)
+    changed = True
 
     module.exit_json(changed=changed, message=rc, stdout=out, stderr=err)
 
