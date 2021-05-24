@@ -124,7 +124,12 @@ from ansible.module_utils.six import StringIO
 from ansible.module_utils._text import to_native
 
 
+<<<<<<< HEAD
 def csv_to_list(rawcsv):
+=======
+def csv_to_json(rawcsv):
+    reader_raw = None
+>>>>>>> 43dad80e... change to None for compatibility
     lines = rawcsv[:rawcsv.rfind('\n')]
     reader_raw = csv.DictReader(StringIO(lines))
     reader = [dict((k, v.strip()) for k, v in row.items()) for row in reader_raw]
