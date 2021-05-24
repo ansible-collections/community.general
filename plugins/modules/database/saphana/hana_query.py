@@ -124,7 +124,7 @@ def main():
             database=dict(type='str', required=False),
             query=dict(type='list', elements='str', required=False),
             filepath=dict(type='list', elements='path', required=False),
-            autocommit=dict(type='bool', required=False, default=True)
+            autocommit=dict(type='bool', required=False, default=True),
         )
     )
     rc, out, err, out_raw = [0, "", "", ""]
