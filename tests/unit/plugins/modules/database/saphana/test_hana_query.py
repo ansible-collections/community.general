@@ -3,7 +3,7 @@
 # Copyright: (c) 2021, Rainer Leber (@rainerleber) <rainerleber@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 __metaclass__ = type
 
 <<<<<<< HEAD
@@ -131,6 +131,7 @@ class Testhana_query(ModuleTestCase):
                 hana_query.main()
                 self.assertTrue(result.exception.args[0]['changed'])
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 <<<<<<< HEAD
         mock_run_command.assert_called_once_with('/usr/sap/HDB/HDB01/exe/hdbsql')
@@ -144,3 +145,6 @@ class Testhana_query(ModuleTestCase):
 =======
         self.assertEqual(run_command.call_count, 1)
 >>>>>>> 1abdfb34... change test
+=======
+        self.assertEqual(run_command.call_count, 1)
+>>>>>>> 442b930e... change test
