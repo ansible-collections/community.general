@@ -9,10 +9,9 @@ __metaclass__ = type
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible_collections.community.general.plugins.modules import hana_query
-from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, set_module_args
+from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, set_module_args, json
 from ansible.module_utils import basic
 from ansible.module_utils.common.text.converters import to_bytes
-import json
 
 
 def set_module_args(args):
@@ -45,7 +44,7 @@ def fail_json(*args, **kwargs):
 
 
 def get_bin_path(self, arg, required=False):
-    """Mock AnsibleModule.get_bin_path"""
+    """Function to return path of hdbsql"""
     if arg.endswith('hdbsql'):
         return '/usr/sap/HDB/HDB01/exe/hdbsql'
     else:
