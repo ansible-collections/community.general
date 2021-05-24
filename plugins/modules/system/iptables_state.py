@@ -218,7 +218,7 @@ initial_rules:
               description: List of the ordered rules packets are checked against.
               type: list
               elements: str
-   sample:
+  sample:
     filter:
       FORWARD:
         policy: "ACCEPT"
