@@ -107,16 +107,15 @@ stdout:
 
 '''
 
-import io
 import csv
 import json
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.six import StringIO
 
 
 def csv_to_json(rawcsv):
-    reader_raw = None
     lines = rawcsv[:rawcsv.rfind('\n')]
-    reader_raw = csv.DictReader(io.StringIO(lines))
+    reader_raw = csv.DictReader(StringIO(lines))
     reader = [dict((k, v.strip()) for k, v in row.items()) for row in reader_raw]
     tolist = list(reader)
     return json.dumps(tolist)
