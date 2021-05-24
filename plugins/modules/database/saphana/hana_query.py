@@ -55,7 +55,8 @@ options:
     query:
         description:
         - SQL query to run. Multiple queries can be passed using YAML list syntax.
-        - Must be a string or list containing strings.
+        - Must be a string or list containing strings. Please note that if you supply a string, it will be split by commas (C(,)) to a list.
+          It's better to supply a one-element list instead to avoid mangled input.
         type: list
         elements: str
 
