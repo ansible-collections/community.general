@@ -35,7 +35,7 @@ options:
     autocommit:
         description: Autocommit the statement.
         type: bool
-        default: True
+        default: true
     host:
         description: The Host IP address. The port can be defined as well.
         type: str
