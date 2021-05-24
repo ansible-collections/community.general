@@ -99,11 +99,10 @@ EXAMPLES = r'''
 RETURN = r'''
 
 stdout:
-    type: complex
+    type: str
     description: A json string of the returned value from the SQL query.
     returned: on success
     sample: '{ "AVG_TIME_S": "0.65", "CHECK_ACTION": "CHECK", "CHECK_PROCEDURE_NAME": "CHECK_TABLE_CONSISTENCY", "ERROR_DETAILS": "0" }'
-    type: json
 
 
 '''
@@ -190,7 +189,6 @@ def main():
             (rc, out_raw, err) = module.run_command(query_command)
             out = out + csv_to_json(out_raw)
     changed = True
-
 
     module.exit_json(changed=changed, message=rc, stdout=out, stderr=err)
 
