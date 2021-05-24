@@ -201,8 +201,8 @@ def main():
             except Exception:
                 command = [module.get_bin_path('sapcar', required=True)]
     except Exception:
-        'SAPCAR not found {0}. \r\nSTDOUT: {1}\r\n\r\nSTDERR: {2}'.format(
-            rc, out, err)
+        module.fail_json(msg='SAPCAR not found {0}. \r\nSTDOUT: {1}\r\n\r\nSTDERR: {2}'.format(
+            rc, out, err))
 
     present = checkifPresent(command[0], path, dest, signature, manifest)
 
