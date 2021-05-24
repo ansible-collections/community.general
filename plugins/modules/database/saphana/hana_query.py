@@ -125,7 +125,8 @@ def main():
             query=dict(type='list', elements='str', required=False),
             filepath=dict(type='list', elements='path', required=False),
             autocommit=dict(type='bool', required=False, default=True),
-        )
+        ),
+        require_one_of=[('query', 'filepath')],
     )
     rc, out, err, out_raw = [0, "", "", ""]
 
