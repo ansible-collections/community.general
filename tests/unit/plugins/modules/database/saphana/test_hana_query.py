@@ -3,7 +3,7 @@
 # Copyright: (c) 2021, Rainer Leber (@rainerleber) <rainerleber@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
 __metaclass__ = type
 
 from ansible_collections.community.general.plugins.modules import hana_query
