@@ -108,11 +108,10 @@ query_result:
 RETURN = r'''
 
 stdout:
-    type: complex
+    type: str
     description: A json string of the returned value from the SQL query.
     returned: on success
     sample: '{ "AVG_TIME_S": "0.65", "CHECK_ACTION": "CHECK", "CHECK_PROCEDURE_NAME": "CHECK_TABLE_CONSISTENCY", "ERROR_DETAILS": "0" }'
-    type: json
 
 
 '''
@@ -296,6 +295,7 @@ def main():
             out = out + csv_to_json(out_raw)
     changed = True
 
+<<<<<<< HEAD
 >>>>>>> 181d9f65... add return description, improvements
 
 <<<<<<< HEAD
@@ -303,6 +303,8 @@ def main():
                      stderr=err, command=' '.join(command))
 >>>>>>> 39ae1ee2... Update plugins/modules/database/saphana/hana_query.py
 =======
+=======
+>>>>>>> e40f395f... change return
     module.exit_json(changed=changed, message=rc, stdout=out, stderr=err)
 >>>>>>> 8358dba9... change hana_query add test
 
