@@ -92,7 +92,7 @@ class CacheModule(BaseCacheModule):
     performance.
     """
     _sentinel_service_name = None
-    re_url_conn = re.compile(r'^(.*):(\d+):(\d+)(?::(.*))?$')
+    re_url_conn = re.compile(r'^([^:]+|\[[^]]+\]):(\d+):(\d+)(?::(.*))?$')
     re_sent_conn = re.compile(r'^(.*):(\d+)$')
 
     def __init__(self, *args, **kwargs):
