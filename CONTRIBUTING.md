@@ -22,4 +22,6 @@ Also, consider taking up a valuable, reviewed, but abandoned pull request which 
 * All commits of a pull request branch will be squashed into one commit at last.
 * Please try not to force-push if it is not needed, so reviewers and other users looking at your pull request later can see the pull request commit history.
 
+You can also read [our Quick-start development guide](https://github.com/ansible/community-docs/blob/main/create_pr_quick_start_guide.rst).
+
 If you find any inconsistencies or places in this document which can be improved, feel free to raise an issue or pull request to fix it.
