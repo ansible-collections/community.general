@@ -120,7 +120,7 @@ def getListOfFiles(dirName):
 
 def downloadSAPCAR(binary_path):
     bin_path = None
-    # download sapcar binary if url is provided other wise path is returned
+    # download sapcar binary if url is provided otherwise path is returned
     try:
         if not os.path.isfile(binary_path):
             with open_url(binary_path) as response, open("/tmp/sapcar", 'wb') as out_file:

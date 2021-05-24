@@ -14,7 +14,7 @@ from ansible.module_utils import basic
 
 def get_bin_path(*args, **kwargs):
     """Function to return path of SAPCAR"""
-    return "/tmp/SAPCAR_1010-70006178.EXE"
+    return "/tmp/sapcar"
 
 
 class Testsapcar_extract(ModuleTestCase):
@@ -43,7 +43,7 @@ class Testsapcar_extract(ModuleTestCase):
         set_module_args({
             'path': "/tmp/HANA_CLIENT_REV2_00_053_00_LINUX_X86_64.SAR",
             'dest': "/tmp/test2",
-            'binary_path': "/tmp/SAPCAR_1010-70006178.EXE"
+            'binary_path': "/tmp/sapcar"
         })
         with patch.object(basic.AnsibleModule, 'run_command') as run_command:
             run_command.return_value = 0, '', ''  # successful execution, no output
