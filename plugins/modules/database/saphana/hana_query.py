@@ -116,20 +116,29 @@ stdout:
 
 '''
 
+<<<<<<< HEAD
 import io
 >>>>>>> 181d9f65... add return description, improvements
+=======
+>>>>>>> 2421789e... change StringIO module
 import csv
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six import StringIO
+<<<<<<< HEAD
 from ansible.module_utils._text import to_native
+=======
+>>>>>>> 2421789e... change StringIO module
 
 
 <<<<<<< HEAD
 def csv_to_list(rawcsv):
 =======
 def csv_to_json(rawcsv):
+<<<<<<< HEAD
     reader_raw = None
 >>>>>>> 43dad80e... change to None for compatibility
+=======
+>>>>>>> 2421789e... change StringIO module
     lines = rawcsv[:rawcsv.rfind('\n')]
     reader_raw = csv.DictReader(StringIO(lines))
     reader = [dict((k, v.strip()) for k, v in row.items()) for row in reader_raw]
