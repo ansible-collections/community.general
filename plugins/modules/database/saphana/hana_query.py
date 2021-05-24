@@ -99,27 +99,27 @@ EXAMPLES = r'''
 
 RETURN = r'''
 
-stdout:
+query_result:
     type: str
     description: A JSON string of the returned values from the SQL queries.
     returned: on success
-    sample: '{ "AVG_TIME_S": "0.65", "CHECK_ACTION": "CHECK", "CHECK_PROCEDURE_NAME": "CHECK_TABLE_CONSISTENCY", "ERROR_DETAILS": "0" }'
+    type: list
+    elements: dict
+    sample: [{"Column": "Value1"},{"Column": "Value2"}]
 
 
 '''
 
 import csv
-import json
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six import StringIO
 
 
-def csv_to_json(rawcsv):
+def csv_to_list(rawcsv):
     lines = rawcsv[:rawcsv.rfind('\n')]
     reader_raw = csv.DictReader(StringIO(lines))
     reader = [dict((k, v.strip()) for k, v in row.items()) for row in reader_raw]
-    tolist = list(reader)
-    return json.dumps(tolist)
+    return reader
 
 
 def main():
@@ -140,7 +140,7 @@ def main():
         ),
         required_one_of=[('query', 'filepath')],
     )
-    rc, out, err, out_raw = [0, "", "", ""]
+    rc, out, err, out_raw = [0, [], "", ""]
 
     params = module.params
 
@@ -181,17 +181,17 @@ def main():
             # iterates through files and append the output to var out.
             query_command = command + [p]
             (rc, out_raw, err) = module.run_command(query_command)
-            out = out + csv_to_json(out_raw)
+            out.append(csv_to_list(out_raw))
     if query is not None:
         for q in query:
             # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# "select user_name from users",
             # iterates through multiple commands and append the output to var out.
             query_command = command + [q]
             (rc, out_raw, err) = module.run_command(query_command)
-            out = out + csv_to_json(out_raw)
+            out.append(csv_to_list(out_raw))
     changed = True
 
-    module.exit_json(changed=changed, message=rc, stdout=out, stderr=err)
+    module.exit_json(changed=changed, message=rc, query_result=out, stderr=err)
 
 
 if __name__ == '__main__':
