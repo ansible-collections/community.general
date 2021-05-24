@@ -125,13 +125,12 @@ class RhsmRepositoryReleaseModuleTestCase(ModuleTestCase):
 
     def test_release_matcher(self):
         # throw a few values at the release matcher -- only sane_values should match
-        sane_values = ['1Server', '10Server', '1.10', '10.0']
+        sane_values = ['1Server', '1Client', '10Server', '1.10', '10.0', '9']
         insane_values = [
             '6server',    # lowercase 's'
             '100Server',  # excessively long 'x' component
-            '100.0',      # excessively long 'x' component
-            '6.100',      # excessively long 'y' component
             '100.100',    # excessively long 'x' and 'y' components
+            '+.-',        # illegal characters
         ]
 
         matches = self.module.release_matcher.findall(' '.join(sane_values + insane_values))
