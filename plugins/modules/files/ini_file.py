@@ -79,6 +79,7 @@ options:
 notes:
    - While it is possible to add an I(option) without specifying a I(value), this makes no sense.
    - As of Ansible 2.3, the I(dest) option has been changed to I(path) as default, but I(dest) still works as well.
+   - As of version 3.2.0 of the community.general collection UTF-8 BOM markers are discarded in files.
 author:
     - Jan-Piet Mens (@jpmens)
     - Ales Nosek (@noseka1)
