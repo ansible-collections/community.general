@@ -18,4 +18,8 @@ You can help by reviewing them. Reviews help move pull requests to merge state. 
 
 Also, consider taking up a valuable, reviewed, but abandoned pull request which you could politely ask the original authors to complete yourself.
 
+* Try committing your changes with an informative but short commit message.
+* All commits of a pull request branch will be squashed into one commit at last.
+* Please try not to force-push if it is not needed, so reviewers and other users looking at your pull request later can see the pull request commit history.
+
 If you find any inconsistencies or places in this document which can be improved, feel free to raise an issue or pull request to fix it.
