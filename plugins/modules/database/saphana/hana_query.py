@@ -49,9 +49,19 @@ options:
         elements: path
     query:
         description:
+<<<<<<< HEAD
+<<<<<<< HEAD
         - SQL query to run.
         - Must be a string or list containing strings. Please note that if you supply a string, it will be split by commas (C(,)) to a list.
           It is better to supply a one-element list instead to avoid mangled input.
+=======
+        - SQL query to run. Multiple queries can be passed using YAML list syntax.
+=======
+        - SQL query to run.
+>>>>>>> aa532df1... Update plugins/modules/database/saphana/hana_query.py
+        - Must be a string or list containing strings. Please note that if you supply a string, it will be split by commas (C(,)) to a list.
+          It's better to supply a one-element list instead to avoid mangled input.
+>>>>>>> 098ad042... Update plugins/modules/database/saphana/hana_query.py
         type: list
         elements: str
 <<<<<<< HEAD
@@ -107,11 +117,13 @@ query_result:
 =======
 RETURN = r'''
 
-stdout:
+query_result:
     type: str
-    description: A json string of the returned value from the SQL query.
+    description: A JSON string of the returned values from the SQL queries.
     returned: on success
-    sample: '{ "AVG_TIME_S": "0.65", "CHECK_ACTION": "CHECK", "CHECK_PROCEDURE_NAME": "CHECK_TABLE_CONSISTENCY", "ERROR_DETAILS": "0" }'
+    type: list
+    elements: list
+    sample: [{"Column": "Value1"},{"Column": "Value2"}]
 
 
 '''
@@ -131,6 +143,7 @@ from ansible.module_utils._text import to_native
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 def csv_to_list(rawcsv):
 =======
 def csv_to_json(rawcsv):
@@ -143,6 +156,17 @@ def csv_to_json(rawcsv):
     reader_raw = csv.DictReader(StringIO(lines))
     reader = [dict((k, v.strip()) for k, v in row.items()) for row in reader_raw]
     return list(reader)
+=======
+def csv_to_list(rawcsv):
+    lines = rawcsv[:rawcsv.rfind('\n')]
+    reader_raw = csv.DictReader(StringIO(lines))
+    reader = [dict((k, v.strip()) for k, v in row.items()) for row in reader_raw]
+<<<<<<< HEAD
+    return reader
+>>>>>>> 22bc01e8... move to list of list, change output
+=======
+    return list(reader)
+>>>>>>> 731d37b4... Update plugins/modules/database/saphana/hana_query.py
 
 
 def main():
@@ -299,16 +323,17 @@ def main():
             # iterates through files and append the output to var out.
             query_command = command + [p]
             (rc, out_raw, err) = module.run_command(query_command)
-            out = out + csv_to_json(out_raw)
+            out.append(csv_to_list(out_raw))
     if query is not None:
         for q in query:
             # makes a command like hdbsql -i 01 -u SYSTEM -p secret123# "select user_name from users",
             # iterates through multiple commands and append the output to var out.
             query_command = command + [q]
             (rc, out_raw, err) = module.run_command(query_command)
-            out = out + csv_to_json(out_raw)
+            out.append(csv_to_list(out_raw))
     changed = True
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 181d9f65... add return description, improvements
 
@@ -321,6 +346,9 @@ def main():
 >>>>>>> e40f395f... change return
     module.exit_json(changed=changed, message=rc, stdout=out, stderr=err)
 >>>>>>> 8358dba9... change hana_query add test
+=======
+    module.exit_json(changed=changed, message=rc, query_result=out, stderr=err)
+>>>>>>> 22bc01e8... move to list of list, change output
 
 
 if __name__ == '__main__':
