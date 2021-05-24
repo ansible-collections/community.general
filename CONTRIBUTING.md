@@ -2,7 +2,7 @@
 
 We follow [Ansible Code of Conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html) in all our contributions and interactions within this repository.
 
-If you are a committer, also refer to the [Ansible committer guidelines](https://docs.ansible.com/ansible/devel/community/committer_guidelines.html).
+If you are a committer, also refer to the [collection's committer guidelines](https://github.com/ansible-collections/community.general/blob/main/commit-rights.md).
 
 ## Issue tracker
 
@@ -15,11 +15,12 @@ so you can cooperate to create a better solution together.
 
 Look through currently [open pull requests](https://github.com/ansible-collections/community.general/pulls).
 You can help by reviewing them. Reviews help move pull requests to merge state. Some good pull requests cannot be merged only due to a lack of reviews. And it is always worth saying that good reviews are often more valuable than pull requests themselves.
+Note that reviewing does not only mean code review, but also offering comments on new interfaces added to existing plugins/modules, interfaces of new plugins/modules, improving language (not everyone is a native english speaker), or testing bugfixes and new features!
 
 Also, consider taking up a valuable, reviewed, but abandoned pull request which you could politely ask the original authors to complete yourself.
 
 * Try committing your changes with an informative but short commit message.
-* All commits of a pull request branch will be squashed into one commit at last.
+* All commits of a pull request branch will be squashed into one commit at last. That does not mean you must have only one commit on your pull request, though!
 * Please try not to force-push if it is not needed, so reviewers and other users looking at your pull request later can see the pull request commit history.
 
 You can also read [our Quick-start development guide](https://github.com/ansible/community-docs/blob/main/create_pr_quick_start_guide.rst).
