@@ -11,6 +11,7 @@ from ansible_collections.community.general.tests.unit.plugins.modules.utils impo
 from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible.module_utils import basic
 
+
 def get_bin_path(*args, **kwargs):
     """Function to return path of hdbsql"""
     return "/usr/sap/HDB/HDB01/exe/hdbsql"
@@ -54,5 +55,4 @@ class Testhana_query(ModuleTestCase):
             with self.assertRaises(AnsibleExitJson) as result:
                 hana_query.main()
                 self.assertTrue(result.exception.args[0]['changed'])
-
-        self.assertEqual(run_command.call_count, 2)
+        self.assertEqual(run_command.call_count, 1)
