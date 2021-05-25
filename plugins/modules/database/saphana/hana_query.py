@@ -103,8 +103,6 @@ query_result:
     type: list
     elements: list
     sample: [[{"Column": "Value1"}, {"Column": "Value2"}], [{"Column": "Value1"}, {"Column": "Value2"}]]
-
-
 '''
 
 import csv
