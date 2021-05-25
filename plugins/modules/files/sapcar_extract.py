@@ -2,7 +2,7 @@
 
 # Copyright: (c) 2021, Rainer Leber <rainerleber@gmail.com>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-from __future__ import (absolute_import, division, print_function, with_statement)
+from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 DOCUMENTATION = '''
@@ -97,8 +97,6 @@ import os
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import open_url
 
-module = None
-
 
 def getListOfFiles(dirName):
     # create a list of file and directories
@@ -121,19 +119,14 @@ def getListOfFiles(dirName):
 def downloadSAPCAR(binary_path):
     bin_path = None
     # download sapcar binary if url is provided otherwise path is returned
-    try:
+    if binary_path is not None:
         if not os.path.isfile(binary_path):
-            with open_url(binary_path) as response, open("/tmp/sapcar", 'wb') as out_file:
-                data = response.read()
-                out_file.write(data)
+            with open_url(binary_path) as response:
+                with open("/tmp/sapcar", 'wb') as out_file:
+                    data = response.read()
+                    out_file.write(data)
             os.chmod("/tmp/sapcar", 755)
             bin_path = "/tmp/sapcar"
-
-    finally:
-        if bin_path is None:
-            os.chmod(binary_path, 755)
-            bin_path = binary_path
-
     return bin_path
 
 
