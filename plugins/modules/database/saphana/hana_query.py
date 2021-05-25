@@ -54,7 +54,8 @@ options:
           It is better to supply a one-element list instead to avoid mangled input.
         type: list
         elements: str
-notes: Does not support C(check_mode).
+notes: 
+  - Does not support C(check_mode).
 author:
     - Rainer Leber (@rainerleber)
 '''
