@@ -255,7 +255,7 @@ def main():
                 has_changed = True
 
     except Exception as ex:
-        module.fail_json(msg=ex.message)
+        module.fail_json(msg=str(ex))
 
     module.exit_json(changed=has_changed, result={"records": [record_data(r) for r in all_records]})
 
