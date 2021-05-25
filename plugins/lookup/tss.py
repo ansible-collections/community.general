@@ -110,7 +110,7 @@ EXAMPLES = r"""
         {{ ((lookup('community.general.tss', 1) | from_json).get('items') | items2dict(key_name='slug', value_name='itemValue'))['password'] }}"
   tasks:
       - ansible.builtin.debug:
-          msg: the password is {{ secret_password}}
+          msg: the password is {{ secret_password }}
 """
 
 from ansible.errors import AnsibleError, AnsibleOptionsError
