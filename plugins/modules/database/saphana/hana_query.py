@@ -134,6 +134,7 @@ def main():
             autocommit=dict(type='bool', required=False, default=True),
         ),
         required_one_of=[('query', 'filepath')],
+        supports_checkmode=False,
     )
     rc, out, err, out_raw = [0, [], "", ""]
 
