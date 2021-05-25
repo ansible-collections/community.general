@@ -100,7 +100,6 @@ EXAMPLES = r'''
 RETURN = r'''
 
 query_result:
-    type: str
     description: A JSON string of the returned values from the SQL queries.
     returned: on success
     type: list
