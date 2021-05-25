@@ -122,7 +122,7 @@ query_result:
     returned: on success
     type: list
     elements: list
-    sample: [{"Column": "Value1"},{"Column": "Value2"}]
+    sample: [[{"Column": "Value1"}, {"Column": "Value2"}]]
 
 
 '''
