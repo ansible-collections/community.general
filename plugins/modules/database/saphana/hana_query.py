@@ -100,11 +100,11 @@ EXAMPLES = r'''
 RETURN = r'''
 
 query_result:
-    description: A JSON string of the returned values from the SQL queries.
+    description: List containing results of all queries executed (one sublist for every query).
     returned: on success
     type: list
     elements: list
-    sample: [[{"Column": "Value1"}, {"Column": "Value2"}]]
+    sample: [[{"Column": "Value1"}, {"Column": "Value2"}], [{"Column": "Value1"}, {"Column": "Value2"}]]
 
 
 '''

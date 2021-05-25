@@ -8,19 +8,13 @@ __metaclass__ = type
 
 from ansible_collections.community.general.plugins.modules import hana_query
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
-from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock
+from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible.module_utils import basic
 
 
 def get_bin_path(*args, **kwargs):
     """Function to return path of hdbsql"""
     return "/usr/sap/HDB/HDB01/exe/hdbsql"
-
-
-class FakeHanaSQL(MagicMock):
-
-    def query_result(self):
-        return [{'username': 'testuser'},{'username': 'testuser2'}]
 
 
 class Testhana_query(ModuleTestCase):
@@ -62,25 +56,3 @@ class Testhana_query(ModuleTestCase):
                 hana_query.main()
                 self.assertTrue(result.exception.args[0]['changed'])
         self.assertEqual(run_command.call_count, 1)
-
-    def test_hana_query_return(self):
-        """Check that result is list."""
-        set_module_args({
-            'sid': "HDB",
-            'instance': "01",
-            'encrypted': False,
-            'host': "localhost",
-            'user': "SYSTEM",
-            'password': "1234Qwer",
-            'database': "HDB",
-            'query': "SELECT * FROM users;"
-        })
-        with self.patch_hana_query(side_effect=FakeHanaSQL) as hana_sql:
-            with patch.object(basic.AnsibleModule, 'run_command') as run_command:
-                run_command.return_value = 0, '', ''  # successful execution, no output
-                with self.assertRaises(AnsibleExitJson) as result:
-                    hana_query.module.main()
-            self.assertEqual(run_command.call_count, 1)
-            self.assertEqual(run_command.call_args, ({'sid': "HDB", 'instance': "01", 'encrypted': False, 'host': "localhost",
-                                            'user': "SYSTEM", 'password': "1234Qwer", 'database': "HDB", 'query': "SELECT * FROM users;"},))
-            self.assertEqual(result.exception.args[0]['sql']['username'], 'testuser', 'testuser2')
