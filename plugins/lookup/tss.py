@@ -103,7 +103,7 @@ EXAMPLES = r"""
                 | items2dict(key_name='slug',
                              value_name='itemValue'))['password']
             }}
-            
+
 - hosts: localhost
   vars:
       secret_password: "{{ ((lookup('community.general.tss', 1) | from_json).get('items') | items2dict(key_name='slug', value_name='itemValue'))['password'] }}"
