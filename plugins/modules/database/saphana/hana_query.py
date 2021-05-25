@@ -9,6 +9,7 @@ DOCUMENTATION = r'''
 ---
 module: hana_query
 <<<<<<< HEAD
+<<<<<<< HEAD
 short_description: Execute SQL on HANA
 =======
 
@@ -17,6 +18,9 @@ short_description: Execute SQL on HANA
 version_added: "3.2.0"
 
 >>>>>>> 4e8527be... Update plugins/modules/database/saphana/hana_query.py
+=======
+short_description: Execute SQL on HANA
+>>>>>>> 3fccb73c... fix checkmode
 description: This module executes SQL statements on HANA with hdbsql.
 options:
     sid:
@@ -76,6 +80,7 @@ options:
         type: list
         elements: str
 <<<<<<< HEAD
+<<<<<<< HEAD
 notes:
     - Does not support C(check_mode).
 =======
@@ -86,6 +91,9 @@ notes:
     notes: Does not support C(check_mode).
 
 >>>>>>> e429b48b... Update plugins/modules/database/saphana/hana_query.py
+=======
+notes: Does not support C(check_mode).
+>>>>>>> 3fccb73c... fix checkmode
 author:
     - Rainer Leber (@rainerleber)
 '''
@@ -218,10 +226,14 @@ def main():
 =======
         required_one_of=[('query', 'filepath')],
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 181d9f65... add return description, improvements
 =======
         supports_checkmode=False,
 >>>>>>> 85bcab15... Update plugins/modules/database/saphana/hana_query.py
+=======
+        supports_check_mode=False,
+>>>>>>> 3fccb73c... fix checkmode
     )
     rc, out, err, out_raw = [0, [], "", ""]
 
