@@ -104,7 +104,7 @@ query_result:
     description: A JSON string of the returned values from the SQL queries.
     returned: on success
     type: list
-    elements: dict
+    elements: list
     sample: [{"Column": "Value1"},{"Column": "Value2"}]
 
 
