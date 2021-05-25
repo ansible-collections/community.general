@@ -254,6 +254,31 @@ def get_archive_contains(format):
     return archive_contains
 
 
+def get_add_to_archive(format, filter):
+    def add_to_zip_archive(archive_file, path, archive_name):
+        try:
+            if format == 'zip':
+                if not filter(path):
+                    archive_file.write(path, archive_name)
+        except Exception as e:
+            return e
+
+        return ""
+
+    def add_to_tar_archive(archive_file, path, archive_name):
+        try:
+            if PY27:
+                archive_file.add(path, archive_name, recursive=False, filter=filter)
+            else:
+                archive_file.add(path, archive_name, recursive=False, exclude=filter)
+        except Exception as e:
+            return e
+
+        return ""
+
+    return add_to_zip_archive if format == 'zip' else add_to_tar_archive
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -307,6 +332,7 @@ def main():
 
     filter = get_filter(exclusion_patterns, fmt)
     archive_contains = get_archive_contains(fmt)
+    add_to_archive = get_add_to_archive(fmt, filter)
 
     # Only try to determine if we are working with an archive or not if we haven't set archive to true
     if not force_archive:
@@ -430,49 +456,28 @@ def main():
                                     n_fullpath = to_na(b_fullpath)
                                     n_arcname = to_native(b_match_root.sub(b'', b_fullpath), errors='surrogate_or_strict')
 
-                                    try:
-                                        if fmt == 'zip':
-                                            if not filter(n_fullpath):
-                                                arcfile.write(n_fullpath, n_arcname)
-                                        else:
-                                            if PY27:
-                                                arcfile.add(n_fullpath, n_arcname, recursive=False, filter=filter)
-                                            else:
-                                                arcfile.add(n_fullpath, n_arcname, recursive=False, exclude=filter)
-
-                                    except Exception as e:
-                                        errors.append('%s: %s' % (n_fullpath, to_native(e)))
+                                    err = add_to_archive(arcfile, n_fullpath, n_arcname)
+                                    if err:
+                                        errors.append('%s: %s' % (n_fullpath, to_native(err)))
 
                                 for b_filename in b_filenames:
                                     b_fullpath = b_dirpath + b_filename
                                     n_fullpath = to_na(b_fullpath)
                                     n_arcname = to_n(b_match_root.sub(b'', b_fullpath))
 
-                                    try:
-                                        if fmt == 'zip':
-                                            if not filter(n_fullpath):
-                                                arcfile.write(n_fullpath, n_arcname)
-                                        else:
-                                            if PY27:
-                                                arcfile.add(n_fullpath, n_arcname, recursive=False, filter=filter)
-                                            else:
-                                                arcfile.add(n_fullpath, n_arcname, recursive=False, exclude=filter)
+                                    err = add_to_archive(arcfile, n_fullpath, n_arcname)
+                                    if err:
+                                        errors.append('Adding %s: %s' % (to_native(b_path), to_native(err)))
 
-                                        if archive_contains(arcfile, n_arcname):
-                                            b_successes.append(b_fullpath)
-                                    except Exception as e:
-                                        errors.append('Adding %s: %s' % (to_native(b_path), to_native(e)))
+                                    if archive_contains(arcfile, n_arcname):
+                                        b_successes.append(b_fullpath)
                         else:
                             path = to_na(b_path)
                             arcname = to_n(b_match_root.sub(b'', b_path))
-                            if fmt == 'zip':
-                                if not filter(path):
-                                    arcfile.write(path, arcname)
-                            else:
-                                if PY27:
-                                    arcfile.add(path, arcname, recursive=False, filter=filter)
-                                else:
-                                    arcfile.add(path, arcname, recursive=False, exclude=filter)
+
+                            err = add_to_archive(arcfile, path, arcname)
+                            if err:
+                                errors.append('Adding %s: %s' % (to_native(b_path), to_native(err)))
 
                             if archive_contains(arcfile, arcname):
                                 b_successes.append(b_path)
