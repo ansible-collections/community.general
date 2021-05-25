@@ -112,8 +112,6 @@ def csv_to_list(rawcsv):
 
 
 def main():
-    global module
-
     module = AnsibleModule(
         argument_spec=dict(
             sid=dict(type='str', required=True),
