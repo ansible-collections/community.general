@@ -20,7 +20,7 @@ def get_bin_path(*args, **kwargs):
 class FakeHanaSQL(MagicMock):
 
     def query_result(self):
-        return [{'username': 'testuser'},{'username': 'testuser2'}]
+        return [[{'username': 'testuser'}]]
 
 
 class Testhana_query(ModuleTestCase):
@@ -34,15 +34,36 @@ class Testhana_query(ModuleTestCase):
         self.mock_get_bin_path.start()
         self.addCleanup(self.mock_get_bin_path.stop)  # ensure that the patching is 'undone'
 
+    def patch_hana_query(self, **kwds):
+        return patch('ansible_collections.community.general.plugins.modules.hana_query', autospec=True, **kwds)
+
     def tearDown(self):
         """Teardown."""
         super(Testhana_query, self).tearDown()
 
     def test_without_required_parameters(self):
         """Failure must occurs when all parameters are missing."""
-        with self.assertRaises(AnsibleFailJson):
-            set_module_args({})
-            self.module.main()
+        with self.patch_hana_query(side_effect=FakeHanaSQL) as hana_sql:
+            with self.assertRaises(AnsibleFailJson) as result:
+                set_module_args({})
+                self.module.main()
+            self.assertEqual(hana_sql.call_count, 1)
+            self.assertEqual(hana_sql.call_args, ({'sid': 'HDB', 'instance': '01', 'password': '1234Qwer'},))
+            self.assertEqual(result.exception.args[0]['query_result']['username'], 'testuser')
+
+    def test_required_parameters(self):
+        """Check that result is changed."""
+        with self.patch_hana_query(side_effect=FakeHanaSQL) as hana_sql:
+            with self.assertRaises(AnsibleFailJson) as result:
+                set_module_args({
+                    'sid': "HDB",
+                    'instance': "01",
+                    'password': "1234Qwer",
+                })
+                self.module.main()
+            self.assertEqual(hana_sql.call_count, 1)
+            self.assertEqual(hana_sql.call_args, ({'sid': 'HDB', 'instance': '01', 'password': '1234Qwer'},))
+            self.assertEqual(result.exception.args[0]['query_result']['username'], 'testuser')
 
     def test_hana_query(self):
         """Check that result is changed."""
@@ -62,25 +83,3 @@ class Testhana_query(ModuleTestCase):
                 hana_query.main()
                 self.assertTrue(result.exception.args[0]['changed'])
         self.assertEqual(run_command.call_count, 1)
-
-    def test_hana_query_return(self):
-        """Check that result is list."""
-        set_module_args({
-            'sid': "HDB",
-            'instance': "01",
-            'encrypted': False,
-            'host': "localhost",
-            'user': "SYSTEM",
-            'password': "1234Qwer",
-            'database': "HDB",
-            'query': "SELECT * FROM users;"
-        })
-        with self.patch_hana_query(side_effect=FakeHanaSQL) as hana_sql:
-            with patch.object(basic.AnsibleModule, 'run_command') as run_command:
-                run_command.return_value = 0, '', ''  # successful execution, no output
-                with self.assertRaises(AnsibleExitJson) as result:
-                    hana_query.module.main()
-            self.assertEqual(run_command.call_count, 1)
-            self.assertEqual(run_command.call_args, ({'sid': "HDB", 'instance': "01", 'encrypted': False, 'host': "localhost",
-                                            'user': "SYSTEM", 'password': "1234Qwer", 'database': "HDB", 'query': "SELECT * FROM users;"},))
-            self.assertEqual(result.exception.args[0]['sql']['username'], 'testuser', 'testuser2')
