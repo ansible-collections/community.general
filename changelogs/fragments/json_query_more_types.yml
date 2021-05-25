@@ -1,0 +1,3 @@
+---
+bugfixes:
+  - json_query filter plugin - avoid 'unknown type' errors for more Ansible internal types (https://github.com/ansible-collections/community.general/pull/2607).
