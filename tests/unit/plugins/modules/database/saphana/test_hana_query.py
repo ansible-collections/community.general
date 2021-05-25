@@ -17,12 +17,6 @@ def get_bin_path(*args, **kwargs):
     return "/usr/sap/HDB/HDB01/exe/hdbsql"
 
 
-class FakeHanaSQL(MagicMock):
-
-    def query_result(self):
-        return [[{'username': 'testuser'}]]
-
-
 class Testhana_query(ModuleTestCase):
     """Main class for testing hana_query module."""
 
@@ -43,27 +37,9 @@ class Testhana_query(ModuleTestCase):
 
     def test_without_required_parameters(self):
         """Failure must occurs when all parameters are missing."""
-        with self.patch_hana_query(side_effect=FakeHanaSQL) as hana_sql:
-            with self.assertRaises(AnsibleFailJson) as result:
-                set_module_args({})
-                self.module.main()
-            self.assertEqual(hana_sql.call_count, 0)
-            self.assertEqual(hana_sql.call_args, ({'sid': 'HDB', 'instance': '01', 'password': '1234Qwer'},))
-            self.assertEqual(result.exception.args[0]['query_result']['username'], 'testuser')
-
-    def test_required_parameters(self):
-        """Check that result is changed."""
-        with self.patch_hana_query(side_effect=FakeHanaSQL) as hana_sql:
-            with self.assertRaises(AnsibleFailJson) as result:
-                set_module_args({
-                    'sid': "HDB",
-                    'instance': "01",
-                    'password': "1234Qwer",
-                })
-                self.module.main()
-            self.assertEqual(hana_sql.call_count, 0)
-            self.assertEqual(hana_sql.call_args, ({'sid': 'HDB', 'instance': '01', 'password': '1234Qwer'},))
-            self.assertEqual(result.exception.args[0]['query_result']['username'], 'testuser')
+        with self.assertRaises(AnsibleFailJson):
+            set_module_args({})
+            self.module.main()
 
     def test_hana_query(self):
         """Check that result is changed."""
