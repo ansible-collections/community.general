@@ -120,13 +120,15 @@ def downloadSAPCAR(binary_path):
     bin_path = None
     # download sapcar binary if url is provided otherwise path is returned
     if binary_path is not None:
-        if not os.path.isfile(binary_path):
+        try:
             with open_url(binary_path) as response:
                 with open("/tmp/sapcar", 'wb') as out_file:
                     data = response.read()
                     out_file.write(data)
-            os.chmod("/tmp/sapcar", 755)
+            os.chmod("/tmp/sapcar", 0o755)
             bin_path = "/tmp/sapcar"
+        except Exception:
+            bin_path = binary_path
     return bin_path
 
 
@@ -185,17 +187,13 @@ def main():
         if not os.path.exists(dest):
             os.makedirs(dest, 0o755)
 
-    try:
-        if bin_path is not None:
-            command = [bin_path]
-        else:
-            try:
-                command = [module.get_bin_path('/tmp/sapcar', required=True)]
-            except Exception:
-                command = [module.get_bin_path('sapcar', required=True)]
-    except Exception:
-        module.fail_json(msg='SAPCAR not found {0}. \r\nSTDOUT: {1}\r\n\r\nSTDERR: {2}'.format(
-            rc, out, err))
+    if bin_path is not None:
+        command = [module.get_bin_path(bin_path, required=True)]
+    else:
+        try:
+            command = [module.get_bin_path('/tmp/sapcar' or '/tmp/SAPCAR' , required=True)]
+        except Exception:
+            command = [module.get_bin_path('sapcar', required=True)]
 
     present = checkifPresent(command[0], path, dest, signature, manifest)
 
