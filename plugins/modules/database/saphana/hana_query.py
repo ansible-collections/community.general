@@ -104,6 +104,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six import StringIO
 from ansible.module_utils._text import to_native
 
+
 def csv_to_list(rawcsv):
     lines = rawcsv[:rawcsv.rfind('\n')]
     reader_raw = csv.DictReader(StringIO(lines))
