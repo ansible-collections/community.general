@@ -81,6 +81,7 @@ options:
         elements: str
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 notes:
     - Does not support C(check_mode).
 =======
@@ -94,6 +95,10 @@ notes:
 =======
 notes: Does not support C(check_mode).
 >>>>>>> 3fccb73c... fix checkmode
+=======
+notes: 
+  - Does not support C(check_mode).
+>>>>>>> 0f5a841c... change notes
 author:
     - Rainer Leber (@rainerleber)
 '''
