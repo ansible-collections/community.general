@@ -82,6 +82,7 @@ options:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 notes:
     - Does not support C(check_mode).
 =======
@@ -101,6 +102,9 @@ notes:
   - Does not support C(check_mode).
 >>>>>>> 0f5a841c... change notes
 =======
+=======
+notes:
+>>>>>>> ec16e697... remove white space
     - Does not support C(check_mode).
 >>>>>>> d286ab2d... change
 author:
