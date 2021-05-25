@@ -150,8 +150,8 @@ def main():
 
     try:
         command = [module.get_bin_path(bin_path, required=True)]
-    except Exception:
-        module.fail_json(msg='hdbsql not found at "{0}". Please check SID and instance number.'.format(bin_path))
+    except Exception as e:
+        module.fail_json(msg='Failed to find hdbsql at the expected path "{0}". Please check SID and instance number: "{1}"'.format(bin_path, to_native(e)))
 
     if encrypted is True:
         command.extend(['-attemptencrypt'])
