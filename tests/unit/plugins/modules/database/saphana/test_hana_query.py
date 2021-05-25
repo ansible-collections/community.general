@@ -47,7 +47,7 @@ class Testhana_query(ModuleTestCase):
             with self.assertRaises(AnsibleFailJson) as result:
                 set_module_args({})
                 self.module.main()
-            self.assertEqual(hana_sql.call_count, 1)
+            self.assertEqual(hana_sql.call_count, 0)
             self.assertEqual(hana_sql.call_args, ({'sid': 'HDB', 'instance': '01', 'password': '1234Qwer'},))
             self.assertEqual(result.exception.args[0]['query_result']['username'], 'testuser')
 
@@ -61,7 +61,7 @@ class Testhana_query(ModuleTestCase):
                     'password': "1234Qwer",
                 })
                 self.module.main()
-            self.assertEqual(hana_sql.call_count, 1)
+            self.assertEqual(hana_sql.call_count, 0)
             self.assertEqual(hana_sql.call_args, ({'sid': 'HDB', 'instance': '01', 'password': '1234Qwer'},))
             self.assertEqual(result.exception.args[0]['query_result']['username'], 'testuser')
 
