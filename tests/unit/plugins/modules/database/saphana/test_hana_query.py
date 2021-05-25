@@ -57,12 +57,6 @@ def get_bin_path(*args, **kwargs):
     return "/usr/sap/HDB/HDB01/exe/hdbsql"
 
 
-class FakeHanaSQL(MagicMock):
-
-    def query_result(self):
-        return [[{'username': 'testuser'}]]
-
-
 class Testhana_query(ModuleTestCase):
     """Main class for testing hana_query module."""
 
@@ -94,6 +88,7 @@ class Testhana_query(ModuleTestCase):
 
     def test_without_required_parameters(self):
         """Failure must occurs when all parameters are missing."""
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 61aafaec... change test
         with self.assertRaises(AnsibleFailJson):
@@ -129,6 +124,11 @@ class Testhana_query(ModuleTestCase):
     def test_hana_query(self):
         """Check that result is changed."""
 =======
+=======
+        with self.assertRaises(AnsibleFailJson):
+            set_module_args({})
+            self.module.main()
+>>>>>>> e94be38d... change test
 
 =======
 >>>>>>> 2d09b71d... change test
