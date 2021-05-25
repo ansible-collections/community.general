@@ -184,6 +184,7 @@ from ansible.module_utils._text import to_native
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 def csv_to_list(rawcsv):
 =======
 def csv_to_json(rawcsv):
@@ -197,6 +198,9 @@ def csv_to_json(rawcsv):
     reader = [dict((k, v.strip()) for k, v in row.items()) for row in reader_raw]
     return list(reader)
 =======
+=======
+
+>>>>>>> 04d97cb6... add space
 def csv_to_list(rawcsv):
     lines = rawcsv[:rawcsv.rfind('\n')]
     reader_raw = csv.DictReader(StringIO(lines))
