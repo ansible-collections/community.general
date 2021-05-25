@@ -55,7 +55,7 @@ options:
         type: list
         elements: str
 notes: 
-  - Does not support C(check_mode).
+    - Does not support C(check_mode).
 author:
     - Rainer Leber (@rainerleber)
 '''
