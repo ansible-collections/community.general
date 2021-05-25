@@ -48,13 +48,18 @@ from ansible_collections.community.general.tests.unit.compat.mock import patch
 >>>>>>> 61aafaec... change test
 from ansible_collections.community.general.plugins.modules import hana_query
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
-from ansible_collections.community.general.tests.unit.compat.mock import patch
+from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock
 from ansible.module_utils import basic
 
 
 def get_bin_path(*args, **kwargs):
     """Function to return path of hdbsql"""
     return "/usr/sap/HDB/HDB01/exe/hdbsql"
+
+class FakeHanaSQL(MagicMock):
+
+    def query_result(self):
+        return [{'username': 'testuser'},{'username': 'testuser2'}]
 
 
 class Testhana_query(ModuleTestCase):
@@ -114,6 +119,7 @@ class Testhana_query(ModuleTestCase):
             'password': "1234Qwer",
             'database': "HDB",
 <<<<<<< HEAD
+<<<<<<< HEAD
             'query': "SELECT * FROM users;"
         })
         with patch.object(basic.AnsibleModule, 'run_command') as run_command:
@@ -124,6 +130,9 @@ class Testhana_query(ModuleTestCase):
         self.assertEqual(run_command.call_count, 1)
 =======
             'query': "SELECT * FROM users:"
+=======
+            'query': "SELECT * FROM users;"
+>>>>>>> c004c054... extent test
         })
         with patch.object(basic.AnsibleModule, 'run_command') as run_command:
             run_command.return_value = 0, '', ''  # successful execution, no output
@@ -147,4 +156,28 @@ class Testhana_query(ModuleTestCase):
 >>>>>>> 1abdfb34... change test
 =======
         self.assertEqual(run_command.call_count, 1)
+<<<<<<< HEAD
 >>>>>>> 442b930e... change test
+=======
+
+    def test_hana_query_return(self):
+        """Check that result is list."""
+        set_module_args({
+            'sid': "HDB",
+            'instance': "01",
+            'encrypted': False,
+            'host': "localhost",
+            'user': "SYSTEM",
+            'password': "1234Qwer",
+            'database': "HDB",
+            'query': "SELECT * FROM users;"
+        })
+        with self.patch_hana_query(side_effect=FakeHanaSQL) as hana_sql:
+            with patch.object(basic.AnsibleModule, 'run_command') as run_command:
+                run_command.return_value = 0, '', ''  # successful execution, no output
+                with self.assertRaises(AnsibleExitJson) as result:
+                    hana_query.module.main()
+            self.assertEqual(run_command.call_count, 1)
+            self.assertEqual(run_command.call_args, ({ 'sid': "HDB", 'instance': "01", 'encrypted': False, 'host': "localhost", 'user': "SYSTEM", 'password': "1234Qwer", 'database': "HDB", 'query': "SELECT * FROM users;"},))
+            self.assertEqual(result.exception.args[0]['sql']['username'], 'testuser','testuser2')
+>>>>>>> c004c054... extent test
