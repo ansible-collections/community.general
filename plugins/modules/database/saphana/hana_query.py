@@ -9,7 +9,7 @@ DOCUMENTATION = r'''
 ---
 module: hana_query
 
-short_description: Execute SQL on HANA.
+short_description: Execute SQL on HANA
 
 version_added: "3.2.0"
 
