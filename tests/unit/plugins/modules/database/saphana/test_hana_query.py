@@ -8,7 +8,7 @@ __metaclass__ = type
 
 from ansible_collections.community.general.plugins.modules import hana_query
 from ansible_collections.community.general.tests.unit.plugins.modules.utils import AnsibleExitJson, AnsibleFailJson, ModuleTestCase, set_module_args
-from ansible_collections.community.general.tests.unit.compat.mock import patch, MagicMock
+from ansible_collections.community.general.tests.unit.compat.mock import patch
 from ansible.module_utils import basic
 
 
@@ -27,9 +27,6 @@ class Testhana_query(ModuleTestCase):
         self.mock_get_bin_path = patch.object(basic.AnsibleModule, 'get_bin_path', get_bin_path)
         self.mock_get_bin_path.start()
         self.addCleanup(self.mock_get_bin_path.stop)  # ensure that the patching is 'undone'
-
-    def patch_hana_query(self, **kwds):
-        return patch('ansible_collections.community.general.plugins.modules.hana_query', autospec=True, **kwds)
 
     def tearDown(self):
         """Teardown."""
