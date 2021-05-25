@@ -171,6 +171,7 @@ import shutil
 import tarfile
 import zipfile
 from fnmatch import fnmatch
+from sys import version_info
 from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -193,6 +194,8 @@ else:
     except ImportError:
         LZMA_IMP_ERR = format_exc()
         HAS_LZMA = False
+
+PY27 = version_info[0:2] >= (2, 7)
 
 
 def to_b(s):
@@ -233,7 +236,7 @@ def get_filter(exclusion_patterns, format):
     def tar_filter(tarinfo):
         return None if matches_exclusion_patterns(tarinfo.name, exclusion_patterns) else tarinfo
 
-    return zip_filter if format == 'zip' else tar_filter
+    return zip_filter if format == 'zip' or not PY27 else tar_filter
 
 
 def get_archive_contains(format):
@@ -432,7 +435,10 @@ def main():
                                             if not filter(n_fullpath):
                                                 arcfile.write(n_fullpath, n_arcname)
                                         else:
-                                            arcfile.add(n_fullpath, n_arcname, recursive=False, filter=filter)
+                                            if PY27:
+                                                arcfile.add(n_fullpath, n_arcname, recursive=False, filter=filter)
+                                            else:
+                                                arcfile.add(n_fullpath, n_arcname, recursive=False, exclude=filter)
 
                                     except Exception as e:
                                         errors.append('%s: %s' % (n_fullpath, to_native(e)))
@@ -447,7 +453,10 @@ def main():
                                             if not filter(n_fullpath):
                                                 arcfile.write(n_fullpath, n_arcname)
                                         else:
-                                            arcfile.add(n_fullpath, n_arcname, recursive=False, filter=filter)
+                                            if PY27:
+                                                arcfile.add(n_fullpath, n_arcname, recursive=False, filter=filter)
+                                            else:
+                                                arcfile.add(n_fullpath, n_arcname, recursive=False, exclude=filter)
 
                                         if archive_contains(arcfile, n_arcname):
                                             b_successes.append(b_fullpath)
@@ -460,7 +469,10 @@ def main():
                                 if not filter(path):
                                     arcfile.write(path, arcname)
                             else:
-                                arcfile.add(path, arcname, recursive=False, filter=filter)
+                                if PY27:
+                                    arcfile.add(path, arcname, recursive=False, filter=filter)
+                                else:
+                                    arcfile.add(path, arcname, recursive=False, exclude=filter)
 
                             if archive_contains(arcfile, arcname):
                                 b_successes.append(b_path)
