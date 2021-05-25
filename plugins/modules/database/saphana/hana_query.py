@@ -94,8 +94,6 @@ EXAMPLES = r'''
     - /tmp/HANA_CPU_UtilizationPerCore_2.00.020+.txt
     - /tmp/HANA.txt
     host: "localhost"
-
-
 '''
 
 RETURN = r'''
