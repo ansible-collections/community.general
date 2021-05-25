@@ -8,7 +8,15 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: hana_query
+<<<<<<< HEAD
 short_description: Execute SQL on HANA
+=======
+
+short_description: Execute SQL on HANA
+
+version_added: "3.2.0"
+
+>>>>>>> 4e8527be... Update plugins/modules/database/saphana/hana_query.py
 description: This module executes SQL statements on HANA with hdbsql.
 options:
     sid:
@@ -54,6 +62,7 @@ options:
         - SQL query to run.
         - Must be a string or list containing strings. Please note that if you supply a string, it will be split by commas (C(,)) to a list.
           It is better to supply a one-element list instead to avoid mangled input.
+<<<<<<< HEAD
 =======
         - SQL query to run. Multiple queries can be passed using YAML list syntax.
 =======
@@ -62,6 +71,8 @@ options:
         - Must be a string or list containing strings. Please note that if you supply a string, it will be split by commas (C(,)) to a list.
           It's better to supply a one-element list instead to avoid mangled input.
 >>>>>>> 098ad042... Update plugins/modules/database/saphana/hana_query.py
+=======
+>>>>>>> 2a56c343... Update plugins/modules/database/saphana/hana_query.py
         type: list
         elements: str
 <<<<<<< HEAD
@@ -69,7 +80,12 @@ notes:
     - Does not support C(check_mode).
 =======
 
+<<<<<<< HEAD
 >>>>>>> 5173c975... change documentation
+=======
+    notes: Does not support C(check_mode).
+
+>>>>>>> e429b48b... Update plugins/modules/database/saphana/hana_query.py
 author:
     - Rainer Leber (@rainerleber)
 '''
@@ -102,6 +118,7 @@ EXAMPLES = r'''
     - /tmp/HANA_CPU_UtilizationPerCore_2.00.020+.txt
     - /tmp/HANA.txt
     host: "localhost"
+<<<<<<< HEAD
 '''
 
 RETURN = r'''
@@ -111,20 +128,19 @@ query_result:
     type: list
     elements: list
     sample: [[{"Column": "Value1"}, {"Column": "Value2"}], [{"Column": "Value1"}, {"Column": "Value2"}]]
+=======
+>>>>>>> dd12b922... Update plugins/modules/database/saphana/hana_query.py
 '''
 
 <<<<<<< HEAD
 =======
 RETURN = r'''
-
 query_result:
     description: List containing results of all queries executed (one sublist for every query).
     returned: on success
     type: list
     elements: list
     sample: [[{"Column": "Value1"}, {"Column": "Value2"}], [{"Column": "Value1"}, {"Column": "Value2"}]]
-
-
 '''
 
 <<<<<<< HEAD
@@ -201,7 +217,11 @@ def main():
 >>>>>>> b694a498... Update plugins/modules/database/saphana/hana_query.py
 =======
         required_one_of=[('query', 'filepath')],
+<<<<<<< HEAD
 >>>>>>> 181d9f65... add return description, improvements
+=======
+        supports_checkmode=False,
+>>>>>>> 85bcab15... Update plugins/modules/database/saphana/hana_query.py
     )
     rc, out, err, out_raw = [0, [], "", ""]
 
