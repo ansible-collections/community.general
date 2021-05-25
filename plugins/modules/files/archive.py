@@ -43,6 +43,13 @@ options:
       - Remote absolute path, glob, or list of paths or globs for the file or files to exclude from I(path) list and glob expansion.
     type: list
     elements: path
+  exclusion_patterns:
+    description:
+      - Glob style patterns to exclude files or directories from the resulting archive.
+      - This differs from I(exclude_path) which applies only to the source paths from I(path).
+    type: list
+    elements: path
+    version_added: 3.2.0
   force_archive:
     description:
       - Allows you to force the module to treat this as an archive even if only a single file is specified.
@@ -163,6 +170,7 @@ import re
 import shutil
 import tarfile
 import zipfile
+from fnmatch import fnmatch
 from traceback import format_exc
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -214,6 +222,35 @@ def expand_paths(paths):
     return expanded_path, is_globby
 
 
+def matches_exclusion_patterns(path, exclusion_patterns):
+    return any(map(lambda p: fnmatch(path, p), exclusion_patterns))
+
+
+def get_filter(exclusion_patterns, format):
+    def zip_filter(path):
+        return matches_exclusion_patterns(path, exclusion_patterns)
+
+    def tar_filter(tarinfo):
+        return None if matches_exclusion_patterns(tarinfo.name, exclusion_patterns) else tarinfo
+
+    return zip_filter if format == 'zip' else tar_filter
+
+
+def get_archive_contains(format):
+    def archive_contains(archive, name):
+        try:
+            if format == 'zip':
+                archive.getinfo(name)
+            else:
+                archive.getmember(name)
+        except KeyError:
+            return False
+
+        return True
+
+    return archive_contains
+
+
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -221,6 +258,7 @@ def main():
             format=dict(type='str', default='gz', choices=['bz2', 'gz', 'tar', 'xz', 'zip']),
             dest=dict(type='path'),
             exclude_path=dict(type='list', elements='path'),
+            exclusion_patterns=dict(type='list', elements='path'),
             force_archive=dict(type='bool', default=False),
             remove=dict(type='bool', default=False),
         ),
@@ -242,6 +280,8 @@ def main():
     changed = False
     state = 'absent'
 
+    exclusion_patterns = params['exclusion_patterns'] if params['exclusion_patterns'] is not None else []
+
     # Simple or archive file compression (inapplicable with 'zip' since it's always an archive)
     b_successes = []
 
@@ -261,6 +301,9 @@ def main():
 
     # Only attempt to expand the exclude paths if it exists
     b_expanded_exclude_paths = expand_paths(exclude_paths)[0] if exclude_paths else []
+
+    filter = get_filter(exclusion_patterns, fmt)
+    archive_contains = get_archive_contains(fmt)
 
     # Only try to determine if we are working with an archive or not if we haven't set archive to true
     if not force_archive:
@@ -386,9 +429,10 @@ def main():
 
                                     try:
                                         if fmt == 'zip':
-                                            arcfile.write(n_fullpath, n_arcname)
+                                            if not filter(n_fullpath):
+                                                arcfile.write(n_fullpath, n_arcname)
                                         else:
-                                            arcfile.add(n_fullpath, n_arcname, recursive=False)
+                                            arcfile.add(n_fullpath, n_arcname, recursive=False, filter=filter)
 
                                     except Exception as e:
                                         errors.append('%s: %s' % (n_fullpath, to_native(e)))
@@ -400,22 +444,26 @@ def main():
 
                                     try:
                                         if fmt == 'zip':
-                                            arcfile.write(n_fullpath, n_arcname)
+                                            if not filter(n_fullpath):
+                                                arcfile.write(n_fullpath, n_arcname)
                                         else:
-                                            arcfile.add(n_fullpath, n_arcname, recursive=False)
+                                            arcfile.add(n_fullpath, n_arcname, recursive=False, filter=filter)
 
-                                        b_successes.append(b_fullpath)
+                                        if archive_contains(arcfile, n_arcname):
+                                            b_successes.append(b_fullpath)
                                     except Exception as e:
                                         errors.append('Adding %s: %s' % (to_native(b_path), to_native(e)))
                         else:
                             path = to_na(b_path)
                             arcname = to_n(b_match_root.sub(b'', b_path))
                             if fmt == 'zip':
-                                arcfile.write(path, arcname)
+                                if not filter(path):
+                                    arcfile.write(path, arcname)
                             else:
-                                arcfile.add(path, arcname, recursive=False)
+                                arcfile.add(path, arcname, recursive=False, filter=filter)
 
-                            b_successes.append(b_path)
+                            if archive_contains(arcfile, arcname):
+                                b_successes.append(b_path)
 
                 except Exception as e:
                     expanded_fmt = 'zip' if fmt == 'zip' else ('tar.' + fmt)
