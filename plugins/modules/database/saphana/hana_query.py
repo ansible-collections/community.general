@@ -97,7 +97,6 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-
 query_result:
     description: List containing results of all queries executed (one sublist for every query).
     returned: on success
