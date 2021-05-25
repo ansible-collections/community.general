@@ -11,6 +11,9 @@ There you can find feature ideas to implement, reports about bugs to solve, or s
 Also somebody may already have started discussing or working on implementing the same or a similar idea,
 so you can cooperate to create a better solution together.
 
+* If you are interested in starting with an easy issue, look for [issues with an `easyfix` label](https://github.com/ansible-collections/community.general/labels/easyfix).
+* Often issues that are waiting for contributors to pick up have [the `waiting_on_contributor` label](https://github.com/ansible-collections/community.general/labels/waiting_on_contributor).
+
 ## Open pull requests
 
 Look through currently [open pull requests](https://github.com/ansible-collections/community.general/pulls).
