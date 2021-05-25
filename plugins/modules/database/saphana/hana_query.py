@@ -8,13 +8,8 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: hana_query
-
 short_description: Execute SQL on HANA
-
-version_added: "3.2.0"
-
 description: This module executes SQL statements on HANA with hdbsql.
-
 options:
     sid:
         description: The system ID.
@@ -59,9 +54,7 @@ options:
           It is better to supply a one-element list instead to avoid mangled input.
         type: list
         elements: str
-
-    notes: Does not support C(check_mode).
-
+notes: Does not support C(check_mode).
 author:
     - Rainer Leber (@rainerleber)
 '''
@@ -134,7 +127,7 @@ def main():
             autocommit=dict(type='bool', required=False, default=True),
         ),
         required_one_of=[('query', 'filepath')],
-        supports_checkmode=False,
+        supports_check_mode=False,
     )
     rc, out, err, out_raw = [0, [], "", ""]
 
