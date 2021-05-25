@@ -191,7 +191,7 @@ def main():
         command = [module.get_bin_path(bin_path, required=True)]
     else:
         try:
-            command = [module.get_bin_path('/tmp/sapcar' or '/tmp/SAPCAR' , required=True)]
+            command = [module.get_bin_path('/tmp/sapcar' or '/tmp/SAPCAR', required=True)]
         except Exception:
             command = [module.get_bin_path('sapcar', required=True)]
 
