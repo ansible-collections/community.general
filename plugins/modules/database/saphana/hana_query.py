@@ -97,8 +97,12 @@ notes: Does not support C(check_mode).
 >>>>>>> 3fccb73c... fix checkmode
 =======
 notes: 
+<<<<<<< HEAD
   - Does not support C(check_mode).
 >>>>>>> 0f5a841c... change notes
+=======
+    - Does not support C(check_mode).
+>>>>>>> d286ab2d... change
 author:
     - Rainer Leber (@rainerleber)
 '''
