@@ -118,7 +118,7 @@ query_result:
 RETURN = r'''
 
 query_result:
-    description: A JSON string of the returned values from the SQL queries.
+    description: List containing results of all queries executed (one sublist for every query).
     returned: on success
     type: list
     elements: list
