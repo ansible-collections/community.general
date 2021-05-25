@@ -8,13 +8,8 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: hana_query
-
-short_description: Execute SQL on HANA.
-
-version_added: "3.2.0"
-
+short_description: Execute SQL on HANA
 description: This module executes SQL statements on HANA with hdbsql.
-
 options:
     sid:
         description: The system ID.
@@ -56,16 +51,15 @@ options:
         description:
         - SQL query to run.
         - Must be a string or list containing strings. Please note that if you supply a string, it will be split by commas (C(,)) to a list.
-          It's better to supply a one-element list instead to avoid mangled input.
+          It is better to supply a one-element list instead to avoid mangled input.
         type: list
         elements: str
-
+notes: Does not support C(check_mode).
 author:
     - Rainer Leber (@rainerleber)
 '''
 
 EXAMPLES = r'''
-
 - name: Simple select query
   community.general.hana_query:
     sid: "hdb"
@@ -93,20 +87,15 @@ EXAMPLES = r'''
     - /tmp/HANA_CPU_UtilizationPerCore_2.00.020+.txt
     - /tmp/HANA.txt
     host: "localhost"
-
-
 '''
 
 RETURN = r'''
-
 query_result:
     description: List containing results of all queries executed (one sublist for every query).
     returned: on success
     type: list
     elements: list
     sample: [[{"Column": "Value1"}, {"Column": "Value2"}], [{"Column": "Value1"}, {"Column": "Value2"}]]
-
-
 '''
 
 import csv
@@ -138,6 +127,7 @@ def main():
             autocommit=dict(type='bool', required=False, default=True),
         ),
         required_one_of=[('query', 'filepath')],
+        supports_check_mode=False,
     )
     rc, out, err, out_raw = [0, [], "", ""]
 
