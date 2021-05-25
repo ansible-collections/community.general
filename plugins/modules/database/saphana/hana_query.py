@@ -65,7 +65,6 @@ author:
 '''
 
 EXAMPLES = r'''
-
 - name: Simple select query
   community.general.hana_query:
     sid: "hdb"
