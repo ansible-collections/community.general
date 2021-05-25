@@ -16,6 +16,7 @@ def get_bin_path(*args, **kwargs):
     """Function to return path of hdbsql"""
     return "/usr/sap/HDB/HDB01/exe/hdbsql"
 
+
 class FakeHanaSQL(MagicMock):
 
     def query_result(self):
@@ -80,5 +81,6 @@ class Testhana_query(ModuleTestCase):
                 with self.assertRaises(AnsibleExitJson) as result:
                     hana_query.module.main()
             self.assertEqual(run_command.call_count, 1)
-            self.assertEqual(run_command.call_args, ({ 'sid': "HDB", 'instance': "01", 'encrypted': False, 'host': "localhost", 'user': "SYSTEM", 'password': "1234Qwer", 'database': "HDB", 'query': "SELECT * FROM users;"},))
-            self.assertEqual(result.exception.args[0]['sql']['username'], 'testuser','testuser2')
+            self.assertEqual(run_command.call_args, ({'sid': "HDB", 'instance': "01", 'encrypted': False, 'host': "localhost",
+                                            'user': "SYSTEM", 'password': "1234Qwer", 'database': "HDB", 'query': "SELECT * FROM users;"},))
+            self.assertEqual(result.exception.args[0]['sql']['username'], 'testuser', 'testuser2')
