@@ -119,7 +119,7 @@ def csv_to_list(rawcsv):
     lines = rawcsv[:rawcsv.rfind('\n')]
     reader_raw = csv.DictReader(StringIO(lines))
     reader = [dict((k, v.strip()) for k, v in row.items()) for row in reader_raw]
-    return reader
+    return list(reader)
 
 
 def main():
