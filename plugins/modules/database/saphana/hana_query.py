@@ -54,7 +54,8 @@ options:
           It is better to supply a one-element list instead to avoid mangled input.
         type: list
         elements: str
-notes: Does not support C(check_mode).
+notes:
+    - Does not support C(check_mode).
 author:
     - Rainer Leber (@rainerleber)
 '''
@@ -101,6 +102,7 @@ query_result:
 import csv
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six import StringIO
+from ansible.module_utils._text import to_native
 
 
 def csv_to_list(rawcsv):
@@ -111,8 +113,6 @@ def csv_to_list(rawcsv):
 
 
 def main():
-    global module
-
     module = AnsibleModule(
         argument_spec=dict(
             sid=dict(type='str', required=True),
@@ -149,8 +149,8 @@ def main():
 
     try:
         command = [module.get_bin_path(bin_path, required=True)]
-    except Exception:
-        module.fail_json(msg='hdbsql not found at "{0}". Please check SID and instance number.'.format(bin_path))
+    except Exception as e:
+        module.fail_json(msg='Failed to find hdbsql at the expected path "{0}". Please check SID and instance number: "{1}"'.format(bin_path, to_native(e)))
 
     if encrypted is True:
         command.extend(['-attemptencrypt'])
