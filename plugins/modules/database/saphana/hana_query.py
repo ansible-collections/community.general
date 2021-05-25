@@ -173,10 +173,14 @@ import csv
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.six import StringIO
 <<<<<<< HEAD
+<<<<<<< HEAD
 from ansible.module_utils._text import to_native
 =======
 >>>>>>> 2421789e... change StringIO module
 
+=======
+from ansible.module_utils._text import to_native
+>>>>>>> 879579ba... add module
 
 <<<<<<< HEAD
 <<<<<<< HEAD
