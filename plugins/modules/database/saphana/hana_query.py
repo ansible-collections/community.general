@@ -277,6 +277,7 @@ def main():
     try:
         command = [module.get_bin_path(bin_path, required=True)]
 <<<<<<< HEAD
+<<<<<<< HEAD
     except Exception as e:
         module.fail_json(msg='Failed to find hdbsql at the expected path "{0}". Please check SID and instance number: "{1}"'.format(bin_path, to_native(e)))
 
@@ -314,6 +315,10 @@ def main():
 =======
     except Exception:
         module.fail_json(msg='hdbsql not found at "{0}". Please check SID and instance number.'.format(bin_path))
+=======
+    except Exception as e:
+        module.fail_json(msg='Failed to find hdbsql at the expected path "{0}". Please check SID and instance number: "{1}"'.format(bin_path, to_native(e)))
+>>>>>>> 2a19428e... Update plugins/modules/database/saphana/hana_query.py
 
 <<<<<<< HEAD
 >>>>>>> 8358dba9... change hana_query add test
