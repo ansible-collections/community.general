@@ -1,31 +1,5 @@
 ---
 requires_ansible: '>=2.9.10'
-action_groups:
-  ovirt:
-  - ovirt_affinity_label_facts
-  - ovirt_api_facts
-  - ovirt_cluster_facts
-  - ovirt_datacenter_facts
-  - ovirt_disk_facts
-  - ovirt_event_facts
-  - ovirt_external_provider_facts
-  - ovirt_group_facts
-  - ovirt_host_facts
-  - ovirt_host_storage_facts
-  - ovirt_network_facts
-  - ovirt_nic_facts
-  - ovirt_permission_facts
-  - ovirt_quota_facts
-  - ovirt_scheduling_policy_facts
-  - ovirt_snapshot_facts
-  - ovirt_storage_domain_facts
-  - ovirt_storage_template_facts
-  - ovirt_storage_vm_facts
-  - ovirt_tag_facts
-  - ovirt_template_facts
-  - ovirt_user_facts
-  - ovirt_vm_facts
-  - ovirt_vmpool_facts
 plugin_routing:
   connection:
     docker:
