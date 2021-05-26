@@ -9,6 +9,7 @@ DOCUMENTATION = r'''
 ---
 module: hana_query
 short_description: Execute SQL on HANA
+version_added: 3.2.0
 description: This module executes SQL statements on HANA with hdbsql.
 options:
     sid:
@@ -180,7 +181,7 @@ def main():
             out.append(csv_to_list(out_raw))
     changed = True
 
-    module.exit_json(changed=changed, message=rc, query_result=out, stderr=err)
+    module.exit_json(changed=changed, rc=rc, query_result=out, stderr=err)
 
 
 if __name__ == '__main__':
