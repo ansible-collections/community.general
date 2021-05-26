@@ -50,6 +50,8 @@ export COLLECTIONS_PATH=$(pwd)/collections:$COLLECTIONS_PATH
 
 You can find more information in the [developer guide for collections](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#contributing-to-collections), and in the [Ansible Community Guide](https://docs.ansible.com/ansible/latest/community/index.html).
 
+Also for some notes specific to this collection see [our CONTRIBUTING documentation](https://github.com/ansible-collections/community.general/blob/main/CONTRIBUTING.md).
+
 ### Running tests
 
 See [here](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#testing-collections).
